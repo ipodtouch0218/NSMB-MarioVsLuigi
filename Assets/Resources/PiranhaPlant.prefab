@@ -277,7 +277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dead: 0
-  playerDetectSize: {x: 2, y: 2}
+  playerDetectSize: {x: 1, y: 1.5}
   popupTimerRequirement: 5.5
   popupTimer: 0
 --- !u!114 &3416259037201337410

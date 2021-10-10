@@ -51,9 +51,7 @@ public class PlayerController : MonoBehaviourPun {
         starDirection = Random.value < 0.5;
         PlayerInput input = GetComponent<PlayerInput>();
         input.enabled = !photonView || photonView.IsMine;
-    }
 
-    void Start() {
         if (photonView) {
             playerId = System.Array.IndexOf(PhotonNetwork.PlayerList, photonView.Owner);
             if (!photonView.IsMine) {
@@ -62,6 +60,7 @@ public class PlayerController : MonoBehaviourPun {
             }
         }
     }
+
 
     void HandleGroundCollision() {
         if (!photonView.IsMine) {
@@ -541,8 +540,8 @@ public class PlayerController : MonoBehaviourPun {
             }
             case "piranhaplant": {
                 PiranhaPlantController piranha = collider.gameObject.GetComponentInParent<PiranhaPlantController>();
-                if (inShell || invincible > 0 || (groundpound && state != PlayerState.Mini)) {
-                    collider.gameObject.GetPhotonView().RPC("Kill", RpcTarget.All, body.velocity.x > 0);
+                if (inShell || invincible > 0) {
+                    collider.gameObject.GetPhotonView().RPC("Kill", RpcTarget.All);
                 } else {
                     if (holding) {
                         piranha.photonView.RPC("Kill", RpcTarget.All);
@@ -709,6 +708,9 @@ public class PlayerController : MonoBehaviourPun {
             PhotonNetwork.Destroy(holding.photonView);
             holding = null;
         }
+        if (deathplane && photonView.IsMine) {
+            transform.Translate(0, -4, 0);
+        }
     }
 
     void SpawnStar() {
@@ -770,7 +772,7 @@ public class PlayerController : MonoBehaviourPun {
         groundpound = false;
         inShell = false;
         landing = 0f;
-        hitInvincibilityCounter = 5f;
+        hitInvincibilityCounter = 3f;
         GameObject.Instantiate(Resources.Load("PuffParticle"), transform.position, Quaternion.identity);
     }
 
@@ -1122,8 +1124,16 @@ public class PlayerController : MonoBehaviourPun {
         }
 
         //hit flash
-        if ((hitInvincibilityCounter -= Time.fixedDeltaTime) > 0 && (hitInvincibilityCounter * 2f) % (blinkingSpeed*2) < blinkingSpeed) {
-            models.SetActive(false);
+        if (hitInvincibilityCounter >= 0) {
+            hitInvincibilityCounter -= Time.fixedDeltaTime;
+            
+            bool invisible;
+            if (hitInvincibilityCounter <= 0.75f) {
+                invisible = ((hitInvincibilityCounter * 3f) % (blinkingSpeed*2f) < blinkingSpeed);
+            } else {
+                invisible = (hitInvincibilityCounter * 2f) % (blinkingSpeed*2) < blinkingSpeed;
+            }
+            models.SetActive(!invisible);
         } else {
             models.SetActive(true);
         }
@@ -1134,15 +1144,15 @@ public class PlayerController : MonoBehaviourPun {
         largeMarioModel.SetActive(large && !luigi);
         smallMarioModel.SetActive(!large && !luigi);
         marioBlueShell.SetActive(state == PlayerState.Shell && !luigi);
-        largeLuigiModel.SetActive(large && luigi);
-        smallLuigiModel.SetActive(!large && luigi);
-        luigiBlueShell.SetActive(state == PlayerState.Shell && luigi);
+        // largeLuigiModel.SetActive(large && luigi);
+        // smallLuigiModel.SetActive(!large && luigi);
+        // luigiBlueShell.SetActive(state == PlayerState.Shell && luigi);
 
-        if (luigi) {
-            animator.avatar = large ? largeLuigiAvatar : smallLuigiAvatar;
-        } else {
+        // if (luigi) {
+        //     animator.avatar = large ? largeLuigiAvatar : smallLuigiAvatar;
+        // } else {
             animator.avatar = large ? largeMarioAvatar : smallMarioAvatar;
-        }
+        // }
     }
 
     void FakeOnGroundCheck() {
@@ -1225,38 +1235,36 @@ public class PlayerController : MonoBehaviourPun {
     }
     
     void HandleWallslide(bool leftWall, bool jump, bool holdingDirection) {
-        if (body.velocity.y <= wallslideSpeed) {
-            triplejump = false;
-            doublejump = false;
-            singlejump = false;
+        triplejump = false;
+        doublejump = false;
+        singlejump = false;
 
-            if (!holdingDirection) {
-                transform.position += new Vector3(0.05f * (leftWall ? 1 : -1), 0, 0);
-                onLeft = false;
-                onRight = false;
-            }
+        if (!holdingDirection) {
+            transform.position += new Vector3(0.05f * (leftWall ? 1 : -1), 0, 0);
+            onLeft = false;
+            onRight = false;
+        }
 
-            body.velocity = new Vector2(0, wallslideSpeed);
-            dust.transform.localPosition = new Vector3(0.075f * (leftWall ? 1 : -1), 0.075f * (state >= PlayerState.Large ? 4 : 1), dust.transform.localPosition.z);
-            dust.transform.rotation = Quaternion.Euler(-90f, 0, 0);
+        body.velocity = new Vector2(0, Mathf.Max(body.velocity.y, wallslideSpeed));
+        dust.transform.localPosition = new Vector3(0.075f * (leftWall ? 1 : -1), 0.075f * (state >= PlayerState.Large ? 4 : 1), dust.transform.localPosition.z);
+        dust.transform.rotation = Quaternion.Euler(-90f, 0, 0);
             
-            if (jump) {
-                onLeft = false;
-                onRight = false;
-                body.velocity = new Vector2((runningMaxSpeed + walkingMaxSpeed)/2f * (leftWall ? 1 : -1), walljumpVelocity);
-                walljumping = 0.5f;
-                facingRight = leftWall;
-                singlejump = true;
-                doublejump = false;
-                triplejump = false;
-                onGround = false;
-                onGroundLastFrame = false;
-                photonView.RPC("PlaySound", RpcTarget.All, "player/walljump");
-                if (Random.value < 0.5) {
-                    photonView.RPC("PlaySound", RpcTarget.All, "mario/walljump_1");
-                } else {
-                    photonView.RPC("PlaySound", RpcTarget.All, "mario/walljump_2");
-                }
+        if (jump) {
+            onLeft = false;
+            onRight = false;
+            body.velocity = new Vector2((runningMaxSpeed + walkingMaxSpeed)/2f * (leftWall ? 1 : -1), walljumpVelocity);
+            walljumping = 0.5f;
+            facingRight = leftWall;
+            singlejump = true;
+            doublejump = false;
+            triplejump = false;
+            onGround = false;
+            onGroundLastFrame = false;
+            photonView.RPC("PlaySound", RpcTarget.All, "player/walljump");
+            if (Random.value < 0.5) {
+                photonView.RPC("PlaySound", RpcTarget.All, "mario/walljump_1");
+            } else {
+                photonView.RPC("PlaySound", RpcTarget.All, "mario/walljump_2");
             }
         }
     }
@@ -1334,7 +1342,7 @@ public class PlayerController : MonoBehaviourPun {
             turnaround = false;
         }
 
-        if (Mathf.Abs(body.velocity.x) < 0.2f) {
+        if (Mathf.Abs(body.velocity.x) < 0.5f) {
             skidding = false;
             if (!left && !right) {
                 turnaround = false;
@@ -1356,6 +1364,7 @@ public class PlayerController : MonoBehaviourPun {
         float walkSpeedTotal = walkingMaxSpeed * invincibleSpeedBoost;
         bool reverseBonus = onGround && (((left && body.velocity.x > 0) || (right && body.velocity.x < 0)));
         float reverseFloat = (reverseBonus ? (ice ? icePenalty : 2) : 1);
+        float turnaroundSpeedBoost = (turnaround && !reverseBonus ? 2 : 1);
 
         if ((crouching && !onGround && !inShell) || !crouching) {
             
@@ -1364,15 +1373,15 @@ public class PlayerController : MonoBehaviourPun {
                     skidding = false;
                     turnaround = false;
                     if (xVel > -runSpeedTotal) {
-                        float change = invincibleSpeedBoost * invincibleSpeedBoost * runningAcceleration * airPenalty * Time.fixedDeltaTime;
+                        float change = invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * Time.fixedDeltaTime;
                         body.velocity += new Vector2(change * -1, 0);
                     }
                 } else {
                     if (xVel > -walkSpeedTotal) {
-                        float change = invincibleSpeedBoost * reverseFloat * walkingAcceleration * Time.fixedDeltaTime;
+                        float change = invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * Time.fixedDeltaTime;
                         body.velocity += new Vector2(change * -1, 0);
                         
-                        if (state != PlayerState.Giant && reverseBonus && xVel > runSpeedTotal - 1) {
+                        if (state != PlayerState.Giant && reverseBonus && xVel > runSpeedTotal - 2) {
                             skidding = true;
                             models.transform.eulerAngles = new Vector3(0,100,0);
                             turnaround = true;
@@ -1390,15 +1399,15 @@ public class PlayerController : MonoBehaviourPun {
                     skidding = false;
                     turnaround = false;
                     if (xVel < runSpeedTotal) {
-                        float change = invincibleSpeedBoost * invincibleSpeedBoost * runningAcceleration * airPenalty * Time.fixedDeltaTime;
+                        float change = invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * Time.fixedDeltaTime;
                         body.velocity += new Vector2(change * 1, 0);
                     }
                 } else {
                     if (xVel < walkSpeedTotal) {
-                        float change = invincibleSpeedBoost * reverseFloat * walkingAcceleration * Time.fixedDeltaTime;
+                        float change = invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * Time.fixedDeltaTime;
                         body.velocity += new Vector2(change * 1, 0);
                         
-                        if (state != PlayerState.Giant && reverseBonus && xVel < -runSpeedTotal + 1) {
+                        if (state != PlayerState.Giant && reverseBonus && xVel < -runSpeedTotal + 2) {
                             skidding = true;
                             models.transform.eulerAngles = new Vector3(0,-100,0);
                             turnaround = true;

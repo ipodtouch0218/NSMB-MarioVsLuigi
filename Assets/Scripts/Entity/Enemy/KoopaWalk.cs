@@ -100,7 +100,7 @@ public class KoopaWalk : HoldableEntity {
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
-        if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown) {
+        if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown || holder) {
             return;
         }
         GameObject obj = collider.gameObject;

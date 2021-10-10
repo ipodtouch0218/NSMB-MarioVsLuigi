@@ -31,12 +31,16 @@ public class BobombWalk : HoldableEntity {
             HandleCollision();
         
         if (lit && !detonated && !dead) {
+                
             if ((detonateCount -= Time.fixedDeltaTime) < 0) {
-
                 if (photonView.IsMine)
                     photonView.RPC("Detonate", RpcTarget.All);
                 return;
             }
+            float redOverlayPercent = (5.39f/(detonateCount+2.695f))*10f % 1f;
+            MaterialPropertyBlock block = new MaterialPropertyBlock(); 
+            block.SetFloat("FlashAmount", redOverlayPercent);
+            renderer.SetPropertyBlock(block);
         }
     }
     [PunRPC]
