@@ -47,9 +47,10 @@ public class GameManager : MonoBehaviourPun {
         spawnpoint = GameObject.FindGameObjectWithTag("Respawn").transform.position;
         
         SceneManager.SetActiveScene(gameObject.scene);
-        localPlayer = PhotonNetwork.Instantiate("Player", new Vector3(0, -1000), Quaternion.identity, 0);
+        localPlayer = PhotonNetwork.Instantiate("Player", spawnpoint, Quaternion.identity, 0);
         Camera.main.GetComponent<CameraController>().target = localPlayer;
-        localPlayer.SetActive(false);
+        // localPlayer.GetComponent<PlayerController>().dead = true;
+        // localPlayer.SetActive(false);
         PhotonNetwork.IsMessageQueueRunning = true;
         photonView.RPC("IveFinishedLoading", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
     }

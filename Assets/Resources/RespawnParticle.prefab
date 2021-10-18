@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 9213689513685810617}
   - component: {fileID: 9183522688431611473}
   - component: {fileID: 3378887125590929954}
+  - component: {fileID: 6129504704901067234}
   m_Layer: 0
   m_Name: RespawnParticle
   m_TagString: Untagged
@@ -144,6 +145,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+--- !u!114 &6129504704901067234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5191653714546004373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e5fbc103d533164493b7c7708d7d456, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5947153708774810409
 GameObject:
   m_ObjectHideFlags: 0
@@ -4922,9 +4935,9 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 20
+  m_SortingLayerID: -755315459
+  m_SortingLayer: 1
+  m_SortingOrder: 0
   m_RenderMode: 0
   m_SortMode: 0
   m_MinParticleSize: 0
@@ -9786,9 +9799,9 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 20
+  m_SortingLayerID: -755315459
+  m_SortingLayer: 1
+  m_SortingOrder: 0
   m_RenderMode: 0
   m_SortMode: 0
   m_MinParticleSize: 0

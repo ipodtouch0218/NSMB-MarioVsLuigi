@@ -28,7 +28,6 @@ TagManager:
   - MegaMushroom
   - bulletbill
   - spinner
-  - UITrack
   - platform
   layers:
   - Default
@@ -44,7 +43,7 @@ TagManager:
   - EntityHitbox
   - HitsNothing
   - Semisolids
-  - 
+  - PassthroughInvalid
   - 
   - 
   - 
@@ -69,4 +68,7 @@ TagManager:
     locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: ParticleLayer
+    uniqueID: 3539651837
     locked: 0

@@ -3,14 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ParticleAutoDestroy : MonoBehaviour {
+    List<ParticleSystem> systems = new List<ParticleSystem>();
     void Start() {
-        float duration = 0;
-        foreach (ParticleSystem systems in GetComponents<ParticleSystem>()) {
-            duration = Mathf.Max(duration, systems.main.duration);
+        systems.AddRange(GetComponents<ParticleSystem>());
+        systems.AddRange(GetComponentsInChildren<ParticleSystem>());
+    }
+
+    void Update() {
+        if (systems.TrueForAll(SystemStopped)) {
+            Destroy(gameObject);
         }
-        foreach (ParticleSystem systems in GetComponentsInChildren<ParticleSystem>()) {
-            duration = Mathf.Max(duration, systems.main.duration);
-        }
-        Destroy(gameObject, duration);
+    }
+
+    private static bool SystemStopped(ParticleSystem ps) {
+        return ps.isStopped;
     }
 }

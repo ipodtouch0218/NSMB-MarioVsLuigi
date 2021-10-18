@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1.2
-  despawn: 10
+  despawn: 5
 --- !u!114 &786289218142832794
 MonoBehaviour:
   m_ObjectHideFlags: 0

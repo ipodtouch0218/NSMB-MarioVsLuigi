@@ -2,19 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
-{
+public class CameraController : MonoBehaviour {
 
     float scroll;
     [SerializeField] float minY, maxY, centerWidth = 1f, minX = -1000, maxX = 1000;
     public GameObject target;
-
-    // Start is called before the first frame update
-    void Start() {
-    }
-
-    // Update is called once per frame
-    void Update() {
+    
+    void LateUpdate() {
         if (target == null)
             return;
 

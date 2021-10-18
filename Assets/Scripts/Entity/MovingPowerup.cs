@@ -5,6 +5,7 @@ using Photon.Pun;
 
 public class MovingPowerup : MonoBehaviourPun {
 
+    private static int groundMask = -1;
     [SerializeField] float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
     Rigidbody2D body;
     BoxCollider2D boxCollider;
@@ -20,6 +21,9 @@ public class MovingPowerup : MonoBehaviourPun {
         boxCollider = GetComponent<BoxCollider2D>();
         renderer = GetComponent<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
+
+        if (groundMask == -1)
+            groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
     }
 
     [PunRPC]
@@ -62,7 +66,7 @@ public class MovingPowerup : MonoBehaviourPun {
             renderer.color = Color.white;
             body.isKinematic = false;
             if (passthrough) {
-                if (!Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, LayerMask.GetMask("Ground"))) {
+                if (!Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, groundMask)) {
                     gameObject.layer = LayerMask.NameToLayer("Entity");
                     passthrough = false;
                 }

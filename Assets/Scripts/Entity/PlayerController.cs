@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviourPun {
     public GameObject onSpinner;
 
     private static int GROUND_MASK;
-    private bool starDirection = false;
+    private bool starDirection, step;
     public bool luigi;
 
     void Awake() {
@@ -204,7 +204,9 @@ public class PlayerController : MonoBehaviourPun {
         }
         if (Mathf.Abs(body.velocity.x) < walkingMaxSpeed)
             return;
-        PlaySoundFromAnim("player/walk");
+        
+        PlaySoundFromAnim("player/walk" + (step ? "-2" : ""));
+        step = !step;
     }
 
     void OnMovement(InputValue value) {
@@ -478,7 +480,7 @@ public class PlayerController : MonoBehaviourPun {
                     bounce = true;
                 } else {
                     if (koopa.shell && (koopa.IsStationary())) {
-                        if (state != PlayerState.Mini && !holding && running && !crouching && !dead && !onLeft && !onRight && !doublejump && !triplejump) {
+                        if (state != PlayerState.Mini && !holding && running && !flying && !crouching && !dead && !onLeft && !onRight && !doublejump && !triplejump) {
                             koopa.photonView.RPC("Pickup", RpcTarget.All, photonView.ViewID);
                             holding = koopa;
                         } else {
@@ -520,7 +522,7 @@ public class PlayerController : MonoBehaviourPun {
                     }
                 } else {
                     if (bomb.lit) {
-                        if (state != PlayerState.Mini && !holding && running && !crouching && !dead && !onLeft && !onRight && !doublejump && !triplejump) {
+                        if (state != PlayerState.Mini && !holding && running && !crouching && !flying && !dead && !onLeft && !onRight && !doublejump && !triplejump) {
                             bomb.photonView.RPC("Pickup", RpcTarget.All, photonView.ViewID);
                             holding = bomb;
                         } else {
@@ -729,6 +731,7 @@ public class PlayerController : MonoBehaviourPun {
     [PunRPC]
     public void PreRespawn() {
         transform.position = GameManager.Instance.spawnpoint + new Vector3(playerId, 0, 0);
+        dead = false;
         body.position = transform.position;
         animator.SetTrigger("respawn");
         state = PlayerState.Small;
@@ -842,7 +845,7 @@ public class PlayerController : MonoBehaviourPun {
         return false;
     }
 
-    bool InteractWithTile(Vector3 tilePos, bool upwards) {
+    int InteractWithTile(Vector3 tilePos, bool upwards) {
         Tilemap tm = GameManager.Instance.tilemap;
         Transform tmtf = tm.transform;
         int x = Mathf.FloorToInt(tilePos.x);
@@ -854,15 +857,15 @@ public class PlayerController : MonoBehaviourPun {
             tm = GameManager.Instance.semiSolidTilemap;
             tile = tm.GetTile(loc);
             if (tile == null) {
-                return false;
+                return -1;
             }
         }
 
         if (tile is InteractableTile) {
             Vector2 loc2 = new Vector2((tilePos.x)*tmtf.localScale.x+tmtf.position.x, (tilePos.y)*tmtf.localScale.y+tmtf.position.y);
-            return ((InteractableTile) tile).Interact(this, (upwards ? InteractableTile.InteractionDirection.Down : InteractableTile.InteractionDirection.Up), loc2);
+            return ((InteractableTile) tile).Interact(this, (upwards ? InteractableTile.InteractionDirection.Down : InteractableTile.InteractionDirection.Up), loc2) ? 1 : 0;
         }
-        return false;
+        return 0;
     }
     
     [PunRPC]
@@ -907,11 +910,18 @@ public class PlayerController : MonoBehaviourPun {
 
     void FixedUpdate() {
         //game ended, freeze.
-        if (GameManager.Instance && GameManager.Instance.gameover) {
-            body.velocity = Vector2.zero;
-            animator.enabled = false;
-            body.isKinematic = true;
-            return;
+        
+        if (GameManager.Instance) {
+            if (!GameManager.Instance.musicEnabled) {
+                models.SetActive(false);
+                return;
+            }
+            if (GameManager.Instance.gameover) {
+                body.velocity = Vector2.zero;
+                animator.enabled = false;
+                body.isKinematic = true;
+                return;
+            }
         }
 
         bool orig = facingRight;
@@ -952,7 +962,7 @@ public class PlayerController : MonoBehaviourPun {
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
         }
 
-        if (photonView.IsMine && deathCounter >= 2.5) {
+        if (photonView.IsMine && deathCounter >= 3f) {
             photonView.RPC("PreRespawn", RpcTarget.All);
         }
     }
@@ -1627,14 +1637,16 @@ public class PlayerController : MonoBehaviourPun {
             }
         }
         if (onGround && (groundpound || drill) && hitBlock) {
-            bool tempHitBlock = false;
+            bool tempHitBlock = true;
             foreach (Vector3 tile in tilesStandingOn) {
-                bool temp = InteractWithTile(tile, true);
-                tempHitBlock |= temp;
+                int temp = InteractWithTile(tile, true);
+                if (temp != -1) {
+                    tempHitBlock &= (temp == 1);
+                }
             }
             hitBlock = tempHitBlock;
             if (drill) {
-                drill = hitBlock;
+                drill = !hitBlock;
                 if (drill) onGround = false;
             } else {
                 //groundpound

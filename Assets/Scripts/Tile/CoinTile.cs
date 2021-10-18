@@ -66,6 +66,6 @@ public class CoinTile : InteractableTile {
         }
 
         GameManager.Instance.photonView.RPC("BumpBlock", RpcTarget.All, tileX, tileY, resultTile, (int) BlockBump.SpawnResult.Coin, direction == InteractionDirection.Down);
-        return true;
+        return false;
     }
 }

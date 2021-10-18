@@ -115,8 +115,8 @@ public class MainMenuManager : MonoBehaviourPun {
         inLobbyPrompt.SetActive(true);
 
         lobbyText.GetComponent<TextMeshProUGUI>().text = room.Name;
-        if (room.CustomProperties[NetworkManager.MAP_INDEX_KEY] != null) {
-            SetLevelIndex((int) room.CustomProperties[NetworkManager.MAP_INDEX_KEY]);
+        if (room.CustomProperties[NetworkManager.PROPKEY_MAP] != null) {
+            SetLevelIndex((int) room.CustomProperties[NetworkManager.PROPKEY_MAP]);
         }
         EventSystem.current.SetSelectedGameObject(currentLobbySelected);
     }
@@ -142,7 +142,7 @@ public class MainMenuManager : MonoBehaviourPun {
         if (PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient) {
             photonView.RPC("ChatMessage", RpcTarget.All, "Map set to: " + levelDropdown.captionText.text, ColorToVector(Color.red));
             ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
-            table[NetworkManager.MAP_INDEX_KEY] = levelDropdown.value;
+            table[NetworkManager.PROPKEY_MAP] = levelDropdown.value;
             PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         }
     }
@@ -299,7 +299,7 @@ public class MainMenuManager : MonoBehaviourPun {
         
         if (PhotonNetwork.IsMasterClient) {
             ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
-            table[NetworkManager.MAP_STARS] = (int) value;
+            table[NetworkManager.PROPKEY_STARS] = (int) value;
             PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         }
         GlobalController.Instance.starRequirement = (int) value;

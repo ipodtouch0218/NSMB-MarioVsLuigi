@@ -75,6 +75,6 @@ public class PowerupTile : InteractableTile {
             ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
             ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/item_block");
         }
-        return true;
+        return false;
     }
 }

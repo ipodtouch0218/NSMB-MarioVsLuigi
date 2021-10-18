@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 
 public class NetworkManager : MonoBehaviourPunCallbacks {
-    public static string MAP_INDEX_KEY = "level", MAP_STARS = "stars";
+    public static string PROPKEY_MAP = "level", PROPKEY_STARS = "stars";
     public static NetworkManager instance;
 
     void Start() {
@@ -23,16 +23,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks {
 
     public override void OnConnectedToMaster() {
         Debug.Log("Connected to Master");
-        // PhotonNetwork.JoinOrCreateRoom("Room", new Photon.Realtime.RoomOptions {MaxPlayers = 64}, Photon.Realtime.TypedLobby.Default);
         PhotonNetwork.JoinLobby();
     }
 
     public override void OnCreatedRoom() {
-        Debug.Log("created room " + PhotonNetwork.CurrentRoom.Name);
+        Debug.Log("Created Room: " + PhotonNetwork.CurrentRoom.Name);
 
         ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
-        table[NetworkManager.MAP_INDEX_KEY] = 0;
-        table[NetworkManager.MAP_STARS] = 15;
+        table[NetworkManager.PROPKEY_MAP] = 0;
+        table[NetworkManager.PROPKEY_STARS] = 10;
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
 
@@ -46,10 +45,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks {
             mmm.PopulatePlayerList();
             
             if (room.CustomProperties != null) {
-                if (room.CustomProperties[MAP_INDEX_KEY] != null)
-                    mmm.SetLevelIndex((int) room.CustomProperties[MAP_INDEX_KEY]);
-                if (room.CustomProperties[MAP_STARS] != null)
-                mmm.SetStarRequirement((int) room.CustomProperties[MAP_STARS]);
+                if (room.CustomProperties[PROPKEY_MAP] != null)
+                    mmm.SetLevelIndex((int) room.CustomProperties[PROPKEY_MAP]);
+                if (room.CustomProperties[PROPKEY_STARS] != null)
+                    mmm.SetStarRequirement((int) room.CustomProperties[PROPKEY_STARS]);
             }
         }
     }
@@ -76,10 +75,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks {
         MainMenuManager mmm = MainMenuManager.Instance;
         // base.OnRoomPropertiesUpdate(propertiesThatChanged);
         if (mmm != null && properties != null) {
-            if (properties.ContainsKey(MAP_INDEX_KEY))
-                mmm.SetLevelIndex((int) properties[MAP_INDEX_KEY]);
-            if (properties.ContainsKey(MAP_STARS))
-                mmm.SetStarRequirement((int) properties[MAP_STARS]);
+            if (properties.ContainsKey(PROPKEY_MAP))
+                mmm.SetLevelIndex((int) properties[PROPKEY_MAP]);
+            if (properties.ContainsKey(PROPKEY_STARS))
+                mmm.SetStarRequirement((int) properties[PROPKEY_STARS]);
         }
     }
 
@@ -92,6 +91,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks {
     }
 
     public override void OnErrorInfo(ErrorInfo errorInfo) {
-        Debug.Log(errorInfo.Info);
+        Debug.LogError(errorInfo.Info);
     }
 }

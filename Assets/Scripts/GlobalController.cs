@@ -7,22 +7,15 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using TMPro;
 
-public class GlobalController : MonoBehaviour
-{
-    public static GlobalController Instance;
+public class GlobalController : Singleton<GlobalController> {
     float volumeSFX = 1, volumeMusic = 1, volumeMaster = 1;
     public Slider musicSlider, sfxSlider, masterSlider;
     public TMP_InputField nicknameInput;
     public AudioMixer mixer;
     public int starRequirement = 15;
     public List<string> loadedPlayers = new List<string>();
-    void Awake () {
-        if (Instance == null) {
-            DontDestroyOnLoad(gameObject);
-            Instance = this;
-        } else if (Instance != this) {
-            Destroy (gameObject);
-        }
+    void Awake() {
+        DontDestroyOnLoad(gameObject);
 
         PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname", "Player" + (int) Random.Range(1000,10000));
         

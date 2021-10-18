@@ -6,12 +6,31 @@ using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
 
-public class UIUpdater : MonoBehaviour {
+public class UIUpdater : WaitForGameStart {
     
+    public static UIUpdater instance;
+    public GameObject playerTrackTemplate, starTrackTemplate;
     PlayerController player;
     public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell; 
     public TMP_Text uiStars, uiCoins, uiPing;
     public Image itemReserve;
+
+    void Start() {
+        instance = this;
+    }
+    
+    public override void Execute() {
+        foreach (PlayerController player in GameObject.FindObjectsOfType<PlayerController>()) {
+            GameObject trackObject = GameObject.Instantiate(playerTrackTemplate, playerTrackTemplate.transform.position, Quaternion.identity, transform);
+            TrackIcon icon = trackObject.GetComponent<TrackIcon>();
+            icon.target = player.gameObject;
+
+            if (!player.photonView.IsMine) {
+                trackObject.transform.localScale = new Vector3(2f/3f, 2f/3f, 1f);
+            }
+            trackObject.SetActive(true);
+        }
+    }
 
     void Update() {
         uiPing.text = "<sprite=2>" + PhotonNetwork.GetPing() + "ms";
@@ -20,12 +39,15 @@ public class UIUpdater : MonoBehaviour {
         if (!player && GameManager.Instance.localPlayer) {
             player = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
         }
-        if (!player) 
+
+        UpdateStoredItemUI();
+        UpdateTextUI();
+    }
+    
+    void UpdateStoredItemUI() {
+        if (!player)
             return;
         
-        uiStars.text = "<sprite=0>" + player.stars + "/" + GlobalController.Instance.starRequirement;
-        uiCoins.text = "<sprite=1>" + player.coins + "/8";
-
         switch (player.storedPowerup) {
         case "Mushroom":
             itemReserve.sprite = storedItemMushroom;
@@ -47,5 +69,11 @@ public class UIUpdater : MonoBehaviour {
             break;
         }
     }
-    
+    void UpdateTextUI() {
+        if (!player)
+            return;
+
+        uiStars.text = "<sprite=0>" + player.stars + "/" + GlobalController.Instance.starRequirement;
+        uiCoins.text = "<sprite=1>" + player.coins + "/8";
+    }
 }

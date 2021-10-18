@@ -5,6 +5,7 @@ using Photon.Pun;
 
 public class StarBouncer : MonoBehaviourPun {
 
+    private static int groundMask = -1;
     public bool stationary = true;
     [SerializeField] float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f;
     float counter;
@@ -19,13 +20,25 @@ public class StarBouncer : MonoBehaviourPun {
         body = GetComponent<Rigidbody2D>();
         collider = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
+
+        if (groundMask == -1)
+            groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
         
         object[] data = photonView.InstantiationData;
         if (data != null && data.Length >= 1) {
             stationary = false;
             passthrough = true;
+            gameObject.layer = LayerMask.NameToLayer("HitsNothing");
             body.velocity = new Vector2(moveSpeed * ((bool) data[0] ? -1 : 1), deathBoostAmount);
         }
+
+        GameObject trackObject = GameObject.Instantiate(UIUpdater.instance.starTrackTemplate, UIUpdater.instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.instance.transform);
+        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
+        icon.target = gameObject;
+        if (!stationary) {
+            trackObject.transform.localScale = new Vector3(3f/4f, 3f/4f, 1f);
+        }
+        trackObject.SetActive(true);
     }
 
     void FixedUpdate() {
@@ -60,7 +73,7 @@ public class StarBouncer : MonoBehaviourPun {
 
         if (passthrough) {
             gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-            if (body.velocity.y <= 0 && !Physics2D.OverlapBox(transform.position, Vector2.one / 3, 0, LayerMask.GetMask("Ground"))) {
+            if (body.velocity.y <= 0 && !Physics2D.OverlapBox(transform.position, Vector2.one / 3, 0, groundMask)) {
                 passthrough = false;
                 gameObject.layer = LayerMask.NameToLayer("Entity");
             }
@@ -74,8 +87,8 @@ public class StarBouncer : MonoBehaviourPun {
             transform.localScale = startingScale;
         }
 
-        if (lifespan < 0) {
-            PhotonNetwork.Destroy(photonView);
+        if (lifespan < 0 || (!passthrough && transform.position.y < GameManager.Instance.GetLevelMinY())) {
+            photonView.RPC("Crushed", RpcTarget.All);
         }
     }
 
