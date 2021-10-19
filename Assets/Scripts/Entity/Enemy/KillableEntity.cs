@@ -43,10 +43,10 @@ public class KillableEntity : MonoBehaviourPun {
         dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
         if (groundpound)
-            GameObject.Instantiate(Resources.Load("EnemySpecialKill"), transform.position + new Vector3(0, 0.5f, -5), Quaternion.identity);
+            GameObject.Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), transform.position + new Vector3(0, 0.5f, -5), Quaternion.identity);
         
         if (photonView.IsMine) {
-            PhotonNetwork.InstantiateRoomObject("LooseCoin", transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
+            PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
         }
     } 
     [PunRPC]

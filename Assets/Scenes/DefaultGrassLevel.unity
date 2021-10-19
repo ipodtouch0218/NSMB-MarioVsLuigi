@@ -243,7 +243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add, type: 3}
+  prefab: Prefabs/Enemy/Goomba
   currentEntity: {fileID: 0}
 --- !u!1001 &237660768
 PrefabInstance:
@@ -435,7 +435,7 @@ Camera:
   far clip plane: 1000
   field of view: 35.971092
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -609,7 +609,7 @@ Camera:
   far clip plane: 1000
   field of view: 35.971092
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -3
   m_CullingMask:
     serializedVersion: 2
@@ -838,7 +838,7 @@ Camera:
   far clip plane: 1000
   field of view: 35.971092
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -5578,7 +5578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add, type: 3}
+  prefab: Prefabs/Enemy/Goomba
   currentEntity: {fileID: 0}
 --- !u!1 &1831778352
 GameObject:
@@ -6137,7 +6137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add, type: 3}
+  prefab: Prefabs/Enemy/Goomba
   currentEntity: {fileID: 0}
 --- !u!1 &2067183185
 GameObject:
@@ -6182,7 +6182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 8836298984178612590, guid: 4f50cb5e806289d43bf820de1f1347bb, type: 3}
+  prefab: Prefabs/Enemy/Koopa
   currentEntity: {fileID: 0}
 --- !u!1001 &5780648778477818224
 PrefabInstance:

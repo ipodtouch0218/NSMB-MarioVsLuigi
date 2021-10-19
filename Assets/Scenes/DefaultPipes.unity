@@ -322,7 +322,7 @@ GameObject:
   m_Component:
   - component: {fileID: 119551482}
   m_Layer: 0
-  m_Name: EntitySpawns
+  m_Name: Spawns
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -348,7 +348,7 @@ Transform:
   - {fileID: 2018240978}
   - {fileID: 154474855}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &154474854
 GameObject:
@@ -410,7 +410,7 @@ Transform:
   - {fileID: 1500230911}
   - {fileID: 1277131673}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &212541684
 GameObject:
@@ -688,7 +688,7 @@ Transform:
   - {fileID: 1890770086}
   - {fileID: 250623563}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &343770563
 GameObject:
@@ -1052,7 +1052,7 @@ Camera:
   far clip plane: 1000
   field of view: 35.971092
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -3
   m_CullingMask:
     serializedVersion: 2
@@ -1080,7 +1080,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &386130603
 MonoBehaviour:
@@ -2289,7 +2289,7 @@ PrefabInstance:
     - target: {fileID: 6445748335641620860, guid: af09df0fb66618e46b9c9c37b6b74fe7,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6445748335641620860, guid: af09df0fb66618e46b9c9c37b6b74fe7,
         type: 3}

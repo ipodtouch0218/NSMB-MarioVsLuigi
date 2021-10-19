@@ -243,11 +243,10 @@ public class PlayerController : MonoBehaviourPun {
         foreach (FireballMover existingFire in GameObject.FindObjectsOfType<FireballMover>()) {
             //fireballs on entity layer do not interact with the player,
             //therefore these are OUR fireballs.
-            if (existingFire.owner == photonView.ViewID) count++;
+            if (existingFire.photonView.IsMine) count++;
         }
         if (count < 2) {
-            GameObject fireball = PhotonNetwork.Instantiate("Fireball", transform.position + new Vector3(facingRight ? 0.3f : -0.3f ,0.5f), Quaternion.identity);
-            fireball.GetPhotonView().RPC("Instantiate", RpcTarget.All, photonView.ViewID, !facingRight);
+            GameObject fireball = PhotonNetwork.Instantiate("Prefabs/Fireball", transform.position + new Vector3(facingRight ? 0.3f : -0.3f ,0.5f), Quaternion.identity, 0, new object[]{!facingRight});
             photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
             animator.SetTrigger("fireball");
         }
@@ -410,9 +409,6 @@ public class PlayerController : MonoBehaviourPun {
         
         Vector2 dir = (transform.position - collider.transform.position);
         dir.Normalize();
-        Debug.DrawRay(collider.transform.position, dir, Color.cyan, 3);
-        Debug.DrawRay(collider.transform.position, Vector2.up.normalized, Color.white, 3);
-        Debug.Log(Vector2.Dot(dir, Vector2.up));
         bool downwards = Vector2.Dot(dir, Vector2.up) > 0.6f;
         switch (collider.tag) {
             case "goomba": {
@@ -589,10 +585,10 @@ public class PlayerController : MonoBehaviourPun {
             }
             case "Fireball": {
                 FireballMover fireball = collider.gameObject.GetComponentInParent<FireballMover>();
-                if (fireball.owner == photonView.ViewID)
+                if (fireball.photonView.IsMine)
                     break;
                 fireball.photonView.RPC("Kill", RpcTarget.All);
-                if (state == PlayerState.Shell)
+                if (state == PlayerState.Shell && (inShell || crouching || groundpound))
                     break;
                 if (state == PlayerState.Mini) {
                     photonView.RPC("Powerdown", RpcTarget.All, false);
@@ -638,7 +634,7 @@ public class PlayerController : MonoBehaviourPun {
             //Main star, reset the tiles.
             GameManager.Instance.ResetTiles();
         }
-        GameObject.Instantiate(Resources.Load("StarCollectParticle"), star.transform.position, Quaternion.identity);
+        GameObject.Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
         PlaySoundFromAnim("player/star_collect");
         if (view.IsMine) {
             PhotonNetwork.Destroy(view);
@@ -660,13 +656,13 @@ public class PlayerController : MonoBehaviourPun {
                 renderer.enabled = false;
                 coin.GetComponent<BoxCollider2D>().enabled = false;
             }
-            GameObject.Instantiate(Resources.Load("CoinCollectParticle"), new Vector3(x, y, 0), Quaternion.identity);
+            GameObject.Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), new Vector3(x, y, 0), Quaternion.identity);
         }
 
         coins++;
 
         PlaySoundFromAnim("player/coin");
-        GameObject num = (GameObject) GameObject.Instantiate(Resources.Load("Number"), new Vector3(x, y, 0), Quaternion.identity);
+        GameObject num = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Particle/Number"), new Vector3(x, y, 0), Quaternion.identity);
         Animator anim = num.GetComponentInChildren<Animator>();
         anim.SetInteger("number", coins);
         anim.SetTrigger("ready");
@@ -698,7 +694,7 @@ public class PlayerController : MonoBehaviourPun {
             }
         }
 
-        GameObject obj = PhotonNetwork.Instantiate(item, transform.position + new Vector3(0,5f), Quaternion.identity);
+        GameObject obj = PhotonNetwork.Instantiate("Prefabs/Powerup/" + item, transform.position + new Vector3(0,5f), Quaternion.identity);
         MovingPowerup pow = obj.GetComponent<MovingPowerup>();
         pow.photonView.RPC("SetFollowMe", RpcTarget.All, photonView.ViewID);
         photonView.RPC("PlaySound", RpcTarget.All, "player/reserve_item_use");
@@ -727,7 +723,7 @@ public class PlayerController : MonoBehaviourPun {
         if (stars > 0) {
             stars--;
             if (photonView.IsMine) {
-                GameObject star = PhotonNetwork.Instantiate("BigStar", transform.position, Quaternion.identity, 0, new object[]{starDirection});
+                GameObject star = PhotonNetwork.Instantiate("Prefabs/BigStar", transform.position, Quaternion.identity, 0, new object[]{starDirection});
                 StarBouncer sb = star.GetComponent<StarBouncer>();
                 sb.photonView.TransferOwnership(PhotonNetwork.MasterClient);
                 photonView.RPC("SetStars", RpcTarget.Others, stars);
@@ -744,7 +740,7 @@ public class PlayerController : MonoBehaviourPun {
         animator.SetTrigger("respawn");
         state = PlayerState.Small;
 
-        GameObject particle = (GameObject) GameObject.Instantiate(Resources.Load("RespawnParticle"), transform.position, Quaternion.identity);
+        GameObject particle = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Particle/Respawn"), transform.position, Quaternion.identity);
         if (photonView.IsMine) {
             particle.GetComponent<RespawnParticle>().player = this;
         }
@@ -784,7 +780,7 @@ public class PlayerController : MonoBehaviourPun {
         inShell = false;
         landing = 0f;
         hitInvincibilityCounter = 3f;
-        GameObject.Instantiate(Resources.Load("PuffParticle"), transform.position, Quaternion.identity);
+        GameObject.Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
     }
 
     [PunRPC]
@@ -1180,6 +1176,7 @@ public class PlayerController : MonoBehaviourPun {
                 onGround = true;
                 transform.position = new Vector2(body.position.x, hit.point.y);
                 body.velocity = new Vector2(body.velocity.x, -1);
+                Debug.Log("fake on ground");
             }
         }
     }
@@ -1663,7 +1660,7 @@ public class PlayerController : MonoBehaviourPun {
                     koyoteTime = 1;
                 } else {
                     photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == PlayerState.Mini ? "-mini" : ""));
-                    photonView.RPC("SpawnParticle", RpcTarget.All, "GroundpoundParticle");
+                    photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
                     groundpoundSit = true;
                 }
             }

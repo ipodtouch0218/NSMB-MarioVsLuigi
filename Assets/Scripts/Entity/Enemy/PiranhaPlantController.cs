@@ -56,9 +56,9 @@ public class PiranhaPlantController : KillableEntity {
         PlaySound("enemy/shell_kick");
         PlaySound("enemy/piranhaplant-die");
         dead = true;
-        Instantiate(Resources.Load("PuffParticle"), transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
+        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
         if (photonView.IsMine) {
-            PhotonNetwork.Instantiate("LooseCoin", transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+            PhotonNetwork.Instantiate("Prefabs/LooseCoin", transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
         }
     }
     

@@ -4465,7 +4465,7 @@ Camera:
   far clip plane: 1000
   field of view: 35.971092
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -4733,7 +4733,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add, type: 3}
+  prefab: Prefabs/Enemy/Goomba
   currentEntity: {fileID: 0}
 --- !u!1001 &481579257
 PrefabInstance:
@@ -6274,7 +6274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 7426856683177255958, guid: 8cf8f49ac0882ed44953ea53ff901f11, type: 3}
+  prefab: Prefabs/Enemy/RedKoopa
   currentEntity: {fileID: 0}
 --- !u!1 &1676077013
 GameObject:
@@ -6381,7 +6381,7 @@ Camera:
   far clip plane: 1000
   field of view: 35.971092
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -6668,7 +6668,7 @@ Camera:
   far clip plane: 1000
   field of view: 35.971092
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -3
   m_CullingMask:
     serializedVersion: 2

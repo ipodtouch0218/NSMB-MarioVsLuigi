@@ -36,14 +36,14 @@ public class BulletBillLauncher : MonoBehaviourPun {
 
         //Shoot left
         if (IntersectsPlayer(transform.position - new Vector3(playerSearchRadius/2 + 1, 0, 0))) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("BulletBill", transform.position - offset, Quaternion.identity, 0, new object[]{true});
+            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position - offset, Quaternion.identity, 0, new object[]{true});
             bills.Add(newBill);
             return;
         }
 
         //Shoot right
         if (IntersectsPlayer(transform.position + new Vector3(playerSearchRadius/2 + 1, 0, 0))) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("BulletBill", transform.position + offset, Quaternion.identity, 0, new object[]{false});
+            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + offset, Quaternion.identity, 0, new object[]{false});
             bills.Add(newBill);
             return;
         }

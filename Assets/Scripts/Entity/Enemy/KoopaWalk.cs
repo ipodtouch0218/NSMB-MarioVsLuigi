@@ -91,7 +91,7 @@ public class KoopaWalk : HoldableEntity {
                 PhotonNetwork.Destroy(photonView);
             }
             if (PhotonNetwork.IsMasterClient) {
-                PhotonNetwork.Instantiate("BlueShell", transform.position, Quaternion.identity);
+                PhotonNetwork.Instantiate("Prefabs/Powerup/BlueShell", transform.position, Quaternion.identity);
             }
         }
         body.velocity = Vector2.zero;

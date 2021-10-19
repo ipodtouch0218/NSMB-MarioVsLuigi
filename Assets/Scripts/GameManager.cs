@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviourPun {
         spawnpoint = GameObject.FindGameObjectWithTag("Respawn").transform.position;
         
         SceneManager.SetActiveScene(gameObject.scene);
-        localPlayer = PhotonNetwork.Instantiate("Player", spawnpoint, Quaternion.identity, 0);
+        localPlayer = PhotonNetwork.Instantiate("Prefabs/Player", spawnpoint, Quaternion.identity, 0);
         Camera.main.GetComponent<CameraController>().target = localPlayer;
         // localPlayer.GetComponent<PlayerController>().dead = true;
         // localPlayer.SetActive(false);
@@ -117,7 +117,7 @@ public class GameManager : MonoBehaviourPun {
     [PunRPC]
     void SpawnBreakParticle(int x, int y, float r, float g, float b) {
         Transform tm = GameManager.Instance.tilemap.transform;
-        GameObject particle = (GameObject) GameObject.Instantiate(Resources.Load("BrickBreakParticle"), new Vector3(x * tm.localScale.x + tm.position.x + 0.25f, y * tm.localScale.y + tm.position.y + 0.25f, 0), Quaternion.identity);
+        GameObject particle = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"), new Vector3(x * tm.localScale.x + tm.position.x + 0.25f, y * tm.localScale.y + tm.position.y + 0.25f, 0), Quaternion.identity);
         ParticleSystem system = particle.GetComponent<ParticleSystem>();
 
         ParticleSystem.MainModule main = system.main;
@@ -129,7 +129,7 @@ public class GameManager : MonoBehaviourPun {
         Tilemap tm = GameManager.Instance.tilemap;
         Vector3Int loc = new Vector3Int(x,y,0);
         
-        GameObject bump = (GameObject) GameObject.Instantiate(Resources.Load("Bump/BlockBump"), new Vector3(x*tm.transform.localScale.x+tm.transform.position.x+0.25f,y*tm.transform.localScale.y+tm.transform.position.y+0.25f,0), Quaternion.identity);
+        GameObject bump = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), new Vector3(x*tm.transform.localScale.x+tm.transform.position.x+0.25f,y*tm.transform.localScale.y+tm.transform.position.y+0.25f,0), Quaternion.identity);
         BlockBump bb = bump.GetComponentInChildren<BlockBump>();
 
         bb.fromAbove = down;
@@ -176,7 +176,7 @@ public class GameManager : MonoBehaviourPun {
                         }
                     }
 
-                    currentStar = PhotonNetwork.InstantiateRoomObject("BigStar", spawnPos, Quaternion.identity);
+                    currentStar = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", spawnPos, Quaternion.identity);
                     //TODO: star appear sound
                     spawnStarCount = 10f;
                 }

@@ -6,13 +6,15 @@ using Photon.Pun;
 public class FireballMover : MonoBehaviourPun {
     public float speed = 3f;
     public bool left;
-    public int owner;
     private Rigidbody2D body;
     private PhysicsEntity physics;
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
         physics = GetComponent<PhysicsEntity>();
+
+        left = (bool) photonView.InstantiationData[0];
+        body.velocity = new Vector2(speed * (left ? -1 : 1), -speed);
     }
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
@@ -26,15 +28,6 @@ public class FireballMover : MonoBehaviourPun {
 
         body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(-speed, body.velocity.y));
     }
-
-    [PunRPC]
-    void Instantiate(int ownerView, bool left) {
-        this.left = left;
-        body = GetComponent<Rigidbody2D>();
-        body.velocity = new Vector2(speed * (left ? -1 : 1), -speed);
-        owner = ownerView;
-    }
-
     void HandleCollision() {
         physics.Update();
 
@@ -55,7 +48,7 @@ public class FireballMover : MonoBehaviourPun {
     public void Kill() {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
-        GameObject.Instantiate(Resources.Load("FireballWallParticle"), transform.position, Quaternion.identity);
+        GameObject.Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
     }
 
     void OnTriggerEnter2D(Collider2D collider) {

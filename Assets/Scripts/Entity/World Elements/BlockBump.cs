@@ -20,7 +20,7 @@ public class BlockBump : MonoBehaviour {
         anim.SetTrigger("start");
 
         if (spawn == SpawnResult.Coin) {
-            GameObject coin = (GameObject) GameObject.Instantiate(Resources.Load("CoinFromBlock"), transform.position + new Vector3(0,(fromAbove ? -0.25f : 0.5f)), Quaternion.identity);
+            GameObject coin = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Particle/CoinFromBlock"), transform.position + new Vector3(0,(fromAbove ? -0.25f : 0.5f)), Quaternion.identity);
             coin.GetComponentInChildren<Animator>().SetBool("down", fromAbove);
         }
     }
@@ -45,11 +45,11 @@ public class BlockBump : MonoBehaviour {
         }
         switch(spawn) {
             case SpawnResult.Mushroom: {
-                PhotonNetwork.Instantiate("Mushroom", transform.position + new Vector3(0,(fromAbove ? -0.5f : 0.25f)), Quaternion.identity);
+                PhotonNetwork.Instantiate("Prefabs/Powerup/Mushroom", transform.position + new Vector3(0,(fromAbove ? -0.5f : 0.25f)), Quaternion.identity);
                 break;
             }
             case SpawnResult.FireFlower: {
-                PhotonNetwork.Instantiate("FireFlower", transform.position + new Vector3(0,(fromAbove ? -0.5f : 0.25f)), Quaternion.identity);
+                PhotonNetwork.Instantiate("Prefabs/Powerup/FireFlower", transform.position + new Vector3(0,(fromAbove ? -0.5f : 0.25f)), Quaternion.identity);
                 break;
             }
             case SpawnResult.Coin: {

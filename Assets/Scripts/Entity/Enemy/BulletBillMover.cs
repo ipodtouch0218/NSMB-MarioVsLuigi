@@ -52,7 +52,7 @@ public class BulletBillMover : KillableEntity {
         animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         if (groundpound)
-            GameObject.Instantiate(Resources.Load("EnemySpecialKill"), transform.position + new Vector3(0, 0.5f, -5), Quaternion.identity);
+            GameObject.Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), transform.position + new Vector3(0, 0.5f, -5), Quaternion.identity);
         
         dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");

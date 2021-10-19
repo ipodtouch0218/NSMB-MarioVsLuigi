@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlatformWrap : MonoBehaviour
-{
+public class PlatformWrap : MonoBehaviour {
     public float maxY, minY, ySpeed;
     void Start() {
         GetComponent<Rigidbody2D>().velocity = new Vector2(0, ySpeed);

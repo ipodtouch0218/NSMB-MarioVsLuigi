@@ -114,6 +114,6 @@ public class StarBouncer : MonoBehaviourPun {
     public void Crushed() {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
-        GameObject.Instantiate(Resources.Load("PuffParticle"), transform.position, Quaternion.identity);
+        GameObject.Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
     }
 }

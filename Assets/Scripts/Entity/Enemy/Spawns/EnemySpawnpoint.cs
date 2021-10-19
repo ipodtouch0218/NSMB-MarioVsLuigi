@@ -5,21 +5,21 @@ using Photon.Pun;
 
 public class EnemySpawnpoint : MonoBehaviour {
     
-    [SerializeField] public GameObject prefab;
+    public string prefab;
     public GameObject currentEntity;
 
     public bool AttemptSpawning() {
         if (currentEntity)
             return false;
 
-        foreach (var hit in Physics2D.OverlapCircleAll(transform.position, 2)) {
-            if (hit.gameObject.tag == "Player" || hit.gameObject.tag == "CameraTarget") {
+        foreach (var hit in Physics2D.OverlapCircleAll(transform.position, 1.5f)) {
+            if (hit.gameObject.tag == "Player") {
                 //cant spawn here
                 return false;
             }
         }
 
-        currentEntity = PhotonNetwork.InstantiateRoomObject(prefab.name, transform.position, transform.rotation);
+        currentEntity = PhotonNetwork.InstantiateRoomObject(prefab, transform.position, transform.rotation);
         return true;
     }
 }

@@ -246,7 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 7426856683177255958, guid: 8cf8f49ac0882ed44953ea53ff901f11, type: 3}
+  prefab: Prefabs/Enemy/RedKoopa
   currentEntity: {fileID: 0}
 --- !u!1 &89162345
 GameObject:
@@ -1557,7 +1557,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2074886471065804745, guid: 66003d5404cd23b469d9ff540b488311, type: 3}
+  prefab: Prefabs/Enemy/BlueKoopa
   currentEntity: {fileID: 0}
 --- !u!1001 &1123674083
 PrefabInstance:
@@ -2385,7 +2385,7 @@ Camera:
   far clip plane: 1000
   field of view: 41.913692
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -3032,7 +3032,7 @@ Camera:
   far clip plane: 1000
   field of view: 41.913692
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -3423,7 +3423,7 @@ Camera:
   far clip plane: 1000
   field of view: 41.913692
   orthographic: 1
-  orthographic size: 4.7
+  orthographic size: 4.6987495
   m_Depth: -3
   m_CullingMask:
     serializedVersion: 2
