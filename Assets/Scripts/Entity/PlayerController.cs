@@ -407,6 +407,13 @@ public class PlayerController : MonoBehaviourPun {
         if (!photonView.IsMine || dead) {
             return;
         }
+        
+        Vector2 dir = (transform.position - collider.transform.position);
+        dir.Normalize();
+        Debug.DrawRay(collider.transform.position, dir, Color.cyan, 3);
+        Debug.DrawRay(collider.transform.position, Vector2.up.normalized, Color.white, 3);
+        Debug.Log(Vector2.Dot(dir, Vector2.up));
+        bool downwards = Vector2.Dot(dir, Vector2.up) > 0.6f;
         switch (collider.tag) {
             case "goomba": {
                 GoombaWalk goomba = collider.gameObject.GetComponentInParent<GoombaWalk>();
@@ -414,7 +421,7 @@ public class PlayerController : MonoBehaviourPun {
                     break;
                 if (inShell || invincible > 0 || ((groundpound || drill) && state != PlayerState.Mini && body.velocity.y < -2) || state == PlayerState.Giant) {
                     collider.gameObject.transform.parent.gameObject.GetPhotonView().RPC("SpecialKill", RpcTarget.All, body.velocity.x > 0, groundpound);
-                } else if (body.velocity.y <= -0.2) {
+                } else if (downwards) {
                     if (groundpound || state != PlayerState.Mini) {
                         collider.gameObject.transform.parent.gameObject.GetPhotonView().RPC("Kill", RpcTarget.All);
                         groundpound = false;
@@ -438,7 +445,7 @@ public class PlayerController : MonoBehaviourPun {
                     break;
                 if (inShell || invincible > 0 || (groundpound && state != PlayerState.Mini && body.velocity.y < -2) || state == PlayerState.Giant) {
                     bullet.photonView.RPC("SpecialKill", RpcTarget.All, body.velocity.x > 0, groundpound);
-                } else if (body.velocity.y <= -0.2) {
+                } else if (downwards) {
                     if (groundpound || drill || state != PlayerState.Mini) {
                         bullet.photonView.RPC("SpecialKill", RpcTarget.All, body.velocity.x > 0, groundpound);
                         groundpound = false;
@@ -470,7 +477,7 @@ public class PlayerController : MonoBehaviourPun {
                     koopa.photonView.RPC("EnterShell", RpcTarget.All);
                     if (!koopa.blue)
                         koopa.photonView.RPC("Kick", RpcTarget.All, body.velocity.x > 0);
-                } else if (body.velocity.y <= -0.2 && (!koopa.shell || !koopa.IsStationary())) {
+                } else if (downwards && (!koopa.shell || !koopa.IsStationary())) {
                     if (state != PlayerState.Mini || groundpound) {
                         koopa.photonView.RPC("EnterShell", RpcTarget.All);
                         if (state == PlayerState.Mini)
@@ -510,7 +517,7 @@ public class PlayerController : MonoBehaviourPun {
                     bomb.photonView.RPC("SpecialKill", RpcTarget.All, body.velocity.x > 0, false);
                     break;
                 }
-                if (body.velocity.y <= -0.2 && !bomb.lit) {
+                if (downwards && !bomb.lit) {
                     if (state != PlayerState.Mini || (groundpound && body.velocity.y < -2)) {
                         bomb.photonView.RPC("Light", RpcTarget.All);
                     }
@@ -704,6 +711,7 @@ public class PlayerController : MonoBehaviourPun {
         flying = false;
         drill = false;
         deathCounter = 0;
+        dust.Stop();
         PlaySoundFromAnim("player/death");
         SpawnStar();
         if (holding) {
@@ -1121,7 +1129,7 @@ public class PlayerController : MonoBehaviourPun {
         
         //Hitbox changing
         if (state == PlayerState.Shell || state == PlayerState.Large || state == PlayerState.FireFlower || state == PlayerState.Giant) {
-            if (crouching || (invincible > 0 && !onGround) || inShell) {
+            if (crouching || (invincible > 0 && !onGround) || inShell || groundpound) {
                 bigHitbox.enabled = false;
                 smolHitbox.enabled = true;
             } else {
@@ -1435,7 +1443,7 @@ public class PlayerController : MonoBehaviourPun {
             skidding = false;
         }
 
-        if (state == PlayerState.Shell && !inShell && onGround && running && !holding && Mathf.Abs(xVel)+0.25f >= runningMaxSpeed) {
+        if (state == PlayerState.Shell && !inShell && onGround && running && !holding && Mathf.Abs(xVel)+0.25f >= runningMaxSpeed && landing > 0.33f) {
             inShell = true;
         }
     }

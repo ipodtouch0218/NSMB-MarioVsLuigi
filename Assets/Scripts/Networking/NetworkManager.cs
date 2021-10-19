@@ -52,7 +52,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks {
             }
         }
     }
-
     public override void OnPlayerEnteredRoom(Player newPlayer) {
         MainMenuManager mmm = MainMenuManager.Instance;
         if (mmm) {
