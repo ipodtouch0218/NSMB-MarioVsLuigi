@@ -7,18 +7,20 @@ using Photon.Pun;
 [CreateAssetMenu]
 public class CoinTile : InteractableTile {
     public string resultTile;
-    public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector2 location) {
+
+    public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
+        Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
         
         if (direction != InteractionDirection.Down) {
             //check for entities above to bump
 
-            foreach (Collider2D collider in Physics2D.OverlapBoxAll(new Vector2(location.x,location.y+0.5f), new Vector2(0.5f,0.05f), 0f)) {
+            foreach (Collider2D collider in Physics2D.OverlapBoxAll(worldLocation + bumpOffset, new Vector2(0.5f,0.05f), 0f)) {
                 GameObject obj = collider.gameObject;
                 if (obj == interacter.gameObject) continue;
                 switch (obj.tag) {
                 case "Player": {
                     PlayerController player = obj.GetComponent<PlayerController>();
-                    player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x > location.x, 1);
+                    player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x > worldLocation.x, 1);
                     break;
                 }
                 case "koopa":
@@ -27,7 +29,7 @@ public class CoinTile : InteractableTile {
                         break;
                     if (obj.GetComponent<KillableEntity>().dead)
                         break;
-                    obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < location.x, false);
+                    obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false);
                     break;
                 }
                 case "coin": {
@@ -53,19 +55,15 @@ public class CoinTile : InteractableTile {
                 }
             }
         }
-        
-        Transform tmtf = GameManager.Instance.tilemap.transform;
-        int tileX = Mathf.FloorToInt((location.x-tmtf.transform.position.x)/tmtf.localScale.x);
-        int tileY = Mathf.FloorToInt((location.y-tmtf.transform.position.y)/tmtf.localScale.y);
 
         if (interacter is PlayerController) {
             PlayerController player = (PlayerController) interacter;
 
             //Give coin to player
-            player.photonView.RPC("CollectCoin", RpcTarget.All, -1, location.x+0.25f, location.y+0.25f);
+            player.photonView.RPC("CollectCoin", RpcTarget.All, -1, worldLocation.x+0.25f, worldLocation.y+0.25f);
         }
 
-        GameManager.Instance.photonView.RPC("BumpBlock", RpcTarget.All, tileX, tileY, resultTile, (int) BlockBump.SpawnResult.Coin, direction == InteractionDirection.Down);
+        GameManager.Instance.photonView.RPC("BumpBlock", RpcTarget.All, tileLocation.x, tileLocation.y, resultTile, (int) BlockBump.SpawnResult.Coin, direction == InteractionDirection.Down);
         return false;
     }
 }

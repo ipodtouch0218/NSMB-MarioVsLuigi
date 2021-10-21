@@ -11,7 +11,7 @@ public class BulletBillLauncher : MonoBehaviourPun {
     private List<GameObject> bills = new List<GameObject>();
 
     private Vector2 searchBox;
-    private Vector3 offset = new Vector3(0.15f, 0, 0);
+    private Vector3 offset = new Vector3(0.25f, -0.2f, 0);
 
     void Start() {
         audio = GetComponent<AudioSource>();
@@ -32,18 +32,18 @@ public class BulletBillLauncher : MonoBehaviourPun {
             if (bills[i] == null)
                 bills.RemoveAt(i--);
         }
-        if (bills.Count >= 5) return;
+        if (bills.Count >= 3) return;
 
         //Shoot left
         if (IntersectsPlayer(transform.position - new Vector3(playerSearchRadius/2 + 1, 0, 0))) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position - offset, Quaternion.identity, 0, new object[]{true});
+            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(-offset.x, offset.y, offset.z), Quaternion.identity, 0, new object[]{true});
             bills.Add(newBill);
             return;
         }
 
         //Shoot right
         if (IntersectsPlayer(transform.position + new Vector3(playerSearchRadius/2 + 1, 0, 0))) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + offset, Quaternion.identity, 0, new object[]{false});
+            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(offset.x, offset.y, offset.z), Quaternion.identity, 0, new object[]{false});
             bills.Add(newBill);
             return;
         }

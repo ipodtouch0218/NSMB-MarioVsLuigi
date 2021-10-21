@@ -7,21 +7,20 @@ using UnityEngine.Tilemaps;
 [CreateAssetMenu]
 public class BreakableBrickTile : InteractableTile {
     public Color particleColor;
-    public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector2 location) {
+    public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         Transform tmtf = GameManager.Instance.tilemap.transform;
-        int tileX = Mathf.FloorToInt((location.x-tmtf.transform.position.x)/tmtf.localScale.x);
-        int tileY = Mathf.FloorToInt((location.y-tmtf.transform.position.y)/tmtf.localScale.y);
+        Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         if (direction != InteractionDirection.Down) {
             //check for entities above to bump
 
-            foreach (Collider2D collider in Physics2D.OverlapBoxAll(new Vector2(location.x,location.y+0.5f), new Vector2(0.5f,0.05f), 0f)) {
+            foreach (Collider2D collider in Physics2D.OverlapBoxAll(worldLocation + bumpOffset, new Vector2(0.5f,0.05f), 0f)) {
                 GameObject obj = collider.gameObject;
                 if (obj == interacter.gameObject) continue;
                 switch (obj.tag) {
                 case "Player": {
                     PlayerController player = obj.GetComponent<PlayerController>();
-                    player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x > location.x, 1);
+                    player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x > worldLocation.x, 1);
                     break;
                 }
                 case "koopa":
@@ -30,7 +29,7 @@ public class BreakableBrickTile : InteractableTile {
                         break;
                     if (obj.GetComponent<KillableEntity>().dead)
                         break;
-                    obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < location.x, false);
+                    obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false);
                     break;
                 }
                 case "coin": {
@@ -64,14 +63,14 @@ public class BreakableBrickTile : InteractableTile {
                 || player.state == PlayerController.PlayerState.Mini) {
                 //Bump
 
-                GameManager.Instance.photonView.RPC("BumpBlock", RpcTarget.All, tileX, tileY, "SpecialTiles/" + this.name, (int) BlockBump.SpawnResult.Nothing, direction == InteractionDirection.Down);
+                GameManager.Instance.photonView.RPC("BumpBlock", RpcTarget.All, tileLocation.x, tileLocation.y, "SpecialTiles/" + this.name, (int) BlockBump.SpawnResult.Nothing, direction == InteractionDirection.Down);
                 return false;
             }
         }
 
         //Break
-        GameManager.Instance.photonView.RPC("ModifyTilemap", RpcTarget.All, tileX, tileY, null);
-        GameManager.Instance.photonView.RPC("SpawnBreakParticle", RpcTarget.All, tileX, tileY, particleColor.r, particleColor.g, particleColor.b);
+        GameManager.Instance.photonView.RPC("ModifyTilemap", RpcTarget.All, tileLocation.x, tileLocation.y, null);
+        GameManager.Instance.photonView.RPC("SpawnBreakParticle", RpcTarget.All, tileLocation.x, tileLocation.y, particleColor.r, particleColor.g, particleColor.b);
         if (interacter is MonoBehaviourPun) {
             ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
         }

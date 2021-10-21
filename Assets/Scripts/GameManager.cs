@@ -282,7 +282,7 @@ public class GameManager : MonoBehaviourPun {
 
     public void Pause() {
         paused = !paused;
-        pauseUI.SetActive(paused);
+        Instance.pauseUI.SetActive(paused);
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
+
 using Photon.Pun;
 
 public class PlayerController : MonoBehaviourPun {
@@ -24,7 +25,7 @@ public class PlayerController : MonoBehaviourPun {
     PipeManager pipeEntering;
     private Vector2 pipeDirection;
     public int stars, coins;
-    List<Vector3> tilesStandingOn = new List<Vector3>(), tilesJumpedInto = new List<Vector3>(), tilesHitSide = new List<Vector3>();
+    List<Vector3Int> tilesStandingOn = new List<Vector3Int>(), tilesJumpedInto = new List<Vector3Int>(), tilesHitSide = new List<Vector3Int>();
     public string storedPowerup = null;
     HoldableEntity holding, holdingOld;
     public Gradient glowGradient;
@@ -63,9 +64,6 @@ public class PlayerController : MonoBehaviourPun {
 
 
     void HandleGroundCollision() {
-        if (!photonView.IsMine) {
-            return;
-        }
         bool ignoreRoof = false;
         int down = 0, left = 0, right = 0, up = 0;
         float blockRoofY = 0;
@@ -92,21 +90,26 @@ public class PlayerController : MonoBehaviourPun {
                 }
                 crushGround |= (point.collider.gameObject.tag != "platform");
                 down++;
-                Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y));
+                Vector3Int vec = Utils.WorldToTilemapPosition(point.point);
+                // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y));
                 tilesStandingOn.Add(vec);
             } else if (point.collider.gameObject.layer == LayerMask.NameToLayer("Ground")) {
                 if (Vector2.Dot(n,Vector2.left) > .9f) {
                     right++;
-                    Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x + 0.1f), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y + 0.05f));
+                    Vector3Int vec = Utils.WorldToTilemapPosition(point.point + new Vector2(0.1f, 0.05f));
+                    // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x + 0.1f), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y + 0.05f));
                     tilesHitSide.Add(vec);
                 } else if (Vector2.Dot(n,Vector2.right) > .9f) {
                     left++;
-                    Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x - 0.1f), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y + 0.05f));
+                    Vector3Int vec = Utils.WorldToTilemapPosition(point.point + new Vector2(-0.1f, 0.05f));
+                    // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x - 0.1f), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y + 0.05f));
                     tilesHitSide.Add(vec);
                 } else if (Vector2.Dot(n,Vector2.down) > .9f && !groundpound) {
                     up++;
-                    blockRoofY = Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y);
-                    Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x), blockRoofY);
+                    Vector3Int vec = Utils.WorldToTilemapPosition(point.point);
+                    // blockRoofY = Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y);
+                    // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x), blockRoofY);
+                    blockRoofY = vec.y;
                     tilesJumpedInto.Add(vec);
                 }
             } else {
@@ -119,11 +122,11 @@ public class PlayerController : MonoBehaviourPun {
             onGroundLastFrame = true;
 
             if (tilesStandingOn.Count >= 2) {
-                float xMax = Mathf.Max(tilesStandingOn[0].x, tilesStandingOn[1].x);
-                float xMin = Mathf.Min(tilesStandingOn[0].x, tilesStandingOn[1].x);
+                int xMax = Mathf.Max(tilesStandingOn[0].x, tilesStandingOn[1].x);
+                int xMin = Mathf.Min(tilesStandingOn[0].x, tilesStandingOn[1].x);
 
-                for (float temp = xMin; temp < xMax; temp++) {
-                    tilesStandingOn.Add(new Vector3(temp, tilesStandingOn[0].y));
+                for (int temp = xMin; temp < xMax; temp++) {
+                    tilesStandingOn.Add(new Vector3Int(temp, tilesStandingOn[0].y, 0));
                 }
             }
         }
@@ -134,18 +137,19 @@ public class PlayerController : MonoBehaviourPun {
         hitRoof = !ignoreRoof && !onLeft && !onRight && up >= 2 && body.velocity.y > -0.2f;
 
         if ((left >= 2 || right >= 2) && tilesHitSide.Count >= 2) {
-            float yMax = Mathf.Max(tilesHitSide[0].y, tilesHitSide[1].y);
-            float yMin = Mathf.Min(tilesHitSide[0].y, tilesHitSide[1].y);
+            int yMax = Mathf.Max(tilesHitSide[0].y, tilesHitSide[1].y);
+            int yMin = Mathf.Min(tilesHitSide[0].y, tilesHitSide[1].y);
 
-            for (float temp = yMin; temp < yMax; temp++) {
-                tilesHitSide.Add(new Vector3(tilesHitSide[0].x, temp));
+            for (int temp = yMin; temp < yMax; temp++) {
+                tilesHitSide.Add(new Vector3Int(tilesHitSide[0].x, temp, 0));
             }
         }
 
-        if (hitRoof) {
-            tilesJumpedInto.Add(new Vector2(Mathf.Floor((transform.position.x - tmtf.position.x) / tmtf.localScale.x), blockRoofY));
-        }
+        // if (hitRoof) {
+        //     tilesJumpedInto.Add(new Vector3Int(Mathf.Floor((transform.position.x - tmtf.position.x) / tmtf.localScale.x), blockRoofY));
+        // }
 
+        //todo: refactor
         ice = false;
         foreach (Vector3 pos in tilesStandingOn) {
             TileBase tile = GameManager.Instance.tilemap.GetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z)));
@@ -794,6 +798,7 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     void HandleGiantTiles() {
+        //todo: refactor to use ne wtile system
         Transform tmtf = GameManager.Instance.tilemap.transform;
         float lsX = tmtf.localScale.x;
         float lsY = tmtf.localScale.y;
@@ -827,6 +832,7 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     bool GiantDestroyTile(Vector3Int vec) {
+        //todo: refactor to use new tile system
         Tilemap tm = GameManager.Instance.tilemap;
 
         TileBase tile = tm.GetTile(vec);
@@ -932,25 +938,20 @@ public class PlayerController : MonoBehaviourPun {
 
         if (photonView.IsMine) {
             if (!dead) {
-                try {
-                    HandleGroundCollision();
-                } catch (System.Exception e) {
-                    Debug.LogError(e);
-                }
-                // collisionsThisFrame.Clear();
+                HandleGroundCollision();
                 HandleMovement();
+
                 tilesJumpedInto.Clear();
                 tilesStandingOn.Clear();
                 tilesHitSide.Clear();
             }
         }
         HandleAnimation(orig);
-        if (dead) {
-            HandleDeathAnimation();
-        }
     }
 
     void HandleDeathAnimation() {
+        if (!dead) return;
+
         models.transform.eulerAngles = new Vector3(0,180,0);
         deathCounter += Time.fixedDeltaTime;
         if (deathCounter < deathUpTime) {
@@ -1153,7 +1154,7 @@ public class PlayerController : MonoBehaviourPun {
         }
 
         //Model changing
-        bool large = state >= PlayerState.Large && state != PlayerState.Mini;
+        bool large = state >= PlayerState.Large;
 
         largeMarioModel.SetActive(large && !luigi);
         smallMarioModel.SetActive(!large && !luigi);
@@ -1167,6 +1168,9 @@ public class PlayerController : MonoBehaviourPun {
         // } else {
             animator.avatar = large ? largeMarioAvatar : smallMarioAvatar;
         // }
+
+        HandleDeathAnimation();
+        HandlePipeAnimation();
     }
 
     void FakeOnGroundCheck() {
@@ -1176,75 +1180,82 @@ public class PlayerController : MonoBehaviourPun {
                 onGround = true;
                 transform.position = new Vector2(body.position.x, hit.point.y);
                 body.velocity = new Vector2(body.velocity.x, -1);
-                Debug.Log("fake on ground");
             }
         }
     }
     
-    void PipeAnimationHandler() {
-        if (pipeEntering != null) {
-            body.isKinematic = true;
-            body.velocity = pipeDirection;
-            
-            if (pipeTimer < pipeDuration / 2f && pipeTimer+Time.fixedDeltaTime >= pipeDuration / 2f) {
-                //tp to other pipe
-                if (pipeEntering.otherPipe.bottom == pipeEntering.bottom) {
-                    pipeDirection *= -1;
-                }
-                Vector2 offset = (pipeDirection * (pipeDuration / 2f));
-                if (pipeEntering.otherPipe.bottom) {
-                    offset -= pipeDirection;
-                    offset.y -= (state == PlayerState.Small ? 0.5f : 0);
-                }
-
-                transform.position = new Vector2(pipeEntering.otherPipe.transform.position.x, pipeEntering.otherPipe.transform.position.y) - offset;
-                photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
-            }
-            if (pipeTimer >= pipeDuration) {
-                pipeEntering = null;
-            }
-            pipeTimer += Time.fixedDeltaTime;
-            return;
-        } else {
-            body.isKinematic = false;
+    void HandlePipeAnimation() {
+        if (!photonView.IsMine) return;
+        if (!pipeEntering) {
             pipeTimer = 0;
+            return;
         }
+
+        body.isKinematic = true;
+        body.velocity = pipeDirection;
+            
+        if (pipeTimer < pipeDuration / 2f && pipeTimer+Time.fixedDeltaTime >= pipeDuration / 2f) {
+            //tp to other pipe
+            if (pipeEntering.otherPipe.bottom == pipeEntering.bottom) {
+                pipeDirection *= -1;
+            }
+            Vector2 offset = (pipeDirection * (pipeDuration / 2f));
+            if (pipeEntering.otherPipe.bottom) {
+                offset -= pipeDirection;
+                offset.y -= (state == PlayerState.Small ? 0.5f : 0);
+            }
+            transform.position = new Vector2(pipeEntering.otherPipe.transform.position.x, pipeEntering.otherPipe.transform.position.y) - offset;
+            photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
+        }
+        if (pipeTimer >= pipeDuration) {
+            pipeEntering = null;
+            body.isKinematic = false;
+        }
+        pipeTimer += Time.fixedDeltaTime;
     }
 
     void DownwardsPipeCheck() {
-        if (onGround && crouching && !inShell) {
-            foreach (RaycastHit2D hit in Physics2D.RaycastAll(transform.position, Vector2.down, 1f)) {
-                GameObject obj = hit.transform.gameObject;
-                if (obj.tag == "pipe") {
-                    //Enter pipe
-                    pipeEntering = obj.GetComponent<PipeManager>();
-                    pipeDirection = Vector2.down;
-                    transform.position = new Vector2(obj.transform.position.x, transform.position.y);
-                    body.velocity = Vector2.down;
-                    photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
-                    transform.position += Vector3.forward;
-                    crouching = false;
-                    break;
-                }
+        if (!onGround) return;
+        if (!crouching) return;
+        if (inShell) return;
+        if (knockback) return;
+
+        foreach (RaycastHit2D hit in Physics2D.RaycastAll(transform.position, Vector2.down, 1f)) {
+            GameObject obj = hit.transform.gameObject;
+            if (obj.tag == "pipe") {
+                //Enter pipe
+                pipeEntering = obj.GetComponent<PipeManager>();
+                pipeDirection = Vector2.down;
+
+                body.velocity = Vector2.down;
+                transform.position.Set(obj.transform.position.x, transform.position.y, 1);
+
+                photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
+
+                crouching = false;
+                break;
             }
         }
     }
 
     void UpwardsPipeCheck() {
         bool uncrouch = joystick.y > 0.05;
-        if (hitRoof && uncrouch) {
-            foreach (RaycastHit2D hit in Physics2D.RaycastAll(transform.position, Vector2.up, 1f)) {
-                GameObject obj = hit.transform.gameObject;
-                if (obj.tag == "pipe") {
-                    //Enter pipe
-                    pipeEntering = obj.GetComponent<PipeManager>();
-                    pipeDirection = Vector2.up;
-                    transform.position = new Vector2(obj.transform.position.x, transform.position.y);
-                    body.velocity = Vector2.up;
-                    photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
-                    transform.position += Vector3.forward;
-                    break;
-                }
+        if (!hitRoof) return;
+        if (!uncrouch) return;
+
+        //todo: change to nonalloc?
+        foreach (RaycastHit2D hit in Physics2D.RaycastAll(transform.position, Vector2.up, 1f)) {
+            GameObject obj = hit.transform.gameObject;
+            if (obj.tag == "pipe") {
+                //pipe found
+                pipeEntering = obj.GetComponent<PipeManager>();
+                pipeDirection = Vector2.up;
+
+                body.velocity = Vector2.up;
+                transform.position.Set(obj.transform.position.x, transform.position.y, 1);
+                
+                photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
+                break;
             }
         }
     }
@@ -1262,7 +1273,7 @@ public class PlayerController : MonoBehaviourPun {
 
         body.velocity = new Vector2(0, Mathf.Max(body.velocity.y, wallslideSpeed));
         dust.transform.localPosition = new Vector3(0.075f * (leftWall ? 1 : -1), 0.075f * (state >= PlayerState.Large ? 4 : 1), dust.transform.localPosition.z);
-        dust.transform.rotation = Quaternion.Euler(-90f, 0, 0);
+        // dust.transform.rotation = Quaternion.Euler(-90f, 0, 0);
             
         if (jump) {
             onLeft = false;
@@ -1286,6 +1297,8 @@ public class PlayerController : MonoBehaviourPun {
     
     void HandleJumping(bool jump) {
         if (knockback) return;
+        if (drill) return;
+        if (groundpound) return;
 
         bool topSpeed = Mathf.Abs(body.velocity.x) + 0.1f > (runningMaxSpeed * (invincible > 0 ? 2 : 1));
         if (bounce || (jump && (onGround || koyoteTime < 0.2f))) {
@@ -1357,7 +1370,7 @@ public class PlayerController : MonoBehaviourPun {
             turnaround = false;
         }
 
-        if (Mathf.Abs(body.velocity.x) < 0.5f) {
+        if (Mathf.Abs(body.velocity.x) < 0.5f || !onGround) {
             skidding = false;
             if (!left && !right) {
                 turnaround = false;
@@ -1378,7 +1391,7 @@ public class PlayerController : MonoBehaviourPun {
         float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
         float walkSpeedTotal = walkingMaxSpeed * invincibleSpeedBoost;
         bool reverseBonus = onGround && (((left && body.velocity.x > 0) || (right && body.velocity.x < 0)));
-        float reverseFloat = (reverseBonus ? (ice ? icePenalty : 2) : 1);
+        float reverseFloat = (reverseBonus ? (ice ? icePenalty : 1.2f) : 1);
         float turnaroundSpeedBoost = (turnaround && !reverseBonus ? 2 : 1);
 
         if ((crouching && !onGround && !inShell) || !crouching) {
@@ -1404,7 +1417,7 @@ public class PlayerController : MonoBehaviourPun {
 
                         if (skidding) {
                             dust.transform.localPosition = new Vector3(0, 0, 0);
-                            dust.transform.rotation = Quaternion.Euler(0, -90f, 0);
+                            // dust.transform.rotation = Quaternion.Euler(0, -90f, 0);
                         }
                     }
                 }
@@ -1430,7 +1443,7 @@ public class PlayerController : MonoBehaviourPun {
                         
                         if (skidding) {
                             dust.transform.localPosition = new Vector3(0, 0, 0);
-                            dust.transform.rotation = Quaternion.Euler(0, -90f, 0);
+                            // dust.transform.rotation = Quaternion.Euler(0, -90f, 0);
                         }
                     }
                 }
@@ -1447,7 +1460,8 @@ public class PlayerController : MonoBehaviourPun {
 
     void HandleMovement() {
         
-        if (!dead && transform.position.y < GameManager.Instance.GetLevelMinY()) {
+        if (transform.position.y < GameManager.Instance.GetLevelMinY()) {
+            //death via pit
             photonView.RPC("Death", RpcTarget.All, true);
             return;
         }
@@ -1464,7 +1478,7 @@ public class PlayerController : MonoBehaviourPun {
 
         if (giantStartTimer > 0) {
             body.velocity = Vector2.zero;
-            body.isKinematic = giantStartTimer - delta > 0;
+            body.isKinematic = giantStartTimer > 0;
             return;
         }
 
@@ -1472,6 +1486,7 @@ public class PlayerController : MonoBehaviourPun {
             if (giantTimer <= 0) {
                 state = PlayerState.Large;
                 hitInvincibilityCounter = 3f;
+                //todo: play shrink sfx
             } else {
                 //destroy tiles
                 HandleGiantTiles();
@@ -1480,14 +1495,6 @@ public class PlayerController : MonoBehaviourPun {
 
         //Ground
         FakeOnGroundCheck();
-
-        //Pipes
-        if (!paused) {
-            DownwardsPipeCheck();
-            UpwardsPipeCheck();
-            PipeAnimationHandler();
-        }
-
         if (onGround) {
             if (hitRoof && crushGround && body.velocity.y < 0) {
                 //Crushed.
@@ -1496,7 +1503,8 @@ public class PlayerController : MonoBehaviourPun {
             koyoteTime = 0;
             onLeft = false;
             onRight = false;
-            if ((landing += delta) > 0.2) {
+            flying = false;
+            if ((landing += delta) > 0.2f) {
                 singlejump = false;
                 doublejump = false;
                 triplejump = false;
@@ -1504,15 +1512,24 @@ public class PlayerController : MonoBehaviourPun {
         } else {
             koyoteTime += delta;
             landing = 0;
+            skidding = false;
+            turnaround = false;
+        }
+
+        //Pipes
+        if (!paused) {
+            DownwardsPipeCheck();
+            UpwardsPipeCheck();
         }
         
         if (knockback && photonView.IsMine) {
-            body.velocity -= (body.velocity * (Time.fixedDeltaTime * 2f));
+            // body.velocity -= (body.velocity * (Time.fixedDeltaTime * 2f));
             if (onGround && Mathf.Abs(body.velocity.x) < 0.05f) {
                 DisableKnockbackState();
             }
         }
 
+        //activate blocks jumped into
         if (hitRoof) {
             foreach (Vector3 tile in tilesJumpedInto) {
                 InteractWithTile(tile, false);
@@ -1537,6 +1554,8 @@ public class PlayerController : MonoBehaviourPun {
                 holding.holderOffset = new Vector2(-0.25f, 0.25f);
             }
         }
+        
+        //throwing held item
         if ((!running || state == PlayerState.Mini || state == PlayerState.Giant) && holding) {
             bool throwLeft = !facingRight;
             if (left) {
@@ -1554,6 +1573,8 @@ public class PlayerController : MonoBehaviourPun {
             holdingOld = holding;
             holding = null;
         }
+
+        //blue shell enter/exit
         if (state != PlayerState.Shell || !running) {
             inShell = false;
         }
@@ -1571,7 +1592,7 @@ public class PlayerController : MonoBehaviourPun {
         //Crouching
         if (state != PlayerState.Giant) {
             if (((crouching && !onGround) || (onGround && !groundpound)) && !onLeft && !onRight && !holding) {
-                if (crouching && state >= PlayerState.Large && state != PlayerState.Mini) {
+                if (crouching && state >= PlayerState.Large) {
                     bool forceCrouch = false;
                     RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + new Vector3(0,0.1f,0), Vector2.up, 0.85f);
                     Debug.DrawRay(transform.position + new Vector3(0,0.1f,0), Vector2.up * 1, Color.magenta);
@@ -1597,7 +1618,7 @@ public class PlayerController : MonoBehaviourPun {
             onLeft = false;
             onRight = false;
             dust.transform.localPosition = new Vector3(0, 0, 0);
-            dust.transform.rotation = Quaternion.Euler(0, 90f, 0);
+            // dust.transform.rotation = Quaternion.Euler(0, 90f, 0);
         }
 
         if (onLeft) {
@@ -1612,69 +1633,12 @@ public class PlayerController : MonoBehaviourPun {
             HandleWalkingRunning(left, right);
 
             //Jumping
-            if (!drill) {
-                HandleJumping(jump);
-            }
+            HandleJumping(jump);
         }
         
-        if (!holding && !onGround && !crouching && crouch && !groundpound && !drill && !onLeft && !onRight && (flying || (!left && !right))) {
-            //groundpound
-
-            if (flying) {
-                //drill
-                if (body.velocity.y < 0) {
-                    drill = true;
-                    hitBlock = true;
-                }
-
-            } else {
-                //groundpound
-                //check if high enough above ground
-                RaycastHit2D rc = Physics2D.Raycast(transform.position, Vector2.down, 0.5f, GROUND_MASK);
-                if (!rc) {
-                    groundpound = true;
-                    groundpoundSit = false;
-                    hitBlock = true;
-                    body.velocity = Vector2.zero;
-                    groundpoundCounter = groundpoundTime;
-                    photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound");
-                }
-            }
-        }
-        if (onGround && (groundpound || drill) && hitBlock) {
-            bool tempHitBlock = true;
-            foreach (Vector3 tile in tilesStandingOn) {
-                int temp = InteractWithTile(tile, true);
-                if (temp != -1) {
-                    tempHitBlock &= (temp == 1);
-                }
-            }
-            hitBlock = tempHitBlock;
-            if (drill) {
-                drill = !hitBlock;
-                if (drill) onGround = false;
-            } else {
-                //groundpound
-                groundpound = crouch;
-                if (hitBlock) {
-                    koyoteTime = 1;
-                } else {
-                    photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == PlayerState.Mini ? "-mini" : ""));
-                    photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
-                    groundpoundSit = true;
-                }
-            }
-        }  
-        if (onGround) {
-            flying = false;
-            drill = false;
-        }
-
-        if (groundpound && ((up && !onGround) || (!crouch && onGround)) && groundpoundCounter <= 0) {
-            groundpound = false;
-            groundpoundSit = false;
-            groundpoundCounter = 0.25f;
-        }
+        if (crouch)
+            HandleGroundpoundStart(left, right);
+        HandleGroundpound(crouch, up);
 
         //slow-rise check
         if (flying) {
@@ -1712,7 +1676,8 @@ public class PlayerController : MonoBehaviourPun {
             }
             //Friction...
             if (onGround && abovemax) {
-                body.velocity -= (body.velocity * (Time.fixedDeltaTime * (ice ? 1f : 3f) * (knockback ? 1f : 2f)));
+                body.velocity *= 1-(Time.fixedDeltaTime * (ice ? 1f : 1.3f) * (knockback ? 1f : 2f));
+                // body.velocity -= (body.velocity * (Time.fixedDeltaTime * (ice ? 1f : 1.3f) * (knockback ? 1f : 2f)));
                 if (Mathf.Abs(body.velocity.x) < 0.05) {
                     body.velocity = new Vector2(0, body.velocity.y);
                 }
@@ -1736,7 +1701,68 @@ public class PlayerController : MonoBehaviourPun {
         onGroundLastFrame = onGround;
     }
 
+    void HandleGroundpoundStart(bool left, bool right) {
+        if (onGround) return;
+        if (!flying && (left || right)) return;
+        if (groundpound || drill) return;
+        if (holding) return;
+        if (crouching) return;
+        if (onLeft || onRight) return;
+
+        if (flying) {
+            //start drill
+            if (body.velocity.y < 0) {
+                drill = true;
+                hitBlock = true;
+            }
+        } else {
+            //start groundpound
+            //check if high enough above ground
+            if (Physics2D.Raycast(transform.position, Vector2.down, 0.5f, GROUND_MASK)) return;
+            
+            groundpound = true;
+            hitBlock = true;
+            groundpoundSit = false;
+            body.velocity = Vector2.zero;
+            groundpoundCounter = groundpoundTime;
+            photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound");
+        }
+    }
+
+    void HandleGroundpound(bool crouch, bool up) {
+        if (onGround && (groundpound || drill) && hitBlock) {
+            bool tempHitBlock = true;
+            foreach (Vector3 tile in tilesStandingOn) {
+                int temp = InteractWithTile(tile, true);
+                if (temp != -1) {
+                    tempHitBlock &= (temp == 1);
+                }
+            }
+            hitBlock = tempHitBlock;
+            if (drill) {
+                drill = hitBlock;
+                if (drill) onGround = false;
+            } else {
+                //groundpound
+                groundpound = crouch;
+                if (hitBlock) {
+                    koyoteTime = 1;
+                } else {
+                    photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == PlayerState.Mini ? "-mini" : ""));
+                    photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
+                    groundpoundSit = true;
+                }
+            }
+        }
+
+        if (groundpound && ((up && !onGround) || (!crouch && onGround)) && groundpoundCounter <= 0) {
+            groundpound = false;
+            groundpoundSit = false;
+            groundpoundCounter = 0.25f;
+        }
+    }
+
     public enum PlayerState {
-        Small, Large, FireFlower, Mini, Shell, Giant
+        Small, Mini, Large, FireFlower, Shell, Giant
     }
 }

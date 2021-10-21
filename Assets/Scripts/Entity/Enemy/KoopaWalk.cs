@@ -10,6 +10,7 @@ public class KoopaWalk : HoldableEntity {
     public bool left = true, putdown = false;
     float wakeupTimer;
     new private BoxCollider2D collider;
+    Vector2 blockOffset = new Vector3(0, 0.05f);
     new void Start() {
         base.Start();
         hitbox = GetComponentInChildren<BoxCollider2D>();
@@ -151,17 +152,13 @@ public class KoopaWalk : HoldableEntity {
                         photonView.RPC("PlaySound", RpcTarget.All, "player/block_bump");
                         sound = true;
                     }
-                    Transform tmtf = GameManager.Instance.tilemap.transform;
-                    int x = Mathf.FloorToInt((point.point.x - tmtf.position.x) / tmtf.localScale.x);
-                    int y = Mathf.FloorToInt((point.point.y - tmtf.position.y) / tmtf.localScale.y + 0.05f);
-                    Vector3Int vec = new Vector3Int(x, y, 0);
-                    TileBase tile = GameManager.Instance.tilemap.GetTile(vec);
+                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(point.point + blockOffset);
+                    TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
                     if (tile == null) continue;
                     if (!shell) continue;
                     
                     if (tile is InteractableTile) {
-                        Vector2 loc2 = new Vector2(point.point.x, point.point.y);
-                        ((InteractableTile) tile).Interact(this, InteractableTile.InteractionDirection.Up, loc2);
+                        ((InteractableTile) tile).Interact(this, InteractableTile.InteractionDirection.Up, point.point);
                     }
                 }
             } else if (point.normal.y > 0 && putdown) {
