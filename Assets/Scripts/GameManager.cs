@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviourPun {
         Camera.main.GetComponent<CameraController>().target = localPlayer;
         // localPlayer.GetComponent<PlayerController>().dead = true;
         // localPlayer.SetActive(false);
+        localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
+        localPlayer.GetComponent<PlayerController>().enabled = false;
         PhotonNetwork.IsMessageQueueRunning = true;
         photonView.RPC("IveFinishedLoading", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
     }
@@ -75,6 +77,8 @@ public class GameManager : MonoBehaviourPun {
         foreach (var wfgs in GameObject.FindObjectsOfType<WaitForGameStart>()) {
             wfgs.AttemptExecute();
         }
+        localPlayer.GetComponent<Rigidbody2D>().isKinematic = false;
+        localPlayer.GetComponent<PlayerController>().enabled = true;
         localPlayer.GetPhotonView().RPC("PreRespawn", RpcTarget.All);
 
         yield return new WaitForSeconds(1f);

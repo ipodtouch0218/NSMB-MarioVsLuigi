@@ -571,7 +571,7 @@ Transform:
   - {fileID: 1123674084}
   - {fileID: 1692531505}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &366154110
 GameObject:
@@ -773,7 +773,7 @@ PrefabInstance:
     - target: {fileID: 7020551328166419880, guid: df38f39e18bbdcf4b9b2ee15b49f1bb2,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7020551328166419880, guid: df38f39e18bbdcf4b9b2ee15b49f1bb2,
         type: 3}
@@ -862,7 +862,7 @@ Transform:
   - {fileID: 89162346}
   - {fileID: 896736414}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &618488773
 GameObject:
@@ -1156,7 +1156,7 @@ PrefabInstance:
     - target: {fileID: 5500062339093502141, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5500062339093502141, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
@@ -2291,7 +2291,7 @@ Transform:
   - {fileID: 263296477}
   - {fileID: 1014048229}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1685191129
 GameObject:
@@ -2385,7 +2385,7 @@ Camera:
   far clip plane: 1000
   field of view: 41.913692
   orthographic: 1
-  orthographic size: 4.6987495
+  orthographic size: 4.699769
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -2617,7 +2617,7 @@ Transform:
   - {fileID: 2137834373}
   - {fileID: 618488774}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1823120123
 PrefabInstance:
@@ -3032,7 +3032,7 @@ Camera:
   far clip plane: 1000
   field of view: 41.913692
   orthographic: 1
-  orthographic size: 4.6987495
+  orthographic size: 4.699769
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -3423,7 +3423,7 @@ Camera:
   far clip plane: 1000
   field of view: 41.913692
   orthographic: 1
-  orthographic size: 4.6987495
+  orthographic size: 4.699769
   m_Depth: -3
   m_CullingMask:
     serializedVersion: 2
@@ -3453,7 +3453,7 @@ Transform:
   - {fileID: 1911576782}
   - {fileID: 1685191130}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2049801523
 MonoBehaviour:

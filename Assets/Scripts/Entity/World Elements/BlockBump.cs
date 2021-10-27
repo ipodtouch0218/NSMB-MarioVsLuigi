@@ -30,8 +30,7 @@ public class BlockBump : MonoBehaviour {
         GameObject.Destroy(transform.parent.gameObject);
         
         Tilemap tm = GameManager.Instance.tilemap;
-        Transform tmtf = tm.transform;
-        Vector3Int loc = new Vector3Int(Mathf.FloorToInt((transform.position.x - tmtf.position.x) / tmtf.localScale.x), Mathf.FloorToInt((transform.position.y - tmtf.position.y) / tmtf.localScale.y), 0);
+        Vector3Int loc = Utils.WorldToTilemapPosition(transform.position);
         
         Object tile = Resources.Load("Tilemaps/Tiles/" + resultTile);
         if (tile is AnimatedTile) {

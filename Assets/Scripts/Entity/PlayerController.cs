@@ -209,7 +209,7 @@ public class PlayerController : MonoBehaviourPun {
         if (Mathf.Abs(body.velocity.x) < walkingMaxSpeed)
             return;
         
-        PlaySoundFromAnim("player/walk" + (step ? "-2" : ""));
+        PlaySoundFromAnim("player/walk" + (step ? "-2" : ""), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
         step = !step;
     }
 
@@ -413,13 +413,13 @@ public class PlayerController : MonoBehaviourPun {
         
         Vector2 dir = (transform.position - collider.transform.position);
         dir.Normalize();
-        bool downwards = Vector2.Dot(dir, Vector2.up) > 0.6f;
+        bool downwards = Vector2.Dot(dir, Vector2.up) > 0.5f;
         switch (collider.tag) {
             case "goomba": {
                 GoombaWalk goomba = collider.gameObject.GetComponentInParent<GoombaWalk>();
                 if (goomba.dead)
                     break;
-                if (inShell || invincible > 0 || ((groundpound || drill) && state != PlayerState.Mini && body.velocity.y < -2) || state == PlayerState.Giant) {
+                if (inShell || invincible > 0 || ((groundpound || drill) && state != PlayerState.Mini && downwards) || state == PlayerState.Giant) {
                     collider.gameObject.transform.parent.gameObject.GetPhotonView().RPC("SpecialKill", RpcTarget.All, body.velocity.x > 0, groundpound);
                 } else if (downwards) {
                     if (groundpound || state != PlayerState.Mini) {
@@ -443,7 +443,7 @@ public class PlayerController : MonoBehaviourPun {
                 BulletBillMover bullet = collider.gameObject.GetComponentInParent<BulletBillMover>();
                 if (bullet.dead)
                     break;
-                if (inShell || invincible > 0 || (groundpound && state != PlayerState.Mini && body.velocity.y < -2) || state == PlayerState.Giant) {
+                if (inShell || invincible > 0 || (groundpound && state != PlayerState.Mini && downwards) || state == PlayerState.Giant) {
                     bullet.photonView.RPC("SpecialKill", RpcTarget.All, body.velocity.x > 0, groundpound);
                 } else if (downwards) {
                     if (groundpound || drill || state != PlayerState.Mini) {
@@ -473,10 +473,13 @@ public class PlayerController : MonoBehaviourPun {
                     break;
                 if (inShell || invincible > 0 || state == PlayerState.Giant) {
                     koopa.photonView.RPC("SpecialKill", RpcTarget.All, !facingRight, false);
-                } else if (groundpound && state != PlayerState.Mini && body.velocity.y < -2) {
+                } else if (groundpound && state != PlayerState.Mini && downwards) {
                     koopa.photonView.RPC("EnterShell", RpcTarget.All);
-                    if (!koopa.blue)
+                    if (!koopa.blue) {
                         koopa.photonView.RPC("Kick", RpcTarget.All, body.velocity.x > 0);
+                        holdingOld = koopa;
+                        throwInvincibility = 0.5f;
+                    }
                 } else if (downwards && (!koopa.shell || !koopa.IsStationary())) {
                     if (state != PlayerState.Mini || groundpound) {
                         koopa.photonView.RPC("EnterShell", RpcTarget.All);
@@ -492,6 +495,8 @@ public class PlayerController : MonoBehaviourPun {
                             holding = koopa;
                         } else {
                             koopa.photonView.RPC("Kick", RpcTarget.All, transform.position.x < koopa.transform.position.x);
+                            holdingOld = koopa;
+                            throwInvincibility = 0.5f;
                         }
                     } else {
                         if (holding) {
@@ -518,7 +523,7 @@ public class PlayerController : MonoBehaviourPun {
                     break;
                 }
                 if (downwards && !bomb.lit) {
-                    if (state != PlayerState.Mini || (groundpound && body.velocity.y < -2)) {
+                    if (state != PlayerState.Mini || (groundpound && downwards)) {
                         bomb.photonView.RPC("Light", RpcTarget.All);
                     }
                     photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
@@ -603,6 +608,10 @@ public class PlayerController : MonoBehaviourPun {
             }
             case "spinner": {
                 onSpinner = collider.gameObject;
+                break;
+            }
+            case "poison": {
+                photonView.RPC("Death", RpcTarget.All, false);
                 break;
             }
         }
@@ -712,6 +721,8 @@ public class PlayerController : MonoBehaviourPun {
         drill = false;
         deathCounter = 0;
         dust.Stop();
+        onLeft = false;
+        onRight = false;
         PlaySoundFromAnim("player/death");
         SpawnStar();
         if (holding) {
@@ -885,8 +896,8 @@ public class PlayerController : MonoBehaviourPun {
         tm.SetTile(loc, (Tile) Resources.Load("Tilemaps/Tiles" + newtile));
     }
 
-    public void PlaySoundFromAnim(string sound) {
-        audio.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound));
+    public void PlaySoundFromAnim(string sound, float volume = 1) {
+        audio.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound), volume);
     }
 
     [PunRPC]

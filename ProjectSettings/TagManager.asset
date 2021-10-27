@@ -29,6 +29,7 @@ TagManager:
   - bulletbill
   - spinner
   - platform
+  - poison
   layers:
   - Default
   - TransparentFX
