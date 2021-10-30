@@ -8,7 +8,7 @@ public class EnemySpawnpoint : MonoBehaviour {
     public string prefab;
     public GameObject currentEntity;
 
-    public bool AttemptSpawning() {
+    public virtual bool AttemptSpawning() {
         if (currentEntity)
             return false;
 

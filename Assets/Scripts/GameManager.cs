@@ -174,7 +174,7 @@ public class GameManager : MonoBehaviourPun {
                     Vector3 spawnPos = spawns[(int) (Random.value * spawns.Length)].transform.position;
                     //Check for people camping spawn
                     foreach (var hit in Physics2D.OverlapCircleAll(spawnPos, 4)) {
-                        if (hit.gameObject.tag == "Player" || hit.gameObject.tag == "CameraTarget") {
+                        if (hit.gameObject.tag == "Player") {
                             //cant spawn here
                             return;
                         }
@@ -277,9 +277,6 @@ public class GameManager : MonoBehaviourPun {
         if (PhotonNetwork.IsMasterClient) {
             foreach (EnemySpawnpoint point in GameObject.FindObjectsOfType<EnemySpawnpoint>()) {
                 point.AttemptSpawning();
-            }
-            foreach (PiranhaPlantController plants in GameObject.FindObjectsOfType<PiranhaPlantController>()) {
-                plants.photonView.RPC("Respawn", RpcTarget.All);
             }
         }
     }

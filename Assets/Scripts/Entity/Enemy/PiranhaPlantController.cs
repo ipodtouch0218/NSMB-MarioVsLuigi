@@ -8,10 +8,12 @@ public class PiranhaPlantController : KillableEntity {
     public float popupTimerRequirement = 6f;
     public float popupTimer;
     private new BoxCollider2D collider2D;
+    private bool upsideDown;
 
     public new void Start() {
         base.Start();
         collider2D = GetComponent<BoxCollider2D>();
+        upsideDown = transform.eulerAngles.z != 0;
     }
 
     public new void Update() {
@@ -27,7 +29,7 @@ public class PiranhaPlantController : KillableEntity {
         if (dead || (photonView && !photonView.IsMine))
             return;
 
-        foreach (var hit in Physics2D.OverlapBoxAll(transform.transform.position + (Vector3) (playerDetectSize*new Vector2(0, 1/2f)), playerDetectSize, 0)) {
+        foreach (var hit in Physics2D.OverlapBoxAll(transform.transform.position + (Vector3) (playerDetectSize*new Vector2(0, (upsideDown ? -0.5f : 0.5f))), playerDetectSize, transform.eulerAngles.z)) {
             if (hit.transform.tag == "Player" || hit.transform.tag == "CameraTarget") {
                 return;
             }
@@ -56,14 +58,14 @@ public class PiranhaPlantController : KillableEntity {
         PlaySound("enemy/shell_kick");
         PlaySound("enemy/piranhaplant-die");
         dead = true;
-        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
+        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, (upsideDown ? -0.5f : 0.5f), 0), Quaternion.identity);
         if (photonView.IsMine) {
-            PhotonNetwork.Instantiate("Prefabs/LooseCoin", transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+            PhotonNetwork.Instantiate("Prefabs/LooseCoin", transform.position + new Vector3(0, (upsideDown ? -1f : 1f), 0), Quaternion.identity);
         }
     }
     
     void OnDrawGizmosSelected() {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(transform.transform.position + (Vector3) (playerDetectSize*new Vector2(0, 1/2f)), playerDetectSize);
+        Gizmos.DrawCube(transform.transform.position + (Vector3) (playerDetectSize*new Vector2(0, (transform.eulerAngles.z != 0 ? -0.5f : 0.5f))), playerDetectSize);
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6004104070224972753}
   - component: {fileID: 6004104070224972750}
   - component: {fileID: 6004104070224972752}
+  - component: {fileID: 2500780753419200967}
   m_Layer: 0
   m_Name: poison-water
   m_TagString: poison
@@ -111,3 +112,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 90, y: 0.6}
   m_EdgeRadius: 0
+--- !u!114 &2500780753419200967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6004104070224972751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0733d35123a9ad4aaf63213211c5b4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tension: 2
+  kconstant: 30
+  damping: 0.98
+  splashVelocity: 15

@@ -10,7 +10,7 @@ public class PirahnaSpawnpoint : EnemySpawnpoint {
         plant = GetComponent<PiranhaPlantController>();
     }
 
-    new public bool AttemptSpawning() {
+    public override bool AttemptSpawning() {
         plant.photonView.RPC("Respawn", Photon.Pun.RpcTarget.All);
         return true;
     }
