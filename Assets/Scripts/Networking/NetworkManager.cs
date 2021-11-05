@@ -8,10 +8,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks {
     public static string PROPKEY_MAP = "level", PROPKEY_STARS = "stars";
     public static NetworkManager instance;
 
-    void Start() {
-        PhotonNetwork.ConnectUsingSettings();
-    }
-
     void Awake() {
         if (instance != null && instance != this) {
             this.gameObject.SetActive(false);

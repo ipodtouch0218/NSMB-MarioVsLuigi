@@ -48,6 +48,13 @@ public class GameManager : MonoBehaviourPun {
         
         SceneManager.SetActiveScene(gameObject.scene);
         localPlayer = PhotonNetwork.Instantiate("Prefabs/Player", spawnpoint, Quaternion.identity, 0);
+        if (!localPlayer) {
+            //not connected to a room, started scene through editor. spawn player
+            PhotonNetwork.OfflineMode = true;
+            PhotonNetwork.CreateRoom("debug");
+            GameObject.Instantiate(Resources.Load("Prefabs/Static/GlobalController"), Vector3.zero, Quaternion.identity);
+            localPlayer = PhotonNetwork.Instantiate("Prefabs/Player", spawnpoint, Quaternion.identity, 0);
+        }
         Camera.main.GetComponent<CameraController>().target = localPlayer;
         // localPlayer.GetComponent<PlayerController>().dead = true;
         // localPlayer.SetActive(false);
@@ -65,15 +72,17 @@ public class GameManager : MonoBehaviourPun {
         loaded = true;
 
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
-        canvas.GetComponent<Animator>().SetTrigger("loaded");
-        canvas.GetComponent<AudioSource>().Stop();
+        if (canvas) {
+            canvas.GetComponent<Animator>().SetTrigger("loaded");
+            canvas.GetComponent<AudioSource>().Stop();
+        }
         StartCoroutine(WaitToActivate());
     }
 
     IEnumerator WaitToActivate() {
         yield return new WaitForSeconds(3.5f);
-        GameObject.FindGameObjectWithTag("LoadingCanvas").GetComponent<AudioSource>().PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
-        
+        GameManager.Instance.audio.PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
+
         foreach (var wfgs in GameObject.FindObjectsOfType<WaitForGameStart>()) {
             wfgs.AttemptExecute();
         }
@@ -84,7 +93,7 @@ public class GameManager : MonoBehaviourPun {
         yield return new WaitForSeconds(1f);
         musicEnabled = true;
         GlobalController.Instance.loadedPlayers.Clear();
-        SceneManager.UnloadSceneAsync(1);
+        SceneManager.UnloadSceneAsync("Loading");
     }
 
     IEnumerator EndGame(Photon.Realtime.Player winner) {
@@ -132,7 +141,7 @@ public class GameManager : MonoBehaviourPun {
     void BumpBlock(int x, int y, string newTile, int spawnResult, bool down) {
         Tilemap tm = GameManager.Instance.tilemap;
         Vector3Int loc = new Vector3Int(x,y,0);
-        
+
         GameObject bump = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), new Vector3(x*tm.transform.localScale.x+tm.transform.position.x+0.25f,y*tm.transform.localScale.y+tm.transform.position.y+0.25f,0), Quaternion.identity);
         BlockBump bb = bump.GetComponentInChildren<BlockBump>();
 
@@ -157,7 +166,7 @@ public class GameManager : MonoBehaviourPun {
         }
 
         if (!loaded) {
-            if (GlobalController.Instance.loadedPlayers.Count >= PhotonNetwork.CurrentRoom.PlayerCount) {
+            if (PhotonNetwork.CurrentRoom == null || GlobalController.Instance.loadedPlayers.Count >= PhotonNetwork.CurrentRoom.PlayerCount) {
                 LoadingComplete();
             }
             return;

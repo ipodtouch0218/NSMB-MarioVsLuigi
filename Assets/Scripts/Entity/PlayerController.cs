@@ -62,7 +62,6 @@ public class PlayerController : MonoBehaviourPun {
         }
     }
 
-
     void HandleGroundCollision() {
         bool ignoreRoof = false;
         int down = 0, left = 0, right = 0, up = 0;
@@ -276,6 +275,7 @@ public class PlayerController : MonoBehaviourPun {
     [PunRPC]
     void Powerup(string powerup, int powerupViewId) {
         bool stateUp = false;
+        PlayerState previous = state;
         string store = null;
         switch (powerup) {
         case "Mushroom": {
@@ -336,14 +336,14 @@ public class PlayerController : MonoBehaviourPun {
             storedPowerup = store;
         }
         if (stateUp) {
-            previousState = state;
+            previousState = previous;
             switch (state) {
             case PlayerState.Mini: {
                 PlaySoundFromAnim("player/powerup-mini");
                 break;
             }
             case PlayerState.Giant: {
-                PlaySoundFromAnim("player/powerup" + (powerup == "MiniMushroom" ? "-mini" : ""));
+                PlaySoundFromAnim("player/powerup-mega");
                 break;
             }
             default: {
@@ -717,6 +717,7 @@ public class PlayerController : MonoBehaviourPun {
     void Death(bool deathplane) {
         dead = true;
         animator.SetTrigger("dead");
+
         flying = false;
         drill = false;
         deathCounter = 0;
@@ -976,6 +977,9 @@ public class PlayerController : MonoBehaviourPun {
             }
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
+            if (transform.position.y < GameManager.Instance.GetLevelMinY()) {
+                transform.position = new Vector2(transform.position.x, GameManager.Instance.GetLevelMinY() - 1);
+            }
         }
 
         if (photonView.IsMine && deathCounter >= 3f) {
@@ -1230,6 +1234,7 @@ public class PlayerController : MonoBehaviourPun {
         if (!crouching) return;
         if (inShell) return;
         if (knockback) return;
+        if (state == PlayerState.Giant) return;
 
         foreach (RaycastHit2D hit in Physics2D.RaycastAll(transform.position, Vector2.down, 1f)) {
             GameObject obj = hit.transform.gameObject;
@@ -1253,6 +1258,7 @@ public class PlayerController : MonoBehaviourPun {
         bool uncrouch = joystick.y > 0.05;
         if (!hitRoof) return;
         if (!uncrouch) return;
+        if (state == PlayerState.Giant) return;
 
         //todo: change to nonalloc?
         foreach (RaycastHit2D hit in Physics2D.RaycastAll(transform.position, Vector2.up, 1f)) {
@@ -1489,7 +1495,7 @@ public class PlayerController : MonoBehaviourPun {
 
         if (giantStartTimer > 0) {
             body.velocity = Vector2.zero;
-            body.isKinematic = giantStartTimer > 0;
+            body.isKinematic = giantStartTimer-delta > 0;
             return;
         }
 
@@ -1497,6 +1503,7 @@ public class PlayerController : MonoBehaviourPun {
             if (giantTimer <= 0) {
                 state = PlayerState.Large;
                 hitInvincibilityCounter = 3f;
+                body.isKinematic = false;
                 //todo: play shrink sfx
             } else {
                 //destroy tiles

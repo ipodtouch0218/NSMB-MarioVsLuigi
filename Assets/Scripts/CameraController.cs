@@ -5,10 +5,10 @@ using UnityEngine;
 public class CameraController : MonoBehaviour {
 
     float scroll;
-    [SerializeField] float minY, maxY, centerWidth = 1f, minX = -1000, maxX = 1000;
+    [SerializeField] float minY, maxY, centerXWidth = 0.5f, centerYWidth = 0.5f, minX = -1000, maxX = 1000;
     public GameObject target;
     
-    void LateUpdate() {
+    void Update() {
         if (target == null)
             return;
 
@@ -25,22 +25,22 @@ public class CameraController : MonoBehaviour {
 
         if (Mathf.Abs(tp) > 5) {
             targetX = ctp.x + scroll;
-        } else if (ctp.x - currX > centerWidth) {
-            targetX = ctp.x - centerWidth;
-        } else if (ctp.x - currX < -centerWidth) {
-            targetX = ctp.x + centerWidth;
+        } else if (ctp.x - currX > centerXWidth) {
+            targetX = ctp.x - centerXWidth;
+        } else if (ctp.x - currX < -centerXWidth) {
+            targetX = ctp.x + centerXWidth;
         }
 
         float targetY = currY;
-        if (ctp.y - currY > centerWidth) {
-            targetY = ctp.y - centerWidth;
-        } else if (ctp.y - currY < -centerWidth) {
-            targetY = ctp.y + centerWidth;
+        if (ctp.y - currY > centerYWidth) {
+            targetY = ctp.y - centerYWidth;
+        } else if (ctp.y - currY < -centerYWidth) {
+            targetY = ctp.y + centerYWidth;
         }
         
         targetPos = new Vector3(Mathf.Clamp(targetX, minX, maxX), Mathf.Clamp(targetY, minY + (Camera.main.orthographicSize - 4.7f), maxY), Camera.main.transform.position.z);
 
         Camera.main.transform.position = targetPos;
-        scroll = Mathf.Clamp(Camera.main.transform.position.x - ctp.x, -centerWidth, centerWidth);
+        scroll = Mathf.Clamp(Camera.main.transform.position.x - ctp.x, -centerXWidth, centerXWidth);
     }
 }

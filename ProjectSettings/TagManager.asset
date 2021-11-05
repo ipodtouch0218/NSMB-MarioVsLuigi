@@ -30,6 +30,7 @@ TagManager:
   - spinner
   - platform
   - poison
+  - cutout
   layers:
   - Default
   - TransparentFX

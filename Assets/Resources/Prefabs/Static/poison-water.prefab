@@ -127,4 +127,4 @@ MonoBehaviour:
   tension: 2
   kconstant: 30
   damping: 0.98
-  splashVelocity: 15
+  splashVelocity: 3

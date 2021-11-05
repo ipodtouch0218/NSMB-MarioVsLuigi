@@ -48,6 +48,12 @@ public class PoisonWaterSplash : MonoBehaviour {
         GameObject.Instantiate(Resources.Load("Prefabs/Particle/PoisonWaterSplash"), collider.transform.position, Quaternion.identity);
         float x = collider.transform.position.x - transform.position.x;
         float xpoints = (x+points)%(points*transform.localScale.x);
-        pointVelocities[(int) (xpoints/transform.localScale.x)] = -splashVelocity;
+        Rigidbody2D body = collider.gameObject.GetComponent<Rigidbody2D>();
+        if (!body)
+            body = collider.gameObject.GetComponentInParent<Rigidbody2D>();
+        float power = 1;
+        if (body)
+            power = -body.velocity.y;
+        pointVelocities[(int) (xpoints/transform.localScale.x)] = -splashVelocity * power;
     }
 }

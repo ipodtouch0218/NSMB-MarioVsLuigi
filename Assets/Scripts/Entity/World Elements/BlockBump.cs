@@ -51,6 +51,14 @@ public class BlockBump : MonoBehaviour {
                 PhotonNetwork.Instantiate("Prefabs/Powerup/FireFlower", transform.position + new Vector3(0,(fromAbove ? -0.5f : 0.25f)), Quaternion.identity);
                 break;
             }
+            case SpawnResult.BlueShell: {
+                PhotonNetwork.Instantiate("Prefabs/Powerup/BlueShell", transform.position + new Vector3(0,(fromAbove ? -0.5f : 0.25f)), Quaternion.identity);
+                break;
+            }
+            case SpawnResult.Star: {
+                PhotonNetwork.Instantiate("Prefabs/Powerup/Star", transform.position + new Vector3(0,(fromAbove ? -0.5f : 0.25f)), Quaternion.identity);
+                break;
+            }
             case SpawnResult.Coin: {
                 //coin already spawned
                 break;
@@ -59,6 +67,6 @@ public class BlockBump : MonoBehaviour {
     }
 
     public enum SpawnResult {
-        Nothing, Coin, Mushroom, FireFlower 
+        Mushroom, FireFlower, BlueShell, Star, Coin, Nothing
     }
 }

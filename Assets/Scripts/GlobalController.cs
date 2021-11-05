@@ -23,10 +23,12 @@ public class GlobalController : Singleton<GlobalController> {
         volumeMusic = PlayerPrefs.GetFloat("volumeMusic", 0.5f);
         volumeMaster = PlayerPrefs.GetFloat("volumeMaster", 1);
 
-        nicknameInput.text = PhotonNetwork.NickName;
-        musicSlider.value = volumeMusic;
-        sfxSlider.value = volumeSFX;
-        masterSlider.value = volumeMaster;
+        if (nicknameInput) {
+            nicknameInput.text = PhotonNetwork.NickName;
+            musicSlider.value = volumeMusic;
+            sfxSlider.value = volumeSFX;
+            masterSlider.value = volumeMaster;
+        }
     }
 
     void Start() {
