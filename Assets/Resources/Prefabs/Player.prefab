@@ -6174,6 +6174,7 @@ MonoBehaviour:
   hitRight: 0
   invincible: 0
   giantTimer: 0
+  floorAngle: 0
   stars: 0
   coins: 0
   storedPowerup: 
@@ -6276,7 +6277,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   serializedVersion: 2
   m_Size: {x: 0.28, y: 0.4633464}
-  m_EdgeRadius: 0
+  m_EdgeRadius: 0.002
 --- !u!114 &4824223341387914442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6315,7 +6316,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   serializedVersion: 2
   m_Size: {x: 0.28, y: 0.8231535}
-  m_EdgeRadius: 0
+  m_EdgeRadius: 0.002
 --- !u!114 &525452844963146276
 MonoBehaviour:
   m_ObjectHideFlags: 0

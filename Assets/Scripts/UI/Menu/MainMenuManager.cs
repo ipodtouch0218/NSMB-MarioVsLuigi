@@ -16,18 +16,20 @@ public class MainMenuManager : MonoBehaviourPun {
     public AudioClip buhBye, musicStart, musicLoop; 
     bool quit, validName;
     public GameObject connecting;
-    public GameObject mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyPrompt;
+    public GameObject mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyPrompt, creditsPage;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText;
     public TMP_Dropdown levelDropdown;
     public RoomIcon selectedRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
+    public Toggle ndsResolutionToggle, fullscreenToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab; 
     public TMP_InputField nicknameField, lobbyNameField;
-    
+    public Slider musicSlider, sfxSlider, masterSlider;
     public Slider starSlider;
     public TMP_Text starsText;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected;
+    private int prevWidth = 1280, prevHeight = 720;
 
     void Awake() {
         Instance = this;
@@ -46,6 +48,15 @@ public class MainMenuManager : MonoBehaviourPun {
 
         PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname");
         Camera.main.transform.position = levelCameraPositions[Random.Range(0,levelCameraPositions.Length-1)].transform.position;
+        
+        nicknameField.text = PhotonNetwork.NickName;
+        musicSlider.value = GlobalController.Instance.volumeMusic;
+        sfxSlider.value = GlobalController.Instance.volumeSFX;
+        masterSlider.value = GlobalController.Instance.volumeMaster;
+
+        ndsResolutionToggle.isOn = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
+        fullscreenToggle.isOn = PlayerPrefs.GetInt("Fullscreen", 0) == 1;
+        OnToggleUpdate();
     }
 
     void Update() {
@@ -70,6 +81,7 @@ public class MainMenuManager : MonoBehaviourPun {
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
         inLobbyPrompt.SetActive(false);
+        creditsPage.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
     }
@@ -82,6 +94,7 @@ public class MainMenuManager : MonoBehaviourPun {
         lobbyMenu.SetActive(true);
         createLobbyPrompt.SetActive(false);
         inLobbyPrompt.SetActive(false);
+        creditsPage.SetActive(false);
 
         nicknameField.interactable = true;
         EventSystem.current.SetSelectedGameObject(lobbySelected);
@@ -92,6 +105,7 @@ public class MainMenuManager : MonoBehaviourPun {
         lobbyMenu.SetActive(true);
         createLobbyPrompt.SetActive(true);
         inLobbyPrompt.SetActive(false);
+        creditsPage.SetActive(false);
 
         nicknameField.interactable = false;
         bool endswithS = nicknameField.text.EndsWith("s");
@@ -104,8 +118,19 @@ public class MainMenuManager : MonoBehaviourPun {
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
         inLobbyPrompt.SetActive(false);
+        creditsPage.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(optionsSelected);
+    }
+    public void OpenCredits() {
+        mainMenu.SetActive(false);
+        optionsMenu.SetActive(false);
+        lobbyMenu.SetActive(false);
+        createLobbyPrompt.SetActive(false);
+        inLobbyPrompt.SetActive(false);
+        creditsPage.SetActive(true);
+
+        EventSystem.current.SetSelectedGameObject(creditsSelected);
     }
     public void OpenInLobbyMenu(RoomInfo room) {
         mainMenu.SetActive(false);
@@ -113,6 +138,7 @@ public class MainMenuManager : MonoBehaviourPun {
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
         inLobbyPrompt.SetActive(true);
+        creditsPage.SetActive(false);
 
         lobbyText.GetComponent<TextMeshProUGUI>().text = room.Name;
         if (room.CustomProperties[NetworkManager.PROPKEY_MAP] != null) {
@@ -306,4 +332,23 @@ public class MainMenuManager : MonoBehaviourPun {
         starSlider.value = value / 5;
     }
 
+    public void OnToggleUpdate() {
+        bool value = ndsResolutionToggle.isOn;
+        PlayerPrefs.SetInt("NDSResolution", value ? 1 : 0);
+        if (!value) return;
+        
+        // Screen.SetResolution(256, 192, Screen.fullScreenMode);
+    }
+    public void OnFullscreenUpdate() {
+        bool value = fullscreenToggle.isOn;
+        PlayerPrefs.SetInt("Fullscreen", value ? 1 : 0);
+        if (value) {
+            prevWidth = Screen.width;
+            prevHeight = Screen.height;
+            Resolution max = Screen.resolutions[Screen.resolutions.Length-1];
+            Screen.SetResolution(max.width, max.height, FullScreenMode.FullScreenWindow);
+        } else {
+            Screen.SetResolution(prevWidth, prevHeight, FullScreenMode.Windowed);
+        }
+    }
 }

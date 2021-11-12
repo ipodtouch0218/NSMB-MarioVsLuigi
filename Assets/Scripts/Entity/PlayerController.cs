@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviourPun {
     public Rigidbody2D body;
     public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, ice, flying, drill, inShell, hitLeft, hitRight;
     float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer;
-    public float invincible = 0f, giantTimer = 0f;
+    public float invincible = 0f, giantTimer = 0f, floorAngle;
     PipeManager pipeEntering;
     private Vector2 pipeDirection;
     public int stars, coins;
@@ -78,17 +78,19 @@ public class PlayerController : MonoBehaviourPun {
             c = bigHitbox.GetContacts(contacts);
         }
 
+        float highestAngleThisFrame = 0;
         crushGround = false;
         for (int i = 0; i < c; i++) {
             var point = contacts[i];
             Vector2 n = point.normal;
-            if (Vector2.Dot(n,Vector2.up) > .9f) {
+            if (Vector2.Dot(n,Vector2.up) > .5f) {
                 if (point.collider.gameObject.layer == LayerMask.NameToLayer("Ground") && transform.position.y - Mathf.Floor((point.point.y+0.05f)*2f)/2f > 0.25f) {
                     //invalid flooring
                     continue;
                 }
                 crushGround |= (point.collider.gameObject.tag != "platform");
                 down++;
+                highestAngleThisFrame = Mathf.Max(highestAngleThisFrame, Vector2.Angle(n, Vector2.up));
                 Vector3Int vec = Utils.WorldToTilemapPosition(point.point);
                 // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y));
                 tilesStandingOn.Add(vec);
@@ -143,6 +145,7 @@ public class PlayerController : MonoBehaviourPun {
                 tilesHitSide.Add(new Vector3Int(tilesHitSide[0].x, temp, 0));
             }
         }
+        floorAngle = highestAngleThisFrame;
 
         // if (hitRoof) {
         //     tilesJumpedInto.Add(new Vector3Int(Mathf.Floor((transform.position.x - tmtf.position.x) / tmtf.localScale.x), blockRoofY));
@@ -1410,6 +1413,7 @@ public class PlayerController : MonoBehaviourPun {
         bool reverseBonus = onGround && (((left && body.velocity.x > 0) || (right && body.velocity.x < 0)));
         float reverseFloat = (reverseBonus ? (ice ? icePenalty : 1.2f) : 1);
         float turnaroundSpeedBoost = (turnaround && !reverseBonus ? 2 : 1);
+        float stationarySpeedBoost = Mathf.Abs(body.velocity.x) <= 0.005f ? 1f : 1f;
 
         if ((crouching && !onGround && !inShell) || !crouching) {
             
@@ -1418,13 +1422,13 @@ public class PlayerController : MonoBehaviourPun {
                     skidding = false;
                     turnaround = false;
                     if (xVel > -runSpeedTotal) {
-                        float change = invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * Time.fixedDeltaTime;
-                        body.velocity += new Vector2(change * -1, 0);
+                        float change = invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
+                        body.velocity += new Vector2(change * -1, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
                     }
                 } else {
                     if (xVel > -walkSpeedTotal) {
-                        float change = invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * Time.fixedDeltaTime;
-                        body.velocity += new Vector2(change * -1, 0);
+                        float change = invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * stationarySpeedBoost * Time.fixedDeltaTime;
+                        body.velocity += new Vector2(change * -1, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
                         
                         if (state != PlayerState.Giant && reverseBonus && xVel > runSpeedTotal - 2) {
                             skidding = true;
@@ -1444,14 +1448,14 @@ public class PlayerController : MonoBehaviourPun {
                     skidding = false;
                     turnaround = false;
                     if (xVel < runSpeedTotal) {
-                        float change = invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * Time.fixedDeltaTime;
-                        body.velocity += new Vector2(change * 1, 0);
+                        float change = invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
+                        body.velocity += new Vector2(change * 1, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
                     }
                 } else {
                     if (xVel < walkSpeedTotal) {
-                        float change = invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * Time.fixedDeltaTime;
-                        body.velocity += new Vector2(change * 1, 0);
-                        
+                        float change = invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * stationarySpeedBoost * Time.fixedDeltaTime;
+                        body.velocity += new Vector2(change * 1, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
+
                         if (state != PlayerState.Giant && reverseBonus && xVel < -runSpeedTotal + 2) {
                             skidding = true;
                             models.transform.eulerAngles = new Vector3(0,-100,0);
@@ -1532,6 +1536,7 @@ public class PlayerController : MonoBehaviourPun {
             landing = 0;
             skidding = false;
             turnaround = false;
+            floorAngle = 0;
         }
 
         //Pipes

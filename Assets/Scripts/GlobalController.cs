@@ -8,9 +8,7 @@ using Photon.Pun;
 using TMPro;
 
 public class GlobalController : Singleton<GlobalController> {
-    float volumeSFX = 1, volumeMusic = 1, volumeMaster = 1;
-    public Slider musicSlider, sfxSlider, masterSlider;
-    public TMP_InputField nicknameInput;
+    public float volumeSFX = 1, volumeMusic = 1, volumeMaster = 1;
     public AudioMixer mixer;
     public int starRequirement = 15;
     public List<string> loadedPlayers = new List<string>();
@@ -22,13 +20,6 @@ public class GlobalController : Singleton<GlobalController> {
         volumeSFX = PlayerPrefs.GetFloat("volumeSFX", 1);
         volumeMusic = PlayerPrefs.GetFloat("volumeMusic", 0.5f);
         volumeMaster = PlayerPrefs.GetFloat("volumeMaster", 1);
-
-        if (nicknameInput) {
-            nicknameInput.text = PhotonNetwork.NickName;
-            musicSlider.value = volumeMusic;
-            sfxSlider.value = volumeSFX;
-            masterSlider.value = volumeMaster;
-        }
     }
 
     void Start() {

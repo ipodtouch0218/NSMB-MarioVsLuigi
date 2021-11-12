@@ -41,7 +41,7 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        if (dead || animator.GetBool("dead")) {
+        if (animator.GetBool("dead")) {
             if ((deathTimer -= Time.fixedDeltaTime) < 0) {
                 PhotonNetwork.Destroy(this.gameObject);
             }

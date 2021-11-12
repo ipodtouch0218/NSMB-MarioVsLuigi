@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class CameraController : MonoBehaviour {
 
     float scroll;
     [SerializeField] float minY, maxY, centerXWidth = 0.5f, centerYWidth = 0.5f, minX = -1000, maxX = 1000;
     public GameObject target;
-    
+
     void Update() {
         if (target == null)
             return;
