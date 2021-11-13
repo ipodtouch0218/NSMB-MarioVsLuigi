@@ -727,6 +727,8 @@ public class PlayerController : MonoBehaviourPun {
         dust.Stop();
         onLeft = false;
         onRight = false;
+        skidding = false;
+        turnaround = false;
         PlaySoundFromAnim("player/death");
         SpawnStar();
         if (holding) {
@@ -1338,7 +1340,7 @@ public class PlayerController : MonoBehaviourPun {
             }
 
             float vel = Mathf.Max(jumpVelocity + Mathf.Abs(body.velocity.x)/8f);
-            if (!flying && topSpeed && landing < 0.1f && !holding && !triplejump && !crouching && !inShell) {
+            if (!flying && topSpeed && landing < 0.1f && !holding && !triplejump && !crouching && !inShell && invincible <= 0) {
                 if (singlejump) {
                     //Double jump
                     photonView.RPC("PlaySound", RpcTarget.All, "mario/double_jump_" +  ((int) (Random.value * 2f) + 1));
@@ -1422,13 +1424,13 @@ public class PlayerController : MonoBehaviourPun {
                     skidding = false;
                     turnaround = false;
                     if (xVel > -runSpeedTotal) {
-                        float change = invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
-                        body.velocity += new Vector2(change * -1, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
+                        float change = invincibleSpeedBoost * invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;    
+                        body.velocity += new Vector2(change * -1, 0);
                     }
                 } else {
                     if (xVel > -walkSpeedTotal) {
                         float change = invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * stationarySpeedBoost * Time.fixedDeltaTime;
-                        body.velocity += new Vector2(change * -1, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
+                        body.velocity += new Vector2(change * -1, 0);
                         
                         if (state != PlayerState.Giant && reverseBonus && xVel > runSpeedTotal - 2) {
                             skidding = true;
@@ -1448,13 +1450,13 @@ public class PlayerController : MonoBehaviourPun {
                     skidding = false;
                     turnaround = false;
                     if (xVel < runSpeedTotal) {
-                        float change = invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
-                        body.velocity += new Vector2(change * 1, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
+                        float change = invincibleSpeedBoost * invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
+                        body.velocity += new Vector2(change * 1, 0);
                     }
                 } else {
                     if (xVel < walkSpeedTotal) {
                         float change = invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * stationarySpeedBoost * Time.fixedDeltaTime;
-                        body.velocity += new Vector2(change * 1, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
+                        body.velocity += new Vector2(change * 1, 0);
 
                         if (state != PlayerState.Giant && reverseBonus && xVel < -runSpeedTotal + 2) {
                             skidding = true;
@@ -1476,6 +1478,9 @@ public class PlayerController : MonoBehaviourPun {
 
         if (state == PlayerState.Shell && !inShell && onGround && running && !holding && Mathf.Abs(xVel)+0.25f >= runningMaxSpeed && landing > 0.33f) {
             inShell = true;
+        }
+        if (onGround) {
+            body.velocity = new Vector2(body.velocity.x, Mathf.Sin(Mathf.Deg2Rad * floorAngle));
         }
     }
 

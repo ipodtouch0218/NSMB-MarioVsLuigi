@@ -3,16 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class KillplaneKill : MonoBehaviour {
+public class KillplaneKill : MonoBehaviourPun {
+    float killTime = 0.0f, timer = 0;
+    bool killed = false;
     void Update() {
+        if (killed) return;
         if (transform.position.y < GameManager.Instance.GetLevelMinY()) {
-            PhotonView view = GetComponent<PhotonView>();
-            if (view == null) {
+            timer += Time.deltaTime;
+            if (timer < killTime)
+                return;
+            if (!photonView) {
                 GameObject.Destroy(gameObject);
                 return;
             } 
-            if (view.IsMine) {
-                PhotonNetwork.Destroy(view);
+            if (photonView.IsMine) {
+                PhotonNetwork.Destroy(photonView);
+                return;
             }
         }
     }
