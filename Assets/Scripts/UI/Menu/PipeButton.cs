@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using UnityEngine.EventSystems;
 
 public class PipeButton : MonoBehaviour {
 
@@ -13,15 +11,13 @@ public class PipeButton : MonoBehaviour {
         rect = GetComponent<RectTransform>();
         button = GetComponent<Button>();
         anchor = rect.anchorMin;
-        Unselect();
     }
 
-    public void Selected() {
-        if (button == null) return;
-        if (button.interactable)
+    void Update() {
+        if (EventSystem.current.currentSelectedGameObject == gameObject) {
             rect.anchorMin = anchor;
-    }
-    public void Unselect() {
-        rect.anchorMin = anchor + new Vector2(0.1f,0);
+        } else {
+            rect.anchorMin = anchor + new Vector2(0.1f,0);
+        }
     }
 }

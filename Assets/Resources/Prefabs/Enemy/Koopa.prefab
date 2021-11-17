@@ -181,6 +181,7 @@ MonoBehaviour:
   red: 0
   blue: 0
   shell: 0
+  hardkick: 0
   left: 1
   putdown: 0
 --- !u!114 &-8304985406365087950

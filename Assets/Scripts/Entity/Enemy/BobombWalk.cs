@@ -95,6 +95,7 @@ public class BobombWalk : HoldableEntity {
         this.holder = null;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
         this.left = facingLeft;
+        renderer.flipX = left;
         if (crouch) {
             body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
         } else {
@@ -105,6 +106,7 @@ public class BobombWalk : HoldableEntity {
     [PunRPC]
     public override void Kick(bool fromLeft, bool groundpound) {
         left = !fromLeft;
+        renderer.flipX = left;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     }
@@ -124,19 +126,27 @@ public class BobombWalk : HoldableEntity {
         if (photonView && !photonView.IsMine) {
             return;
         }
-        if (physics.hitRight) {
-            Turnaround(false);
-        } else if (physics.hitLeft) {
-            Turnaround(true);
+        if (physics.hitRight && !left) {
+            if (photonView)
+                photonView.RPC("Turnaround", RpcTarget.All, false);
+            else
+                Turnaround(false);
+        } else if (physics.hitLeft && left) {
+            if (photonView)
+                photonView.RPC("Turnaround", RpcTarget.All, true);
+            else
+                Turnaround(true);
         }
 
         if (physics.onGround && physics.hitRoof) {
             photonView.RPC("Detonate", RpcTarget.All);
         }
     }
+    [PunRPC]
     void Turnaround(bool hitWallOnLeft) {
         left = !hitWallOnLeft;
-        transform.localScale = new Vector3(startingScale.x * (left ? -1 : 1), transform.localScale.y, transform.localScale.z);
+        renderer.flipX = left;
         body.velocity = new Vector2(walkSpeed * (left ? -1 : 1), body.velocity.y);
+        animator.SetTrigger("turnaround");
     }
 }
