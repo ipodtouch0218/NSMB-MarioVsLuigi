@@ -103,7 +103,7 @@ public class BobombWalk : HoldableEntity {
     }
 
     [PunRPC]
-    public override void Kick(bool fromLeft) {
+    public override void Kick(bool fromLeft, bool groundpound) {
         left = !fromLeft;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");

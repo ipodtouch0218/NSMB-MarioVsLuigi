@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 
 public class KoopaWalk : HoldableEntity {
     [SerializeField] float walkSpeed, kickSpeed, wakeup = 15;
-    [SerializeField] public bool red, blue, shell;
+    [SerializeField] public bool red, blue, shell, hardkick;
     public bool left = true, putdown = false;
     float wakeupTimer;
     new private BoxCollider2D collider;
@@ -57,9 +57,10 @@ public class KoopaWalk : HoldableEntity {
         }
     }
     [PunRPC]
-    public override void Kick(bool fromLeft) {
+    public override void Kick(bool fromLeft, bool groundpound) {
         left = !fromLeft;
-        body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 0);
+        hardkick = groundpound;
+        body.velocity = new Vector2(kickSpeed * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), (hardkick ? 1 : 0));
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     }
     [PunRPC]
@@ -67,6 +68,7 @@ public class KoopaWalk : HoldableEntity {
         if (holder == null) {
             return;
         }
+        hardkick = false;
         transform.position = new Vector2(holder.transform.position.x, transform.position.y);
         this.holder = null;
         shell = true;
@@ -172,7 +174,7 @@ public class KoopaWalk : HoldableEntity {
     void Turnaround(bool hitWallOnLeft) {
         left = !hitWallOnLeft;
         if (shell) {
-            body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), body.velocity.y);
+            body.velocity = new Vector2(kickSpeed * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), body.velocity.y);
         } else {
             body.velocity = new Vector2(walkSpeed * (left ? -1 : 1), body.velocity.y);
         }

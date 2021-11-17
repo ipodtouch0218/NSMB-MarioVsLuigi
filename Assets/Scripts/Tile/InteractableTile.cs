@@ -7,7 +7,7 @@ using Photon.Pun;
 
 public abstract class InteractableTile : AnimatedTile {
 
-    protected Vector3 bumpOffset = new Vector3(0, 0.5f, 0), bumpSize = new Vector3(0.65f, 0.1f, 0);
+    protected Vector3 bumpOffset = new Vector3(0, 0.5f, 0), bumpSize = new Vector3(0.55f, 0.1f, 0);
     public abstract bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation);
     protected void Bump(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (direction != InteractionDirection.Down) {

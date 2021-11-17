@@ -34,7 +34,9 @@ public class PlayerController : MonoBehaviourPun {
 
     public List<string> giantTiles = new List<string>();
 
+    private float analogDeadzone = 0.35f;
     private Vector2 joystick;
+
     public GameObject smallMarioModel, largeMarioModel, marioBlueShell, smallLuigiModel, largeLuigiModel, luigiBlueShell;
     public Avatar smallMarioAvatar, largeMarioAvatar, smallLuigiAvatar, largeLuigiAvatar;
     public GameObject onSpinner;
@@ -479,7 +481,7 @@ public class PlayerController : MonoBehaviourPun {
                 } else if (groundpound && state != PlayerState.Mini && downwards) {
                     koopa.photonView.RPC("EnterShell", RpcTarget.All);
                     if (!koopa.blue) {
-                        koopa.photonView.RPC("Kick", RpcTarget.All, body.velocity.x > 0);
+                        koopa.photonView.RPC("Kick", RpcTarget.All, transform.position.x < koopa.transform.position.x, groundpound);
                         holdingOld = koopa;
                         throwInvincibility = 0.5f;
                     }
@@ -497,7 +499,7 @@ public class PlayerController : MonoBehaviourPun {
                             koopa.photonView.RPC("Pickup", RpcTarget.All, photonView.ViewID);
                             holding = koopa;
                         } else {
-                            koopa.photonView.RPC("Kick", RpcTarget.All, transform.position.x < koopa.transform.position.x);
+                            koopa.photonView.RPC("Kick", RpcTarget.All, transform.position.x < koopa.transform.position.x, groundpound);
                             holdingOld = koopa;
                             throwInvincibility = 0.5f;
                         }
@@ -531,7 +533,7 @@ public class PlayerController : MonoBehaviourPun {
                     }
                     photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
                     if (groundpound) {
-                        bomb.photonView.RPC("Kick", RpcTarget.All, transform.position.x < bomb.transform.position.x);
+                        bomb.photonView.RPC("Kick", RpcTarget.All, transform.position.x < bomb.transform.position.x, groundpound);
                     } else {
                         bounce = true;
                     }
@@ -541,7 +543,7 @@ public class PlayerController : MonoBehaviourPun {
                             bomb.photonView.RPC("Pickup", RpcTarget.All, photonView.ViewID);
                             holding = bomb;
                         } else {
-                            bomb.photonView.RPC("Kick", RpcTarget.All, transform.position.x < bomb.transform.position.x);
+                            bomb.photonView.RPC("Kick", RpcTarget.All, transform.position.x < bomb.transform.position.x, groundpound);
                         }
                     } else {
                         if (holding) {
@@ -1018,8 +1020,8 @@ public class PlayerController : MonoBehaviourPun {
             animator.SetBool("inShell", inShell || (state == PlayerState.Shell && (groundpound || crouching)));
 
             //Facing direction
-            bool right = joystick.x > 0.05;
-            bool left = joystick.x < -0.05;
+            bool right = joystick.x > analogDeadzone;
+            bool left = joystick.x < -analogDeadzone;
             if (onGround) {
                 if (body.velocity.x > 0.1) {
                     facingRight = true;
@@ -1260,7 +1262,7 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     void UpwardsPipeCheck() {
-        bool uncrouch = joystick.y > 0.05;
+        bool uncrouch = joystick.y > analogDeadzone;
         if (!hitRoof) return;
         if (!uncrouch) return;
         if (state == PlayerState.Giant) return;
@@ -1567,10 +1569,10 @@ public class PlayerController : MonoBehaviourPun {
         bool origRunning = running;
         bool orig = facingRight;
 
-        bool right = joystick.x > 0.05 && !paused;
-        bool left = joystick.x < -0.05 && !paused;
-        bool crouch = joystick.y < -0.05 && !paused;
-        bool up = joystick.y > 0.05 && !paused;
+        bool right = joystick.x > analogDeadzone && !paused;
+        bool left = joystick.x < -analogDeadzone && !paused;
+        bool crouch = joystick.y < -analogDeadzone && !paused;
+        bool up = joystick.y > analogDeadzone && !paused;
         bool jump = (jumpBuffer > 0 && (onGround || koyoteTime < 0.1f || onLeft || onRight)) && !paused; 
 
         if (holding) {
