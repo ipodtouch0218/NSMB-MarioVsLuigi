@@ -7,12 +7,13 @@ using Photon.Pun;
 
 public abstract class InteractableTile : AnimatedTile {
 
-    protected Vector3 bumpOffset = new Vector3(0, 0.5f, 0), bumpSize = new Vector3(0.55f, 0.1f, 0);
     public abstract bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation);
     protected void Bump(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
+        Vector3 bumpOffset = new Vector3(0.25f, 0.5f, 0), bumpSize = new Vector3(0.50f, 0.1f, 0);
         if (direction != InteractionDirection.Down) {
             //check for entities above to bump
-            foreach (Collider2D collider in Physics2D.OverlapBoxAll(worldLocation + bumpOffset, bumpSize, 0f)) {
+            Debug.DrawRay((Vector3) worldLocation + (Vector3) bumpOffset, Vector3.up, Color.green, 3);
+            foreach (Collider2D collider in Physics2D.OverlapBoxAll((Vector3) worldLocation + (Vector3) bumpOffset, bumpSize, 0f)) {
                 GameObject obj = collider.gameObject;
                 if (obj == interacter.gameObject) continue;
                 switch (obj.tag) {

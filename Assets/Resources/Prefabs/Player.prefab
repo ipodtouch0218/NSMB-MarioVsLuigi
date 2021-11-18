@@ -6222,15 +6222,9 @@ MonoBehaviour:
   smallMarioModel: {fileID: 8422425991972032533}
   largeMarioModel: {fileID: 6784312141689353033}
   marioBlueShell: {fileID: 3629787967981286811}
-  smallLuigiModel: {fileID: 1269466578856094116}
-  largeLuigiModel: {fileID: 7784235285894822453}
-  luigiBlueShell: {fileID: 6037247592153547169}
   smallMarioAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
   largeMarioAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
-  smallLuigiAvatar: {fileID: 9000000, guid: b9c007ad3b94b184fa982b69cd7b6c49, type: 3}
-  largeLuigiAvatar: {fileID: 9000000, guid: 77fa7e39322fd5440bec69cf0275d39d, type: 3}
   onSpinner: {fileID: 0}
-  luigi: 0
 --- !u!50 &4824223341387914443
 Rigidbody2D:
   serializedVersion: 4
@@ -19724,12 +19718,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f9541b8e97f76f4419778d672831fc42, type: 3}
---- !u!1 &6037247592153547169 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f9541b8e97f76f4419778d672831fc42,
-    type: 3}
-  m_PrefabInstance: {fileID: 6848274514538151152}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6378025190593747739 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f9541b8e97f76f4419778d672831fc42,

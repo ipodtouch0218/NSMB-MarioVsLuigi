@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2152394541463391542}
-  m_Layer: 12
+  m_Layer: 8
   m_Name: Armature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5801919727347960438}
-  m_Layer: 12
+  m_Layer: 8
   m_Name: spin_obj2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4524643587766688399}
-  m_Layer: 12
+  m_Layer: 8
   m_Name: spin_obj3_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1062070206634343210}
   - component: {fileID: 5419776802840818205}
-  m_Layer: 12
+  m_Layer: 8
   m_Name: spin_obj
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,7 +194,7 @@ GameObject:
   - component: {fileID: 3233889381157595090}
   - component: {fileID: 7932145647555159822}
   - component: {fileID: 759852852978943238}
-  m_Layer: 12
+  m_Layer: 8
   m_Name: Spinner
   m_TagString: spinner
   m_Icon: {fileID: 0}
@@ -294,7 +294,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3120107479358717248}
-  m_Layer: 12
+  m_Layer: 8
   m_Name: spin_obj3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -325,7 +325,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1028613950560636254}
-  m_Layer: 12
+  m_Layer: 8
   m_Name: spin_obj 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

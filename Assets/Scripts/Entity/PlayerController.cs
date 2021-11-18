@@ -9,6 +9,8 @@ using Photon.Pun;
 
 public class PlayerController : MonoBehaviourPun {
     
+    private static int ANY_GROUND_MASK, GROUND_LAYERID;
+
     private int playerId = 0;
     [SerializeField] public bool dead = false;
     [SerializeField] public PlayerState state = PlayerState.Small, previousState;
@@ -19,10 +21,11 @@ public class PlayerController : MonoBehaviourPun {
     private new AudioSource audio;
     private Animator animator;
     public Rigidbody2D body;
+
     public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, ice, flying, drill, inShell, hitLeft, hitRight;
     float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer;
     public float invincible = 0f, giantTimer = 0f, floorAngle;
-    PipeManager pipeEntering;
+    
     private Vector2 pipeDirection;
     public int stars, coins;
     List<Vector3Int> tilesStandingOn = new List<Vector3Int>(), tilesJumpedInto = new List<Vector3Int>(), tilesHitSide = new List<Vector3Int>();
@@ -37,16 +40,17 @@ public class PlayerController : MonoBehaviourPun {
     private float analogDeadzone = 0.35f;
     private Vector2 joystick;
 
-    public GameObject smallMarioModel, largeMarioModel, marioBlueShell, smallLuigiModel, largeLuigiModel, luigiBlueShell;
-    public Avatar smallMarioAvatar, largeMarioAvatar, smallLuigiAvatar, largeLuigiAvatar;
+    public GameObject smallMarioModel, largeMarioModel, marioBlueShell;
+    public Avatar smallMarioAvatar, largeMarioAvatar;
     public GameObject onSpinner;
+    PipeManager pipeEntering;
 
-    private static int GROUND_MASK;
     private bool starDirection, step;
-    public bool luigi;
 
     void Awake() {
-        GROUND_MASK = LayerMask.GetMask("Ground", "Semisolids");
+        ANY_GROUND_MASK = LayerMask.GetMask("Ground", "Semisolids");
+        GROUND_LAYERID = LayerMask.NameToLayer("Ground");
+        
         animator = GetComponentInChildren<Animator>();
         body = GetComponent<Rigidbody2D>();
         audio = GetComponent<AudioSource>();
@@ -86,17 +90,18 @@ public class PlayerController : MonoBehaviourPun {
             var point = contacts[i];
             Vector2 n = point.normal;
             if (Vector2.Dot(n,Vector2.up) > .5f) {
-                if (point.collider.gameObject.layer == LayerMask.NameToLayer("Ground") && transform.position.y - Mathf.Floor((point.point.y+0.05f)*2f)/2f > 0.25f) {
+                Vector3Int vec = Utils.WorldToTilemapPosition(point.point);
+                float playerY = Utils.WorldToTilemapPosition(transform.position + new Vector3(0, 0.25f)).y;
+                if (((point.collider.gameObject.layer != GROUND_LAYERID && playerY <= vec.y) || body.velocity.y > 0.2f) && (point.collider.gameObject.tag != "platform")) {
                     //invalid flooring
                     continue;
                 }
                 crushGround |= (point.collider.gameObject.tag != "platform");
                 down++;
                 highestAngleThisFrame = Mathf.Max(highestAngleThisFrame, Vector2.Angle(n, Vector2.up));
-                Vector3Int vec = Utils.WorldToTilemapPosition(point.point);
                 // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y));
                 tilesStandingOn.Add(vec);
-            } else if (point.collider.gameObject.layer == LayerMask.NameToLayer("Ground")) {
+            } else if (point.collider.gameObject.layer == GROUND_LAYERID) {
                 if (Vector2.Dot(n,Vector2.left) > .9f) {
                     right++;
                     Vector3Int vec = Utils.WorldToTilemapPosition(point.point + new Vector2(0.1f, 0.05f));
@@ -517,11 +522,7 @@ public class PlayerController : MonoBehaviourPun {
             }
             case "bobomb": {
                 BobombWalk bomb = collider.gameObject.GetComponentInParent<BobombWalk>();
-                if (holding == bomb)
-                    break;
-                if (bomb.dead)
-                    break;
-                if (throwInvincibility > 0 && holdingOld == bomb)
+                if (holding == bomb || bomb.dead || (throwInvincibility > 0 && holdingOld == bomb))
                     break;
                 if (inShell || invincible > 0) {
                     bomb.photonView.RPC("SpecialKill", RpcTarget.All, body.velocity.x > 0, false);
@@ -539,7 +540,7 @@ public class PlayerController : MonoBehaviourPun {
                     }
                 } else {
                     if (bomb.lit) {
-                        if (state != PlayerState.Mini && !holding && running && !crouching && !flying && !dead && !onLeft && !onRight && !doublejump && !triplejump) {
+                        if (state != PlayerState.Mini && !holding && running && !crouching && !flying && !dead && !onLeft && !onRight && !doublejump && !triplejump && !groundpound) {
                             bomb.photonView.RPC("Pickup", RpcTarget.All, photonView.ViewID);
                             holding = bomb;
                         } else {
@@ -1178,26 +1179,18 @@ public class PlayerController : MonoBehaviourPun {
         //Model changing
         bool large = state >= PlayerState.Large;
 
-        largeMarioModel.SetActive(large && !luigi);
-        smallMarioModel.SetActive(!large && !luigi);
-        marioBlueShell.SetActive(state == PlayerState.Shell && !luigi);
-        // largeLuigiModel.SetActive(large && luigi);
-        // smallLuigiModel.SetActive(!large && luigi);
-        // luigiBlueShell.SetActive(state == PlayerState.Shell && luigi);
-
-        // if (luigi) {
-        //     animator.avatar = large ? largeLuigiAvatar : smallLuigiAvatar;
-        // } else {
-            animator.avatar = large ? largeMarioAvatar : smallMarioAvatar;
-        // }
+        largeMarioModel.SetActive(large);
+        smallMarioModel.SetActive(!large);
+        marioBlueShell.SetActive(state == PlayerState.Shell);
+        animator.avatar = large ? largeMarioAvatar : smallMarioAvatar;
 
         HandleDeathAnimation();
         HandlePipeAnimation();
     }
 
     void FakeOnGroundCheck() {
-        if (onGroundLastFrame && pipeEntering == null && !singlejump && !doublejump && !triplejump) {
-            var hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, GROUND_MASK);
+        if (onGroundLastFrame && pipeEntering == null) {
+            var hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, ANY_GROUND_MASK);
             if (hit) {
                 onGround = true;
                 transform.position = new Vector2(body.position.x, hit.point.y);
@@ -1522,30 +1515,6 @@ public class PlayerController : MonoBehaviourPun {
             }
         }
 
-        //Ground
-        FakeOnGroundCheck();
-        if (onGround) {
-            if (hitRoof && crushGround && body.velocity.y < 0) {
-                //Crushed.
-                photonView.RPC("Powerdown", RpcTarget.All, true);
-            }
-            koyoteTime = 0;
-            onLeft = false;
-            onRight = false;
-            flying = false;
-            if ((landing += delta) > 0.2f) {
-                singlejump = false;
-                doublejump = false;
-                triplejump = false;
-            }
-        } else {
-            koyoteTime += delta;
-            landing = 0;
-            skidding = false;
-            turnaround = false;
-            floorAngle = 0;
-        }
-
         //Pipes
         if (!paused) {
             DownwardsPipeCheck();
@@ -1670,6 +1639,30 @@ public class PlayerController : MonoBehaviourPun {
             HandleGroundpoundStart(left, right);
         HandleGroundpound(crouch, up);
 
+        //Ground
+        FakeOnGroundCheck();
+        if (onGround) {
+            if (hitRoof && crushGround && body.velocity.y <= 0.1) {
+                //Crushed.
+                photonView.RPC("Powerdown", RpcTarget.All, true);
+            }
+            koyoteTime = 0;
+            onLeft = false;
+            onRight = false;
+            flying = false;
+            if ((landing += delta) > 0.2f) {
+                singlejump = false;
+                doublejump = false;
+                triplejump = false;
+            }
+        } else {
+            koyoteTime += delta;
+            landing = 0;
+            skidding = false;
+            turnaround = false;
+            floorAngle = 0;
+        }
+
         //slow-rise check
         if (flying) {
             body.gravityScale = flyingGravity;
@@ -1748,8 +1741,10 @@ public class PlayerController : MonoBehaviourPun {
         } else {
             //start groundpound
             //check if high enough above ground
-            if (Physics2D.Raycast(transform.position, Vector2.down, 0.5f, GROUND_MASK)) return;
+            if (Physics2D.Raycast(transform.position, Vector2.down, 0.5f, ANY_GROUND_MASK)) return;
             
+            onLeft = false;
+            onRight = false;
             groundpound = true;
             hitBlock = true;
             groundpoundSit = false;
@@ -1771,7 +1766,10 @@ public class PlayerController : MonoBehaviourPun {
             hitBlock = tempHitBlock;
             if (drill) {
                 drill = hitBlock;
-                if (drill) onGround = false;
+                if (drill) {
+                    onGround = false;
+                    onGroundLastFrame = false;
+                }
             } else {
                 //groundpound
                 groundpound = crouch;

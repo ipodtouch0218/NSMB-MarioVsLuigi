@@ -12,7 +12,7 @@ public class StarBouncer : MonoBehaviourPun {
     Vector3 startingScale;
     private Rigidbody2D body;
     new private BoxCollider2D collider;
-    public bool passthrough = true;
+    public bool passthrough = true, left = true;
     private PhysicsEntity physics;
 
     void Start() {
@@ -29,7 +29,7 @@ public class StarBouncer : MonoBehaviourPun {
             stationary = false;
             passthrough = true;
             gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-            body.velocity = new Vector2(moveSpeed * ((bool) data[0] ? -1 : 1), deathBoostAmount);
+            left = (bool) data[0];
         }
 
         GameObject trackObject = GameObject.Instantiate(UIUpdater.instance.starTrackTemplate, UIUpdater.instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.instance.transform);
@@ -37,6 +37,7 @@ public class StarBouncer : MonoBehaviourPun {
         icon.target = gameObject;
         if (!stationary) {
             trackObject.transform.localScale = new Vector3(3f/4f, 3f/4f, 1f);
+            body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), deathBoostAmount);
         }
         trackObject.SetActive(true);
     }
@@ -53,6 +54,8 @@ public class StarBouncer : MonoBehaviourPun {
             float sin = (Mathf.Sin(counter * pulseSpeed)) * pulseAmount;
             transform.localScale = startingScale + new Vector3(sin, sin, 0);
             return;
+        } else {
+            body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), body.velocity.y);
         }
 
         HandleCollision();
@@ -67,12 +70,12 @@ public class StarBouncer : MonoBehaviourPun {
             }
         }
         
-        bool left = body.velocity.x < 0;
+        // bool left = body.velocity.x < 0;
         Transform t = transform.Find("Graphic");
-        t.Rotate(new Vector3(0,0,rotationSpeed * (left ? 1 : -1)), Space.Self);
+        t.Rotate(new Vector3(0, 0, rotationSpeed * (left ? 1 : -1)), Space.Self);
 
         if (passthrough) {
-            gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+            // gameObject.layer = LayerMask.NameToLayer("HitsNothing");
             if (body.velocity.y <= 0 && !Physics2D.OverlapBox(transform.position, Vector2.one / 3, 0, groundMask)) {
                 passthrough = false;
                 gameObject.layer = LayerMask.NameToLayer("Entity");
@@ -96,10 +99,10 @@ public class StarBouncer : MonoBehaviourPun {
         physics.Update();
 
         if (physics.hitLeft) {
-            body.velocity = new Vector2(moveSpeed, body.velocity.y);
+            photonView.RPC("Turnaround", RpcTarget.All, true);
         }
         if (physics.hitRight) {
-            body.velocity = new Vector2(-moveSpeed, body.velocity.y);
+            photonView.RPC("Turnaround", RpcTarget.All, false);
         }
         if (physics.onGround && physics.hitRoof) {
             photonView.RPC("Crushed", RpcTarget.All);
@@ -115,5 +118,10 @@ public class StarBouncer : MonoBehaviourPun {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
         GameObject.Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
+    }
+    [PunRPC]
+    public void Turnaround(bool hitLeft) {
+        left = !hitLeft;
+        body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), body.velocity.y);
     }
 }
