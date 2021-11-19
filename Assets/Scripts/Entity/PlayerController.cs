@@ -76,47 +76,46 @@ public class PlayerController : MonoBehaviourPun {
         Tilemap tilemap = GameManager.Instance.tilemap;
         Transform tmtf = tilemap.transform;
 
-        int c = 0;
+        int collisionCount = 0;
         ContactPoint2D[] contacts = new ContactPoint2D[20];
         if (smolHitbox.enabled) {
-            c = smolHitbox.GetContacts(contacts);
+            collisionCount = smolHitbox.GetContacts(contacts);
         } else {
-            c = bigHitbox.GetContacts(contacts);
+            collisionCount = bigHitbox.GetContacts(contacts);
         }
 
         float highestAngleThisFrame = 0;
         crushGround = false;
-        for (int i = 0; i < c; i++) {
-            var point = contacts[i];
-            Vector2 n = point.normal;
+        for (int i = 0; i < collisionCount; i++) {
+            ContactPoint2D contact = contacts[i];
+            Vector2 n = contact.normal;
             if (Vector2.Dot(n,Vector2.up) > .5f) {
-                Vector3Int vec = Utils.WorldToTilemapPosition(point.point);
+                Vector2 modifiedVec = contact.point + (new Vector2(0.01f, 0) * (contact.point.x - transform.position.x < 0 ? 1 : -1)); 
+                Vector3Int vec = Utils.WorldToTilemapPosition(modifiedVec);
                 float playerY = Utils.WorldToTilemapPosition(transform.position + new Vector3(0, 0.25f)).y;
-                if (((point.collider.gameObject.layer != GROUND_LAYERID && playerY <= vec.y) || body.velocity.y > 0.2f) && (point.collider.gameObject.tag != "platform")) {
+                if (((contact.collider.gameObject.layer != GROUND_LAYERID && playerY <= vec.y) || body.velocity.y > 0.2f) && (contact.collider.gameObject.tag != "platform")) {
                     //invalid flooring
                     continue;
                 }
-                crushGround |= (point.collider.gameObject.tag != "platform");
+                crushGround |= (contact.collider.gameObject.tag != "platform");
                 down++;
                 highestAngleThisFrame = Mathf.Max(highestAngleThisFrame, Vector2.Angle(n, Vector2.up));
-                // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y));
                 tilesStandingOn.Add(vec);
-            } else if (point.collider.gameObject.layer == GROUND_LAYERID) {
+            } else if (contact.collider.gameObject.layer == GROUND_LAYERID) {
                 if (Vector2.Dot(n,Vector2.left) > .9f) {
                     right++;
-                    Vector3Int vec = Utils.WorldToTilemapPosition(point.point + new Vector2(0.1f, 0.05f));
-                    // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x + 0.1f), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y + 0.05f));
+                    Vector2 modifiedVec = contact.point + (new Vector2(0, (contact.point.y - transform.position.y > 0.2f ? -0.05f : 0.05f)));
+                    Vector3Int vec = Utils.WorldToTilemapPosition(modifiedVec + new Vector2(0.1f, 0));
                     tilesHitSide.Add(vec);
                 } else if (Vector2.Dot(n,Vector2.right) > .9f) {
                     left++;
-                    Vector3Int vec = Utils.WorldToTilemapPosition(point.point + new Vector2(-0.1f, 0.05f));
-                    // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x - 0.1f), Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y + 0.05f));
+                    Vector2 modifiedVec = contact.point + (new Vector2(0, (contact.point.y - transform.position.y > 0.2f ? -0.05f : 0.05f))); 
+                    Vector3Int vec = Utils.WorldToTilemapPosition(modifiedVec + new Vector2(-0.1f, 0));
                     tilesHitSide.Add(vec);
                 } else if (Vector2.Dot(n,Vector2.down) > .9f && !groundpound) {
                     up++;
-                    Vector3Int vec = Utils.WorldToTilemapPosition(point.point);
-                    // blockRoofY = Mathf.Floor((point.point.y - tmtf.position.y) / tmtf.localScale.y);
-                    // Vector2 vec = new Vector2(Mathf.Floor((point.point.x - tmtf.position.x) / tmtf.localScale.x), blockRoofY);
+                    Vector2 modifiedVec = contact.point + (new Vector2(0.01f, 0) * (contact.point.x - transform.position.x < 0 ? 1 : -1)); 
+                    Vector3Int vec = Utils.WorldToTilemapPosition(modifiedVec);
                     blockRoofY = vec.y;
                     tilesJumpedInto.Add(vec);
                 }
@@ -154,14 +153,10 @@ public class PlayerController : MonoBehaviourPun {
         }
         floorAngle = highestAngleThisFrame;
 
-        // if (hitRoof) {
-        //     tilesJumpedInto.Add(new Vector3Int(Mathf.Floor((transform.position.x - tmtf.position.x) / tmtf.localScale.x), blockRoofY));
-        // }
-
         //todo: refactor
         ice = false;
-        foreach (Vector3 pos in tilesStandingOn) {
-            TileBase tile = GameManager.Instance.tilemap.GetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z)));
+        foreach (Vector3Int pos in tilesStandingOn) {
+            TileBase tile = GameManager.Instance.tilemap.GetTile(pos);
             if (!tile) continue;
             if (tile.name == "Ice") {
                 ice = true;
@@ -254,15 +249,16 @@ public class PlayerController : MonoBehaviourPun {
 
         int count = 0;
         foreach (FireballMover existingFire in GameObject.FindObjectsOfType<FireballMover>()) {
-            //fireballs on entity layer do not interact with the player,
-            //therefore these are OUR fireballs.
-            if (existingFire.photonView.IsMine) count++;
+            if (existingFire.photonView.IsMine) {
+                count++;
+                if (count >= 2) 
+                    return;
+            }
         }
-        if (count < 2) {
-            GameObject fireball = PhotonNetwork.Instantiate("Prefabs/Fireball", transform.position + new Vector3(facingRight ? 0.3f : -0.3f ,0.5f), Quaternion.identity, 0, new object[]{!facingRight});
-            photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
-            animator.SetTrigger("fireball");
-        }
+
+        PhotonNetwork.Instantiate("Prefabs/Fireball", transform.position + new Vector3(facingRight ? 0.3f : -0.3f ,0.4f), Quaternion.identity, 0, new object[]{!facingRight});
+        photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
+        animator.SetTrigger("fireball");
     }
 
     void OnItem() {
@@ -732,6 +728,7 @@ public class PlayerController : MonoBehaviourPun {
         onRight = false;
         skidding = false;
         turnaround = false;
+        inShell = false;
         PlaySoundFromAnim("player/death");
         SpawnStar();
         if (holding) {
@@ -1547,11 +1544,7 @@ public class PlayerController : MonoBehaviourPun {
         if (holding) {
             onLeft = false;
             onRight = false;
-            if (facingRight) {
-                holding.holderOffset = new Vector2(0.25f, 0.25f);
-            } else {
-                holding.holderOffset = new Vector2(-0.25f, 0.25f);
-            }
+            holding.holderOffset = new Vector2((facingRight ? 1 : -1) * 0.25f, (state >= PlayerState.Large ? 0.5f : 0.25f));
         }
         
         //throwing held item

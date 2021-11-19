@@ -22,7 +22,14 @@ public abstract class InteractableTile : AnimatedTile {
                     player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x > worldLocation.x, 1);
                     break;
                 }
-                case "koopa":
+                case "koopa": {
+                    if (!obj.GetPhotonView())
+                        break;
+                    if (obj.GetComponent<KillableEntity>().dead)
+                        break;
+                    obj.GetPhotonView().RPC("Bump", RpcTarget.All);
+                    break;
+                }
                 case "goomba": {
                     if (!obj.GetPhotonView())
                         break;
@@ -48,7 +55,7 @@ public abstract class InteractableTile : AnimatedTile {
                             break;
                         }
                     }
-                    body.velocity = new Vector2(body.velocity.x, 7f);
+                    body.velocity = new Vector2(body.velocity.x, 15f);
                     break;
                 }
                 }

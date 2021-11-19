@@ -192,7 +192,7 @@ MonoBehaviour:
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
-    m_PerlinScale: 0.999
+    m_PerlinScale: 0.618
     m_Output: 1
     m_ColliderType: 2
     m_RandomTransform: 2

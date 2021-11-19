@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: -4185712347842838936}
   - component: {fileID: -4308704378559277832}
   - component: {fileID: 7052311415719264077}
+  - component: {fileID: 818487035572622980}
   - component: {fileID: 3399800873378663516}
   m_Layer: 9
   m_Name: Koopa
@@ -147,10 +148,10 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.07288477}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 0.5, y: 0.25}
     oldSize: {x: 0.17, y: 0.3}
     newSize: {x: 0.17, y: 0.3}
     adaptiveTilingThreshold: 0.5
@@ -181,7 +182,9 @@ MonoBehaviour:
   red: 0
   blue: 0
   shell: 0
+  stationary: 0
   hardkick: 0
+  upsideDown: 0
   left: 1
   putdown: 0
 --- !u!114 &-8304985406365087950
@@ -273,6 +276,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &818487035572622980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8836298984178612590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onGround: 0
+  hitRoof: 0
+  hitRight: 0
+  hitLeft: 0
+  currentCollider: {fileID: 8836298984178612584}
+  floorAndRoofCutoff: 0.3
 --- !u!82 &3399800873378663516
 AudioSource:
   m_ObjectHideFlags: 0
@@ -405,7 +426,7 @@ Transform:
   m_GameObject: {fileID: 8836298985264993977}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.33, y: 0.33, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8836298984178612587}
   m_RootOrder: 0
@@ -423,16 +444,16 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.00000010430813, y: 0.220224}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
+    pivot: {x: 0.5, y: 0.25}
+    oldSize: {x: 0.17, y: 0.3}
+    newSize: {x: 0.17, y: 0.3}
+    adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.30470905, y: 0.39470607}
+  m_Size: {x: 0.1, y: 0.13022041}
   m_EdgeRadius: 0
