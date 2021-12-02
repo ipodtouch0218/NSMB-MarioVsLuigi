@@ -298,6 +298,16 @@ public class MainMenuManager : MonoBehaviourPun {
     public void SetUsername(TMP_InputField field) {
         PhotonNetwork.NickName = field.text;
         validName = field.text.Length > 2;
+        if (!validName) {
+            ColorBlock colors = field.colors;
+            colors.normalColor = new Color(1, 0.7f, 0.7f, 1);
+            colors.highlightedColor = new Color(1, 0.55f, 0.55f, 1);
+            field.colors = colors;
+        } else {
+            ColorBlock colors = field.colors;
+            colors.normalColor = Color.white;
+            field.colors = colors;
+        }
 
         PlayerPrefs.SetString("Nickname", field.text);
         PlayerPrefs.Save();
