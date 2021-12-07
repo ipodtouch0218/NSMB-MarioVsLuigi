@@ -4,7 +4,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour {
 
     float scroll;
-    [SerializeField] float minY, maxY, centerXWidth = 0.5f, centerYWidth = 0.5f, minX = -1000, maxX = 1000;
+    [SerializeField] float minY, heightY, centerXWidth = 0.5f, centerYWidth = 0.5f, minX = -1000, maxX = 1000;
     public GameObject target;
 
     void Update() {
@@ -37,7 +37,7 @@ public class CameraController : MonoBehaviour {
             targetY = ctp.y + centerYWidth;
         }
         
-        targetPos = new Vector3(Mathf.Clamp(targetX, minX, maxX), Mathf.Clamp(targetY, minY + (Camera.main.orthographicSize - 4.7f), maxY), Camera.main.transform.position.z);
+        targetPos = new Vector3(Mathf.Clamp(targetX, minX, maxX), Mathf.Clamp(targetY, minY + Camera.main.orthographicSize, minY + Camera.main.orthographicSize + heightY), Camera.main.transform.position.z);
 
         Camera.main.transform.position = targetPos;
         scroll = Mathf.Clamp(Camera.main.transform.position.x - ctp.x, -centerXWidth, centerXWidth);

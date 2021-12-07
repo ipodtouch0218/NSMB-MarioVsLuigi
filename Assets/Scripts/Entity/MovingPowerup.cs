@@ -5,6 +5,7 @@ using Photon.Pun;
 
 public class MovingPowerup : MonoBehaviourPun {
 
+    private static float cameraOffset = 5;
     private static int groundMask = -1;
     [SerializeField] float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
     Rigidbody2D body;
@@ -45,7 +46,7 @@ public class MovingPowerup : MonoBehaviourPun {
         if (followMe) {
             body.isKinematic = true;
             if (photonView.IsMine) {
-                transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y + ((float) Camera.main.GetComponent<HorizontalCamera>().m_orthographicSize - Camera.main.orthographicSize) + 1.5f);
+                transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y - Camera.main.orthographicSize + cameraOffset);
             }
 
             if ((followMeCounter * blinkingRate) % 2 < 1) {

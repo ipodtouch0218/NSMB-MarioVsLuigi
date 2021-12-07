@@ -1654,7 +1654,17 @@ PrefabInstance:
     - target: {fileID: 181876538126937071, guid: e6ca96f49b777b74c87c6e28603540d8,
         type: 3}
       propertyPath: minY
-      value: 4.1
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 181876538126937071, guid: e6ca96f49b777b74c87c6e28603540d8,
+        type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 181876538126937071, guid: e6ca96f49b777b74c87c6e28603540d8,
+        type: 3}
+      propertyPath: heightY
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 181876538279403049, guid: e6ca96f49b777b74c87c6e28603540d8,
         type: 3}

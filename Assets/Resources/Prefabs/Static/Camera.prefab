@@ -120,7 +120,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f27299145e1ce1b49a88121eefbbc590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_orthographicSize: 4.7
+  orthographicSize: 3.524
+  ndsSize: 3
 --- !u!1 &181876537489510025
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,7 +242,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f27299145e1ce1b49a88121eefbbc590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_orthographicSize: 4.7
+  orthographicSize: 3.524
+  ndsSize: 3
 --- !u!1 &181876538126937069
 GameObject:
   m_ObjectHideFlags: 0
@@ -318,7 +320,7 @@ Camera:
   m_TargetDisplay: 0
   m_TargetEye: 0
   m_HDR: 1
-  m_AllowMSAA: 0
+  m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 0
@@ -344,8 +346,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minY: 4.1
-  maxY: 4.1
+  minY: 0
+  heightY: 0
   centerXWidth: 0.5
   centerYWidth: 0.5
   minX: -1000
@@ -412,7 +414,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f27299145e1ce1b49a88121eefbbc590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_orthographicSize: 4.7
+  orthographicSize: 3.524
+  ndsSize: 3
 --- !u!1 &181876538279403046
 GameObject:
   m_ObjectHideFlags: 0
@@ -533,4 +536,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f27299145e1ce1b49a88121eefbbc590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_orthographicSize: 4.7
+  orthographicSize: 3.524
+  ndsSize: 3

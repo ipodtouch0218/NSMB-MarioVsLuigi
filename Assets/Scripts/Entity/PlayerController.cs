@@ -470,6 +470,7 @@ public class PlayerController : MonoBehaviourPun {
                 break;
             }
             case "koopa": {
+                downwards = Vector2.Dot(dir, Vector2.up) > 0;
                 KoopaWalk koopa = collider.gameObject.GetComponentInParent<KoopaWalk>();
                 if (holding == koopa)
                     break;
@@ -1183,10 +1184,14 @@ public class PlayerController : MonoBehaviourPun {
 
         HandleDeathAnimation();
         HandlePipeAnimation();
+
+        if (photonView.IsMine) {
+            HorizontalCamera.OFFSET_TARGET = (flying ? 0.75f : 0f);
+        }
     }
 
     void FakeOnGroundCheck() {
-        if (onGroundLastFrame && pipeEntering == null) {
+        if ((onGroundLastFrame || (flying && body.velocity.y < 0)) && pipeEntering == null) {
             var hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, ANY_GROUND_MASK);
             if (hit) {
                 onGround = true;
@@ -1758,6 +1763,7 @@ public class PlayerController : MonoBehaviourPun {
             }
             hitBlock = tempHitBlock;
             if (drill) {
+                flying = hitBlock;
                 drill = hitBlock;
                 if (drill) {
                     onGround = false;

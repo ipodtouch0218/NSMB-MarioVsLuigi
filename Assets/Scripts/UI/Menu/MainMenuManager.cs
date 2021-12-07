@@ -345,9 +345,7 @@ public class MainMenuManager : MonoBehaviourPun {
     public void OnToggleUpdate() {
         bool value = ndsResolutionToggle.isOn;
         PlayerPrefs.SetInt("NDSResolution", value ? 1 : 0);
-        if (!value) return;
-        
-        // Screen.SetResolution(256, 192, Screen.fullScreenMode);
+        GlobalController.Instance.ndsMode = value;
     }
     public void OnFullscreenUpdate() {
         bool value = fullscreenToggle.isOn;

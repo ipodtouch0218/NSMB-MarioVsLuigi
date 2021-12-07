@@ -1021,12 +1021,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minY: 4.6
-  maxY: 6.25
+  minY: 0
+  heightY: 4.35
   centerXWidth: 0.5
   centerYWidth: 0.5
-  minX: -12
-  maxX: 5
+  minX: -15.5
+  maxX: 8.5
   target: {fileID: 0}
 --- !u!81 &386130600
 AudioListener:
@@ -1105,7 +1105,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f27299145e1ce1b49a88121eefbbc590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_orthographicSize: 4.7
+  orthographicSize: 4.699999809265137
+  ndsSize: 3
 --- !u!1001 &397271343
 PrefabInstance:
   m_ObjectHideFlags: 0
