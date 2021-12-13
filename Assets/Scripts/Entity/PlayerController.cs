@@ -242,16 +242,14 @@ public class PlayerController : MonoBehaviourPun {
         if (onLeft || onRight) return;
         if (groundpound || knockback) return;
         if (state != PlayerState.FireFlower) return;
-        if (dead || holding) return;
+        if (dead || holding || flying || drill) return;
         if (GameManager.Instance.gameover) return;
-        if (flying) return;
         if (pipeEntering) return;
 
         int count = 0;
         foreach (FireballMover existingFire in GameObject.FindObjectsOfType<FireballMover>()) {
             if (existingFire.photonView.IsMine) {
-                count++;
-                if (count >= 2) 
+                if (++count >= 2) 
                     return;
             }
         }
@@ -265,11 +263,10 @@ public class PlayerController : MonoBehaviourPun {
         if (!photonView.IsMine) return;
         if (GameManager.Instance.paused) return;
         if (dead) return;
+        if (storedPowerup == null || storedPowerup.Length <= 0) return; 
 
-        if (storedPowerup != null) {
-            SpawnItem(storedPowerup);
-            storedPowerup = null;
-        }
+        SpawnItem(storedPowerup);
+        storedPowerup = null;
     }
 
     void OnPause() {

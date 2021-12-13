@@ -5646,7 +5646,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.95
+  m_fontSize: 20
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -14299,7 +14299,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1480501033}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -32137,6 +32137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f27299145e1ce1b49a88121eefbbc590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  renderToTextureIfAvailable: 1
   orthographicSize: 4.699999809265137
   ndsSize: 3
 --- !u!1 &1706461254

@@ -7,9 +7,11 @@ public class HorizontalCamera : MonoBehaviour {
     private new Camera camera;
     private float lastAspect;
     
-    public double orthographicSize = 4.7f;
+    public bool renderToTextureIfAvailable = true;
+    public double orthographicSize = 3.524f;
     public float ndsSize = 3f;
-    private void OnEnable() {
+
+    void Start() {
         RefreshCamera();
     }
      
@@ -17,7 +19,7 @@ public class HorizontalCamera : MonoBehaviour {
         OFFSET = Mathf.SmoothDamp(OFFSET, OFFSET_TARGET, ref OFFSET_VELOCITY, 1f);
         float aspect = camera.aspect;
         AdjustCamera(aspect);
-        camera.targetTexture = (GlobalController.Instance.ndsMode && SceneManager.GetActiveScene().buildIndex != 0 
+        camera.targetTexture = (renderToTextureIfAvailable && GlobalController.Instance.ndsMode && SceneManager.GetActiveScene().buildIndex != 0 
             ? GlobalController.Instance.ndsTexture 
             : null);
     }

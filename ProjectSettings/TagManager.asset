@@ -30,7 +30,7 @@ TagManager:
   - spinner
   - platform
   - poison
-  - cutout
+  - uicamera
   layers:
   - Default
   - TransparentFX

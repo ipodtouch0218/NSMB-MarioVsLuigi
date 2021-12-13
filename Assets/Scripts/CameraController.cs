@@ -37,7 +37,9 @@ public class CameraController : MonoBehaviour {
             targetY = ctp.y + centerYWidth;
         }
         
-        targetPos = new Vector3(Mathf.Clamp(targetX, minX, maxX), Mathf.Clamp(targetY, minY + Camera.main.orthographicSize, minY + Camera.main.orthographicSize + heightY), Camera.main.transform.position.z);
+        float vOrtho = Camera.main.orthographicSize;
+        float hOrtho = vOrtho * (Camera.main.aspect);
+        targetPos = new Vector3(Mathf.Clamp(targetX, minX + hOrtho, maxX - hOrtho), Mathf.Clamp(targetY, minY + vOrtho, minY + heightY - vOrtho), Camera.main.transform.position.z);
 
         Camera.main.transform.position = targetPos;
         scroll = Mathf.Clamp(Camera.main.transform.position.x - ctp.x, -centerXWidth, centerXWidth);

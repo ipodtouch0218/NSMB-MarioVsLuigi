@@ -248,7 +248,7 @@ PrefabInstance:
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: levelWidthTile
-      value: 60
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
@@ -1022,11 +1022,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minY: 0
-  heightY: 4.35
+  heightY: 10.5
   centerXWidth: 0.5
   centerYWidth: 0.5
-  minX: -15.5
-  maxX: 8.5
+  minX: -19.5
+  maxX: 12.5
   target: {fileID: 0}
 --- !u!81 &386130600
 AudioListener:
@@ -1105,7 +1105,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f27299145e1ce1b49a88121eefbbc590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  orthographicSize: 4.699999809265137
+  renderToTextureIfAvailable: 1
+  orthographicSize: 3.524
   ndsSize: 3
 --- !u!1001 &397271343
 PrefabInstance:

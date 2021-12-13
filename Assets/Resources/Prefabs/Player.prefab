@@ -724,7 +724,7 @@ GameObject:
   - component: {fileID: 3388375054421348969}
   - component: {fileID: 4541427373102620735}
   - component: {fileID: 4618889859348759581}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -771,7 +771,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &1609890886107309318
 MonoBehaviour:
@@ -12079,7 +12079,7 @@ GameObject:
   - component: {fileID: 3376956333729134479}
   - component: {fileID: 1322457990369268675}
   - component: {fileID: 6813991412463709956}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: username
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18301,7 +18301,7 @@ GameObject:
   - component: {fileID: 693338863911249441}
   - component: {fileID: 4676652694992057514}
   - component: {fileID: 7985054078198344117}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: stars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
