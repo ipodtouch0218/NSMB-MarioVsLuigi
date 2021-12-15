@@ -1051,7 +1051,7 @@ public class PlayerController : MonoBehaviourPun {
 
             if (pipeEntering != null) {
                 models.transform.eulerAngles = new Vector3(0,180,0);
-            } else if (animator.GetBool("inShell")) {
+            } else if (animator.GetBool("inShell") && !onSpinner) {
                 models.transform.eulerAngles += (new Vector3(0,1800 * (facingRight ? -1 : 1)) * Time.deltaTime) * (Mathf.Abs(body.velocity.x) / runningMaxSpeed);
             } else if ((holding != null || ice || !turnaround)) {
                 if (onSpinner && onGround && Mathf.Abs(body.velocity.x) < 0.3f) {
@@ -1075,7 +1075,7 @@ public class PlayerController : MonoBehaviourPun {
                         models.transform.eulerAngles = new Vector3(0,-100,0);
                     }
                 }
-            }
+            } 
 
             switch (state) {
             case PlayerState.Mini:
@@ -1196,12 +1196,10 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     void FakeOnGroundCheck() {
-        if ((onGroundLastFrame || (flying && body.velocity.y < 0) || drill) && pipeEntering == null) {
+        if ((onGroundLastFrame || (flying && body.velocity.y < 0)) && pipeEntering == null) {
             var hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, ANY_GROUND_MASK);
             if (hit) {
                 onGround = true;
-                flying = false;
-                drill = false;
                 transform.position = new Vector2(body.position.x, hit.point.y);
                 body.velocity = new Vector2(body.velocity.x, -1);
             }
@@ -1333,7 +1331,7 @@ public class PlayerController : MonoBehaviourPun {
             skidding = false;
             turnaround = false;
 
-            if (onSpinner && !inShell && !holding) {
+            if (onSpinner && !inShell && !holding && !(crouching && state == PlayerState.Shell)) {
                 photonView.RPC("PlaySound", RpcTarget.All, "mario/spinner_launch");
                 photonView.RPC("PlaySound", RpcTarget.All, "player/spinner_launch");
                 body.velocity = new Vector2(body.velocity.x, launchVelocity);
@@ -1421,7 +1419,7 @@ public class PlayerController : MonoBehaviourPun {
         float turnaroundSpeedBoost = (turnaround && !reverseBonus ? 2 : 1);
         float stationarySpeedBoost = Mathf.Abs(body.velocity.x) <= 0.005f ? 1f : 1f;
 
-        if ((crouching && !onGround && !inShell) || !crouching) {
+        if ((crouching && !onGround && state != PlayerState.Shell) || !crouching) {
             
             if (left) {
                 if (running && !flying && xVel <= -(walkingMaxSpeed - 0.3f)) {
@@ -1761,18 +1759,18 @@ public class PlayerController : MonoBehaviourPun {
 
     void HandleGroundpound(bool crouch, bool up) {
         if (onGround && (groundpound || drill) && hitBlock) {
-            bool tempHitBlock = true;
+            bool tempHitBlock = false;
             foreach (Vector3 tile in tilesStandingOn) {
                 int temp = InteractWithTile(tile, true);
                 if (temp != -1) {
-                    tempHitBlock &= (temp == 1);
+                    tempHitBlock |= (temp == 1);
                 }
             }
             hitBlock = tempHitBlock;
             if (drill) {
                 flying = hitBlock;
                 drill = hitBlock;
-                if (drill) {
+                if (hitBlock) {
                     onGround = false;
                     onGroundLastFrame = false;
                 }

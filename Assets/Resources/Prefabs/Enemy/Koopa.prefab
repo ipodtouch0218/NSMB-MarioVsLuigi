@@ -187,6 +187,7 @@ MonoBehaviour:
   upsideDown: 0
   left: 1
   putdown: 0
+  wakeupTimer: 0
 --- !u!114 &-8304985406365087950
 MonoBehaviour:
   m_ObjectHideFlags: 0

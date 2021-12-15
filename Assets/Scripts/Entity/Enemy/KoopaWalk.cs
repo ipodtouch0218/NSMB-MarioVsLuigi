@@ -63,13 +63,13 @@ public class KoopaWalk : HoldableEntity {
                 transform.eulerAngles = new Vector3(
                     transform.eulerAngles.x, 
                     transform.eulerAngles.y, 
-                    Mathf.Lerp(transform.eulerAngles.z, 180f, dampVelocity) + (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 60f) * 15f) : 0));
+                    Mathf.Lerp(transform.eulerAngles.z, 180f, dampVelocity) + (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0));
             } else {
                 dampVelocity = 0;
                 transform.eulerAngles = new Vector3(
                     transform.eulerAngles.x, 
                     transform.eulerAngles.y, 
-                    (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 60f) * 15f) : 0));
+                    (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0));
             }
         }
         if (!stationary) {
