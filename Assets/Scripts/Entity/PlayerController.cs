@@ -276,6 +276,14 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     [PunRPC]
+    void HoldingWakeup() {
+        holding = null;
+        holdingOld = null;
+        throwInvincibility = 0;
+        Powerdown(false);
+    }
+
+    [PunRPC]
     void Powerup(string powerup, int powerupViewId) {
         bool stateUp = false;
         PlayerState previous = state;
@@ -1188,10 +1196,12 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     void FakeOnGroundCheck() {
-        if ((onGroundLastFrame || (flying && body.velocity.y < 0)) && pipeEntering == null) {
+        if ((onGroundLastFrame || (flying && body.velocity.y < 0) || drill) && pipeEntering == null) {
             var hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, ANY_GROUND_MASK);
             if (hit) {
                 onGround = true;
+                flying = false;
+                drill = false;
                 transform.position = new Vector2(body.position.x, hit.point.y);
                 body.velocity = new Vector2(body.velocity.x, -1);
             }

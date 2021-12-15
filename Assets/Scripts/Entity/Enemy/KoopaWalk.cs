@@ -8,7 +8,7 @@ public class KoopaWalk : HoldableEntity {
     [SerializeField] float walkSpeed, kickSpeed, wakeup = 15;
     [SerializeField] public bool red, blue, shell, stationary, hardkick, upsideDown;
     public bool left = true, putdown = false;
-    float wakeupTimer;
+    public float wakeupTimer;
     new private BoxCollider2D collider;
     Vector2 blockOffset = new Vector3(0, 0.05f);
     private float dampVelocity;
@@ -40,10 +40,11 @@ public class KoopaWalk : HoldableEntity {
         }
 
         if (shell) {
-            if (body.velocity.x == 0) {
+            if (stationary) {
                 if ((wakeupTimer -= Time.fixedDeltaTime) < 0) {
                     photonView.RPC("WakeUp", RpcTarget.All);
                 }
+
             } else {
                 wakeupTimer = wakeup;
             }
@@ -59,10 +60,16 @@ public class KoopaWalk : HoldableEntity {
         if (!dead) {
             if (upsideDown) {
                 dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
-                transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, Mathf.Lerp(transform.eulerAngles.z, 180f, dampVelocity));
+                transform.eulerAngles = new Vector3(
+                    transform.eulerAngles.x, 
+                    transform.eulerAngles.y, 
+                    Mathf.Lerp(transform.eulerAngles.z, 180f, dampVelocity) + (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 60f) * 15f) : 0));
             } else {
                 dampVelocity = 0;
-                transform.rotation = Quaternion.identity;
+                transform.eulerAngles = new Vector3(
+                    transform.eulerAngles.x, 
+                    transform.eulerAngles.y, 
+                    (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 60f) * 15f) : 0));
             }
         }
         if (!stationary) {
@@ -107,6 +114,9 @@ public class KoopaWalk : HoldableEntity {
         left = true;
         upsideDown = false;
         stationary = false;
+        if (holder)
+            holder.GetPhotonView().RPC("HoldingWakeup", RpcTarget.All);
+        holder = null;
     }
     [PunRPC]
     public void EnterShell() {
