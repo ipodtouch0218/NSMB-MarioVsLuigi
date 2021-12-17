@@ -724,10 +724,12 @@ public class PlayerController : MonoBehaviourPun {
     [PunRPC]
     void Death(bool deathplane) {
         dead = true;
-        animator.SetTrigger("dead");
 
+        onSpinner = null;
+        pipeEntering = null;
         flying = false;
         drill = false;
+        animator.SetBool("flying", false);
         deathCounter = 0;
         dust.Stop();
         onLeft = false;
@@ -735,6 +737,7 @@ public class PlayerController : MonoBehaviourPun {
         skidding = false;
         turnaround = false;
         inShell = false;
+        animator.SetTrigger("dead");
         PlaySoundFromAnim("player/death");
         SpawnStar();
         if (holding) {
@@ -1054,7 +1057,7 @@ public class PlayerController : MonoBehaviourPun {
             } else if (animator.GetBool("inShell") && !onSpinner) {
                 models.transform.eulerAngles += (new Vector3(0,1800 * (facingRight ? -1 : 1)) * Time.deltaTime) * (Mathf.Abs(body.velocity.x) / runningMaxSpeed);
             } else if ((holding != null || ice || !turnaround)) {
-                if (onSpinner && onGround && Mathf.Abs(body.velocity.x) < 0.3f) {
+                if (onSpinner && onGround && Mathf.Abs(body.velocity.x) < 0.3f && !holding) {
                     Transform spnr = onSpinner.transform;
                     if (transform.position.x > spnr.transform.position.x + 0.02f) {
                         transform.position -= (new Vector3(0.01f * 60f, 0, 0) * Time.deltaTime);

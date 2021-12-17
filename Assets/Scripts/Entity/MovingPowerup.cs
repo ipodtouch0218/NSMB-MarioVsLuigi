@@ -14,7 +14,7 @@ public class MovingPowerup : MonoBehaviourPun {
     bool right = true;
     public bool passthrough = false;
     public GameObject followMe;
-    public float followMeCounter;
+    public float followMeCounter, despawnCounter = 15;
     private PhysicsEntity physics;
 
     void Start() {
@@ -63,7 +63,21 @@ public class MovingPowerup : MonoBehaviourPun {
             }
             gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         } else {
-            renderer.enabled = true;
+
+            despawnCounter -= Time.fixedDeltaTime;
+            if (despawnCounter <= 3) {
+                if ((despawnCounter * blinkingRate) % 1 < 0.5f) {
+                    renderer.enabled = false;
+                } else {
+                    renderer.enabled = true;
+                }
+            } else {
+                renderer.enabled = true;
+            }
+            if (despawnCounter <= 0 && photonView.IsMine) {
+                PhotonNetwork.Destroy(photonView);
+            }
+
             renderer.color = Color.white;
             body.isKinematic = false;
             if (passthrough) {
