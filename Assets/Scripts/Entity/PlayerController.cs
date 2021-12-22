@@ -9,7 +9,7 @@ using Photon.Pun;
 
 public class PlayerController : MonoBehaviourPun {
     
-    private static int ANY_GROUND_MASK, GROUND_LAYERID;
+    private static int ANY_GROUND_MASK, ONLY_GROUND_MASK, GROUND_LAYERID;
 
     private int playerId = 0;
     [SerializeField] public bool dead = false;
@@ -44,13 +44,17 @@ public class PlayerController : MonoBehaviourPun {
     public Avatar smallMarioAvatar, largeMarioAvatar;
     public GameObject onSpinner;
     PipeManager pipeEntering;
+    private CameraController cameraController;
+    private Vector3 cameraOffsetLeft = Vector3.left, cameraOffsetRight = Vector3.right, cameraOffsetZero = Vector3.zero;
 
     private bool starDirection, step;
 
     void Awake() {
         ANY_GROUND_MASK = LayerMask.GetMask("Ground", "Semisolids");
+        ONLY_GROUND_MASK = LayerMask.GetMask("Ground");
         GROUND_LAYERID = LayerMask.NameToLayer("Ground");
         
+        cameraController = Camera.main.GetComponent<CameraController>();
         animator = GetComponentInChildren<Animator>();
         body = GetComponent<Rigidbody2D>();
         audio = GetComponent<AudioSource>();
@@ -1195,6 +1199,14 @@ public class PlayerController : MonoBehaviourPun {
 
         if (photonView.IsMine) {
             HorizontalCamera.OFFSET_TARGET = (flying ? 0.75f : 0f);
+            if (flying) {
+                float percentage = Mathf.Abs(body.velocity.x) / walkingMaxSpeed;
+                cameraController.targetOffset = (body.velocity.x > 0 ? cameraOffsetRight : cameraOffsetLeft) * percentage * 2f;
+                cameraController.exactCentering = true;
+            } else {
+                cameraController.targetOffset = cameraOffsetZero;
+                cameraController.exactCentering = false;
+            }
         }
     }
 
@@ -1598,17 +1610,16 @@ public class PlayerController : MonoBehaviourPun {
         if (state != PlayerState.Giant) {
             if (((crouching && !onGround) || (onGround && !groundpound)) && !onLeft && !onRight && !holding) {
                 if (crouching && state >= PlayerState.Large) {
-                    bool forceCrouch = false;
-                    RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + new Vector3(0,0.1f,0), Vector2.up, 0.85f);
-                    Debug.DrawRay(transform.position + new Vector3(0,0.1f,0), Vector2.up * 1, Color.magenta);
-                    foreach (RaycastHit2D hit in hits) {
-                        if (hit.collider.isTrigger) continue;
-                        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground")) {
-                            forceCrouch = true;
-                            break;
-                        }
+                    float width = smolHitbox.bounds.extents.x;
+                    Debug.DrawRay(transform.position + new Vector3(-width+0.05f,0.1f,0), Vector2.up * 1, Color.magenta);
+                    Debug.DrawRay(transform.position + new Vector3(width-0.05f,0.1f,0), Vector2.up * 1, Color.magenta);
+                    if (Physics2D.Raycast(transform.position + new Vector3(-width+0.05f,0.1f,0), Vector2.up, 0.85f, ONLY_GROUND_MASK) 
+                        || Physics2D.Raycast(transform.position + new Vector3(width-0.05f,0.1f,0), Vector2.up, 0.85f, ONLY_GROUND_MASK)) {
+
+                        crouching = true;
+                    } else {
+                        crouching = crouch;
                     }
-                    crouching = crouch || forceCrouch; 
                 } else {
                     if (!crouching && crouch) {
                         photonView.RPC("PlaySound", RpcTarget.All, "player/crouch");
