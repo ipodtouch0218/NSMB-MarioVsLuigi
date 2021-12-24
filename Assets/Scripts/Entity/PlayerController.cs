@@ -1559,7 +1559,7 @@ public class PlayerController : MonoBehaviourPun {
         bool paused = GameManager.Instance.paused;
         float delta = Time.fixedDeltaTime;
 
-        invincible -= delta;
+        if (!pipeEntering) invincible -= delta;
         throwInvincibility -= delta;
         jumpBuffer -= delta;
         walljumping -= delta;
