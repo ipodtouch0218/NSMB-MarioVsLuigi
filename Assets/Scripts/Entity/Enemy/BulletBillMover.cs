@@ -5,11 +5,13 @@ using Photon.Pun;
 
 public class BulletBillMover : KillableEntity {
     
-    public float speed;
+    public float speed, playerSearchRadius = 4;
+    private Vector2 searchVector;
     public bool left = true;
     private SpriteRenderer spriteRenderer;
     new void Start() {
         base.Start();
+        searchVector = new Vector2(playerSearchRadius*2f, playerSearchRadius*2f);
         left = photonView && photonView.InstantiationData != null && (bool) photonView.InstantiationData[0];
         body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -34,6 +36,35 @@ public class BulletBillMover : KillableEntity {
             body.isKinematic = true;
             return;
         }
+
+        if (photonView.IsMine) {
+            DespawnCheck();
+        }
+    }
+
+    void DespawnCheck() {
+        foreach (var collision in Physics2D.BoxCastAll(transform.position, searchVector, 0f, Vector2.zero)) {
+            if (collision.transform.tag == "Player") {
+                return;
+            }
+        }
+        //left border check
+        if (transform.position.x - playerSearchRadius < GameManager.Instance.GetLevelMinX()) {
+            foreach (var collision in Physics2D.BoxCastAll(transform.position + new Vector3(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector, 0f, Vector2.zero)) {
+                if (collision.transform.tag == "Player") {
+                    return;
+                }
+            }
+        }
+        //right border check
+        if (transform.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX()) {
+            foreach (var collision in Physics2D.BoxCastAll(transform.position - new Vector3(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector, 0f, Vector2.zero)) {
+                if (collision.transform.tag == "Player") {
+                    return;
+                }
+            }
+        }
+        PhotonNetwork.Destroy(photonView);
     }
 
     [PunRPC]
@@ -43,7 +74,7 @@ public class BulletBillMover : KillableEntity {
     
     [PunRPC]
     public override void SpecialKill(bool right, bool groundpound) {
-        body.velocity = new Vector2(2.5f * (right ? 1 : -1), 2.5f);
+        body.velocity = new Vector2(0, 2.5f);
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (right ? 1 : -1);
         body.gravityScale = 1.5f;
@@ -57,4 +88,16 @@ public class BulletBillMover : KillableEntity {
         dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     } 
+    void OnDrawGizmosSelected() {
+        Gizmos.color = new Color(1, 0, 0, 0.5f);
+        Gizmos.DrawCube(transform.position, searchVector);
+        //left border check
+        if (transform.position.x - playerSearchRadius < GameManager.Instance.GetLevelMinX()) {
+            Gizmos.DrawCube(transform.position + new Vector3(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
+        }
+        //right border check
+        if (transform.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX()) {
+            Gizmos.DrawCube(transform.position - new Vector3(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
+        }
+    }
 }

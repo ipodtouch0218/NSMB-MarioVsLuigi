@@ -6172,6 +6172,7 @@ MonoBehaviour:
   inShell: 0
   hitLeft: 0
   hitRight: 0
+  iceSliding: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0

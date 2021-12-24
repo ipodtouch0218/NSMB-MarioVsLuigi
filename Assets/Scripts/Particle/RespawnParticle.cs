@@ -8,7 +8,7 @@ public class RespawnParticle : MonoBehaviour {
     public PlayerController player;
 
     void Update() {
-        if (!player.photonView.IsMine)
+        if (!player || !player.photonView.IsMine)
             return;
         if (respawnTimer > 0 && (respawnTimer -= Time.deltaTime) <= 0) {
             if (player != null)
