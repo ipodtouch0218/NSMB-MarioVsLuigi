@@ -6067,8 +6067,8 @@ GameObject:
   - component: {fileID: 4824223341387914485}
   - component: {fileID: 4824223341387914443}
   - component: {fileID: 4824223341387914484}
-  - component: {fileID: 4824223341387914442}
   - component: {fileID: 4824223341387914486}
+  - component: {fileID: 4824223341387914442}
   - component: {fileID: 525452844963146276}
   - component: {fileID: 5377451828833222271}
   - component: {fileID: 1356630168326180770}
@@ -6273,19 +6273,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.28, y: 0.4633464}
   m_EdgeRadius: 0.002
---- !u!114 &4824223341387914442
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824223341387914446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  offset: 0
 --- !u!61 &4824223341387914486
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6312,6 +6299,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.28, y: 0.8231535}
   m_EdgeRadius: 0.002
+--- !u!114 &4824223341387914442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824223341387914446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: 0
 --- !u!114 &525452844963146276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6333,7 +6333,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 1356630168326180770}
   - {fileID: 2969629008759004962}
-  - {fileID: 4891513875648552896}
   - {fileID: 4945816510512606649}
   sceneViewId: 0
   InstantiationId: 0
@@ -6566,6 +6565,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 1
     Name: inShell
+  - Type: 4
+    SynchronizeType: 1
+    Name: facingRight
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
@@ -18032,7 +18034,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8422425992379838804}
-  - component: {fileID: 4891513875648552896}
   m_Layer: 7
   m_Name: Models
   m_TagString: Untagged
@@ -18058,22 +18059,6 @@ Transform:
   m_Father: {fileID: 4824223341387914440}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 5, y: 90, z: 0}
---- !u!114 &4891513875648552896
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8422425992379838812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 0
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &8422425992422597832
 GameObject:
   m_ObjectHideFlags: 0

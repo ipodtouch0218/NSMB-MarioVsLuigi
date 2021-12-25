@@ -316,7 +316,7 @@ Camera:
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967261
+    m_Bits: 4294967293
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -355,6 +355,9 @@ MonoBehaviour:
   minX: -1000
   maxX: 1000
   target: {fileID: 0}
+  targetOffset: {x: 0, y: 0, z: 0}
+  exactCentering: 0
+  dampVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &181876538126936848
 MonoBehaviour:
   m_ObjectHideFlags: 0
