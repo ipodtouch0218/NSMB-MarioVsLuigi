@@ -10,7 +10,7 @@ using Photon.Pun;
 public class PlayerController : MonoBehaviourPun {
     
     private static int ANY_GROUND_MASK, ONLY_GROUND_MASK, GROUND_LAYERID;
-
+    
     private int playerId = 0;
     [SerializeField] public bool dead = false;
     [SerializeField] public PlayerState state = PlayerState.Small, previousState;
@@ -773,7 +773,7 @@ public class PlayerController : MonoBehaviourPun {
 
     [PunRPC]
     public void PreRespawn() {
-        transform.position = GameManager.Instance.spawnpoint + new Vector3(playerId, 0, 0);
+        transform.position = GameManager.Instance.GetSpawnpoint(playerId);
         dead = false;
         body.position = transform.position;
         animator.SetTrigger("respawn");

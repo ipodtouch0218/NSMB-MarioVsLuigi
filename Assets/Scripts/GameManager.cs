@@ -44,7 +44,6 @@ public class GameManager : MonoBehaviourPun {
         }
 
         spawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-        spawnpoint = GameObject.FindGameObjectWithTag("Respawn").transform.position;
         
         SceneManager.SetActiveScene(gameObject.scene);
         localPlayer = PhotonNetwork.Instantiate("Prefabs/Player", spawnpoint, Quaternion.identity, 0);
@@ -56,8 +55,6 @@ public class GameManager : MonoBehaviourPun {
             localPlayer = PhotonNetwork.Instantiate("Prefabs/Player", spawnpoint, Quaternion.identity, 0);
         }
         Camera.main.GetComponent<CameraController>().target = localPlayer;
-        // localPlayer.GetComponent<PlayerController>().dead = true;
-        // localPlayer.SetActive(false);
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
         localPlayer.GetComponent<PlayerController>().enabled = false;
         PhotonNetwork.IsMessageQueueRunning = true;
@@ -157,10 +154,10 @@ public class GameManager : MonoBehaviourPun {
         
         if (gameover) return;
 
-        foreach (var player in GameObject.FindGameObjectsWithTag("Player")) {
+        foreach (var player in FindObjectsOfType<PlayerController>()) {
             if (player.GetComponent<PlayerController>().stars >= GlobalController.Instance.starRequirement) {
                 //game over, losers
-                photonView.RPC("Win", RpcTarget.All, player.GetPhotonView().Owner);
+                photonView.RPC("Win", RpcTarget.All, player.photonView.Owner);
                 return;
             }
         }
@@ -312,5 +309,23 @@ public class GameManager : MonoBehaviourPun {
     }
     public float GetLevelMaxY() {
         return ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    }
+
+
+    public float size = 1.39f, ySize = 0.8f;
+    public Vector3 GetSpawnpoint(int playerIndex, int players = -1) {
+        if (players <= -1)
+            players = PhotonNetwork.CurrentRoom.PlayerCount;
+        float comp = ((float) playerIndex/players) * 2 * Mathf.PI + (Mathf.PI/2f) + (Mathf.PI/(2*players));
+        float scale = (2-(players+1f)/players) * size;
+        return spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2 ? scale * ySize : 0), 0);
+    }
+    [Range(1,10)]
+    public int playersToVisualize = 10;
+    void OnDrawGizmosSelected() {
+        for (int i = 0; i < playersToVisualize; i++) {
+            Gizmos.color = new Color(i/playersToVisualize, 0, 0, 0.75f);
+            Gizmos.DrawCube(GetSpawnpoint(i, playersToVisualize) + Vector3.down/4f, Vector2.one/2f);
+        }
     }
 }
