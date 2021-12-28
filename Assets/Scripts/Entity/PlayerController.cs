@@ -1298,19 +1298,21 @@ public class PlayerController : MonoBehaviourPun {
 
         foreach (RaycastHit2D hit in Physics2D.RaycastAll(transform.position, Vector2.down, 1f)) {
             GameObject obj = hit.transform.gameObject;
-            if (obj.tag == "pipe") {
-                //Enter pipe
-                pipeEntering = obj.GetComponent<PipeManager>();
-                pipeDirection = Vector2.down;
+            if (obj.tag != "pipe") continue;
+            PipeManager pipe = obj.GetComponent<PipeManager>();
+            if (pipe.miniOnly && state != PlayerState.Mini) continue;
+            
+            //Enter pipe
+            pipeEntering = pipe;
+            pipeDirection = Vector2.down;
 
-                body.velocity = Vector2.down;
-                transform.position.Set(obj.transform.position.x, transform.position.y, 1);
+            body.velocity = Vector2.down;
+            transform.position = new Vector2(obj.transform.position.x, transform.position.y);
 
-                photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
+            photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
 
-                crouching = false;
-                break;
-            }
+            crouching = false;
+            break;
         }
     }
 
@@ -1323,17 +1325,19 @@ public class PlayerController : MonoBehaviourPun {
         //todo: change to nonalloc?
         foreach (RaycastHit2D hit in Physics2D.RaycastAll(transform.position, Vector2.up, 1f)) {
             GameObject obj = hit.transform.gameObject;
-            if (obj.tag == "pipe") {
-                //pipe found
-                pipeEntering = obj.GetComponent<PipeManager>();
-                pipeDirection = Vector2.up;
+            if (obj.tag != "pipe") continue;
+            PipeManager pipe = obj.GetComponent<PipeManager>();
+            if (pipe.miniOnly && state != PlayerState.Mini) continue;
 
-                body.velocity = Vector2.up;
-                transform.position.Set(obj.transform.position.x, transform.position.y, 1);
+            //pipe found
+            pipeEntering = pipe;
+            pipeDirection = Vector2.up;
+
+            body.velocity = Vector2.up;
+            transform.position = new Vector2(obj.transform.position.x, transform.position.y);
                 
-                photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
-                break;
-            }
+            photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
+            break;
         }
     }
     
@@ -1521,6 +1525,7 @@ public class PlayerController : MonoBehaviourPun {
                         if (state != PlayerState.Giant && reverseBonus && xVel > runSpeedTotal - 2) {
                             skidding = true;
                             turnaround = true;
+                            facingRight = true;
                         }
                     }
                 }
@@ -1541,6 +1546,7 @@ public class PlayerController : MonoBehaviourPun {
                         if (state != PlayerState.Giant && reverseBonus && xVel < -runSpeedTotal + 2) {
                             skidding = true;
                             turnaround = true;
+                            facingRight = false;
                         }
                     }
                 }

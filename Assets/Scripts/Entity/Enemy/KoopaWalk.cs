@@ -157,7 +157,7 @@ public class KoopaWalk : HoldableEntity {
             killa.photonView.RPC("SpecialKill", RpcTarget.All, obj.transform.position.x > transform.position.x, false);
             break;
         }
-        case "pirahnaplant": {
+        case "piranhaplant": {
             KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
             killa.photonView.RPC("Kill", RpcTarget.All);
             break;
