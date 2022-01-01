@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Realtime;
 using UnityEngine.Tilemaps;
 
 public class Utils {
     
+    public static RaiseEventOptions EVENT_OTHERS {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.Others};
+    public static RaiseEventOptions EVENT_ALL {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.All};
     public static Vector3Int WorldToTilemapPosition(Vector3 vec) {
         return WorldToTilemapPosition(vec.x, vec.y);
     }

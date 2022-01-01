@@ -4,7 +4,8 @@ using UnityEngine;
 using Photon.Pun;
 
 public class KillplaneKill : MonoBehaviourPun {
-    float killTime = 0.0f, timer = 0;
+    [SerializeField] float killTime = 0f;
+    float timer = 0;
     bool killed = false;
     void Update() {
         if (killed) return;

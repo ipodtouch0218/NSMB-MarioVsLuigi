@@ -6175,7 +6175,6 @@ MonoBehaviour:
   iceSliding: 0
   invincible: 0
   giantTimer: 0
-  floorAngle: 0
   stars: 0
   coins: 0
   storedPowerup: 
@@ -6220,6 +6219,7 @@ MonoBehaviour:
   - PowerupBlueBrick
   - BlueQuestion
   - CoinBlueBrick
+  joystick: {x: 0, y: 0}
   smallMarioModel: {fileID: 8422425991972032533}
   largeMarioModel: {fileID: 6784312141689353033}
   marioBlueShell: {fileID: 3629787967981286811}
@@ -6327,12 +6327,11 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 1
+  Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 0
   ObservedComponents:
-  - {fileID: 1356630168326180770}
-  - {fileID: 2969629008759004962}
+  - {fileID: 4824223341387914485}
   - {fileID: 4945816510512606649}
   sceneViewId: 0
   InstantiationId: 0
@@ -6450,7 +6449,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4824223341387914446}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e7cb724808c322458aa4d15f5035fa9, type: 3}
   m_Name: 
@@ -6466,7 +6465,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4824223341387914446}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
   m_Name: 

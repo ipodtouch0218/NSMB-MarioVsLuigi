@@ -58,7 +58,7 @@ MonoBehaviour:
   moveSpeed: 1.5
   rotationSpeed: 3
   bounceAmount: 7
-  deathBoostAmount: 11
+  deathBoostAmount: 10
   blinkingSpeed: 0.25
   lifespan: 15
   passthrough: 0

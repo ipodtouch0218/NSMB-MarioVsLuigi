@@ -6,10 +6,11 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 using TMPro;
 
-public class MainMenuManager : MonoBehaviourPun {
-    public static MainMenuManager Instance;
+public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
+    public static MainMenuManager Instance; 
     Color defaultColor = Color.white;
     AudioSource music, sfx;
     public GameObject lobbiesContent, lobbyPrefab;
@@ -30,14 +31,147 @@ public class MainMenuManager : MonoBehaviourPun {
     public TMP_Text starsText;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected;
     private int prevWidth = 1280, prevHeight = 720;
+    public GameObject errorBox;
+    public TMP_Text errorText;
 
-    void Awake() {
-        Instance = this;
+    // LOBBY CALLBACKS
+    public void OnJoinedLobby() {}
+    public void OnLeftLobby() {}
+    public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbies) {}
+    public void OnRoomListUpdate(List<RoomInfo> roomList) {
+        //clear existing
+        for (int i = 0; i < lobbiesContent.transform.childCount; i++) {
+            GameObject roomObj = lobbiesContent.transform.GetChild(i).gameObject;
+            if (!roomObj.activeSelf) continue;
+            GameObject.Destroy(roomObj);
+        }
+        //add new rooms
+        //TODO refactor??
+        int count = 0;
+        foreach (RoomInfo room in roomList) {
+            if (!room.IsVisible || !room.IsOpen || room.MaxPlayers <= 0) {
+                continue;
+            } 
+            GameObject newLobby = GameObject.Instantiate(lobbyPrefab, Vector3.zero, Quaternion.identity, lobbiesContent.transform);
+            newLobby.SetActive(true);
+            RectTransform rect = newLobby.GetComponent<RectTransform>();
+            rect.offsetMin = new Vector2(0, (count-1) * 55f);
+            rect.offsetMax = new Vector2(0, (count) * 55f);
+            SetText(newLobby.transform.Find("LobbyName").gameObject, "Name: " + room.Name);
+            SetText(newLobby.transform.Find("LobbyPlayers").gameObject, "Players: " + room.PlayerCount + "/" + room.MaxPlayers);
+            newLobby.GetComponent<RoomIcon>().room = room;
+            count--;
+        }
     }
+
+    // ROOM CALLBACKS
+    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {}
+    public void OnMasterClientSwitched(Player newMaster) {
+        LocalChatMessage(newMaster.NickName + " has become the Host", ColorToVector(Color.red));
+    }
+    public void OnJoinedRoom() {
+        RoomInfo room = PhotonNetwork.CurrentRoom;
+        OpenInLobbyMenu(room);
+        LocalChatMessage(PhotonNetwork.LocalPlayer.NickName + " joined the lobby", ColorToVector(Color.red));
+        levelDropdown.interactable = PhotonNetwork.IsMasterClient;
+        PopulatePlayerList();
+        OnRoomPropertiesUpdate(room.CustomProperties);
+    }
+    public void OnPlayerEnteredRoom(Player newPlayer) {
+        LocalChatMessage(newPlayer.NickName + " joined the lobby", MainMenuManager.ColorToVector(Color.red));
+        PopulatePlayerList();
+    }
+    public void OnPlayerLeftRoom(Player otherPlayer) {
+        LocalChatMessage(otherPlayer.NickName + " left the lobby", MainMenuManager.ColorToVector(Color.red));
+        PopulatePlayerList();
+    }
+    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) {
+        if (PhotonNetwork.IsMasterClient)
+            return;
+
+        if (properties != null) {
+            if (properties[Enums.NetRoomProperties.Level] != null)
+                SetLevelIndex((int) properties[Enums.NetRoomProperties.Level]);
+            if (properties[Enums.NetRoomProperties.StarRequirement] != null)
+                SetStarRequirement((int) properties[Enums.NetRoomProperties.StarRequirement]);
+        }
+    }
+    // CONNECTION CALLBACKS
+    public void OnConnected() {}
+    public void OnDisconnected(DisconnectCause cause) {
+        OpenErrorBox("Disconnected: " + cause.ToString());
+        //TODO reconnect + offline option?
+    }
+    public void OnRegionListReceived(RegionHandler handler) {
+        //TODO changing server regions?
+    }
+    public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {}
+    public void OnCustomAuthenticationFailed(string failure) {}
+    public void OnConnectedToMaster() {
+        Debug.Log("Connected to Master");
+        PhotonNetwork.JoinLobby();
+    }
+    // MATCHMAKING CALLBACKS
+    public void OnFriendListUpdate(List<FriendInfo> friendList) {}
+    public void OnLeftRoom() {
+        OpenLobbyMenu();
+        ClearChat();
+    }
+    public void OnJoinRandomFailed(short reasonId, string reasonMessage) {
+        OnJoinRoomFailed(reasonId, reasonMessage);
+    }
+    public void OnJoinRoomFailed(short reasonId, string reasonMessage) {
+        //TODO: error messages
+        OpenErrorBox(reasonMessage);
+        Debug.LogError("join room failed, " + reasonId + ": " + reasonMessage);
+    }
+    public void OnCreateRoomFailed(short reasonId, string reasonMessage) {
+        //TOOD: error message
+        Debug.LogError("create room failed, " + reasonId + ": " + reasonMessage);
+        OpenErrorBox(reasonMessage);
+    }
+    public void OnCreatedRoom() {
+        Debug.Log("Created Room: " + PhotonNetwork.CurrentRoom.Name);
+
+        ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
+        table[Enums.NetRoomProperties.Level] = 0;
+        table[Enums.NetRoomProperties.StarRequirement] = 10;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        SetLevelIndex(0);
+    }
+    // CUSTOM EVENT CALLBACKS
+    public void OnEvent(EventData e) {
+        switch (e.Code) {
+        case (byte) Enums.NetEventIds.StartGame: {
+            PhotonNetwork.IsMessageQueueRunning = false;
+            SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
+            SceneManager.LoadSceneAsync(levelDropdown.value + 2, LoadSceneMode.Additive);
+            break;
+        }
+        case (byte) Enums.NetEventIds.ChatMessage: {
+            object[] data = (object[]) e.CustomData;
+            string message = (string) data[0];
+            Vector3 color = (Vector3) data[1];
+            LocalChatMessage(message, color);
+            break;
+        }
+        }
+    }
+
+    // CALLBACK REGISTERING
+    void OnEnable() {
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+    void OnDisable() {
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
+
+    // Unity Stuff
     void Start() {
+        Instance = this;
         Debug.Log(PhotonNetwork.InRoom);
         if (PhotonNetwork.InRoom) {
-            NetworkManager.instance.OnJoinedRoom();
+            OnJoinedRoom();
         }
 
         music = GetComponents<AudioSource>()[0];
@@ -50,13 +184,12 @@ public class MainMenuManager : MonoBehaviourPun {
         Camera.main.transform.position = levelCameraPositions[Random.Range(0,levelCameraPositions.Length-1)].transform.position;
         
         nicknameField.text = PhotonNetwork.NickName;
-        musicSlider.value = GlobalController.Instance.volumeMusic;
-        sfxSlider.value = GlobalController.Instance.volumeSFX;
-        masterSlider.value = GlobalController.Instance.volumeMaster;
+        musicSlider.value = Settings.Instance.VolumeMusic;
+        sfxSlider.value = Settings.Instance.VolumeSFX;
+        masterSlider.value = Settings.Instance.VolumeMaster;
 
-        ndsResolutionToggle.isOn = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
-        fullscreenToggle.isOn = PlayerPrefs.GetInt("Fullscreen", 0) == 1;
-        OnToggleUpdate();
+        ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
+        fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
     }
 
     void Update() {
@@ -141,36 +274,36 @@ public class MainMenuManager : MonoBehaviourPun {
         creditsPage.SetActive(false);
 
         lobbyText.GetComponent<TextMeshProUGUI>().text = room.Name;
-        if (room.CustomProperties[NetworkManager.PROPKEY_MAP] != null) {
-            SetLevelIndex((int) room.CustomProperties[NetworkManager.PROPKEY_MAP]);
+        if (room.CustomProperties[Enums.NetRoomProperties.Level] != null) {
+            SetLevelIndex((int) room.CustomProperties[Enums.NetRoomProperties.Level]);
         }
         EventSystem.current.SetSelectedGameObject(currentLobbySelected);
     }
+    public void OpenErrorBox(string text) {
+        errorBox.SetActive(true);
+        errorText.text = text;
+    }
+
     public void QuitRoom() {
         PhotonNetwork.LeaveRoom();
-        MainMenuManager.Instance.OpenLobbyMenu();
-        MainMenuManager.Instance.ClearChat();
     }
     public void StartGame() {
         PhotonNetwork.CurrentRoom.IsOpen = false;
         PhotonNetwork.CurrentRoom.IsVisible = false;
-        photonView.RPC("StartLoading", RpcTarget.AllViaServer);
+
+        //start game with all players
+        RaiseEventOptions options = new RaiseEventOptions {Receivers = ReceiverGroup.All};
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.StartGame, null, options, SendOptions.SendReliable);
     }
-    
-    [PunRPC]
-    public void StartLoading() {
-        PhotonNetwork.IsMessageQueueRunning = false;
-        SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
-        SceneManager.LoadSceneAsync(levelDropdown.value + 2, LoadSceneMode.Additive);
-    }
+
     public void SetLevelIndex() {
         Camera.main.transform.position = levelCameraPositions[levelDropdown.value].transform.position;
-        if (PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient) {
-            photonView.RPC("ChatMessage", RpcTarget.All, "Map set to: " + levelDropdown.captionText.text, ColorToVector(Color.red));
-            ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
-            table[NetworkManager.PROPKEY_MAP] = levelDropdown.value;
-            PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        }
+        if (!PhotonNetwork.IsMasterClient) return;
+        GlobalChatMessage("Map set to: " + levelDropdown.captionText.text, ColorToVector(Color.red));
+
+        ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
+        table[Enums.NetRoomProperties.Level] = levelDropdown.value;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
     public void SetLevelIndex(int index) {
         if (PhotonNetwork.IsMasterClient && levelDropdown.value == index) return;
@@ -239,8 +372,12 @@ public class MainMenuManager : MonoBehaviourPun {
         starSlider.interactable = PhotonNetwork.IsMasterClient;
     }
     
-    [PunRPC]
-    public void ChatMessage(string message, Vector3 color) {
+    public void GlobalChatMessage(string message, Vector3 color) {
+        RaiseEventOptions options = new RaiseEventOptions {Receivers = ReceiverGroup.All};
+        object[] parameters = new object[]{ message, color };
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChatMessage, parameters, options, SendOptions.SendReliable);
+    }
+    public void LocalChatMessage(string message, Vector3 color) {
         float y = 0;
         for (int i = 0; i < chatContent.transform.childCount; i++) {
             GameObject child = chatContent.transform.GetChild(i).gameObject;
@@ -266,35 +403,14 @@ public class MainMenuManager : MonoBehaviourPun {
         if (input.text == null || input.text == "")
             return;
         
-        photonView.RPC("ChatMessage", RpcTarget.All, PhotonNetwork.NickName + ": " + text, ColorToVector(Color.black));
+        GlobalChatMessage(PhotonNetwork.NickName + ": " + text, ColorToVector(Color.black));
         input.text = "";
         // EventSystem.current.SetSelectedGameObject(input.gameObject);
     }
     public static Vector3 ColorToVector(Color color) {
         return new Vector3(color.r, color.g, color.b);
     }
-    public void OnRoomListUpdate(List<RoomInfo> roomList) {
-        for (int i = 0; i < lobbiesContent.transform.childCount; i++) {
-            GameObject roomObj = lobbiesContent.transform.GetChild(i).gameObject;
-            if (!roomObj.activeSelf) continue;
-            GameObject.Destroy(roomObj);
-        }
-        int count = 0;
-        foreach (RoomInfo room in roomList) {
-            if (!room.IsVisible || !room.IsOpen || room.MaxPlayers <= 0) {
-                continue;
-            } 
-            GameObject newLobby = GameObject.Instantiate(lobbyPrefab, Vector3.zero, Quaternion.identity, lobbiesContent.transform);
-            newLobby.SetActive(true);
-            RectTransform rect = newLobby.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(0, (count-1) * 55f);
-            rect.offsetMax = new Vector2(0, (count) * 55f);
-            SetText(newLobby.transform.Find("LobbyName").gameObject, "Name: " + room.Name);
-            SetText(newLobby.transform.Find("LobbyPlayers").gameObject, "Players: " + room.PlayerCount + "/" + room.MaxPlayers);
-            newLobby.GetComponent<RoomIcon>().room = room;
-            count--;
-        }
-    }
+
     public void SetUsername(TMP_InputField field) {
         PhotonNetwork.NickName = field.text;
         validName = field.text.Length > 2;
@@ -335,21 +451,34 @@ public class MainMenuManager : MonoBehaviourPun {
         
         if (PhotonNetwork.IsMasterClient) {
             ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
-            table[NetworkManager.PROPKEY_STARS] = (int) value;
+            table[Enums.NetRoomProperties.StarRequirement] = (int) value;
             PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         }
-        GlobalController.Instance.starRequirement = (int) value;
         starSlider.value = value / 5;
     }
 
-    public void OnToggleUpdate() {
-        bool value = ndsResolutionToggle.isOn;
-        PlayerPrefs.SetInt("NDSResolution", value ? 1 : 0);
-        GlobalController.Instance.ndsMode = value;
+    public void SetVolumeMusic() {
+        Settings s = Settings.Instance;
+        s.VolumeMusic = musicSlider.value;
+        s.SaveSettingsToPreferences();
     }
-    public void OnFullscreenUpdate() {
+    public void SetVolumeSFX() {
+        Settings s = Settings.Instance;
+        s.VolumeSFX = sfxSlider.value;
+        s.SaveSettingsToPreferences();
+    }
+    public void SetVolumeMaster() {
+        Settings s = Settings.Instance;
+        s.VolumeMaster = masterSlider.value;
+        s.SaveSettingsToPreferences();
+    }
+    public void OnNdsResolutionToggle() {
+        Settings s = Settings.Instance;
+        s.ndsResolution = ndsResolutionToggle.isOn;
+        s.SaveSettingsToPreferences();
+    }
+    public void OnFullscreenToggle() {
         bool value = fullscreenToggle.isOn;
-        PlayerPrefs.SetInt("Fullscreen", value ? 1 : 0);
         if (value) {
             prevWidth = Screen.width;
             prevHeight = Screen.height;

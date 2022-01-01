@@ -12,7 +12,7 @@ public class LoadingWaitingOn : MonoBehaviour {
     }
 
     void Update() {
-        if (GlobalController.Instance.loadedPlayers.Count == 0) return;
+        if (GameManager.Instance.loadedPlayers.Count == 0) return;
 
         string final;
         if (iveLoadedText != null) {
@@ -20,7 +20,7 @@ public class LoadingWaitingOn : MonoBehaviour {
         } else {
             List<string> loading = new List<string>();
             foreach (Photon.Realtime.Player player in PhotonNetwork.CurrentRoom.Players.Values) {
-                if (!GlobalController.Instance.loadedPlayers.Contains(player.NickName)) {
+                if (!GameManager.Instance.loadedPlayers.Contains(player.NickName)) {
                     loading.Add(player.NickName);
                 }
             }

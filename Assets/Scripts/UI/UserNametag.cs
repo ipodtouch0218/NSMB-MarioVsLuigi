@@ -18,7 +18,7 @@ public class UserNametag : MonoBehaviour {
     void Update() {
         float y;
         switch (parent.state) {
-        case PlayerController.PlayerState.Small:
+        case Enums.PowerupState.Small:
             y = 1.2f;
             break;
         default:

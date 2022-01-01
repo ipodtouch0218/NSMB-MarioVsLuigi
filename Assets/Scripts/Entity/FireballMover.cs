@@ -48,6 +48,9 @@ public class FireballMover : MonoBehaviourPun {
     public void Kill() {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
+    }
+
+    void OnDestroy() {
         GameObject.Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
     }
 

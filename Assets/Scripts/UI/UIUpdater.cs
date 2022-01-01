@@ -14,9 +14,11 @@ public class UIUpdater : WaitForGameStart {
     public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell; 
     public TMP_Text uiStars, uiCoins, uiPing;
     public Image itemReserve;
+    private float pingSample = 0;
 
     void Start() {
         instance = this;
+        pingSample = PhotonNetwork.GetPing();
     }
     
     public override void Execute() {
@@ -33,7 +35,8 @@ public class UIUpdater : WaitForGameStart {
     }
 
     void Update() {
-        uiPing.text = "<sprite=2>" + PhotonNetwork.GetPing() + "ms";
+        pingSample = PhotonNetwork.GetPing() * Time.deltaTime + (1-Time.deltaTime) * pingSample;
+        uiPing.text = "<sprite=2>" + (int) pingSample + "ms";
         
         //Player stuff update.
         if (!player && GameManager.Instance.localPlayer) {
@@ -73,7 +76,7 @@ public class UIUpdater : WaitForGameStart {
         if (!player)
             return;
 
-        uiStars.text = "<sprite=0>" + player.stars + "/" + GlobalController.Instance.starRequirement;
+        uiStars.text = "<sprite=0>" + player.stars + "/" + GameManager.Instance.starRequirement;
         uiCoins.text = "<sprite=1>" + player.coins + "/8";
     }
 }

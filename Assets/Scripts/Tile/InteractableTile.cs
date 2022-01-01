@@ -9,7 +9,7 @@ public abstract class InteractableTile : AnimatedTile {
 
     public abstract bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation);
     protected void Bump(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
-        Vector3 bumpOffset = new Vector3(0.25f, 0.5f, 0), bumpSize = new Vector3(0.50f, 0.1f, 0);
+        Vector3 bumpOffset = new Vector3(0.25f, 0.5f, 0), bumpSize = new Vector3(0.45f, 0.1f, 0);
         if (direction != InteractionDirection.Down) {
             //check for entities above to bump
             Debug.DrawRay((Vector3) worldLocation + (Vector3) bumpOffset, Vector3.up, Color.green, 3);
@@ -19,7 +19,7 @@ public abstract class InteractableTile : AnimatedTile {
                 switch (obj.tag) {
                 case "Player": {
                     PlayerController player = obj.GetComponent<PlayerController>();
-                    player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x > worldLocation.x, 1);
+                    player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x > worldLocation.x, 1, null);
                     break;
                 }
                 case "koopa": {
