@@ -361,8 +361,8 @@ public class GameManager : MonoBehaviourPun, IOnEventCallback {
         float comp = ((float) playerIndex/players) * 2 * Mathf.PI + (Mathf.PI/2f) + (Mathf.PI/(2*players));
         float scale = (2-(players+1f)/players) * size;
         Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2 ? scale * ySize : 0), 0);
-        if (spawn.x < GetLevelMinX()) spawn += (Vector3.right * levelWidthTile/2f);
-        if (spawn.x > GetLevelMinX()) spawn += (Vector3.left * levelWidthTile/2f);
+        if (spawn.x < GetLevelMinX()) spawn += new Vector3(levelWidthTile/2f, 0);
+        if (spawn.x > GetLevelMaxX()) spawn -= new Vector3(levelWidthTile/2f, 0);
         return spawn;
     }
     [Range(1,10)]

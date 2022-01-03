@@ -20,6 +20,7 @@ public abstract class InteractableTile : AnimatedTile {
                 case "Player": {
                     PlayerController player = obj.GetComponent<PlayerController>();
                     player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x > worldLocation.x, 1, null);
+                    player.photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/PlayerBounce", player.transform.position.x, player.transform.position.y);
                     break;
                 }
                 case "koopa": {

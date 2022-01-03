@@ -193,7 +193,7 @@ public class KoopaWalk : HoldableEntity {
                     if (!shell) continue;
                     
                     if (tile is InteractableTile) {
-                        ((InteractableTile) tile).Interact(this, InteractableTile.InteractionDirection.Up, point.point);
+                        ((InteractableTile) tile).Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
                     }
                 }
             } else if (point.normal.y > 0 && putdown) {
