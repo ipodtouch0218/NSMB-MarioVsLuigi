@@ -16,19 +16,14 @@ public class UserNametag : MonoBehaviour {
     }
     
     void Update() {
-        float y;
-        switch (parent.state) {
-        case Enums.PowerupState.Small:
+        float y = 1.6f;
+        if (parent.state <= Enums.PowerupState.Small || parent.inShell || parent.crouching) {
             y = 1.2f;
-            break;
-        default:
-            y = 1.6f;
-            break;
         }
 
         transform.localPosition = new Vector2(0, y);
 
-        usernameText.text = (parent.photonView.Owner.IsMasterClient ? "(H) " : "") + parent.photonView.Owner.NickName;
+        usernameText.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName;
         starText.text = "<sprite=0>" + parent.stars;
     }
 }

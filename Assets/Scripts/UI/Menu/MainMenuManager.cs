@@ -22,7 +22,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject sliderText, lobbyText;
     public TMP_Dropdown levelDropdown;
     public RoomIcon selectedRoom;
-    public Button joinRoomBtn, createRoomBtn, startGameBtn;
+    public Button joinRoomBtn, createRoomBtn, startGameBtn, changeCharacterBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab; 
     public TMP_InputField nicknameField, lobbyNameField;
@@ -35,7 +35,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Text errorText;
 
     // LOBBY CALLBACKS
-    public void OnJoinedLobby() {}
+    public void OnJoinedLobby() {
+        ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
+        prop.Add("character", 0);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+    }
     public void OnLeftLobby() {}
     public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbies) {}
     public void OnRoomListUpdate(List<RoomInfo> roomList) {
@@ -65,7 +69,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     // ROOM CALLBACKS
-    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {}
+    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {
+        PopulatePlayerList();
+    }
     public void OnMasterClientSwitched(Player newMaster) {
         LocalChatMessage(newMaster.NickName + " has become the Host", ColorToVector(Color.red));
     }
@@ -74,6 +80,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         OpenInLobbyMenu(room);
         LocalChatMessage(PhotonNetwork.LocalPlayer.NickName + " joined the lobby", ColorToVector(Color.red));
         levelDropdown.interactable = PhotonNetwork.IsMasterClient;
+
+        changeCharacterBtn.image.sprite = GlobalController.Instance.characters[0].buttonSprite;
+
         PopulatePlayerList();
         OnRoomPropertiesUpdate(room.CustomProperties);
     }
@@ -356,13 +365,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         SortedDictionary<int, Photon.Realtime.Player> sortedPlayers = new SortedDictionary<int,Photon.Realtime.Player>(PhotonNetwork.CurrentRoom.Players);
         foreach (KeyValuePair<int, Photon.Realtime.Player> player in sortedPlayers) {
             Player pl = player.Value;
-            
+            string characterString = Utils.GetCharacterData(pl).uistring;
+
             GameObject newPl = GameObject.Instantiate(playersPrefab, Vector3.zero, Quaternion.identity);
             newPl.transform.SetParent(playersContent.transform);
             newPl.transform.localPosition = new Vector3(0, -(count-- * 40f), 0);
             newPl.transform.localScale = Vector3.one;
             newPl.SetActive(true);
-            SetText(newPl.transform.Find("Text").gameObject, (pl.IsMasterClient ? "(Host) " : "") + pl.NickName);
+            SetText(newPl.transform.Find("Text").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
             RectTransform tf = newPl.GetComponent<RectTransform>();
             tf.offsetMax = new Vector2(330, tf.offsetMax.y);
         }
@@ -409,6 +419,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public static Vector3 ColorToVector(Color color) {
         return new Vector3(color.r, color.g, color.b);
+    }
+    public void SwapCharacter() {
+        int character = (int) PhotonNetwork.LocalPlayer.CustomProperties["character"];
+        character = (character+1) % GlobalController.Instance.characters.Length;
+
+        ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
+        prop.Add("character", character);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+
+        PlayerData data = GlobalController.Instance.characters[character];
+        changeCharacterBtn.image.sprite = data.buttonSprite;
+        
+        sfx.PlayOneShot((AudioClip) Resources.Load("Sound/" + data.soundFolder + "/selected"));
     }
 
     public void SetUsername(TMP_InputField field) {

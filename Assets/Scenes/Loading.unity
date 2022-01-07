@@ -459,8 +459,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e48041bc4d851541ba8a667f3643203, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  small: {fileID: 1040450253486601905, guid: a7245cae141f3ee449147539ebd2a2c9, type: 3}
-  large: {fileID: -1751142936083476856, guid: a7245cae141f3ee449147539ebd2a2c9, type: 3}
   scale: 0
   previousScale: 0
   scaleTimer: 0
@@ -1547,6 +1545,7 @@ GameObject:
   - component: {fileID: 1858421151}
   - component: {fileID: 1858421153}
   - component: {fileID: 1858421152}
+  - component: {fileID: 1858421154}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -1612,3 +1611,15 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1858421150}
   m_CullTransparentMesh: 1
+--- !u!114 &1858421154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1858421150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbeccd0bed4d67e4f8ad1c997834fd47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

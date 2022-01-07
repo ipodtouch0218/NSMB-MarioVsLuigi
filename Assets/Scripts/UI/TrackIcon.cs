@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class TrackIcon : MonoBehaviour {
     [SerializeField] float trackMinX, trackMaxX, offsetY;
@@ -9,7 +10,7 @@ public class TrackIcon : MonoBehaviour {
     private PlayerController playerTarget;
     public Color outlineColor;
     Image image;
-    public Sprite starSprite, playerSprite;
+    public Sprite starSprite;
     private float flashTimer;
     void Start() {
         image = GetComponent<Image>();
@@ -22,7 +23,7 @@ public class TrackIcon : MonoBehaviour {
         }
         image.enabled = true;
         if (target.tag == "Player") {
-            image.sprite = playerSprite;
+            image.sprite = Utils.GetCharacterData(target.GetPhotonView().Owner).trackSprite;
             if (playerTarget == null) {
                 playerTarget = target.GetComponent<PlayerController>();
             }

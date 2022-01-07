@@ -304,7 +304,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -287.09995, y: -38}
+  m_AnchoredPosition: {x: -517.82, y: -38}
   m_SizeDelta: {x: 18, y: 38}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &5186918864963716179
@@ -364,8 +364,6 @@ MonoBehaviour:
   target: {fileID: 0}
   outlineColor: {r: 0, g: 0, b: 0, a: 0}
   starSprite: {fileID: 6326231466481203021, guid: 6afc8664f51abf545987f0a04b8a1125,
-    type: 3}
-  playerSprite: {fileID: 2894126367625617641, guid: 3279a4c4726060841b216b3de72d86a5,
     type: 3}
 --- !u!1 &982548274797097743
 GameObject:
@@ -1029,7 +1027,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 11400000, guid: baf3a0127fd658f4ea49a3bd27fd3ab8, type: 2}
+  m_spriteAsset: {fileID: 11400000, guid: 8e65a200650c3db478c3651570102f3c, type: 2}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901
@@ -1239,7 +1237,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 11400000, guid: baf3a0127fd658f4ea49a3bd27fd3ab8, type: 2}
+  m_spriteAsset: {fileID: 11400000, guid: 8e65a200650c3db478c3651570102f3c, type: 2}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901
@@ -2082,7 +2080,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 11400000, guid: baf3a0127fd658f4ea49a3bd27fd3ab8, type: 2}
+  m_spriteAsset: {fileID: 11400000, guid: 8e65a200650c3db478c3651570102f3c, type: 2}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901
@@ -2420,7 +2418,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -191.69992, y: -42}
+  m_AnchoredPosition: {x: -520.8, y: -42}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4921889592944250499
@@ -2480,6 +2478,4 @@ MonoBehaviour:
   target: {fileID: 0}
   outlineColor: {r: 0, g: 0, b: 0, a: 0}
   starSprite: {fileID: 6326231466481203021, guid: 6afc8664f51abf545987f0a04b8a1125,
-    type: 3}
-  playerSprite: {fileID: 2894126367625617641, guid: 3279a4c4726060841b216b3de72d86a5,
     type: 3}

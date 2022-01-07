@@ -5,7 +5,6 @@ using Photon.Pun;
 
 public class MovingPowerup : MonoBehaviourPun {
 
-    private static float cameraOffset = 5;
     private static int groundMask = -1;
     [SerializeField] float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
     Rigidbody2D body;
@@ -13,7 +12,7 @@ public class MovingPowerup : MonoBehaviourPun {
     new SpriteRenderer renderer;
     bool right = true;
     public bool passthrough = false;
-    public GameObject followMe;
+    public PlayerController followMe;
     public float followMeCounter, despawnCounter = 15;
     private PhysicsEntity physics;
 
@@ -31,8 +30,8 @@ public class MovingPowerup : MonoBehaviourPun {
     void SetFollowMe(int view) {
         PhotonView followView = PhotonView.Find(view);
         photonView.TransferOwnership(followView.Owner);
-        followMe = followView.gameObject;
-        followMeCounter = 2f;
+        followMe = followView.GetComponent<PlayerController>();
+        followMeCounter = 1f;
         passthrough = true;
     }
 
@@ -46,7 +45,8 @@ public class MovingPowerup : MonoBehaviourPun {
         if (followMe) {
             body.isKinematic = true;
             if (photonView.IsMine) {
-                transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y - Camera.main.orthographicSize + cameraOffset);
+                float size = (followMe.flying ? 4.2f : 3);
+                transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y + (size*0.6f));
             }
 
             if ((followMeCounter * blinkingRate) % 2 < 1) {

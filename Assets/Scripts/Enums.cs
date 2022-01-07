@@ -7,8 +7,11 @@ public class Enums {
     public enum PowerupState {
         Small, Mini, Large, FireFlower, Shell, Giant
     }
+    public enum PlayerEyeState {
+        Normal, HalfBlink, FullBlink, Death
+    }
     // Networking Enums
-    public class NetRoomProperties {
+    public static class NetRoomProperties {
         public static string Level { get; } = "level";
         public static string StarRequirement { get; } = "stars";
     }

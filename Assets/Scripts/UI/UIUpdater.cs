@@ -22,12 +22,12 @@ public class UIUpdater : WaitForGameStart {
     }
     
     public override void Execute() {
-        foreach (PlayerController player in GameObject.FindObjectsOfType<PlayerController>()) {
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player")) {
             GameObject trackObject = GameObject.Instantiate(playerTrackTemplate, playerTrackTemplate.transform.position, Quaternion.identity, transform);
             TrackIcon icon = trackObject.GetComponent<TrackIcon>();
             icon.target = player.gameObject;
 
-            if (!player.photonView.IsMine) {
+            if (!player.GetPhotonView().IsMine) {
                 trackObject.transform.localScale = new Vector3(2f/3f, 2f/3f, 1f);
             }
             trackObject.SetActive(true);

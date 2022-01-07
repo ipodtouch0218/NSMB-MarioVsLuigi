@@ -30,8 +30,7 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
-    rigImportErrors: "Invalid Avatar Rig Configuration. Missing or invalid transform:\n\tRequired
-      human bone 'Head' not found\n"
+    rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
@@ -81,7 +80,7 @@ ModelImporter:
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
-    normalSmoothAngle: 60
+    normalSmoothAngle: 180
     normalImportMode: 1
     tangentImportMode: 3
     normalCalculationMode: 4
@@ -89,190 +88,126 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 1
+  importAnimation: 0
   humanDescription:
     serializedVersion: 3
     human: []
     skeleton:
-    - name: luigi_small(Clone)
+    - name: smallmario(Clone)
       parentName: 
       position: {x: 0, y: 0, z: 0}
       rotation: {x: 0, y: 0, z: 0, w: 1}
       scale: {x: 1, y: 1, z: 1}
-    - name: Armature
-      parentName: luigi_small(Clone)
+    - name: small_model
+      parentName: smallmario(Clone)
       position: {x: -0, y: 0, z: 0}
-      rotation: {x: 0.000000081460335, y: 0, z: -0, w: 1}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 100, y: 100, z: 100}
     - name: mario_all_root
-      parentName: Armature
+      parentName: small_model
       position: {x: -0, y: 0, z: 0}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
+      rotation: {x: 0.7071068, y: -0.0000000053561764, z: -0.0000000053561773, w: 0.7071067}
       scale: {x: 1, y: 1, z: 1}
     - name: skl_root
       parentName: mario_all_root
-      position: {x: -9.473119e-18, y: 0.06144287, z: -0.0047387695}
-      rotation: {x: 2.9947142e-22, y: -0.70710665, z: 2.9947131e-22, w: 0.7071069}
-      scale: {x: 1, y: 0.99999994, z: 1}
+      position: {x: 4.046659e-11, y: 0.054109983, z: -0.012399912}
+      rotation: {x: -0, y: -0.0000000073263813, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
     - name: leg_l1
       parentName: skl_root
-      position: {x: 0.0030712893, y: 0.0010327292, z: 0.014438476}
-      rotation: {x: 7.166659e-15, y: 1, z: -6.12318e-17, w: -0.0000000754979}
-      scale: {x: 1, y: 0.9999999, z: 1}
+      position: {x: -0.014438477, y: 0.0010327135, z: 0.00307129}
+      rotation: {x: 0.000000055646524, y: -1.2197317e-16, z: 1, w: 0.0000000029103884}
+      scale: {x: 0.9999998, y: 0.99999994, z: 0.9999999}
     - name: leg_l2
       parentName: leg_l1
-      position: {x: 7.404131e-11, y: -0.028715815, z: 5.764519e-10}
-      rotation: {x: 7.166659e-15, y: 1, z: 6.12318e-17, w: 0.0000000754979}
-      scale: {x: 1, y: 1.0000002, z: 1}
+      position: {x: -0.0000000019371509, y: 0.02871585, z: -0.0000000012665987}
+      rotation: {x: 0.000000005820774, y: -1, z: -1.8228189e-16, w: 0.000000075669966}
+      scale: {x: 1.0000001, y: 0.9999997, z: 1}
     - name: ankle_l1
       parentName: leg_l2
-      position: {x: -1.2906554e-10, y: -0.020083014, z: -3.2466982e-10}
-      rotation: {x: 5.0242966e-15, y: 1, z: 1.2246401e-16, w: -0.00000005960465}
-      scale: {x: 1, y: 0.9999998, z: 1}
+      position: {x: -6.2864275e-10, y: 0.02008302, z: 0.0000000029057263}
+      rotation: {x: -0.7071069, y: -0.00000005968059, z: 0.0000000102897495, w: 0.70710665}
+      scale: {x: 0.99999994, y: 0.99999994, z: 1.0000001}
     - name: ankle_l1_end
       parentName: ankle_l1
-      position: {x: 7.4041155e-11, y: 0.009724121, z: 5.764519e-10}
-      rotation: {x: 1.0351513e-15, y: 0.000000027818132, z: -0.000000007661961, w: 1}
-      scale: {x: 1, y: 1.0000001, z: 1}
-    - name: ankle_l1_end_end
-      parentName: ankle_l1_end
-      position: {x: -7.729607e-11, y: 0.009724123, z: -5.228688e-10}
-      rotation: {x: -1.2482913e-15, y: 8.506949e-32, z: 0.000000007661957, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: ankle_l1_end_end_end
-      parentName: ankle_l1_end_end
-      position: {x: -0, y: 0.009724121, z: 0}
+      position: {x: -0, y: 0.020083006, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: leg_r1
       parentName: skl_root
-      position: {x: 0.0030712888, y: 0.0010327292, z: -0.014438476}
-      rotation: {x: 7.166659e-15, y: 1, z: -6.12318e-17, w: -0.0000000754979}
-      scale: {x: 1, y: 0.9999999, z: 1}
+      position: {x: 0.014438477, y: 0.0010327135, z: 0.0030712893}
+      rotation: {x: 0.00000007310882, y: -1.5576436e-16, z: 1, w: 0.0000000058207714}
+      scale: {x: 1, y: 1, z: 0.9999999}
     - name: leg_r2
       parentName: leg_r1
-      position: {x: 7.4970696e-11, y: -0.028715815, z: 5.7645405e-10}
-      rotation: {x: 7.166659e-15, y: 1, z: 6.12318e-17, w: 0.0000000754979}
-      scale: {x: 1, y: 1.0000002, z: 1}
+      position: {x: 0.000000001490116, y: 0.02871584, z: 5.9604643e-10}
+      rotation: {x: 7.1054274e-15, y: -1, z: 1.8101586e-16, w: 0.000000072759576}
+      scale: {x: 1, y: 1.0000001, z: 1.0000004}
     - name: ankle_r1
       parentName: leg_r2
-      position: {x: 1.290661e-10, y: -0.020083014, z: -3.24671e-10}
-      rotation: {x: 7.166659e-15, y: 1, z: 6.123288e-17, w: -0.0000000754979}
-      scale: {x: 1, y: 0.9999998, z: 1}
+      position: {x: -0.0000000013411044, y: 0.020083023, z: -5.9604643e-10}
+      rotation: {x: -0.7071069, y: -0.00000004321698, z: 0.0000000061738574, w: 0.70710665}
+      scale: {x: 1.0000001, y: 1.0000001, z: 1.0000001}
     - name: ankle_r1_end
       parentName: ankle_r1
-      position: {x: -7.404106e-11, y: 0.009724121, z: 5.7645405e-10}
-      rotation: {x: 1.3248631e-21, y: 0.000000027818132, z: -3.552714e-15, w: 1}
-      scale: {x: 1, y: 1.0000001, z: 1}
-    - name: ankle_r1_end_end
-      parentName: ankle_r1_end
-      position: {x: 1.6725274e-11, y: 0.009724123, z: -5.228663e-10}
-      rotation: {x: -1.2621775e-29, y: -0, z: 1.0587912e-22, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: ankle_r1_end_end_end
-      parentName: ankle_r1_end_end
-      position: {x: -0, y: 0.009724121, z: 0}
+      position: {x: -0, y: 0.020083006, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: spin
       parentName: skl_root
-      position: {x: -0, y: 0.0097241355, z: 5.986793e-17}
-      rotation: {x: -9.071044e-22, y: -5e-44, z: -7.1054265e-15, w: 1}
-      scale: {x: 1, y: 0.9999998, z: 1}
+      position: {x: -3.352177e-17, y: 0.009724119, z: -8.4654517e-10}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 0.9999999, z: 0.9999999}
     - name: arm_l1
       parentName: spin
-      position: {x: -0.00032714746, y: 0.02949953, z: 0.028749997}
-      rotation: {x: -1.0051324e-14, y: 0.7070205, z: 1.0052551e-14, w: 0.707193}
-      scale: {x: 0.99999994, y: 1.0000001, z: 0.99999994}
+      position: {x: -0.022624517, y: 0.029499516, z: -0.00032714254}
+      rotation: {x: 0.7071068, y: -0.70710677, z: 0.000000054424113, w: 0.000000070141354}
+      scale: {x: 0.99999976, y: 0.9999997, z: 1.0000002}
     - name: arm_l2
       parentName: arm_l1
-      position: {x: -0.019587401, y: 7.105427e-17, z: 5.937196e-10}
-      rotation: {x: 1.0658142e-14, y: 0.00012207031, z: 2.3697263e-18, w: 1}
-      scale: {x: 0.9999998, y: 0.9999999, z: 0.9999998}
+      position: {x: 0.000000015832484, y: 0.019587401, z: -0.0000000047683715}
+      rotation: {x: 0.000000029802322, y: 1, z: 0.0000000018936959, w: -0.00000004025316}
+      scale: {x: 1.0000002, y: 1.0000002, z: 1.0000001}
     - name: wrist_l1
       parentName: arm_l2
-      position: {x: -0.018750012, y: -3.5527136e-17, z: -0.0000000013415895}
-      rotation: {x: -0.00000003022434, y: 0.00000012120292, z: 0.6723668, w: 0.7402181}
-      scale: {x: 1, y: 1.0000001, z: 1}
+      position: {x: 0.000000011920928, y: 0.018750012, z: 0.000000004470348}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 0.9999999, y: 0.9999999, z: 0.9999998}
     - name: wrist_l1_end
       parentName: wrist_l1
-      position: {x: -0.0000000029549545, y: 0.009724131, z: -7.4652007e-10}
-      rotation: {x: -0.000000030647815, y: 1.4210856e-14, z: 0.0000002451826, w: 1}
-      scale: {x: 0.99999994, y: 1, z: 0.99999994}
-    - name: wrist_l1_end_end
-      parentName: wrist_l1_end
-      position: {x: 0.000000003493063, y: 0.009724116, z: -5.365712e-10}
-      rotation: {x: 0.000000030647822, y: 7.105424e-15, z: -0.00000024518258, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: wrist_l1_end_end_end
-      parentName: wrist_l1_end_end
-      position: {x: -0, y: 0.009724121, z: 0}
+      position: {x: -0, y: 0.018749995, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: arm_r1
       parentName: spin
-      position: {x: -0.0003271506, y: 0.02949953, z: -0.028749999}
-      rotation: {x: 7.536446e-15, y: -0.7071067, z: 7.536445e-15, w: 0.7071068}
-      scale: {x: 1, y: 1.0000004, z: 1}
+      position: {x: 0.022624513, y: 0.029499525, z: -0.00032714717}
+      rotation: {x: 0.7071068, y: 0.70710677, z: 0.00000002462179, w: -0.00000001053671}
+      scale: {x: 1, y: 0.99999976, z: 1.0000002}
     - name: arm_r2
       parentName: arm_r1
-      position: {x: -0.019587405, y: 0.000000009536743, z: 0.000000004820378}
-      rotation: {x: 7.1054257e-15, y: 0.000000027818135, z: 1.0669865e-22, w: 1}
-      scale: {x: 0.9999999, y: 1, z: 0.9999999}
+      position: {x: -0.000000010852236, y: 0.019587416, z: 0.0000000016391277}
+      rotation: {x: 0.000000029802322, y: -1, z: -0.00000006132657, w: -0.000000107260824}
+      scale: {x: 1.0000001, y: 0.9999999, z: 1}
     - name: wrist_r1
       parentName: arm_r2
-      position: {x: -0.01875001, y: 1.0658141e-16, z: 0.0000000037701375}
-      rotation: {x: -0.000000048506326, y: -0.00000013980078, z: 0.6723668, w: 0.7402181}
-      scale: {x: 1.0000001, y: 0.9999999, z: 1.0000001}
+      position: {x: 0.000000012814998, y: 0.01875001, z: 0}
+      rotation: {x: 0.00000002107342, y: -0.000000021073435, z: 0.000000029802319,
+        w: 1}
+      scale: {x: 1.0000004, y: 1.0000001, z: 1.0000004}
     - name: wrist_r1_end
       parentName: wrist_r1
-      position: {x: -0.0000000016506948, y: 0.009724131, z: 1.9386177e-10}
-      rotation: {x: -6.352747e-22, y: -0, z: -1.7477624e-24, w: 1}
-      scale: {x: 0.9999999, y: 1, z: 0.9999999}
-    - name: wrist_r1_end_end
-      parentName: wrist_r1_end
-      position: {x: -0.0000000064190666, y: 0.009724121, z: 1.9385936e-10}
-      rotation: {x: 3.9443045e-31, y: -1.4210855e-14, z: 2.524355e-29, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: wrist_r1_end_end_end
-      parentName: wrist_r1_end_end
-      position: {x: -0, y: 0.009724121, z: 0}
+      position: {x: -0, y: 0.018749995, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
-    - name: s_luigi_model
-      parentName: luigi_small(Clone)
-      position: {x: -0.00000068684494, y: -0.0000013032374, z: 0.00000008768612}
-      rotation: {x: 0.000000081460335, y: 4.5474734e-15, z: -2.0084065e-22, w: 1}
-      scale: {x: 100, y: 100, z: 100}
-    - name: Armature.001
-      parentName: luigi_small(Clone)
+    - name: small_model.001
+      parentName: smallmario(Clone)
       position: {x: -0, y: 0, z: 0}
-      rotation: {x: 0.000000081460335, y: 0, z: -0, w: 1}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 100, y: 100, z: 100}
-    - name: l_head_model
-      parentName: Armature.001
-      position: {x: -0, y: 0.002092285, z: 0.0047387695}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: l_head_model_end
-      parentName: l_head_model
-      position: {x: -0, y: 0.009999997, z: 0}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: l_head_model_end_end
-      parentName: l_head_model_end
-      position: {x: -0, y: 0.01, z: 0}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: l_head_model_end_end_end
-      parentName: l_head_model_end_end
-      position: {x: -0, y: 0.01, z: 0}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: s_luigi_head_c
-      parentName: luigi_small(Clone)
-      position: {x: -0, y: 0.00000007720434, z: 0.000000070020505}
-      rotation: {x: 0.000000081460335, y: 0, z: -0, w: 1}
+    - name: mario_head_cap.001
+      parentName: smallmario(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 100, y: 100, z: 100}
     armTwist: 0.5
     foreArmTwist: 0.5
@@ -286,11 +221,12 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292,
+    type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 1
+  avatarSetup: 2
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   additionalBone: 0
   userData: 

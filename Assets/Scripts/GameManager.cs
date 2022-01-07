@@ -10,7 +10,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
 
-public class GameManager : MonoBehaviourPun, IOnEventCallback {
+public class GameManager : MonoBehaviour, IOnEventCallback {
     public static GameManager Instance { get; private set; }
 
     [SerializeField] AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
@@ -123,13 +123,13 @@ public class GameManager : MonoBehaviourPun, IOnEventCallback {
 
         
         SceneManager.SetActiveScene(gameObject.scene);
-        localPlayer = PhotonNetwork.Instantiate("Prefabs/Player", spawnpoint, Quaternion.identity, 0);
+        localPlayer = PhotonNetwork.Instantiate("Prefabs/" + Utils.GetCharacterData().prefab, spawnpoint, Quaternion.identity, 0);
         if (!localPlayer) {
             //not connected to a room, started scene through editor. spawn player
             PhotonNetwork.OfflineMode = true;
             PhotonNetwork.CreateRoom("debug");
             GameObject.Instantiate(Resources.Load("Prefabs/Static/GlobalController"), Vector3.zero, Quaternion.identity);
-            localPlayer = PhotonNetwork.Instantiate("Prefabs/Player", spawnpoint, Quaternion.identity, 0);
+            localPlayer = PhotonNetwork.Instantiate("Prefabs/PlayerMario", spawnpoint, Quaternion.identity, 0);
         }
         Camera.main.GetComponent<CameraController>().target = localPlayer;
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;

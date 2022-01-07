@@ -47,6 +47,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ndsCanvas: {fileID: 0}
   ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
+  characters:
+  - {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
+  - {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
 --- !u!114 &1776850482587567144
 MonoBehaviour:
   m_ObjectHideFlags: 0

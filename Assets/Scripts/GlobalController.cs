@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class GlobalController : Singleton<GlobalController> {
     public Canvas ndsCanvas;
     public RenderTexture ndsTexture;
+    public PlayerData[] characters;
     void Awake() {
         if (!base.InstanceCheck()) return;
         instance = this;

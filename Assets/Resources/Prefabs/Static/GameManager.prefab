@@ -104,7 +104,6 @@ GameObject:
   - component: {fileID: 5500062339093502141}
   - component: {fileID: 5500062339093502114}
   - component: {fileID: 5500062339093502112}
-  - component: {fileID: -7117426054802333166}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -158,6 +157,12 @@ MonoBehaviour:
   pauseButton: {fileID: 0}
   gameover: 0
   musicEnabled: 0
+  loadedPlayers: []
+  starRequirement: 0
+  allPlayers: []
+  size: 1.39
+  ySize: 0.8
+  playersToVisualize: 10
 --- !u!82 &5500062339093502112
 AudioSource:
   m_ObjectHideFlags: 0
@@ -255,25 +260,3 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &-7117426054802333166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5500062339093502118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 1
-  InstantiationId: 0
-  isRuntimeInstantiated: 0

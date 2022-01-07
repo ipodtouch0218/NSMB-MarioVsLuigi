@@ -20,6 +20,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - EyeTextures:
+        m_Texture: {fileID: 18700000, guid: 2c010d7564aa4d94db0d110f73e3eb80, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - FireFlowerTexture:
         m_Texture: {fileID: 2800000, guid: c4c89f548192a084bb03306933978cf9, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -82,6 +86,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - IsEyeTexture: 1
     - OutlineSize: 0.01
     - _AlphaClip: 0
     - _Blend: 0

@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private int playerId = 0;
     [SerializeField] public bool dead = false;
     [SerializeField] public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
-    [SerializeField] public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.5f, flyingTerminalVelocity = -1f, drillVelocity = 9f, deathUpTime = 0.6f, deathForce = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 12, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 20f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -2f, walljumpVelocity = 6f, pipeDuration = 2f, giantStartTime = 1.5f, icePenalty = 0.4f;
+    [SerializeField] public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.5f, flyingTerminalVelocity = -1f, drillVelocity = 9f, deathUpTime = 0.6f, deathForce = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 12, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 20f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -2f, walljumpVelocity = 6f, pipeDuration = 2f, giantStartTime = 1.5f, icePenalty = 0.4f, blinkDuration = 0.25f;
     [SerializeField] ParticleSystem dust, sparkles, drillParticle;
     [SerializeField] BoxCollider2D smolHitbox, bigHitbox;
     GameObject models;
@@ -21,9 +21,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private Animator animator;
     public Rigidbody2D body;
 
-    public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, ice, flying, drill, inShell, hitLeft, hitRight, iceSliding;
+    public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, ice, flying, drill, inShell, hitLeft, hitRight, iceSliding, snow;
     float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer;
-    public float invincible = 0f, giantTimer = 0f;
+    public float invincible = 0, giantTimer = 0, blinkTimer = 0;
     
     private Vector2 pipeDirection;
     public int stars, coins;
@@ -39,13 +39,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private float analogDeadzone = 0.35f;
     public Vector2 joystick;
 
-    public GameObject smallMarioModel, largeMarioModel, marioBlueShell;
-    public Avatar smallMarioAvatar, largeMarioAvatar;
+    public GameObject smallModel, largeModel, blueShell;
+    public Avatar smallAvatar, largeAvatar;
     public GameObject onSpinner;
     PipeManager pipeEntering;
     private CameraController cameraController;
     private Vector3 cameraOffsetLeft = Vector3.left, cameraOffsetRight = Vector3.right, cameraOffsetZero = Vector3.zero;
     private bool starDirection, step;
+    private Enums.PlayerEyeState eyeState;
+    public string characterSoundFolder = "mario";
 
     private long localFrameId = 0;
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
@@ -104,6 +106,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         starDirection = Random.value < 0.5;
         PlayerInput input = GetComponent<PlayerInput>();
         input.enabled = !photonView || photonView.IsMine;
+
+        smallModel.SetActive(false);
+        largeModel.SetActive(false);
 
         if (photonView) {
             playerId = System.Array.IndexOf(PhotonNetwork.PlayerList, photonView.Owner);
@@ -258,7 +263,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (Mathf.Abs(body.velocity.x) < walkingMaxSpeed)
             return;
         
-        PlaySoundFromAnim("player/walk" + (step ? "-2" : ""), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
+        PlaySoundFromAnim("player/walk" + (snow ? "-snow" : "") + (step ? "-2" : ""), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
         step = !step;
     }
 
@@ -792,6 +797,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         skidding = false;
         turnaround = false;
         inShell = false;
+        knockback = false;
         animator.SetTrigger("dead");
         PlaySoundFromAnim("player/death");
         SpawnStar();
@@ -1010,6 +1016,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [PunRPC]
     void ResetKnockback() {
         hitInvincibilityCounter = 2f;
+        bounce = false;
         knockback = false;
     }
 
@@ -1065,12 +1072,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void HandleIce() {
         //todo: refactor
         ice = false;
+        snow = false;
         foreach (Vector3Int pos in tilesStandingOn) {
             TileBase tile = GameManager.Instance.tilemap.GetTile(pos);
             if (!tile) continue;
+            if (tile.name == "SnowGrass") {
+                snow = true;
+            }
             if (tile.name == "Ice") {
                 ice = true;
-                break;
             }
         }
     }
@@ -1247,12 +1257,31 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             if (drillParticle.isPlaying)
                 drillParticle.Stop();
         }
+
+        //Blinking
+        if (dead) {
+            eyeState = Enums.PlayerEyeState.Death;
+        } else {
+            if ((blinkTimer -= Time.fixedDeltaTime) < 0) {
+                blinkTimer = 3f + (Random.value * 2f);
+            }
+            if (blinkTimer < blinkDuration) {
+                eyeState = Enums.PlayerEyeState.HalfBlink;
+            } else if (blinkTimer < blinkDuration*2f) {
+                eyeState = Enums.PlayerEyeState.FullBlink;
+            } else if (blinkTimer < blinkDuration*3f) {
+                eyeState = Enums.PlayerEyeState.HalfBlink;
+            } else {
+                eyeState = Enums.PlayerEyeState.Normal;
+            }
+        }
     
         //Enable rainbow effect
         MaterialPropertyBlock block = new MaterialPropertyBlock(); 
         block.SetColor("GlowColor", glowColor);
         block.SetFloat("RainbowEnabled", (animator.GetBool("invincible") ? 1.1f : 0f));
         block.SetFloat("FireEnabled", (state == Enums.PowerupState.FireFlower ? 1.1f : 0f));
+        block.SetFloat("EyeState", (int) eyeState);
         foreach (MeshRenderer renderer in GetComponentsInChildren<MeshRenderer>()) {
             renderer.SetPropertyBlock(block);
         }
@@ -1298,10 +1327,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         //Model changing
         bool large = state >= Enums.PowerupState.Large;
 
-        largeMarioModel.SetActive(large);
-        smallMarioModel.SetActive(!large);
-        marioBlueShell.SetActive(state == Enums.PowerupState.Shell);
-        animator.avatar = large ? largeMarioAvatar : smallMarioAvatar;
+        largeModel.SetActive(large);
+        smallModel.SetActive(!large);
+        blueShell.SetActive(state == Enums.PowerupState.Shell);
+        animator.avatar = large ? largeAvatar : smallAvatar;
 
         HandleDeathAnimation();
         HandlePipeAnimation();
@@ -1467,9 +1496,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onGroundLastFrame = false;
             photonView.RPC("PlaySound", RpcTarget.All, "player/walljump");
             if (Random.value < 0.5) {
-                photonView.RPC("PlaySound", RpcTarget.All, "mario/walljump_1");
+                photonView.RPC("PlaySound", RpcTarget.All, characterSoundFolder + "/walljump_1");
             } else {
-                photonView.RPC("PlaySound", RpcTarget.All, "mario/walljump_2");
+                photonView.RPC("PlaySound", RpcTarget.All, characterSoundFolder + "/walljump_2");
             }
         }
     }
@@ -1487,7 +1516,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             turnaround = false;
 
             if (onSpinner && !inShell && !holding && !(crouching && state == Enums.PowerupState.Shell)) {
-                photonView.RPC("PlaySound", RpcTarget.All, "mario/spinner_launch");
+                photonView.RPC("PlaySound", RpcTarget.All, characterSoundFolder + "/spinner_launch");
                 photonView.RPC("PlaySound", RpcTarget.All, "player/spinner_launch");
                 body.velocity = new Vector2(body.velocity.x, launchVelocity);
                 flying = true;
@@ -1498,16 +1527,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
             float vel = Mathf.Max(jumpVelocity + Mathf.Abs(body.velocity.x)/8f);
             if (!flying && topSpeed && landing < 0.1f && !holding && !triplejump && !crouching && !inShell && invincible <= 0) {
-                if (singlejump) {
+                bool canSpecialJump = !Physics2D.Raycast(transform.position + new Vector3(0, 0.1f, 0), Vector2.up, 1f, ONLY_GROUND_MASK);
+                if (singlejump && canSpecialJump) {
                     //Double jump
-                    photonView.RPC("PlaySound", RpcTarget.All, "mario/double_jump_" +  ((int) (Random.value * 2f) + 1));
+                    photonView.RPC("PlaySound", RpcTarget.All, characterSoundFolder + "/double_jump_" +  ((int) (Random.value * 2f) + 1));
                     singlejump = false;
                     doublejump = true;
                     triplejump = false;
                     body.velocity = new Vector2(body.velocity.x, vel);
-                } else if (doublejump) {
+                } else if (doublejump && canSpecialJump) {
                     //Triple jump
-                    photonView.RPC("PlaySound", RpcTarget.All, "mario/triple_jump");
+                    photonView.RPC("PlaySound", RpcTarget.All, characterSoundFolder + "/triple_jump");
                     singlejump = false;
                     doublejump = false;
                     triplejump = true;
@@ -1720,7 +1750,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
             if (!crouch) {
-                photonView.RPC("PlaySound", RpcTarget.All, "mario/walljump_2");
+                photonView.RPC("PlaySound", RpcTarget.All, characterSoundFolder + "/walljump_2");
                 throwInvincibility = 0.5f;
                 animator.SetTrigger("throw");
             }
@@ -1838,7 +1868,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             //Friction...
             if (onGround && abovemax) {
-                body.velocity *= 1-(Time.fixedDeltaTime * (ice ? 0.1f : 1f) * (knockback ? 1f : 4f));
+                body.velocity *= 1-(Time.fixedDeltaTime * (ice ? 0.1f : 1f) * (knockback ? 3f : 4f));
                 if (Mathf.Abs(body.velocity.x) < 0.05) {
                     body.velocity = new Vector2(0, body.velocity.y);
                 }

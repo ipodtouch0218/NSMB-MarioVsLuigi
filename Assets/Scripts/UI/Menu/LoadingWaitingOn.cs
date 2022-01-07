@@ -12,6 +12,7 @@ public class LoadingWaitingOn : MonoBehaviour {
     }
 
     void Update() {
+        if (!GameManager.Instance) return;
         if (GameManager.Instance.loadedPlayers.Count == 0) return;
 
         string final;

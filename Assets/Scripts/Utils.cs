@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.Tilemaps;
 
@@ -32,5 +33,17 @@ public class Utils {
         float y = (tileY * tilemap.localScale.y) + tilemap.position.y;
 
         return new Vector3(x, y, 0);
+    }
+
+    public static int GetCharacterIndex(Player player = null) {
+        if (player == null) player = PhotonNetwork.LocalPlayer;
+        object index;
+        player.CustomProperties.TryGetValue("character", out index);
+        if (index == null) index = 0;
+        return (int) index;
+    }
+
+    public static PlayerData GetCharacterData(Player player = null) {
+        return GlobalController.Instance.characters[GetCharacterIndex(player)];
     }
 }
