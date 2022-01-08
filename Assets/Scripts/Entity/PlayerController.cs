@@ -1811,6 +1811,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onLeft = false;
             onRight = false;
             flying = false;
+            if (triplejump && landing == 0 && !(left || right)) {
+                body.velocity = new Vector2(0,0);
+                animator.Play("jumplanding", state >= Enums.PowerupState.Large ? 1 : 0);
+            }
             if ((landing += delta) > 0.2f) {
                 singlejump = false;
                 doublejump = false;

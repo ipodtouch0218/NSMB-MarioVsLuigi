@@ -118,7 +118,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnCustomAuthenticationFailed(string failure) {}
     public void OnConnectedToMaster() {
         Debug.Log("Connected to Master");
-        PhotonNetwork.JoinLobby();
+        PhotonNetwork.JoinLobby(new TypedLobby(Application.version, LobbyType.Default));
     }
     // MATCHMAKING CALLBACKS
     public void OnFriendListUpdate(List<FriendInfo> friendList) {}
