@@ -15,24 +15,21 @@ public class MovingPowerup : MonoBehaviourPun {
     public PlayerController followMe;
     public float followMeCounter, despawnCounter = 15;
     private PhysicsEntity physics;
-
     void Start() {
         body = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
         renderer = GetComponent<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
 
+        object[] data = photonView.InstantiationData;
+        if (data != null && data.Length >= 1) {
+            followMe = PhotonView.Find((int) data[0]).GetComponent<PlayerController>();
+            followMeCounter = 2f;
+            passthrough = true;
+        }
+
         if (groundMask == -1)
             groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
-    }
-
-    [PunRPC]
-    void SetFollowMe(int view) {
-        PhotonView followView = PhotonView.Find(view);
-        photonView.TransferOwnership(followView.Owner);
-        followMe = followView.GetComponent<PlayerController>();
-        followMeCounter = 1f;
-        passthrough = true;
     }
 
     void FixedUpdate() {
@@ -45,7 +42,7 @@ public class MovingPowerup : MonoBehaviourPun {
         if (followMe) {
             body.isKinematic = true;
             if (photonView.IsMine) {
-                float size = (followMe.flying ? 4.2f : 3);
+                float size = (followMe.flying ? 3.9f : 2.7f);
                 transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y + (size*0.6f));
             }
 
@@ -63,7 +60,6 @@ public class MovingPowerup : MonoBehaviourPun {
             }
             gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         } else {
-
             despawnCounter -= Time.fixedDeltaTime;
             if (despawnCounter <= 3) {
                 if ((despawnCounter * blinkingRate) % 1 < 0.5f) {
@@ -81,7 +77,7 @@ public class MovingPowerup : MonoBehaviourPun {
             renderer.color = Color.white;
             body.isKinematic = false;
             if (passthrough) {
-                if (!Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, groundMask)) {
+                if (Utils.GetTileAtWorldLocation(transform.position) == null && !Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, groundMask)) {
                     gameObject.layer = LayerMask.NameToLayer("Entity");
                     passthrough = false;
                 }

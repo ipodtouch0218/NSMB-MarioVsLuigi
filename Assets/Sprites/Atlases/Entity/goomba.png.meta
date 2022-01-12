@@ -54,6 +54,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -352,6 +353,17 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      goomba_2: 1329094052204966939
+      goomba_6: 2147156700845412417
+      goomba_4: 8044139085597164931
+      goomba_1: 6268277884297706374
+      goomba_7: -1837141360104208851
+      goomba_0: -2665958366948368982
+      goomba_3: -2646936077272662393
+      goomba_8: 7954056396027083100
+      goomba_9: -728934508601558331
+      goomba_5: 7518829234646223683
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

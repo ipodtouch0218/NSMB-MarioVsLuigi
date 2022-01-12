@@ -42,6 +42,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -256,6 +257,13 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      reserve-ui_4: 2690215448161037315
+      reserve-ui_3: 5709720548119103520
+      reserve-ui_1: -6080119536613256813
+      reserve-ui_0: 7194109699264141795
+      reserve-ui_5: 2664608197882872095
+      reserve-ui_2: -4773353537684922170
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

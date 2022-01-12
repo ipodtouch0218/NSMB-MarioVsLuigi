@@ -237,6 +237,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -1816,6 +1817,78 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      3 Underground_10: -7075255907576508134
+      3 Underground_19: 5934163385887375649
+      3 Underground_21: 6360112234212200750
+      3 Underground_41: -2407327455208861409
+      3 Underground_53: 7920607768217987751
+      3 Underground_6: 5046127751588644594
+      3 Underground_61: 6267085102995346296
+      3 Underground_3: -1535558481256665973
+      3 Underground_70: -4554435737748647395
+      3 Underground_42: 1918294179741333185
+      3 Underground_11: 1641314556468492031
+      3 Underground_50: 3863335306085668065
+      3 Underground_9: -6995818904012696921
+      3 Underground_16: -5008371506858948843
+      3 Underground_60: -7211349006176634189
+      3 Underground_39: -8213143830004242261
+      3 Underground_7: -9092035814142509112
+      3 Underground_32: 5101963765977977332
+      3 Underground_33: -2656776139926852584
+      3 Underground_45: -2974347374039282858
+      3 Underground_0: -5075989108963858929
+      3 Underground_28: -5504146075331479022
+      3 Underground_62: 8927676664575928329
+      3 Underground_15: 560638121558576558
+      3 Underground_22: -1089876685667018724
+      3 Underground_57: 6306048131865159482
+      3 Underground_68: 6752388242828291333
+      3 Underground_1: 4050391162013687314
+      3 Underground_37: 6190131516894779375
+      3 Underground_64: 1904208714770779817
+      3 Underground_29: -2739207723528399159
+      3 Underground_52: 8685483973966310090
+      3 Underground_27: -5579467343459527551
+      3 Underground_65: 8849873609094901373
+      3 Underground_23: 8851103658266996879
+      3 Underground_5: 6196399331303883641
+      3 Underground_54: 7884410035826076547
+      3 Underground_34: 5635688219657122462
+      3 Underground_25: -6560361784806401008
+      3 Underground_38: 6550361414492530132
+      3 Underground_18: 3063184645777418243
+      3 Underground_48: -4713769997724592872
+      3 Underground_20: 8255513676119260903
+      3 Underground_31: -4526634487479236839
+      3 Underground_35: 660675865005400509
+      3 Underground_59: 726254269042248027
+      3 Underground_40: -112354361696733117
+      3 Underground_56: 6758647820905168696
+      3 Underground_47: -777653938178405623
+      3 Underground_8: -3843259335920623202
+      3 Underground_58: -1542319782368315419
+      3 Underground_66: -3422249272407578504
+      3 Underground_26: -554761880773288566
+      3 Underground_46: 6098625255179482186
+      3 Underground_69: 3684809679540830838
+      3 Underground_43: 7980992373314500853
+      3 Underground_30: 1805277079288433756
+      3 Underground_51: 4940877122856205801
+      3 Underground_14: 8868485360429641932
+      3 Underground_67: 5558611318756103059
+      3 Underground_36: -8235075547086860888
+      3 Underground_55: -8291814707360524538
+      3 Underground_17: -2313739378377137096
+      3 Underground_24: 8266831398056174340
+      3 Underground_63: 7301335806783167732
+      3 Underground_12: 2262548734585039647
+      3 Underground_4: -4680055240660615123
+      3 Underground_13: -4382169101540521697
+      3 Underground_49: 2504184677384220434
+      3 Underground_44: 7479893653817455186
+      3 Underground_2: 6831069359793690693
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

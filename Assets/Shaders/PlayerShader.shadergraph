@@ -1,5 +1,5 @@
 {
-    "m_SGVersion": 2,
+    "m_SGVersion": 3,
     "m_Type": "UnityEditor.ShaderGraph.GraphData",
     "m_ObjectId": "b79fecd3b1f142819bc6e07debabb930",
     "m_Properties": [
@@ -35,6 +35,12 @@
         }
     ],
     "m_Keywords": [],
+    "m_Dropdowns": [],
+    "m_CategoryData": [
+        {
+            "m_Id": "2c090e1ddae34c048a7861c61b40a05a"
+        }
+    ],
     "m_Nodes": [
         {
             "m_Id": "94c504d8226cc185bb5a2467f3220bdf"
@@ -605,10 +611,11 @@
         "serializedMesh": {
             "m_SerializedMesh": "{\"mesh\":{\"fileID\":-6852372355584245671,\"guid\":\"e0d3ef6bcff32414dbd34fc6ac031292\",\"type\":3}}",
             "m_Guid": ""
-        }
+        },
+        "preventRotation": false
     },
     "m_Path": "Shader Graphs",
-    "m_ConcretePrecision": 0,
+    "m_GraphPrecision": 0,
     "m_PreviewMode": 2,
     "m_OutputNode": {
         "m_Id": ""
@@ -777,6 +784,8 @@
     "m_DefaultReferenceName": "OutlineColor",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -787,6 +796,7 @@
         "b": 0.0,
         "a": 0.0
     },
+    "isMainColor": false,
     "m_ColorMode": 0
 }
 
@@ -1259,6 +1269,45 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.CategoryData",
+    "m_ObjectId": "2c090e1ddae34c048a7861c61b40a05a",
+    "m_Name": "",
+    "m_ChildObjectList": [
+        {
+            "m_Id": "bdafa3120381268fa226fd7d149f30fd"
+        },
+        {
+            "m_Id": "b673d92f0ec0108699f5634d8f063bad"
+        },
+        {
+            "m_Id": "3aa63fc776b76f868855d8281f72c3f1"
+        },
+        {
+            "m_Id": "69fe07c0e3b93781b1b342dd52eba1ff"
+        },
+        {
+            "m_Id": "4ba0a4ac2f7b9987a71b32514a331408"
+        },
+        {
+            "m_Id": "040cbbd8420a4eebb9a3e53c9d742ef8"
+        },
+        {
+            "m_Id": "e2254ba08bed4376858423455d149dae"
+        },
+        {
+            "m_Id": "686bdee5b88944db8eda53901ef81fd6"
+        },
+        {
+            "m_Id": "b4aa8aa0930a478896a7639474f85877"
+        },
+        {
+            "m_Id": "4a314f428025469ebeb0db359b7788c6"
+        }
+    ]
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.BooleanMaterialSlot",
     "m_ObjectId": "2c46994a39e8db85af91add837990d52",
     "m_Id": 0,
@@ -1445,6 +1494,8 @@
     "m_DefaultReferenceName": "Gradient_A232CEC5",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": false,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -1726,6 +1777,8 @@
     "m_DefaultReferenceName": "EyeState",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": false,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 2,
@@ -1751,6 +1804,8 @@
     "m_DefaultReferenceName": "Boolean_C293A01D",
     "m_OverrideReferenceName": "FireEnabled",
     "m_GeneratePropertyBlock": false,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -1935,7 +1990,8 @@
         "m_SerializableColors": []
     },
     "m_TextureType": 0,
-    "m_NormalMapSpace": 0
+    "m_NormalMapSpace": 0,
+    "m_EnableGlobalMipBias": true
 }
 
 {
@@ -2351,17 +2407,23 @@
 }
 
 {
-    "m_SGVersion": 0,
+    "m_SGVersion": 1,
     "m_Type": "UnityEditor.Rendering.Universal.ShaderGraph.UniversalTarget",
     "m_ObjectId": "5ea985c9385f470c8f49453911b141d9",
     "m_ActiveSubTarget": {
         "m_Id": "84845c1d020b464da2cfd7460d1da933"
     },
+    "m_AllowMaterialOverride": false,
     "m_SurfaceType": 0,
+    "m_ZTestMode": 4,
+    "m_ZWriteControl": 0,
     "m_AlphaMode": 0,
-    "m_TwoSided": false,
+    "m_RenderFace": 2,
     "m_AlphaClip": false,
-    "m_CustomEditorGUI": ""
+    "m_CastShadows": true,
+    "m_ReceiveShadows": false,
+    "m_CustomEditorGUI": "",
+    "m_SupportVFX": false
 }
 
 {
@@ -2539,6 +2601,8 @@
     "m_DefaultReferenceName": "EyeTextures",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -2563,6 +2627,8 @@
     "m_DefaultReferenceName": "Texture2D_A2ACAFDF",
     "m_OverrideReferenceName": "FireFlowerTexture",
     "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -2571,6 +2637,8 @@
         "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"a13da4655a7223d438c8268b546b43e5\",\"type\":3}}",
         "m_Guid": ""
     },
+    "isMainTexture": false,
+    "useTilingAndOffset": false,
     "m_Modifiable": true,
     "m_DefaultType": 0
 }
@@ -3234,7 +3302,8 @@
         "m_SerializableColors": []
     },
     "m_TextureType": 0,
-    "m_NormalMapSpace": 0
+    "m_NormalMapSpace": 0,
+    "m_EnableGlobalMipBias": true
 }
 
 {
@@ -3290,7 +3359,8 @@
     "m_PreviewMode": 0,
     "m_CustomColors": {
         "m_SerializableColors": []
-    }
+    },
+    "m_EnableGlobalMipBias": false
 }
 
 {
@@ -3466,7 +3536,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Occlusion",
     "m_StageCapability": 2,
-    "m_Value": 10.0,
+    "m_Value": 6.0,
     "m_DefaultValue": 1.0,
     "m_Labels": []
 }
@@ -3646,6 +3716,8 @@
     "m_DefaultReferenceName": "IsEyeTexture",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -3666,6 +3738,8 @@
     "m_DefaultReferenceName": "Boolean_9FF37879",
     "m_OverrideReferenceName": "RainbowEnabled",
     "m_GeneratePropertyBlock": false,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -3881,6 +3955,8 @@
     "m_DefaultReferenceName": "Texture2D_6E11FA61",
     "m_OverrideReferenceName": "_MainTex",
     "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -3889,6 +3965,8 @@
         "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"8cf09ca90a094874ba5ed992fef1a6fc\",\"type\":3}}",
         "m_Guid": ""
     },
+    "isMainTexture": false,
+    "useTilingAndOffset": false,
     "m_Modifiable": true,
     "m_DefaultType": 0
 }
@@ -4348,6 +4426,8 @@
     "m_DefaultReferenceName": "OutlineSize",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,

@@ -144,6 +144,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -1096,6 +1097,47 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      bullet-bill_30: 2886525785126744720
+      bullet-bill_23: -6543140737029061705
+      bullet-bill_36: 1133817184176290043
+      bullet-bill_7: -927170474769652834
+      bullet-bill_20: -294499784271422418
+      bullet-bill_11: -6732196475982872372
+      bullet-bill_27: -7084923413941219917
+      bullet-bill_38: -519060384786953374
+      bullet-bill_39: -3085684383362731524
+      bullet-bill_1: -2818031222768422380
+      bullet-bill_4: 7191136249163539515
+      bullet-bill_29: -1636464415318447411
+      bullet-bill_26: 3165505910097845299
+      bullet-bill_34: 1343641698083305072
+      bullet-bill_15: -7356728388599353748
+      bullet-bill_9: 3406488099570981050
+      bullet-bill_16: -5605002149365405448
+      bullet-bill_8: -996603885120511269
+      bullet-bill_18: -2847493920732427658
+      bullet-bill_19: 1395841122740822184
+      bullet-bill_5: -7521696274918527525
+      bullet-bill_31: 2740354904297333526
+      bullet-bill_12: -3615920736292080735
+      bullet-bill_6: -7106124364265648615
+      bullet-bill_28: 3522223965041152537
+      bullet-bill_14: -2199199328808334208
+      bullet-bill_2: 4334051271889305020
+      bullet-bill_17: 5493740106489136956
+      bullet-bill_32: 1245065480202249198
+      bullet-bill_33: 2883160672904108367
+      bullet-bill_10: 6313132055520808705
+      bullet-bill_24: -4398283605932973991
+      bullet-bill_0: 2801264589581574561
+      bullet-bill_25: -6352226591004578681
+      bullet-bill_37: 3957211391672382866
+      bullet-bill_22: 4057679638165308187
+      bullet-bill_35: -5819212398167860867
+      bullet-bill_3: 1478413778195064918
+      bullet-bill_21: 1145148965077268566
+      bullet-bill_13: 6087690775682358850
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

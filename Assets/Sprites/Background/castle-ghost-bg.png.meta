@@ -72,6 +72,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -520,6 +521,23 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      castle-ghost-bg_3: -2525371087867846486
+      castle-ghost-bg_7: -6698363543424246935
+      castle-ghost-bg_0: -5678689275348466435
+      castle-ghost-bg_11: 176826710557277798
+      castle-ghost-bg_13: -2393522530287537934
+      castle-ghost-bg_6: 4062536281597656816
+      castle-ghost-bg_4: -69706944256468304
+      castle-ghost-bg_12: 5068917531568033095
+      castle-ghost-bg_2: -3965792242843936385
+      castle-ghost-bg_9: 8682941655984205371
+      castle-ghost-bg_1: -8217140280598032119
+      castle-ghost-bg_10: -12139951235066542
+      castle-ghost-bg_5: -2992121686157119713
+      castle-ghost-bg_8: 3216301327740853204
+      castle-ghost-bg_15: -8326956381823363689
+      castle-ghost-bg_14: -1108779709775148126
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

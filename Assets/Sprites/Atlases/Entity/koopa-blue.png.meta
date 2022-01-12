@@ -78,6 +78,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -568,6 +569,25 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      koopa-blue_9: 1356151832309872733
+      koopa-blue_8: 8969156262024257604
+      koopa-blue_10: 1314759585801329
+      koopa-blue_14: 2987772215273506645
+      koopa-blue_4: 8007311943996465842
+      koopa-blue_11: 5002131046975236532
+      koopa-blue_5: -4331254507924784442
+      koopa-blue_17: 64540993215258477
+      koopa-blue_1: 6855819960668806750
+      koopa-blue_12: 4288369980945784781
+      koopa-blue_16: 1982076295540741864
+      koopa-blue_15: 8252686961211432577
+      koopa-blue_3: -3966318328118112903
+      koopa-blue_13: 5894452475274308847
+      koopa-blue_6: -829171787373596523
+      koopa-blue_7: -7864945618935437103
+      koopa-blue_0: 3764543692002720701
+      koopa-blue_2: 5443230004347411077
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

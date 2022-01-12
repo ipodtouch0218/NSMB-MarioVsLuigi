@@ -168,6 +168,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         foreach (var wfgs in GameObject.FindObjectsOfType<WaitForGameStart>()) {
             wfgs.AttemptExecute();
         }
+        if (PhotonNetwork.IsMasterClient) {
+            foreach (EnemySpawnpoint point in GameObject.FindObjectsOfType<EnemySpawnpoint>()) {
+                point.AttemptSpawning();
+            }
+        }
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = false;
         localPlayer.GetComponent<PlayerController>().enabled = true;
         localPlayer.GetPhotonView().RPC("PreRespawn", RpcTarget.All);
@@ -208,7 +213,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     //game over, losers
                     
                     RaiseEventOptions options = new RaiseEventOptions {Receivers=ReceiverGroup.All};
-                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, player, options, SendOptions.SendReliable);
+                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, player.photonView.Owner, options, SendOptions.SendReliable);
                     return;
                 }
             }

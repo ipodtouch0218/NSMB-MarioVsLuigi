@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a8e0a9cf03afb145bee88e8779c16e9, type: 3}
+  m_Name: WoodenTile
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: -2409467939832598147, guid: 02501bf114d1a0a4f98fa72f08e7c70c, type: 3}
+  m_MinSpeed: 1
+  m_MaxSpeed: 1
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 2
+  particleColor: {r: 0.72156864, g: 0.5647059, b: 0.2509804, a: 0}
+  breakableBySmallMario: 0
+  breakableByLargeMario: 0
+  breakableByGiantMario: 1
+  breakableByShells: 0
+  breakableByBombs: 1
+  bumpIfNotBroken: 0
+  bumpIfBroken: 0

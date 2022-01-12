@@ -38,4 +38,12 @@ MonoBehaviour:
   m_AnimationStartTime: 0
   m_AnimationStartFrame: 0
   m_TileColliderType: 2
-  resultTile: Basic/EmptyBlueQuestion
+  particleColor: {r: 0.29411766, g: 0.6901961, b: 0.86274517, a: 0}
+  breakableBySmallMario: 0
+  breakableByLargeMario: 0
+  breakableByGiantMario: 1
+  breakableByShells: 0
+  breakableByBombs: 1
+  bumpIfNotBroken: 1
+  bumpIfBroken: 0
+  resultTile: SpecialTiles/EmptyBlueQuestion

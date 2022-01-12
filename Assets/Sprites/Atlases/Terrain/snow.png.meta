@@ -276,6 +276,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -2152,6 +2153,91 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      17 Snow (with ice)_4: -9013453111420326038
+      17 Snow (with ice)_20: 6276221612720772921
+      17 Snow (with ice)_59: -5818526749545188408
+      17 Snow (with ice)_41: -2631127404179897917
+      17 Snow (with ice)_6: 8293584250301118868
+      17 Snow (with ice)_76: 7772855040124251841
+      17 Snow (with ice)_23: 6828257872530074796
+      17 Snow (with ice)_60: -6356306983337635172
+      17 Snow (with ice)_8: -2138034016857250402
+      17 Snow (with ice)_62: 2844340004484196322
+      17 Snow (with ice)_104: 6520820702182674956
+      17 Snow (with ice)_0: -6300410782580505984
+      17 Snow (with ice)_11: -4494366842637114311
+      17 Snow (with ice)_40: 6580648872662214890
+      17 Snow (with ice)_38: -4926953012709212600
+      17 Snow (with ice)_79: -4667633893116139394
+      17 Snow (with ice)_19: 3226195363676501907
+      17 Snow (with ice)_25: -3556226607749843564
+      17 Snow (with ice)_42: 7395684506710753096
+      17 Snow (with ice)_44: 1697982533516544020
+      17 Snow (with ice)_12: 3460211445942149478
+      17 Snow (with ice)_63: -2298399621995650721
+      17 Snow (with ice)_103: 4854830910324205991
+      17 Snow (with ice)_82: -4862717808911733
+      17 Snow (with ice)_99: 3894684780014457245
+      17 Snow (with ice)_10: -2837221730051091734
+      17 Snow (with ice)_56: -369944536642310432
+      17 Snow (with ice)_15: -182444427051251573
+      17 Snow (with ice)_95: 8640388344009670486
+      17 Snow (with ice)_100: 5893547083715574885
+      17 Snow (with ice)_70: 5631042602748212753
+      17 Snow (with ice)_83: 6648006000860349067
+      17 Snow (with ice)_212: 6413545887853820868
+      17 Snow (with ice)_80: 947766031780083832
+      17 Snow (with ice)_54: -2842157672857578184
+      17 Snow (with ice)_81: -8407847473480121096
+      17 Snow (with ice)_32: 3431206980173699850
+      17 Snow (with ice)_101: 8176468427257778730
+      17 Snow (with ice)_21: -4530427751867993857
+      17 Snow (with ice)_75: -7617203997942276020
+      17 Snow (with ice)_5: 1893304468737283418
+      17 Snow (with ice)_97: 3791035259704847999
+      17 Snow (with ice)_86: 441550507884855593
+      17 Snow (with ice)_18: -7655771042961951389
+      17 Snow (with ice)_7: 2365977113783317205
+      17 Snow (with ice)_88: -6630464420988987600
+      17 Snow (with ice)_69: 7983974791397222505
+      17 Snow (with ice)_77: 7521112415818800856
+      17 Snow (with ice)_14: -3970593749064347476
+      17 Snow (with ice)_39: 1928070836197381956
+      17 Snow (with ice)_3: 1813239276613189179
+      17 Snow (with ice)_13: 1548642490827387919
+      17 Snow (with ice)_84: -3937821555686740368
+      17 Snow (with ice)_58: 4176180033442103499
+      17 Snow (with ice)_26: -5262711072247304031
+      17 Snow (with ice)_55: 9084816540663525322
+      17 Snow (with ice)_85: 5449189118766894354
+      17 Snow (with ice)_47: 3243707234121225211
+      17 Snow (with ice)_24: -1688621852434866573
+      17 Snow (with ice)_89: -494903562235785116
+      17 Snow (with ice)_96: 6929731253186273174
+      17 Snow (with ice)_87: 4374294410776526029
+      17 Snow (with ice)_73: -8962288578422844348
+      17 Snow (with ice)_78: 5862298523878809754
+      17 Snow (with ice)_1: -4053067319055912903
+      17 Snow (with ice)_2: 5118175505408131421
+      17 Snow (with ice)_9: 335365305919136532
+      17 Snow (with ice)_102: 1484539609621353927
+      17 Snow (with ice)_105: 1722470237677832252
+      17 Snow (with ice)_98: 341520223738611989
+      17 Snow (with ice)_31: -7810133161317435622
+      17 Snow (with ice)_57: -863726444344398902
+      17 Snow (with ice)_61: 4700990251516197323
+      17 Snow (with ice)_74: -3381731573352926752
+      17 Snow (with ice)_45: 945367669344123159
+      17 Snow (with ice)_107: 6779239019230897394
+      17 Snow (with ice)_43: 1976347658632571419
+      17 Snow (with ice)_29: -3572203244071242199
+      17 Snow (with ice)_30: -5997012777536148397
+      17 Snow (with ice)_16: -7538437064517441079
+      17 Snow (with ice)_22: 1231485242115983449
+      17 Snow (with ice)_46: -2732051846205184009
+      17 Snow (with ice)_17: -6660284966460321296
+      17 Snow (with ice)_106: -276582683036807909
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

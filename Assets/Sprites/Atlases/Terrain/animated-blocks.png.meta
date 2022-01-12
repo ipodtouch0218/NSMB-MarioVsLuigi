@@ -120,6 +120,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -880,6 +881,39 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      animation_24: 4602633912051959003
+      animation_27: -3318003699947615551
+      animation_12: 595918852289861335
+      animation_17: -8954504132767192025
+      animation_28: 5242519309527336308
+      animation_0: -8917260427315313510
+      animation_3: 2250798203632615395
+      animation_6: -6030831360514867012
+      animation_9: -3961342211389282260
+      animation_8: 2620925746830137660
+      animation_11: -6910632858783443427
+      animation_5: 3442106473843032738
+      animation_7: 3684821612489964542
+      animation_21: 6700115880502462848
+      animation_23: 5563996254464901877
+      animation_19: -4876230672202525009
+      animation_22: 4366118933763392549
+      animation_10: -2074995507315294404
+      animation_31: 105889491633116753
+      animation_15: -8417162070665421395
+      animation_1: -8151411539534625427
+      animation_26: 4103098580831267492
+      animation_30: 2286950547735446004
+      animation_2: 215657226047675787
+      animation_29: -5785169764808499753
+      animation_20: 6088895996261290297
+      animation_13: 845948447533366988
+      animation_14: -5313328981683241401
+      animation_4: 1709446548163320796
+      animation_25: -8450008797135637194
+      animation_16: 6764869996083366342
+      animation_18: 3988752837330785565
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

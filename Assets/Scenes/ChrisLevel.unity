@@ -281,6 +281,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1557116182}
   - {fileID: 1936834776}
@@ -316,6 +317,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.5, y: 4.2, z: 30}
   m_LocalScale: {x: 3, y: 3, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 488296848}
   m_RootOrder: 0
@@ -479,6 +481,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.2629387, y: 0.5387667, z: -407.63162}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1715870657}
   - {fileID: 1041791688}
@@ -513,6 +516,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 1.490531, y: 2.4126258, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 191868330}
   m_Father: {fileID: 0}
@@ -550,6 +554,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 966498832}
   m_RootOrder: 1
@@ -568,28 +573,12 @@ CompositeCollider2D:
   m_UsedByEffector: 1
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_GeometryType: 1
+  m_GeometryType: 0
   m_GenerationType: 0
-  m_EdgeRadius: 0
+  m_EdgeRadius: 0.01
   m_ColliderPaths:
   - m_Collider: {fileID: 548172407}
     m_ColliderPaths:
-    - - X: -149999900
-        Y: 2812459
-      - X: -149999900
-        Y: 5000041
-      - X: -149999959
-        Y: 5000100
-      - X: -165000041
-        Y: 5000100
-      - X: -165000100
-        Y: 5000041
-      - X: -165000100
-        Y: 2812459
-      - X: -165000041
-        Y: 2812400
-      - X: -149999959
-        Y: 2812400
     - - X: 100000000
         Y: 5000000
       - X: 70000000
@@ -597,6 +586,14 @@ CompositeCollider2D:
       - X: 70000000
         Y: 2812500
       - X: 100000000
+        Y: 2812500
+    - - X: -150000000
+        Y: 5000000
+      - X: -165000000
+        Y: 5000000
+      - X: -165000000
+        Y: 2812500
+      - X: -150000000
         Y: 2812500
     - - X: -45000000
         Y: -5000000
@@ -624,18 +621,14 @@ CompositeCollider2D:
         Y: -27187500
   m_CompositePaths:
     m_Paths:
-    - - {x: -14.99999, y: 0.28124592}
-      - {x: -14.99999, y: 0.5000041}
-      - {x: -14.999995, y: 0.50001}
-      - {x: -16.500006, y: 0.50001}
-      - {x: -16.50001, y: 0.5000041}
-      - {x: -16.50001, y: 0.28124592}
-      - {x: -16.500006, y: 0.28124002}
-      - {x: -14.999995, y: 0.28124002}
     - - {x: 10, y: 0.5}
       - {x: 7, y: 0.5}
       - {x: 7, y: 0.28125}
       - {x: 10, y: 0.28125}
+    - - {x: -15, y: 0.5}
+      - {x: -16.5, y: 0.5}
+      - {x: -16.5, y: 0.28125}
+      - {x: -15, y: 0.28125}
     - - {x: -4.5, y: -0.5}
       - {x: -12.5, y: -0.5}
       - {x: -12.5, y: -0.71875}
@@ -1252,6 +1245,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 148948815}
   m_RootOrder: 3
@@ -1295,6 +1289,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1861198505}
   - {fileID: 548172403}
@@ -1487,6 +1482,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -8.5, y: 2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 148948815}
   m_RootOrder: 0
@@ -1602,6 +1598,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.5, y: 8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 148948815}
   m_RootOrder: 2
@@ -1637,6 +1634,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 966498832}
   m_RootOrder: 0
@@ -1655,9 +1653,9 @@ CompositeCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_GeometryType: 1
+  m_GeometryType: 0
   m_GenerationType: 0
-  m_EdgeRadius: 0
+  m_EdgeRadius: 0.01
   m_ColliderPaths:
   - m_Collider: {fileID: 1861198507}
     m_ColliderPaths:
@@ -4146,6 +4144,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -8.5, y: 7.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 148948815}
   m_RootOrder: 1

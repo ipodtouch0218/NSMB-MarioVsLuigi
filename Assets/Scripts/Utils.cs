@@ -46,4 +46,8 @@ public class Utils {
     public static PlayerData GetCharacterData(Player player = null) {
         return GlobalController.Instance.characters[GetCharacterIndex(player)];
     }
+
+    public static TileBase GetTileAtWorldLocation(Vector3 worldLocation) {
+        return GameManager.Instance.tilemap.GetTile(WorldToTilemapPosition(worldLocation));
+    }
 }

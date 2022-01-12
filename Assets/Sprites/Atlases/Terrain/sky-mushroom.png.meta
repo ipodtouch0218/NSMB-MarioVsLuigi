@@ -288,6 +288,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -2315,6 +2316,95 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Skymushrooms_85: -6109128753210672573
+      Skymushrooms_61: 7494226669953535768
+      Skymushrooms_81: 1123145378296939486
+      Skymushrooms_1: 786117695671816683
+      Skymushrooms_6: -37149245372377089
+      Skymushrooms_27: 2754491441136477863
+      Skymushrooms_34: -8734582558230733495
+      Skymushrooms_63: 3638813699760844240
+      Skymushrooms_29: -6598001722334024784
+      Skymushrooms_69: 789131072841948001
+      Skymushrooms_73: -984974904620634381
+      Skymushrooms_51: -4535484763583307891
+      Skymushrooms_11: 7304438836060056843
+      Skymushrooms_10: -3207064330932205020
+      Skymushrooms_35: 4098961065637277205
+      Skymushrooms_45: -5479778025903380948
+      Skymushrooms_12: -980895399583070378
+      Skymushrooms_43: -1554781803756030628
+      Skymushrooms_74: 6211997385092982439
+      Skymushrooms_56: -6026304684005058244
+      Skymushrooms_42: -1272653884124787773
+      Skymushrooms_7: 5763691364356027619
+      Skymushrooms_9: 2032974154344175520
+      Skymushrooms_70: -4653757559578060563
+      Skymushrooms_22: -4076472492969651994
+      Skymushrooms_14: -4418943456902762905
+      Skymushrooms_77: 5784158856992659498
+      Skymushrooms_30: -2579355631425097000
+      Skymushrooms_47: 5778673836966095166
+      Skymushrooms_87: -156903136121610645
+      Skymushrooms_68: 6063801523406181830
+      Skymushrooms_59: 4771366600546267579
+      Skymushrooms_40: 6515043403255071780
+      Skymushrooms_26: 7348318705444323560
+      Skymushrooms_50: 417433667850450018
+      Skymushrooms_17: 8700737957286116436
+      Skymushrooms_54: -3183942212545404133
+      Skymushrooms_82: 817700700024558990
+      Skymushrooms_65: 8464125568395539648
+      Skymushrooms_20: 2734180118967482461
+      Skymushrooms_28: -1251792435538640276
+      Skymushrooms_24: 2280411415995440697
+      Skymushrooms_39: -2112383379826603273
+      Skymushrooms_60: -5491756262427933478
+      Skymushrooms_75: -6616024812902712420
+      Skymushrooms_32: 32887307887050358
+      Skymushrooms_8: -728441411400653890
+      Skymushrooms_13: -2748880045226230217
+      Skymushrooms_16: -892671872539168266
+      Skymushrooms_25: 1901194976322088746
+      Skymushrooms_49: 8568281470691030380
+      Skymushrooms_71: -3010237649884328254
+      Skymushrooms_41: -3561982115147921740
+      Skymushrooms_2: -932970545309924650
+      Skymushrooms_0: -762288683377061082
+      Skymushrooms_38: 7412149278456841375
+      Skymushrooms_5: 3690292316899092411
+      Skymushrooms_53: 4901008666701711393
+      Skymushrooms_21: -4320519723084309860
+      Skymushrooms_67: 4138574172172216695
+      Skymushrooms_48: 7361287675278722029
+      Skymushrooms_57: -948723566694838679
+      Skymushrooms_19: -5550551016755153739
+      Skymushrooms_58: -190814122739574485
+      Skymushrooms_36: -3921928425416340578
+      Skymushrooms_80: -6639439535095878054
+      Skymushrooms_62: 2113599233723097702
+      Skymushrooms_33: 3456219669633816419
+      Skymushrooms_46: 8883888304400857001
+      Skymushrooms_23: -4137293705489798214
+      Skymushrooms_18: 1853358722189741258
+      Skymushrooms_76: -5860269945567622136
+      Skymushrooms_31: 3152232992842693777
+      Skymushrooms_78: -2669483726977299307
+      Skymushrooms_86: 4407005130160523397
+      Skymushrooms_64: 7546571488923478216
+      Skymushrooms_37: 6918724622927256643
+      Skymushrooms_15: -2988504637511396051
+      Skymushrooms_79: -2053057857507790463
+      Skymushrooms_84: 6040951720715882079
+      Skymushrooms_83: 1238704485370563030
+      Skymushrooms_72: 1115334955727682769
+      Skymushrooms_52: -3831619558200354565
+      Skymushrooms_55: -4444894422979927309
+      Skymushrooms_4: -7959102626937959564
+      Skymushrooms_66: 3005343802994389978
+      Skymushrooms_3: 8705624004837244469
+      Skymushrooms_44: 6211702021642853450
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

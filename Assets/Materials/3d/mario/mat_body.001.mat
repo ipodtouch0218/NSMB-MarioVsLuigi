@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 2
+  version: 5
 --- !u!21 &2100000
 Material:
   serializedVersion: 6
@@ -33,6 +33,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - EyeTextures:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - FireFlowerTexture:
         m_Texture: {fileID: 2800000, guid: 8cf09ca90a094874ba5ed992fef1a6fc, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -80,6 +84,7 @@ Material:
     m_Ints: []
     m_Floats:
     - FireFlower: 0
+    - IsEyeTexture: 0
     - OutlineSize: 0.01
     - _AlphaClip: 0
     - _Blend: 0
@@ -93,6 +98,7 @@ Material:
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
+    - _QueueControl: 1
     - _QueueOffset: 0
     - _RainbowEnabled: 0
     - _ReceiveShadows: 1

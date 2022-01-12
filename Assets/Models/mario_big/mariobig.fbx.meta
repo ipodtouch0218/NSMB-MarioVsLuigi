@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 024ceb223bceebd488dbc425555f4df0
 ModelImporter:
-  serializedVersion: 21100
+  serializedVersion: 21202
   internalIDToNameTable:
   - first:
       74: 6526803134433627612
@@ -653,6 +653,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: 
@@ -1197,14 +1198,14 @@ ModelImporter:
       takeName: mario_model_mg|big_hip_at_mario_model_mg
       internalID: 0
       firstFrame: 0
-      lastFrame: 0
+      lastFrame: 1
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -6859,6 +6860,7 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
+    nodeNameCollisionStrategy: 0
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
@@ -6870,6 +6872,7 @@ ModelImporter:
     skinWeightsMode: 0
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
+    optimizeBones: 1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8

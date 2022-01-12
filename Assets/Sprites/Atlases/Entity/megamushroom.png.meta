@@ -75,6 +75,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -544,6 +545,24 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      bigboi_8: -417955946291207368
+      bigboi_5: -8113494857970498766
+      bigboi_6: 617426677308558520
+      bigboi_16: -3752053547170821965
+      bigboi_3: 7938416544177365061
+      bigboi_1: -2946716687055840294
+      bigboi_10: -5819561555168620552
+      bigboi_14: -7131337882231599856
+      bigboi_0: 4866609708958501371
+      bigboi_12: 3662409755243278128
+      bigboi_9: -8842036640453771547
+      bigboi_7: -7195880147293423748
+      bigboi_15: -4608296523285631259
+      bigboi_11: -5811931434875833142
+      bigboi_13: -1304782017106125720
+      bigboi_2: -3871314162010161280
+      bigboi_4: 3100511505728297510
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
