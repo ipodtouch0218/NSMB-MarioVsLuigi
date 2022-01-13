@@ -38,7 +38,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnJoinedLobby() {
         ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
         prop.Add("character", 0);
+        prop.Add("ping", PhotonNetwork.GetPing());
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+
+        StartCoroutine(UpdatePing());
     }
     public void OnLeftLobby() {}
     public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbies) {}
@@ -70,7 +73,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     // ROOM CALLBACKS
     public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {
-        PopulatePlayerList();
+        UpdatePlayerList(player);
     }
     public void OnMasterClientSwitched(Player newMaster) {
         LocalChatMessage(newMaster.NickName + " has become the Host", ColorToVector(Color.red));
@@ -202,7 +205,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     void Update() {
-        bool connected = PhotonNetwork.IsConnectedAndReady;
+        bool connected = PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
         connecting.SetActive(!connected);
         if (quit && !sfx.isPlaying) {
             Application.Quit();
@@ -215,6 +218,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         joinRoomBtn.interactable = connected && selectedRoom != null && validName;
         createRoomBtn.interactable = connected && validName;
+    }
+
+    IEnumerator UpdatePing() {
+        while (true) {
+            yield return new WaitForSeconds(2);
+            if (PhotonNetwork.InRoom) {
+                ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
+                prop.Add("ping", PhotonNetwork.GetPing());
+                PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+            }
+        }
     }
 
     public void OpenMainMenu() {
@@ -340,7 +354,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (room == null || room == "" || players < 2) {
             return;
         }
-        PhotonNetwork.CreateRoom(room, new RoomOptions{MaxPlayers=players, IsVisible=true}, TypedLobby.Default);
+        PhotonNetwork.CreateRoom(room, new RoomOptions{MaxPlayers=players, IsVisible=true, PublishUserId=true}, TypedLobby.Default);
         Camera.main.transform.position = levelCameraPositions[0].transform.position;
         createLobbyPrompt.SetActive(false);
     }
@@ -365,21 +379,42 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         SortedDictionary<int, Photon.Realtime.Player> sortedPlayers = new SortedDictionary<int,Photon.Realtime.Player>(PhotonNetwork.CurrentRoom.Players);
         foreach (KeyValuePair<int, Photon.Realtime.Player> player in sortedPlayers) {
             Player pl = player.Value;
-            string characterString = Utils.GetCharacterData(pl).uistring;
 
             GameObject newPl = GameObject.Instantiate(playersPrefab, Vector3.zero, Quaternion.identity);
+            newPl.name = pl.UserId;
             newPl.transform.SetParent(playersContent.transform);
             newPl.transform.localPosition = new Vector3(0, -(count-- * 40f), 0);
             newPl.transform.localScale = Vector3.one;
             newPl.SetActive(true);
-            SetText(newPl.transform.Find("Text").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
             RectTransform tf = newPl.GetComponent<RectTransform>();
             tf.offsetMax = new Vector2(330, tf.offsetMax.y);
+            UpdatePlayerList(pl);
         }
 
         startGameBtn.interactable = PhotonNetwork.IsMasterClient;
         levelDropdown.interactable = PhotonNetwork.IsMasterClient;
         starSlider.interactable = PhotonNetwork.IsMasterClient;
+    }
+    public void UpdatePlayerList(Player pl) {
+        string characterString = Utils.GetCharacterData(pl).uistring;
+        object ping;
+        pl.CustomProperties.TryGetValue("ping", out ping);
+        if (ping == null) ping = -1;
+        string pingColor;
+        if ((int) ping < 0) {
+            pingColor = "black";    
+        } else if ((int) ping < 80) {
+            pingColor = "#00b900";
+        } else if ((int) ping < 120) {
+            pingColor = "orange";
+        } else {
+            pingColor = "red";
+        }
+
+        Transform newPl = playersContent.transform.Find(pl.UserId);
+        if (newPl == null) return;
+        SetText(newPl.Find("NameText").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
+        SetText(newPl.Find("PingText").gameObject, "<color=" + pingColor + ">" + (int) ping);
     }
     
     public void GlobalChatMessage(string message, Vector3 color) {

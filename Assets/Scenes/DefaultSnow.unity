@@ -892,7 +892,7 @@ CompositeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_GeometryType: 0
   m_GenerationType: 0
-  m_EdgeRadius: 0.01
+  m_EdgeRadius: 0.005
   m_ColliderPaths:
   - m_Collider: {fileID: 618488778}
     m_ColliderPaths: []
@@ -8067,7 +8067,7 @@ CompositeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_GeometryType: 0
   m_GenerationType: 0
-  m_EdgeRadius: 0.01
+  m_EdgeRadius: 0.005
   m_ColliderPaths:
   - m_Collider: {fileID: 2137834375}
     m_ColliderPaths:

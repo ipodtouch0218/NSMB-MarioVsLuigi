@@ -264,15 +264,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         bool invincible = false;
         bool mega = false;
         bool speedup = false;
-
+        
         foreach (var player in allPlayers) {
+            if (player == null) return;
             if (player.state == Enums.PowerupState.Giant) {
                 mega = true;
             }
             if (player.invincible > 0) {
                 invincible = true;
             }
-            int stars = player.GetComponent<PlayerController>().stars;
+            int stars = player.stars;
             if (((float) stars + 1) / starRequirement >= 0.9f) {
                 speedup = true;
             }

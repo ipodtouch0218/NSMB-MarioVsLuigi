@@ -8,7 +8,7 @@ using Photon.Pun;
 
 public class PlayerController : MonoBehaviourPun, IPunObservable {
     
-    private static int ANY_GROUND_MASK, ONLY_GROUND_MASK, GROUND_LAYERID, HITS_NOTHING_LAYERID, ENTITY_HITBOX_LAYERID, DEFAULT_LAYERID = 0;
+    private static int ANY_GROUND_MASK, ONLY_GROUND_MASK, GROUND_LAYERID, HITS_NOTHING_LAYERID, ENTITY_HITBOX_LAYERID, DEFAULT_LAYERID;
     
     private int playerId = 0;
     [SerializeField] public bool dead = false;
@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private Animator animator;
     public Rigidbody2D body;
 
-    public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, ice, flying, drill, inShell, hitLeft, hitRight, iceSliding, snow;
+    public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, ice, flying, drill, inShell, hitLeft, hitRight, iceSliding, snow, stuckInBlock;
     float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, holdingDownTimer, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer;
     public float invincible = 0, giantTimer = 0, blinkTimer = 0;
     
@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             stream.SendNext(localFrameId++);
 
         } else if (stream.IsReading) {
-            Vector3 pos = (Vector3) stream.ReceiveNext();
+            Vector2 pos = (Vector2) stream.ReceiveNext();
             Vector2 vel = (Vector2) stream.ReceiveNext();
             ExitGames.Client.Photon.Hashtable controls = (ExitGames.Client.Photon.Hashtable) stream.ReceiveNext();
             long frameId = (long) stream.ReceiveNext();
@@ -99,6 +99,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         GROUND_LAYERID = LayerMask.NameToLayer("Ground");
         HITS_NOTHING_LAYERID = LayerMask.NameToLayer("HitsNothing");
         ENTITY_HITBOX_LAYERID = LayerMask.NameToLayer("EntityHitbox");
+        DEFAULT_LAYERID = LayerMask.NameToLayer("Default");
         
         cameraController = Camera.main.GetComponent<CameraController>();
         animator = GetComponentInChildren<Animator>();
@@ -1164,15 +1165,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
 
         if (animator.GetBool("pipe")) {
-            if (gameObject.layer != HITS_NOTHING_LAYERID) {
-                gameObject.layer = HITS_NOTHING_LAYERID;
-                body.position = new Vector3(body.position.x, body.position.y, 1);
-            }
-        } else if (dead) {
-            if (gameObject.layer != HITS_NOTHING_LAYERID) {
-                gameObject.layer = HITS_NOTHING_LAYERID;
-                body.position = new Vector3(body.position.x, body.position.y, -3);
-            }
+            gameObject.layer = HITS_NOTHING_LAYERID;
+            body.position = new Vector3(body.position.x, body.position.y, 1);
+        } else if (dead || stuckInBlock) {
+            gameObject.layer = HITS_NOTHING_LAYERID;
+            body.position = new Vector3(body.position.x, body.position.y, -3);
         } else {
             gameObject.layer = DEFAULT_LAYERID;
             body.position = new Vector3(body.position.x, body.position.y, -3);
@@ -1312,7 +1309,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
 
         if (crouching) {
-            height *= 0.7f;
+            height *= (state <= Enums.PowerupState.Small ? 0.7f : 0.5f);
         }
 
         hitbox.size = new Vector2(width, height);
@@ -1642,6 +1639,31 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
     }
 
+    bool HandleStuckInBlock(float delta) {
+        if (Utils.GetTileAtWorldLocation(body.position + Vector2.up/4f) == null) {
+            stuckInBlock = false;
+            return false;
+        }
+        stuckInBlock = true;
+        body.gravityScale = 0;
+        onGround = true;
+        RaycastHit2D rightRaycast = Physics2D.Raycast(body.position, Vector2.right, 5, ONLY_GROUND_MASK);
+        RaycastHit2D leftRaycast = Physics2D.Raycast(body.position, Vector2.left, 5, ONLY_GROUND_MASK);
+        float rightDistance = 0, leftDistance = 0;
+        if (rightRaycast) {
+            rightDistance = rightRaycast.distance;
+        }
+        if (leftRaycast) {
+            leftDistance = leftRaycast.distance;
+        }
+        if (rightDistance <= leftDistance) {
+            body.velocity = Vector2.right*2f;
+        } else {
+            body.velocity = Vector2.left*2f;
+        }
+        return true;
+    }
+
     void HandleMovement(float delta) {
         
         if (photonView.IsMine && body.position.y < GameManager.Instance.GetLevelMinY()) {
@@ -1658,6 +1680,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         walljumping -= delta;
         giantTimer -= delta;
         giantStartTimer -= delta;
+        groundpoundCounter -= delta;
+
+        if (HandleStuckInBlock(delta))
+            return;
 
         if (giantStartTimer > 0) {
             body.velocity = Vector2.zero;
@@ -1779,7 +1805,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             HandleJumping(jump);
         }
         
-        if (holdingDownTimer > 0.1f && !alreadyGroundpounded) {
+        if (holdingDownTimer > 0.05f && !alreadyGroundpounded) {
             HandleGroundpoundStart(left, right);
         }
         HandleGroundpound(crouch, up);
@@ -1837,7 +1863,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 body.gravityScale = normalGravity * (gravityModifier / 1.2f);
             }
         }
-        groundpoundCounter -= delta;
 
         if (!groundpoundSit && groundpound && (groundpoundCounter) <= 0) {
             body.velocity = new Vector2(0f, -groundpoundVelocity);

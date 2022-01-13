@@ -12,6 +12,7 @@ public class BreakableBrickTile : InteractableTile {
     public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
     protected bool BreakBlockCheck(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         bool doBump = false, doBreak = false;
+        Debug.Log(interacter);
         if (interacter is PlayerController) {
             PlayerController pl = (PlayerController) interacter;
             if (pl.state <= Enums.PowerupState.Small) {
@@ -53,6 +54,7 @@ public class BreakableBrickTile : InteractableTile {
         }
     }
     public void BumpWithAnimation(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
+        Bump(interacter, direction, worldLocation);
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Bump for others

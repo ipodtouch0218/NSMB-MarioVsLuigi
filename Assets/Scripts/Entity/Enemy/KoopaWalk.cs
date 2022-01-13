@@ -175,6 +175,7 @@ public class KoopaWalk : HoldableEntity {
         int collisionAmount = collider.GetContacts(collisions);
         for (int i = 0; i < collisionAmount; i++) {
             var point = collisions[i];
+            Vector2 p = point.point + (point.normal * -0.15f);
             if (Mathf.Abs(point.normal.x) > 0.2f) {
                 
                 if (photonView)
@@ -187,7 +188,7 @@ public class KoopaWalk : HoldableEntity {
                         photonView.RPC("PlaySound", RpcTarget.All, "player/block_bump");
                         sound = true;
                     }
-                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(point.point + blockOffset);
+                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
                     TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
                     if (tile == null) continue;
                     if (!shell) continue;

@@ -39,7 +39,7 @@ public abstract class InteractableTile : AnimatedTile {
                     continue;
                 }
                 case "coin": {
-                    if (interacter && interacter is PlayerController) {
+                    if (interacter is PlayerController) {
                         ((PlayerController) interacter).photonView.RPC("CollectCoin", RpcTarget.All, obj.GetComponentInParent<PhotonView>().ViewID, obj.transform.position.x, obj.transform.position.y);
                     }
                     continue;
