@@ -77,7 +77,7 @@ public class MovingPowerup : MonoBehaviourPun {
             renderer.color = Color.white;
             body.isKinematic = false;
             if (passthrough) {
-                if (Utils.GetTileAtWorldLocation(transform.position) == null && !Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, groundMask)) {
+                if (!Utils.IsTileSolidAtWorldLocation(transform.position) && !Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, groundMask)) {
                     gameObject.layer = LayerMask.NameToLayer("Entity");
                     passthrough = false;
                 }

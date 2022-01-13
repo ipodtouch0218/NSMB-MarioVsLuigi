@@ -21,13 +21,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private Animator animator;
     public Rigidbody2D body;
 
-    public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, ice, flying, drill, inShell, hitLeft, hitRight, iceSliding, snow, stuckInBlock;
+    public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock;
     float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, holdingDownTimer, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer;
     public float invincible = 0, giantTimer = 0, blinkTimer = 0;
     
     private Vector2 pipeDirection;
     public int stars, coins;
-    HashSet<Vector3Int> tilesStandingOn = new HashSet<Vector3Int>(), tilesJumpedInto = new HashSet<Vector3Int>(), tilesHitSide = new HashSet<Vector3Int>();
     public string storedPowerup = null;
     HoldableEntity holding, holdingOld;
     public Gradient glowGradient;
@@ -48,6 +47,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private Enums.PlayerEyeState eyeState;
     public PlayerData character;
     public float heightSmallModel = 0.46f, heightLargeModel = 0.82f;
+
+    //Tile data
+    private string footstepMaterial = "";
+    private bool doIceSkidding;
+    private float tileFriction = 1;
+    private HashSet<Vector3Int> tilesStandingOn = new HashSet<Vector3Int>(), 
+        tilesJumpedInto = new HashSet<Vector3Int>(), 
+        tilesHitSide = new HashSet<Vector3Int>();
+    
 
     private long localFrameId = 0;
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
@@ -259,14 +267,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void Footstep() {
         if (state == Enums.PowerupState.Giant)
             return;
-        if (ice && skidding) {
+        if (doIceSkidding && skidding) {
             PlaySoundFromAnim("player/ice-skid");
             return;
         }
         if (Mathf.Abs(body.velocity.x) < walkingMaxSpeed)
             return;
         
-        PlaySoundFromAnim("player/walk" + (snow ? "-snow" : "") + (step ? "-2" : ""), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
+        PlaySoundFromAnim("player/walk" + (footstepMaterial != "" ? "-" + footstepMaterial : "") + (step ? "-2" : ""), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
         step = !step;
     }
 
@@ -1012,7 +1020,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!dead) {
             HandleTemporaryInvincibility();
             HandleGroundCollision();
-            HandleIce();
+            HandleCustomTiles();
             HandleMovement(Time.fixedDeltaTime);
         }
         HandleAnimation(orig);
@@ -1034,18 +1042,21 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
     }
 
-    void HandleIce() {
+    void HandleCustomTiles() {
         //todo: refactor
-        ice = false;
-        snow = false;
+        doIceSkidding = false;
+        tileFriction = 0;
+        footstepMaterial = "";
         foreach (Vector3Int pos in tilesStandingOn) {
-            TileBase tile = GameManager.Instance.tilemap.GetTile(pos);
-            if (!tile) continue;
-            if (tile.name == "SnowGrass") {
-                snow = true;
-            }
-            if (tile.name == "Ice") {
-                ice = true;
+            TileBase tile = Utils.GetTileAtTileLocation(pos);
+            if (tile == null) continue;
+            if (tile is TileWithProperties) {
+                TileWithProperties propTile = (TileWithProperties) tile;
+                footstepMaterial = propTile.footstepMaterial;
+                doIceSkidding = propTile.iceSkidding;
+                tileFriction = Mathf.Max(tileFriction, propTile.frictionFactor);
+            } else {
+                tileFriction = 1;
             }
         }
     }
@@ -1096,7 +1107,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 }
             }
 
-            if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5 && crouching) || ice)) {
+            if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5 && crouching) || doIceSkidding)) {
                 if (right) {
                     facingRight = true;
                 }
@@ -1106,14 +1117,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
 
             //Animation
-            animator.SetBool("skidding", !ice && skidding);
+            animator.SetBool("skidding", !doIceSkidding && skidding);
             animator.SetBool("turnaround", turnaround);
             animator.SetBool("onLeft", onLeft);
             animator.SetBool("onRight", onRight);
             animator.SetBool("onGround", onGround);
             animator.SetBool("invincible", invincible > 0);
             float animatedVelocity = Mathf.Abs(body.velocity.x);
-            if (ice) {
+            if (stuckInBlock) {
+                animatedVelocity = 0;
+            } else if (doIceSkidding) {
                 if (skidding) {
                     animatedVelocity = 3.5f;
                 }
@@ -1166,13 +1179,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if (animator.GetBool("pipe")) {
             gameObject.layer = HITS_NOTHING_LAYERID;
-            body.position = new Vector3(body.position.x, body.position.y, 1);
+            transform.position = new Vector3(body.position.x, body.position.y, 1);
         } else if (dead || stuckInBlock) {
             gameObject.layer = HITS_NOTHING_LAYERID;
-            body.position = new Vector3(body.position.x, body.position.y, -3);
+            transform.position = new Vector3(body.position.x, body.position.y, -4);
         } else {
             gameObject.layer = DEFAULT_LAYERID;
-            body.position = new Vector3(body.position.x, body.position.y, -3);
+            transform.position = new Vector3(body.position.x, body.position.y, -4);
         }
 
         if (dead || animator.GetBool("pipe")) {
@@ -1185,7 +1198,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             } else {
                 models.transform.eulerAngles = new Vector3(0,100,0);
             }
-        } else if ((holding != null || ice || !turnaround)) {
+        } else if ((holding != null || doIceSkidding || !turnaround)) {
             if (onSpinner && onGround && Mathf.Abs(body.velocity.x) < 0.3f && !holding) {
                 models.transform.eulerAngles += (new Vector3(0, -1800, 0) * Time.deltaTime);
             } else if (flying) {
@@ -1203,7 +1216,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
 
-        if (onLeft || onRight || (onGround && ((skidding && !ice) || (crouching && Mathf.Abs(body.velocity.x) > 1))) ) {
+        if (onLeft || onRight || (onGround && ((skidding && !doIceSkidding) || (crouching && Mathf.Abs(body.velocity.x) > 1))) ) {
             if (!dust.isPlaying)
                 dust.Play();
         } else {
@@ -1308,20 +1321,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             height = heightLargeModel;
         }
 
-        if (crouching) {
+        if (crouching && !inShell) {
             height *= (state <= Enums.PowerupState.Small ? 0.7f : 0.5f);
         }
 
         hitbox.size = new Vector2(width, height);
         hitbox.offset = new Vector2(0, height/2f);
-        // Debug.Log(hitbox);
     }
 
     void FakeOnGroundCheck() {
         if ((onGroundLastFrame || (flying && body.velocity.y < 0)) && pipeEntering == null && !onGround) {
             var hit = Physics2D.Raycast(body.position, Vector2.down, 0.1f, ANY_GROUND_MASK);
             if (hit) {
-                Debug.Log("fake on ground hit");
                 onGround = true;
                 body.position = new Vector2(body.position.x, hit.point.y);
                 body.velocity = new Vector2(body.velocity.x, 0);
@@ -1550,7 +1561,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!left && !right) {
             skidding = false;
             turnaround = false;
-            if (ice) {
+            if (doIceSkidding) {
                 iceSliding = true;
             }
         }
@@ -1575,7 +1586,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
         float walkSpeedTotal = walkingMaxSpeed * invincibleSpeedBoost;
         bool reverseBonus = onGround && (((left && body.velocity.x > 0) || (right && body.velocity.x < 0)));
-        float reverseFloat = (reverseBonus ? (ice ? icePenalty : 1.2f) : 1);
+        float reverseFloat = (reverseBonus ? (doIceSkidding ? icePenalty : 1.2f) : 1);
         float turnaroundSpeedBoost = (turnaround && !reverseBonus ? 2 : 1);
         float stationarySpeedBoost = Mathf.Abs(body.velocity.x) <= 0.005f ? 1f : 1f;
 
@@ -1640,10 +1651,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     bool HandleStuckInBlock(float delta) {
-        if (Utils.GetTileAtWorldLocation(body.position + Vector2.up/4f) == null) {
+        Vector2 checkPos = body.position + Vector2.up/4f;
+        if (!Utils.IsTileSolidAtWorldLocation(checkPos)) {
             stuckInBlock = false;
             return false;
         }
+        TileBase tile = Utils.GetTileAtWorldLocation(checkPos);
         stuckInBlock = true;
         body.gravityScale = 0;
         onGround = true;
@@ -1881,7 +1894,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             //Friction...
             if (onGround && abovemax) {
-                body.velocity *= 1-(delta * (ice ? 0.1f : 1f) * (knockback ? 3f : 4f));
+                body.velocity *= 1-(delta * tileFriction * (knockback ? 3f : 4f));
                 if (Mathf.Abs(body.velocity.x) < 0.05) {
                     body.velocity = new Vector2(0, body.velocity.y);
                 }

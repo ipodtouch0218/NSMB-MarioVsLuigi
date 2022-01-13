@@ -5086,14 +5086,13 @@ MonoBehaviour:
   hitBlock: 0
   running: 0
   jumpHeld: 0
-  ice: 0
   flying: 0
   drill: 0
   inShell: 0
   hitLeft: 0
   hitRight: 0
   iceSliding: 0
-  snow: 0
+  stuckInBlock: 0
   invincible: 0
   giantTimer: 0
   blinkTimer: 0

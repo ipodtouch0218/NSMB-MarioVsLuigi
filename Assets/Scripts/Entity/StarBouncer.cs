@@ -76,7 +76,7 @@ public class StarBouncer : MonoBehaviourPun {
 
         if (passthrough) {
             // gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-            if (body.velocity.y <= 0 && Utils.GetTileAtWorldLocation(transform.position) == null && !Physics2D.OverlapBox(transform.position, Vector2.one / 3, 0, groundMask)) {
+            if (body.velocity.y <= 0 && !Utils.IsTileSolidAtWorldLocation(transform.position) && !Physics2D.OverlapBox(transform.position, Vector2.one / 3, 0, groundMask)) {
                 passthrough = false;
                 gameObject.layer = LayerMask.NameToLayer("Entity");
             }

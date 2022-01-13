@@ -6,33 +6,22 @@ using Photon.Realtime;
 using UnityEngine.Tilemaps;
 
 public class Utils {
-    
     public static RaiseEventOptions EVENT_OTHERS {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.Others};
     public static RaiseEventOptions EVENT_ALL {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.All};
-    public static Vector3Int WorldToTilemapPosition(Vector3 vec) {
-        return WorldToTilemapPosition(vec.x, vec.y);
+    public static Vector3Int WorldToTilemapPosition(Vector3 worldVec) {
+        return GameManager.Instance.tilemap.WorldToCell(worldVec);
     }
 
     public static Vector3Int WorldToTilemapPosition(float worldX, float worldY) {
-        Transform tilemap = GameManager.Instance.tilemap.transform;
-
-        int x = Mathf.FloorToInt((worldX - tilemap.position.x) / tilemap.localScale.x);
-        int y = Mathf.FloorToInt((worldY - tilemap.position.y) / tilemap.localScale.y);
-
-        return new Vector3Int(x, y, 0);
+        return WorldToTilemapPosition(new Vector3(worldX, worldY));
     }
 
-    public static Vector3 TilemapToWorldPosition(Vector3Int tilevec) {
-        return TilemapToWorldPosition(tilevec.x, tilevec.y);
+    public static Vector3 TilemapToWorldPosition(Vector3Int tileVec) {
+        return GameManager.Instance.tilemap.CellToWorld(tileVec);
     }
 
     public static Vector3 TilemapToWorldPosition(int tileX, int tileY) {
-        Transform tilemap = GameManager.Instance.tilemap.transform;
-
-        float x = (tileX * tilemap.localScale.x) + tilemap.position.x;
-        float y = (tileY * tilemap.localScale.y) + tilemap.position.y;
-
-        return new Vector3(x, y, 0);
+        return TilemapToWorldPosition(new Vector3Int(tileX, tileY));
     }
 
     public static int GetCharacterIndex(Player player = null) {
@@ -47,7 +36,18 @@ public class Utils {
         return GlobalController.Instance.characters[GetCharacterIndex(player)];
     }
 
-    public static TileBase GetTileAtWorldLocation(Vector3 worldLocation) {
-        return GameManager.Instance.tilemap.GetTile(WorldToTilemapPosition(worldLocation));
+    public static TileBase GetTileAtTileLocation(Vector3Int tileLocation) {
+        return GameManager.Instance.tilemap.GetTile(tileLocation);
     }
+    public static TileBase GetTileAtWorldLocation(Vector3 worldLocation) {
+        return GetTileAtTileLocation(WorldToTilemapPosition(worldLocation));
+    }
+
+    public static bool IsTileSolidAtTileLocation(Vector3Int tileLocation) {
+        TileBase tile = GetTileAtTileLocation(tileLocation);
+        return (tile != null && (tile is TileWithProperties && !((TileWithProperties) tile).isBackgroundTile));
+    } 
+    public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
+        return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
+    } 
 }
