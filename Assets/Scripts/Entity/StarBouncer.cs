@@ -8,7 +8,7 @@ public class StarBouncer : MonoBehaviourPun {
     private static int groundMask = -1;
     public bool stationary = true;
     [SerializeField] float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f;
-    float counter;
+    public float counter, readyForUnPassthrough = 0.5f;
     Vector3 startingScale;
     private Rigidbody2D body;
     new private BoxCollider2D collider;
@@ -53,6 +53,7 @@ public class StarBouncer : MonoBehaviourPun {
             counter += Time.fixedDeltaTime;
             float sin = (Mathf.Sin(counter * pulseSpeed)) * pulseAmount;
             transform.localScale = startingScale + new Vector3(sin, sin, 0);
+            readyForUnPassthrough = -1;
             return;
         } else {
             body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), body.velocity.y);
@@ -75,8 +76,7 @@ public class StarBouncer : MonoBehaviourPun {
         t.Rotate(new Vector3(0, 0, rotationSpeed * (left ? 1 : -1)), Space.Self);
 
         if (passthrough) {
-            // gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-            if (body.velocity.y <= 0 && !Utils.IsTileSolidAtWorldLocation(transform.position) && !Physics2D.OverlapBox(transform.position, Vector2.one / 3, 0, groundMask)) {
+            if ((readyForUnPassthrough -= Time.fixedDeltaTime) < 0 && body.velocity.y <= 0 && !Utils.IsTileSolidAtWorldLocation(transform.position) && !Physics2D.OverlapBox(transform.position, Vector2.one / 3, 0, groundMask)) {
                 passthrough = false;
                 gameObject.layer = LayerMask.NameToLayer("Entity");
             }

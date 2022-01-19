@@ -62,6 +62,8 @@ MonoBehaviour:
   deathBoostAmount: 10
   blinkingSpeed: 0.25
   lifespan: 15
+  counter: 0
+  readyForUnPassthrough: 0.5
   passthrough: 0
   left: 1
 --- !u!114 &1973747262660636107

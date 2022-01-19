@@ -17,7 +17,7 @@ public class UserNametag : MonoBehaviour {
     
     void Update() {
         float y = 1.6f;
-        if (parent.state <= Enums.PowerupState.Small || parent.inShell || parent.crouching) {
+        if (parent.state == Enums.PowerupState.Small || parent.inShell || parent.crouching) {
             y = 1.2f;
         }
 

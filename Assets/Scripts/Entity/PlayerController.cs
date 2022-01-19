@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public Rigidbody2D body;
 
     public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock;
-    float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, holdingDownTimer, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer;
+    float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer;
     public float invincible = 0, giantTimer = 0, blinkTimer = 0;
     
     private Vector2 pipeDirection;
@@ -315,7 +315,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
 
-        PhotonNetwork.InstantiateRoomObject("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[]{!facingRight});
+        PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[]{!facingRight});
         photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
         animator.SetTrigger("fireball");
     }
@@ -709,14 +709,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [PunRPC]
     void CollectBigStar(int starID) {
         PhotonView view = PhotonView.Find(starID);
-        if (view == null)
-            return;
+        if (view == null) return;
         GameObject star = view.gameObject;
-        if (star == null) 
-            return;
         StarBouncer starScript = star.GetComponent<StarBouncer>();
-        if (starScript.passthrough)
-            return;
+        if (starScript.readyForUnPassthrough > 0) return;
+        if (starScript.passthrough) return;
         
         if (photonView.IsMine) {
             photonView.RPC("SetStars", RpcTarget.Others, ++stars);
@@ -769,30 +766,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     void SpawnItem(string item = null) {
         if (item == null) {
-            float rand = UnityEngine.Random.value;
-
-            if (rand < 0.1f) {
-                //10% chance for mega mushroom
-                item = "MegaMushroom";
-            } else if (rand < 0.2f) {
-                //10% chance for star
-                item = "Star";
-            } else if (rand < 0.35f) {
-                //15% chance for a mini mushroom
-                item = "MiniMushroom";
-            } else if (rand < 0.5f) {
-                //15% chance for a blue shell
-                item = "BlueShell";
-            } else if (rand < 0.75f) {
-                //25% chance for a fire flower
-                item = "FireFlower";
-            } else {
-                //25% chance for a mushroom
-                item = "Mushroom";
-            }
+            item = Utils.GetRandomItem(stars).prefab;
         }
 
-        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + item, body.position + new Vector2(0, 5), Quaternion.identity, 0, new object[]{photonView.ViewID});
+        PhotonNetwork.Instantiate("Prefabs/Powerup/" + item, body.position + new Vector2(0, 5), Quaternion.identity, 0, new object[]{photonView.ViewID});
         photonView.RPC("PlaySound", RpcTarget.All, "player/reserve_item_use");
     }
 
@@ -828,13 +805,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void SpawnStar() {
         if (stars <= 0) return;
         stars--;
-        if (!photonView.IsMine) return;
-        
+        if (!PhotonNetwork.IsMasterClient) return;
+
         GameObject star = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", transform.position, Quaternion.identity, 0, new object[]{starDirection});
         StarBouncer sb = star.GetComponent<StarBouncer>();
         sb.photonView.TransferOwnership(PhotonNetwork.MasterClient);
         photonView.RPC("SetStars", RpcTarget.Others, stars);
         starDirection = !starDirection;
+        
     }
 
     [PunRPC]
@@ -986,7 +964,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         flying = false;
         drill = false;
         body.gravityScale = normalGravity;
-        if (!photonView.IsMine) return;
         while (starsToDrop-- > 0) {
             SpawnStar();
         }
@@ -1580,7 +1557,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if ((left && right) || !(left || right)) return;
 
-        float invincibleSpeedBoost = (invincible > 0 ? 2f : 1);
+        float invincibleSpeedBoost = (invincible > 0 ? 1.5f : 1);
         float airPenalty = (onGround ? 1 : 0.5f);
         float xVel = body.velocity.x;
         float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
@@ -1748,10 +1725,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         bool up = joystick.y > analogDeadzone && !paused;
         bool jump = (jumpBuffer > 0 && (onGround || koyoteTime < 0.1f || onLeft || onRight)) && !paused; 
 
-        if (crouch) {
-            holdingDownTimer += delta;
-        } else {
-            holdingDownTimer = 0;
+        if (!crouch) {
             alreadyGroundpounded = false;
         }
 
@@ -1818,7 +1792,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             HandleJumping(jump);
         }
         
-        if (holdingDownTimer > 0.05f && !alreadyGroundpounded) {
+        if (crouch && !alreadyGroundpounded) {
             HandleGroundpoundStart(left, right);
         }
         HandleGroundpound(crouch, up);
@@ -1877,7 +1851,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
 
-        if (!groundpoundSit && groundpound && (groundpoundCounter) <= 0) {
+        if (!groundpoundSit && groundpound && groundpoundCounter <= 0) {
             body.velocity = new Vector2(0f, -groundpoundVelocity);
         }
 

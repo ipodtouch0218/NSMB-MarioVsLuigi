@@ -50,4 +50,29 @@ public class Utils {
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     } 
+
+
+    public static Powerup[] powerups = null;
+    public static Powerup GetRandomItem(int stars) {
+        float starPercentage = (float) stars / GameManager.Instance.starRequirement;
+        float totalChance = 0;
+        if (powerups == null) {
+            powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
+        }
+        foreach (Powerup powerup in powerups) {
+            totalChance += powerup.GetModifiedChance(starPercentage);
+        }
+
+        float rand = UnityEngine.Random.value * totalChance;
+        foreach (Powerup powerup in powerups) {
+            float chance = powerup.GetModifiedChance(starPercentage);
+            if (rand < chance) {
+                return powerup;
+            } else {
+                rand -= chance;
+            }
+        }
+
+        return powerups[0];
+    }
 }
