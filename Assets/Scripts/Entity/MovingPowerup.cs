@@ -31,6 +31,29 @@ public class MovingPowerup : MonoBehaviourPun {
         if (groundMask == -1)
             groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
     }
+    void LateUpdate() {
+        if (!followMe) return;
+
+        body.isKinematic = true;
+        if (photonView.IsMine) {
+            float size = (followMe.flying ? 3.9f : 2.7f);
+            transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y + (size*0.6f));
+        }
+
+        if ((followMeCounter * blinkingRate) % 2 < 1) {
+            renderer.enabled = false;
+        } else {
+            renderer.enabled = true;
+        }
+        if ((followMeCounter -= Time.fixedDeltaTime) < 0) {
+            followMe = null;
+            if (photonView.IsMine) {
+                photonView.TransferOwnership(PhotonNetwork.MasterClient);
+                passthrough = true;
+            }
+        }
+        gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+    }
 
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
@@ -39,48 +62,26 @@ public class MovingPowerup : MonoBehaviourPun {
             return;
         }
 
-        if (followMe) {
-            body.isKinematic = true;
-            if (photonView.IsMine) {
-                float size = (followMe.flying ? 3.9f : 2.7f);
-                transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y + (size*0.6f));
-            }
-
-            if ((followMeCounter * blinkingRate) % 2 < 1) {
+        despawnCounter -= Time.fixedDeltaTime;
+        if (despawnCounter <= 3) {
+            if ((despawnCounter * blinkingRate) % 1 < 0.5f) {
                 renderer.enabled = false;
             } else {
                 renderer.enabled = true;
             }
-            if ((followMeCounter -= Time.fixedDeltaTime) < 0) {
-                followMe = null;
-                if (photonView.IsMine) {
-                    photonView.TransferOwnership(PhotonNetwork.MasterClient);
-                    passthrough = true;
-                }
-            }
-            gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         } else {
-            despawnCounter -= Time.fixedDeltaTime;
-            if (despawnCounter <= 3) {
-                if ((despawnCounter * blinkingRate) % 1 < 0.5f) {
-                    renderer.enabled = false;
-                } else {
-                    renderer.enabled = true;
-                }
-            } else {
-                renderer.enabled = true;
-            }
-            if (despawnCounter <= 0 && photonView.IsMine) {
-                PhotonNetwork.Destroy(photonView);
-            }
+            renderer.enabled = true;
+        }
+        if (despawnCounter <= 0 && photonView.IsMine) {
+            PhotonNetwork.Destroy(photonView);
+        }
 
-            renderer.color = Color.white;
-            body.isKinematic = false;
-            if (passthrough) {
-                if (!Utils.IsTileSolidAtWorldLocation(transform.position) && !Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, groundMask)) {
-                    gameObject.layer = LayerMask.NameToLayer("Entity");
-                    passthrough = false;
-                }
+        renderer.color = Color.white;
+        body.isKinematic = false;
+        if (passthrough) {
+            if (!Utils.IsTileSolidAtWorldLocation(transform.position) && !Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, groundMask)) {
+                gameObject.layer = LayerMask.NameToLayer("Entity");
+                passthrough = false;
             }
         }
         HandleCollision();

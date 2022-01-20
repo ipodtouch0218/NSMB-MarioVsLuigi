@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WrappingObject : MonoBehaviour
-{
+public class WrappingObject : MonoBehaviour {
     [SerializeField] float offset;
+    private Rigidbody2D body;
+    void Start() {
+        body = GetComponent<Rigidbody2D>();
+    }
     void Update() {
         float leftX = GameManager.Instance.GetLevelMinX();
         float rightX = GameManager.Instance.GetLevelMaxX();
@@ -12,11 +15,11 @@ public class WrappingObject : MonoBehaviour
 
         leftX = leftX + (width * offset);
 
-        if (transform.position.x < leftX) {
-            transform.position += new Vector3(width, 0, 0);
+        if (body.position.x < leftX) {
+            body.position += new Vector2(width, 0);
         }
-        if (transform.position.x > rightX) {
-            transform.position += new Vector3(-width, 0, 0);
+        if (body.position.x > rightX) {
+            body.position += new Vector2(-width, 0);
         }
     }
 }

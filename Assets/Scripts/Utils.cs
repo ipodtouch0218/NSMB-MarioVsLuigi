@@ -45,7 +45,9 @@ public class Utils {
 
     public static bool IsTileSolidAtTileLocation(Vector3Int tileLocation) {
         TileBase tile = GetTileAtTileLocation(tileLocation);
-        return (tile != null && (tile is TileWithProperties && !((TileWithProperties) tile).isBackgroundTile));
+        if (tile is TileWithProperties)
+            return !((TileWithProperties) tile).isBackgroundTile;
+        return tile != null;
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));

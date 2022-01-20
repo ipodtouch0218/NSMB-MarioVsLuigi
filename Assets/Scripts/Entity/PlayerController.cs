@@ -52,9 +52,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private string footstepMaterial = "";
     private bool doIceSkidding;
     private float tileFriction = 1;
-    private HashSet<Vector3Int> tilesStandingOn = new HashSet<Vector3Int>(), 
-        tilesJumpedInto = new HashSet<Vector3Int>(), 
-        tilesHitSide = new HashSet<Vector3Int>();
+    private HashSet<Vector3Int> tilesStandingOn = new HashSet<Vector3Int>(), tilesJumpedInto = new HashSet<Vector3Int>(), tilesHitSide = new HashSet<Vector3Int>();
     
 
     private long localFrameId = 0;
@@ -191,30 +189,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         onGround = down >= 2 && body.velocity.y < 3;
         if (onGround) {
             onGroundLastFrame = true;
-
-            if (tilesStandingOn.Count >= 2) {
-                // int xMax = Mathf.Max(tilesStandingOn[0].x, tilesStandingOn[1].x);
-                // int xMin = Mathf.Min(tilesStandingOn[0].x, tilesStandingOn[1].x);
-
-                // for (int temp = xMin; temp < xMax; temp++) {
-                //     tilesStandingOn.Add(new Vector3Int(temp, tilesStandingOn[0].y, 0));
-                // }
-            }
         }
         hitLeft = left >= 2;
         onLeft = hitLeft && !inShell && body.velocity.y < -0.1 && !facingRight && !onGround && !holding && state != Enums.PowerupState.Giant && !flying;
         hitRight = right >= 2;
         onRight = hitRight && !inShell && body.velocity.y < -0.1 && facingRight && !onGround && !holding && state != Enums.PowerupState.Giant && !flying;
         hitRoof = !ignoreRoof && !onLeft && !onRight && up >= 2 && body.velocity.y > -0.2f;
-
-        if ((left >= 2 || right >= 2) && tilesHitSide.Count >= 2) {
-            // int yMax = Mathf.Max(tilesHitSide[0].y, tilesHitSide[1].y);
-            // int yMin = Mathf.Min(tilesHitSide[0].y, tilesHitSide[1].y);
-
-            // for (int temp = yMin; temp < yMax; temp++) {
-            //     tilesHitSide.Add(new Vector3Int(tilesHitSide[0].x, temp, 0));
-            // }
-        }
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
@@ -817,7 +797,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     [PunRPC]
     public void PreRespawn() {
-        transform.position = GameManager.Instance.GetSpawnpoint(playerId);
+        transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
         state = Enums.PowerupState.Small;
         dead = false;
         animator.SetTrigger("respawn");
@@ -1022,7 +1002,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void HandleCustomTiles() {
         //todo: refactor
         doIceSkidding = false;
-        tileFriction = 0;
+        tileFriction = -1;
         footstepMaterial = "";
         foreach (Vector3Int pos in tilesStandingOn) {
             TileBase tile = Utils.GetTileAtTileLocation(pos);
@@ -1036,10 +1016,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 tileFriction = 1;
             }
         }
+        if (tileFriction == -1) {
+            tileFriction = 1;
+        }
     }
 
     void HandleDeathAnimation() {
         if (!dead) return;
+        if (body.position.y < GameManager.Instance.GetLevelMinY()) {
+            body.position = new Vector2(body.position.x, GameManager.Instance.GetLevelMinY() - 8);
+        }
 
         deathCounter += Time.fixedDeltaTime;
         if (deathCounter < deathUpTime) {
@@ -1053,9 +1039,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
-            if (body.position.y < GameManager.Instance.GetLevelMinY()) {
-                body.position = new Vector2(transform.position.x, GameManager.Instance.GetLevelMinY() - 1);
-            }
         }
 
         if (photonView.IsMine && deathCounter >= 3f) {
@@ -1628,7 +1611,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     bool HandleStuckInBlock(float delta) {
-        Vector2 checkPos = body.position + Vector2.up/4f;
+        Vector2 checkPos = body.position + new Vector2(0, hitbox.size.y/4f);
         if (!Utils.IsTileSolidAtWorldLocation(checkPos)) {
             stuckInBlock = false;
             return false;
@@ -1637,15 +1620,20 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         stuckInBlock = true;
         body.gravityScale = 0;
         onGround = true;
-        RaycastHit2D rightRaycast = Physics2D.Raycast(body.position, Vector2.right, 5, ONLY_GROUND_MASK);
-        RaycastHit2D leftRaycast = Physics2D.Raycast(body.position, Vector2.left, 5, ONLY_GROUND_MASK);
+        if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(0.25f, 0))) {
+            body.velocity = Vector2.right*2f;
+            return true;
+        } else if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(-0.25f, 0))) {
+            body.velocity = Vector2.left*2f;
+            return true;
+        }
+        Debug.DrawRay(checkPos, Vector2.right*5);
+        Debug.DrawRay(checkPos, Vector2.left*5);
+        RaycastHit2D rightRaycast = Physics2D.Raycast(checkPos, Vector2.right, 5, ONLY_GROUND_MASK);
+        RaycastHit2D leftRaycast = Physics2D.Raycast(checkPos, Vector2.left, 5, ONLY_GROUND_MASK);
         float rightDistance = 0, leftDistance = 0;
-        if (rightRaycast) {
-            rightDistance = rightRaycast.distance;
-        }
-        if (leftRaycast) {
-            leftDistance = leftRaycast.distance;
-        }
+        if (rightRaycast) rightDistance = rightRaycast.distance;
+        if (leftRaycast) leftDistance = leftRaycast.distance;
         if (rightDistance <= leftDistance) {
             body.velocity = Vector2.right*2f;
         } else {
@@ -1947,7 +1935,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 } else {
                     photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == Enums.PowerupState.Mini ? "-mini" : ""));
                     photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
-                    groundpoundSit = true;
+                    groundpoundSit = state != Enums.PowerupState.Giant;
                 }
             }
         }
