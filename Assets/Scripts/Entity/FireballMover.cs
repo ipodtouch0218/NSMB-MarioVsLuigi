@@ -73,7 +73,7 @@ public class FireballMover : MonoBehaviourPun {
                 if (!bobomb.lit) {
                     bobomb.photonView.RPC("Light", RpcTarget.All);   
                 } else {
-                    bobomb.photonView.RPC("Kick", RpcTarget.All, transform.position.x < bobomb.transform.position.x);
+                    bobomb.photonView.RPC("Kick", RpcTarget.All, body.position.x < bobomb.body.position.x, false);
                 }
                 PhotonNetwork.Destroy(gameObject);
                 break;

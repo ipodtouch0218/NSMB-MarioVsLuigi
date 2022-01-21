@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
@@ -181,13 +182,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // Unity Stuff
     void Start() {
         Instance = this;
-        Debug.Log(PhotonNetwork.InRoom);
+        music = GetComponents<AudioSource>()[0];
+        sfx = GetComponents<AudioSource>()[1];
+        
+        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
+        mixer.SetFloat("MusicSpeed", 1f);
+        mixer.SetFloat("MusicPitch", 1f);
+
         if (PhotonNetwork.InRoom) {
             OnJoinedRoom();
         }
 
-        music = GetComponents<AudioSource>()[0];
-        sfx = GetComponents<AudioSource>()[1];
         music.clip = musicStart;
         music.Play();
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject; 

@@ -5093,12 +5093,25 @@ MonoBehaviour:
   hitRight: 0
   iceSliding: 0
   stuckInBlock: 0
+  walljumping: 0
+  landing: 0
+  koyoteTime: 0
+  deathCounter: 0
+  groundpoundCounter: 0
+  hitInvincibilityCounter: 0
+  powerupFlash: 0
+  throwInvincibility: 0
+  jumpBuffer: 0
+  pipeTimer: 0
+  giantStartTimer: 0
   invincible: 0
   giantTimer: 0
   blinkTimer: 0
   stars: 0
   coins: 0
   storedPowerup: 
+  holding: {fileID: 0}
+  holdingOld: {fileID: 0}
   glowGradient:
     serializedVersion: 2
     key0: {r: 1, g: 0.5082409, b: 0, a: 1}
@@ -16195,7 +16208,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8422425992379838812}
   m_LocalRotation: {x: 0.030843573, y: 0.7064338, z: -0.030843573, w: 0.7064338}
-  m_LocalPosition: {x: 0, y: 0.05, z: 0}
+  m_LocalPosition: {x: 0, y: 0.03, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children:

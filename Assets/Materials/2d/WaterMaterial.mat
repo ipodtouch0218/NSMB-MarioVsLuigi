@@ -48,6 +48,6 @@ Material:
     m_Colors:
     - BackgroundColor: {r: 0.3798112, g: 0, b: 0.62264144, a: 0.8156863}
     - FoamColor: {r: 1, g: 0.91886795, b: 0.99505395, a: 1}
-    - RippleColor: {r: 0.5, g: 0.13867924, b: 0.46236247, a: 1}
+    - RippleColor: {r: 0.8113208, g: 0.4240299, b: 0.7696766, a: 1}
     - TopColor: {r: 1, g: 0, b: 0.29803923, a: 1}
   m_BuildTextureStacks: []

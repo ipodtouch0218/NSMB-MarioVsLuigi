@@ -176,6 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dead: 0
+  body: {fileID: 0}
   holder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
   walkSpeed: 0.6

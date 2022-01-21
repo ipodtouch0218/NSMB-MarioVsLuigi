@@ -50,7 +50,7 @@ public class GoombaWalk : KillableEntity {
     }
 
     [PunRPC]
-    public void Kill() {
+    public override void Kill() {
         body.velocity = Vector2.zero;
         body.isKinematic = true;
         speed = 0;

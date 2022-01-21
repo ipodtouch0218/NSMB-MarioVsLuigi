@@ -17,13 +17,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public Vector3 spawnpoint;
-    public Tilemap tilemap, semiSolidTilemap;
+    public Tilemap tilemap;
+    public bool canSpawnMegaMushroom = true;
     TileBase[] originalTiles;
     BoundsInt origin;
     GameObject currentStar = null;
     GameObject[] starSpawns;
     float spawnStarCount;
-    SpriteRenderer spriteRenderer;
     new AudioSource audio;
 
     public GameObject localPlayer;
@@ -108,7 +108,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     void Start() {
         Instance = this;
         audio = GetComponent<AudioSource>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
@@ -274,7 +273,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                 invincible = true;
             }
             int stars = player.stars;
-            if (((float) stars + 1) / starRequirement >= 0.9f) {
+            if (((float) stars + 1) / starRequirement >= 0.95f) {
                 speedup = true;
             }
         }

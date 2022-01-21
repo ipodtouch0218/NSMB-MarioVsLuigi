@@ -48,13 +48,22 @@ public class PiranhaPlantController : KillableEntity {
         collider2D.enabled = false;
     }
 
+    public override void InteractWithPlayer(PlayerController player) {
+        if (player.invincible > 0 || player.inShell || player.state == Enums.PowerupState.Giant) {
+            photonView.RPC("Kill", RpcTarget.All);
+        } else {
+            player.photonView.RPC("Powerdown", RpcTarget.All, false);
+        }
+    }
+
     [PunRPC]
     public void Respawn() {
         dead = false;
         popupTimer = 3;
     }
+
     [PunRPC]
-    public void Kill() {
+    public override void Kill() {
         PlaySound("enemy/shell_kick");
         PlaySound("enemy/piranhaplant-die");
         dead = true;

@@ -26,6 +26,7 @@ public class MovingPowerup : MonoBehaviourPun {
             followMe = PhotonView.Find((int) data[0]).GetComponent<PlayerController>();
             followMeCounter = 2f;
             passthrough = true;
+            body.isKinematic = true;
         }
 
         if (groundMask == -1)
@@ -34,18 +35,11 @@ public class MovingPowerup : MonoBehaviourPun {
     void LateUpdate() {
         if (!followMe) return;
 
-        body.isKinematic = true;
-        if (photonView.IsMine) {
-            float size = (followMe.flying ? 3.9f : 2.7f);
-            transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y + (size*0.6f));
-        }
+        float size = (followMe.flying ? 3.8f : 2.8f);
+        transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y + (size*0.6f));
 
-        if ((followMeCounter * blinkingRate) % 2 < 1) {
-            renderer.enabled = false;
-        } else {
-            renderer.enabled = true;
-        }
-        if ((followMeCounter -= Time.fixedDeltaTime) < 0) {
+        renderer.enabled = (followMeCounter * blinkingRate) % 2 > 1;
+        if ((followMeCounter -= Time.deltaTime) < 0) {
             followMe = null;
             if (photonView.IsMine) {
                 photonView.TransferOwnership(PhotonNetwork.MasterClient);
@@ -61,6 +55,8 @@ public class MovingPowerup : MonoBehaviourPun {
             body.isKinematic = true;
             return;
         }
+
+        if (followMe) return;
 
         despawnCounter -= Time.fixedDeltaTime;
         if (despawnCounter <= 3) {
@@ -79,7 +75,7 @@ public class MovingPowerup : MonoBehaviourPun {
         renderer.color = Color.white;
         body.isKinematic = false;
         if (passthrough) {
-            if (!Utils.IsTileSolidAtWorldLocation(transform.position) && !Physics2D.OverlapBox(transform.position, Vector2.one / 3f, 0, groundMask)) {
+            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, Vector2.one / 3f, 0, groundMask)) {
                 gameObject.layer = LayerMask.NameToLayer("Entity");
                 passthrough = false;
             }

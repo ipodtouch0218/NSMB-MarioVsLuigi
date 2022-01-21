@@ -47,7 +47,7 @@ public class Utils {
         TileBase tile = GetTileAtTileLocation(tileLocation);
         if (tile is TileWithProperties)
             return !((TileWithProperties) tile).isBackgroundTile;
-        return tile != null;
+        return tile != null && GameManager.Instance.tilemap.GetTile<Tile>(tileLocation).colliderType == Tile.ColliderType.Grid;
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
@@ -62,11 +62,15 @@ public class Utils {
             powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
         }
         foreach (Powerup powerup in powerups) {
+            if (powerup.prefab == "MegaMushroom" && !GameManager.Instance.canSpawnMegaMushroom)
+                continue;
             totalChance += powerup.GetModifiedChance(starPercentage);
         }
 
         float rand = UnityEngine.Random.value * totalChance;
         foreach (Powerup powerup in powerups) {
+            if (powerup.prefab == "MegaMushroom" && !GameManager.Instance.canSpawnMegaMushroom)
+                continue;
             float chance = powerup.GetModifiedChance(starPercentage);
             if (rand < chance) {
                 return powerup;

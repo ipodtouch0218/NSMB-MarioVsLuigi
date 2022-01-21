@@ -11,7 +11,8 @@
                     "id": "a250dc6e-76cc-492f-803c-3b53bbe6df95",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Jump",
@@ -19,7 +20,8 @@
                     "id": "7f6d93e5-bd0b-4095-bcc3-a687928f91b8",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=2)"
+                    "interactions": "Press(behavior=2)",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Fireball",
@@ -27,7 +29,8 @@
                     "id": "65f84768-f346-4525-b429-95d650c37964",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Sprint",
@@ -35,7 +38,8 @@
                     "id": "798623dc-6c31-47df-9cf8-f6d52086f268",
                     "expectedControlType": "Analog",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Item",
@@ -43,7 +47,8 @@
                     "id": "27ec6a67-2030-438e-ab5f-3e20fddb0588",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=2)"
+                    "interactions": "Press(behavior=2)",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Pause",
@@ -51,7 +56,8 @@
                     "id": "b675ba03-a647-4f82-a679-dcc6c27cbdf0",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -255,6 +261,17 @@
                 },
                 {
                     "name": "",
+                    "id": "a077bd36-864d-41c8-b34b-863cbcc49ecf",
+                    "path": "<Keyboard>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "333b6c30-fc28-4f7b-8ef9-10531c0db276",
                     "path": "<Gamepad>/buttonWest",
                     "interactions": "",
@@ -304,6 +321,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Pokken",
+                    "action": "Fireball",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2b284224-af05-4e95-8374-101e01be02d5",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
                     "action": "Fireball",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -365,6 +393,17 @@
                 },
                 {
                     "name": "",
+                    "id": "d1c5bf80-bd76-4405-88a9-0949f8dc2387",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "10c0c973-147b-4d97-8bdc-d2021ca6f0d7",
                     "path": "<Gamepad>/leftShoulder",
                     "interactions": "",
@@ -420,6 +459,17 @@
                 },
                 {
                     "name": "",
+                    "id": "95f2f5d9-dd1c-45a8-93ca-413d282b0773",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Item",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "0b6bb60e-a9f6-452b-a747-5944a983d29d",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
@@ -463,7 +513,8 @@
                     "id": "b072402b-cb37-44ad-ad92-a6bfd444a263",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Submit",
@@ -471,7 +522,8 @@
                     "id": "758ce95c-f766-4c5d-8d4a-dd89249ab100",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Cancel",
@@ -479,7 +531,8 @@
                     "id": "c84903a3-a408-4390-bec1-f830d54ea872",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Point",
@@ -487,7 +540,8 @@
                     "id": "5c7013a5-1581-4d40-9965-05d3486faf12",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Click",
@@ -495,7 +549,8 @@
                     "id": "528240f0-81db-4042-b0fb-509d2b15e7ee",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "ScrollWheel",
@@ -503,7 +558,8 @@
                     "id": "8b11591d-f107-4fa6-8858-eadb2b8a96ea",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "MiddleClick",
@@ -511,7 +567,8 @@
                     "id": "6b5ee6dd-9c9e-4e74-9461-fe743c15623f",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "RightClick",
@@ -519,7 +576,8 @@
                     "id": "170943c8-16ac-4712-90c4-0292b6c875b8",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -690,6 +748,17 @@
                 },
                 {
                     "name": "",
+                    "id": "8eb51837-064d-4aa1-b909-70a4979b3cf6",
+                    "path": "<Keyboard>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Submit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "91e8e78d-63df-485e-a0a5-33f5feb543f9",
                     "path": "<HID::HORI CO.,LTD. POKKEN CONTROLLER>/button2",
                     "interactions": "",
@@ -717,6 +786,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8ce21316-8bdd-4459-9f35-b2b7a943f50d",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
                     "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false

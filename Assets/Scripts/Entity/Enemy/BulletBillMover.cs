@@ -11,7 +11,7 @@ public class BulletBillMover : KillableEntity {
     private SpriteRenderer spriteRenderer;
     new void Start() {
         base.Start();
-        searchVector = new Vector2(playerSearchRadius*2f, playerSearchRadius*2f);
+        searchVector = new Vector2(playerSearchRadius*2f, 100);
         left = photonView && photonView.InstantiationData != null && (bool) photonView.InstantiationData[0];
         body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -68,8 +68,8 @@ public class BulletBillMover : KillableEntity {
     }
 
     [PunRPC]
-    public void Kill() {
-        base.SpecialKill();
+    public override void Kill() {
+        SpecialKill(!left, false);
     }
     
     [PunRPC]

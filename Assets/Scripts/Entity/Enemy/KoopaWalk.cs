@@ -50,7 +50,7 @@ public class KoopaWalk : HoldableEntity {
             }
         }
 
-        if ((red || blue) && !shell && !Physics2D.Raycast(transform.position + new Vector3(0.1f * (left ? -1 : 1), 0, 0), Vector2.down, 0.5f, LayerMask.GetMask("Ground", "Semisolids"))) {
+        if ((red || blue) && !shell && !Physics2D.Raycast(body.position + new Vector2(0.1f * (left ? -1 : 1), 0), Vector2.down, 0.5f, LayerMask.GetMask("Ground", "Semisolids"))) {
             if (photonView)
                 photonView.RPC("Turnaround", RpcTarget.All, left);
             else
@@ -80,6 +80,42 @@ public class KoopaWalk : HoldableEntity {
             }
         }
     }
+    public override void InteractWithPlayer(PlayerController player) {
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
+        if (holder) return;
+
+        if (player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant) {
+            photonView.RPC("SpecialKill", RpcTarget.All, !player.facingRight, false);
+        } else if (player.groundpound && player.state != Enums.PowerupState.Mini && attackedFromAbove) {
+            photonView.RPC("EnterShell", RpcTarget.All);
+            if (!blue) {
+                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+            }
+        } else if (attackedFromAbove && (!shell || !IsStationary())) {
+            if (player.state != Enums.PowerupState.Mini || player.groundpound) {
+                photonView.RPC("EnterShell", RpcTarget.All);
+                if (player.state == Enums.PowerupState.Mini)
+                    player.groundpound = false;
+            }
+            player.photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+            player.bounce = true;
+        } else {
+            if (shell && IsStationary()) {
+                if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
+                    photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
+                    player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
+                } else {
+                    photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                    player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                }
+            } else {
+                player.photonView.RPC("Powerdown", RpcTarget.All, false);
+            }
+        }
+    }
+
     [PunRPC]
     public override void Kick(bool fromLeft, bool groundpound) {
         left = !fromLeft;
@@ -115,7 +151,7 @@ public class KoopaWalk : HoldableEntity {
         upsideDown = false;
         stationary = false;
         if (holder)
-            holder.GetPhotonView().RPC("HoldingWakeup", RpcTarget.All);
+            holder.photonView.RPC("HoldingWakeup", RpcTarget.All);
         holder = null;
     }
     [PunRPC]
@@ -135,31 +171,30 @@ public class KoopaWalk : HoldableEntity {
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
-        if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown || holder) {
+        if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown) {
             return;
         }
         GameObject obj = collider.gameObject;
         switch (obj.tag) {
-        case "koopa": {
-            KoopaWalk koopa = obj.GetComponentInParent<KoopaWalk>();
-            if (koopa.dead) break;
-            if (koopa.shell && !koopa.IsStationary()) {
-                photonView.RPC("SpecialKill", RpcTarget.All, obj.transform.position.x > transform.position.x, false);
-            }
-            koopa.photonView.RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < transform.position.x, false);
-            break;
-        }
+        case "koopa":
         case "bobomb":
         case "bulletbill":
         case "goomba": {
             KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
             if (killa.dead) break;
-            killa.photonView.RPC("SpecialKill", RpcTarget.All, obj.transform.position.x > transform.position.x, false);
+            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false);
+            if (holder) {
+                photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false);
+            }
             break;
         }
         case "piranhaplant": {
             KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
+            if (killa.dead) break;
             killa.photonView.RPC("Kill", RpcTarget.All);
+            if (holder) {
+                photonView.RPC("Kill", RpcTarget.All);
+            }
             break;
         }
         }
@@ -239,11 +274,17 @@ public class KoopaWalk : HoldableEntity {
     public bool IsStationary() {
         return !holder && stationary;
     }
+    [PunRPC]
+    public override void Kill() {
+        EnterShell();
+    }
 
     [PunRPC]
     public override void SpecialKill(bool right = true, bool groundpound = false) {
         base.SpecialKill(right, groundpound);
         shell = true;
+        if (holder)
+            holder.holding = null;
         holder = null;
     } 
 }

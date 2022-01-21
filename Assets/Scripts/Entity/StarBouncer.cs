@@ -71,12 +71,11 @@ public class StarBouncer : MonoBehaviourPun {
             }
         }
         
-        // bool left = body.velocity.x < 0;
         Transform t = transform.Find("Graphic");
         t.Rotate(new Vector3(0, 0, rotationSpeed * (left ? 1 : -1)), Space.Self);
 
         if (passthrough) {
-            if ((readyForUnPassthrough -= Time.fixedDeltaTime) < 0 && body.velocity.y <= 0 && !Utils.IsTileSolidAtWorldLocation(transform.position) && !Physics2D.OverlapBox(transform.position, Vector2.one / 3, 0, groundMask)) {
+            if ((readyForUnPassthrough -= Time.fixedDeltaTime) < 0 && body.velocity.y <= 0 && !Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, groundMask)) {
                 passthrough = false;
                 gameObject.layer = LayerMask.NameToLayer("Entity");
             }

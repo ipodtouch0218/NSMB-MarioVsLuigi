@@ -49,6 +49,10 @@ public class CameraController : MonoBehaviour {
         targetPos.y = Mathf.Clamp(targetPos.y, minY + vOrtho, (heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho)));
         
         if (exactCentering) {
+            if (Vector2.Distance(transform.position, targetPos) > 10) {
+                bool right = transform.position.x < targetPos.x;
+                transform.position += new Vector3(((right ? 1 : -1) * GameManager.Instance.levelWidthTile/2f), 0, 0);
+            } 
             Vector3 result = Vector3.SmoothDamp(transform.position, targetPos, ref dampVelocity, 0.5f);
             result.y = targetPos.y;
             transform.position = result;

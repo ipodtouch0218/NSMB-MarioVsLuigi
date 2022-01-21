@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class KillableEntity : MonoBehaviourPun {
+public abstract class KillableEntity : MonoBehaviourPun {
     public bool dead;
-    protected Rigidbody2D body;
+    public Rigidbody2D body;
     protected BoxCollider2D hitbox;
     protected Animator animator;
     protected new SpriteRenderer renderer;
@@ -30,6 +30,37 @@ public class KillableEntity : MonoBehaviourPun {
             }
         }
     }
+
+    public virtual void InteractWithPlayer(PlayerController player) {
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
+
+        if (player.invincible > 0 || player.inShell 
+            || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.Mini && attackedFromAbove) 
+            || player.state == Enums.PowerupState.Giant) {
+            
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
+            return;
+        }
+        if (attackedFromAbove) {
+            if (player.state == Enums.PowerupState.Mini && !player.drill && !player.groundpound) {
+                player.groundpound = false;
+                player.bounce = true;
+            } else {
+                photonView.RPC("Kill", RpcTarget.All);
+                player.groundpound = false;
+                player.bounce = !player.drill;
+            }
+            player.photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+            player.drill = false;
+            return;
+        }
+                
+        player.photonView.RPC("Powerdown", RpcTarget.All, false);
+    }
+
+    [PunRPC]
+    public abstract void Kill();
 
     [PunRPC]
     public virtual void SpecialKill(bool right = true, bool groundpound = false) {

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using Photon.Pun;
 
 public class BobombWalk : HoldableEntity {
@@ -74,10 +75,29 @@ public class BobombWalk : HoldableEntity {
             }
             }
         }
+
+        Tilemap tm = GameManager.Instance.tilemap;
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                
+                Vector3Int loc = Utils.WorldToTilemapPosition(body.position) + new Vector3Int(x, y, 0);
+
+                TileBase tile = tm.GetTile(loc);
+                if (tile == null) continue;
+
+                if (tile is InteractableTile) {
+                    ((InteractableTile) tile).Interact(this, (InteractableTile.InteractionDirection.Up), Utils.TilemapToWorldPosition(loc));
+                }
+            }
+        }
         //TODO tile breaking effects
         PhotonNetwork.Destroy(gameObject);
     }
 
+    [PunRPC]
+    public override void Kill() {
+        Light();
+    }
     [PunRPC]
     public void Light() {
         animator.SetTrigger("lit");
@@ -109,6 +129,38 @@ public class BobombWalk : HoldableEntity {
         renderer.flipX = left;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
+    }
+
+    public override void InteractWithPlayer(PlayerController player) {
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
+
+        if (player.inShell || player.invincible > 0) {
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false);
+            return;
+        }
+        if (attackedFromAbove && !lit) {
+            if (player.state != Enums.PowerupState.Mini || (player.groundpound && attackedFromAbove)) {
+                photonView.RPC("Light", RpcTarget.All);
+            }
+            photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+            if (player.groundpound) {
+                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+            } else {
+                player.bounce = true;
+            }
+        } else {
+            if (lit) {
+                if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.crouching && !player.flying && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump && !player.groundpound) {
+                    photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
+                    player.holding = this;
+                } else {
+                    photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                }
+            } else {
+                player.photonView.RPC("Powerdown", RpcTarget.All, false);
+            }
+        }
     }
 
     void HandleCollision() {
