@@ -47,7 +47,8 @@ public class Utils {
         TileBase tile = GetTileAtTileLocation(tileLocation);
         if (tile is TileWithProperties)
             return !((TileWithProperties) tile).isBackgroundTile;
-        return tile != null && GameManager.Instance.tilemap.GetTile<Tile>(tileLocation).colliderType == Tile.ColliderType.Grid;
+        Tile tile2 = GameManager.Instance.tilemap.GetTile<Tile>(tileLocation);
+        return tile != null && tile2 != null && tile2.colliderType == Tile.ColliderType.Grid;
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));

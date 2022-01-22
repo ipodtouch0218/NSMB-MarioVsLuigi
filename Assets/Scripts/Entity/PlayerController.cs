@@ -240,8 +240,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void Footstep() {
-        if (state == Enums.PowerupState.Giant)
+        if (state == Enums.PowerupState.Giant) {
+            cameraController.screenShakeTimer = 0.15f;
             return;
+        }
         if (doIceSkidding && skidding) {
             PlaySoundFromAnim("player/ice-skid");
             return;
@@ -379,6 +381,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 state = Enums.PowerupState.Giant;
                 stateUp = true;
                 giantStartTimer = giantStartTime;
+                groundpound = false;
                 giantTimer = 15f;
                 transform.localScale = Vector3.one;
             }
@@ -703,51 +706,32 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleGiantTiles() {
-        Transform tmtf = GameManager.Instance.tilemap.transform;
-        float lsX = tmtf.localScale.x;
-        float lsY = tmtf.localScale.y;
-        float tmX = tmtf.position.x;
-        float tmY = tmtf.position.y;
-
-        float posX = body.position.x;
-        float posY = body.position.y - 0.4f;
-        bool landing = singlejump && onGround;
-
-        for (int x = -2; x < 2; x++) {
-            for (int y = 0; y <= 9; y++) {
+        int minY = (singlejump || groundpound) ? 0 : 1, maxY = Mathf.Abs(body.velocity.y) > 0.05f ? 8 : 7;
+        Vector2 offset = (Vector2.right * 0.3f) * (facingRight ? 1 : -1); 
+        for (int x = -1; x <= 1; x++) {
+            for (int y = minY; y <= maxY; y++) {
                 
-                if (y == 0 && !(landing || groundpound))
-                    continue;
+                Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.2f));
 
-                if (y < 8 && y > 0 && (Mathf.Abs(body.velocity.x) < 0.3f))
-                    continue;
+                Debug.DrawLine(Utils.TilemapToWorldPosition(tileLocation), Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0.5f, 0.5f), Color.red);
+                Debug.DrawLine(Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0, 0.5f), Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0.5f, 0), Color.red);
 
-                if (y >= 8 && (body.velocity.y < 0 || onGround))
-                    continue;
-
-                int relX = Mathf.FloorToInt(((posX - tmX) / lsX) + x + 0.4f);
-                int relY = Mathf.FloorToInt((posY - tmY) / lsY) + y;
-
-                InteractWithTile(new Vector3(relX, relY), false);
+                InteractWithTile(tileLocation, false);
             }
-        } 
-        if (landing) {
-            singlejump = false;
         }
+        if (onGround)
+            singlejump = false;
     }
 
-    int InteractWithTile(Vector3 tilePos, bool upwards) {
+    int InteractWithTile(Vector3Int tilePos, bool upwards) {
         if (!photonView.IsMine) return 0;
         Tilemap tm = GameManager.Instance.tilemap;
-        int x = Mathf.FloorToInt(tilePos.x);
-        int y = Mathf.FloorToInt(tilePos.y);
-        Vector3Int loc = new Vector3Int(x, y, 0);
 
-        TileBase tile = tm.GetTile(loc);
+        TileBase tile = tm.GetTile(tilePos);
         if (tile == null) return -1;
 
         if (tile is InteractableTile) {
-            return ((InteractableTile) tile).Interact(this, (upwards ? InteractableTile.InteractionDirection.Down : InteractableTile.InteractionDirection.Up), Utils.TilemapToWorldPosition(loc)) ? 1 : 0;
+            return ((InteractableTile) tile).Interact(this, (upwards ? InteractableTile.InteractionDirection.Down : InteractableTile.InteractionDirection.Up), Utils.TilemapToWorldPosition(tilePos)) ? 1 : 0;
         }
         return 0;
     }
@@ -896,7 +880,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 } else if (body.velocity.x < -0.1) {
                     facingRight = false;
                 }
-            } else if (walljumping <= 0 && !inShell) {
+            } else if (walljumping <= 0 && !inShell || giantStartTimer > 0) {
                 if (right) {
                     facingRight = true;
                 } else if (left) {
@@ -952,7 +936,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 transform.localScale = Vector3.one / 2;
                 break;
             case Enums.PowerupState.Giant:
-                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (giantStartTimer / giantStartTime)) * 3f));
+                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (giantStartTimer / giantStartTime)) * 2.5f));
                 break;
             default:
                 transform.localScale = Vector3.one;
@@ -1053,13 +1037,19 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         block.SetFloat("FireEnabled", (state == Enums.PowerupState.FireFlower ? 1.1f : 0f));
         block.SetFloat("EyeState", (int) eyeState);
         block.SetFloat("ModelScale", transform.lossyScale.x);
+        Vector3 giantMultiply = Vector3.one;
+        if (giantTimer > 0 && giantTimer < 4) {
+            float v = (((Mathf.Sin(giantTimer * 20f) + 1f) / 2f) * 0.9f) + 0.1f;
+            giantMultiply = new Vector3(v, 1, v);
+        }
+        block.SetVector("MultiplyColor", giantMultiply);
         foreach (MeshRenderer renderer in GetComponentsInChildren<MeshRenderer>()) {
             renderer.SetPropertyBlock(block);
         }
         foreach (SkinnedMeshRenderer renderer in GetComponentsInChildren<SkinnedMeshRenderer>()) {
             renderer.SetPropertyBlock(block);
         }
-        if (invincible > 0) {
+        if (invincible > 0 || state == Enums.PowerupState.Giant) {
             if (!sparkles.isPlaying)
                 sparkles.Play();
         } else {
@@ -1519,7 +1509,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         TickCounter(ref throwInvincibility, 0, delta);
         TickCounter(ref jumpBuffer, 0, delta);
         TickCounter(ref walljumping, 0, delta);
-        TickCounter(ref giantTimer, 0, delta);
+        if (giantStartTimer <= 0) TickCounter(ref giantTimer, 0, delta);
         TickCounter(ref giantStartTimer, 0, delta);
         TickCounter(ref groundpoundCounter, 0, delta);
 
@@ -1531,6 +1521,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             body.isKinematic = giantStartTimer-delta > 0;
             if (animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale")
                 animator.Play("mega-scale", state >= Enums.PowerupState.Large ? 1 : 0);
+            if (giantStartTimer - delta <= 0) {
+                photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/mega_start");
+            }
             return;
         }
 
@@ -1562,7 +1555,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         //activate blocks jumped into
         if (hitRoof) {
             body.velocity = new Vector2(body.velocity.x, Mathf.Min(body.velocity.y, -0.1f));
-            foreach (Vector3 tile in tilesJumpedInto) {
+            foreach (Vector3Int tile in tilesJumpedInto) {
                 InteractWithTile(tile, false);
             }
         }
@@ -1777,7 +1770,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void HandleGroundpound(bool crouch, bool up) {
         if (photonView.IsMine && onGround && (groundpound || drill) && hitBlock) {
             bool tempHitBlock = false;
-            foreach (Vector3 tile in tilesStandingOn) {
+            foreach (Vector3Int tile in tilesStandingOn) {
                 int temp = InteractWithTile(tile, true);
                 if (temp != -1) {
                     tempHitBlock |= (temp == 1);
@@ -1797,6 +1790,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     koyoteTime = 1;
                 } else {
                     photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == Enums.PowerupState.Mini ? "-mini" : ""));
+                    if (state == Enums.PowerupState.Giant)
+                        photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound_mega");
                     photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
                     groundpoundSit = state != Enums.PowerupState.Giant;
                 }

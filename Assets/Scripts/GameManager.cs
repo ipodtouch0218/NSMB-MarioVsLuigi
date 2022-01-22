@@ -266,7 +266,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         
         foreach (var player in allPlayers) {
             if (player == null) return;
-            if (player.state == Enums.PowerupState.Giant) {
+            if (player.state == Enums.PowerupState.Giant && player.giantStartTimer <= 0) {
                 mega = true;
             }
             if (player.invincible > 0) {

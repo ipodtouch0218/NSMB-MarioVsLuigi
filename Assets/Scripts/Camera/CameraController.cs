@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour {
     public Vector3 targetOffset = Vector3.zero;
     public bool exactCentering = false;
     public Vector3 dampVelocity = new Vector3();
+    public float screenShakeTimer = 0;
 
     void Update() {
         if (target == null)
@@ -60,5 +61,8 @@ public class CameraController : MonoBehaviour {
             transform.position = targetPos;
         }
         scroll = Mathf.Clamp(transform.position.x - ctp.x, -centerXWidth, centerXWidth);
+        if ((screenShakeTimer -= Time.deltaTime) > 0) {
+            transform.position += new Vector3((Random.value-0.5f) * (screenShakeTimer / 2), (Random.value-0.5f) * (screenShakeTimer / 2));
+        }
     }
 }
