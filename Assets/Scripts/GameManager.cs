@@ -325,6 +325,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             coin.GetComponent<SpriteRenderer>().enabled = true;
             coin.GetComponent<BoxCollider2D>().enabled = true;
         }
+        foreach (DestructablePipe pipe in GameObject.FindObjectsOfType<DestructablePipe>()) {
+            pipe.ResetPipe();
+        }
         
         tilemap.SetTilesBlock(origin, originalTiles);
         if (PhotonNetwork.IsMasterClient) {

@@ -238,10 +238,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         }
     }
-
+    void GiantFootstep() {
+        cameraController.screenShakeTimer = 0.15f;
+        SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position.x + (facingRight ? 0.5f : -0.5f), body.position.y);
+        //TODO: find stomp sound
+    }
     void Footstep() {
         if (state == Enums.PowerupState.Giant) {
-            cameraController.screenShakeTimer = 0.15f;
             return;
         }
         if (doIceSkidding && skidding) {
@@ -384,6 +387,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 groundpound = false;
                 giantTimer = 15f;
                 transform.localScale = Vector3.one;
+                GameObject.Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), (Vector3) body.position + (Vector3.forward * transform.position.z), Quaternion.identity);
             }
             break;
         }
@@ -458,7 +462,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void SetStars(int stars) {
         this.stars = stars;
     }
-    void OnTriggerEnter2D(Collider2D collider) {
+    void OnTriggerStay2D(Collider2D collider) {
         if (dead) return;
         if (!photonView.IsMine) return;
 
@@ -474,6 +478,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         dir.Normalize();
         bool downwards = Vector2.Dot(dir, Vector2.up) > 0.5f;
         switch (collider.tag) {
+            case "spinner":
+                onSpinner = collider.gameObject;
+                break;
             case "bigstar": {
                 photonView.RPC("CollectBigStar", RpcTarget.AllViaServer, collider.gameObject.transform.parent.gameObject.GetPhotonView().ViewID);
                 break;
@@ -518,10 +525,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 break;
             }
         }
-    }
-    void OnTriggerStay2D(Collider2D collider) {
-        if (collider.tag == "spinner")
-            onSpinner = collider.gameObject;
     }
     void OnTriggerExit2D(Collider2D collider) {
         switch (collider.tag) {
@@ -706,12 +709,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleGiantTiles() {
-        int minY = (singlejump || groundpound) ? 0 : 1, maxY = Mathf.Abs(body.velocity.y) > 0.05f ? 8 : 7;
-        Vector2 offset = (Vector2.right * 0.3f) * (facingRight ? 1 : -1); 
-        for (int x = -1; x <= 1; x++) {
+        int minY = (groundpound || (singlejump && onGround)) ? 0 : 1, maxY = Mathf.Abs(body.velocity.y) > 0.05f ? 8 : 7;
+        Vector2 offset = (Vector2.right * 0.3f) * (facingRight ? 1 : -1);
+        int width = 1;
+        if (groundpound) {
+            width = 2;
+            offset = Vector2.zero;
+        }
+        for (int x = -width; x <= width; x++) {
             for (int y = minY; y <= maxY; y++) {
                 
-                Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.2f));
+                Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.45f));
 
                 Debug.DrawLine(Utils.TilemapToWorldPosition(tileLocation), Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0.5f, 0.5f), Color.red);
                 Debug.DrawLine(Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0, 0.5f), Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0.5f, 0), Color.red);
@@ -719,8 +727,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 InteractWithTile(tileLocation, false);
             }
         }
-        if (onGround)
-            singlejump = false;
     }
 
     int InteractWithTile(Vector3Int tilePos, bool upwards) {
@@ -1285,6 +1291,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (drill) return;
         if (groundpound) return;
         if (groundpoundCounter > 0) return;
+        if (state == Enums.PowerupState.Giant && singlejump) return;
 
         bool topSpeed = Mathf.Abs(body.velocity.x) + 0.1f > (runningMaxSpeed * (invincible > 0 ? 2 : 1));
         if (bounce || (jump && (onGround || koyoteTime < 0.2f))) {
@@ -1303,7 +1310,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 return;
             }
 
-            float vel = Mathf.Max(jumpVelocity + Mathf.Abs(body.velocity.x)/8f);
+            float vel = jumpVelocity + Mathf.Abs(body.velocity.x)/8f * (state == Enums.PowerupState.Giant ? 1.5f : 1f);
             if (!flying && topSpeed && landing < 0.1f && !holding && !triplejump && !crouching && !inShell && invincible <= 0) {
                 bool canSpecialJump = !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, ONLY_GROUND_MASK);
                 if (singlejump && canSpecialJump) {
@@ -1506,6 +1513,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         bool paused = GameManager.Instance.paused;
 
         if (!pipeEntering) TickCounter(ref invincible, 0, delta);
+        if (state == Enums.PowerupState.Giant) invincible = 0;
+
         TickCounter(ref throwInvincibility, 0, delta);
         TickCounter(ref jumpBuffer, 0, delta);
         TickCounter(ref walljumping, 0, delta);
@@ -1519,8 +1528,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (giantStartTimer > 0) {
             body.velocity = Vector2.zero;
             body.isKinematic = giantStartTimer-delta > 0;
-            if (animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale")
+            if (animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale") {
                 animator.Play("mega-scale", state >= Enums.PowerupState.Large ? 1 : 0);
+            }
             if (giantStartTimer - delta <= 0) {
                 photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/mega_start");
             }
@@ -1656,7 +1666,25 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 body.velocity = new Vector2(0,0);
                 animator.Play("jumplanding", state >= Enums.PowerupState.Large ? 1 : 0);
             }
-            if ((landing += delta) > 0.2f) {
+            if (singlejump && state == Enums.PowerupState.Giant) {
+                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
+                DestructablePipe hit = null;
+                if (state == Enums.PowerupState.Giant) {
+                    RaycastHit2D raycast = Physics2D.Raycast(body.position - new Vector2(0.3f, 0), Vector2.down, 0.2f, ONLY_GROUND_MASK);
+                    if (raycast && raycast.collider.tag == "DestructablePipe") {
+                        (hit = raycast.collider.gameObject.GetComponent<DestructablePipe>()).photonView.RPC("DamagePipe", RpcTarget.All, body.position, Vector2.up);
+                    }
+                    raycast = Physics2D.Raycast(body.position + new Vector2(0.3f, 0), Vector2.down, 0.2f, ONLY_GROUND_MASK);
+                    if (raycast && raycast.collider.tag == "DestructablePipe") {
+                        DestructablePipe other = raycast.collider.gameObject.GetComponent<DestructablePipe>();
+                        if (other != hit) {
+                            other.photonView.RPC("DamagePipe", RpcTarget.All, body.position, Vector2.up);
+                        }
+                    }
+                }
+                singlejump = false;
+            }
+            if ((landing += delta) > 0.1f) {
                 singlejump = false;
                 doublejump = false;
                 triplejump = false;
@@ -1790,15 +1818,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     koyoteTime = 1;
                 } else {
                     photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == Enums.PowerupState.Mini ? "-mini" : ""));
-                    if (state == Enums.PowerupState.Giant)
+                    if (state == Enums.PowerupState.Giant) {
                         photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound_mega");
+                        cameraController.screenShakeTimer = 0.35f;
+                    }
                     photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
                     groundpoundSit = state != Enums.PowerupState.Giant;
                 }
             }
         }
 
-        if (groundpound && ((up && !onGround) || (!crouch && onGround)) && groundpoundCounter <= 0) {
+        if (groundpound && ((up && !onGround) || ((!crouch || state == Enums.PowerupState.Giant) && onGround)) && groundpoundCounter <= 0) {
             groundpound = false;
             groundpoundSit = false;
             groundpoundCounter = (state == Enums.PowerupState.Giant ? 0.4f : 0.25f);
