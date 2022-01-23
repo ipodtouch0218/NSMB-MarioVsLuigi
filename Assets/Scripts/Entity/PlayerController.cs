@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [SerializeField] public bool dead = false;
     [SerializeField] public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
     [SerializeField] public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.5f, flyingTerminalVelocity = -1f, drillVelocity = 9f, deathUpTime = 0.6f, deathForce = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 12, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 20f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -2f, walljumpVelocity = 6f, pipeDuration = 2f, giantStartTime = 1.5f, icePenalty = 0.4f, blinkDuration = 0.25f;
-    [SerializeField] ParticleSystem dust, sparkles, drillParticle;
+    [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle;
     private BoxCollider2D hitbox;
     GameObject models;
     private new AudioSource audio;
@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public Rigidbody2D body;
 
     public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock;
-    public float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer;
+    public float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer, giantEndTimer;
     public float invincible = 0, giantTimer = 0, blinkTimer = 0;
     
     private Vector2 pipeDirection;
@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
 
     private float analogDeadzone = 0.35f;
-    public Vector2 joystick;
+    public Vector2 joystick, savedVelocity;
 
     public GameObject smallModel, largeModel, blueShell;
     public Avatar smallAvatar, largeAvatar;
@@ -630,11 +630,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         turnaround = false;
         inShell = false;
         knockback = false;
-        animator.SetTrigger("dead");
+        animator.Play("deadstart", state >= Enums.PowerupState.Large ? 1 : 0);
         PlaySoundFromAnim("player/death");
         SpawnStar();
         if (holding) {
-            PhotonNetwork.Destroy(holding.photonView);
+            holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
             holding = null;
         }
         if (deathplane && photonView.IsMine) {
@@ -720,35 +720,58 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleGiantTiles() {
-        int minY = (groundpound || (singlejump && onGround)) ? 0 : 1, maxY = Mathf.Abs(body.velocity.y) > 0.05f ? 8 : 7;
+        int minY = (singlejump && onGround) ? 0 : 1, maxY = Mathf.Abs(body.velocity.y) > 0.05f ? 8 : 7;
         Vector2 offset = (Vector2.right * 0.3f) * (facingRight ? 1 : -1);
         int width = 1;
         if (groundpound) {
-            width = 2;
-            offset = Vector2.zero;
+            offset = new Vector2(0, -0.3f);
         }
         for (int x = -width; x <= width; x++) {
             for (int y = minY; y <= maxY; y++) {
-                
+                Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.4f));
+                BreakablePipeTile pipe = GameManager.Instance.tilemap.GetTile<BreakablePipeTile>(tileLocation);
+                if (pipe && pipe.upsideDownPipe) continue;
+
+                InteractableTile.InteractionDirection dir = InteractableTile.InteractionDirection.Up;
+                if (y == minY && singlejump && onGround) {
+                    dir = InteractableTile.InteractionDirection.Down;
+                } else if (x == -width) {
+                    dir = InteractableTile.InteractionDirection.Left;
+                } else if (x == width) {
+                    dir = InteractableTile.InteractionDirection.Right;
+                }
+
+                InteractWithTile(tileLocation, dir);
+            }
+        }
+        
+        for (int x = -width; x <= width; x++) {
+            for (int y = maxY; y >= minY; y--) {
                 Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.45f));
+                BreakablePipeTile pipe = GameManager.Instance.tilemap.GetTile<BreakablePipeTile>(tileLocation);
+                if (!pipe || !pipe.upsideDownPipe) continue;
 
-                Debug.DrawLine(Utils.TilemapToWorldPosition(tileLocation), Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0.5f, 0.5f), Color.red);
-                Debug.DrawLine(Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0, 0.5f), Utils.TilemapToWorldPosition(tileLocation) + new Vector3(0.5f, 0), Color.red);
+                InteractableTile.InteractionDirection dir = InteractableTile.InteractionDirection.Up;
+                if (y == minY && singlejump && onGround) {
+                    dir = InteractableTile.InteractionDirection.Down;
+                } else if (x == -width) {
+                    dir = InteractableTile.InteractionDirection.Left;
+                } else if (x == width) {
+                    dir = InteractableTile.InteractionDirection.Right;
+                }
 
-                InteractWithTile(tileLocation, false);
+                InteractWithTile(tileLocation, dir);
             }
         }
     }
 
-    int InteractWithTile(Vector3Int tilePos, bool upwards) {
+    int InteractWithTile(Vector3Int tilePos, InteractableTile.InteractionDirection direction) {
         if (!photonView.IsMine) return 0;
-        Tilemap tm = GameManager.Instance.tilemap;
 
-        TileBase tile = tm.GetTile(tilePos);
+        TileBase tile = GameManager.Instance.tilemap.GetTile(tilePos);
         if (tile == null) return -1;
-
         if (tile is InteractableTile) {
-            return ((InteractableTile) tile).Interact(this, (upwards ? InteractableTile.InteractionDirection.Down : InteractableTile.InteractionDirection.Up), Utils.TilemapToWorldPosition(tilePos)) ? 1 : 0;
+            return ((InteractableTile) tile).Interact(this, direction, Utils.TilemapToWorldPosition(tilePos)) ? 1 : 0;
         }
         return 0;
     }
@@ -839,7 +862,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleCustomTiles() {
-        //todo: refactor
         doIceSkidding = false;
         tileFriction = -1;
         footstepMaterial = "";
@@ -964,22 +986,26 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             facingRight = animator.GetBool("facingRight");
         }
         
-        switch (state) {
-        case Enums.PowerupState.Mini:
-            transform.localScale = Vector3.one / 2;
-            break;
-        case Enums.PowerupState.Giant:
-            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (giantStartTimer / giantStartTime)) * 2.5f));
-            break;
-        default:
-            transform.localScale = Vector3.one;
-            break;
+        if (giantEndTimer > 0) {
+            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, giantEndTimer / (giantStartTime / 2f)) * 2.5f));
+        } else {
+            switch (state) {
+            case Enums.PowerupState.Mini:
+                transform.localScale = Vector3.one / 2;
+                break;
+            case Enums.PowerupState.Giant:
+                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (giantStartTimer / giantStartTime)) * 2.5f));
+                break;
+            default:
+                transform.localScale = Vector3.one;
+                break;
+            }
         }
 
         if (animator.GetBool("pipe")) {
             gameObject.layer = HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, 1);
-        } else if (dead || stuckInBlock) {
+        } else if (dead || stuckInBlock || giantEndTimer > 0) {
             gameObject.layer = HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, -4);
         } else {
@@ -1067,11 +1093,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         foreach (SkinnedMeshRenderer renderer in GetComponentsInChildren<SkinnedMeshRenderer>()) {
             renderer.SetPropertyBlock(block);
         }
-        if (invincible > 0 || state == Enums.PowerupState.Giant) {
+        if (invincible > 0) {
             if (!sparkles.isPlaying)
                 sparkles.Play();
         } else {
             sparkles.Stop();
+        }
+        if (state == Enums.PowerupState.Giant) {
+            if (!giantParticle.isPlaying)
+                giantParticle.Play();
+        } else {
+            giantParticle.Stop();
         }
         
         //Hitbox changing
@@ -1527,6 +1559,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (giantStartTimer <= 0) TickCounter(ref giantTimer, 0, delta);
         TickCounter(ref giantStartTimer, 0, delta);
         TickCounter(ref groundpoundCounter, 0, delta);
+        TickCounter(ref giantEndTimer, 0, delta);
     }
 
     void HandleMovement(float delta) {
@@ -1539,8 +1572,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         bool paused = GameManager.Instance.paused;
 
-        if (HandleStuckInBlock(delta))
-            return;
 
         if (giantStartTimer > 0) {
             body.velocity = Vector2.zero;
@@ -1553,18 +1584,35 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             return;
         }
+        if (giantEndTimer > 0) {
+            body.velocity = Vector2.zero;
+            
+            if (giantEndTimer - delta <= 0) {
+                hitInvincibilityCounter = 3f;
+                body.velocity = savedVelocity;
+                animator.enabled = true;
+                body.isKinematic = false;
+            }
+            return;
+        }
 
         if (state == Enums.PowerupState.Giant) {
             if (giantTimer <= 0) {
                 state = Enums.PowerupState.Large;
                 hitInvincibilityCounter = 3f;
-                body.isKinematic = false;
+                body.isKinematic = true;
+                animator.enabled = false;
+                giantEndTimer = giantStartTime / 2f;
+                savedVelocity = body.velocity;
                 //todo: play shrink sfx
             } else {
                 //destroy tiles
                 HandleGiantTiles();
             }
         }
+        
+        if (HandleStuckInBlock(delta))
+            return;
 
         //Pipes
         if (!paused) {
@@ -1583,7 +1631,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (hitRoof) {
             body.velocity = new Vector2(body.velocity.x, Mathf.Min(body.velocity.y, -0.1f));
             foreach (Vector3Int tile in tilesJumpedInto) {
-                InteractWithTile(tile, false);
+                InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
             }
         }
 
@@ -1607,7 +1655,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         
         //throwing held item
-        if ((!running || state == Enums.PowerupState.Mini || state == Enums.PowerupState.Giant) && holding) {
+        if ((!running || state == Enums.PowerupState.Mini || state == Enums.PowerupState.Giant || invincible > 0) && holding) {
             bool throwLeft = !facingRight;
             if (left) {
                 throwLeft = true;
@@ -1616,7 +1664,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 throwLeft = false;
             }
             holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
-            if (!crouch) {
+            if (!crouch && !knockback) {
                 photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/walljump_2");
                 throwInvincibility = 0.5f;
                 animator.SetTrigger("throw");
@@ -1633,7 +1681,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             crouch = true;
             if (photonView.IsMine && (hitLeft || hitRight)) {
                 foreach (var tile in tilesHitSide) {
-                    InteractWithTile(tile, false);
+                    InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
                 }
                 facingRight = hitLeft;
                 photonView.RPC("PlaySound", RpcTarget.All, "player/block_bump");
@@ -1685,28 +1733,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             if (singlejump && state == Enums.PowerupState.Giant) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
-                DestructablePipe hit = null;
-                if (state == Enums.PowerupState.Giant) {
-                    RaycastHit2D raycast = Physics2D.Raycast(body.position - new Vector2(0.6f, 0), Vector2.down, 0.2f, ONLY_GROUND_MASK);
-                    if (raycast && raycast.collider.tag == "DestructablePipe") {
-                        (hit = raycast.collider.gameObject.GetComponent<DestructablePipe>()).photonView.RPC("DamagePipe", RpcTarget.All, body.position, Vector2.up);
-                    }
-                    raycast = Physics2D.Raycast(body.position, Vector2.down, 0.2f, ONLY_GROUND_MASK);
-                    if (raycast && raycast.collider.tag == "DestructablePipe") {
-                        DestructablePipe other = raycast.collider.gameObject.GetComponent<DestructablePipe>();
-                        if (other != hit) {
-                            other.photonView.RPC("DamagePipe", RpcTarget.All, body.position, Vector2.up);
-                            other = hit;
-                        }
-                    }
-                    raycast = Physics2D.Raycast(body.position + new Vector2(0.6f, 0), Vector2.down, 0.2f, ONLY_GROUND_MASK);
-                    if (raycast && raycast.collider.tag == "DestructablePipe") {
-                        DestructablePipe other = raycast.collider.gameObject.GetComponent<DestructablePipe>();
-                        if (other != hit) {
-                            other.photonView.RPC("DamagePipe", RpcTarget.All, body.position, Vector2.up);
-                        }
-                    }
-                }
                 singlejump = false;
             }
             if ((landing += delta) > 0.1f) {
@@ -1824,7 +1850,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (photonView.IsMine && onGround && (groundpound || drill) && hitBlock) {
             bool tempHitBlock = false;
             foreach (Vector3Int tile in tilesStandingOn) {
-                int temp = InteractWithTile(tile, true);
+                int temp = InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
                 if (temp != -1) {
                     tempHitBlock |= (temp == 1);
                 }

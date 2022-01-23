@@ -1884,8 +1884,8 @@ TextureImporter:
         y: 48
         width: 32
         height: 32
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 16}
       outline: []
       physicsShape: []
@@ -1905,8 +1905,8 @@ TextureImporter:
         y: 48
         width: 32
         height: 32
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 16}
       outline: []
       physicsShape: []
@@ -1914,6 +1914,48 @@ TextureImporter:
       bones: []
       spriteID: 058b873525ea0134690a0024c4fe5b79
       internalID: 141294352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pipes_73
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 16
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 6, z: 0, w: 16}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4221d959eefdc304bbf907732fc7ee3f
+      internalID: -1133122105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pipes_74
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 16
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 8, z: 0, w: 8}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1f2de63938348148a79ae7c5875bf6c
+      internalID: 1742602189
       vertices: []
       indices: 
       edges: []
@@ -1932,6 +1974,7 @@ TextureImporter:
       pipes_26: 3052222682423282222
       pipes_27: 6231186028581598333
       pipes_45: -4665783783918546955
+      pipes_74: 1742602189
       pipes_8: 1571344320749704877
       pipes_24: 5364295599661756985
       pipes_47: 2370763127165377862
@@ -1972,6 +2015,7 @@ TextureImporter:
       pipes_20: -6786872277579448766
       pipes_25: -4183399864497368122
       pipes_72: 141294352
+      pipes_73: -1133122105
       pipes_13: 2949637312520497048
       pipes_5: -2508138221163281763
       pipes_23: -2562358786362537477

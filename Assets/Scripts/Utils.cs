@@ -56,6 +56,8 @@ public class Utils {
         return false;
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
+        if (Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground")))
+            return true;
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     } 
 

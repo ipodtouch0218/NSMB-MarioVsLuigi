@@ -13,6 +13,7 @@ using TMPro;
 public class GameManager : MonoBehaviour, IOnEventCallback {
     public static GameManager Instance { get; private set; }
 
+    public Sprite destroyedPipeSprite;
     [SerializeField] AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
@@ -25,7 +26,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     GameObject[] starSpawns;
     List<GameObject> remainingSpawns = new List<GameObject>();
     float spawnStarCount;
-    new AudioSource audio;
+    public AudioSource music, sfx;
 
     public GameObject localPlayer;
     public bool paused, loaded;
@@ -38,14 +39,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     // EVENT CALLBACK
     public void OnEvent(EventData e) {
-        switch (e.Code) {
+        OnEvent(e.Code, e.CustomData);
+    }
+    public void OnEvent(byte eventId, object customData) {
+        switch (eventId) {
         case (byte) Enums.NetEventIds.EndGame: {
-            Player winner = (Player) e.CustomData;
+            Player winner = (Player) customData;
             StartCoroutine(EndGame(winner));
             break;
         }
         case (byte) Enums.NetEventIds.SetTile: {
-            object[] data = (object[]) e.CustomData;
+            object[] data = (object[]) customData;
             int x = (int) data[0];
             int y = (int) data[1];
             string tilename = (string) data[2];
@@ -53,13 +57,29 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             tilemap.SetTile(loc, (Tile) Resources.Load("Tilemaps/Tiles/" + tilename));
             break;
         }
+        case (byte) Enums.NetEventIds.SetTileBatch: {
+            object[] data = (object[]) customData;
+            int x = (int) data[0];
+            int y = (int) data[1];
+            int width = (int) data[2];
+            int height = (int) data[3];
+            string[] tiles = (string[]) data[4];
+            TileBase[] tileObjects = new TileBase[tiles.Length];
+            for (int i = 0; i < tiles.Length; i++) {
+                string tile = tiles[i];
+                if (tile == "") continue;
+                tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
+            }
+            tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
+            break;
+        }
         case (byte) Enums.NetEventIds.PlayerFinishedLoading: {
-            Player player = (Player) e.CustomData;
+            Player player = (Player) customData;
             loadedPlayers.Add(player.NickName);
             break;
         }
         case (byte) Enums.NetEventIds.BumpTile: {
-            object[] data = (object[]) e.CustomData;
+            object[] data = (object[]) customData;
             int x = (int) data[0];
             int y = (int) data[1];
             bool downwards = (bool) data[2];
@@ -80,7 +100,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             break;
         }
         case (byte) Enums.NetEventIds.SpawnParticle: {
-            object[] data = (object[]) e.CustomData;
+            object[] data = (object[]) customData;
             int x = (int) data[0];
             int y = (int) data[1];
             string particleName = (string) data[2];
@@ -93,6 +113,26 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
             ParticleSystem.MainModule main = system.main;
             main.startColor = new Color(color.x, color.y, color.z, 1);
+            break;
+        }
+        case (byte) Enums.NetEventIds.SpawnDestructablePipe: {
+            object[] data = (object[]) customData;
+            float x = (float) data[0];
+            float y = (float) data[1];
+            bool right = (bool) data[2];
+            bool upsideDown = (bool) data[3];
+            int tiles = (int) data[4];
+            bool alreadyDestroyed = (bool) data[5];
+            GameObject particle = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Particle/DestructablePipe"), new Vector2(x + (right ? 0.5f : 0f), y + (tiles/4f * (upsideDown ? -1 : 1))), Quaternion.Euler(0, 0, upsideDown ? 180 : 0));
+            Rigidbody2D body = particle.GetComponent<Rigidbody2D>();
+            body.velocity = new Vector2(right ? 7 : -7, 4);
+            body.angularVelocity = (right ^ upsideDown ? -300 : 300); 
+            SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
+            sr.size = new Vector2(2, tiles);
+            if (alreadyDestroyed)
+                sr.sprite = destroyedPipeSprite;
+            //TODO: find the right sound
+            sfx.PlayOneShot((AudioClip) Resources.Load("Sound/player/brick_break"));
             break;
         }
         }
@@ -108,7 +148,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     void Start() {
         Instance = this;
-        audio = GetComponent<AudioSource>();
         
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
@@ -163,7 +202,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     IEnumerator WaitToActivate() {
         yield return new WaitForSeconds(3.5f);
-        GameManager.Instance.audio.PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
+        music.PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
 
         foreach (var wfgs in GameObject.FindObjectsOfType<WaitForGameStart>()) {
             wfgs.AttemptExecute();
@@ -184,19 +223,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     IEnumerator EndGame(Photon.Realtime.Player winner) {
         gameover = true;
-        audio.Stop();
+        music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
         text.GetComponent<TMP_Text>().text = winner.NickName + " Wins!";
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
 
-        AudioMixer mixer = audio.outputAudioMixerGroup.audioMixer;
+        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
         if (winner.IsLocal) {
-            audio.PlayOneShot((AudioClip) Resources.Load("Sound/match-win"));
+            music.PlayOneShot((AudioClip) Resources.Load("Sound/match-win"));
         } else {
-            audio.PlayOneShot((AudioClip) Resources.Load("Sound/match-lose"));
+            music.PlayOneShot((AudioClip) Resources.Load("Sound/match-lose"));
         }
         //TOOD: make a results screen?
 
@@ -261,9 +300,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     void HandleMusic() {
         if (intro != null) {
             intro = null;
-            audio.clip = intro;
-            audio.loop = false;
-            audio.Play();
+            music.clip = intro;
+            music.loop = false;
+            music.Play();
         }
 
         bool invincible = false;
@@ -285,38 +324,38 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
 
         if (mega) {
-            if (audio.clip != megaMushroomLoop || !audio.isPlaying) {
-                audio.clip = megaMushroomLoop;
-                audio.loop = true;
-                audio.Play();
+            if (music.clip != megaMushroomLoop || !music.isPlaying) {
+                music.clip = megaMushroomLoop;
+                music.loop = true;
+                music.Play();
             }
         } else if (invincible) {
-            if (audio.clip == intro || audio.clip == loop) {
-                audio.clip = invincibleIntro;
-                audio.loop = false;
-                audio.Play();
+            if (music.clip == intro || music.clip == loop) {
+                music.clip = invincibleIntro;
+                music.loop = false;
+                music.Play();
             }
-            if (audio.clip == invincibleIntro && !audio.isPlaying) {
-                audio.clip = invincibleLoop;
-                audio.loop = true;
-                audio.Play();
+            if (music.clip == invincibleIntro && !music.isPlaying) {
+                music.clip = invincibleLoop;
+                music.loop = true;
+                music.Play();
             }
             return;
-        } else if (!(audio.clip == intro || audio.clip == loop)) {
-            audio.Stop();
+        } else if (!(music.clip == intro || music.clip == loop)) {
+            music.Stop();
             if (intro != null) {
-                audio.clip = intro;
-                audio.loop = false;
-                audio.Play();
+                music.clip = intro;
+                music.loop = false;
+                music.Play();
             }
         }
-        if (!audio.isPlaying) {
-            audio.clip = loop;
-            audio.loop = true;
-            audio.Play();
+        if (!music.isPlaying) {
+            music.clip = loop;
+            music.loop = true;
+            music.Play();
         }
 
-        AudioMixer mixer = audio.outputAudioMixerGroup.audioMixer;
+        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         if (speedup) {
             mixer.SetFloat("MusicSpeed", 1.25f);
             mixer.SetFloat("MusicPitch", 1f / 1.25f);
@@ -331,10 +370,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             coin.GetComponent<SpriteRenderer>().enabled = true;
             coin.GetComponent<BoxCollider2D>().enabled = true;
         }
-        foreach (DestructablePipe pipe in GameObject.FindObjectsOfType<DestructablePipe>()) {
-            pipe.ResetPipe();
-        }
-        
+
         tilemap.SetTilesBlock(origin, originalTiles);
         if (PhotonNetwork.IsMasterClient) {
             foreach (EnemySpawnpoint point in GameObject.FindObjectsOfType<EnemySpawnpoint>()) {

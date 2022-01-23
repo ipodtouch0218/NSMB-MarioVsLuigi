@@ -15,7 +15,7 @@ public class CameraController : MonoBehaviour {
         if (target == null)
             return;
         
-        Vector3 ctp = target.transform.position + targetOffset;
+        Vector3 ctp = target.transform.position + targetOffset + (target.transform.localScale/2f);
         Vector3 targetPos = ctp;
         targetPos.z = transform.position.z;
         if (!exactCentering) {

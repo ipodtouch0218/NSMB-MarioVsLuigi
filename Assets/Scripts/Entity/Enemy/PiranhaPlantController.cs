@@ -26,8 +26,9 @@ public class PiranhaPlantController : KillableEntity {
         base.Update();
 
         animator.SetBool("dead", dead);
-        if (dead || (photonView && !photonView.IsMine))
+        if (dead || (photonView && !photonView.IsMine)) {
             return;
+        }
 
         foreach (var hit in Physics2D.OverlapBoxAll(transform.transform.position + (Vector3) (playerDetectSize*new Vector2(0, (upsideDown ? -0.5f : 0.5f))), playerDetectSize, transform.eulerAngles.z)) {
             if (hit.transform.tag == "Player" || hit.transform.tag == "CameraTarget") {
@@ -39,13 +40,6 @@ public class PiranhaPlantController : KillableEntity {
             animator.SetTrigger("popup");
             popupTimer = 0;
         }
-    }
-
-    public void EnableHitbox() {
-        collider2D.enabled = true;
-    }
-    public void DisableHitbox() {
-        collider2D.enabled = false;
     }
 
     public override void InteractWithPlayer(PlayerController player) {
@@ -60,6 +54,7 @@ public class PiranhaPlantController : KillableEntity {
     public void Respawn() {
         dead = false;
         popupTimer = 3;
+        collider2D.enabled = true;
     }
 
     [PunRPC]
@@ -67,6 +62,7 @@ public class PiranhaPlantController : KillableEntity {
         PlaySound("enemy/shell_kick");
         PlaySound("enemy/piranhaplant-die");
         dead = true;
+        collider2D.enabled = false;
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, (upsideDown ? -0.5f : 0.5f), 0), Quaternion.identity);
         if (photonView.IsMine) {
             PhotonNetwork.Instantiate("Prefabs/LooseCoin", transform.position + new Vector3(0, (upsideDown ? -1f : 1f), 0), Quaternion.identity);

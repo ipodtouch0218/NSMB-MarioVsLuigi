@@ -25,8 +25,10 @@ public class Enums {
         // 20-29 = world-based game events
         SetTile = 20,
         BumpTile = 21,
+        SetTileBatch = 22,
         // 30-39 = graphical-only events
         SpawnParticle = 30,
+        SpawnDestructablePipe = 31,
 
     }
 }
