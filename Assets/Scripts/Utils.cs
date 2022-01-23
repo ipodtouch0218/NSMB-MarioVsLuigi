@@ -44,11 +44,16 @@ public class Utils {
     }
 
     public static bool IsTileSolidAtTileLocation(Vector3Int tileLocation) {
-        TileBase tile = GetTileAtTileLocation(tileLocation);
-        if (tile is TileWithProperties)
-            return !((TileWithProperties) tile).isBackgroundTile;
         Tile tile2 = GameManager.Instance.tilemap.GetTile<Tile>(tileLocation);
-        return tile != null && tile2 != null && tile2.colliderType == Tile.ColliderType.Grid;
+        if (tile2 && tile2.colliderType == Tile.ColliderType.Grid)
+            return true;
+        AnimatedTile animated = GameManager.Instance.tilemap.GetTile<AnimatedTile>(tileLocation);
+        if (animated && animated.m_TileColliderType == Tile.ColliderType.Grid)
+            return true;
+        RuleTile ruleTile = GameManager.Instance.tilemap.GetTile<RuleTile>(tileLocation);
+        if (ruleTile && ruleTile.m_DefaultColliderType == Tile.ColliderType.Grid)
+            return true;
+        return false;
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));

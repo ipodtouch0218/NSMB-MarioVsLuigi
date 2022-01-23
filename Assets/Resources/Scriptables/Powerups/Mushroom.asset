@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: Mushroom
   spawnChance: 1
-  starModifier: 0.5
+  starModifier: 0.2

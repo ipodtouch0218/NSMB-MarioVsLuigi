@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: MiniMushroom
   m_EditorClassIdentifier: 
   prefab: MiniMushroom
-  spawnChance: 0.1
-  starModifier: 0.1
+  spawnChance: 0.2
+  starModifier: 0

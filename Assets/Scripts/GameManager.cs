@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     BoundsInt origin;
     GameObject currentStar = null;
     GameObject[] starSpawns;
+    List<GameObject> remainingSpawns = new List<GameObject>();
     float spawnStarCount;
     new AudioSource audio;
 
@@ -134,7 +135,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
         localPlayer.GetComponent<PlayerController>().enabled = false;
 
-        PhotonNetwork.SerializationRate = 30;
+        PhotonNetwork.SerializationRate = 50;
 
         PhotonNetwork.IsMessageQueueRunning = true;
 
@@ -233,7 +234,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         if (currentStar == null) {
             if (PhotonNetwork.IsMasterClient) {
                 if ((spawnStarCount -= Time.deltaTime) <= 0) {
-                    Vector3 spawnPos = starSpawns[(int) (Random.value * starSpawns.Length)].transform.position;
+                    if (remainingSpawns.Count == 0) {
+                        remainingSpawns.AddRange(starSpawns);
+                    }
+                    int index = (int) (Random.value * remainingSpawns.Count);
+                    Vector3 spawnPos = remainingSpawns[index].transform.position;
                     //Check for people camping spawn
                     foreach (var hit in Physics2D.OverlapCircleAll(spawnPos, 4)) {
                         if (hit.gameObject.tag == "Player") {
@@ -243,6 +248,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     }
 
                     currentStar = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", spawnPos, Quaternion.identity);
+                    remainingSpawns.RemoveAt(index);
                     //TODO: star appear sound
                     spawnStarCount = 10f;
                 }

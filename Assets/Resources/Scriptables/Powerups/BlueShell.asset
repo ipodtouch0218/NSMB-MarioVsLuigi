@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: BlueShell
   m_EditorClassIdentifier: 
   prefab: BlueShell
-  spawnChance: 0.5
-  starModifier: -0.2
+  spawnChance: 0.6
+  starModifier: -0.1
