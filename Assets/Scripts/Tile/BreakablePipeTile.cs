@@ -33,11 +33,12 @@ public class BreakablePipeTile : InteractableTile {
 
         int tileHeight;
         bool shrink = false;
+        
+        if (height <= 1)
+            return false;
 
         if (direction == InteractionDirection.Down || direction == InteractionDirection.Up) {
             //hit top/bottom of pipe.
-            if (height <= 1)
-                return false;
 
             //shrink the pipe by 1. simple as moving the hat tiles up/down one
             tileHeight = 2;

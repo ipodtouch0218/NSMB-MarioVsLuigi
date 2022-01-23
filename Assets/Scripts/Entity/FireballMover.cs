@@ -81,6 +81,8 @@ public class FireballMover : MonoBehaviourPun {
             case "piranhaplant": {
                 KillableEntity killa = collider.gameObject.GetComponentInParent<KillableEntity>();
                 if (killa.dead) return;
+                AnimatorStateInfo asi = killa.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
+                if (asi.IsName("end") && asi.normalizedTime > 0.5f) return;
                 killa.photonView.RPC("Kill", RpcTarget.All);
                 PhotonNetwork.Destroy(gameObject);
                 break;

@@ -25,6 +25,11 @@ public class PiranhaPlantController : KillableEntity {
         }
         base.Update();
 
+        if (photonView && !dead && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + Vector3.down) == null) {
+            photonView.RPC("Kill", RpcTarget.All);
+            return;
+        }
+
         animator.SetBool("dead", dead);
         if (dead || (photonView && !photonView.IsMine)) {
             return;
@@ -55,6 +60,7 @@ public class PiranhaPlantController : KillableEntity {
         dead = false;
         popupTimer = 3;
         collider2D.enabled = true;
+        Debug.Log("respawn");
     }
 
     [PunRPC]

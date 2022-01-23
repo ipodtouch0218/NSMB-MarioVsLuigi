@@ -1005,7 +1005,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (animator.GetBool("pipe")) {
             gameObject.layer = HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, 1);
-        } else if (dead || stuckInBlock || giantEndTimer > 0) {
+        } else if (dead || stuckInBlock || giantStartTimer > 0 || giantEndTimer > 0) {
             gameObject.layer = HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, -4);
         } else {
@@ -1575,17 +1575,31 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if (giantStartTimer > 0) {
             body.velocity = Vector2.zero;
-            body.isKinematic = giantStartTimer-delta > 0;
-            if (animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale") {
-                animator.Play("mega-scale", state >= Enums.PowerupState.Large ? 1 : 0);
-            }
-            if (giantStartTimer - delta <= 0) {
-                PlaySound(character.soundFolder + "/mega_start");
+            if (giantStartTimer-delta <= 0) {
+                //start by checking bounding
+                Debug.DrawLine(body.position + new Vector2(0, 1.75f), body.position + new Vector2(0, 1.75f) + new Vector2(0.5f, 1.5f), Color.red, 10f);
+                if (Physics2D.BoxCast(body.position + new Vector2(0, 1.75f), new Vector2(1f, 3f), 0, Vector2.zero, 0, ONLY_GROUND_MASK)) {
+                    //hit a wall, cancel
+                    state = Enums.PowerupState.Large;
+                    giantEndTimer = giantStartTime / 2f;
+                    storedPowerup = "MegaMushroom";
+                    giantTimer = 0f;
+                    PlaySound("player/reserve_item_store");
+                } else {
+                    PlaySound(character.soundFolder + "/mega_start");
+                }
+                body.isKinematic = false;
+            } else {
+                body.isKinematic = true;
+                if (animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale") {
+                    animator.Play("mega-scale", state >= Enums.PowerupState.Large ? 1 : 0);
+                }
             }
             return;
         }
         if (giantEndTimer > 0) {
             body.velocity = Vector2.zero;
+            body.isKinematic = true;
             
             if (giantEndTimer - delta <= 0) {
                 hitInvincibilityCounter = 3f;
@@ -1598,12 +1612,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if (state == Enums.PowerupState.Giant) {
             if (giantTimer <= 0) {
+                if (state != Enums.PowerupState.Large) {
+                    savedVelocity = body.velocity;
+                } else {
+                    savedVelocity = Vector2.zero;
+                }
                 state = Enums.PowerupState.Large;
                 hitInvincibilityCounter = 3f;
                 body.isKinematic = true;
                 animator.enabled = false;
                 giantEndTimer = giantStartTime / 2f;
-                savedVelocity = body.velocity;
                 //todo: play shrink sfx
             } else {
                 //destroy tiles
