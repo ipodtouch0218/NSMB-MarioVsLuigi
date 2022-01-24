@@ -10,8 +10,10 @@ public class PoisonWaterSplash : MonoBehaviour {
     private Texture2D heightTex;
     private float[] pointHeights, pointVelocities;
     private Color32[] colors;
+    private AudioSource sfx;
     void Start() {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        sfx = GetComponent<AudioSource>();
         heightTex = new Texture2D(points, 1);
         pointHeights = new float[points];
         pointVelocities = new float[points];
@@ -46,6 +48,7 @@ public class PoisonWaterSplash : MonoBehaviour {
     }
     void OnTriggerEnter2D(Collider2D collider) {
         GameObject.Instantiate(Resources.Load("Prefabs/Particle/PoisonWaterSplash"), collider.transform.position, Quaternion.identity);
+        sfx.Play();
         float x = collider.transform.position.x - transform.position.x;
         float xpoints = (x+points)%(points*transform.localScale.x);
         Rigidbody2D body = collider.gameObject.GetComponent<Rigidbody2D>();

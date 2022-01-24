@@ -18,9 +18,7 @@ public class PiranhaPlantController : KillableEntity {
 
     public new void Update() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
-            body.velocity = Vector2.zero;
             animator.enabled = false;
-            body.isKinematic = true;
             return;
         }
         base.Update();
