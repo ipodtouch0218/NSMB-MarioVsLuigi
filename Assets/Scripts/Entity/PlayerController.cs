@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [SerializeField] public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
     [SerializeField] public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.5f, flyingTerminalVelocity = -1f, drillVelocity = 9f, deathUpTime = 0.6f, deathForce = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 12, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 20f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -2f, walljumpVelocity = 6f, pipeDuration = 2f, giantStartTime = 1.5f, blinkDuration = 0.25f;
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle;
-    private BoxCollider2D hitbox;
+    private BoxCollider2D[] hitboxes;
     GameObject models;
     private new AudioSource audio;
     private Animator animator;
@@ -110,7 +110,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         animator = GetComponentInChildren<Animator>();
         body = GetComponent<Rigidbody2D>();
         audio = GetComponent<AudioSource>();
-        hitbox = GetComponent<BoxCollider2D>();
         models = transform.Find("Models").gameObject;
         starDirection = Random.value < 0.5;
         PlayerInput input = GetComponent<PlayerInput>();
@@ -126,6 +125,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
     }
+    void Start() {
+        hitboxes = GetComponents<BoxCollider2D>();
+    }
 
     void HandleGroundCollision() {
         tilesJumpedInto.Clear();
@@ -140,43 +142,45 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         Transform tmtf = tilemap.transform;
 
         int collisionCount = 0;
-        ContactPoint2D[] contacts = new ContactPoint2D[20];
-        collisionCount = hitbox.GetContacts(contacts);
-
         float highestAngleThisFrame = 0;
         crushGround = false;
-        for (int i = 0; i < collisionCount; i++) {
-            ContactPoint2D contact = contacts[i];
-            Vector2 n = contact.normal;
-            Vector2 p = contact.point + (contact.normal * -0.15f);
-            Vector3Int vec = Utils.WorldToTilemapPosition(p);
-            if (contact.collider.tag == "Player") continue;
+        foreach (BoxCollider2D hitbox in hitboxes) {
+            ContactPoint2D[] contacts = new ContactPoint2D[20];
+            collisionCount = hitbox.GetContacts(contacts);
 
-            if (Vector2.Dot(n,Vector2.up) > .5f) {
-                // Vector2 modifiedVec = p + (new Vector2(0.01f, 0) * (p.x - body.position.x < 0 ? 1 : -1)); 
-                float playerY = Utils.WorldToTilemapPosition(body.position + new Vector2(0, 0.25f)).y;
-                if (((contact.collider.gameObject.layer != GROUND_LAYERID && playerY <= vec.y) || body.velocity.y > 0.2f) && (contact.collider.gameObject.tag != "platform")) {
-                    //invalid flooring
-                    continue;
+            for (int i = 0; i < collisionCount; i++) {
+                ContactPoint2D contact = contacts[i];
+                Vector2 n = contact.normal;
+                Vector2 p = contact.point + (contact.normal * -0.15f);
+                Vector3Int vec = Utils.WorldToTilemapPosition(p);
+                if (contact.collider.tag == "Player") continue;
+
+                if (Vector2.Dot(n,Vector2.up) > .5f) {
+                    // Vector2 modifiedVec = p + (new Vector2(0.01f, 0) * (p.x - body.position.x < 0 ? 1 : -1)); 
+                    float playerY = Utils.WorldToTilemapPosition(body.position + new Vector2(0, 0.25f)).y;
+                    if (((contact.collider.gameObject.layer != GROUND_LAYERID && playerY <= vec.y) || body.velocity.y > 0.2f) && (contact.collider.gameObject.tag != "platform")) {
+                        //invalid flooring
+                        continue;
+                    }
+                    crushGround |= (contact.collider.gameObject.tag != "platform");
+                    down++;
+                    highestAngleThisFrame = Mathf.Max(highestAngleThisFrame, Vector2.Angle(n, Vector2.up));
+                    tilesStandingOn.Add(vec);
+                } else if (contact.collider.gameObject.layer == GROUND_LAYERID) {
+                    if (Vector2.Dot(n,Vector2.left) > .9f) {
+                        right++;
+                        tilesHitSide.Add(vec);
+                    } else if (Vector2.Dot(n,Vector2.right) > .9f) {
+                        left++;
+                        tilesHitSide.Add(vec);
+                    } else if (Vector2.Dot(n,Vector2.down) > .9f && !groundpound) {
+                        up++;
+                        blockRoofY = vec.y;
+                        tilesJumpedInto.Add(vec);
+                    }
+                } else {
+                    ignoreRoof = true;
                 }
-                crushGround |= (contact.collider.gameObject.tag != "platform");
-                down++;
-                highestAngleThisFrame = Mathf.Max(highestAngleThisFrame, Vector2.Angle(n, Vector2.up));
-                tilesStandingOn.Add(vec);
-            } else if (contact.collider.gameObject.layer == GROUND_LAYERID) {
-                if (Vector2.Dot(n,Vector2.left) > .9f) {
-                    right++;
-                    tilesHitSide.Add(vec);
-                } else if (Vector2.Dot(n,Vector2.right) > .9f) {
-                    left++;
-                    tilesHitSide.Add(vec);
-                } else if (Vector2.Dot(n,Vector2.down) > .9f && !groundpound) {
-                    up++;
-                    blockRoofY = vec.y;
-                    tilesJumpedInto.Add(vec);
-                }
-            } else {
-                ignoreRoof = true;
             }
         }
 
@@ -725,6 +729,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleGiantTiles(bool pipes) {
+        Vector3Int worldOffset = new Vector3Int(GameManager.Instance.levelWidthTile, 0, 0);
         int minY = (singlejump && onGround) ? 0 : 1, maxY = Mathf.Abs(body.velocity.y) > 0.05f ? 8 : 7;
         Vector2 offset = (Vector2.right * 0.3f) * (facingRight ? 1 : -1);
         int width = 1;
@@ -734,6 +739,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         for (int x = -width; x <= width; x++) {
             for (int y = minY; y <= maxY; y++) {
                 Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.4f));
+                if (tileLocation.x < GameManager.Instance.levelMinTileX) {
+                    tileLocation += worldOffset;
+                }
                 BreakablePipeTile pipe = GameManager.Instance.tilemap.GetTile<BreakablePipeTile>(tileLocation);
                 if (pipe && (pipe.upsideDownPipe || !pipes)) continue;
 
@@ -753,6 +761,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             for (int x = -width; x <= width; x++) {
                 for (int y = maxY; y >= minY; y--) {
                     Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.45f));
+                    if (tileLocation.x < GameManager.Instance.levelMinTileX) {
+                        tileLocation += worldOffset;
+                    }
                     BreakablePipeTile pipe = GameManager.Instance.tilemap.GetTile<BreakablePipeTile>(tileLocation);
                     if (!pipe || !pipe.upsideDownPipe) continue;
 
@@ -857,12 +868,20 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (shouldntCollide && colliding) {
             colliding = false;
             foreach (var player in GameManager.Instance.allPlayers) {
-                Physics2D.IgnoreCollision(hitbox, player.hitbox, true);
+                foreach (BoxCollider2D hitbox in hitboxes) {
+                    foreach (BoxCollider2D otherHitbox in hitboxes) {
+                        Physics2D.IgnoreCollision(hitbox, otherHitbox, true);
+                    }
+                }
             }
         } else if (!shouldntCollide && !colliding) {
             colliding = true;
             foreach (var player in GameManager.Instance.allPlayers) {
-                Physics2D.IgnoreCollision(hitbox, player.hitbox, false);
+                foreach (BoxCollider2D hitbox in hitboxes) {
+                    foreach (BoxCollider2D otherHitbox in hitboxes) {
+                        Physics2D.IgnoreCollision(hitbox, otherHitbox, false);
+                    }
+                }
             }
         }
     }
@@ -980,14 +999,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         
         if (giantEndTimer > 0) {
-            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, giantEndTimer / (giantStartTime / 2f)) * 2.5f));
+            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, giantEndTimer / (giantStartTime / 2f)) * 2.6f));
         } else {
             switch (state) {
             case Enums.PowerupState.Mini:
                 transform.localScale = Vector3.one / 2;
                 break;
             case Enums.PowerupState.Giant:
-                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (giantStartTimer / giantStartTime)) * 2.5f));
+                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (giantStartTimer / giantStartTime)) * 2.6f));
                 break;
             default:
                 transform.localScale = Vector3.one;
@@ -1169,7 +1188,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void UpdateHitbox() {
-        float width = hitbox.size.x;
+        float width = hitboxes[0].size.x;
         float height = 0;
 
         if (state <= Enums.PowerupState.Small || (invincible  > 0 && !onGround && !crouching) || groundpound) {
@@ -1182,8 +1201,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             height *= (state <= Enums.PowerupState.Small ? 0.7f : 0.5f);
         }
 
-        hitbox.size = new Vector2(width, height);
-        hitbox.offset = new Vector2(0, height/2f);
+        hitboxes[0].size = new Vector2(width, height);
+        hitboxes[0].offset = new Vector2(0, height/2f);
     }
 
     void FakeOnGroundCheck() {
@@ -1296,7 +1315,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     bool ForceCrouchCheck() {
         if (state < Enums.PowerupState.Large) return false;
-        float width = hitbox.bounds.extents.x;
+        float width = hitboxes[0].bounds.extents.x;
         Debug.DrawRay(body.position + new Vector2(-width+0.05f,0.05f), Vector2.up * heightLargeModel, Color.magenta);
         Debug.DrawRay(body.position + new Vector2(width-0.05f,0.05f), Vector2.up * heightLargeModel, Color.magenta);
 
@@ -1520,7 +1539,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     bool HandleStuckInBlock(float delta) {
-        Vector2 checkPos = body.position + new Vector2(0, hitbox.size.y/4f);
+        Vector2 checkPos = body.position + new Vector2(0, hitboxes[0].size.y/4f);
         if (!Utils.IsTileSolidAtWorldLocation(checkPos)) {
             stuckInBlock = false;
             return false;

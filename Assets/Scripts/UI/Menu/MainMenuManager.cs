@@ -185,6 +185,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         music = GetComponents<AudioSource>()[0];
         sfx = GetComponents<AudioSource>()[1];
         
+        PhotonNetwork.SerializationRate = 30;
+
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);

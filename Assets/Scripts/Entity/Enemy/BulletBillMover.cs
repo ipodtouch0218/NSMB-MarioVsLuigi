@@ -89,6 +89,7 @@ public class BulletBillMover : KillableEntity {
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     } 
     void OnDrawGizmosSelected() {
+        if (!GameManager.Instance) return;
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(transform.position, searchVector);
         //left border check

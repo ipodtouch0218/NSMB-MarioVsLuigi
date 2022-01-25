@@ -221,6 +221,9 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 2
     Name: lit
+  - Type: 9
+    SynchronizeType: 0
+    Name: turnaround
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
@@ -365,7 +368,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: 0
 --- !u!114 &-2214749743101336736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,6 +409,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3286581578154145921}
   - component: {fileID: 3286581578154145920}
+  - component: {fileID: 5674126332256202388}
   m_Layer: 10
   m_Name: Hitbox
   m_TagString: bobomb
@@ -455,3 +458,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.8, y: 0.8}
   m_EdgeRadius: 0
+--- !u!114 &5674126332256202388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286581578154145922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

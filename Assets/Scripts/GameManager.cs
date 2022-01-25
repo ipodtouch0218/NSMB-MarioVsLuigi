@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     [SerializeField] AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
+    public bool loopingLevel = true;
     public Vector3 spawnpoint;
     public Tilemap tilemap;
     public bool canSpawnMegaMushroom = true;
@@ -180,7 +181,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         Camera.main.GetComponent<CameraController>().target = localPlayer;
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
 
-        PhotonNetwork.SerializationRate = 50;
+        // PhotonNetwork.SerializationRate = 50;
 
         PhotonNetwork.IsMessageQueueRunning = true;
 
