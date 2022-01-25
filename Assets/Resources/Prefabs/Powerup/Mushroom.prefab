@@ -170,6 +170,7 @@ MonoBehaviour:
   terminalVelocity: 8
   blinkingRate: 4
   passthrough: 1
+  avoidPlayers: 0
   followMe: {fileID: 0}
   followMeCounter: 0
   despawnCounter: 15

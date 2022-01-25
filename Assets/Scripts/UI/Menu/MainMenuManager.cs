@@ -320,7 +320,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.IsVisible = false;
 
         //start game with all players
-        RaiseEventOptions options = new RaiseEventOptions {Receivers = ReceiverGroup.All};
+        RaiseEventOptions options = new RaiseEventOptions{Receivers = ReceiverGroup.All};
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.StartGame, null, options, SendOptions.SendReliable);
     }
 
@@ -393,14 +393,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             newPl.SetActive(true);
             RectTransform tf = newPl.GetComponent<RectTransform>();
             tf.offsetMax = new Vector2(330, tf.offsetMax.y);
-            UpdatePlayerList(pl);
+            UpdatePlayerList(pl, newPl.transform);
         }
 
         startGameBtn.interactable = PhotonNetwork.IsMasterClient;
         levelDropdown.interactable = PhotonNetwork.IsMasterClient;
         starSlider.interactable = PhotonNetwork.IsMasterClient;
     }
-    public void UpdatePlayerList(Player pl) {
+    public void UpdatePlayerList(Player pl, Transform nameObject = null) {
         string characterString = Utils.GetCharacterData(pl).uistring;
         object ping;
         pl.CustomProperties.TryGetValue("ping", out ping);
@@ -416,10 +416,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             pingColor = "red";
         }
 
-        Transform newPl = playersContent.transform.Find(pl.UserId);
-        if (newPl == null) return;
-        SetText(newPl.Find("NameText").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
-        SetText(newPl.Find("PingText").gameObject, "<color=" + pingColor + ">" + (int) ping);
+        if (nameObject == null) nameObject = playersContent.transform.Find(pl.UserId);
+        if (nameObject == null) return;
+        SetText(nameObject.Find("NameText").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
+        SetText(nameObject.Find("PingText").gameObject, "<color=" + pingColor + ">" + (int) ping);
     }
     
     public void GlobalChatMessage(string message, Vector3 color) {

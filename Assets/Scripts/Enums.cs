@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +29,8 @@ public class Enums {
         // 30-39 = graphical-only events
         SpawnParticle = 30,
         SpawnDestructablePipe = 31,
-
     }
+    //TODO: event caching?
+    // private static List<byte> uncached = new List<byte>(new byte[]{1, 2, 10, 11, 21, 30, 31});
+    // public static ReadOnlyCollection<byte> uncachedEvents => uncached.AsReadOnly();
 }

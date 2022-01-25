@@ -22,12 +22,11 @@ public class PowerupTile : BreakableBrickTile {
 
                 //Tilemap
                 object[] parametersTile = new object[]{tileLocation.x, tileLocation.y, null};
-                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SetTile, parametersTile, Utils.EVENT_OTHERS, ExitGames.Client.Photon.SendOptions.SendReliable);
-                GameManager.Instance.tilemap.SetTile(new Vector3Int(tileLocation.x, tileLocation.y, 0), null);
+                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetTile, parametersTile, ExitGames.Client.Photon.SendOptions.SendReliable);
 
                 //Particle
                 object[] parametersParticle = new object[]{tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b)};
-                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SpawnParticle, parametersParticle, Utils.EVENT_ALL, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
                 
                 if (interacter is MonoBehaviourPun) {
                     ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
@@ -45,18 +44,7 @@ public class PowerupTile : BreakableBrickTile {
         Bump(interacter, direction, worldLocation);
 
         object[] parametersBump = new object[]{tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult};
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.BumpTile, parametersBump, Utils.EVENT_OTHERS, ExitGames.Client.Photon.SendOptions.SendReliable);
-        
-        Vector3Int loc = new Vector3Int(tileLocation.x, tileLocation.y,0);
-        GameObject bump = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
-        BlockBump bb = bump.GetComponentInChildren<BlockBump>();
-
-        bb.fromAbove = (bool) parametersBump[2];
-        bb.resultTile = (string) parametersBump[3];
-        bb.sprite = GameManager.Instance.tilemap.GetSprite(loc);
-        bb.spawn = (BlockBump.SpawnResult) parametersBump[4];
-
-        GameManager.Instance.tilemap.SetTile(loc, null);
+        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
 
         if (interacter is MonoBehaviourPun) {
             // ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");

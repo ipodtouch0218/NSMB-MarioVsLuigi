@@ -49,9 +49,9 @@ public class BreakablePipeTile : InteractableTile {
 
             bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
             
+            
             object[] parametersParticle = new object[]{worldLocation.x, worldLocation.y, leftOfPipe, upsideDownPipe, tileHeight-1, alreadyDestroyed};
-            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SpawnDestructablePipe, parametersParticle, Utils.EVENT_OTHERS, ExitGames.Client.Photon.SendOptions.SendUnreliable);
-            GameManager.Instance.OnEvent((byte) Enums.NetEventIds.SpawnDestructablePipe, parametersParticle);
+            GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnDestructablePipe, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         }
         string[] tiles = new string[tileHeight*2];
         
@@ -85,8 +85,7 @@ public class BreakablePipeTile : InteractableTile {
         Vector3Int offset = (upsideDownPipe ? Vector3Int.zero : pipeDirection * (tileHeight-1));
         BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector3Int.zero : Vector3Int.left), new Vector2Int(2, tileHeight), tiles);
         
-        //technically, we modify the tilemap. however, we dont want to pass thru, so return false.
-        return false;
+        return true;
     }
 
     private Vector3Int GetPipeOrigin(Vector3Int ourLocation) {
@@ -118,7 +117,6 @@ public class BreakablePipeTile : InteractableTile {
 
     private void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tilenames) {
         object[] parametersTile = new object[]{tileOrigin.x, tileOrigin.y, tileDimensions.x, tileDimensions.y, tilenames};
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SetTile, parametersTile, Utils.EVENT_OTHERS, ExitGames.Client.Photon.SendOptions.SendReliable);
-        GameManager.Instance.OnEvent((byte) Enums.NetEventIds.SetTileBatch, parametersTile);
+        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetTileBatch, parametersTile, ExitGames.Client.Photon.SendOptions.SendReliable);
     }
 }

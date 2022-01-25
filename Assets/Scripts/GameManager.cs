@@ -36,8 +36,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public int starRequirement;
 
     public PlayerController[] allPlayers;
+    public EnemySpawnpoint[] enemySpawnpoints;
 
     // EVENT CALLBACK
+    public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, ExitGames.Client.Photon.SendOptions sendOption) {
+        //TODO event caching for rejoining?
+        PhotonNetwork.RaiseEvent((byte) eventId, parameters, Utils.EVENT_OTHERS, sendOption);
+        OnEvent((byte) eventId, parameters);
+    }
     public void OnEvent(EventData e) {
         OnEvent(e.Code, e.CustomData);
     }
@@ -54,7 +60,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             int y = (int) data[1];
             string tilename = (string) data[2];
             Vector3Int loc = new Vector3Int(x,y,0);
-            tilemap.SetTile(loc, (Tile) Resources.Load("Tilemaps/Tiles/" + tilename));
+            Tile tile = (tilename != null ? (Tile) Resources.Load("Tilemaps/Tiles/" + tilename) : null);
+            tilemap.SetTile(loc, tile);
             break;
         }
         case (byte) Enums.NetEventIds.SetTileBatch: {
@@ -172,7 +179,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
         Camera.main.GetComponent<CameraController>().target = localPlayer;
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
-        localPlayer.GetComponent<PlayerController>().enabled = false;
 
         PhotonNetwork.SerializationRate = 50;
 
@@ -186,6 +192,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         loaded = true;
         loadedPlayers.Clear();
         allPlayers = FindObjectsOfType<PlayerController>();
+        enemySpawnpoints = GameObject.FindObjectsOfType<EnemySpawnpoint>();
         if (PhotonNetwork.IsMasterClient) {
             //clear buffered loading complete events. 
             RaiseEventOptions options = new RaiseEventOptions {Receivers=ReceiverGroup.MasterClient, CachingOption=EventCaching.RemoveFromRoomCache};
@@ -195,14 +202,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
         if (canvas) {
             canvas.GetComponent<Animator>().SetTrigger("loaded");
-            canvas.GetComponent<AudioSource>().Stop();
+            //please just dont beep at me :(
+            AudioSource source = canvas.GetComponent<AudioSource>();
+            source.Stop();
+            source.volume = 0;
+            source.enabled = false;
+            Destroy(source);
         }
         StartCoroutine(WaitToActivate());
     }
 
     IEnumerator WaitToActivate() {
         yield return new WaitForSeconds(3.5f);
-        music.PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
+        sfx.PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
 
         foreach (var wfgs in GameObject.FindObjectsOfType<WaitForGameStart>()) {
             wfgs.AttemptExecute();
@@ -250,9 +262,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             foreach (var player in allPlayers) {
                 if (player.stars >= starRequirement) {
                     //game over, losers
-                    
-                    RaiseEventOptions options = new RaiseEventOptions {Receivers=ReceiverGroup.All};
-                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, player.photonView.Owner, options, SendOptions.SendReliable);
+                    gameover = true;
+                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
                     return;
                 }
             }
@@ -366,17 +377,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     }
 
     public void ResetTiles() {
+        tilemap.SetTilesBlock(origin, originalTiles);
+        
         foreach (GameObject coin in GameObject.FindGameObjectsWithTag("coin")) {
             coin.GetComponent<SpriteRenderer>().enabled = true;
             coin.GetComponent<BoxCollider2D>().enabled = true;
         }
 
-        tilemap.SetTilesBlock(origin, originalTiles);
-        if (PhotonNetwork.IsMasterClient) {
-            foreach (EnemySpawnpoint point in GameObject.FindObjectsOfType<EnemySpawnpoint>()) {
-                point.AttemptSpawning();
-            }
-        }
+        if (!PhotonNetwork.IsMasterClient) return;
+        foreach (EnemySpawnpoint point in enemySpawnpoints)
+            point.AttemptSpawning();
     }
 
     public void Pause() {
