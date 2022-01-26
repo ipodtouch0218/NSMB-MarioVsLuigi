@@ -9,16 +9,16 @@ public class StarBouncer : MonoBehaviourPun {
     public bool stationary = true;
     [SerializeField] float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f;
     public float counter, readyForUnPassthrough = 0.5f;
-    Vector3 startingScale;
+    private Vector3 startingScale;
     private Rigidbody2D body;
-    new private BoxCollider2D collider;
+    private BoxCollider2D hitbox;
     public bool passthrough = true, left = true;
     private PhysicsEntity physics;
 
     void Start() {
         startingScale = transform.localScale;
         body = GetComponent<Rigidbody2D>();
-        collider = GetComponent<BoxCollider2D>();
+        hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
 
         if (groundMask == -1)

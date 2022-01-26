@@ -17,12 +17,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle;
     private BoxCollider2D[] hitboxes;
     GameObject models;
-    private new AudioSource audio;
+    public CameraController cameraController;
+    private AudioSource sfx;
     private Animator animator;
     public Rigidbody2D body;
 
     public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock;
-    public float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer, giantEndTimer;
+    public float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer, giantEndTimer;
     public float invincible = 0, giantTimer = 0, blinkTimer = 0;
     
     private Vector2 pipeDirection;
@@ -40,7 +41,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public Avatar smallAvatar, largeAvatar;
     public GameObject onSpinner;
     PipeManager pipeEntering;
-    private CameraController cameraController;
     private Vector3 cameraOffsetLeft = Vector3.left, cameraOffsetRight = Vector3.right, cameraOffsetZero = Vector3.zero;
     private bool starDirection, step, alreadyGroundpounded, cancelledMega, wasTurnaround;
     private Enums.PlayerEyeState eyeState;
@@ -106,10 +106,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         ENTITY_HITBOX_LAYERID = LayerMask.NameToLayer("EntityHitbox");
         DEFAULT_LAYERID = LayerMask.NameToLayer("Default");
         
-        cameraController = Camera.main.GetComponent<CameraController>();
+        cameraController = GetComponent<CameraController>();
         animator = GetComponentInChildren<Animator>();
         body = GetComponent<Rigidbody2D>();
-        audio = GetComponent<AudioSource>();
+        sfx = GetComponent<AudioSource>();
         models = transform.Find("Models").gameObject;
         starDirection = Random.value < 0.5;
         PlayerInput input = GetComponent<PlayerInput>();
@@ -533,7 +533,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             case "Mushroom": {
                 if (!photonView.IsMine) return;
                 MovingPowerup powerup = obj.GetComponentInParent<MovingPowerup>();
-                if (powerup.followMeCounter > 0)
+                if (powerup.followMeCounter > 0 || powerup.ignoreCounter > 0)
                     break;
                 photonView.RPC("Powerup", RpcTarget.AllViaServer, powerup.photonView.ViewID, obj.tag, obj.transform.parent.gameObject.GetPhotonView().ViewID);
                 Destroy(collider);
@@ -667,6 +667,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [PunRPC]
     public void PreRespawn() {
         transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
+        cameraController.Update();
         state = Enums.PowerupState.Small;
         dead = false;
         animator.SetTrigger("respawn");
@@ -715,7 +716,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     [PunRPC]
     void PlaySound(string sound) {
-        audio.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound));
+        sfx.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound));
     }
 
     [PunRPC]
@@ -794,7 +795,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
     
     public void PlaySoundFromAnim(string sound, float volume = 1) {
-        audio.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound), volume);
+        sfx.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound), volume);
     }
 
     [PunRPC]
@@ -869,7 +870,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             colliding = false;
             foreach (var player in GameManager.Instance.allPlayers) {
                 foreach (BoxCollider2D hitbox in hitboxes) {
-                    foreach (BoxCollider2D otherHitbox in hitboxes) {
+                    foreach (BoxCollider2D otherHitbox in player.hitboxes) {
                         Physics2D.IgnoreCollision(hitbox, otherHitbox, true);
                     }
                 }
@@ -878,7 +879,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             colliding = true;
             foreach (var player in GameManager.Instance.allPlayers) {
                 foreach (BoxCollider2D hitbox in hitboxes) {
-                    foreach (BoxCollider2D otherHitbox in hitboxes) {
+                    foreach (BoxCollider2D otherHitbox in player.hitboxes) {
                         Physics2D.IgnoreCollision(hitbox, otherHitbox, false);
                     }
                 }
@@ -939,10 +940,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             //Facing direction
             bool right = joystick.x > analogDeadzone;
             bool left = joystick.x < -analogDeadzone;
-            if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
+            if (doIceSkidding) {
+                if (right || left) {
+                    facingRight = right;
+                }
+            } else if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
                 if (onGround && state != Enums.PowerupState.Giant && Mathf.Abs(body.velocity.x) > 0.05f) {
                     facingRight = body.velocity.x > 0;
-                } else if ((walljumping <= 0 && !inShell || giantStartTimer > 0) && (right || left)) {
+                } else if (((walljumping <= 0 && !inShell) || giantStartTimer > 0) && (right || left)) {
                     facingRight = right;
                 }
                 if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5f && crouching) || doIceSkidding) && (right || left)) {
@@ -1168,10 +1173,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             HorizontalCamera.OFFSET_TARGET = (flying ? 0.75f : 0f);
             if (flying) {
                 float percentage = Mathf.Abs(body.velocity.x) / walkingMaxSpeed;
-                cameraController.targetOffset = (body.velocity.x > 0 ? cameraOffsetRight : cameraOffsetLeft) * percentage * 2f;
+                cameraController.offset = (body.velocity.x > 0 ? cameraOffsetRight : cameraOffsetLeft) * percentage * 2f;
                 cameraController.exactCentering = true;
             } else {
-                cameraController.targetOffset = cameraOffsetZero;
+                cameraController.offset = cameraOffsetZero;
                 cameraController.exactCentering = false;
             }
         }
@@ -1539,6 +1544,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     bool HandleStuckInBlock(float delta) {
+        if (!body || hitboxes == null) return false;
         Vector2 checkPos = body.position + new Vector2(0, hitboxes[0].size.y/4f);
         if (!Utils.IsTileSolidAtWorldLocation(checkPos)) {
             stuckInBlock = false;
@@ -1584,6 +1590,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         TickCounter(ref giantStartTimer, 0, delta);
         TickCounter(ref groundpoundCounter, 0, delta);
         TickCounter(ref giantEndTimer, 0, delta);
+        TickCounter(ref groundpoundDelay, 0, delta);
     }
 
     [PunRPC]
@@ -1787,6 +1794,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             if (triplejump && landing == 0 && !(left || right) && !groundpound) {
                 body.velocity = new Vector2(0,0);
                 animator.Play("jumplanding", state >= Enums.PowerupState.Large ? 1 : 0);
+                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
             }
             if (singlejump && state == Enums.PowerupState.Giant) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
@@ -1879,6 +1887,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (holding) return;
         if (crouching) return;
         if (onLeft || onRight) return;
+        if (groundpoundDelay > 0) return;
 
         if (flying) {
             //start drill
@@ -1900,6 +1909,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             groundpoundCounter = groundpoundTime * (state == Enums.PowerupState.Giant ? 1.5f : 1);
             photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound");
             alreadyGroundpounded = true;
+            groundpoundDelay = 0.5f;
         }
     }
 

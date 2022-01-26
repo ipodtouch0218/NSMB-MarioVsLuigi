@@ -8,13 +8,11 @@ public class BulletBillMover : KillableEntity {
     public float speed, playerSearchRadius = 4;
     private Vector2 searchVector;
     public bool left = true;
-    private SpriteRenderer spriteRenderer;
     new void Start() {
         base.Start();
         searchVector = new Vector2(playerSearchRadius*2f, 100);
         left = photonView && photonView.InstantiationData != null && (bool) photonView.InstantiationData[0];
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        base.body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
 
         Transform t = transform.GetChild(1);
         ParticleSystem ps = t.GetComponent<ParticleSystem>();
@@ -26,14 +24,14 @@ public class BulletBillMover : KillableEntity {
         }
 
         ps.Play();
-        spriteRenderer.flipX = !left;
+        base.sRenderer.flipX = !left;
     }
 
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
-            body.velocity = Vector2.zero;
-            animator.enabled = false;
-            body.isKinematic = true;
+            base.body.velocity = Vector2.zero;
+            base.animator.enabled = false;
+            base.body.isKinematic = true;
             return;
         }
 
@@ -74,18 +72,18 @@ public class BulletBillMover : KillableEntity {
     
     [PunRPC]
     public override void SpecialKill(bool right, bool groundpound) {
-        body.velocity = new Vector2(0, 2.5f);
-        body.constraints = RigidbodyConstraints2D.None;
-        body.angularVelocity = 400f * (right ? 1 : -1);
-        body.gravityScale = 1.5f;
-        body.isKinematic = false;
-        hitbox.enabled = false;
-        animator.speed = 0;
+        base.body.velocity = new Vector2(0, 2.5f);
+        base.body.constraints = RigidbodyConstraints2D.None;
+        base.body.angularVelocity = 400f * (right ? 1 : -1);
+        base.body.gravityScale = 1.5f;
+        base.body.isKinematic = false;
+        base.hitbox.enabled = false;
+        base.animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         if (groundpound)
             GameObject.Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), transform.position + new Vector3(0, 0.5f, -5), Quaternion.identity);
         
-        dead = true;
+        base.dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     } 
     void OnDrawGizmosSelected() {

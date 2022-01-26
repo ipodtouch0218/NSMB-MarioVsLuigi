@@ -9,13 +9,13 @@ public class BlockBump : MonoBehaviour {
     public SpawnResult spawn = SpawnResult.Nothing;
     public Sprite sprite;
     public bool fromAbove;
-    new AudioSource audio;
-    new SpriteRenderer renderer;
+    AudioSource sfx;
+    SpriteRenderer sRenderer;
     public PlayerController hitter;
     void Start() {
         Animator anim = GetComponentInChildren<Animator>();
-        renderer = GetComponentInChildren<SpriteRenderer>();
-        renderer.sprite = sprite;
+        sRenderer = GetComponentInChildren<SpriteRenderer>();
+        sRenderer.sprite = sprite;
         anim.SetBool("down", fromAbove);
         anim.SetTrigger("start");
 

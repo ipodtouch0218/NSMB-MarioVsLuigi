@@ -7,15 +7,12 @@ public class BulletBillLauncher : MonoBehaviourPun {
     public float playerSearchRadius = 7, playerCloseCutoff = 1;
     public float initialShootTimer = 5;
     private float shootTimer;
-    new AudioSource audio;
     private List<GameObject> bills = new List<GameObject>();
 
     private Vector2 searchBox, searchOffset;
     private Vector3 offset = new Vector3(0.25f, -0.2f, 0);
 
     void Start() {
-        audio = GetComponent<AudioSource>();
-
         searchBox = new Vector2(playerSearchRadius, playerSearchRadius);
         searchOffset = new Vector2(playerSearchRadius/2 + playerCloseCutoff, 0);
     }

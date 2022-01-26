@@ -5,20 +5,20 @@ using UnityEngine;
 public class ParticleSound : MonoBehaviour {
 
     private ParticleSystem system;
-    new private AudioSource audio;
+    private AudioSource sfx;
 
     void Start() {
         system = GetComponent<ParticleSystem>();
-        audio = GetComponent<AudioSource>();
+        sfx = GetComponent<AudioSource>();
     }
 
     void Update() {
-        if (system.isEmitting && !audio.isPlaying) {
-            audio.Play();
+        if (system.isEmitting && !sfx.isPlaying) {
+            sfx.Play();
         }
 
-        if (!system.isEmitting && audio.isPlaying) {
-            audio.Stop();
+        if (!system.isEmitting && sfx.isPlaying) {
+            sfx.Stop();
         }
     }
 }

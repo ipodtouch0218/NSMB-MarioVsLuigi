@@ -56,7 +56,8 @@ public class Utils {
         return false;
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
-        if (Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground")))
+        Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
+        if (collision && !collision.isTrigger)
             return true;
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     } 

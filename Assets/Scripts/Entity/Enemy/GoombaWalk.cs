@@ -6,19 +6,17 @@ using Photon.Pun;
 public class GoombaWalk : KillableEntity {
     [SerializeField] float speed, deathTimer;
     private bool left = true;
-    private SpriteRenderer spriteRenderer;
     new void Start() {
         base.Start();
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+        base.body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
         animator.SetBool("dead", false);
-        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
-            body.velocity = Vector2.zero;
-            animator.enabled = false;
-            body.isKinematic = true;
+            base.body.velocity = Vector2.zero;
+            base.animator.enabled = false;
+            base.body.isKinematic = true;
             return;
         }
 
@@ -28,20 +26,20 @@ public class GoombaWalk : KillableEntity {
         } else if (physics.hitRight) {
             left = true;
         }
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+        base.body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
 
         if (!photonView || photonView.IsMine) {
             animator.SetBool("left", left);
-            spriteRenderer.flipX = !left;
+            base.sRenderer.flipX = !left;
         } else {
-            spriteRenderer.flipX = !animator.GetBool("left");
+            base.sRenderer.flipX = !animator.GetBool("left");
         }
 
         if (photonView && !photonView.IsMine) {
             return;
         }
 
-        if (animator.GetBool("dead")) {
+        if (base.animator.GetBool("dead")) {
             if ((deathTimer -= Time.fixedDeltaTime) < 0) {
                 PhotonNetwork.Destroy(this.gameObject);
             }
@@ -51,13 +49,12 @@ public class GoombaWalk : KillableEntity {
 
     [PunRPC]
     public override void Kill() {
-        body.velocity = Vector2.zero;
-        body.isKinematic = true;
+        base.body.velocity = Vector2.zero;
+        base.body.isKinematic = true;
         speed = 0;
-        dead = true;
+        base.dead = true;
         deathTimer = 0.5f;
-        hitbox.enabled = false;
-        
-        animator.SetBool("dead", true);
+        base.hitbox.enabled = false;
+        base.animator.SetBool("dead", true);
     }
 }

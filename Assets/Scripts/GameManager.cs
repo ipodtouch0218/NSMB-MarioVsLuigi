@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     [SerializeField] AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
+    public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     public bool loopingLevel = true;
     public Vector3 spawnpoint;
     public Tilemap tilemap;
@@ -178,7 +179,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             GameObject.Instantiate(Resources.Load("Prefabs/Static/GlobalController"), Vector3.zero, Quaternion.identity);
             localPlayer = PhotonNetwork.Instantiate("Prefabs/PlayerMario", spawnpoint, Quaternion.identity, 0);
         }
-        Camera.main.GetComponent<CameraController>().target = localPlayer;
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
 
         // PhotonNetwork.SerializationRate = 50;

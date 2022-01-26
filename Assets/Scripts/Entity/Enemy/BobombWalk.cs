@@ -41,13 +41,13 @@ public class BobombWalk : HoldableEntity {
             float redOverlayPercent = (5.39f/(detonateCount+2.695f))*10f % 1f;
             MaterialPropertyBlock block = new MaterialPropertyBlock(); 
             block.SetFloat("FlashAmount", redOverlayPercent);
-            renderer.SetPropertyBlock(block);
+            base.sRenderer.SetPropertyBlock(block);
         }
     }
     [PunRPC]
     public void Detonate() {
         
-        renderer.enabled = false;
+        base.sRenderer.enabled = false;
         hitbox.enabled = false;
         detonated = true;
 
@@ -115,7 +115,7 @@ public class BobombWalk : HoldableEntity {
         this.holder = null;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
         this.left = facingLeft;
-        renderer.flipX = left;
+        base.sRenderer.flipX = left;
         if (crouch) {
             body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
         } else {
@@ -126,7 +126,7 @@ public class BobombWalk : HoldableEntity {
     [PunRPC]
     public override void Kick(bool fromLeft, bool groundpound) {
         left = !fromLeft;
-        renderer.flipX = left;
+        base.sRenderer.flipX = left;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     }
@@ -197,7 +197,7 @@ public class BobombWalk : HoldableEntity {
     [PunRPC]
     void Turnaround(bool hitWallOnLeft) {
         left = !hitWallOnLeft;
-        renderer.flipX = left;
+        base.sRenderer.flipX = left;
         body.velocity = new Vector2(walkSpeed * (left ? -1 : 1), body.velocity.y);
         animator.SetTrigger("turnaround");
     }

@@ -7,38 +7,43 @@ public class MovingPowerup : MonoBehaviourPun {
 
     private static int groundMask = -1;
     [SerializeField] float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
-    Rigidbody2D body;
-    BoxCollider2D boxCollider;
-    new SpriteRenderer renderer;
-    bool right = true;
+    private Rigidbody2D body;
+    private BoxCollider2D hitbox;
+    private SpriteRenderer sRenderer;
+    private bool right = true;
     public bool passthrough, avoidPlayers;
     public PlayerController followMe;
-    public float followMeCounter, despawnCounter = 15;
+    public float followMeCounter, despawnCounter = 15, ignoreCounter;
     private PhysicsEntity physics;
     void Start() {
         body = GetComponent<Rigidbody2D>();
-        boxCollider = GetComponent<BoxCollider2D>();
-        renderer = GetComponent<SpriteRenderer>();
+        hitbox = GetComponent<BoxCollider2D>();
+        sRenderer = GetComponent<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
 
         object[] data = photonView.InstantiationData;
-        if (data != null && data.Length >= 1) {
-            followMe = PhotonView.Find((int) data[0]).GetComponent<PlayerController>();
-            followMeCounter = 1.5f;
-            passthrough = true;
-            body.isKinematic = true;
+        if (data != null) {
+            if (data[0] is float) {
+                ignoreCounter = (float) data[0];
+            } else if (data[0] is int) {
+                followMe = PhotonView.Find((int) data[0]).GetComponent<PlayerController>();
+                followMeCounter = 1.5f;
+                passthrough = true;
+                body.isKinematic = true;
+            }
         }
 
         if (groundMask == -1)
             groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
     }
     void LateUpdate() {
+        ignoreCounter -= Time.deltaTime;
         if (!followMe) return;
 
         float size = (followMe.flying ? 3.8f : 2.8f);
-        transform.position = new Vector3(followMe.transform.position.x, Camera.main.transform.position.y + (size*0.6f));
+        transform.position = new Vector3(followMe.transform.position.x, followMe.cameraController.currentPosition.y + (size*0.6f));
 
-        renderer.enabled = (followMeCounter * blinkingRate) % 2 > 1;
+        sRenderer.enabled = (followMeCounter * blinkingRate) % 2 > 1;
         if ((followMeCounter -= Time.deltaTime) < 0) {
             followMe = null;
             if (photonView.IsMine) {
@@ -61,18 +66,18 @@ public class MovingPowerup : MonoBehaviourPun {
         despawnCounter -= Time.fixedDeltaTime;
         if (despawnCounter <= 3) {
             if ((despawnCounter * blinkingRate) % 1 < 0.5f) {
-                renderer.enabled = false;
+                sRenderer.enabled = false;
             } else {
-                renderer.enabled = true;
+                sRenderer.enabled = true;
             }
         } else {
-            renderer.enabled = true;
+            sRenderer.enabled = true;
         }
         if (despawnCounter <= 0 && photonView.IsMine) {
             PhotonNetwork.Destroy(photonView);
         }
 
-        renderer.color = Color.white;
+        sRenderer.color = Color.white;
         body.isKinematic = false;
         if (passthrough) {
             if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, Vector2.one / 3f, 0, groundMask)) {

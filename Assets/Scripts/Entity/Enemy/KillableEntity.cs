@@ -8,7 +8,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
     public Rigidbody2D body;
     protected BoxCollider2D hitbox;
     protected Animator animator;
-    protected new SpriteRenderer renderer;
+    protected SpriteRenderer sRenderer;
     protected AudioSource audioSource;
     protected PhysicsEntity physics;
 
@@ -17,13 +17,13 @@ public abstract class KillableEntity : MonoBehaviourPun {
         hitbox = GetComponent<BoxCollider2D>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        renderer = GetComponent<SpriteRenderer>();
+        sRenderer = GetComponent<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
     }
 
     public void Update() {
-        if (renderer.enabled) {
-            if (!renderer.isVisible) {
+        if (sRenderer.enabled) {
+            if (!sRenderer.isVisible) {
                 audioSource.volume = 0;
             } else {
                 audioSource.volume = 1;

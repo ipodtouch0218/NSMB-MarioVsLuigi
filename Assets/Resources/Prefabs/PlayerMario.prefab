@@ -9796,6 +9796,8 @@ GameObject:
   - component: {fileID: 4945816510512606649}
   - component: {fileID: 2254935152879088866}
   - component: {fileID: -794181859137843178}
+  - component: {fileID: 2496339128398130277}
+  - component: {fileID: 7672112719043132634}
   m_Layer: 10
   m_Name: PlayerMario
   m_TagString: Player
@@ -9865,6 +9867,7 @@ MonoBehaviour:
   sparkles: {fileID: 4824223340723290478}
   drillParticle: {fileID: 599751029868069242}
   giantParticle: {fileID: 8077331287960115309}
+  cameraController: {fileID: 0}
   body: {fileID: 0}
   onGround: 0
   crushGround: 0
@@ -9900,6 +9903,7 @@ MonoBehaviour:
   koyoteTime: 0
   deathCounter: 0
   groundpoundCounter: 0
+  groundpoundDelay: 0
   hitInvincibilityCounter: 0
   powerupFlash: 0
   throwInvincibility: 0
@@ -10259,6 +10263,34 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &2496339128398130277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824223341387914446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  screenShakeTimer: 0
+  exactCentering: 0
+  offset: {x: 0, y: 0, z: 0}
+  currentPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &7672112719043132634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824223341387914446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbe023cea6fd5f842af136c8824b0710, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4824223342336871188
 GameObject:
   m_ObjectHideFlags: 0
