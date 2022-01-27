@@ -19,6 +19,8 @@ public class UserNametag : MonoBehaviour {
         float y = 1.6f;
         if (parent.state == Enums.PowerupState.Small || parent.inShell || parent.crouching) {
             y = 1.2f;
+        } else if (parent.state == Enums.PowerupState.Giant) {
+            y = 1.15f;
         }
 
         transform.localPosition = new Vector2(0, y);

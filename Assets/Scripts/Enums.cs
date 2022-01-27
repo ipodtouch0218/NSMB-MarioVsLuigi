@@ -20,8 +20,9 @@ public class Enums {
         StartGame = 1,
         ChatMessage = 2,
         // 10-19 = game state events
-        EndGame = 10,
-        PlayerFinishedLoading = 11,
+        PlayerFinishedLoading = 10,
+        SetGameStartTimestamp = 11,
+        EndGame = 19,
         // 20-29 = world-based game events
         SetTile = 20,
         BumpTile = 21,

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class CameraController : MonoBehaviour {
 
-    private float scrollAmount;
+    public float scrollAmount;
     public float screenShakeTimer = 0;
     public bool exactCentering = false;
     public Vector3 offset = Vector3.zero, currentPosition;

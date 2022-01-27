@@ -228,13 +228,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     //hit them from above
                     bounce = !groundpound;
                     drill = false;
-                    if (state == Enums.PowerupState.Mini) {
-                        if (!groundpound) {
-                            photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
-                            return;
-                        }
+                    if (state == Enums.PowerupState.Mini && !groundpound) {
+                        photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
+                    } else if (other.state == Enums.PowerupState.Mini && groundpound) {
+                        otherView.RPC("Powerdown", RpcTarget.All, false);
+                        bounce = false;
+                    } else {
+                        otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, groundpound && state != Enums.PowerupState.Mini ? 2 : 1, photonView.ViewID);
                     }
-                    otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, groundpound && state != Enums.PowerupState.Mini ? 2 : 1, photonView.ViewID);
                     return;
                 }
 
@@ -667,6 +668,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [PunRPC]
     public void PreRespawn() {
         transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
+        cameraController.scrollAmount = 0;
         cameraController.Update();
         state = Enums.PowerupState.Small;
         dead = false;
@@ -940,7 +942,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             //Facing direction
             bool right = joystick.x > analogDeadzone;
             bool left = joystick.x < -analogDeadzone;
-            if (doIceSkidding) {
+            if (doIceSkidding && !inShell && !groundpound) {
                 if (right || left) {
                     facingRight = right;
                 }
@@ -1473,7 +1475,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if ((left && right) || !(left || right)) return;
 
-        float invincibleSpeedBoost = (invincible > 0 ? 1.5f : 1);
+        float invincibleSpeedBoost = (invincible > 0 ? 2f : 1);
         float airPenalty = (onGround ? 1 : 0.5f);
         float xVel = body.velocity.x;
         float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
@@ -1554,7 +1556,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         stuckInBlock = true;
         body.gravityScale = 0;
         onGround = true;
-        if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(0.25f, 0))) {
+        if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(0, 0.3f))) {
+            transform.position = body.position = new Vector2(body.position.x, Mathf.Floor((checkPos.y + 0.3f)*2)/2);
+            return true;
+        } else if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(0.25f, 0))) {
             body.velocity = Vector2.right*2f;
             return true;
         } else if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(-0.25f, 0))) {

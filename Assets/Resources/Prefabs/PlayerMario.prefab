@@ -10275,6 +10275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scrollAmount: 0
   screenShakeTimer: 0
   exactCentering: 0
   offset: {x: 0, y: 0, z: 0}

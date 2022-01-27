@@ -115,6 +115,7 @@ MonoBehaviour:
   followMe: {fileID: 0}
   followMeCounter: 0
   despawnCounter: 15
+  ignoreCounter: 0
 --- !u!50 &3379984366894124869
 Rigidbody2D:
   serializedVersion: 4
@@ -149,7 +150,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.2}
+  m_Offset: {x: 0, y: 0.2625}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}

@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public AudioSource music, sfx;
 
     public GameObject localPlayer;
-    public bool paused, loaded;
+    public bool paused, loaded, starting;
     [SerializeField] GameObject pauseUI, pauseButton;
     public bool gameover = false, musicEnabled = false;
     public List<string> loadedPlayers = new List<string>();
@@ -51,6 +51,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     }
     public void OnEvent(byte eventId, object customData) {
         switch (eventId) {
+        case (byte) Enums.NetEventIds.SetGameStartTimestamp: {
+            if (loaded) break;
+            StartCoroutine(LoadingComplete((int) customData));
+            break;
+        }
         case (byte) Enums.NetEventIds.EndGame: {
             Player winner = (Player) customData;
             StartCoroutine(EndGame(winner));
@@ -189,7 +194,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, PhotonNetwork.LocalPlayer, options, SendOptions.SendReliable);
         loadedPlayers.Add(PhotonNetwork.LocalPlayer.NickName);
     }
-    public void LoadingComplete() {
+    IEnumerator LoadingComplete(long startTimestamp) {
+        starting = true;
         loaded = true;
         loadedPlayers.Clear();
         allPlayers = FindObjectsOfType<PlayerController>();
@@ -199,6 +205,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             RaiseEventOptions options = new RaiseEventOptions {Receivers=ReceiverGroup.MasterClient, CachingOption=EventCaching.RemoveFromRoomCache};
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);
         }
+        
+        yield return new WaitForSecondsRealtime((startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f);
 
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
         if (canvas) {
@@ -210,11 +218,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             source.enabled = false;
             Destroy(source);
         }
-        StartCoroutine(WaitToActivate());
-    }
 
-    IEnumerator WaitToActivate() {
         yield return new WaitForSeconds(3.5f);
+
         sfx.PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
 
         foreach (var wfgs in GameObject.FindObjectsOfType<WaitForGameStart>()) {
@@ -230,6 +236,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         localPlayer.GetPhotonView().RPC("PreRespawn", RpcTarget.All);
 
         yield return new WaitForSeconds(1f);
+        
         musicEnabled = true;
         SceneManager.UnloadSceneAsync("Loading");
     }
@@ -259,7 +266,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     void Update() {
         if (gameover) return;
 
+        if (musicEnabled) {
+            HandleMusic();
+        }
         if (PhotonNetwork.IsMasterClient) {
+            int players = PhotonNetwork.CurrentRoom.PlayerCount;
+            if (!loaded && loadedPlayers.Count >= players) {
+                SendAndExecuteEvent(Enums.NetEventIds.SetGameStartTimestamp, PhotonNetwork.ServerTimestamp + ((players-1) * 250) + 1000, SendOptions.SendReliable);
+                return;
+            }
             foreach (var player in allPlayers) {
                 if (player.stars >= starRequirement) {
                     //game over, losers
@@ -271,19 +286,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
         }
 
-        if (!loaded) {
-            if (PhotonNetwork.CurrentRoom == null || loadedPlayers.Count >= PhotonNetwork.CurrentRoom.PlayerCount) {
-                LoadingComplete();
-            }
-            return;
-        }
-        if (musicEnabled) {
-            HandleMusic();
-        }
-
-
         if (currentStar == null) {
-            if (PhotonNetwork.IsMasterClient) {
+            if (!PhotonNetwork.IsMasterClient) {
                 if ((spawnStarCount -= Time.deltaTime) <= 0) {
                     if (remainingSpawns.Count == 0) {
                         remainingSpawns.AddRange(starSpawns);
@@ -294,6 +298,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     foreach (var hit in Physics2D.OverlapCircleAll(spawnPos, 4)) {
                         if (hit.gameObject.tag == "Player") {
                             //cant spawn here
+                            remainingSpawns.RemoveAt(index);
                             return;
                         }
                     }

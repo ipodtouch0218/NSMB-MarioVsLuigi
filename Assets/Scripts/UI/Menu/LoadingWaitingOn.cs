@@ -5,36 +5,18 @@ using TMPro;
 using Photon.Pun;
 public class LoadingWaitingOn : MonoBehaviour {
     private TMP_Text text;
-    public string emptyText = "";
-    public string iveLoadedText = "";
+    public string emptyText = "Loading...", iveLoadedText = "Waiting for others...", readyToStartText = "Starting...";
     void Start() {
         text = GetComponent<TMP_Text>();
     }
 
     void Update() {
         if (!GameManager.Instance) return;
-        if (GameManager.Instance.loadedPlayers.Count == 0) return;
-
-        string final;
-        if (iveLoadedText != null) {
-            final = iveLoadedText;
-        } else {
-            List<string> loading = new List<string>();
-            foreach (Photon.Realtime.Player player in PhotonNetwork.CurrentRoom.Players.Values) {
-                if (!GameManager.Instance.loadedPlayers.Contains(player.NickName)) {
-                    loading.Add(player.NickName);
-                }
-            }
-            
-            if (loading.Count <= 0) {
-                text.text = emptyText; 
-                return; 
-            }
-            final = "Waiting on:";
-            foreach (string loadingPlayer in loading) {
-                final += "\n* " + loadingPlayer;
-            }
+        if (GameManager.Instance.starting) {
+            text.text = readyToStartText;
+            return;
         }
-        text.text = final;
+        if (GameManager.Instance.loadedPlayers.Count == 0) return;
+        text.text = iveLoadedText;
     }
 }

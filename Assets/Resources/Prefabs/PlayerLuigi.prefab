@@ -15912,6 +15912,7 @@ MonoBehaviour:
   sparkles: {fileID: 1192088335986799603}
   drillParticle: {fileID: 4430736674483794918}
   giantParticle: {fileID: 1382120724504233341}
+  cameraController: {fileID: 0}
   body: {fileID: 0}
   onGround: 0
   crushGround: 0
@@ -16319,6 +16320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scrollAmount: 0
   screenShakeTimer: 0
   exactCentering: 0
   offset: {x: 0, y: 0, z: 0}

@@ -88,30 +88,19 @@ public class MovingPowerup : MonoBehaviourPun {
         HandleCollision();
         if (!followMe && !passthrough && avoidPlayers && physics.onGround) {
             Collider2D closest = null;
+            Vector2 closestPosition = Vector2.zero;
             float distance = float.MaxValue;
             foreach (var hit in Physics2D.OverlapCircleAll(body.position, 10f)) {
                 if (hit.tag != "Player") continue;
-                float tempDistance = Vector2.Distance(hit.attachedRigidbody.position, body.position);
+                Vector2 actualPosition = (hit.attachedRigidbody.position + hit.offset);
+                float tempDistance = Vector2.Distance(actualPosition, body.position);
                 if (tempDistance > distance) continue;
                 distance = tempDistance;    
                 closest = hit;
-            }
-            Vector2 offset = new Vector2(GameManager.Instance.levelWidthTile/2f, 0);
-            float centerOfMap = offset.x + GameManager.Instance.GetLevelMinX();
-            bool offsets = false;
-            if (body.position.x < centerOfMap) {
-                offset = -offset;
-            }
-            foreach (var hit in Physics2D.OverlapCircleAll(body.position + offset, 10f)) {
-                if (hit.tag != "Player") continue;
-                float tempDistance = Vector2.Distance(hit.attachedRigidbody.position, body.position + offset);
-                if (tempDistance > distance) continue;
-                distance = tempDistance;
-                closest = hit;
-                offsets = true;
+                closestPosition = actualPosition;
             }
             if (closest) {
-                right = ((closest.attachedRigidbody.position.x - body.position.x) < 0) ^ offsets; 
+                right = ((closestPosition.x - body.position.x) < 0); 
             }
         }
 
@@ -143,15 +132,5 @@ public class MovingPowerup : MonoBehaviourPun {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
         GameObject.Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
-    }
-
-    private void OnDrawGizmos() {
-        Gizmos.DrawWireSphere(body.position, 10f);
-        Vector2 offset = new Vector2(GameManager.Instance.levelWidthTile/2f, 0);
-        float centerOfMap = offset.x + GameManager.Instance.GetLevelMinX();
-        if (body.position.x < centerOfMap) {
-            offset = -offset;
-        }
-        Gizmos.DrawWireSphere(body.position + offset, 10f);
     }
 }
