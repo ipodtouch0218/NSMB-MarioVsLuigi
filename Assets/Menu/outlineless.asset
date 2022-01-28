@@ -123,8 +123,8 @@ MonoBehaviour:
   m_SourceFontFileGUID: d15e25fbcc2b1e44b85ac210ea8c69f8
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: d15e25fbcc2b1e44b85ac210ea8c69f8,
     type: 3}
-  m_SourceFontFile: {fileID: 12800000, guid: d15e25fbcc2b1e44b85ac210ea8c69f8, type: 3}
-  m_AtlasPopulationMode: 1
+  m_SourceFontFile: {fileID: 0}
+  m_AtlasPopulationMode: 0
   m_FaceInfo:
     m_FaceIndex: 0
     m_FamilyName: Super Mario DS
@@ -467,6 +467,20 @@ MonoBehaviour:
       m_Y: 310
       m_Width: 45
       m_Height: 45
+    m_Scale: 1
+    m_AtlasIndex: 0
+  - m_Index: 33
+    m_Metrics:
+      m_Width: 35.984375
+      m_Height: 63
+      m_HorizontalBearingX: 0
+      m_HorizontalBearingY: 71.984375
+      m_HorizontalAdvance: 45
+    m_GlyphRect:
+      m_X: 640
+      m_Y: 474
+      m_Width: 36
+      m_Height: 64
     m_Scale: 1
     m_AtlasIndex: 0
   - m_Index: 34
@@ -1183,20 +1197,6 @@ MonoBehaviour:
       m_Height: 63
     m_Scale: 1
     m_AtlasIndex: 0
-  - m_Index: 33
-    m_Metrics:
-      m_Width: 35.984375
-      m_Height: 63
-      m_HorizontalBearingX: 0
-      m_HorizontalBearingY: 71.984375
-      m_HorizontalAdvance: 45
-    m_GlyphRect:
-      m_X: 640
-      m_Y: 474
-      m_Width: 36
-      m_Height: 64
-    m_Scale: 1
-    m_AtlasIndex: 0
   m_CharacterTable:
   - m_ElementType: 1
     m_Unicode: 32
@@ -1289,6 +1289,10 @@ MonoBehaviour:
   - m_ElementType: 1
     m_Unicode: 61
     m_GlyphIndex: 32
+    m_Scale: 1
+  - m_ElementType: 1
+    m_Unicode: 62
+    m_GlyphIndex: 33
     m_Scale: 1
   - m_ElementType: 1
     m_Unicode: 63
@@ -1493,10 +1497,6 @@ MonoBehaviour:
   - m_ElementType: 1
     m_Unicode: 121
     m_GlyphIndex: 91
-    m_Scale: 1
-  - m_ElementType: 1
-    m_Unicode: 62
-    m_GlyphIndex: 33
     m_Scale: 1
   m_AtlasTextures:
   - {fileID: 3926905847682913098}
@@ -2084,7 +2084,7 @@ Texture2D:
   m_MipsStripped: 0
   m_TextureFormat: 1
   m_MipCount: 1
-  m_IsReadable: 1
+  m_IsReadable: 0
   m_IsPreProcessed: 0
   m_IgnoreMasterTextureLimit: 0
   m_StreamingMipmaps: 0

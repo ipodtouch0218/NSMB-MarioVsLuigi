@@ -350,12 +350,12 @@ PrefabInstance:
         type: 3}
       propertyPath: loop
       value: 
-      objectReference: {fileID: 8300000, guid: c0cef5299770e8f4ba5897f2d9f3027a, type: 3}
+      objectReference: {fileID: 8300000, guid: 7dc7977227170d74fb477131e75eb9f6, type: 3}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: intro
       value: 
-      objectReference: {fileID: 8300000, guid: 938cdbc3efc53f74ea100ea13f7880f9, type: 3}
+      objectReference: {fileID: 8300000, guid: 9b5bbe163479ba74bb50d19fc4a9ef97, type: 3}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: pauseUI

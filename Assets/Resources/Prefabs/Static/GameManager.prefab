@@ -164,15 +164,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyedPipeSprite: {fileID: 1742602189, guid: c55eba81d441d3f439e8289699cf72c8,
     type: 3}
-  intro: {fileID: 8300000, guid: 575ecee20cb0a6b428ebcc7cfc1d6a29, type: 3}
-  loop: {fileID: 8300000, guid: 6b77e7f633641e7448deef5fb53719d9, type: 3}
-  invincibleIntro: {fileID: 8300000, guid: 2c649b52d92a2194ba01ea3cc507ee76, type: 3}
-  invincibleLoop: {fileID: 8300000, guid: d39cb269a52f3e14bba39a7f091aa30b, type: 3}
-  megaMushroomLoop: {fileID: 8300000, guid: 889c824bddb584743a5b0762112da631, type: 3}
+  intro: {fileID: 8300000, guid: 1f32b5e2616e1164c9c0107b77e22cb8, type: 3}
+  loop: {fileID: 8300000, guid: 454acdfab669cfa458f51430b371d43a, type: 3}
+  invincibleIntro: {fileID: 8300000, guid: 1927ed9d3a0189b4fabe6bdbb53feb5e, type: 3}
+  invincibleLoop: {fileID: 8300000, guid: 9f6a1e2969ca09647a7ac1c8f7e0541b, type: 3}
+  megaMushroomLoop: {fileID: 8300000, guid: b19d40ba33fd0c04d85f36e6a03b5484, type: 3}
   levelMinTileX: -30
   levelMinTileY: -12
   levelWidthTile: 50
   levelHeightTile: 15
+  cameraMinY: 0
+  cameraHeightY: 0
+  cameraMinX: -1000
+  cameraMaxX: 1000
+  loopingLevel: 1
   spawnpoint: {x: 0, y: 0, z: 0}
   tilemap: {fileID: 0}
   canSpawnMegaMushroom: 1
@@ -181,6 +186,7 @@ MonoBehaviour:
   localPlayer: {fileID: 0}
   paused: 0
   loaded: 0
+  starting: 0
   pauseUI: {fileID: 0}
   pauseButton: {fileID: 0}
   gameover: 0
@@ -188,6 +194,7 @@ MonoBehaviour:
   loadedPlayers: []
   starRequirement: 0
   allPlayers: []
+  enemySpawnpoints: []
   size: 1.39
   ySize: 0.8
   playersToVisualize: 10

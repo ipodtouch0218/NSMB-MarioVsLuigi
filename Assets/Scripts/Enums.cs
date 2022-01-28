@@ -34,4 +34,9 @@ public class Enums {
     //TODO: event caching?
     // private static List<byte> uncached = new List<byte>(new byte[]{1, 2, 10, 11, 21, 30, 31});
     // public static ReadOnlyCollection<byte> uncachedEvents => uncached.AsReadOnly();
+    public enum MusicState {
+        Normal,
+        MegaMushroom,
+        Starman,
+    }
 }

@@ -28,7 +28,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     GameObject[] starSpawns;
     List<GameObject> remainingSpawns = new List<GameObject>();
     float spawnStarCount;
+
+    //Audio
     public AudioSource music, sfx;
+    private Enums.MusicState? musicState = null;
+    private Coroutine musicPlayRoutine = null;
 
     public GameObject localPlayer;
     public bool paused, loaded, starting;
@@ -41,9 +45,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public EnemySpawnpoint[] enemySpawnpoints;
 
     // EVENT CALLBACK
-    public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, ExitGames.Client.Photon.SendOptions sendOption) {
+    public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, ExitGames.Client.Photon.SendOptions sendOption, RaiseEventOptions eventOptions = null) {
+        if (eventOptions == null)
+            eventOptions = Utils.EVENT_OTHERS;
         //TODO event caching for rejoining?
-        PhotonNetwork.RaiseEvent((byte) eventId, parameters, Utils.EVENT_OTHERS, sendOption);
+        PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
         OnEvent((byte) eventId, parameters);
     }
     public void OnEvent(EventData e) {
@@ -186,11 +192,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
 
-        // PhotonNetwork.SerializationRate = 50;
-
         PhotonNetwork.IsMessageQueueRunning = true;
 
+        
         RaiseEventOptions options = new RaiseEventOptions {Receivers=ReceiverGroup.Others, CachingOption=EventCaching.AddToRoomCache};
+        SendAndExecuteEvent(Enums.NetEventIds.PlayerFinishedLoading, PhotonNetwork.LocalPlayer, SendOptions.SendReliable, options);
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, PhotonNetwork.LocalPlayer, options, SendOptions.SendReliable);
         loadedPlayers.Add(PhotonNetwork.LocalPlayer.NickName);
     }
@@ -269,6 +275,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         if (musicEnabled) {
             HandleMusic();
         }
+
         if (PhotonNetwork.IsMasterClient) {
             int players = PhotonNetwork.CurrentRoom.PlayerCount;
             if (!loaded && loadedPlayers.Count >= players) {
@@ -314,14 +321,21 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
     }
 
-    void HandleMusic() {
-        if (intro != null) {
-            intro = null;
-            music.clip = intro;
-            music.loop = false;
+    void PlaySong(Enums.MusicState state, AudioClip loop, AudioClip intro = null) {
+        if (musicState == state) return;
+        musicState = state;
+        music.Stop();
+        music.clip = loop;
+        music.loop = true;
+        if (intro) {
+            music.PlayOneShot(intro);
+            music.PlayScheduled(AudioSettings.dspTime + intro.length - (Time.fixedDeltaTime * 2));
+        } else {
             music.Play();
         }
+    }
 
+    void HandleMusic() {
         bool invincible = false;
         bool mega = false;
         bool speedup = false;
@@ -341,35 +355,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
 
         if (mega) {
-            if (music.clip != megaMushroomLoop || !music.isPlaying) {
-                music.clip = megaMushroomLoop;
-                music.loop = true;
-                music.Play();
-            }
+            PlaySong(Enums.MusicState.MegaMushroom, megaMushroomLoop);
         } else if (invincible) {
-            if (music.clip == intro || music.clip == loop) {
-                music.clip = invincibleIntro;
-                music.loop = false;
-                music.Play();
-            }
-            if (music.clip == invincibleIntro && !music.isPlaying) {
-                music.clip = invincibleLoop;
-                music.loop = true;
-                music.Play();
-            }
-            return;
-        } else if (!(music.clip == intro || music.clip == loop)) {
-            music.Stop();
-            if (intro != null) {
-                music.clip = intro;
-                music.loop = false;
-                music.Play();
-            }
-        }
-        if (!music.isPlaying) {
-            music.clip = loop;
-            music.loop = true;
-            music.Play();
+            PlaySong(Enums.MusicState.Starman, invincibleLoop, invincibleIntro);
+        } else {
+            PlaySong(Enums.MusicState.Normal, loop, intro);
         }
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;

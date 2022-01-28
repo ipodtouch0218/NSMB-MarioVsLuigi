@@ -29,7 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CustomJungle.unity
     guid: de8e2edb54b6b5e489c97578fa670804
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ChrisLevel.unity
     guid: 726270b3f73301e4d86c79f4ef9e818c
   m_configObjects: {}
