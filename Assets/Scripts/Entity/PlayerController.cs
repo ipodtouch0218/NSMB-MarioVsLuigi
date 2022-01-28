@@ -732,7 +732,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleGiantTiles(bool pipes) {
-        Vector3Int worldOffset = new Vector3Int(GameManager.Instance.levelWidthTile, 0, 0);
         int minY = (singlejump && onGround) ? 0 : 1, maxY = Mathf.Abs(body.velocity.y) > 0.05f ? 8 : 7;
         Vector2 offset = (Vector2.right * 0.3f) * (facingRight ? 1 : -1);
         int width = 1;
@@ -742,9 +741,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         for (int x = -width; x <= width; x++) {
             for (int y = minY; y <= maxY; y++) {
                 Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.4f));
-                if (tileLocation.x < GameManager.Instance.levelMinTileX) {
-                    tileLocation += worldOffset;
-                }
+
                 BreakablePipeTile pipe = GameManager.Instance.tilemap.GetTile<BreakablePipeTile>(tileLocation);
                 if (pipe && (pipe.upsideDownPipe || !pipes)) continue;
 
@@ -764,9 +761,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             for (int x = -width; x <= width; x++) {
                 for (int y = maxY; y >= minY; y--) {
                     Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position + offset + new Vector2(x/2f, y/2f - 0.45f));
-                    if (tileLocation.x < GameManager.Instance.levelMinTileX) {
-                        tileLocation += worldOffset;
-                    }
                     BreakablePipeTile pipe = GameManager.Instance.tilemap.GetTile<BreakablePipeTile>(tileLocation);
                     if (!pipe || !pipe.upsideDownPipe) continue;
 

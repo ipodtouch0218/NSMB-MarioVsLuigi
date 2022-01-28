@@ -584,7 +584,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
@@ -609,7 +609,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -640,6 +640,42 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -648,7 +684,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 176
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -669,7 +705,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 144
-        y: 176
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -690,7 +726,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 160
-        y: 176
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -711,7 +747,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 176
-        y: 176
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -732,7 +768,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 176
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -753,7 +789,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 208
-        y: 176
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -774,7 +810,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 224
-        y: 176
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -795,7 +831,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 240
-        y: 176
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -816,7 +852,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 80
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -837,7 +873,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 96
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -858,7 +894,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -879,7 +915,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 144
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -900,7 +936,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 160
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -921,7 +957,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 176
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -942,7 +978,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -963,7 +999,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 208
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -984,7 +1020,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 224
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -1005,7 +1041,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 240
-        y: 160
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -1169,69 +1205,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 0 Grassland_97
-      rect:
-        serializedVersion: 2
-        x: 112
-        y: 96
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f54d1d6959d746b80800000000000000
-      internalID: -8402452923332570017
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 0 Grassland_98
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 96
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d2e1e8cafaf66b3a0800000000000000
-      internalID: -6650004999461003731
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 0 Grassland_99
-      rect:
-        serializedVersion: 2
-        x: 144
-        y: 96
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 05f448f1c66056f50800000000000000
-      internalID: 6873907467705929552
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: 0 Grassland_100
       rect:
         serializedVersion: 2
@@ -1269,69 +1242,6 @@ TextureImporter:
       bones: []
       spriteID: 11aeef0058b69d6c0800000000000000
       internalID: -4118142165262079471
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 0 Grassland_102
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 96
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2b91a5a64ef0293c0800000000000000
-      internalID: -4354400416002598478
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 0 Grassland_103
-      rect:
-        serializedVersion: 2
-        x: 208
-        y: 96
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 58b270f63944d5910800000000000000
-      internalID: 1827692423795911557
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 0 Grassland_104
-      rect:
-        serializedVersion: 2
-        x: 224
-        y: 96
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6e903e6098306f820800000000000000
-      internalID: 2951550492848884198
       vertices: []
       indices: 
       edges: []

@@ -134,7 +134,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 1.4.0-beta
+  bundleVersion: 1.4.1-beta
   preloadedAssets:
   - {fileID: 0}
   - {fileID: 0}
@@ -866,7 +866,7 @@ PlayerSettings:
   cloudServicesEnabled:
     Analytics: 1
     Build: 0
-    Collab: 1
+    Collab: 0
     Game Performance: 0
     Purchasing: 0
     UDP: 0

@@ -140,7 +140,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
@@ -165,7 +165,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -196,6 +196,42 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -204,7 +240,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 119
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -224,8 +260,8 @@ TextureImporter:
       name: animation_1
       rect:
         serializedVersion: 2
-        x: 17
-        y: 119
+        x: 16
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -245,8 +281,8 @@ TextureImporter:
       name: animation_2
       rect:
         serializedVersion: 2
-        x: 34
-        y: 119
+        x: 32
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -266,8 +302,8 @@ TextureImporter:
       name: animation_3
       rect:
         serializedVersion: 2
-        x: 51
-        y: 119
+        x: 48
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -288,7 +324,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 102
+        y: 96
         width: 16
         height: 16
       alignment: 0
@@ -308,8 +344,8 @@ TextureImporter:
       name: animation_5
       rect:
         serializedVersion: 2
-        x: 17
-        y: 102
+        x: 16
+        y: 96
         width: 16
         height: 16
       alignment: 0
@@ -329,8 +365,8 @@ TextureImporter:
       name: animation_6
       rect:
         serializedVersion: 2
-        x: 34
-        y: 102
+        x: 32
+        y: 96
         width: 16
         height: 16
       alignment: 0
@@ -350,8 +386,8 @@ TextureImporter:
       name: animation_7
       rect:
         serializedVersion: 2
-        x: 51
-        y: 102
+        x: 48
+        y: 96
         width: 16
         height: 16
       alignment: 0
@@ -372,7 +408,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1
-        y: 85
+        y: 80
         width: 14
         height: 16
       alignment: 0
@@ -392,8 +428,8 @@ TextureImporter:
       name: animation_9
       rect:
         serializedVersion: 2
-        x: 19
-        y: 85
+        x: 18
+        y: 80
         width: 11
         height: 16
       alignment: 0
@@ -413,8 +449,8 @@ TextureImporter:
       name: animation_10
       rect:
         serializedVersion: 2
-        x: 40
-        y: 85
+        x: 38
+        y: 80
         width: 4
         height: 16
       alignment: 0
@@ -434,8 +470,8 @@ TextureImporter:
       name: animation_11
       rect:
         serializedVersion: 2
-        x: 53
-        y: 85
+        x: 50
+        y: 80
         width: 12
         height: 16
       alignment: 0
@@ -456,7 +492,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1
-        y: 68
+        y: 64
         width: 14
         height: 16
       alignment: 0
@@ -476,8 +512,8 @@ TextureImporter:
       name: animation_13
       rect:
         serializedVersion: 2
-        x: 19
-        y: 68
+        x: 18
+        y: 64
         width: 11
         height: 16
       alignment: 0
@@ -497,8 +533,8 @@ TextureImporter:
       name: animation_14
       rect:
         serializedVersion: 2
-        x: 40
-        y: 68
+        x: 38
+        y: 64
         width: 4
         height: 16
       alignment: 0
@@ -518,8 +554,8 @@ TextureImporter:
       name: animation_15
       rect:
         serializedVersion: 2
-        x: 53
-        y: 68
+        x: 50
+        y: 64
         width: 12
         height: 16
       alignment: 0
@@ -540,7 +576,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 51
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -560,8 +596,8 @@ TextureImporter:
       name: animation_17
       rect:
         serializedVersion: 2
-        x: 17
-        y: 51
+        x: 16
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -581,8 +617,8 @@ TextureImporter:
       name: animation_18
       rect:
         serializedVersion: 2
-        x: 34
-        y: 51
+        x: 32
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -602,8 +638,8 @@ TextureImporter:
       name: animation_19
       rect:
         serializedVersion: 2
-        x: 51
-        y: 51
+        x: 48
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -624,7 +660,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 34
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -644,8 +680,8 @@ TextureImporter:
       name: animation_21
       rect:
         serializedVersion: 2
-        x: 17
-        y: 34
+        x: 16
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -665,8 +701,8 @@ TextureImporter:
       name: animation_22
       rect:
         serializedVersion: 2
-        x: 34
-        y: 34
+        x: 32
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -686,8 +722,8 @@ TextureImporter:
       name: animation_23
       rect:
         serializedVersion: 2
-        x: 51
-        y: 34
+        x: 48
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -708,7 +744,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 17
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -728,8 +764,8 @@ TextureImporter:
       name: animation_25
       rect:
         serializedVersion: 2
-        x: 17
-        y: 17
+        x: 16
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -749,8 +785,8 @@ TextureImporter:
       name: animation_26
       rect:
         serializedVersion: 2
-        x: 34
-        y: 17
+        x: 32
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -770,8 +806,8 @@ TextureImporter:
       name: animation_27
       rect:
         serializedVersion: 2
-        x: 51
-        y: 17
+        x: 48
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -796,7 +832,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -812,12 +848,12 @@ TextureImporter:
       name: animation_29
       rect:
         serializedVersion: 2
-        x: 17
+        x: 16
         y: 0
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -833,12 +869,12 @@ TextureImporter:
       name: animation_30
       rect:
         serializedVersion: 2
-        x: 34
+        x: 32
         y: 0
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -854,12 +890,12 @@ TextureImporter:
       name: animation_31
       rect:
         serializedVersion: 2
-        x: 51
+        x: 48
         y: 0
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

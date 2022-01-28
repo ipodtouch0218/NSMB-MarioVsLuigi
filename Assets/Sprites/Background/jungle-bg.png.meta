@@ -55,7 +55,7 @@ TextureImporter:
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -130,6 +130,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -137,19 +149,19 @@ TextureImporter:
       name: jungle-bg_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 499
-        width: 506
-        height: 488
+        x: 0
+        y: 98
+        width: 128
+        height: 202
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 200, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3ddf28481da043be0800000000000000
-      internalID: -1498560881019912749
+      spriteID: 27db87ff2da275c70800000000000000
+      internalID: 8959677069394492786
       vertices: []
       indices: 
       edges: []
@@ -158,19 +170,19 @@ TextureImporter:
       name: jungle-bg_1
       rect:
         serializedVersion: 2
-        x: 3
-        y: 5
-        width: 505
-        height: 488
+        x: 0
+        y: 0
+        width: 128
+        height: 98
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 97, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 27db87ff2da275c70800000000000000
-      internalID: 8959677069394492786
+      spriteID: a7f34d69396e2f842990e03a830ff22b
+      internalID: -1382079246
       vertices: []
       indices: 
       edges: []
@@ -186,8 +198,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      jungle-bg_0: -1498560881019912749
-      jungle-bg_1: 8959677069394492786
+      jungle-bg_0: 8959677069394492786
+      jungle-bg_1: -1382079246
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

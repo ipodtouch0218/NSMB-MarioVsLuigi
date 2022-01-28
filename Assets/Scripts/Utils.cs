@@ -9,7 +9,18 @@ public class Utils {
     public static RaiseEventOptions EVENT_OTHERS {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.Others};
     public static RaiseEventOptions EVENT_ALL {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.All};
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec) {
-        return GameManager.Instance.tilemap.WorldToCell(worldVec);
+        Vector3Int tileLocation = GameManager.Instance.tilemap.WorldToCell(worldVec);
+        WrapTileLocation(ref tileLocation);
+        return tileLocation;
+    }
+
+    public static void WrapTileLocation(ref Vector3Int tileLocation) {
+        if (tileLocation.x < GameManager.Instance.levelMinTileX) {
+            tileLocation.x += GameManager.Instance.levelWidthTile;
+        }
+        if (tileLocation.x >= GameManager.Instance.levelMinTileX + GameManager.Instance.levelWidthTile) {
+            tileLocation.x -= GameManager.Instance.levelWidthTile;
+        }
     }
 
     public static Vector3Int WorldToTilemapPosition(float worldX, float worldY) {
@@ -37,6 +48,7 @@ public class Utils {
     }
 
     public static TileBase GetTileAtTileLocation(Vector3Int tileLocation) {
+        WrapTileLocation(ref tileLocation);
         return GameManager.Instance.tilemap.GetTile(tileLocation);
     }
     public static TileBase GetTileAtWorldLocation(Vector3 worldLocation) {
@@ -44,6 +56,7 @@ public class Utils {
     }
 
     public static bool IsTileSolidAtTileLocation(Vector3Int tileLocation) {
+        WrapTileLocation(ref tileLocation);
         Tile tile2 = GameManager.Instance.tilemap.GetTile<Tile>(tileLocation);
         if (tile2 && tile2.colliderType == Tile.ColliderType.Grid)
             return true;

@@ -413,7 +413,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
@@ -438,7 +438,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -459,6 +459,42 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -3101,12 +3137,13 @@ TextureImporter:
       bobomb_30: 4233090646143567117
       bobomb_5: -6875700398245287810
       bobomb_35: -6292798802282190010
-      bobomb_39: 1992761075017618208
+      bobomb_92: 2732210552630016984
       bobomb_47: -1614941335336611617
       bobomb_51: -8984335024730610018
-      bobomb_92: 2732210552630016984
+      bobomb_39: 1992761075017618208
       bobomb_2: 2977297280237847164
       bobomb_9: -1206508018138923714
+      bobomb_118: 4046440315886582256
       bobomb_16: 6008743476786152582
       bobomb_10: 1329537037601255902
       bobomb_23: -5186710341907233292
@@ -3121,21 +3158,20 @@ TextureImporter:
       bobomb_11: 1157878513374669233
       bobomb_103: -504432946264390904
       bobomb_14: 3670274235265251618
-      bobomb_106: -2726424431158848691
+      bobomb_114: 1092803952907589746
       bobomb_97: 585469587996746764
+      bobomb_106: -2726424431158848691
       bobomb_36: -8488715386043380814
-      bobomb_76: -5631971147912289225
       bobomb_64: 5893889764879259956
+      bobomb_76: -5631971147912289225
       bobomb_85: 8294002979847247203
-      bobomb_86: 7861812565743486574
       bobomb_96: 8445394881514567046
+      bobomb_86: 7861812565743486574
       bobomb_122: -6985388001290370435
       bobomb_73: 5594852989985777601
       bobomb_77: 7481976505158308573
       bobomb_48: 6798889096317293590
-      bobomb_114: 1092803952907589746
       bobomb_80: 2907792552573877165
-      bobomb_118: 4046440315886582256
       bobomb_81: -4164867705864706652
       bobomb_107: 3754014434283498427
       bobomb_83: 6994572450102403316

@@ -6,6 +6,7 @@ using Photon.Pun;
 
 public class BobombWalk : HoldableEntity {
 
+    private int explosionTileSize = 2;
     public float walkSpeed, kickSpeed, detonateTimer;
     bool left;
     public bool lit, detonated;
@@ -76,17 +77,17 @@ public class BobombWalk : HoldableEntity {
             }
         }
 
+        Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position);
         Tilemap tm = GameManager.Instance.tilemap;
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                
-                Vector3Int loc = Utils.WorldToTilemapPosition(body.position) + new Vector3Int(x, y, 0);
+        for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
+            for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
+                if (Mathf.Abs(x) + Mathf.Abs(y) > explosionTileSize) continue;
+                Vector3Int ourLocation = tileLocation + new Vector3Int(x, y, 0);
+                Utils.WrapTileLocation(ref ourLocation);
 
-                TileBase tile = tm.GetTile(loc);
-                if (tile == null) continue;
-
+                TileBase tile = tm.GetTile(ourLocation);
                 if (tile is InteractableTile) {
-                    ((InteractableTile) tile).Interact(this, (InteractableTile.InteractionDirection.Up), Utils.TilemapToWorldPosition(loc));
+                    ((InteractableTile) tile).Interact(this, (InteractableTile.InteractionDirection.Up), Utils.TilemapToWorldPosition(ourLocation));
                 }
             }
         }

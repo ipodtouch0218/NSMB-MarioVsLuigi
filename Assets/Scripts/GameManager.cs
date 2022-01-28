@@ -287,9 +287,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
 
         if (currentStar == null) {
-            if (!PhotonNetwork.IsMasterClient) {
+            if (PhotonNetwork.IsMasterClient) {
                 if ((spawnStarCount -= Time.deltaTime) <= 0) {
-                    if (remainingSpawns.Count == 0) {
+                    if (remainingSpawns.Count <= 0) {
                         remainingSpawns.AddRange(starSpawns);
                     }
                     int index = (int) (Random.value * remainingSpawns.Count);

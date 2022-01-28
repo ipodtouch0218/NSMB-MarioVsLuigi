@@ -1207,6 +1207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scrollAmount: 0
   screenShakeTimer: 0
   exactCentering: 0
   offset: {x: 0, y: 0, z: 0}
@@ -2252,7 +2253,7 @@ GameObject:
   - component: {fileID: 1277131673}
   - component: {fileID: 1277131672}
   m_Layer: 1
-  m_Name: BG-1
+  m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2299,13 +2300,12 @@ SpriteRenderer:
   m_SortingLayerID: -1013106893
   m_SortingLayer: -1
   m_SortingOrder: -1
-  m_Sprite: {fileID: -3631132898627699518, guid: f351c60507a4a554c964ec121f8ed891,
-    type: 3}
+  m_Sprite: {fileID: -217905571, guid: b84e328ee40c6e444adf3976ab53abd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 1
+  m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 74.09, y: 10}
+  m_DrawMode: 2
+  m_Size: {x: 5.06, y: 4.4}
   m_AdaptiveModeThreshold: 0
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2319,8 +2319,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1277131671}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.22, z: 20}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
+  m_LocalPosition: {x: 0, y: 2.48, z: 20}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 167560906}
@@ -2798,7 +2798,7 @@ GameObject:
   - component: {fileID: 1500230911}
   - component: {fileID: 1500230912}
   m_Layer: 1
-  m_Name: BG-0
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2812,8 +2812,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1500230910}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 4.42, z: 30}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalPosition: {x: 0, y: 2.37, z: 30}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 167560906}
@@ -2860,15 +2860,14 @@ SpriteRenderer:
   m_SortingLayerID: -1013106893
   m_SortingLayer: -1
   m_SortingOrder: -2
-  m_Sprite: {fileID: 6173344511710676806, guid: f351c60507a4a554c964ec121f8ed891,
-    type: 3}
+  m_Sprite: {fileID: -1403104231, guid: b84e328ee40c6e444adf3976ab53abd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 64, y: 9.3}
+  m_DrawMode: 2
+  m_Size: {x: 5.06, y: 3.37}
   m_AdaptiveModeThreshold: 0
-  m_SpriteTileMode: 1
+  m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
