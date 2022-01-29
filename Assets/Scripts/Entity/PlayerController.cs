@@ -668,6 +668,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [PunRPC]
     public void PreRespawn() {
         transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
+        gameObject.layer = DEFAULT_LAYERID;
         cameraController.scrollAmount = 0;
         cameraController.Update();
         state = Enums.PowerupState.Small;
@@ -1677,7 +1678,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
         
-        if (HandleStuckInBlock(delta))
+        if (gameObject.layer != HITS_NOTHING_LAYERID && HandleStuckInBlock(delta))
             return;
 
         //Pipes
@@ -1687,6 +1688,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         
         if (knockback) {
+            onLeft = false;
+            onRight = false;
             body.velocity -= (body.velocity * (delta * 2f));
             if (photonView.IsMine && onGround && Mathf.Abs(body.velocity.x) < 0.05f) {
                 photonView.RPC("ResetKnockback", RpcTarget.All);

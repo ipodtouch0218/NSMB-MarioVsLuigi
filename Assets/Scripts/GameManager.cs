@@ -32,7 +32,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     //Audio
     public AudioSource music, sfx;
     private Enums.MusicState? musicState = null;
-    private Coroutine musicPlayRoutine = null;
 
     public GameObject localPlayer;
     public bool paused, loaded, starting;
@@ -204,7 +203,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         starting = true;
         loaded = true;
         loadedPlayers.Clear();
-        allPlayers = FindObjectsOfType<PlayerController>();
         enemySpawnpoints = GameObject.FindObjectsOfType<EnemySpawnpoint>();
         if (PhotonNetwork.IsMasterClient) {
             //clear buffered loading complete events. 
@@ -276,11 +274,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             HandleMusic();
         }
 
+        if (allPlayers.Length != PhotonNetwork.CurrentRoom.PlayerCount) {
+            allPlayers = FindObjectsOfType<PlayerController>();
+        }
+
         if (PhotonNetwork.IsMasterClient) {
             int players = PhotonNetwork.CurrentRoom.PlayerCount;
             if (!loaded && loadedPlayers.Count >= players) {
                 SendAndExecuteEvent(Enums.NetEventIds.SetGameStartTimestamp, PhotonNetwork.ServerTimestamp + ((players-1) * 250) + 1000, SendOptions.SendReliable);
-                return;
+                loaded = true;
             }
             foreach (var player in allPlayers) {
                 if (player.stars >= starRequirement) {
