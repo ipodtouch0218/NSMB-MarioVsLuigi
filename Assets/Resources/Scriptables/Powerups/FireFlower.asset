@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: FireFlower
   m_EditorClassIdentifier: 
   prefab: FireFlower
-  spawnChance: 0.8
-  starModifier: -0.2
+  spawnChance: 0.9
+  starModifier: -0.1

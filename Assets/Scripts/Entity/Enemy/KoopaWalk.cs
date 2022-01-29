@@ -23,6 +23,7 @@ public class KoopaWalk : HoldableEntity {
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             base.body.velocity = Vector2.zero;
+            base.body.angularVelocity = 0;
             base.animator.enabled = false;
             base.body.isKinematic = true;
             return;
@@ -104,12 +105,14 @@ public class KoopaWalk : HoldableEntity {
             player.bounce = true;
         } else {
             if (shell && IsStationary()) {
-                if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
-                    photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
-                    player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
-                } else {
-                    photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
-                    player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                if (!holder) {
+                    if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
+                        photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
+                        player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
+                    } else {
+                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                        player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                    }
                 }
             } else {
                 player.photonView.RPC("Powerdown", RpcTarget.All, false);

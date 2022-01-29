@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: MegaMushroom
   m_EditorClassIdentifier: 
   prefab: MegaMushroom
-  spawnChance: 0.25
+  spawnChance: 0.3
   starModifier: -0.2

@@ -6,7 +6,7 @@ public class SingletonCanvas : Singleton<SingletonCanvas> {
     private Camera uiCamera;
     void Awake() {
         if (!base.InstanceCheck()) return;
-        instance = this;
+        Instance = this;
     }
     void LateUpdate() {
         if (!uiCamera) {

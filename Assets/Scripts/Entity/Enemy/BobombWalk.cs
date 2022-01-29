@@ -24,6 +24,7 @@ public class BobombWalk : HoldableEntity {
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
+            base.body.angularVelocity = 0;
             animator.enabled = false;
             body.isKinematic = true;
             return;
@@ -152,11 +153,13 @@ public class BobombWalk : HoldableEntity {
             }
         } else {
             if (lit) {
-                if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.crouching && !player.flying && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump && !player.groundpound) {
-                    photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
-                    player.holding = this;
-                } else {
-                    photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                if (!holder) {
+                    if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.crouching && !player.flying && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump && !player.groundpound) {
+                        photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
+                        player.holding = this;
+                    } else {
+                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                    }
                 }
             } else {
                 player.photonView.RPC("Powerdown", RpcTarget.All, false);

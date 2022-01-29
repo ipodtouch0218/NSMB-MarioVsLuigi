@@ -174,6 +174,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Instance = this;
         music = GetComponents<AudioSource>()[0];
         sfx = GetComponents<AudioSource>()[1];
+        HorizontalCamera.OFFSET_TARGET = 0; 
         
         PhotonNetwork.SerializationRate = 30;
 

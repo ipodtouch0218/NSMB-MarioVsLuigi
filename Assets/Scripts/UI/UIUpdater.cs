@@ -6,9 +6,9 @@ using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
 
-public class UIUpdater : WaitForGameStart {
+public class UIUpdater : MonoBehaviour {
     
-    public static UIUpdater instance;
+    public static UIUpdater Instance;
     public GameObject playerTrackTemplate, starTrackTemplate;
     PlayerController player;
     public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell; 
@@ -17,11 +17,11 @@ public class UIUpdater : WaitForGameStart {
     private float pingSample = 0;
 
     void Start() {
-        instance = this;
+        Instance = this;
         pingSample = PhotonNetwork.GetPing();
     }
     
-    public override void Execute() {
+    public void GivePlayersIcons() {
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player")) {
             GameObject trackObject = GameObject.Instantiate(playerTrackTemplate, playerTrackTemplate.transform.position, Quaternion.identity, transform);
             TrackIcon icon = trackObject.GetComponent<TrackIcon>();

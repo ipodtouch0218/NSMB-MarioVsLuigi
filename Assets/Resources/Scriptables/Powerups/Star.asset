@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Star
   m_EditorClassIdentifier: 
   prefab: Star
-  spawnChance: 0.4
+  spawnChance: 0.3
   starModifier: -0.3

@@ -9,7 +9,7 @@ public class GlobalController : Singleton<GlobalController> {
     public PlayerData[] characters;
     void Awake() {
         if (!base.InstanceCheck()) return;
-        instance = this;
+        Instance = this;
     }
     void Update() {
         ndsCanvas.enabled = Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0;

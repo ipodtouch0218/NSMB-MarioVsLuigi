@@ -70,7 +70,7 @@ public class Utils {
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
-        if (collision && !collision.isTrigger)
+        if (collision && !collision.isTrigger && collision.tag != "Player")
             return true;
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     } 

@@ -9,18 +9,17 @@ public class KillplaneKill : MonoBehaviourPun {
     bool killed = false;
     void Update() {
         if (killed) return;
-        if (transform.position.y < GameManager.Instance.GetLevelMinY()) {
-            timer += Time.deltaTime;
-            if (timer < killTime)
-                return;
-            if (!photonView) {
-                GameObject.Destroy(gameObject);
-                return;
-            } 
-            if (photonView.IsMine) {
-                PhotonNetwork.Destroy(photonView);
-                return;
-            }
+        if (transform.position.y >= GameManager.Instance.GetLevelMinY()) return;
+        timer += Time.deltaTime;
+        if (timer < killTime)
+            return;
+        if (!photonView) {
+            GameObject.Destroy(gameObject);
+            return;
+        } 
+        if (photonView.IsMine) {
+            PhotonNetwork.Destroy(photonView);
+            return;
         }
     }
 }

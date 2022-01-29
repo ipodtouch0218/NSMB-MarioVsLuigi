@@ -66,6 +66,7 @@ MonoBehaviour:
   readyForUnPassthrough: 0.5
   passthrough: 0
   left: 1
+  creator: -1
 --- !u!114 &1973747262660636107
 MonoBehaviour:
   m_ObjectHideFlags: 0

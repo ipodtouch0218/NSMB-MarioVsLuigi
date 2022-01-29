@@ -13,20 +13,20 @@ public abstract class WaitForGameStart : MonoBehaviourPun {
         }
 
         switch (target) {
-            case FunctionTarget.ALL: {
+        case FunctionTarget.ALL: {
+            Execute();
+            break;
+        }
+        case FunctionTarget.MASTER_ONLY: {
+            if (PhotonNetwork.IsMasterClient)
                 Execute();
-                break;
-            }
-            case FunctionTarget.MASTER_ONLY: {
-                if (PhotonNetwork.IsMasterClient)
-                    Execute();
-                break;
-            }
-            case FunctionTarget.OWNER_ONLY: {
-                if (photonView.IsMine)
-                    Execute();
-                break;
-            }
+            break;
+        }
+        case FunctionTarget.OWNER_ONLY: {
+            if (photonView.IsMine)
+                Execute();
+            break;
+        }
         }
     }
     public abstract void Execute();

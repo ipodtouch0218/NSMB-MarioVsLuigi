@@ -15,6 +15,7 @@ public class GoombaWalk : KillableEntity {
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             base.body.velocity = Vector2.zero;
+            base.body.angularVelocity = 0;
             base.animator.enabled = false;
             base.body.isKinematic = true;
             return;

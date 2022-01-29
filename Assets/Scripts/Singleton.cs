@@ -3,14 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
-    protected static T instance; 
-    public static T Instance {
-        get {
-            return instance;
-        }
-    }
+    public static T Instance { get; protected set; }
     protected bool InstanceCheck() {
-        if (instance != null) {
+        if (Instance != null) {
             Destroy(gameObject);
             return false;
         }

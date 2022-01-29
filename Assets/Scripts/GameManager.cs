@@ -276,6 +276,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
         if (allPlayers.Length != PhotonNetwork.CurrentRoom.PlayerCount) {
             allPlayers = FindObjectsOfType<PlayerController>();
+            if (allPlayers.Length == PhotonNetwork.CurrentRoom.PlayerCount) {
+                UIUpdater.Instance.GivePlayersIcons();
+            }
         }
 
         if (PhotonNetwork.IsMasterClient) {

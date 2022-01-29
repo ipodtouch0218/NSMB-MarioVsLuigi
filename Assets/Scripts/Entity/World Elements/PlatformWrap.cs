@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class PlatformWrap : MonoBehaviour {
     public float maxY, minY, ySpeed;
+    private Rigidbody2D body;
     void Start() {
-        GetComponent<Rigidbody2D>().velocity = new Vector2(0, ySpeed);
+        body = GetComponent<Rigidbody2D>();
+        body.velocity = new Vector2(0, ySpeed);
     }
     void Update() {
         float y = transform.position.y;
         if (y > maxY) {
-            transform.position = new Vector2(transform.position.x, y - (maxY - minY));
+            body.position = new Vector2(body.position.x, y - (maxY - minY));
         } else if (y < minY) {
-            transform.position = new Vector2(transform.position.x, y + (maxY - minY));
+            body.position = new Vector2(body.position.x, y + (maxY - minY));
         }
     }
 }

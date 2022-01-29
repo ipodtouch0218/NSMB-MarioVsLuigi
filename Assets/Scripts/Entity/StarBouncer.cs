@@ -14,6 +14,7 @@ public class StarBouncer : MonoBehaviourPun {
     private BoxCollider2D hitbox;
     public bool passthrough = true, left = true;
     private PhysicsEntity physics;
+    public int creator = -1;
 
     void Start() {
         startingScale = transform.localScale;
@@ -25,14 +26,15 @@ public class StarBouncer : MonoBehaviourPun {
             groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
         
         object[] data = photonView.InstantiationData;
-        if (data != null && data.Length >= 1) {
+        if (data != null) {
             stationary = false;
             passthrough = true;
             gameObject.layer = LayerMask.NameToLayer("HitsNothing");
             left = (bool) data[0];
+            creator = (int) data[1];
         }
 
-        GameObject trackObject = GameObject.Instantiate(UIUpdater.instance.starTrackTemplate, UIUpdater.instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.instance.transform);
+        GameObject trackObject = GameObject.Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.Instance.transform);
         TrackIcon icon = trackObject.GetComponent<TrackIcon>();
         icon.target = gameObject;
         if (!stationary) {

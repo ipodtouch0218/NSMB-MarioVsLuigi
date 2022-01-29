@@ -37,7 +37,7 @@ public class Settings : Singleton<Settings> {
 
     void Awake() {
         if (!base.InstanceCheck()) return;
-        instance = this;
+        Instance = this;
         LoadSettingsFromPreferences();
         ApplyVolumeSettings();
     }

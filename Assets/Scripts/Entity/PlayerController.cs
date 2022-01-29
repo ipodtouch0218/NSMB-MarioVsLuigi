@@ -562,8 +562,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (view == null) return;
         GameObject star = view.gameObject;
         StarBouncer starScript = star.GetComponent<StarBouncer>();
-        if (starScript.readyForUnPassthrough > 0) return;
-        if (starScript.passthrough) return;
+        if (starScript.readyForUnPassthrough > 0 && starScript.creator == photonView.ViewID) return;
         
         if (photonView.IsMine) {
             photonView.RPC("SetStars", RpcTarget.Others, ++stars);
@@ -657,7 +656,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         stars--;
         if (!PhotonNetwork.IsMasterClient) return;
 
-        GameObject star = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", transform.position, Quaternion.identity, 0, new object[]{starDirection});
+        GameObject star = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", transform.position, Quaternion.identity, 0, new object[]{starDirection, photonView.ViewID});
         StarBouncer sb = star.GetComponent<StarBouncer>();
         sb.photonView.TransferOwnership(PhotonNetwork.MasterClient);
         photonView.RPC("SetStars", RpcTarget.Others, stars);
@@ -667,13 +666,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     [PunRPC]
     public void PreRespawn() {
-        transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
+        cameraController.currentPosition = transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
         gameObject.layer = DEFAULT_LAYERID;
         cameraController.scrollAmount = 0;
         cameraController.Update();
         state = Enums.PowerupState.Small;
         dead = false;
         animator.SetTrigger("respawn");
+        invincible = 0;
+        giantTimer = 0;
+        giantEndTimer = 0;
+        giantStartTimer = 0;
+
 
         GameObject particle = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Particle/Respawn"), body.position, Quaternion.identity);
         if (photonView.IsMine) {
@@ -1581,7 +1585,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void TickCounters() {
         float delta = Time.fixedDeltaTime;
         if (!pipeEntering) TickCounter(ref invincible, 0, delta);
-        if (state == Enums.PowerupState.Giant) invincible = 0;
 
         TickCounter(ref throwInvincibility, 0, delta);
         TickCounter(ref jumpBuffer, 0, delta);
@@ -1678,7 +1681,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
         
-        if (gameObject.layer != HITS_NOTHING_LAYERID && HandleStuckInBlock(delta))
+        if (pipeEntering && HandleStuckInBlock(delta))
             return;
 
         //Pipes
@@ -1690,9 +1693,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (knockback) {
             onLeft = false;
             onRight = false;
+            crouching = false;
+            inShell = false;
             body.velocity -= (body.velocity * (delta * 2f));
-            if (photonView.IsMine && onGround && Mathf.Abs(body.velocity.x) < 0.05f) {
+            if (photonView.IsMine && onGround && Mathf.Abs(body.velocity.x) < 0.2f) {
                 photonView.RPC("ResetKnockback", RpcTarget.All);
+            }
+            if (holding) {
+                holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
+                holding = null;
             }
         }
 
@@ -1883,7 +1892,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleGroundpoundStart(bool left, bool right) {
-        if (onGround) return;
+        if (onGround || knockback) return;
         if (!flying && (left || right)) return;
         if (groundpound || drill) return;
         if (holding) return;

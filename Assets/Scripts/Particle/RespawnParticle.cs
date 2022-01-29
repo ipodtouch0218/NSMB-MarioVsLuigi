@@ -8,11 +8,10 @@ public class RespawnParticle : MonoBehaviour {
     public PlayerController player;
 
     void Update() {
-        if (!player || !player.photonView.IsMine)
-            return;
+        if (!player || !player.photonView.IsMine) return;
         if (respawnTimer > 0 && (respawnTimer -= Time.deltaTime) <= 0) {
-            if (player != null)
-                player.photonView.RPC("Respawn", Photon.Pun.RpcTarget.All);
+            if (!player) return;
+            player.photonView.RPC("Respawn", Photon.Pun.RpcTarget.All);
         }
     }
 }
