@@ -13,18 +13,21 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private int playerId = 0;
     [SerializeField] public bool dead = false;
     [SerializeField] public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
-    [SerializeField] public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.5f, flyingTerminalVelocity = -1f, drillVelocity = 9f, deathUpTime = 0.6f, deathForce = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 12, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 20f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -2f, walljumpVelocity = 6f, pipeDuration = 2f, giantStartTime = 1.5f, blinkDuration = 0.25f;
+    [SerializeField] public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.5f, flyingTerminalVelocity = -1f, drillVelocity = 9f, deathUpTime = 0.6f, deathForce = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 12, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 20f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -2f, walljumpVelocity = 6f, pipeDuration = 2f, giantStartTime = 1.5f, blinkDuration = 0.25f, fadeDuration = 2f;
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle;
     private BoxCollider2D[] hitboxes;
     GameObject models;
+
     public CameraController cameraController;
+    private GameObject cameraMask;
+    
     private AudioSource sfx;
     private Animator animator;
     public Rigidbody2D body;
 
-    public bool onGround, crushGround, onGroundLastFrame, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundSit, knockback, deathUp, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock;
+    public bool onGround, crushGround, doGroundSnap, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, deathUp, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock;
     public float walljumping, landing, koyoteTime, deathCounter, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, pipeTimer, giantStartTimer, giantEndTimer;
-    public float invincible = 0, giantTimer = 0, blinkTimer = 0;
+    public float invincible, giantTimer, blinkTimer, fadeOutTimer, fadeInTimer, floorAngle;
     
     private Vector2 pipeDirection;
     public int stars, coins;
@@ -111,6 +114,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         body = GetComponent<Rigidbody2D>();
         sfx = GetComponent<AudioSource>();
         models = transform.Find("Models").gameObject;
+        // if (photonView.IsMine) {
+        //     cameraMask = GameObject.FindGameObjectWithTag("CanvasMask");
+        //     if (cameraMask)
+        //         cameraMask.transform.localScale = Vector3.zero;
+        // }
         starDirection = Random.value < 0.5;
         PlayerInput input = GetComponent<PlayerInput>();
         input.enabled = !photonView || photonView.IsMine;
@@ -152,20 +160,19 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 ContactPoint2D contact = contacts[i];
                 Vector2 n = contact.normal;
                 Vector2 p = contact.point + (contact.normal * -0.15f);
+                if (n == Vector2.up && contact.point.y > body.position.y) continue;
                 Vector3Int vec = Utils.WorldToTilemapPosition(p);
                 if (contact.collider.tag == "Player") continue;
 
-                if (Vector2.Dot(n,Vector2.up) > .5f) {
-                    // Vector2 modifiedVec = p + (new Vector2(0.01f, 0) * (p.x - body.position.x < 0 ? 1 : -1)); 
-                    float playerY = Utils.WorldToTilemapPosition(body.position + new Vector2(0, 0.25f)).y;
-                    if (((contact.collider.gameObject.layer != GROUND_LAYERID && playerY <= vec.y) || body.velocity.y > 0.2f) && (contact.collider.gameObject.tag != "platform")) {
+                if (Vector2.Dot(n,Vector2.up) > .05f) {
+                    if (Vector2.Dot(body.velocity.normalized, n) > 0.1f && !onGround) {
                         //invalid flooring
                         continue;
                     }
-                    crushGround |= (contact.collider.gameObject.tag != "platform");
+                    crushGround |= (contact.collider.gameObject.layer != LayerMask.NameToLayer("Semisolids"));
                     down++;
-                    highestAngleThisFrame = Mathf.Max(highestAngleThisFrame, Vector2.Angle(n, Vector2.up));
-                    tilesStandingOn.Add(vec);
+                    highestAngleThisFrame = Vector2.SignedAngle(Vector2.up, n);
+                    tilesStandingOn.Add(vec );
                 } else if (contact.collider.gameObject.layer == GROUND_LAYERID) {
                     if (Vector2.Dot(n,Vector2.left) > .9f) {
                         right++;
@@ -184,10 +191,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
 
-        onGround = down >= 2 && body.velocity.y < 3;
-        if (onGround) {
-            onGroundLastFrame = true;
-        }
+        onGround = down >= 1;
         hitLeft = left >= 2;
         onLeft = hitLeft && !inShell && body.velocity.y < -0.1 && !facingRight && !onGround && !holding && state != Enums.PowerupState.Giant && !flying;
         hitRight = right >= 2;
@@ -294,7 +298,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void OnFireball() {
         if (!photonView.IsMine) return;
         if (GameManager.Instance.paused) return;
-        if (crouching) return;
+        if (crouching || sliding) return;
         if (onLeft || onRight) return;
         if (groundpound || knockback) return;
         if (state != Enums.PowerupState.FireFlower) return;
@@ -639,6 +643,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         turnaround = false;
         inShell = false;
         knockback = false;
+        fadeOutTimer = fadeDuration;
         animator.Play("deadstart", state >= Enums.PowerupState.Large ? 1 : 0);
         PlaySoundFromAnim("player/death");
         SpawnStar();
@@ -661,7 +666,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         sb.photonView.TransferOwnership(PhotonNetwork.MasterClient);
         photonView.RPC("SetStars", RpcTarget.Others, stars);
         starDirection = !starDirection;
-        
     }
 
     [PunRPC]
@@ -677,7 +681,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         giantTimer = 0;
         giantEndTimer = 0;
         giantStartTimer = 0;
-
+        // fadeInTimer = fadeDuration;
 
         GameObject particle = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Particle/Respawn"), body.position, Quaternion.identity);
         if (photonView.IsMine) {
@@ -734,6 +738,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [PunRPC]
     void SpawnParticle(string particle, float x, float y) {
         GameObject.Instantiate(Resources.Load(particle), new Vector2(x, y), Quaternion.identity);
+    }
+    
+    [PunRPC]
+    void SpawnParticle(string particle, float x, float y, Vector3 scale) {
+        GameObject obj = (GameObject) GameObject.Instantiate(Resources.Load(particle), new Vector2(x, y), Quaternion.identity);
+        obj.transform.localScale = scale;
     }
 
     void HandleGiantTiles(bool pipes) {
@@ -807,7 +817,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         knockback = true;
         PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
         if (attacker) {
-            if (attacker.gameObject.GetComponent<PlayerController>()) {
+            if (attacker.gameObject.tag == "Player" || attacker.gameObject.tag == "Fireball") {
                 //attacker is a player
                 SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position.x, attacker.transform.position.y);
             }
@@ -835,7 +845,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         bounce = false;
         knockback = false;
     }
-
+    
     void FixedUpdate() {
         //game ended, freeze.
         
@@ -861,7 +871,84 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             TickCounters();
             HandleMovement(Time.fixedDeltaTime);
         }
+        // TickCounter(ref fadeOutTimer, 0, Time.fixedDeltaTime);
+        // TickCounter(ref fadeInTimer, 0, Time.fixedDeltaTime);
         HandleAnimation();
+    }
+
+    void HandleSliding(bool up) {
+        if (groundpound) {
+            if (onGround) {
+                if (Mathf.Abs(floorAngle) >= 20) {
+                    groundpound = false;
+                    sliding = true;
+                    alreadyGroundpounded = true;
+                    body.velocity = new Vector2(-Mathf.Sign(floorAngle) * groundpoundVelocity, 0);
+                } else if (state == Enums.PowerupState.Giant || up || !crouching) {
+                    groundpound = false;
+                    groundpoundCounter = (state == Enums.PowerupState.Giant ? 0.4f : 0.25f);
+                }
+            } else if (up) {
+                groundpound = false;
+            }
+        }
+        if (crouching && Mathf.Abs(floorAngle) >= 20) {
+            sliding = true;
+            crouching = false;
+            alreadyGroundpounded = true;
+        }
+        if (sliding && onGround && Mathf.Abs(floorAngle) > 20) {
+            float angle = floorAngle * Mathf.Deg2Rad;
+            float speed = runningMaxSpeed * Time.fixedDeltaTime * 4;
+            float newX = body.velocity.x - (Mathf.Sin(angle) * speed);
+            if (Mathf.Abs(body.velocity.x) <= 0.1f && Mathf.Abs(body.velocity.y - groundpoundVelocity) < 0.1f) {
+                newX = Mathf.Sign(angle) * -1000;
+            }
+            newX = Mathf.Clamp(newX, -(runningMaxSpeed * 1.25f), (runningMaxSpeed * 1.25f));
+            float newY = -Mathf.Cos(angle) * Mathf.Abs(newX);
+            body.velocity = new Vector2(newX, newY);
+        }
+
+        if (up || (Mathf.Abs(floorAngle) < 20 && onGround && Mathf.Abs(body.velocity.x) < 0.1)) {
+            sliding = false;
+            alreadyGroundpounded = false;
+        }
+    }
+
+    void HandleSlopes() {
+        if (!onGround) {
+            floorAngle = 0;
+            return;
+        }
+        BoxCollider2D mainCollider = hitboxes[0];
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * (mainCollider.size.y/2f)), mainCollider.size, 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
+        if (hit) {
+            //hit ground
+            float angle = Vector2.SignedAngle(Vector2.up, hit.normal); 
+            if (angle < -89 || angle > 89) return;
+            floorAngle = angle;
+
+            if (!sliding && angle != 0) {
+                float change = Mathf.Sin(angle * Mathf.Deg2Rad) * body.velocity.x;
+                body.velocity = new Vector2(body.velocity.x, change);
+                onGround = true;
+            }
+        } else {
+            hit = Physics2D.BoxCast(body.position + (Vector2.up * (mainCollider.size.y/2f)), mainCollider.size, 0, Vector2.down, 0.4f, ANY_GROUND_MASK);
+            if (hit) {
+                float angle = Vector2.SignedAngle(Vector2.up, hit.normal); 
+                if (angle < -89 || angle > 89) return;
+                floorAngle = angle;
+                
+                if (!sliding) {
+                    float change = Mathf.Sin(angle * Mathf.Deg2Rad) * body.velocity.x;
+                    body.velocity = new Vector2(body.velocity.x, change);
+                    onGround = true;
+                }
+            } else {
+                floorAngle = 0;
+            }
+        }
     }
 
     bool colliding = true;
@@ -935,24 +1022,37 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleAnimation() {
-        //Dust particles
+
         if (photonView.IsMine) {
+            
+            //Fade out
+            // if (fadeOutTimer > 0) {
+            //     float mask = (fadeOutTimer / fadeDuration) * 50f; 
+            //     cameraMask.transform.localScale = new Vector3(mask, mask, mask);
+            //     cameraMask.transform.position = transform.position;
+            // } else if (fadeInTimer > 0) {
+            //     float mask = (1-(fadeInTimer / fadeDuration)) * 50f; 
+            //     cameraMask.transform.localScale = new Vector3(mask, mask, mask);
+            //     cameraMask.transform.position = transform.position;
+            // }
 
             //Facing direction
             bool right = joystick.x > analogDeadzone;
             bool left = joystick.x < -analogDeadzone;
-            if (doIceSkidding && !inShell && !groundpound) {
-                if (right || left) {
-                    facingRight = right;
-                }
-            } else if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
-                if (onGround && state != Enums.PowerupState.Giant && Mathf.Abs(body.velocity.x) > 0.05f) {
-                    facingRight = body.velocity.x > 0;
-                } else if (((walljumping <= 0 && !inShell) || giantStartTimer > 0) && (right || left)) {
-                    facingRight = right;
-                }
-                if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5f && crouching) || doIceSkidding) && (right || left)) {
-                    facingRight = right;
+            if (!sliding) {
+                if (doIceSkidding && !inShell && !groundpound) {
+                    if (right || left) {
+                        facingRight = right;
+                    }
+                } else if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
+                    if (onGround && state != Enums.PowerupState.Giant && Mathf.Abs(body.velocity.x) > 0.05f) {
+                        facingRight = body.velocity.x > 0;
+                    } else if (((walljumping <= 0 && !inShell) || giantStartTimer > 0) && (right || left)) {
+                        facingRight = right;
+                    }
+                    if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5f && crouching) || doIceSkidding) && (right || left)) {
+                        facingRight = right;
+                    }
                 }
             }
 
@@ -980,6 +1080,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             animator.SetBool("triplejump", triplejump);
             animator.SetBool("crouching", crouching);
             animator.SetBool("groundpound", groundpound);
+            animator.SetBool("sliding", sliding);
             animator.SetBool("holding", holding != null);
             animator.SetBool("knockback", knockback);
             animator.SetBool("pipe", pipeEntering != null);
@@ -999,6 +1100,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             invincible = animator.GetBool("invincible") ? 1f : 0f;
             flying = animator.GetBool("flying");
             drill = animator.GetBool("drill");
+            sliding = animator.GetBool("sliding");
             // inShell = animator.GetBool("inShell");
             // knockback = animator.GetBool("knockback");
             facingRight = animator.GetBool("facingRight");
@@ -1076,7 +1178,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround;
 
-        if ((onLeft || onRight || (onGround && ((skidding && !doIceSkidding) || (crouching && Mathf.Abs(body.velocity.x) > 1)))) && !pipeEntering) {
+        if ((onLeft || onRight || (onGround && ((skidding && !doIceSkidding) || (crouching && Mathf.Abs(body.velocity.x) > 1))) || (sliding && Mathf.Abs(body.velocity.x) > 0.2 && onGround)) && !pipeEntering) {
             if (!dust.isPlaying)
                 dust.Play();
         } else {
@@ -1211,15 +1313,23 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         hitboxes[0].offset = new Vector2(0, height/2f);
     }
 
-    void FakeOnGroundCheck() {
-        if ((onGroundLastFrame || (flying && body.velocity.y < 0)) && pipeEntering == null && !onGround) {
-            var hit = Physics2D.Raycast(body.position, Vector2.down, 0.1f, ANY_GROUND_MASK);
-            if (hit) {
-                onGround = true;
-                body.position = new Vector2(body.position.x, hit.point.y);
-                body.velocity = new Vector2(body.velocity.x, 0);
-            }
-        }
+    void GroundSnapCheck() {
+        if (!onGround || !doGroundSnap || pipeEntering || Mathf.Abs(body.velocity.x) < 0.05f) return;
+       
+        BoxCollider2D hitbox = hitboxes[0];
+        float ySize = hitbox.size.y/2f;
+        var lefthit = Physics2D.Raycast(body.position + new Vector2(hitbox.size.x/2f, ySize), Vector2.down, 0.3f, ANY_GROUND_MASK);
+        var righthit = Physics2D.Raycast(body.position + new Vector2(-hitbox.size.x/2f, ySize), Vector2.down, 0.3f, ANY_GROUND_MASK);
+        RaycastHit2D hit;
+        if (!lefthit && !righthit) return;
+        if (lefthit && !righthit) hit = lefthit;
+        else if (!lefthit && righthit) hit = righthit;
+        else if (lefthit.distance < righthit.distance) hit = lefthit;
+        else hit = righthit;
+
+        onGround = true;
+        body.position = new Vector2(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
+        // body.velocity = new Vector2(body.velocity.x, 0);
     }
     
     void HandlePipeAnimation() {
@@ -1307,6 +1417,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
     
     void HandleCrouching(bool crouchInput) {
+        if (sliding) return;
         if (state == Enums.PowerupState.Giant) {
             crouching = false;
             return;
@@ -1348,6 +1459,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         dust.transform.localPosition = new Vector3(0.075f * (leftWall ? 1 : -1), 0.075f * (state >= Enums.PowerupState.Large ? 4 : 1), dust.transform.localPosition.z);
             
         if (jump) {
+            float offsetX = hitboxes[0].size.x/2f * (onLeft ? -1 : 1);
+            float offsetY = hitboxes[0].size.y/2f;
+            photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/WalljumpParticle", transform.position.x + offsetX, transform.position.y + offsetY, onLeft ? Vector3.one : new Vector3(-1, 1, 1));
+        
             onLeft = false;
             onRight = false;
             body.velocity = new Vector2((runningMaxSpeed + walkingMaxSpeed)/2f * (leftWall ? 1 : -1), walljumpVelocity);
@@ -1357,7 +1472,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             doublejump = false;
             triplejump = false;
             onGround = false;
-            onGroundLastFrame = false;
             photonView.RPC("PlaySound", RpcTarget.All, "player/walljump");
             if (Random.value < 0.5) {
                 photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/walljump_1");
@@ -1368,10 +1482,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
     
     void HandleJumping(bool jump) {
-        if (knockback) return;
-        if (drill) return;
-        if (groundpound) return;
-        if (groundpoundCounter > 0) return;
+        if (knockback || drill) return;
+        if (groundpound || groundpoundCounter > 0) return;
         if (state == Enums.PowerupState.Giant && singlejump) return;
 
         bool topSpeed = Mathf.Abs(body.velocity.x) + 0.1f > (runningMaxSpeed * (invincible > 0 ? 2 : 1));
@@ -1380,6 +1492,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             jumpBuffer = 0;
             skidding = false;
             turnaround = false;
+            sliding = false;
+            alreadyGroundpounded = false;
 
             if (onSpinner && !inShell && !holding && !(crouching && state == Enums.PowerupState.Shell)) {
                 photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/spinner_launch");
@@ -1387,7 +1501,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 body.velocity = new Vector2(body.velocity.x, launchVelocity);
                 flying = true;
                 onGround = false;
-                onGroundLastFrame = false;
                 return;
             }
 
@@ -1443,14 +1556,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             bounce = false;
             onGround = false;
-            onGroundLastFrame = false;
+            body.position += Vector2.up * 0.075f;
         }
     }
 
     void HandleWalkingRunning(bool left, bool right) {
-        if (groundpound) return;
-        if (pipeEntering) return;
-        if (knockback) return;
+        if (groundpound || sliding || knockback || pipeEntering) return;
         if (groundpoundCounter > 0) return;
         if (!(walljumping <= 0 || onGround)) return;
 
@@ -1480,7 +1591,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
         float walkSpeedTotal = walkingMaxSpeed * invincibleSpeedBoost;
         bool reverseSlowing = onGround && (((left && body.velocity.x > 0.02) || (right && body.velocity.x < -0.02)));
-        float reverseFloat = (reverseSlowing ? (doIceSkidding ? 0.4f : 0.7f) : 1);
+        float reverseFloat = (reverseSlowing && doIceSkidding ? 0.4f : 1);
         float turnaroundSpeedBoost = (turnaround && !reverseSlowing ? 5 : 1);
         float stationarySpeedBoost = Mathf.Abs(body.velocity.x) <= 0.005f ? 1f : 1f;
 
@@ -1763,36 +1874,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
 
-        //Crouching
-        HandleCrouching(crouch);
-        if (crouching) {
-            onLeft = false;
-            onRight = false;
-            dust.transform.localPosition = Vector3.zero;
-        }
-
-        if (onLeft) {
-            HandleWallslide(true, jump, left);
-        }
-        if (onRight) {
-            HandleWallslide(false, jump, right);
-        }
-
-        if ((walljumping <= 0 || onGround) && !groundpound) {
-            //Normal walking/running
-            HandleWalkingRunning(left, right);
-
-            //Jumping
-            HandleJumping(jump);
-        }
-        
-        if (crouch && !alreadyGroundpounded) {
-            HandleGroundpoundStart(left, right);
-        }
-        HandleGroundpound(crouch, up);
-
         //Ground
-        FakeOnGroundCheck();
+        GroundSnapCheck();
         if (onGround) {
             if (photonView.IsMine && hitRoof && crushGround && body.velocity.y <= 0.1) {
                 //Crushed.
@@ -1803,7 +1886,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onRight = false;
             flying = false;
             if (triplejump && landing == 0 && !(left || right) && !groundpound) {
-                body.velocity = new Vector2(0,0);
+                if (!doIceSkidding)
+                    body.velocity = new Vector2(0,0);
                 animator.Play("jumplanding", state >= Enums.PowerupState.Large ? 1 : 0);
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
             }
@@ -1832,6 +1916,34 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             turnaround = false;
         }
 
+        //Crouching
+        HandleCrouching(crouch);
+        if (crouching || sliding) {
+            onLeft = false;
+            onRight = false;
+            dust.transform.localPosition = Vector3.zero;
+        }
+
+        if (onLeft) {
+            HandleWallslide(true, jump, left);
+        }
+        if (onRight) {
+            HandleWallslide(false, jump, right);
+        }
+
+        if ((walljumping <= 0 || onGround) && !groundpound) {
+            //Normal walking/running
+            HandleWalkingRunning(left, right);
+
+            //Jumping
+            HandleJumping(jump);
+        }
+        
+        if (crouch && !alreadyGroundpounded) {
+            HandleGroundpoundStart(left, right);
+        }
+        HandleGroundpound(crouch, up);
+
         //slow-rise check
         if (flying) {
             body.gravityScale = flyingGravity;
@@ -1843,32 +1955,36 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 } else {
                     body.gravityScale = normalGravity * 1.5f * gravityModifier;
                 }
-            } else if (!groundpoundSit && groundpound && !onGround) {
+            } else if (onGround || groundpound) {
                 body.gravityScale = 0f;
             } else {
                 body.gravityScale = normalGravity * (gravityModifier / 1.2f);
             }
         }
 
-        if (!groundpoundSit && groundpound && groundpoundCounter <= 0) {
+        if (groundpound && groundpoundCounter <= 0) {
             body.velocity = new Vector2(0f, -groundpoundVelocity);
         }
 
-        if (!inShell) {
+        if (!inShell && onGround) {
             bool abovemax;
+            bool slide = sliding && Mathf.Abs(floorAngle) > 20;
             float invincibleSpeedBoost = (invincible > 0 ? 2f : 1);
-            float max = (functionallyRunning ? runningMaxSpeed : walkingMaxSpeed) * invincibleSpeedBoost;
-            if (left && !crouching) {
+            bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
+            float max = ((functionallyRunning || slide) ? runningMaxSpeed : walkingMaxSpeed) * invincibleSpeedBoost * (slide ? 2 : 1) * (uphill ? (1-(Mathf.Abs(floorAngle)/90f)) : 1);
+            if (slide && uphill) {
+                abovemax = true;
+            } else if ((slide || (!sliding && left)) && !crouching) {
                 abovemax = body.velocity.x < -max; 
-            } else if (right && !crouching) {
+            } else if ((slide || (!sliding && right)) && !crouching) {
                 abovemax = body.velocity.x > max;
             } else {
                 abovemax = true;
             }
             //Friction...
-            if (onGround && abovemax) {
-                body.velocity *= 1-(delta * tileFriction * (knockback ? 3f : 4f));
-                if (Mathf.Abs(body.velocity.x) < 0.05) {
+            if (abovemax) {
+                body.velocity *= 1-(delta * tileFriction * (knockback ? 3f : 4f) * (sliding ? 0.7f : 1f));
+                if (Mathf.Abs(body.velocity.x) < 0.1) {
                     body.velocity = new Vector2(0, body.velocity.y);
                 }
             }
@@ -1887,8 +2003,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!onGround) {
             body.velocity = new Vector2(Mathf.Max(-runningMaxSpeed, Mathf.Min(runningMaxSpeed, body.velocity.x)), body.velocity.y);
         }
+        doGroundSnap = onGround || sliding;
 
-        onGroundLastFrame = onGround;
+        HandleSlopes();
+        HandleSliding(up);
     }
 
     void HandleGroundpoundStart(bool left, bool right) {
@@ -1896,7 +2014,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!flying && (left || right)) return;
         if (groundpound || drill) return;
         if (holding) return;
-        if (crouching) return;
+        if (crouching || sliding) return;
         if (onLeft || onRight) return;
         if (groundpoundDelay > 0) return;
 
@@ -1914,8 +2032,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onLeft = false;
             onRight = false;
             groundpound = true;
+            singlejump = false;
+            doublejump = false;
+            triplejump = false;
             hitBlock = true;
-            groundpoundSit = false;
+            sliding = false;
             body.velocity = Vector2.zero;
             groundpoundCounter = groundpoundTime * (state == Enums.PowerupState.Giant ? 1.5f : 1);
             photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound");
@@ -1939,12 +2060,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 drill = hitBlock;
                 if (hitBlock) {
                     onGround = false;
-                    onGroundLastFrame = false;
                 }
             } else {
                 //groundpound
                 if (hitBlock) {
-                    koyoteTime = 1;
+                    koyoteTime = 1.5f;
                 } else {
                     photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == Enums.PowerupState.Mini ? "-mini" : ""));
                     if (state == Enums.PowerupState.Giant) {
@@ -1952,15 +2072,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                         cameraController.screenShakeTimer = 0.35f;
                     }
                     photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
-                    groundpoundSit = state != Enums.PowerupState.Giant;
                 }
             }
         }
-
-        if (groundpound && ((up && !onGround) || ((!crouch || state == Enums.PowerupState.Giant) && onGround)) && groundpoundCounter <= 0) {
-            groundpound = false;
-            groundpoundSit = false;
-            groundpoundCounter = (state == Enums.PowerupState.Giant ? 0.4f : 0.25f);
-        }
+    }
+    
+    void OnDrawGizmos() {
+        Gizmos.DrawRay(body.position, body.velocity);
+        Gizmos.DrawCube(body.position + new Vector2(0, hitboxes[0].size.y/2f) + (body.velocity * Time.fixedDeltaTime), hitboxes[0].size);
     }
 }

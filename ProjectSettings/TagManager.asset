@@ -31,7 +31,8 @@ TagManager:
   - platform
   - poison
   - uicamera
-  - DestructablePipe
+  - CanvasMask
+  - Backgrounds
   layers:
   - Default
   - TransparentFX

@@ -15908,6 +15908,7 @@ MonoBehaviour:
   pipeDuration: 2
   giantStartTime: 1.5
   blinkDuration: 0.1
+  fadeDuration: 2
   dust: {fileID: 8636928219237579149}
   sparkles: {fileID: 1192088335986799603}
   drillParticle: {fileID: 4430736674483794918}
@@ -15916,7 +15917,7 @@ MonoBehaviour:
   body: {fileID: 0}
   onGround: 0
   crushGround: 0
-  onGroundLastFrame: 0
+  doGroundSnap: 0
   onRight: 0
   onLeft: 0
   hitRoof: 0
@@ -15929,7 +15930,7 @@ MonoBehaviour:
   bounce: 0
   crouching: 0
   groundpound: 0
-  groundpoundSit: 0
+  sliding: 0
   knockback: 0
   deathUp: 0
   hitBlock: 0
@@ -15959,6 +15960,9 @@ MonoBehaviour:
   invincible: 0
   giantTimer: 0
   blinkTimer: 0
+  fadeOutTimer: 0
+  fadeInTimer: 0
+  floorAngle: 0
   stars: 0
   coins: 0
   storedPowerup: 
@@ -16252,6 +16256,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 1
     Name: facingRight
+  - Type: 4
+    SynchronizeType: 1
+    Name: sliding
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

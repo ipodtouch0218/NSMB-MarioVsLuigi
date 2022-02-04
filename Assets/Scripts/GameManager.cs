@@ -164,10 +164,21 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         PhotonNetwork.RemoveCallbackTarget(this);
     }
 
-
     void Start() {
         Instance = this;
         
+        if (!PhotonNetwork.IsConnectedAndReady) {
+            // offline mode, spawning in editor?
+            PhotonNetwork.OfflineMode = true;
+            PhotonNetwork.CreateRoom("Debug");
+            ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable();
+            properties.Add(Enums.NetRoomProperties.StarRequirement, 10);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+            GameObject.Instantiate(Resources.Load("Prefabs/Static/GlobalController"), Vector3.zero, Quaternion.identity);
+        
+            Debug.Log(PhotonNetwork.LocalPlayer);
+        }
+
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
         starRequirement = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.StarRequirement];
@@ -182,29 +193,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         
         SceneManager.SetActiveScene(gameObject.scene);
         localPlayer = PhotonNetwork.Instantiate("Prefabs/" + Utils.GetCharacterData().prefab, spawnpoint, Quaternion.identity, 0);
-        if (!localPlayer) {
-            //not connected to a room, started scene through editor. spawn player
-            PhotonNetwork.OfflineMode = true;
-            PhotonNetwork.CreateRoom("debug");
-            GameObject.Instantiate(Resources.Load("Prefabs/Static/GlobalController"), Vector3.zero, Quaternion.identity);
-            localPlayer = PhotonNetwork.Instantiate("Prefabs/PlayerMario", spawnpoint, Quaternion.identity, 0);
-        }
         localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
 
         PhotonNetwork.IsMessageQueueRunning = true;
-
         
         RaiseEventOptions options = new RaiseEventOptions {Receivers=ReceiverGroup.Others, CachingOption=EventCaching.AddToRoomCache};
         SendAndExecuteEvent(Enums.NetEventIds.PlayerFinishedLoading, PhotonNetwork.LocalPlayer, SendOptions.SendReliable, options);
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, PhotonNetwork.LocalPlayer, options, SendOptions.SendReliable);
-        loadedPlayers.Add(PhotonNetwork.LocalPlayer.NickName);
     }
     IEnumerator LoadingComplete(long startTimestamp) {
         starting = true;
         loaded = true;
         loadedPlayers.Clear();
         enemySpawnpoints = GameObject.FindObjectsOfType<EnemySpawnpoint>();
-        if (PhotonNetwork.IsMasterClient) {
+        if (PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode) {
             //clear buffered loading complete events. 
             RaiseEventOptions options = new RaiseEventOptions {Receivers=ReceiverGroup.MasterClient, CachingOption=EventCaching.RemoveFromRoomCache};
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);
@@ -428,10 +429,41 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     }
     [Range(1,10)]
     public int playersToVisualize = 10;
-    void OnDrawGizmosSelected() {
+    void OnDrawGizmos() {
         for (int i = 0; i < playersToVisualize; i++) {
-            Gizmos.color = new Color(i/playersToVisualize, 0, 0, 0.75f);
+            Gizmos.color = new Color((float) i/ (float) playersToVisualize, 0, 0, 0.75f);
             Gizmos.DrawCube(GetSpawnpoint(i, playersToVisualize) + Vector3.down/4f, Vector2.one/2f);
+        }
+
+        Vector3 size = new Vector3(levelWidthTile/2f, levelHeightTile/2f);
+        Vector3 origin = new Vector3(GetLevelMinX() + (levelWidthTile/4f), GetLevelMinY() + (levelHeightTile/4f), 1);
+        Gizmos.color = Color.gray;
+        Gizmos.DrawWireCube(origin, size);
+
+        if (loopingLevel) {
+            size = new Vector3(levelWidthTile/2f, cameraHeightY);
+            origin = new Vector3(GetLevelMinX() + (levelWidthTile/4f), cameraMinY + (cameraHeightY/2f), 1);
+        }
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(origin, size);
+
+
+        if (!tilemap) return;
+        for (int x = 0; x < levelWidthTile; x++) {
+            for (int y = 0; y < levelHeightTile; y++) {
+                Vector3Int loc = new Vector3Int(x+levelMinTileX, y+levelMinTileY, 0);
+                TileBase tile = tilemap.GetTile(loc);
+                if (tile is CoinTile)
+                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + new Vector3(0.25f, 0.25f), "coin");
+                if (tile is PowerupTile)
+                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + new Vector3(0.25f, 0.25f), "powerup");
+            }
+        }
+        
+        Gizmos.color = new Color(1, 0.9f, 0.2f, 0.2f);
+        foreach (GameObject starSpawn in GameObject.FindGameObjectsWithTag("StarSpawn")) {
+            Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
+            Gizmos.DrawIcon(starSpawn.transform.position, "star", true, new Color(1, 1, 1, 0.5f));
         }
     }
 }

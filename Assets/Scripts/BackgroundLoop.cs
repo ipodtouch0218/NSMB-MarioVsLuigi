@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BackgroundLoop : MonoBehaviour {
-    public GameObject[] levels;
+    private GameObject[] levels;
     private Camera mainCamera;
     private Vector2 screenBounds;
     private Vector3 lastPosition;
 
     void Start() {
+        Transform t = GameObject.FindGameObjectWithTag("Backgrounds").transform;
+        levels = new GameObject[t.childCount];
+        for (int i = 0; i < t.childCount; i++) {
+            levels[i] = t.GetChild(i).gameObject;
+        }
+
         mainCamera = gameObject.GetComponent<Camera>();
         screenBounds = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
         foreach (GameObject obj in levels) {

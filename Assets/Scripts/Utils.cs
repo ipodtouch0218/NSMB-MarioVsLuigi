@@ -8,18 +8,20 @@ using UnityEngine.Tilemaps;
 public class Utils {
     public static RaiseEventOptions EVENT_OTHERS {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.Others};
     public static RaiseEventOptions EVENT_ALL {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.All};
-    public static Vector3Int WorldToTilemapPosition(Vector3 worldVec) {
-        Vector3Int tileLocation = GameManager.Instance.tilemap.WorldToCell(worldVec);
-        WrapTileLocation(ref tileLocation);
+    public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null) {
+        if (!manager) manager = GameManager.Instance;
+        Vector3Int tileLocation = manager.tilemap.WorldToCell(worldVec);
+        WrapTileLocation(ref tileLocation, manager);
         return tileLocation;
     }
 
-    public static void WrapTileLocation(ref Vector3Int tileLocation) {
-        if (tileLocation.x < GameManager.Instance.levelMinTileX) {
-            tileLocation.x += GameManager.Instance.levelWidthTile;
+    public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {
+        if (!manager) manager = GameManager.Instance;
+        if (tileLocation.x < manager.levelMinTileX) {
+            tileLocation.x += manager.levelWidthTile;
         }
-        if (tileLocation.x >= GameManager.Instance.levelMinTileX + GameManager.Instance.levelWidthTile) {
-            tileLocation.x -= GameManager.Instance.levelWidthTile;
+        if (tileLocation.x >= manager.levelMinTileX + manager.levelWidthTile) {
+            tileLocation.x -= manager.levelWidthTile;
         }
     }
 
@@ -27,8 +29,9 @@ public class Utils {
         return WorldToTilemapPosition(new Vector3(worldX, worldY));
     }
 
-    public static Vector3 TilemapToWorldPosition(Vector3Int tileVec) {
-        return GameManager.Instance.tilemap.CellToWorld(tileVec);
+    public static Vector3 TilemapToWorldPosition(Vector3Int tileVec, GameManager manager = null) {
+        if (!manager) manager = GameManager.Instance;
+        return manager.tilemap.CellToWorld(tileVec);
     }
 
     public static Vector3 TilemapToWorldPosition(int tileX, int tileY) {
