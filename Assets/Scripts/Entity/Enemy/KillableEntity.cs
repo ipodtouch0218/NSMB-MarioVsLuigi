@@ -35,7 +35,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (player.invincible > 0 || player.inShell 
+        if (player.invincible > 0 || player.inShell || player.sliding
             || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.Mini && attackedFromAbove) 
             || player.state == Enums.PowerupState.Giant) {
             

@@ -440,10 +440,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         Gizmos.color = Color.gray;
         Gizmos.DrawWireCube(origin, size);
 
-        if (loopingLevel) {
-            size = new Vector3(levelWidthTile/2f, cameraHeightY);
-            origin = new Vector3(GetLevelMinX() + (levelWidthTile/4f), cameraMinY + (cameraHeightY/2f), 1);
-        }
+        size = new Vector3(levelWidthTile/2f, cameraHeightY);
+        origin = new Vector3(GetLevelMinX() + (levelWidthTile/4f), cameraMinY + (cameraHeightY/2f), 1);
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(origin, size);
 

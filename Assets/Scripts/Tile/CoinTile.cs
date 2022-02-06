@@ -13,8 +13,8 @@ public class CoinTile : BreakableBrickTile {
 
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
-        if (interacter is PlayerController) {
-            PlayerController player = (PlayerController) interacter;
+        if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.previousHolder != null)) {
+            PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk) interacter).previousHolder;
             if (player.state == Enums.PowerupState.Giant) {
                 //Break
 

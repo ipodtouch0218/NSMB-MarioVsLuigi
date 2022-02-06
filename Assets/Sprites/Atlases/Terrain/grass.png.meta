@@ -2264,6 +2264,31 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: grass_0
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -8, y: 7}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: 7}
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3d526d77bdc33549acb9fa0d797d8e6
+      internalID: -503044061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -2395,6 +2420,7 @@ TextureImporter:
       0 Grassland_140: -5799643608959397948
       0 Grassland_151: 7262261740020469975
       0 Grassland_174: 8008633347620254193
+      grass_0: -503044061
       0 Grassland_102: -4354400416002598478
       0 Grassland_109: -5524555054500316562
       0 Grassland_48: -2372336785400602172

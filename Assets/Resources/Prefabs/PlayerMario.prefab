@@ -9863,7 +9863,6 @@ MonoBehaviour:
   pipeDuration: 2
   giantStartTime: 1.5
   blinkDuration: 0.1
-  fadeDuration: 2
   dust: {fileID: 4824223342336871185}
   sparkles: {fileID: 4824223340723290478}
   drillParticle: {fileID: 599751029868069242}

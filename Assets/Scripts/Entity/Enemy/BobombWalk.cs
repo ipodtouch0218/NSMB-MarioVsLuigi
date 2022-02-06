@@ -137,7 +137,7 @@ public class BobombWalk : HoldableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (player.inShell || player.invincible > 0) {
+        if (player.sliding || player.inShell || player.invincible > 0) {
             photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false);
             return;
         }

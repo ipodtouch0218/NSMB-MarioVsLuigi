@@ -33,19 +33,21 @@ public class BreakablePipeTile : InteractableTile {
 
         int tileHeight;
         bool shrink = false;
-        
-        if (height <= 1)
-            return false;
+        bool addHat = true;
 
         if (direction == InteractionDirection.Down || direction == InteractionDirection.Up) {
             //hit top/bottom of pipe.
+            if (height <= 1)
+                return false;
 
             //shrink the pipe by 1. simple as moving the hat tiles up/down one
             tileHeight = 2;
             shrink = true;
         } else {
             //hit left/right side of pipe
-            tileHeight = (Mathf.Abs(hat.y - ourLocation.y)+2);
+            if (ourLocation == origin)
+                addHat = false;
+            tileHeight = Mathf.Abs(hat.y - ourLocation.y) + 2;
 
             bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
             
@@ -57,23 +59,25 @@ public class BreakablePipeTile : InteractableTile {
         
 
         int start = (upsideDownPipe ? (tileHeight*2)-2 : 0);
-        if (leftOfPipe) {
-            //we're the left side. modify the right side too.
-            if (shrink) {
-                tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat).name;
-                tiles[start+1] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.right).name;
+        if (addHat) {
+            if (leftOfPipe) {
+                //we're the left side. modify the right side too.
+                if (shrink) {
+                    tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat).name;
+                    tiles[start + 1] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.right).name;
+                } else {
+                    tiles[start] = "SpecialPipes/" + leftDestroy;
+                    tiles[start + 1] = "SpecialPipes/" + rightDestroy;
+                }
             } else {
-                tiles[start] = "SpecialPipes/" + leftDestroy;
-                tiles[start+1] = "SpecialPipes/" + rightDestroy;
-            }
-        } else {
-            //we're the right side. modify the left side too.
-            if (shrink) {
-                tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.left).name;
-                tiles[start+1] = "SpecialPipes/" + tilemap.GetTile(hat).name;
-            } else {
-                tiles[start] = "SpecialPipes/" + leftDestroy;
-                tiles[start+1] = "SpecialPipes/" + rightDestroy;
+                //we're the right side. modify the left side too.
+                if (shrink) {
+                    tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.left).name;
+                    tiles[start + 1] = "SpecialPipes/" + tilemap.GetTile(hat).name;
+                } else {
+                    tiles[start] = "SpecialPipes/" + leftDestroy;
+                    tiles[start + 1] = "SpecialPipes/" + rightDestroy;
+                }
             }
         }
 
@@ -82,7 +86,7 @@ public class BreakablePipeTile : InteractableTile {
             if (tiles[i] == null) tiles[i] = "";
         }
 
-        Vector3Int offset = (upsideDownPipe ? Vector3Int.zero : pipeDirection * (tileHeight-1));
+        Vector3Int offset = (upsideDownPipe ? Vector3Int.down * (addHat ? 0 : 1) : pipeDirection * (tileHeight-1));
         BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector3Int.zero : Vector3Int.left), new Vector2Int(2, tileHeight), tiles);
         
         return true;
@@ -92,8 +96,7 @@ public class BreakablePipeTile : InteractableTile {
         Tilemap tilemap = GameManager.Instance.tilemap;
         Vector3Int searchDirection = (upsideDownPipe ? Vector3Int.up : Vector3Int.down);
         Vector3Int searchVector = (upsideDownPipe ? Vector3Int.up : Vector3Int.down);
-        BreakablePipeTile tile;
-        while ((tile = tilemap.GetTile<BreakablePipeTile>(ourLocation + searchVector)) != null) {
+        while (tilemap.GetTile<BreakablePipeTile>(ourLocation + searchVector)) {
             searchVector += searchDirection;
         }
         return ourLocation + searchVector - searchDirection;

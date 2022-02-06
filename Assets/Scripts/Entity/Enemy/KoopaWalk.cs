@@ -58,11 +58,13 @@ public class KoopaWalk : HoldableEntity {
 
         if (shell) {
             if (stationary) {
+                if (physics.onGround) {
+                    body.velocity = new Vector2(0, body.velocity.y);
+                }
                 if ((wakeupTimer -= Time.fixedDeltaTime) < 0) {
                     if (photonView.IsMine)
                         photonView.RPC("WakeUp", RpcTarget.All);
                 }
-
             } else {
                 wakeupTimer = wakeup;
             }
@@ -87,13 +89,14 @@ public class KoopaWalk : HoldableEntity {
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
         if (holder) return;
 
-        if (player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant) {
+        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant) {
             photonView.RPC("SpecialKill", RpcTarget.All, !player.facingRight, false);
         } else if (player.groundpound && player.state != Enums.PowerupState.Mini && attackedFromAbove) {
             photonView.RPC("EnterShell", RpcTarget.All);
             if (!blue) {
                 photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
                 player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                this.previousHolder = player;
             }
         } else if (attackedFromAbove && (!shell || !IsStationary())) {
             if (player.state != Enums.PowerupState.Mini || player.groundpound) {
@@ -112,6 +115,7 @@ public class KoopaWalk : HoldableEntity {
                     } else {
                         photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
                         player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                        this.previousHolder = player;
                     }
                 }
             } else {
@@ -136,6 +140,7 @@ public class KoopaWalk : HoldableEntity {
         stationary = crouch;
         hardkick = false;
         transform.position = new Vector2(holder.transform.position.x, transform.position.y);
+        this.previousHolder = holder;
         this.holder = null;
         shell = true;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
@@ -157,6 +162,7 @@ public class KoopaWalk : HoldableEntity {
         if (holder)
             holder.photonView.RPC("HoldingWakeup", RpcTarget.All);
         holder = null;
+        previousHolder = null;
     }
     [PunRPC]
     public void EnterShell() {
@@ -201,6 +207,19 @@ public class KoopaWalk : HoldableEntity {
             }
             break;
         }
+        case "coin": {
+            if (!holder && !stationary && previousHolder) {
+                previousHolder.photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, obj.transform.position.x, collider.transform.position.y);
+            }
+            break;
+        }
+        case "loosecoin": {
+            if (!holder && !stationary && previousHolder) {
+                Transform parent = obj.transform.parent;
+                previousHolder.photonView.RPC("CollectCoin", RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, parent.position.x, parent.position.y);
+            }
+            break;
+        }
         }
     }
 
@@ -215,7 +234,7 @@ public class KoopaWalk : HoldableEntity {
         for (int i = 0; i < collisionAmount; i++) {
             var point = collisions[i];
             Vector2 p = point.point + (point.normal * -0.15f);
-            if (Mathf.Abs(point.normal.x) > 0.2f) {
+            if (Mathf.Abs(point.normal.x) > 0.5f) {
                 
                 if (photonView)
                     photonView.RPC("Turnaround", RpcTarget.All, point.normal.x > 0);
@@ -232,8 +251,8 @@ public class KoopaWalk : HoldableEntity {
                     if (tile == null) continue;
                     if (!shell) continue;
                     
-                    if (tile is InteractableTile) {
-                        ((InteractableTile) tile).Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
+                    if (tile is InteractableTile it) {
+                        it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
                     }
                 }
             } else if (point.normal.y > 0 && putdown) {
@@ -244,7 +263,7 @@ public class KoopaWalk : HoldableEntity {
     }
     
     [PunRPC]
-    void Turnaround(bool hitWallOnLeft) {
+    protected void Turnaround(bool hitWallOnLeft) {
         if (stationary)
             return;
         left = !hitWallOnLeft;
@@ -256,7 +275,7 @@ public class KoopaWalk : HoldableEntity {
     }
 
     [PunRPC]
-    void Bump() {
+    protected void Bump() {
         if (blue) {
             if (photonView.IsMine) {
                 PhotonNetwork.Destroy(photonView);

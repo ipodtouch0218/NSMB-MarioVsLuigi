@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 
 public abstract class HoldableEntity : KillableEntity {
-    public PlayerController holder;
+    public PlayerController holder, previousHolder;
     public Vector3 holderOffset;
 
     public void LateUpdate() {
@@ -30,6 +30,7 @@ public abstract class HoldableEntity : KillableEntity {
         if (holder) return;
         PhotonView holderView = PhotonView.Find(view);
         this.holder = holderView.gameObject.GetComponent<PlayerController>();
+        previousHolder = holder;
         photonView.TransferOwnership(holderView.Owner);
     }
 }
