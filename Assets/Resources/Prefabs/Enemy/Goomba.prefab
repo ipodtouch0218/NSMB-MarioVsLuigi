@@ -392,7 +392,7 @@ MonoBehaviour:
   hitRight: 0
   hitLeft: 0
   currentCollider: {fileID: 7523289063499453452}
-  floorAndRoofCutoff: 0.3
+  floorAndRoofCutoff: 0.2
 --- !u!1 &7523289063554791230
 GameObject:
   m_ObjectHideFlags: 0

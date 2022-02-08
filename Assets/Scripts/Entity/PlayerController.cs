@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                         //invalid flooring
                         continue;
                     }
-                    crushGround |= (contact.collider.gameObject.layer != LayerMask.NameToLayer("Semisolids"));
+                    crushGround |= !contact.collider.gameObject.CompareTag("platform");
                     down++;
                     tilesStandingOn.Add(vec );
                 } else if (contact.collider.gameObject.layer == GROUND_LAYERID) {
@@ -257,20 +257,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         //TODO: find stomp sound
     }
     protected void Footstep() {
-        if (state == Enums.PowerupState.Giant) {
-            return;
-        }
+        if (state == Enums.PowerupState.Giant) return;
         if (doIceSkidding && skidding) {
             PlaySoundFromAnim("player/ice-skid");
             return;
         }
-        if (Mathf.Abs(body.velocity.x) < walkingMaxSpeed)
-            return;
+        if (Mathf.Abs(body.velocity.x) < walkingMaxSpeed) return;
         
         PlaySoundFromAnim("player/walk" + (footstepMaterial != "" ? "-" + footstepMaterial : "") + (step ? "-2" : ""), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
         step = !step;
     }
 
+    #region Controls Callbacks
     protected void OnMovement(InputValue value) {
         if (!photonView.IsMine) return;
         joystick = value.Get<Vector2>();
@@ -328,6 +326,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         PlaySoundFromAnim("pause");
         GameManager.Instance.Pause();
     }
+    #endregion
 
     [PunRPC]
     protected void HoldingWakeup() {
@@ -343,10 +342,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         bool stateUp = false;
         Enums.PowerupState previous = state;
+        string powerupSfx = "powerup";
         string store = null;
         switch (powerup) {
         case "Mushroom": {
-            if (state == Enums.PowerupState.Small || state == Enums.PowerupState.Mini) {
+            if (state <= Enums.PowerupState.Small) {
                 state = Enums.PowerupState.Large;
                 stateUp = true;
                 transform.localScale = Vector3.one;
@@ -377,6 +377,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 stateUp = true;
                 state = Enums.PowerupState.Mini;
                 transform.localScale = Vector3.one / 2;
+                powerupSfx = "powerup-mini";
             }
             break;
         }
@@ -393,16 +394,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         case "MegaMushroom": {
             if (state == Enums.PowerupState.Giant) {
                 store = powerup;
-            } else {
-                state = Enums.PowerupState.Giant;
-                stateUp = true;
-                giantStartTimer = giantStartTime;
-                groundpound = false;
-                giantTimer = 15f;
-                crouching = false;
-                transform.localScale = Vector3.one;
-                GameObject.Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), (Vector3) body.position + (Vector3.forward * transform.position.z), Quaternion.identity);
+                break;
             }
+            state = Enums.PowerupState.Giant;
+            stateUp = true;
+            powerupSfx = "powerup-mega";
+            giantStartTimer = giantStartTime;
+            groundpound = false;
+            crouching = false;
+            giantTimer = 15f;
+            transform.localScale = Vector3.one;
+            GameObject.Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), (Vector3) body.position + (Vector3.forward * transform.position.z), Quaternion.identity);
+
             break;
         }
         }
@@ -411,17 +414,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         if (stateUp) {
             previousState = previous;
-            if (powerup == "MiniMushroom") {
-                PlaySoundFromAnim("player/powerup-mini");
-            } else if (powerup == "MegaMushroom") {
-                PlaySoundFromAnim("player/powerup-mega");
-            } else {
-                PlaySoundFromAnim("player/powerup");
-            }
+            PlaySoundFromAnim("player/" + powerupSfx);
             powerupFlash = 2f;
-            if (ForceCrouchCheck()) {
-                crouching = true;
-            }
+            crouching |= ForceCrouchCheck();
         } else {
             PlaySoundFromAnim("player/reserve_item_store");
         }
@@ -838,8 +833,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         knockback = false;
     }
 
-#if UNITY_EDITOR
     protected void Update() {
+        HandleAnimations();
+
+#if UNITY_EDITOR
+        if (!photonView.IsMine) return;
         Keyboard kb = Keyboard.current;
         if (kb[Key.LeftBracket].wasPressedThisFrame) {
             Time.timeScale /= 2;
@@ -849,18 +847,31 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             Time.timeScale *= 2;
             Debug.Log("new timescale = " + Time.timeScale);
         }
-        NumpadItem(Key.Numpad0, null);
-        NumpadItem(Key.Numpad1, "Mushroom");
-        NumpadItem(Key.Numpad2, "FireFlower");
-        NumpadItem(Key.Numpad3, "BlueShell");
-        NumpadItem(Key.Numpad4, "MiniMushroom");
-        NumpadItem(Key.Numpad5, "MegaMushroom");
-        NumpadItem(Key.Numpad6, "Star");
+        DebugItem(Key.Numpad0, null);
+        DebugItem(Key.Numpad1, "Mushroom");
+        DebugItem(Key.Numpad2, "FireFlower");
+        DebugItem(Key.Numpad3, "BlueShell");
+        DebugItem(Key.Numpad4, "MiniMushroom");
+        DebugItem(Key.Numpad5, "MegaMushroom");
+        DebugItem(Key.Numpad6, "Star");
+        DebugEntity(Key.Digit1, "Koopa");
+        DebugEntity(Key.Digit2, "RedKoopa");
+        DebugEntity(Key.Digit3, "BlueKoopa");
+        DebugEntity(Key.Digit4, "Goomba");
+        DebugEntity(Key.Digit5, "Bobomb");
+        DebugEntity(Key.Digit6, "BulletBill");
+#endif
     }
 
-    private void NumpadItem(Key key, string item) {
+#if UNITY_EDITOR
+    private void DebugItem(Key key, string item) {
         if (Keyboard.current[key].wasPressedThisFrame) {
             SpawnItem(item);
+        }
+    }
+    private void DebugEntity(Key key, string entity) {
+        if (Keyboard.current[key].wasPressedThisFrame) {
+            PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity, body.position + (facingRight ? Vector2.right : Vector2.left), Quaternion.identity);
         }
     }
 #endif
@@ -896,22 +907,30 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         // TickCounter(ref fadeOutTimer, 0, Time.fixedDeltaTime);
         // TickCounter(ref fadeInTimer, 0, Time.fixedDeltaTime);
-        HandleAnimation();
+        UpdateAnimatorStates();
     }
 
     void HandleSliding(bool up) {
         if (groundpound) {
-            if (onGround && !inShell && state != Enums.PowerupState.Giant) {
-                if (Mathf.Abs(floorAngle) >= 20) {
+            if (onGround) {
+                if (state == Enums.PowerupState.Giant) {
                     groundpound = false;
-                    sliding = true;
-                    alreadyGroundpounded = true;
-                    body.velocity = new Vector2(-Mathf.Sign(floorAngle) * groundpoundVelocity, 0);
-                } else if (up || !crouching) {
-                    groundpound = false;
-                    groundpoundCounter = (state == Enums.PowerupState.Giant ? 0.4f : 0.25f);
+                    groundpoundCounter = 0.5f;
+                    return;
+                } else {
+
+                    if (!inShell && Mathf.Abs(floorAngle) >= 20) {
+                        groundpound = false;
+                        sliding = true;
+                        alreadyGroundpounded = true;
+                        body.velocity = new Vector2(-Mathf.Sign(floorAngle) * groundpoundVelocity, 0);
+                    } else if (up || !crouching) {
+                        groundpound = false;
+                        groundpoundCounter = (state == Enums.PowerupState.Giant ? 0.4f : 0.25f);
+                    }
                 }
-            } else if (up) {
+            }
+            if (up && state != Enums.PowerupState.Giant) {
                 groundpound = false;
             }
         }
@@ -943,7 +962,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         }
         BoxCollider2D mainCollider = hitboxes[0];
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * (mainCollider.size.y/2f * transform.lossyScale.y)), mainCollider.size * transform.lossyScale, 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
         if (hit) {
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal); 
@@ -955,7 +974,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onGround = true;
             doGroundSnap = true;
         } else {
-            hit = Physics2D.BoxCast(body.position + (Vector2.up * (mainCollider.size.y / 2f * transform.lossyScale.y)), mainCollider.size * transform.lossyScale, 0, Vector2.down, 0.4f, ANY_GROUND_MASK);
+            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x - 0.1f, 0.1f) * transform.lossyScale, 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
             if (hit) {
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal); 
                 if (angle < -89 || angle > 89) return;
@@ -1024,8 +1043,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     void HandleDeathAnimation() {
         if (!dead) return;
-        if (body.position.y < GameManager.Instance.GetLevelMinY()) {
-            body.position = new Vector2(body.position.x, GameManager.Instance.GetLevelMinY() - 8);
+        if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y) {
+            transform.position = body.position = new Vector2(body.position.x, GameManager.Instance.GetLevelMinY() - 20);
         }
 
         deathCounter += Time.fixedDeltaTime;
@@ -1046,8 +1065,95 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             photonView.RPC("PreRespawn", RpcTarget.All);
         }
     }
+    
+    void HandleAnimations() {
+        Vector3 targetEuler = models.transform.eulerAngles;
+        bool instant = false;
+        if (dead || animator.GetBool("pipe")) {
+            targetEuler = new Vector3(0, 180, 0);
+            instant = true;
+        } else if (animator.GetBool("inShell") && !onSpinner) {
+            targetEuler += (Mathf.Abs(body.velocity.x) / runningMaxSpeed) * Time.deltaTime * new Vector3(0, 1800 * (facingRight ? -1 : 1));
+            instant = true;
+        } else if (skidding || turnaround) {
+            if (facingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
+                targetEuler = new Vector3(0, 360 - 100, 0);
+            } else {
+                targetEuler = new Vector3(0, 100, 0);
+            }
+        } else {
+            if (onSpinner && onGround && Mathf.Abs(body.velocity.x) < 0.3f && !holding) {
+                targetEuler += new Vector3(0, -1800, 0) * Time.deltaTime;
+                instant = true;
+            } else if (flying) {
+                if (drill) {
+                    targetEuler += new Vector3(0, -2000, 0) * Time.deltaTime;
+                } else {
+                    targetEuler += new Vector3(0, -1200, 0) * Time.deltaTime;
+                }
+                instant = true;
+            } else {
+                if (facingRight) {
+                    targetEuler = new Vector3(0, 100, 0);
+                } else {
+                    targetEuler = new Vector3(0, 360 - 100, 0);
+                }
+            }
+        }
+        if (instant || wasTurnaround) {
+            models.transform.rotation = Quaternion.Euler(targetEuler);
+        } else {
+            float maxRotation = 2000f * Time.deltaTime;
+            float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
+            x += Mathf.Max(Mathf.Min(maxRotation, targetEuler.x - x), -maxRotation);
+            y += Mathf.Max(Mathf.Min(maxRotation, targetEuler.y - y), -maxRotation);
+            z += Mathf.Max(Mathf.Min(maxRotation, targetEuler.z - z), -maxRotation);
+            models.transform.rotation = Quaternion.Euler(x, y, z);
+        }
+        wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround;
 
-    void HandleAnimation() {
+        //Particles
+        SetParticleEmission(dust, (onLeft || onRight || (onGround && ((skidding && !doIceSkidding) || (crouching && Mathf.Abs(body.velocity.x) > 1))) || (sliding && Mathf.Abs(body.velocity.x) > 0.2 && onGround)) && !pipeEntering);
+        SetParticleEmission(drillParticle, drill);
+        SetParticleEmission(sparkles, invincible > 0);
+        SetParticleEmission(giantParticle, state == Enums.PowerupState.Giant && giantStartTimer < 0);
+
+        //Blinking
+        if (dead) {
+            eyeState = Enums.PlayerEyeState.Death;
+        } else {
+            if ((blinkTimer -= Time.fixedDeltaTime) < 0) {
+                blinkTimer = 3f + (Random.value * 2f);
+            }
+            if (blinkTimer < blinkDuration) {
+                eyeState = Enums.PlayerEyeState.HalfBlink;
+            } else if (blinkTimer < blinkDuration * 2f) {
+                eyeState = Enums.PlayerEyeState.FullBlink;
+            } else if (blinkTimer < blinkDuration * 3f) {
+                eyeState = Enums.PlayerEyeState.HalfBlink;
+            } else {
+                eyeState = Enums.PlayerEyeState.Normal;
+            }
+        }
+
+        HorizontalCamera.OFFSET_TARGET = (flying ? 0.75f : 0f);
+        if (flying) {
+            float percentage = Mathf.Abs(body.velocity.x) / walkingMaxSpeed;
+            cameraController.offset = 2f * percentage * (body.velocity.x > 0 ? cameraOffsetRight : cameraOffsetLeft);
+            cameraController.exactCentering = true;
+        } else {
+            cameraController.offset = cameraOffsetZero;
+            cameraController.exactCentering = false;
+        }
+
+        if (crouching || sliding || skidding) {
+            onLeft = false;
+            onRight = false;
+            dust.transform.localPosition = Vector2.zero;
+        }
+    }
+
+    void UpdateAnimatorStates() {
 
         if (photonView.IsMine) {
 
@@ -1078,7 +1184,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             animator.SetBool("onRight", onRight);
             animator.SetBool("onGround", onGround);
             animator.SetBool("invincible", invincible > 0);
-            float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Cos(floorAngle));
+            float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(floorAngle * Mathf.Deg2Rad));
             if (stuckInBlock) {
                 animatedVelocity = 0;
             } else if (doIceSkidding) {
@@ -1130,75 +1236,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 _ => Vector3.one,
             };
         }
-
-        Vector3 targetEuler = models.transform.eulerAngles;
-        bool instant = false;
-        if (dead || animator.GetBool("pipe")) {
-            targetEuler = new Vector3(0,180,0);
-            instant = true;
-        } else if (animator.GetBool("inShell") && !onSpinner) {
-            targetEuler += (new Vector3(0, 1800 * (facingRight ? -1 : 1)) * Time.fixedDeltaTime) * (Mathf.Abs(body.velocity.x) / runningMaxSpeed);
-            instant = true;
-        } else if (skidding || turnaround) {
-            if (facingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
-                targetEuler = new Vector3(0,360-100,0);
-            } else {
-                targetEuler = new Vector3(0,100,0);
-            }
-        } else {
-            if (onSpinner && onGround && Mathf.Abs(body.velocity.x) < 0.3f && !holding) {
-                targetEuler += (new Vector3(0, -1800, 0) * Time.fixedDeltaTime);
-                instant = true;
-            } else if (flying) {
-                if (drill) {
-                    targetEuler += (new Vector3(0, -2000, 0) * Time.fixedDeltaTime);
-                } else {
-                    targetEuler += (new Vector3(0, -1200, 0) * Time.fixedDeltaTime);
-                }
-                instant = true;
-            } else {
-                if (facingRight) {
-                    targetEuler = new Vector3(0,100,0);
-                } else {
-                    targetEuler = new Vector3(0,360-100,0);
-                }
-            }
-        }
-        if (instant || wasTurnaround) {
-            models.transform.rotation = Quaternion.Euler(targetEuler);
-        } else {
-            float maxRotation = 2000f * Time.fixedDeltaTime;
-            float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
-            x += Mathf.Max(Mathf.Min(maxRotation, targetEuler.x - x), -maxRotation);
-            y += Mathf.Max(Mathf.Min(maxRotation, targetEuler.y - y), -maxRotation);
-            z += Mathf.Max(Mathf.Min(maxRotation, targetEuler.z - z), -maxRotation);
-            models.transform.rotation = Quaternion.Euler(x, y, z);
-        }
-        wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround;
-
-        //Particles
-        SetParticleEmission(dust, (onLeft || onRight || (onGround && ((skidding && !doIceSkidding) || (crouching && Mathf.Abs(body.velocity.x) > 1))) || (sliding && Mathf.Abs(body.velocity.x) > 0.2 && onGround)) && !pipeEntering);
-        SetParticleEmission(drillParticle, drill);
-        SetParticleEmission(sparkles, invincible > 0);
-        SetParticleEmission(giantParticle, state == Enums.PowerupState.Giant && giantStartTimer < 0);
-
-        //Blinking
-        if (dead) {
-            eyeState = Enums.PlayerEyeState.Death;
-        } else {
-            if ((blinkTimer -= Time.fixedDeltaTime) < 0) {
-                blinkTimer = 3f + (Random.value * 2f);
-            }
-            if (blinkTimer < blinkDuration) {
-                eyeState = Enums.PlayerEyeState.HalfBlink;
-            } else if (blinkTimer < blinkDuration*2f) {
-                eyeState = Enums.PlayerEyeState.FullBlink;
-            } else if (blinkTimer < blinkDuration*3f) {
-                eyeState = Enums.PlayerEyeState.HalfBlink;
-            } else {
-                eyeState = Enums.PlayerEyeState.Normal;
-            }
-        }
     
         //Enable rainbow effect
         MaterialPropertyBlock block = new(); 
@@ -1248,24 +1285,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         HandleDeathAnimation();
         HandlePipeAnimation();
-
-        if (photonView.IsMine) {
-            HorizontalCamera.OFFSET_TARGET = (flying ? 0.75f : 0f);
-            if (flying) {
-                float percentage = Mathf.Abs(body.velocity.x) / walkingMaxSpeed;
-                cameraController.offset = 2f * percentage * (body.velocity.x > 0 ? cameraOffsetRight : cameraOffsetLeft);
-                cameraController.exactCentering = true;
-            } else {
-                cameraController.offset = cameraOffsetZero;
-                cameraController.exactCentering = false;
-            }
-        }
-        
-        if (crouching || sliding || skidding) {
-            onLeft = false;
-            onRight = false;
-            dust.transform.localPosition = Vector2.zero;
-        }
 
         if (animator.GetBool("pipe")) {
             gameObject.layer = HITS_NOTHING_LAYERID;
@@ -1323,10 +1342,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if ((body.velocity.y > 0 && !onGround)|| !doGroundSnap || pipeEntering) return false;
        
         BoxCollider2D hitbox = hitboxes[0];
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + new Vector2(0, 0.15f * transform.lossyScale.y), new Vector2(hitbox.size.x, 0.05f) * transform.lossyScale, 0, Vector2.down, 0.5f * transform.lossyScale.y, ANY_GROUND_MASK);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + new Vector2(0, 0.1f), new Vector2(hitbox.size.x * transform.lossyScale.x, 0.05f), 0, Vector2.down, 0.4f, ANY_GROUND_MASK);
         if (hit) {
             body.position = new Vector2(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
-            Debug.Log("snap");
+            Debug.Log("Snap");
             return true;
         }
         return false;
@@ -1651,7 +1670,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
     }
 
-    bool HandleStuckInBlock(float delta) {
+    bool HandleStuckInBlock() {
         if (!body || hitboxes == null) return false;
         Vector2 checkPos = body.position + new Vector2(0, hitboxes[0].size.y/4f);
         if (!Utils.IsTileSolidAtWorldLocation(checkPos)) {
@@ -1662,13 +1681,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         body.gravityScale = 0;
         onGround = true;
         if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(0, 0.3f))) {
-            transform.position = body.position = new Vector2(body.position.x, Mathf.Floor((checkPos.y + 0.3f)*2)/2);
+            transform.position = body.position = new Vector2(body.position.x, Mathf.Floor((checkPos.y + 0.3f) * 2) / 2);
+            return true;
+        } else if (!Utils.IsTileSolidAtWorldLocation(checkPos - new Vector2(0, 0.3f))) {
+            transform.position = body.position = new Vector2(body.position.x, Mathf.Floor((checkPos.y - 0.3f) * 2) / 2);
             return true;
         } else if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(0.25f, 0))) {
-            body.velocity = Vector2.right*2f;
+            body.velocity = Vector2.right * 2f;
             return true;
         } else if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(-0.25f, 0))) {
-            body.velocity = Vector2.left*2f;
+            body.velocity = Vector2.left * 2f;
             return true;
         }
         RaycastHit2D rightRaycast = Physics2D.Raycast(checkPos, Vector2.right, 15, ONLY_GROUND_MASK);
@@ -1727,7 +1749,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         RaycastHit2D hit = Physics2D.BoxCast(o, new Vector2(0.6f, 3f), 0, Vector2.zero, 0, ONLY_GROUND_MASK);
         photonView.RPC("FinishMegaMario", RpcTarget.All, !(bool) hit);
     }
-    
+
     void HandleMovement(float delta) {
         functionallyRunning = running || state == Enums.PowerupState.Giant;
 
@@ -1741,14 +1763,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if (giantStartTimer > 0) {
             body.velocity = Vector2.zero;
-            if (giantStartTimer-delta <= 0) {
+            if (giantStartTimer - delta <= 0) {
                 //start by checking bounding
                 giantStartTimer = 0;
                 if (photonView.IsMine)
                     StartCoroutine(CheckForGiantStartupTiles());
             } else {
                 body.isKinematic = true;
-                if (animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale") {
+                if (animator.GetCurrentAnimatorClipInfo(1).Length <= 0 || animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale") {
                     animator.Play("mega-scale", 1);
                 }
             }
@@ -1757,7 +1779,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (giantEndTimer > 0) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
-            
+
             if (giantEndTimer - delta <= 0) {
                 hitInvincibilityCounter = 3f;
                 body.velocity = savedVelocity;
@@ -1768,26 +1790,26 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
 
         if (state == Enums.PowerupState.Giant) {
+            HandleGiantTiles(true);
             if (giantTimer <= 0) {
+                // works??
                 if (state != Enums.PowerupState.Large) {
                     savedVelocity = body.velocity;
                 } else {
                     savedVelocity = Vector2.zero;
                 }
+                giantEndTimer = giantStartTime / 2f;
                 state = Enums.PowerupState.Large;
                 hitInvincibilityCounter = 3f;
                 body.isKinematic = true;
                 animator.enabled = false;
-                giantEndTimer = giantStartTime / 2f;
-                //todo: play shrink sfx
-            } else {
-                //destroy tiles
-                HandleGiantTiles(true);
             }
         }
         
-        if (pipeEntering || HandleStuckInBlock(delta))
-            return;
+        //pipes > stuck in block, else the animation gets janked.
+        if (pipeEntering) return;
+        if (HandleStuckInBlock()) return;
+
 
         //Pipes
         if (!paused) {
@@ -1970,7 +1992,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             //Friction...
             if (abovemax) {
-                Debug.Log("friction");
                 body.velocity *= 1-(delta * tileFriction * (knockback ? 3f : 4f) * (sliding ? 0.7f : 1f));
                 if (Mathf.Abs(body.velocity.x) < 0.15f) {
                     body.velocity = new Vector2(0, body.velocity.y);
@@ -1978,7 +1999,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
         //Terminal velocity
-        float terminalVelocityModifier = (state != Enums.PowerupState.Mini ? 1f : 0.65f);
+        float terminalVelocityModifier = (state == Enums.PowerupState.Mini ? 0.65f : 1f);
         if (flying) {
             if (drill) {
                 body.velocity = new Vector2(Mathf.Max(-1.5f, Mathf.Min(1.5f, body.velocity.x)), -drillVelocity);
@@ -1997,12 +2018,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleGroundpoundStart(bool left, bool right) {
-        if (onGround || knockback) return;
+        if (onGround || knockback || groundpound || drill 
+            || holding || crouching || sliding 
+            || onLeft || onRight) return;
         if (!flying && (left || right)) return;
-        if (groundpound || drill) return;
-        if (holding) return;
-        if (crouching || sliding) return;
-        if (onLeft || onRight) return;
         if (groundpoundDelay > 0) return;
 
         if (flying) {
@@ -2014,7 +2033,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         } else {
             //start groundpound
             //check if high enough above ground
-            if (Physics2D.Raycast(body.position, Vector2.down, 0.5f * (state == Enums.PowerupState.Giant ? 2.5f : 1), ANY_GROUND_MASK)) return;
+            if (Physics2D.Raycast(body.position, Vector2.down, 0.25f * (state == Enums.PowerupState.Giant ? 2.5f : 1), ANY_GROUND_MASK)) return;
             
             onLeft = false;
             onRight = false;
@@ -2033,37 +2052,35 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleGroundpound() {
-        if (photonView.IsMine && onGround && (groundpound || drill) && hitBlock) {
-            bool tempHitBlock = false;
-            foreach (Vector3Int tile in tilesStandingOn) {
-                int temp = InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
-                if (temp != -1) {
-                    tempHitBlock |= temp == 1;
-                }
+        if (!(photonView.IsMine && onGround && (groundpound || drill) && hitBlock)) return;
+        bool tempHitBlock = false;
+        foreach (Vector3Int tile in tilesStandingOn) {
+            int temp = InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
+            if (temp != -1) {
+                tempHitBlock |= temp == 1;
             }
-            hitBlock = tempHitBlock;
-            if (drill) {
-                flying = hitBlock;
-                drill = hitBlock;
-                if (hitBlock) {
-                    onGround = false;
-                }
+        }
+        hitBlock = tempHitBlock;
+        if (drill) {
+            flying = hitBlock;
+            drill = hitBlock;
+            if (hitBlock) {
+                onGround = false;
+            }
+        } else {
+            //groundpound
+            if (hitBlock) {
+                koyoteTime = 1.5f;
             } else {
-                //groundpound
-                if (hitBlock) {
-                    koyoteTime = 1.5f;
-                } else {
-                    photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == Enums.PowerupState.Mini ? "-mini" : ""));
-                    if (state == Enums.PowerupState.Giant) {
-                        photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound_mega");
-                        cameraController.screenShakeTimer = 0.35f;
-                    }
-                    photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
+                photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == Enums.PowerupState.Mini ? "-mini" : ""));
+                if (state == Enums.PowerupState.Giant) {
+                    photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound_mega");
+                    cameraController.screenShakeTimer = 0.35f;
                 }
+                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust");
             }
         }
     }
-    
     void OnDrawGizmos() {
         Gizmos.DrawRay(body.position, body.velocity);
         Gizmos.DrawCube(body.position + new Vector2(0, hitboxes[0].size.y/2f * transform.lossyScale.y) + (body.velocity * Time.fixedDeltaTime), hitboxes[0].size * transform.lossyScale);

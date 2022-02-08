@@ -673,7 +673,7 @@ CompositeCollider2D:
   m_UsedByEffector: 1
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_GeometryType: 0
+  m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
   m_ColliderPaths:
@@ -718,8 +718,8 @@ PlatformEffector2D:
     m_Bits: 4294967295
   m_RotationalOffset: 0
   m_UseOneWay: 1
-  m_UseOneWayGrouping: 1
-  m_SurfaceArc: 1
+  m_UseOneWayGrouping: 0
+  m_SurfaceArc: 120
   m_UseSideFriction: 0
   m_UseSideBounce: 0
   m_SideArc: 1

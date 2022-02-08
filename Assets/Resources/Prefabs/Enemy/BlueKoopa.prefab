@@ -22,6 +22,11 @@ PrefabInstance:
       propertyPath: ObservedComponents.Array.data[0]
       value: 
       objectReference: {fileID: 2558873171136878799}
+    - target: {fileID: 1651255696094252028, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: floorAndRoofCutoff
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: m_Controller

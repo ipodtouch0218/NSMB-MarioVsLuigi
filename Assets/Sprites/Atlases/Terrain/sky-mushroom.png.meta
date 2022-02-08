@@ -1658,7 +1658,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      sky-mushroom_15: -530305657
+      sky-mushroom_11: 2050376766
       sky-mushroom_33: -1859754107
       sky-mushroom_35: -1379005115
       sky-mushroom_39: -1245157445
@@ -1737,7 +1737,7 @@ TextureImporter:
       sky-mushroom_67: 571464679
       sky-mushroom_10: 1545862070
       sky-mushroom_4: -1348476940
-      sky-mushroom_11: 2050376766
+      sky-mushroom_15: -530305657
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

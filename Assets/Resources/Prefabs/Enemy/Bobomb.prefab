@@ -242,6 +242,7 @@ MonoBehaviour:
   dead: 0
   body: {fileID: 0}
   holder: {fileID: 0}
+  previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
   walkSpeed: 0.6
   kickSpeed: 5
@@ -398,7 +399,7 @@ MonoBehaviour:
   hitRight: 0
   hitLeft: 0
   currentCollider: {fileID: 3286581577125373962}
-  floorAndRoofCutoff: 0.3
+  floorAndRoofCutoff: 0.2
 --- !u!1 &3286581578154145922
 GameObject:
   m_ObjectHideFlags: 0

@@ -298,7 +298,7 @@ MonoBehaviour:
   hitRight: 0
   hitLeft: 0
   currentCollider: {fileID: 8836298984178612584}
-  floorAndRoofCutoff: 0.3
+  floorAndRoofCutoff: 0.2
 --- !u!82 &3399800873378663516
 AudioSource:
   m_ObjectHideFlags: 0

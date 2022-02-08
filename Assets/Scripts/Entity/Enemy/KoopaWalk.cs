@@ -5,8 +5,10 @@ using Photon.Pun;
 using UnityEngine.Tilemaps;
 
 public class KoopaWalk : HoldableEntity {
+    private static int GROUND_LAYER_ID;
+
     [SerializeField] float walkSpeed, kickSpeed, wakeup = 15;
-    [SerializeField] public bool red, blue, shell, stationary, hardkick, upsideDown;
+    public bool red, blue, shell, stationary, hardkick, upsideDown;
     public bool left = true, putdown = false;
     public float wakeupTimer;
     private BoxCollider2D worldHitbox;
@@ -16,6 +18,7 @@ public class KoopaWalk : HoldableEntity {
         base.Start();
         hitbox = GetComponentInChildren<BoxCollider2D>();
         worldHitbox = GetComponent<BoxCollider2D>();
+        GROUND_LAYER_ID = LayerMask.NameToLayer("Ground");
 
         base.body.velocity = new Vector2(-walkSpeed, 0);
     }
@@ -234,7 +237,7 @@ public class KoopaWalk : HoldableEntity {
         for (int i = 0; i < collisionAmount; i++) {
             var point = collisions[i];
             Vector2 p = point.point + (point.normal * -0.15f);
-            if (Mathf.Abs(point.normal.x) > 0.5f) {
+            if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == GROUND_LAYER_ID) {
                 
                 if (photonView)
                     photonView.RPC("Turnaround", RpcTarget.All, point.normal.x > 0);
