@@ -27,6 +27,8 @@ public class BulletBillLauncher : MonoBehaviourPun {
     }
 
     void TryToShoot() {
+        if (!Utils.IsTileSolidAtWorldLocation(transform.position))
+            return;
         for (int i = 0; i < bills.Count; i++) {
             if (bills[i] == null)
                 bills.RemoveAt(i--);

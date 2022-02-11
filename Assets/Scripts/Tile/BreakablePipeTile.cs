@@ -48,12 +48,12 @@ public class BreakablePipeTile : InteractableTile {
 
             bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
             
-            object[] parametersParticle = new object[]{worldLocation.x, worldLocation.y, leftOfPipe, upsideDownPipe, tileHeight-1, alreadyDestroyed};
-            GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnDestructablePipe, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+            object[] parametersParticle = new object[]{(Vector2) worldLocation + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight-1), "DestructablePipe" + (alreadyDestroyed ? "-D" : "")};
+            GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnResizableParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         }
         string[] tiles = new string[tileHeight*2];
         
-        int start = (upsideDownPipe ? (tileHeight*2)-2 : 0);
+        int start = upsideDownPipe ? (tileHeight*2)-2 : 0;
         if (addHat) {
             if (leftOfPipe) {
                 //we're the left side. modify the right side too.

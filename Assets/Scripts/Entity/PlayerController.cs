@@ -1920,7 +1920,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             savedVelocity = state != Enums.PowerupState.Large ? body.velocity : Vector2.zero;
             giantEndTimer = giantStartTime / 2f;
             state = Enums.PowerupState.Large;
-            hitInvincibilityCounter = 3f;
             body.isKinematic = true;
             animator.enabled = false;
             photonView.RPC("PlaySound", RpcTarget.All, "player/mega-end");

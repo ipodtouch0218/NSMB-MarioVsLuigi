@@ -29,7 +29,7 @@ public class Enums {
         SetTileBatch = 22,
         // 30-39 = graphical-only events
         SpawnParticle = 30,
-        SpawnDestructablePipe = 31,
+        SpawnResizableParticle = 31,
     }
     //TODO: event caching?
     // private static List<byte> uncached = new List<byte>(new byte[]{1, 2, 10, 11, 21, 30, 31});
