@@ -22,13 +22,8 @@ public abstract class KillableEntity : MonoBehaviourPun {
     }
 
     public void Update() {
-        if (sRenderer.enabled) {
-            if (!sRenderer.isVisible) {
-                audioSource.volume = 0;
-            } else {
-                audioSource.volume = 1;
-            }
-        }
+        if (sRenderer.enabled)
+            audioSource.volume = sRenderer.isVisible ? 1 : 0;
     }
 
     public virtual void InteractWithPlayer(PlayerController player) {
@@ -74,11 +69,10 @@ public abstract class KillableEntity : MonoBehaviourPun {
         dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
         if (groundpound)
-            GameObject.Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), transform.position + new Vector3(0, 0.5f, -5), Quaternion.identity);
+            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
         
-        if (photonView.IsMine) {
-            PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
-        }
+        if (photonView.IsMine)
+            PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + new Vector2(0, 0.5f), Quaternion.identity);
     } 
     [PunRPC]
     public void PlaySound(string sound) {

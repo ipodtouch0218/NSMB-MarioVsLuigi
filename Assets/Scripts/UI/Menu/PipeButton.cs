@@ -17,7 +17,7 @@ public class PipeButton : MonoBehaviour {
         image = GetComponent<Image>();
         anchor = rect.anchorMin;
         adjustedAnchor = anchor + new Vector2(0.1f,0);
-        disabledColor = new Color(deselectedColor.r, deselectedColor.g, deselectedColor.b, deselectedColor.a/2f);
+        disabledColor = new(deselectedColor.r, deselectedColor.g, deselectedColor.b, deselectedColor.a/2f);
     }
 
     void Update() {

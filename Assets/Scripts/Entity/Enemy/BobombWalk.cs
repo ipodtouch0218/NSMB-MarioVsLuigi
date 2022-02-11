@@ -6,18 +6,16 @@ using Photon.Pun;
 
 public class BobombWalk : HoldableEntity {
 
-    private int explosionTileSize = 2;
+    private readonly int explosionTileSize = 2;
     public float walkSpeed, kickSpeed, detonateTimer;
     bool left;
     public bool lit, detonated;
     float detonateCount;
-    Vector3 startingScale;
     public GameObject explosion;
 
     new void Start() {
         base.Start();
         body.velocity = new Vector2(walkSpeed * (left ? -1 : 1), body.velocity.y);
-        startingScale = transform.localScale;
         physics = GetComponent<PhysicsEntity>();
     }
 
@@ -40,8 +38,8 @@ public class BobombWalk : HoldableEntity {
                     photonView.RPC("Detonate", RpcTarget.All);
                 return;
             }
-            float redOverlayPercent = (5.39f/(detonateCount+2.695f))*10f % 1f;
-            MaterialPropertyBlock block = new MaterialPropertyBlock(); 
+            float redOverlayPercent = 5.39f/(detonateCount+2.695f)*10f % 1f;
+            MaterialPropertyBlock block = new(); 
             block.SetFloat("FlashAmount", redOverlayPercent);
             base.sRenderer.SetPropertyBlock(block);
         }
@@ -53,7 +51,7 @@ public class BobombWalk : HoldableEntity {
         hitbox.enabled = false;
         detonated = true;
 
-        GameObject.Instantiate(explosion, transform.position, Quaternion.identity);
+        Instantiate(explosion, transform.position, Quaternion.identity);
 
         if (!photonView.IsMine)
             return;
@@ -87,8 +85,8 @@ public class BobombWalk : HoldableEntity {
                 Utils.WrapTileLocation(ref ourLocation);
 
                 TileBase tile = tm.GetTile(ourLocation);
-                if (tile is InteractableTile) {
-                    ((InteractableTile) tile).Interact(this, (InteractableTile.InteractionDirection.Up), Utils.TilemapToWorldPosition(ourLocation));
+                if (tile is InteractableTile iTile) {
+                    iTile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(ourLocation));
                 }
             }
         }
@@ -111,9 +109,8 @@ public class BobombWalk : HoldableEntity {
     }
     [PunRPC]
     public override void Throw(bool facingLeft, bool crouch) {
-        if (holder == null) {
+        if (!holder)
             return;
-        }
         this.holder = null;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
         this.left = facingLeft;
@@ -142,9 +139,8 @@ public class BobombWalk : HoldableEntity {
             return;
         }
         if (attackedFromAbove && !lit) {
-            if (player.state != Enums.PowerupState.Mini || (player.groundpound && attackedFromAbove)) {
+            if (player.state != Enums.PowerupState.Mini || (player.groundpound && attackedFromAbove))
                 photonView.RPC("Light", RpcTarget.All);
-            }
             photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
             if (player.groundpound) {
                 photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
@@ -171,9 +167,9 @@ public class BobombWalk : HoldableEntity {
         if (holder)
             return;
 
-        physics.Update();
+        physics.UpdateCollisions();
         if (lit && physics.onGround) {
-            body.velocity -= (body.velocity * (Time.fixedDeltaTime * 3f));
+            body.velocity -= body.velocity * (Time.fixedDeltaTime * 3f);
             if (Mathf.Abs(body.velocity.x) < 0.05) {
                 body.velocity = new Vector2(0, body.velocity.y);
             }
@@ -183,20 +179,21 @@ public class BobombWalk : HoldableEntity {
             return;
         }
         if (physics.hitRight && !left) {
-            if (photonView)
+            if (photonView) {
                 photonView.RPC("Turnaround", RpcTarget.All, false);
-            else
+            } else {
                 Turnaround(false);
+            }
         } else if (physics.hitLeft && left) {
-            if (photonView)
+            if (photonView) {
                 photonView.RPC("Turnaround", RpcTarget.All, true);
-            else
+            } else {
                 Turnaround(true);
+            }
         }
 
-        if (physics.onGround && physics.hitRoof) {
+        if (physics.onGround && physics.hitRoof)
             photonView.RPC("Detonate", RpcTarget.All);
-        }
     }
     [PunRPC]
     void Turnaround(bool hitWallOnLeft) {

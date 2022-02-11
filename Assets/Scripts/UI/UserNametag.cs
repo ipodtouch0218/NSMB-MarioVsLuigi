@@ -11,7 +11,6 @@ public class UserNametag : MonoBehaviour {
 
     void Start() {
         parent = GetComponentInParent<PlayerController>();
-
         gameObject.SetActive(!parent.photonView.IsMine);
     }
     

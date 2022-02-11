@@ -11,12 +11,14 @@ public class LoadingWaitingOn : MonoBehaviour {
     }
 
     void Update() {
-        if (!GameManager.Instance) return;
+        if (!GameManager.Instance) 
+            return;
         if (GameManager.Instance.starting) {
             text.text = readyToStartText;
             return;
         }
-        if (GameManager.Instance.loadedPlayers.Count == 0) return;
+        if (GameManager.Instance.loadedPlayers.Count == 0) 
+            return;
         text.text = iveLoadedText;
     }
 }

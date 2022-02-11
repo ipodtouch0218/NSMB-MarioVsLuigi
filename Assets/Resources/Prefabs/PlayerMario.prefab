@@ -9849,7 +9849,7 @@ MonoBehaviour:
   deathUpTime: 0.6
   deathForce: 7
   groundpoundTime: 0.25
-  groundpoundVelocity: 12
+  groundpoundVelocity: 10
   blinkingSpeed: 0.25
   terminalVelocity: -7
   jumpVelocity: 6.25
@@ -10282,6 +10282,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scrollAmount: 0
+  dampingTime: 0.5
   screenShakeTimer: 0
   exactCentering: 0
   offset: {x: 0, y: 0, z: 0}

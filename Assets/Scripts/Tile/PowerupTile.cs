@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using Photon.Pun;
 
 [CreateAssetMenu(fileName = "PowerupTile", menuName = "ScriptableObjects/Tiles/PowerupTile", order = 2)]
@@ -28,17 +27,12 @@ public class PowerupTile : BreakableBrickTile {
                 object[] parametersParticle = new object[]{tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b)};
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
                 
-                if (interacter is MonoBehaviourPun) {
-                    ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
-                }
+                if (interacter is MonoBehaviourPun pun)
+                    pun.photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
                 return true;
             }
 
-            if (player.state <= Enums.PowerupState.Small) {
-                spawnResult = BlockBump.SpawnResult.Mushroom;
-            } else {
-                spawnResult = BlockBump.SpawnResult.FireFlower;
-            }
+            spawnResult = player.state <= Enums.PowerupState.Small ? BlockBump.SpawnResult.Mushroom : BlockBump.SpawnResult.FireFlower;
         }
         
         Bump(interacter, direction, worldLocation);
@@ -46,10 +40,8 @@ public class PowerupTile : BreakableBrickTile {
         object[] parametersBump = new object[]{tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult};
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
 
-        if (interacter is MonoBehaviourPun) {
-            // ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
-            ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/item_block");
-        }
+        if (interacter is MonoBehaviourPun pun2)
+            pun2.photonView.RPC("PlaySound", RpcTarget.All, "player/item_block");
         return false;
     }
 }

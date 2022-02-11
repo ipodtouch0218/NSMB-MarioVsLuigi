@@ -18,9 +18,9 @@ public class LoadingPower : MonoBehaviour {
 
     void Update() {
         animator.SetBool("goomba", goomba);
-        if ((goombaTimer -= Time.deltaTime) < 0) {
-            rect.localPosition += (movementSpeed * Time.deltaTime);
-        }
+        if ((goombaTimer -= Time.deltaTime) < 0)
+            rect.localPosition += movementSpeed * Time.deltaTime;
+
         if (rect.localPosition.x <= marioX) {
             if (goomba) {
                 if (!goombaHit) {
@@ -29,9 +29,8 @@ public class LoadingPower : MonoBehaviour {
                     mario.scaleTimer = 0f;
                     goombaTimer = 0.5f;
                 }
-                if (rect.localPosition.x <= minX) {
+                if (rect.localPosition.x <= minX)
                     Reset();
-                }
             } else {
                 mario.scale++;
                 mario.scaleTimer = 0f;
@@ -42,13 +41,7 @@ public class LoadingPower : MonoBehaviour {
 
     void Reset() {
         goombaHit = false;
-        if (mario.scale <= 0) {
-            goomba = false;
-        } else if (mario.scale >= 2) {
-            goomba = true;
-        } else {
-            goomba = Random.value <= 0.5f;
-        }
+        goomba = mario.scale > 0 && (mario.scale >= 2 || Random.value < 0.5f);
         rect.localPosition = new Vector2(peachX, rect.localPosition.y);
     }
 }

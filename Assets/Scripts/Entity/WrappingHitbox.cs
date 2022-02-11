@@ -10,12 +10,14 @@ public class WrappingHitbox : MonoBehaviour {
     private Vector2 offset = Vector2.zero;
     void Awake() {
         body = GetComponent<Rigidbody2D>();
-        if (!body) body = GetComponentInParent<Rigidbody2D>();
+        if (!body)
+            body = GetComponentInParent<Rigidbody2D>();
         ourColliders = GetComponents<BoxCollider2D>();
         Update();
     }
     void Update() {
-        if (!GameManager.Instance) return;
+        if (!GameManager.Instance) 
+            return;
         if (!GameManager.Instance.loopingLevel) {
             this.enabled = false;
             return;
@@ -24,7 +26,7 @@ public class WrappingHitbox : MonoBehaviour {
         if (offset == Vector2.zero) {
             childColliders = new BoxCollider2D[ourColliders.Length];
             for (int i = 0; i < ourColliders.Length; i++)
-            childColliders[i] = gameObject.AddComponent<BoxCollider2D>();
+                childColliders[i] = gameObject.AddComponent<BoxCollider2D>();
             levelWidth = GameManager.Instance.levelWidthTile/2f;
             levelMiddle = GameManager.Instance.GetLevelMinX() + levelWidth/2f;
             offset = new Vector2(levelWidth, 0);
@@ -39,7 +41,6 @@ public class WrappingHitbox : MonoBehaviour {
         BoxCollider2D childCollider = childColliders[index];
 
         childCollider.autoTiling = ourCollider.autoTiling;
-        // childCollider.density = ourCollider.density;
         childCollider.edgeRadius = ourCollider.edgeRadius;
         childCollider.enabled = ourCollider.enabled;
         childCollider.isTrigger = ourCollider.isTrigger;

@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Photon.Pun;
 
 [CreateAssetMenu(fileName = "BreakablePipeTile", menuName = "ScriptableObjects/Tiles/BreakablePipeTile", order = 4)]
 public class BreakablePipeTile : InteractableTile {
-    [SerializeField] string leftDestroy, rightDestroy;
+    public string leftDestroy, rightDestroy;
     public bool upsideDownPipe, leftOfPipe;
     public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (!(interacter is PlayerController))
@@ -15,14 +14,12 @@ public class BreakablePipeTile : InteractableTile {
         PlayerController player = (PlayerController) interacter;
         if (player.state != Enums.PowerupState.Giant)
             return false;
-
         if ((leftOfPipe && direction == InteractionDirection.Left) || (!leftOfPipe && direction == InteractionDirection.Right))
             //we've hit the inside of the pipe.
             return false;
-        if ((upsideDownPipe && direction == InteractionDirection.Down) || (!upsideDownPipe && direction == InteractionDirection.Up)) {
+        if ((upsideDownPipe && direction == InteractionDirection.Down) || (!upsideDownPipe && direction == InteractionDirection.Up))
             //we've hit the underside of the pipe
             return false;
-        }
 
         Tilemap tilemap = GameManager.Instance.tilemap;
         Vector3Int ourLocation = Utils.WorldToTilemapPosition(worldLocation);
@@ -37,7 +34,7 @@ public class BreakablePipeTile : InteractableTile {
 
         if (direction == InteractionDirection.Down || direction == InteractionDirection.Up) {
             //hit top/bottom of pipe.
-            if (height <= 1)
+            if (hat == origin || height <= 1)
                 return false;
 
             //shrink the pipe by 1. simple as moving the hat tiles up/down one
@@ -51,13 +48,11 @@ public class BreakablePipeTile : InteractableTile {
 
             bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
             
-            
             object[] parametersParticle = new object[]{worldLocation.x, worldLocation.y, leftOfPipe, upsideDownPipe, tileHeight-1, alreadyDestroyed};
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnDestructablePipe, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         }
         string[] tiles = new string[tileHeight*2];
         
-
         int start = (upsideDownPipe ? (tileHeight*2)-2 : 0);
         if (addHat) {
             if (leftOfPipe) {
@@ -81,10 +76,9 @@ public class BreakablePipeTile : InteractableTile {
             }
         }
 
-        for (int i = 0; i < tiles.Length; i++) {
+        for (int i = 0; i < tiles.Length; i++)
             //photon doesn't like serializing nulls
             if (tiles[i] == null) tiles[i] = "";
-        }
 
         Vector3Int offset = (upsideDownPipe ? Vector3Int.down * (addHat ? 0 : 1) : pipeDirection * (tileHeight-1));
         BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector3Int.zero : Vector3Int.left), new Vector2Int(2, tileHeight), tiles);
@@ -96,9 +90,8 @@ public class BreakablePipeTile : InteractableTile {
         Tilemap tilemap = GameManager.Instance.tilemap;
         Vector3Int searchDirection = (upsideDownPipe ? Vector3Int.up : Vector3Int.down);
         Vector3Int searchVector = (upsideDownPipe ? Vector3Int.up : Vector3Int.down);
-        while (tilemap.GetTile<BreakablePipeTile>(ourLocation + searchVector)) {
+        while (tilemap.GetTile<BreakablePipeTile>(ourLocation + searchVector))
             searchVector += searchDirection;
-        }
         return ourLocation + searchVector - searchDirection;
     }
 

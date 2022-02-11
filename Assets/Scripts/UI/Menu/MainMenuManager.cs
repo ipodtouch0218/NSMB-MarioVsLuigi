@@ -12,7 +12,6 @@ using TMPro;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
     public static MainMenuManager Instance; 
-    Color defaultColor = Color.white;
     AudioSource music, sfx;
     public GameObject lobbiesContent, lobbyPrefab;
     public AudioClip buhBye, musicStart, musicLoop; 
@@ -37,9 +36,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
-        ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
-        prop.Add("character", 0);
-        prop.Add("ping", PhotonNetwork.GetPing());
+        ExitGames.Client.Photon.Hashtable prop = new() {
+            { "character", 0 },
+            { "ping", PhotonNetwork.GetPing() }
+        };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
         StartCoroutine(UpdatePing());
@@ -50,21 +50,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //clear existing
         for (int i = 0; i < lobbiesContent.transform.childCount; i++) {
             GameObject roomObj = lobbiesContent.transform.GetChild(i).gameObject;
-            if (!roomObj.activeSelf) continue;
-            GameObject.Destroy(roomObj);
+            if (!roomObj.activeSelf) 
+                continue;
+
+            Destroy(roomObj);
         }
         //add new rooms
         //TODO refactor??
         int count = 0;
         foreach (RoomInfo room in roomList) {
-            if (!room.IsVisible || !room.IsOpen || room.MaxPlayers <= 0) {
+            if (!room.IsVisible || !room.IsOpen || room.MaxPlayers <= 0)
                 continue;
-            } 
-            GameObject newLobby = GameObject.Instantiate(lobbyPrefab, Vector3.zero, Quaternion.identity, lobbiesContent.transform);
+
+            GameObject newLobby = Instantiate(lobbyPrefab, Vector3.zero, Quaternion.identity, lobbiesContent.transform);
             newLobby.SetActive(true);
             RectTransform rect = newLobby.GetComponent<RectTransform>();
             rect.offsetMin = new Vector2(0, (count-1) * 55f);
-            rect.offsetMax = new Vector2(0, (count) * 55f);
+            rect.offsetMax = new Vector2(0, count * 55f);
             SetText(newLobby.transform.Find("LobbyName").gameObject, "Name: " + room.Name);
             SetText(newLobby.transform.Find("LobbyPlayers").gameObject, "Players: " + room.PlayerCount + "/" + room.MaxPlayers);
             newLobby.GetComponent<RoomIcon>().room = room;
@@ -137,9 +139,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnCreatedRoom() {
         Debug.Log("Created Room: " + PhotonNetwork.CurrentRoom.Name);
 
-        ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
-        table[Enums.NetRoomProperties.Level] = 0;
-        table[Enums.NetRoomProperties.StarRequirement] = 10;
+        ExitGames.Client.Photon.Hashtable table = new() {
+            [Enums.NetRoomProperties.Level] = 0,
+            [Enums.NetRoomProperties.StarRequirement] = 10
+        };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
     // CUSTOM EVENT CALLBACKS
@@ -182,16 +185,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
 
-        if (PhotonNetwork.InRoom) {
+        if (PhotonNetwork.InRoom)
             OnJoinedRoom();
-        }
 
         music.clip = musicStart;
         music.Play();
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject; 
 
         PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname");
-        Camera.main.transform.position = levelCameraPositions[Random.Range(0,levelCameraPositions.Length-1)].transform.position;
+        Camera.main.transform.position = levelCameraPositions[Random.Range(0,levelCameraPositions.Length)].transform.position;
         
         nicknameField.text = PhotonNetwork.NickName;
         musicSlider.value = Settings.Instance.VolumeMusic;
@@ -219,8 +221,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         while (true) {
             yield return new WaitForSeconds(2);
             if (PhotonNetwork.InRoom) {
-                ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
-                prop.Add("ping", PhotonNetwork.GetPing());
+                ExitGames.Client.Photon.Hashtable prop = new() {
+                    { "ping", PhotonNetwork.GetPing() }
+                };
                 PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
             }
         }
@@ -246,9 +249,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
     }
     public void OpenLobbyMenu() {
-        if (!PhotonNetwork.IsConnected) {
+        if (!PhotonNetwork.IsConnected)
             PhotonNetwork.ConnectUsingSettings();
-        }
+
         mainMenu.SetActive(false);
         optionsMenu.SetActive(false);
         lobbyMenu.SetActive(true);
@@ -316,7 +319,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.IsVisible = false;
 
         //start game with all players
-        RaiseEventOptions options = new RaiseEventOptions{Receivers = ReceiverGroup.All};
+        RaiseEventOptions options = new(){ Receivers = ReceiverGroup.All };
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.StartGame, null, options, SendOptions.SendReliable);
     }
     public void ChangeLevel(int index) {
@@ -325,37 +328,41 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
     }
     public void SetLevelIndex() {
-        if (!PhotonNetwork.IsMasterClient) return;
+        if (!PhotonNetwork.IsMasterClient) 
+            return;
+
         int newLevelIndex = levelDropdown.value;
-        if (newLevelIndex == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Level]) return;
+        if (newLevelIndex == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Level]) 
+            return;
 
         GlobalChatMessage("Map set to: " + levelDropdown.captionText.text, ColorToVector(Color.red));
 
-        ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
-        table[Enums.NetRoomProperties.Level] = levelDropdown.value;
+        ExitGames.Client.Photon.Hashtable table = new() {
+            [Enums.NetRoomProperties.Level] = levelDropdown.value
+        };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
     public void SelectRoom(GameObject room) {
-        if (selectedRoom) {
+        if (selectedRoom)
             selectedRoom.Unselect();
-        }
+
         selectedRoom = room.GetComponent<RoomIcon>();
         selectedRoom.Select();
         joinRoomBtn.interactable = room != null && PhotonNetwork.NickName.Length >= 3;
     }
     public void JoinSelectedRoom() {
-        if (selectedRoom == null) {
+        if (selectedRoom == null)
             return;
-        }
+
         PhotonNetwork.JoinRoom(selectedRoom.room.Name);
     }
     public void CreateRoom(GameObject lobbyInfo) {
         string room = lobbyNameField.text;
         byte players = (byte) lobbyInfo.transform.Find("MaxPlayers").Find("Slider").gameObject.GetComponent<Slider>().value;
-        if (room == null || room == "" || players < 2) {
+        if (room == null || room == "" || players < 2)
             return;
-        }
-        PhotonNetwork.CreateRoom(room, new RoomOptions{MaxPlayers=players, IsVisible=true, PublishUserId=true}, TypedLobby.Default);
+
+        PhotonNetwork.CreateRoom(room, new() { MaxPlayers = players, IsVisible = true, PublishUserId = true }, TypedLobby.Default);
         createLobbyPrompt.SetActive(false);
     }
     public void SetMaxPlayersText(Slider slider) {
@@ -364,23 +371,25 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void ClearChat() {
         for (int i = 0; i < chatContent.transform.childCount; i++) {
             GameObject chatMsg = chatContent.transform.GetChild(i).gameObject;
-            if (!chatMsg.activeSelf) continue;
-            GameObject.Destroy(chatMsg);
+            if (!chatMsg.activeSelf) 
+                continue;
+            Destroy(chatMsg);
         }
     }
     public void PopulatePlayerList() {
         for (int i = 0; i < playersContent.transform.childCount; i++) {
             GameObject pl = playersContent.transform.GetChild(i).gameObject;
-            if (!pl.activeSelf) continue;
-            GameObject.Destroy(pl);
+            if (!pl.activeSelf) 
+                continue;
+            Destroy(pl);
         }
 
         int count = 0;
-        SortedDictionary<int, Photon.Realtime.Player> sortedPlayers = new SortedDictionary<int,Photon.Realtime.Player>(PhotonNetwork.CurrentRoom.Players);
+        SortedDictionary<int, Photon.Realtime.Player> sortedPlayers = new(PhotonNetwork.CurrentRoom.Players);
         foreach (KeyValuePair<int, Photon.Realtime.Player> player in sortedPlayers) {
             Player pl = player.Value;
 
-            GameObject newPl = GameObject.Instantiate(playersPrefab, Vector3.zero, Quaternion.identity);
+            GameObject newPl = Instantiate(playersPrefab, Vector3.zero, Quaternion.identity);
             newPl.name = pl.UserId;
             newPl.transform.SetParent(playersContent.transform);
             newPl.transform.localPosition = new Vector3(0, -(count-- * 40f), 0);
@@ -397,9 +406,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void UpdatePlayerList(Player pl, Transform nameObject = null) {
         string characterString = Utils.GetCharacterData(pl).uistring;
-        object ping;
-        pl.CustomProperties.TryGetValue("ping", out ping);
-        if (ping == null) ping = -1;
+        pl.CustomProperties.TryGetValue("ping", out object ping);
+        if (ping == null) 
+            ping = -1;
         string pingColor;
         if ((int) ping < 0) {
             pingColor = "black";    
@@ -411,26 +420,30 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             pingColor = "red";
         }
 
-        if (nameObject == null) nameObject = playersContent.transform.Find(pl.UserId);
-        if (nameObject == null) return;
+        if (nameObject == null) 
+            nameObject = playersContent.transform.Find(pl.UserId);
+        if (nameObject == null) 
+            return;
         SetText(nameObject.Find("NameText").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
         SetText(nameObject.Find("PingText").gameObject, "<color=" + pingColor + ">" + (int) ping);
     }
     
     public void GlobalChatMessage(string message, Vector3 color) {
-        RaiseEventOptions options = new RaiseEventOptions {Receivers = ReceiverGroup.All};
-        object[] parameters = new object[]{ message, color };
+        RaiseEventOptions options = new() { Receivers = ReceiverGroup.All };
+        object[] parameters = new object[] { message, color };
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChatMessage, parameters, options, SendOptions.SendReliable);
     }
     public void LocalChatMessage(string message, Vector3 color) {
         float y = 0;
         for (int i = 0; i < chatContent.transform.childCount; i++) {
             GameObject child = chatContent.transform.GetChild(i).gameObject;
-            if (!child.activeSelf) continue;
-            y -= (child.GetComponent<RectTransform>().rect.height + 20);
+            if (!child.activeSelf)
+                continue;
+
+            y -= child.GetComponent<RectTransform>().rect.height + 20;
         }
 
-        GameObject chat = GameObject.Instantiate(chatPrefab, Vector3.zero, Quaternion.identity);
+        GameObject chat = Instantiate(chatPrefab, Vector3.zero, Quaternion.identity);
         chat.transform.SetParent(chatContent.transform);
         chat.transform.localPosition = new Vector3(0, y, 0);
         chat.transform.localScale = Vector3.one;
@@ -439,9 +452,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         SetText(txtObject, message, new Color(color.x, color.y, color.z));
         Canvas.ForceUpdateCanvases();
         RectTransform tf = txtObject.GetComponent<RectTransform>();
-        Rect rect = tf.rect;
         Bounds bounds = txtObject.GetComponent<TextMeshProUGUI>().textBounds;
-        tf.sizeDelta = new Vector2(tf.sizeDelta.x, (bounds.max.y - bounds.min.y) - 15f);
+        tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
     }
     public void SendChat(TMP_InputField input) {
         string text = input.text;
@@ -457,10 +469,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void SwapCharacter() {
         int character = (int) PhotonNetwork.LocalPlayer.CustomProperties["character"];
-        character = (character+1) % GlobalController.Instance.characters.Length;
+        character = (character + 1) % GlobalController.Instance.characters.Length;
 
-        ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
-        prop.Add("character", character);
+        ExitGames.Client.Photon.Hashtable prop = new() {
+            { "character", character }
+        };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
         PlayerData data = GlobalController.Instance.characters[character];
@@ -502,7 +515,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Application.Quit();
     }
     public void Quit() {
-        if (quit) return;
+        if (quit)
+            return;
         StartCoroutine(FinishQuitting());
     }
 
@@ -511,12 +525,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         starsText.text = "" + stars;
     }
     public void SetStarRequirementSlider(Slider slider) {
-        if (!PhotonNetwork.IsMasterClient) return;
-        int newValue = (int) slider.value * 5;
-        if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.StarRequirement]) return;
+        if (!PhotonNetwork.IsMasterClient) 
+            return;
 
-        ExitGames.Client.Photon.Hashtable table = new ExitGames.Client.Photon.Hashtable();
-        table[Enums.NetRoomProperties.StarRequirement] = newValue;
+        int newValue = (int) slider.value * 5;
+        if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.StarRequirement]) 
+            return;
+
+        ExitGames.Client.Photon.Hashtable table = new() {
+            [Enums.NetRoomProperties.StarRequirement] = newValue
+        };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         ChangeStarRequirement(newValue);
     }
@@ -546,7 +564,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (value) {
             prevWidth = Screen.width;
             prevHeight = Screen.height;
-            Resolution max = Screen.resolutions[Screen.resolutions.Length-1];
+            Resolution max = Screen.resolutions[^1];
             Screen.SetResolution(max.width, max.height, FullScreenMode.FullScreenWindow);
         } else {
             Screen.SetResolution(prevWidth, prevHeight, FullScreenMode.Windowed);

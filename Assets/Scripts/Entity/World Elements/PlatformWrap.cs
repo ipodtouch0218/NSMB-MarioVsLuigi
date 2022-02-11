@@ -8,6 +8,7 @@ public class PlatformWrap : MonoBehaviour {
     void Start() {
         body = GetComponent<Rigidbody2D>();
         body.velocity = new Vector2(0, ySpeed);
+        body.isKinematic = true;
     }
     void Update() {
         float y = transform.position.y;

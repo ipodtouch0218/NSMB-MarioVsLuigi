@@ -27,9 +27,9 @@ public class UIUpdater : MonoBehaviour {
             TrackIcon icon = trackObject.GetComponent<TrackIcon>();
             icon.target = player.gameObject;
 
-            if (!player.GetPhotonView().IsMine) {
+            if (!player.GetPhotonView().IsMine)
                 trackObject.transform.localScale = new Vector3(2f/3f, 2f/3f, 1f);
-            }
+
             trackObject.SetActive(true);
         }
     }
@@ -39,9 +39,8 @@ public class UIUpdater : MonoBehaviour {
         uiPing.text = "<sprite=2>" + (int) pingSample + "ms";
         
         //Player stuff update.
-        if (!player && GameManager.Instance.localPlayer) {
+        if (!player && GameManager.Instance.localPlayer)
             player = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        }
 
         UpdateStoredItemUI();
         UpdateTextUI();
@@ -50,27 +49,15 @@ public class UIUpdater : MonoBehaviour {
     void UpdateStoredItemUI() {
         if (!player)
             return;
-        
-        switch (player.storedPowerup) {
-        case "Mushroom":
-            itemReserve.sprite = storedItemMushroom;
-            break;
-        case "FireFlower":
-            itemReserve.sprite = storedItemFireFlower;
-            break;
-        case "MiniMushroom":
-            itemReserve.sprite = storedItemMiniMushroom;
-            break;
-        case "MegaMushroom":
-            itemReserve.sprite = storedItemMegaMushroom;
-            break;
-        case "BlueShell":
-            itemReserve.sprite = storedItemBlueShell;
-            break;
-        default:
-            itemReserve.sprite = storedItemNull;
-            break;
-        }
+
+        itemReserve.sprite = player.storedPowerup switch {
+            "Mushroom" => storedItemMushroom,
+            "FireFlower" => storedItemFireFlower,
+            "MiniMushroom" => storedItemMiniMushroom,
+            "MegaMushroom" => storedItemMegaMushroom,
+            "BlueShell" => storedItemBlueShell,
+            _ => storedItemNull,
+        };
     }
     void UpdateTextUI() {
         if (!player)

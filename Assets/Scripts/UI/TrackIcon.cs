@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 
 public class TrackIcon : MonoBehaviour {
-    [SerializeField] float trackMinX, trackMaxX, offsetY;
+    public float trackMinX, trackMaxX, offsetY;
     public GameObject target;
     private PlayerController playerTarget;
     public Color outlineColor;
@@ -22,11 +22,10 @@ public class TrackIcon : MonoBehaviour {
             return;
         }
         image.enabled = true;
-        if (target.tag == "Player") {
+        if (target.CompareTag("Player")) {
             image.sprite = Utils.GetCharacterData(target.GetPhotonView().Owner).trackSprite;
-            if (playerTarget == null) {
+            if (!playerTarget)
                 playerTarget = target.GetComponent<PlayerController>();
-            }
             if (playerTarget.dead) {
                 flashTimer += Time.deltaTime;
                 image.enabled = (flashTimer % 0.2f) <= 0.1f;

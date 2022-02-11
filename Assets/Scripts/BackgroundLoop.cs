@@ -11,15 +11,14 @@ public class BackgroundLoop : MonoBehaviour {
     void Start() {
         Transform t = GameObject.FindGameObjectWithTag("Backgrounds").transform;
         levels = new GameObject[t.childCount];
-        for (int i = 0; i < t.childCount; i++) {
+        for (int i = 0; i < t.childCount; i++)
             levels[i] = t.GetChild(i).gameObject;
-        }
 
         mainCamera = gameObject.GetComponent<Camera>();
         screenBounds = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
-        foreach (GameObject obj in levels) {
+        foreach (GameObject obj in levels)
             LoadChildObjects(obj);
-        }
+
         lastPosition = transform.position;
     }
     void LoadChildObjects(GameObject obj) {
@@ -55,9 +54,8 @@ public class BackgroundLoop : MonoBehaviour {
     void LateUpdate() {
         float difference = transform.position.x - lastPosition.x;
         if (Mathf.Abs(difference) > 3) {
-            foreach (GameObject obj in levels) {
+            foreach (GameObject obj in levels)
                 obj.transform.Translate(difference, 0, 0);
-            }
         } else {
             foreach (GameObject obj in levels) {
                 RepositionChildObjects(obj); 

@@ -13,11 +13,9 @@ public class ParticleSound : MonoBehaviour {
     }
 
     void Update() {
-        if (system.isEmitting && !sfx.isPlaying) {
+        if (system.isEmitting && !sfx.isPlaying)
             sfx.Play();
-        }
-        if (!system.isEmitting && sfx.isPlaying) {
+        if (!system.isEmitting && sfx.isPlaying)
             sfx.Stop();
-        }
     }
 }

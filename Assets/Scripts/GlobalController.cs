@@ -8,7 +8,8 @@ public class GlobalController : Singleton<GlobalController> {
     public RenderTexture ndsTexture;
     public PlayerData[] characters;
     void Awake() {
-        if (!base.InstanceCheck()) return;
+        if (!InstanceCheck()) 
+            return;
         Instance = this;
     }
     void Update() {

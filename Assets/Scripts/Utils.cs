@@ -6,23 +6,23 @@ using Photon.Realtime;
 using UnityEngine.Tilemaps;
 
 public class Utils {
-    public static RaiseEventOptions EVENT_OTHERS {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.Others};
-    public static RaiseEventOptions EVENT_ALL {get;} = new RaiseEventOptions{Receivers=ReceiverGroup.All};
+    public static RaiseEventOptions EVENT_OTHERS { get; } = new() { Receivers=ReceiverGroup.Others };
+    public static RaiseEventOptions EVENT_ALL { get; } = new() { Receivers=ReceiverGroup.All };
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null) {
-        if (!manager) manager = GameManager.Instance;
+        if (!manager) 
+            manager = GameManager.Instance;
         Vector3Int tileLocation = manager.tilemap.WorldToCell(worldVec);
         WrapTileLocation(ref tileLocation, manager);
         return tileLocation;
     }
 
     public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {
-        if (!manager) manager = GameManager.Instance;
-        if (tileLocation.x < manager.levelMinTileX) {
+        if (!manager) 
+            manager = GameManager.Instance;
+        if (tileLocation.x < manager.levelMinTileX)
             tileLocation.x += manager.levelWidthTile;
-        }
-        if (tileLocation.x >= manager.levelMinTileX + manager.levelWidthTile) {
+        if (tileLocation.x >= manager.levelMinTileX + manager.levelWidthTile)
             tileLocation.x -= manager.levelWidthTile;
-        }
     }
 
     public static Vector3Int WorldToTilemapPosition(float worldX, float worldY) {
@@ -30,7 +30,8 @@ public class Utils {
     }
 
     public static Vector3 TilemapToWorldPosition(Vector3Int tileVec, GameManager manager = null) {
-        if (!manager) manager = GameManager.Instance;
+        if (!manager)
+            manager = GameManager.Instance;
         return manager.tilemap.CellToWorld(tileVec);
     }
 
@@ -39,10 +40,11 @@ public class Utils {
     }
 
     public static int GetCharacterIndex(Player player = null) {
-        if (player == null) player = PhotonNetwork.LocalPlayer;
-        object index;
-        player.CustomProperties.TryGetValue("character", out index);
-        if (index == null) index = 0;
+        if (player == null) 
+            player = PhotonNetwork.LocalPlayer;
+        player.CustomProperties.TryGetValue("character", out object index);
+        if (index == null) 
+            index = 0;
         return (int) index;
     }
 

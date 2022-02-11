@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ParticleAutoDestroy : MonoBehaviour {
-    List<ParticleSystem> systems = new List<ParticleSystem>();
+    private readonly List<ParticleSystem> systems = new();
     void Start() {
         systems.AddRange(GetComponents<ParticleSystem>());
         systems.AddRange(GetComponentsInChildren<ParticleSystem>());
     }
 
     void Update() {
-        if (systems.TrueForAll(SystemStopped)) {
+        if (systems.TrueForAll(SystemStopped))
             Destroy(gameObject);
-        }
     }
 
     private static bool SystemStopped(ParticleSystem ps) {

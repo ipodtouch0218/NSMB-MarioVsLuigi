@@ -5,16 +5,15 @@ using Photon.Pun;
 
 public class KillplaneKill : MonoBehaviourPun {
     [SerializeField] float killTime = 0f;
-    float timer = 0;
-    bool killed = false;
+    private float timer = 0;
     void Update() {
-        if (killed) return;
-        if (transform.position.y >= GameManager.Instance.GetLevelMinY()) return;
+        if (transform.position.y >= GameManager.Instance.GetLevelMinY()) 
+            return;
         timer += Time.deltaTime;
         if (timer < killTime)
             return;
         if (!photonView) {
-            GameObject.Destroy(gameObject);
+            Destroy(gameObject);
             return;
         } 
         if (photonView.IsMine) {

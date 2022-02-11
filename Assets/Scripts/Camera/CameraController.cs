@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class CameraController : MonoBehaviour {
 
-    public float scrollAmount;
+    public float scrollAmount, dampingTime = 0.5f;
     public float screenShakeTimer = 0;
     public bool exactCentering = false;
     public Vector3 offset = Vector3.zero, currentPosition;
@@ -22,9 +22,8 @@ public class CameraController : MonoBehaviour {
 
     public void Update() {
         currentPosition = CalculateNewPosition();
-        if (weControlCamera) {
+        if (weControlCamera)
             targetCamera.transform.position = currentPosition;
-        }
     }
 
     private Vector3 CalculateNewPosition() {
@@ -32,12 +31,12 @@ public class CameraController : MonoBehaviour {
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX; 
         Vector3 ctp = transform.position + offset + new Vector3(0, transform.localScale.y/2f);
         Vector3 targetPos = ctp;
-        
+
         if (!exactCentering) {
             float currX = currentPosition.x;
             float currY = currentPosition.y;
-            
-            float tp = targetPos.x - currX; 
+
+            float tp = targetPos.x - currX;
             float targetX = currX;
 
             if (Mathf.Abs(tp) > 5) {
@@ -60,23 +59,22 @@ public class CameraController : MonoBehaviour {
         }
 
         float vOrtho = targetCamera.orthographicSize;
-        float hOrtho = vOrtho * (targetCamera.aspect);
+        float hOrtho = vOrtho * targetCamera.aspect;
         targetPos.x = Mathf.Clamp(targetPos.x, minX + hOrtho, maxX - hOrtho);
-        targetPos.y = Mathf.Clamp(targetPos.y, minY + vOrtho, (heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho)));
+        targetPos.y = Mathf.Clamp(targetPos.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
         
         if (exactCentering) {
-            if (Vector2.Distance(currentPosition, targetPos) > 10) {
+            if (Vector2.Distance(currentPosition, targetPos) > 5) {
                 bool right = currentPosition.x < targetPos.x;
-                targetPos += new Vector3(((right ? 1 : -1) * GameManager.Instance.levelWidthTile/2f), 0, 0);
-            } 
-            Vector3 result = Vector3.SmoothDamp(currentPosition, targetPos, ref dampVelocity, 0.5f);
+                currentPosition += new Vector3((right ? 1 : -1) * GameManager.Instance.levelWidthTile / 2f, 0, 0);
+            }
+            Vector3 result = Vector3.SmoothDamp(currentPosition, targetPos, ref dampVelocity, dampingTime);
             result.y = targetPos.y;
             targetPos = result;
         }
         scrollAmount = Mathf.Clamp(currentPosition.x - ctp.x, -0.5f, 0.5f);
-        if ((screenShakeTimer -= Time.deltaTime) > 0) {
-            targetPos += new Vector3((Random.value-0.5f) * (screenShakeTimer / 2), (Random.value-0.5f) * (screenShakeTimer / 2));
-        }
+        if ((screenShakeTimer -= Time.deltaTime) > 0) 
+            targetPos += new Vector3((Random.value - 0.5f) * (screenShakeTimer / 2), (Random.value - 0.5f) * (screenShakeTimer / 2));
 
         //perserve camera z
         targetPos.z = startingZ;

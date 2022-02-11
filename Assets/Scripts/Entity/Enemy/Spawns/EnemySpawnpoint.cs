@@ -13,10 +13,9 @@ public class EnemySpawnpoint : MonoBehaviour {
             return false;
 
         foreach (var hit in Physics2D.OverlapCircleAll(transform.position, 1.5f)) {
-            if (hit.gameObject.tag == "Player") {
+            if (hit.gameObject.CompareTag("Player"))
                 //cant spawn here
                 return false;
-            }
         }
 
         currentEntity = PhotonNetwork.InstantiateRoomObject(prefab, transform.position, transform.rotation);

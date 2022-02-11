@@ -3,7 +3,7 @@ using UnityEngine.Audio;
 using Photon.Pun;
 
 public class Settings : Singleton<Settings> {
-    [SerializeField] AudioMixer mixer;
+    public AudioMixer mixer;
 
     private float _volumeMaster, _volumeMusic, _volumeSFX;
     public float VolumeMaster { 
@@ -36,7 +36,8 @@ public class Settings : Singleton<Settings> {
     public bool ndsResolution = false;
 
     void Awake() {
-        if (!base.InstanceCheck()) return;
+        if (!base.InstanceCheck()) 
+            return;
         Instance = this;
         LoadSettingsFromPreferences();
         ApplyVolumeSettings();

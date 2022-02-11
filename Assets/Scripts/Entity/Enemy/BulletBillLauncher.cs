@@ -4,20 +4,21 @@ using UnityEngine;
 using Photon.Pun;
 
 public class BulletBillLauncher : MonoBehaviourPun {
+
     public float playerSearchRadius = 7, playerCloseCutoff = 1;
     public float initialShootTimer = 5;
     private float shootTimer;
-    private List<GameObject> bills = new List<GameObject>();
+    private readonly List<GameObject> bills = new();
 
-    private Vector2 searchBox, searchOffset;
-    private Vector3 offset = new Vector3(0.25f, -0.2f, 0);
+    private Vector2 searchBox, searchOffset, spawnOffset = new(0.25f, -0.2f);
 
     void Start() {
-        searchBox = new Vector2(playerSearchRadius, playerSearchRadius);
-        searchOffset = new Vector2(playerSearchRadius/2 + playerCloseCutoff, 0);
+        searchBox = new(playerSearchRadius, playerSearchRadius);
+        searchOffset = new(playerSearchRadius/2 + playerCloseCutoff, 0);
     }
     void Update() {
-        if (!PhotonNetwork.IsMasterClient) return;
+        if (!PhotonNetwork.IsMasterClient) 
+            return;
 
         if ((shootTimer -= Time.deltaTime) <= 0) {
             shootTimer = initialShootTimer;
@@ -30,18 +31,19 @@ public class BulletBillLauncher : MonoBehaviourPun {
             if (bills[i] == null)
                 bills.RemoveAt(i--);
         }
-        if (bills.Count >= 3) return;
+        if (bills.Count >= 3)
+            return;
 
         //Shoot left
         if (IntersectsPlayer((Vector2) transform.position - searchOffset)) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(-offset.x, offset.y, offset.z), Quaternion.identity, 0, new object[]{true});
+            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(-spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ true });
             bills.Add(newBill);
             return;
         }
 
         //Shoot right
-        if (IntersectsPlayer((Vector2) transform.position + searchOffset)) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(offset.x, offset.y, offset.z), Quaternion.identity, 0, new object[]{false});
+        if (IntersectsPlayer((Vector2)transform.position + searchOffset)) {
+            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ false });
             bills.Add(newBill);
             return;
         }
@@ -49,9 +51,8 @@ public class BulletBillLauncher : MonoBehaviourPun {
 
     bool IntersectsPlayer(Vector2 origin) {
         foreach (var hit in Physics2D.OverlapBoxAll(origin, searchBox, 0)) {
-            if (hit.gameObject.tag == "Player") {
+            if (hit.gameObject.CompareTag("Player"))
                 return true;
-            }
         }
         return false;
     }

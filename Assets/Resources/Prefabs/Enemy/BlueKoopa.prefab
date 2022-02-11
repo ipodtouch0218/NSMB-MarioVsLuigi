@@ -27,6 +27,21 @@ PrefabInstance:
       propertyPath: floorAndRoofCutoff
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 7426856683177255952, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7426856683177255952, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 0.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 7426856683177255952, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: m_Controller
@@ -36,7 +51,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 3764543692002720701, guid: d273f5e6f069ba7439cb125550745e1b,
+      objectReference: {fileID: 8252686961211432577, guid: d273f5e6f069ba7439cb125550745e1b,
         type: 3}
     - target: {fileID: 7426856683177255955, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}

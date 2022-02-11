@@ -15894,7 +15894,7 @@ MonoBehaviour:
   deathUpTime: 0.6
   deathForce: 7
   groundpoundTime: 0.25
-  groundpoundVelocity: 12
+  groundpoundVelocity: 10
   blinkingSpeed: 0.25
   terminalVelocity: -7
   jumpVelocity: 6.25
@@ -15908,7 +15908,6 @@ MonoBehaviour:
   pipeDuration: 2
   giantStartTime: 1.5
   blinkDuration: 0.1
-  fadeDuration: 2
   dust: {fileID: 8636928219237579149}
   sparkles: {fileID: 1192088335986799603}
   drillParticle: {fileID: 4430736674483794918}

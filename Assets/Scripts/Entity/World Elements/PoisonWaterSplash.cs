@@ -19,16 +19,15 @@ public class PoisonWaterSplash : MonoBehaviour {
         pointVelocities = new float[points];
         colors = new Color32[points];
 
-        MaterialPropertyBlock properties = new MaterialPropertyBlock();
+        MaterialPropertyBlock properties = new();
         properties.SetTexture("Heightmap", heightTex);
         spriteRenderer.SetPropertyBlock(properties);
     }
     void FixedUpdate() {
-
         for (int i = 0; i < points; i++) {
             float height = pointHeights[i];
-            pointVelocities[i] += tension * (-height);
-            pointVelocities[i] *= (damping);
+            pointVelocities[i] += tension * -height;
+            pointVelocities[i] *= damping;
         }
         for (int i = 0; i < points; i++) {
             pointHeights[i] += pointVelocities[i] * Time.fixedDeltaTime;
@@ -36,8 +35,8 @@ public class PoisonWaterSplash : MonoBehaviour {
         for (int i = 0; i < points; i++) {
             float height = pointHeights[i];
 
-            pointVelocities[i] -= (kconstant * Time.fixedDeltaTime) * (height - pointHeights[(i+points-1)%points]); //left
-            pointVelocities[i] -= (kconstant * Time.fixedDeltaTime) * (height - pointHeights[(i+points+1)%points]); //right
+            pointVelocities[i] -= kconstant * Time.fixedDeltaTime * (height - pointHeights[(i + points - 1) % points]); //left
+            pointVelocities[i] -= kconstant * Time.fixedDeltaTime * (height - pointHeights[(i + points + 1) % points]); //right
         }
         for (int i = 0; i < points; i++) {
             colors[i] = new Color((pointHeights[i]/20f) + 0.5f, 0, 0, 1);
@@ -47,7 +46,7 @@ public class PoisonWaterSplash : MonoBehaviour {
         heightTex.Apply();
     }
     void OnTriggerEnter2D(Collider2D collider) {
-        GameObject.Instantiate(Resources.Load("Prefabs/Particle/PoisonWaterSplash"), collider.transform.position, Quaternion.identity);
+        Instantiate(Resources.Load("Prefabs/Particle/PoisonWaterSplash"), collider.transform.position, Quaternion.identity);
         sfx.Play();
         float x = collider.transform.position.x - transform.position.x;
         float xpoints = (x+points)%(points*transform.localScale.x);

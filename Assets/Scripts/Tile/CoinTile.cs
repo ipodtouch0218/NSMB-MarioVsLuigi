@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using Photon.Pun;
 
 [CreateAssetMenu(fileName = "CoinTile", menuName = "ScriptableObjects/Tiles/CoinTile", order = 1)]
@@ -13,8 +12,13 @@ public class CoinTile : BreakableBrickTile {
 
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
-        if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.previousHolder != null)) {
-            PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk) interacter).previousHolder;
+        PlayerController player = null;
+        if (interacter is PlayerController controller)
+            player = controller;
+        if (interacter is KoopaWalk koopa)
+            player = koopa.previousHolder;
+
+        if (player) {
             if (player.state == Enums.PowerupState.Giant) {
                 //Break
 
@@ -25,10 +29,8 @@ public class CoinTile : BreakableBrickTile {
                 //Particle
                 object[] parametersParticle = new object[]{tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b)};
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
-                
-                if (interacter is MonoBehaviourPun) {
-                    ((MonoBehaviourPun) interacter).photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
-                }
+
+                player.photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
                 return true;
             }
 

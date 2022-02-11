@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class MaterialDuplicator : MonoBehaviour {
     void Awake() {
-        Renderer renderer = gameObject.GetComponent<Renderer>();
-        renderer.material = new Material(renderer.material);
+        Renderer renderer = GetComponent<Renderer>();
+        renderer.material = new(renderer.material);
     }
 }
  

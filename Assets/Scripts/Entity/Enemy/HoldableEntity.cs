@@ -8,13 +8,13 @@ public abstract class HoldableEntity : KillableEntity {
     public Vector3 holderOffset;
 
     public void LateUpdate() {
-        if (!holder) return;
+        if (!holder) 
+            return;
 
         body.velocity = Vector2.zero;
         Vector3 newLoc = holder.transform.position + holderOffset;
-        if (Utils.IsTileSolidAtWorldLocation(newLoc)) {
+        if (Utils.IsTileSolidAtWorldLocation(newLoc))
             newLoc.x = transform.position.x;
-        }
         transform.position = newLoc;
         return;
     }
@@ -27,7 +27,8 @@ public abstract class HoldableEntity : KillableEntity {
 
     [PunRPC]
     public void Pickup(int view) {
-        if (holder) return;
+        if (holder) 
+            return;
         PhotonView holderView = PhotonView.Find(view);
         this.holder = holderView.gameObject.GetComponent<PlayerController>();
         previousHolder = holder;

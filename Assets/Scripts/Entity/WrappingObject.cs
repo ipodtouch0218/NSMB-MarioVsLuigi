@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class WrappingObject : MonoBehaviour {
     private Rigidbody2D body;
-    void Awake() {
+    void Start() {
         body = GetComponent<Rigidbody2D>();
-        if (!body) body = GetComponentInParent<Rigidbody2D>();
+        if (!body) 
+            body = GetComponentInParent<Rigidbody2D>();
     }
     void Update() {
-        if (!GameManager.Instance) return;
+        if (!GameManager.Instance) 
+            return;
         if (!GameManager.Instance.loopingLevel) {
             this.enabled = false;
             return;
@@ -18,14 +20,11 @@ public class WrappingObject : MonoBehaviour {
         WrapMainObject();
     }
     void WrapMainObject() {
-        float leftX = GameManager.Instance.GetLevelMinX();
-        float rightX = GameManager.Instance.GetLevelMaxX();
-        float width = (rightX - leftX);
+        float width = GameManager.Instance.levelWidthTile / 2;
 
-        if (body.position.x < leftX) {
+        if (body.position.x < GameManager.Instance.GetLevelMinX()) {
             body.position += new Vector2(width, 0);
-        }
-        if (body.position.x > rightX) {
+        } else if (body.position.x > GameManager.Instance.GetLevelMaxX()) {
             body.position += new Vector2(-width, 0);
         }
         body.centerOfMass = Vector2.zero;

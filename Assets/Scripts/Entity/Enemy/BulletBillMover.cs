@@ -10,9 +10,9 @@ public class BulletBillMover : KillableEntity {
     public bool left = true;
     new void Start() {
         base.Start();
-        searchVector = new Vector2(playerSearchRadius*2f, 100);
+        searchVector = new Vector2(playerSearchRadius * 2, 100);
         left = photonView && photonView.InstantiationData != null && (bool) photonView.InstantiationData[0];
-        base.body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
 
         Transform t = transform.GetChild(1);
         ParticleSystem ps = t.GetComponent<ParticleSystem>();
@@ -24,43 +24,39 @@ public class BulletBillMover : KillableEntity {
         }
 
         ps.Play();
-        base.sRenderer.flipX = !left;
+        sRenderer.flipX = !left;
     }
 
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
-            base.body.velocity = Vector2.zero;
-            base.body.angularVelocity = 0;
-            base.animator.enabled = false;
-            base.body.isKinematic = true;
+            body.velocity = Vector2.zero;
+            body.angularVelocity = 0;
+            animator.enabled = false;
+            body.isKinematic = true;
             return;
         }
 
-        if (photonView.IsMine) {
+        if (photonView.IsMine)
             DespawnCheck();
-        }
     }
 
     void DespawnCheck() {
-        foreach (var collision in Physics2D.BoxCastAll(transform.position, searchVector, 0f, Vector2.zero)) {
-            if (collision.transform.tag == "Player") {
+        foreach (var collision in Physics2D.BoxCastAll(body.position, searchVector, 0f, Vector2.zero)) {
+            if (collision.transform.CompareTag("Player"))
                 return;
-            }
         }
         //left border check
-        if (transform.position.x - playerSearchRadius < GameManager.Instance.GetLevelMinX()) {
-            foreach (var collision in Physics2D.BoxCastAll(transform.position + new Vector3(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector, 0f, Vector2.zero)) {
-                if (collision.transform.tag == "Player") {
+        if (body.position.x - playerSearchRadius < GameManager.Instance.GetLevelMinX()) {
+            foreach (var collision in Physics2D.BoxCastAll(body.position + new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector, 0f, Vector2.zero)) {
+                if (collision.transform.CompareTag("Player"))
                     return;
-                }
             }
         }
         //right border check
-        if (transform.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX()) {
-            foreach (var collision in Physics2D.BoxCastAll(transform.position - new Vector3(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector, 0f, Vector2.zero)) {
-                if (collision.transform.tag == "Player") {
+        if (body.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX()) {
+            foreach (var collision in Physics2D.BoxCastAll(body.position - new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector, 0f, Vector2.zero)) {
+                if (collision.transform.CompareTag("Player"))
                     return;
-                }
             }
         }
         PhotonNetwork.Destroy(photonView);
@@ -73,31 +69,30 @@ public class BulletBillMover : KillableEntity {
     
     [PunRPC]
     public override void SpecialKill(bool right, bool groundpound) {
-        base.body.velocity = new Vector2(0, 2.5f);
-        base.body.constraints = RigidbodyConstraints2D.None;
-        base.body.angularVelocity = 400f * (right ? 1 : -1);
-        base.body.gravityScale = 1.5f;
-        base.body.isKinematic = false;
-        base.hitbox.enabled = false;
-        base.animator.speed = 0;
+        body.velocity = new Vector2(0, 2.5f);
+        body.constraints = RigidbodyConstraints2D.None;
+        body.angularVelocity = 400f * (right ? 1 : -1);
+        body.gravityScale = 1.5f;
+        body.isKinematic = false;
+        hitbox.enabled = false;
+        animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         if (groundpound)
-            GameObject.Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), transform.position + new Vector3(0, 0.5f, -5), Quaternion.identity);
-        
-        base.dead = true;
+            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
+
+        dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     } 
     void OnDrawGizmosSelected() {
-        if (!GameManager.Instance) return;
+        if (!GameManager.Instance) 
+            return;
         Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(transform.position, searchVector);
+        Gizmos.DrawCube(body.position, searchVector);
         //left border check
-        if (transform.position.x - playerSearchRadius < GameManager.Instance.GetLevelMinX()) {
-            Gizmos.DrawCube(transform.position + new Vector3(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
-        }
+        if (body.position.x - playerSearchRadius < GameManager.Instance.GetLevelMinX())
+            Gizmos.DrawCube(body.position + new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
         //right border check
-        if (transform.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX()) {
-            Gizmos.DrawCube(transform.position - new Vector3(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
-        }
+        if (body.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX())
+            Gizmos.DrawCube(body.position - new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
     }
 }
