@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     //Audio
     public AudioSource music, sfx;
-    private Enums.MusicState? musicState = null;
+    public Enums.MusicState? musicState = null;
 
     public GameObject localPlayer;
     public bool paused, loaded, starting;
@@ -43,10 +43,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public EnemySpawnpoint[] enemySpawnpoints;
 
     // EVENT CALLBACK
-    public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, ExitGames.Client.Photon.SendOptions sendOption, RaiseEventOptions eventOptions = null) {
+    public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
         if (eventOptions == null)
             eventOptions = Utils.EVENT_OTHERS;
-        //TODO event caching for rejoining?
         PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
         OnEvent((byte) eventId, parameters);
     }
@@ -238,9 +237,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                 point.AttemptSpawning();
 
-        localPlayer.GetComponent<Rigidbody2D>().isKinematic = false;
-        localPlayer.GetComponent<PlayerController>().enabled = true;
-        localPlayer.GetPhotonView().RPC("PreRespawn", RpcTarget.All);
+        localPlayer.GetComponent<PlayerController>().OnGameStart();
 
         yield return new WaitForSeconds(1f);
         
@@ -250,18 +247,23 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             SceneManager.UnloadSceneAsync("Loading");
     }
 
-    IEnumerator EndGame(Photon.Realtime.Player winner) {
+    IEnumerator EndGame(Player winner) {
         gameover = true;
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner.NickName + " Wins!";
+        if (winner != null) {
+            text.GetComponent<TMP_Text>().text = winner.NickName + " Wins!";
+        } else {
+            text.GetComponent<TMP_Text>().text = "It's a Draw!";
+        }
+
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
-        music.PlayOneShot((AudioClip)Resources.Load("Sound/match-" + (winner.IsLocal ? "win" : "lose")));
+        music.PlayOneShot((AudioClip) Resources.Load("Sound/match-" + (winner != null && winner.IsLocal ? "win" : "lose")));
         //TOOD: make a results screen?
 
         yield return new WaitForSecondsRealtime(4);
@@ -287,14 +289,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                 SendAndExecuteEvent(Enums.NetEventIds.SetGameStartTimestamp, PhotonNetwork.ServerTimestamp + ((players-1) * 250) + 1000, SendOptions.SendReliable);
                 loaded = true;
             }
-            foreach (var player in allPlayers) {
-                if (player.stars < starRequirement)
-                    continue;
-
-                gameover = true;
-                PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
-            }
-
         }
 
         if (!currentStar) {
@@ -317,7 +311,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     currentStar = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", spawnPos, Quaternion.identity);
                     remainingSpawns.RemoveAt(index);
                     //TODO: star appear sound
-                    spawnStarCount = 15f;
+                    spawnStarCount = 15.75f - (PhotonNetwork.CurrentRoom.PlayerCount * 0.75f);
                 }
             } else {
                 currentStar = GameObject.FindGameObjectWithTag("bigstar");
@@ -325,7 +319,34 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
     }
 
-    void PlaySong(Enums.MusicState state, AudioClip loop, AudioClip intro = null) {
+    public void CheckForWinner() {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        int playerCount = 0;
+        PlayerController winningPlayer = null;
+        foreach (var player in allPlayers) {
+            if (player == null || player.lives == 0)
+                continue;
+            playerCount++;
+            winningPlayer = player;
+            if (player.stars < starRequirement)
+                continue;
+
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
+            return;
+        }
+        if (playerCount == 1 && PhotonNetwork.CurrentRoom.PlayerCount >= 2) {
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayer.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
+            return;
+        }
+        if (playerCount == 0) {
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, Utils.EVENT_ALL, SendOptions.SendReliable);
+            return;
+        }
+    }
+
+    private void PlaySong(Enums.MusicState state, AudioClip loop, AudioClip intro = null) {
         if (musicState == state) 
             return;
         musicState = state;

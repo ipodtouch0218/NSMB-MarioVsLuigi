@@ -20,7 +20,7 @@ public class PiranhaPlantController : KillableEntity {
             return;
         }
         base.Update();
-        if (!GameManager.Instance.musicEnabled)
+        if (GameManager.Instance && !GameManager.Instance.musicEnabled)
             return;
 
         if (photonView && !dead && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
@@ -55,6 +55,8 @@ public class PiranhaPlantController : KillableEntity {
     public void Respawn() {
         dead = false;
         popupTimer = 3;
+        animator.Play("end");
+
         hitbox.enabled = true;
     }
 

@@ -8,11 +8,12 @@ using UnityEngine.Tilemaps;
 public class Utils {
     public static RaiseEventOptions EVENT_OTHERS { get; } = new() { Receivers=ReceiverGroup.Others };
     public static RaiseEventOptions EVENT_ALL { get; } = new() { Receivers=ReceiverGroup.All };
-    public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null) {
+    public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
         if (!manager) 
             manager = GameManager.Instance;
         Vector3Int tileLocation = manager.tilemap.WorldToCell(worldVec);
-        WrapTileLocation(ref tileLocation, manager);
+        if (wrap)
+            WrapTileLocation(ref tileLocation, manager);
         return tileLocation;
     }
 
@@ -75,7 +76,7 @@ public class Utils {
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
-        if (collision && !collision.isTrigger && collision.tag != "Player")
+        if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
             return true;
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     } 
@@ -83,27 +84,26 @@ public class Utils {
 
     public static Powerup[] powerups = null;
     public static Powerup GetRandomItem(int stars) {
+        bool cantSpawnMegaMushroom = (!GameManager.Instance.canSpawnMegaMushroom || GameManager.Instance.musicState == Enums.MusicState.MegaMushroom);
         float starPercentage = (float) stars / GameManager.Instance.starRequirement;
         float totalChance = 0;
         if (powerups == null) {
             powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
         }
         foreach (Powerup powerup in powerups) {
-            if (powerup.prefab == "MegaMushroom" && !GameManager.Instance.canSpawnMegaMushroom)
+            if (powerup.prefab == "MegaMushroom" && cantSpawnMegaMushroom)
                 continue;
             totalChance += powerup.GetModifiedChance(starPercentage);
         }
 
-        float rand = UnityEngine.Random.value * totalChance;
+        float rand = Random.value * totalChance;
         foreach (Powerup powerup in powerups) {
-            if (powerup.prefab == "MegaMushroom" && !GameManager.Instance.canSpawnMegaMushroom)
+            if (powerup.prefab == "MegaMushroom" && cantSpawnMegaMushroom)
                 continue;
             float chance = powerup.GetModifiedChance(starPercentage);
-            if (rand < chance) {
+            if (rand < chance) 
                 return powerup;
-            } else {
-                rand -= chance;
-            }
+            rand -= chance;
         }
 
         return powerups[0];

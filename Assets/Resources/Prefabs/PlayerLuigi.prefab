@@ -5504,7 +5504,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4421313393254934475}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.245, z: 0}
+  m_LocalPosition: {x: 0, y: 0.245, z: -0.5}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15833,6 +15833,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8636928217783201364}
   - component: {fileID: 8636928217783201385}
+  - component: {fileID: 4962373736136367448}
   - component: {fileID: 8636928217783201367}
   - component: {fileID: 8636928217783201384}
   - component: {fileID: 8636928217783201366}
@@ -15883,6 +15884,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 984b6c8bdb2dc4a419d0cd6be4254d4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerId: -1
   dead: 0
   state: 0
   previousState: 0
@@ -15891,8 +15893,6 @@ MonoBehaviour:
   flyingGravity: 0.8
   flyingTerminalVelocity: 1.25
   drillVelocity: 7
-  deathUpTime: 0.6
-  deathForce: 7
   groundpoundTime: 0.25
   groundpoundVelocity: 10
   blinkingSpeed: 0.25
@@ -15905,13 +15905,7 @@ MonoBehaviour:
   runningMaxSpeed: 5
   wallslideSpeed: -4.25
   walljumpVelocity: 5.6
-  pipeDuration: 2
   giantStartTime: 1.5
-  blinkDuration: 0.1
-  dust: {fileID: 8636928219237579149}
-  sparkles: {fileID: 1192088335986799603}
-  drillParticle: {fileID: 4430736674483794918}
-  giantParticle: {fileID: 1382120724504233341}
   cameraController: {fileID: 0}
   body: {fileID: 0}
   onGround: 0
@@ -15931,7 +15925,6 @@ MonoBehaviour:
   groundpound: 0
   sliding: 0
   knockback: 0
-  deathUp: 0
   hitBlock: 0
   running: 0
   functionallyRunning: 0
@@ -15946,39 +15939,60 @@ MonoBehaviour:
   walljumping: 0
   landing: 0
   koyoteTime: 0
-  deathCounter: 0
   groundpoundCounter: 0
   groundpoundDelay: 0
   hitInvincibilityCounter: 0
   powerupFlash: 0
   throwInvincibility: 0
   jumpBuffer: 0
-  pipeTimer: 0
   giantStartTimer: 0
   giantEndTimer: 0
   invincible: 0
   giantTimer: 0
-  blinkTimer: 0
-  fadeOutTimer: 0
-  fadeInTimer: 0
   floorAngle: 0
+  pipeDirection: {x: 0, y: 0}
   stars: 0
   coins: 0
+  lives: -1
   storedPowerup: 
   holding: {fileID: 0}
   holdingOld: {fileID: 0}
-  glowColor: {r: 0, g: 0, b: 0, a: 0}
   joystick: {x: 0, y: 0}
-  savedVelocity: {x: 0, y: 0}
+  giantSavedVelocity: {x: 0, y: 0}
+  previousFrameVelocity: {x: 0, y: 0}
+  onSpinner: {fileID: 0}
+  pipeEntering: {fileID: 0}
+  character: {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
+  doIceSkidding: 0
+--- !u!114 &4962373736136367448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8636928217783201362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf9d71929a202541b352e506ca0197e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  models: {fileID: 4741703498087908288}
   smallModel: {fileID: 1717812904357955791}
   largeModel: {fileID: 3839069354041722077}
   blueShell: {fileID: 5339554911692584767}
-  smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
-  largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
-  onSpinner: {fileID: 0}
-  character: {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
+  dust: {fileID: 8636928219237579149}
+  sparkles: {fileID: 1192088335986799603}
+  drillParticle: {fileID: 4430736674483794918}
+  giantParticle: {fileID: 1382120724504233341}
+  blinkDuration: 0.1
+  pipeDuration: 2
   heightSmallModel: 0.46
   heightLargeModel: 0.82
+  deathUpTime: 0.6
+  deathForce: 7
+  smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
+  largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
+  glowColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!50 &8636928217783201367
 Rigidbody2D:
   serializedVersion: 4
@@ -16327,6 +16341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scrollAmount: 0
+  dampingTime: 0.5
   screenShakeTimer: 0
   exactCentering: 0
   offset: {x: 0, y: 0, z: 0}

@@ -11,53 +11,54 @@ public abstract class InteractableTile : AnimatedTile {
 
     public abstract bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation);
     protected void Bump(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
-        
-        if (direction != InteractionDirection.Down) {
+
+        if (direction == InteractionDirection.Down)
+            return;
+
             //check for entities above to bump
-            foreach (Collider2D collider in Physics2D.OverlapBoxAll(worldLocation + bumpOffset, bumpSize, 0f)) {
-                GameObject obj = collider.gameObject;
-                if (obj == interacter.gameObject) 
-                    continue;
-                switch (obj.tag) {
+        foreach (Collider2D collider in Physics2D.OverlapBoxAll(worldLocation + bumpOffset, bumpSize, 0f)) {
+            GameObject obj = collider.gameObject;
+            if (obj == interacter.gameObject) 
+                continue;
+            switch (obj.tag) {
                 case "Player": {
-                    PlayerController player = obj.GetComponent<PlayerController>();
-                    player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, null);
-                    player.photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/PlayerBounce", player.transform.position.x, player.transform.position.y);
-                    continue;
-                }
+                        PlayerController player = obj.GetComponent<PlayerController>();
+                        player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, null);
+                        player.photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/PlayerBounce", player.body.position);
+                        continue;
+                    }
                 case "koopa": {
-                    if (!obj.GetPhotonView() || obj.GetComponent<KillableEntity>().dead)
+                        if (!obj.GetPhotonView() || obj.GetComponent<KillableEntity>().dead)
+                            continue;
+                        obj.GetPhotonView().RPC("Bump", RpcTarget.All);
                         continue;
-                    obj.GetPhotonView().RPC("Bump", RpcTarget.All);
-                    continue;
-                }
+                    }
                 case "goomba": {
-                    if (!obj.GetPhotonView() || obj.GetComponent<KillableEntity>().dead)
+                        if (!obj.GetPhotonView() || obj.GetComponent<KillableEntity>().dead)
+                            continue;
+                        obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false);
                         continue;
-                    obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false);
-                    continue;
-                }
+                    }
                 case "coin": {
-                    if (interacter is PlayerController pl)
-                        pl.photonView.RPC("CollectCoin", RpcTarget.All, obj.GetComponentInParent<PhotonView>().ViewID, obj.transform.position.x, obj.transform.position.y);
-                    continue;
-                }
+                        if (interacter is PlayerController pl)
+                            pl.photonView.RPC("CollectCoin", RpcTarget.All, obj.GetComponentInParent<PhotonView>().ViewID, obj.transform.position);
+                        continue;
+                    }
                 case "MainStar":
-                case "bigstar": 
+                case "bigstar":
                     continue;
                 default: {
-                    if (obj.layer != LayerMask.NameToLayer("Entity")) 
-                        continue;
-                    Rigidbody2D body = obj.GetComponentInParent<Rigidbody2D>();
-                    if (!body) {
-                        body = obj.GetComponent<Rigidbody2D>();
-                        if (!body)
+                        if (obj.layer != LayerMask.NameToLayer("Entity"))
                             continue;
+                        Rigidbody2D body = obj.GetComponentInParent<Rigidbody2D>();
+                        if (!body) {
+                            body = obj.GetComponent<Rigidbody2D>();
+                            if (!body)
+                                continue;
+                        }
+                        body.velocity = new Vector2(body.velocity.x, 3f);
+                        continue;
                     }
-                    body.velocity = new Vector2(body.velocity.x, 15f);
-                    continue;
-                }
-                }
             }
         }
     }

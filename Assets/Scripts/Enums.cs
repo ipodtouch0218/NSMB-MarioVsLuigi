@@ -14,6 +14,8 @@ public class Enums {
     public static class NetRoomProperties {
         public static string Level { get; } = "level";
         public static string StarRequirement { get; } = "stars";
+        public static string Lives { get; } = "lives";
+        public static string NewPowerups { get; } = "newpowerups";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events

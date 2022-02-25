@@ -25,7 +25,7 @@ public class BreakablePipeTile : InteractableTile {
         Vector3Int ourLocation = Utils.WorldToTilemapPosition(worldLocation);
         int height = GetPipeHeight(ourLocation);
         Vector3Int origin = GetPipeOrigin(ourLocation);
-        Vector3Int pipeDirection = (upsideDownPipe ? Vector3Int.up : Vector3Int.down);
+        Vector3Int pipeDirection = upsideDownPipe ? Vector3Int.up : Vector3Int.down;
         Vector3Int hat = origin - (pipeDirection * (height - 1));
 
         int tileHeight;
@@ -44,11 +44,11 @@ public class BreakablePipeTile : InteractableTile {
             //hit left/right side of pipe
             if (ourLocation == origin)
                 addHat = false;
-            tileHeight = Mathf.Abs(hat.y - ourLocation.y) + 2;
+            tileHeight = Mathf.Abs(hat.y - ourLocation.y) + (addHat ? 2 : 1);
 
             bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
             
-            object[] parametersParticle = new object[]{(Vector2) worldLocation + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight-1), "DestructablePipe" + (alreadyDestroyed ? "-D" : "")};
+            object[] parametersParticle = new object[]{(Vector2) worldLocation + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight-(addHat? 1 : 0)), "DestructablePipe" + (alreadyDestroyed ? "-D" : "")};
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnResizableParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         }
         string[] tiles = new string[tileHeight*2];
@@ -78,18 +78,18 @@ public class BreakablePipeTile : InteractableTile {
 
         for (int i = 0; i < tiles.Length; i++)
             //photon doesn't like serializing nulls
-            if (tiles[i] == null) tiles[i] = "";
+            if (tiles[i] == null) 
+                tiles[i] = "";
 
-        Vector3Int offset = (upsideDownPipe ? Vector3Int.down * (addHat ? 0 : 1) : pipeDirection * (tileHeight-1));
+        Vector3Int offset = upsideDownPipe ? Vector3Int.zero : pipeDirection * (tileHeight-1);
         BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector3Int.zero : Vector3Int.left), new Vector2Int(2, tileHeight), tiles);
-        
         return true;
     }
 
     private Vector3Int GetPipeOrigin(Vector3Int ourLocation) {
         Tilemap tilemap = GameManager.Instance.tilemap;
-        Vector3Int searchDirection = (upsideDownPipe ? Vector3Int.up : Vector3Int.down);
-        Vector3Int searchVector = (upsideDownPipe ? Vector3Int.up : Vector3Int.down);
+        Vector3Int searchDirection = upsideDownPipe ? Vector3Int.up : Vector3Int.down;
+        Vector3Int searchVector = upsideDownPipe ? Vector3Int.up : Vector3Int.down;
         while (tilemap.GetTile<BreakablePipeTile>(ourLocation + searchVector))
             searchVector += searchDirection;
         return ourLocation + searchVector - searchDirection;

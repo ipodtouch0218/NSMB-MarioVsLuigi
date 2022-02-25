@@ -89,7 +89,8 @@ public class StarBouncer : MonoBehaviourPun {
     void HandleCollision() {
         physics.UpdateCollisions();
 
-        photonView.RPC("Turnaround", RpcTarget.All, physics.hitLeft);
+        if (physics.hitLeft || physics.hitRight)
+            photonView.RPC("Turnaround", RpcTarget.All, physics.hitLeft);
         if (physics.onGround) {
             body.velocity = new Vector2(body.velocity.x, bounceAmount);
             if (physics.hitRoof)

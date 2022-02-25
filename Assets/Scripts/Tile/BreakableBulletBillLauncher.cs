@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-[CreateAssetMenu(fileName = "BreakableBulletBillTile", menuName = "ScriptableObjects/Tiles/BreakableBulletBillTile", order = 5)]
-public class BreakableBulletBillTile : InteractableTile {
+[CreateAssetMenu(fileName = "BreakableBulletBillLauncher", menuName = "ScriptableObjects/Tiles/BreakableBulletBillLauncher", order = 5)]
+public class BreakableBulletBillLauncher : InteractableTile {
     public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (!(interacter is PlayerController))
             return false;
@@ -36,7 +36,7 @@ public class BreakableBulletBillTile : InteractableTile {
         Tilemap tilemap = GameManager.Instance.tilemap;
         Vector3Int searchDirection = Vector3Int.down;
         Vector3Int searchVector = Vector3Int.down;
-        while (tilemap.GetTile<BreakableBulletBillTile>(ourLocation + searchVector))
+        while (tilemap.GetTile<BreakableBulletBillLauncher>(ourLocation + searchVector))
             searchVector += searchDirection;
         return ourLocation + searchVector - searchDirection;
     }
@@ -45,12 +45,12 @@ public class BreakableBulletBillTile : InteractableTile {
         int height = 1;
         Tilemap tilemap = GameManager.Instance.tilemap;
         Vector3Int searchVector = Vector3Int.up;
-        while (tilemap.GetTile<BreakableBulletBillTile>(ourLocation + searchVector)) {
+        while (tilemap.GetTile<BreakableBulletBillLauncher>(ourLocation + searchVector)) {
             height++;
             searchVector += Vector3Int.up;
         }
         searchVector = Vector3Int.down;
-        while (tilemap.GetTile<BreakableBulletBillTile>(ourLocation + searchVector)) {
+        while (tilemap.GetTile<BreakableBulletBillLauncher>(ourLocation + searchVector)) {
             height++;
             searchVector += Vector3Int.down;
         }

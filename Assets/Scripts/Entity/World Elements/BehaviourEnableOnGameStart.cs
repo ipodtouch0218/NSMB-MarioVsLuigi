@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class MonoBehaviourEnableOnGameStart : WaitForGameStart {
-    public MonoBehaviour[] behaviours;
+public class BehaviourEnableOnGameStart : WaitForGameStart {
+    public Behaviour[] behaviours;
     public override void Execute() {
-        foreach (MonoBehaviour behaviour in behaviours)
+        foreach (Behaviour behaviour in behaviours)
             behaviour.enabled = true;
     }
 }

@@ -19,7 +19,7 @@ public class BulletBillMover : KillableEntity {
         ParticleSystem.ShapeModule shape = ps.shape;
         if (!left) {
             Transform tf = transform.GetChild(0);
-            tf.localPosition *= Vector2.left;
+            tf.localPosition *= new Vector2(-1, 1);
             shape.rotation = new Vector3(0, 0, -33);
         }
 

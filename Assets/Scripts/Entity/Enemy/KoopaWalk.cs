@@ -57,9 +57,8 @@ public class KoopaWalk : HoldableEntity {
 
         HandleTile();
         animator.SetBool("shell", shell || holder != null);
-        if (!blue) {
+        if (!blue)
             animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
-        }
 
         if (shell) {
             if (stationary) {
@@ -81,13 +80,8 @@ public class KoopaWalk : HoldableEntity {
                 Turnaround(left);
             }
         }
-        if (!stationary) {
-            if (shell) {
-                body.velocity = new Vector2(kickSpeed * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), body.velocity.y);
-            } else {
-                body.velocity = new Vector2(walkSpeed * (left ? -1 : 1), body.velocity.y);
-            }
-        }
+        if (!stationary)
+            body.velocity = new Vector2((shell ? kickSpeed : walkSpeed) * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), body.velocity.y);
     }
     public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
@@ -96,13 +90,16 @@ public class KoopaWalk : HoldableEntity {
             return;
 
         if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant) {
-            photonView.RPC("SpecialKill", RpcTarget.All, !player.facingRight, false);
+            bool originalFacing = player.facingRight;
+            if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
+                player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
+            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false);
         } else if (player.groundpound && player.state != Enums.PowerupState.Mini && attackedFromAbove) {
             photonView.RPC("EnterShell", RpcTarget.All);
             if (!blue) {
                 photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
                 player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
-                this.previousHolder = player;
+                previousHolder = player;
             }
         } else if (attackedFromAbove && (!shell || !IsStationary())) {
             if (player.state != Enums.PowerupState.Mini || player.groundpound) {
@@ -121,7 +118,7 @@ public class KoopaWalk : HoldableEntity {
                     } else {
                         photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
                         player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
-                        this.previousHolder = player;
+                        previousHolder = player;
                     }
                 }
             } else {
@@ -135,7 +132,7 @@ public class KoopaWalk : HoldableEntity {
         left = !fromLeft;
         stationary = false;
         hardkick = groundpound;
-        body.velocity = new Vector2(kickSpeed * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), (hardkick ? 3.5f : 0));
+        body.velocity = new Vector2(kickSpeed * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), hardkick ? 3.5f : 0);
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     }
     [PunRPC]
@@ -146,11 +143,11 @@ public class KoopaWalk : HoldableEntity {
         stationary = crouch;
         hardkick = false;
         transform.position = new Vector2(holder.transform.position.x, transform.position.y);
-        this.previousHolder = holder;
-        this.holder = null;
+        previousHolder = holder;
+        holder = null;
         shell = true;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
-        this.left = facingLeft;
+        left = facingLeft;
         if (crouch) {
             body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
             putdown = true;
@@ -186,7 +183,7 @@ public class KoopaWalk : HoldableEntity {
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
-        if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown)
+        if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown || dead)
             return;
 
         GameObject obj = collider.gameObject;
@@ -214,13 +211,13 @@ public class KoopaWalk : HoldableEntity {
         }
         case "coin": {
             if (!holder && !stationary && previousHolder)
-                previousHolder.photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, obj.transform.position.x, collider.transform.position.y);
+                previousHolder.photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
             break;
         }
         case "loosecoin": {
             if (!holder && !stationary && previousHolder) {
                 Transform parent = obj.transform.parent;
-                previousHolder.photonView.RPC("CollectCoin", RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, parent.position.x, parent.position.y);
+                previousHolder.photonView.RPC("CollectCoin", RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, parent.position);
             }
             break;
         }
@@ -258,9 +255,8 @@ public class KoopaWalk : HoldableEntity {
                     if (!shell) 
                         continue;
                     
-                    if (tile is InteractableTile it) {
+                    if (tile is InteractableTile it)
                         it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
-                    }
                 }
             } else if (point.normal.y > 0 && putdown) {
                 body.velocity = new Vector2(0, body.velocity.y);
@@ -274,11 +270,7 @@ public class KoopaWalk : HoldableEntity {
         if (stationary)
             return;
         left = !hitWallOnLeft;
-        if (shell) {
-            body.velocity = new Vector2(kickSpeed * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), body.velocity.y);
-        } else {
-            body.velocity = new Vector2(walkSpeed * (left ? -1 : 1), body.velocity.y);
-        }
+        body.velocity = new Vector2((shell ? kickSpeed : walkSpeed) * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), body.velocity.y);
     }
 
     [PunRPC]
