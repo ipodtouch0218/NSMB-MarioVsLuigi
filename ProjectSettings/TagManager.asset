@@ -33,6 +33,8 @@ TagManager:
   - uicamera
   - CanvasMask
   - Backgrounds
+  - DestructablePipe
+  - PropellerMushroom
   layers:
   - Default
   - TransparentFX

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Enums {
 
     public enum PowerupState {
-        Mini, Small, Large, FireFlower, Shell, Giant
+        Mini, Small, Large, FireFlower, PropellerMushroom, Shell, Giant
     }
     public enum PlayerEyeState {
         Normal, HalfBlink, FullBlink, Death

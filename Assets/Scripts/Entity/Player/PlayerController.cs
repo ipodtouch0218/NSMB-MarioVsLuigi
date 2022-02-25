@@ -338,6 +338,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             case "Star":
             case "MiniMushroom":
             case "FireFlower":
+            case "PropellerMushroom":
             case "MegaMushroom":
             case "Mushroom": {
                     if (!photonView.IsMine)
@@ -385,6 +386,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     protected void OnFireball() {
+        Debug.Log("Did the thing");
         if (!photonView.IsMine || GameManager.Instance.paused || state != Enums.PowerupState.FireFlower || crouching || sliding) return;
         if (onLeft || onRight || groundpound || knockback) return;
         if (dead || triplejump || holding || flying || drill) return;
@@ -442,6 +444,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         case "FireFlower": {
             if (state != Enums.PowerupState.Giant && state != Enums.PowerupState.FireFlower) {
                 state = Enums.PowerupState.FireFlower;
+                stateUp = true;
+                transform.localScale = Vector3.one;
+            } else {
+                store = powerup;
+            }
+            break;
+        }
+        case "PropellerMushroom": {
+            if (state != Enums.PowerupState.Giant && state != Enums.PowerupState.PropellerMushroom) {
+                state = Enums.PowerupState.PropellerMushroom;
                 stateUp = true;
                 transform.localScale = Vector3.one;
             } else {
@@ -535,6 +547,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             break;
         }
         case Enums.PowerupState.FireFlower:
+        case Enums.PowerupState.PropellerMushroom:
         case Enums.PowerupState.Shell: {
             state = Enums.PowerupState.Large;
             powerupFlash = 2f;

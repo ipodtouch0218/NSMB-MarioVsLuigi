@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
-  m_Name: Star
+  m_Name: PropellerMushroom
   m_EditorClassIdentifier: 
-  prefab: Star
-  spawnChance: 0.3
-  starModifier: -0.3
+  prefab: 
+  spawnChance: 0.1
+  starModifier: 0
   custom: 0
