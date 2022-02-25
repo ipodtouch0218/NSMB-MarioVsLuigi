@@ -98,9 +98,10 @@ public class Utils {
 
         float rand = Random.value * totalChance;
         foreach (Powerup powerup in powerups) {
-            if (powerup.prefab == "MegaMushroom" && cantSpawnMegaMushroom)
+            if (powerup.prefab == "MegaMushroom" && cantSpawnMegaMushroom || !(bool)PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.NewPowerups] && powerup.custom)
                 continue;
             float chance = powerup.GetModifiedChance(starPercentage);
+
             if (rand < chance) 
                 return powerup;
             rand -= chance;

@@ -13,7 +13,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     BoxCollider2D mainHitbox;
     CameraController cameraController;
 
-    [SerializeField] GameObject models, smallModel, largeModel, blueShell;
+    [SerializeField] GameObject models, smallModel, largeModel, blueShell, propellerHelment;
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle;
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
@@ -33,6 +33,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         smallModel.SetActive(false);
         largeModel.SetActive(false);
         blueShell.SetActive(false);
+        propellerHelment.SetActive(false);
 
         if (photonView && !photonView.IsMine)
             glowColor = Color.HSVToRGB(controller.playerId / ((float) PhotonNetwork.PlayerList.Length + 1), 1, 1);
@@ -223,6 +224,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         largeModel.SetActive(large);
         smallModel.SetActive(!large);
         blueShell.SetActive(controller.state == Enums.PowerupState.Shell);
+        propellerHelment.SetActive(controller.state == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
 
         HandleDeathAnimation();

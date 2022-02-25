@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a4c578c4328faa043bb7b88ff52d1587
+guid: 794bc215dd02bf34ab2cfae7702bfdfd
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -173,7 +173,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: powerups_0
+      name: Mushroom
       rect:
         serializedVersion: 2
         x: 0
@@ -194,7 +194,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: powerups_1
+      name: 1-Up
       rect:
         serializedVersion: 2
         x: 16
@@ -215,7 +215,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: powerups_2
+      name: MiniMushroom
       rect:
         serializedVersion: 2
         x: 35
@@ -236,7 +236,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: powerups_6
+      name: FireFlower
       rect:
         serializedVersion: 2
         x: 0
@@ -257,7 +257,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: powerups_7
+      name: Star
       rect:
         serializedVersion: 2
         x: 16
@@ -278,7 +278,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: powerups_8
+      name: Shell
       rect:
         serializedVersion: 2
         x: 32
@@ -298,6 +298,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: PopellerMushroom
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 16
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33e41dfc73ff8de47b595b9de634a78f
+      internalID: 4928671260392873470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -309,17 +330,17 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      powerups_3: 4928671260392873470
-      powerups_8: 2834573260081099437
-      powerups_0: 3410918491446568398
       powerups_4: 4536303970436761004
       powerups_10: 3366297153455892705
-      powerups_7: -4108787663010400821
-      powerups_1: -7415331047110381915
+      Mushroom: 3410918491446568398
+      1-Up: -7415331047110381915
+      FireFlower: -6090384608550177697
       powerups_5: -499814844998443567
-      powerups_6: -6090384608550177697
+      MiniMushroom: 621560852509794982
+      Shell: 2834573260081099437
+      PopellerMushroom: 4928671260392873470
       powerups_9: -2004970489635254543
-      powerups_2: 621560852509794982
+      Star: -4108787663010400821
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
