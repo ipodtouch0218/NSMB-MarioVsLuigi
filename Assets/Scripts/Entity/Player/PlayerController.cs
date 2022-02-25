@@ -1093,7 +1093,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     #endregion
 
     void HandleCrouching(bool crouchInput) {
-        if (sliding) 
+        if (sliding)  
             return;
         if (state == Enums.PowerupState.Giant) {
             crouching = false;
