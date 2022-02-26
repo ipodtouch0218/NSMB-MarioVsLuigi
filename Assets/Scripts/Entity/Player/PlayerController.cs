@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public int playerId = -1;
     public bool dead = false;
     public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
-    public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 12f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f;
+    public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 12f, propellerLaunchVelocity = 7f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f;
     private BoxCollider2D[] hitboxes;
     GameObject models;
 
@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public Rigidbody2D body;
     private PlayerAnimationController animationController;
 
-    public bool onGround, crushGround, doGroundSnap, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock;
+    public bool onGround, crushGround, doGroundSnap, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, spinJump, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock;
     public float walljumping, landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer;
     public float invincible, giantTimer, floorAngle;
     
@@ -135,6 +135,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             animator.enabled = false;
             body.isKinematic = true;
             return;
+        }
+
+        if (spinJump) {
+            OnSpinJump();
         }
 
         if (!dead) {
@@ -386,7 +390,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     protected void OnFireball() {
-        Debug.Log("Did the thing");
         if (!photonView.IsMine || GameManager.Instance.paused || state != Enums.PowerupState.FireFlower || crouching || sliding) return;
         if (onLeft || onRight || groundpound || knockback) return;
         if (dead || triplejump || holding || flying || drill) return;
@@ -403,6 +406,28 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[]{!facingRight});
         photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
         animator.SetTrigger("fireball");
+    }
+    protected void OnSpinJump() {
+        if (!photonView.IsMine || GameManager.Instance.paused || state != Enums.PowerupState.PropellerMushroom || crouching || sliding) return;
+        if (onLeft || onRight || knockback) return;
+        if (dead || holding) return;
+        if (pipeEntering || GameManager.Instance.gameover) return;
+
+        if (drill) {
+            drill = false;
+            return;
+        }
+        if (flying) {
+            return;
+		}
+
+        spinJump = false;
+
+        photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/spinner_launch");
+        body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity);
+        flying = true;
+        onGround = false;
+
     }
 
     protected void OnItem() {
@@ -1552,6 +1577,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onLeft = false;
             onRight = false;
             flying = false;
+            spinJump = false;
             if (triplejump && landing == 0 && !(left || right) && !groundpound) {
                 if (!doIceSkidding)
                     body.velocity = Vector2.zero;

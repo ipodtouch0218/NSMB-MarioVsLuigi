@@ -58,6 +58,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "spin jump",
+                    "type": "Button",
+                    "id": "3e34d799-8a36-4354-8026-7681e4cb69d6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -498,6 +507,17 @@
                     "processors": "",
                     "groups": "Pokken",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f52f7124-042d-45b3-ba3e-bec5532f3ec9",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "spin jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

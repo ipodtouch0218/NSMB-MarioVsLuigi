@@ -10406,6 +10406,7 @@ MonoBehaviour:
   terminalVelocity: -7
   jumpVelocity: 6.25
   launchVelocity: 12
+  propellerLaunchVelocity: 7
   walkingAcceleration: 8
   runningAcceleration: 3
   walkingMaxSpeed: 2.7
@@ -10436,6 +10437,7 @@ MonoBehaviour:
   running: 0
   functionallyRunning: 0
   jumpHeld: 0
+  spinJump: 0
   flying: 0
   drill: 0
   inShell: 0
