@@ -14,12 +14,16 @@ public class MovingPowerup : MonoBehaviourPun {
     public PlayerController followMe;
     public float followMeCounter, despawnCounter = 15, ignoreCounter;
     private PhysicsEntity physics;
+    private Animator childAnimator;
+    private BoxCollider2D hitbox;
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
-        sRenderer = GetComponent<SpriteRenderer>();
+        sRenderer = GetComponentInChildren<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
-
+        childAnimator = GetComponentInChildren<Animator>();
+        hitbox = GetComponent<BoxCollider2D>();
+        
         object[] data = photonView.InstantiationData;
         if (data != null) {
             if (data[0] is float ignore) {
@@ -30,7 +34,11 @@ public class MovingPowerup : MonoBehaviourPun {
                 passthrough = true;
                 body.isKinematic = true;
                 gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+            } else {
+                passthrough = false;
             }
+        } else {
+            passthrough = false;
         }
 
         if (groundMask == -1)
@@ -84,6 +92,12 @@ public class MovingPowerup : MonoBehaviourPun {
         }
 
         HandleCollision();
+        if (physics.onGround && !passthrough && childAnimator) {
+            childAnimator.SetTrigger("trigger");
+            hitbox.enabled = false;
+            body.isKinematic = true;
+            body.gravityScale = 0;
+        }
         if (avoidPlayers && physics.onGround && !followMe) {
             Collider2D closest = null;
             Vector2 closestPosition = Vector2.zero;
@@ -124,6 +138,6 @@ public class MovingPowerup : MonoBehaviourPun {
     public void DespawnWithPoof() {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
-        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
+        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.GetChild(0).position, Quaternion.identity);
     }
 }

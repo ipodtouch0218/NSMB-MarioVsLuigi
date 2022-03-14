@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public bool loopingLevel = true;
     public Vector3 spawnpoint;
     public Tilemap tilemap;
-    public bool canSpawnMegaMushroom = true;
+    public bool spawnBigPowerups = true;
     TileBase[] originalTiles;
     BoundsInt origin;
     GameObject currentStar = null;

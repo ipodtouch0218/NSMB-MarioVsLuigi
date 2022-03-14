@@ -26,19 +26,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab; 
     public TMP_InputField nicknameField, lobbyNameField, starsText, livesField;
-    public Slider musicSlider, sfxSlider, masterSlider;
+    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected;
     private int prevWidth = 1280, prevHeight = 720;
     public GameObject errorBox;
     public TMP_Text errorText;
+    public TMP_Dropdown region;
 
     public Selectable[] roomSettings;
 
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
         ExitGames.Client.Photon.Hashtable prop = new() {
-            { "character", 0 },
-            { "ping", PhotonNetwork.GetPing() }
+            { Enums.NetPlayerProperties.Character, 0 },
+            { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
@@ -109,11 +110,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // CONNECTION CALLBACKS
     public void OnConnected() { }
     public void OnDisconnected(DisconnectCause cause) {
+        if (cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic)
+            return;
         OpenErrorBox("Disconnected: " + cause.ToString());
         //TODO reconnect + offline option?
     }
     public void OnRegionListReceived(RegionHandler handler) {
-        //TODO changing server regions?
+        handler.PingMinimumOfRegions(new System.Action<RegionHandler>(PingRegionsCallback), "");
     }
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {}
     public void OnCustomAuthenticationFailed(string failure) {}
@@ -206,6 +209,27 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
+
+        if (!PhotonNetwork.IsConnected) {
+            PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
+            PhotonNetwork.NetworkingClient.ConnectToNameServer();
+        } else {
+            List<string> newRegions = new();
+
+            int index = 0;
+            bool found = false;
+            foreach (Region r in PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions) {
+                newRegions.Add($"{r.Code} <color=#cccccc>({r.Ping}ms)");
+                if (!found)
+                    index++;
+                found &= r.Code == PhotonNetwork.CloudRegion;
+            }
+            if (found)
+                region.value = index;
+
+            region.AddOptions(newRegions);
+        }
+        EventSystem.current.SetSelectedGameObject(title);
     }
 
     void Update() {
@@ -219,6 +243,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         joinRoomBtn.interactable = connected && selectedRoom != null && validName;
         createRoomBtn.interactable = connected && validName;
+        region.interactable = connected;
     }
 
     IEnumerator UpdatePing() {
@@ -226,13 +251,38 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             yield return new WaitForSeconds(2);
             if (PhotonNetwork.InRoom) {
                 ExitGames.Client.Photon.Hashtable prop = new() {
-                    { "ping", PhotonNetwork.GetPing() }
+                    { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() }
                 };
                 PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
             }
         }
     }
 
+    void PingRegionsCallback(RegionHandler handler) {
+        List<string> newRegions = new();
+        Debug.Log("a");
+
+        int index = 0;
+        bool found = false;
+        Debug.Log(handler.BestRegion);
+        foreach (Region r in handler.EnabledRegions) {
+            newRegions.Add($"{r.Code} <color=#cccccc>({r.Ping}ms)");
+            if (!found)
+                index++;
+            found &= r.Code == handler.BestRegion.Code;
+        }
+        Debug.Log("b");
+        Debug.Log(newRegions.Count);
+        Debug.Log("c");
+        if (found)
+            region.value = index;
+
+        Debug.Log("d");
+
+        PhotonNetwork.Disconnect();
+        PhotonNetwork.ConnectToRegion(handler.BestRegion.Code);
+        region.AddOptions(newRegions);
+    }
     void EnterRoom() {
         RoomInfo room = PhotonNetwork.CurrentRoom;
         OpenInLobbyMenu(room);
@@ -255,9 +305,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
     }
     public void OpenLobbyMenu() {
-        if (!PhotonNetwork.IsConnected)
-            PhotonNetwork.ConnectUsingSettings();
-
         title.SetActive(false);
         bg.SetActive(true);
         mainMenu.SetActive(false);
@@ -327,6 +374,24 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorText.text = text;
     }
 
+    public void ConnectToDropdownRegion() {
+        Region targetRegion = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions[region.value];
+        if (PhotonNetwork.CloudRegion == targetRegion.Code)
+            return;
+
+        for (int i = 0; i < lobbiesContent.transform.childCount; i++) {
+            GameObject roomObj = lobbiesContent.transform.GetChild(i).gameObject;
+            if (!roomObj.activeSelf)
+                continue;
+
+            Destroy(roomObj);
+        }
+        selectedRoom = null;
+
+        PhotonNetwork.Disconnect();
+        PhotonNetwork.ConnectToRegion(targetRegion.Code);
+    }
+
     public void QuitRoom() {
         PhotonNetwork.LeaveRoom();
     }
@@ -342,8 +407,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         powerupsEnabled.isOn = value;
     }
     public void ChangeLives(int lives) {
+        Debug.Log($"set lives to {lives}");
         livesEnabled.isOn = lives != -1;
-        livesField.interactable = livesEnabled.isOn;
+        livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         if (lives == -1)
             return;
 
@@ -354,10 +420,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
 
         int.TryParse(input.text, out int newValue);
-        if (newValue < 1) {
+        if (newValue < 1)
             newValue = 1;
-            input.text = 1.ToString();
-        }
         if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Lives])
             return;
 
@@ -365,7 +429,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Lives] = newValue
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        ChangeLives(newValue);
+        //ChangeLives(newValue);
     }
     public void SetNewPowerups(Toggle toggle) {
         ExitGames.Client.Photon.Hashtable properties = new() {
@@ -413,9 +477,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PhotonNetwork.JoinRoom(selectedRoom.room.Name);
     }
-    public void CreateRoom(GameObject lobbyInfo) {
+    public void CreateRoom() {
         string room = lobbyNameField.text;
-        byte players = (byte) lobbyInfo.transform.Find("MaxPlayers").Find("Slider").gameObject.GetComponent<Slider>().value;
+        byte players = (byte) lobbyPlayersSlider.value;
         if (room == null || room == "" || players < 2)
             return;
 
@@ -467,7 +531,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void UpdatePlayerList(Player pl, Transform nameObject = null) {
         string characterString = Utils.GetCharacterData(pl).uistring;
-        pl.CustomProperties.TryGetValue("ping", out object ping);
+        pl.CustomProperties.TryGetValue(Enums.NetPlayerProperties.Ping, out object ping);
         if (ping == null) 
             ping = -1;
         string pingColor;
@@ -535,7 +599,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void SwapCharacter(TMP_Dropdown dropdown) {
         ExitGames.Client.Photon.Hashtable prop = new() {
-            { "character", dropdown.value }
+            { Enums.NetPlayerProperties.Character, dropdown.value }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 

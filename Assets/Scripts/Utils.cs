@@ -17,6 +17,15 @@ public class Utils {
         return tileLocation;
     }
 
+    public static void WrapWorldLocation(ref Vector3 location, GameManager manager = null) {
+        if (!manager)
+            manager = GameManager.Instance;
+        if (location.x < manager.GetLevelMinX())
+            location.x += (manager.levelWidthTile / 2);
+        if (location.x >= manager.GetLevelMaxX())
+            location.x -= (manager.levelWidthTile / 2);
+    }
+
     public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {
         if (!manager) 
             manager = GameManager.Instance;
@@ -84,21 +93,20 @@ public class Utils {
 
     public static Powerup[] powerups = null;
     public static Powerup GetRandomItem(int stars) {
-        bool cantSpawnMegaMushroom = (!GameManager.Instance.canSpawnMegaMushroom || GameManager.Instance.musicState == Enums.MusicState.MegaMushroom);
         float starPercentage = (float) stars / GameManager.Instance.starRequirement;
         float totalChance = 0;
-        if (powerups == null) {
+        if (powerups == null)
             powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
-        }
+
         foreach (Powerup powerup in powerups) {
-            if (powerup.prefab == "MegaMushroom" && cantSpawnMegaMushroom)
+            if ((powerup.big && !GameManager.Instance.spawnBigPowerups) || (powerup.custom && !(bool) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.NewPowerups]))
                 continue;
             totalChance += powerup.GetModifiedChance(starPercentage);
         }
 
         float rand = Random.value * totalChance;
         foreach (Powerup powerup in powerups) {
-            if (powerup.prefab == "MegaMushroom" && cantSpawnMegaMushroom || !(bool)PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.NewPowerups] && powerup.custom)
+            if ((powerup.big && !GameManager.Instance.spawnBigPowerups) || (powerup.custom && !(bool) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.NewPowerups]))
                 continue;
             float chance = powerup.GetModifiedChance(starPercentage);
 
@@ -108,5 +116,8 @@ public class Utils {
         }
 
         return powerups[0];
+    }
+    public static float QuadraticEaseOut(float v) {
+        return -1 * v * (v - 2);
     }
 }

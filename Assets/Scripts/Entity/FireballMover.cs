@@ -42,6 +42,12 @@ public class FireballMover : MonoBehaviourPun {
         Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
     }
 
+    [PunRPC]
+    protected void Kill() {
+        if (photonView.IsMine)
+            PhotonNetwork.Destroy(photonView);
+    }
+
     void OnTriggerEnter2D(Collider2D collider) {
         if (!photonView.IsMine)
             return;

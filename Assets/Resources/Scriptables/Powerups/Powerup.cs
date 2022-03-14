@@ -6,7 +6,7 @@ using UnityEngine;
 public class Powerup : ScriptableObject {
     public string prefab;
     public float spawnChance = 0.1f, starModifier = 0f;
-    public bool custom;
+    public bool big, custom;
     public float GetModifiedChance(float starPercentage) {
         return Mathf.Max(0, spawnChance + (starModifier * starPercentage));
     }

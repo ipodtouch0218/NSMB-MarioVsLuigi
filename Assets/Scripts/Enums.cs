@@ -11,6 +11,10 @@ public class Enums {
         Normal, HalfBlink, FullBlink, Death
     }
     // Networking Enums
+    public static class NetPlayerProperties {
+        public static string Character { get; } = "character";
+        public static string Ping { get; } = "ping";
+    }
     public static class NetRoomProperties {
         public static string Level { get; } = "level";
         public static string StarRequirement { get; } = "stars";

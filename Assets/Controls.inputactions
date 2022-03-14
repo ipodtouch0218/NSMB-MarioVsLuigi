@@ -24,12 +24,12 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Fireball",
+                    "name": "PowerupAction",
                     "type": "Button",
                     "id": "65f84768-f346-4525-b429-95d650c37964",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press(behavior=2)",
                     "initialStateCheck": false
                 },
                 {
@@ -47,22 +47,13 @@
                     "id": "27ec6a67-2030-438e-ab5f-3e20fddb0588",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=2)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
                     "name": "Pause",
                     "type": "Button",
-                    "id": "b675ba03-a647-4f82-a679-dcc6c27cbdf0",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "spin jump",
-                    "type": "Button",
-                    "id": "3e34d799-8a36-4354-8026-7681e4cb69d6",
+                    "id": "6df4bb8a-02ad-4bab-bb48-269494f9a21e",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -286,7 +277,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Fireball",
+                    "action": "PowerupAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -297,7 +288,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
-                    "action": "Fireball",
+                    "action": "PowerupAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -308,7 +299,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Fireball",
+                    "action": "PowerupAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -319,7 +310,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Pokken",
-                    "action": "Fireball",
+                    "action": "PowerupAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -330,7 +321,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Pokken",
-                    "action": "Fireball",
+                    "action": "PowerupAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -341,7 +332,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
-                    "action": "Fireball",
+                    "action": "PowerupAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -479,7 +470,7 @@
                 },
                 {
                     "name": "",
-                    "id": "0b6bb60e-a9f6-452b-a747-5944a983d29d",
+                    "id": "44b9b031-6ff9-4f35-b12f-008894ff6fc5",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
@@ -490,7 +481,7 @@
                 },
                 {
                     "name": "",
-                    "id": "326ea45a-df00-4726-9ff3-f3914788eb82",
+                    "id": "a211af1c-92a9-410b-acea-cc9dd7ff63e4",
                     "path": "*/{Menu}",
                     "interactions": "",
                     "processors": "",
@@ -501,23 +492,12 @@
                 },
                 {
                     "name": "",
-                    "id": "c9fc5ac9-a12c-4c76-a9bf-e2fcaeb5583c",
+                    "id": "b98e761c-5644-457c-8bb0-8d1f565325d7",
                     "path": "<HID::HORI CO.,LTD. POKKEN CONTROLLER>/button10",
                     "interactions": "",
                     "processors": "",
                     "groups": "Pokken",
                     "action": "Pause",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f52f7124-042d-45b3-ba3e-bec5532f3ec9",
-                    "path": "<Keyboard>/enter",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard",
-                    "action": "spin jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
