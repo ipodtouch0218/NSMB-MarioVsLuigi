@@ -4831,6 +4831,7 @@ GameObject:
   - component: {fileID: 3529903825791625940}
   - component: {fileID: -7394845021063202232}
   - component: {fileID: -7036648632289049460}
+  - component: {fileID: 5332019233134181777}
   m_Layer: 10
   m_Name: BulletBill
   m_TagString: bulletbill
@@ -5153,6 +5154,22 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 0
   m_TeleportEnabled: 1
   m_TeleportIfDistanceGreaterThan: 3
+--- !u!114 &5332019233134181777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2627485830306083579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundRange: 12
+  soundOrigin: {fileID: 2627485830306083583}
+  audioSources:
+  - {fileID: 7433892576473697450}
 --- !u!1 &2855663874240651994
 GameObject:
   m_ObjectHideFlags: 0

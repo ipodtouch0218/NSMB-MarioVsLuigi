@@ -33,6 +33,7 @@ public class Enums {
         SetTile = 20,
         BumpTile = 21,
         SetTileBatch = 22,
+        ResetTiles = 23,
         // 30-39 = graphical-only events
         SpawnParticle = 30,
         SpawnResizableParticle = 31,

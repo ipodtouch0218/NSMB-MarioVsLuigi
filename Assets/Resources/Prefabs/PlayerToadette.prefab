@@ -4845,6 +4845,7 @@ GameObject:
   - component: {fileID: 3386696468066791140}
   - component: {fileID: 8692315093253444247}
   - component: {fileID: 3494046117617009192}
+  - component: {fileID: 5560844394415011469}
   m_Layer: 10
   m_Name: PlayerToadette
   m_TagString: Player
@@ -4907,6 +4908,7 @@ MonoBehaviour:
   wallslideSpeed: -4.25
   walljumpVelocity: 5.6
   giantStartTime: 1.5
+  soundRange: 10
   propellerLaunchVelocity: 6
   propellerFallSpeed: 2
   propellerSpinFallSpeed: 1.5
@@ -4935,7 +4937,6 @@ MonoBehaviour:
   running: 0
   functionallyRunning: 0
   jumpHeld: 0
-  spinJump: 0
   flying: 0
   drill: 0
   inShell: 0
@@ -4991,6 +4992,7 @@ MonoBehaviour:
   largeModel: {fileID: 719180744479294967}
   blueShell: {fileID: 6877159210954244630}
   propellerHelmet: {fileID: 0}
+  propeller: {fileID: 0}
   dust: {fileID: 1798796770605823459}
   sparkles: {fileID: 1798796768989855644}
   drillParticle: {fileID: 5933272410689208200}
@@ -5378,6 +5380,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe023cea6fd5f842af136c8824b0710, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5560844394415011469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798796769927389756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundRange: 12
+  soundOrigin: {fileID: 1798796769927389754}
+  audioSources:
+  - {fileID: 452142615345585620}
+  - {fileID: 3840316709683434929}
+  - {fileID: 1199367360609747085}
 --- !u!1 &1798796770605823462
 GameObject:
   m_ObjectHideFlags: 0

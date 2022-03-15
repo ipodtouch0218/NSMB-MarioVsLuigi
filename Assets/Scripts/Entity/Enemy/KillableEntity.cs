@@ -21,11 +21,6 @@ public abstract class KillableEntity : MonoBehaviourPun {
         physics = GetComponent<PhysicsEntity>();
     }
 
-    public void Update() {
-        if (sRenderer.enabled)
-            audioSource.volume = sRenderer.isVisible ? 1 : 0;
-    }
-
     public virtual void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;

@@ -20,10 +20,12 @@ public class Utils {
     public static void WrapWorldLocation(ref Vector3 location, GameManager manager = null) {
         if (!manager)
             manager = GameManager.Instance;
+        if (!manager.loopingLevel)
+            return;
         if (location.x < manager.GetLevelMinX())
-            location.x += (manager.levelWidthTile / 2);
+            location.x += manager.levelWidthTile / 2;
         if (location.x >= manager.GetLevelMaxX())
-            location.x -= (manager.levelWidthTile / 2);
+            location.x -= manager.levelWidthTile / 2;
     }
 
     public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {

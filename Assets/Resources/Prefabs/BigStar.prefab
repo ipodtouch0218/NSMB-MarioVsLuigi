@@ -4839,6 +4839,7 @@ GameObject:
   - component: {fileID: 4316652804600488892}
   - component: {fileID: 7896063384542606738}
   - component: {fileID: 4404708631857811697}
+  - component: {fileID: 858852620204674597}
   m_Layer: 9
   m_Name: BigStar
   m_TagString: bigstar
@@ -5121,6 +5122,22 @@ MonoBehaviour:
   hitLeft: 0
   currentCollider: {fileID: 1973747262660636111}
   floorAndRoofCutoff: 0.3
+--- !u!114 &858852620204674597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundRange: 5
+  soundOrigin: {fileID: 1973747262660636105}
+  audioSources:
+  - {fileID: 7844204986304545686}
 --- !u!1 &1973747262981084694
 GameObject:
   m_ObjectHideFlags: 0

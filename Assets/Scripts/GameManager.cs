@@ -53,19 +53,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         OnEvent(e.Code, e.CustomData);
     }
     public void OnEvent(byte eventId, object customData) {
-        switch (eventId) {
-            case (byte) Enums.NetEventIds.SetGameStartTimestamp: {
+        switch ((Enums.NetEventIds) eventId) {
+            case Enums.NetEventIds.SetGameStartTimestamp: {
                     if (loaded)
                         break;
                     StartCoroutine(LoadingComplete((int) customData));
                     break;
                 }
-            case (byte) Enums.NetEventIds.EndGame: {
+            case Enums.NetEventIds.EndGame: {
                     Player winner = (Player) customData;
                     StartCoroutine(EndGame(winner));
                     break;
                 }
-            case (byte) Enums.NetEventIds.SetTile: {
+            case Enums.NetEventIds.SetTile: {
                     object[] data = (object[]) customData;
                     int x = (int) data[0];
                     int y = (int) data[1];
@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     tilemap.SetTile(loc, tile);
                     break;
                 }
-            case (byte) Enums.NetEventIds.SetTileBatch: {
+            case Enums.NetEventIds.SetTileBatch: {
                     object[] data = (object[]) customData;
                     int x = (int) data[0];
                     int y = (int) data[1];
@@ -92,12 +92,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
                     break;
                 }
-            case (byte) Enums.NetEventIds.PlayerFinishedLoading: {
+            case Enums.NetEventIds.ResetTiles: {
+                    ResetTiles();
+                    break;
+                }
+            case Enums.NetEventIds.PlayerFinishedLoading: {
                     Player player = (Player) customData;
                     loadedPlayers.Add(player.NickName);
                     break;
                 }
-            case (byte) Enums.NetEventIds.BumpTile: {
+            case Enums.NetEventIds.BumpTile: {
                     object[] data = (object[]) customData;
                     int x = (int) data[0];
                     int y = (int) data[1];
@@ -118,7 +122,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     tilemap.SetTile(loc, null);
                     break;
                 }
-            case (byte) Enums.NetEventIds.SpawnParticle: {
+            case Enums.NetEventIds.SpawnParticle: {
                     object[] data = (object[]) customData;
                     int x = (int) data[0];
                     int y = (int) data[1];
@@ -134,7 +138,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     main.startColor = new Color(color.x, color.y, color.z, 1);
                     break;
                 }
-            case (byte) Enums.NetEventIds.SpawnResizableParticle: {
+            case Enums.NetEventIds.SpawnResizableParticle: {
                     object[] data = (object[]) customData;
                     Vector2 pos = (Vector2) data[0];
                     bool right = (bool) data[1];
