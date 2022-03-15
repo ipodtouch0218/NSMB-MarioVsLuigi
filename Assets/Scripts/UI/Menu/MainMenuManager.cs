@@ -29,7 +29,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected;
     private int prevWidth = 1280, prevHeight = 720;
-    public GameObject errorBox;
+    public GameObject errorBox, errorButton;
     public TMP_Text errorText;
     public TMP_Dropdown region;
 
@@ -372,6 +372,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OpenErrorBox(string text) {
         errorBox.SetActive(true);
         errorText.text = text;
+        EventSystem.current.SetSelectedGameObject(errorButton);
     }
 
     public void ConnectToDropdownRegion() {
