@@ -9,8 +9,7 @@ public class KillScript : MonoBehaviour {
         if (transform.parent != null)
             Destroy(transform.parent.gameObject);
 
-        if (spawnAfter.Length > 0) {
+        if (spawnAfter.Length > 0)
             Instantiate(Resources.Load("Prefabs/" + spawnAfter), transform.position, Quaternion.identity);
-        }
     }
 }

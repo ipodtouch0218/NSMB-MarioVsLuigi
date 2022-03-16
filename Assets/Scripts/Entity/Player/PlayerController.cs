@@ -243,7 +243,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
-        if (!photonView.IsMine || !collision.gameObject.CompareTag("Player"))
+        if (!photonView.IsMine || !collision.gameObject.CompareTag("Player") || knockback)
             return;
 
         //hit antoher player
@@ -438,7 +438,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         body.position += Vector2.up * 0.15f;
     }
 
-    protected void OnItem() {
+    protected void OnReserveItem() {
         if (!photonView.IsMine || storedPowerup == null || storedPowerup.Length <= 0 || GameManager.Instance.paused || dead) 
             return;
 
@@ -621,13 +621,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (starScript.readyForUnPassthrough > 0 && starScript.creator == photonView.ViewID)
             return;
 
-        if (photonView.IsMine) {
-            photonView.RPC("SetStars", RpcTarget.Others, ++stars);
-            if (starScript.stationary)
-                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
-        }
+        if (photonView.IsMine && starScript.stationary)
+            GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
 
+        stars++;
+        if (photonView.IsMine)
+            photonView.RPC("SetStars", RpcTarget.Others, stars); //just in case
         GameManager.Instance.CheckForWinner();
+
         Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
         PlaySound("player/star_collect", 999);
         if (view.IsMine)
@@ -657,20 +658,21 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), position, Quaternion.identity);
 
         coins++;
+        if (coins >= 8) {
+            coins = 0;
+            if (photonView.IsMine) {
+                SpawnItem();
+                photonView.RPC("SetCoins", RpcTarget.Others, coins); //just in case.
+            }
+        }
 
         PlaySound("player/coin");
         GameObject num = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity);
         Animator anim = num.GetComponentInChildren<Animator>();
-        anim.SetInteger("number", coins);
+        anim.SetInteger("number", coins <= 0 ? 8 : coins);
         anim.SetTrigger("ready");
+        Destroy(num, 1.5f);
 
-        if (photonView.IsMine) {
-            if (coins >= 8) {
-                SpawnItem();
-                coins = 0;
-            }
-            photonView.RPC("SetCoins", RpcTarget.Others, coins);
-        }
     }
 
     public void SpawnItem(string item = null) {

@@ -77,21 +77,23 @@ public class MovingPowerup : MonoBehaviourPun {
         sRenderer.enabled = !(despawnCounter <= 3 && despawnCounter * blinkingRate % 1 < 0.5f);
 
         if (despawnCounter <= 0 && photonView.IsMine) {
-            photonView.RPC("DespawnWithPoof", RpcTarget.All);
+            photonView.RPC("DespawnWithPoof", RpcTarget.AllViaServer);
             return;
         }
 
         body.isKinematic = false;
         if (passthrough) {
-            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, Vector2.one / 3f, 0, groundMask)) {
+            Debug.DrawLine(body.position + hitbox.offset - new Vector2(0, hitbox.size.y / 2f), body.position + hitbox.offset - new Vector2(0, hitbox.size.y / 2f) + hitbox.size);
+            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position + hitbox.offset - new Vector2(0, hitbox.size.y/2f), hitbox.size, 0, groundMask)) {
                 gameObject.layer = LayerMask.NameToLayer("Entity");
                 passthrough = false;
             } else {
                 return;
             }
+        } else {
+            HandleCollision();
         }
 
-        HandleCollision();
         if (physics.onGround && !passthrough && childAnimator) {
             childAnimator.SetTrigger("trigger");
             hitbox.enabled = false;

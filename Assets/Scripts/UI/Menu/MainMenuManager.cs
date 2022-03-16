@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -17,7 +18,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public AudioClip buhBye, musicStart, musicLoop; 
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText;
     public TMP_Dropdown levelDropdown, characterDropdown;
@@ -27,10 +28,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab; 
     public TMP_InputField nicknameField, lobbyNameField, starsText, livesField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected;
     private int prevWidth = 1280, prevHeight = 720;
-    public GameObject errorBox, errorButton;
-    public TMP_Text errorText;
+    public GameObject errorBox, errorButton, rebindPrompt;
+    public TMP_Text errorText, rebindCountdown, rebindText;
     public TMP_Dropdown region;
 
     public Selectable[] roomSettings;
@@ -83,15 +84,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         LocalChatMessage(newMaster.NickName + " has become the Host", ColorToVector(Color.red));
     }
     public void OnJoinedRoom() {
-        LocalChatMessage(PhotonNetwork.LocalPlayer.NickName + " joined the lobby", ColorToVector(Color.red));
+        LocalChatMessage(PhotonNetwork.LocalPlayer.NickName + " joined the room", ColorToVector(Color.red));
         EnterRoom();
     }
     public void OnPlayerEnteredRoom(Player newPlayer) {
-        LocalChatMessage(newPlayer.NickName + " joined the lobby", ColorToVector(Color.red));
+        LocalChatMessage(newPlayer.NickName + " joined the room", ColorToVector(Color.red));
         PopulatePlayerList();
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
-        LocalChatMessage(otherPlayer.NickName + " left the lobby", ColorToVector(Color.red));
+        LocalChatMessage(otherPlayer.NickName + " left the room", ColorToVector(Color.red));
         PopulatePlayerList();
     }
     public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) {
@@ -122,7 +123,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnCustomAuthenticationFailed(string failure) {}
     public void OnConnectedToMaster() {
         Debug.Log("Connected to Master");
-        PhotonNetwork.JoinLobby(new TypedLobby(Application.version, LobbyType.Default));
+        Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
+        PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
     }
     // MATCHMAKING CALLBACKS
     public void OnFriendListUpdate(List<FriendInfo> friendList) {}
@@ -297,6 +299,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         bg.SetActive(true);
         mainMenu.SetActive(true);
         optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
@@ -309,6 +312,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         bg.SetActive(true);
         mainMenu.SetActive(false);
         optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(true);
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
@@ -322,6 +326,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         bg.SetActive(true);
         mainMenu.SetActive(false);
         optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(true);
         createLobbyPrompt.SetActive(true);
         inLobbyMenu.SetActive(false);
@@ -337,6 +342,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         bg.SetActive(true);
         mainMenu.SetActive(false);
         optionsMenu.SetActive(true);
+        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
@@ -344,11 +350,25 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         EventSystem.current.SetSelectedGameObject(optionsSelected);
     }
+    public void OpenControls() {
+        title.SetActive(false);
+        bg.SetActive(true);
+        mainMenu.SetActive(false);
+        optionsMenu.SetActive(false);
+        controlsMenu.SetActive(true);
+        lobbyMenu.SetActive(false);
+        createLobbyPrompt.SetActive(false);
+        inLobbyMenu.SetActive(false);
+        creditsMenu.SetActive(false);
+
+        EventSystem.current.SetSelectedGameObject(controlsSelected);
+    }
     public void OpenCredits() {
         title.SetActive(false);
         bg.SetActive(true);
         mainMenu.SetActive(false);
         optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
@@ -361,6 +381,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         bg.SetActive(true);
         mainMenu.SetActive(false);
         optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(true);
