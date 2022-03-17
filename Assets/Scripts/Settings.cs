@@ -50,10 +50,6 @@ public class Settings : Singleton<Settings> {
         VolumeMaster = PlayerPrefs.GetFloat("volumeMaster", 1);
         ndsResolution = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
         fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
-
-        new UnityEditor.GUID();
-        //pid = PlayerPrefs.getint
-
     }
     public void SaveSettingsToPreferences() {
         PlayerPrefs.SetString("Nickname", PhotonNetwork.NickName);
