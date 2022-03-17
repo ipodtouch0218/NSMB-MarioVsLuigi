@@ -1,22 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
 public class RebindManager : MonoBehaviour {
 
+    public static RebindManager Instance;
+
+    public FileInfo file;
     public InputActionAsset controls;
-    public GameObject headerTemplate, buttonTemplate, axisTemplate;
+    public GameObject headerTemplate, buttonTemplate, axisTemplate, playerSettings, resetAll;
+
+    private readonly List<RebindButton> buttons = new();
     
     public void Start() {
+        Instance = this;
+
         buttonTemplate.SetActive(false);
         axisTemplate.SetActive(false);
         headerTemplate.SetActive(false);
+
+        file = new(Application.persistentDataPath + "/controls.json");
+        if (!file.Exists) {
+            file.Create();
+        } else {
+            controls.LoadBindingOverridesFromJson(File.ReadAllText(file.FullName));
+        }
+
         CreateActions();
+
+        resetAll.transform.SetAsLastSibling();
+    }
+
+    public void ResetActions() {
+        controls.RemoveAllBindingOverrides();
+        File.WriteAllText(file.FullName, controls.SaveBindingOverridesAsJson());
+
+        foreach (RebindButton button in buttons) {
+            button.targetBinding = button.targetAction.bindings[button.index];
+            button.EndRebind(false);
+        }
     }
 
     void CreateActions() {
+
         foreach (InputActionMap map in controls.actionMaps) {
 
             if (map.name.StartsWith("!"))
@@ -25,7 +54,7 @@ public class RebindManager : MonoBehaviour {
             GameObject newHeader = Instantiate(headerTemplate);
             newHeader.name = map.name;
             newHeader.SetActive(true);
-            newHeader.transform.SetParent(transform, true);
+            newHeader.transform.SetParent(transform, false);
             newHeader.GetComponentInChildren<TMP_Text>().text = map.name;
 
             foreach (InputAction action in map.actions) {
@@ -37,7 +66,7 @@ public class RebindManager : MonoBehaviour {
                     //axis
                     GameObject newTemplate = Instantiate(axisTemplate);
                     newTemplate.name = action.name;
-                    newTemplate.transform.SetParent(transform, true);
+                    newTemplate.transform.SetParent(transform, false);
                     newTemplate.SetActive(true);
                     RebindControl control = newTemplate.GetComponent<RebindControl>();
                     control.text.text = action.name;
@@ -53,13 +82,15 @@ public class RebindManager : MonoBehaviour {
                         button.targetBinding = binding;
                         button.index = i;
                         buttonIndex++;
+
+                        buttons.Add(button);
                     }
 
                 } else {
                     //button
                     GameObject newTemplate = Instantiate(buttonTemplate);
                     newTemplate.name = action.name;
-                    newTemplate.transform.SetParent(transform, true);
+                    newTemplate.transform.SetParent(transform, false);
                     newTemplate.SetActive(true);
                     RebindControl control = newTemplate.GetComponent<RebindControl>();
                     control.text.text = action.name;
@@ -68,9 +99,14 @@ public class RebindManager : MonoBehaviour {
                         button.targetAction = action;
                         button.targetBinding = action.bindings[i];
                         button.index = i;
+
+                        buttons.Add(button);
                     }
                 }
             }
+
+            if (map.name == "Player")
+                playerSettings.transform.SetAsLastSibling();
         }
     }
 }

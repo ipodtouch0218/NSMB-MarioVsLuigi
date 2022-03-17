@@ -21,6 +21,9 @@ public class RebindButton : MonoBehaviour {
     }
 
     public void StartRebind() {
+
+        targetAction.actionMap.Disable();
+
         MainMenuManager.Instance.rebindPrompt.SetActive(true);
         MainMenuManager.Instance.rebindText.text = $"Rebinding {targetAction.name} {targetBinding.name} ({targetBinding.groups})\nPress any button or key.";
 
@@ -31,7 +34,7 @@ public class RebindButton : MonoBehaviour {
             .WithTargetBinding(index)
             .WithTimeout(timeoutTime)
             .OnMatchWaitForAnother(0.1f)
-            .OnApplyBinding((op, str) => ApplyBind(str))
+            .OnApplyBinding((op,str) => ApplyBind(str))
             .OnCancel(op => CancelRebind())
             .OnComplete(op => EndRebind(true))
             .Start();
@@ -46,18 +49,25 @@ public class RebindButton : MonoBehaviour {
         }
     }
 
-    void ApplyBind(string str) {
-        Debug.Log("apply bind " + str);
-        targetBinding.overridePath = str;
+    void ApplyBind(string path) {
+
+        targetBinding = targetAction.bindings[index];
+        targetBinding.overridePath = path;
+        targetAction.ApplyBindingOverride(index, targetBinding);
+        targetBinding = targetAction.bindings[index];
+
+        //Debug.Log("applied? " + targetBinding.overridePath);
     }
 
-    void EndRebind(bool cancel) {
-        Debug.Log("hasOverrides? " + targetBinding.hasOverrides);
+    public void EndRebind(bool cancel) {
         ourText.text = InputControlPath.ToHumanReadableString(
             targetBinding.effectivePath,
             InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
-        if (cancel)
+        targetAction.actionMap.Enable();
+        if (cancel) {
             CancelRebind();
+            System.IO.File.WriteAllText(RebindManager.Instance.file.FullName, RebindManager.Instance.controls.SaveBindingOverridesAsJson());
+        }
     }
 
     void CancelRebind() {

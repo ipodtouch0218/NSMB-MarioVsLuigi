@@ -77,7 +77,7 @@ public class MovingPowerup : MonoBehaviourPun {
         sRenderer.enabled = !(despawnCounter <= 3 && despawnCounter * blinkingRate % 1 < 0.5f);
 
         if (despawnCounter <= 0 && photonView.IsMine) {
-            photonView.RPC("DespawnWithPoof", RpcTarget.AllViaServer);
+            photonView.RPC("DespawnWithPoof", RpcTarget.All);
             return;
         }
 
@@ -140,6 +140,7 @@ public class MovingPowerup : MonoBehaviourPun {
     public void DespawnWithPoof() {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
+        DestroyImmediate(gameObject);
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.GetChild(0).position, Quaternion.identity);
     }
 }

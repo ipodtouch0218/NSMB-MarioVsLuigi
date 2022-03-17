@@ -118,7 +118,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         
         models = transform.Find("Models").gameObject;
         starDirection = Random.value < 0.5;
+
+
         PlayerInput input = GetComponent<PlayerInput>();
+        input.actions.LoadBindingOverridesFromJson(System.IO.File.ReadAllText(Application.persistentDataPath + "/controls.json"));
         input.enabled = !photonView || photonView.IsMine;
         input.camera = Camera.main;
 
@@ -392,6 +395,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!photonView.IsMine || GameManager.Instance.paused) 
             return;
         running = value.Get<float>() >= 0.5f;
+
+        if (running && state == Enums.PowerupState.FireFlower && GlobalController.Instance.settings.fireballFromSprint)
+            ActivatePowerupAction();
     }
 
     protected void OnPowerupAction(InputValue value) {
@@ -401,30 +407,35 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!powerupButtonHeld || knockback || pipeEntering || GameManager.Instance.gameover) 
             return;
 
+        ActivatePowerupAction();
+    }
+
+    private void ActivatePowerupAction() {
         switch (state) {
-            case Enums.PowerupState.FireFlower:
-                if (onLeft || onRight || groundpound || triplejump || holding || flying || drill || crouching || sliding)
+        case Enums.PowerupState.FireFlower:
+            if (onLeft || onRight || groundpound || triplejump || holding || flying || drill || crouching || sliding)
+                return;
+
+            int count = 0;
+            foreach (FireballMover existingFire in FindObjectsOfType<FireballMover>()) {
+                if (existingFire.photonView.IsMine && ++count >= 2)
                     return;
+            }
 
-                int count = 0;
-                foreach (FireballMover existingFire in FindObjectsOfType<FireballMover>()) {
-                    if (existingFire.photonView.IsMine && ++count >= 2)
-                        return;
-                }
+            PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
+            photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
+            animator.SetTrigger("fireball");
+            break;
 
-                PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
-                photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
-                animator.SetTrigger("fireball");
-                break;
+        case Enums.PowerupState.PropellerMushroom:
+            if (groundpound || knockback || holding || (flying && drill) || propeller || crouching || sliding)
+                return;
 
-            case Enums.PowerupState.PropellerMushroom:
-                if (groundpound || knockback || holding || (flying && drill) || propeller || crouching || sliding)
-                    return;
-
-                photonView.RPC("StartPropeller", RpcTarget.All);
-                break;
+            photonView.RPC("StartPropeller", RpcTarget.All);
+            break;
         }
     }
+    
     [PunRPC]
     protected void StartPropeller() {
         PlaySound("player/propeller_start");

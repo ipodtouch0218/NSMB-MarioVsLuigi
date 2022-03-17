@@ -24,7 +24,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, fireballToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab; 
     public TMP_InputField nicknameField, lobbyNameField, starsText, livesField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
@@ -211,6 +211,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
+        fireballToggle.isOn = Settings.Instance.fireballFromSprint;
 
         if (!PhotonNetwork.IsConnected) {
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
@@ -708,6 +709,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnNdsResolutionToggle() {
         Settings s = Settings.Instance;
         s.ndsResolution = ndsResolutionToggle.isOn;
+        s.SaveSettingsToPreferences();
+    }
+
+    public void OnFireballToggle() {
+        Settings s = Settings.Instance;
+        s.fireballFromSprint = fireballToggle.isOn;
         s.SaveSettingsToPreferences();
     }
     public void OnFullscreenToggle() {
