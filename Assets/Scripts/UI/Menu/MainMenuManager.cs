@@ -26,10 +26,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, fireballToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab; 
-    public TMP_InputField nicknameField, lobbyNameField, starsText, livesField;
+    public TMP_InputField nicknameField, starsText, livesField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected;
-    private int prevWidth = 1280, prevHeight = 720;
     public GameObject errorBox, errorButton, rebindPrompt;
     public TMP_Text errorText, rebindCountdown, rebindText;
     public TMP_Dropdown region;
@@ -197,8 +196,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (PhotonNetwork.InRoom)
             OnJoinedRoom();
 
-        music.clip = musicStart;
-        music.Play();
+        PlaySong(musicLoop, musicStart);
+
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject; 
 
         PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname");
@@ -238,18 +237,25 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     void Update() {
         bool connected = PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
         connecting.SetActive(!connected);
-        if (!music.isPlaying) {
-            music.clip = musicLoop;
-            music.loop = true;
-            music.Play();
-        }
 
         joinRoomBtn.interactable = connected && selectedRoom != null && validName;
         createRoomBtn.interactable = connected && validName;
         region.interactable = connected;
     }
+    private void PlaySong(AudioClip loop, AudioClip intro = null) {
+        music.Stop();
+        music.clip = loop;
+        music.loop = true;
+        if (intro) {
+            music.PlayOneShot(intro);
+            music.PlayScheduled(AudioSettings.dspTime + intro.length - (Time.fixedDeltaTime * 2));
+        } else {
+            music.Play();
+        }
+    }
 
     IEnumerator UpdatePing() {
+        // push our ping into our player properties every N seconds. 2 seems good.
         while (true) {
             yield return new WaitForSeconds(2);
             if (PhotonNetwork.InRoom) {
@@ -319,7 +325,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
 
-        nicknameField.interactable = true;
         EventSystem.current.SetSelectedGameObject(lobbySelected);
     }
     public void OpenCreateLobby() {
@@ -333,9 +338,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
 
-        nicknameField.interactable = false;
-        bool endswithS = nicknameField.text.EndsWith("s");
-        lobbyNameField.text = nicknameField.text + "'" + (endswithS ? "" : "s") + " Lobby";
         EventSystem.current.SetSelectedGameObject(createLobbySelected);
     }
     public void OpenOptions() {
@@ -430,7 +432,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         powerupsEnabled.isOn = value;
     }
     public void ChangeLives(int lives) {
-        Debug.Log($"set lives to {lives}");
         livesEnabled.isOn = lives != -1;
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         if (lives == -1)
@@ -501,9 +502,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.JoinRoom(selectedRoom.room.Name);
     }
     public void CreateRoom() {
-        string room = lobbyNameField.text;
+        bool endswithS = nicknameField.text.EndsWith("s");
+        string room = nicknameField.text + "'" + (endswithS ? "" : "s") + " Lobby";
+
         byte players = (byte) lobbyPlayersSlider.value;
-        if (room == null || room == "" || players < 2)
+        if (players < 2)
             return;
 
         PhotonNetwork.CreateRoom(room, new() { MaxPlayers = players, IsVisible = true, PublishUserId = true }, TypedLobby.Default);
@@ -547,10 +550,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         startGameBtn.interactable = PhotonNetwork.IsMasterClient;
         levelDropdown.interactable = PhotonNetwork.IsMasterClient;
 
-        //TODO: server settings interactable
-        foreach (Selectable s in roomSettings) {
+        foreach (Selectable s in roomSettings)
             s.interactable = PhotonNetwork.IsMasterClient;
-        }
     }
     public void UpdatePlayerList(Player pl, Transform nameObject = null) {
         string characterString = Utils.GetCharacterData(pl).uistring;
@@ -657,6 +658,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         textComp.text = txt;
         textComp.color = color;
     }
+
     IEnumerator FinishQuitting() {
         sfx.PlayOneShot(buhBye);
         quit = true;
@@ -691,41 +693,4 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ChangeStarRequirement(newValue);
     }
 
-    public void SetVolumeMusic() {
-        Settings s = Settings.Instance;
-        s.VolumeMusic = musicSlider.value;
-        s.SaveSettingsToPreferences();
-    }
-    public void SetVolumeSFX() {
-        Settings s = Settings.Instance;
-        s.VolumeSFX = sfxSlider.value;
-        s.SaveSettingsToPreferences();
-    }
-    public void SetVolumeMaster() {
-        Settings s = Settings.Instance;
-        s.VolumeMaster = masterSlider.value;
-        s.SaveSettingsToPreferences();
-    }
-    public void OnNdsResolutionToggle() {
-        Settings s = Settings.Instance;
-        s.ndsResolution = ndsResolutionToggle.isOn;
-        s.SaveSettingsToPreferences();
-    }
-
-    public void OnFireballToggle() {
-        Settings s = Settings.Instance;
-        s.fireballFromSprint = fireballToggle.isOn;
-        s.SaveSettingsToPreferences();
-    }
-    public void OnFullscreenToggle() {
-        bool value = fullscreenToggle.isOn;
-        if (value) {
-            prevWidth = Screen.width;
-            prevHeight = Screen.height;
-            Resolution max = Screen.resolutions[^1];
-            Screen.SetResolution(max.width, max.height, FullScreenMode.FullScreenWindow);
-        } else {
-            Screen.SetResolution(prevWidth, prevHeight, FullScreenMode.Windowed);
-        }
-    }
 }

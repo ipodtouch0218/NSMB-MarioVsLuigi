@@ -138,9 +138,9 @@ public class MovingPowerup : MonoBehaviourPun {
 
     [PunRPC]
     public void DespawnWithPoof() {
+        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.GetChild(0).position, Quaternion.identity);
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
         DestroyImmediate(gameObject);
-        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.GetChild(0).position, Quaternion.identity);
     }
 }

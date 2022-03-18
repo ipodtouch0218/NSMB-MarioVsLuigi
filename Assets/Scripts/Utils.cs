@@ -14,6 +14,7 @@ public class Utils {
         Vector3Int tileLocation = manager.tilemap.WorldToCell(worldVec);
         if (wrap)
             WrapTileLocation(ref tileLocation, manager);
+
         return tileLocation;
     }
 
@@ -22,6 +23,7 @@ public class Utils {
             manager = GameManager.Instance;
         if (!manager.loopingLevel)
             return;
+
         if (location.x < manager.GetLevelMinX())
             location.x += manager.levelWidthTile / 2;
         if (location.x >= manager.GetLevelMaxX())
@@ -59,7 +61,6 @@ public class Utils {
             index = 0;
         return (int) index;
     }
-
     public static PlayerData GetCharacterData(Player player = null) {
         return GlobalController.Instance.characters[GetCharacterIndex(player)];
     }
@@ -77,18 +78,22 @@ public class Utils {
         Tile tile2 = GameManager.Instance.tilemap.GetTile<Tile>(tileLocation);
         if (tile2 && tile2.colliderType == Tile.ColliderType.Grid)
             return true;
+
         AnimatedTile animated = GameManager.Instance.tilemap.GetTile<AnimatedTile>(tileLocation);
         if (animated && animated.m_TileColliderType == Tile.ColliderType.Grid)
             return true;
+
         RuleTile ruleTile = GameManager.Instance.tilemap.GetTile<RuleTile>(tileLocation);
         if (ruleTile && ruleTile.m_DefaultColliderType == Tile.ColliderType.Grid)
             return true;
+
         return false;
     } 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
         if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
             return true;
+
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     } 
 
@@ -101,13 +106,18 @@ public class Utils {
             powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
 
         foreach (Powerup powerup in powerups) {
+            if (powerup.name == "MegaMushroom" && GameManager.Instance.musicState == Enums.MusicState.MegaMushroom)
+                continue;
             if ((powerup.big && !GameManager.Instance.spawnBigPowerups) || (powerup.custom && !(bool) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.NewPowerups]))
                 continue;
+
             totalChance += powerup.GetModifiedChance(starPercentage);
         }
 
         float rand = Random.value * totalChance;
         foreach (Powerup powerup in powerups) {
+            if (powerup.name == "MegaMushroom" && GameManager.Instance.musicState == Enums.MusicState.MegaMushroom)
+                continue;
             if ((powerup.big && !GameManager.Instance.spawnBigPowerups) || (powerup.custom && !(bool) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.NewPowerups]))
                 continue;
             float chance = powerup.GetModifiedChance(starPercentage);
