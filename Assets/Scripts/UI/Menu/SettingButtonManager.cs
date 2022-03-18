@@ -5,31 +5,31 @@ using UnityEngine.UI;
 
 public class SettingButtonManager : MonoBehaviour {
 
-    private Settings settings;
     private int prevWidth = 1280;
     private int prevHeight = 720;
 
-    public void Start() {
-        settings = Settings.Instance;
-    }
-
     public void SetVolumeMusic(Slider slider) {
+        Settings settings = Settings.Instance;
         settings.VolumeMusic = slider.value;
         settings.SaveSettingsToPreferences();
     }
     public void SetVolumeSFX(Slider slider) {
+        Settings settings = Settings.Instance;
         settings.VolumeSFX = slider.value;
         settings.SaveSettingsToPreferences();
     }
     public void SetVolumeMaster(Slider slider) {
+        Settings settings = Settings.Instance;
         settings.VolumeMaster = slider.value;
         settings.SaveSettingsToPreferences();
     }
     public void OnNdsResolutionToggle(Toggle toggle) {
+        Settings settings = Settings.Instance;
         settings.ndsResolution = toggle.isOn;
         settings.SaveSettingsToPreferences();
     }
     public void OnFireballToggle(Toggle toggle) {
+        Settings settings = Settings.Instance;
         settings.fireballFromSprint = toggle.isOn;
         settings.SaveSettingsToPreferences();
     }
