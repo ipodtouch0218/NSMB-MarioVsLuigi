@@ -229,7 +229,7 @@ TextureImporter:
         width: 140
         height: 140
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -250,7 +250,7 @@ TextureImporter:
         width: 140
         height: 140
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -271,7 +271,7 @@ TextureImporter:
         width: 140
         height: 140
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -279,6 +279,27 @@ TextureImporter:
       bones: []
       spriteID: f11076cc9079af420800000000000000
       internalID: 2664608197882872095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: reserve-ui_6
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 152
+        width: 139
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2cdaf4c1ee21c1447adddaf2d4af29f4
+      internalID: -1858463510
       vertices: []
       indices: 
       edges: []
@@ -296,6 +317,7 @@ TextureImporter:
     nameFileIdTable:
       reserve-ui_4: 2690215448161037315
       reserve-ui_3: 5709720548119103520
+      reserve-ui_6: -1858463510
       reserve-ui_1: -6080119536613256813
       reserve-ui_0: 7194109699264141795
       reserve-ui_5: 2664608197882872095

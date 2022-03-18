@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 3416259037201337410}
   - component: {fileID: 7866072093298580898}
   - component: {fileID: 9130149352575295893}
+  - component: {fileID: 3206924239527984068}
   m_Layer: 0
   m_Name: animatorsarestupid
   m_TagString: piranhaplant
@@ -345,3 +346,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: 
   currentEntity: {fileID: 0}
+--- !u!114 &3206924239527984068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900118008454034841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundRange: 12
+  soundOrigin: {fileID: 1900118008454034840}
+  audioSources:
+  - {fileID: 4891561017733555876}

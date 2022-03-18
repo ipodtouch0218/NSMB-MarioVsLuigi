@@ -23,7 +23,6 @@ public class DebugControls : MonoBehaviour {
             Time.timeScale *= 2;
             Debug.Log("new timescale = " + Time.timeScale);
         }
-        TestSpinJump(Key.Enter);
         DebugItem(Key.Numpad0, null);
         DebugItem(Key.Numpad1, "Mushroom");
         DebugItem(Key.Numpad2, "FireFlower");
@@ -38,11 +37,9 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.Digit4, "Goomba");
         DebugEntity(Key.Digit5, "Bobomb");
         DebugEntity(Key.Digit6, "BulletBill");
-    }
+        DebugItem(Key.Digit7, "IceFlower");
+        DebugItem(Key.Digit0, null);
 
-    private void TestSpinJump(Key key) {
-        if (Keyboard.current[key].wasPressedThisFrame)
-            GameManager.Instance.localPlayer.GetComponent<PlayerController>().spinJump = true;
     }
 
     private void DebugItem(Key key, string item) {

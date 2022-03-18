@@ -14,12 +14,12 @@ public class PiranhaPlantController : KillableEntity {
         upsideDown = transform.eulerAngles.z != 0;
     }
 
-    public new void Update() {
+    public void Update() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             animator.enabled = false;
             return;
         }
-        base.Update();
+
         if (GameManager.Instance && !GameManager.Instance.musicEnabled)
             return;
 

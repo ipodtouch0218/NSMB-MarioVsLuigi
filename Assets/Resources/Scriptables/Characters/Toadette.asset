@@ -19,9 +19,8 @@ MonoBehaviour:
     type: 3}
   trackSprite: {fileID: 2894126367625617641, guid: 3279a4c4726060841b216b3de72d86a5,
     type: 3}
-  loadingSmallSprite: {fileID: 1040450253486601905, guid: a7245cae141f3ee449147539ebd2a2c9,
+  loadingSmallSprite: {fileID: -1248723344, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
-  loadingBigSprite: {fileID: -1751142936083476856, guid: a7245cae141f3ee449147539ebd2a2c9,
-    type: 3}
+  loadingBigSprite: {fileID: 1395420228, guid: a7245cae141f3ee449147539ebd2a2c9, type: 3}
   readySprite: {fileID: 7263181891274304025, guid: 70672da71d9d71a4daaf5f3fc58531e6,
     type: 3}
