@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 using TMPro;
 
 public class RebindManager : MonoBehaviour {
@@ -13,7 +12,6 @@ public class RebindManager : MonoBehaviour {
     public FileInfo file;
     public InputActionAsset controls;
     public GameObject headerTemplate, buttonTemplate, axisTemplate, playerSettings, resetAll;
-    public Toggle fireballToggle;
 
     private readonly List<RebindButton> buttons = new();
     
@@ -44,10 +42,6 @@ public class RebindManager : MonoBehaviour {
             button.targetBinding = button.targetAction.bindings[button.index];
             button.EndRebind(false);
         }
-
-        fireballToggle.isOn = true;
-        Settings.Instance.fireballFromSprint = true;
-        Settings.Instance.SaveSettingsToPreferences();
     }
 
     void CreateActions() {
