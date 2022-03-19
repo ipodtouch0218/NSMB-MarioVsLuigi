@@ -7,10 +7,11 @@ public class StarBouncer : MonoBehaviourPun {
 
     private static int ANY_GROUND_MASK = -1;
     public bool stationary = true;
-    [SerializeField] float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f;
+    [SerializeField] float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f, sparkleSoundDistance = 4f;
     public float counter, readyForUnPassthrough = 0.5f;
     private Vector3 startingScale;
     private Rigidbody2D body;
+    private AudioSource sfx;
     private SpriteRenderer sRenderer;
     public bool passthrough = true, left = true;
     private PhysicsEntity physics;
@@ -21,6 +22,7 @@ public class StarBouncer : MonoBehaviourPun {
         body = GetComponent<Rigidbody2D>();
         physics = GetComponent<PhysicsEntity>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
+        sfx = GetComponent<AudioSource>();
 
         object[] data = photonView.InstantiationData;
         if (data != null) {
@@ -42,6 +44,17 @@ public class StarBouncer : MonoBehaviourPun {
 
         if (ANY_GROUND_MASK == -1)
             ANY_GROUND_MASK = LayerMask.GetMask("Ground", "PassthroughInvalid");
+    }
+
+    void Update() {
+        if (GameManager.Instance.localPlayer == null)
+            return;
+
+        Vector3 loc = GameManager.Instance.localPlayer.transform.position;
+        if (Mathf.Abs(loc.x - transform.position.x) > GameManager.Instance.levelWidthTile/4f) {
+            loc.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(loc.x - transform.position.x);
+        }
+        sfx.volume = Utils.QuadraticEaseOut(1 - Mathf.Clamp01(Vector2.Distance(loc, transform.position - (Vector3.down/2f)) / sparkleSoundDistance));
     }
 
     void FixedUpdate() {

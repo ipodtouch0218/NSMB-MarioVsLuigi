@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1068660991916741857}
   - component: {fileID: 6797847914880496266}
   - component: {fileID: 3063277920240522671}
+  - component: {fileID: 4335231745449965271}
   m_Layer: 0
   m_Name: BulletBillLauncher
   m_TagString: Untagged
@@ -144,3 +145,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4335231745449965271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135764822071322507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundRange: 12
+  soundOrigin: {fileID: 1068660991916741857}
+  audioSources:
+  - {fileID: 3063277920240522671}

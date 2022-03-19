@@ -1,28 +1,34 @@
 # NSMB-MarioVsLuigi
-Standalone Unity remake of New Super Mario Bros DS' multiplayer gamemode, "Mario vs Luigi"
+A unity-standalone 2-10 player remake of the Mario vs Luigi gamemode from the New Super Mario Bros DS download game. 
 
-A unity-standalone 1-10(+?) player remake of the Mario vs Luigi gamemode from the New Super Mario Bros DS download game.
-Includes the 5 default levels, along with a custom jungle level!
+Includes the 5 default levels (Grassland, Bricks, Castle, Pipes, and Ice), along with two custom levels: Jungle and Sky! 
+All powerups are implemented and fully faithful to their originals, along with the addition of NSMBWii's Propeller Suit!
 
 ## Download
 
-Windows, Linux, Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases
+Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest
 
-## Controls
-| Action | Keyboard WASD | Keyboard Arrow Keys | Gamepad *(untested)* |
-| --- | --- | --- | --- |
-| Movement | WASD | Arrow Keys | Left Analog Stick or DPad |
-| Jump | Space Bar | Z | A & B Buttons |
-| Sprint | Left Shift | X (hold) | X & Y Buttons (hold) |
-| Fireball | E | X (press) | X & Y Buttons (press) |
-| Reserve Item | Q | C | Left & Right Bumpers |
-| Pause | ESC | | Start Button |
-| Confirm | Left Mouse Click | Enter | A Button |
+## Default Controls
+| Action | Keyboard | Gamepad *(untested)* |
+| --- | --- | --- |
+| Movement | WASD or Arrow Keys | Left Analog or DPad |
+| Jump | Space or Z | A or B Buttons |
+| Sprint | Shift or X (hold) | X or Y Buttons (hold) |
+| Powerup Action | E or C | RB or RT |
+| Reserve Item | Q or V | LB or LT |
+| Pause | Escape | Start Button |
+| UI Confirm | Left Mouse or Enter or Z | A Button |
 
-## Credits
+<details>
+  <summary><h2>Credits</h2></summary>
 
+### Original Content:
 * New Super Mario Bros
 * Super Mario Maker 2
+
+### Contributors:
+* [@ipodtouch0218](https://github.com/ipodtouch0218)
+* [@GradedWarrior](https://github.com/GradedWarrior)
 
 ### Rippers:
   
@@ -52,3 +58,4 @@ Windows, Linux, Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/r
 * chriswizard
 * ExecuteOrder_66
 * Leanpanther
+</details>

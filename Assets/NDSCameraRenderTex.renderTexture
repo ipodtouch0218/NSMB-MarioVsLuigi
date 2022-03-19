@@ -29,7 +29,7 @@ RenderTexture:
   m_TextureSettings:
     serializedVersion: 2
     m_FilterMode: 0
-    m_Aniso: 0
+    m_Aniso: 2
     m_MipBias: 0
     m_WrapU: 1
     m_WrapV: 1
