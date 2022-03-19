@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 3636465036723004912}
   - component: {fileID: -2214749743101336736}
   - component: {fileID: 4821492387200492676}
-  - component: {fileID: 6162738416106121865}
   m_Layer: 9
   m_Name: Bobomb
   m_TagString: bobomb
@@ -401,22 +400,6 @@ MonoBehaviour:
   hitLeft: 0
   currentCollider: {fileID: 3286581577125373962}
   floorAndRoofCutoff: 0.2
---- !u!114 &6162738416106121865
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3286581577125373952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 3286581577125373960}
-  audioSources:
-  - {fileID: -3689537593968581114}
 --- !u!1 &3286581578154145922
 GameObject:
   m_ObjectHideFlags: 0

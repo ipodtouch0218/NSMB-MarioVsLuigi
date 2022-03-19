@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: PropellerMushroom
   m_EditorClassIdentifier: 
   prefab: PropellerMushroom
-  spawnChance: 0.5
-  starModifier: -0.1
-  big: 1
-  custom: 1
+  spawnChance: 0.3
+  starModifier: 0
+  custom: 0

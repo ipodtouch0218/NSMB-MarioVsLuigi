@@ -14,16 +14,12 @@ public class MovingPowerup : MonoBehaviourPun {
     public PlayerController followMe;
     public float followMeCounter, despawnCounter = 15, ignoreCounter;
     private PhysicsEntity physics;
-    private Animator childAnimator;
-    private BoxCollider2D hitbox;
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
-        sRenderer = GetComponentInChildren<SpriteRenderer>();
+        sRenderer = GetComponent<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
-        childAnimator = GetComponentInChildren<Animator>();
-        hitbox = GetComponent<BoxCollider2D>();
-        
+
         object[] data = photonView.InstantiationData;
         if (data != null) {
             if (data[0] is float ignore) {
@@ -34,11 +30,7 @@ public class MovingPowerup : MonoBehaviourPun {
                 passthrough = true;
                 body.isKinematic = true;
                 gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-            } else {
-                passthrough = false;
             }
-        } else {
-            passthrough = false;
         }
 
         if (groundMask == -1)
@@ -83,23 +75,15 @@ public class MovingPowerup : MonoBehaviourPun {
 
         body.isKinematic = false;
         if (passthrough) {
-            Debug.DrawLine(body.position + hitbox.offset - new Vector2(0, hitbox.size.y / 2f), body.position + hitbox.offset - new Vector2(0, hitbox.size.y / 2f) + hitbox.size);
-            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position + hitbox.offset - new Vector2(0, hitbox.size.y/2f), hitbox.size, 0, groundMask)) {
+            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, Vector2.one / 3f, 0, groundMask)) {
                 gameObject.layer = LayerMask.NameToLayer("Entity");
                 passthrough = false;
             } else {
                 return;
             }
-        } else {
-            HandleCollision();
         }
 
-        if (physics.onGround && !passthrough && childAnimator) {
-            childAnimator.SetTrigger("trigger");
-            hitbox.enabled = false;
-            body.isKinematic = true;
-            body.gravityScale = 0;
-        }
+        HandleCollision();
         if (avoidPlayers && physics.onGround && !followMe) {
             Collider2D closest = null;
             Vector2 closestPosition = Vector2.zero;
@@ -138,9 +122,8 @@ public class MovingPowerup : MonoBehaviourPun {
 
     [PunRPC]
     public void DespawnWithPoof() {
-        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.GetChild(0).position, Quaternion.identity);
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
-        DestroyImmediate(gameObject);
+        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
     }
 }

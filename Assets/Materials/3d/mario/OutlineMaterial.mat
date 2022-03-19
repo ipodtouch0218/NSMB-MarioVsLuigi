@@ -91,7 +91,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - GlowThickness: 0.01
+    - GlowThickness: 0.02
     - Thickness: 0.015
     - _AlphaClip: 0
     - _Blend: 0

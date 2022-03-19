@@ -89,7 +89,7 @@ public class KoopaWalk : HoldableEntity {
         if (holder) 
             return;
 
-        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant || player.drill) {
+        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant) {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
@@ -112,7 +112,7 @@ public class KoopaWalk : HoldableEntity {
         } else {
             if (shell && IsStationary()) {
                 if (!holder) {
-                    if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
+                    if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
                         photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                         player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
                     } else {
@@ -187,36 +187,40 @@ public class KoopaWalk : HoldableEntity {
             return;
 
         GameObject obj = collider.gameObject;
-        KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
         switch (obj.tag) {
         case "koopa":
         case "bobomb":
         case "bulletbill":
-        case "goomba":
-            if (killa.dead) 
-                break;
+        case "goomba": {
+            KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
+            if (killa.dead) break;
             killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false);
-            if (holder)
+            if (holder) {
                 photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false);
+            }
             break;
-        case "piranhaplant":
-            if (killa.dead) 
-                break;
+        }
+        case "piranhaplant": {
+            KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
+            if (killa.dead) break;
             killa.photonView.RPC("Kill", RpcTarget.All);
             if (holder)
                 photonView.RPC("Kill", RpcTarget.All);
 
             break;
-        case "coin": 
+        }
+        case "coin": {
             if (!holder && !stationary && previousHolder)
                 previousHolder.photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
             break;
-        case "loosecoin": 
+        }
+        case "loosecoin": {
             if (!holder && !stationary && previousHolder) {
                 Transform parent = obj.transform.parent;
                 previousHolder.photonView.RPC("CollectCoin", RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, parent.position);
             }
             break;
+        }
         }
     }
 

@@ -6,10 +6,8 @@ using Photon.Pun;
 public class FireballMover : MonoBehaviourPun {
     public float speed = 3f;
     public bool left;
-    public bool isIceball;
     private Rigidbody2D body;
     private PhysicsEntity physics;
-    
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
@@ -41,18 +39,7 @@ public class FireballMover : MonoBehaviourPun {
     }
 
     void OnDestroy() {
-        if (isIceball) {
-            Instantiate(Resources.Load("Prefabs/Particle/IceballWall"), transform.position, Quaternion.identity);
-        } else {
-            Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
-        }
-
-    }
-
-    [PunRPC]
-    protected void Kill() {
-        if (photonView.IsMine)
-            PhotonNetwork.Destroy(photonView);
+        Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
@@ -65,15 +52,8 @@ public class FireballMover : MonoBehaviourPun {
                 KillableEntity en = collider.gameObject.GetComponentInParent<KillableEntity>();
                 if (en.dead) 
                     return;
-                if (isIceball) {
-                    PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + Vector3.up, Quaternion.identity);
-                    PhotonNetwork.Destroy(en.gameObject);
-                    // TODO: give enemy bool left value to FrozenCube so when it melts it spawns the enemy back facing the right way
-                    PhotonNetwork.Destroy(gameObject);
-                } else {
-                    en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false);
-                    PhotonNetwork.Destroy(gameObject);
-                }
+                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false);
+                PhotonNetwork.Destroy(gameObject);
                 break;
             }
             case "bobomb": {

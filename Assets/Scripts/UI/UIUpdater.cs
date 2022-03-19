@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 using Photon.Pun;
 using TMPro;
 
@@ -10,8 +11,7 @@ public class UIUpdater : MonoBehaviour {
     public static UIUpdater Instance;
     public GameObject playerTrackTemplate, starTrackTemplate;
     PlayerController player;
-    //TODO: refactor
-    public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell, storedItemPropellerMushroom; 
+    public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell; 
     public TMP_Text uiStars, uiCoins, uiPing;
     public Image itemReserve;
     private float pingSample = 0;
@@ -23,9 +23,9 @@ public class UIUpdater : MonoBehaviour {
     
     public void GivePlayersIcons() {
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player")) {
-            GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.position, Quaternion.identity, transform);
+            GameObject trackObject = GameObject.Instantiate(playerTrackTemplate, playerTrackTemplate.transform.position, Quaternion.identity, transform);
             TrackIcon icon = trackObject.GetComponent<TrackIcon>();
-            icon.target = player;
+            icon.target = player.gameObject;
 
             if (!player.GetPhotonView().IsMine)
                 trackObject.transform.localScale = new Vector3(2f/3f, 2f/3f, 1f);
@@ -50,14 +50,12 @@ public class UIUpdater : MonoBehaviour {
         if (!player)
             return;
 
-        //TODO: refactor
         itemReserve.sprite = player.storedPowerup switch {
             "Mushroom" => storedItemMushroom,
             "FireFlower" => storedItemFireFlower,
             "MiniMushroom" => storedItemMiniMushroom,
             "MegaMushroom" => storedItemMegaMushroom,
             "BlueShell" => storedItemBlueShell,
-            "PropellerMushroom" => storedItemPropellerMushroom,
             _ => storedItemNull,
         };
     }

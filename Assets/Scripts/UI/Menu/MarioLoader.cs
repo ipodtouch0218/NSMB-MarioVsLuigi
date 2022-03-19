@@ -8,7 +8,7 @@ public class MarioLoader : MonoBehaviour {
     public int scale = 0, previousScale;
     public float scaleTimer, blinkSpeed = 0.5f;
     private Image image;
-    public PlayerData data;
+    private PlayerData data;
     void Start() {
         image = GetComponent<Image>();
         data = Utils.GetCharacterData();

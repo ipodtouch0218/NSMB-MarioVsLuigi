@@ -15,5 +15,3 @@ MonoBehaviour:
   prefab: MegaMushroom
   spawnChance: 0.3
   starModifier: -0.2
-  big: 1
-  custom: 0

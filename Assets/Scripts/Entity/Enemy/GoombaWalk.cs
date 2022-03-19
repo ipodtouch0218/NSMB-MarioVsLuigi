@@ -21,8 +21,6 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        left = body.velocity.x < 0;
-
         physics.UpdateCollisions();
         if (physics.hitLeft || physics.hitRight) {
             left = physics.hitRight;
