@@ -214,6 +214,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         int ps = controller.state switch {
             Enums.PowerupState.FireFlower => 1,
             Enums.PowerupState.PropellerMushroom => 2,
+            Enums.PowerupState.IceFlower => 3,
             _ => 0
         };
         block.SetFloat("PowerupState", ps);

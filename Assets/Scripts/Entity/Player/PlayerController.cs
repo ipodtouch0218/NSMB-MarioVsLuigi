@@ -353,6 +353,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             case "Star":
             case "MiniMushroom":
             case "FireFlower":
+            case "IceFlower":
             case "PropellerMushroom":
             case "MegaMushroom":
                 if (!photonView.IsMine)
@@ -396,7 +397,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         running = value.Get<float>() >= 0.5f;
 
-        if (running && state == Enums.PowerupState.FireFlower && GlobalController.Instance.settings.fireballFromSprint)
+        if (running && (state == Enums.PowerupState.FireFlower || state == Enums.PowerupState.IceFlower) && GlobalController.Instance.settings.fireballFromSprint)
             ActivatePowerupAction();
     }
 
@@ -424,6 +425,20 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
             PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
             photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
+            animator.SetTrigger("fireball");
+            break;
+        case Enums.PowerupState.IceFlower:
+            if (onLeft || onRight || groundpound || triplejump || holding || flying || drill || crouching || sliding)
+                return;
+
+            int iceCount = 0;
+            foreach (FireballMover existingFire in FindObjectsOfType<FireballMover>()) {
+                if (existingFire.photonView.IsMine && ++iceCount >= 2)
+                    return;
+            }
+
+            PhotonNetwork.Instantiate("Prefabs/Iceball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
+            photonView.RPC("PlaySound", RpcTarget.All, "player/fireball"); // Add ice ball sound effect
             animator.SetTrigger("fireball");
             break;
 
@@ -488,6 +503,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         case "FireFlower": 
             if (state != Enums.PowerupState.Giant && state != Enums.PowerupState.FireFlower) {
                 state = Enums.PowerupState.FireFlower;
+                stateUp = true;
+                transform.localScale = Vector3.one;
+            } else {
+                store = powerup;
+            }
+            break;
+        case "IceFlower": 
+            if (state != Enums.PowerupState.Giant && state != Enums.PowerupState.IceFlower) {
+                state = Enums.PowerupState.IceFlower;
                 stateUp = true;
                 transform.localScale = Vector3.one;
             } else {
@@ -593,6 +617,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 SpawnStar();
                 break;
             case Enums.PowerupState.FireFlower:
+            case Enums.PowerupState.IceFlower:
             case Enums.PowerupState.PropellerMushroom:
             case Enums.PowerupState.Shell:
                 state = Enums.PowerupState.Large;
