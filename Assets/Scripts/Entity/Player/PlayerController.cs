@@ -308,7 +308,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (holdable && (holding == holdable || (holdingOld == holdable && throwInvincibility > 0)))
             return;
         KillableEntity killable = collider.gameObject.GetComponentInParent<KillableEntity>();
-        if (killable && !killable.dead) {
+        if (killable && !killable.dead && !killable.frozen) {
             killable.InteractWithPlayer(this);
             return;
         }

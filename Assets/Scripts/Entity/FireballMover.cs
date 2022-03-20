@@ -65,15 +65,22 @@ public class FireballMover : MonoBehaviourPun {
                 KillableEntity en = collider.gameObject.GetComponentInParent<KillableEntity>();
                 if (en.dead) 
                     return;
-                if (isIceball) {
-                    PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + Vector3.up, Quaternion.identity);
-                    PhotonNetwork.Destroy(en.gameObject);
+                if (isIceball && !en.frozen) {
+                    GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.gameObject.tag, en.photonView.ViewID);
+                    //PhotonNetwork.Destroy(en.gameObject);
                     // TODO: give enemy bool left value to FrozenCube so when it melts it spawns the enemy back facing the right way
                     PhotonNetwork.Destroy(gameObject);
-                } else {
+                } else if (!isIceball && !en.frozen) {
                     en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false);
                     PhotonNetwork.Destroy(gameObject);
                 }
+                break;
+            }
+            case "FrozenCube": {
+
+                // TODO: Stuff here
+
                 break;
             }
             case "bobomb": {

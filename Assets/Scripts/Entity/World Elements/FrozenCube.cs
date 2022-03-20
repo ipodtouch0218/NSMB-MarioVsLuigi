@@ -8,13 +8,15 @@ public class FrozenCube : HoldableEntity
 {
     public float throwSpeed = 10f;
     bool left;
+    public KillableEntity frozenEntity;
+    public KillableEntity frozenEntityGO;
 
     // TODO: when ice collides with something while after being thrown it breaks
 
     new void Start() {
         base.Start();
         hitbox = GetComponentInChildren<BoxCollider2D>();
-
+        dropcoin = false;
         body.velocity = new Vector2(0, 0);
     }
 
@@ -32,6 +34,10 @@ public class FrozenCube : HoldableEntity
         } else {
             GetComponent<BoxCollider2D>().enabled = true;
         }
+
+        if (frozenEntity) {
+            frozenEntity.transform.position = new Vector3(transform.position.x, transform.position.y - (transform.localScale.y / 3), frozenEntity.transform.position.z);
+		}
     }
 	// Start is called before the first frame update
 	public override void InteractWithPlayer(PlayerController player) {
@@ -40,10 +46,10 @@ public class FrozenCube : HoldableEntity
         if (holder)
             return;
         else if (player.groundpound && player.state != Enums.PowerupState.Mini && attackedFromAbove) {
-            PhotonNetwork.Destroy(gameObject);
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
         }
         
-        if (!holder) {
+        if (!holder && !dead) {
             if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
                 photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                 player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
@@ -59,6 +65,18 @@ public class FrozenCube : HoldableEntity
     void Update()
     {
         
+    }
+
+    [PunRPC]
+    public void setFrozenEntity(string entity, int enitiyID) {
+        frozenEntity = PhotonView.Find(enitiyID).GetComponent<KillableEntity>();
+        frozenEntity.photonView.RPC("Freeze", RpcTarget.All);
+
+        if (entity == "koopa") {
+            //transform.localScale = new Vector3(1, 1, transform.localScale.z);
+		} else if (entity == "goomba") {
+            //transform.localScale = new Vector3(1, 1, transform.localScale.z);
+        }
     }
 
     [PunRPC]
@@ -92,15 +110,11 @@ public class FrozenCube : HoldableEntity
             case "bobomb":
             case "bulletbill":
             case "goomba":
-            if (killa.dead)
+            if (killa.dead || killa.Equals(frozenEntity))
                 break;
             killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false);
-            if (holder)
-                photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false);
+            photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false);
 
-            // Do ice breaking sound and particles here.
-
-            PhotonNetwork.Destroy(gameObject);
             break;
             case "piranhaplant":
             if (killa.dead)
@@ -125,14 +139,23 @@ public class FrozenCube : HoldableEntity
 
     [PunRPC]
     public override void Kill() {
-        PhotonNetwork.Destroy(gameObject);
+        if (holder)
+            holder.holding = null;
+        holder = null;
     }
 
     [PunRPC]
     public override void SpecialKill(bool right = true, bool groundpound = false) {
         base.SpecialKill(right, groundpound);
+        print("test!!!");
+        if (frozenEntity) {
+            frozenEntity.photonView.RPC("SpecialKill", RpcTarget.All, right, false);
+        }
+        
+        
         if (holder)
             holder.holding = null;
         holder = null;
+
     }
 }
