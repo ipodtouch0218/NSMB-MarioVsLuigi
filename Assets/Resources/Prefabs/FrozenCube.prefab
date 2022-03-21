@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 82072111131152862}
   - component: {fileID: 1182937128297349914}
   - component: {fileID: 1482905306660078958}
+  - component: {fileID: 3852760734466000956}
   m_Layer: 0
   m_Name: Hitbox
-  m_TagString: Untagged
+  m_TagString: frozencube
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -111,7 +112,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.36, y: 2}
+  m_Size: {x: 1.35, y: 1.35}
   m_EdgeRadius: 0
 --- !u!114 &1482905306660078958
 MonoBehaviour:
@@ -125,6 +126,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3852760734466000956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215588498524246718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 1
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 0}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4465303805189439310
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,9 +167,10 @@ GameObject:
   - component: {fileID: 2249742354441438921}
   - component: {fileID: -5867948262533087669}
   - component: {fileID: -4211955845073762521}
+  - component: {fileID: -3223435254849421410}
   m_Layer: 0
   m_Name: FrozenCube
-  m_TagString: Untagged
+  m_TagString: frozencube
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -186,8 +211,18 @@ MonoBehaviour:
   previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
   throwSpeed: 10
+  frozenCubeCollider: {fileID: 1182937128297349914}
+  spriteRender: {fileID: 5543798153942386180}
+  iceSprites:
+  - {fileID: 732412983, guid: 64d8b3652072ff942ad60637750783cc, type: 3}
+  - {fileID: 733263250, guid: 64d8b3652072ff942ad60637750783cc, type: 3}
+  - {fileID: 1303551094, guid: 64d8b3652072ff942ad60637750783cc, type: 3}
   frozenEntity: {fileID: 0}
-  frozenEntityGO: {fileID: 0}
+  frozenPlayer: {fileID: 0}
+  kinematicEntity: 0
+  flyingEntity: 0
+  plantEntity: 0
+  offset: 0
 --- !u!114 &-1720675168950811037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,15 +301,15 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.22, y: 0.22}
+    newSize: {x: 0.19, y: 0.32}
+    adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 1.35, y: 1.35}
   m_EdgeRadius: 0
 --- !u!114 &472015331249174581
 MonoBehaviour:
@@ -430,6 +465,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-3223435254849421410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465303805189439310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  killTime: 0
 --- !u!1 &6270504196635899897
 GameObject:
   m_ObjectHideFlags: 0
@@ -502,8 +550,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 733263250, guid: 64d8b3652072ff942ad60637750783cc, type: 3}
+  m_SortingOrder: 10
+  m_Sprite: {fileID: 732412983, guid: 64d8b3652072ff942ad60637750783cc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

@@ -36,6 +36,8 @@ TagManager:
   - DestructablePipe
   - PropellerMushroom
   - FadeUI
+  - frozencube
+  - IceFlower
   layers:
   - Default
   - TransparentFX

@@ -25,6 +25,8 @@ public abstract class KillableEntity : MonoBehaviourPun {
     }
 
     public virtual void InteractWithPlayer(PlayerController player) {
+        if (player.frozen)
+            return;
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
@@ -59,9 +61,13 @@ public abstract class KillableEntity : MonoBehaviourPun {
     public virtual void Freeze() {
         frozen = true;
         animator.enabled = false;
-        body.velocity = Vector2.zero;
-        body.angularVelocity = 0;
-        body.isKinematic = true;
+        // Note: disabling hitbox doesn't work for some reason but I left the code here.
+        hitbox.enabled = false;
+        if (body) {
+            body.velocity = Vector2.zero;
+            body.angularVelocity = 0;
+            body.isKinematic = true;
+		}
         dropcoin = false;
     }
 
@@ -71,6 +77,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         animator.enabled = true;
         body.isKinematic = false;
         dropcoin = true;
+        hitbox.enabled = true;
     }
 
     [PunRPC]

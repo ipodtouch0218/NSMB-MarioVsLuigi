@@ -5086,7 +5086,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dead: 0
+  frozen: 0
   body: {fileID: 0}
+  dropcoin: 1
   speed: 1.5
   playerSearchRadius: 12
   left: 1
