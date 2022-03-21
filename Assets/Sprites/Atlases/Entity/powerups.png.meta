@@ -299,13 +299,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PropellerMushroom
+      name: IceFlower
       rect:
         serializedVersion: 2
         x: 48
         y: 0
         width: 16
-        height: 20
+        height: 16
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -334,11 +334,11 @@ TextureImporter:
       powerups_10: 3366297153455892705
       Mushroom: 3410918491446568398
       1-Up: -7415331047110381915
+      IceFlower: 4928671260392873470
       FireFlower: -6090384608550177697
       powerups_5: -499814844998443567
       MiniMushroom: 621560852509794982
       Shell: 2834573260081099437
-      PropellerMushroom: 4928671260392873470
       powerups_9: -2004970489635254543
       Star: -4108787663010400821
   spritePackingTag: 

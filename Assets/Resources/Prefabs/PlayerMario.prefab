@@ -10252,6 +10252,7 @@ MonoBehaviour:
   iceSliding: 0
   stuckInBlock: 0
   propeller: 0
+  frozen: 0
   walljumping: 0
   landing: 0
   koyoteTime: 0
@@ -10265,6 +10266,7 @@ MonoBehaviour:
   giantEndTimer: 0
   propellerTimer: 0
   propellerSpinTimer: 0
+  frozenJump: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0
@@ -10275,6 +10277,7 @@ MonoBehaviour:
   storedPowerup: 
   holding: {fileID: 0}
   holdingOld: {fileID: 0}
+  FrozenObject: {fileID: 0}
   joystick: {x: 0, y: 0}
   giantSavedVelocity: {x: 0, y: 0}
   previousFrameVelocity: {x: 0, y: 0}
