@@ -1982,6 +1982,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: PiranhaPlant
       objectReference: {fileID: 0}
+    - target: {fileID: 3206924239527984068, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: soundRange
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 3416259037201337410, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
       propertyPath: sceneViewId
@@ -2169,7 +2174,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00002670288, y: -0.0002593994}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 1101}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &111480245
@@ -7476,6 +7481,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: PiranhaPlant
       objectReference: {fileID: 0}
+    - target: {fileID: 3206924239527984068, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: soundRange
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 3416259037201337410, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
       propertyPath: sceneViewId
@@ -8465,6 +8475,7 @@ GameObject:
   - component: {fileID: 448507887}
   - component: {fileID: 448507890}
   - component: {fileID: 448507889}
+  - component: {fileID: 448507891}
   m_Layer: 5
   m_Name: MaxPlayerSlider
   m_TagString: Untagged
@@ -8596,6 +8607,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 448507886}
   m_CullTransparentMesh: 1
+--- !u!114 &448507891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 448507886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 566761500}
+          m_TargetAssemblyTypeName: UnityEngine.EventSystems.EventSystem, UnityEngine.UI
+          m_MethodName: SetSelectedGameObject
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 448507886}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &452697243
 GameObject:
   m_ObjectHideFlags: 0
@@ -20581,6 +20621,7 @@ MonoBehaviour:
   rebindCountdown: {fileID: 395885055}
   rebindText: {fileID: 1382848006}
   region: {fileID: 947074750}
+  rebindManager: {fileID: 1657549225}
   roomSettings:
   - {fileID: 2036188050}
   - {fileID: 1132725540}
