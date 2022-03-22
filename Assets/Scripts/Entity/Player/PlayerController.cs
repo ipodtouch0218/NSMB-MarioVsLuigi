@@ -331,11 +331,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 if (fireball.photonView.IsMine)
                     break;
                 fireball.photonView.RPC("Kill", RpcTarget.All);
-                if (state == Enums.PowerupState.Giant && state == Enums.PowerupState.Shell && (inShell || crouching || groundpound))
+                if (state == Enums.PowerupState.Giant || (state == Enums.PowerupState.Shell && (inShell || crouching || groundpound)) || invincible > 0)
                     break;
                 if (state == Enums.PowerupState.Mini) {
                     photonView.RPC("Powerdown", RpcTarget.All, false);
-                } else if (state != Enums.PowerupState.Giant) {
+                } else {
                     photonView.RPC("Knockback", RpcTarget.All, collider.attachedRigidbody.position.x > body.position.x, 1, fireball.photonView.ViewID);
                 }
                 break;
