@@ -66,7 +66,7 @@ public class RebindButton : MonoBehaviour {
         targetAction.actionMap.Enable();
         if (cancel) {
             CancelRebind();
-            System.IO.File.WriteAllText(RebindManager.Instance.file.FullName, RebindManager.Instance.controls.SaveBindingOverridesAsJson());
+            MainMenuManager.Instance.rebindManager.SaveRebindings();
         }
     }
 

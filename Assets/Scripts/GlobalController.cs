@@ -8,6 +8,7 @@ public class GlobalController : Singleton<GlobalController> {
     public RenderTexture ndsTexture;
     public PlayerData[] characters;
     public Settings settings;
+    public string controlsJson = null;
     void Awake() {
         if (!InstanceCheck()) 
             return;

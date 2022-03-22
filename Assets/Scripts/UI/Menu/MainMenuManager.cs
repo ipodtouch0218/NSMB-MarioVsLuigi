@@ -32,6 +32,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject errorBox, errorButton, rebindPrompt;
     public TMP_Text errorText, rebindCountdown, rebindText;
     public TMP_Dropdown region;
+    public RebindManager rebindManager;
 
     public Selectable[] roomSettings;
 
@@ -211,6 +212,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
         fireballToggle.isOn = Settings.Instance.fireballFromSprint;
+
+        rebindManager.Init();
 
         if (!PhotonNetwork.IsConnected) {
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
