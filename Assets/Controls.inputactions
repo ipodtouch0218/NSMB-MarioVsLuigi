@@ -29,7 +29,7 @@
                     "id": "798623dc-6c31-47df-9cf8-f6d52086f268",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press(behavior=2)",
                     "initialStateCheck": true
                 },
                 {
@@ -373,7 +373,7 @@
                     "name": "",
                     "id": "7c6a824a-127d-4a16-bbb0-fbf98dc33c60",
                     "path": "<Keyboard>/shift",
-                    "interactions": "Press(behavior=2)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
                     "action": "Sprint",
@@ -395,7 +395,7 @@
                     "name": "",
                     "id": "76651f3d-3a36-4be9-b752-b55ded85dcea",
                     "path": "<Gamepad>/buttonNorth",
-                    "interactions": "Press(behavior=2)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Sprint",
@@ -406,7 +406,7 @@
                     "name": "",
                     "id": "40223f13-16dd-46c0-b295-57edb60d3de6",
                     "path": "<Gamepad>/buttonWest",
-                    "interactions": "Press(behavior=2)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Sprint",
@@ -820,34 +820,6 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Cancel",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "!Rebinding",
-            "id": "a79fcfee-5d19-4598-8b0f-68037e913e41",
-            "actions": [
-                {
-                    "name": "!Nothing",
-                    "type": "Button",
-                    "id": "9909b114-404d-4248-acf9-d9c91df01cca",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "99f81bfa-30dc-4108-b3b9-fcc71a789dc2",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "!Nothing",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
