@@ -1982,6 +1982,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: PiranhaPlant
       objectReference: {fileID: 0}
+    - target: {fileID: 3206924239527984068, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: soundRange
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 3416259037201337410, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
       propertyPath: sceneViewId
@@ -7475,6 +7480,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PiranhaPlant
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206924239527984068, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: soundRange
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 3416259037201337410, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
