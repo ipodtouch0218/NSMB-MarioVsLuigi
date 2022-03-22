@@ -24,7 +24,7 @@ public class RebindManager : MonoBehaviour {
 
         file = new(Application.persistentDataPath + "/controls.json");
 
-        if (GlobalController.Instance.controlsJson != null) {
+        if (GlobalController.Instance.controlsJson != "") {
             // we have old bindings...
             controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
             SaveRebindings();
