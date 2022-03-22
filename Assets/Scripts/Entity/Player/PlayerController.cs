@@ -121,8 +121,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
 
         PlayerInput input = GetComponent<PlayerInput>();
-        input.actions.LoadBindingOverridesFromJson(System.IO.File.ReadAllText(Application.persistentDataPath + "/controls.json"));
         input.enabled = !photonView || photonView.IsMine;
+        if (input.enabled && GlobalController.Instance.controlsJson != null)
+            input.actions.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
+
+        //TODO: change if we want split-screen local multiplayer... maybe?
         input.camera = Camera.main;
 
         playerId = PhotonNetwork.CurrentRoom != null ? System.Array.IndexOf(PhotonNetwork.PlayerList, photonView.Owner) : -1;

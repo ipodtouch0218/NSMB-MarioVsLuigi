@@ -16,23 +16,30 @@ public class RebindManager : MonoBehaviour {
     public Toggle fireballToggle;
 
     private readonly List<RebindButton> buttons = new();
-    
-    public void Start() {
-        Instance = this;
 
+    public void Init() {
         buttonTemplate.SetActive(false);
         axisTemplate.SetActive(false);
         headerTemplate.SetActive(false);
 
         file = new(Application.persistentDataPath + "/controls.json");
-        if (!file.Exists) {
-            file.Create();
-        } else {
-            controls.LoadBindingOverridesFromJson(File.ReadAllText(file.FullName));
+
+        if (GlobalController.Instance.controlsJson != null) {
+            // we have old bindings...
+            controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
+            SaveRebindings();
+
+        } else if (file.Exists) {
+            //load bindings...
+            try {
+                controls.LoadBindingOverridesFromJson(File.ReadAllText(file.FullName));
+                GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
+            } catch (System.Exception e) {
+                Debug.LogError(e.Message);
+            }
         }
 
         CreateActions();
-
         resetAll.transform.SetAsLastSibling();
     }
 
@@ -114,5 +121,14 @@ public class RebindManager : MonoBehaviour {
             if (map.name == "Player")
                 playerSettings.transform.SetAsLastSibling();
         }
+    }
+    public void SaveRebindings() {
+        string json = controls.SaveBindingOverridesAsJson();
+        
+        if (!file.Exists)
+            file.Directory.Create();
+
+        File.WriteAllText(file.FullName, json);
+        GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
     }
 }
