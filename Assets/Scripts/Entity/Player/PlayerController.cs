@@ -328,8 +328,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 break;
             case "Fireball":
                 FireballMover fireball = obj.GetComponentInParent<FireballMover>();
-                if (fireball.photonView.IsMine)
+                if (fireball.photonView.IsMine || hitInvincibilityCounter > 0)
                     break;
+
                 fireball.photonView.RPC("Kill", RpcTarget.All);
                 if (state == Enums.PowerupState.Giant || (state == Enums.PowerupState.Shell && (inShell || crouching || groundpound)) || invincible > 0)
                     break;
@@ -1164,7 +1165,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     #endregion
 
     void HandleCrouching(bool crouchInput) {
-        if (sliding || propeller)  
+        if (sliding || propeller || knockback)  
             return;
         if (state == Enums.PowerupState.Giant) {
             crouching = false;
