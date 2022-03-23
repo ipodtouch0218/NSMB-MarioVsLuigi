@@ -6,6 +6,8 @@ All powerups are implemented and fully faithful to their originals, along with t
 
 ## Download
 
+[Play now in browser on itch.io!](https://ipodtouch0218.itch.io/nsmb-mariovsluigi)
+
 Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest
 
 ## Default Controls
