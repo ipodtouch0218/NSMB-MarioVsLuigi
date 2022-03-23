@@ -116,7 +116,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         }
 
         if (photonView.IsMine)
-            HorizontalCamera.OFFSET_TARGET = controller.flying ? 0.75f : 0f;
+            HorizontalCamera.OFFSET_TARGET = (controller.flying || controller.propeller) ? 0.75f : 0f;
         if (controller.flying) {
             float percentage = Mathf.Abs(body.velocity.x) / controller.walkingMaxSpeed;
             cameraController.offset = 2f * percentage * (body.velocity.x > 0 ? cameraOffsetRight : cameraOffsetLeft);

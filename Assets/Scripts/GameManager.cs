@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     float spawnStarCount;
 
     //Audio
-    public AudioSource music, sfx;
+    public AudioSource musicSourceIntro, musicSourceLoop, sfx;
     public Enums.MusicState? musicState = null;
 
     public GameObject localPlayer;
@@ -253,7 +253,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     IEnumerator EndGame(Player winner) {
         gameover = true;
-        music.Stop();
+        musicSourceIntro.Stop();
+        musicSourceLoop.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
         if (winner != null) {
             text.GetComponent<TMP_Text>().text = winner.NickName + " Wins!";
@@ -264,10 +265,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
 
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
+        AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
-        music.PlayOneShot((AudioClip) Resources.Load("Sound/match-" + (winner != null && winner.IsLocal ? "win" : "lose")));
+        musicSourceLoop.PlayOneShot((AudioClip) Resources.Load("Sound/match-" + (winner != null && winner.IsLocal ? "win" : "lose")));
         //TOOD: make a results screen?
 
         yield return new WaitForSecondsRealtime(4);
@@ -350,19 +351,34 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
     }
 
+    private Coroutine loopCoroutine;
     private void PlaySong(Enums.MusicState state, AudioClip loop, AudioClip intro = null) {
         if (musicState == state) 
             return;
-        musicState = state;
-        music.Stop();
-        music.clip = loop;
-        music.loop = true;
-        if (intro) {
-            music.PlayOneShot(intro);
-            music.PlayScheduled(AudioSettings.dspTime + intro.length - (Time.fixedDeltaTime * 2));
-        } else {
-            music.Play();
+        if (loopCoroutine != null) {
+            StopCoroutine(loopCoroutine);
+            loopCoroutine = null;
         }
+
+        musicSourceLoop.Stop();
+        musicSourceIntro.Stop();
+
+        musicSourceLoop.clip = loop;
+        musicSourceLoop.loop = true;
+        if (intro) {
+            musicSourceIntro.clip = intro;
+            musicSourceIntro.Play();
+            StartCoroutine(LoopMusic(musicSourceIntro, musicSourceLoop));
+        } else {
+            musicSourceLoop.Play();
+        }
+
+        musicState = state;
+    }
+    IEnumerator LoopMusic(AudioSource intro, AudioSource loop) {
+        yield return new WaitUntil(() => intro.isPlaying);
+        loop.PlayDelayed(intro.clip.length - intro.time);
+        loopCoroutine = null;
     }
 
     void HandleMusic() {
@@ -389,7 +405,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             PlaySong(Enums.MusicState.Normal, loop, intro);
         }
 
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
+        AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
         if (speedup) {
             mixer.SetFloat("MusicSpeed", 1.25f);
             mixer.SetFloat("MusicPitch", 1f / 1.25f);

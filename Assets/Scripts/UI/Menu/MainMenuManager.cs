@@ -13,7 +13,7 @@ using TMPro;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
     public static MainMenuManager Instance; 
-    AudioSource music, sfx;
+    public AudioSource musicSourceLoop, musicSourceIntro, sfx;
     public GameObject lobbiesContent, lobbyPrefab;
     public AudioClip buhBye, musicStart, musicLoop; 
     bool quit, validName;
@@ -184,13 +184,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // Unity Stuff
     void Start() {
         Instance = this;
-        music = GetComponents<AudioSource>()[0];
-        sfx = GetComponents<AudioSource>()[1];
         HorizontalCamera.OFFSET_TARGET = 0; 
         
         PhotonNetwork.SerializationRate = 30;
 
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
+        AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
 
@@ -245,16 +243,31 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createRoomBtn.interactable = connected && validName;
         region.interactable = connected;
     }
+
+    private Coroutine loopCoroutine;
     private void PlaySong(AudioClip loop, AudioClip intro = null) {
-        music.Stop();
-        music.clip = loop;
-        music.loop = true;
-        if (intro) {
-            music.PlayOneShot(intro);
-            music.PlayScheduled(AudioSettings.dspTime + intro.length - (Time.fixedDeltaTime * 2));
-        } else {
-            music.Play();
+        if (loopCoroutine != null) {
+            StopCoroutine(loopCoroutine);
+            loopCoroutine = null;
         }
+
+        musicSourceLoop.Stop();
+        musicSourceIntro.Stop();
+
+        musicSourceLoop.clip = loop;
+        musicSourceLoop.loop = true;
+        if (intro) {
+            musicSourceIntro.clip = intro;
+            musicSourceIntro.Play();
+            StartCoroutine(LoopMusic(musicSourceIntro, musicSourceLoop));
+        } else {
+            musicSourceLoop.Play();
+        }
+    }
+    IEnumerator LoopMusic(AudioSource intro, AudioSource loop) {
+        yield return new WaitUntil(() => intro.isPlaying);
+        loop.PlayDelayed(intro.clip.length - intro.time);
+        loopCoroutine = null;
     }
 
     IEnumerator UpdatePing() {
