@@ -4,6 +4,9 @@ A unity-standalone 2-10 player remake of the Mario vs Luigi gamemode from the Ne
 Includes the 5 default levels (Grassland, Bricks, Castle, Pipes, and Ice), along with two custom levels: Jungle and Sky! 
 All powerups are implemented and fully faithful to their originals, along with the addition of NSMBWii's Propeller Suit!
 
+## Discord
+[**Join the discord**](https://discord.gg/dgKVaUKpj5) to keep up to date with the development of the game, make feature suggestions, report bugs (if you're too lazy to use issues...), get technical support, look for people to play with, and just talk about the game!
+
 ## Download
 
 [Play now in browser on itch.io!](https://ipodtouch0218.itch.io/nsmb-mariovsluigi)
