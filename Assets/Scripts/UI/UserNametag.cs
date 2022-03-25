@@ -25,6 +25,8 @@ public class UserNametag : MonoBehaviour {
         transform.localPosition = new Vector2(0, y);
 
         usernameText.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName;
-        starText.text = "<sprite=0>" + parent.stars;
+        // this will have to be updated if another character is added
+        starText.text = (parent.lives > 0 ? (Utils.GetCharacterIndex(parent.photonView.Owner) == 0 ? "<sprite=3>" : "<sprite=4>") + parent.lives : "");
+        starText.text += "<sprite=0>" + parent.stars;
     }
 }
