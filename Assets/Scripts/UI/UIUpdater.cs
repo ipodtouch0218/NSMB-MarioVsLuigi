@@ -12,7 +12,7 @@ public class UIUpdater : MonoBehaviour {
     PlayerController player;
     //TODO: refactor
     public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell, storedItemPropellerMushroom; 
-    public TMP_Text uiStars, uiCoins, uiPing;
+    public TMP_Text uiStars, uiCoins, uiPing, uiLives;
     public Image itemReserve;
     private float pingSample = 0;
 
@@ -67,5 +67,6 @@ public class UIUpdater : MonoBehaviour {
 
         uiStars.text = "<sprite=0>" + player.stars + "/" + GameManager.Instance.starRequirement;
         uiCoins.text = "<sprite=1>" + player.coins + "/8";
+        uiLives.text = (player.lives > 0 ? (Utils.GetCharacterIndex(player.photonView.Owner) == 0 ? "<sprite=3>" : "<sprite=4>") + player.lives : "");
     }
 }
