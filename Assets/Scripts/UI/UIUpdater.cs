@@ -12,9 +12,9 @@ public class UIUpdater : MonoBehaviour {
     PlayerController player;
     //TODO: refactor
     public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell, storedItemPropellerMushroom; 
-    public TMP_Text uiStars, uiCoins, uiPing, uiLives;
+    public TMP_Text uiStars, uiCoins, uiDebug, uiLives;
     public Image itemReserve;
-    private float pingSample = 0;
+    private float pingSample = 0, fpsSample = 0;
 
     void Start() {
         Instance = this;
@@ -35,8 +35,13 @@ public class UIUpdater : MonoBehaviour {
     }
 
     void Update() {
-        pingSample = PhotonNetwork.GetPing() * Time.deltaTime + (1-Time.deltaTime) * pingSample;
-        uiPing.text = "<sprite=2>" + (int) pingSample + "ms";
+        float newPing = PhotonNetwork.GetPing();
+        pingSample = Mathf.Lerp(pingSample, newPing, 0.01f);
+
+        float newFPS = 1.0f / Time.smoothDeltaTime;
+        fpsSample = Mathf.Lerp(fpsSample, newFPS, 0.01f);
+
+        uiDebug.text = $"{(int) fpsSample}FPS | Ping: {(int) pingSample}ms";
         
         //Player stuff update.
         if (!player && GameManager.Instance.localPlayer)

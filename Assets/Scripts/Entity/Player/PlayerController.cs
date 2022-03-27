@@ -1129,7 +1129,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             body.velocity = Vector2.down;
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
-            photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
+            photonView.RPC("PlaySound", RpcTarget.All, "player/powerdown");
             crouching = false;
             sliding = false;
             drill = false;
@@ -1157,7 +1157,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             body.velocity = Vector2.up;
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
                 
-            photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
+            photonView.RPC("PlaySound", RpcTarget.All, "player/powerdown");
             crouching = false;
             sliding = false;
             propeller = false;
@@ -1176,9 +1176,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         bool prevCrouchState = crouching;
         crouching = ((onGround && crouchInput) || (!onGround && crouchInput && crouching) || (crouching && ForceCrouchCheck())) && !holding;
-        if (crouching && !prevCrouchState)
+        if (crouching && !prevCrouchState) {
             //crouch start sound
-            PlaySound("player/crouch");
+            if (state == Enums.PowerupState.Shell) {
+                PlaySound("player/shell-enter");
+            } else {
+                PlaySound("player/crouch");
+            }
+        }
     }
 
     bool ForceCrouchCheck() {
@@ -1326,10 +1331,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         float stationarySpeedBoost = Mathf.Abs(body.velocity.x) <= 0.005f ? 1f : 1f;
         float propellerBoost = propellerTimer > 0 ? 2.5f : 1;
 
-        if ((crouching && !onGround && state != Enums.PowerupState.Shell) || !crouching) {
+        if ((crouching && !onGround /*&& state != Enums.PowerupState.Shell*/) || !crouching) {
             
             if (left) {
-                if (functionallyRunning && !flying && xVel <= -(walkingMaxSpeed - 0.3f)) {
+                if (functionallyRunning && !crouching && !flying && xVel <= -(walkingMaxSpeed - 0.3f)) {
                     skidding = false;
                     turnaround = false;
                     if (xVel > -runSpeedTotal) {
@@ -1350,7 +1355,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 }
             }
             if (right) {
-                if (functionallyRunning && !flying && xVel >= (walkingMaxSpeed - 0.3f)) {
+                if (functionallyRunning && !crouching && !flying && xVel >= (walkingMaxSpeed - 0.3f)) {
                     skidding = false;
                     turnaround = false;
                     if (xVel < runSpeedTotal) {
