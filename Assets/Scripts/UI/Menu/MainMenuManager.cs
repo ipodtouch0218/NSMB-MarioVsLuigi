@@ -312,9 +312,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         RoomInfo room = PhotonNetwork.CurrentRoom;
         OpenInLobbyMenu(room);
         PopulatePlayerList();
-        characterDropdown.value = 0;
+        characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
 
         OnRoomPropertiesUpdate(room.CustomProperties);
+        StartCoroutine(UpdatePing());
     }
 
     public void OpenMainMenu() {

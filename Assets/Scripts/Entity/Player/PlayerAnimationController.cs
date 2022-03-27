@@ -179,7 +179,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             animator.SetBool("mega", controller.state == Enums.PowerupState.Giant);
             animator.SetBool("flying", controller.flying);
             animator.SetBool("drill", controller.drill);
-            animator.SetBool("inShell", controller.inShell || (controller.state == Enums.PowerupState.Shell && (controller.crouching || controller.groundpound)));
+            animator.SetBool("inShell", controller.inShell || (controller.state == Enums.PowerupState.Shell && (controller.crouching || (controller.groundpound && body.velocity.y < 0))));
             animator.SetBool("facingRight", controller.facingRight);
             animator.SetBool("propeller", controller.propeller);
             animator.SetBool("propellerSpin", controller.propellerSpinTimer > 0);
