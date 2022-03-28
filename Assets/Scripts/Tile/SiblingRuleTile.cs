@@ -14,4 +14,20 @@ public class SiblingRuleTile : RuleTile {
             _ => base.RuleMatch(neighbor, other),
         };
     }
+
+    public new bool RuleMatches(TilingRule rule, Vector3Int position, ITilemap tilemap, int angle) {
+        //TODO: doesn't work.
+        if (GameManager.Instance)
+            Utils.WrapTileLocation(ref position);
+
+        return base.RuleMatches(rule, position, tilemap, angle);
+    }
+
+    public new bool RuleMatches(TilingRule rule, Vector3Int position, ITilemap tilemap, bool mirrorX, bool mirrorY) {
+        //TODO: doesn't work.
+        if (GameManager.Instance)
+            Utils.WrapTileLocation(ref position);
+
+        return base.RuleMatches(rule, position, tilemap, mirrorX, mirrorY);
+    }
 }
