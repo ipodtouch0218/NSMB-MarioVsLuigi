@@ -316,6 +316,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         OnRoomPropertiesUpdate(room.CustomProperties);
         StartCoroutine(UpdatePing());
+
+        if (PhotonNetwork.IsMasterClient)
+            PhotonNetwork.CurrentRoom.IsVisible = true;
     }
 
     public void OpenMainMenu() {
