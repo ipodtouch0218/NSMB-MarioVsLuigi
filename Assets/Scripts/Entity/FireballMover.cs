@@ -6,8 +6,10 @@ using Photon.Pun;
 public class FireballMover : MonoBehaviourPun {
     public float speed = 3f;
     public bool left;
+    public bool isIceball;
     private Rigidbody2D body;
     private PhysicsEntity physics;
+    
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
@@ -39,7 +41,12 @@ public class FireballMover : MonoBehaviourPun {
     }
 
     void OnDestroy() {
-        Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
+        if (isIceball) {
+            Instantiate(Resources.Load("Prefabs/Particle/IceballWall"), transform.position, Quaternion.identity);
+        } else {
+            Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
+        }
+
     }
 
     [PunRPC]
@@ -56,22 +63,58 @@ public class FireballMover : MonoBehaviourPun {
             case "koopa":
             case "goomba": {
                 KillableEntity en = collider.gameObject.GetComponentInParent<KillableEntity>();
-                if (en.dead) 
+                if (en.dead || en.frozen) 
                     return;
-                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false);
-                PhotonNetwork.Destroy(gameObject);
+                if (isIceball) {
+                    GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.gameObject.tag, en.photonView.ViewID);
+                    PhotonNetwork.Destroy(gameObject);
+                } else {
+                    en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false);
+                    PhotonNetwork.Destroy(gameObject);
+                }
+                break;
+            }
+            case "frozencube": {
+                FrozenCube fc = collider.gameObject.GetComponentInParent<FrozenCube>();
+                if (fc.dead)
+                    return;
+                    // TODO: Stuff here
+
+                if (isIceball) {
+                    PhotonNetwork.Destroy(gameObject);
+                } else {
+                    fc.gameObject.GetComponent<FrozenCube>().photonView.RPC("Kill", RpcTarget.All);
+                    PhotonNetwork.Destroy(gameObject);
+                }
+                break;
+            }
+            case "bulletbill": {
+                KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
+                if (isIceball && !bb.frozen) {
+                    GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, bb.gameObject.tag, bb.photonView.ViewID);
+                    PhotonNetwork.Destroy(gameObject);
+                }
+
                 break;
             }
             case "bobomb": {
                 BobombWalk bobomb = collider.gameObject.GetComponentInParent<BobombWalk>();
-                if (bobomb.dead) 
+                if (bobomb.dead || bobomb.frozen) 
                     return;
-                if (!bobomb.lit) {
-                    bobomb.photonView.RPC("Light", RpcTarget.All);   
+                if (!isIceball) {
+                    if (!bobomb.lit) {
+                        bobomb.photonView.RPC("Light", RpcTarget.All);
+                    } else {
+                        bobomb.photonView.RPC("Kick", RpcTarget.All, body.position.x < bobomb.body.position.x, false);
+                    }
+                    PhotonNetwork.Destroy(gameObject);
                 } else {
-                    bobomb.photonView.RPC("Kick", RpcTarget.All, body.position.x < bobomb.body.position.x, false);
+                    GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", bobomb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, bobomb.gameObject.tag, bobomb.photonView.ViewID);
+                    PhotonNetwork.Destroy(gameObject);
                 }
-                PhotonNetwork.Destroy(gameObject);
                 break;
             }
             case "piranhaplant": {
@@ -81,8 +124,13 @@ public class FireballMover : MonoBehaviourPun {
                 AnimatorStateInfo asi = killa.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
                 if (asi.IsName("end") && asi.normalizedTime > 0.5f) 
                     return;
-                killa.photonView.RPC("Kill", RpcTarget.All);
-                PhotonNetwork.Destroy(gameObject);
+                if (!isIceball) {
+                    killa.photonView.RPC("Kill", RpcTarget.All);
+                    PhotonNetwork.Destroy(gameObject);
+                } else {
+                    GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, killa.gameObject.tag, killa.photonView.ViewID);
+                }
                 break;
             }
         }

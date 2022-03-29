@@ -35,7 +35,11 @@ public class BulletBillMover : KillableEntity {
             body.isKinematic = true;
             return;
         }
-
+        if (frozen) {
+            body.velocity = new Vector2(0, 0);
+        } else {
+            body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+        }
         if (photonView.IsMine)
             DespawnCheck();
     }

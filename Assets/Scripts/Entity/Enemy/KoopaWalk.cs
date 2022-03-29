@@ -34,6 +34,9 @@ public class KoopaWalk : HoldableEntity {
             return;
         }
 
+        if (frozen)
+            return;
+
         sRenderer.flipX = !left;
         
         if (!dead) {
