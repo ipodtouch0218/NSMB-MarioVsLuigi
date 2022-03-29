@@ -37,6 +37,7 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.Digit4, "Goomba");
         DebugEntity(Key.Digit5, "Bobomb");
         DebugEntity(Key.Digit6, "BulletBill");
+        DebugEntity(Key.Digit7, "Spiny");
     }
 
     private void DebugItem(Key key, string item) {

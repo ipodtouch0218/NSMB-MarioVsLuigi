@@ -259,7 +259,6 @@ MonoBehaviour:
   shell: 0
   stationary: 0
   hardkick: 0
-  upsideDown: 0
   left: 1
   putdown: 0
   wakeupTimer: 0

@@ -4,12 +4,12 @@ using UnityEngine;
 using Photon.Pun;
 using UnityEngine.Tilemaps;
 
-//This is pretty much just the koopawalk script but it causes damage when you stand on 
+//This is pretty much just the koopawalk script but it causes damage when you stand on it.
 public class SpinyWalk : HoldableEntity {
     private static int GROUND_LAYER_ID = -1;
 
     public float walkSpeed, kickSpeed, wakeup = 15;
-    public bool red, shell, stationary, hardkick, upsideDown;
+    public bool red, shell, stationary, hardkick;
     public bool left = true, putdown = false;
     public float wakeupTimer;
     private BoxCollider2D worldHitbox;
@@ -38,20 +38,11 @@ public class SpinyWalk : HoldableEntity {
         sRenderer.flipX = left;
         
         if (!dead) {
-            if (upsideDown) {
-                dampVelocity = Mathf.Min(dampVelocity + Time.fixedDeltaTime * 3, 1);
-                transform.eulerAngles = new Vector3(
-                    transform.eulerAngles.x, 
-                    transform.eulerAngles.y, 
-                    Mathf.Lerp(transform.eulerAngles.z, 180f, dampVelocity) + (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0));
-            } else {
-                dampVelocity = 0;
                 transform.eulerAngles = new Vector3(
                     transform.eulerAngles.x, 
                     transform.eulerAngles.y, 
                     wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0);
             }
-        }
 
         if (photonView && !photonView.IsMine)
             return;
@@ -164,7 +155,6 @@ public class SpinyWalk : HoldableEntity {
         shell = false;
         body.velocity = new Vector2(-walkSpeed, 0);
         left = true;
-        upsideDown = false;
         stationary = false;
         if (holder)
             holder.photonView.RPC("HoldingWakeup", RpcTarget.All);
@@ -190,7 +180,8 @@ public class SpinyWalk : HoldableEntity {
         case "bobomb":
         case "bulletbill":
         case "goomba":
-            if (killa.dead) 
+        case "spiny":
+                if (killa.dead) 
                 break;
             killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false);
             if (holder)
