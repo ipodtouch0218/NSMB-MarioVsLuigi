@@ -567,7 +567,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             giantTimer = 15f;
             transform.localScale = Vector3.one;
             Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
-            PlaySoundEverywhere("powerup-mega");
+            PlaySoundEverywhere("player/powerup-mega");
 
             break;
         }
