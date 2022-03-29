@@ -11,7 +11,18 @@ using ExitGames.Client.Photon;
 using TMPro;
 
 public class GameManager : MonoBehaviour, IOnEventCallback {
-    public static GameManager Instance { get; private set; }
+    private static GameManager _instance;
+    public static GameManager Instance { 
+        get {
+            if (_instance == null)
+                _instance = FindObjectOfType<GameManager>();
+
+            return _instance;
+        }
+        private set {
+            _instance = value;
+        }
+    }
 
     public AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
 
@@ -230,6 +241,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             Destroy(source);
         }
 
+        foreach (PlayerController controllers in allPlayers)
+            controllers.gameObject.SetActive(false);
+
         yield return new WaitForSeconds(3.5f);
 
         sfx.PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
@@ -316,7 +330,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                     currentStar = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", spawnPos, Quaternion.identity);
                     remainingSpawns.RemoveAt(index);
                     //TODO: star appear sound
-                    spawnStarCount = 15.75f - (PhotonNetwork.CurrentRoom.PlayerCount * 0.75f);
+                    spawnStarCount = 16f - PhotonNetwork.CurrentRoom.PlayerCount;
                 }
             } else {
                 currentStar = GameObject.FindGameObjectWithTag("bigstar");
@@ -470,6 +484,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     [Range(1,10)]
     public int playersToVisualize = 10;
     public void OnDrawGizmos() {
+
+        if (!tilemap)
+            return;
+
         for (int i = 0; i < playersToVisualize; i++) {
             Gizmos.color = new Color((float) i / playersToVisualize, 0, 0, 0.75f);
             Gizmos.DrawCube(GetSpawnpoint(i, playersToVisualize) + Vector3.down/4f, Vector2.one/2f);

@@ -33,7 +33,7 @@ public class Settings : Singleton<Settings> {
             ApplyVolumeSettings();
         }
     }
-    public bool ndsResolution = false, fireballFromSprint = true;
+    public bool ndsResolution = false, fireballFromSprint = true, vsync = false;
 
     void Awake() {
         if (!InstanceCheck()) 
@@ -50,6 +50,7 @@ public class Settings : Singleton<Settings> {
         VolumeMaster = PlayerPrefs.GetFloat("volumeMaster", 1);
         ndsResolution = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
         fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
+        vsync = PlayerPrefs.GetInt("VSync", 0) == 1;
     }
     public void SaveSettingsToPreferences() {
         PlayerPrefs.SetString("Nickname", PhotonNetwork.NickName);
@@ -58,6 +59,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetFloat("volumeMaster", VolumeMaster);
         PlayerPrefs.SetInt("NDSResolution", ndsResolution ? 1 : 0);
         PlayerPrefs.SetInt("FireballFromSprint", fireballFromSprint ? 1 : 0);
+        PlayerPrefs.SetInt("VSync", vsync ? 1 : 0);
         PlayerPrefs.Save();
     }
 

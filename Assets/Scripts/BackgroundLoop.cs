@@ -37,10 +37,11 @@ public class BackgroundLoop : MonoBehaviour {
     void RepositionChildObjects(GameObject obj) {
         if (!obj)
             return;
+
         Transform[] children = obj.GetComponentsInChildren<Transform>();
         if (children.Length > 1) {
             GameObject firstChild = children[1].gameObject;
-            GameObject lastChild = children[children.Length - 1].gameObject;
+            GameObject lastChild = children[^1].gameObject;
             float halfObjectWidth = lastChild.GetComponent<SpriteRenderer>().bounds.extents.x;
             if (transform.position.x + screenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
                 firstChild.transform.SetAsLastSibling();
@@ -60,7 +61,7 @@ public class BackgroundLoop : MonoBehaviour {
             foreach (GameObject obj in levels) {
                 RepositionChildObjects(obj); 
                 float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(lastPosition.z / obj.transform.position.z));
-                obj.transform.Translate(Vector3.right * difference * parallaxSpeed);
+                obj.transform.Translate(difference * parallaxSpeed * Vector3.right);
             }
         }
         lastPosition = transform.position;

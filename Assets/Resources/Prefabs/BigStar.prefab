@@ -4883,12 +4883,13 @@ MonoBehaviour:
   moveSpeed: 1.5
   rotationSpeed: 3
   bounceAmount: 7
-  deathBoostAmount: 10
+  deathBoostAmount: 8.75
   blinkingSpeed: 0.25
   lifespan: 15
   sparkleSoundDistance: 6
   counter: 0
   readyForUnPassthrough: 0.5
+  body: {fileID: 0}
   passthrough: 0
   left: 1
   creator: -1

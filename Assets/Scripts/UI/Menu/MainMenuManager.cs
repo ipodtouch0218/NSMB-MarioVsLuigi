@@ -24,7 +24,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, fireballToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, fireballToggle, vsyncToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab; 
     public TMP_InputField nicknameField, starsText, livesField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
@@ -33,6 +33,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Text errorText, rebindCountdown, rebindText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
+    public string lastRegion;
 
     public Selectable[] roomSettings;
 
@@ -114,7 +115,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic)
             return;
         OpenErrorBox("Disconnected: " + cause.ToString());
-        //TODO reconnect + offline option?
+
+        Debug.Log(PhotonNetwork.NetworkClientState);
+        if (!PhotonNetwork.IsConnectedAndReady)
+            PhotonNetwork.ConnectToRegion(lastRegion);
     }
     public void OnRegionListReceived(RegionHandler handler) {
         handler.PingMinimumOfRegions(new System.Action<RegionHandler>(PingRegionsCallback), "");
@@ -122,7 +126,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {}
     public void OnCustomAuthenticationFailed(string failure) {}
     public void OnConnectedToMaster() {
-        Debug.Log("Connected to Master");
         Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
         PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
     }
@@ -142,6 +145,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnCreateRoomFailed(short reasonId, string reasonMessage) {
         Debug.LogError("create room failed, " + reasonId + ": " + reasonMessage);
         OpenErrorBox(reasonMessage);
+
+        OnConnectedToMaster();
     }
     public void OnCreatedRoom() {
         Debug.Log("Created Room: " + PhotonNetwork.CurrentRoom.Name);
@@ -199,7 +204,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject; 
 
-        PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname");
+        PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname", "Player" + Random.Range(1000,10000));
         Camera.main.transform.position = levelCameraPositions[Random.Range(0,levelCameraPositions.Length)].transform.position;
         
         nicknameField.text = PhotonNetwork.NickName;
@@ -210,6 +215,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
         fireballToggle.isOn = Settings.Instance.fireballFromSprint;
+        vsyncToggle.isOn = Settings.Instance.vsync;
+        QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
 
         rebindManager.Init();
 
@@ -222,7 +229,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             int index = 0;
             bool found = false;
             foreach (Region r in PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions) {
-                newRegions.Add($"{r.Code} <color=#cccccc>({r.Ping}ms)");
+                newRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
                 if (!found)
                     index++;
                 found &= r.Code == PhotonNetwork.CloudRegion;
@@ -291,7 +298,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         bool found = false;
         Debug.Log(handler.BestRegion);
         foreach (Region r in handler.EnabledRegions) {
-            newRegions.Add($"{r.Code} <color=#cccccc>({r.Ping}ms)");
+            newRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
             if (!found)
                 index++;
             found &= r.Code == handler.BestRegion.Code;
@@ -306,6 +313,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PhotonNetwork.Disconnect();
         PhotonNetwork.ConnectToRegion(handler.BestRegion.Code);
+        lastRegion = handler.BestRegion.Code;
         region.AddOptions(newRegions);
     }
     void EnterRoom() {
@@ -317,8 +325,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         OnRoomPropertiesUpdate(room.CustomProperties);
         StartCoroutine(UpdatePing());
 
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient) {
             PhotonNetwork.CurrentRoom.IsVisible = true;
+            PhotonNetwork.CurrentRoom.IsOpen = true;
+        }
     }
 
     public void OpenMainMenu() {
