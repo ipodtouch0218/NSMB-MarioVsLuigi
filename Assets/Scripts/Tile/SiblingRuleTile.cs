@@ -14,20 +14,21 @@ public class SiblingRuleTile : RuleTile {
             _ => base.RuleMatch(neighbor, other),
         };
     }
+    public override Vector3Int GetOffsetPosition(Vector3Int position, Vector3Int offset) {
+        Vector3Int result = position + offset;
+        if (!GameManager.Instance)
+            return result;
 
-    public new bool RuleMatches(TilingRule rule, Vector3Int position, ITilemap tilemap, int angle) {
-        //TODO: doesn't work.
-        if (GameManager.Instance)
-            Utils.WrapTileLocation(ref position);
-
-        return base.RuleMatches(rule, position, tilemap, angle);
+        Utils.WrapTileLocation(ref result);
+        return result;
     }
 
-    public new bool RuleMatches(TilingRule rule, Vector3Int position, ITilemap tilemap, bool mirrorX, bool mirrorY) {
-        //TODO: doesn't work.
-        if (GameManager.Instance)
-            Utils.WrapTileLocation(ref position);
+    public override Vector3Int GetOffsetPositionReverse(Vector3Int position, Vector3Int offset) {
+        Vector3Int result = position - offset;
+        if (!GameManager.Instance)
+            return result;
 
-        return base.RuleMatches(rule, position, tilemap, mirrorX, mirrorY);
+        Utils.WrapTileLocation(ref result);
+        return result;
     }
 }

@@ -45,4 +45,11 @@ public class SettingButtonManager : MonoBehaviour {
         }
     }
 
+    public void OnVsyncToggle(Toggle toggle) {
+        Settings settings = Settings.Instance;
+        settings.vsync = toggle.isOn;
+        QualitySettings.vSyncCount = toggle.isOn ? 1 : 0;
+        settings.SaveSettingsToPreferences();
+        Debug.Log(QualitySettings.vSyncCount);
+    }
 }

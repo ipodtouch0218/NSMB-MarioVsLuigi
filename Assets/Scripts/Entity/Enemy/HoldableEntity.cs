@@ -14,8 +14,9 @@ public abstract class HoldableEntity : KillableEntity {
         body.velocity = Vector2.zero;
         Vector3 newLoc = holder.transform.position + holderOffset;
         if (Utils.IsTileSolidAtWorldLocation(newLoc))
-            newLoc.x = transform.position.x;
-        transform.position = newLoc;
+            newLoc.x = body.position.x;
+
+        body.position = newLoc;
         return;
     }
 
@@ -29,8 +30,9 @@ public abstract class HoldableEntity : KillableEntity {
     public void Pickup(int view) {
         if (holder) 
             return;
+
         PhotonView holderView = PhotonView.Find(view);
-        this.holder = holderView.gameObject.GetComponent<PlayerController>();
+        holder = holderView.gameObject.GetComponent<PlayerController>();
         previousHolder = holder;
         photonView.TransferOwnership(holderView.Owner);
     }

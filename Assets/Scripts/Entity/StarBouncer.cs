@@ -10,7 +10,7 @@ public class StarBouncer : MonoBehaviourPun {
     [SerializeField] float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f, sparkleSoundDistance = 4f;
     public float counter, readyForUnPassthrough = 0.5f;
     private Vector3 startingScale;
-    private Rigidbody2D body;
+    public Rigidbody2D body;
     private AudioSource sfx;
     private SpriteRenderer sRenderer;
     public bool passthrough = true, left = true;
@@ -38,7 +38,7 @@ public class StarBouncer : MonoBehaviourPun {
         icon.target = gameObject;
         if (!stationary) {
             trackObject.transform.localScale = new Vector3(3f/4f, 3f/4f, 1f);
-            body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), deathBoostAmount);
+            body.velocity += new Vector2(moveSpeed * (left ? -1 : 1), deathBoostAmount);
         }
         trackObject.SetActive(true);
 

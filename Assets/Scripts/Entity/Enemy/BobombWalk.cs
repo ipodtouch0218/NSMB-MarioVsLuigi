@@ -22,7 +22,7 @@ public class BobombWalk : HoldableEntity {
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
-            base.body.angularVelocity = 0;
+            body.angularVelocity = 0;
             animator.enabled = false;
             body.isKinematic = true;
             return;
@@ -41,13 +41,13 @@ public class BobombWalk : HoldableEntity {
             float redOverlayPercent = 5.39f/(detonateCount+2.695f)*10f % 1f;
             MaterialPropertyBlock block = new(); 
             block.SetFloat("FlashAmount", redOverlayPercent);
-            base.sRenderer.SetPropertyBlock(block);
+            sRenderer.SetPropertyBlock(block);
         }
     }
     [PunRPC]
     public void Detonate() {
         
-        base.sRenderer.enabled = false;
+        sRenderer.enabled = false;
         hitbox.enabled = false;
         detonated = true;
 
@@ -90,7 +90,6 @@ public class BobombWalk : HoldableEntity {
                 }
             }
         }
-        //TODO tile breaking effects
         PhotonNetwork.Destroy(gameObject);
     }
 
@@ -111,10 +110,10 @@ public class BobombWalk : HoldableEntity {
     public override void Throw(bool facingLeft, bool crouch) {
         if (!holder)
             return;
-        this.holder = null;
+        holder = null;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
-        this.left = facingLeft;
-        base.sRenderer.flipX = left;
+        left = facingLeft;
+        sRenderer.flipX = left;
         if (crouch) {
             body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
         } else {
@@ -125,7 +124,7 @@ public class BobombWalk : HoldableEntity {
     [PunRPC]
     public override void Kick(bool fromLeft, bool groundpound) {
         left = !fromLeft;
-        base.sRenderer.flipX = left;
+        sRenderer.flipX = left;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
     }
@@ -152,7 +151,7 @@ public class BobombWalk : HoldableEntity {
                 if (!holder) {
                     if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.crouching && !player.flying && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump && !player.groundpound) {
                         photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
-                        player.holding = this;
+                        player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
                     } else {
                         photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
                     }
@@ -198,7 +197,7 @@ public class BobombWalk : HoldableEntity {
     [PunRPC]
     void Turnaround(bool hitWallOnLeft) {
         left = !hitWallOnLeft;
-        base.sRenderer.flipX = left;
+        sRenderer.flipX = left;
         body.velocity = new Vector2(walkSpeed * (left ? -1 : 1), body.velocity.y);
         animator.SetTrigger("turnaround");
     }

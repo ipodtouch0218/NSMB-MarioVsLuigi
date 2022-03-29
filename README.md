@@ -33,7 +33,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 
 ### Contributors:
 * [@ipodtouch0218](https://github.com/ipodtouch0218)
-* [@GradedWarrior](https://github.com/GradedWarrior)
+* @GradedWarrior
 * [@TheMoogle](https://github.com/TheMoogle)
 
 ### Rippers:

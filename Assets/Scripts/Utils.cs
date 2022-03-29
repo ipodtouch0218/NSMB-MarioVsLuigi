@@ -95,8 +95,13 @@ public class Utils {
             return true;
 
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
-    } 
+    }
 
+    public static void GetCustomProperty<T>(string key, ref T value) {
+        PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(key, out object temp);
+        if (temp != null)
+            value = (T)temp;
+    }
 
     public static Powerup[] powerups = null;
     public static Powerup GetRandomItem(int stars) {
@@ -105,10 +110,13 @@ public class Utils {
         if (powerups == null)
             powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
 
+        bool custom = true;
+        GetCustomProperty(Enums.NetRoomProperties.NewPowerups, ref custom);
+
         foreach (Powerup powerup in powerups) {
             if (powerup.name == "MegaMushroom" && GameManager.Instance.musicState == Enums.MusicState.MegaMushroom)
                 continue;
-            if ((powerup.big && !GameManager.Instance.spawnBigPowerups) || (powerup.custom && !(bool) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.NewPowerups]))
+            if ((powerup.big && !GameManager.Instance.spawnBigPowerups) || (powerup.custom && !custom))
                 continue;
 
             totalChance += powerup.GetModifiedChance(starPercentage);
@@ -118,7 +126,7 @@ public class Utils {
         foreach (Powerup powerup in powerups) {
             if (powerup.name == "MegaMushroom" && GameManager.Instance.musicState == Enums.MusicState.MegaMushroom)
                 continue;
-            if ((powerup.big && !GameManager.Instance.spawnBigPowerups) || (powerup.custom && !(bool) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.NewPowerups]))
+            if ((powerup.big && !GameManager.Instance.spawnBigPowerups) || (powerup.custom && !custom))
                 continue;
             float chance = powerup.GetModifiedChance(starPercentage);
 

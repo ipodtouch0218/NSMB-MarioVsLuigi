@@ -18,7 +18,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
     [SerializeField] [ColorUsage(true, false)] Color glowColor = Color.clear;
-    [SerializeField] Animator propellerAnimator;
 
     AudioSource drillParticleAudio;
     [SerializeField] AudioClip normalDrill, propellerDrill;
