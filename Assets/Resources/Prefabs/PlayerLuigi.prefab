@@ -17054,6 +17054,7 @@ MonoBehaviour:
   iceSliding: 0
   stuckInBlock: 0
   propeller: 0
+  frozen: 0
   walljumping: 0
   landing: 0
   koyoteTime: 0
@@ -17067,6 +17068,7 @@ MonoBehaviour:
   giantEndTimer: 0
   propellerTimer: 0
   propellerSpinTimer: 0
+  frozenJump: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0
@@ -17077,6 +17079,7 @@ MonoBehaviour:
   storedPowerup: 
   holding: {fileID: 0}
   holdingOld: {fileID: 0}
+  FrozenObject: {fileID: 0}
   joystick: {x: 0, y: 0}
   giantSavedVelocity: {x: 0, y: 0}
   previousFrameVelocity: {x: 0, y: 0}
@@ -17115,7 +17118,6 @@ MonoBehaviour:
   smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
   largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
   glowColor: {r: 0, g: 0, b: 0, a: 0}
-  propellerAnimator: {fileID: 0}
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
 --- !u!50 &8636928217783201367

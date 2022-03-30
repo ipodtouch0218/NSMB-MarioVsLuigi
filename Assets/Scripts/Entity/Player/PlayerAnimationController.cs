@@ -172,6 +172,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             animator.SetBool("groundpound", controller.groundpound);
             animator.SetBool("sliding", controller.sliding);
             animator.SetBool("holding", controller.holding != null);
+            animator.SetBool("head carry", controller.holding != null && controller.holding.GetComponent<FrozenCube>() != null);
             animator.SetBool("knockback", controller.knockback);
             animator.SetBool("pipe", controller.pipeEntering != null);
             animator.SetBool("mini", controller.state == Enums.PowerupState.Mini);

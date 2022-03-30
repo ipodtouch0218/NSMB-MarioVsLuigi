@@ -249,6 +249,8 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Luigi
       m_Image: {fileID: 0}
+    - m_Text: Toadette
+      m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -23528,7 +23530,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
+  m_fontSize: 22.7
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -59750,7 +59752,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
+  m_fontSize: 22.7
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

@@ -241,7 +241,7 @@ MonoBehaviour:
   prefixField: -1
   Synchronization: 1
   OwnershipTransfer: 0
-  observableSearch: 0
+  observableSearch: 2
   ObservedComponents:
   - {fileID: 2249742354441438921}
   sceneViewId: 1
@@ -478,7 +478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  killTime: 0
+  killTime: 0.1
 --- !u!1 &6270504196635899897
 GameObject:
   m_ObjectHideFlags: 0

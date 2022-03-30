@@ -58,11 +58,7 @@ public class FrozenCube : HoldableEntity
             return;
         }
 
-        if (holder) {
-            GetComponent<BoxCollider2D>().enabled = false;
-        } else {
-            GetComponent<BoxCollider2D>().enabled = true;
-        }
+        body.mass = holder != null ? 0 : 1;
 
         if (frozenPlayer) {
             if (!frozenPlayer.frozen || frozenPlayer.frozenJump >= 3) {
@@ -84,8 +80,8 @@ public class FrozenCube : HoldableEntity
 
         if (photonView && !photonView.IsMine)
             return;
-
-        //HandleTile();
+        if (!dead)
+        HandleTile();
     }
 	// Start is called before the first frame update
 	public override void InteractWithPlayer(PlayerController player) {
@@ -226,37 +222,39 @@ public class FrozenCube : HoldableEntity
     }
 
     void HandleTile() {
-        if (holder)
-            return;
         physics.UpdateCollisions();
 
-        ContactPoint2D[] collisions = new ContactPoint2D[20];
-        int collisionAmount = GetComponent<BoxCollider2D>().GetContacts(collisions);
-        for (int i = 0; i < collisionAmount; i++) {
-            var point = collisions[i];
-            Vector2 p = point.point + (point.normal * -0.15f);
-            if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == GROUND_LAYER_ID) {
+        if (holder != null && (physics.hitLeft || physics.hitRight || physics.hitRoof)) {
+            photonView.RPC("SpecialKill", RpcTarget.All, false, false);
+        } else {
+            ContactPoint2D[] collisions = new ContactPoint2D[20];
+            int collisionAmount = GetComponent<BoxCollider2D>().GetContacts(collisions);
+            for (int i = 0; i < collisionAmount; i++) {
+                var point = collisions[i];
+                Vector2 p = point.point + (point.normal * -0.15f);
+                if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == GROUND_LAYER_ID) {
 
-                if (photonView) {
-                    photonView.RPC("Crash", RpcTarget.All);
-                } else {
-                    Crash();
+                    if (photonView) {
+                        photonView.RPC("Crash", RpcTarget.All);
+                    } else {
+                        Crash();
+                    }
+
+                    if (!stationary) {
+                        // Ice bump sound?
+                        Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
+                        TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
+                        if (tile == null)
+                            continue;
+
+                        if (tile is InteractableTile it)
+                            it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
+                    }
                 }
-
-                if (!stationary) {
-                    // Ice bump sound?
-                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
-                    TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
-                    if (tile == null)
-                        continue;
-
-                    if (tile is InteractableTile it)
-                        it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
-                }
-            } else if (point.normal.y > 0) {
-                body.velocity = new Vector2(0, body.velocity.y);
             }
         }
+            
+        
     }
 
     [PunRPC]
@@ -264,7 +262,6 @@ public class FrozenCube : HoldableEntity
         if (stationary)
             return;
         photonView.RPC("SpecialKill", RpcTarget.All, false, false);
-        print("Ice crashed");
     }
 
     [PunRPC]
@@ -279,7 +276,6 @@ public class FrozenCube : HoldableEntity
 
     [PunRPC]
     public override void Kill() {
-        print("Ice Regular Kill");
         if (frozenEntity) {
             frozenEntity.photonView.RPC("Unfreeze", RpcTarget.All);
             if (kinematicEntity)
@@ -301,21 +297,20 @@ public class FrozenCube : HoldableEntity
     [PunRPC]
     public override void SpecialKill(bool right = true, bool groundpound = false) {
         base.SpecialKill(right, groundpound);
-        print("Ice Special Kill");
+        hitbox.enabled = false;
         if (frozenEntity) {
+
+            frozenEntity.dropcoin = false;
+            frozenEntity.photonView.RPC("Unfreeze", RpcTarget.All);
+
             if (!plantEntity) {
                 frozenEntity.photonView.RPC("SpecialKill", RpcTarget.All, right, false);
             } else {
                 frozenEntity.photonView.RPC("Kill", RpcTarget.All);
             }
 
-            if (!frozenEntity.photonView) {
-                Destroy(frozenEntity.gameObject);
-                return;
-            }
-            if (photonView.IsMine) {
-                PhotonNetwork.Destroy(frozenEntity.photonView);
-            }
+            frozenEntity.dropcoin = true;
+            spriteRender.enabled = false;
 
         }
         
@@ -327,5 +322,7 @@ public class FrozenCube : HoldableEntity
             holder.holding = null;
         holder = null;
 
+        Instantiate(Resources.Load("Prefabs/Particle/IceBreak"), transform.position, Quaternion.identity);
+        dead = true;
     }
 }
