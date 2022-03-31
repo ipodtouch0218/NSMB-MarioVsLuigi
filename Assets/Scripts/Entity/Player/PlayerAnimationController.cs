@@ -14,7 +14,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     CameraController cameraController;
 
     [SerializeField] GameObject models, smallModel, largeModel, blueShell, propellerHelmet, propeller;
-    [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle;
+    [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
     [SerializeField] [ColorUsage(true, false)] Color glowColor = Color.clear;
@@ -50,7 +50,14 @@ public class PlayerAnimationController : MonoBehaviourPun {
     void HandleAnimations() {
         Vector3 targetEuler = models.transform.eulerAngles;
         bool instant = false;
-        if (controller.dead || animator.GetBool("pipe")) {
+        if (controller.dead) {
+            if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
+                targetEuler = new Vector3(-15, controller.facingRight ? 110 : 250, 0);
+            } else {
+                targetEuler = new Vector3(0, 180, 0);
+            }
+            instant = true;
+        } else if (controller.pipeEntering) {
             targetEuler = new Vector3(0, 180, 0);
             instant = true;
         } else if (animator.GetBool("inShell") && !controller.onSpinner) {
@@ -69,7 +76,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
             } else if (controller.flying || controller.propeller) {
                 targetEuler += new Vector3(0, -1200 - (controller.propellerTimer * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer <= 0 && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
                 instant = true;
-                
             } else {
                 targetEuler = new Vector3(0, controller.facingRight ? 100 : 260, 0);
             }
@@ -96,6 +102,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             drillParticleAudio.clip = (controller.state == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
         SetParticleEmission(sparkles, controller.invincible > 0);
         SetParticleEmission(giantParticle, controller.state == Enums.PowerupState.Giant && controller.giantStartTimer <= 0);
+        SetParticleEmission(fireParticle, animator.GetBool("firedeath") && controller.dead && deathTimer > deathUpTime);
 
         //Blinking
         if (controller.dead) {
@@ -276,6 +283,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
             if (!deathUp && body.position.y > GameManager.Instance.GetLevelMinY()) {
                 body.velocity = new Vector2(0, deathForce);
                 deathUp = true;
+                if (animator.GetBool("firedeath"))
+                    controller.PlaySound(controller.character.soundFolder + "/lava_death");
             }
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));

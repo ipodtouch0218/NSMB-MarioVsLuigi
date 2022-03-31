@@ -43,11 +43,12 @@ Material:
     m_Ints: []
     m_Floats:
     - WaveHeight: 0.15
-    - WaveSpeed: 1
+    - WaveSpeed: 1.5
     - WaveWidth: 1
+    - _Points: 160
     m_Colors:
-    - BackgroundColor: {r: 1, g: 0.26194972, b: 0, a: 0.8156863}
-    - FoamColor: {r: 1, g: 0.37320846, b: 0, a: 1}
+    - BackgroundColor: {r: 1, g: 0, b: 0.019174099, a: 0.8}
+    - FoamColor: {r: 1, g: 0.9676137, b: 0.3622641, a: 1}
     - RippleColor: {r: 1, g: 0.630872, b: 0, a: 1}
-    - TopColor: {r: 1, g: 0.20461845, b: 0, a: 1}
+    - TopColor: {r: 1, g: 0.14068654, b: 0, a: 1}
   m_BuildTextureStacks: []

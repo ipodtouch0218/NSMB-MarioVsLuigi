@@ -18,17 +18,16 @@ MonoBehaviour:
   m_TilingRules:
   - m_Id: 1
     m_Sprites:
-    - {fileID: -1951153461, guid: 5e5c7fadd03649b449102e252a78793f, type: 3}
-    - {fileID: 9004548082323880429, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae, type: 3}
-    - {fileID: -2929024777266657357, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae, type: 3}
-    - {fileID: 2647591593500648587, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae, type: 3}
+    - {fileID: -547484509, guid: 5e5c7fadd03649b449102e252a78793f, type: 3}
+    - {fileID: -2084825640, guid: 5e5c7fadd03649b449102e252a78793f, type: 3}
+    - {fileID: -591155385, guid: 5e5c7fadd03649b449102e252a78793f, type: 3}
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
     m_PerlinScale: 0.718
-    m_Output: 0
+    m_Output: 1
     m_ColliderType: 2
-    m_RandomTransform: 0
+    m_RandomTransform: 2
     m_Neighbors: 01000000010000000100000001000000
     m_NeighborPositions:
     - {x: -1, y: 0, z: 0}
@@ -61,10 +60,10 @@ MonoBehaviour:
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
-    m_PerlinScale: 0.71828
+    m_PerlinScale: 0.87
     m_Output: 1
     m_ColliderType: 2
-    m_RandomTransform: 0
+    m_RandomTransform: 2
     m_Neighbors: 02000000
     m_NeighborPositions:
     - {x: 0, y: 1, z: 0}
@@ -72,11 +71,13 @@ MonoBehaviour:
   - m_Id: 4
     m_Sprites:
     - {fileID: -1420784789, guid: 5e5c7fadd03649b449102e252a78793f, type: 3}
+    - {fileID: 701219725, guid: 5e5c7fadd03649b449102e252a78793f, type: 3}
+    - {fileID: 603582879, guid: 5e5c7fadd03649b449102e252a78793f, type: 3}
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
-    m_PerlinScale: 0.5
-    m_Output: 0
+    m_PerlinScale: 0.87
+    m_Output: 1
     m_ColliderType: 2
     m_RandomTransform: 0
     m_Neighbors: 01000000010000000100000002000000
@@ -123,8 +124,6 @@ MonoBehaviour:
   siblings:
   - {fileID: 11400000, guid: 139e791c13fd6ae4184306c5caa652ed, type: 2}
   - {fileID: 11400000, guid: 9cf91fa80d72c8944bbc903a55fc66e6, type: 2}
-  - {fileID: 11400000, guid: 9fd41f2f71b206b428b076ad034fc7f7, type: 2}
-  - {fileID: 11400000, guid: 74e6e6ddbc571204ea46505205c1f68e, type: 2}
   isBackgroundTile: 0
   iceSkidding: 0
   footstepMaterial: 

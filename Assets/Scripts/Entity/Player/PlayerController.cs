@@ -385,7 +385,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             case "poison":
                 if (!photonView.IsMine)
                     return;
-                photonView.RPC("Death", RpcTarget.All, false);
+                photonView.RPC("Death", RpcTarget.All, false, false);
+                break;
+            case "lava":
+                if (!photonView.IsMine)
+                    return;
+                photonView.RPC("Death", RpcTarget.All, false, true);
                 break;
         }
     }
@@ -605,7 +610,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             case Enums.PowerupState.Mini:
             case Enums.PowerupState.Small:
                 if (photonView.IsMine)
-                    photonView.RPC("Death", RpcTarget.All, false);
+                    photonView.RPC("Death", RpcTarget.All, false, false);
                 nowDead = true;
                 break;
             case Enums.PowerupState.Large:
@@ -734,7 +739,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     #region -- DEATH / RESPAWNING --
     [PunRPC]
-    protected void Death(bool deathplane) {
+    protected void Death(bool deathplane, bool fire) {
         dead = true;
         onSpinner = null;
         pipeEntering = null;
@@ -750,6 +755,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         knockback = false;
         animator.SetBool("knockback", false);
         animator.SetBool("flying", false);
+        animator.SetBool("firedeath", fire);
         animator.Play("deadstart", state >= Enums.PowerupState.Large ? 1 : 0);
         PlaySound("player/death");
         SpawnStar(deathplane);
@@ -819,22 +825,23 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         landing = 0f;
         ResetKnockback();
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
+        models.transform.rotation = Quaternion.Euler(0, 180, 0);
     }
     #endregion
 
     #region -- SOUNDS / PARTICLES --
     [PunRPC]
-    protected void PlaySoundEverywhere(string sound) {
+    public void PlaySoundEverywhere(string sound) {
         GameManager.Instance.sfx.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound));
     }
     [PunRPC]
-    protected void PlaySound(string sound, float volume) {
+    public void PlaySound(string sound, float volume) {
         float volumeByRange = 1;
 
         sfx.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound), Mathf.Clamp01(volumeByRange * volume));
     }
     [PunRPC]
-    protected void PlaySound(string sound) {
+    public void PlaySound(string sound) {
         PlaySound(sound, 1);
     }
 
@@ -1013,7 +1020,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     groundpound = false;
                     groundpoundCounter = 0.5f;
                     return;
-                } if (!inShell && Mathf.Abs(floorAngle) >= 20) {
+                } if (!inShell && Mathf.Abs(floorAngle) >= 40) {
                     groundpound = false;
                     sliding = true;
                     alreadyGroundpounded = true;
@@ -1031,7 +1038,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             crouching = false;
             alreadyGroundpounded = true;
         }
-        if (sliding && onGround && Mathf.Abs(floorAngle) > 20) {
+        if (sliding && onGround && Mathf.Abs(floorAngle) > 40) {
             float angleDeg = floorAngle * Mathf.Deg2Rad;
 
             bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
@@ -1515,7 +1522,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if (photonView.IsMine && body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
             //death via pit
-            photonView.RPC("Death", RpcTarget.All, true);
+            photonView.RPC("Death", RpcTarget.All, true, false);
             return;
         }
 
@@ -1754,7 +1761,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             //Friction...
             if (abovemax) {
-                body.velocity *= 1 - (delta * tileFriction * (knockback ? 3f : 4f) * (sliding ? 0.7f : 1f));
+                body.velocity *= 1 - (delta * tileFriction * (knockback ? 3f : 4f) * (sliding ? 0.4f : 1f));
                 if (Mathf.Abs(body.velocity.x) < 0.15f)
                     body.velocity = new Vector2(0, body.velocity.y);
             }

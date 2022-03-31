@@ -2,18 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LavaSplash : MonoBehaviour {
- //This is literally the poison water splash but edited to use the lava splash instead.
-    private int points = 256;
-    public float tension = 2, kconstant = 30, damping = 0.98f, splashVelocity = 3f;
+public class WaterSplash : MonoBehaviour {
+
+    [Delayed]
+    public int points = 256;
+    public float tension = 40, kconstant = 2, damping = 0.95f, splashVelocity = 50f;
+    public string splashParticle;
     private SpriteRenderer spriteRenderer;
     private Texture2D heightTex;
     private float[] pointHeights, pointVelocities;
     private Color32[] colors;
-    private AudioSource sfx;
+    public AudioSource sfx;
+
     void Start() {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        sfx = GetComponent<AudioSource>();
+
         heightTex = new Texture2D(points, 1);
         pointHeights = new float[points];
         pointVelocities = new float[points];
@@ -46,16 +49,16 @@ public class LavaSplash : MonoBehaviour {
         heightTex.Apply();
     }
     void OnTriggerEnter2D(Collider2D collider) {
-        Instantiate(Resources.Load("Prefabs/Particle/LavaSplash"), collider.transform.position, Quaternion.identity);
-        sfx.Play();
-        float x = collider.transform.position.x - transform.position.x;
-        float xpoints = (x+points)%(points*transform.localScale.x);
-        Rigidbody2D body = collider.gameObject.GetComponent<Rigidbody2D>();
-        if (!body)
-            body = collider.gameObject.GetComponentInParent<Rigidbody2D>();
-        float power = 1;
-        if (body)
-            power = -body.velocity.y;
-        pointVelocities[(int) (xpoints/transform.localScale.x)] = -splashVelocity * power;
+        Instantiate(Resources.Load(splashParticle), collider.transform.position, Quaternion.identity);
+        if (sfx)
+            sfx.Play();
+        float localX = transform.InverseTransformPoint(collider.transform.position).x;
+        float pointsX = localX  % points;
+        while (pointsX < 0)
+            pointsX += points;
+
+        Rigidbody2D body = collider.attachedRigidbody;
+        float power = body ? -body.velocity.y : 1;
+        pointVelocities[(int) pointsX] = -splashVelocity * power;
     }
 }
