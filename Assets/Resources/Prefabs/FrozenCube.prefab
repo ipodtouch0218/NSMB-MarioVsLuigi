@@ -219,7 +219,9 @@ MonoBehaviour:
   - {fileID: 1303551094, guid: 64d8b3652072ff942ad60637750783cc, type: 3}
   frozenEntity: {fileID: 0}
   frozenPlayer: {fileID: 0}
+  fallTimer: 5
   stationary: 0
+  fallen: 0
   kinematicEntity: 0
   flyingEntity: 0
   plantEntity: 0
@@ -491,7 +493,7 @@ GameObject:
   - component: {fileID: 5543798153942386180}
   m_Layer: 0
   m_Name: Sprite0
-  m_TagString: Untagged
+  m_TagString: frozencube
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -89,6 +89,13 @@ public class FireballMover : MonoBehaviourPun {
                 }
                 break;
             }
+            case "Fireball": {
+                if (isIceball) {
+                    PhotonNetwork.Destroy(collider.gameObject);
+                    PhotonNetwork.Destroy(gameObject);
+                }
+                break;
+            }
             case "bulletbill": {
                 KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
                 if (isIceball && !bb.frozen) {
