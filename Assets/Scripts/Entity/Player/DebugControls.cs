@@ -7,7 +7,7 @@ using Photon.Pun;
 public class DebugControls : MonoBehaviour {
 
     public void Start() {
-        if (!Application.isEditor) {
+        if (!Debug.isDebugBuild && !Application.isEditor) {
             enabled = false;
             return;
         }

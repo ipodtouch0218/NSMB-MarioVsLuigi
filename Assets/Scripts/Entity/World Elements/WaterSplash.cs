@@ -6,7 +6,7 @@ public class WaterSplash : MonoBehaviour {
 
     [Delayed]
     public int points = 256;
-    public float tension = 40, kconstant = 2, damping = 0.95f, splashVelocity = 50f;
+    public float tension = 40, kconstant = 2, damping = 0.95f, splashVelocity = 50f, resistance = 0f;
     public string splashParticle;
     private SpriteRenderer spriteRenderer;
     private Texture2D heightTex;
@@ -60,5 +60,11 @@ public class WaterSplash : MonoBehaviour {
         Rigidbody2D body = collider.attachedRigidbody;
         float power = body ? -body.velocity.y : 1;
         pointVelocities[(int) pointsX] = -splashVelocity * power;
+    }
+    void OnTriggerStay2D(Collider2D collision) {
+        if (collision.attachedRigidbody == null)
+            return;
+
+        collision.attachedRigidbody.velocity *= 1-Mathf.Clamp01(resistance);
     }
 }

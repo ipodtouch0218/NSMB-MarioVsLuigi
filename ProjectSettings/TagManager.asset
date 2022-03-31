@@ -37,6 +37,7 @@ TagManager:
   - PropellerMushroom
   - FadeUI
   - lava
+  - MarioBrosPlatform
   layers:
   - Default
   - TransparentFX

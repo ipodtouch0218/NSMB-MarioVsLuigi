@@ -21843,6 +21843,7 @@ MonoBehaviour:
   walljumpVelocity: 5.6
   giantStartTime: 1.5
   soundRange: 10
+  slopeSlidingAngle: 25
   propellerLaunchVelocity: 6
   propellerFallSpeed: 2
   propellerSpinFallSpeed: 1.5
@@ -22231,6 +22232,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 1
     Name: firedeath
+  - Type: 4
+    SynchronizeType: 2
+    Name: fireballKnockback
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

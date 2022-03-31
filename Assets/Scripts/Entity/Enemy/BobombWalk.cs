@@ -103,7 +103,6 @@ public class BobombWalk : HoldableEntity {
         detonateCount = detonateTimer;
         body.velocity = Vector2.zero;
         lit = true;
-        PlaySound("enemy/bobomb_light");
         PlaySound("enemy/bobomb_beep");
     }
     [PunRPC]
@@ -149,7 +148,7 @@ public class BobombWalk : HoldableEntity {
         } else {
             if (lit) {
                 if (!holder) {
-                    if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.crouching && !player.flying && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump && !player.groundpound) {
+                    if (player.CanPickup()) {
                         photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                         player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
                     } else {

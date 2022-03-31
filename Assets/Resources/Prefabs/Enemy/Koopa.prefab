@@ -190,6 +190,8 @@ MonoBehaviour:
   stationary: 0
   hardkick: 0
   upsideDown: 0
+  canBeFlipped: 1
+  flipXFlip: 0
   left: 1
   putdown: 0
   wakeupTimer: 0
@@ -298,6 +300,7 @@ MonoBehaviour:
   hitRoof: 0
   hitRight: 0
   hitLeft: 0
+  floorAngle: 0
   currentCollider: {fileID: 8836298984178612584}
   floorAndRoofCutoff: 0.2
 --- !u!82 &3399800873378663516

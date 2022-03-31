@@ -32,7 +32,7 @@ EditorSettings:
   m_SerializeInlineMappingsOnOneLine: 0
   m_DisableCookiesInLightmapper: 1
   m_AssetPipelineMode: 1
-  m_RefreshImportMode: 0
+  m_RefreshImportMode: 1
   m_CacheServerMode: 0
   m_CacheServerEndpoint: 
   m_CacheServerNamespacePrefix: default

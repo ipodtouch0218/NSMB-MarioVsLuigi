@@ -57,7 +57,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 targetEuler = new Vector3(0, 180, 0);
             }
             instant = true;
-        } else if (controller.pipeEntering) {
+        } else if (animator.GetBool("pipe")) {
             targetEuler = new Vector3(0, 180, 0);
             instant = true;
         } else if (animator.GetBool("inShell") && !controller.onSpinner) {
@@ -300,13 +300,13 @@ public class PlayerAnimationController : MonoBehaviourPun {
         float width = mainHitbox.size.x;
         float height;
 
-        if (controller.state <= Enums.PowerupState.Small || (controller.invincible > 0 && !controller.onGround && !controller.crouching && !controller.sliding) || controller.groundpound) {
+        if (controller.state <= Enums.PowerupState.Small || (controller.invincible > 0 && !controller.onGround && !controller.crouching && !controller.sliding && !controller.flying && !controller.propeller) || controller.groundpound) {
             height = heightSmallModel;
         } else {
             height = heightLargeModel;
         }
 
-        if (controller.crouching || controller.inShell || controller.sliding)
+        if (controller.state != Enums.PowerupState.Mini && (controller.crouching || controller.inShell || controller.sliding || controller.triplejump))
             height *= controller.state <= Enums.PowerupState.Small ? 0.7f : 0.5f;
 
         mainHitbox.size = new Vector2(width, height);
@@ -336,7 +336,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 offset.y -= heightLargeModel - (mainHitbox.size.y * transform.localScale.y);
             }
             transform.position = body.position = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
-            photonView.RPC("PlaySound", RpcTarget.All, "player/pipe");
+            photonView.RPC("PlaySound", RpcTarget.All, "player/powerdown");
         }
         if (pipeTimer >= pipeDuration) {
             controller.pipeEntering = null;

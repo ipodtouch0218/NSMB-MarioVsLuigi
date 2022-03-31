@@ -10,7 +10,7 @@ public abstract class InteractableTile : AnimatedTile {
     private static Vector3 bumpOffset = new(0.25f, 0.5f, 0), bumpSize = new(0.45f, 0.1f, 0);
 
     public abstract bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation);
-    protected void Bump(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
+    public static void Bump(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
 
         if (direction == InteractionDirection.Down)
             return;
