@@ -10609,6 +10609,12 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 0
     Name: head carry
+  - Type: 4
+    SynchronizeType: 0
+    Name: fireballKnockback
+  - Type: 4
+    SynchronizeType: 0
+    Name: firedeath
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

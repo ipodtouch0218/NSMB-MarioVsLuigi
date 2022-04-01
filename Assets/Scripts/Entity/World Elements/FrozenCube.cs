@@ -2,11 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using UnityEngine.Tilemaps;
 
 // maybe a better name for the script
-public class FrozenCube : HoldableEntity
-{
+public class FrozenCube : HoldableEntity {
     private static int GROUND_LAYER_ID = -1;
 
     public float throwSpeed = 10f;
@@ -80,17 +78,17 @@ public class FrozenCube : HoldableEntity
                     fallen = true;
                 }
             }
-
         } else if (!frozenPlayer) {
             PhotonNetwork.Destroy(photonView);
         }
 
         if (photonView && !photonView.IsMine)
             return;
+
         if (!dead)
             HandleTile();
     }
-    // Start is called before the first frame update
+
     public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
@@ -99,7 +97,7 @@ public class FrozenCube : HoldableEntity
         else if (player.groundpound && player.state != Enums.PowerupState.Mini && attackedFromAbove) {
             photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
         } else if (Mathf.Abs(body.velocity.x) >= 2f * 1 && !physics.hitRoof) {
-            player.photonView.RPC("Knockback", RpcTarget.All, body.position.x > player.body.position.x, 1, photonView.ViewID);
+            player.photonView.RPC("Knockback", RpcTarget.All, body.position.x > player.body.position.x, 1, false, photonView.ViewID);
         }
         if (!holder && !dead && !plantEntity && !plantEntity) {
             if (player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
@@ -166,23 +164,24 @@ public class FrozenCube : HoldableEntity
 
     [PunRPC]
     public override void Kick(bool fromLeft, bool groundpound) {
+
     }
+
     [PunRPC]
     public override void Throw(bool facingLeft, bool crouch) {
         if (holder == null)
             return;
 
-        stationary = crouch;
-        transform.position = new Vector2((holder.facingRight ? holder.transform.position.x + 0.1f : holder.transform.position.x - 0.1f), transform.position.y);
+        stationary = false;
+        body.position = new Vector2(holder.facingRight ? holder.transform.position.x + 0.1f : holder.transform.position.x - 0.1f, transform.position.y);
 
         previousHolder = holder;
         holder = null;
 
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
 
-        if (frozenEntity) {
+        if (frozenEntity)
             frozenEntity.body.isKinematic = false;
-        }
 
         if (crouch) {
             body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
@@ -198,18 +197,19 @@ public class FrozenCube : HoldableEntity
         GameObject obj = collider.gameObject;
         KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
         switch (obj.tag) {
-            case "koopa":
-            case "bobomb":
-            case "bulletbill":
-            case "goomba":
-            //case "frozencube":
+        case "koopa":
+        case "bobomb":
+        case "bulletbill":
+        //case "frozencube":
+        case "goomba": {
             if (dead || killa.dead || killa.Equals(frozenEntity))
                 break;
             killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false);
             photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false);
 
             break;
-            case "piranhaplant":
+        }
+        case "piranhaplant": {
             if (killa.dead)
                 break;
             killa.photonView.RPC("Kill", RpcTarget.All);
@@ -217,15 +217,18 @@ public class FrozenCube : HoldableEntity
                 photonView.RPC("Kill", RpcTarget.All);
 
             break;
-            case "coin":
-                (holder != null ? holder : previousHolder).photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
+        }
+        case "coin": {
+            previousHolder.photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
             break;
-            case "loosecoin":
+        }
+        case "loosecoin": {
             if (!holder && previousHolder) {
                 Transform parent = obj.transform.parent;
                 previousHolder.photonView.RPC("CollectCoin", RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, parent.position);
             }
             break;
+        }
         }
     }
 

@@ -40,7 +40,6 @@ public class PhysicsEntity : MonoBehaviour {
                 } else {
                     //touching a wall
                     if (Mathf.Abs(previousHeightY - point.point.y) < 0.2f) {
-                        Debug.Log("AAAA");
                         continue;
                     }
                     previousHeightY = point.point.y;

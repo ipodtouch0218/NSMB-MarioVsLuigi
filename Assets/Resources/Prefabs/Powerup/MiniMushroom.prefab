@@ -230,6 +230,7 @@ MonoBehaviour:
   hitRoof: 0
   hitRight: 0
   hitLeft: 0
+  floorAngle: 0
   currentCollider: {fileID: 3379984366894124866}
   floorAndRoofCutoff: 0.3
 --- !u!114 &3370984598777677660
