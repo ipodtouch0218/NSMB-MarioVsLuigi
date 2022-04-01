@@ -126,10 +126,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0733d35123a9ad4aaf63213211c5b4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  points: 256
   tension: 2
   kconstant: 30
   damping: 0.98
   splashVelocity: 3
+  splashParticle: Prefabs/Particle/PoisonWaterSplash
 --- !u!82 &-4253210140195803947
 AudioSource:
   m_ObjectHideFlags: 0

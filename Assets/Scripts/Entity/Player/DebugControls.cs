@@ -7,7 +7,7 @@ using Photon.Pun;
 public class DebugControls : MonoBehaviour {
 
     public void Start() {
-        if (!Application.isEditor) {
+        if (!Debug.isDebugBuild && !Application.isEditor) {
             enabled = false;
             return;
         }
@@ -31,13 +31,14 @@ public class DebugControls : MonoBehaviour {
         DebugItem(Key.Numpad5, "MegaMushroom");
         DebugItem(Key.Numpad6, "Star");
         DebugItem(Key.Numpad7, "PropellerMushroom");
+        DebugItem(Key.Numpad8, "IceFlower");
         DebugEntity(Key.Digit1, "Koopa");
         DebugEntity(Key.Digit2, "RedKoopa");
         DebugEntity(Key.Digit3, "BlueKoopa");
         DebugEntity(Key.Digit4, "Goomba");
         DebugEntity(Key.Digit5, "Bobomb");
         DebugEntity(Key.Digit6, "BulletBill");
-        DebugItem(Key.Digit7, "IceFlower");
+        DebugEntity(Key.Digit7, "Spiny");
     }
 
     private void DebugItem(Key key, string item) {

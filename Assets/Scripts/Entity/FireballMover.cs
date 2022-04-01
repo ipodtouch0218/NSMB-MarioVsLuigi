@@ -33,8 +33,10 @@ public class FireballMover : MonoBehaviourPun {
     void HandleCollision() {
         physics.UpdateCollisions();
 
-        if (physics.onGround)
-            body.velocity = new Vector2(body.velocity.x, speed / 1.25f);
+        if (physics.onGround) {
+            float bounceHeight = speed / 1.25f;
+            body.velocity = new Vector2(body.velocity.x, bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)));
+        }
 
         if (photonView && photonView.IsMine && (physics.hitLeft || physics.hitRight || physics.hitRoof))
             PhotonNetwork.Destroy(gameObject);

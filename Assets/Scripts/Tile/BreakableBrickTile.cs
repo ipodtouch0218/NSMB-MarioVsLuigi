@@ -21,7 +21,11 @@ public class BreakableBrickTile : InteractableTile {
                 doBreak = breakableByLargeMario;
                 doBump = true;
             }
-        } else if (interacter is KoopaWalk) {
+
+        } else if (interacter is SpinyWalk) {
+            doBump = true;
+            doBreak = breakableByShells;
+        } else if (interacter is KoopaWalk){
             doBump = true;
             doBreak = breakableByShells;
         } else if (interacter is BobombWalk) {

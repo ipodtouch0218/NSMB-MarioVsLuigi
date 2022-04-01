@@ -26,7 +26,7 @@ public class Utils {
 
         if (location.x < manager.GetLevelMinX())
             location.x += manager.levelWidthTile / 2;
-        if (location.x >= manager.GetLevelMaxX())
+        else if (location.x >= manager.GetLevelMaxX())
             location.x -= manager.levelWidthTile / 2;
     }
 

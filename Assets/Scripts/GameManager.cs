@@ -64,113 +64,133 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         OnEvent(e.Code, e.CustomData);
     }
     public void OnEvent(byte eventId, object customData) {
+        object[] data = customData as object[];
+
         switch ((Enums.NetEventIds) eventId) {
-            case Enums.NetEventIds.SetGameStartTimestamp: {
-                    if (loaded)
-                        break;
-                    StartCoroutine(LoadingComplete((int) customData));
-                    break;
-                }
-            case Enums.NetEventIds.EndGame: {
-                    Player winner = (Player) customData;
-                    StartCoroutine(EndGame(winner));
-                    break;
-                }
-            case Enums.NetEventIds.SetTile: {
-                    object[] data = (object[]) customData;
-                    int x = (int) data[0];
-                    int y = (int) data[1];
-                    string tilename = (string) data[2];
-                    Vector3Int loc = new(x, y, 0);
-                    Tile tile = tilename != null ? (Tile) Resources.Load("Tilemaps/Tiles/" + tilename) : null;
-                    tilemap.SetTile(loc, tile);
-                    break;
-                }
-            case Enums.NetEventIds.SetTileBatch: {
-                    object[] data = (object[]) customData;
-                    int x = (int) data[0];
-                    int y = (int) data[1];
-                    int width = (int) data[2];
-                    int height = (int) data[3];
-                    string[] tiles = (string[]) data[4];
-                    TileBase[] tileObjects = new TileBase[tiles.Length];
-                    for (int i = 0; i < tiles.Length; i++) {
-                        string tile = tiles[i];
-                        if (tile == "")
-                            continue;
-                        tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
-                    }
-                    tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
-                    break;
-                }
-            case Enums.NetEventIds.ResetTiles: {
-                    ResetTiles();
-                    break;
-                }
-            case Enums.NetEventIds.PlayerFinishedLoading: {
-                    Player player = (Player) customData;
-                    loadedPlayers.Add(player.NickName);
-                    break;
-                }
-            case Enums.NetEventIds.BumpTile: {
-                    object[] data = (object[]) customData;
-                    int x = (int) data[0];
-                    int y = (int) data[1];
-                    bool downwards = (bool) data[2];
-                    string newTile = (string) data[3];
-                    BlockBump.SpawnResult spawnResult = (BlockBump.SpawnResult) data[4];
+        case Enums.NetEventIds.SetGameStartTimestamp: {
+            if (loaded)
+                break;
+            StartCoroutine(LoadingComplete((int) customData));
+            break;
+        }
+        case Enums.NetEventIds.EndGame: {
+            Player winner = (Player) customData;
+            StartCoroutine(EndGame(winner));
+            break;
+        }
+        case Enums.NetEventIds.SetTile: {
+            int x = (int) data[0];
+            int y = (int) data[1];
+            string tilename = (string) data[2];
+            Vector3Int loc = new(x, y, 0);
+            TileBase tile = tilename != null ? (TileBase) Resources.Load("Tilemaps/Tiles/" + tilename) : null;
+            tilemap.SetTile(loc, tile);
+            break;
+        }
+        case Enums.NetEventIds.SetTileBatch: {
+            int x = (int) data[0];
+            int y = (int) data[1];
+            int width = (int) data[2];
+            int height = (int) data[3];
+            string[] tiles = (string[]) data[4];
+            TileBase[] tileObjects = new TileBase[tiles.Length];
+            for (int i = 0; i < tiles.Length; i++) {
+                string tile = tiles[i];
+                if (tile == "")
+                    continue;
 
-                    Vector3Int loc = new(x, y, 0);
+                tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
+            }
+            tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
+            break;
+        }
+        case Enums.NetEventIds.ResetTiles:
+            ResetTiles();
+            break;
+        case Enums.NetEventIds.PlayerFinishedLoading: {
+            Player player = (Player) customData;
+            loadedPlayers.Add(player.NickName);
+            break;
+        }
+        case Enums.NetEventIds.BumpTile: {
+            int x = (int) data[0];
+            int y = (int) data[1];
+            bool downwards = (bool) data[2];
+            string newTile = (string) data[3];
+            BlockBump.SpawnResult spawnResult = (BlockBump.SpawnResult) data[4];
 
-                    GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
-                    BlockBump bb = bump.GetComponentInChildren<BlockBump>();
+            Vector3Int loc = new(x, y, 0);
 
-                    bb.fromAbove = downwards;
-                    bb.resultTile = newTile;
-                    bb.sprite = tilemap.GetSprite(loc);
-                    bb.spawn = spawnResult;
+            GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
+            BlockBump bb = bump.GetComponentInChildren<BlockBump>();
 
-                    tilemap.SetTile(loc, null);
-                    break;
-                }
-            case Enums.NetEventIds.SpawnParticle: {
-                    object[] data = (object[]) customData;
-                    int x = (int) data[0];
-                    int y = (int) data[1];
-                    string particleName = (string) data[2];
-                    Vector3 color = data.Length > 3 ? (Vector3) data[3] : new Vector3(1, 1, 1);
+            bb.fromAbove = downwards;
+            bb.resultTile = newTile;
+            bb.sprite = tilemap.GetSprite(loc);
+            bb.spawn = spawnResult;
 
-                    Vector3Int loc = new(x, y, 0);
+            tilemap.SetTile(loc, null);
+            break;
+        }
+        case Enums.NetEventIds.SetAndBumpTile: {
+            int x = (int) data[0];
+            int y = (int) data[1];
+            bool downwards = (bool) data[2];
+            string newTile = (string) data[3];
+            BlockBump.SpawnResult spawnResult = (BlockBump.SpawnResult) data[4];
 
-                    GameObject particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
-                    ParticleSystem system = particle.GetComponent<ParticleSystem>();
+            Vector3Int loc = new(x, y, 0);
 
-                    ParticleSystem.MainModule main = system.main;
-                    main.startColor = new Color(color.x, color.y, color.z, 1);
-                    break;
-                }
-            case Enums.NetEventIds.SpawnResizableParticle: {
-                    object[] data = (object[]) customData;
-                    Vector2 pos = (Vector2) data[0];
-                    bool right = (bool) data[1];
-                    bool upsideDown = (bool) data[2];
-                    Vector2 size = (Vector2) data[3];
-                    string prefab = (string) data[4];
-                    GameObject particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + prefab), pos, Quaternion.Euler(0, 0, upsideDown ? 180 : 0));
+            tilemap.SetTile(loc, (TileBase) Resources.Load("Tilemaps/Tiles/" + newTile));
+            tilemap.RefreshTile(loc);
 
-                    SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
-                    sr.size = size;
+            GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
+            BlockBump bb = bump.GetComponentInChildren<BlockBump>();
 
-                    Rigidbody2D body = particle.GetComponent<Rigidbody2D>();
-                    body.velocity = new Vector2(right ? 7 : -7, 6);
-                    body.angularVelocity = right ^ upsideDown ? -300 : 300;
+            bb.fromAbove = downwards;
+            bb.resultTile = newTile;
+            bb.sprite = tilemap.GetSprite(loc);
+            bb.spawn = spawnResult;
 
-                    particle.transform.position += new Vector3(sr.size.x/4f, size.y / 4f * (upsideDown ? -1 : 1));
+            tilemap.SetTile(loc, null);
+            break;
+        }
+        case Enums.NetEventIds.SpawnParticle: {
+            int x = (int) data[0];
+            int y = (int) data[1];
+            string particleName = (string) data[2];
+            Vector3 color = data.Length > 3 ? (Vector3) data[3] : new Vector3(1, 1, 1);
 
-                    //TODO: find the right sound
-                    sfx.PlayOneShot((AudioClip) Resources.Load("Sound/player/brick_break"));
-                    break;
-                }
+            Vector3Int loc = new(x, y, 0);
+
+            GameObject particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
+            ParticleSystem system = particle.GetComponent<ParticleSystem>();
+
+            ParticleSystem.MainModule main = system.main;
+            main.startColor = new Color(color.x, color.y, color.z, 1);
+            break;
+        }
+        case Enums.NetEventIds.SpawnResizableParticle: {
+            Vector2 pos = (Vector2) data[0];
+            bool right = (bool) data[1];
+            bool upsideDown = (bool) data[2];
+            Vector2 size = (Vector2) data[3];
+            string prefab = (string) data[4];
+            GameObject particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + prefab), pos, Quaternion.Euler(0, 0, upsideDown ? 180 : 0));
+
+            SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
+            sr.size = size;
+
+            Rigidbody2D body = particle.GetComponent<Rigidbody2D>();
+            body.velocity = new Vector2(right ? 7 : -7, 6);
+            body.angularVelocity = right ^ upsideDown ? -300 : 300;
+
+            particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (upsideDown ? -1 : 1));
+
+            //TODO: find the right sound
+            sfx.PlayOneShot((AudioClip) Resources.Load("Sound/player/brick_break"));
+            break;
+        }
         }
     }
 

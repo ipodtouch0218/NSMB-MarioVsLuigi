@@ -36,6 +36,8 @@ TagManager:
   - DestructablePipe
   - PropellerMushroom
   - FadeUI
+  - lava
+  - MarioBrosPlatform
   layers:
   - Default
   - TransparentFX

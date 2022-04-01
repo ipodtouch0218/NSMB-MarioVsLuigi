@@ -968,6 +968,31 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: castle_4
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 32
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -8, y: 8}
+        - {x: -8, y: 7}
+        - {x: 8, y: 7}
+        - {x: 8, y: 8}
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee92597841fa9344b957037ad8128d6c
+      internalID: 804450432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1001,6 +1026,7 @@ TextureImporter:
       Castle_21: -1609143546227108842
       Castle_15: -5185617447438664962
       Castle_48: 6916266795080129722
+      castle_4: 804450432
       Castle_12: -8683591605262331235
       Castle_4: -77001387259621195
       Castle_9: -5426138607464267151

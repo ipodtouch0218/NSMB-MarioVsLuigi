@@ -6,7 +6,8 @@ public class PhysicsEntity : MonoBehaviour {
 
     private static int GROUND_LAYERID = -1;
 
-    public bool onGround, hitRoof, hitRight, hitLeft; 
+    public bool onGround, hitRoof, hitRight, hitLeft;
+    public float floorAngle = 0;
     public Collider2D currentCollider;
     public float floorAndRoofCutoff = 0.3f;
     private readonly ContactPoint2D[] contacts = new ContactPoint2D[32];
@@ -17,10 +18,11 @@ public class PhysicsEntity : MonoBehaviour {
     }
 
     public void UpdateCollisions() {
+        int hitRightCount = 0, hitLeftCount = 0;
+        float previousHeightY = float.MaxValue;
         onGround = false;
         hitRoof = false;
-        hitRight = false;
-        hitLeft = false;
+        floorAngle = 0;
         if (!currentCollider)
             return;
         
@@ -30,16 +32,28 @@ public class PhysicsEntity : MonoBehaviour {
             if (Vector2.Dot(point.normal, Vector2.up) > floorAndRoofCutoff) {
                 //touching floor
                 onGround = true;
+                floorAngle = Vector2.SignedAngle(Vector2.up, point.normal);
             } else if (point.collider.gameObject.layer == GROUND_LAYERID) {
                 if (Vector2.Dot(point.normal, Vector2.down) > floorAndRoofCutoff) {
                     //touching roof
                     hitRoof = true;
                 } else {
                     //touching a wall
-                    hitRight |= point.normal.x < 0;
-                    hitLeft |= point.normal.x > 0;
+                    if (Mathf.Abs(previousHeightY - point.point.y) < 0.2f) {
+                        Debug.Log("AAAA");
+                        continue;
+                    }
+                    previousHeightY = point.point.y;
+
+                    if (point.normal.x < 0) {
+                        hitRightCount++;
+                    } else {
+                        hitLeftCount++;
+                    }
                 }
             }
         }
+        hitRight = hitRightCount >= 2;
+        hitLeft = hitLeftCount >= 2;
     }
 }
