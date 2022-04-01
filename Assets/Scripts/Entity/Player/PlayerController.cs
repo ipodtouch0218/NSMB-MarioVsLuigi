@@ -267,6 +267,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
                 if (invincible > 0) {
                     //we are invincible. murder time :)
+                    if (other.state == Enums.PowerupState.Giant) {
+                        //wait fuck-
+                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, false, otherView.ViewID);
+                        return;
+                    }
+
                     otherView.RPC("Powerdown", RpcTarget.All, false);
                     return;
                 }
@@ -274,8 +280,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 if (state == Enums.PowerupState.Giant || other.state == Enums.PowerupState.Giant) {
                     if (state == Enums.PowerupState.Giant && other.state == Enums.PowerupState.Giant) {
                         //both giant
-                        otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, false, -1);
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, false, -1);
+                        otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, false, photonView.ViewID);
+                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, false, otherView.ViewID);
                     } else if (state == Enums.PowerupState.Giant) {
                         //only we are giant
                         otherView.RPC("Powerdown", RpcTarget.All, false);
