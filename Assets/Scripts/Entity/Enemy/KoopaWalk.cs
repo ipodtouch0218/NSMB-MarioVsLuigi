@@ -36,8 +36,11 @@ public class KoopaWalk : HoldableEntity {
             return;
         }
 
-        sRenderer.flipX = !left ^ flipXFlip;
+        if (frozen)
+            return;
 
+        sRenderer.flipX = !left ^ flipXFlip;
+      
         if (!dead) {
             if (upsideDown) {
                 dampVelocity = Mathf.Min(dampVelocity + Time.fixedDeltaTime * 3, 1);

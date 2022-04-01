@@ -645,6 +645,9 @@ ModelImporter:
   - first:
       74: -7677944236119783192
     second: small_model|shfdn_getup
+  - first:
+      74: -2279589505200434635
+    second: small_model|ice_carry_pose_small_model
   externalObjects: {}
   materials:
     materialImportMode: 0
@@ -6898,6 +6901,35 @@ ModelImporter:
       internalID: 0
       firstFrame: 5
       lastFrame: 10
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: small_model|ice_carry_pose_small_model
+      takeName: small_model|carry_pose_small_model
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

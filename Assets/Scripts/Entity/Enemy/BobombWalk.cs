@@ -30,7 +30,10 @@ public class BobombWalk : HoldableEntity {
 
         if (!photonView || photonView.IsMine)
             HandleCollision();
-        
+
+        if (frozen)
+            return;
+
         if (lit && !detonated && !dead) {
                 
             if ((detonateCount -= Time.fixedDeltaTime) < 0) {
