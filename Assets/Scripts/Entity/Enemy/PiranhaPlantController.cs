@@ -9,6 +9,7 @@ public class PiranhaPlantController : KillableEntity {
     public float popupTimer;
     private bool upsideDown;
 
+    bool wasFrozen;
     public new void Start() {
         base.Start();
         upsideDown = transform.eulerAngles.z != 0;
@@ -22,6 +23,9 @@ public class PiranhaPlantController : KillableEntity {
 
         if (GameManager.Instance && !GameManager.Instance.musicEnabled)
             return;
+
+        if (frozen)
+            wasFrozen = true;
 
         if (photonView && !dead && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
             photonView.RPC("Kill", RpcTarget.All);
@@ -53,6 +57,9 @@ public class PiranhaPlantController : KillableEntity {
 
     [PunRPC]
     public void Respawn() {
+        if (frozen)
+            return;
+        wasFrozen = false;
         dead = false;
         popupTimer = 3;
         animator.Play("end");
@@ -62,8 +69,13 @@ public class PiranhaPlantController : KillableEntity {
 
     [PunRPC]
     public override void Kill() {
-        PlaySound("enemy/shell_kick");
-        PlaySound("enemy/piranhaplant-die");
+
+        if (!wasFrozen) {
+            PlaySound("enemy/shell_kick");
+            PlaySound("enemy/piranhaplant-die");
+        } else
+            photonView.RPC("PlaySound", RpcTarget.All, "enemy/FrozenEnemyShatter");
+
         dead = true;
         hitbox.enabled = false;
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, upsideDown ? -0.5f : 0.5f, 0), Quaternion.identity);
