@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public float timeRemaining;
     public int highestStarCount = -1;
     public bool hurryup = false;
+    public bool timeBasedGame = false;
     public bool isDraw = false;
 
     public PlayerController[] allPlayers;
@@ -318,6 +319,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public void Update() {
         if (timeRemaining > 0 && gameover != true)
         {
+            timeBasedGame = true;
             timeRemaining -= 1 * Time.deltaTime;
             if (hurryup != true && timeRemaining <= 10)
             {
@@ -389,7 +391,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                 continue;
             playerCount++;
             winningPlayer = player;
-            if (timeRemaining > 0)
+            if (timeBasedGame == false || timeRemaining > 0)
             {
                 if (player.stars < starRequirement)
                     continue;
@@ -397,7 +399,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                 PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
                 return;
             }
-            else if (timeRemaining <= 0)
+            else if (timeBasedGame == true && timeRemaining <= 0)
             {
                 if (player.stars < highestStarCount)
                     continue;

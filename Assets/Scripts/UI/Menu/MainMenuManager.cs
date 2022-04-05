@@ -111,7 +111,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (properties[Enums.NetRoomProperties.NewPowerups] != null)
             ChangeNewPowerups((bool) properties[Enums.NetRoomProperties.NewPowerups]);
         if (properties[Enums.NetRoomProperties.Time] != null)
-            ChangeTime((int)properties[Enums.NetRoomProperties.Time]);
+            ChangeTime((int) properties[Enums.NetRoomProperties.Time]);
     }
     // CONNECTION CALLBACKS
     public void OnConnected() { }
