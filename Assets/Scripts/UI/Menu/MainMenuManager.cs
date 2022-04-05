@@ -37,6 +37,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public Selectable[] roomSettings;
 
+    private Coroutine updatePingCoroutine;
+
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
         ExitGames.Client.Photon.Hashtable prop = new() {
@@ -323,7 +325,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
 
         OnRoomPropertiesUpdate(room.CustomProperties);
-        StartCoroutine(UpdatePing());
+
+        if (updatePingCoroutine == null)
+            updatePingCoroutine = StartCoroutine(UpdatePing());
 
         if (PhotonNetwork.IsMasterClient) {
             PhotonNetwork.CurrentRoom.IsVisible = true;
@@ -452,7 +456,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void StartGame() {
         PhotonNetwork.CurrentRoom.IsOpen = false;
-        PhotonNetwork.CurrentRoom.IsVisible = false;
+        PhotonNetwork.CurrentRoom.IsVisible = true;
 
         //start game with all players
         RaiseEventOptions options = new() { Receivers = ReceiverGroup.All };
@@ -461,6 +465,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void ChangeNewPowerups(bool value) {
         powerupsEnabled.isOn = value;
     }
+
     public void ChangeLives(int lives) {
         livesEnabled.isOn = lives != -1;
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
@@ -635,7 +640,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
     }
     public void SendChat(TMP_InputField input) {
-        string text = input.text;
+        string text = input.text.Trim();
         if (input.text == null || input.text == "")
             return;
         

@@ -17,7 +17,7 @@ public class BulletBillLauncher : MonoBehaviourPun {
         searchOffset = new(playerSearchRadius/2 + playerCloseCutoff, 0);
     }
     void Update() {
-        if (!PhotonNetwork.IsMasterClient) 
+        if (GameManager.Instance && GameManager.Instance.gameover)
             return;
 
         if ((shootTimer -= Time.deltaTime) <= 0) {
@@ -27,8 +27,12 @@ public class BulletBillLauncher : MonoBehaviourPun {
     }
 
     void TryToShoot() {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
         if (!Utils.IsTileSolidAtWorldLocation(transform.position))
             return;
+
         for (int i = 0; i < bills.Count; i++) {
             if (bills[i] == null)
                 bills.RemoveAt(i--);
