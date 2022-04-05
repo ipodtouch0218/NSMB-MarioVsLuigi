@@ -74,8 +74,6 @@ public class WaterSplash : MonoBehaviour {
 
         heightTex.SetPixels32(colors, 0);
         heightTex.Apply();
-
-        Debug.Log(heightTex.GetPixel(128, 0));
     }
     void OnTriggerEnter2D(Collider2D collider) {
         int points = widthTiles * pointsPerTile;
