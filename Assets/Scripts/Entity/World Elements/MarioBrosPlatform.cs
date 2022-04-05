@@ -40,6 +40,52 @@ public class MarioBrosPlatform : MonoBehaviour {
         mpb.SetFloat("PlatformWidth", platformWidth);
         mpb.SetFloat("PointsPerTile", samplesPerTile);
     }
+    /*
+    private void CreateMesh() {
+        //create verts
+        int segmentCount = platformWidth * pointsPerTile;
+        Vector3[] verts = new Vector3[(segmentCount + 1) * 2];
+        Vector2[] uvs = new Vector2[verts.Length];
+        float distancePerPoint = 1f / pointsPerTile;
+        float xOffset = segmentCount / pointsPerTile / 2f;
+        for (int x = 0; x <= segmentCount; x++) {
+            int i = x * 2;
+            float xPos = x * distancePerPoint;
+            verts[i] = new(xPos - xOffset, -5f / 16f);
+            verts[i + 1] = new(xPos - xOffset, 5f / 16f);
+
+            if (x < pointsPerTile) {
+                uvs[i] = new(0f, 0f);
+                uvs[i + 1] = new(.5f, 1f);
+            } else if (x > segmentCount - pointsPerTile) {
+                uvs[i] = new(0f, 0f);
+                uvs[i + 1] = new(, 1f);
+            } else {
+                uvs[i] = new(.5f, 0f);
+                uvs[i + 1] = new(1f, 1f);
+            }
+        }
+
+        //create mesh
+        mesh = new();
+        mesh.name = "Mario Bros Platform Mesh";
+        int[] tris = new int[segmentCount * 6];
+        for (int i = 0; i < segmentCount; i++) {
+            int v = i * 6;
+            int p = i * 2;
+
+            tris[v + 0] = p + 0;
+            tris[v + 4] = tris[v + 1] = p + 1;
+            tris[v + 3] = tris[v + 2] = p + 2;
+            tris[v + 5] = p + 3;
+        }
+
+        mesh.vertices = verts;
+        mesh.triangles = tris;
+        mesh.uv = uvs;
+        meshFilter.mesh = mesh;
+    }
+    */
     public void Update() {
         for (int i = 0; i < platformWidth * samplesPerTile; i++)
             pixels[i] = new Color32(0, 0, 0, 255);

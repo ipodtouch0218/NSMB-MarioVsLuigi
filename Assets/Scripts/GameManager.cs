@@ -51,9 +51,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public int starRequirement;
     public float timeRemaining;
     public int highestStarCount = -1;
-    public bool hurryup = false; //This might be unnecessary, however without it, the hurry up sound would play on loop and it was very loud.
+    public bool hurryup = false;
     public bool isDraw = false;
-    public bool timeBasedGame = false; //I had to add this because it broke games with no time limit
 
     public PlayerController[] allPlayers;
     public EnemySpawnpoint[] enemySpawnpoints;
@@ -423,7 +422,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         }
     }
 
-    public void FindHighestStarCount() // TODO: I can already see some potential issues doing it this way. It might require some testing to see if there are any bugs.
+    public void FindHighestStarCount() // TODO: I can already see some potential issues doing it this way. I'll have to fix it.
     {
         if (!PhotonNetwork.IsMasterClient)
             return;

@@ -42,14 +42,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - BottomYPos: 0
-    - Height: 0
-    - Points: 256
-    - PointsPerTile: 4
     - WaveHeight: 0.15
     - WaveSpeed: 1
     - WaveWidth: 1
-    - _Points: 256
     m_Colors:
     - BackgroundColor: {r: 0.3798112, g: 0, b: 0.62264144, a: 0.8156863}
     - FoamColor: {r: 1, g: 0.91886795, b: 0.99505395, a: 1}

@@ -83,10 +83,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 //recevied info older than what we have
                 return;
 
-            if (GameManager.Instance && GameManager.Instance.gameover)
-                //we're DONE with you
-                return;
-
             float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
 
             body.position = pos;
@@ -1084,7 +1080,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         groundpound = false;
         flying = false;
         propeller = false;
-        propellerTimer = 0;
         drill = false;
         body.gravityScale = normalGravity;
         while (starsToDrop-- > 0)
@@ -1759,7 +1754,22 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
 
         //throwing held item
-        ThrowHeldItem(left, right, crouch);
+        if ((!functionallyRunning || state == Enums.PowerupState.Mini || state == Enums.PowerupState.Giant || invincible > 0 || flying || propeller) && holding) {
+            bool throwLeft = !facingRight;
+            if (left)
+                throwLeft = true;
+            if (right)
+                throwLeft = false;
+
+            holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
+            if (!crouch && !knockback) {
+                photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/walljump_2");
+                throwInvincibility = 0.5f;
+                animator.SetTrigger("throw");
+            }
+            holdingOld = holding;
+            holding = null;
+        }
 
         //blue shell enter/exit
         if (state != Enums.PowerupState.Shell || !functionallyRunning)
@@ -1830,7 +1840,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             state = Enums.PowerupState.Large;
             body.isKinematic = true;
             animator.enabled = false;
-            PlaySoundEverywhere("player/mega-end");
+            photonView.RPC("PlaySoundEverywhere", RpcTarget.All, "player/mega-end");
         }
 
         HandleSlopes();
@@ -1924,27 +1934,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 triplejump = false;
             }
         }
-    }
-
-    [PunRPC]
-    void ThrowHeldItem(bool left, bool right, bool crouch) {
-        if (!((!functionallyRunning || state == Enums.PowerupState.Mini || state == Enums.PowerupState.Giant || invincible > 0 || flying || propeller) && holding))
-            return;
-
-        bool throwLeft = !facingRight;
-        if (left ^ right)
-            throwLeft = left;
-
-        if (photonView.IsMine)
-            holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
-
-        if (!crouch && !knockback) {
-            PlaySound(character.soundFolder + "/walljump_2");
-            throwInvincibility = 0.5f;
-            animator.SetTrigger("throw");
-        }
-        holdingOld = holding;
-        holding = null;
     }
 
     void HandleGroundpoundStart(bool left, bool right) {

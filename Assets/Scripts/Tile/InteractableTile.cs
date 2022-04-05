@@ -23,9 +23,6 @@ public abstract class InteractableTile : AnimatedTile {
             switch (obj.tag) {
             case "Player": {
                 PlayerController player = obj.GetComponent<PlayerController>();
-                if (player.state == Enums.PowerupState.Giant)
-                    return;
-
                 player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, null);
                 player.photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/PlayerBounce", player.body.position);
                 continue;
