@@ -10271,6 +10271,7 @@ MonoBehaviour:
   frozenJump: 0
   invincible: 0
   giantTimer: 0
+  unfreezeTimer: 3
   floorAngle: 0
   pipeDirection: {x: 0, y: 0}
   stars: 0

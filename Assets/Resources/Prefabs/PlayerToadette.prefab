@@ -4964,6 +4964,7 @@ MonoBehaviour:
   frozenJump: 0
   invincible: 0
   giantTimer: 0
+  unfreezeTimer: 3
   floorAngle: 0
   pipeDirection: {x: 0, y: 0}
   stars: 0
@@ -5302,6 +5303,12 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 0
     Name: head carry
+  - Type: 4
+    SynchronizeType: 0
+    Name: fireballKnockback
+  - Type: 4
+    SynchronizeType: 0
+    Name: firedeath
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
