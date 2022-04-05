@@ -180,6 +180,7 @@ MonoBehaviour:
   dead: 0
   frozen: 0
   body: {fileID: 0}
+  dropcoin: 1
   speed: 0.8
   deathTimer: 0.5
 --- !u!114 &8698039766182409506

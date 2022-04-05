@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public bool onGround, crushGround, doGroundSnap, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, frozen;
     public float walljumping, landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenJump;
-    public float invincible, giantTimer, unfreezeTimer, floorAngle;
+    public float invincible, giantTimer, floorAngle;
 
     public Vector2 pipeDirection;
     public int stars, coins, lives = -1;
@@ -172,15 +172,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             return;
         }
 
-        if (frozen && !dead) {
-            // Do 3 second timer
-
-            if ((unfreezeTimer -= Time.fixedDeltaTime) < 0) {
-                FrozenObject.photonView.RPC("SpecialKill", RpcTarget.All, false, false);
-            }
-
+        if (frozen && !dead)
             return;
-        }
 
         if (!dead) {
             HandleTemporaryInvincibility();
@@ -414,14 +407,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
                     }
                 } else {
 
-                    if (state == Enums.PowerupState.Mini) {
-                        photonView.RPC("Powerdown", RpcTarget.All, false);
-                    } else if (!frozen && !FrozenObject && state != Enums.PowerupState.Giant && !pipeEntering && !knockback && hitInvincibilityCounter <= 0) {
+                if (state == Enums.PowerupState.Mini) {
+                    photonView.RPC("Powerdown", RpcTarget.All, false);
+                } else if (!frozen || FrozenObject || state != Enums.PowerupState.Giant || !pipeEntering || knockback || hitInvincibilityCounter > 0) {
 
-                        GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                        frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, gameObject.tag, photonView.ViewID);
+                    GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, gameObject.tag, photonView.ViewID);
 
-                    }
+                }
                 }
             break;
 
@@ -484,8 +477,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (jumpHeld)
             jumpBuffer = 0.15f;
 
-        if (frozen)
+        if (frozen) {
             photonView.RPC("FrozenJump", RpcTarget.All);
+        }
     }
 
     protected void OnSprint(InputValue value) {
@@ -756,17 +750,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/FrozenEnemyShatter");
         photonView.RPC("Knockback", RpcTarget.All, false, 1, true, 0);
         frozenJump = 0;
-        unfreezeTimer = 3;
     }
 
     [PunRPC]
     protected void FrozenJump() {
         // FrozenJump is called by OnJump and that is called everytime jump is pushed or letgo so I just put a 4 there.
-        if (unfreezeTimer > 0) {
-            unfreezeTimer -= 0.1f;
+        if (frozen && frozenJump != 11) {
+            frozenJump += 1;
             return;
         } else {
             HandleJumping(jumpBuffer > 0 && (onGround || koyoteTime < 0.1f));
+            FrozenObject.photonView.RPC("SpecialKill", RpcTarget.All, false, false);
+
         }
     }
 
