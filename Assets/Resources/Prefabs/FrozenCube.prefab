@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 5153594664742763544}
   - component: {fileID: 82072111131152862}
   - component: {fileID: 1182937128297349914}
+  - component: {fileID: 1482905306660078958}
+  - component: {fileID: 3852760734466000956}
   m_Layer: 0
   m_Name: Hitbox
   m_TagString: frozencube
@@ -112,6 +114,41 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.35, y: 1.35}
   m_EdgeRadius: 0
+--- !u!114 &1482905306660078958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215588498524246718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3852760734466000956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215588498524246718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 1
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 0}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4465303805189439310
 GameObject:
   m_ObjectHideFlags: 0
@@ -169,7 +206,6 @@ MonoBehaviour:
   dead: 0
   frozen: 0
   body: {fileID: -1029166702606754831}
-  dropcoin: 1
   holder: {fileID: 0}
   previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
@@ -183,8 +219,9 @@ MonoBehaviour:
   frozenEntity: {fileID: 0}
   frozenPlayer: {fileID: 0}
   fallTimer: 5
-  stationary: 0
+  fastSlide: 0
   fallen: 0
+  crashed: 0
   kinematicEntity: 0
   flyingEntity: 0
   plantEntity: 0
@@ -224,10 +261,10 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1000000
+  m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 3
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -333,7 +370,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4465303805189439310}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
@@ -470,7 +507,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6270504196635899897}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.8}
   m_LocalScale: {x: 6.2, y: 6.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

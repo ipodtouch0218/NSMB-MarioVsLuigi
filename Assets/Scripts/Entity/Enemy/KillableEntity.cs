@@ -13,8 +13,6 @@ public abstract class KillableEntity : MonoBehaviourPun {
     protected AudioSource audioSource;
     protected PhysicsEntity physics;
 
-    public bool dropcoin = true;
-
     public void Start() {
         body = GetComponent<Rigidbody2D>();
         hitbox = GetComponent<BoxCollider2D>();
@@ -60,24 +58,26 @@ public abstract class KillableEntity : MonoBehaviourPun {
     [PunRPC]
     public virtual void Freeze() {
         frozen = true;
+        photonView.RPC("PlaySound", RpcTarget.All, "enemy/FreezeEnemy");
         animator.enabled = false;
         // Note: disabling hitbox doesn't work for some reason but I left the code here.
         hitbox.enabled = false;
+        audioSource.enabled = false;
         if (body) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             body.isKinematic = true;
 		}
-        dropcoin = false;
     }
 
     [PunRPC]
     public virtual void Unfreeze() {
         frozen = false;
         animator.enabled = true;
-        body.isKinematic = false;
-        dropcoin = true;
+        if (body)
+            body.isKinematic = false;
         hitbox.enabled = true;
+        audioSource.enabled = true;
     }
 
     [PunRPC]
@@ -86,15 +86,17 @@ public abstract class KillableEntity : MonoBehaviourPun {
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (right ? 1 : -1);
         body.gravityScale = 1.5f;
+        audioSource.enabled = true;
+        animator.enabled = true;
         hitbox.enabled = false;
         animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         dead = true;
-        photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
+        photonView.RPC("PlaySound", RpcTarget.All, !frozen ? "enemy/shell_kick" : "enemy/FrozenEnemyShatter");
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
         
-        if (photonView.IsMine && dropcoin)
+        if (photonView.IsMine && !tag.Contains("frozencube"))
             PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + new Vector2(0, 0.5f), Quaternion.identity);
     } 
     [PunRPC]

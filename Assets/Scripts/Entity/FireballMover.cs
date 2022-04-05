@@ -9,7 +9,7 @@ public class FireballMover : MonoBehaviourPun {
     public bool isIceball;
     private Rigidbody2D body;
     private PhysicsEntity physics;
-    
+    bool breakOnImpact;
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
@@ -34,23 +34,30 @@ public class FireballMover : MonoBehaviourPun {
         physics.UpdateCollisions();
 
         if (physics.onGround) {
-            float bounceHeight = speed / 1.25f;
-            body.velocity = new Vector2(body.velocity.x, bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)));
-        }
+            float bounceHeight = speed / (isIceball ? 1.0f : 1.25f);
 
-        if (photonView && photonView.IsMine && (physics.hitLeft || physics.hitRight || physics.hitRoof))
+            body.velocity = new Vector2(body.velocity.x, bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)));
+
+        } else if (isIceball && body.velocity.y > 1.5f)  {
+            breakOnImpact = true;
+        }
+        if (photonView && photonView.IsMine && (physics.hitLeft || physics.hitRight || physics.hitRoof || physics.onGround && breakOnImpact))
             PhotonNetwork.Destroy(gameObject);
     }
 
     void OnDestroy() {
-        Instantiate(Resources.Load("Prefabs/Particle/" + (isIceball ? "IceballWall" : "FireballWall")), transform.position, Quaternion.identity);
+        if (isIceball) {
+            Instantiate(Resources.Load("Prefabs/Particle/IceballWall"), transform.position, Quaternion.identity);
+        } else {
+            Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
+        }
+
     }
 
     [PunRPC]
     protected void Kill() {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(photonView);
-        Destroy(photonView);
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
@@ -65,7 +72,7 @@ public class FireballMover : MonoBehaviourPun {
                     return;
                 if (isIceball) {
                     GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                    frozenBlock.GetPhotonView().RPC("setFrozenEntity", RpcTarget.All, en.gameObject.tag, en.photonView.ViewID);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.gameObject.tag, en.photonView.ViewID);
                     PhotonNetwork.Destroy(gameObject);
                 } else {
                     en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false);
@@ -77,24 +84,28 @@ public class FireballMover : MonoBehaviourPun {
                 FrozenCube fc = collider.gameObject.GetComponentInParent<FrozenCube>();
                 if (fc.dead)
                     return;
+                    // TODO: Stuff here
 
-                // TODO: Stuff here
-                if (!isIceball)
+                if (isIceball) {
+                    PhotonNetwork.Destroy(gameObject);
+                } else {
                     fc.gameObject.GetComponent<FrozenCube>().photonView.RPC("Kill", RpcTarget.All);
-
-                PhotonNetwork.Destroy(gameObject);
+                    PhotonNetwork.Destroy(gameObject);
+                }
                 break;
             }
             case "Fireball": {
-                if (isIceball)
+                if (isIceball) {
+                    PhotonNetwork.Destroy(collider.gameObject);
                     PhotonNetwork.Destroy(gameObject);
+                }
                 break;
             }
             case "bulletbill": {
                 KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
                 if (isIceball && !bb.frozen) {
                     GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                    frozenBlock.GetPhotonView().RPC("setFrozenEntity", RpcTarget.All, bb.gameObject.tag, bb.photonView.ViewID);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, bb.gameObject.tag, bb.photonView.ViewID);
                     PhotonNetwork.Destroy(gameObject);
                 }
 
@@ -113,7 +124,7 @@ public class FireballMover : MonoBehaviourPun {
                     PhotonNetwork.Destroy(gameObject);
                 } else {
                     GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", bobomb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                    frozenBlock.GetPhotonView().RPC("setFrozenEntity", RpcTarget.All, bobomb.gameObject.tag, bobomb.photonView.ViewID);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, bobomb.gameObject.tag, bobomb.photonView.ViewID);
                     PhotonNetwork.Destroy(gameObject);
                 }
                 break;
@@ -122,17 +133,15 @@ public class FireballMover : MonoBehaviourPun {
                 KillableEntity killa = collider.gameObject.GetComponentInParent<KillableEntity>();
                 if (killa.dead) 
                     return;
-
                 AnimatorStateInfo asi = killa.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
                 if (asi.IsName("end") && asi.normalizedTime > 0.5f) 
                     return;
-
                 if (!isIceball) {
                     killa.photonView.RPC("Kill", RpcTarget.All);
                     PhotonNetwork.Destroy(gameObject);
                 } else {
                     GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                    frozenBlock.GetPhotonView().RPC("setFrozenEntity", RpcTarget.All, killa.gameObject.tag, killa.photonView.ViewID);
+                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, killa.gameObject.tag, killa.photonView.ViewID);
                 }
                 break;
             }
