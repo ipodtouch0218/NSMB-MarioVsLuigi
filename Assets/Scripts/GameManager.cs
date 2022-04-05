@@ -49,6 +49,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public bool gameover = false, musicEnabled = false;
     public readonly List<string> loadedPlayers = new();
     public int starRequirement;
+    public float timeRemaining;
+    public int highestStarCount = -1;
+    public bool hurryup = false;
+    public bool isDraw = false;
 
     public PlayerController[] allPlayers;
     public EnemySpawnpoint[] enemySpawnpoints;
@@ -209,7 +213,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             PhotonNetwork.OfflineMode = true;
             PhotonNetwork.CreateRoom("Debug");
             ExitGames.Client.Photon.Hashtable properties = new() {
-                { Enums.NetRoomProperties.StarRequirement, 10 }
+                [Enums.NetRoomProperties.StarRequirement] = 10,
+                [Enums.NetRoomProperties.Time] =  -1,
             };
             PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
             Instantiate(Resources.Load("Prefabs/Static/GlobalController"), Vector3.zero, Quaternion.identity);
@@ -278,9 +283,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         localPlayer.GetComponent<PlayerController>().OnGameStart();
 
         yield return new WaitForSeconds(1f);
-        
+
         musicEnabled = true;
-        
+        timeRemaining = (int)PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
+
         if (canvas)
             SceneManager.UnloadSceneAsync("Loading");
     }
@@ -310,6 +316,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     }
 
     public void Update() {
+        if (timeRemaining > 0 && gameover != true)
+        {
+            timeRemaining -= 1 * Time.deltaTime;
+            if (hurryup != true && timeRemaining <= 10)
+            {
+                hurryup = true;
+                sfx.PlayOneShot((AudioClip)Resources.Load("Sound/hurry-up"));
+            }
+            if (timeRemaining <= 0)
+            {
+                FindHighestStarCount();
+            } // TODO: Make a (working) sudden death mechanic
+        }
+
         if (gameover) 
             return;
 
@@ -369,11 +389,28 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                 continue;
             playerCount++;
             winningPlayer = player;
-            if (player.stars < starRequirement)
-                continue;
+            if (timeRemaining > 0)
+            {
+                if (player.stars < starRequirement)
+                    continue;
 
-            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
-            return;
+                PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
+                return;
+            }
+            else if (timeRemaining <= 0)
+            {
+                if (player.stars < highestStarCount)
+                    continue;
+
+                 else if (isDraw == true || highestStarCount <= 0)
+                {
+                    PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, null, Utils.EVENT_ALL, SendOptions.SendReliable);
+                    return;
+                }
+
+                PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
+                return;
+            }
         }
         if (playerCount == 1 && PhotonNetwork.CurrentRoom.PlayerCount >= 2) {
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayer.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
@@ -383,6 +420,28 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, Utils.EVENT_ALL, SendOptions.SendReliable);
             return;
         }
+    }
+
+    public void FindHighestStarCount() // TODO: I can already see some potential issues doing it this way. I'll have to fix it.
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+        foreach (var player in allPlayers)
+        {
+            if (player == null || player.lives == 0)
+                continue;
+            if (player.stars > highestStarCount)
+            {
+                highestStarCount = player.stars;
+                isDraw = false;
+            }
+            else if (player.stars == highestStarCount)
+            {
+                isDraw = true;
+            }
+        }
+        CheckForWinner();
+
     }
 
     private Coroutine loopCoroutine;
@@ -427,8 +486,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
                 mega = true;
             if (player.invincible > 0)
                 invincible = true;
-            if ((player.stars + 1f) / starRequirement >= 0.95f)
+            if ((player.stars + 1f) / starRequirement >= 0.95f || hurryup != false)
                 speedup = true;
+
         }
 
         if (mega) {

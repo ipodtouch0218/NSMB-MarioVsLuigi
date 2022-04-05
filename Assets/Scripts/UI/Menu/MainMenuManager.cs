@@ -24,9 +24,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, fireballToggle, vsyncToggle;
-    public GameObject playersContent, playersPrefab, chatContent, chatPrefab; 
-    public TMP_InputField nicknameField, starsText, livesField;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle;
+    public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
+    public TMP_InputField nicknameField, starsText, livesField, timeField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected;
     public GameObject errorBox, errorButton, rebindPrompt;
@@ -108,6 +108,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             ChangeLives((int) properties[Enums.NetRoomProperties.Lives]);
         if (properties[Enums.NetRoomProperties.NewPowerups] != null)
             ChangeNewPowerups((bool) properties[Enums.NetRoomProperties.NewPowerups]);
+        if (properties[Enums.NetRoomProperties.Time] != null)
+            ChangeTime((int)properties[Enums.NetRoomProperties.Time]);
     }
     // CONNECTION CALLBACKS
     public void OnConnected() { }
@@ -155,6 +157,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Level] = 0,
             [Enums.NetRoomProperties.StarRequirement] = 10,
             [Enums.NetRoomProperties.Lives] = -1,
+            [Enums.NetRoomProperties.Time] = -1,
             [Enums.NetRoomProperties.NewPowerups] = true
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
@@ -721,6 +724,42 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         ChangeStarRequirement(newValue);
+    }
+
+    public void ChangeTime(int time)
+    {
+        timeEnabled.isOn = time != -1;
+        timeField.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
+        if (time == -1)
+            return;
+
+        timeField.text = time.ToString();
+    }
+    public void SetTime(TMP_InputField input)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        int.TryParse(input.text, out int newTimeValue);
+        if (newTimeValue < 1)
+            newTimeValue = 1;
+        if (newTimeValue == (int)PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time])
+            return;
+
+        ExitGames.Client.Photon.Hashtable table = new()
+        {
+            [Enums.NetRoomProperties.Time] = newTimeValue
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        ChangeTime(newTimeValue);
+    }
+    public void EnableTime(Toggle toggle)
+    {
+        ExitGames.Client.Photon.Hashtable properties = new()
+        {
+            [Enums.NetRoomProperties.Time] = toggle.isOn ? int.Parse(timeField.text) : -1
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }
 
 }
