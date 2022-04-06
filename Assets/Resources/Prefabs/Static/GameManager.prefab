@@ -3491,6 +3491,7 @@ GameObject:
   - component: {fileID: 3063105634746227037}
   - component: {fileID: 8814515203468784576}
   - component: {fileID: 6161724238288570319}
+  - component: {fileID: 5559958013354152961}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3545,6 +3546,7 @@ MonoBehaviour:
   spawnpoint: {x: 0, y: 0, z: 0}
   tilemap: {fileID: 0}
   spawnBigPowerups: 1
+  levelDesigner: 
   musicSourceIntro: {fileID: 5500062339093502112}
   musicSourceLoop: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
@@ -3558,9 +3560,8 @@ MonoBehaviour:
   musicEnabled: 0
   starRequirement: 0
   timeRemaining: -1
-  highestStarCount: 0
+  maxTime: 0
   hurryup: 0
-  isDraw: 0
   allPlayers: []
   enemySpawnpoints: []
   size: 1.39
@@ -3869,6 +3870,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a62b79df5160ecf44b403e14b896fe1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5559958013354152961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5500062339093502118}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 1
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: 2a2bcd05-0494-4a9c-8828-45e5f5e38a7e
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 482268096050949619}
 --- !u!1 &5871210287236870881
 GameObject:
   m_ObjectHideFlags: 0

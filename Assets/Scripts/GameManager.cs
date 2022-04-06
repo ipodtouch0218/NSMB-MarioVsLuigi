@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
@@ -14,7 +15,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     private static GameManager _instance;
     public static GameManager Instance { 
         get {
-            if (_instance == null)
+            if (_instance == null && SceneManager.GetActiveScene().buildIndex > 2)
                 _instance = FindObjectOfType<GameManager>();
 
             return _instance;
@@ -32,12 +33,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public Vector3 spawnpoint;
     public Tilemap tilemap;
     public bool spawnBigPowerups = true;
+    public string levelDesigner = "";
     TileBase[] originalTiles;
     BoundsInt origin;
     GameObject currentStar = null;
     GameObject[] starSpawns;
     readonly List<GameObject> remainingSpawns = new();
     float spawnStarCount;
+    private PlayerInput input;
 
     //Audio
     public AudioSource musicSourceIntro, musicSourceLoop, sfx;
@@ -49,11 +52,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public bool gameover = false, musicEnabled = false;
     public readonly List<string> loadedPlayers = new();
     public int starRequirement;
-    public float timeRemaining;
-    public int highestStarCount = -1;
+    public float timeRemaining, maxTime;
     public bool hurryup = false;
-    public bool timeBasedGame = false;
-    public bool isDraw = false;
 
     public PlayerController[] allPlayers;
     public EnemySpawnpoint[] enemySpawnpoints;
@@ -208,7 +208,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     public void Start() {
         Instance = this;
-        
+        input = GetComponent<PlayerInput>();
+        input.enabled = false;
+
         if (!PhotonNetwork.IsConnectedAndReady) {
             // offline mode, spawning in editor?
             PhotonNetwork.OfflineMode = true;
@@ -286,7 +288,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
-        timeRemaining = (int)PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
+        timeRemaining = maxTime = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
 
         if (canvas)
             SceneManager.UnloadSceneAsync("Loading");
@@ -317,19 +319,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     }
 
     public void Update() {
-        if (timeRemaining > 0 && gameover != true)
-        {
-            timeBasedGame = true;
-            timeRemaining -= 1 * Time.deltaTime;
-            if (hurryup != true && timeRemaining <= 10)
-            {
+        input.enabled = localPlayer == null;
+
+        if (timeRemaining > 0 && gameover != true) {
+            timeRemaining -= Time.deltaTime;
+            //play hurry sound if time < 10 OR less than 10%
+            if (hurryup != true && (timeRemaining <= 10 || timeRemaining < (maxTime * 0.1f))) {
                 hurryup = true;
-                sfx.PlayOneShot((AudioClip)Resources.Load("Sound/hurry-up"));
+                sfx.PlayOneShot((AudioClip) Resources.Load("Sound/hurry-up"));
             }
-            if (timeRemaining <= 0)
-            {
-                FindHighestStarCount();
-            } // TODO: Make a (working) sudden death mechanic
+            if (timeRemaining <= 0) {
+                CheckForWinner();
+                timeRemaining = 0;
+            }
         }
 
         if (gameover) 
@@ -381,69 +383,62 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     }
 
     public void CheckForWinner() {
-        if (!PhotonNetwork.IsMasterClient)
+        if (gameover || !PhotonNetwork.IsMasterClient)
             return;
 
-        int playerCount = 0;
-        PlayerController winningPlayer = null;
+        bool starGame = starRequirement != -1;
+        bool timeUp = timeRemaining != -1 && timeRemaining <= 0;
+        int winningStars = 0;
+        List<PlayerController> winningPlayers = new();
+        List<PlayerController> alivePlayers = new();
         foreach (var player in allPlayers) {
             if (player == null || player.lives == 0)
                 continue;
-            playerCount++;
-            winningPlayer = player;
-            if (timeBasedGame == false || timeRemaining > 0)
-            {
-                if (player.stars < starRequirement)
-                    continue;
 
-                PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
-                return;
-            }
-            else if (timeBasedGame == true && timeRemaining <= 0)
-            {
-                if (player.stars < highestStarCount)
-                    continue;
+            alivePlayers.Add(player);
 
-                 else if (isDraw == true || highestStarCount <= 0)
-                {
-                    PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, null, Utils.EVENT_ALL, SendOptions.SendReliable);
-                    return;
+            if ((starGame && player.stars >= starRequirement) || timeUp) {
+                //we're in a state where this player would win.
+                //check if someone has more stars
+                Debug.Log($"player with {player.stars} stars can win.");
+                if (player.stars >= winningStars) {
+                    //we have more stars than the current winners. clear them
+                    Debug.Log($"player with {player.stars} stars has more than {winningStars}.");
+                    if (player.stars > winningStars) {
+                        Debug.Log($"clear winning player array");
+                        winningPlayers.Clear();
+                    }
+
+                    winningStars = player.stars;
+                    winningPlayers.Add(player);
+                    Debug.Log($"winningStars = {winningStars}");
                 }
-
-                PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, player.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
-                return;
             }
         }
-        if (playerCount == 1 && PhotonNetwork.CurrentRoom.PlayerCount >= 2) {
-            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayer.photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
-            return;
-        }
-        if (playerCount == 0) {
+        //LIVES CHECKS
+        if (alivePlayers.Count == 0) {
+            //everyone's dead...? ok then, draw.
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, Utils.EVENT_ALL, SendOptions.SendReliable);
             return;
-        }
-    }
-
-    public void FindHighestStarCount() // TODO: I can already see some potential issues doing it this way. I'll have to fix it.
-    {
-        if (!PhotonNetwork.IsMasterClient)
+        } else if (alivePlayers.Count == 1 && PhotonNetwork.CurrentRoom.PlayerCount >= 2) {
+            //one player left alive (and not in a solo game). winner!
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
             return;
-        foreach (var player in allPlayers)
-        {
-            if (player == null || player.lives == 0)
-                continue;
-            if (player.stars > highestStarCount)
-            {
-                highestStarCount = player.stars;
-                isDraw = false;
-            }
-            else if (player.stars == highestStarCount)
-            {
-                isDraw = true;
-            }
         }
-        CheckForWinner();
+        //TIMED CHECKS
+        if (timeUp) {
+            //time up! check who has most stars, if a tie keep playing
+            if (winningPlayers.Count == 1)
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
 
+            return;
+        }
+        if (starGame && winningStars >= starRequirement) {
+            if (winningPlayers.Count == 1)
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
+
+            return;
+        }
     }
 
     private Coroutine loopCoroutine;
