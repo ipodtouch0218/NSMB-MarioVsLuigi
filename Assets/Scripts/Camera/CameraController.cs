@@ -5,24 +5,22 @@ public class CameraController : MonoBehaviour {
 
     public float scrollAmount, dampingTime = 0.5f;
     public float screenShakeTimer = 0;
-    public bool exactCentering = false;
+    public bool exactCentering = false, controlCamera = false;
     public Vector3 offset = Vector3.zero, currentPosition;
 
     private Vector3 dampVelocity;
     private Camera targetCamera;
-    private bool weControlCamera;
     private float startingZ;
 
     void Start() {
         //only control the camera if we're the local player.
         targetCamera = Camera.main;
         startingZ = targetCamera.transform.position.z;
-        weControlCamera = GameManager.Instance.localPlayer.gameObject == gameObject;
     }
 
     public void Update() {
         currentPosition = CalculateNewPosition();
-        if (weControlCamera)
+        if (controlCamera)
             targetCamera.transform.position = currentPosition;
     }
 

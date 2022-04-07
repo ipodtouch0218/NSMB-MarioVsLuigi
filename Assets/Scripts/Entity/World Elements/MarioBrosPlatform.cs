@@ -16,15 +16,21 @@ public class MarioBrosPlatform : MonoBehaviour {
     private SpriteRenderer spriteRenderer;
     private Color32[] pixels;
 
-    public void Awake() {
+    public void Start() {
         Initialize();
     }
 
     public void OnValidate() {
-        Initialize();
+        ValidationUtility.SafeOnValidate(() => {
+            Initialize();
+        });
     }
 
     private void Initialize() {
+        if (this == null)
+            //what
+            return;
+
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         spriteRenderer.size = new Vector2(platformWidth, 1.25f);

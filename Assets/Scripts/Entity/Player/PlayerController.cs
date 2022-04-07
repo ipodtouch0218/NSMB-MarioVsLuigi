@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         tilesJumpedInto = new(),
         tilesHitSide = new();
 
+    private GameObject trackIcon;
 
     #region -- SERIALIZATION / EVENTS --
 
@@ -113,6 +114,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
 
         cameraController = GetComponent<CameraController>();
+        cameraController.controlCamera = photonView.IsMine;
+
         animator = GetComponentInChildren<Animator>();
         body = GetComponent<Rigidbody2D>();
         sfx = GetComponent<AudioSource>();
@@ -122,6 +125,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         models = transform.Find("Models").gameObject;
         starDirection = Random.value < 0.5;
 
+        trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
 
         PlayerInput input = GetComponent<PlayerInput>();
         input.enabled = !photonView || photonView.IsMine;
@@ -915,8 +919,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public void PreRespawn() {
         if (--lives == 0) {
             GameManager.Instance.CheckForWinner();
-            if (photonView.IsMine)
+            Destroy(trackIcon);
+            if (photonView.IsMine) {
                 PhotonNetwork.Destroy(photonView);
+                GameManager.Instance.spectationManager.Spectating = true;
+            }
             return;
         }
         cameraController.currentPosition = transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
