@@ -28,8 +28,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private PlayerAnimationController animationController;
 
     public bool onGround, crushGround, doGroundSnap, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen;
-    public float walljumping, landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenJump;
-    public float invincible, giantTimer, floorAngle;
+    public float walljumping, landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenStruggle;
+    public float invincible, giantTimer, floorAngle, unfreezeTimer;
 
     public Vector2 pipeDirection;
     public int stars, coins, lives = -1;
@@ -172,8 +172,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         }
 
-        if (frozen && !dead)
+        if (frozen && !dead) {
+            // Do 3 second timer
+            if ((unfreezeTimer -= Time.fixedDeltaTime) < 0) {
+                FrozenObject.photonView.RPC("SpecialKill", RpcTarget.All, false, false);
+            }
+
             return;
+        }
 
         if (!dead) {
             HandleTemporaryInvincibility();
@@ -468,6 +474,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!photonView.IsMine || GameManager.Instance.paused)
             return;
         joystick = value.Get<Vector2>();
+        if (frozen)
+            photonView.RPC("FrozenStruggle", RpcTarget.All, true);
     }
 
     protected void OnJump(InputValue value) {
@@ -478,9 +486,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (jumpHeld)
             jumpBuffer = 0.15f;
 
-        if (frozen) {
-            photonView.RPC("FrozenJump", RpcTarget.All);
-        }
+        if (frozen)
+            photonView.RPC("FrozenStruggle", RpcTarget.All, false);
     }
 
     protected void OnSprint(InputValue value) {
@@ -765,18 +772,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         body.simulated = true;
         photonView.RPC("PlaySound", RpcTarget.All, "enemy/FrozenEnemyShatter");
         photonView.RPC("Knockback", RpcTarget.All, false, 1, true, 0);
-        frozenJump = 0;
+        frozenStruggle = 0;
+        unfreezeTimer = 3;
     }
 
     [PunRPC]
-    protected void FrozenJump() {
-        // FrozenJump is called by OnJump and that is called everytime jump is pushed or letgo so I just put a 4 there.
-        if (frozen && frozenJump != 11) {
-            frozenJump += 1;
+    protected void FrozenStruggle(bool movement = false) {
+        // FrozenStruggle is called by OnJump and that is called everytime jump is pushed or letgo so I just put a 4 there.
+        if (unfreezeTimer > 0) {
+            unfreezeTimer -= movement ? 0.02f : 0.04f;
             return;
         } else {
             HandleJumping(jumpBuffer > 0 && (onGround || koyoteTime < 0.1f));
-            FrozenObject.photonView.RPC("SpecialKill", RpcTarget.All, false, false);
         }
     }
 
@@ -890,6 +897,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         pipeEntering = null;
         propeller = false;
         propellerSpinTimer = 0;
+        unfreezeTimer = 3;
         flying = false;
         drill = false;
         onLeft = false;
@@ -927,6 +935,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         dead = false;
         animator.SetTrigger("respawn");
         invincible = 0;
+        unfreezeTimer = 3;
         giantTimer = 0;
         giantEndTimer = 0;
         giantStartTimer = 0;
@@ -1816,7 +1825,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onLeft = false;
             onRight = false;
             if (holding.CompareTag("frozencube")) {
-                holding.holderOffset = new Vector2(0f, state >= Enums.PowerupState.Large ? 1.2f : 0.5f);
+                holding.holderOffset = new Vector2(0f, state >= Enums.PowerupState.Large ? 1.1f : 0.5f);
             } else {
                 holding.holderOffset = new Vector2((facingRight ? 1 : -1) * 0.25f, state >= Enums.PowerupState.Large ? 0.5f : 0.25f);
             }

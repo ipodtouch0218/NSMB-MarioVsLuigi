@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
 
-public class DebugControls : MonoBehaviour {
+public class DebugControls : MonoBehaviour
+{
 
     public void Start() {
         if (!Debug.isDebugBuild && !Application.isEditor) {
@@ -40,8 +41,17 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.Digit6, "BulletBill");
         DebugEntity(Key.Digit7, "Spiny");
         DebugItem(Key.Digit8, "IceFlower");
+        FreezePlayer(Key.Digit9);
     }
 
+    private void FreezePlayer(Key key) {
+        PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
+        if (Keyboard.current[key].wasPressedThisFrame && (!p.frozen && !p.FrozenObject && p.state != Enums.PowerupState.Giant && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0)) {
+
+            GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", p.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+            frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, "Player", p.photonView.ViewID);
+        }
+    }
     private void DebugItem(Key key, string item) {
         if (Keyboard.current[key].wasPressedThisFrame)
             GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem(item);
