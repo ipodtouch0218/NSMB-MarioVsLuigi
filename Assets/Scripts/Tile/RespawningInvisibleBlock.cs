@@ -11,6 +11,9 @@ public class RespawningInvisibleBlock : MonoBehaviour {
         if (!collision.CompareTag("Player") || Utils.GetTileAtTileLocation(tileLocation) != null)
             return;
 
+        if (!collision.gameObject.GetPhotonView().IsMine)
+            return;
+
         Rigidbody2D body = collision.attachedRigidbody;
         if (body.velocity.y <= 0)
             return;

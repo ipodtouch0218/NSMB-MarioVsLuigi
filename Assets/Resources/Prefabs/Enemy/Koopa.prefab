@@ -179,7 +179,6 @@ MonoBehaviour:
   dead: 0
   frozen: 0
   body: {fileID: 0}
-  dropcoin: 1
   holder: {fileID: 0}
   previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}

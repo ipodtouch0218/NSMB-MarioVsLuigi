@@ -50,48 +50,50 @@ public class PlayerAnimationController : MonoBehaviourPun {
     void HandleAnimations() {
         Vector3 targetEuler = models.transform.eulerAngles;
         bool instant = false;
-        if (controller.dead) {
-            if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
-                targetEuler = new Vector3(-15, controller.facingRight ? 110 : 250, 0);
-            } else {
+        if (!controller.knockback) {
+            if (controller.dead) {
+                if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
+                    targetEuler = new Vector3(-15, controller.facingRight ? 110 : 250, 0);
+                } else {
+                    targetEuler = new Vector3(0, 180, 0);
+                }
+                instant = true;
+            } else if (animator.GetBool("pipe")) {
                 targetEuler = new Vector3(0, 180, 0);
-            }
-            instant = true;
-        } else if (animator.GetBool("pipe")) {
-            targetEuler = new Vector3(0, 180, 0);
-            instant = true;
-        } else if (animator.GetBool("inShell") && !controller.onSpinner) {
-            targetEuler += Mathf.Abs(body.velocity.x) / controller.runningMaxSpeed * Time.deltaTime * new Vector3(0, 1800 * (controller.facingRight ? -1 : 1));
-            instant = true;
-        } else if (controller.skidding || controller.turnaround) {
-            if (controller.facingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.turnaround)) {
-                targetEuler = new Vector3(0, 260, 0);
-            } else {
-                targetEuler = new Vector3(0, 100, 0);
-            }
-        } else {
-            if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.holding && controller.state != Enums.PowerupState.Giant) {
-                targetEuler += new Vector3(0, -1800, 0) * Time.deltaTime;
                 instant = true;
-            } else if (controller.flying || controller.propeller) {
-                targetEuler += new Vector3(0, -1200 - (controller.propellerTimer * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer <= 0 && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
+            } else if (animator.GetBool("inShell") && !controller.onSpinner) {
+                targetEuler += Mathf.Abs(body.velocity.x) / controller.runningMaxSpeed * Time.deltaTime * new Vector3(0, 1800 * (controller.facingRight ? -1 : 1));
                 instant = true;
+            } else if (controller.skidding || controller.turnaround) {
+                if (controller.facingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.turnaround)) {
+                    targetEuler = new Vector3(0, 260, 0);
+                } else {
+                    targetEuler = new Vector3(0, 100, 0);
+                }
             } else {
-                targetEuler = new Vector3(0, controller.facingRight ? 100 : 260, 0);
+                if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.holding && controller.state != Enums.PowerupState.Giant) {
+                    targetEuler += new Vector3(0, -1800, 0) * Time.deltaTime;
+                    instant = true;
+                } else if (controller.flying || controller.propeller) {
+                    targetEuler += new Vector3(0, -1200 - (controller.propellerTimer * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer <= 0 && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
+                    instant = true;
+                } else {
+                    targetEuler = new Vector3(0, controller.facingRight ? 100 : 260, 0);
+                }
             }
-        }
-        propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.flying || controller.propeller) ? -1 : 1) * Time.deltaTime), -2500, -300);
-        propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
+            propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.flying || controller.propeller) ? -1 : 1) * Time.deltaTime), -2500, -300);
+            propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
 
-        if (instant || wasTurnaround) {
-            models.transform.rotation = Quaternion.Euler(targetEuler);
-        } else {
-            float maxRotation = 2000f * Time.deltaTime;
-            float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
-            x += Mathf.Clamp(targetEuler.x - x, -maxRotation, maxRotation);
-            y += Mathf.Clamp(targetEuler.y - y, -maxRotation, maxRotation);
-            z += Mathf.Clamp(targetEuler.z - z, -maxRotation, maxRotation);
-            models.transform.rotation = Quaternion.Euler(x, y, z);
+            if (instant || wasTurnaround) {
+                models.transform.rotation = Quaternion.Euler(targetEuler);
+            } else {
+                float maxRotation = 2000f * Time.deltaTime;
+                float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
+                x += Mathf.Clamp(targetEuler.x - x, -maxRotation, maxRotation);
+                y += Mathf.Clamp(targetEuler.y - y, -maxRotation, maxRotation);
+                z += Mathf.Clamp(targetEuler.z - z, -maxRotation, maxRotation);
+                models.transform.rotation = Quaternion.Euler(x, y, z);
+            }
         }
         wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.turnaround;
 
@@ -281,6 +283,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             deathUp = false;
             body.gravityScale = 0;
             body.velocity = Vector2.zero;
+            animator.Play("deadstart", controller.state >= Enums.PowerupState.Large ? 1 : 0);
         } else {
             if (!deathUp && body.position.y > GameManager.Instance.GetLevelMinY()) {
                 body.velocity = new Vector2(0, deathForce);

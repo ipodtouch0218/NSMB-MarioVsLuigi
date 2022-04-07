@@ -47,7 +47,7 @@ Material:
     - Points: 256
     - PointsPerTile: 4
     - WaveHeight: 0.15
-    - WaveSpeed: 1
+    - WaveSpeed: 3
     - WaveWidth: 1
     - _Points: 256
     m_Colors:

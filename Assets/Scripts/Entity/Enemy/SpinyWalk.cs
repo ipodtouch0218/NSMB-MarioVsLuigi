@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using UnityEngine.Tilemaps;
 
 //This is pretty much just the koopawalk script but it causes damage when you stand on it.
 public class SpinyWalk : KoopaWalk {
@@ -60,6 +59,7 @@ public class SpinyWalk : KoopaWalk {
                                 //normal mario isnt groundpounding, we get stopped
                                 photonView.RPC("EnterShell", RpcTarget.All);
                                 photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+                                player.bounce = true;
                             }
                         }
                     } else {
