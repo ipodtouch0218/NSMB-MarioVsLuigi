@@ -128,6 +128,8 @@ MonoBehaviour:
   characters:
   - {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
   - {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
+  settings: {fileID: 0}
+  controlsJson: 
 --- !u!114 &1776850482587567144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,6 +144,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
   ndsResolution: 0
+  fireballFromSprint: 1
+  vsync: 0
 --- !u!82 &1776850482587567145
 AudioSource:
   m_ObjectHideFlags: 0
@@ -289,7 +293,7 @@ Canvas:
   m_GameObject: {fileID: 1955773772637164072}
   m_Enabled: 0
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0

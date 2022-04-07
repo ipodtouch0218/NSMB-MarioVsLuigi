@@ -21,17 +21,17 @@ public class UIUpdater : MonoBehaviour {
         pingSample = PhotonNetwork.GetPing();
     }
     
-    public void GivePlayersIcons() {
-        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player")) {
-            GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.position, Quaternion.identity, transform);
-            TrackIcon icon = trackObject.GetComponent<TrackIcon>();
-            icon.target = player;
+    public GameObject CreatePlayerIcon(PlayerController player) {
+        GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.position, Quaternion.identity, transform);
+        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
+        icon.target = player.gameObject;
 
-            if (!player.GetPhotonView().IsMine)
-                trackObject.transform.localScale = new Vector3(2f/3f, 2f/3f, 1f);
+        if (!player.photonView.IsMine)
+            trackObject.transform.localScale = new Vector3(2f / 3f, 2f / 3f, 1f);
 
-            trackObject.SetActive(true);
-        }
+        trackObject.SetActive(true);
+
+        return trackObject;
     }
 
     void Update() {

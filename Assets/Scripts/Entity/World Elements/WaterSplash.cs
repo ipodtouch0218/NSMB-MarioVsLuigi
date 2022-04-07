@@ -20,10 +20,20 @@ public class WaterSplash : MonoBehaviour {
     private MeshFilter meshFilter;
     private Mesh mesh;
 
-    void Start() {
-        OnValidate();
+    void Awake() {
+        Initialize();
     }
     private void OnValidate() {
+        ValidationUtility.SafeOnValidate(() => {
+            Initialize();
+        });
+    }
+
+    private void Initialize() {
+        if (this == null)
+            //what
+            return;
+
         meshRenderer = GetComponent<MeshRenderer>();
         meshFilter = GetComponent<MeshFilter>();
         BoxCollider2D collider = GetComponent<BoxCollider2D>();
@@ -52,6 +62,7 @@ public class WaterSplash : MonoBehaviour {
         meshRenderer.SetPropertyBlock(properties);
         meshRenderer.localBounds = new Bounds(collider.offset, collider.size);
     }
+
     void FixedUpdate() {
         int points = widthTiles * pointsPerTile;
         for (int i = 0; i < points; i++) {

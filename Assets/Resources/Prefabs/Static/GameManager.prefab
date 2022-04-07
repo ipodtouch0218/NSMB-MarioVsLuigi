@@ -1540,7 +1540,7 @@ GameObject:
   - component: {fileID: 5958562601690126037}
   m_Layer: 0
   m_Name: BaseCamera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3487,6 +3487,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5500062339093502141}
   - component: {fileID: 5500062339093502114}
+  - component: {fileID: 3058852347368318539}
   - component: {fileID: 5500062339093502112}
   - component: {fileID: 3063105634746227037}
   - component: {fileID: 8814515203468784576}
@@ -3567,6 +3568,20 @@ MonoBehaviour:
   size: 1.39
   ySize: 0.8
   playersToVisualize: 10
+--- !u!114 &3058852347368318539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5500062339093502118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ce8888412d73134aa21c20a7ec15ab3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spectationUI: {fileID: 4050497442588632677}
+  spectatingText: {fileID: 3211943134775986993}
 --- !u!82 &5500062339093502112
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3898,7 +3913,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
-  m_DefaultActionMap: 2a2bcd05-0494-4a9c-8828-45e5f5e38a7e
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 482268096050949619}
 --- !u!1 &5871210287236870881

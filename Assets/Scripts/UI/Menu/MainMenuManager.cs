@@ -195,8 +195,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // Unity Stuff
     void Start() {
         Instance = this;
-        HorizontalCamera.OFFSET_TARGET = 0; 
-        
+        HorizontalCamera.OFFSET_TARGET = 0;
+
         PhotonNetwork.SerializationRate = 30;
 
         AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
@@ -298,7 +298,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     void PingRegionsCallback(RegionHandler handler) {
         List<string> newRegions = new();
-        Debug.Log("a");
+#if UNITY_EDITOR
+        Debug.Log("i don't know why");
+#endif
 
         int index = 0;
         bool found = false;
@@ -309,13 +311,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 index++;
             found &= r.Code == handler.BestRegion.Code;
         }
-        Debug.Log("b");
+
+#if UNITY_EDITOR
+        Debug.Log("but photon doesn't connect");
         Debug.Log(newRegions.Count);
-        Debug.Log("c");
+        Debug.Log("without these debug messages");
+#endif
         if (found)
             region.value = index;
 
-        Debug.Log("d");
+#if UNITY_EDITOR
+        Debug.Log("but ONLY in editor???");
+#endif
 
         PhotonNetwork.Disconnect();
         PhotonNetwork.ConnectToRegion(handler.BestRegion.Code);
@@ -741,39 +748,69 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void ChangeTime(int time) {
-        Debug.Log($"time changed to {time}");
+        Debug.Log($"time changed to {time}s");
         timeEnabled.SetIsOnWithoutNotify(time != -1);
         UpdateSettingEnableStates();
         if (time == -1)
             return;
 
-        timeField.SetTextWithoutNotify(time.ToString());
+        int minutes = time / 60;
+        int seconds = time % 60;
+
+        timeField.SetTextWithoutNotify($"{minutes}:{seconds:D2}");
     }
     public void SetTime(TMP_InputField input) {
         if (!PhotonNetwork.IsMasterClient)
             return;
 
-        int.TryParse(input.text, out int newTimeValue);
-        if (newTimeValue == -1)
+        int seconds = ParseTimeToSeconds(input.text);
+
+        if (seconds == -1)
             return;
-        if (newTimeValue < 1) {
-            newTimeValue = 300;
-        }
-        if (newTimeValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time])
+
+        if (seconds < 1)
+            seconds = 300;
+
+        ChangeTime(seconds);
+
+        if (seconds == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time])
             return;
 
         ExitGames.Client.Photon.Hashtable table = new()
         {
-            [Enums.NetRoomProperties.Time] = newTimeValue
+            [Enums.NetRoomProperties.Time] = seconds
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        //ChangeTime(newTimeValue);
     }
     public void EnableTime(Toggle toggle) {
         ExitGames.Client.Photon.Hashtable properties = new()
         {
-            [Enums.NetRoomProperties.Time] = toggle.isOn ? int.Parse(timeField.text) : -1
+            [Enums.NetRoomProperties.Time] = toggle.isOn ? ParseTimeToSeconds(timeField.text) : -1
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
+
+    public int ParseTimeToSeconds(string time) {
+
+        int minutes;
+        int seconds;
+
+        if (time.Contains(":")) {
+            string[] split = time.Split(":");
+            int.TryParse(split[0], out minutes);
+            int.TryParse(split[1], out seconds);
+        } else {
+            minutes = 0;
+            int.TryParse(time, out seconds);
+        }
+
+        if (seconds >= 60) {
+            minutes += seconds / 60;
+            seconds %= 60;
+        }
+
+        seconds = minutes * 60 + seconds;
+
+        return seconds;
     }
 }
