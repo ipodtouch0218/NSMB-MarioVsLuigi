@@ -50,6 +50,5 @@ public class SettingButtonManager : MonoBehaviour {
         settings.vsync = toggle.isOn;
         QualitySettings.vSyncCount = toggle.isOn ? 1 : 0;
         settings.SaveSettingsToPreferences();
-        Debug.Log(QualitySettings.vSyncCount);
     }
 }

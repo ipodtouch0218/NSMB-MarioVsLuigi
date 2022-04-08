@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     public bool onGround, crushGround, doGroundSnap, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen;
     public float walljumping, landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenJump;
-    public float invincible, giantTimer, floorAngle;
+    public float invincible, giantTimer, floorAngle, knockbackTimer;
 
     public Vector2 pipeDirection;
     public int stars, coins, lives = -1;
@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         tilesHitSide = new();
 
     private GameObject trackIcon;
+
+    private ExitGames.Client.Photon.Hashtable gameState = new(); //only used to update spectating players
 
     #region -- SERIALIZATION / EVENTS --
 
@@ -125,8 +127,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         models = transform.Find("Models").gameObject;
         starDirection = Random.value < 0.5;
 
-        trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
-
         PlayerInput input = GetComponent<PlayerInput>();
         input.enabled = !photonView || photonView.IsMine;
         if (input.enabled && GlobalController.Instance.controlsJson != null)
@@ -144,10 +144,40 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     public void Start() {
         hitboxes = GetComponents<BoxCollider2D>();
+        trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
+        
+        if (GlobalController.Instance.joinedAsSpectator)
+            LoadFromGameState();
     }
     public void OnGameStart() {
         gameObject.SetActive(true);
         photonView.RPC("PreRespawn", RpcTarget.All);
+
+        gameState = new() {
+            [Enums.NetPlayerProperties.GameState] = new ExitGames.Client.Photon.Hashtable()
+        };
+        UpdateGameState();
+    }
+    
+    private void LoadFromGameState() {
+        if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not ExitGames.Client.Photon.Hashtable gs)
+            return;
+
+        lives = (int) gs[Enums.NetPlayerGameState.Lives];
+        stars = (int) gs[Enums.NetPlayerGameState.Stars];
+        state = (Enums.PowerupState) gs[Enums.NetPlayerGameState.PowerupState];
+    }
+
+    private void UpdateGameState() {
+        UpdateGameStateVariable(Enums.NetPlayerGameState.Lives, lives);
+        UpdateGameStateVariable(Enums.NetPlayerGameState.Stars, stars);
+        UpdateGameStateVariable(Enums.NetPlayerGameState.PowerupState, (int) state);
+
+        PhotonNetwork.LocalPlayer.SetCustomProperties(gameState);
+    }
+
+    private void UpdateGameStateVariable(string key, object value) {
+        ((ExitGames.Client.Photon.Hashtable) gameState[Enums.NetPlayerProperties.GameState])[key] = value;
     }
 
     public void LateUpdate() {
@@ -312,7 +342,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     return;
                 }
 
-                if (contact.normal.y > 0 || (other.inShell && onGround && body.position.y + 0.1f > other.body.position.y)) {
+                bool above = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) > (inShell ? .1f : .6f);
+
+                if (above) {
                     //hit them from above
                     bounce = !groundpound;
                     drill = false;
@@ -338,7 +370,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     return;
                 }
 
-                if (inShell && (other.inShell || body.position.y > other.body.position.y - 0.1f || other.onGround)) {
+                if (inShell && (other.inShell || above)) {
                     if (other.inShell) {
                         otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, false, -1);
                         photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, false, -1);
@@ -704,6 +736,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         Destroy(view.gameObject);
+
+        UpdateGameState();
     }
 
     [PunRPC]
@@ -742,6 +776,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             hitInvincibilityCounter = 3f;
             PlaySound("player/powerdown");
         }
+
+        UpdateGameState();
     }
     #endregion
 
@@ -819,6 +855,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         Destroy(star);
+
+        UpdateGameState();
     }
 
     [PunRPC]
@@ -883,6 +921,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         starDirection = !starDirection;
 
         GameManager.Instance.CheckForWinner();
+
+        UpdateGameState();
     }
     #endregion
 
@@ -922,7 +962,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             Destroy(trackIcon);
             if (photonView.IsMine) {
                 PhotonNetwork.Destroy(photonView);
-                GameManager.Instance.spectationManager.Spectating = true;
+                GameManager.Instance.SpectationManager.Spectating = true;
             }
             return;
         }
@@ -978,6 +1018,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         ResetKnockback();
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
         models.transform.rotation = Quaternion.Euler(0, 180, 0);
+
+        UpdateGameState();
     }
     #endregion
 
@@ -1118,21 +1160,24 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
 
         knockback = true;
+        knockbackTimer = fireball ? 0.5f : 1f;
 
         PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
         if (attacker)
             SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
 
+        /*
         if (!fireball) {
             if (Physics2D.Raycast(body.position + new Vector2(0, 0.2f), fromRight ? Vector2.left : Vector2.right, 0.3f, ONLY_GROUND_MASK))
                 fromRight = !fromRight;
             facingRight = !fromRight;
         }
+        */
 
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", facingRight != fromRight);
 
-        body.velocity = new Vector2((fromRight ? -1 : 1) * 3 * (starsToDrop + 1) * (state == Enums.PowerupState.Giant ? 3 : 1), fireball ? 0 : 1);
+        body.velocity = new Vector2((fromRight ? -1 : 1) * 3 * (starsToDrop + 1) * (state == Enums.PowerupState.Giant ? 3 : 1), fireball ? 0 : 4);
         if (onGround && !fireball)
             body.position += Vector2.up * 0.15f;
         
@@ -1239,7 +1284,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         }
         BoxCollider2D mainCollider = hitboxes[0];
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x * transform.lossyScale.x + (Physics2D.defaultContactOffset * 2f), 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
         if (hit) {
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
@@ -1254,7 +1299,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onGround = true;
             doGroundSnap = true;
         } else {
-            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x - 0.1f, 0.1f) * transform.lossyScale, 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
+            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x * transform.lossyScale.x + (Physics2D.defaultContactOffset * 2f), 0.1f), 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
             if (hit) {
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
                 if (angle < -89 || angle > 89)
@@ -1469,7 +1514,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
 
             float vel = jumpVelocity + Mathf.Abs(body.velocity.x) / 8f * (state == Enums.PowerupState.Giant ? 1.5f : 1f);
-            bool canSpecialJump = !flying && !propeller && topSpeed && landing < 0.2f && !holding && !triplejump && !crouching && !inShell && invincible <= 0 && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, ONLY_GROUND_MASK);
+            bool canSpecialJump = !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && invincible <= 0 && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, ONLY_GROUND_MASK);
             float jumpBoost = 0;
 
             if (canSpecialJump && singlejump) {
@@ -1658,6 +1703,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         TickCounter(ref hitInvincibilityCounter, 0, delta);
         TickCounter(ref propellerSpinTimer, 0, delta);
         TickCounter(ref propellerTimer, 0, delta);
+        TickCounter(ref knockbackTimer, 0, delta);
+
+        if (onGround)
+            TickCounter(ref landing, 0, -delta);
     }
 
     [PunRPC]
@@ -1768,7 +1817,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             crouching = false;
             inShell = false;
             body.velocity -= body.velocity * (delta * 2f);
-            if (photonView.IsMine && onGround && Mathf.Abs(body.velocity.x) < 0.2f)
+            if (photonView.IsMine && onGround && Mathf.Abs(body.velocity.x) < 0.2f && knockbackTimer <= 0)
                 photonView.RPC("ResetKnockback", RpcTarget.All);
             if (holding) {
                 holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
@@ -1822,7 +1871,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (holding) {
             onLeft = false;
             onRight = false;
-            if (holding.CompareTag("frozencube")) {
+            if (holding.CompareTag("Frozencube")) {
                 holding.holderOffset = new Vector2(0f, state >= Enums.PowerupState.Large ? 1.2f : 0.5f);
             } else {
                 holding.holderOffset = new Vector2((facingRight ? 1 : -1) * 0.25f, state >= Enums.PowerupState.Large ? 0.5f : 0.25f);
@@ -1990,7 +2039,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 animator.Play("jumplanding", state >= Enums.PowerupState.Large ? 1 : 0);
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
             }
-            if ((landing += delta) > 0.1f) {
+            if (landing > 0.45f) {
                 singlejump = false;
                 doublejump = false;
                 triplejump = false;

@@ -33,11 +33,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Text errorText, rebindCountdown, rebindText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
-    public string lastRegion;
+    public static string lastRegion;
 
     public Selectable[] roomSettings;
 
     private Coroutine updatePingCoroutine;
+
+    private bool pingsReceived;
+    private List<string> formattedRegions;
+    private Region[] pingSortedRegions;
 
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
@@ -49,6 +53,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (updatePingCoroutine == null)
             updatePingCoroutine = StartCoroutine(UpdatePing());
+
+        PhotonNetwork.ReconnectAndRejoin();
     }
     public void OnLeftLobby() {}
     public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbies) {}
@@ -117,16 +123,26 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // CONNECTION CALLBACKS
     public void OnConnected() { }
     public void OnDisconnected(DisconnectCause cause) {
-        if (cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic)
-            return;
-        OpenErrorBox("Disconnected: " + cause.ToString());
+        Debug.Log("disconnected: " + cause.ToString());
+        if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic))
+            OpenErrorBox("Disconnected: " + cause.ToString());
 
-        Debug.Log(PhotonNetwork.NetworkClientState);
         if (!PhotonNetwork.IsConnectedAndReady)
             PhotonNetwork.ConnectToRegion(lastRegion);
     }
     public void OnRegionListReceived(RegionHandler handler) {
-        handler.PingMinimumOfRegions(new System.Action<RegionHandler>(PingRegionsCallback), "");
+        handler.PingMinimumOfRegions((handler) => {
+
+            formattedRegions = new();
+            pingSortedRegions = handler.EnabledRegions.ToArray();
+            System.Array.Sort(pingSortedRegions, new RegionComparer());
+
+            foreach (Region r in pingSortedRegions)
+                formattedRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
+
+            lastRegion = pingSortedRegions[0].Code;
+            pingsReceived = true;
+        }, "");
     }
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {}
     public void OnCustomAuthenticationFailed(string failure) {}
@@ -161,7 +177,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.StarRequirement] = 10,
             [Enums.NetRoomProperties.Lives] = -1,
             [Enums.NetRoomProperties.Time] = -1,
-            [Enums.NetRoomProperties.NewPowerups] = true
+            [Enums.NetRoomProperties.NewPowerups] = true,
+            [Enums.NetRoomProperties.GameStarted] = false
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
@@ -198,13 +215,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         HorizontalCamera.OFFSET_TARGET = 0;
 
         PhotonNetwork.SerializationRate = 30;
+        PhotonNetwork.MaxResendsBeforeDisconnect = 15;
 
         AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
 
         if (PhotonNetwork.InRoom)
-            OnJoinedRoom();
+            EnterRoom();
+        if (PhotonNetwork.ReconnectAndRejoin()) {
+            Debug.Log("rejoin");
+        }
 
         PlaySong(musicLoop, musicStart);
 
@@ -231,19 +252,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {
             List<string> newRegions = new();
+            pingSortedRegions = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.ToArray();
+            System.Array.Sort(pingSortedRegions, new RegionComparer());
 
             int index = 0;
             bool found = false;
-            foreach (Region r in PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions) {
+            foreach (Region r in pingSortedRegions) {
                 newRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
+                found &= r.Code == lastRegion || r.Code == PhotonNetwork.CloudRegion;
                 if (!found)
                     index++;
-                found &= r.Code == PhotonNetwork.CloudRegion;
             }
+
+            region.ClearOptions();
+            region.AddOptions(newRegions);
+            
             if (found)
                 region.value = index;
-
-            region.AddOptions(newRegions);
         }
         EventSystem.current.SetSelectedGameObject(title);
     }
@@ -255,7 +280,24 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         joinRoomBtn.interactable = connected && selectedRoom != null && validName;
         createRoomBtn.interactable = connected && validName;
         region.interactable = connected;
+
+        if (pingsReceived) {
+            pingsReceived = false;
+
+            region.ClearOptions();
+            region.AddOptions(formattedRegions);
+            region.value = 0;
+
+            PhotonNetwork.Disconnect();
+        }
     }
+
+    public class RegionComparer : IComparer<Region> {
+        public int Compare(Region r1, Region r2) {
+            return r1.Ping - r2.Ping;
+        }
+    }
+
 
     private Coroutine loopCoroutine;
     private void PlaySong(AudioClip loop, AudioClip intro = null) {
@@ -296,41 +338,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
     }
 
-    void PingRegionsCallback(RegionHandler handler) {
-        List<string> newRegions = new();
-#if UNITY_EDITOR
-        Debug.Log("i don't know why");
-#endif
-
-        int index = 0;
-        bool found = false;
-        Debug.Log(handler.BestRegion);
-        foreach (Region r in handler.EnabledRegions) {
-            newRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
-            if (!found)
-                index++;
-            found &= r.Code == handler.BestRegion.Code;
-        }
-
-#if UNITY_EDITOR
-        Debug.Log("but photon doesn't connect");
-        Debug.Log(newRegions.Count);
-        Debug.Log("without these debug messages");
-#endif
-        if (found)
-            region.value = index;
-
-#if UNITY_EDITOR
-        Debug.Log("but ONLY in editor???");
-#endif
-
-        PhotonNetwork.Disconnect();
-        PhotonNetwork.ConnectToRegion(handler.BestRegion.Code);
-        lastRegion = handler.BestRegion.Code;
-        region.AddOptions(newRegions);
-    }
     void EnterRoom() {
-        RoomInfo room = PhotonNetwork.CurrentRoom;
+        Room room = PhotonNetwork.CurrentRoom;
+
+        object started = room.CustomProperties[Enums.NetRoomProperties.GameStarted];
+        if (started != null && (bool) started) {
+            //start as spectator
+            GlobalController.Instance.joinedAsSpectator = true;
+            PhotonNetwork.IsMessageQueueRunning = false;
+            SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
+            SceneManager.LoadSceneAsync(levelDropdown.value + 2, LoadSceneMode.Additive);
+            return;
+        }
+        
         OpenInLobbyMenu(room);
         PopulatePlayerList();
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
@@ -341,8 +361,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             updatePingCoroutine = StartCoroutine(UpdatePing());
 
         if (PhotonNetwork.IsMasterClient) {
-            PhotonNetwork.CurrentRoom.IsVisible = true;
-            PhotonNetwork.CurrentRoom.IsOpen = true;
+            room.IsVisible = true;
+            room.IsOpen = true;
         }
     }
 
@@ -445,7 +465,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void ConnectToDropdownRegion() {
-        Region targetRegion = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions[region.value];
+        Region targetRegion = pingSortedRegions[region.value];
         if (PhotonNetwork.CloudRegion == targetRegion.Code)
             return;
 
@@ -459,7 +479,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         selectedRoom = null;
 
         PhotonNetwork.Disconnect();
-        PhotonNetwork.ConnectToRegion(targetRegion.Code);
     }
 
     public void QuitRoom() {
@@ -468,6 +487,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void StartGame() {
         PhotonNetwork.CurrentRoom.IsOpen = true;
         PhotonNetwork.CurrentRoom.IsVisible = true;
+
+        //set started game
+        PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = true });
 
         //start game with all players
         RaiseEventOptions options = new() { Receivers = ReceiverGroup.All };
@@ -711,7 +733,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         textComp.text = txt;
         textComp.color = color;
     }
-
+    public void OpenLinks() {
+        Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/blob/master/LINKS.md");
+    }
     public void Quit() {
         if (quit)
             return;

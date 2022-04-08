@@ -14,20 +14,31 @@ public class SpectationManager : MonoBehaviour {
         }
         set {
             _spectating = value;
+            if (TargetPlayer == null)
+                SpectateNextPlayer();
+
             UpdateSpectateUI();
         }
     }
-    private PlayerController targetPlayer;
+    private PlayerController _targetPlayer;
+    public PlayerController TargetPlayer {
+        get {
+            return _targetPlayer;
+        }
+        set {
+            _targetPlayer = value;
+            if (value != null)
+                UpdateSpectateUI();
+        }
+    }
     private int targetIndex;
 
     public void Update() {
         if (!Spectating)
             return;
 
-        if (targetPlayer == null)
+        if (!TargetPlayer)
             SpectateNextPlayer();
-
-        UpdateSpectateUI();
     }
 
     public void UpdateSpectateUI() {
@@ -35,36 +46,40 @@ public class SpectationManager : MonoBehaviour {
         if (!Spectating)
             return;
 
-        spectatingText.text = $"Spectating: { targetPlayer.photonView.Owner.NickName }";
+        spectatingText.text = $"Spectating: { TargetPlayer.photonView.Owner.NickName }";
     }
     
     public void SpectateNextPlayer() {
-        if (targetPlayer)
-            targetPlayer.cameraController.controlCamera = false;
+        if (TargetPlayer)
+            TargetPlayer.cameraController.controlCamera = false;
 
-        targetPlayer = null;
+        TargetPlayer = null;
         PlayerController[] players = GameManager.Instance.allPlayers;
-
-        while (targetPlayer == null) {
-            targetIndex = (targetIndex + 1) % players.Length;
-            targetPlayer = players[targetIndex];
+        if (players.Length <= 0) {
+            GameManager.Instance.allPlayers = FindObjectsOfType<PlayerController>();
+            players = GameManager.Instance.allPlayers;
         }
 
-        targetPlayer.cameraController.controlCamera = true;
+        while (TargetPlayer == null) {
+            targetIndex = (targetIndex + 1) % players.Length;
+            TargetPlayer = players[targetIndex];
+        }
+
+        TargetPlayer.cameraController.controlCamera = true;
     }
 
     public void SpectatePreviousPlayer() {
-        if (targetPlayer)
-            targetPlayer.cameraController.controlCamera = false;
+        if (TargetPlayer)
+            TargetPlayer.cameraController.controlCamera = false;
 
-        targetPlayer = null;
+        TargetPlayer = null;
         PlayerController[] players = GameManager.Instance.allPlayers;
 
-        while (targetPlayer == null) {
+        while (TargetPlayer == null) {
             targetIndex = (targetIndex - 1 + players.Length) % players.Length;
-            targetPlayer = players[targetIndex];
+            TargetPlayer = players[targetIndex];
         }
 
-        targetPlayer.cameraController.controlCamera = true;
+        TargetPlayer.cameraController.controlCamera = true;
     }
 }

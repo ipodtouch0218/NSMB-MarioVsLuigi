@@ -10273,6 +10273,7 @@ MonoBehaviour:
   invincible: 0
   giantTimer: 0
   floorAngle: 0
+  knockbackTimer: 0
   pipeDirection: {x: 0, y: 0}
   stars: 0
   coins: 0
@@ -10694,6 +10695,7 @@ MonoBehaviour:
   dampingTime: 0.5
   screenShakeTimer: 0
   exactCentering: 0
+  controlCamera: 0
   offset: {x: 0, y: 0, z: 0}
   currentPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &7672112719043132634
