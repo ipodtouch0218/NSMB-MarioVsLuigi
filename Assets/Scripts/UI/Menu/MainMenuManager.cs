@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -21,7 +22,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText;
-    public TMP_Dropdown levelDropdown, characterDropdown;
+    public TMP_Dropdown levelDropdown, characterDropdown, primaryColorDropdown, secondaryColorDropdown;
     public RoomIcon selectedRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle;
@@ -47,7 +48,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnJoinedLobby() {
         ExitGames.Client.Photon.Hashtable prop = new() {
             { Enums.NetPlayerProperties.Character, 0 },
-            { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() }
+            { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() },
+            { Enums.NetPlayerProperties.PrimaryColor, CustomColors.Primary.Keys.ElementAt(0) }, 
+            { Enums.NetPlayerProperties.SecondaryColor, CustomColors.Secondary.Keys.ElementAt(0) },
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
@@ -240,6 +243,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
         fireballToggle.isOn = Settings.Instance.fireballFromSprint;
         vsyncToggle.isOn = Settings.Instance.vsync;
+
+        //custom color dropdown initialization
+        primaryColorDropdown.AddOptions( new List<string>(CustomColors.Primary.Keys) );
+        secondaryColorDropdown.AddOptions( new List<string>(CustomColors.Secondary.Keys) );
+
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
 
         rebindManager.Init();
@@ -702,6 +710,30 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PlayerData data = GlobalController.Instance.characters[dropdown.value];
         
         sfx.PlayOneShot((AudioClip) Resources.Load("Sound/" + data.soundFolder + "/selected"));
+    }
+
+    public void SwapPrimaryColor(TMP_Dropdown dropdown){
+        string colorName = dropdown.captionText.text;
+        ExitGames.Client.Photon.Hashtable prop = new() {
+            { Enums.NetPlayerProperties.PrimaryColor, colorName }
+        };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+
+        dropdown.captionText.color = dropdown.value == 0
+            ? new Color(1f,1f,1f,1f)
+            : CustomColors.Primary[colorName];
+    }
+
+    public void SwapSecondaryColor(TMP_Dropdown dropdown){
+        string colorName = dropdown.captionText.text;
+        ExitGames.Client.Photon.Hashtable prop = new() {
+            { Enums.NetPlayerProperties.SecondaryColor, colorName }
+        };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+
+        dropdown.captionText.color = dropdown.value == 0
+            ? new Color(1f,1f,1f,1f)
+            : CustomColors.Secondary[colorName];
     }
 
     public void SetUsername(TMP_InputField field) {
