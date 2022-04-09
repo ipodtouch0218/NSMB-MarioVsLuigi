@@ -53,8 +53,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (updatePingCoroutine == null)
             updatePingCoroutine = StartCoroutine(UpdatePing());
-
-        PhotonNetwork.ReconnectAndRejoin();
     }
     public void OnLeftLobby() {}
     public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbies) {}
@@ -213,6 +211,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     void Start() {
         Instance = this;
         HorizontalCamera.OFFSET_TARGET = 0;
+        HorizontalCamera.OFFSET = 0;
+        GlobalController.Instance.joinedAsSpectator = false;
 
         PhotonNetwork.SerializationRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
@@ -223,9 +223,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (PhotonNetwork.InRoom)
             EnterRoom();
-        if (PhotonNetwork.ReconnectAndRejoin()) {
-            Debug.Log("rejoin");
-        }
 
         PlaySong(musicLoop, musicStart);
 

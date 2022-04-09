@@ -59,6 +59,8 @@ public class SpectationManager : MonoBehaviour {
             GameManager.Instance.allPlayers = FindObjectsOfType<PlayerController>();
             players = GameManager.Instance.allPlayers;
         }
+        if (players.Length <= 0)
+            return;
 
         while (TargetPlayer == null) {
             targetIndex = (targetIndex + 1) % players.Length;
@@ -74,6 +76,12 @@ public class SpectationManager : MonoBehaviour {
 
         TargetPlayer = null;
         PlayerController[] players = GameManager.Instance.allPlayers;
+        if (players.Length <= 0) {
+            GameManager.Instance.allPlayers = FindObjectsOfType<PlayerController>();
+            players = GameManager.Instance.allPlayers;
+        }
+        if (players.Length <= 0)
+            return;
 
         while (TargetPlayer == null) {
             targetIndex = (targetIndex - 1 + players.Length) % players.Length;

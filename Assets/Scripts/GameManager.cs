@@ -11,7 +11,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
 
-public class GameManager : MonoBehaviour, IOnEventCallback {
+public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
     private static GameManager _instance;
     public static GameManager Instance { 
         get {
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public Vector3 spawnpoint;
     public Tilemap tilemap;
     public bool spawnBigPowerups = true;
-    public string levelDesigner = "";
+    public string levelDesigner = "", richPresenceId = "";
     TileBase[] originalTiles;
     BoundsInt origin;
     GameObject currentStar = null;
@@ -199,7 +199,22 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             break;
         }
         }
+    }    // ROOM CALLBACKS
+    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {  }
+    public void OnMasterClientSwitched(Player newMaster) {
+        //TODO: chat message
     }
+    public void OnJoinedRoom() { }
+    public void OnPlayerEnteredRoom(Player newPlayer) {
+        //TODO: chat message
+        if (localPlayer)
+            localPlayer.GetComponent<PlayerController>().UpdateGameState();
+    }
+    public void OnPlayerLeftRoom(Player otherPlayer) {
+        //TODO: player disconnect message
+    }
+    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) { }
+
 
     public void OnEnable() {
         PhotonNetwork.AddCallbackTarget(this);
@@ -258,7 +273,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
         bool spectating = GlobalController.Instance.joinedAsSpectator;
 
-        if (PhotonNetwork.IsMasterClient) {
+        if (PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode) {
             //clear buffered loading complete events. 
             RaiseEventOptions options = new() { Receivers = ReceiverGroup.All, CachingOption = EventCaching.RemoveFromRoomCache };
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);

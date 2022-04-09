@@ -172,6 +172,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
+      propertyPath: richPresenceId
+      value: sky
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
       propertyPath: levelHeightTile
       value: 21
       objectReference: {fileID: 0}
@@ -1262,8 +1267,8 @@ SpriteRenderer:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 2
-  m_Size: {x: 5.12, y: 3.62}
+  m_DrawMode: 1
+  m_Size: {x: 2.56, y: 3.62}
   m_AdaptiveModeThreshold: 0.205
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

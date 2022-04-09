@@ -6,7 +6,7 @@ using UnityEngine;
 public class WaterSplash : MonoBehaviour {
 
     [Delayed]
-    public int widthTiles = 64, pointsPerTile = 4;
+    public int widthTiles = 64, pointsPerTile = 4, splashWidth = 1;
     [Delayed]
     public float height = 0;
     public float tension = 40, kconstant = 2, damping = 0.95f, splashVelocity = 50f, resistance = 0f;
@@ -16,6 +16,7 @@ public class WaterSplash : MonoBehaviour {
     private Color32[] colors;
     public AudioSource sfx;
 
+    private int totalPoints;
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
     private Mesh mesh;
@@ -40,13 +41,13 @@ public class WaterSplash : MonoBehaviour {
 
         CreateMesh();
 
-        int points = widthTiles * pointsPerTile;
-        heightTex = new Texture2D(points, 1);
-        pointHeights = new float[points];
-        pointVelocities = new float[points];
-        colors = new Color32[points];
+        totalPoints = widthTiles * pointsPerTile;
+        heightTex = new Texture2D(totalPoints, 1);
+        pointHeights = new float[totalPoints];
+        pointVelocities = new float[totalPoints];
+        colors = new Color32[totalPoints];
 
-        for (int i = 0; i < points; i++)
+        for (int i = 0; i < totalPoints; i++)
             colors[i] = new(128, 128, 128, 255);
         heightTex.SetPixels32(colors);
         heightTex.Apply();
@@ -56,7 +57,7 @@ public class WaterSplash : MonoBehaviour {
 
         MaterialPropertyBlock properties = new();
         properties.SetTexture("Heightmap", heightTex);
-        properties.SetFloat("Points", widthTiles * pointsPerTile);
+        properties.SetFloat("Points", totalPoints);
         properties.SetFloat("PointsPerTile", pointsPerTile);
         properties.SetFloat("Height", height);
         meshRenderer.SetPropertyBlock(properties);
@@ -64,22 +65,21 @@ public class WaterSplash : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        int points = widthTiles * pointsPerTile;
-        for (int i = 0; i < points; i++) {
+        for (int i = 0; i < totalPoints; i++) {
             float height = pointHeights[i];
             pointVelocities[i] += tension * -height;
             pointVelocities[i] *= damping;
         }
-        for (int i = 0; i < points; i++) {
+        for (int i = 0; i < totalPoints; i++) {
             pointHeights[i] += pointVelocities[i] * Time.fixedDeltaTime;
         }
-        for (int i = 0; i < points; i++) {
+        for (int i = 0; i < totalPoints; i++) {
             float height = pointHeights[i];
 
-            pointVelocities[i] -= kconstant * Time.fixedDeltaTime * (height - pointHeights[(i + points - 1) % points]); //left
-            pointVelocities[i] -= kconstant * Time.fixedDeltaTime * (height - pointHeights[(i + points + 1) % points]); //right
+            pointVelocities[i] -= kconstant * Time.fixedDeltaTime * (height - pointHeights[(i + totalPoints - 1) % totalPoints]); //left
+            pointVelocities[i] -= kconstant * Time.fixedDeltaTime * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); //right
         }
-        for (int i = 0; i < points; i++) {
+        for (int i = 0; i < totalPoints; i++) {
             colors[i] = new Color((pointHeights[i]/20f) + 0.5f, 0, 0, 1);
         }
 
@@ -87,18 +87,17 @@ public class WaterSplash : MonoBehaviour {
         heightTex.Apply();
     }
     void OnTriggerEnter2D(Collider2D collider) {
-        int points = widthTiles * pointsPerTile;
         Instantiate(Resources.Load(splashParticle), collider.transform.position, Quaternion.identity);
         if (sfx)
             sfx.Play();
-        float localX = transform.InverseTransformPoint(collider.transform.position).x;
-        float pointsX = localX  % points;
-        while (pointsX < 0)
-            pointsX += points;
 
         Rigidbody2D body = collider.attachedRigidbody;
         float power = body ? -body.velocity.y : 1;
-        pointVelocities[(int) pointsX] = -splashVelocity * power;
+        float tile = transform.InverseTransformPoint(collider.transform.position).x * 2f;
+        for (int i = -splashWidth; i <= splashWidth; i++) {
+            int pointsX = (int) ((tile * pointsPerTile + i + totalPoints) % totalPoints);
+            pointVelocities[pointsX] = -splashVelocity * power;
+        }
     }
     void OnTriggerStay2D(Collider2D collision) {
         if (collision.attachedRigidbody == null)
@@ -108,26 +107,25 @@ public class WaterSplash : MonoBehaviour {
     }
     private void CreateMesh() {
         //create verts
-        int segmentCount = widthTiles * pointsPerTile;
-        Vector3[] verts = new Vector3[(segmentCount + 1) * 2];
+        Vector3[] verts = new Vector3[(totalPoints + 1) * 2];
         Vector2[] uvs = new Vector2[verts.Length];
         float distancePerPoint = .5f / pointsPerTile;
-        float xOffset = segmentCount / pointsPerTile / 4f;
-        for (int x = 0; x <= segmentCount; x++) {
+        float xOffset = totalPoints / pointsPerTile / 4f;
+        for (int x = 0; x <= totalPoints; x++) {
             int i = x * 2;
             float xPos = x * distancePerPoint;
             verts[i] = new(xPos - xOffset, -5f / 16f);
             verts[i + 1] = new(xPos - xOffset, 5f / 16f);
 
-            uvs[i] = new((float) x / (segmentCount + 1), 0f);
-            uvs[i + 1] = new((float) (x + 1) / (segmentCount + 1), 1f);
+            uvs[i] = new((float) x / (totalPoints + 1), 0f);
+            uvs[i + 1] = new((float) (x + 1) / (totalPoints + 1), 1f);
         }
 
         //create mesh
         mesh = new();
         mesh.name = "i hate making my own meshes";
-        int[] tris = new int[segmentCount * 6];
-        for (int i = 0; i < segmentCount; i++) {
+        int[] tris = new int[totalPoints * 6];
+        for (int i = 0; i < totalPoints; i++) {
             int v = i * 6;
             int p = i * 2;
 

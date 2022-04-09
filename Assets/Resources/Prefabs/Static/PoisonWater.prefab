@@ -96,7 +96,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 1}
@@ -126,11 +126,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   widthTiles: 64
   pointsPerTile: 4
+  splashWidth: 1
   height: 2
-  tension: 2
-  kconstant: 30
+  tension: 1
+  kconstant: 100
   damping: 0.98
-  splashVelocity: 3
+  splashVelocity: 7
   resistance: 0
   splashParticle: Prefabs/Particle/PoisonWaterSplash
   sfx: {fileID: 0}

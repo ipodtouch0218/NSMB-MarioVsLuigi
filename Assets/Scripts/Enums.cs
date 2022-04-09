@@ -25,6 +25,7 @@ public class Enums {
     }
     public static class NetPlayerGameState {
         public static string Stars { get; } = "stars";
+        public static string Coins { get; } = "coins";
         public static string Lives { get; } = "lives";
         public static string PowerupState { get; } = "powerup_state";
     }
