@@ -57,6 +57,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private GameObject trackIcon;
 
     private ExitGames.Client.Photon.Hashtable gameState = new(); //only used to update spectating players
+    private bool initialKnockbackFacingRight = false;
 
     #region -- SERIALIZATION / EVENTS --
 
@@ -1153,7 +1154,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
 
         knockback = true;
-        knockbackTimer = fireball ? 0.5f : 1f;
+        knockbackTimer = 0.5f;
+        initialKnockbackFacingRight = facingRight;
 
         PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
         if (attacker)
@@ -1198,6 +1200,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         bounce = false;
         knockback = false;
         body.velocity = new(0, body.velocity.y);
+        facingRight = initialKnockbackFacingRight;
     }
     #endregion
 
