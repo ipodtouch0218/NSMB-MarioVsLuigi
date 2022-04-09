@@ -10269,10 +10269,11 @@ MonoBehaviour:
   giantEndTimer: 0
   propellerTimer: 0
   propellerSpinTimer: 0
-  frozenJump: 0
+  frozenStruggle: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0
+  unfreezeTimer: 0
   knockbackTimer: 0
   pipeDirection: {x: 0, y: 0}
   stars: 0
