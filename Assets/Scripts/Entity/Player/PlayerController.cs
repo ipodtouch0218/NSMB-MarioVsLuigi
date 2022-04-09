@@ -574,7 +574,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 }
 
                 PhotonNetwork.Instantiate("Prefabs/Iceball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
-                photonView.RPC("PlaySound", RpcTarget.All, "player/fireball"); // Add ice ball sound effect
+                photonView.RPC("PlaySound", RpcTarget.All, "player/IceBallThrow"); // Added ice ball sound effect
                 animator.SetTrigger("fireball");
                 break;
             }
@@ -714,6 +714,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             propeller = false;
             flying = false;
             drill = false;
+            inShell = false;
             giantTimer = 15f;
             transform.localScale = Vector3.one;
             Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
@@ -1287,7 +1288,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             body.velocity = new Vector2(newX, newY);
         }
 
-        if (down || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && Mathf.Abs(body.velocity.x) < 0.1)) {
+        if (up || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && Mathf.Abs(body.velocity.x) < 0.1)) {
             sliding = false;
             alreadyGroundpounded = false;
         }
@@ -1886,7 +1887,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (holding) {
             onLeft = false;
             onRight = false;
-            if (holding.CompareTag("Frozencube")) {
+            if (holding.CompareTag("frozencube")) {
                 holding.holderOffset = new Vector2(0f, state >= Enums.PowerupState.Large ? 1.2f : 0.5f);
             } else {
                 holding.holderOffset = new Vector2((facingRight ? 1 : -1) * 0.25f, state >= Enums.PowerupState.Large ? 0.5f : 0.25f);

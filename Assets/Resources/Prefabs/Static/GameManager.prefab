@@ -3358,6 +3358,8 @@ MonoBehaviour:
     type: 3}
   storedItemPropellerMushroom: {fileID: -1858463510, guid: a87d3b028baa82640b06b88398a8c4f0,
     type: 3}
+  storedItemIceFlower: {fileID: -1604689058, guid: a87d3b028baa82640b06b88398a8c4f0,
+    type: 3}
   uiStars: {fileID: 5065808885645615392}
   uiCoins: {fileID: 1358896583763656960}
   uiDebug: {fileID: 2394508728399749356}
@@ -3548,6 +3550,7 @@ MonoBehaviour:
   tilemap: {fileID: 0}
   spawnBigPowerups: 1
   levelDesigner: 
+  richPresenceId: 
   musicSourceIntro: {fileID: 5500062339093502112}
   musicSourceLoop: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
