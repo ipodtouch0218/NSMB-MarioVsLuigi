@@ -37,7 +37,7 @@ public class FireballMover : MonoBehaviourPun {
             float bounceHeight = speed / (isIceball ? 1.0f : 1.25f);
 
             body.velocity = new Vector2(body.velocity.x, bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)));
-
+            Debug.Log($"bounce = {bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad) * 3f)}");
         } else if (isIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
         }
@@ -51,7 +51,6 @@ public class FireballMover : MonoBehaviourPun {
         } else {
             Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
         }
-
     }
 
     [PunRPC]
@@ -72,7 +71,7 @@ public class FireballMover : MonoBehaviourPun {
                     return;
                 if (isIceball) {
                     GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.gameObject.tag, en.photonView.ViewID);
+                    frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.gameObject.tag, en.photonView.ViewID);
                     PhotonNetwork.Destroy(gameObject);
                 } else {
                     en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false);
@@ -105,7 +104,7 @@ public class FireballMover : MonoBehaviourPun {
                 KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
                 if (isIceball && !bb.frozen) {
                     GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, bb.gameObject.tag, bb.photonView.ViewID);
+                    frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, bb.gameObject.tag, bb.photonView.ViewID);
                     PhotonNetwork.Destroy(gameObject);
                 }
 
@@ -141,7 +140,7 @@ public class FireballMover : MonoBehaviourPun {
                     PhotonNetwork.Destroy(gameObject);
                 } else {
                     GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                    frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, killa.gameObject.tag, killa.photonView.ViewID);
+                    frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, killa.gameObject.tag, killa.photonView.ViewID);
                 }
                 break;
             }

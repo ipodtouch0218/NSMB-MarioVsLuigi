@@ -11,7 +11,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
 
-public class GameManager : MonoBehaviour, IOnEventCallback {
+public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
     private static GameManager _instance;
     public static GameManager Instance { 
         get {
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public Vector3 spawnpoint;
     public Tilemap tilemap;
     public bool spawnBigPowerups = true;
-    public string levelDesigner = "";
+    public string levelDesigner = "", richPresenceId = "";
     TileBase[] originalTiles;
     BoundsInt origin;
     GameObject currentStar = null;
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     public PlayerController[] allPlayers;
     public EnemySpawnpoint[] enemySpawnpoints;
 
-    public SpectationManager spectationManager { get; private set; }
+    public SpectationManager SpectationManager { get; private set; }
 
     // EVENT CALLBACK
     public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
         object[] data = customData as object[];
 
         switch ((Enums.NetEventIds) eventId) {
-        case Enums.NetEventIds.SetGameStartTimestamp: {
+        case Enums.NetEventIds.AllFinishedLoading: {
             if (loaded)
                 break;
             StartCoroutine(LoadingComplete((int) customData));
@@ -199,7 +199,22 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             break;
         }
         }
+    }    // ROOM CALLBACKS
+    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {  }
+    public void OnMasterClientSwitched(Player newMaster) {
+        //TODO: chat message
     }
+    public void OnJoinedRoom() { }
+    public void OnPlayerEnteredRoom(Player newPlayer) {
+        //TODO: chat message
+        if (localPlayer)
+            localPlayer.GetComponent<PlayerController>().UpdateGameState();
+    }
+    public void OnPlayerLeftRoom(Player otherPlayer) {
+        //TODO: player disconnect message
+    }
+    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) { }
+
 
     public void OnEnable() {
         PhotonNetwork.AddCallbackTarget(this);
@@ -210,9 +225,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
     public void Start() {
         Instance = this;
-        input = GetComponent<PlayerInput>();
-        spectationManager = GetComponent<SpectationManager>();
-        input.enabled = false;
+        SpectationManager = GetComponent<SpectationManager>();
 
         if (!PhotonNetwork.IsConnectedAndReady) {
             // offline mode, spawning in editor?
@@ -239,33 +252,42 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             originalTiles[i] = map[i];
         }
 
-        
         SceneManager.SetActiveScene(gameObject.scene);
-        localPlayer = PhotonNetwork.Instantiate("Prefabs/" + Utils.GetCharacterData().prefab, spawnpoint, Quaternion.identity, 0);
-        localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
 
         PhotonNetwork.IsMessageQueueRunning = true;
-        
-        RaiseEventOptions options = new() { Receivers = ReceiverGroup.Others, CachingOption = EventCaching.AddToRoomCache };
-        SendAndExecuteEvent(Enums.NetEventIds.PlayerFinishedLoading, PhotonNetwork.LocalPlayer, SendOptions.SendReliable, options);
+
+        if (!GlobalController.Instance.joinedAsSpectator) {
+            localPlayer = PhotonNetwork.Instantiate("Prefabs/" + Utils.GetCharacterData().prefab, spawnpoint, Quaternion.identity, 0);
+            localPlayer.GetComponent<Rigidbody2D>().isKinematic = true;
+
+            RaiseEventOptions options = new() { Receivers = ReceiverGroup.Others, CachingOption = EventCaching.AddToRoomCache };
+            SendAndExecuteEvent(Enums.NetEventIds.PlayerFinishedLoading, PhotonNetwork.LocalPlayer, SendOptions.SendReliable, options);
+        } else {
+            SpectationManager.Spectating = true;
+        }
     }
     IEnumerator LoadingComplete(long startTimestamp) {
         starting = true;
         loaded = true;
         loadedPlayers.Clear();
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
+        bool spectating = GlobalController.Instance.joinedAsSpectator;
 
-        if (PhotonNetwork.IsMasterClient) {
+        if (PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode) {
             //clear buffered loading complete events. 
             RaiseEventOptions options = new() { Receivers = ReceiverGroup.All, CachingOption = EventCaching.RemoveFromRoomCache };
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);
         }
-        
-        yield return new WaitForSecondsRealtime((startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f);
+
+        if (!spectating) {
+            yield return new WaitForSecondsRealtime((startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f);
+        } else {
+            yield return new WaitForSeconds(2f);
+        }
 
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
         if (canvas) {
-            canvas.GetComponent<Animator>().SetTrigger("loaded");
+            canvas.GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
             //please just dont beep at me :(
             AudioSource source = canvas.GetComponent<AudioSource>();
             source.Stop();
@@ -274,26 +296,31 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
             Destroy(source);
         }
 
+
         allPlayers = FindObjectsOfType<PlayerController>();
-        foreach (PlayerController controllers in allPlayers)
-            controllers.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(3.5f);
+        if (!spectating) {
+            foreach (PlayerController controllers in allPlayers)
+                controllers.gameObject.SetActive(false);
 
-        sfx.PlayOneShot((AudioClip) Resources.Load("Sound/startgame")); 
+            yield return new WaitForSeconds(3.5f);
 
-        foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
-            wfgs.AttemptExecute();
+            sfx.PlayOneShot((AudioClip) Resources.Load("Sound/startgame"));
 
-        if (PhotonNetwork.IsMasterClient)
-            foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
-                point.AttemptSpawning();
+            if (PhotonNetwork.IsMasterClient)
+                foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
+                    point.AttemptSpawning();
 
-        localPlayer.GetComponent<PlayerController>().OnGameStart();
+            foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
+                wfgs.AttemptExecute();
+
+            localPlayer.GetComponent<PlayerController>().OnGameStart();
+        }
 
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
+        //todo; base off of end time decided by host
         timeRemaining = maxTime = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
 
         if (canvas)
@@ -301,6 +328,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     }
 
     IEnumerator EndGame(Player winner) {
+        PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
         musicSourceIntro.Stop();
         musicSourceLoop.Stop();
@@ -321,7 +349,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
     }
 
     public void Update() {
-        input.enabled = localPlayer == null;
+        //input.enabled = localPlayer == null;
 
         if (gameover)
             return;
@@ -341,11 +369,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback {
 
         if (musicEnabled)
             HandleMusic();
-
+        
         if (PhotonNetwork.IsMasterClient) {
             int players = PhotonNetwork.CurrentRoom.PlayerCount;
             if (!loaded && loadedPlayers.Count >= players) {
-                SendAndExecuteEvent(Enums.NetEventIds.SetGameStartTimestamp, PhotonNetwork.ServerTimestamp + ((players-1) * 250) + 1000, SendOptions.SendReliable);
+                RaiseEventOptions options = new() { CachingOption = EventCaching.AddToRoomCacheGlobal, Receivers = ReceiverGroup.All };
+                SendAndExecuteEvent(Enums.NetEventIds.AllFinishedLoading, PhotonNetwork.ServerTimestamp + ((players-1) * 250) + 1000, SendOptions.SendReliable, options);
                 loaded = true;
             }
         }

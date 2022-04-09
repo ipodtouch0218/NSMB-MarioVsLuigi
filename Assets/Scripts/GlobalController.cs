@@ -11,6 +11,8 @@ public class GlobalController : Singleton<GlobalController> {
     public Settings settings;
     public string controlsJson = null;
 
+    public bool joinedAsSpectator = false;
+
     private int windowWidth, windowHeight;
 
     void Awake() {

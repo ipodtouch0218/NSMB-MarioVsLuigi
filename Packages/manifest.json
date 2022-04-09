@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.jimmycushnie.noisynodes": "https://github.com/JimmyCushnie/Noisy-Nodes.git",
     "com.unity.2d.animation": "7.0.3",
     "com.unity.2d.pixel-perfect": "5.0.1",
     "com.unity.2d.psdimporter": "6.0.2",

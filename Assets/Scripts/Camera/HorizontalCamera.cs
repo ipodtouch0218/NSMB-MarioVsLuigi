@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class HorizontalCamera : MonoBehaviour {
     public static float OFFSET_TARGET = 0f;
-    private static float OFFSET_VELOCITY, OFFSET = 0f;
+    public static float OFFSET_VELOCITY, OFFSET = 0f;
     private Camera ourCamera;
     
     public bool renderToTextureIfAvailable = true;

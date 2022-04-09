@@ -6,8 +6,7 @@ using UnityEngine.InputSystem;
 using Photon.Pun;
 using ExitGames.Client.Photon;
 
-public class PlayerController : MonoBehaviourPun, IPunObservable
-{
+public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     public static int ANY_GROUND_MASK = -1, ONLY_GROUND_MASK, GROUND_LAYERID, HITS_NOTHING_LAYERID, DEFAULT_LAYERID;
 
@@ -58,6 +57,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     private GameObject trackIcon;
 
     private ExitGames.Client.Photon.Hashtable gameState = new(); //only used to update spectating players
+    private bool initialKnockbackFacingRight = false;
 
     #region -- SERIALIZATION / EVENTS --
 
@@ -157,28 +157,29 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         gameState = new() {
             [Enums.NetPlayerProperties.GameState] = new ExitGames.Client.Photon.Hashtable()
         };
-        UpdateGameState();
     }
-
+    
     private void LoadFromGameState() {
         if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not ExitGames.Client.Photon.Hashtable gs)
             return;
 
-        lives = (int)gs[Enums.NetPlayerGameState.Lives];
-        stars = (int)gs[Enums.NetPlayerGameState.Stars];
-        state = (Enums.PowerupState)gs[Enums.NetPlayerGameState.PowerupState];
+        lives = (int) gs[Enums.NetPlayerGameState.Lives];
+        stars = (int) gs[Enums.NetPlayerGameState.Stars];
+        coins = (int) gs[Enums.NetPlayerGameState.Coins];
+        state = (Enums.PowerupState) gs[Enums.NetPlayerGameState.PowerupState];
     }
 
-    private void UpdateGameState() {
+    public void UpdateGameState() {
         UpdateGameStateVariable(Enums.NetPlayerGameState.Lives, lives);
         UpdateGameStateVariable(Enums.NetPlayerGameState.Stars, stars);
-        UpdateGameStateVariable(Enums.NetPlayerGameState.PowerupState, (int)state);
+        UpdateGameStateVariable(Enums.NetPlayerGameState.Coins, coins);
+        UpdateGameStateVariable(Enums.NetPlayerGameState.PowerupState, (int) state);
 
         PhotonNetwork.LocalPlayer.SetCustomProperties(gameState);
     }
 
     private void UpdateGameStateVariable(string key, object value) {
-        ((ExitGames.Client.Photon.Hashtable)gameState[Enums.NetPlayerProperties.GameState])[key] = value;
+        ((ExitGames.Client.Photon.Hashtable) gameState[Enums.NetPlayerProperties.GameState])[key] = value;
     }
 
     public void LateUpdate() {
@@ -275,7 +276,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             }
         }
 
-        bool canWallslide = !inShell && body.velocity.y < -0.1 && !onGround && !holding && state != Enums.PowerupState.Giant && !flying && !drill && !crouching && !sliding;
+        bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !holding && state != Enums.PowerupState.Giant && !flying && !drill && !crouching && !sliding;
         onGround = down >= 1;
         hitLeft = left >= 2;
         hitRight = right >= 2;
@@ -935,6 +936,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     #region -- DEATH / RESPAWNING --
     [PunRPC]
     protected void Death(bool deathplane, bool fire) {
+        if (dead)
+            return;
         dead = true;
         onSpinner = null;
         pipeEntering = null;
@@ -1166,7 +1169,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             return;
 
         knockback = true;
-        knockbackTimer = fireball ? 0.5f : 1f;
+        knockbackTimer = 0.5f;
+        initialKnockbackFacingRight = facingRight;
 
         PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
         if (attacker)
@@ -1211,6 +1215,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         bounce = false;
         knockback = false;
         body.velocity = new(0, body.velocity.y);
+        facingRight = initialKnockbackFacingRight;
     }
     #endregion
 
@@ -1241,7 +1246,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     }
     #endregion
 
-    void HandleSliding(bool up) {
+    void HandleSliding(bool up, bool down) {
         if (groundpound) {
             if (onGround) {
                 if (state == Enums.PowerupState.Giant) {
@@ -1254,10 +1259,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
                     sliding = true;
                     alreadyGroundpounded = true;
                     body.velocity = new Vector2(-Mathf.Sign(floorAngle) * groundpoundVelocity, 0);
-                } else if (up || !crouching) {
-                    groundpound = false;
+                } else {
+                    alreadyGroundpounded = false;
                     groundpoundCounter = state == Enums.PowerupState.Giant ? 0.4f : 0.25f;
+                    body.velocity = Vector2.zero;
                 }
+
+                if (!down || state == Enums.PowerupState.Giant)
+                    groundpound = false;
             }
             if (up && state != Enums.PowerupState.Giant)
                 groundpound = false;
@@ -1278,7 +1287,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             body.velocity = new Vector2(newX, newY);
         }
 
-        if (up || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && Mathf.Abs(body.velocity.x) < 0.1)) {
+        if (down || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && Mathf.Abs(body.velocity.x) < 0.1)) {
             sliding = false;
             alreadyGroundpounded = false;
         }
@@ -1454,7 +1463,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         bool triggerState = Physics2D.queriesHitTriggers;
         Physics2D.queriesHitTriggers = false;
 
-        bool ret = Physics2D.BoxCast(body.position + new Vector2(0, 0.86f / 2f + 0.05f), new Vector2(width, 0.76f), 0, Vector2.zero, 0, ONLY_GROUND_MASK);
+        bool ret = Physics2D.BoxCast(body.position + new Vector2(0, 0.86f / 2f + 0.05f), new Vector2(width, 0.71f), 0, Vector2.zero, 0, ONLY_GROUND_MASK);
 
         Physics2D.queriesHitTriggers = triggerState;
         return ret;
@@ -1498,7 +1507,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (knockback || drill || groundpound || groundpoundCounter > 0 || (state == Enums.PowerupState.Giant && singlejump))
             return;
 
-        bool topSpeed = Mathf.Abs(body.velocity.x) + 0.1f > (runningMaxSpeed * (invincible > 0 ? 2 : 1));
+        bool topSpeed = Mathf.Abs(body.velocity.x) + 0.3f > (runningMaxSpeed * (invincible > 0 ? 2 : 1));
         if (bounce || (jump && (onGround || (koyoteTime < 0.15f && !propeller)))) {
             koyoteTime = 1;
             jumpBuffer = 0;
@@ -1689,7 +1698,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     }
 
     void TickCounter(ref float counter, float min, float delta) {
-        counter = Mathf.Max(0, counter - delta);
+        counter = Mathf.Max(min, counter - delta);
     }
 
     void TickCounters() {
@@ -1961,7 +1970,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         }
 
         HandleSlopes();
-        HandleSliding(up);
+        HandleSliding(up, crouch);
         HandleFacingDirection();
 
         //slow-rise check
@@ -2045,7 +2054,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
                 animator.Play("jumplanding", state >= Enums.PowerupState.Large ? 1 : 0);
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
             }
-            if (landing > 0.45f) {
+            if (landing > 0.2f) {
                 singlejump = false;
                 doublejump = false;
                 triplejump = false;

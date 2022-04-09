@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.jimmycushnie.noisynodes": {
+      "version": "https://github.com/JimmyCushnie/Noisy-Nodes.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.shadergraph": "7.1.8"
+      },
+      "hash": "1f212c268860dc1dc260bbd60d03246908508b79"
+    },
     "com.unity.2d.animation": {
       "version": "7.0.3",
       "depth": 0,

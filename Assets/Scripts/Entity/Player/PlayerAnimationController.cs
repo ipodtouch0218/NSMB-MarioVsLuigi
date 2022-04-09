@@ -50,7 +50,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     void HandleAnimations() {
         Vector3 targetEuler = models.transform.eulerAngles;
         bool instant = false;
-        if (!controller.knockback) {
+        if (!controller.knockback && !GameManager.Instance.gameover) {
             if (controller.dead) {
                 if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
                     targetEuler = new Vector3(-15, controller.facingRight ? 110 : 250, 0);
