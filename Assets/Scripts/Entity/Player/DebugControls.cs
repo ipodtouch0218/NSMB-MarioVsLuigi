@@ -58,7 +58,7 @@ public class DebugControls : MonoBehaviour
     }
     private void DebugEntity(Key key, string entity) {
         if (Keyboard.current[key].wasPressedThisFrame)
-            PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity, GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().facingRight ? Vector3.right : Vector3.left), Quaternion.identity);
+            PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity, GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().facingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
     }
 
 }

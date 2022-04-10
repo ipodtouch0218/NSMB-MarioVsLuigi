@@ -574,7 +574,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 }
 
                 PhotonNetwork.Instantiate("Prefabs/Iceball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
-                photonView.RPC("PlaySound", RpcTarget.All, "player/fireball"); // Add ice ball sound effect
+                photonView.RPC("PlaySound", RpcTarget.All, "player/IceBallThrow"); // Added ice ball sound effect
                 animator.SetTrigger("fireball");
                 break;
             }
@@ -714,6 +714,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             propeller = false;
             flying = false;
             drill = false;
+            inShell = false;
             giantTimer = 15f;
             transform.localScale = Vector3.one;
             Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
