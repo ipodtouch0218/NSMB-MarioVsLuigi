@@ -11,7 +11,7 @@ public class UIUpdater : MonoBehaviour {
     public GameObject playerTrackTemplate, starTrackTemplate;
     PlayerController player;
     //TODO: refactor
-    public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell, storedItemPropellerMushroom; 
+    public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell, storedItemPropellerMushroom, storedItemIceFlower; 
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     public Image itemReserve;
     public float pingSample = 0, fpsSample = 60;
@@ -59,6 +59,7 @@ public class UIUpdater : MonoBehaviour {
             "MegaMushroom" => storedItemMegaMushroom,
             "BlueShell" => storedItemBlueShell,
             "PropellerMushroom" => storedItemPropellerMushroom,
+            "IceFlower" => storedItemIceFlower,
             _ => storedItemNull,
         };
     }

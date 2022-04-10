@@ -10273,8 +10273,8 @@ MonoBehaviour:
   invincible: 0
   giantTimer: 0
   floorAngle: 0
-  unfreezeTimer: 0
   knockbackTimer: 0
+  unfreezeTimer: 0
   pipeDirection: {x: 0, y: 0}
   stars: 0
   coins: 0

@@ -21,6 +21,8 @@ public class Enums {
     public static class NetPlayerProperties {
         public static string Character { get; } = "character";
         public static string Ping { get; } = "ping";
+        public static string PrimaryColor { get; } = "primarycolor";
+        public static string SecondaryColor { get; } = "secondarycolor";
         public static string GameState { get; } = "game_state";
     }
     public static class NetPlayerGameState {

@@ -161,6 +161,7 @@ public class FrozenCube : HoldableEntity
                     GetComponent<BoxCollider2D>().size = new Vector2(1.35f, 1.35f);
                     frozenCubeCollider.size = new Vector2(1.35f, 1.35f);
                     offset = 0.25f;
+                    ((KoopaWalk)frozenEntity).stationary = true;
                 } else {
                     GetComponent<BoxCollider2D>().size = new Vector2(1.35f, 2);
                     frozenCubeCollider.size = new Vector2(1.35f, 2);

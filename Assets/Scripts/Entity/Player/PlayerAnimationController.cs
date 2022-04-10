@@ -18,6 +18,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
     [SerializeField] [ColorUsage(true, false)] Color glowColor = Color.clear;
+    [SerializeField] public Color primaryColor = Color.clear, secondaryColor = Color.clear;
 
     AudioSource drillParticleAudio;
     [SerializeField] AudioClip normalDrill, propellerDrill;
@@ -230,6 +231,11 @@ public class PlayerAnimationController : MonoBehaviourPun {
         block.SetFloat("EyeState", (int) eyeState);
         block.SetFloat("ModelScale", transform.lossyScale.x);
         block.SetColor("GlowColor", glowColor);
+
+        //Customizeable player color
+        block.SetVector("OverallsColor", primaryColor);
+        block.SetVector("ShirtColor", secondaryColor);
+
         Vector3 giantMultiply = Vector3.one;
         if (controller.giantTimer > 0 && controller.giantTimer < 4) {
             float v = ((Mathf.Sin(controller.giantTimer * 20f) + 1f) / 2f * 0.9f) + 0.1f;
@@ -348,5 +354,10 @@ public class PlayerAnimationController : MonoBehaviourPun {
             body.isKinematic = false;
         }
         pipeTimer += Time.fixedDeltaTime;
+    }
+
+    public void setCustomColors(Color primaryColor, Color secondaryColor){
+        this.primaryColor = primaryColor;
+        this.secondaryColor = secondaryColor;
     }
 }
