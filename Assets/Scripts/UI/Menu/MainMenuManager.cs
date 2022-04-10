@@ -44,13 +44,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     private List<string> formattedRegions;
     private Region[] pingSortedRegions;
 
+    private List<GameObject> currentRooms;
+
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
         ExitGames.Client.Photon.Hashtable prop = new() {
             { Enums.NetPlayerProperties.Character, 0 },
             { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() },
-            { Enums.NetPlayerProperties.PrimaryColor, CustomColors.Primary.Keys.ElementAt(0) }, 
-            { Enums.NetPlayerProperties.SecondaryColor, CustomColors.Secondary.Keys.ElementAt(0) },
+            { Enums.NetPlayerProperties.PrimaryColor, 0 }, 
+            { Enums.NetPlayerProperties.SecondaryColor, 0 },
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
@@ -84,6 +86,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             SetText(newLobby.transform.Find("LobbyPlayers").gameObject, "Players: " + room.PlayerCount + "/" + room.MaxPlayers);
             newLobby.GetComponent<RoomIcon>().room = room;
             count--;
+
+            Debug.Log(room.CustomProperties);
         }
     }
 
@@ -106,20 +110,21 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         LocalChatMessage(otherPlayer.NickName + " left the room", ColorToVector(Color.red));
         PopulatePlayerList();
     }
-    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) {
-        if (properties == null)
+    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable updatedProperties) {
+        if (updatedProperties == null)
             return;
 
-        if (properties[Enums.NetRoomProperties.Level] != null)
-            ChangeLevel((int) properties[Enums.NetRoomProperties.Level]);
-        if (properties[Enums.NetRoomProperties.StarRequirement] != null)
-            ChangeStarRequirement((int) properties[Enums.NetRoomProperties.StarRequirement]);
-        if (properties[Enums.NetRoomProperties.Lives] != null)
-            ChangeLives((int) properties[Enums.NetRoomProperties.Lives]);
-        if (properties[Enums.NetRoomProperties.NewPowerups] != null)
-            ChangeNewPowerups((bool) properties[Enums.NetRoomProperties.NewPowerups]);
-        if (properties[Enums.NetRoomProperties.Time] != null)
-            ChangeTime((int) properties[Enums.NetRoomProperties.Time]);
+        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
+        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
+        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
+        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
+    }
+    private void AttemptToUpdateProperty<T>(ExitGames.Client.Photon.Hashtable updatedProperties, string key, System.Action<T> updateAction) {
+        if (updatedProperties[key] == null)
+            return;
+
+        updateAction((T) updatedProperties[key]);
     }
     // CONNECTION CALLBACKS
     public void OnConnected() { }
@@ -172,16 +177,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnCreatedRoom() {
         Debug.Log("Created Room: " + PhotonNetwork.CurrentRoom.Name);
-
-        ExitGames.Client.Photon.Hashtable table = new() {
-            [Enums.NetRoomProperties.Level] = 0,
-            [Enums.NetRoomProperties.StarRequirement] = 10,
-            [Enums.NetRoomProperties.Lives] = -1,
-            [Enums.NetRoomProperties.Time] = -1,
-            [Enums.NetRoomProperties.NewPowerups] = true,
-            [Enums.NetRoomProperties.GameStarted] = false
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
     // CUSTOM EVENT CALLBACKS
     public void OnEvent(EventData e) {
@@ -245,8 +240,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         vsyncToggle.isOn = Settings.Instance.vsync;
 
         //custom color dropdown initialization
-        primaryColorDropdown.AddOptions( new List<string>(CustomColors.Primary.Keys) );
-        secondaryColorDropdown.AddOptions( new List<string>(CustomColors.Secondary.Keys) );
+
+        CustomColors.Primary.SelectMany(c => c.name).ToList();
+
+        primaryColorDropdown.AddOptions(CustomColors.Primary.Select(c => c.name).ToList());
+        secondaryColorDropdown.AddOptions(CustomColors.Secondary.Select(c => c.name).ToList());
 
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
 
@@ -359,6 +357,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         OpenInLobbyMenu(room);
         PopulatePlayerList();
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
+        primaryColorDropdown.SetValueWithoutNotify((int) PhotonNetwork.LocalPlayer.CustomProperties[Enums.NetPlayerProperties.PrimaryColor]);
+        secondaryColorDropdown.SetValueWithoutNotify((int) PhotonNetwork.LocalPlayer.CustomProperties[Enums.NetPlayerProperties.SecondaryColor]);
 
         OnRoomPropertiesUpdate(room.CustomProperties);
 
@@ -583,10 +583,25 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         string room = nicknameField.text + "'" + (endswithS ? "" : "s") + " Lobby";
 
         byte players = (byte) lobbyPlayersSlider.value;
-        if (players < 2)
-            return;
 
-        PhotonNetwork.CreateRoom(room, new() { MaxPlayers = players, IsVisible = true, PublishUserId = true }, TypedLobby.Default);
+        RoomOptions options = new() {
+            MaxPlayers = players,
+            IsVisible = true,
+            PublishUserId = true,
+            CustomRoomPropertiesForLobby = new string[]{
+                Enums.NetRoomProperties.Level,
+                Enums.NetRoomProperties.GameStarted,
+            },
+            CustomRoomProperties = new() {
+                [Enums.NetRoomProperties.Level] = 0,
+                [Enums.NetRoomProperties.StarRequirement] = 10,
+                [Enums.NetRoomProperties.Lives] = -1,
+                [Enums.NetRoomProperties.Time] = -1,
+                [Enums.NetRoomProperties.NewPowerups] = true,
+                [Enums.NetRoomProperties.GameStarted] = false
+            }
+        };
+        PhotonNetwork.CreateRoom(room, options, TypedLobby.Default);
         createLobbyPrompt.SetActive(false);
     }
     public void SetMaxPlayersText(Slider slider) {
@@ -712,28 +727,22 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         sfx.PlayOneShot((AudioClip) Resources.Load("Sound/" + data.soundFolder + "/selected"));
     }
 
-    public void SwapPrimaryColor(TMP_Dropdown dropdown){
-        string colorName = dropdown.captionText.text;
+    public void SwapPrimaryColor(TMP_Dropdown dropdown) {
         ExitGames.Client.Photon.Hashtable prop = new() {
-            { Enums.NetPlayerProperties.PrimaryColor, colorName }
+            { Enums.NetPlayerProperties.PrimaryColor, dropdown.value }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
-        dropdown.captionText.color = dropdown.value == 0
-            ? new Color(1f,1f,1f,1f)
-            : CustomColors.Primary[colorName];
+        dropdown.captionText.color = dropdown.value == 0 ? Color.white : CustomColors.Primary[dropdown.value].color;
     }
 
-    public void SwapSecondaryColor(TMP_Dropdown dropdown){
-        string colorName = dropdown.captionText.text;
+    public void SwapSecondaryColor(TMP_Dropdown dropdown) {
         ExitGames.Client.Photon.Hashtable prop = new() {
-            { Enums.NetPlayerProperties.SecondaryColor, colorName }
+            { Enums.NetPlayerProperties.SecondaryColor, dropdown.value }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
-        dropdown.captionText.color = dropdown.value == 0
-            ? new Color(1f,1f,1f,1f)
-            : CustomColors.Secondary[colorName];
+        dropdown.captionText.color = dropdown.value == 0 ? Color.white : CustomColors.Secondary[dropdown.value].color;
     }
 
     public void SetUsername(TMP_InputField field) {

@@ -18,7 +18,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
     [SerializeField] [ColorUsage(true, false)] Color glowColor = Color.clear;
-    [SerializeField] public Color primaryColor = Color.clear, secondaryColor = Color.clear;
+    [SerializeField] Color primaryColor = Color.clear, secondaryColor = Color.clear;
 
     AudioSource drillParticleAudio;
     [SerializeField] AudioClip normalDrill, propellerDrill;
@@ -40,8 +40,13 @@ public class PlayerAnimationController : MonoBehaviourPun {
         blueShell.SetActive(false);
         propellerHelmet.SetActive(false);
 
-        if (photonView && !photonView.IsMine)
-            glowColor = Color.HSVToRGB(controller.playerId / ((float) PhotonNetwork.PlayerList.Length + 1), 1, 1);
+        if (photonView) {
+            if (!photonView.IsMine)
+                glowColor = Color.HSVToRGB(controller.playerId / ((float) PhotonNetwork.PlayerList.Length + 1), 1, 1);
+
+            primaryColor = CustomColors.Primary[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.PrimaryColor]].color.linear;
+            secondaryColor = CustomColors.Secondary[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.SecondaryColor]].color.linear;
+        }
     }
 
     public void Update() {
@@ -300,7 +305,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
         }
-        if (controller.photonView.IsMine && deathTimer + Time.fixedDeltaTime > (3-0.43f) && deathTimer < (3 - 0.43f))
+        if (controller.photonView.IsMine && deathTimer + Time.fixedDeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f))
             controller.fadeOut.FadeOutAndIn(0.33f, .1f);
 
         if (photonView.IsMine && deathTimer >= 3f)
@@ -354,10 +359,5 @@ public class PlayerAnimationController : MonoBehaviourPun {
             body.isKinematic = false;
         }
         pipeTimer += Time.fixedDeltaTime;
-    }
-
-    public void setCustomColors(Color primaryColor, Color secondaryColor){
-        this.primaryColor = primaryColor;
-        this.secondaryColor = secondaryColor;
     }
 }

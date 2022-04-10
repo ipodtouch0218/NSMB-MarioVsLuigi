@@ -19,24 +19,24 @@ public class Enums {
     }
     // Networking Enums
     public static class NetPlayerProperties {
-        public static string Character { get; } = "character";
+        public static string Character { get; } = "char";
         public static string Ping { get; } = "ping";
-        public static string PrimaryColor { get; } = "primarycolor";
-        public static string SecondaryColor { get; } = "secondarycolor";
-        public static string GameState { get; } = "game_state";
+        public static string PrimaryColor { get; } = "clr1";
+        public static string SecondaryColor { get; } = "clr2";
+        public static string GameState { get; } = "state";
     }
     public static class NetPlayerGameState {
         public static string Stars { get; } = "stars";
         public static string Coins { get; } = "coins";
         public static string Lives { get; } = "lives";
-        public static string PowerupState { get; } = "powerup_state";
+        public static string PowerupState { get; } = "state";
     }
     public static class NetRoomProperties {
-        public static string Level { get; } = "level";
+        public static string Level { get; } = "map";
         public static string StarRequirement { get; } = "stars";
         public static string Lives { get; } = "lives";
         public static string Time { get; } = "time";
-        public static string NewPowerups { get; } = "newpowerups";
+        public static string NewPowerups { get; } = "custom";
         public static string GameStarted { get; } = "started";
     }
     public enum NetEventIds : byte {
