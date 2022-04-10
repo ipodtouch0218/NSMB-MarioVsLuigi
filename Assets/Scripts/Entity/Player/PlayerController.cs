@@ -1261,12 +1261,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     body.velocity = new Vector2(-Mathf.Sign(floorAngle) * groundpoundVelocity, 0);
                 } else {
                     alreadyGroundpounded = false;
-                    groundpoundCounter = state == Enums.PowerupState.Giant ? 0.4f : 0.25f;
                     body.velocity = Vector2.zero;
+                    if (!down || state == Enums.PowerupState.Giant) {
+                        groundpound = false;
+                        groundpoundCounter = state == Enums.PowerupState.Giant ? 0.4f : 0.25f;
+                    }
                 }
-
-                if (!down || state == Enums.PowerupState.Giant)
-                    groundpound = false;
             }
             if (up && state != Enums.PowerupState.Giant)
                 groundpound = false;
@@ -1287,7 +1287,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             body.velocity = new Vector2(newX, newY);
         }
 
-        if (down || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && Mathf.Abs(body.velocity.x) < 0.1)) {
+        if (up || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && Mathf.Abs(body.velocity.x) < 0.1)) {
             sliding = false;
             alreadyGroundpounded = false;
         }
@@ -1886,7 +1886,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (holding) {
             onLeft = false;
             onRight = false;
-            if (holding.CompareTag("Frozencube")) {
+            if (holding.CompareTag("frozencube")) {
                 holding.holderOffset = new Vector2(0f, state >= Enums.PowerupState.Large ? 1.2f : 0.5f);
             } else {
                 holding.holderOffset = new Vector2((facingRight ? 1 : -1) * 0.25f, state >= Enums.PowerupState.Large ? 0.5f : 0.25f);
