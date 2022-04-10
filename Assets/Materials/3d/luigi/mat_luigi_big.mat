@@ -122,6 +122,7 @@ Material:
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
+    - _MultiPowerupMaterial: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _QueueControl: 1
@@ -138,6 +139,8 @@ Material:
     m_Colors:
     - MultiplyColor: {r: 1, g: 1, b: 1, a: 0}
     - OutlineColor: {r: 0, g: 0, b: 0, a: 0}
+    - OverallsColor: {r: 0.21294737, g: 0.32941175, b: 0.094117604, a: 1}
+    - ShirtColor: {r: 0.31372547, g: 0.21960777, b: 0.21960777, a: 1}
     - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
     - _Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
