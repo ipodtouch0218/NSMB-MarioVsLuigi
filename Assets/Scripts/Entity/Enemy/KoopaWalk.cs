@@ -217,6 +217,7 @@ public class KoopaWalk : HoldableEntity {
         case "koopa":
         case "bobomb":
         case "bulletbill":
+        case "frozencube":
         case "goomba":
             if (killa.dead) 
                 break;
