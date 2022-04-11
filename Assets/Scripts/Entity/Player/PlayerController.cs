@@ -208,8 +208,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         }
 
-        if (frozen && !dead)
+        if (frozen && !dead) {
+            if ((unfreezeTimer -= Time.fixedDeltaTime) < 0) {
+                FrozenObject.photonView.RPC("SpecialKill", RpcTarget.All, body.position.x > body.position.x, false);
+            }
             return;
+        }
 
         if (!dead) {
             HandleTemporaryInvincibility();
@@ -448,7 +452,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
                 if (state == Enums.PowerupState.Mini) {
                     photonView.RPC("Powerdown", RpcTarget.All, false);
-                } else if (!frozen || FrozenObject || state != Enums.PowerupState.Giant || !pipeEntering || knockback || hitInvincibilityCounter > 0) {
+                } else if (!frozen && !FrozenObject && state != Enums.PowerupState.Giant && !pipeEntering && knockback && hitInvincibilityCounter > 0) {
 
                     GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
                     frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, gameObject.tag, photonView.ViewID);
@@ -527,10 +531,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         running = value.Get<float>() >= 0.5f;
 
+        if (frozen) {
+            photonView.RPC("FrozenStruggle", RpcTarget.All, false);
+            return;
+        }
         if (running && (state == Enums.PowerupState.FireFlower || state == Enums.PowerupState.IceFlower) && GlobalController.Instance.settings.fireballFromSprint)
             ActivatePowerupAction();
-        if (frozen)
-            photonView.RPC("FrozenStruggle", RpcTarget.All, false);
     }
 
     protected void OnPowerupAction(InputValue value) {
@@ -824,7 +830,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             unfreezeTimer -= movement ? 0.02f : 0.04f;
             return;
         } else {
-            HandleJumping(jumpBuffer > 0 && (onGround || koyoteTime < 0.1f));
+            FrozenObject.photonView.RPC("SpecialKill", RpcTarget.All, body.position.x > body.position.x, false);
         }
     }
 
@@ -944,6 +950,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         pipeEntering = null;
         propeller = false;
         propellerSpinTimer = 0;
+        unfreezeTimer = 3;
         flying = false;
         drill = false;
         onLeft = false;
@@ -984,6 +991,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         dead = false;
         animator.SetTrigger("respawn");
         invincible = 0;
+        unfreezeTimer = 3;
         giantTimer = 0;
         giantEndTimer = 0;
         giantStartTimer = 0;
