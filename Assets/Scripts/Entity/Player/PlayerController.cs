@@ -123,10 +123,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         body = GetComponent<Rigidbody2D>();
         sfx = GetComponent<AudioSource>();
         animationController = GetComponent<PlayerAnimationController>();
-            animationController.setCustomColors(
-                CustomColors.Primary[(string) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.PrimaryColor]].linear,
-                CustomColors.Secondary[(string) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.SecondaryColor]].linear
-            );
         fadeOut = GameObject.FindGameObjectWithTag("FadeUI").GetComponent<FadeOutManager>();
 
         models = transform.Find("Models").gameObject;

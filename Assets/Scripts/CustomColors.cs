@@ -2,34 +2,43 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CustomColors {
+public static class CustomColors {
+    public class PlayerColor {
+        public string name;
+        public Color color;
+        public PlayerColor(string name, Color32 color) {
+            this.name = name;
+            this.color = color;
+        }
+    }
+
     //Overalls colors
-    public static Dictionary<string, Color> Primary = new() {
-        {"Default",new Color(0f,0f,0f,0f)},
-        {"Rossi",new Color(0.565f,0.322f,0.322f,1f)},
-        {"Wood",new Color(0.541f,0.392f,0.302f,1f)},
-        {"Cashmere",new Color(0.522f,0.478f,0.282f,1f)},
-        {"Shamrock",new Color(0.322f,0.541f,0.376f,1f)},
-        {"Azurite",new Color(0.290f,0.533f,0.486f,1f)},
-        {"Cerulean",new Color(0.322f,0.412f,0.561f,1f)},
-        {"Denim",new Color(0.235f,0.227f,0.337f,1f)},
-        {"Mallow",new Color(0.604f,0.463f,0.561f,1f)},
-        {"Tyrian",new Color(0.510f,0.322f,0.561f,1f)},
-        {"Coal",new Color(0.149f,0.149f,0.149f,1f)},
+    public static PlayerColor[] Primary = new PlayerColor[] {
+        new("Default", new(0, 0, 0, 0)),
+        new("Red", new(212, 60, 14, 255)),
+        new("Orange", new(251, 132, 0, 255)),
+        new("Yellow", new(245, 188, 0, 255)),
+        new("Green", new(131, 188, 59, 255)),
+        new("Teal", new(0, 203, 162, 255)),
+        new("Blue", new(42, 126, 255, 255)),
+        new("Purple", new(78, 60, 255, 255)),
+        new("Pink", new(212, 43, 255, 255)),
+        new("Magenta", new(131, 16, 164, 255)),
+        new("Black", new(96, 96, 96, 255))
     };
     //Shirt/Hat colors
-    public static Dictionary<string, Color> Secondary = new() {
-        {"Default",new Color(0f,0f,0f,0f)},
-        {"Lobster",new Color(0.659f,0.294f,0.184f,1f)},
-        {"Copper",new Color(0.827f,0.541f,0.165f,1f)},
-        {"Dandelion",new Color(0.859f,0.722f,0.169f,1f)},
-        {"Meadow",new Color(0.549f,0.686f,0.376f,1f)},
-        {"Turqouise",new Color(0.165f,0.690f,0.592f,1f)},
-        {"Sky",new Color(0.278f,0.478f,0.808f,1f)},
-        {"Indigo",new Color(0.322f,0.278f,0.800f,1f)},
-        {"Lilac",new Color(0.690f,0.282f,0.808f,1f)},
-        {"Byzantium",new Color(0.416f,0.137f,0.494f,1f)},
-        {"Coal",new Color(0.376f,0.376f,0.376f,1f)},
+    public static PlayerColor[] Secondary = new PlayerColor[] {
+        new("Default", new(0, 0, 0, 0)),
+        new("Red", new(137, 57, 57, 255)),
+        new("Orange", new(145, 88, 55, 255)),
+        new("Yellow", new(145, 128, 45, 255)),
+        new("Green", new(49, 120, 67, 255)),
+        new("Teal", new(34, 104, 90, 255)),
+        new("Blue", new(29, 68, 132, 255)),
+        new("Purple", new(58, 51, 132, 255)),
+        new("Pink", new(135, 41, 107, 255)),
+        new("Magenta", new(78, 30, 91, 255)),
+        new("Black", new(38, 38, 38, 255))
     };
     
 }
