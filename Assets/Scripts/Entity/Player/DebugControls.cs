@@ -42,6 +42,7 @@ public class DebugControls : MonoBehaviour
         DebugEntity(Key.Digit7, "Spiny");
         DebugItem(Key.Digit8, "IceFlower");
         FreezePlayer(Key.Digit9);
+        DebugWorldEntity(Key.Digit0, "FrozenCube");
     }
 
     private void FreezePlayer(Key key) {
@@ -59,6 +60,14 @@ public class DebugControls : MonoBehaviour
     private void DebugEntity(Key key, string entity) {
         if (Keyboard.current[key].wasPressedThisFrame)
             PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity, GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().facingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
+    }
+    private void DebugWorldEntity(Key key, string entity) {
+        PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
+        if (Keyboard.current[key].wasPressedThisFrame && (!p.frozen && !p.FrozenObject && p.state != Enums.PowerupState.Giant && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0)) {
+            GameObject en = PhotonNetwork.Instantiate("Prefabs/Enemy/Goomba", GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().facingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
+            GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
+            frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.tag, en.GetComponent<KillableEntity>().photonView.ViewID);
+        }
     }
 
 }
