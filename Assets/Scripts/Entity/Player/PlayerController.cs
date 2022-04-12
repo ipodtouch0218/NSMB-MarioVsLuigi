@@ -1520,12 +1520,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             flying &= bounce;
             propeller &= bounce;
 
-            if (onSpinner && state != Enums.PowerupState.Giant && !inShell && !holding && !(crouching && state == Enums.PowerupState.Shell)) {
+            if (onSpinner && !holding) {
                 photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/spinner_launch");
                 photonView.RPC("PlaySound", RpcTarget.All, "player/spinner_launch");
                 body.velocity = new Vector2(body.velocity.x, launchVelocity);
                 flying = true;
                 onGround = false;
+                crouching = false;
+                inShell = false;
                 return;
             }
 
@@ -1924,7 +1926,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             if (drill)
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
 
-            if (onSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !holding && state != Enums.PowerupState.Giant) {
+            if (onSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !holding) {
                 Transform spnr = onSpinner.transform;
                 if (body.position.x > spnr.transform.position.x + 0.02f) {
                     body.position -= new Vector2(0.01f * 60f, 0) * Time.fixedDeltaTime;
