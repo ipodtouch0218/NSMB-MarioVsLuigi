@@ -21,7 +21,7 @@ public class WaterSplash : MonoBehaviour {
     private MeshFilter meshFilter;
     private Mesh mesh;
 
-    void Awake() {
+    void Start() {
         Initialize();
     }
     private void OnValidate() {
