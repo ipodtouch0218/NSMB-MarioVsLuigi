@@ -19,25 +19,27 @@ public class Enums {
     }
     // Networking Enums
     public static class NetPlayerProperties {
-        public static string Character { get; } = "char";
-        public static string Ping { get; } = "ping";
-        public static string PrimaryColor { get; } = "clr1";
-        public static string SecondaryColor { get; } = "clr2";
-        public static string GameState { get; } = "state";
+        public static string Character { get; } = "C";
+        public static string Ping { get; } = "P";
+        public static string PrimaryColor { get; } = "C1";
+        public static string SecondaryColor { get; } = "C2";
+        public static string GameState { get; } = "GS";
     }
     public static class NetPlayerGameState {
-        public static string Stars { get; } = "stars";
-        public static string Coins { get; } = "coins";
-        public static string Lives { get; } = "lives";
-        public static string PowerupState { get; } = "state";
+        public static string Stars { get; } = "S";
+        public static string Coins { get; } = "C";
+        public static string Lives { get; } = "L";
+        public static string PowerupState { get; } = "PS";
     }
     public static class NetRoomProperties {
-        public static string Level { get; } = "map";
-        public static string StarRequirement { get; } = "stars";
-        public static string Lives { get; } = "lives";
-        public static string Time { get; } = "time";
-        public static string NewPowerups { get; } = "custom";
-        public static string GameStarted { get; } = "started";
+        public static string Level { get; } = "L";
+        public static string StarRequirement { get; } = "SR";
+        public static string Lives { get; } = "Li";
+        public static string Time { get; } = "T";
+        public static string NewPowerups { get; } = "C";
+        public static string GameStarted { get; } = "S";
+        public static string HostName { get; } = "HN";
+        public static string Password { get; } = "PW";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events

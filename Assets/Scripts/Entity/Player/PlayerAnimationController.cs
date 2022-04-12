@@ -77,7 +77,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                     targetEuler = new Vector3(0, 100, 0);
                 }
             } else {
-                if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.holding && controller.state != Enums.PowerupState.Giant) {
+                if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.holding) {
                     targetEuler += new Vector3(0, -1800, 0) * Time.deltaTime;
                     instant = true;
                 } else if (controller.flying || controller.propeller) {

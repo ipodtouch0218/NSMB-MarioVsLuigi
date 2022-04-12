@@ -56,7 +56,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     private GameObject trackIcon;
 
-    private ExitGames.Client.Photon.Hashtable gameState = new(); //only used to update spectating players
+    private ExitGames.Client.Photon.Hashtable gameState = new() {
+        [Enums.NetPlayerProperties.GameState] = new ExitGames.Client.Photon.Hashtable()
+    }; //only used to update spectating players
     private bool initialKnockbackFacingRight = false;
 
     #region -- SERIALIZATION / EVENTS --
@@ -77,10 +79,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             stream.SendNext(localFrameId++);
 
         } else if (stream.IsReading) {
-            Vector2 pos = (Vector2)stream.ReceiveNext();
-            Vector2 vel = (Vector2)stream.ReceiveNext();
-            ExitGames.Client.Photon.Hashtable controls = (ExitGames.Client.Photon.Hashtable)stream.ReceiveNext();
-            long frameId = (long)stream.ReceiveNext();
+            Vector2 pos = (Vector2) stream.ReceiveNext();
+            Vector2 vel = (Vector2) stream.ReceiveNext();
+            ExitGames.Client.Photon.Hashtable controls = (ExitGames.Client.Photon.Hashtable) stream.ReceiveNext();
+            long frameId = (long) stream.ReceiveNext();
 
             if (frameId < localFrameId)
                 //recevied info older than what we have
@@ -90,15 +92,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 //we're DONE with you
                 return;
 
-            float lag = (float)(PhotonNetwork.Time - info.SentServerTime);
+            float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
 
             body.position = pos;
             body.velocity = vel;
             localFrameId = frameId;
 
-            joystick = (Vector2)controls["joystick"];
-            running = (bool)controls["sprintHeld"];
-            jumpHeld = (bool)controls["jumpHeld"];
+            joystick = (Vector2) controls["joystick"];
+            running = (bool) controls["sprintHeld"];
+            jumpHeld = (bool) controls["jumpHeld"];
 
             HandleMovement(lag);
         }
@@ -313,7 +315,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
 
         switch (collision.gameObject.tag) {
-            case "Player":
+        case "Player": {
             //hit players
             foreach (ContactPoint2D contact in collision.contacts) {
                 GameObject otherObj = collision.gameObject;
@@ -348,7 +350,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     return;
                 }
 
-                bool above = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) > (inShell ? .1f : .6f);
+                bool above = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) > (inShell ? .1f : .7f);
+                bool otherAbove = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) < -(other.inShell ? .1f : .7f);
 
                 if (above) {
                     //hit them from above
@@ -374,20 +377,24 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);
 
                     return;
-                }
-
-                if (inShell && (other.inShell || above)) {
+                } else if (inShell && (other.inShell || above)) {
                     if (other.inShell) {
-                        otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, false, -1);
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, false, -1);
+                        otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, false, photonView.ViewID);
+                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, false, otherView.ViewID);
                     } else {
                         otherView.RPC("Powerdown", RpcTarget.All, false);
                     }
                     return;
+                } else if (!otherAbove && onGround && other.onGround && contact.normalImpulse > .5f) {
+                    //bump?
+
+                    otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
+                    photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
                 }
             }
             break;
-            case "MarioBrosPlatform":
+        }
+        case "MarioBrosPlatform": {
             List<Vector2> points = new();
             foreach (ContactPoint2D c in collision.contacts) {
                 if (c.normal != Vector2.down)
@@ -406,6 +413,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             collision.gameObject.GetComponent<MarioBrosPlatform>().Bump(this, avg);
             photonView.RPC("PlaySound", RpcTarget.All, "player/block_bump");
             break;
+        }
         }
     }
     protected void OnTriggerEnter2D(Collider2D collider) {
@@ -748,8 +756,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         Destroy(view.gameObject);
-
-        UpdateGameState();
     }
 
     [PunRPC]
@@ -788,8 +794,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             hitInvincibilityCounter = 3f;
             PlaySound("player/powerdown");
         }
-
-        UpdateGameState();
     }
     #endregion
 
@@ -869,8 +873,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         Destroy(star);
-
-        UpdateGameState();
     }
 
     [PunRPC]
@@ -935,8 +937,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         starDirection = !starDirection;
 
         GameManager.Instance.CheckForWinner();
-
-        UpdateGameState();
     }
     #endregion
 
@@ -1036,8 +1036,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         ResetKnockback();
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
         models.transform.rotation = Quaternion.Euler(0, 180, 0);
-
-        UpdateGameState();
     }
     #endregion
 
@@ -1528,12 +1526,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             flying &= bounce;
             propeller &= bounce;
 
-            if (onSpinner && state != Enums.PowerupState.Giant && !inShell && !holding && !(crouching && state == Enums.PowerupState.Shell)) {
+            if (onSpinner && !holding) {
                 photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/spinner_launch");
                 photonView.RPC("PlaySound", RpcTarget.All, "player/spinner_launch");
                 body.velocity = new Vector2(body.velocity.x, launchVelocity);
                 flying = true;
                 onGround = false;
+                crouching = false;
+                inShell = false;
                 return;
             }
 
@@ -1932,7 +1932,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             if (drill)
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
 
-            if (onSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !holding && state != Enums.PowerupState.Giant) {
+            if (onSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !holding) {
                 Transform spnr = onSpinner.transform;
                 if (body.position.x > spnr.transform.position.x + 0.02f) {
                     body.position -= new Vector2(0.01f * 60f, 0) * Time.fixedDeltaTime;

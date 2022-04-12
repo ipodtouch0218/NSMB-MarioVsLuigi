@@ -4891,8 +4891,8 @@ MonoBehaviour:
   dead: 0
   state: 0
   previousState: 0
-  slowriseGravity: 0.85
-  normalGravity: 2.5
+  slowriseGravity: 1.15
+  normalGravity: 3.25
   flyingGravity: 0.8
   flyingTerminalVelocity: 1.25
   drillVelocity: 7
@@ -4900,14 +4900,14 @@ MonoBehaviour:
   groundpoundVelocity: 10
   blinkingSpeed: 0.25
   terminalVelocity: -7
-  jumpVelocity: 6.25
+  jumpVelocity: 7
   launchVelocity: 12
   walkingAcceleration: 8
   runningAcceleration: 3
   walkingMaxSpeed: 2.7
   runningMaxSpeed: 5
   wallslideSpeed: -4.25
-  walljumpVelocity: 5.6
+  walljumpVelocity: 6.25
   giantStartTime: 1.5
   soundRange: 10
   slopeSlidingAngle: 25
@@ -4962,10 +4962,12 @@ MonoBehaviour:
   giantEndTimer: 0
   propellerTimer: 0
   propellerSpinTimer: 0
-  frozenJump: 0
+  frozenStruggle: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0
+  knockbackTimer: 0
+  unfreezeTimer: 0
   pipeDirection: {x: 0, y: 0}
   stars: 0
   coins: 0
@@ -5013,6 +5015,8 @@ MonoBehaviour:
   smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
   largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
   glowColor: {r: 0, g: 0, b: 0, a: 0}
+  primaryColor: {r: 0, g: 0, b: 0, a: 0}
+  secondaryColor: {r: 0, g: 0, b: 0, a: 0}
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
 --- !u!50 &1798796769927389753
@@ -5309,9 +5313,6 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 1
     Name: knockforwards
-  - Type: 9
-    SynchronizeType: 1
-    Name: propellerStart
   - Type: 4
     SynchronizeType: 1
     Name: firedeath
@@ -5387,6 +5388,7 @@ MonoBehaviour:
   dampingTime: 0.5
   screenShakeTimer: 0
   exactCentering: 0
+  controlCamera: 0
   offset: {x: 0, y: 0, z: 0}
   currentPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &3494046117617009192
