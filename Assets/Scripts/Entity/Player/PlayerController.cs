@@ -1896,7 +1896,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             onLeft = false;
             onRight = false;
             if (holding.CompareTag("frozencube")) {
-                holding.holderOffset = new Vector2(0f, state >= Enums.PowerupState.Large ? 1.2f : 0.5f);
+                holding.holderOffset = new Vector2(state >= Enums.PowerupState.Large ? 0f : (facingRight ? 1 : -1) * 0.035f, state >= Enums.PowerupState.Large ? 1.2f : 0.5f);
             } else {
                 holding.holderOffset = new Vector2((facingRight ? 1 : -1) * 0.25f, state >= Enums.PowerupState.Large ? 0.5f : 0.25f);
             }
