@@ -56,7 +56,7 @@ public class Utils {
     public static int GetCharacterIndex(Player player = null) {
         if (player == null) 
             player = PhotonNetwork.LocalPlayer;
-        player.CustomProperties.TryGetValue(Enums.NetPlayerProperties.Character, out object index);
+        player.CustomProperties.TryGetValue("character", out object index);
         if (index == null) 
             index = 0;
         return (int) index;
