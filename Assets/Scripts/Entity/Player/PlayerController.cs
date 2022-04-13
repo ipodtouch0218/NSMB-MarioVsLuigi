@@ -1642,7 +1642,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         float stationarySpeedBoost = Mathf.Abs(body.velocity.x) <= 0.005f ? 1f : 1f;
         float propellerBoost = propellerTimer > 0 ? 2.5f : 1;
 
-        if ((crouching && !onGround /*&& state != Enums.PowerupState.Shell*/) || !crouching) {
+        if ((crouching && !onGround) || !crouching) {
 
             if (left) {
                 if (functionallyRunning && !crouching && !flying && xVel <= -(walkingMaxSpeed - 0.3f)) {
@@ -1662,6 +1662,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                             turnaround = true;
                             facingRight = true;
                         }
+                    } else {
+                        turnaround = false;
                     }
                 }
             }
@@ -1683,6 +1685,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                             turnaround = true;
                             facingRight = false;
                         }
+                    } else {
+                        turnaround = false;
                     }
                 }
             }
@@ -2043,7 +2047,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             float invincibleSpeedBoost = invincible > 0 ? 2f : 1;
             bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
             float max = (functionallyRunning ? runningMaxSpeed : walkingMaxSpeed) * invincibleSpeedBoost * (uphill ? (1 - (Mathf.Abs(floorAngle) / 270f)) : 1);
-            if (!sliding && left && !crouching) {
+            if (knockback) {
+                abovemax = true;
+            } else if (!sliding && left && !crouching) {
                 abovemax = body.velocity.x < -max;
             } else if (!sliding && right && !crouching) {
                 abovemax = body.velocity.x > max;

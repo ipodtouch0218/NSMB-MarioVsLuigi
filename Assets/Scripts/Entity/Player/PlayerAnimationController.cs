@@ -25,7 +25,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
     Enums.PlayerEyeState eyeState;
     float blinkTimer, pipeTimer, deathTimer, propellerVelocity;
-    bool wasTurnaround, deathUp;
+    public bool deathUp, wasTurnaround;
 
     public void Start() {
         controller = GetComponent<PlayerController>();
@@ -70,12 +70,13 @@ public class PlayerAnimationController : MonoBehaviourPun {
             } else if (animator.GetBool("inShell") && !controller.onSpinner) {
                 targetEuler += Mathf.Abs(body.velocity.x) / controller.runningMaxSpeed * Time.deltaTime * new Vector3(0, 1800 * (controller.facingRight ? -1 : 1));
                 instant = true;
-            } else if (controller.skidding || controller.turnaround) {
-                if (controller.facingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.turnaround)) {
+            } else if (wasTurnaround || controller.skidding || controller.turnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
+                if (controller.facingRight ^ (wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.turnaround)) {
                     targetEuler = new Vector3(0, 260, 0);
                 } else {
                     targetEuler = new Vector3(0, 100, 0);
                 }
+                instant = true;
             } else {
                 if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.holding) {
                     targetEuler += new Vector3(0, -1800, 0) * Time.deltaTime;
@@ -90,7 +91,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.flying || controller.propeller) ? -1 : 1) * Time.deltaTime), -2500, -300);
             propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
 
-            if (instant || wasTurnaround) {
+            if (instant) {
                 models.transform.rotation = Quaternion.Euler(targetEuler);
             } else {
                 float maxRotation = 2000f * Time.deltaTime;
@@ -101,7 +102,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 models.transform.rotation = Quaternion.Euler(x, y, z);
             }
         }
-        wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.turnaround;
 
         //Particles
         SetParticleEmission(dust, (controller.onLeft || controller.onRight || (controller.onGround && ((controller.skidding && !controller.doIceSkidding) || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);

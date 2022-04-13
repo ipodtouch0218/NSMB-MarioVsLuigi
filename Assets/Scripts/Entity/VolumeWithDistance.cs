@@ -14,7 +14,7 @@ public class VolumeWithDistance : MonoBehaviour {
         Vector3 listener;
         if (GameManager.Instance && GameManager.Instance.localPlayer) {
             listener = GameManager.Instance.localPlayer.transform.position;
-            if (Mathf.Abs(listener.x - soundOrigin.position.x) > GameManager.Instance.levelWidthTile / 4f)
+            if (GameManager.Instance.loopingLevel && Mathf.Abs(listener.x - soundOrigin.position.x) > GameManager.Instance.levelWidthTile / 4f)
                 listener.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(listener.x - soundOrigin.position.x);
 
         } else {
