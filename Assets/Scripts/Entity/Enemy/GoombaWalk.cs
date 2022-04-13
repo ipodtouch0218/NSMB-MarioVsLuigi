@@ -5,7 +5,6 @@ using Photon.Pun;
 
 public class GoombaWalk : KillableEntity {
     [SerializeField] float speed, deathTimer;
-    private bool left = true;
     new void Start() {
         base.Start();
         body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
@@ -21,30 +20,19 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        left = body.velocity.x < 0;
-
         physics.UpdateCollisions();
         if (physics.hitLeft || physics.hitRight) {
             left = physics.hitRight;
         }
         body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
-
-        if (!photonView || photonView.IsMine) {
-            animator.SetBool("left", left);
-            sRenderer.flipX = !left;
-        } else {
-            sRenderer.flipX = !animator.GetBool("left");
-        }
+        sRenderer.flipX = !left;
 
         if (photonView && !photonView.IsMine) {
             return;
         }
 
-        if (animator.GetBool("dead")) {
-            if ((deathTimer -= Time.fixedDeltaTime) < 0)
-                PhotonNetwork.Destroy(this.gameObject);
-            return;
-        }
+        if (dead && (deathTimer -= Time.fixedDeltaTime) < 0)
+            PhotonNetwork.Destroy(gameObject);
     }
 
     [PunRPC]

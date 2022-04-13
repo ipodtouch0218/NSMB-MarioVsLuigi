@@ -125,7 +125,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PopulatePlayerList();
     }
     public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable updatedProperties) {
-        Debug.Log(updatedProperties);
         if (updatedProperties == null)
             return;
 
@@ -268,8 +267,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             region.AddOptions(newRegions);
 
             region.value = index;
-
-            Debug.Log("region=" + lastRegion + ", index=" + index);
         }
 
         PlaySong(musicLoop, musicStart);
@@ -583,7 +580,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);    
     }
     public void ChangeLevel(int index) {
-        Debug.Log("changelevel called");
         levelDropdown.SetValueWithoutNotify(index);
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
     }

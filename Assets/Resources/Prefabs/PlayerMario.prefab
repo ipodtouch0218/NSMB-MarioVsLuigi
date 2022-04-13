@@ -10255,6 +10255,7 @@ MonoBehaviour:
   propeller: 0
   usedPropellerThisJump: 0
   frozen: 0
+  stationaryGiantEnd: 0
   walljumping: 0
   landing: 0
   koyoteTime: 0
@@ -10325,6 +10326,8 @@ MonoBehaviour:
   secondaryColor: {r: 0, g: 0, b: 0, a: 0}
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
+  deathUp: 0
+  wasTurnaround: 0
 --- !u!50 &4824223341387914443
 Rigidbody2D:
   serializedVersion: 4

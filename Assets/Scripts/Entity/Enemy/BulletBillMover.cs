@@ -7,7 +7,6 @@ public class BulletBillMover : KillableEntity {
     
     public float speed, playerSearchRadius = 4;
     private Vector2 searchVector;
-    public bool left = true;
     new void Start() {
         base.Start();
         searchVector = new Vector2(playerSearchRadius * 2, 100);
@@ -42,6 +41,37 @@ public class BulletBillMover : KillableEntity {
         }
         if (photonView.IsMine)
             DespawnCheck();
+    }
+    public override void InteractWithPlayer(PlayerController player) {
+        if (player.frozen)
+            return;
+
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
+
+        if (player.invincible > 0 || player.inShell || player.sliding
+            || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
+            || player.state == Enums.PowerupState.MegaMushroom) {
+
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
+            return;
+        }
+        if (attackedFromAbove) {
+            if (player.state == Enums.PowerupState.MiniMushroom && !player.drill && !player.groundpound) {
+                player.groundpound = false;
+                player.bounce = true;
+            } else {
+                photonView.RPC("Kill", RpcTarget.All);
+                player.groundpound = false;
+                player.bounce = !player.drill;
+            }
+            player.photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+            player.drill = false;
+            return;
+        }
+
+        player.photonView.RPC("Powerdown", RpcTarget.All, false);
+        // left = damageDirection.x < 0;
     }
 
     void DespawnCheck() {

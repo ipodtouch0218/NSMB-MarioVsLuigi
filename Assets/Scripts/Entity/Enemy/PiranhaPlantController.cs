@@ -24,6 +24,8 @@ public class PiranhaPlantController : KillableEntity {
         if (GameManager.Instance && !GameManager.Instance.musicEnabled)
             return;
 
+        left = false;
+
         if (frozen)
             wasFrozen = true;
 

@@ -10,7 +10,7 @@ public class FrozenCube : HoldableEntity {
     private static int GROUND_LAYER_ID = -1;
 
     public float throwSpeed = 10f;
-    bool left, deathCheck;
+    bool deathCheck;
     public BoxCollider2D frozenCubeCollider;
     public SpriteRenderer spriteRender;
     public Sprite[] iceSprites;

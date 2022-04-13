@@ -88,7 +88,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                     targetEuler = new Vector3(0, controller.facingRight ? 100 : 260, 0);
                 }
             }
-            propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.flying || controller.propeller) ? -1 : 1) * Time.deltaTime), -2500, -300);
+            propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.flying || controller.propeller || controller.usedPropellerThisJump) ? -1 : 1) * Time.deltaTime), -2500, -300);
             propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
 
             if (instant) {

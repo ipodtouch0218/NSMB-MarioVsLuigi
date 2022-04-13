@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public Rigidbody2D body;
     private PlayerAnimationController animationController;
 
-    public bool onGround, crushGround, doGroundSnap, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen;
+    public bool onGround, crushGround, doGroundSnap, onRight, onLeft, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen, stationaryGiantEnd;
     public float walljumping, landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenStruggle;
     public float invincible, giantTimer, floorAngle, knockbackTimer, unfreezeTimer;
 
@@ -340,11 +340,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     return;
                 }
 
+                bool above = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) > (inShell ? .1f : .7f);
+                bool otherAbove = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) < -(other.inShell ? .1f : .7f);
+
                 if (state == Enums.PowerupState.MegaMushroom || other.state == Enums.PowerupState.MegaMushroom) {
                     if (state == Enums.PowerupState.MegaMushroom && other.state == Enums.PowerupState.MegaMushroom) {
                         //both giant
-                        otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, false, photonView.ViewID);
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, false, otherView.ViewID);
+                        if (above) {
+                            bounce = true;
+                        } else if (!otherAbove) {
+                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, true, photonView.ViewID);
+                            photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
+                        }
                     } else if (state == Enums.PowerupState.MegaMushroom) {
                         //only we are giant
                         otherView.RPC("Powerdown", RpcTarget.All, false);
@@ -352,8 +359,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     return;
                 }
 
-                bool above = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) > (inShell ? .1f : .7f);
-                bool otherAbove = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) < -(other.inShell ? .1f : .7f);
 
                 if (above) {
                     //hit them from above
@@ -743,6 +748,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 store = Enums.PowerupState.MegaMushroom;
                 break;
             }
+            store = previous != Enums.PowerupState.Large ? previous : null;
             state = Enums.PowerupState.MegaMushroom;
             stateUp = true;
             powerupSfx = null;
@@ -1235,6 +1241,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         flying = false;
         propeller = false;
         propellerTimer = 0;
+        sliding = false;
         drill = false;
         body.gravityScale = normalGravity;
         while (starsToDrop-- > 0)
@@ -1439,6 +1446,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             crouching = false;
             sliding = false;
             drill = false;
+            groundpound = false;
             break;
         }
     }
@@ -1545,7 +1553,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
 
         bool topSpeed = Mathf.Abs(body.velocity.x) + 0.3f > (runningMaxSpeed * (invincible > 0 ? 2 : 1));
-        if (bounce || (jump && (onGround || (koyoteTime < 0.15f && !propeller)))) {
+        if (bounce || (jump && (onGround || (koyoteTime < 0.07f && !propeller)))) {
             koyoteTime = 1;
             jumpBuffer = 0;
             skidding = false;
@@ -1776,6 +1784,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             giantSavedVelocity = Vector2.zero;
             state = Enums.PowerupState.Large;
             giantEndTimer = giantStartTime;
+            stationaryGiantEnd = true;
             storedPowerup = Enums.PowerupState.MegaMushroom;
             giantTimer = 0;
             animator.enabled = true;
@@ -1836,13 +1845,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             return;
         }
-        if (giantEndTimer > 0) {
+        if (giantEndTimer > 0 && stationaryGiantEnd) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
             transform.position = body.position = previousFramePosition;
 
             if (giantEndTimer - delta <= 0) {
-                hitInvincibilityCounter = 3f;
+                hitInvincibilityCounter = 2f;
                 body.velocity = giantSavedVelocity;
                 animator.enabled = true;
                 body.isKinematic = false;
@@ -1860,7 +1869,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
 
         //pipes > stuck in block, else the animation gets janked.
-        if (pipeEntering || giantStartTimer > 0 || giantEndTimer > 0 || animator.GetBool("pipe"))
+        if (pipeEntering || giantStartTimer > 0 || (giantEndTimer > 0 && stationaryGiantEnd) || animator.GetBool("pipe"))
             return;
         if (HandleStuckInBlock())
             return;
@@ -1907,7 +1916,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         bool left = joystick.x < -analogDeadzone && !paused;
         bool crouch = joystick.y < -analogDeadzone && !paused;
         bool up = joystick.y > analogDeadzone && !paused;
-        bool jump = jumpBuffer > 0 && (onGround || koyoteTime < 0.1f || onLeft || onRight) && !paused;
+        bool jump = jumpBuffer > 0 && (onGround || koyoteTime < 0.07f || onLeft || onRight) && !paused;
 
         onLeft &= left;
         onRight &= right;
@@ -2009,11 +2018,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         HandleGroundpound();
 
         if (state == Enums.PowerupState.MegaMushroom && giantTimer <= 0) {
-            giantSavedVelocity = state != Enums.PowerupState.Large ? body.velocity : Vector2.zero;
             giantEndTimer = giantStartTime / 2f;
             state = Enums.PowerupState.Large;
-            body.isKinematic = true;
-            animator.enabled = false;
+            stationaryGiantEnd = false;
+            hitInvincibilityCounter = 3f;
             PlaySoundEverywhere("player/mega-end");
         }
 

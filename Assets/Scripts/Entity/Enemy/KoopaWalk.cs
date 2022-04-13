@@ -9,7 +9,7 @@ public class KoopaWalk : HoldableEntity {
 
     public float walkSpeed, kickSpeed, wakeup = 15;
     public bool red, blue, shell, stationary, hardkick, upsideDown, canBeFlipped = true, flipXFlip = false;
-    public bool left = true, putdown = false;
+    public bool putdown = false;
     public float wakeupTimer;
     private BoxCollider2D worldHitbox;
     Vector2 blockOffset = new Vector3(0, 0.05f), velocityLastFrame;
@@ -78,7 +78,7 @@ public class KoopaWalk : HoldableEntity {
             }
         }
 
-        if (physics.onGround && red && !shell) {
+        if (physics.onGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, GROUND_AND_SEMISOLIDS_LAYER_ID) && red && !shell) {
             Vector3 redCheckPos = body.position + new Vector2(0.1f * (left ? -1 : 1), 0);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref redCheckPos);
@@ -114,7 +114,9 @@ public class KoopaWalk : HoldableEntity {
         if (holder) 
             return;
 
-        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.drill) {
+        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching) {
+            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
+        } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.drill) {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
@@ -146,8 +148,10 @@ public class KoopaWalk : HoldableEntity {
                         previousHolder = player;
                     }
                 }
-            } else {
+            } else if (player.hitInvincibilityCounter <= 0) {
                 player.photonView.RPC("Powerdown", RpcTarget.All, false);
+                if (!shell)
+                    photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
             }
         }
     }

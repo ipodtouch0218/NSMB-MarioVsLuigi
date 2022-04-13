@@ -8,7 +8,7 @@ public class WaterSplash : MonoBehaviour {
     [Delayed]
     public int widthTiles = 64, pointsPerTile = 4, splashWidth = 1;
     [Delayed]
-    public float height = 0;
+    public float height = 1;
     public float tension = 40, kconstant = 2, damping = 0.95f, splashVelocity = 50f, resistance = 0f;
     public string splashParticle;
     private Texture2D heightTex;
@@ -20,8 +20,10 @@ public class WaterSplash : MonoBehaviour {
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
     private Mesh mesh;
+    MaterialPropertyBlock properties;
+    private bool initialized;
 
-    void Start() {
+    private void Awake() {
         Initialize();
     }
     private void OnValidate() {
@@ -32,7 +34,6 @@ public class WaterSplash : MonoBehaviour {
 
     private void Initialize() {
         if (this == null)
-            //what
             return;
 
         meshRenderer = GetComponent<MeshRenderer>();
@@ -42,20 +43,20 @@ public class WaterSplash : MonoBehaviour {
         CreateMesh();
 
         totalPoints = widthTiles * pointsPerTile;
-        heightTex = new Texture2D(totalPoints, 1);
         pointHeights = new float[totalPoints];
         pointVelocities = new float[totalPoints];
         colors = new Color32[totalPoints];
 
+        heightTex = new Texture2D(totalPoints, 1);
         for (int i = 0; i < totalPoints; i++)
-            colors[i] = new(128, 128, 128, 255);
+            colors[i] = new Color(.5f, .5f, .5f, 1f);
         heightTex.SetPixels32(colors);
         heightTex.Apply();
 
         collider.size = new(widthTiles / 2f, height + 0.5f);
         collider.offset = new(0, height / 2f);
 
-        MaterialPropertyBlock properties = new();
+        properties = new();
         properties.SetTexture("Heightmap", heightTex);
         properties.SetFloat("Points", totalPoints);
         properties.SetFloat("PointsPerTile", pointsPerTile);
@@ -65,6 +66,11 @@ public class WaterSplash : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        if (!initialized) {
+            Initialize();
+            initialized = true;
+        }
+
         for (int i = 0; i < totalPoints; i++) {
             float height = pointHeights[i];
             pointVelocities[i] += tension * -height;
