@@ -114,12 +114,12 @@ public class KoopaWalk : HoldableEntity {
         if (holder) 
             return;
 
-        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant || player.drill) {
+        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.drill) {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
             photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false);
-        } else if (player.groundpound && player.state != Enums.PowerupState.Mini && attackedFromAbove) {
+        } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("EnterShell", RpcTarget.All);
             if (!blue) {
                 photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
@@ -127,9 +127,9 @@ public class KoopaWalk : HoldableEntity {
                 previousHolder = player;
             }
         } else if (attackedFromAbove && (!shell || !IsStationary())) {
-            if (player.state != Enums.PowerupState.Mini || player.groundpound) {
+            if (player.state != Enums.PowerupState.MiniMushroom || player.groundpound) {
                 photonView.RPC("EnterShell", RpcTarget.All);
-                if (player.state == Enums.PowerupState.Mini)
+                if (player.state == Enums.PowerupState.MiniMushroom)
                     player.groundpound = false;
             }
             player.photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");

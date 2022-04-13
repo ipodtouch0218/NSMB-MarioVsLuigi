@@ -5,7 +5,7 @@ using UnityEngine;
 public class Enums {
 
     public enum PowerupState {
-        Mini, Small, Large, FireFlower, IceFlower, PropellerMushroom, Shell, Giant
+        MiniMushroom, Small, Large, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
     // Animation enums
     public enum PlayerEyeState {

@@ -23,7 +23,7 @@ public abstract class InteractableTile : AnimatedTile {
             switch (obj.tag) {
             case "Player": {
                 PlayerController player = obj.GetComponent<PlayerController>();
-                if (player.state == Enums.PowerupState.Giant)
+                if (player.state == Enums.PowerupState.MegaMushroom)
                     return;
 
                 player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, false, null);

@@ -10279,7 +10279,6 @@ MonoBehaviour:
   stars: 0
   coins: 0
   lives: -1
-  storedPowerup: 
   holding: {fileID: 0}
   holdingOld: {fileID: 0}
   FrozenObject: {fileID: 0}

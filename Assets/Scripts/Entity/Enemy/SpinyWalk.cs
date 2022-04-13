@@ -12,7 +12,7 @@ public class SpinyWalk : KoopaWalk {
         if (holder) 
             return;
 
-        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant) {
+        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom) {
             //Special kill
             bool originalFacing = player.facingRight;
             if (player.inShell && shell && !stationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
@@ -38,7 +38,7 @@ public class SpinyWalk : KoopaWalk {
                     //in shell, moving.
                     if (attackedFromAbove) {
                         //being stomped on
-                        if (player.state == Enums.PowerupState.Mini) {
+                        if (player.state == Enums.PowerupState.MiniMushroom) {
                             //mini mario interactions
                             if (player.groundpound) {
                                 //mini mario is groundpounding, cancel their groundpound & stop moving

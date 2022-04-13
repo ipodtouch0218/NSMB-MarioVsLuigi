@@ -4888,7 +4888,6 @@ MonoBehaviour:
   lifespan: 15
   sparkleSoundDistance: 6
   counter: 0
-  readyForUnPassthrough: 0.5
   body: {fileID: 0}
   passthrough: 0
   left: 1

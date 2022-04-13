@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using Photon.Realtime;
 
 public class GlobalController : Singleton<GlobalController> {
     public Canvas ndsCanvas;
@@ -12,6 +13,7 @@ public class GlobalController : Singleton<GlobalController> {
     public string controlsJson = null;
 
     public bool joinedAsSpectator = false;
+    public DisconnectCause? disconnectCause = null;
 
     private int windowWidth, windowHeight;
 

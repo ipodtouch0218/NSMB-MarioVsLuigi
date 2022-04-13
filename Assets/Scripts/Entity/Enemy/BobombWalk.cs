@@ -140,7 +140,7 @@ public class BobombWalk : HoldableEntity {
             return;
         }
         if (attackedFromAbove && !lit) {
-            if (player.state != Enums.PowerupState.Mini || (player.groundpound && attackedFromAbove))
+            if (player.state != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
                 photonView.RPC("Light", RpcTarget.All);
             photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
             if (player.groundpound) {

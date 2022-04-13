@@ -4,8 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
 
-public class DebugControls : MonoBehaviour
-{
+public class DebugControls : MonoBehaviour {
 
     public void Start() {
         if (!Debug.isDebugBuild && !Application.isEditor) {
@@ -46,27 +45,39 @@ public class DebugControls : MonoBehaviour
     }
 
     private void FreezePlayer(Key key) {
+        if (!GameManager.Instance.localPlayer)
+            return;
+
         PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        if (Keyboard.current[key].wasPressedThisFrame && (!p.frozen && !p.FrozenObject && p.state != Enums.PowerupState.Giant && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0)) {
+        if (Keyboard.current[key].wasPressedThisFrame && (!p.frozen && !p.FrozenObject && p.state != Enums.PowerupState.MegaMushroom && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0)) {
 
             GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", p.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-            frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, "Player", p.photonView.ViewID);
+            frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, "Player", p.photonView.ViewID);
         }
     }
     private void DebugItem(Key key, string item) {
+        if (!GameManager.Instance.localPlayer)
+            return;
+
         if (Keyboard.current[key].wasPressedThisFrame)
             GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem(item);
     }
     private void DebugEntity(Key key, string entity) {
+        if (!GameManager.Instance.localPlayer)
+            return;
+
         if (Keyboard.current[key].wasPressedThisFrame)
             PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity, GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().facingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
     }
     private void DebugWorldEntity(Key key, string entity) {
+        if (!GameManager.Instance.localPlayer)
+            return;
+
         PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        if (Keyboard.current[key].wasPressedThisFrame && (!p.frozen && !p.FrozenObject && p.state != Enums.PowerupState.Giant && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0)) {
+        if (Keyboard.current[key].wasPressedThisFrame && (!p.frozen && !p.FrozenObject && p.state != Enums.PowerupState.MegaMushroom && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0)) {
             GameObject en = PhotonNetwork.Instantiate("Prefabs/Enemy/Goomba", GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().facingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
             GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-            frozenBlock.gameObject.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.tag, en.GetComponent<KillableEntity>().photonView.ViewID);
+            frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.tag, en.GetComponent<KillableEntity>().photonView.ViewID);
         }
     }
 

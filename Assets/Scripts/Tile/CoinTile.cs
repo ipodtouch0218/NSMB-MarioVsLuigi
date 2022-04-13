@@ -19,7 +19,7 @@ public class CoinTile : BreakableBrickTile {
             player = koopa.previousHolder;
 
         if (player) {
-            if (player.state == Enums.PowerupState.Giant) {
+            if (player.state == Enums.PowerupState.MegaMushroom) {
                 //Break
 
                 //Tilemap

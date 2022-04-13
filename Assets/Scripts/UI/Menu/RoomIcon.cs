@@ -20,7 +20,7 @@ public class RoomIcon : MonoBehaviour {
 
         nameText.text = $"{prop[Enums.NetRoomProperties.HostName]}'s Lobby";
         playersText.text = $"Players: {room.PlayerCount}/{room.MaxPlayers}";
-        inProgressText.text = (bool) prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "In Lobby";
+        inProgressText.text = (bool) prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
     }
     public void Select() {
         icon.color = selectedColor;

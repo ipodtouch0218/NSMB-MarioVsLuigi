@@ -83,8 +83,7 @@ public class MovingPowerup : MonoBehaviourPun {
 
         body.isKinematic = false;
         if (passthrough) {
-            Debug.DrawLine(body.position + hitbox.offset - new Vector2(0, hitbox.size.y / 2f), body.position + hitbox.offset - new Vector2(0, hitbox.size.y / 2f) + hitbox.size);
-            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position + hitbox.offset - new Vector2(0, hitbox.size.y/2f), hitbox.size, 0, groundMask)) {
+            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position + hitbox.offset, hitbox.size, 0, groundMask)) {
                 gameObject.layer = LayerMask.NameToLayer("Entity");
                 passthrough = false;
             } else {

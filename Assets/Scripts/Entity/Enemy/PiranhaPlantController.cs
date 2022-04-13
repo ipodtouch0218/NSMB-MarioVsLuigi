@@ -48,7 +48,7 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public override void InteractWithPlayer(PlayerController player) {
-        if (player.invincible > 0 || player.inShell || player.state == Enums.PowerupState.Giant) {
+        if (player.invincible > 0 || player.inShell || player.state == Enums.PowerupState.MegaMushroom) {
             photonView.RPC("Kill", RpcTarget.All);
         } else {
             player.photonView.RPC("Powerdown", RpcTarget.All, false);

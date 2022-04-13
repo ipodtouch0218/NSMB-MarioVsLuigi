@@ -29,14 +29,14 @@ public abstract class KillableEntity : MonoBehaviourPun {
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
         if (player.invincible > 0 || player.inShell || player.sliding
-            || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.Mini && attackedFromAbove) 
-            || player.state == Enums.PowerupState.Giant) {
+            || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) 
+            || player.state == Enums.PowerupState.MegaMushroom) {
             
             photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
             return;
         }
         if (attackedFromAbove) {
-            if (player.state == Enums.PowerupState.Mini && !player.drill && !player.groundpound) {
+            if (player.state == Enums.PowerupState.MiniMushroom && !player.drill && !player.groundpound) {
                 player.groundpound = false;
                 player.bounce = true;
             } else {
