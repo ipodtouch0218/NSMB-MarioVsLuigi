@@ -5,12 +5,12 @@ using Photon.Pun;
 using UnityEngine.Tilemaps;
 
 // maybe a better name for the script
-public class FrozenCube : HoldableEntity
-{
+public class FrozenCube : HoldableEntity {
+
     private static int GROUND_LAYER_ID = -1;
 
     public float throwSpeed = 10f;
-    bool left, deathCheck;
+    bool deathCheck;
     public BoxCollider2D frozenCubeCollider;
     public SpriteRenderer spriteRender;
     public Sprite[] iceSprites;
@@ -112,7 +112,7 @@ public class FrozenCube : HoldableEntity
         }
         if (holder || player.frozen)
             return;
-        else if (player.groundpound && player.state != Enums.PowerupState.Mini && attackedFromAbove) {
+        else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             if (!plantEntity)
                 photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
             else
@@ -121,7 +121,7 @@ public class FrozenCube : HoldableEntity
             player.photonView.RPC("Knockback", RpcTarget.All, body.position.x > player.body.position.x, 1, false, photonView.ViewID);
         }
         if (!holder && !dead && !plantEntity) {
-            if (player.CanPickup() && player.state != Enums.PowerupState.Mini && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
+            if (player.CanPickup() && player.state != Enums.PowerupState.MiniMushroom && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.onLeft && !player.onRight && !player.doublejump && !player.triplejump) {
                 fallen = true;
                 photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                 player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);

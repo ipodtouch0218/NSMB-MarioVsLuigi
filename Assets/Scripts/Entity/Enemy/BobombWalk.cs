@@ -8,7 +8,6 @@ public class BobombWalk : HoldableEntity {
 
     private readonly int explosionTileSize = 2;
     public float walkSpeed, kickSpeed, detonateTimer;
-    bool left;
     public bool lit, detonated;
     float detonateCount;
     public GameObject explosion;
@@ -30,6 +29,7 @@ public class BobombWalk : HoldableEntity {
 
         if (!photonView || photonView.IsMine)
             HandleCollision();
+        sRenderer.flipX = left;
 
         if (frozen)
             return;
@@ -135,18 +135,20 @@ public class BobombWalk : HoldableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (player.sliding || player.inShell || player.invincible > 0) {
+        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching) {
+            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
+        } else if(player.sliding || player.inShell || player.invincible > 0) {
             photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false);
             return;
-        }
-        if (attackedFromAbove && !lit) {
-            if (player.state != Enums.PowerupState.Mini || (player.groundpound && attackedFromAbove))
+        } else if (attackedFromAbove && !lit) {
+            if (player.state != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
                 photonView.RPC("Light", RpcTarget.All);
             photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
-            if (player.groundpound) {
+            if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom) {
                 photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
             } else {
                 player.bounce = true;
+                player.groundpound = false;
             }
         } else {
             if (lit) {
@@ -158,8 +160,9 @@ public class BobombWalk : HoldableEntity {
                         photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
                     }
                 }
-            } else {
+            } else if (player.hitInvincibilityCounter <= 0) {
                 player.photonView.RPC("Powerdown", RpcTarget.All, false);
+                photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
             }
         }
     }

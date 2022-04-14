@@ -12,7 +12,7 @@ public class BreakablePipeTile : InteractableTile {
             return false;
 
         PlayerController player = (PlayerController) interacter;
-        if (player.state != Enums.PowerupState.Giant)
+        if (player.state != Enums.PowerupState.MegaMushroom)
             return false;
         if ((leftOfPipe && direction == InteractionDirection.Left) || (!leftOfPipe && direction == InteractionDirection.Right))
             //we've hit the inside of the pipe.

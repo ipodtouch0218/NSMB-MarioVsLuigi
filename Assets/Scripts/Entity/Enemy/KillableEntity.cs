@@ -4,8 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 
 public abstract class KillableEntity : MonoBehaviourPun {
-    public bool dead;
-    public bool frozen;
+    public bool dead, frozen, left = true;
     public Rigidbody2D body;
     protected BoxCollider2D hitbox;
     protected Animator animator;
@@ -28,15 +27,15 @@ public abstract class KillableEntity : MonoBehaviourPun {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (player.invincible > 0 || player.inShell || player.sliding
-            || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.Mini && attackedFromAbove) 
-            || player.state == Enums.PowerupState.Giant) {
-            
+        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching) {
+            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
+        } else if (player.invincible > 0 || player.inShell || player.sliding
+            || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
+            || player.state == Enums.PowerupState.MegaMushroom) {
+
             photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
-            return;
-        }
-        if (attackedFromAbove) {
-            if (player.state == Enums.PowerupState.Mini && !player.drill && !player.groundpound) {
+        } else if (attackedFromAbove) {
+            if (player.state == Enums.PowerupState.MiniMushroom && !player.drill && !player.groundpound) {
                 player.groundpound = false;
                 player.bounce = true;
             } else {
@@ -46,10 +45,16 @@ public abstract class KillableEntity : MonoBehaviourPun {
             }
             player.photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
             player.drill = false;
-            return;
+        } else if (player.hitInvincibilityCounter <= 0) {
+            player.photonView.RPC("Powerdown", RpcTarget.All, false);
+            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
         }
-                
-        player.photonView.RPC("Powerdown", RpcTarget.All, false);
+    }
+
+    [PunRPC]
+    public void SetLeft(bool left) {
+        this.left = left;
+        body.velocity = new Vector2(Mathf.Abs(body.velocity.x) * (left ? -1 : 1), body.velocity.y);
     }
 
     [PunRPC]

@@ -16,7 +16,7 @@ public class PowerupTile : BreakableBrickTile {
 
         if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.previousHolder != null)) {
             PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk)interacter).previousHolder;
-            if (player.state == Enums.PowerupState.Giant) {
+            if (player.state == Enums.PowerupState.MegaMushroom) {
                 //Break
 
                 //Tilemap

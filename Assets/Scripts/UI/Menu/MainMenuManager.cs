@@ -29,16 +29,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, livesField, timeField, passwordCreateField, passwordField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, passwordSelected;
-    public GameObject errorBox, errorButton, rebindPrompt;
-    public TMP_Text errorText, rebindCountdown, rebindText;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, passwordSelected, reconnectSelected;
+    public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
+    public TMP_Text errorText, rebindCountdown, rebindText, reconnectText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
 
     public Selectable[] roomSettings;
-
-    private Coroutine updatePingCoroutine;
 
     private bool pingsReceived;
     private List<string> formattedRegions;
@@ -47,6 +45,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
 
     private static readonly string roomNameChars = "BCDFGHJKLMNPRQSTVWXYZ";
+
+    Coroutine loopCoroutine, updatePingCoroutine;
 
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
@@ -226,23 +226,52 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         HorizontalCamera.OFFSET_TARGET = 0;
         HorizontalCamera.OFFSET = 0;
         GlobalController.Instance.joinedAsSpectator = false;
+        Time.timeScale = 1;
+        if (GlobalController.Instance.disconnectCause != null) {
+            OpenReconnectBox((DisconnectCause) GlobalController.Instance.disconnectCause);
+        }
 
         PhotonNetwork.SerializationRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
+        PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname", "Player" + Random.Range(1000, 10000));
 
         AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
 
-        if (PhotonNetwork.InRoom)
-            EnterRoom();
+        Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length)].transform.position;
+
+        if (!PhotonNetwork.IsConnected) {
+            PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
+            PhotonNetwork.NetworkingClient.ConnectToNameServer();
+        } else {
+            if (PhotonNetwork.InRoom) {
+                EnterRoom();
+            } else {
+                PhotonNetwork.Disconnect();
+            }
+
+            List<string> newRegions = new();
+            pingSortedRegions = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.ToArray();
+            System.Array.Sort(pingSortedRegions, new RegionComparer());
+
+            int index = 0;
+            for (int i = 0; i < pingSortedRegions.Length; i++) {
+                Region r = pingSortedRegions[i];
+                newRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
+                if (r.Code == lastRegion)
+                    index = i;
+            }
+
+            region.ClearOptions();
+            region.AddOptions(newRegions);
+
+            region.value = index;
+        }
 
         PlaySong(musicLoop, musicStart);
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject; 
-
-        PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname", "Player" + Random.Range(1000,10000));
-        Camera.main.transform.position = levelCameraPositions[Random.Range(0,levelCameraPositions.Length)].transform.position;
         
         nicknameField.text = PhotonNetwork.NickName;
         musicSlider.value = Settings.Instance.VolumeMusic;
@@ -265,29 +294,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         rebindManager.Init();
 
-        if (!PhotonNetwork.IsConnected) {
-            PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
-            PhotonNetwork.NetworkingClient.ConnectToNameServer();
-        } else {
-            List<string> newRegions = new();
-            pingSortedRegions = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.ToArray();
-            System.Array.Sort(pingSortedRegions, new RegionComparer());
 
-            int index = 0;
-            bool found = false;
-            foreach (Region r in pingSortedRegions) {
-                newRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
-                found &= r.Code == lastRegion || r.Code == PhotonNetwork.CloudRegion;
-                if (!found)
-                    index++;
-            }
-
-            region.ClearOptions();
-            region.AddOptions(newRegions);
-            
-            if (found)
-                region.value = index;
-        }
         EventSystem.current.SetSelectedGameObject(title);
     }
 
@@ -316,8 +323,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
     }
 
-
-    private Coroutine loopCoroutine;
     private void PlaySong(AudioClip loop, AudioClip intro = null) {
         if (loopCoroutine != null) {
             StopCoroutine(loopCoroutine);
@@ -346,7 +351,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     IEnumerator UpdatePing() {
         // push our ping into our player properties every N seconds. 2 seems good.
         while (true) {
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSecondsRealtime(2);
             if (PhotonNetwork.InRoom) {
                 ExitGames.Client.Photon.Hashtable prop = new() {
                     { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() }
@@ -494,10 +499,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
     }
+    public void OpenReconnectBox(DisconnectCause cause) {
+        reconnectBox.SetActive(true);
+        reconnectText.text = cause.ToString();
+        EventSystem.current.SetSelectedGameObject(reconnectSelected);
+    }
 
     public void ConnectToDropdownRegion() {
         Region targetRegion = pingSortedRegions[region.value];
-        if (PhotonNetwork.CloudRegion == targetRegion.Code)
+        if (lastRegion == targetRegion.Code)
             return;
 
         for (int i = 0; i < lobbiesContent.transform.childCount; i++) {
@@ -508,6 +518,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             Destroy(roomObj);
         }
         selectedRoom = null;
+        lastRegion = targetRegion.Code;
 
         PhotonNetwork.Disconnect();
     }
@@ -569,8 +580,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);    
     }
     public void ChangeLevel(int index) {
-        levelDropdown.value = index;
-        levelDropdown.RefreshShownValue();
+        levelDropdown.SetValueWithoutNotify(index);
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
     }
     public void SetLevelIndex() {

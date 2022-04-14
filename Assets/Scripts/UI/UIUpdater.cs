@@ -53,13 +53,14 @@ public class UIUpdater : MonoBehaviour {
 
         //TODO: refactor
         itemReserve.sprite = player.storedPowerup switch {
-            "Mushroom" => storedItemMushroom,
-            "FireFlower" => storedItemFireFlower,
-            "MiniMushroom" => storedItemMiniMushroom,
-            "MegaMushroom" => storedItemMegaMushroom,
-            "BlueShell" => storedItemBlueShell,
-            "PropellerMushroom" => storedItemPropellerMushroom,
-            "IceFlower" => storedItemIceFlower,
+            Enums.PowerupState.MiniMushroom => storedItemMiniMushroom,
+            //Enums.powerupstae.Small => null
+            Enums.PowerupState.Large => storedItemMushroom,
+            Enums.PowerupState.FireFlower => storedItemFireFlower,
+            Enums.PowerupState.MegaMushroom => storedItemMegaMushroom,
+            Enums.PowerupState.BlueShell => storedItemBlueShell,
+            Enums.PowerupState.PropellerMushroom => storedItemPropellerMushroom,
+            Enums.PowerupState.IceFlower => storedItemIceFlower,
             _ => storedItemNull,
         };
     }
@@ -69,7 +70,7 @@ public class UIUpdater : MonoBehaviour {
 
         uiStars.text = "<sprite=0>" + player.stars + "/" + GameManager.Instance.starRequirement;
         uiCoins.text = "<sprite=1>" + player.coins + "/8";
-        uiLives.text = (player.lives > 0 ? (Utils.GetCharacterIndex(player.photonView.Owner) == 0 ? "<sprite=3>" : "<sprite=4>") + player.lives : "");
-        uiCountdown.text = (GameManager.Instance.timeRemaining > -0.9 ? "<sprite=6>" + GameManager.Instance.timeRemaining.ToString("0s") : "");
+        uiLives.text = player.lives > 0 ? (Utils.GetCharacterIndex(player.photonView.Owner) == 0 ? "<sprite=3>" : "<sprite=4>") + player.lives : "";
+        uiCountdown.text = GameManager.Instance.timeRemaining > -0.9 ? "<sprite=6>" + GameManager.Instance.timeRemaining.ToString("0s") : "";
     }
 }

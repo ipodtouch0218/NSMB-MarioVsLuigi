@@ -38,6 +38,7 @@ TagManager:
   - FadeUI
   - lava
   - MarioBrosPlatform
+  - frozencube
   layers:
   - Default
   - TransparentFX

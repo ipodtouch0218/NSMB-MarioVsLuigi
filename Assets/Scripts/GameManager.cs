@@ -11,7 +11,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
 
-public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
+public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks {
     private static GameManager _instance;
     public static GameManager Instance { 
         get {
@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
         }
     }
 
+    private System.Collections.Hashtable tileCache = new();
+    
     public AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
@@ -90,7 +92,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
             int y = (int) data[1];
             string tilename = (string) data[2];
             Vector3Int loc = new(x, y, 0);
-            TileBase tile = tilename != null ? (TileBase) Resources.Load("Tilemaps/Tiles/" + tilename) : null;
+
+            TileBase tile = GetTileFromCache(tilename);
             tilemap.SetTile(loc, tile);
             break;
         }
@@ -148,7 +151,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
 
             Vector3Int loc = new(x, y, 0);
 
-            tilemap.SetTile(loc, (TileBase) Resources.Load("Tilemaps/Tiles/" + newTile));
+            tilemap.SetTile(loc, GetTileFromCache(newTile));
             tilemap.RefreshTile(loc);
 
             GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
@@ -199,7 +202,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
             break;
         }
         }
-    }    // ROOM CALLBACKS
+    }    
+
+    private TileBase GetTileFromCache(string tilename) {
+        if (tilename == null || tilename == "")
+            return null;
+
+        return (TileBase) (tileCache.ContainsKey(tilename) ? 
+            tileCache[tilename] : 
+            tileCache[tilename] = Resources.Load($"Tilemaps/Tiles/{tilename}") as TileBase);
+    }
+    
+    // ROOM CALLBACKS
     public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {  }
     public void OnMasterClientSwitched(Player newMaster) {
         //TODO: chat message
@@ -214,6 +228,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
         //TODO: player disconnect message
     }
     public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) { }
+
+
+    // CONNECTION CALLBACKS
+    public void OnConnected() { }
+    public void OnDisconnected(DisconnectCause cause) {
+        GlobalController.Instance.disconnectCause = cause;
+        SceneManager.LoadScene(0);
+    }
+    public void OnRegionListReceived(RegionHandler handler) { }
+    public void OnCustomAuthenticationResponse(Dictionary<string, object> response) { }
+    public void OnCustomAuthenticationFailed(string failure) { }
+    public void OnConnectedToMaster() { }
+
 
 
     public void OnEnable() {
@@ -505,7 +532,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks {
         foreach (var player in allPlayers) {
             if (player == null) 
                 return;
-            if (player.state == Enums.PowerupState.Giant && player.giantTimer != 15)
+            if (player.state == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
                 mega = true;
             if (player.invincible > 0)
                 invincible = true;

@@ -4888,7 +4888,6 @@ MonoBehaviour:
   lifespan: 15
   sparkleSoundDistance: 6
   counter: 0
-  readyForUnPassthrough: 0.5
   body: {fileID: 0}
   passthrough: 0
   left: 1
@@ -5221,7 +5220,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7308630834410186342}
   - component: {fileID: 3409460790137144535}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Graphic
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -12,7 +12,9 @@ public class SpinyWalk : KoopaWalk {
         if (holder) 
             return;
 
-        if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.Giant) {
+        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching) {
+            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
+        } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom) {
             //Special kill
             bool originalFacing = player.facingRight;
             if (player.inShell && shell && !stationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
@@ -38,7 +40,7 @@ public class SpinyWalk : KoopaWalk {
                     //in shell, moving.
                     if (attackedFromAbove) {
                         //being stomped on
-                        if (player.state == Enums.PowerupState.Mini) {
+                        if (player.state == Enums.PowerupState.MiniMushroom) {
                             //mini mario interactions
                             if (player.groundpound) {
                                 //mini mario is groundpounding, cancel their groundpound & stop moving
@@ -60,16 +62,18 @@ public class SpinyWalk : KoopaWalk {
                                 photonView.RPC("EnterShell", RpcTarget.All);
                                 photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
                                 player.bounce = true;
+                                photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
                             }
                         }
-                    } else {
+                    } else if (player.hitInvincibilityCounter <= 0) {
                         //not being stomped on. just do damage.
                         player.photonView.RPC("Powerdown", RpcTarget.All, false);
                     }
                 }
-            } else {
+            } else if (player.hitInvincibilityCounter <= 0) {
                 //Not in shell, we can't be stomped on.
                 player.photonView.RPC("Powerdown", RpcTarget.All, false);
+                photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
             }
         }
     }
