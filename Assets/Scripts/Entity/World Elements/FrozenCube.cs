@@ -72,7 +72,7 @@ public class FrozenCube : HoldableEntity {
             }
 
             if (flyingEntity && !frozenEntity.dead && !dead) {
-                if ((fallTimerCount -= Time.fixedDeltaTime) < 0) {
+                if ((fallTimerCount -= Time.fixedDeltaTime) < 0 || holder) {
                     body.isKinematic = false;
                     fallen = true;
                 } else {
