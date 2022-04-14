@@ -578,7 +578,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                         return;
                 }
 
-                PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
+                PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.2f : -0.2f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
                 photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
                 animator.SetTrigger("fireball");
                 break;
@@ -593,7 +593,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                         return;
                 }
 
-                PhotonNetwork.Instantiate("Prefabs/Iceball", body.position + new Vector2(facingRight ? 0.3f : -0.3f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
+                PhotonNetwork.Instantiate("Prefabs/Iceball", body.position + new Vector2(facingRight ? 0.2f : -0.2f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
                 photonView.RPC("PlaySound", RpcTarget.All, "player/IceBallThrow"); // Added ice ball sound effect
                 animator.SetTrigger("fireball");
                 break;
@@ -712,6 +712,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             invincible = 10f;
             stateUp = true;
             store = null;
+            if (holding && photonView.IsMine) {
+                holding.photonView.RPC("SpecialKill", RpcTarget.All, facingRight, false);
+                holding = null;
+            }
             break;
         }
 
@@ -1216,7 +1220,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     [PunRPC]
     protected void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
-        if (invincible > 0 || knockback || hitInvincibilityCounter > 0)
+        if (invincible > 0 || knockback || hitInvincibilityCounter > 0 || pipeEntering)
             return;
 
         knockback = true;
@@ -1549,7 +1553,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleJumping(bool jump) {
-        if (knockback || drill || groundpound || groundpoundCounter > 0 || (state == Enums.PowerupState.MegaMushroom && singlejump))
+        if (knockback || drill || (state == Enums.PowerupState.MegaMushroom && (singlejump || groundpound || groundpoundCounter > 0)))
             return;
 
         bool topSpeed = Mathf.Abs(body.velocity.x) + 0.3f > (runningMaxSpeed * (invincible > 0 ? 2 : 1));
@@ -1560,6 +1564,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             turnaround = false;
             sliding = false;
             alreadyGroundpounded = false;
+            groundpound = false;
+            groundpoundCounter = 0;
             drill = false;
             flying &= bounce;
             propeller &= bounce;
@@ -1923,7 +1929,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if (drill) {
             propellerSpinTimer = 0;
-            if (propeller && up)
+            if (propeller && !crouch)
                 drill = false;
         }
 
@@ -2005,7 +2011,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         HandleSlopes();
 
-        if ((walljumping <= 0 || onGround) && !groundpound) {
+        if (crouch && !alreadyGroundpounded)
+            HandleGroundpoundStart(left, right);
+        HandleGroundpound();
+
+        if ((walljumping <= 0 || onGround) && !(groundpound && !onGround)) {
             //Normal walking/running
             HandleWalkingRunning(left, right);
 
@@ -2013,9 +2023,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             HandleJumping(jump);
         }
 
-        if (crouch && !alreadyGroundpounded)
-            HandleGroundpoundStart(left, right);
-        HandleGroundpound();
 
         if (state == Enums.PowerupState.MegaMushroom && giantTimer <= 0) {
             giantEndTimer = giantStartTime / 2f;
@@ -2152,10 +2159,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!propeller && !flying && (left || right))
             return;
 
-        if (flying || propeller) {
+        if (flying) {
             //start drill
-            if (body.velocity.y < 0 && propellerTimer <= 0) {
+            if (body.velocity.y < 0) {
                 drill = true;
+                hitBlock = true;
+            }
+        } else if (propeller) {
+            //start propeller drill
+            if (propellerTimer < 0.6f) {
+                drill = true;
+                propellerTimer = 0;
                 hitBlock = true;
             }
         } else {
