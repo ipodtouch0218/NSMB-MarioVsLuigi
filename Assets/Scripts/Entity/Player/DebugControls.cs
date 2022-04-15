@@ -88,14 +88,14 @@ public class DebugControls : MonoBehaviour {
     public void specialSettings() {
         if (Keyboard.current[Key.P].wasPressedThisFrame)
             editMode = !editMode;
-
+        Vector3 pos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
         if (editMode == true) {
             if (Mouse.current.rightButton.wasPressedThisFrame)
-                GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("PlaceTile", RpcTarget.All, Mouse.current.position.ReadValue().x, Mouse.current.position.ReadValue().y);
+            GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("PlaceTile", RpcTarget.All, pos.x, pos.y, pos.z);
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
-                GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("RemoveTile", RpcTarget.All, Mouse.current.position.ReadValue().x, Mouse.current.position.ReadValue().y);
+                GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("RemoveTile", RpcTarget.All, pos.x, pos.y, pos.z);
         }
     }
      

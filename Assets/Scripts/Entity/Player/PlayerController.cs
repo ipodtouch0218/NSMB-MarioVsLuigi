@@ -867,18 +867,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     [PunRPC]
-    protected void RemoveTile(float x, float y) {
-        Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector2(x, y));
+    protected void RemoveTile(float x, float y, float z) {
+        Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(x, y, z));
         Vector3Int tileLoc = Utils.WorldToTilemapPosition(pos);
         GameManager.Instance.tilemap.SetTile(tileLoc, null);
     }
 
     [PunRPC]
-    protected void PlaceTile(float x, float y) {
-        Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector2(x, y));
+    protected void PlaceTile(float x, float y, float z) {
+        
         //Debug.Log(string.Format("Co-ords of mouse is [X: {0} Y: {0}]", pos.x, pos.y));
 
-        Vector3Int tileLoc = Utils.WorldToTilemapPosition(pos);
+        Vector3Int tileLoc = Utils.WorldToTilemapPosition(new Vector3(x, y, z));
         if (GameManager.Instance.tilemap.GetTile(tileLoc) == null)
             GameManager.Instance.tilemap.SetTile(tileLoc, currentTile);
         else
