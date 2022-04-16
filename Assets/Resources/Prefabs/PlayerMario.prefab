@@ -10207,6 +10207,7 @@ MonoBehaviour:
   blinkingSpeed: 0.25
   terminalVelocity: -7
   jumpVelocity: 7
+  megaJumpVelocity: 12
   launchVelocity: 12
   walkingAcceleration: 8
   runningAcceleration: 3

@@ -249,6 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dead: 0
   frozen: 0
+  left: 1
   body: {fileID: 1435431862184428450}
   holder: {fileID: 0}
   previousHolder: {fileID: 0}
@@ -264,7 +265,6 @@ MonoBehaviour:
   upsideDown: 0
   canBeFlipped: 0
   flipXFlip: 1
-  left: 1
   putdown: 0
   wakeupTimer: 0
 --- !u!114 &7346982284271418879

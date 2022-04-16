@@ -273,7 +273,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (animator.GetBool("pipe")) {
             gameObject.layer = PlayerController.HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, 1);
-        } else if (controller.dead || controller.stuckInBlock || controller.giantStartTimer > 0 || controller.giantEndTimer > 0) {
+        } else if (controller.dead || controller.stuckInBlock || controller.giantStartTimer > 0 || controller.stationaryGiantEnd) {
             gameObject.layer = PlayerController.HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, -4);
         } else {

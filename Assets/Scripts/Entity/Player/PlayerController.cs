@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public int playerId = -1;
     public bool dead = false;
     public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
-    public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, launchVelocity = 12f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 25f;
+    public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 25f;
     public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f;
 
     private BoxCollider2D[] hitboxes;
@@ -665,6 +665,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 transform.localScale = Vector3.one;
             } else if (storedPowerup == null) {
                 store = Enums.PowerupState.Large;
+            } else {
+                store = null;
             }
             break;
         }
@@ -834,8 +836,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
     }
     #endregion
-
-    // I didn't know what region to put this, move it if needed.
 
     // I didn't know what region to put this, move it if needed.
 
@@ -1581,7 +1581,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 return;
             }
 
-            float vel = jumpVelocity + Mathf.Abs(body.velocity.x) / 8f * (state == Enums.PowerupState.MegaMushroom ? 1.5f : 1f);
+
+            float vel = state switch {
+                Enums.PowerupState.MegaMushroom => megaJumpVelocity,
+                _ => jumpVelocity + Mathf.Abs(body.velocity.x) / 8f,
+            };
             bool canSpecialJump = !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && invincible <= 0 && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, ONLY_GROUND_MASK);
             float jumpBoost = 0;
 
@@ -2030,6 +2034,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             stationaryGiantEnd = false;
             hitInvincibilityCounter = 3f;
             PlaySoundEverywhere("player/mega-end");
+            body.velocity = new(body.velocity.x, body.velocity.y > 0 ? (body.velocity.y / 3f) : body.velocity.y);
         }
 
         HandleSlopes();
@@ -2040,10 +2045,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (flying || propeller) {
             body.gravityScale = flyingGravity;
         } else {
-            float gravityModifier = state != Enums.PowerupState.MiniMushroom ? 1f : 0.4f;
+            float gravityModifier = state switch {
+                Enums.PowerupState.MiniMushroom => 0.4f,
+                _ => 1,
+            };
+            float slowriseModifier = state switch {
+                Enums.PowerupState.MegaMushroom => 3f,
+                _ => 1f,
+            };
             if (body.velocity.y > 2.5) {
-                if (jump || jumpHeld) {
-                    body.gravityScale = slowriseGravity;
+                if (jump || jumpHeld || state == Enums.PowerupState.MegaMushroom) {
+                    body.gravityScale = slowriseGravity * slowriseModifier;
                 } else {
                     body.gravityScale = normalGravity * 1.5f * gravityModifier;
                 }
@@ -2081,7 +2093,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
         //Terminal velocity
-        float terminalVelocityModifier = state == Enums.PowerupState.MiniMushroom ? 0.65f : 1f;
+        float terminalVelocityModifier = state switch {
+            Enums.PowerupState.MiniMushroom => 0.65f,
+            Enums.PowerupState.MegaMushroom => 3f,
+            _ => 1f,
+        };
         if (flying) {
             if (drill) {
                 body.velocity = new Vector2(Mathf.Max(-1.5f, Mathf.Min(1.5f, body.velocity.x)), -drillVelocity);
