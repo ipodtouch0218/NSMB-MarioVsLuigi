@@ -71,6 +71,7 @@ public class RebindButton : MonoBehaviour {
     }
 
     void CancelRebind() {
+        targetAction.actionMap.Enable();
         rebinding.Dispose();
         MainMenuManager.Instance.rebindPrompt.SetActive(false);
         StopCoroutine(countdown);

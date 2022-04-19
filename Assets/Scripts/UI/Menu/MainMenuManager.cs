@@ -757,12 +757,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void SendChat(TMP_InputField input) {
         string text = input.text.Trim();
-        if (input.text == null || input.text == "")
+        input.text = "";
+        if (text == null || text == "") {
             return;
+        }
         
         GlobalChatMessage(PhotonNetwork.NickName + ": " + text, ColorToVector(Color.black));
-        input.text = "";
-
         StartCoroutine(SelectNextFrame(input));
     }
     IEnumerator SelectNextFrame(TMP_InputField input) {
