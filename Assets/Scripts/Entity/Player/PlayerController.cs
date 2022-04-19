@@ -1601,6 +1601,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             //Start wallslide
             wallSlideRight = currentWallDirection == Vector2.right;
             wallSlideLeft = currentWallDirection == Vector2.left;
+            propeller = false;
         }
 
         if (wallSlideTimer <= 0) {

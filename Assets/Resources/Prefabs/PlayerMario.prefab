@@ -10257,6 +10257,7 @@ MonoBehaviour:
   usedPropellerThisJump: 0
   frozen: 0
   stationaryGiantEnd: 0
+  fireballKnockback: 0
   landing: 0
   koyoteTime: 0
   groundpoundCounter: 0

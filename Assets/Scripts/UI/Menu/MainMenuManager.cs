@@ -227,6 +227,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         HorizontalCamera.OFFSET = 0;
         GlobalController.Instance.joinedAsSpectator = false;
         Time.timeScale = 1;
+
         if (GlobalController.Instance.disconnectCause != null) {
             OpenReconnectBox((DisconnectCause) GlobalController.Instance.disconnectCause);
         }
@@ -242,6 +243,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length)].transform.position;
 
         if (!PhotonNetwork.IsConnected) {
+            OpenTitleScreen();
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {
@@ -387,6 +389,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     }
 
+    public void OpenTitleScreen() {
+        title.SetActive(true);
+        bg.SetActive(false);
+        mainMenu.SetActive(false);
+        optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
+        lobbyMenu.SetActive(false);
+        createLobbyPrompt.SetActive(false);
+        inLobbyMenu.SetActive(false);
+        creditsMenu.SetActive(false);
+        passwordPrompt.SetActive(false);
+
+        EventSystem.current.SetSelectedGameObject(mainMenuSelected);
+    }
     public void OpenMainMenu() {
         title.SetActive(false);
         bg.SetActive(true);

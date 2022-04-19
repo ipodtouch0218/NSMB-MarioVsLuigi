@@ -37,6 +37,12 @@ public class UIUpdater : MonoBehaviour {
     void Update() {
         pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Time.unscaledDeltaTime * 0.5f);
         fpsSample = Mathf.Lerp(fpsSample, 1.0f / Time.unscaledDeltaTime, Time.unscaledDeltaTime * 0.5f);
+
+        if (pingSample == float.NaN)
+            pingSample = 0;
+        if (fpsSample == float.NaN)
+            fpsSample = 60;
+        
         uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">{Mathf.RoundToInt(fpsSample)}FPS | Ping: {(int) pingSample}ms</font>";
         
         //Player stuff update.
