@@ -85,7 +85,7 @@ public class MarioBrosPlatform : MonoBehaviour {
 
     public void Bump(PlayerController player, Vector3 worldPos) {
         float localPos = transform.InverseTransformPoint(worldPos).x;
-        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos - (Vector3.left * 0.25f));
+        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + new Vector3(-0.25f, -0.1f));
 
         if (Mathf.Abs(localPos) > platformWidth) {
             worldPos.x += GameManager.Instance.levelWidthTile / 2f;

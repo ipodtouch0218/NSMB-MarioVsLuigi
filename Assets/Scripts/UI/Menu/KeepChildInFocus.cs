@@ -4,20 +4,52 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class KeepChildInFocus : MonoBehaviour {
-    public RectTransform contentPanel;
-    private ScrollRect us;
+[RequireComponent(typeof(ScrollRect))]
+public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+    public float scrollAmount = 15;
+    private bool mouseOver = false;
+    private ScrollRect rect;
+    private float scrollPos = 0;
 
-    void Start() {
-        us = GetComponent<ScrollRect>();
+    void Awake() {
+        rect = GetComponent<ScrollRect>();
     }
+    void Update() {
+        if (mouseOver || rect.content == null)
+            return;
+        
+        rect.verticalNormalizedPosition = Mathf.Lerp(rect.verticalNormalizedPosition, scrollPos, scrollAmount * Time.deltaTime);
 
-    public void Update() {
         if (!EventSystem.current.currentSelectedGameObject)
             return;
 
         RectTransform target = EventSystem.current.currentSelectedGameObject.GetComponent<RectTransform>();
-        if (target.IsChildOf(transform) && target.name != "Scrollbar Vertical")
-            UIExtensions.ScrollToCenter(us, target);
+
+        if (IsFirstParent(target) && target.name != "Scrollbar Vertical") {
+            scrollPos = UIExtensions.ScrollToCenter(rect, target, false);
+        } else {
+            scrollPos = rect.verticalNormalizedPosition;
+        }
+    }
+
+    private readonly List<ScrollRect> components = new();
+    private bool IsFirstParent(Transform target) {
+        do {
+            target.GetComponents(components);
+
+            if (components.Count >= 1)
+                return components.Contains(rect);
+
+            target = target.parent;
+        } while (target != null);
+
+        return false;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+        mouseOver = true;
+    }
+    public void OnPointerExit(PointerEventData eventData) {
+        mouseOver = false;
     }
 }

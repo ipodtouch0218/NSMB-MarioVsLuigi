@@ -58,7 +58,7 @@ public static class UIExtensions {
     /// </summary>
     /// <param name="scrollRect">Scroll rect to scroll</param>
     /// <param name="target">Element of the scroll rect's content to center vertically</param>
-    public static void ScrollToCenter(this ScrollRect scrollRect, RectTransform target) {
+    public static float ScrollToCenter(this ScrollRect scrollRect, RectTransform target, bool onlyOffscreen) {
         // The scroll rect's view's space is used to calculate scroll position
         var view = scrollRect.viewport != null ? scrollRect.viewport : scrollRect.GetComponent<RectTransform>();
 
@@ -67,11 +67,11 @@ public static class UIExtensions {
         var elementBounds = target.TransformBoundsTo(view);
         var offset = viewRect.center.y - elementBounds.center.y;
 
-        if ((elementBounds.center.y + elementBounds.extents.y) < 0 && (elementBounds.center.y - elementBounds.extents.y) > -viewRect.height)
-            return;
+        if (onlyOffscreen && (elementBounds.center.y + elementBounds.extents.y) < 0 && (elementBounds.center.y - elementBounds.extents.y) > -viewRect.height)
+            return scrollRect.verticalNormalizedPosition;
 
         // Normalize and apply the calculated offset
         var scrollPos = scrollRect.verticalNormalizedPosition - scrollRect.NormalizeScrollDistance(1, offset);
-        scrollRect.verticalNormalizedPosition = Mathf.Clamp(scrollPos, 0f, 1f);
+        return Mathf.Clamp(scrollPos, 0f, 1f);
     }
 }

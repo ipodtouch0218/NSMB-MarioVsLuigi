@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
   m_Name: MegaMushroom
   m_EditorClassIdentifier: 
+  state: 8
   prefab: MegaMushroom
-  spawnChance: 0.3
-  starModifier: -0.2
+  soundEffect: powerup-mega
+  spawnChance: 0.4
+  starModifier: -0.4
   big: 1
+  tall: 0
   custom: 0

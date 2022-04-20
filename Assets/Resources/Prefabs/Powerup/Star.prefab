@@ -117,6 +117,7 @@ MonoBehaviour:
   followMeCounter: 0
   despawnCounter: 15
   ignoreCounter: 0
+  powerupScriptable: {fileID: 11400000, guid: c00c1b56106aee544b8facce85b9f455, type: 2}
 --- !u!50 &387509546018045311
 Rigidbody2D:
   serializedVersion: 4
@@ -5083,7 +5084,7 @@ GameObject:
   - component: {fileID: 5139606358860933889}
   m_Layer: 10
   m_Name: Hitbox
-  m_TagString: Star
+  m_TagString: Powerup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

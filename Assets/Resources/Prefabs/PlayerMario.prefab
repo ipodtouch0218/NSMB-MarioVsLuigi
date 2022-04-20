@@ -10207,13 +10207,14 @@ MonoBehaviour:
   blinkingSpeed: 0.25
   terminalVelocity: -7
   jumpVelocity: 7
+  megaJumpVelocity: 14
   launchVelocity: 12
   walkingAcceleration: 8
   runningAcceleration: 3
   walkingMaxSpeed: 2.7
-  runningMaxSpeed: 5
+  runningMaxSpeed: 5.625
   wallslideSpeed: -4.25
-  walljumpVelocity: 6.25
+  walljumpVelocity: 6
   giantStartTime: 1.5
   soundRange: 10
   slopeSlidingAngle: 25
@@ -10227,8 +10228,8 @@ MonoBehaviour:
   onGround: 0
   crushGround: 0
   doGroundSnap: 0
-  onRight: 0
-  onLeft: 0
+  touchingWallRight: 0
+  touchingWallLeft: 0
   hitRoof: 0
   skidding: 0
   turnaround: 0
@@ -10256,7 +10257,7 @@ MonoBehaviour:
   usedPropellerThisJump: 0
   frozen: 0
   stationaryGiantEnd: 0
-  walljumping: 0
+  fireballKnockback: 0
   landing: 0
   koyoteTime: 0
   groundpoundCounter: 0
@@ -10275,10 +10276,13 @@ MonoBehaviour:
   floorAngle: 0
   knockbackTimer: 0
   unfreezeTimer: 0
+  wallSlideLeft: 0
+  wallSlideRight: 0
   pipeDirection: {x: 0, y: 0}
   stars: 0
   coins: 0
   lives: -1
+  storedPowerup: {fileID: 0}
   holding: {fileID: 0}
   holdingOld: {fileID: 0}
   FrozenObject: {fileID: 0}

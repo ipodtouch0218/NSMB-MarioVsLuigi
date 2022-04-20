@@ -10,7 +10,7 @@ public class BulletBillLauncher : MonoBehaviourPun {
     private float shootTimer;
     private readonly List<GameObject> bills = new();
 
-    private Vector2 searchBox, searchOffset, spawnOffset = new(0.25f, -0.2f);
+    private Vector2 searchBox, closeSearchBox = new(1.5f, 1f), searchOffset, spawnOffset = new(0.25f, -0.2f);
 
     void Start() {
         searchBox = new(playerSearchRadius, playerSearchRadius);
@@ -36,22 +36,26 @@ public class BulletBillLauncher : MonoBehaviourPun {
         if (bills.Count >= 3)
             return;
 
+        //Check for players close by
+        if (IntersectsPlayer(transform.position + Vector3.down * 0.25f, closeSearchBox))
+            return;
+
         //Shoot left
-        if (IntersectsPlayer((Vector2) transform.position - searchOffset)) {
+        if (IntersectsPlayer((Vector2) transform.position - searchOffset, searchBox)) {
             GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(-spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ true });
             bills.Add(newBill);
             return;
         }
 
         //Shoot right
-        if (IntersectsPlayer((Vector2)transform.position + searchOffset)) {
+        if (IntersectsPlayer((Vector2) transform.position + searchOffset, searchBox)) {
             GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ false });
             bills.Add(newBill);
             return;
         }
     }
 
-    bool IntersectsPlayer(Vector2 origin) {
+    bool IntersectsPlayer(Vector2 origin, Vector2 searchBox) {
         foreach (var hit in Physics2D.OverlapBoxAll(origin, searchBox, 0)) {
             if (hit.gameObject.CompareTag("Player"))
                 return true;
@@ -61,8 +65,9 @@ public class BulletBillLauncher : MonoBehaviourPun {
 
     void OnDrawGizmosSelected() {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube((Vector2) transform.position - searchOffset, searchBox);
+        Gizmos.DrawCube(transform.position + Vector3.down * 0.5f, closeSearchBox);
         Gizmos.color = new Color(0, 0, 1, 0.5f);
+        Gizmos.DrawCube((Vector2) transform.position - searchOffset, searchBox);
         Gizmos.DrawCube((Vector2) transform.position + searchOffset, searchBox);
     }
 }

@@ -37,6 +37,12 @@ public class UIUpdater : MonoBehaviour {
     void Update() {
         pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Time.unscaledDeltaTime * 0.5f);
         fpsSample = Mathf.Lerp(fpsSample, 1.0f / Time.unscaledDeltaTime, Time.unscaledDeltaTime * 0.5f);
+
+        if (pingSample == float.NaN)
+            pingSample = 0;
+        if (fpsSample == float.NaN)
+            fpsSample = 60;
+        
         uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">{Mathf.RoundToInt(fpsSample)}FPS | Ping: {(int) pingSample}ms</font>";
         
         //Player stuff update.
@@ -52,17 +58,21 @@ public class UIUpdater : MonoBehaviour {
             return;
 
         //TODO: refactor
-        itemReserve.sprite = player.storedPowerup switch {
-            Enums.PowerupState.MiniMushroom => storedItemMiniMushroom,
-            //Enums.powerupstae.Small => null
-            Enums.PowerupState.Large => storedItemMushroom,
-            Enums.PowerupState.FireFlower => storedItemFireFlower,
-            Enums.PowerupState.MegaMushroom => storedItemMegaMushroom,
-            Enums.PowerupState.BlueShell => storedItemBlueShell,
-            Enums.PowerupState.PropellerMushroom => storedItemPropellerMushroom,
-            Enums.PowerupState.IceFlower => storedItemIceFlower,
-            _ => storedItemNull,
-        };
+        if (player.storedPowerup) {
+            itemReserve.sprite = player.storedPowerup.state switch {
+                Enums.PowerupState.MiniMushroom => storedItemMiniMushroom,
+                //Enums.powerupstae.Small => null
+                Enums.PowerupState.Large => storedItemMushroom,
+                Enums.PowerupState.FireFlower => storedItemFireFlower,
+                Enums.PowerupState.MegaMushroom => storedItemMegaMushroom,
+                Enums.PowerupState.BlueShell => storedItemBlueShell,
+                Enums.PowerupState.PropellerMushroom => storedItemPropellerMushroom,
+                Enums.PowerupState.IceFlower => storedItemIceFlower,
+                _ => storedItemNull,
+            };
+        } else {
+            itemReserve.sprite = storedItemNull;
+        }
     }
     void UpdateTextUI() {
         if (!player)
@@ -71,6 +81,6 @@ public class UIUpdater : MonoBehaviour {
         uiStars.text = "<sprite=0>" + player.stars + "/" + GameManager.Instance.starRequirement;
         uiCoins.text = "<sprite=1>" + player.coins + "/8";
         uiLives.text = player.lives > 0 ? (Utils.GetCharacterIndex(player.photonView.Owner) == 0 ? "<sprite=3>" : "<sprite=4>") + player.lives : "";
-        uiCountdown.text = GameManager.Instance.timeRemaining > -0.9 ? "<sprite=6>" + GameManager.Instance.timeRemaining.ToString("0s") : "";
+        uiCountdown.text = GameManager.Instance.endTime != -1 ? "<sprite=6>" + ((GameManager.Instance.endTime - PhotonNetwork.ServerTimestamp) / 1000).ToString("0s") : "";
     }
 }

@@ -104,7 +104,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         }
 
         //Particles
-        SetParticleEmission(dust, (controller.onLeft || controller.onRight || (controller.onGround && ((controller.skidding && !controller.doIceSkidding) || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);
+        SetParticleEmission(dust, (controller.wallSlideLeft || controller.wallSlideRight || (controller.onGround && ((controller.skidding && !controller.doIceSkidding) || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);
         SetParticleEmission(drillParticle, controller.drill);
         if (controller.drill)
             drillParticleAudio.clip = (controller.state == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
@@ -145,7 +145,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (controller.crouching || controller.sliding || controller.skidding) {
             dust.transform.localPosition = Vector2.zero;
         } else {
-            dust.transform.localPosition = new Vector2(mainHitbox.size.x * (3f / 4f) * (controller.onLeft ? -1 : 1), mainHitbox.size.y * (3f / 4f));
+            dust.transform.localPosition = new Vector2(mainHitbox.size.x * (3f / 4f) * (controller.wallSlideLeft ? -1 : 1), mainHitbox.size.y * (3f / 4f));
         }
     }
     private void SetParticleEmission(ParticleSystem particle, bool value) {
@@ -164,8 +164,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
             //Animation
             animator.SetBool("skidding", !controller.doIceSkidding && controller.skidding);
             animator.SetBool("turnaround", controller.turnaround);
-            animator.SetBool("onLeft", controller.onLeft);
-            animator.SetBool("onRight", controller.onRight);
+            animator.SetBool("onLeft", controller.wallSlideLeft);
+            animator.SetBool("onRight", controller.wallSlideRight);
             animator.SetBool("onGround", controller.onGround);
             animator.SetBool("invincible", controller.invincible > 0);
             float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.floorAngle * Mathf.Deg2Rad));
@@ -199,8 +199,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
             animator.SetBool("propeller", controller.propeller);
             animator.SetBool("propellerSpin", controller.propellerSpinTimer > 0);
         } else {
-            controller.onLeft = animator.GetBool("onLeft");
-            controller.onRight = animator.GetBool("onRight");
+            controller.wallSlideLeft = animator.GetBool("onLeft");
+            controller.wallSlideRight = animator.GetBool("onRight");
             controller.onGround = animator.GetBool("onGround");
             controller.skidding = animator.GetBool("skidding");
             controller.turnaround = animator.GetBool("turnaround");
@@ -273,7 +273,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (animator.GetBool("pipe")) {
             gameObject.layer = PlayerController.HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, 1);
-        } else if (controller.dead || controller.stuckInBlock || controller.giantStartTimer > 0 || controller.giantEndTimer > 0) {
+        } else if (controller.dead || controller.stuckInBlock || controller.giantStartTimer > 0 || controller.stationaryGiantEnd) {
             gameObject.layer = PlayerController.HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, -4);
         } else {

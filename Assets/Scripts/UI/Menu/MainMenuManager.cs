@@ -23,7 +23,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText;
     public TMP_Dropdown levelDropdown, characterDropdown, primaryColorDropdown, secondaryColorDropdown;
-    public RoomIcon selectedRoom;
+    public RoomIcon selectedRoomIcon;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle, passwordToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
@@ -35,6 +35,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
+    public string connectThroughSecret = "";
+    public string selectedRoom;
+    public bool askedToJoin;
 
     public Selectable[] roomSettings;
 
@@ -57,6 +60,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             { Enums.NetPlayerProperties.SecondaryColor, 0 },
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+
+        if (connectThroughSecret != "") {
+            PhotonNetwork.JoinRoom(connectThroughSecret);
+            connectThroughSecret = "";
+        }
 
         if (updatePingCoroutine == null)
             updatePingCoroutine = StartCoroutine(UpdatePing());
@@ -84,6 +92,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 currentRooms[room.Name] = roomIcon = newLobby.GetComponent<RoomIcon>();
                 roomIcon.room = room;
             }
+            if (room.Name == selectedRoom) {
+                selectedRoomIcon = roomIcon;
+            }
 
             roomIcon.UpdateUI();
         }
@@ -94,6 +105,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             Destroy(currentRooms[key].gameObject);
             currentRooms.Remove(key);
+        }
+
+        if (askedToJoin && selectedRoomIcon != null) {
+            JoinSelectedRoom();
+            askedToJoin = false;
+            selectedRoom = null;
+            selectedRoomIcon = null;
         }
     }
 
@@ -148,6 +166,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic))
             OpenErrorBox("Disconnected: " + cause.ToString());
 
+        selectedRoom = null;
+        selectedRoomIcon = null;
         if (!PhotonNetwork.IsConnectedAndReady)
             PhotonNetwork.ConnectToRegion(lastRegion);
     }
@@ -222,11 +242,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     // Unity Stuff
     void Start() {
+
         Instance = this;
         HorizontalCamera.OFFSET_TARGET = 0;
         HorizontalCamera.OFFSET = 0;
         GlobalController.Instance.joinedAsSpectator = false;
         Time.timeScale = 1;
+
         if (GlobalController.Instance.disconnectCause != null) {
             OpenReconnectBox((DisconnectCause) GlobalController.Instance.disconnectCause);
         }
@@ -242,6 +264,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length)].transform.position;
 
         if (!PhotonNetwork.IsConnected) {
+            OpenTitleScreen();
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {
@@ -285,8 +308,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         //custom color dropdown initialization
 
-        CustomColors.Primary.SelectMany(c => c.name).ToList();
-
         primaryColorDropdown.AddOptions(CustomColors.Primary.Select(c => c.name).ToList());
         secondaryColorDropdown.AddOptions(CustomColors.Secondary.Select(c => c.name).ToList());
 
@@ -294,7 +315,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         rebindManager.Init();
 
-
+        GlobalController.Instance.discordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
     }
 
@@ -302,7 +323,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         bool connected = PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
         connecting.SetActive(!connected);
 
-        joinRoomBtn.interactable = connected && selectedRoom != null && validName;
+        joinRoomBtn.interactable = connected && selectedRoomIcon != null && validName;
         createRoomBtn.interactable = connected && validName;
         region.interactable = connected;
 
@@ -384,9 +405,22 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (updatePingCoroutine == null)
             updatePingCoroutine = StartCoroutine(UpdatePing());
-
     }
 
+    public void OpenTitleScreen() {
+        title.SetActive(true);
+        bg.SetActive(false);
+        mainMenu.SetActive(false);
+        optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
+        lobbyMenu.SetActive(false);
+        createLobbyPrompt.SetActive(false);
+        inLobbyMenu.SetActive(false);
+        creditsMenu.SetActive(false);
+        passwordPrompt.SetActive(false);
+
+        EventSystem.current.SetSelectedGameObject(mainMenuSelected);
+    }
     public void OpenMainMenu() {
         title.SetActive(false);
         bg.SetActive(true);
@@ -517,6 +551,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             Destroy(roomObj);
         }
+        selectedRoomIcon = null;
         selectedRoom = null;
         lastRegion = targetRegion.Code;
 
@@ -599,32 +634,34 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
     public void SelectRoom(GameObject room) {
-        if (selectedRoom)
-            selectedRoom.Unselect();
+        if (selectedRoomIcon)
+            selectedRoomIcon.Unselect();
 
-        selectedRoom = room.GetComponent<RoomIcon>();
-        selectedRoom.Select();
+        selectedRoomIcon = room.GetComponent<RoomIcon>();
+        selectedRoomIcon.Select();
+        selectedRoom = selectedRoomIcon.room.Name;
+
         joinRoomBtn.interactable = room != null && PhotonNetwork.NickName.Length >= 3;
     }
     public void JoinSelectedRoom() {
         if (selectedRoom == null)
             return;
 
-        if ((string) selectedRoom.room.CustomProperties[Enums.NetRoomProperties.Password] != "") {
+        if ((string) selectedRoomIcon.room.CustomProperties[Enums.NetRoomProperties.Password] != "") {
             OpenPasswordPrompt();
             return;
         }
 
-        PhotonNetwork.JoinRoom(selectedRoom.room.Name);
+        PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
     }
     public void JoinPasswordedRoom() {
-        string pw = (string) selectedRoom.room.CustomProperties[Enums.NetRoomProperties.Password];
+        string pw = (string) selectedRoomIcon.room.CustomProperties[Enums.NetRoomProperties.Password];
         if (pw == "")
             return;
 
         passwordPrompt.SetActive(false);
         if (pw == passwordField.text) {
-            PhotonNetwork.JoinRoom(selectedRoom.room.Name);
+            PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
         } else {
             OpenLobbyMenu();
             OpenErrorBox("Incorrect Password!");
@@ -703,6 +740,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
 
         UpdateSettingEnableStates();
+
+        GlobalController.Instance.discordController.UpdateActivity();
     }
     public void UpdatePlayerList(Player pl, Transform nameObject = null) {
         string characterString = Utils.GetCharacterData(pl).uistring;
@@ -757,12 +796,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void SendChat(TMP_InputField input) {
         string text = input.text.Trim();
-        if (input.text == null || input.text == "")
+        input.text = "";
+        if (text == null || text == "") {
             return;
+        }
         
         GlobalChatMessage(PhotonNetwork.NickName + ": " + text, ColorToVector(Color.black));
-        input.text = "";
-
         StartCoroutine(SelectNextFrame(input));
     }
     IEnumerator SelectNextFrame(TMP_InputField input) {

@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
   m_Name: Star
   m_EditorClassIdentifier: 
+  state: 0
   prefab: Star
-  spawnChance: 0.3
-  starModifier: -0.3
+  soundEffect: powerup
+  spawnChance: 0.5
+  starModifier: -0.45
+  big: 0
+  tall: 0
   custom: 0

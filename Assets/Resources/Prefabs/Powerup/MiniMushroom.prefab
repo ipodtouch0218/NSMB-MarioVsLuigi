@@ -116,6 +116,7 @@ MonoBehaviour:
   followMeCounter: 0
   despawnCounter: 15
   ignoreCounter: 0
+  powerupScriptable: {fileID: 11400000, guid: b3cbb6a3699975d4fb0a2e641a09684c, type: 2}
 --- !u!50 &3379984366894124869
 Rigidbody2D:
   serializedVersion: 4
@@ -270,7 +271,7 @@ GameObject:
   - component: {fileID: 4759868166318895300}
   m_Layer: 10
   m_Name: Hitbox
-  m_TagString: MiniMushroom
+  m_TagString: Powerup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

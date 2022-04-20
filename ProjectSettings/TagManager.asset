@@ -10,11 +10,6 @@ TagManager:
   - Powerup
   - coin
   - bigstar
-  - Mushroom
-  - Star
-  - MiniMushroom
-  - FireFlower
-  - BlueShell
   - StarSpawn
   - MainStar
   - Fireball
@@ -25,7 +20,6 @@ TagManager:
   - LoadingCanvas
   - loosecoin
   - wintext
-  - MegaMushroom
   - bulletbill
   - spinner
   - platform
@@ -34,7 +28,6 @@ TagManager:
   - CanvasMask
   - Backgrounds
   - DestructablePipe
-  - PropellerMushroom
   - FadeUI
   - lava
   - MarioBrosPlatform

@@ -12,7 +12,7 @@ public class SpinyWalk : KoopaWalk {
         if (holder) 
             return;
 
-        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching) {
+        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
         } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom) {
             //Special kill

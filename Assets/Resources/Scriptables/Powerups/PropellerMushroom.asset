@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
   m_Name: PropellerMushroom
   m_EditorClassIdentifier: 
+  state: 6
   prefab: PropellerMushroom
+  soundEffect: powerup
   spawnChance: 0.5
   starModifier: -0.1
-  big: 1
+  big: 0
+  tall: 1
   custom: 1

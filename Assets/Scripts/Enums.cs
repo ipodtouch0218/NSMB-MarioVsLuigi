@@ -4,8 +4,29 @@ using UnityEngine;
 
 public class Enums {
 
+    public class PriorityPair {
+        public int itemPriority, statePriority;
+        public PriorityPair(int state) {
+            statePriority = itemPriority = state;
+        }
+        public PriorityPair(int state, int item) {
+            statePriority = state;
+            itemPriority = item;
+        }
+    }
+    public static readonly Dictionary<PowerupState, PriorityPair> PowerupStatePriority = new() {
+        [PowerupState.None] = new(-1),
+        [PowerupState.MiniMushroom] = new(0, 3),
+        [PowerupState.Small] = new(-1),
+        [PowerupState.Large] = new(1),
+        [PowerupState.FireFlower] = new(2),
+        [PowerupState.IceFlower] = new(2),
+        [PowerupState.PropellerMushroom] = new(2),
+        [PowerupState.BlueShell] = new(2),
+        [PowerupState.MegaMushroom] = new(4),
+    };
     public enum PowerupState {
-        MiniMushroom, Small, Large, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
+        None, MiniMushroom, Small, Large, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
     // Animation enums
     public enum PlayerEyeState {
@@ -40,6 +61,7 @@ public class Enums {
         public static string GameStarted { get; } = "S";
         public static string HostName { get; } = "HN";
         public static string Password { get; } = "PW";
+        public static string DiscordJoinSecret { get; } = "DJS";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events

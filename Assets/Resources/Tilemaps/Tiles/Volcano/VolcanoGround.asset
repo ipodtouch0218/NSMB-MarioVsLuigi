@@ -141,6 +141,7 @@ MonoBehaviour:
   siblings:
   - {fileID: 11400000, guid: 139e791c13fd6ae4184306c5caa652ed, type: 2}
   - {fileID: 11400000, guid: 9cf91fa80d72c8944bbc903a55fc66e6, type: 2}
+  - {fileID: 11400000, guid: 416f34b2507d2cb47aa09b53f1b618f1, type: 2}
   isBackgroundTile: 0
   iceSkidding: 0
   footstepMaterial: 

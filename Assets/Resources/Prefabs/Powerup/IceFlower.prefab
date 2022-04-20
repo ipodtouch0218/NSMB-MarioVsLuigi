@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7205141820930779380}
   m_Layer: 10
   m_Name: Hitbox
-  m_TagString: IceFlower
+  m_TagString: Powerup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -174,6 +174,7 @@ MonoBehaviour:
   followMeCounter: 0
   despawnCounter: 15
   ignoreCounter: 0
+  powerupScriptable: {fileID: 11400000, guid: ef97a693c40ceef42867ab6091a3a1c7, type: 2}
 --- !u!61 &7205141821402601893
 BoxCollider2D:
   m_ObjectHideFlags: 0
