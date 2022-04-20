@@ -242,6 +242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dead: 0
   frozen: 0
+  left: 1
   body: {fileID: 0}
   holder: {fileID: 0}
   previousHolder: {fileID: 0}

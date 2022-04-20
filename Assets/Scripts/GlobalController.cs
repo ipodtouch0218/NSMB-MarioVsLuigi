@@ -10,6 +10,7 @@ public class GlobalController : Singleton<GlobalController> {
     public RenderTexture ndsTexture;
     public PlayerData[] characters;
     public Settings settings;
+    public DiscordController discordController;
     public string controlsJson = null;
 
     public bool joinedAsSpectator = false;
@@ -21,9 +22,8 @@ public class GlobalController : Singleton<GlobalController> {
         if (!InstanceCheck()) 
             return;
         Instance = this;
-    }
-    void Start() {
-        settings = GetComponent<Settings>();    
+        settings = GetComponent<Settings>();
+        discordController = GetComponent<DiscordController>();
     }
     void Update() {
         ndsCanvas.enabled = Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0;

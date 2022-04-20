@@ -117,6 +117,7 @@ MonoBehaviour:
   followMeCounter: 0
   despawnCounter: 15
   ignoreCounter: 0
+  powerupScriptable: {fileID: 11400000, guid: a3c6d7fa6c939be4ead398f0d82b5eb9, type: 2}
 --- !u!61 &1017215213198693184
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -271,7 +272,7 @@ GameObject:
   - component: {fileID: 1017215213943153169}
   m_Layer: 10
   m_Name: Hitbox
-  m_TagString: Mushroom
+  m_TagString: Powerup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

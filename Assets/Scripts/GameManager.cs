@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    private System.Collections.Hashtable tileCache = new();
+    private readonly System.Collections.Hashtable tileCache = new();
     
     public AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
 
@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     readonly List<GameObject> remainingSpawns = new();
     float spawnStarCount;
     private PlayerInput input;
+    public long startTime, endTime = -1;
 
     //Audio
     public AudioSource musicSourceIntro, musicSourceLoop, sfx;
@@ -53,10 +54,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public GameObject pauseUI, pauseButton;
     public bool gameover = false, musicEnabled = false;
     public readonly List<string> loadedPlayers = new();
-    public int starRequirement;
-    public float timeRemaining, maxTime;
+    public int starRequirement, timedGameDuration;
     public bool hurryup = false;
 
+    public int playerCount;
     public PlayerController[] allPlayers;
     public EnemySpawnpoint[] enemySpawnpoints;
 
@@ -294,7 +295,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
     IEnumerator LoadingComplete(long startTimestamp) {
+
+        GlobalController.Instance.discordController.UpdateActivity();
         starting = true;
+        startTime = startTimestamp;
+        if (timedGameDuration != -1) {
+            endTime = startTimestamp + (timedGameDuration + 2) * 1000;
+        }
         loaded = true;
         loadedPlayers.Clear();
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
@@ -325,6 +332,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
 
         allPlayers = FindObjectsOfType<PlayerController>();
+        playerCount = allPlayers.Length;
 
         if (!spectating) {
             foreach (PlayerController controllers in allPlayers)
@@ -348,7 +356,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         musicEnabled = true;
         //todo; base off of end time decided by host
-        timeRemaining = maxTime = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
+        timedGameDuration = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
 
         if (canvas)
             SceneManager.UnloadSceneAsync("Loading");
@@ -381,16 +389,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (gameover)
             return;
 
-        if (timeRemaining > 0 && gameover != true) {
-            timeRemaining -= Time.deltaTime;
-            //play hurry sound if time < 10 OR less than 10%
-            if (hurryup != true && (timeRemaining <= 10 || timeRemaining < (maxTime * 0.2f))) {
-                hurryup = true;
-                sfx.PlayOneShot((AudioClip) Resources.Load("Sound/hurry-up"));
-            }
-            if (timeRemaining <= 0) {
-                CheckForWinner();
-                timeRemaining = 0;
+        if (endTime != -1) {
+            float timeRemaining = (endTime - PhotonNetwork.ServerTimestamp) / 1000f;
+
+            if (timeRemaining > 0 && gameover != true) {
+                timeRemaining -= Time.deltaTime;
+                //play hurry sound if time < 10 OR less than 10%
+                if (hurryup != true && (timeRemaining <= 10 || timeRemaining < (timedGameDuration * 0.2f))) {
+                    hurryup = true;
+                    sfx.PlayOneShot((AudioClip) Resources.Load("Sound/hurry-up"));
+                }
+                if (timeRemaining - Time.deltaTime <= 0) {
+                    CheckForWinner();
+                }
             }
         }
 
@@ -440,7 +451,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             return;
 
         bool starGame = starRequirement != -1;
-        bool timeUp = timeRemaining != -1 && timeRemaining <= 0;
+        bool timeUp = endTime != -1 && endTime - PhotonNetwork.ServerTimestamp < 0;
         int winningStars = 0;
         List<PlayerController> winningPlayers = new();
         List<PlayerController> alivePlayers = new();
@@ -453,18 +464,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if ((starGame && player.stars >= starRequirement) || timeUp) {
                 //we're in a state where this player would win.
                 //check if someone has more stars
-                Debug.Log($"player with {player.stars} stars can win.");
                 if (player.stars >= winningStars) {
                     //we have more stars than the current winners. clear them
-                    Debug.Log($"player with {player.stars} stars has more than {winningStars}.");
                     if (player.stars > winningStars) {
-                        Debug.Log($"clear winning player array");
                         winningPlayers.Clear();
                     }
 
                     winningStars = player.stars;
                     winningPlayers.Add(player);
-                    Debug.Log($"winningStars = {winningStars}");
                 }
             }
         }
@@ -473,7 +480,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             //everyone's dead...? ok then, draw.
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, Utils.EVENT_ALL, SendOptions.SendReliable);
             return;
-        } else if (alivePlayers.Count == 1 && PhotonNetwork.CurrentRoom.PlayerCount >= 2) {
+        } else if (alivePlayers.Count == 1 && playerCount >= 2) {
             //one player left alive (and not in a solo game). winner!
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
             return;

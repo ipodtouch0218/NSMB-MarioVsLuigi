@@ -25,7 +25,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         if (player.frozen)
             return;
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.onGround;
 
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);

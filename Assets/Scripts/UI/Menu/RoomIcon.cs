@@ -32,7 +32,7 @@ public class RoomIcon : MonoBehaviour {
         icon.color = highlightColor;
     }
     public void Unhover() {
-        if (MainMenuManager.Instance.selectedRoom == this) {
+        if (MainMenuManager.Instance.selectedRoomIcon == this) {
             Select();
         } else {
             Unselect();

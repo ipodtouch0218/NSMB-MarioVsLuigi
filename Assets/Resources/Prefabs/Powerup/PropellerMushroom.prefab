@@ -61,6 +61,7 @@ MonoBehaviour:
   followMeCounter: 0
   despawnCounter: 15
   ignoreCounter: 0
+  powerupScriptable: {fileID: 11400000, guid: 797462c66e600c04dbd7898d6d95bd38, type: 2}
 --- !u!50 &3953063015163593099
 Rigidbody2D:
   serializedVersion: 4
@@ -195,7 +196,7 @@ GameObject:
   - component: {fileID: 1781921117773604784}
   m_Layer: 10
   m_Name: Graphic
-  m_TagString: PropellerMushroom
+  m_TagString: Powerup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 1776850482587567140}
   - component: {fileID: 1776850482587567144}
   - component: {fileID: 1776850482587567145}
+  - component: {fileID: 4164633649054386327}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -130,6 +131,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
   settings: {fileID: 0}
   controlsJson: 
+  joinedAsSpectator: 0
 --- !u!114 &1776850482587567144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -243,6 +245,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4164633649054386327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776850482587567141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4120bc7cea3f6444199a2d0c54fe41be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1955773772637164072
 GameObject:
   m_ObjectHideFlags: 0
