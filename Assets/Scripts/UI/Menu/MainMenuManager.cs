@@ -27,7 +27,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle, passwordToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public TMP_InputField nicknameField, starsText, livesField, timeField, passwordCreateField, passwordField;
+    public TMP_InputField nicknameField, starsText, livesField, timeField, passwordCreateField, passwordField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, passwordSelected, reconnectSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
@@ -794,15 +794,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Bounds bounds = txtObject.GetComponent<TextMeshProUGUI>().textBounds;
         tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
     }
-    public void SendChat(TMP_InputField input) {
-        string text = input.text.Trim();
-        input.text = "";
+    public void SendChat() {
+        string text = chatTextField.text.Trim();
+        chatTextField.text = "";
         if (text == null || text == "") {
             return;
         }
         
         GlobalChatMessage(PhotonNetwork.NickName + ": " + text, ColorToVector(Color.black));
-        StartCoroutine(SelectNextFrame(input));
+        StartCoroutine(SelectNextFrame(chatTextField));
     }
     IEnumerator SelectNextFrame(TMP_InputField input) {
         yield return new WaitForEndOfFrame();

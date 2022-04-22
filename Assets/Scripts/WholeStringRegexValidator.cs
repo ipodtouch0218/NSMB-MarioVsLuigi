@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 public class WholeStringRegexValidator : TMP_InputValidator {
     public string pattern;
     public override char Validate(ref string text, ref int pos, char ch) {
-        Debug.Log($"text={text} ch={ch} combined={text+ch} against regex={pattern}");
         if (Regex.IsMatch(text + ch, pattern)) {
             text = text.Insert(pos, ch.ToString());
             pos++;
