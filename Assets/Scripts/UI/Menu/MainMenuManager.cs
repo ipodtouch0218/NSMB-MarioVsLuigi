@@ -255,7 +255,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PhotonNetwork.SerializationRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
-        PhotonNetwork.NickName = PlayerPrefs.GetString("Nickname", "Player" + Random.Range(1000, 10000));
 
         AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);

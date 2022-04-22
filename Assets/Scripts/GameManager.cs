@@ -25,8 +25,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    private readonly System.Collections.Hashtable tileCache = new();
-    
     public AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
@@ -94,7 +92,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             string tilename = (string) data[2];
             Vector3Int loc = new(x, y, 0);
 
-            TileBase tile = GetTileFromCache(tilename);
+            TileBase tile = Utils.GetTileFromCache(tilename);
             tilemap.SetTile(loc, tile);
             break;
         }
@@ -115,9 +113,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
             break;
         }
-        case Enums.NetEventIds.ResetTiles:
+        case Enums.NetEventIds.ResetTiles: {
             ResetTiles();
             break;
+        }
+        case Enums.NetEventIds.SyncTilemap: {
+            ExitGames.Client.Photon.Hashtable changes = (ExitGames.Client.Photon.Hashtable) customData;
+            Utils.ApplyTilemapChanges(originalTiles, origin, tilemap, changes);
+            break;
+        }
         case Enums.NetEventIds.PlayerFinishedLoading: {
             Player player = (Player) customData;
             loadedPlayers.Add(player.NickName);
@@ -152,7 +156,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             Vector3Int loc = new(x, y, 0);
 
-            tilemap.SetTile(loc, GetTileFromCache(newTile));
+            tilemap.SetTile(loc, Utils.GetTileFromCache(newTile));
             tilemap.RefreshTile(loc);
 
             GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
@@ -204,15 +208,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         }
     }    
-
-    private TileBase GetTileFromCache(string tilename) {
-        if (tilename == null || tilename == "")
-            return null;
-
-        return (TileBase) (tileCache.ContainsKey(tilename) ? 
-            tileCache[tilename] : 
-            tileCache[tilename] = Resources.Load($"Tilemaps/Tiles/{tilename}") as TileBase);
-    }
     
     // ROOM CALLBACKS
     public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {  }
@@ -221,9 +216,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
     public void OnJoinedRoom() { }
     public void OnPlayerEnteredRoom(Player newPlayer) {
-        //TODO: chat message
+        //Spectator joined. Sync the room state.
+
+        //SYNCHRONIZE PLAYER STATE
         if (localPlayer)
             localPlayer.GetComponent<PlayerController>().UpdateGameState();
+
+        //SYNCHRONIZE TILEMAPS
+        if (PhotonNetwork.IsMasterClient) {
+            ExitGames.Client.Photon.Hashtable changes = Utils.GetTilemapChanges(originalTiles, origin, tilemap);
+            Debug.Log(changes);
+            RaiseEventOptions options = new() { CachingOption = EventCaching.DoNotCache, TargetActors = new int[]{ newPlayer.ActorNumber } };
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SyncTilemap, changes, options, SendOptions.SendReliable);
+        }
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
         //TODO: player disconnect message
@@ -299,8 +304,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         GlobalController.Instance.discordController.UpdateActivity();
         starting = true;
         startTime = startTimestamp;
-        if (timedGameDuration != -1) {
-            endTime = startTimestamp + (timedGameDuration + 2) * 1000;
+        if (timedGameDuration > 0) {
+            endTime = startTimestamp + (timedGameDuration + 3) * 1000;
         }
         loaded = true;
         loadedPlayers.Clear();
@@ -355,7 +360,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
-        //todo; base off of end time decided by host
         timedGameDuration = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
 
         if (canvas)

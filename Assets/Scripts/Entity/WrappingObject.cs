@@ -21,7 +21,6 @@ public class WrappingObject : MonoBehaviour {
     }
     void WrapMainObject() {
         float width = GameManager.Instance.levelWidthTile / 2;
-
         if (body.position.x < GameManager.Instance.GetLevelMinX()) {
             body.position += new Vector2(width, 0);
         } else if (body.position.x > GameManager.Instance.GetLevelMaxX()) {

@@ -10697,12 +10697,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scrollAmount: 0
-  dampingTime: 0.5
   screenShakeTimer: 0
-  exactCentering: 0
   controlCamera: 0
-  offset: {x: 0, y: 0, z: 0}
+  onGround: 0
   currentPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &7672112719043132634
 MonoBehaviour:
@@ -15961,9 +15958,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '
-
-'
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5825b7eb90fdaa043ba90e0a30a93dbc, type: 2}
   m_sharedMaterial: {fileID: -53834951448225802, guid: 5825b7eb90fdaa043ba90e0a30a93dbc,
@@ -15991,7 +15986,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 100
+  m_fontSize: 0.4
   m_fontSizeBase: 0.4
   m_fontWeight: 400
   m_enableAutoSizing: 1

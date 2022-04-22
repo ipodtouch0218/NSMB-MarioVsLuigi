@@ -131,16 +131,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
         if (photonView.IsMine)
             HorizontalCamera.OFFSET_TARGET = (controller.flying || controller.propeller) ? 0.75f : 0f;
-        if (controller.flying) {
-            float percentage = Mathf.Abs(body.velocity.x) / controller.walkingMaxSpeed;
-            cameraController.offset = 2f * percentage * (body.velocity.x > 0 ? cameraOffsetRight : cameraOffsetLeft);
-            cameraController.exactCentering = true;
-            cameraController.dampingTime = 0.5f;
-        } else {
-            cameraController.offset = cameraOffsetZero;
-            cameraController.exactCentering = false;
-            cameraController.dampingTime = 0;
-        }
 
         if (controller.crouching || controller.sliding || controller.skidding) {
             dust.transform.localPosition = Vector2.zero;
@@ -273,7 +263,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (animator.GetBool("pipe")) {
             gameObject.layer = PlayerController.HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, 1);
-        } else if (controller.dead || controller.stuckInBlock || controller.giantStartTimer > 0 || controller.stationaryGiantEnd) {
+        } else if (controller.dead || controller.stuckInBlock || controller.giantStartTimer > 0 || (controller.giantEndTimer > 0 &&  controller.stationaryGiantEnd)) {
             gameObject.layer = PlayerController.HITS_NOTHING_LAYERID;
             transform.position = new Vector3(body.position.x, body.position.y, -4);
         } else {

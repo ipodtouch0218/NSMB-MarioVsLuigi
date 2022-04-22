@@ -62,9 +62,12 @@ public class SpectationManager : MonoBehaviour {
         if (players.Length <= 0)
             return;
 
+        int nulls = 0;
         while (TargetPlayer == null) {
             targetIndex = (targetIndex + 1) % players.Length;
             TargetPlayer = players[targetIndex];
+            if (nulls++ >= players.Length)
+                break;
         }
 
         TargetPlayer.cameraController.controlCamera = true;
@@ -83,9 +86,12 @@ public class SpectationManager : MonoBehaviour {
         if (players.Length <= 0)
             return;
 
+        int nulls = 0;
         while (TargetPlayer == null) {
             targetIndex = (targetIndex - 1 + players.Length) % players.Length;
             TargetPlayer = players[targetIndex];
+            if (nulls++ >= players.Length)
+                break;
         }
 
         TargetPlayer.cameraController.controlCamera = true;

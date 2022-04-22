@@ -1,81 +1,87 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 public class CameraController : MonoBehaviour {
 
-    public float scrollAmount, dampingTime = 0.5f;
     public float screenShakeTimer = 0;
-    public bool exactCentering = false, controlCamera = false;
-    public Vector3 offset = Vector3.zero, currentPosition;
+    public bool controlCamera = false, onGround = false;
+    public Vector3 currentPosition;
+    
+    private Vector2 airThreshold = new(0.5f, 1.5f), groundedThreshold = new(0.5f, .25f);
+    private Vector2 airOffset = new(0, 1f), groundedOffset = new(0, 1.25f);
 
-    private Vector3 dampVelocity;
+    private Vector3 smoothDampVel;
     private Camera targetCamera;
     private float startingZ;
+
+    private Rigidbody2D body;
 
     void Start() {
         //only control the camera if we're the local player.
         targetCamera = Camera.main;
         startingZ = targetCamera.transform.position.z;
+        body = GetComponent<Rigidbody2D>();
     }
 
-    public void Update() {
+    public void LateUpdate() {
         currentPosition = CalculateNewPosition();
-        if (controlCamera)
+        if (controlCamera) {
             targetCamera.transform.position = currentPosition;
+            if (BackgroundLoop.Instance)
+                BackgroundLoop.Instance.LateUpdate();
+        }
+    }
+
+    public void Recenter() {
+        currentPosition = (Vector2) transform.position + airOffset;
+        smoothDampVel = Vector3.zero;
+        LateUpdate();
     }
 
     private Vector3 CalculateNewPosition() {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
-        float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX; 
-        Vector3 ctp = transform.position + offset + new Vector3(0, transform.localScale.y/2f);
-        Vector3 targetPos = ctp;
+        float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
-        if (!exactCentering) {
-            float currX = currentPosition.x;
-            float currY = currentPosition.y;
+        Vector2 threshold = onGround ? groundedThreshold : airThreshold;
+        Vector2 offset = onGround ? groundedOffset : airOffset;
 
-            float tp = targetPos.x - currX;
-            float targetX = currX;
+        Vector2 playerPos = (Vector2) transform.position + offset;
+        playerPos.y += 16 * Time.fixedDeltaTime * body.velocity.y;
+        float xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
+        float yDifference = Vector2.Distance(Vector2.up * currentPosition.y, Vector2.up * playerPos.y);
 
-            if (Mathf.Abs(tp) > 5) {
-                targetX = targetPos.x + scrollAmount;
-            } else if (targetPos.x - currX > 0.5f) {
-                targetX = targetPos.x - 0.5f;
-            } else if (targetPos.x - currX < -0.5f) {
-                targetX = targetPos.x + 0.5f;
-            }
-
-            float targetY = currY;
-            if (targetPos.y - currY > 0.5f) {
-                targetY = targetPos.y - 0.5f;
-            } else if (targetPos.y - currY < -0.5f) {
-                targetY = targetPos.y + 0.5f;
-            }
-
-            targetPos.x = targetX;
-            targetPos.y = targetY;
+        Vector3 newPosition = currentPosition;
+        bool right = currentPosition.x > playerPos.x;
+        if (xDifference >= 8) {
+            newPosition.x += (right ? -1 : 1) * GameManager.Instance.levelWidthTile / 2f;
+            xDifference = Vector2.Distance(Vector2.right * newPosition.x, Vector2.right * playerPos.x);
         }
+        if (xDifference >= threshold.x) {
+            newPosition.x += (threshold.x - xDifference) * (right ? 1 : -1);
+        }
+        if (yDifference >= threshold.y) {
+            newPosition.y += (threshold.y - yDifference) * (currentPosition.y > playerPos.y ? 1 : -1);
+        }
+
+        currentPosition.x = newPosition.x;
+        Vector3 targetPos = Vector3.SmoothDamp(currentPosition, newPosition, ref smoothDampVel, 0.25f);
+
+        if ((screenShakeTimer -= Time.deltaTime) > 0) 
+            targetPos += new Vector3((Random.value - 0.5f) * (screenShakeTimer / 2), (Random.value - 0.5f) * (screenShakeTimer / 2));
 
         float vOrtho = targetCamera.orthographicSize;
         float hOrtho = vOrtho * targetCamera.aspect;
         targetPos.x = Mathf.Clamp(targetPos.x, minX + hOrtho, maxX - hOrtho);
         targetPos.y = Mathf.Clamp(targetPos.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
-        
-        if (exactCentering) {
-            if (Vector2.Distance(currentPosition, targetPos) > 5) {
-                bool right = currentPosition.x < targetPos.x;
-                currentPosition += new Vector3((right ? 1 : -1) * GameManager.Instance.levelWidthTile / 2f, 0, 0);
-            }
-            Vector3 result = Vector3.SmoothDamp(currentPosition, targetPos, ref dampVelocity, dampingTime);
-            result.y = targetPos.y;
-            targetPos = result;
-        }
-        scrollAmount = Mathf.Clamp(currentPosition.x - ctp.x, -0.5f, 0.5f);
-        if ((screenShakeTimer -= Time.deltaTime) > 0) 
-            targetPos += new Vector3((Random.value - 0.5f) * (screenShakeTimer / 2), (Random.value - 0.5f) * (screenShakeTimer / 2));
-
-        //perserve camera z
         targetPos.z = startingZ;
+
         return targetPos;
+    }
+    private void OnDrawGizmos() {
+        Gizmos.color = Color.blue;
+        Vector2 threshold = onGround ? groundedThreshold : airThreshold;
+        Vector2 offset = onGround ? groundedOffset : airOffset;
+        Gizmos.DrawWireCube((Vector2) transform.position + offset, new Vector3(threshold.x * 2, threshold.y * 2, 1));
     }
 }
