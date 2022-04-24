@@ -548,8 +548,8 @@ GameObject:
   - component: {fileID: 482268096050949619}
   - component: {fileID: 482268096050949617}
   - component: {fileID: 482268096050949389}
-  - component: {fileID: 482268096050949390}
   - component: {fileID: 482268096050949391}
+  - component: {fileID: 7144317710558697061}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -664,18 +664,6 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
---- !u!114 &482268096050949390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 482268096050949616}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f26481b5f0a012a42aa5bfb9cfaa9939, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &482268096050949391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -691,6 +679,18 @@ MonoBehaviour:
   renderToTextureIfAvailable: 1
   orthographicSize: 3.524
   ndsSize: 3
+--- !u!114 &7144317710558697061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 482268096050949616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f26481b5f0a012a42aa5bfb9cfaa9939, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &482268096166975547
 GameObject:
   m_ObjectHideFlags: 0
@@ -3551,6 +3551,8 @@ MonoBehaviour:
   spawnBigPowerups: 1
   levelDesigner: 
   richPresenceId: 
+  startTime: 0
+  endTime: -1
   musicSourceIntro: {fileID: 5500062339093502112}
   musicSourceLoop: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
@@ -3563,9 +3565,9 @@ MonoBehaviour:
   gameover: 0
   musicEnabled: 0
   starRequirement: 0
-  timeRemaining: -1
-  maxTime: 0
+  timedGameDuration: 0
   hurryup: 0
+  playerCount: 0
   allPlayers: []
   enemySpawnpoints: []
   size: 1.39

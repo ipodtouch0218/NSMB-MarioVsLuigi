@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: LiberationSans SDF - Outline
   m_Shader: {fileID: 4800000, guid: fe393ace9b354375a9cb14cdbbc28be4, type: 3}
-  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA OUTLINE_ON
+  m_ShaderKeywords: OUTLINE_ON
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -50,7 +50,6 @@ Material:
     - _BumpFace: 0
     - _BumpOutline: 0
     - _ColorMask: 15
-    - _CullMode: 0
     - _Diffuse: 0.5
     - _FaceDilate: 0.1
     - _FaceUVSpeedX: 0

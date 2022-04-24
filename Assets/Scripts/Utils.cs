@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.Tilemaps;
+using System.Linq;
 
 public class Utils {
     public static RaiseEventOptions EVENT_OTHERS { get; } = new() { Receivers=ReceiverGroup.Others };
@@ -139,5 +140,61 @@ public class Utils {
     }
     public static float QuadraticEaseOut(float v) {
         return -1 * v * (v - 2);
+    }
+
+    public static ExitGames.Client.Photon.Hashtable GetTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap) {
+        Dictionary<int, int> changes = new();
+        List<string> tiles = new();
+
+        TileBase[] current = tilemap.GetTilesBlock(bounds);
+
+        for (int i = 0; i < original.Length; i++) {
+            if (current[i] == original[i])
+                continue;
+
+            TileBase cTile = current[i];
+            string path;
+            if (cTile == null) {
+                path = "";
+            } else {
+                path = ResourceDB.GetAsset(cTile.name).ResourcesPath;
+            }
+
+            if (!tiles.Contains(path))
+                tiles.Add(path);
+            
+            changes[i] = tiles.IndexOf(path);
+        }
+
+        return new() {
+            ["T"] = tiles.ToArray(),
+            ["C"] = changes,
+        };
+    }
+
+    public static void ApplyTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap, ExitGames.Client.Photon.Hashtable changesTable) {
+        TileBase[] copy = (TileBase[]) original.Clone();
+
+        Dictionary<int, int> changes = (Dictionary<int, int>) changesTable["C"];
+        string[] tiles = (string[]) changesTable["T"];
+
+        foreach (KeyValuePair<int, int> pairs in changes) {
+            copy[pairs.Key] = GetTileFromCache(tiles[pairs.Value]);
+        }
+
+        tilemap.SetTilesBlock(bounds, copy);
+    }
+
+    private static readonly Dictionary<string, TileBase> tileCache = new();
+    public static TileBase GetTileFromCache(string tilename) {
+        if (tilename == null || tilename == "")
+            return null;
+        
+        if (!tilename.StartsWith("Tilemaps/Tiles/"))
+            tilename = "Tilemaps/Tiles/" + tilename;
+
+        return tileCache.ContainsKey(tilename) ?
+            tileCache[tilename] :
+            tileCache[tilename] = Resources.Load(tilename) as TileBase;
     }
 }

@@ -121,7 +121,7 @@ public class FrozenCube : HoldableEntity {
             player.photonView.RPC("Knockback", RpcTarget.All, body.position.x > player.body.position.x, 1, false, photonView.ViewID);
         }
         if (!holder && !dead && !plantEntity) {
-            if (player.CanPickup() && player.state != Enums.PowerupState.MiniMushroom && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.touchingWallLeft && !player.touchingWallRight && !player.doublejump && !player.triplejump) {
+            if (player.CanPickup() && player.state != Enums.PowerupState.MiniMushroom && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.wallSlideLeft && !player.wallSlideRight && !player.doublejump && !player.triplejump) {
                 fallen = true;
                 photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                 player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);

@@ -36,7 +36,7 @@ public class FireballMover : MonoBehaviourPun {
         if (physics.onGround) {
             float bounceHeight = speed / (isIceball ? 1.0f : 1.25f);
 
-            body.velocity = new Vector2(body.velocity.x, bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)));
+            body.velocity = new Vector2(body.velocity.x, bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad) * 1.5f));
         } else if (isIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
         }

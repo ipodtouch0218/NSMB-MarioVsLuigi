@@ -8,7 +8,10 @@ public class BackgroundLoop : MonoBehaviour {
     private Vector2 screenBounds;
     private Vector3 lastPosition;
 
+    public static BackgroundLoop Instance = null;
+
     void Start() {
+        Instance = this;
         Transform t = GameObject.FindGameObjectWithTag("Backgrounds").transform;
         levels = new GameObject[t.childCount];
         for (int i = 0; i < t.childCount; i++)
@@ -52,7 +55,7 @@ public class BackgroundLoop : MonoBehaviour {
             }
         }
     }
-    void LateUpdate() {
+    public void LateUpdate() {
         float difference = transform.position.x - lastPosition.x;
         if (Mathf.Abs(difference) > 3) {
             foreach (GameObject obj in levels)
