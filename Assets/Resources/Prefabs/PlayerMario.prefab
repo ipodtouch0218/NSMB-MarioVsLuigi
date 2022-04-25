@@ -10228,8 +10228,6 @@ MonoBehaviour:
   onGround: 0
   crushGround: 0
   doGroundSnap: 0
-  touchingWallRight: 0
-  touchingWallLeft: 0
   hitRoof: 0
   skidding: 0
   turnaround: 0
