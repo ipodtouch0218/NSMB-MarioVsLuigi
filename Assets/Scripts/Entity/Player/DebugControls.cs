@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
+using UnityEngine.Tilemaps;
 
 public class DebugControls : MonoBehaviour {
 
+    public bool editMode;
     public void Start() {
         if (!Debug.isDebugBuild && !Application.isEditor) {
             enabled = false;
@@ -42,6 +44,7 @@ public class DebugControls : MonoBehaviour {
         DebugItem(Key.Digit8, "IceFlower");
         FreezePlayer(Key.Digit9);
         DebugWorldEntity(Key.Digit0, "FrozenCube");
+        specialSettings();
     }
 
     private void FreezePlayer(Key key) {
@@ -79,5 +82,22 @@ public class DebugControls : MonoBehaviour {
             frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.tag, en.GetComponent<KillableEntity>().photonView.ViewID);
         }
     }
+
+    // The event zone 
+
+    public void specialSettings() {
+        if (Keyboard.current[Key.P].wasPressedThisFrame)
+            editMode = !editMode;
+        Vector3 pos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+
+        if (editMode == true) {
+            if (Mouse.current.rightButton.wasPressedThisFrame)
+            GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("PlaceTile", RpcTarget.All, pos.x, pos.y, pos.z);
+
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+                GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("RemoveTile", RpcTarget.All, pos.x, pos.y, pos.z);
+        }
+    }
+     
 
 }

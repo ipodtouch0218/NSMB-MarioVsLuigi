@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public PlayerData character;
 
     //Tile data
+    TileBase currentTile;
     private string footstepMaterial = "";
     public bool doIceSkidding;
     private float tileFriction = 1;
@@ -789,6 +790,25 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         photonView.RPC("Knockback", RpcTarget.All, false, 1, true, 0);
         frozenStruggle = 0;
         unfreezeTimer = 3;
+    }
+
+    [PunRPC]
+    protected void RemoveTile(float x, float y, float z) {
+        Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(x, y, z));
+        Vector3Int tileLoc = Utils.WorldToTilemapPosition(pos);
+        GameManager.Instance.tilemap.SetTile(tileLoc, null);
+    }
+
+    [PunRPC]
+    protected void PlaceTile(float x, float y, float z) {
+        
+        //Debug.Log(string.Format("Co-ords of mouse is [X: {0} Y: {0}]", pos.x, pos.y));
+
+        Vector3Int tileLoc = Utils.WorldToTilemapPosition(new Vector3(x, y, z));
+        if (GameManager.Instance.tilemap.GetTile(tileLoc) == null)
+            GameManager.Instance.tilemap.SetTile(tileLoc, currentTile);
+        else
+            currentTile = GameManager.Instance.tilemap.GetTile(tileLoc);
     }
 
     [PunRPC]

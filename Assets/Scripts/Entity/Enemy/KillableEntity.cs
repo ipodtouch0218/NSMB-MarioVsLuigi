@@ -68,6 +68,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         //audioSource.enabled = false; // Note: I commented this out since it stopped the freeze enemy sound, if it was necessary, revert this change.
         // Note: disabling hitbox doesn't work for some reason but I left the code here.
         hitbox.enabled = false;
+        transform.Find("Hitbox").gameObject.SetActive(false);
         if (body) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -82,6 +83,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         if (body)
             body.isKinematic = false;
         hitbox.enabled = true;
+        transform.Find("Hitbox").gameObject.SetActive(true);
         audioSource.enabled = true;
     }
 

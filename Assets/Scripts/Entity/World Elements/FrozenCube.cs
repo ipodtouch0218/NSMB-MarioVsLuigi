@@ -18,11 +18,11 @@ public class FrozenCube : HoldableEntity {
     public KillableEntity frozenEntity;
     public PlayerController frozenPlayer;
 
-    public float fallTimer;
+    public float fallTimer, killTimer = .5f;
     float fallTimerCount;
     Vector2 blockOffset = new Vector3(0, 0.05f);
 
-    public bool fastSlide, fallen, crashed;
+    public bool fastSlide, fallen, crashed, deathFlag;
     public bool kinematicEntity, flyingEntity, plantEntity;
 
     public float offset;
