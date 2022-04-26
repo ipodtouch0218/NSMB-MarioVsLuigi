@@ -4842,7 +4842,6 @@ GameObject:
   - component: {fileID: 1199367360609747085}
   - component: {fileID: 2208620177496134475}
   - component: {fileID: 4994116104114752016}
-  - component: {fileID: 3386696468066791140}
   - component: {fileID: 8692315093253444247}
   - component: {fileID: 3494046117617009192}
   - component: {fileID: 5560844394415011469}
@@ -4916,14 +4915,13 @@ MonoBehaviour:
   propellerFallSpeed: 2
   propellerSpinFallSpeed: 1.5
   propellerSpinTime: 0.5
+  hitboxes: []
   cameraController: {fileID: 0}
   fadeOut: {fileID: 0}
   body: {fileID: 0}
   onGround: 0
   crushGround: 0
   doGroundSnap: 0
-  touchingWallRight: 0
-  touchingWallLeft: 0
   hitRoof: 0
   skidding: 0
   turnaround: 0
@@ -4951,6 +4949,8 @@ MonoBehaviour:
   usedPropellerThisJump: 0
   frozen: 0
   stationaryGiantEnd: 0
+  fireballKnockback: 0
+  startedSliding: 0
   landing: 0
   koyoteTime: 0
   groundpoundCounter: 0
@@ -4975,6 +4975,7 @@ MonoBehaviour:
   stars: 0
   coins: 0
   lives: -1
+  storedPowerup: {fileID: 0}
   holding: {fileID: 0}
   holdingOld: {fileID: 0}
   FrozenObject: {fileID: 0}
@@ -5346,37 +5347,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &3386696468066791140
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1798796769927389756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: d29805f34fe91da4e94010a38823fab7,
-    type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Keyboard
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!114 &8692315093253444247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5389,12 +5359,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scrollAmount: 0
-  dampingTime: 0.5
   screenShakeTimer: 0
-  exactCentering: 0
   controlCamera: 0
-  offset: {x: 0, y: 0, z: 0}
   currentPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &3494046117617009192
 MonoBehaviour:

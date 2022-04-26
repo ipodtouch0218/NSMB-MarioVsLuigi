@@ -137,14 +137,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         models = transform.Find("Models").gameObject;
         starDirection = Random.value < 0.5;
 
-        PlayerInput input = GetComponent<PlayerInput>();
-        input.enabled = !photonView || photonView.IsMine;
-        if (input.enabled && GlobalController.Instance.controlsJson != null)
-            input.actions.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
-
-        //TODO: change if we want split-screen local multiplayer... maybe?
-        input.camera = Camera.main;
-
         playerId = PhotonNetwork.CurrentRoom != null ? System.Array.IndexOf(PhotonNetwork.PlayerList, photonView.Owner) : -1;
         Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, ref lives);
         if (lives != -1)
@@ -527,7 +519,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     #endregion
 
     #region -- CONTROLLER FUNCTIONS --
-    protected void OnMovement(InputValue value) {
+    public void OnMovement(InputValue value) {
         if (!photonView.IsMine || GameManager.Instance.paused)
             return;
         joystick = value.Get<Vector2>();
@@ -535,7 +527,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             photonView.RPC("FrozenStruggle", RpcTarget.All, true);
     }
 
-    protected void OnJump(InputValue value) {
+    public void OnJump(InputValue value) {
         if (!photonView.IsMine || GameManager.Instance.paused)
             return;
 
@@ -547,7 +539,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             photonView.RPC("FrozenStruggle", RpcTarget.All, false);
     }
 
-    protected void OnSprint(InputValue value) {
+    public void OnSprint(InputValue value) {
         if (!photonView.IsMine || GameManager.Instance.paused)
             return;
         running = value.Get<float>() >= 0.5f;
@@ -560,7 +552,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             ActivatePowerupAction();
     }
 
-    protected void OnPowerupAction(InputValue value) {
+    public void OnPowerupAction(InputValue value) {
         if (!photonView.IsMine || dead || GameManager.Instance.paused)
             return;
         powerupButtonHeld = value.Get<float>() >= 0.5f;
@@ -637,19 +629,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         usedPropellerThisJump = true;
     }
 
-    protected void OnReserveItem() {
+    public void OnReserveItem() {
         if (!photonView.IsMine || storedPowerup == null || GameManager.Instance.paused || dead)
             return;
 
         SpawnItem(storedPowerup);
         storedPowerup = null;
-    }
-
-    protected void OnPause() {
-        if (!photonView.IsMine)
-            return;
-        //PlaySound("pause");
-        GameManager.Instance.Pause();
     }
     #endregion
 

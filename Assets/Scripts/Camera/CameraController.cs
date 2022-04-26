@@ -8,8 +8,8 @@ public class CameraController : MonoBehaviour {
     public bool controlCamera = false;
     public Vector3 currentPosition;
     
-    private Vector2 airThreshold = new(0.5f, 1.3f), groundedThreshold = new(0.5f, .25f);
-    private Vector2 airOffset = new(0, .65f), groundedOffset = new(0, 1.25f);
+    private Vector2 airThreshold = new(0.5f, 1.3f), groundedThreshold = new(0.5f, 0f);
+    private Vector2 airOffset = new(0, .65f), groundedOffset = new(0, 1.015f);
 
     private Vector3 smoothDampVel;
     private Camera targetCamera;
@@ -18,7 +18,7 @@ public class CameraController : MonoBehaviour {
 
     private Rigidbody2D body;
     private PlayerController controller;
-    private Vector2 playerPos;
+    private Vector3 playerPos;
 
     void Start() {
         //only control the camera if we're the local player.
@@ -49,32 +49,36 @@ public class CameraController : MonoBehaviour {
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
 
-        playerPos = transform.position;
+        float time = (Time.time - Time.fixedTime) / Time.fixedDeltaTime;
+        playerPos = Vector2.Lerp(body.position, body.position + (body.velocity * Time.fixedDeltaTime), time);
+        Utils.WrapWorldLocation(ref playerPos);
 
         if (controller.onGround)
             floorHeight = body.position.y;
 
         //float floorRange = (controller.singlejump || controller.doublejump || controller.triplejump) ? 3.75f : 1.75f;
-        float floorRange = 3f;
+        float floorRange = 3.5f;
         validGround = body.position.y + (Time.fixedDeltaTime * body.velocity.y) - floorHeight < floorRange && body.position.y - floorHeight > -.5f;
 
         RaycastHit2D hit;
-        if (validGround) {
-            if (!controller.onGround && (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, floorRange, PlayerController.ANY_GROUND_MASK))) {
+        if (!controller.dead) {
+            if (validGround) {
+                if (!controller.onGround && (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, floorRange, PlayerController.ANY_GROUND_MASK))) {
+                    floorHeight = hit.point.y;
+                }
+                playerPos.y = floorHeight;
+            } else if (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, 1f, PlayerController.ANY_GROUND_MASK)) {
                 floorHeight = hit.point.y;
+                playerPos.y = floorHeight;
+                validGround = true;
             }
-            playerPos.y = floorHeight;
-        } else if (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, 1f, PlayerController.ANY_GROUND_MASK)) {
-            floorHeight = hit.point.y;
-            playerPos.y = floorHeight;
-            validGround = true;
         }
         if (!validGround || controller.dead || controller.flying) {
-            playerPos.y += 24 * Time.fixedDeltaTime * body.velocity.y;
+            playerPos.y += 24 * Time.fixedDeltaTime * body.velocity.y * (controller.dead ? 0.5f : 1f);
         }
 
         Vector2 threshold = (controller.onGround || validGround) ? groundedThreshold : airThreshold;
-        Vector2 offset = (controller.onGround || validGround) ? groundedOffset : airOffset;
+        Vector3 offset = (controller.onGround || validGround) ? groundedOffset : airOffset;
 
         playerPos += offset;
 
@@ -112,7 +116,6 @@ public class CameraController : MonoBehaviour {
     private void OnDrawGizmos() {
         Gizmos.color = Color.blue;
         Vector2 threshold = controller.onGround ? groundedThreshold : airThreshold;
-        Vector2 offset = controller.onGround ? groundedOffset : airOffset;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
     }
 }

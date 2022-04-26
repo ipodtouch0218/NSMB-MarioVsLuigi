@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    public AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop;
+    public AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop, pauseSfx;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
@@ -585,7 +585,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public void Pause() {
+        if (!musicEnabled)
+            return;
+
         paused = !paused;
+        sfx.PlayOneShot(pauseSfx);
         Instance.pauseUI.SetActive(paused);
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
