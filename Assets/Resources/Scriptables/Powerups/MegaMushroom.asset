@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 8
   prefab: MegaMushroom
-  soundEffect: powerup-mega
+  soundEffect: 38
   spawnChance: 0.4
-  starModifier: -0.4
+  starModifier: -0.5
   big: 1
   tall: 0
   custom: 0

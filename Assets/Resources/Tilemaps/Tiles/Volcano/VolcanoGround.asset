@@ -144,5 +144,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 416f34b2507d2cb47aa09b53f1b618f1, type: 2}
   isBackgroundTile: 0
   iceSkidding: 0
-  footstepMaterial: 
+  footstepSound: 23
   frictionFactor: 1

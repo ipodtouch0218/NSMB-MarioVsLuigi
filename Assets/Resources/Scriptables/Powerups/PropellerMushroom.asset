@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 6
   prefab: PropellerMushroom
-  soundEffect: powerup
+  soundEffect: 16
   spawnChance: 0.5
   starModifier: -0.1
   big: 0

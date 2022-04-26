@@ -48,7 +48,7 @@ public class SpinyWalk : KoopaWalk {
                                 player.groundpound = false;
                             } else {
                                 //mini mario not groundpounding, just bounce.
-                                photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+                                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
                             }
                             player.bounce = true;
                         } else {
@@ -60,7 +60,7 @@ public class SpinyWalk : KoopaWalk {
                             } else {
                                 //normal mario isnt groundpounding, we get stopped
                                 photonView.RPC("EnterShell", RpcTarget.All);
-                                photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+                                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
                                 player.bounce = true;
                                 photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
                             }

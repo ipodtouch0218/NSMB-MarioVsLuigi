@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 25f;
     public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f;
 
-    private BoxCollider2D[] hitboxes;
+    public BoxCollider2D[] hitboxes;
     GameObject models;
 
     public CameraController cameraController;
@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public Rigidbody2D body;
     private PlayerAnimationController animationController;
 
-    public bool onGround, crushGround, doGroundSnap, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen, stationaryGiantEnd, fireballKnockback;
+    public bool onGround, crushGround, doGroundSnap, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenStruggle;
     public float invincible, giantTimer, floorAngle, knockbackTimer, unfreezeTimer;
 
@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     //Tile data
     TileBase currentTile;
-    private string footstepMaterial = "";
+    private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
     public bool doIceSkidding;
     private float tileFriction = 1;
     private readonly HashSet<Vector3Int> tilesStandingOn = new(),
@@ -300,13 +300,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     void HandleTileProperties() {
         doIceSkidding = false;
         tileFriction = -1;
-        footstepMaterial = "";
+        footstepSound = Enums.Sounds.Player_Walk_Grass;
         foreach (Vector3Int pos in tilesStandingOn) {
             TileBase tile = Utils.GetTileAtTileLocation(pos);
             if (tile == null)
                 continue;
             if (tile is TileWithProperties propTile) {
-                footstepMaterial = propTile.footstepMaterial;
+                footstepSound = propTile.footstepSound;
                 doIceSkidding = propTile.iceSkidding;
                 tileFriction = Mathf.Max(tileFriction, propTile.frictionFactor);
             } else {
@@ -382,7 +382,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                             groundpound = false;
                             bounce = true;
                         } else {
-                            photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+                            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
                         }
                     } else if (other.state == Enums.PowerupState.MiniMushroom && (groundpound || drill)) {
                         //we are big, groundpounding a mini opponent. squish.
@@ -429,7 +429,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             avg /= points.Count;
 
             collision.gameObject.GetComponent<MarioBrosPlatform>().Bump(this, avg);
-            photonView.RPC("PlaySound", RpcTarget.All, "player/block_bump");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
             break;
         }
         }
@@ -586,7 +586,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
 
             PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.2f : -0.2f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
-            photonView.RPC("PlaySound", RpcTarget.All, "player/fireball");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_Fireball_Shoot);
             animator.SetTrigger("fireball");
             break;
         }
@@ -601,7 +601,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
 
             PhotonNetwork.Instantiate("Prefabs/Iceball", body.position + new Vector2(facingRight ? 0.2f : -0.2f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
-            photonView.RPC("PlaySound", RpcTarget.All, "player/IceBallThrow"); // Added ice ball sound effect
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_Iceball_Shoot);
             animator.SetTrigger("fireball");
             break;
         }
@@ -619,11 +619,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     protected void StartPropeller() {
         if (usedPropellerThisJump) {
             propellerSpinTimer = propellerSpinTime;
-            PlaySound("player/propeller_spin");
+            PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
         } else {
             body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity);
             propellerTimer = 1f;
-            PlaySound("player/propeller_start");
+            PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
         }
         animator.Play("propeller_up", 1);
         propeller = true;
@@ -648,7 +648,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     protected void OnPause() {
         if (!photonView.IsMine)
             return;
-        PlaySound("pause");
+        //PlaySound("pause");
         GameManager.Instance.Pause();
     }
     #endregion
@@ -665,6 +665,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         Enums.PriorityPair pp = Enums.PowerupStatePriority[powerup.state];
         Enums.PriorityPair cp = Enums.PowerupStatePriority[state];
         bool reserve = cp.statePriority > pp.itemPriority || state == newState;
+        bool soundPlayed = false;
 
         if (powerup.state == Enums.PowerupState.MegaMushroom && state != Enums.PowerupState.MegaMushroom) {
 
@@ -679,12 +680,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             giantTimer = 15f;
             transform.localScale = Vector3.one;
             Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
-            PlaySoundEverywhere("player/" + powerup.soundEffect);
+
+            PlaySoundEverywhere(powerup.soundEffect);
+            soundPlayed = true;
 
         } else if (powerup.prefab == "Star") {
             //starman
             invincible = 10f;
-            PlaySound("player/" + powerup.soundEffect);
+            PlaySound(powerup.soundEffect);
+            soundPlayed = true;
 
             if (holding && photonView.IsMine) {
                 holding.photonView.RPC("SpecialKill", RpcTarget.All, facingRight, false);
@@ -703,7 +707,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 //dont reserve mushrooms 
                 storedPowerup = powerup;
             }
-            PlaySound("player/reserve_item_store");
+            PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         } else {
 
             if (!(state == Enums.PowerupState.Large && newState != Enums.PowerupState.Large) && (storedPowerup == null || Enums.PowerupStatePriority[storedPowerup.state].itemPriority <= cp.itemPriority)) {
@@ -717,7 +721,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             propeller = false;
             drill &= flying;
             propellerTimer = 0;
-            PlaySound("player/" + powerup.soundEffect);
+            
+            if (!soundPlayed)
+                PlaySound(powerup.soundEffect);
         }
 
         if (view.IsMine)
@@ -759,7 +765,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if (!nowDead) {
             hitInvincibilityCounter = 3f;
-            PlaySound("player/powerdown");
+            PlaySound(Enums.Sounds.Player_Sound_Powerdown);
         }
     }
     #endregion
@@ -772,7 +778,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         if (invincible > 0) {
             Instantiate(Resources.Load("Prefabs/Particle/IceBreak"), transform.position, Quaternion.identity);
-            photonView.RPC("PlaySound", RpcTarget.All, "enemy/FrozenEnemyShatter");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_FreezeShatter);
             return;
         }
         frozen = true;
@@ -786,7 +792,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         animator.enabled = true;
         body.isKinematic = false;
         body.simulated = true;
-        photonView.RPC("PlaySound", RpcTarget.All, "enemy/FrozenEnemyShatter");
+        PlaySound(Enums.Sounds.Enemy_Generic_FreezeShatter);
         photonView.RPC("Knockback", RpcTarget.All, false, 1, true, 0);
         frozenStruggle = 0;
         unfreezeTimer = 3;
@@ -854,7 +860,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         GameManager.Instance.CheckForWinner();
 
         Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
-        PlaySoundEverywhere("player/star_collect");
+        PlaySoundEverywhere(Enums.Sounds.World_Star_Collect);
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         Destroy(star);
@@ -890,7 +896,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
         }
 
-        PlaySound("player/coin");
+        PlaySound(Enums.Sounds.World_Coin_Collect);
         GameObject num = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity);
         Animator anim = num.GetComponentInChildren<Animator>();
         anim.SetInteger("number", coins <= 0 ? 8 : coins);
@@ -902,11 +908,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         string prefab = item == null ? Utils.GetRandomItem(stars).prefab : item.prefab;
 
         PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + new Vector2(0, 5), Quaternion.identity, 0, new object[] { photonView.ViewID });
-        photonView.RPC("PlaySound", RpcTarget.All, "player/reserve_item_use");
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
     }
     public void SpawnItem(string prefab) {
         PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + new Vector2(0, 5), Quaternion.identity, 0, new object[] { photonView.ViewID });
-        photonView.RPC("PlaySound", RpcTarget.All, "player/reserve_item_use");
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
     }
 
     void SpawnStar(bool deathplane) {
@@ -952,7 +958,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
         animator.Play("deadstart", state >= Enums.PowerupState.Large ? 1 : 0);
-        PlaySound("player/death");
+        PlaySound(Enums.Sounds.Player_Sound_Death);
         SpawnStar(deathplane);
         if (holding) {
             holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
@@ -1032,18 +1038,20 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     #region -- SOUNDS / PARTICLES --
     [PunRPC]
-    public void PlaySoundEverywhere(string sound) {
-        GameManager.Instance.sfx.PlayOneShot((AudioClip)Resources.Load("Sound/" + sound));
+    public void PlaySoundEverywhere(Enums.Sounds sound) {
+        GameManager.Instance.sfx.PlayOneShot(sound.GetClip());
     }
     [PunRPC]
-    public void PlaySound(string sound, float volume) {
-        float volumeByRange = 1;
-
-        sfx.PlayOneShot((AudioClip)Resources.Load("Sound/" + sound), Mathf.Clamp01(volumeByRange * volume));
+    public void PlaySound(Enums.Sounds sound, byte variant, float volume) {
+        sfx.PlayOneShot(sound.GetClip(character, variant), Mathf.Clamp01(volume));
     }
     [PunRPC]
-    public void PlaySound(string sound) {
-        PlaySound(sound, 1);
+    public void PlaySound(Enums.Sounds sound, byte variant) {
+        sfx.PlayOneShot(sound.GetClip(character, variant), 1);
+    }
+    [PunRPC]
+    public void PlaySound(Enums.Sounds sound) {
+        PlaySound(sound, 0, 1);
     }
 
     [PunRPC]
@@ -1066,17 +1074,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (state == Enums.PowerupState.MegaMushroom)
             return;
         if (doIceSkidding && skidding) {
-            PlaySound("player/ice-skid");
+            PlaySound(Enums.Sounds.World_Ice_Skidding);
             return;
         }
         if (propeller) {
-            PlaySound("player/propeller_kick");
+            PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Kick);
             return;
         }
         if (Mathf.Abs(body.velocity.x) < walkingMaxSpeed)
             return;
 
-        PlaySound("player/walk" + (footstepMaterial != "" ? "-" + footstepMaterial : "") + (step ? "-2" : ""), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
+        PlaySound(footstepSound, (byte) (step ? 1 : 2), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
         step = !step;
     }
     #endregion
@@ -1239,6 +1247,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     #endregion
 
     void HandleSliding(bool up, bool down) {
+        startedSliding = false;
         if (groundpound) {
             if (onGround) {
                 if (state == Enums.PowerupState.MegaMushroom) {
@@ -1251,6 +1260,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     sliding = true;
                     alreadyGroundpounded = true;
                     body.velocity = new Vector2(-Mathf.Sign(floorAngle) * groundpoundVelocity, 0);
+                    startedSliding = true;
                 } else {
                     alreadyGroundpounded = false;
                     body.velocity = Vector2.zero;
@@ -1390,7 +1400,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             body.velocity = Vector2.down;
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
-            photonView.RPC("PlaySound", RpcTarget.All, "player/powerdown");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
             crouching = false;
             sliding = false;
             drill = false;
@@ -1419,7 +1429,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             body.velocity = Vector2.up;
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
-            photonView.RPC("PlaySound", RpcTarget.All, "player/powerdown");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
             crouching = false;
             sliding = false;
             propeller = false;
@@ -1441,9 +1451,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (crouching && !prevCrouchState) {
             //crouch start sound
             if (state == Enums.PowerupState.BlueShell) {
-                photonView.RPC("PlaySound", RpcTarget.All, "player/shell-enter");
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_BlueShell_Enter);
             } else {
-                photonView.RPC("PlaySound", RpcTarget.All, "player/crouch");
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Crouch);
             }
         }
     }
@@ -1491,12 +1501,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 hitLeft = false;
                 body.velocity = new Vector2(runningMaxSpeed * (3 / 4f) * (wallSlideLeft ? 1 : -1), walljumpVelocity);
                 facingRight = wallSlideLeft;
-                singlejump = true;
+                singlejump = false;
                 doublejump = false;
                 triplejump = false;
                 onGround = false;
-                photonView.RPC("PlaySound", RpcTarget.All, "player/walljump");
-                photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/walljump_" + Random.Range(1, 3));
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_WallJump);
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_WallJump, (byte) Random.Range(1, 3));
 
                 Vector2 offset = new(hitboxes[0].size.x / 2f * (wallSlideLeft ? -1 : 1), hitboxes[0].size.y / 2f);
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Vector3.zero : Vector3.up * 180);
@@ -1573,7 +1583,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
 
         bool topSpeed = Mathf.Abs(body.velocity.x) + 0.5f > (runningMaxSpeed * (invincible > 0 ? 2 : 1));
-        if (bounce || (jump && (onGround || (koyoteTime < 0.07f && !propeller)))) {
+        if (bounce || (jump && (onGround || (koyoteTime < 0.07f && !propeller)) && !startedSliding)) {
             koyoteTime = 1;
             jumpBuffer = 0;
             skidding = false;
@@ -1587,8 +1597,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             propeller &= bounce;
 
             if (onSpinner && !holding) {
-                photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/spinner_launch");
-                photonView.RPC("PlaySound", RpcTarget.All, "player/spinner_launch");
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_SpinnerLaunch);
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Spinner_Launch);
                 body.velocity = new Vector2(body.velocity.x, launchVelocity);
                 flying = true;
                 onGround = false;
@@ -1610,14 +1620,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 singlejump = false;
                 doublejump = true;
                 triplejump = false;
-                photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/double_jump_" + Random.Range(1, 3));
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_DoubleJump, (byte) Random.Range(1, 3));
             } else if (canSpecialJump && doublejump) {
                 //Triple Jump
                 singlejump = false;
                 doublejump = false;
                 triplejump = true;
                 jumpBoost = 0.5f;
-                photonView.RPC("PlaySound", RpcTarget.All, character.soundFolder + "/triple_jump");
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_TripleJump);
             } else {
                 //Normal jump
                 singlejump = true;
@@ -1631,12 +1641,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
             if (!bounce) {
                 //play jump sound
-                string sound = state switch {
-                    Enums.PowerupState.MiniMushroom => "jump_mini",
-                    Enums.PowerupState.MegaMushroom => "jump_mega",
-                    _ => "jump"
+                Enums.Sounds sound = state switch {
+                    Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Jump,
+                    Enums.PowerupState.MegaMushroom => Enums.Sounds.Powerup_MegaMushroom_Jump,
+                    _ => Enums.Sounds.Player_Sound_Jump,
                 };
-                photonView.RPC("PlaySound", RpcTarget.All, "player/" + sound);
+                photonView.RPC("PlaySound", RpcTarget.All, sound);
             }
             bounce = false;
         }
@@ -1806,7 +1816,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     [PunRPC]
     public void FinishMegaMario(bool success) {
         if (success) {
-            PlaySoundEverywhere(character.soundFolder + "/mega_start");
+            PlaySoundEverywhere(Enums.Sounds.Player_Voice_MegaMushroom);
         } else {
             //hit a wall, cancel
             giantSavedVelocity = Vector2.zero;
@@ -1817,7 +1827,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             giantTimer = 0;
             animator.enabled = true;
             animator.Play("mega-cancel", 1);
-            PlaySound("player/reserve_item_store");
+            PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         }
         body.isKinematic = false;
     }
@@ -1936,7 +1946,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             if (tempHitBlock && state == Enums.PowerupState.MegaMushroom) {
                 cameraController.screenShakeTimer = 0.15f;
-                photonView.RPC("PlaySound", RpcTarget.All, "player/block_bump");
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
             }
         }
 
@@ -1961,7 +1971,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (powerupButtonHeld) {
             if (body.velocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
                 propellerSpinTimer = propellerSpinTime;
-                photonView.RPC("PlaySound", RpcTarget.All, "player/propeller_spin");
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_PropellerMushroom_Spin);
             }
         }
 
@@ -1988,7 +1998,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 foreach (var tile in tilesHitSide)
                     InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
                 facingRight = hitLeft;
-                photonView.RPC("PlaySound", RpcTarget.All, "player/block_bump");
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
             }
         }
 
@@ -2045,7 +2055,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             state = Enums.PowerupState.Large;
             stationaryGiantEnd = false;
             hitInvincibilityCounter = 3f;
-            PlaySoundEverywhere("player/mega-end");
+            PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
             body.velocity = new(body.velocity.x, body.velocity.y > 0 ? (body.velocity.y / 3f) : body.velocity.y);
         }
 
@@ -2136,7 +2146,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             wallSlideLeft = false;
             wallSlideRight = false;
         }
-        cameraController.onGround = onGround;
         if (onGround) {
             if (propellerTimer < 0.5f) {
                 propeller = false;
@@ -2171,7 +2180,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
 
         if (!crouch && !knockback) {
-            PlaySound(character.soundFolder + "/walljump_2");
+            PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);
             throwInvincibility = 0.5f;
             animator.SetTrigger("throw");
         }
@@ -2219,7 +2228,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             sliding = false;
             body.velocity = Vector2.zero;
             groundpoundCounter = groundpoundTime * (state == Enums.PowerupState.MegaMushroom ? 1.5f : 1);
-            photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_GroundpoundStart);
             alreadyGroundpounded = true;
             groundpoundDelay = 0.7f;
         }
@@ -2247,7 +2256,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             //groundpound
             if (hitAnyBlock) {
                 if (state != Enums.PowerupState.MegaMushroom) {
-                    photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound-landing" + (state == Enums.PowerupState.MiniMushroom ? "-mini" : ""));
+                    Enums.Sounds sound = state switch {
+                        Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Groundpound,
+                        _ => Enums.Sounds.Player_Sound_GroundpoundLanding,
+                    };
+                    photonView.RPC("PlaySound", RpcTarget.All, sound);
                     photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
                 } else {
                     cameraController.screenShakeTimer = 0.15f;
@@ -2256,7 +2269,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             if (hitBlock) {
                 koyoteTime = 1.5f;
             } else if (state == Enums.PowerupState.MegaMushroom) {
-                photonView.RPC("PlaySound", RpcTarget.All, "player/groundpound_mega");
+                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_MegaMushroom_Groundpound);
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
                 cameraController.screenShakeTimer = 0.35f;
             }

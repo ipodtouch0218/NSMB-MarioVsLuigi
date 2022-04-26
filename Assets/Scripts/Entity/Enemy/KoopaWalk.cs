@@ -134,7 +134,7 @@ public class KoopaWalk : HoldableEntity {
                 if (player.state == Enums.PowerupState.MiniMushroom)
                     player.groundpound = false;
             }
-            player.photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+            player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.bounce = true;
         } else {
             if (shell && IsStationary()) {
@@ -162,7 +162,7 @@ public class KoopaWalk : HoldableEntity {
         stationary = false;
         hardkick = groundpound;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1) * (hardkick ? 1.2f : 1f), hardkick ? 3.5f : 0);
-        photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
     }
     [PunRPC]
     public override void Throw(bool facingLeft, bool crouch) {
@@ -281,12 +281,13 @@ public class KoopaWalk : HoldableEntity {
     
     [PunRPC]
     protected void Turnaround(bool hitWallOnLeft, float x) {
-        if (stationary)
+        if (IsStationary())
             return;
+
         left = !hitWallOnLeft;
         body.velocity = new Vector2(Mathf.Abs(x) * (left ? -1 : 1), body.velocity.y);
         if (shell && !IsStationary())
-            photonView.RPC("PlaySound", RpcTarget.All, "player/block_bump");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
     }
 
     [PunRPC]
@@ -308,7 +309,7 @@ public class KoopaWalk : HoldableEntity {
         shell = true;
         upsideDown = canBeFlipped;
         body.velocity = new Vector2(body.velocity.x, 5.5f);
-        photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
     }
 
     public bool IsStationary() {

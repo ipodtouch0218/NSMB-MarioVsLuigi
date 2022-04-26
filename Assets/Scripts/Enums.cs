@@ -1,9 +1,13 @@
-using System.Collections.ObjectModel;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
 using UnityEngine;
 
-public class Enums {
+public static class Enums {
 
+    #region POWERUPS
     public class PriorityPair {
         public int itemPriority, statePriority;
         public PriorityPair(int state) {
@@ -28,6 +32,8 @@ public class Enums {
     public enum PowerupState {
         None, MiniMushroom, Small, Large, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
+    #endregion
+    #region ANIMATION & MUSIC
     // Animation enums
     public enum PlayerEyeState {
         Normal, HalfBlink, FullBlink, Death
@@ -38,6 +44,80 @@ public class Enums {
         MegaMushroom,
         Starman,
     }
+    //Sound effects
+    public enum Sounds : byte {
+
+        //Enemy
+        [SoundData("enemy/freeze")]                     Enemy_Generic_Freeze,
+        [SoundData("enemy/freeze_shatter")]             Enemy_Generic_FreezeShatter,
+        [SoundData("enemy/kick")]                       Enemy_Generic_Kick,
+        [SoundData("enemy/stomp")]                      Enemy_Generic_Stomp,
+        [SoundData("enemy/bobomb_explode")]             Enemy_Bobomb_Explode,
+        [SoundData("enemy/bobomb_fuse")]                Enemy_Bobomb_Fuse,
+        [SoundData("enemy/bulletbill_shoot")]           Enemy_BulletBill_Shoot,
+        [SoundData("enemy/pirahnaplant_chomp")]         Enemy_PirahnaPlant_Chomp,
+        [SoundData("enemy/pirahnaplant_death")]         Enemy_PirahnaPlant_Death,
+
+        //Player
+        [SoundData("player/collision")]                 Player_Sound_Collision,
+        [SoundData("player/crouch")]                    Player_Sound_Crouch,
+        [SoundData("player/death")]                     Player_Sound_Death,
+        [SoundData("player/drill")]                     Player_Sound_Drill,
+        [SoundData("player/groundpound_start")]         Player_Sound_GroundpoundStart,
+        [SoundData("player/groundpound_landing")]       Player_Sound_GroundpoundLanding,
+        [SoundData("player/jump")]                      Player_Sound_Jump,
+        [SoundData("player/powerup")]                   Player_Sound_PowerupCollect,
+        [SoundData("player/powerup_reserve_store")]     Player_Sound_PowerupReserveStore,
+        [SoundData("player/powerup_reserve_use")]       Player_Sound_PowerupReserveUse,
+        [SoundData("player/powerdown")]                 Player_Sound_Powerdown,
+        [SoundData("player/respawn")]                   Player_Sound_Respawn,
+        [SoundData("player/walljump")]                  Player_Sound_WallJump,
+        [SoundData("player/wallslide")]                 Player_Sound_WallSlide,
+
+        [SoundData("player/walk/grass")]                Player_Walk_Grass,
+        [SoundData("player/walk/snow")]                 Player_Walk_Snow,
+
+        [SoundData("character/{char}/doublejump")]      Player_Voice_DoubleJump,
+        [SoundData("character/{char}/lava_death")]      Player_Voice_LavaDeath,
+        [SoundData("character/{char}/mega_mushroom")]   Player_Voice_MegaMushroom,
+        [SoundData("character/{char}/selected")]        Player_Voice_Selected,
+        [SoundData("character/{char}/spinner_launch")]  Player_Voice_SpinnerLaunch,
+        [SoundData("character/{char}/triplejump")]      Player_Voice_TripleJump,
+        [SoundData("character/{char}/walljump")]        Player_Voice_WallJump,
+
+        //Powerup
+        [SoundData("powerup/blueshell_enter")]          Powerup_BlueShell_Enter,
+        [SoundData("powerup/blueshell_slide")]          Powerup_BlueShell_Slide,
+        [SoundData("powerup/fireball_break")]           Powerup_Fireball_Break,
+        [SoundData("powerup/fireball_shoot")]           Powerup_Fireball_Shoot,
+        [SoundData("powerup/iceball_break")]            Powerup_Iceball_Break,
+        [SoundData("powerup/iceball_shoot")]            Powerup_Iceball_Shoot,
+        [SoundData("powerup/megamushroom_collect")]     Powerup_MegaMushroom_Collect,
+        [SoundData("powerup/megamushroom_end")]         Powerup_MegaMushroom_End,
+        [SoundData("powerup/megamushroom_groundpound")] Powerup_MegaMushroom_Groundpound,
+        [SoundData("powerup/megamushroom_jump")]        Powerup_MegaMushroom_Jump,
+        [SoundData("powerup/minimushroom_collect")]     Powerup_MiniMushroom_Collect,
+        [SoundData("powerup/minimushroom_groundpound")] Powerup_MiniMushroom_Groundpound,
+        [SoundData("powerup/minimushroom_jump")]        Powerup_MiniMushroom_Jump,
+        [SoundData("powerup/propellermushroom_drill")]  Powerup_PropellerMushroom_Drill,
+        [SoundData("powerup/propellermushroom_kick")]   Powerup_PropellerMushroom_Kick,
+        [SoundData("powerup/propellermushroom_spin")]   Powerup_PropellerMushroom_Spin,
+        [SoundData("powerup/propellermushroom_start")]  Powerup_PropellerMushroom_Start,
+
+        //World Elements
+        [SoundData("world/block_break")]                World_Block_Break,
+        [SoundData("world/block_bump")]                 World_Block_Bump,
+        [SoundData("world/block_powerup")]              World_Block_Powerup,
+        [SoundData("world/coin_collect")]               World_Coin_Collect,
+        [SoundData("world/ice_skidding")]               World_Ice_Skidding,
+        [SoundData("world/spinner_launch")]             World_Spinner_Launch,
+        [SoundData("world/star_collect")]               World_Star_Collect,
+        [SoundData("world/star_nearby")]                World_Star_Nearby,
+        [SoundData("world/water_splash")]               World_Water_Splash,
+    }
+
+    #endregion
+    #region NETWORKING 
     // Networking Enums
     public static class NetPlayerProperties {
         public static string Character { get; } = "C";
@@ -81,5 +161,25 @@ public class Enums {
         // 30-39 = graphical-only events
         SpawnParticle = 30,
         SpawnResizableParticle = 31,
+    }
+    #endregion
+}
+
+public class SoundData : Attribute {
+    public string Sound { get; private set; }
+    internal SoundData(string sound) {
+        Sound = sound;
+    }
+}
+public static class SoundDataExtensions {
+    public static AudioClip GetClip(this Enums.Sounds sound, PlayerData player = null, int variant = 0) {
+        SoundData data = GetSoundDataFromSound(sound);
+        string name = "Sound/" + data.Sound + (variant > 0 ? "_" + variant : "");
+        if (player != null)
+            name = name.Replace("{char}", player.soundFolder);
+        return Resources.Load(name) as AudioClip;
+    }
+    private static SoundData GetSoundDataFromSound(Enums.Sounds sound) {
+        return sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>();
     }
 }

@@ -290,7 +290,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 body.velocity = new Vector2(0, deathForce);
                 deathUp = true;
                 if (animator.GetBool("firedeath"))
-                    controller.PlaySound(controller.character.soundFolder + "/lava_death");
+                    controller.PlaySound(Enums.Sounds.Player_Voice_LavaDeath);
             }
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
@@ -342,7 +342,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 offset.y -= heightLargeModel - (mainHitbox.size.y * transform.localScale.y);
             }
             transform.position = body.position = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
-            photonView.RPC("PlaySound", RpcTarget.All, "player/powerdown");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
         }
         if (pipeTimer >= pipeDuration) {
             controller.pipeEntering = null;

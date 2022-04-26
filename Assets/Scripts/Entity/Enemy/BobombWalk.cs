@@ -106,7 +106,7 @@ public class BobombWalk : HoldableEntity {
         detonateCount = detonateTimer;
         body.velocity = Vector2.zero;
         lit = true;
-        PlaySound("enemy/bobomb_beep");
+        PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
     }
     [PunRPC]
     public override void Throw(bool facingLeft, bool crouch) {
@@ -128,7 +128,7 @@ public class BobombWalk : HoldableEntity {
         left = !fromLeft;
         sRenderer.flipX = left;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);
-        photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
     }
 
     public override void InteractWithPlayer(PlayerController player) {
@@ -143,7 +143,7 @@ public class BobombWalk : HoldableEntity {
         } else if (attackedFromAbove && !lit) {
             if (player.state != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
                 photonView.RPC("Light", RpcTarget.All);
-            photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom) {
                 photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
             } else {

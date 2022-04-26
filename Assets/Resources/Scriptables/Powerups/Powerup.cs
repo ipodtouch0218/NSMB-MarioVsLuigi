@@ -6,7 +6,8 @@ using UnityEngine;
 public class Powerup : ScriptableObject {
 
     public Enums.PowerupState state;
-    public string prefab, soundEffect = "powerup";
+    public string prefab;
+    public Enums.Sounds soundEffect = Enums.Sounds.Player_Sound_PowerupCollect;
     public float spawnChance = 0.1f, starModifier = 0f;
     public bool big, tall, custom;
     public float GetModifiedChance(float starPercentage) {

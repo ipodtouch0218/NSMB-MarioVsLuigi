@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 7
   prefab: BlueShell
-  soundEffect: powerup
+  soundEffect: 16
   spawnChance: 0.5
   starModifier: -0.1
   big: 0

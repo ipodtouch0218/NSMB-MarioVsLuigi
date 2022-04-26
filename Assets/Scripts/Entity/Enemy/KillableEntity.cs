@@ -43,7 +43,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
                 player.groundpound = false;
                 player.bounce = !player.drill;
             }
-            player.photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+            player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;
         } else if (player.hitInvincibilityCounter <= 0) {
             player.photonView.RPC("Powerdown", RpcTarget.All, false);
@@ -99,15 +99,16 @@ public abstract class KillableEntity : MonoBehaviourPun {
         animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         dead = true;
-        photonView.RPC("PlaySound", RpcTarget.All, !frozen ? "enemy/shell_kick" : "enemy/FrozenEnemyShatter");
+        photonView.RPC("PlaySound", RpcTarget.All, !frozen ? Enums.Sounds.Enemy_Generic_Kick : Enums.Sounds.Enemy_Generic_FreezeShatter);
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
         
-        if (photonView.IsMine && !tag.Contains("frozencube"))
+        if (PhotonNetwork.IsMasterClient && !tag.Contains("frozencube"))
             PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + new Vector2(0, 0.5f), Quaternion.identity);
     } 
+
     [PunRPC]
-    public void PlaySound(string sound) {
-        audioSource.PlayOneShot((AudioClip) Resources.Load("Sound/" + sound));
+    public void PlaySound(Enums.Sounds sound) {
+        audioSource.PlayOneShot(sound.GetClip());
     }
 }

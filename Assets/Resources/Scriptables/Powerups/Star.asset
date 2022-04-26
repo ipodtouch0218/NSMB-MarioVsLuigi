@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   prefab: Star
-  soundEffect: powerup
+  soundEffect: 16
   spawnChance: 0.5
   starModifier: -0.45
   big: 0

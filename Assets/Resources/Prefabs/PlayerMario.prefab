@@ -10222,6 +10222,7 @@ MonoBehaviour:
   propellerFallSpeed: 2
   propellerSpinFallSpeed: 1.5
   propellerSpinTime: 0.5
+  hitboxes: []
   cameraController: {fileID: 0}
   fadeOut: {fileID: 0}
   body: {fileID: 0}
@@ -10256,6 +10257,7 @@ MonoBehaviour:
   frozen: 0
   stationaryGiantEnd: 0
   fireballKnockback: 0
+  startedSliding: 0
   landing: 0
   koyoteTime: 0
   groundpoundCounter: 0
@@ -10697,7 +10699,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   screenShakeTimer: 0
   controlCamera: 0
-  onGround: 0
   currentPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &7672112719043132634
 MonoBehaviour:

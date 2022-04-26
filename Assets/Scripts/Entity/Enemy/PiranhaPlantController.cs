@@ -73,10 +73,11 @@ public class PiranhaPlantController : KillableEntity {
     public override void Kill() {
 
         if (!wasFrozen) {
-            PlaySound("enemy/shell_kick");
-            PlaySound("enemy/piranhaplant-die");
-        } else
+            PlaySound(Enums.Sounds.Enemy_Generic_Kick);
+            PlaySound(Enums.Sounds.Enemy_PirahnaPlant_Death);
+        } else {
             photonView.RPC("PlaySound", RpcTarget.All, "enemy/FrozenEnemyShatter");
+        }
 
         dead = true;
         hitbox.enabled = false;
