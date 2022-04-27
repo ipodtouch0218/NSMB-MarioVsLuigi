@@ -41,7 +41,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     readonly List<GameObject> remainingSpawns = new();
     float spawnStarCount;
     private PlayerInput input;
-    public long startTime, endTime = -1;
+    public int startServerTime, endServerTime = -1;
+    public long startRealTime = -1, endRealTime = -1;
 
     //Audio
     public AudioSource musicSourceIntro, musicSourceLoop, sfx;
@@ -272,7 +273,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 [Enums.NetRoomProperties.Lives] = -1
             };
             PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-            Instantiate(Resources.Load("Prefabs/Static/GlobalController"), Vector3.zero, Quaternion.identity);
         }
 
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
@@ -304,14 +304,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
 
-    IEnumerator LoadingComplete(long startTimestamp) {
-
+    IEnumerator LoadingComplete(int startTimestamp) {
         GlobalController.Instance.discordController.UpdateActivity();
+
         starting = true;
-        startTime = startTimestamp;
-        if (timedGameDuration > 0) {
-            endTime = startTimestamp + (timedGameDuration + 3) * 1000;
-        }
         loaded = true;
         loadedPlayers.Clear();
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
@@ -322,6 +318,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             RaiseEventOptions options = new() { Receivers = ReceiverGroup.All, CachingOption = EventCaching.RemoveFromRoomCache };
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);
         }
+
 
         if (!spectating) {
             yield return new WaitForSecondsRealtime((startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f);
@@ -367,6 +364,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         musicEnabled = true;
         timedGameDuration = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
 
+        startServerTime = PhotonNetwork.ServerTimestamp;
+        startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        if (timedGameDuration > 0) {
+            endServerTime = startTimestamp + timedGameDuration * 1000;
+            endRealTime = startRealTime + timedGameDuration * 1000;
+        }
+
+        GlobalController.Instance.discordController.UpdateActivity();
+
         if (canvas)
             SceneManager.UnloadSceneAsync("Loading");
     }
@@ -398,8 +404,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (gameover)
             return;
 
-        if (endTime != -1) {
-            float timeRemaining = (endTime - PhotonNetwork.ServerTimestamp) / 1000f;
+        if (endServerTime != -1) {
+            float timeRemaining = (endServerTime - PhotonNetwork.ServerTimestamp) / 1000f;
 
             if (timeRemaining > 0 && gameover != true) {
                 timeRemaining -= Time.deltaTime;
@@ -460,7 +466,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             return;
 
         bool starGame = starRequirement != -1;
-        bool timeUp = endTime != -1 && endTime - PhotonNetwork.ServerTimestamp < 0;
+        bool timeUp = endServerTime != -1 && endServerTime - PhotonNetwork.ServerTimestamp < 0;
         int winningStars = 0;
         List<PlayerController> winningPlayers = new();
         List<PlayerController> alivePlayers = new();

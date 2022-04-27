@@ -24,8 +24,8 @@ public class CameraController : MonoBehaviour {
         //only control the camera if we're the local player.
         targetCamera = Camera.main;
         startingZ = targetCamera.transform.position.z;
-        body = GetComponent<Rigidbody2D>();
         controller = GetComponent<PlayerController>();
+        body = controller.body;
     }
 
     public void LateUpdate() {

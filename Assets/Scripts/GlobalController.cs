@@ -18,8 +18,13 @@ public class GlobalController : Singleton<GlobalController> {
 
     private int windowWidth, windowHeight;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    public static void CreateInstance() {
+        Instantiate(Resources.Load("Prefabs/Static/GlobalController"));
+    }
+
     void Awake() {
-        if (!InstanceCheck()) 
+        if (!InstanceCheck())
             return;
         Instance = this;
         settings = GetComponent<Settings>();

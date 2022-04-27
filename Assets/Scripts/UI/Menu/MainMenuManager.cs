@@ -196,6 +196,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnLeftRoom() {
         OpenLobbyMenu();
         ClearChat();
+        GlobalController.Instance.discordController.UpdateActivity();
     }
     public void OnJoinRandomFailed(short reasonId, string reasonMessage) {
         OnJoinRoomFailed(reasonId, reasonMessage);
@@ -255,6 +256,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PhotonNetwork.SerializationRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
+        PhotonNetwork.NickName = Settings.Instance.nickname;
 
         AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);

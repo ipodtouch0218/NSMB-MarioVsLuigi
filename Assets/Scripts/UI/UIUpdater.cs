@@ -78,6 +78,6 @@ public class UIUpdater : MonoBehaviour {
         uiStars.text = "<sprite=0>" + player.stars + "/" + GameManager.Instance.starRequirement;
         uiCoins.text = "<sprite=1>" + player.coins + "/8";
         uiLives.text = player.lives > 0 ? (Utils.GetCharacterIndex(player.photonView.Owner) == 0 ? "<sprite=3>" : "<sprite=4>") + player.lives : "";
-        uiCountdown.text = GameManager.Instance.endTime != -1 ? "<sprite=6>" + ((GameManager.Instance.endTime - PhotonNetwork.ServerTimestamp) / 1000).ToString("0s") : "";
+        uiCountdown.text = GameManager.Instance.endServerTime != -1 ? "<sprite=6>" + ((GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000).ToString("0s") : "";
     }
 }

@@ -14,8 +14,8 @@ public class DiscordController : MonoBehaviour {
     public void Awake() {
         discord = new Discord.Discord(962073502469459999, (ulong) CreateFlags.NoRequireDiscord);
         activityManager = discord.GetActivityManager();
-        activityManager.OnActivityJoin += TryJoinGame;
         activityManager.OnActivityJoinRequest += AskToJoin;
+        activityManager.OnActivityJoin += TryJoinGame;
     }
 
     public void TryJoinGame(string secret) {
@@ -32,7 +32,7 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void AskToJoin(ref User user) {
-        activityManager.AcceptInvite(user.Id, (res) => {
+        activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
             Debug.Log(res);
         });
     }
@@ -60,12 +60,14 @@ public class DiscordController : MonoBehaviour {
 
             if (gm.richPresenceId != "")
                 activity.Assets = new() { LargeImage = $"level-{gm.richPresenceId}" };
+
             if (gm.timedGameDuration == -1) {
-                activity.Timestamps = new() { Start = gm.startTime };
+                activity.Timestamps = new() { Start = gm.startRealTime / 1000 };
             } else {
-                activity.Timestamps = new() { Start = gm.timedGameDuration };
+                activity.Timestamps = new() { End = gm.endRealTime / 1000 };
             }
 
+            Debug.Log(activity.Timestamps.Start + " - " + activity.Timestamps.End);
 
         } else if (PhotonNetwork.InRoom) {
             //in a room
@@ -91,7 +93,7 @@ public class DiscordController : MonoBehaviour {
 
         activityManager.UpdateActivity(activity, (res) => {
             //head empty.
-            Debug.Log(res);
+            Debug.Log($"Discord activity update: {res}");
         });
     }
 

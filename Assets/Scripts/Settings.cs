@@ -34,6 +34,7 @@ public class Settings : Singleton<Settings> {
         }
     }
     public bool ndsResolution = false, fireballFromSprint = true, vsync = false;
+    public string nickname;
 
     void Awake() {
         if (!InstanceCheck()) 
@@ -44,11 +45,10 @@ public class Settings : Singleton<Settings> {
     }
 
     public void LoadSettingsFromPreferences() {
-        string name = PlayerPrefs.GetString("Nickname");
-        if (name == null || name == "")
-            name = "Player" + Random.Range(1000, 10000);
+        nickname = PlayerPrefs.GetString("Nickname");
+        if (nickname == null || nickname == "")
+            nickname = "Player" + Random.Range(1000, 10000);
 
-        PhotonNetwork.NickName = name;
         VolumeSFX = PlayerPrefs.GetFloat("volumeSFX", 0.5f);
         VolumeMusic = PlayerPrefs.GetFloat("volumeMusic", 0.25f);
         VolumeMaster = PlayerPrefs.GetFloat("volumeMaster", 1);
