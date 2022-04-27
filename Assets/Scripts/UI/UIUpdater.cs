@@ -26,9 +26,6 @@ public class UIUpdater : MonoBehaviour {
         TrackIcon icon = trackObject.GetComponent<TrackIcon>();
         icon.target = player.gameObject;
 
-        if (!player.photonView.IsMine)
-            trackObject.transform.localScale = new Vector3(2f / 3f, 2f / 3f, 1f);
-
         trackObject.SetActive(true);
 
         return trackObject;

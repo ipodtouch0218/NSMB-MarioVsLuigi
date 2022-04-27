@@ -590,6 +590,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public void OnPause(InputAction.CallbackContext context) {
+        Pause();
+    }
+    public void Pause() {
         if (!musicEnabled)
             return;
 

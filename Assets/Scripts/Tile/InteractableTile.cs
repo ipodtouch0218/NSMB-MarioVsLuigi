@@ -16,7 +16,6 @@ public abstract class InteractableTile : AnimatedTile {
             return;
 
         //check for entities above to bump
-        Debug.DrawLine(worldLocation + bumpOffset + new Vector3(-bumpOffset.x, bumpOffset.y), worldLocation + bumpOffset + new Vector3(bumpOffset.x, bumpOffset.y), Color.red, 10f);
         foreach (Collider2D collider in Physics2D.OverlapBoxAll(worldLocation + bumpOffset, bumpSize, 0f)) {
             GameObject obj = collider.gameObject;
             if (obj == interacter.gameObject) 

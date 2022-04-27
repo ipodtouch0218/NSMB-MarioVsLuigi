@@ -15,7 +15,8 @@ public class RoomIcon : MonoBehaviour {
         icon = GetComponent<Image>();
         Unselect();
     }
-    public void UpdateUI() {
+    public void UpdateUI(RoomInfo newRoom) {
+        room = newRoom;
         ExitGames.Client.Photon.Hashtable prop = room.CustomProperties;
 
         nameText.text = $"{prop[Enums.NetRoomProperties.HostName]}'s Lobby";

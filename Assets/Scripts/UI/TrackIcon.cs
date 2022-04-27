@@ -33,6 +33,7 @@ public class TrackIcon : MonoBehaviour {
                 flashTimer = 0;
                 image.enabled = true;
             }
+            transform.localScale = Vector3.one * (playerTarget.cameraController.controlCamera ? 1 : (2 / 3f));
         } else {
             image.sprite = starSprite;
         }

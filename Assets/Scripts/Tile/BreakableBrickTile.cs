@@ -52,7 +52,7 @@ public class BreakableBrickTile : InteractableTile {
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         
         if (interacter is MonoBehaviourPun pun) {
-            pun.photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
+            pun.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Break);
         }
     }
     public void BumpWithAnimation(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {

@@ -28,7 +28,7 @@ public class PowerupTile : BreakableBrickTile {
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
                 
                 if (interacter is MonoBehaviourPun pun)
-                    pun.photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
+                    pun.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Break);
                 return true;
             }
 
@@ -41,7 +41,7 @@ public class PowerupTile : BreakableBrickTile {
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
 
         if (interacter is MonoBehaviourPun pun2)
-            pun2.photonView.RPC("PlaySound", RpcTarget.All, "player/item_block");
+            pun2.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Powerup);
         return false;
     }
 }

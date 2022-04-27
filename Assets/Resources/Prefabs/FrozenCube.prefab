@@ -205,6 +205,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dead: 0
   frozen: 0
+  left: 1
   body: {fileID: -1029166702606754831}
   holder: {fileID: 0}
   previousHolder: {fileID: 0}
@@ -219,9 +220,11 @@ MonoBehaviour:
   frozenEntity: {fileID: 0}
   frozenPlayer: {fileID: 0}
   fallTimer: 5
+  killTimer: 0.5
   fastSlide: 0
   fallen: 0
   crashed: 0
+  deathFlag: 0
   kinematicEntity: 0
   flyingEntity: 0
   plantEntity: 0

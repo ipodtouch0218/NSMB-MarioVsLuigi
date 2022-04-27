@@ -62,7 +62,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
 
     [PunRPC]
     public virtual void Freeze() {
-        photonView.RPC("PlaySound", RpcTarget.All, "enemy/FreezeEnemy");
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Freeze);
         frozen = true;
         animator.enabled = false;
         //audioSource.enabled = false; // Note: I commented this out since it stopped the freeze enemy sound, if it was necessary, revert this change.

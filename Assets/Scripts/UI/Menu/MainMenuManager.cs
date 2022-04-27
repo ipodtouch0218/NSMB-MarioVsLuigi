@@ -96,7 +96,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 selectedRoomIcon = roomIcon;
             }
 
-            roomIcon.UpdateUI();
+            roomIcon.UpdateUI(room);
         }
 
         foreach (string key in invalidRooms) {

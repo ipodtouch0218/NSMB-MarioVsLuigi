@@ -55,7 +55,7 @@ public static class Enums {
         [SoundData("enemy/bobomb_explode")]             Enemy_Bobomb_Explode,
         [SoundData("enemy/bobomb_fuse")]                Enemy_Bobomb_Fuse,
         [SoundData("enemy/bulletbill_shoot")]           Enemy_BulletBill_Shoot,
-        [SoundData("enemy/pirahnaplant_chomp")]         Enemy_PirahnaPlant_Chomp,
+        [SoundData("enemy/pirahnaplant_chomp")]         Enemy_PirahnaPlant_Chomp = 7,
         [SoundData("enemy/pirahnaplant_death")]         Enemy_PirahnaPlant_Death,
 
         //Player
