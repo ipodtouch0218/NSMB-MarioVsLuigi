@@ -56,16 +56,12 @@ public class CameraController : MonoBehaviour {
         if (controller.onGround)
             floorHeight = body.position.y;
 
-        //float floorRange = (controller.singlejump || controller.doublejump || controller.triplejump) ? 3.75f : 1.75f;
-        float floorRange = 3.5f;
+        float floorRange = 3f;
         validGround = body.position.y + (Time.fixedDeltaTime * body.velocity.y) - floorHeight < floorRange && body.position.y - floorHeight > -.5f;
 
         RaycastHit2D hit;
         if (!controller.dead) {
             if (validGround) {
-                if (!controller.onGround && (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, floorRange, PlayerController.ANY_GROUND_MASK))) {
-                    floorHeight = hit.point.y;
-                }
                 playerPos.y = floorHeight;
             } else if (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, 1f, PlayerController.ANY_GROUND_MASK)) {
                 floorHeight = hit.point.y;
@@ -93,10 +89,10 @@ public class CameraController : MonoBehaviour {
             xDifference = Vector2.Distance(Vector2.right * newPosition.x, Vector2.right * playerPos.x);
         }
         if (xDifference > threshold.x) {
-            newPosition.x += (threshold.x - xDifference + 0.01f) * (right ? 1 : -1);
+            newPosition.x += (threshold.x - xDifference - 0.01f) * (right ? 1 : -1);
         }
         if (yDifference > threshold.y) {
-            newPosition.y += (threshold.y - yDifference + 0.01f) * (up ? 1 : -1);
+            newPosition.y += (threshold.y - yDifference - 0.01f) * (up ? 1 : -1);
         }
 
         currentPosition.x = newPosition.x;

@@ -153,6 +153,28 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (GlobalController.Instance.joinedAsSpectator)
             LoadFromGameState();
     }
+
+    public void OnEnable() {
+        if (!photonView.IsMine)
+            return;
+
+        InputSystem.controls.Player.Movement.performed += OnMovement;
+        InputSystem.controls.Player.Jump.performed += OnJump;
+        InputSystem.controls.Player.Sprint.performed += OnSprint;
+        InputSystem.controls.Player.PowerupAction.performed += OnPowerupAction;
+        InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
+    }
+    public void OnDisable() {
+        if (!photonView.IsMine)
+            return;
+
+        InputSystem.controls.Player.Movement.performed -= OnMovement;
+        InputSystem.controls.Player.Jump.performed -= OnJump;
+        InputSystem.controls.Player.Sprint.performed -= OnSprint;
+        InputSystem.controls.Player.PowerupAction.performed -= OnPowerupAction;
+        InputSystem.controls.Player.ReserveItem.performed -= OnReserveItem;
+    }
+
     public void OnGameStart() {
         gameObject.SetActive(true);
         photonView.RPC("PreRespawn", RpcTarget.All);
@@ -519,19 +541,20 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     #endregion
 
     #region -- CONTROLLER FUNCTIONS --
-    public void OnMovement(InputValue value) {
+    public void OnMovement(InputAction.CallbackContext context) {
         if (!photonView.IsMine || GameManager.Instance.paused)
             return;
-        joystick = value.Get<Vector2>();
+
+        joystick = context.ReadValue<Vector2>();
         if (frozen)
             photonView.RPC("FrozenStruggle", RpcTarget.All, true);
     }
 
-    public void OnJump(InputValue value) {
+    public void OnJump(InputAction.CallbackContext context) {
         if (!photonView.IsMine || GameManager.Instance.paused)
             return;
 
-        jumpHeld = value.Get<float>() >= 0.5f;
+        jumpHeld = context.ReadValue<float>() >= 0.5f;
         if (jumpHeld)
             jumpBuffer = 0.15f;
 
@@ -539,10 +562,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             photonView.RPC("FrozenStruggle", RpcTarget.All, false);
     }
 
-    public void OnSprint(InputValue value) {
+    public void OnSprint(InputAction.CallbackContext context) {
         if (!photonView.IsMine || GameManager.Instance.paused)
             return;
-        running = value.Get<float>() >= 0.5f;
+        running = context.ReadValue<float>() >= 0.5f;
 
         if (frozen) {
             photonView.RPC("FrozenStruggle", RpcTarget.All, false);
@@ -552,10 +575,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             ActivatePowerupAction();
     }
 
-    public void OnPowerupAction(InputValue value) {
+    public void OnPowerupAction(InputAction.CallbackContext context) {
         if (!photonView.IsMine || dead || GameManager.Instance.paused)
             return;
-        powerupButtonHeld = value.Get<float>() >= 0.5f;
+        powerupButtonHeld = context.ReadValue<float>() >= 0.5f;
         if (!powerupButtonHeld)
             return;
 
@@ -629,7 +652,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         usedPropellerThisJump = true;
     }
 
-    public void OnReserveItem() {
+    public void OnReserveItem(InputAction.CallbackContext context) {
         if (!photonView.IsMine || storedPowerup == null || GameManager.Instance.paused || dead)
             return;
 
@@ -673,7 +696,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             //starman
             invincible = 10f;
             PlaySound(powerup.soundEffect);
-            soundPlayed = true;
 
             if (holding && photonView.IsMine) {
                 holding.photonView.RPC("SpecialKill", RpcTarget.All, facingRight, false);

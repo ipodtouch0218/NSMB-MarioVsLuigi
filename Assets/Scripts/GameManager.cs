@@ -251,9 +251,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void OnEnable() {
         PhotonNetwork.AddCallbackTarget(this);
+        InputSystem.controls.UI.Pause.performed += OnPause;
     }
     public void OnDisable() {
         PhotonNetwork.RemoveCallbackTarget(this);
+        InputSystem.controls.UI.Pause.performed -= OnPause;
     }
 
     public void Start() {
@@ -298,7 +300,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         } else {
             SpectationManager.Spectating = true;
         }
+
     }
+
+
     IEnumerator LoadingComplete(long startTimestamp) {
 
         GlobalController.Instance.discordController.UpdateActivity();
@@ -584,7 +589,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             point.AttemptSpawning();
     }
 
-    public void Pause() {
+    public void OnPause(InputAction.CallbackContext context) {
         if (!musicEnabled)
             return;
 
