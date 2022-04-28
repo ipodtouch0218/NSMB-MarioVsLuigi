@@ -883,6 +883,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         quit = true;
         yield return new WaitForSeconds(buhBye.length);
         Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 
     public void ChangeStarRequirement(int stars) {
