@@ -65,7 +65,7 @@ public class BulletBillMover : KillableEntity {
                 player.groundpound = false;
                 player.bounce = !player.drill;
             }
-            player.photonView.RPC("PlaySound", RpcTarget.All, "enemy/goomba");
+            player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;
             return;
         }
@@ -115,7 +115,7 @@ public class BulletBillMover : KillableEntity {
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
 
         dead = true;
-        photonView.RPC("PlaySound", RpcTarget.All, "enemy/shell_kick");
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
     } 
     void OnDrawGizmosSelected() {
         if (!GameManager.Instance) 

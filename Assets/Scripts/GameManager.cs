@@ -40,7 +40,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     GameObject[] starSpawns;
     readonly List<GameObject> remainingSpawns = new();
     float spawnStarCount;
-    private PlayerInput input;
     public int startServerTime, endServerTime = -1;
     public long startRealTime = -1, endRealTime = -1;
 
@@ -59,6 +58,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public int playerCount;
     public PlayerController[] allPlayers;
     public EnemySpawnpoint[] enemySpawnpoints;
+
+    private GameObjectPool brickBreakPool;
 
     public SpectationManager SpectationManager { get; private set; }
 
@@ -176,12 +177,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             int y = (int) data[1];
             string particleName = (string) data[2];
             Vector3 color = data.Length > 3 ? (Vector3) data[3] : new Vector3(1, 1, 1);
+            Vector3 worldPos = Utils.TilemapToWorldPosition(new(x, y)) + new Vector3(0.25f, 0.25f);
 
-            Vector3Int loc = new(x, y, 0);
+            GameObject particle;
+            if (particleName == "BrickBreak") {
+                particle = brickBreakPool.Pop();
+                particle.SetActive(true);
+                particle.transform.position = worldPos;
+            } else {
+                particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), worldPos, Quaternion.identity);
+            }
 
-            GameObject particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
             ParticleSystem system = particle.GetComponent<ParticleSystem>();
-
             ParticleSystem.MainModule main = system.main;
             main.startColor = new Color(color.x, color.y, color.z, 1);
             break;
@@ -204,7 +211,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (upsideDown ? -1 : 1));
 
             //TODO: find the right sound
-            sfx.PlayOneShot((AudioClip) Resources.Load("Sound/player/brick_break"));
+            sfx.PlayOneShot(Enums.Sounds.World_Block_Break.GetClip());
             break;
         }
         }
@@ -301,6 +308,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SpectationManager.Spectating = true;
         }
 
+        brickBreakPool = new(Resources.Load("Prefabs/Particle/BrickBreak") as GameObject, 32);
     }
 
 

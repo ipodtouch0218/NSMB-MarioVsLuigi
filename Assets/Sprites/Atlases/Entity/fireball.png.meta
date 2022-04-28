@@ -156,7 +156,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 1
+        y: 7
         width: 11
         height: 11
       alignment: 7
@@ -177,7 +177,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 11
-        y: 1
+        y: 7
         width: 11
         height: 11
       alignment: 7
@@ -198,7 +198,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 22
-        y: 1
+        y: 7
         width: 11
         height: 11
       alignment: 7
@@ -219,7 +219,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 33
-        y: 1
+        y: 7
         width: 11
         height: 11
       alignment: 7
@@ -235,6 +235,69 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: fireball_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 0
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a6be0aaa081d284a866dbe715af0061
+      internalID: -1737155869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fireball_5
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 0
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba54fb353d3545b43b665e6ecc3f96c9
+      internalID: -1295335873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fireball_6
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 1
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed30fa9d75f502840bd28519d39ec0ff
+      internalID: 1454502836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -246,8 +309,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      fireball_5: -1295335873
       fireball_0: 5353841184698615464
+      fireball_6: 1454502836
       fireball_2: -8127487528002223245
+      fireball_4: -1737155869
       fireball_3: -3915765450054648673
       fireball_1: 750297706712597742
   spritePackingTag: 

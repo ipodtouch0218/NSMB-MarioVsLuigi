@@ -10221,6 +10221,7 @@ MonoBehaviour:
   propellerFallSpeed: 2
   propellerSpinFallSpeed: 1.5
   propellerSpinTime: 0.5
+  propellerDrillBuffer: 0
   hitboxes: []
   cameraController: {fileID: 0}
   fadeOut: {fileID: 0}

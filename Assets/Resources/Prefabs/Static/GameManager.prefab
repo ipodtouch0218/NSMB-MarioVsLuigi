@@ -3556,8 +3556,10 @@ MonoBehaviour:
   spawnBigPowerups: 1
   levelDesigner: 
   richPresenceId: 
-  startTime: 0
-  endTime: -1
+  startServerTime: 0
+  endServerTime: -1
+  startRealTime: -1
+  endRealTime: -1
   musicSourceIntro: {fileID: 5500062339093502112}
   musicSourceLoop: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
@@ -4079,7 +4081,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36.9
+  m_fontSize: 36.95
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

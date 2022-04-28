@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 
 public class FireballMover : MonoBehaviourPun {
-    public float speed = 3f;
+    public float speed = 3f, bounceHeight = 4.5f;
     public bool left;
     public bool isIceball;
     private Rigidbody2D body;
@@ -34,22 +34,17 @@ public class FireballMover : MonoBehaviourPun {
         physics.UpdateCollisions();
 
         if (physics.onGround) {
-            float bounceHeight = speed / (isIceball ? 1.0f : 1.25f);
-
             body.velocity = new Vector2(body.velocity.x, bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad) * 1.5f));
         } else if (isIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
         }
-        if (photonView && photonView.IsMine && (physics.hitLeft || physics.hitRight || physics.hitRoof || physics.onGround && breakOnImpact))
+        bool breaking = (physics.hitLeft || physics.hitRight || physics.hitRoof || physics.onGround && breakOnImpact);
+        if (photonView && photonView.IsMine && breaking)
             PhotonNetwork.Destroy(gameObject);
     }
 
     void OnDestroy() {
-        if (isIceball) {
-            Instantiate(Resources.Load("Prefabs/Particle/IceballWall"), transform.position, Quaternion.identity);
-        } else {
-            Instantiate(Resources.Load("Prefabs/Particle/FireballWall"), transform.position, Quaternion.identity);
-        }
+        Instantiate(Resources.Load("Prefabs/Particle/" + (isIceball ? "IceballWall" : "FireballWall")), transform.position, Quaternion.identity);
     }
 
     [PunRPC]

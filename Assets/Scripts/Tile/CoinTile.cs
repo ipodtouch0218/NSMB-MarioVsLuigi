@@ -30,14 +30,14 @@ public class CoinTile : BreakableBrickTile {
                 object[] parametersParticle = new object[]{tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b)};
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
 
-                player.photonView.RPC("PlaySound", RpcTarget.All, "player/brick_break");
+                player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Break);
                 return true;
             }
 
             //Give coin to player
             player.photonView.RPC("CollectCoin", RpcTarget.All, -1, worldLocation + Vector3.one/4f);
         } else {
-            interacter.gameObject.GetPhotonView().RPC("PlaySound", RpcTarget.All, "player/coin");
+            interacter.gameObject.GetPhotonView().RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Coin_Collect);
         }
 
         Bump(interacter, direction, worldLocation);

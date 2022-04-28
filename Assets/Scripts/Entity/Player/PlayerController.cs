@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public bool dead = false;
     public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
     public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 25f;
-    public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f;
+    public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, propellerDrillBuffer;
 
     public BoxCollider2D[] hitboxes;
     GameObject models;
@@ -600,8 +600,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     return;
             }
 
-            PhotonNetwork.Instantiate("Prefabs/Fireball", body.position + new Vector2(facingRight ? 0.2f : -0.2f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
+            Vector2 pos = body.position + new Vector2(facingRight ? 0.5f : -0.5f, 0.5f);
+            if (Utils.IsTileSolidAtWorldLocation(pos)) {
+                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/FireballWall", pos);
+            } else {
+                PhotonNetwork.Instantiate("Prefabs/Fireball", pos, Quaternion.identity, 0, new object[] { !facingRight });
+            }
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_Fireball_Shoot);
+            
             animator.SetTrigger("fireball");
             break;
         }
@@ -615,7 +621,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     return;
             }
 
-            PhotonNetwork.Instantiate("Prefabs/Iceball", body.position + new Vector2(facingRight ? 0.2f : -0.2f, 0.4f), Quaternion.identity, 0, new object[] { !facingRight });
+            Vector2 pos = body.position + new Vector2(facingRight ? 0.5f : -0.5f, 0.5f);
+            if (Utils.IsTileSolidAtWorldLocation(pos)) {
+                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/IceballWall", pos);
+            } else {
+                PhotonNetwork.Instantiate("Prefabs/Iceball", pos, Quaternion.identity, 0, new object[] { !facingRight });
+            }
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_Iceball_Shoot);
             animator.SetTrigger("fireball");
             break;
@@ -961,6 +972,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         turnaround = false;
         groundpound = false;
         knockback = false;
+        wallSlideLeft = false;
+        wallSlideRight = false;
         animator.SetBool("knockback", false);
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
@@ -1046,7 +1059,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     #region -- SOUNDS / PARTICLES --
     [PunRPC]
     public void PlaySoundEverywhere(Enums.Sounds sound) {
-        GameManager.Instance.sfx.PlayOneShot(sound.GetClip());
+        GameManager.Instance.sfx.PlayOneShot(sound.GetClip(character));
     }
     [PunRPC]
     public void PlaySound(Enums.Sounds sound, byte variant, float volume) {
@@ -1104,12 +1117,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         Vector2 normalizedVelocity = body.velocity;
         if (!groundpound)
             normalizedVelocity.y = Mathf.Max(0, body.velocity.y);
-
+        
         Vector2 offset = Vector2.zero;
         if (singlejump && onGround)
             offset = Vector2.down / 2f;
 
-        Vector2 checkPosition = body.position + (2 * Time.fixedDeltaTime * normalizedVelocity) + new Vector2(0, checkSize.y / 2) + offset;
+        Vector2 checkPosition = body.position + (5 * Time.fixedDeltaTime * normalizedVelocity) + new Vector2(0, checkSize.y / 2) + offset;
 
         Vector3Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
         Vector3Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
@@ -1965,8 +1978,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         if (drill) {
             propellerSpinTimer = 0;
-            if (propeller && !crouch)
-                drill = false;
+            if (propeller) {
+                if (!crouch) {
+                    TickCounter(ref propellerDrillBuffer, 0, Time.deltaTime);
+                    if (propellerDrillBuffer <= 0)
+                        drill = false;
+                } else {
+                    propellerDrillBuffer = 0.15f;
+                }
+            }
         }
 
         if (propellerTimer > 0)

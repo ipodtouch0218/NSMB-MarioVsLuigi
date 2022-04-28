@@ -5,13 +5,10 @@ using Photon.Pun;
 
 public class PlayerAnimationController : MonoBehaviourPun {
 
-    readonly Vector3 cameraOffsetLeft = Vector3.left, cameraOffsetRight = Vector3.right, cameraOffsetZero = Vector3.zero;
-
     PlayerController controller;
     Animator animator;
     Rigidbody2D body;
     BoxCollider2D mainHitbox;
-    CameraController cameraController;
 
     [SerializeField] GameObject models, smallModel, largeModel, blueShell, propellerHelmet, propeller;
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
@@ -32,7 +29,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
         animator = GetComponent<Animator>();
         body = GetComponent<Rigidbody2D>();
         mainHitbox = GetComponent<BoxCollider2D>();
-        cameraController = GetComponent<CameraController>();
         drillParticleAudio = drillParticle.GetComponent<AudioSource>();
 
         smallModel.SetActive(false);
@@ -168,7 +164,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
                     animatedVelocity = 3.5f;
                 if (controller.iceSliding)
                     animatedVelocity = 0f;
-            }
+            } else if (Mathf.Abs(body.velocity.x) > 0.1f && controller.state == Enums.PowerupState.MegaMushroom) {
+                animatedVelocity = 4.5f;
+            } 
             animator.SetFloat("velocityX", animatedVelocity);
             animator.SetFloat("velocityY", body.velocity.y);
             animator.SetBool("doublejump", controller.doublejump);
