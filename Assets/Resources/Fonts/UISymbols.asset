@@ -118,6 +118,24 @@ MonoBehaviour:
     m_Scale: 1
     m_Name: ui_5
     m_HashCode: 4313910
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 7
+    m_Scale: 1
+    m_Name: ui_6
+    m_HashCode: 4313909
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 8
+    m_Scale: 1
+    m_Name: ui_7
+    m_HashCode: 4313908
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 9
+    m_Scale: 1
+    m_Name: ui_8
+    m_HashCode: 4313915
   m_SpriteGlyphTable:
   - m_Index: 0
     m_Metrics:
@@ -220,7 +238,7 @@ MonoBehaviour:
       m_Width: 13
       m_Height: 13
       m_HorizontalBearingX: -2
-      m_HorizontalBearingY: 12
+      m_HorizontalBearingY: 11.5
       m_HorizontalAdvance: 13
     m_GlyphRect:
       m_X: 39
@@ -230,5 +248,50 @@ MonoBehaviour:
     m_Scale: 1
     m_AtlasIndex: 0
     sprite: {fileID: 309482482, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 7
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -2
+      m_HorizontalBearingY: 11.5
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 52
+      m_Y: 20
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: -1683070159, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 8
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -2
+      m_HorizontalBearingY: 11.5
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 65
+      m_Y: 20
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 268930356, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 9
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -2
+      m_HorizontalBearingY: 11.5
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 78
+      m_Y: 20
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 1261997413, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   spriteInfoList: []
   fallbackSpriteAssets: []
