@@ -6,7 +6,9 @@ using UnityEngine.SceneManagement;
 using Photon.Realtime;
 
 public class GlobalController : Singleton<GlobalController> {
-    public Canvas ndsCanvas;
+
+    public GameObject ndsCanvas, graphy;
+
     public RenderTexture ndsTexture;
     public PlayerData[] characters;
     public Settings settings;
@@ -29,9 +31,17 @@ public class GlobalController : Singleton<GlobalController> {
         Instance = this;
         settings = GetComponent<Settings>();
         discordController = GetComponent<DiscordController>();
+
     }
+
+    void Start() {
+        InputSystem.controls.UI.DebugInfo.performed += (context) => {
+            graphy.SetActive(!graphy.activeSelf);
+        };
+    }
+
     void Update() {
-        ndsCanvas.enabled = Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0;
+        ndsCanvas.SetActive(Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0);
 
 #if UNITY_STANDALONE
         int currentWidth = Screen.width;

@@ -41,6 +41,7 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.Digit5, "Bobomb");
         DebugEntity(Key.Digit6, "BulletBill");
         DebugEntity(Key.Digit7, "Spiny");
+
         DebugItem(Key.Digit8, "IceFlower");
         FreezePlayer(Key.Digit9);
         DebugWorldEntity(Key.Digit0, "FrozenCube");
@@ -63,7 +64,10 @@ public class DebugControls : MonoBehaviour {
             return;
 
         if (Keyboard.current[key].wasPressedThisFrame)
-            GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem(item);
+            if (item == null)
+                GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem();
+            else
+                GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem(item);
     }
     private void DebugEntity(Key key, string entity) {
         if (!GameManager.Instance.localPlayer)

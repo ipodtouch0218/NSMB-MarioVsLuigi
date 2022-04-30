@@ -48,10 +48,8 @@ public class CameraController : MonoBehaviour {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
-
         float time = (Time.time - Time.fixedTime) / Time.fixedDeltaTime;
         playerPos = Vector2.Lerp(body.position, body.position + (body.velocity * Time.fixedDeltaTime), time);
-        Utils.WrapWorldLocation(ref playerPos);
 
         if (controller.onGround)
             floorHeight = body.position.y;
@@ -78,6 +76,8 @@ public class CameraController : MonoBehaviour {
 
         playerPos += offset;
 
+        Utils.WrapWorldLocation(ref playerPos);
+
         float xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
         float yDifference = Vector2.Distance(Vector2.up * currentPosition.y, Vector2.up * playerPos.y);
 
@@ -99,7 +99,7 @@ public class CameraController : MonoBehaviour {
         Vector3 targetPos = Vector3.SmoothDamp(currentPosition, newPosition, ref smoothDampVel, 0.25f);
 
         if ((screenShakeTimer -= Time.deltaTime) > 0) 
-            targetPos += new Vector3((Random.value - 0.5f) * (screenShakeTimer / 2), (Random.value - 0.5f) * (screenShakeTimer / 2));
+            targetPos += new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
 
         float vOrtho = targetCamera.orthographicSize;
         float hOrtho = vOrtho * targetCamera.aspect;

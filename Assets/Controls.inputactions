@@ -403,6 +403,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Debug Info",
+                    "type": "Button",
+                    "id": "8cc650dc-a45e-4887-b332-7b0fdfdb1106",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "!Point",
                     "type": "PassThrough",
                     "id": "5c7013a5-1581-4d40-9965-05d3486faf12",
@@ -820,6 +829,50 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1b8a9c51-6fb0-4003-b3da-e9c59e91d92e",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Debug Info",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0267a921-9477-4fca-a466-67d3fece6585",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Debug Info",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bcc0af49-9727-421a-ba9c-493d50b2caaa",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Debug Info",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ce5c24b0-8663-43ab-b7cc-40433414bbf1",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Debug Info",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

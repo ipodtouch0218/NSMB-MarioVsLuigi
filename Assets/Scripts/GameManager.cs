@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool loopingLevel = true;
     public Vector3 spawnpoint;
     public Tilemap tilemap;
-    public bool spawnBigPowerups = true;
+    public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     public string levelDesigner = "", richPresenceId = "";
     TileBase[] originalTiles;
     BoundsInt origin;
@@ -277,7 +277,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             ExitGames.Client.Photon.Hashtable properties = new() {
                 [Enums.NetRoomProperties.StarRequirement] = 10,
                 [Enums.NetRoomProperties.Time] =  -1,
-                [Enums.NetRoomProperties.Lives] = -1
+                [Enums.NetRoomProperties.Lives] = -1,
+                [Enums.NetRoomProperties.NewPowerups] = true,
             };
             PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
         }

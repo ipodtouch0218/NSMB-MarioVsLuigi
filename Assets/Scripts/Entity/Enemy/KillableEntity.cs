@@ -109,6 +109,12 @@ public abstract class KillableEntity : MonoBehaviourPun {
 
     [PunRPC]
     public void PlaySound(Enums.Sounds sound) {
+        Debug.Log(sound);
+        audioSource.PlayOneShot(sound.GetClip());
+    }
+
+    public void PlaySoundAnim(int id) {
+        Enums.Sounds sound = (Enums.Sounds) id;
         audioSource.PlayOneShot(sound.GetClip());
     }
 }

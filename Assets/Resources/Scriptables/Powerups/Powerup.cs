@@ -9,7 +9,7 @@ public class Powerup : ScriptableObject {
     public string prefab;
     public Enums.Sounds soundEffect = Enums.Sounds.Player_Sound_PowerupCollect;
     public float spawnChance = 0.1f, starModifier = 0f;
-    public bool big, tall, custom;
+    public bool big, vertical, custom;
     public float GetModifiedChance(float starPercentage) {
         return Mathf.Max(0, spawnChance + (starModifier * starPercentage));
     }

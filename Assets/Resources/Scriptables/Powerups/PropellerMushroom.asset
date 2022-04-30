@@ -18,5 +18,5 @@ MonoBehaviour:
   spawnChance: 0.5
   starModifier: -0.1
   big: 0
-  tall: 1
+  vertical: 1
   custom: 1

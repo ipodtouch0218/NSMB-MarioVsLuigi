@@ -138,7 +138,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         starDirection = Random.value < 0.5;
 
         playerId = PhotonNetwork.CurrentRoom != null ? System.Array.IndexOf(PhotonNetwork.PlayerList, photonView.Owner) : -1;
-        Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, ref lives);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out lives);
         if (lives != -1)
             lives++;
     }

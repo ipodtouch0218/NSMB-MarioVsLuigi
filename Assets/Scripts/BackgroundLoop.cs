@@ -58,8 +58,10 @@ public class BackgroundLoop : MonoBehaviour {
     public void LateUpdate() {
         float difference = transform.position.x - lastPosition.x;
         if (Mathf.Abs(difference) > 3) {
-            foreach (GameObject obj in levels)
+            foreach (GameObject obj in levels) {
                 obj.transform.Translate(difference, 0, 0);
+                RepositionChildObjects(obj);
+            }
         } else {
             foreach (GameObject obj in levels) {
                 RepositionChildObjects(obj); 
