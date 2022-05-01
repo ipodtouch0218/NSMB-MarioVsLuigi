@@ -48,11 +48,10 @@ public class CameraController : MonoBehaviour {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
-        float time = (Time.time - Time.fixedTime) / Time.fixedDeltaTime;
-        playerPos = Vector2.Lerp(body.position, body.position + (body.velocity * Time.fixedDeltaTime), time);
+        playerPos = AntiJitter(transform.position);
 
         if (controller.onGround)
-            floorHeight = body.position.y;
+            floorHeight = AntiJitter(body.position).y;
 
         float floorRange = 3f;
         validGround = body.position.y + (Time.fixedDeltaTime * body.velocity.y) - floorHeight < floorRange && body.position.y - floorHeight > -.5f;
@@ -62,7 +61,7 @@ public class CameraController : MonoBehaviour {
             if (validGround) {
                 playerPos.y = floorHeight;
             } else if (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, 1f, PlayerController.ANY_GROUND_MASK)) {
-                floorHeight = hit.point.y;
+                floorHeight = AntiJitter(hit.point).y;
                 playerPos.y = floorHeight;
                 validGround = true;
             }
@@ -105,6 +104,8 @@ public class CameraController : MonoBehaviour {
         float hOrtho = vOrtho * targetCamera.aspect;
         targetPos.x = Mathf.Clamp(targetPos.x, minX + hOrtho, maxX - hOrtho);
         targetPos.y = Mathf.Clamp(targetPos.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
+
+        targetPos = AntiJitter(targetPos);
         targetPos.z = startingZ;
 
         return targetPos;
@@ -113,5 +114,10 @@ public class CameraController : MonoBehaviour {
         Gizmos.color = Color.blue;
         Vector2 threshold = controller.onGround ? groundedThreshold : airThreshold;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
+    }
+
+    private static Vector2 AntiJitter(Vector3 vec) {
+        vec.y = ((int) (vec.y * 100)) / 100f;
+        return vec;
     }
 }
