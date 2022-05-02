@@ -9,6 +9,7 @@ public class BackgroundLoop : MonoBehaviour {
     private Vector3 lastPosition;
 
     public static BackgroundLoop Instance = null;
+    public bool wrap;
 
     void Start() {
         Instance = this;
@@ -57,11 +58,12 @@ public class BackgroundLoop : MonoBehaviour {
     }
     public void LateUpdate() {
         float difference = transform.position.x - lastPosition.x;
-        if (Mathf.Abs(difference) > 3) {
+        if (wrap) {
             foreach (GameObject obj in levels) {
                 obj.transform.Translate(difference, 0, 0);
                 RepositionChildObjects(obj);
             }
+            wrap = false;
         } else {
             foreach (GameObject obj in levels) {
                 RepositionChildObjects(obj); 

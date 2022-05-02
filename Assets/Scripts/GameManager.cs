@@ -59,21 +59,22 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public PlayerController[] allPlayers;
     public EnemySpawnpoint[] enemySpawnpoints;
 
-    private GameObjectPool brickBreakPool;
-
     public SpectationManager SpectationManager { get; private set; }
+
+    ParticleSystem brickBreak;
 
     // EVENT CALLBACK
     public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
         if (eventOptions == null)
-            eventOptions = Utils.EVENT_OTHERS;
+            eventOptions = NetworkUtils.EventOthers;
+
         PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
-        OnEvent((byte) eventId, parameters);
+        HandleEvent((byte) eventId, parameters);
     }
     public void OnEvent(EventData e) {
-        OnEvent(e.Code, e.CustomData);
+        HandleEvent(e.Code, e.CustomData);
     }
-    public void OnEvent(byte eventId, object customData) {
+    public void HandleEvent(byte eventId, object customData) {
         object[] data = customData as object[];
 
         switch ((Enums.NetEventIds) eventId) {
@@ -181,16 +182,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             GameObject particle;
             if (particleName == "BrickBreak") {
-                particle = brickBreakPool.Pop();
-                particle.SetActive(true);
-                particle.transform.position = worldPos;
+                brickBreak.transform.position = worldPos;
+                ParticleSystem.MainModule main = brickBreak.main;
+                main.startColor = new Color(color.x, color.y, color.z, 1);
+                brickBreak.Emit(4);
             } else {
                 particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), worldPos, Quaternion.identity);
+                
+                ParticleSystem system = particle.GetComponent<ParticleSystem>();
+                ParticleSystem.MainModule main = system.main;
+                main.startColor = new Color(color.x, color.y, color.z, 1);
             }
 
-            ParticleSystem system = particle.GetComponent<ParticleSystem>();
-            ParticleSystem.MainModule main = system.main;
-            main.startColor = new Color(color.x, color.y, color.z, 1);
             break;
         }
         case Enums.NetEventIds.SpawnResizableParticle: {
@@ -215,16 +218,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             break;
         }
         }
-    }    
-    
+    }
+
     // ROOM CALLBACKS
-    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {  }
+    public void OnJoinedRoom() { }
+    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) { }
+    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) { }
+
     public void OnMasterClientSwitched(Player newMaster) {
         //TODO: chat message
     }
-    public void OnJoinedRoom() { }
     public void OnPlayerEnteredRoom(Player newPlayer) {
         //Spectator joined. Sync the room state.
+        //TODO: chat message
 
         //SYNCHRONIZE PLAYER STATE
         if (localPlayer)
@@ -241,8 +247,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void OnPlayerLeftRoom(Player otherPlayer) {
         //TODO: player disconnect message
     }
-    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) { }
-
 
     // CONNECTION CALLBACKS
     public void OnConnected() { }
@@ -256,7 +260,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void OnConnectedToMaster() { }
 
 
-
+    //Register callbacks & controls
     public void OnEnable() {
         PhotonNetwork.AddCallbackTarget(this);
         InputSystem.controls.UI.Pause.performed += OnPause;
@@ -270,30 +274,24 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         Instance = this;
         SpectationManager = GetComponent<SpectationManager>();
 
+#if UNITY_EDITOR
+        //Spawning in editor??
         if (!PhotonNetwork.IsConnectedAndReady) {
-            // offline mode, spawning in editor?
             PhotonNetwork.OfflineMode = true;
-            PhotonNetwork.CreateRoom("Debug");
-            ExitGames.Client.Photon.Hashtable properties = new() {
-                [Enums.NetRoomProperties.StarRequirement] = 10,
-                [Enums.NetRoomProperties.Time] =  -1,
-                [Enums.NetRoomProperties.Lives] = -1,
-                [Enums.NetRoomProperties.NewPowerups] = true,
-            };
-            PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+            PhotonNetwork.CreateRoom("Debug", new() { 
+                CustomRoomProperties = NetworkUtils.DefaultRoomProperties 
+            });
         }
+#endif
 
+        //Respawning Tilemaps
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
-        starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-        starRequirement = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.StarRequirement];
+        originalTiles = tilemap.GetTilesBlock(origin);
 
-        TileBase[] map = tilemap.GetTilesBlock(origin);
-        originalTiles = new TileBase[map.Length];
-        for (int i = 0; i < map.Length; i++) {
-            if (map[i] == null) 
-                continue;
-            originalTiles[i] = map[i];
-        }
+        //Star spawning
+        starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
+        Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out starRequirement);
+
 
         SceneManager.SetActiveScene(gameObject.scene);
 
@@ -309,7 +307,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SpectationManager.Spectating = true;
         }
 
-        brickBreakPool = new(Resources.Load("Prefabs/Particle/BrickBreak") as GameObject, 32);
+        brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
     }
 
 
@@ -332,7 +330,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (!spectating) {
             yield return new WaitForSecondsRealtime((startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f);
         } else {
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(3f);
         }
 
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
@@ -501,25 +499,25 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         //LIVES CHECKS
         if (alivePlayers.Count == 0) {
-            //everyone's dead...? ok then, draw.
-            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, Utils.EVENT_ALL, SendOptions.SendReliable);
+            //everyone's dead...? ok then, draw?
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
             return;
         } else if (alivePlayers.Count == 1 && playerCount >= 2) {
             //one player left alive (and not in a solo game). winner!
-            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
             return;
         }
         //TIMED CHECKS
         if (timeUp) {
             //time up! check who has most stars, if a tie keep playing
             if (winningPlayers.Count == 1)
-                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
 
             return;
         }
         if (starGame && winningStars >= starRequirement) {
             if (winningPlayers.Count == 1)
-                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, Utils.EVENT_ALL, SendOptions.SendReliable);
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
 
             return;
         }
@@ -569,7 +567,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 invincible = true;
             if ((player.stars + 1f) / starRequirement >= 0.95f || hurryup != false)
                 speedup = true;
-
         }
 
         if (mega) {

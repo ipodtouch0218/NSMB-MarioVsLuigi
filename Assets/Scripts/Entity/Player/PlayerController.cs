@@ -109,7 +109,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             running = (bool) controls["sprintHeld"];
             jumpHeld = (bool) controls["jumpHeld"];
 
-            HandleMovement(lag);
+            //HandleMovement(lag);
+            int fullResims = (int) (lag / Time.fixedDeltaTime);
+            float partialResim = lag % Time.fixedDeltaTime;
+
+            while (fullResims-- > 0)
+                HandleMovement(Time.fixedDeltaTime);
+            HandleMovement(partialResim);
         }
     }
     #endregion

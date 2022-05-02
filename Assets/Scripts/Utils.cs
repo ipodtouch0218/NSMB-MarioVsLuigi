@@ -7,8 +7,6 @@ using UnityEngine.Tilemaps;
 using System.Linq;
 
 public class Utils {
-    public static RaiseEventOptions EVENT_OTHERS { get; } = new() { Receivers=ReceiverGroup.Others };
-    public static RaiseEventOptions EVENT_ALL { get; } = new() { Receivers=ReceiverGroup.All };
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
         if (!manager) 
             manager = GameManager.Instance;
@@ -61,10 +59,9 @@ public class Utils {
     public static int GetCharacterIndex(Player player = null) {
         if (player == null) 
             player = PhotonNetwork.LocalPlayer;
-        player.CustomProperties.TryGetValue(Enums.NetPlayerProperties.Character, out object index);
-        if (index == null) 
-            index = 0;
-        return (int) index;
+
+        GetCustomProperty(Enums.NetPlayerProperties.Character, out int index, player.CustomProperties);
+        return index;
     }
     public static PlayerData GetCharacterData(Player player = null) {
         return GlobalController.Instance.characters[GetCharacterIndex(player)];
@@ -102,8 +99,11 @@ public class Utils {
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     }
 
-    public static void GetCustomProperty<T>(string key, out T value) {
-        PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(key, out object temp);
+    public static void GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
+        if (properties == null)
+            properties = PhotonNetwork.CurrentRoom.CustomProperties;
+        
+        properties.TryGetValue(key, out object temp);
         if (temp != null) {
             value = (T) temp;
         } else {

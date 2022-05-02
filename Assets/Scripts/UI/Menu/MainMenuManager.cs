@@ -124,10 +124,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         
         if (newMaster.IsLocal) {
             //i am de captain now
-            ExitGames.Client.Photon.Hashtable prop = new() {
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
                 [Enums.NetRoomProperties.HostName] = newMaster.NickName
-            };
-            PhotonNetwork.CurrentRoom.SetCustomProperties(prop);
+            });
         }
     }
     public void OnJoinedRoom() {
@@ -160,9 +159,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         updateAction((T) updatedProperties[key]);
     }
     // CONNECTION CALLBACKS
-    public void OnConnected() { }
+    public void OnConnected() {
+        Debug.Log("Connected to Photon.");
+    }
     public void OnDisconnected(DisconnectCause cause) {
-        Debug.Log("disconnected: " + cause.ToString());
+        Debug.Log("Disconnected: " + cause.ToString());
         if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic))
             OpenErrorBox("Disconnected: " + cause.ToString());
 
@@ -176,7 +177,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             formattedRegions = new();
             pingSortedRegions = handler.EnabledRegions.ToArray();
-            System.Array.Sort(pingSortedRegions, new RegionComparer());
+            System.Array.Sort(pingSortedRegions, NetworkUtils.RegionPingComparer);
 
             foreach (Region r in pingSortedRegions)
                 formattedRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
@@ -202,17 +203,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         OnJoinRoomFailed(reasonId, reasonMessage);
     }
     public void OnJoinRoomFailed(short reasonId, string reasonMessage) {
-        Debug.LogError("join room failed, " + reasonId + ": " + reasonMessage);
+        Debug.LogError($"[PHOTON] Join room failed ({reasonId}, {reasonMessage})");
         OpenErrorBox(reasonMessage);
     }
     public void OnCreateRoomFailed(short reasonId, string reasonMessage) {
-        Debug.LogError("create room failed, " + reasonId + ": " + reasonMessage);
+        Debug.LogError($"[PHOTON] Create room failed ({reasonId}, {reasonMessage})");
         OpenErrorBox(reasonMessage);
 
         OnConnectedToMaster();
     }
     public void OnCreatedRoom() {
-        Debug.Log("Created Room: " + PhotonNetwork.CurrentRoom.Name);
+        Debug.Log($"[PHOTON] Created Room ({PhotonNetwork.CurrentRoom.Name})");
     }
     // CUSTOM EVENT CALLBACKS
     public void OnEvent(EventData e) {
@@ -243,8 +244,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     // Unity Stuff
     void Start() {
-
+        
+        /*
+         * dear god this needs a refactor. does every UI element seriously have to have
+         * their callbacks into this one fuckin script?
+         */
+        
         Instance = this;
+
+        //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
         HorizontalCamera.OFFSET = 0;
         GlobalController.Instance.joinedAsSpectator = false;
@@ -254,9 +262,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             OpenReconnectBox((DisconnectCause) GlobalController.Instance.disconnectCause);
         }
 
-        PhotonNetwork.SerializationRate = 30;
-        PhotonNetwork.MaxResendsBeforeDisconnect = 15;
-        PhotonNetwork.NickName = Settings.Instance.nickname;
 
         AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
@@ -264,6 +269,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length)].transform.position;
 
+        //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
             OpenTitleScreen();
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
@@ -277,7 +283,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             List<string> newRegions = new();
             pingSortedRegions = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.ToArray();
-            System.Array.Sort(pingSortedRegions, new RegionComparer());
+            System.Array.Sort(pingSortedRegions, NetworkUtils.RegionPingComparer);
 
             int index = 0;
             for (int i = 0; i < pingSortedRegions.Length; i++) {
@@ -295,9 +301,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PlaySong(musicLoop, musicStart);
 
-        lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject; 
-        
-        nicknameField.text = PhotonNetwork.NickName;
+        lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
+
+        //Apply settings
+        nicknameField.text = PhotonNetwork.NickName = Settings.Instance.nickname;
         musicSlider.value = Settings.Instance.VolumeMusic;
         sfxSlider.value = Settings.Instance.VolumeSFX;
         masterSlider.value = Settings.Instance.VolumeMaster;
@@ -306,13 +313,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
         fireballToggle.isOn = Settings.Instance.fireballFromSprint;
         vsyncToggle.isOn = Settings.Instance.vsync;
+        QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
 
         //custom color dropdown initialization
-
         primaryColorDropdown.AddOptions(CustomColors.Primary.Select(c => c.name).ToList());
         secondaryColorDropdown.AddOptions(CustomColors.Secondary.Select(c => c.name).ToList());
-
-        QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
 
         rebindManager.Init();
 
@@ -339,13 +344,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
     }
 
-    public class RegionComparer : IComparer<Region> {
-        public int Compare(Region r1, Region r2) {
-            return r1.Ping - r2.Ping;
-        }
-    }
-
     private void PlaySong(AudioClip loop, AudioClip intro = null) {
+        //todo: this shit doesn't work consistently / with audio speedups / on webgl
         if (loopCoroutine != null) {
             StopCoroutine(loopCoroutine);
             loopCoroutine = null;
@@ -375,10 +375,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         while (true) {
             yield return new WaitForSecondsRealtime(2);
             if (PhotonNetwork.InRoom) {
-                ExitGames.Client.Photon.Hashtable prop = new() {
+                PhotonNetwork.LocalPlayer.SetCustomProperties(new() {
                     { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() }
-                };
-                PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+                });
             }
         }
     }
@@ -674,28 +673,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         for (int i = 0; i < 8; i++)
             roomName += roomNameChars[Random.Range(0, roomNameChars.Length)];
 
+        ExitGames.Client.Photon.Hashtable properties = NetworkUtils.DefaultRoomProperties;
+        properties[Enums.NetRoomProperties.HostName] = PhotonNetwork.NickName;
+        properties[Enums.NetRoomProperties.Password] = passwordToggle.isOn ? passwordCreateField.text : "";
+
         RoomOptions options = new() {
             MaxPlayers = players,
             IsVisible = true,
             PublishUserId = true,
-            CustomRoomPropertiesForLobby = new string[] {
-                Enums.NetRoomProperties.Lives,
-                Enums.NetRoomProperties.Time,
-                Enums.NetRoomProperties.NewPowerups,
-                Enums.NetRoomProperties.GameStarted,
-                Enums.NetRoomProperties.HostName,
-                Enums.NetRoomProperties.Password,
-            },
-            CustomRoomProperties = new() {
-                [Enums.NetRoomProperties.Level] = 0,
-                [Enums.NetRoomProperties.StarRequirement] = 10,
-                [Enums.NetRoomProperties.Lives] = -1,
-                [Enums.NetRoomProperties.Time] = -1,
-                [Enums.NetRoomProperties.NewPowerups] = true,
-                [Enums.NetRoomProperties.GameStarted] = false,
-                [Enums.NetRoomProperties.HostName] = PhotonNetwork.NickName,
-                [Enums.NetRoomProperties.Password] = passwordToggle.isOn ? passwordCreateField.text : "",
-            }
+            CustomRoomProperties = properties,
+            CustomRoomPropertiesForLobby = NetworkUtils.LobbyVisibleRoomProperties,
         };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         createLobbyPrompt.SetActive(false);
@@ -748,15 +735,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void UpdatePlayerList(Player pl, Transform nameObject = null) {
         string characterString = Utils.GetCharacterData(pl).uistring;
-        pl.CustomProperties.TryGetValue(Enums.NetPlayerProperties.Ping, out object ping);
-        if (ping == null) 
-            ping = -1;
+        Utils.GetCustomProperty(Enums.NetPlayerProperties.Ping, out int ping, pl.CustomProperties);
+
         string pingColor;
-        if ((int) ping < 0) {
+        if (ping < 0) {
             pingColor = "black";    
-        } else if ((int) ping < 80) {
+        } else if (ping < 80) {
             pingColor = "#00b900";
-        } else if ((int) ping < 120) {
+        } else if (ping < 120) {
             pingColor = "orange";
         } else {
             pingColor = "red";
@@ -764,10 +750,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (nameObject == null) 
             nameObject = playersContent.transform.Find(pl.UserId);
+
         if (nameObject == null) 
             return;
+
         SetText(nameObject.Find("NameText").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
-        SetText(nameObject.Find("PingText").gameObject, "<color=" + pingColor + ">" + (int) ping);
+        SetText(nameObject.Find("PingText").gameObject, $"<color={pingColor}>ping</color>");
     }
     
     public void GlobalChatMessage(string message, Vector3 color) {

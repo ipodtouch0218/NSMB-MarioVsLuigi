@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 using Photon.Realtime;
 
 public class GlobalController : Singleton<GlobalController> {
@@ -35,14 +36,20 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     void Start() {
+        //Photon settings.
+        PhotonNetwork.SerializationRate = 30;
+        PhotonNetwork.MaxResendsBeforeDisconnect = 15;
+
         InputSystem.controls.UI.DebugInfo.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
     }
 
     void Update() {
+        //todo: move this somewhere else???
         ndsCanvas.SetActive(Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0);
 
+        //todo: this jitters to hell
 #if UNITY_STANDALONE
         int currentWidth = Screen.width;
         int currentHeight = Screen.height;

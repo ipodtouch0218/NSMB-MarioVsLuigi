@@ -96,5 +96,4 @@ public class DiscordController : MonoBehaviour {
             Debug.Log($"Discord activity update: {res}");
         });
     }
-
 }

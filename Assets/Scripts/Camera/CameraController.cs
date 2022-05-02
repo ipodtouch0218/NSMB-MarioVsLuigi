@@ -86,6 +86,9 @@ public class CameraController : MonoBehaviour {
         if (xDifference >= 8) {
             newPosition.x += (right ? -1 : 1) * GameManager.Instance.levelWidthTile / 2f;
             xDifference = Vector2.Distance(Vector2.right * newPosition.x, Vector2.right * playerPos.x);
+            if (controlCamera) {
+                BackgroundLoop.Instance.wrap = true;
+            }
         }
         if (xDifference > threshold.x) {
             newPosition.x += (threshold.x - xDifference - 0.01f) * (right ? 1 : -1);
