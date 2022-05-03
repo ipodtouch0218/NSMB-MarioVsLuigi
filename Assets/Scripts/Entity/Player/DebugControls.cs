@@ -19,11 +19,11 @@ public class DebugControls : MonoBehaviour {
         Keyboard kb = Keyboard.current;
         if (kb[Key.LeftBracket].wasPressedThisFrame) {
             Time.timeScale /= 2;
-            Debug.Log("new timescale = " + Time.timeScale);
+            Debug.Log($"[DEBUG] Timescale set to {Time.timeScale}x");
         }
         if (kb[Key.RightBracket].wasPressedThisFrame) {
             Time.timeScale *= 2;
-            Debug.Log("new timescale = " + Time.timeScale);
+            Debug.Log($"[DEBUG] Timescale set to {Time.timeScale}x");
         }
         DebugItem(Key.Numpad0, null);
         DebugItem(Key.Numpad1, "Mushroom");

@@ -31,10 +31,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         mainHitbox = GetComponent<BoxCollider2D>();
         drillParticleAudio = drillParticle.GetComponent<AudioSource>();
 
-        smallModel.SetActive(false);
-        largeModel.SetActive(false);
-        blueShell.SetActive(false);
-        propellerHelmet.SetActive(false);
+        DisableAllModels();
 
         if (photonView) {
             if (!photonView.IsMine)
@@ -68,9 +65,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 instant = true;
             } else if (wasTurnaround || controller.skidding || controller.turnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
                 if (controller.facingRight ^ (wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.turnaround)) {
-                    targetEuler = new Vector3(0, 260, 0);
+                    targetEuler = new Vector3(0, 250, 0);
                 } else {
-                    targetEuler = new Vector3(0, 100, 0);
+                    targetEuler = new Vector3(0, 110, 0);
                 }
                 instant = true;
             } else {
@@ -81,7 +78,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                     targetEuler += new Vector3(0, -1200 - (controller.propellerTimer * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer <= 0 && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
                     instant = true;
                 } else {
-                    targetEuler = new Vector3(0, controller.facingRight ? 100 : 260, 0);
+                    targetEuler = new Vector3(0, controller.facingRight ? 110 : 250, 0);
                 }
             }
             propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.flying || controller.propeller || controller.usedPropellerThisJump) ? -1 : 1) * Time.deltaTime), -2500, -300);
@@ -348,5 +345,13 @@ public class PlayerAnimationController : MonoBehaviourPun {
             body.isKinematic = false;
         }
         pipeTimer += Time.fixedDeltaTime;
+    }
+
+    public void DisableAllModels() {
+        smallModel.SetActive(false);
+        largeModel.SetActive(false);
+        blueShell.SetActive(false);
+        propellerHelmet.SetActive(false);
+        animator.avatar = smallAvatar;
     }
 }

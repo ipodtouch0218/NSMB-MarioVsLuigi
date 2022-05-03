@@ -27,6 +27,7 @@ public class DiscordController : MonoBehaviour {
         if (SceneManager.GetActiveScene().buildIndex != 0)
             return;
 
+        Debug.Log($"[DISCORD] Attempting to join game with secret \"{secret}\"");
         string[] split = secret.Split("-");
         string region = split[0];
         string room = split[1];
@@ -36,9 +37,10 @@ public class DiscordController : MonoBehaviour {
         PhotonNetwork.Disconnect();
     }
 
+    //TODO this doesn't work???
     public void AskToJoin(ref User user) {
         activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
-            Debug.Log(res);
+            Debug.Log($"[DISCORD] Ask to Join response: {res}");
         });
     }
 
@@ -104,7 +106,7 @@ public class DiscordController : MonoBehaviour {
 
         activityManager.UpdateActivity(activity, (res) => {
             //head empty.
-            Debug.Log($"Discord activity update: {res}");
+            Debug.Log($"[DISCORD] Rich Presence Update: {res}");
         });
     }
 }

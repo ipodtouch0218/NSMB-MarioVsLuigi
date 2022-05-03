@@ -641,7 +641,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             break;
         }
         case Enums.PowerupState.PropellerMushroom: {
-            if (groundpound || knockback || holding || (flying && drill) || propeller || crouching || sliding)
+            if (groundpound || knockback || holding || (flying && drill) || propeller || crouching || sliding || wallJumpTimer > 0)
                 return;
 
             photonView.RPC("StartPropeller", RpcTarget.All);
@@ -887,7 +887,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         GameManager.Instance.CheckForWinner();
 
         Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
-        PlaySoundEverywhere(Enums.Sounds.World_Star_Collect);
+        PlaySoundEverywhere(photonView.IsMine ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         Destroy(star);
@@ -1011,6 +1011,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         cameraController.Recenter();
         gameObject.layer = DEFAULT_LAYERID;
         previousState = state = Enums.PowerupState.Small;
+        animationController.DisableAllModels();
         dead = false;
         animator.SetTrigger("respawn");
         invincible = 0;
@@ -2005,8 +2006,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             alreadyGroundpounded = false;
 
         if (powerupButtonHeld) {
-            if (body.velocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
+            if (body.velocity.y < -0.1f && (propeller || usedPropellerThisJump) && !drill && !wallSlideLeft && !wallSlideRight && wallJumpTimer <= 0 && propellerSpinTimer < propellerSpinTime / 4f) {
                 propellerSpinTimer = propellerSpinTime;
+                propeller = true;
                 photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_PropellerMushroom_Spin);
             }
         }

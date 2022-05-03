@@ -120,8 +120,10 @@ public static class Enums {
         [SoundData("world/coin_collect")]               World_Coin_Collect,
         [SoundData("world/ice_skidding")]               World_Ice_Skidding,
         [SoundData("world/spinner_launch")]             World_Spinner_Launch,
-        [SoundData("world/star_collect")]               World_Star_Collect,
+        [SoundData("world/star_collect")]               World_Star_Collect_Self,
+        [SoundData("world/star_collect_enemy")]         World_Star_Collect_Enemy,
         [SoundData("world/star_nearby")]                World_Star_Nearby,
+        [SoundData("world/star_spawn")]                 World_Star_Spawn,
         [SoundData("world/water_splash")]               World_Water_Splash,
     }
 

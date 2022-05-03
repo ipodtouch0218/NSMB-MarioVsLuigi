@@ -463,7 +463,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
                     currentStar = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", spawnPos, Quaternion.identity);
                     remainingSpawns.RemoveAt(index);
-                    //TODO: star appear sound
+                    if (musicEnabled)
+                        sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
                     spawnStarCount = 16f - PhotonNetwork.CurrentRoom.PlayerCount;
                 }
             } else {

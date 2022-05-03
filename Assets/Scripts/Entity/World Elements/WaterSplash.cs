@@ -14,7 +14,6 @@ public class WaterSplash : MonoBehaviour {
     private Texture2D heightTex;
     private float[] pointHeights, pointVelocities;
     private Color32[] colors;
-    public AudioSource sfx;
 
     private int totalPoints;
     private MeshRenderer meshRenderer;
@@ -94,8 +93,6 @@ public class WaterSplash : MonoBehaviour {
     }
     void OnTriggerEnter2D(Collider2D collider) {
         Instantiate(Resources.Load(splashParticle), collider.transform.position, Quaternion.identity);
-        if (sfx)
-            sfx.Play();
 
         Rigidbody2D body = collider.attachedRigidbody;
         float power = body ? -body.velocity.y : 1;

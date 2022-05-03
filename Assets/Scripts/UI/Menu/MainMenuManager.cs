@@ -115,9 +115,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     // ROOM CALLBACKS
-    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {
-        UpdatePlayerList(player);
-    }
+    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) { }
     public void OnMasterClientSwitched(Player newMaster) {
         LocalChatMessage(newMaster.NickName + " has become the Host", ColorToVector(Color.red));
         
@@ -134,11 +132,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnPlayerEnteredRoom(Player newPlayer) {
         LocalChatMessage(newPlayer.NickName + " joined the room", ColorToVector(Color.red));
-        PopulatePlayerList();
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
         LocalChatMessage(otherPlayer.NickName + " left the room", ColorToVector(Color.red));
-        PopulatePlayerList();
     }
     public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable updatedProperties) {
         if (updatedProperties == null)
@@ -159,10 +155,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     // CONNECTION CALLBACKS
     public void OnConnected() {
-        Debug.Log("Connected to Photon.");
+        Debug.Log("[PHOTON] Connected to Photon.");
     }
     public void OnDisconnected(DisconnectCause cause) {
-        Debug.Log("Disconnected: " + cause.ToString());
+        Debug.Log("[PHOTON] Disconnected: " + cause.ToString());
         if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic))
             OpenErrorBox("Disconnected: " + cause.ToString());
 
@@ -367,7 +363,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
         
         OpenInLobbyMenu();
-        PopulatePlayerList();
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
         primaryColorDropdown.SetValueWithoutNotify((int) PhotonNetwork.LocalPlayer.CustomProperties[Enums.NetPlayerProperties.PrimaryColor]);
         secondaryColorDropdown.SetValueWithoutNotify((int) PhotonNetwork.LocalPlayer.CustomProperties[Enums.NetPlayerProperties.SecondaryColor]);
@@ -546,7 +541,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void ChangeLives(int lives) {
-        Debug.Log($"lives changed to {lives}");
         livesEnabled.SetIsOnWithoutNotify(lives != -1);
         UpdateSettingEnableStates();
         if (lives == -1)
@@ -675,58 +669,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         timeField.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
-    }
-    public void PopulatePlayerList() {
-        for (int i = 0; i < playersContent.transform.childCount; i++) {
-            GameObject pl = playersContent.transform.GetChild(i).gameObject;
-            if (!pl.activeSelf) 
-                continue;
-            Destroy(pl);
-        }
-
-        int count = 0;
-        SortedDictionary<int, Player> sortedPlayers = new(PhotonNetwork.CurrentRoom.Players);
-        foreach (KeyValuePair<int, Player> player in sortedPlayers) {
-            Player pl = player.Value;
-
-            GameObject newPl = Instantiate(playersPrefab, Vector3.zero, Quaternion.identity);
-            newPl.name = pl.UserId;
-            newPl.transform.SetParent(playersContent.transform);
-            newPl.transform.localPosition = new Vector3(0, -(count-- * 40f), 0);
-            newPl.transform.localScale = Vector3.one;
-            newPl.SetActive(true);
-            RectTransform tf = newPl.GetComponent<RectTransform>();
-            tf.offsetMax = new Vector2(330, tf.offsetMax.y);
-            UpdatePlayerList(pl, newPl.transform);
-        }
-
-        UpdateSettingEnableStates();
-
-        GlobalController.Instance.discordController.UpdateActivity();
-    }
-    public void UpdatePlayerList(Player pl, Transform nameObject = null) {
-        string characterString = Utils.GetCharacterData(pl).uistring;
-        Utils.GetCustomProperty(Enums.NetPlayerProperties.Ping, out int ping, pl.CustomProperties);
-
-        string pingColor;
-        if (ping < 0) {
-            pingColor = "black";    
-        } else if (ping < 80) {
-            pingColor = "#00b900";
-        } else if (ping < 120) {
-            pingColor = "orange";
-        } else {
-            pingColor = "red";
-        }
-
-        if (nameObject == null) 
-            nameObject = playersContent.transform.Find(pl.UserId);
-
-        if (nameObject == null) 
-            return;
-
-        SetText(nameObject.Find("NameText").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
-        SetText(nameObject.Find("PingText").gameObject, $"<color={pingColor}>{ping}</color>");
     }
     
     public void GlobalChatMessage(string message, Vector3 color) {
@@ -873,7 +815,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void ChangeTime(int time) {
-        Debug.Log($"time changed to {time}s");
         timeEnabled.SetIsOnWithoutNotify(time != -1);
         UpdateSettingEnableStates();
         if (time == -1)
