@@ -28,17 +28,22 @@ public class FireballMover : MonoBehaviourPun {
 
         HandleCollision();
 
-        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(-speed, body.velocity.y));
+        float gravityInOneFrame = body.gravityScale * Physics2D.gravity.y * Time.fixedDeltaTime;
+        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(-speed - gravityInOneFrame, body.velocity.y));
     }
     void HandleCollision() {
         physics.UpdateCollisions();
 
         if (physics.onGround) {
-            body.velocity = new Vector2(body.velocity.x, bounceHeight + (bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad) * 1.5f));
+            float boost = bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad) * 1.5f;
+            if (Mathf.Sign(physics.floorAngle) != Mathf.Sign(body.velocity.x))
+                boost = 0;
+            
+            body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
         } else if (isIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
         }
-        bool breaking = (physics.hitLeft || physics.hitRight || physics.hitRoof || physics.onGround && breakOnImpact);
+        bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact);
         if (photonView && photonView.IsMine && breaking)
             PhotonNetwork.Destroy(gameObject);
     }

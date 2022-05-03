@@ -299,6 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  goUpSlopes: 0
   onGround: 0
   hitRoof: 0
   hitRight: 0

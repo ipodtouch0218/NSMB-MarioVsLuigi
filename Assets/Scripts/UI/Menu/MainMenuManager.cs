@@ -13,10 +13,9 @@ using ExitGames.Client.Photon;
 using TMPro;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
-    public static MainMenuManager Instance; 
-    public AudioSource musicSourceLoop, musicSourceIntro, sfx;
+    public static MainMenuManager Instance;
+    public AudioSource sfx, music;
     public GameObject lobbiesContent, lobbyPrefab;
-    public AudioClip buhBye, musicStart, musicLoop; 
     bool quit, validName;
     public GameObject connecting;
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, passwordPrompt;
@@ -49,7 +48,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     private static readonly string roomNameChars = "BCDFGHJKLMNPRQSTVWXYZ";
 
-    Coroutine loopCoroutine, updatePingCoroutine;
+    Coroutine updatePingCoroutine;
 
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
@@ -262,8 +261,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             OpenReconnectBox((DisconnectCause) GlobalController.Instance.disconnectCause);
         }
 
-
-        AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
+        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
 
@@ -299,7 +297,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             region.value = index;
         }
 
-        PlaySong(musicLoop, musicStart);
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
 
@@ -342,32 +339,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             PhotonNetwork.Disconnect();
         }
-    }
-
-    private void PlaySong(AudioClip loop, AudioClip intro = null) {
-        //todo: this shit doesn't work consistently / with audio speedups / on webgl
-        if (loopCoroutine != null) {
-            StopCoroutine(loopCoroutine);
-            loopCoroutine = null;
-        }
-
-        musicSourceLoop.Stop();
-        musicSourceIntro.Stop();
-
-        musicSourceLoop.clip = loop;
-        musicSourceLoop.loop = true;
-        if (intro) {
-            musicSourceIntro.clip = intro;
-            musicSourceIntro.Play();
-            StartCoroutine(LoopMusic(musicSourceIntro, musicSourceLoop));
-        } else {
-            musicSourceLoop.Play();
-        }
-    }
-    IEnumerator LoopMusic(AudioSource intro, AudioSource loop) {
-        yield return new WaitUntil(() => intro.isPlaying);
-        loop.PlayDelayed(intro.clip.length - intro.time);
-        loopCoroutine = null;
     }
 
     IEnumerator UpdatePing() {
@@ -755,7 +726,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
 
         SetText(nameObject.Find("NameText").gameObject, (pl.IsMasterClient ? "<sprite=5>" : "") + characterString + pl.NickName);
-        SetText(nameObject.Find("PingText").gameObject, $"<color={pingColor}>ping</color>");
+        SetText(nameObject.Find("PingText").gameObject, $"<color={pingColor}>{ping}</color>");
     }
     
     public void GlobalChatMessage(string message, Vector3 color) {
@@ -867,10 +838,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         StartCoroutine(FinishQuitting());
     }
     IEnumerator FinishQuitting() {
-        sfx.PlayOneShot(buhBye);
+        AudioClip clip = Enums.Sounds.UI_Quit.GetClip();
+        sfx.PlayOneShot(clip);
         quit = true;
-        yield return new WaitForSeconds(buhBye.length);
+
+        yield return new WaitForSeconds(clip.length);
         Application.Quit();
+
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif

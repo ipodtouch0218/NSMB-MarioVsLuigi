@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    public AudioClip intro, loop, invincibleIntro, invincibleLoop, megaMushroomLoop, pauseSfx;
+    public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
@@ -44,7 +44,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public long startRealTime = -1, endRealTime = -1;
 
     //Audio
-    public AudioSource musicSourceIntro, musicSourceLoop, sfx;
+    public AudioSource music, sfx;
+    private LoopingMusic loopMusic;
     public Enums.MusicState? musicState = null;
 
     public GameObject localPlayer;
@@ -273,6 +274,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void Start() {
         Instance = this;
         SpectationManager = GetComponent<SpectationManager>();
+        loopMusic = GetComponent<LoopingMusic>();
 
 #if UNITY_EDITOR
         //Spawning in editor??
@@ -354,7 +356,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             yield return new WaitForSeconds(3.5f);
 
-            sfx.PlayOneShot((AudioClip) Resources.Load("Sound/startgame"));
+            sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
             if (PhotonNetwork.IsMasterClient)
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
@@ -387,18 +389,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     IEnumerator EndGame(Player winner) {
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
-        musicSourceIntro.Stop();
-        musicSourceLoop.Stop();
+        music.Stop();
+        music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
         text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.NickName } Wins!" : "It's a draw!";
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
 
-        AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
+        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
-        musicSourceLoop.PlayOneShot((AudioClip) Resources.Load("Sound/match-" + (winner != null && winner.IsLocal ? "win" : "lose")));
+
+        bool win = winner != null && winner.IsLocal;
+        music.PlayOneShot((win ? Enums.Sounds.UI_Match_Win : Enums.Sounds.UI_Match_Lose).GetClip());
         //TOOD: make a results screen?
 
         yield return new WaitForSecondsRealtime(4);
@@ -419,7 +423,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 //play hurry sound if time < 10 OR less than 10%
                 if (hurryup != true && (timeRemaining <= 10 || timeRemaining < (timedGameDuration * 0.2f))) {
                     hurryup = true;
-                    sfx.PlayOneShot((AudioClip) Resources.Load("Sound/hurry-up"));
+                    sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
                 }
                 if (timeRemaining - Time.deltaTime <= 0) {
                     CheckForWinner();
@@ -523,34 +527,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    private Coroutine loopCoroutine;
-    private void PlaySong(Enums.MusicState state, AudioClip loop, AudioClip intro = null) {
+    private void PlaySong(Enums.MusicState state, MusicData musicToPlay) {
         if (musicState == state) 
             return;
-        if (loopCoroutine != null) {
-            StopCoroutine(loopCoroutine);
-            loopCoroutine = null;
-        }
 
-        musicSourceLoop.Stop();
-        musicSourceIntro.Stop();
-
-        musicSourceLoop.clip = loop;
-        musicSourceLoop.loop = true;
-        if (intro) {
-            musicSourceIntro.clip = intro;
-            musicSourceIntro.Play();
-            StartCoroutine(LoopMusic(musicSourceIntro, musicSourceLoop));
-        } else {
-            musicSourceLoop.Play();
-        }
-
+        loopMusic.Play(musicToPlay);
         musicState = state;
-    }
-    IEnumerator LoopMusic(AudioSource intro, AudioSource loop) {
-        yield return new WaitUntil(() => intro.isPlaying);
-        loop.PlayDelayed(intro.clip.length - intro.time);
-        loopCoroutine = null;
     }
 
     void HandleMusic() {
@@ -570,14 +552,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         if (mega) {
-            PlaySong(Enums.MusicState.MegaMushroom, megaMushroomLoop);
+            PlaySong(Enums.MusicState.MegaMushroom, megaMushroomMusic);
         } else if (invincible) {
-            PlaySong(Enums.MusicState.Starman, invincibleLoop, invincibleIntro);
+            PlaySong(Enums.MusicState.Starman, invincibleMusic);
         } else {
-            PlaySong(Enums.MusicState.Normal, loop, intro);
+            PlaySong(Enums.MusicState.Normal, mainMusic);
         }
 
-        AudioMixer mixer = musicSourceLoop.outputAudioMixerGroup.audioMixer;
+        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         if (speedup) {
             mixer.SetFloat("MusicSpeed", 1.25f);
             mixer.SetFloat("MusicPitch", 1f / 1.25f);
@@ -609,7 +591,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             return;
 
         paused = !paused;
-        sfx.PlayOneShot(pauseSfx);
+        sfx.PlayOneShot(Enums.Sounds.UI_Pause.GetClip());
         Instance.pauseUI.SetActive(paused);
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }

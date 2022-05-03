@@ -55,8 +55,8 @@ public static class Enums {
         [SoundData("enemy/bobomb_explode")]             Enemy_Bobomb_Explode,
         [SoundData("enemy/bobomb_fuse")]                Enemy_Bobomb_Fuse,
         [SoundData("enemy/bulletbill_shoot")]           Enemy_BulletBill_Shoot,
-        [SoundData("enemy/pirahnaplant_chomp")]         Enemy_PirahnaPlant_Chomp = 7,
-        [SoundData("enemy/pirahnaplant_death")]         Enemy_PirahnaPlant_Death,
+        [SoundData("enemy/piranhaplant_chomp")]         Enemy_PiranhaPlant_Chomp = 7,
+        [SoundData("enemy/piranhaplant_death")]         Enemy_PiranhaPlant_Death,
 
         //Player
         [SoundData("player/collision")]                 Player_Sound_Collision,
@@ -103,6 +103,15 @@ public static class Enums {
         [SoundData("powerup/propellermushroom_kick")]   Powerup_PropellerMushroom_Kick,
         [SoundData("powerup/propellermushroom_spin")]   Powerup_PropellerMushroom_Spin,
         [SoundData("powerup/propellermushroom_start")]  Powerup_PropellerMushroom_Start,
+
+        //UI Sounds / Songs / Jingles
+        [SoundData("ui/hurry_up")]                      UI_HurryUp,
+        [SoundData("ui/loading")]                       UI_Loading,
+        [SoundData("ui/match_lose")]                    UI_Match_Lose,
+        [SoundData("ui/match_win")]                     UI_Match_Win,
+        [SoundData("ui/pause")]                         UI_Pause,
+        [SoundData("ui/quit")]                          UI_Quit,
+        [SoundData("ui/start_game")]                    UI_StartGame,
 
         //World Elements
         [SoundData("world/block_break")]                World_Block_Break,

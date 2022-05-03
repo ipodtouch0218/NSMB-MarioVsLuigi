@@ -5,6 +5,8 @@ using UnityEngine;
 public class PhysicsEntity : MonoBehaviour {
 
     private static int GROUND_LAYERID = -1;
+    
+    public bool goUpSlopes;
 
     public bool onGround, hitRoof, hitRight, hitLeft;
     public float floorAngle = 0;
@@ -52,7 +54,11 @@ public class PhysicsEntity : MonoBehaviour {
                 }
             }
         }
-        hitRight = hitRightCount >= 2;
-        hitLeft = hitLeftCount >= 2;
+        hitRight = hitRightCount >= 1;
+        hitLeft = hitLeftCount >= 1;
+    }
+
+    public void HandleSlopes() {
+
     }
 }

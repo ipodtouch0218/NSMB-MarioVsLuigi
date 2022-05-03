@@ -5087,10 +5087,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dead: 0
   frozen: 0
+  left: 1
   body: {fileID: 0}
   speed: 1.5
   playerSearchRadius: 12
-  left: 1
 --- !u!114 &473391894580253470
 MonoBehaviour:
   m_ObjectHideFlags: 0

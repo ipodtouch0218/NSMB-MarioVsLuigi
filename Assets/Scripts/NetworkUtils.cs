@@ -1,3 +1,4 @@
+using UnityEngine;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
 
@@ -19,7 +20,9 @@ public static class NetworkUtils {
 
     public static Hashtable DefaultRoomProperties {
         get {
-            return (Hashtable) _defaultRoomProperties.Clone();
+            Hashtable ret = new();
+            ret.Merge(_defaultRoomProperties);
+            return ret;
         }
         private set { }
     }

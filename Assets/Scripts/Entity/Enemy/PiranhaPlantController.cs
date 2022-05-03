@@ -74,7 +74,7 @@ public class PiranhaPlantController : KillableEntity {
 
         if (!wasFrozen) {
             PlaySound(Enums.Sounds.Enemy_Generic_Kick);
-            PlaySound(Enums.Sounds.Enemy_PirahnaPlant_Death);
+            PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
         } else {
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_FreezeShatter);
         }

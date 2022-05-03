@@ -166,7 +166,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         InputSystem.controls.Player.Movement.performed += OnMovement;
         InputSystem.controls.Player.Jump.performed += OnJump;
-        InputSystem.controls.Player.Sprint.performed += OnSprint;
+        InputSystem.controls.Player.Sprint.started += OnSprint;
+        InputSystem.controls.Player.Sprint.canceled += OnSprint;
         InputSystem.controls.Player.PowerupAction.performed += OnPowerupAction;
         InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
     }
@@ -571,7 +572,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public void OnSprint(InputAction.CallbackContext context) {
         if (!photonView.IsMine || GameManager.Instance.paused)
             return;
-        running = context.ReadValue<float>() >= 0.5f;
+
+        running = context.started;
 
         if (frozen) {
             photonView.RPC("FrozenStruggle", RpcTarget.All, false);

@@ -6,12 +6,17 @@ using Photon.Pun;
 using Photon.Realtime;
 using Discord;
 
+#pragma warning disable CS0162 // Unreachable code, but it isnt unreachable
 public class DiscordController : MonoBehaviour {
 
     public Discord.Discord discord;
     public ActivityManager activityManager;
 
     public void Awake() {
+#if UNITY_WEBGL
+        return;
+#endif
+
         discord = new Discord.Discord(962073502469459999, (ulong) CreateFlags.NoRequireDiscord);
         activityManager = discord.GetActivityManager();
         activityManager.OnActivityJoinRequest += AskToJoin;
@@ -38,6 +43,10 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void Update() {
+#if UNITY_WEBGL
+        return;
+#endif
+
         discord.RunCallbacks();
     }
 
@@ -46,6 +55,9 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void UpdateActivity() {
+#if UNITY_WEBGL
+        return;
+#endif
 
         Activity activity = new();
 
