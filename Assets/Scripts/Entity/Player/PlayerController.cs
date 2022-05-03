@@ -177,7 +177,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         InputSystem.controls.Player.Movement.performed -= OnMovement;
         InputSystem.controls.Player.Jump.performed -= OnJump;
-        InputSystem.controls.Player.Sprint.performed -= OnSprint;
+        InputSystem.controls.Player.Sprint.started -= OnSprint;
+        InputSystem.controls.Player.Sprint.canceled -= OnSprint;
         InputSystem.controls.Player.PowerupAction.performed -= OnPowerupAction;
         InputSystem.controls.Player.ReserveItem.performed -= OnReserveItem;
     }

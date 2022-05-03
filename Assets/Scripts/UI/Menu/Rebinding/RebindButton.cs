@@ -67,6 +67,7 @@ public class RebindButton : MonoBehaviour {
         if (cancel) {
             CancelRebind();
             MainMenuManager.Instance.rebindManager.SaveRebindings();
+            InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
         }
     }
 
