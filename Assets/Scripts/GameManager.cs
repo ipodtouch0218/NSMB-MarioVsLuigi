@@ -213,9 +213,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             body.angularVelocity = right ^ upsideDown ? -300 : 300;
 
             particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (upsideDown ? -1 : 1));
-
-            //TODO: find the right sound
-            sfx.PlayOneShot(Enums.Sounds.World_Block_Break.GetClip());
             break;
         }
         }

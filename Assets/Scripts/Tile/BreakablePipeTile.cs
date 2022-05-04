@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Photon.Pun;
 
 [CreateAssetMenu(fileName = "BreakablePipeTile", menuName = "ScriptableObjects/Tiles/BreakablePipeTile", order = 4)]
 public class BreakablePipeTile : InteractableTile {
@@ -83,6 +84,8 @@ public class BreakablePipeTile : InteractableTile {
 
         Vector3Int offset = upsideDownPipe ? Vector3Int.zero : pipeDirection * (tileHeight-1);
         BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector3Int.zero : Vector3Int.left), new Vector2Int(2, tileHeight), tiles);
+        
+        player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_MegaMushroom_Break_Pipe);
         return true;
     }
 

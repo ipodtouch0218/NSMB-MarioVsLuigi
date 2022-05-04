@@ -697,6 +697,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             groundpound = false;
             crouching = false;
             propeller = false;
+            usedPropellerThisJump = false;
             flying = false;
             drill = false;
             inShell = false;
@@ -741,6 +742,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             powerupFlash = 2;
             crouching |= ForceCrouchCheck();
             propeller = false;
+            usedPropellerThisJump = false;
             drill &= flying;
             propellerTimer = 0;
             
@@ -1072,7 +1074,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     protected void GiantFootstep() {
         cameraController.screenShakeTimer = 0.15f;
         SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position + new Vector2(facingRight ? 0.5f : -0.5f, 0));
-        //TODO: find stomp sound
+        PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte) (step ? 1 : 2));
+        step = !step;
     }
     protected void Footstep(int layer) {
         if ((state <= Enums.PowerupState.Small ? 0 : 1) != layer)

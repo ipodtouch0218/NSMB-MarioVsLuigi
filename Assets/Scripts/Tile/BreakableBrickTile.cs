@@ -9,13 +9,14 @@ public class BreakableBrickTile : InteractableTile {
     public Color particleColor;
     public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
     protected bool BreakBlockCheck(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
-        bool doBump = false, doBreak = false;
+        bool doBump = false, doBreak = false, giantBreak = false;
         if (interacter is PlayerController pl) {
             if (pl.state <= Enums.PowerupState.Small) {
                 doBreak = breakableBySmallMario;
                 doBump = true;
             } else if (pl.state == Enums.PowerupState.MegaMushroom) {
                 doBreak = breakableByGiantMario;
+                giantBreak = true;
                 doBump = false;
             } else if (pl.state >= Enums.PowerupState.Large) {
                 doBreak = breakableByLargeMario;
@@ -25,7 +26,7 @@ public class BreakableBrickTile : InteractableTile {
         } else if (interacter is SpinyWalk) {
             doBump = true;
             doBreak = breakableByShells;
-        } else if (interacter is KoopaWalk){
+        } else if (interacter is KoopaWalk) {
             doBump = true;
             doBreak = breakableByShells;
         } else if (interacter is BobombWalk) {
@@ -37,10 +38,10 @@ public class BreakableBrickTile : InteractableTile {
         if (doBump && !doBreak && bumpIfNotBroken) 
             BumpWithAnimation(interacter, direction, worldLocation);
         if (doBreak) 
-            Break(interacter, direction, worldLocation);
+            Break(interacter, worldLocation, giantBreak ? Enums.Sounds.Powerup_MegaMushroom_Break_Block : Enums.Sounds.World_Block_Break);
         return doBreak;
     }
-    public void Break(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
+    public void Break(MonoBehaviour interacter, Vector3 worldLocation, Enums.Sounds sound) {
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Tilemap
@@ -52,7 +53,7 @@ public class BreakableBrickTile : InteractableTile {
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         
         if (interacter is MonoBehaviourPun pun) {
-            pun.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Break);
+            pun.photonView.RPC("PlaySound", RpcTarget.All, sound);
         }
     }
     public void BumpWithAnimation(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
