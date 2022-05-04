@@ -7,11 +7,9 @@ public class StarBouncer : MonoBehaviourPun {
 
     private static int ANY_GROUND_MASK = -1;
     public bool stationary = true;
-    [SerializeField] float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f, sparkleSoundDistance = 4f;
+    [SerializeField] float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f;
     public float counter;
-    private Vector3 startingScale;
     public Rigidbody2D body;
-    private AudioSource sfx;
     private SpriteRenderer sRenderer;
     private Transform graphicTransform;
     public bool passthrough = true, left = true;
@@ -22,11 +20,9 @@ public class StarBouncer : MonoBehaviourPun {
     private bool alreadyCollectible;
 
     void Start() {
-        startingScale = transform.localScale;
         body = GetComponent<Rigidbody2D>();
         physics = GetComponent<PhysicsEntity>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
-        sfx = GetComponent<AudioSource>();
 
         graphicTransform = transform.Find("Graphic");
 
@@ -38,8 +34,11 @@ public class StarBouncer : MonoBehaviourPun {
             left = (bool) data[0];
             creator = (int) data[1];
             becomeCollectibleAt = (int) data[2];
+            body.isKinematic = false;
         } else {
+            GetComponent<Animator>().enabled = true;
             alreadyCollectible = true;
+            body.isKinematic = true;
         }
 
         GameObject trackObject = Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.Instance.transform);
@@ -56,14 +55,19 @@ public class StarBouncer : MonoBehaviourPun {
     }
 
     void Update() {
-        if (GameManager.Instance.localPlayer == null)
+        if (GameManager.Instance && GameManager.Instance.gameover)
             return;
 
-        Vector3 loc = GameManager.Instance.localPlayer.transform.position;
-        if (Mathf.Abs(loc.x - transform.position.x) > GameManager.Instance.levelWidthTile/4f) {
-            loc.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(loc.x - transform.position.x);
+        if (stationary) {
+            counter += Time.deltaTime;
+            float sin = Mathf.Sin(counter * pulseSpeed) * pulseAmount;
+            graphicTransform.localScale = Vector3.one * 3f + new Vector3(sin, sin, 0);
+            return;
         }
-        sfx.volume = Utils.QuadraticEaseOut(1 - Mathf.Clamp01(Vector2.Distance(loc, transform.position - (Vector3.down/2f)) / sparkleSoundDistance));
+
+        lifespan -= Time.deltaTime;
+        sRenderer.enabled = !(lifespan < 5 && lifespan * 2 % (blinkingSpeed * 2) < blinkingSpeed);
+        graphicTransform.Rotate(new Vector3(0, 0, rotationSpeed * 60 * (left ? 1 : -1) * Time.deltaTime), Space.Self);
     }
 
     void FixedUpdate() {
@@ -73,35 +77,19 @@ public class StarBouncer : MonoBehaviourPun {
             return;
         }
 
-        if (stationary) {
-            counter += Time.fixedDeltaTime;
-            float sin = Mathf.Sin(counter * pulseSpeed) * pulseAmount;
-            transform.localScale = startingScale + new Vector3(sin, sin, 0);
+        if (stationary)
             return;
-        } else {
-            body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), body.velocity.y);
-        }
+
+        body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), body.velocity.y);
 
         HandleCollision();
-
-        lifespan -= Time.fixedDeltaTime;
-        sRenderer.enabled = !(lifespan < 5 && lifespan * 2 % (blinkingSpeed * 2) < blinkingSpeed);
-        graphicTransform.Rotate(new Vector3(0, 0, rotationSpeed * (left ? 1 : -1)), Space.Self);
 
         if (passthrough && IsCollectible() && body.velocity.y <= 0 && !Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, ANY_GROUND_MASK)) {
             passthrough = false;
             gameObject.layer = LayerMask.NameToLayer("Entity");
         }
 
-        if (!photonView.IsMine || stationary) {
-            body.isKinematic = true;
-            return;
-        } else {
-            body.isKinematic = false;
-            transform.localScale = startingScale;
-        }
-
-        if (lifespan < 0 || (!passthrough && transform.position.y < GameManager.Instance.GetLevelMinY()))
+        if (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY()))
             photonView.RPC("Crushed", RpcTarget.All);
     }
 

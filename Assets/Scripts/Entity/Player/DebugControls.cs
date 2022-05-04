@@ -42,10 +42,8 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.Digit6, "BulletBill");
         DebugEntity(Key.Digit7, "Spiny");
 
-        DebugItem(Key.Digit8, "IceFlower");
-        FreezePlayer(Key.Digit9);
-        DebugWorldEntity(Key.Digit0, "FrozenCube");
-        specialSettings();
+        //FreezePlayer(Key.Digit9);
+        //DebugWorldEntity(Key.Digit0, "FrozenCube");
     }
 
     private void FreezePlayer(Key key) {
@@ -87,6 +85,7 @@ public class DebugControls : MonoBehaviour {
         }
     }
 
+    /*
     // The event zone 
 
     public void specialSettings() {
@@ -102,6 +101,5 @@ public class DebugControls : MonoBehaviour {
                 GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("RemoveTile", RpcTarget.All, pos.x, pos.y, pos.z);
         }
     }
-     
-
+    */
 }

@@ -52,7 +52,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public PlayerData character;
 
     //Tile data
-    TileBase currentTile;
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
     public bool doIceSkidding;
     private float tileFriction = 1;
@@ -147,6 +146,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out lives);
         if (lives != -1)
             lives++;
+
+        InputSystem.controls.Player.Movement.performed += OnMovement;
+        InputSystem.controls.Player.Jump.performed += OnJump;
+        InputSystem.controls.Player.Sprint.started += OnSprint;
+        InputSystem.controls.Player.Sprint.canceled += OnSprint;
+        InputSystem.controls.Player.PowerupAction.performed += OnPowerupAction;
+        InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
     }
 
 
@@ -159,19 +165,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (GlobalController.Instance.joinedAsSpectator)
             LoadFromGameState();
     }
-
-    public void OnEnable() {
-        if (!photonView.IsMine)
-            return;
-
-        InputSystem.controls.Player.Movement.performed += OnMovement;
-        InputSystem.controls.Player.Jump.performed += OnJump;
-        InputSystem.controls.Player.Sprint.started += OnSprint;
-        InputSystem.controls.Player.Sprint.canceled += OnSprint;
-        InputSystem.controls.Player.PowerupAction.performed += OnPowerupAction;
-        InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
-    }
-    public void OnDisable() {
+    
+    public void OnDestroy() {
         if (!photonView.IsMine)
             return;
 
@@ -826,25 +821,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     [PunRPC]
-    protected void RemoveTile(float x, float y, float z) {
-        Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(x, y, z));
-        Vector3Int tileLoc = Utils.WorldToTilemapPosition(pos);
-        GameManager.Instance.tilemap.SetTile(tileLoc, null);
-    }
-
-    [PunRPC]
-    protected void PlaceTile(float x, float y, float z) {
-        
-        //Debug.Log(string.Format("Co-ords of mouse is [X: {0} Y: {0}]", pos.x, pos.y));
-
-        Vector3Int tileLoc = Utils.WorldToTilemapPosition(new Vector3(x, y, z));
-        if (GameManager.Instance.tilemap.GetTile(tileLoc) == null)
-            GameManager.Instance.tilemap.SetTile(tileLoc, currentTile);
-        else
-            currentTile = GameManager.Instance.tilemap.GetTile(tileLoc);
-    }
-
-    [PunRPC]
     protected void FrozenStruggle(bool movement = false) {
         // FrozenStruggle is called by OnJump and that is called everytime jump is pushed or letgo so I just put a 4 there.
         if (unfreezeTimer > 0) {
@@ -1363,7 +1339,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 floorAngle = 0;
             }
         }
-        if (joystick.x == 0 && !inShell && !sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle && state != Enums.PowerupState.MegaMushroom) {
+        if (joystick.x == 0 && !inShell && !sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2 && state != Enums.PowerupState.MegaMushroom) {
             //steep slope, continously walk downwards
             float autowalkMaxSpeed = floorAngle / 30;
             if (Mathf.Abs(body.velocity.x) > autowalkMaxSpeed)

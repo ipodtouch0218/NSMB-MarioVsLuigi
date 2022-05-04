@@ -4840,6 +4840,7 @@ GameObject:
   - component: {fileID: 7896063384542606738}
   - component: {fileID: 4404708631857811697}
   - component: {fileID: 858852620204674597}
+  - component: {fileID: 7013426154861581906}
   m_Layer: 9
   m_Name: BigStar
   m_TagString: bigstar
@@ -4856,7 +4857,7 @@ Transform:
   m_GameObject: {fileID: 1973747262660636106}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1973747262981084695}
@@ -4886,7 +4887,6 @@ MonoBehaviour:
   deathBoostAmount: 8.75
   blinkingSpeed: 0.25
   lifespan: 15
-  sparkleSoundDistance: 6
   counter: 0
   body: {fileID: 0}
   passthrough: 0
@@ -5018,9 +5018,9 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &1973747262660636111
 BoxCollider2D:
@@ -5046,7 +5046,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.2, y: 0.2}
+  m_Size: {x: 0.75, y: 0.75}
   m_EdgeRadius: 0
 --- !u!114 &1973747262660636098
 MonoBehaviour:
@@ -5140,6 +5140,26 @@ MonoBehaviour:
   soundOrigin: {fileID: 1973747262660636105}
   audioSources:
   - {fileID: 7844204986304545686}
+--- !u!95 &7013426154861581906
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 792875bb6c2ba694dbee1b5cef493baa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1973747262981084694
 GameObject:
   m_ObjectHideFlags: 0
@@ -5197,7 +5217,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.3, y: 0.3}
+  m_Size: {x: 0.9, y: 0.9}
   m_EdgeRadius: 0
 --- !u!114 &3770681904034704963
 MonoBehaviour:
@@ -5237,7 +5257,7 @@ Transform:
   m_GameObject: {fileID: 9209823662088345179}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1973747262660636105}

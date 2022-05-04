@@ -10,12 +10,16 @@ public class TrackIcon : MonoBehaviour {
     private PlayerController playerTarget;
     public Color outlineColor;
     Image image;
+    public bool doAnimation;
     public Sprite starSprite;
     private float flashTimer;
     void Start() {
         image = GetComponent<Image>();
-    }
 
+        StarBouncer star;
+        if (star = target.GetComponent<StarBouncer>())
+            GetComponent<Animator>().enabled = star.stationary;
+    }
     void Update() {
         if (target == null) {
             Destroy(gameObject);

@@ -9,7 +9,7 @@ public class CameraController : MonoBehaviour {
     public Vector3 currentPosition;
     
     private Vector2 airThreshold = new(0.5f, 1.3f), groundedThreshold = new(0.5f, 0f);
-    private Vector2 airOffset = new(0, .65f), groundedOffset = new(0, 1.015f);
+    private Vector2 airOffset = new(0, .65f), groundedOffset = new(0, 1.3f);
 
     private Vector3 smoothDampVel;
     private Camera targetCamera;
@@ -81,15 +81,14 @@ public class CameraController : MonoBehaviour {
         float yDifference = Vector2.Distance(Vector2.up * currentPosition.y, Vector2.up * playerPos.y);
 
         Vector3 newPosition = currentPosition;
-        bool right = currentPosition.x > playerPos.x;
-        bool up = currentPosition.y > playerPos.y;
+        bool right = newPosition.x > playerPos.x;
+        bool up = newPosition.y > playerPos.y;
         if (xDifference >= 8) {
-            Debug.Log("wrap");
             newPosition.x += (right ? -1 : 1) * GameManager.Instance.levelWidthTile / 2f;
             xDifference = Vector2.Distance(Vector2.right * newPosition.x, Vector2.right * playerPos.x);
-            if (controlCamera) {
+            right = newPosition.x > playerPos.x;
+            if (controlCamera)
                 BackgroundLoop.Instance.wrap = true;
-            }
         }
         if (xDifference > threshold.x) {
             newPosition.x += (threshold.x - xDifference - 0.01f) * (right ? 1 : -1);
@@ -101,13 +100,13 @@ public class CameraController : MonoBehaviour {
         currentPosition.x = newPosition.x;
         Vector3 targetPos = Vector3.SmoothDamp(currentPosition, newPosition, ref smoothDampVel, 0.25f);
 
-        if ((screenShakeTimer -= Time.deltaTime) > 0) 
-            targetPos += new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
-
         float vOrtho = targetCamera.orthographicSize;
         float hOrtho = vOrtho * targetCamera.aspect;
         targetPos.x = Mathf.Clamp(targetPos.x, minX + hOrtho, maxX - hOrtho);
         targetPos.y = Mathf.Clamp(targetPos.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
+
+        if ((screenShakeTimer -= Time.deltaTime) > 0)
+            targetPos += new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
 
         targetPos = AntiJitter(targetPos);
         targetPos.z = startingZ;
