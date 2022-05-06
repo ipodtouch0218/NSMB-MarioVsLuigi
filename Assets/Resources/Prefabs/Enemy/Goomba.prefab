@@ -133,7 +133,7 @@ Rigidbody2D:
   m_Mass: 0.091181055
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 2.2
+  m_GravityScale: 3
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -181,8 +181,9 @@ MonoBehaviour:
   frozen: 0
   left: 1
   body: {fileID: 0}
-  speed: 0.6
+  speed: 0.875
   deathTimer: 0.5
+  terminalVelocity: -8
 --- !u!114 &8698039766182409506
 MonoBehaviour:
   m_ObjectHideFlags: 0

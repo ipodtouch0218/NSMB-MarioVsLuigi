@@ -12,7 +12,7 @@ public class StarBouncer : MonoBehaviourPun {
     public Rigidbody2D body;
     private SpriteRenderer sRenderer;
     private Transform graphicTransform;
-    public bool passthrough = true, left = true;
+    public bool passthrough = true, left = true, fast = false;
     private PhysicsEntity physics;
     public int creator = -1;
 
@@ -31,7 +31,9 @@ public class StarBouncer : MonoBehaviourPun {
             stationary = false;
             passthrough = true;
             gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-            left = (bool) data[0];
+            int direction = (int) data[0];
+            left = direction <= 1;
+            fast = direction == 0 || direction == 3;
             creator = (int) data[1];
             becomeCollectibleAt = (int) data[2];
             body.isKinematic = false;
@@ -39,6 +41,8 @@ public class StarBouncer : MonoBehaviourPun {
             GetComponent<Animator>().enabled = true;
             alreadyCollectible = true;
             body.isKinematic = true;
+            body.velocity = Vector2.zero;
+            becomeCollectibleAt = PhotonNetwork.ServerTimestamp;
         }
 
         GameObject trackObject = Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.Instance.transform);
@@ -67,7 +71,7 @@ public class StarBouncer : MonoBehaviourPun {
 
         lifespan -= Time.deltaTime;
         sRenderer.enabled = !(lifespan < 5 && lifespan * 2 % (blinkingSpeed * 2) < blinkingSpeed);
-        graphicTransform.Rotate(new Vector3(0, 0, rotationSpeed * 60 * (left ? 1 : -1) * Time.deltaTime), Space.Self);
+        graphicTransform.Rotate(new Vector3(0, 0, rotationSpeed * 30 * (left ? 1 : -1) * Time.deltaTime), Space.Self);
     }
 
     void FixedUpdate() {
@@ -80,13 +84,20 @@ public class StarBouncer : MonoBehaviourPun {
         if (stationary)
             return;
 
-        body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new Vector2(moveSpeed * (left ? -1 : 1) * (fast ? 1.5f : 1f), body.velocity.y);
 
         HandleCollision();
 
         if (passthrough && IsCollectible() && body.velocity.y <= 0 && !Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, ANY_GROUND_MASK)) {
             passthrough = false;
             gameObject.layer = LayerMask.NameToLayer("Entity");
+        }
+        if (!passthrough) {
+            if (Utils.IsTileSolidAtWorldLocation(body.position)) {
+                gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+            } else {
+                gameObject.layer = LayerMask.NameToLayer("Entity");
+            }
         }
 
         if (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY()))
@@ -119,6 +130,6 @@ public class StarBouncer : MonoBehaviourPun {
     }
 
     public bool IsCollectible() {
-        return alreadyCollectible || PhotonNetwork.ServerTimestamp - becomeCollectibleAt > 0;
+        return becomeCollectibleAt != 0 && (alreadyCollectible || PhotonNetwork.ServerTimestamp - becomeCollectibleAt > 0);
     }
 }

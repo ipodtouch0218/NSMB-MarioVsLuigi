@@ -29,6 +29,10 @@ public class BreakablePipeTile : InteractableTile {
         Vector3Int pipeDirection = upsideDownPipe ? Vector3Int.up : Vector3Int.down;
         Vector3Int hat = origin - (pipeDirection * (height - 1));
 
+        if (ourLocation.y == GameManager.Instance.levelMinTileY + 1)
+            //exception: dont break out of bounds.
+            return false;
+
         int tileHeight;
         bool shrink = false;
         bool addHat = true;

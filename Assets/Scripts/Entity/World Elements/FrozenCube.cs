@@ -199,7 +199,7 @@ public class FrozenCube : HoldableEntity {
     }
 
     [PunRPC]
-    public override void Kick(bool fromLeft, bool groundpound) {
+    public override void Kick(bool fromLeft, float kickFactor, bool groundpound) {
     }
     [PunRPC]
     public override void Throw(bool facingLeft, bool crouch) {

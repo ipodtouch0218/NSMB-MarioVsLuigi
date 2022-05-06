@@ -723,7 +723,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PlayerData data = GlobalController.Instance.characters[dropdown.value];
         
-        sfx.PlayOneShot((AudioClip) Resources.Load("Sound/" + data.soundFolder + "/selected"));
+        sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
     }
 
     public void SwapPrimaryColor(TMP_Dropdown dropdown) {

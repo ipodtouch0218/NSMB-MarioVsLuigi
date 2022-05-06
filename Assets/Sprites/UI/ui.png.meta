@@ -162,7 +162,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 13
-        y: 20
+        y: 32
         width: 11
         height: 13
       alignment: 0
@@ -183,7 +183,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 26
-        y: 20
+        y: 32
         width: 11
         height: 13
       alignment: 0
@@ -204,7 +204,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 12
         width: 20
         height: 20
       alignment: 0
@@ -225,7 +225,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 20
-        y: 0
+        y: 12
         width: 20
         height: 20
       alignment: 0
@@ -246,7 +246,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 40
-        y: 0
+        y: 12
         width: 21
         height: 20
       alignment: 0
@@ -267,7 +267,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 20
+        y: 32
         width: 13
         height: 13
       alignment: 0
@@ -288,7 +288,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 39
-        y: 20
+        y: 32
         width: 13
         height: 13
       alignment: 0
@@ -309,7 +309,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 52
-        y: 20
+        y: 32
         width: 13
         height: 13
       alignment: 0
@@ -330,7 +330,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 65
-        y: 20
+        y: 32
         width: 13
         height: 13
       alignment: 0
@@ -351,7 +351,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 78
-        y: 20
+        y: 32
         width: 13
         height: 13
       alignment: 0
@@ -367,6 +367,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: ui_9
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 7
+        width: 23
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0c39fd34d8dd1ee45afb517601e16215
+      internalID: 1346584908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -378,6 +399,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      ui_9: 1346584908
       ui_4: -7975249404588759376
       ui_0: 5707218116961789024
       ui_3: 7263181891274304025

@@ -7,18 +7,18 @@ using Photon.Pun;
 public class BreakableBrickTile : InteractableTile {
     [ColorUsage(false)]
     public Color particleColor;
-    public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
+    public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true, specialBreak = false;
     protected bool BreakBlockCheck(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         bool doBump = false, doBreak = false, giantBreak = false;
         if (interacter is PlayerController pl) {
-            if (pl.state <= Enums.PowerupState.Small) {
+            if (pl.state <= Enums.PowerupState.Small && !pl.drill) {
                 doBreak = breakableBySmallMario;
                 doBump = true;
             } else if (pl.state == Enums.PowerupState.MegaMushroom) {
                 doBreak = breakableByGiantMario;
                 giantBreak = true;
                 doBump = false;
-            } else if (pl.state >= Enums.PowerupState.Large) {
+            } else if (pl.state >= Enums.PowerupState.Large || pl.drill) {
                 doBreak = breakableByLargeMario;
                 doBump = true;
             }
@@ -38,7 +38,7 @@ public class BreakableBrickTile : InteractableTile {
         if (doBump && !doBreak && bumpIfNotBroken) 
             BumpWithAnimation(interacter, direction, worldLocation);
         if (doBreak) 
-            Break(interacter, worldLocation, giantBreak ? Enums.Sounds.Powerup_MegaMushroom_Break_Block : Enums.Sounds.World_Block_Break);
+            Break(interacter, worldLocation, giantBreak && specialBreak ? Enums.Sounds.Powerup_MegaMushroom_Break_Block : Enums.Sounds.World_Block_Break);
         return doBreak;
     }
     public void Break(MonoBehaviour interacter, Vector3 worldLocation, Enums.Sounds sound) {

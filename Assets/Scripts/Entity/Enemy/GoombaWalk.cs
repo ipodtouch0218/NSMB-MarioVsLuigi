@@ -4,7 +4,8 @@ using UnityEngine;
 using Photon.Pun;
 
 public class GoombaWalk : KillableEntity {
-    [SerializeField] float speed, deathTimer;
+    [SerializeField] float speed, deathTimer, terminalVelocity = -8;
+
     new void Start() {
         base.Start();
         body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
@@ -24,7 +25,7 @@ public class GoombaWalk : KillableEntity {
         if (physics.hitLeft || physics.hitRight) {
             left = physics.hitRight;
         }
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
         sRenderer.flipX = !left;
 
         if (photonView && !photonView.IsMine) {

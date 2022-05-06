@@ -462,7 +462,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     remainingSpawns.RemoveAt(index);
                     if (musicEnabled)
                         sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
-                    spawnStarCount = 16f - PhotonNetwork.CurrentRoom.PlayerCount;
+                    spawnStarCount = 10.4f - (PhotonNetwork.CurrentRoom.PlayerCount / 5f);
                 }
             } else {
                 currentStar = GameObject.FindGameObjectWithTag("bigstar");

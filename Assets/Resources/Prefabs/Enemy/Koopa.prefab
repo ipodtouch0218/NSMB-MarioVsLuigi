@@ -183,14 +183,13 @@ MonoBehaviour:
   holder: {fileID: 0}
   previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
-  walkSpeed: 0.6
-  kickSpeed: 6
+  walkSpeed: 0.875
+  kickSpeed: 5
   wakeup: 15
   red: 0
   blue: 0
   shell: 0
   stationary: 0
-  hardkick: 0
   upsideDown: 0
   canBeFlipped: 1
   flipXFlip: 0

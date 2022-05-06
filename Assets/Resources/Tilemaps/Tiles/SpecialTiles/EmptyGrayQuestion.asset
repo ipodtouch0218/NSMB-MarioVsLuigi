@@ -27,3 +27,4 @@ MonoBehaviour:
   breakableByBombs: 1
   bumpIfNotBroken: 0
   bumpIfBroken: 0
+  specialBreak: 1

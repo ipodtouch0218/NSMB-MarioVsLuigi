@@ -124,7 +124,7 @@ public class BobombWalk : HoldableEntity {
     }
 
     [PunRPC]
-    public override void Kick(bool fromLeft, bool groundpound) {
+    public override void Kick(bool fromLeft, float speed, bool groundpound) {
         left = !fromLeft;
         sRenderer.flipX = left;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);

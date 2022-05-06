@@ -4882,15 +4882,16 @@ MonoBehaviour:
   pulseAmount: 0.15
   pulseSpeed: 16
   moveSpeed: 1.5
-  rotationSpeed: 3
+  rotationSpeed: 6
   bounceAmount: 7
-  deathBoostAmount: 8.75
+  deathBoostAmount: 10
   blinkingSpeed: 0.25
   lifespan: 15
   counter: 0
   body: {fileID: 0}
   passthrough: 0
   left: 1
+  fast: 0
   creator: -1
 --- !u!82 &7844204986304545686
 AudioSource:
@@ -5009,14 +5010,14 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1973747262660636106}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 1.3
   m_Material: {fileID: 0}
   m_Interpolate: 1
   m_SleepingMode: 1

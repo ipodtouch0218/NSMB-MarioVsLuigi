@@ -31,4 +31,5 @@ MonoBehaviour:
   breakableByBombs: 1
   bumpIfNotBroken: 1
   bumpIfBroken: 0
+  specialBreak: 1
   resultTile: SpecialTiles/EmptyYellowQuestion

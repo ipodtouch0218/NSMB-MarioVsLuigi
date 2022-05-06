@@ -56,8 +56,14 @@ public class CameraController : MonoBehaviour {
         float floorRange = 3f;
         validGround = body.position.y + (Time.fixedDeltaTime * body.velocity.y) - floorHeight < floorRange && body.position.y - floorHeight > -.5f;
 
-        RaycastHit2D hit;
+        if (controller.flying && body.velocity.y > 0)
+            validGround = false;
+
+        if (!validGround || controller.dead || controller.flying) {
+            playerPos.y += 24 * Time.fixedDeltaTime * body.velocity.y * (controller.dead ? 0.5f : 1f);
+        }
         if (!controller.dead) {
+            RaycastHit2D hit;
             if (validGround) {
                 playerPos.y = floorHeight;
             } else if (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, 1f, PlayerController.ANY_GROUND_MASK)) {
@@ -65,9 +71,6 @@ public class CameraController : MonoBehaviour {
                 playerPos.y = floorHeight;
                 validGround = true;
             }
-        }
-        if (!validGround || controller.dead || controller.flying) {
-            playerPos.y += 24 * Time.fixedDeltaTime * body.velocity.y * (controller.dead ? 0.5f : 1f);
         }
 
         Vector2 threshold = (controller.onGround || validGround) ? groundedThreshold : airThreshold;
