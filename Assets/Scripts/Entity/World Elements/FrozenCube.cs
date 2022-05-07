@@ -53,7 +53,7 @@ public class FrozenCube : HoldableEntity {
         }
     }
 
-    void FixedUpdate() {
+    new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -61,6 +61,7 @@ public class FrozenCube : HoldableEntity {
             body.isKinematic = true;
             return;
         }
+        base.FixedUpdate();
 
         body.mass = holder != null ? 0 : 1;
 
@@ -228,7 +229,7 @@ public class FrozenCube : HoldableEntity {
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collider) {
+    new void OnTriggerEnter2D(Collider2D collider) {
         if ((photonView && !photonView.IsMine) || dead)
             return;
 

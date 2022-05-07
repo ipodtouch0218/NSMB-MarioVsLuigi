@@ -18,7 +18,7 @@ public class BobombWalk : HoldableEntity {
         physics = GetComponent<PhysicsEntity>();
     }
 
-    void FixedUpdate() {
+    new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -26,6 +26,7 @@ public class BobombWalk : HoldableEntity {
             body.isKinematic = true;
             return;
         }
+        base.FixedUpdate();
 
         if (!photonView || photonView.IsMine)
             HandleCollision();
@@ -145,7 +146,7 @@ public class BobombWalk : HoldableEntity {
                 photonView.RPC("Light", RpcTarget.All);
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom) {
-                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.runningMaxSpeed, player.groundpound);
             } else {
                 player.bounce = true;
                 player.groundpound = false;
@@ -157,7 +158,7 @@ public class BobombWalk : HoldableEntity {
                         photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                         player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
                     } else {
-                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.runningMaxSpeed, player.groundpound);
                     }
                 }
             } else if (player.hitInvincibilityCounter <= 0) {

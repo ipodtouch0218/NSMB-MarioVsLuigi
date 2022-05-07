@@ -10631,6 +10631,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 1
     Name: knockforwards
+  - Type: 4
+    SynchronizeType: 0
+    Name: blueshell
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

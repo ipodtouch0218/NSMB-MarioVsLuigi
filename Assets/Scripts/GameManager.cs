@@ -220,7 +220,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     // ROOM CALLBACKS
     public void OnJoinedRoom() { }
-    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) { }
+    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {
+        foreach (PlayerController players in allPlayers) {
+            if (players == null)
+                continue;
+
+            if (players.photonView.Owner == player)
+                players.LoadFromGameState();
+        }
+    }
     public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) { }
 
     public void OnMasterClientSwitched(Player newMaster) {
@@ -237,7 +245,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         //SYNCHRONIZE TILEMAPS
         if (PhotonNetwork.IsMasterClient) {
             ExitGames.Client.Photon.Hashtable changes = Utils.GetTilemapChanges(originalTiles, origin, tilemap);
-            Debug.Log(changes);
             RaiseEventOptions options = new() { CachingOption = EventCaching.DoNotCache, TargetActors = new int[]{ newPlayer.ActorNumber } };
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SyncTilemap, changes, options, SendOptions.SendReliable);
         }
@@ -373,8 +380,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         startServerTime = PhotonNetwork.ServerTimestamp;
         startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
         if (timedGameDuration > 0) {
-            endServerTime = startTimestamp + timedGameDuration * 1000;
-            endRealTime = startRealTime + timedGameDuration * 1000;
+            endServerTime = startTimestamp + 4500 + timedGameDuration * 1000;
+            endRealTime = startRealTime + 4500 + timedGameDuration * 1000;
         }
 
         GlobalController.Instance.discordController.UpdateActivity();
@@ -403,12 +410,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         //TOOD: make a results screen?
 
         yield return new WaitForSecondsRealtime(4);
+        PhotonNetwork.DestroyAll();
         SceneManager.LoadScene("MainMenu");
     }
 
     public void Update() {
-        //input.enabled = localPlayer == null;
-
         if (gameover)
             return;
 

@@ -163,8 +163,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         transform.position = body.position = GameManager.Instance.spawnpoint;
         cameraController.Recenter();
 
-        if (GlobalController.Instance.joinedAsSpectator)
-            LoadFromGameState();
+        LoadFromGameState();
     }
     
     public void OnDestroy() {
@@ -188,7 +187,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         };
     }
     
-    private void LoadFromGameState() {
+    public void LoadFromGameState() {
         if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not ExitGames.Client.Photon.Hashtable gs)
             return;
 
@@ -421,7 +420,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                         body.velocity = new Vector2(-body.velocity.x, body.velocity.y);
                     }
                     return;
-                } else if (!otherAbove && onGround && other.onGround && contact.normalImpulse > .3f) {
+                } else if (!otherAbove && onGround && other.onGround && Mathf.Abs(previousFrameVelocity.x) > walkingMaxSpeed - 0.5) {
                     //bump?
 
                     otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
@@ -506,15 +505,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     protected void OnTriggerStay2D(Collider2D collider) {
+        GameObject obj = collider.gameObject;
+        if (obj.CompareTag("spinner")) {
+            onSpinner = obj;
+            return;
+        }
+
         if (!photonView.IsMine || dead || frozen)
             return;
 
-        GameObject obj = collider.gameObject;
         switch (obj.tag) {
-        case "spinner": {
-            onSpinner = obj;
-            break;
-        }
         case "Powerup": {
             if (!photonView.IsMine)
                 return;
@@ -609,7 +609,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/FireballWall", pos);
             } else {
-                PhotonNetwork.Instantiate("Prefabs/Fireball", pos, Quaternion.identity, 0, new object[] { !facingRight });
+                PhotonNetwork.Instantiate("Prefabs/Fireball", pos, Quaternion.identity, 0, new object[] { !facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") });
             }
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_Fireball_Shoot);
             
@@ -626,11 +626,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     return;
             }
 
-            Vector2 pos = body.position + new Vector2(facingRight ? 0.5f : -0.5f, 0.5f);
+            Vector2 pos = body.position + new Vector2(facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.5f);
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/IceballWall", pos);
             } else {
-                PhotonNetwork.Instantiate("Prefabs/Iceball", pos, Quaternion.identity, 0, new object[] { !facingRight });
+                PhotonNetwork.Instantiate("Prefabs/Iceball", pos, Quaternion.identity, 0, new object[] { !facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") });
             }
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_Iceball_Shoot);
             animator.SetTrigger("fireball");
@@ -751,6 +751,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 PlaySound(powerup.soundEffect);
         }
 
+        UpdateGameState();
+
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         Destroy(view.gameObject);
@@ -802,7 +804,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     [PunRPC]
     protected void Freeze() {
-        if (knockback || hitInvincibilityCounter > 0 || frozen)
+        if (knockback || hitInvincibilityCounter > 0 || frozen || state == Enums.PowerupState.BlueShell)
             return;
         if (invincible > 0) {
             Instantiate(Resources.Load("Prefabs/Particle/IceBreak"), transform.position, Quaternion.identity);
@@ -871,6 +873,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
         PlaySoundEverywhere(photonView.IsMine ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
 
+        UpdateGameState();
+
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         DestroyImmediate(star);
@@ -897,21 +901,19 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), position, Quaternion.identity);
 
+        PlaySound(Enums.Sounds.World_Coin_Collect);
+        GameObject num = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity);
+        num.GetComponentInChildren<NumberParticle>().SetSprite(coins);
+        Destroy(num, 1.5f);
+
         coins++;
         if (coins >= 8) {
             coins = 0;
-            if (photonView.IsMine) {
+            if (photonView.IsMine) 
                 SpawnItem();
-                photonView.RPC("SetCoins", RpcTarget.Others, coins); //just in case.
-            }
         }
 
-        PlaySound(Enums.Sounds.World_Coin_Collect);
-        GameObject num = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity);
-        Animator anim = num.GetComponentInChildren<Animator>();
-        anim.SetInteger("number", coins <= 0 ? 8 : coins);
-        anim.SetTrigger("ready");
-        Destroy(num, 1.5f);
+        UpdateGameState();
     }
 
     public void SpawnItem(Powerup item = null) {
@@ -1781,7 +1783,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     bool HandleStuckInBlock() {
-        if (!body || hitboxes == null)
+        if (!body || hitboxes[0] == null)
             return false;
         Vector2 checkPos = body.position + new Vector2(0, hitboxes[0].size.y / 4f);
         if (!Utils.IsTileSolidAtWorldLocation(checkPos)) {

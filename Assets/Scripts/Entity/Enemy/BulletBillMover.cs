@@ -26,7 +26,7 @@ public class BulletBillMover : KillableEntity {
         sRenderer.flipX = !left;
     }
 
-    void FixedUpdate() {
+    new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;

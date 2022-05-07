@@ -48,7 +48,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
     void HandleAnimations() {
         Vector3 targetEuler = models.transform.eulerAngles;
-        bool instant = false;
+        bool instant = false, changeFacing = false;
         if (!controller.knockback && !GameManager.Instance.gameover) {
             if (controller.dead) {
                 if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
@@ -74,6 +74,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.holding) {
                     targetEuler += new Vector3(0, -1800, 0) * Time.deltaTime;
                     instant = true;
+                    changeFacing = true;
                 } else if (controller.flying || controller.propeller) {
                     targetEuler += new Vector3(0, -1200 - (controller.propellerTimer * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer <= 0 && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
                     instant = true;
@@ -94,6 +95,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 z += Mathf.Clamp(targetEuler.z - z, -maxRotation, maxRotation);
                 models.transform.rotation = Quaternion.Euler(x, y, z);
             }
+
+            if (changeFacing)
+                controller.facingRight = models.transform.eulerAngles.y < 180; 
         }
 
         //Particles
@@ -175,6 +179,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             animator.SetBool("head carry", controller.holding != null && controller.holding.GetComponent<FrozenCube>() != null);
             animator.SetBool("knockback", controller.knockback);
             animator.SetBool("pipe", controller.pipeEntering != null);
+            animator.SetBool("blueshell", controller.state == Enums.PowerupState.BlueShell);
             animator.SetBool("mini", controller.state == Enums.PowerupState.MiniMushroom);
             animator.SetBool("mega", controller.state == Enums.PowerupState.MegaMushroom);
             animator.SetBool("flying", controller.flying);

@@ -21856,6 +21856,8 @@ MonoBehaviour:
   onGround: 0
   crushGround: 0
   doGroundSnap: 0
+  jumping: 0
+  properJump: 0
   hitRoof: 0
   skidding: 0
   turnaround: 0
@@ -22256,6 +22258,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 0
     Name: head carry
+  - Type: 4
+    SynchronizeType: 0
+    Name: blueshell
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

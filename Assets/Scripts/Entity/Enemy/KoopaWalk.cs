@@ -27,7 +27,7 @@ public class KoopaWalk : HoldableEntity {
         body.velocity = new Vector2(-walkSpeed, 0);
     }
 
-    void FixedUpdate() {
+    new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -35,6 +35,7 @@ public class KoopaWalk : HoldableEntity {
             body.isKinematic = true;
             return;
         }
+        base.FixedUpdate();
 
         if (frozen)
             return;
@@ -57,14 +58,6 @@ public class KoopaWalk : HoldableEntity {
             }
         }
 
-        if (photonView && !photonView.IsMine)
-            return;
-
-        HandleTile();
-        animator.SetBool("shell", shell || holder != null);
-        if (!blue)
-            animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
-
         if (shell) {
             if (stationary) {
                 if (physics.onGround)
@@ -77,6 +70,15 @@ public class KoopaWalk : HoldableEntity {
                 wakeupTimer = wakeup;
             }
         }
+
+        if (photonView && !photonView.IsMine)
+            return;
+
+        HandleTile();
+        animator.SetBool("shell", shell || holder != null);
+        if (!blue)
+            animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
+
 
         if (physics.onGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, GROUND_AND_SEMISOLIDS_LAYER_ID) && red && !shell) {
             Vector3 redCheckPos = body.position + new Vector2(0.1f * (left ? -1 : 1), 0);
@@ -211,9 +213,14 @@ public class KoopaWalk : HoldableEntity {
         stationary = true;
     }
 
-    void OnTriggerEnter2D(Collider2D collider) {
+    public new void OnTriggerEnter2D(Collider2D collider) {
+        if (!shell)
+            base.OnTriggerEnter2D(collider);
+
         if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown || dead)
             return;
+
+
 
         GameObject obj = collider.gameObject;
         KillableEntity killa = obj.GetComponentInParent<KillableEntity>();

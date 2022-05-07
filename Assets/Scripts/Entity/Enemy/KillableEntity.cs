@@ -21,6 +21,25 @@ public abstract class KillableEntity : MonoBehaviourPun {
         physics = GetComponent<PhysicsEntity>();
     }
 
+    public void FixedUpdate() {
+        if (dead || !photonView || !GameManager.Instance || !photonView.IsMine)
+            return;
+
+        if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
+            photonView.RPC("SpecialKill", RpcTarget.All, left, false);
+    }
+
+    public void OnTriggerEnter2D(Collider2D collider) {
+        if (!photonView.IsMine || !collider.GetComponentInParent<KillableEntity>())
+            return;
+
+        bool goLeft = body.position.x < collider.attachedRigidbody.position.x;
+        if (body.position.x == collider.attachedRigidbody.position.x) {
+            goLeft = body.position.y > collider.attachedRigidbody.position.y;
+        }
+        photonView.RPC("SetLeft", RpcTarget.All, goLeft);
+    }
+
     public virtual void InteractWithPlayer(PlayerController player) {
         if (player.frozen)
             return;

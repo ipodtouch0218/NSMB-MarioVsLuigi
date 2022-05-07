@@ -12,7 +12,7 @@ public class GoombaWalk : KillableEntity {
         animator.SetBool("dead", false);
     }
 
-    void FixedUpdate() {
+    new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -20,6 +20,7 @@ public class GoombaWalk : KillableEntity {
             body.isKinematic = true;
             return;
         }
+        base.FixedUpdate();
 
         physics.UpdateCollisions();
         if (physics.hitLeft || physics.hitRight) {

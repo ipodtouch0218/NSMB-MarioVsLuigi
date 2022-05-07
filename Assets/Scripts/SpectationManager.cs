@@ -45,7 +45,9 @@ public class SpectationManager : MonoBehaviour {
         spectationUI.SetActive(Spectating);
         if (!Spectating)
             return;
-
+        if (!TargetPlayer)
+            return;
+        
         spectatingText.text = $"Spectating: { TargetPlayer.photonView.Owner.NickName }";
     }
     

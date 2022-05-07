@@ -20,7 +20,7 @@ public class CameraController : MonoBehaviour {
     private PlayerController controller;
     private Vector3 playerPos;
 
-    void Start() {
+    void Awake() {
         //only control the camera if we're the local player.
         targetCamera = Camera.main;
         startingZ = targetCamera.transform.position.z;
