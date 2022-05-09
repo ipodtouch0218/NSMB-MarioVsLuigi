@@ -153,6 +153,7 @@ public static class Enums {
         public static string Time { get; } = "T";
         public static string NewPowerups { get; } = "C";
         public static string GameStarted { get; } = "S";
+        public static string newMaxPlayers { get; } = "NM";
         public static string HostName { get; } = "HN";
         public static string Password { get; } = "PW";
         public static string DiscordJoinSecret { get; } = "DJS";

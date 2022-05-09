@@ -157,7 +157,7 @@ public class FrozenCube : HoldableEntity {
             break;
             case "koopa": {
                 spriteRender.sprite = iceSprites[1];
-                if (frozenEntity.GetComponent<KoopaWalk>().shell) {
+                if (frozenEntity.GetComponent<KoopaWalk>().shell || frozenEntity.GetComponent<SpinyWalk>()) {
                     spriteRender.sprite = iceSprites[0];
                     GetComponent<BoxCollider2D>().size = new Vector2(1.35f, 1.35f);
                     frozenCubeCollider.size = new Vector2(1.35f, 1.35f);
