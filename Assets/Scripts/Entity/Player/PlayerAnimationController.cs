@@ -276,8 +276,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
             deathTimer = 0;
             return;
         }
-        if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y)
-            transform.position = body.position = new Vector2(body.position.x, GameManager.Instance.GetLevelMinY() - 20);
 
         deathTimer += Time.fixedDeltaTime;
         if (deathTimer < deathUpTime) {
@@ -300,6 +298,12 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
         if (photonView.IsMine && deathTimer >= 3f)
             photonView.RPC("PreRespawn", RpcTarget.All);
+
+        if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y) {
+            models.SetActive(false);
+            body.velocity = Vector2.zero;
+            body.gravityScale = 0;
+        }
     }
 
     void UpdateHitbox() {
@@ -348,6 +352,11 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (pipeTimer >= pipeDuration) {
             controller.pipeEntering = null;
             body.isKinematic = false;
+            controller.onGround = false;
+            controller.properJump = false;
+            controller.koyoteTime = 1;
+            controller.crouching = false;
+            controller.alreadyGroundpounded = true;
         }
         pipeTimer += Time.fixedDeltaTime;
     }

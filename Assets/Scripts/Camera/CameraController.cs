@@ -56,7 +56,7 @@ public class CameraController : MonoBehaviour {
         float floorRange = 3f;
         validGround = body.position.y + (Time.fixedDeltaTime * body.velocity.y) - floorHeight < floorRange && body.position.y - floorHeight > -.5f;
 
-        if (controller.flying && body.velocity.y > 0)
+        if ((controller.flying && body.velocity.y > 0) || controller.pipeEntering)
             validGround = false;
 
         if (!validGround || controller.dead || controller.flying) {
@@ -120,6 +120,8 @@ public class CameraController : MonoBehaviour {
         Gizmos.color = Color.blue;
         Vector2 threshold = controller.onGround ? groundedThreshold : airThreshold;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(new(playerPos.x, floorHeight), Vector3.right / 2);
     }
 
     private static Vector2 AntiJitter(Vector3 vec) {

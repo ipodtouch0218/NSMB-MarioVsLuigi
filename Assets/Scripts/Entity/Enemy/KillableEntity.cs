@@ -25,7 +25,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         if (dead || !photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
-        if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
+        if (body && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false);
     }
 

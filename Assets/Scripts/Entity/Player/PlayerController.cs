@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     public GameObject onSpinner;
     public PipeManager pipeEntering;
-    private bool step, alreadyGroundpounded;
+    public bool step, alreadyGroundpounded;
     private int starDirection;
     public PlayerData character;
 
@@ -1337,26 +1337,29 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         }
         BoxCollider2D mainCollider = hitboxes[0];
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x * transform.lossyScale.x + (Physics2D.defaultContactOffset * 2f), 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x + (Physics2D.defaultContactOffset * 3f), 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
         if (hit) {
+
+            Debug.Log("a");
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
-            if (angle < -89 || angle > 89)
+            if (hit.point.y > body.position.y || angle < -89 || angle > 89)
                 return;
 
-            float x = floorAngle != angle ? previousFrameVelocity.x : body.velocity.x;
             floorAngle = angle;
 
-            float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.25f;
-            body.velocity = new Vector2(x, change);
+            float change = Mathf.Sin(angle * Mathf.Deg2Rad) * body.velocity.x * 1.25f;
+            body.velocity = new Vector2(body.velocity.x, change);
             onGround = true;
             doGroundSnap = true;
         } else {
-            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x * transform.lossyScale.x + (Physics2D.defaultContactOffset * 2f), 0.1f), 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
+            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x + (Physics2D.defaultContactOffset * 3f), 0.1f), 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
             if (hit) {
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
-                if (angle < -89 || angle > 89)
+                if (hit.point.y > body.position.y || angle < -89 || angle > 89)
                     return;
+
+                Debug.Log("b");
 
                 float x = floorAngle != angle ? previousFrameVelocity.x : body.velocity.x;
                 floorAngle = angle;
@@ -2140,7 +2143,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (groundpound && groundpoundCounter <= 0)
             body.velocity = new Vector2(0f, -groundpoundVelocity);
 
-        if (!inShell && onGround && !(sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle)) {
+        if (!inShell && onGround && !(sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2)) {
             bool abovemax;
             float invincibleSpeedBoost = invincible > 0 ? 2f : 1;
             bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
@@ -2151,7 +2154,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 abovemax = body.velocity.x < -max;
             } else if (!sliding && right && !crouching) {
                 abovemax = body.velocity.x > max;
-            } else if (Mathf.Abs(floorAngle) > slopeSlidingAngle) {
+            } else if (Mathf.Abs(floorAngle) > slopeSlidingAngle * 2) {
                 abovemax = Mathf.Abs(body.velocity.x) > (Mathf.Abs(floorAngle) / 30f);
             } else {
                 abovemax = true;

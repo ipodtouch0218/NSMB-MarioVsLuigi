@@ -15,14 +15,7 @@ public class UserNametag : MonoBehaviour {
     }
     
     void Update() {
-        float y = 1.6f;
-        if (parent.state == Enums.PowerupState.Small || parent.inShell || parent.crouching) {
-            y = 1.2f;
-        } else if (parent.state == Enums.PowerupState.MegaMushroom) {
-            y = 1.15f;
-        }
-
-        transform.localPosition = new Vector2(0, y);
+        transform.position = new Vector2(parent.transform.position.x, parent.transform.position.y + (parent.hitboxes[0].size.y * parent.transform.lossyScale.y * 1.2f) + 0.5f);
 
         usernameText.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName;
         // this will have to be updated if another character is added
