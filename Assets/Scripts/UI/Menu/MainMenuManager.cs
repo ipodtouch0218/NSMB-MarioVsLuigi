@@ -146,7 +146,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
-        AttemptToUpdateProperty<byte>(updatedProperties, Enums.NetRoomProperties.newMaxPlayers, ChangeMaxPlayers);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
     }
     private void AttemptToUpdateProperty<T>(ExitGames.Client.Photon.Hashtable updatedProperties, string key, System.Action<T> updateAction) {
@@ -226,6 +225,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string message = (string) data[0];
             Vector3 color = (Vector3) data[1];
             LocalChatMessage(message, color);
+            break;
+        }
+        case (byte) Enums.NetEventIds.ChangeMaxPlayers: {
+            ChangeMaxPlayers((byte) e.CustomData);
             break;
         }
         }
@@ -655,9 +658,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(false);
         ChangeMaxPlayers(players);
     }
-    public void SetMaxPlayersText(Slider slider) {
-        sliderText.GetComponent<TextMeshProUGUI>().text = "" + slider.value;
-    }
     public void ClearChat() {
         for (int i = 0; i < chatContent.transform.childCount; i++) {
             GameObject chatMsg = chatContent.transform.GetChild(i).gameObject;
@@ -818,29 +818,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //ChangeStarRequirement(newValue);
     }
 
-    public void ChangeMaxPlayers(byte value)
-    {
-        UpdateSettingEnableStates();
-        changePlayersSlider.value = value;
+    public void ChangeMaxPlayers(byte value) {
+        changePlayersSlider.SetValueWithoutNotify(value);
         currentMaxPlayers.GetComponent<TextMeshProUGUI>().text = "" + value;
     }
-    public void SetMaxPlayers()
-    {
+    public void SetMaxPlayers(Slider slider) {
         if (!PhotonNetwork.IsMasterClient)
             return;
 
-        byte newValue = (byte)changePlayersSlider.value;
+        byte players = PhotonNetwork.CurrentRoom.PlayerCount;
+        if (slider.value < players)
+            slider.SetValueWithoutNotify(players);
 
-        if (newValue == (byte)PhotonNetwork.CurrentRoom.MaxPlayers)
+        if (slider.value == PhotonNetwork.CurrentRoom.MaxPlayers)
             return;
 
-        PhotonNetwork.CurrentRoom.MaxPlayers = newValue;
-
-        ExitGames.Client.Photon.Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.newMaxPlayers] = newValue
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        PhotonNetwork.CurrentRoom.MaxPlayers = (byte) slider.value;
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChangeMaxPlayers, (byte) slider.value, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
 

@@ -153,7 +153,6 @@ public static class Enums {
         public static string Time { get; } = "T";
         public static string NewPowerups { get; } = "C";
         public static string GameStarted { get; } = "S";
-        public static string newMaxPlayers { get; } = "NM";
         public static string HostName { get; } = "HN";
         public static string Password { get; } = "PW";
         public static string DiscordJoinSecret { get; } = "DJS";
@@ -162,6 +161,7 @@ public static class Enums {
         // 1-9 = in-lobby events
         StartGame = 1,
         ChatMessage = 2,
+        ChangeMaxPlayers = 3,
         // 10-19 = game state events
         PlayerFinishedLoading = 10,
         AllFinishedLoading = 11,
