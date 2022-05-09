@@ -20,14 +20,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject connecting;
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, passwordPrompt;
     public GameObject[] levelCameraPositions;
-    public GameObject sliderText, lobbyText;
+    public GameObject sliderText, lobbyText, currentMaxPlayers;
     public TMP_Dropdown levelDropdown, characterDropdown, primaryColorDropdown, secondaryColorDropdown;
     public RoomIcon selectedRoomIcon;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle, passwordToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, livesField, timeField, passwordCreateField, passwordField, chatTextField;
-    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
+    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, passwordSelected, reconnectSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, rebindCountdown, rebindText, reconnectText;
@@ -146,6 +146,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
+        AttemptToUpdateProperty<byte>(updatedProperties, Enums.NetRoomProperties.newMaxPlayers, ChangeMaxPlayers);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
     }
     private void AttemptToUpdateProperty<T>(ExitGames.Client.Photon.Hashtable updatedProperties, string key, System.Action<T> updateAction) {
@@ -652,6 +653,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         createLobbyPrompt.SetActive(false);
+        ChangeMaxPlayers(players);
     }
     public void SetMaxPlayersText(Slider slider) {
         sliderText.GetComponent<TextMeshProUGUI>().text = "" + slider.value;
@@ -670,6 +672,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         timeField.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
+        changePlayersSlider.interactable = PhotonNetwork.IsMasterClient;
     }
     
     public void GlobalChatMessage(string message, Vector3 color) {
@@ -814,6 +817,32 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         //ChangeStarRequirement(newValue);
     }
+
+    public void ChangeMaxPlayers(byte value)
+    {
+        UpdateSettingEnableStates();
+        changePlayersSlider.value = value;
+        currentMaxPlayers.GetComponent<TextMeshProUGUI>().text = "" + value;
+    }
+    public void SetMaxPlayers()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        byte newValue = (byte)changePlayersSlider.value;
+
+        if (newValue == (byte)PhotonNetwork.CurrentRoom.MaxPlayers)
+            return;
+
+        PhotonNetwork.CurrentRoom.MaxPlayers = newValue;
+
+        ExitGames.Client.Photon.Hashtable table = new()
+        {
+            [Enums.NetRoomProperties.newMaxPlayers] = newValue
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+    }
+
 
     public void ChangeTime(int time) {
         timeEnabled.SetIsOnWithoutNotify(time != -1);

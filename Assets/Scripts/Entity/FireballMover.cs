@@ -93,7 +93,8 @@ public class FireballMover : MonoBehaviourPun {
             break;
         }
         case "Fireball": {
-            if (isIceball) {
+            FireballMover otherball = collider.gameObject.GetComponentInParent<FireballMover>();
+            if (isIceball && otherball.isIceball == false || !isIceball && otherball.isIceball == true) {
                 PhotonNetwork.Destroy(collider.gameObject);
                 PhotonNetwork.Destroy(gameObject);
             }
