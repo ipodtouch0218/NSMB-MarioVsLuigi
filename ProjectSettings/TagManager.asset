@@ -75,3 +75,6 @@ TagManager:
   - name: ParticleLayer
     uniqueID: 3539651837
     locked: 0
+  - name: NametagLayer
+    uniqueID: 3589790019
+    locked: 0

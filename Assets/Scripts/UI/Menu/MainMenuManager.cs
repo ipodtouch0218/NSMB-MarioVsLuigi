@@ -20,7 +20,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject connecting;
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, passwordPrompt;
     public GameObject[] levelCameraPositions;
-    public GameObject sliderText, lobbyText, currentMaxPlayers;
+    public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
     public TMP_Dropdown levelDropdown, characterDropdown, primaryColorDropdown, secondaryColorDropdown;
     public RoomIcon selectedRoomIcon;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
@@ -373,9 +373,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         secondaryColorDropdown.SetValueWithoutNotify((int) PhotonNetwork.LocalPlayer.CustomProperties[Enums.NetPlayerProperties.SecondaryColor]);
 
         OnRoomPropertiesUpdate(room.CustomProperties);
+        ChangeMaxPlayers(room.MaxPlayers);
 
         if (updatePingCoroutine == null)
             updatePingCoroutine = StartCoroutine(UpdatePing());
+
+        settingsPanel.transform.localPosition = new(7, 0);
     }
 
     public void OpenTitleScreen() {
@@ -823,6 +826,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         currentMaxPlayers.GetComponent<TextMeshProUGUI>().text = "" + value;
     }
     public void SetMaxPlayers(Slider slider) {
+        if (!PhotonNetwork.InRoom) {
+            sliderText.GetComponent<TMP_Text>().text = slider.value.ToString();
+            return;
+        }
         if (!PhotonNetwork.IsMasterClient)
             return;
 

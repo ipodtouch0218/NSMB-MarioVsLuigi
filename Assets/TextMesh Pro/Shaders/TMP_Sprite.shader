@@ -15,6 +15,8 @@ Shader "TextMeshPro/Sprite"
 		_ColorMask ("Color Mask", Float) = 15
 		_ClipRect ("Clip Rect", vector) = (-32767, -32767, 32767, 32767)
 
+		[PerRendererData] _VerticalOffsetX ("Vertical Offset based on X pos", Float) = 0
+
 		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
 	}
 
@@ -27,6 +29,7 @@ Shader "TextMeshPro/Sprite"
 			"RenderType"="Transparent" 
 			"PreviewType"="Plane"
 			"CanUseSpriteAtlas"="True"
+			"DisableBatching"="True"
 		}
 		
 		Stencil
@@ -64,7 +67,7 @@ Shader "TextMeshPro/Sprite"
 				float4 vertex   : POSITION;
 				float4 color    : COLOR;
 				float2 texcoord : TEXCOORD0;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
+				uint id         : SV_VertexId;
 			};
 
 			struct v2f
@@ -73,7 +76,6 @@ Shader "TextMeshPro/Sprite"
 				fixed4 color    : COLOR;
                 float2 texcoord  : TEXCOORD0;
 				float4 worldPosition : TEXCOORD1;
-                UNITY_VERTEX_OUTPUT_STEREO
 			};
 			
             sampler2D _MainTex;
@@ -81,13 +83,13 @@ Shader "TextMeshPro/Sprite"
 			fixed4 _TextureSampleAdd;
 			float4 _ClipRect;
             float4 _MainTex_ST;
+			float _VerticalOffsetX;
 
             v2f vert(appdata_t v)
 			{
 				v2f OUT;
-                UNITY_SETUP_INSTANCE_ID(v);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
-                OUT.worldPosition = v.vertex;
+				OUT.worldPosition = v.vertex;
+				OUT.worldPosition.y += ((v.id / 4) * _VerticalOffsetX);
 				OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
 
                 OUT.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);

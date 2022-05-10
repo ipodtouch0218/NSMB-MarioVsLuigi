@@ -14,7 +14,7 @@ public class UIUpdater : MonoBehaviour {
     public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell, storedItemPropellerMushroom, storedItemIceFlower; 
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     public Image itemReserve;
-    public float pingSample = 0, fpsSample = 60;
+    public float pingSample = 0;
 
     void Start() {
         Instance = this;
@@ -33,14 +33,11 @@ public class UIUpdater : MonoBehaviour {
 
     void Update() {
         pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Time.unscaledDeltaTime * 0.5f);
-        fpsSample = Mathf.Lerp(fpsSample, 1.0f / Time.unscaledDeltaTime, Time.unscaledDeltaTime * 0.5f);
 
         if (pingSample == float.NaN)
             pingSample = 0;
-        if (fpsSample == float.NaN)
-            fpsSample = 60;
         
-        uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">{Mathf.RoundToInt(fpsSample)}FPS | Ping: {(int) pingSample}ms</font>";
+        uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: {(int) pingSample}ms</font>";
         
         //Player stuff update.
         if (!player && GameManager.Instance.localPlayer)
@@ -75,9 +72,34 @@ public class UIUpdater : MonoBehaviour {
         if (!player)
             return;
 
-        uiStars.text = "<sprite=0>" + player.stars + "/" + GameManager.Instance.starRequirement;
-        uiCoins.text = "<sprite=1>" + player.coins + "/8";
-        uiLives.text = player.lives > 0 ? (Utils.GetCharacterIndex(player.photonView.Owner) == 0 ? "<sprite=3>" : "<sprite=4>") + player.lives : "";
-        uiCountdown.text = GameManager.Instance.endServerTime != -1 ? "<sprite=6>" + ((GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000).ToString("0s") : "";
+        uiStars.text = GetSymbolString($"Sx{player.stars}/{GameManager.Instance.starRequirement}");
+        uiCoins.text = GetSymbolString($"Cx{player.coins}/8");
+        
+        if (player.lives == -1) {
+            uiLives.gameObject.SetActive(false);
+        } else {
+            uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + GetSymbolString("x" + player.lives);
+        }
+
+        if (GameManager.Instance.timedGameDuration != -1) {
+            uiCountdown.gameObject.SetActive(false);
+        } else {
+            int seconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000;
+            uiCountdown.text = GetSymbolString($"cx{seconds/60}:{seconds%60:00}");
+        }
+    }
+
+    private static readonly string charString = "     c     0123456789xCS/:";
+    private static string GetSymbolString(string str) {
+        string ret = "";
+        int index;
+        foreach (char c in str) {
+            if ((index = charString.IndexOf(c)) != -1) {
+                ret += $"<sprite={index}>";
+            } else {
+                ret += c;
+            }
+        }
+        return ret;
     }
 }

@@ -12,11 +12,7 @@ public abstract class HoldableEntity : KillableEntity {
             return;
 
         body.velocity = Vector2.zero;
-        Vector3 newLoc = holder.transform.position + holderOffset;
-        if (Utils.IsTileSolidAtWorldLocation(newLoc))
-            newLoc.x = body.position.x;
-
-        body.position = newLoc;
+        transform.position = body.position = holder.transform.position + holderOffset;
         return;
     }
 

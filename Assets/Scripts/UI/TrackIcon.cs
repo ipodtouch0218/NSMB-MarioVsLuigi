@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 
 public class TrackIcon : MonoBehaviour {
-    public float trackMinX, trackMaxX, offsetY;
+    public float trackMinX, trackMaxX;
     public GameObject target;
     private PlayerController playerTarget;
     public Color outlineColor;

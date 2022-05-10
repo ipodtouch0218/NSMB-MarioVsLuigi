@@ -4923,6 +4923,8 @@ MonoBehaviour:
   onGround: 0
   crushGround: 0
   doGroundSnap: 0
+  jumping: 0
+  properJump: 0
   hitRoof: 0
   skidding: 0
   turnaround: 0
@@ -4986,6 +4988,8 @@ MonoBehaviour:
   previousFramePosition: {x: 0, y: 0}
   onSpinner: {fileID: 0}
   pipeEntering: {fileID: 0}
+  step: 0
+  alreadyGroundpounded: 0
   character: {fileID: 11400000, guid: b92aa215d5b62ab4cac4ff2159bc186d, type: 2}
   doIceSkidding: 0
 --- !u!114 &6565795528566295951
@@ -5323,6 +5327,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 1
     Name: firedeath
+  - Type: 4
+    SynchronizeType: 0
+    Name: blueshell
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
@@ -25270,7 +25277,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
-  m_SortingLayerID: 0
+  m_SortingLayerID: -705177277
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &5499724774653811700

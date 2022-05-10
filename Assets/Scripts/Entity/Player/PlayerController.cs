@@ -928,10 +928,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void SpawnStars(float amount, bool deathplane) {
-
         bool fastStars = amount > 2;
 
-        Debug.Log("faststars=" + fastStars);
         while (amount > 0) {
             if (!fastStars) {
                 if (starDirection == 0)
@@ -1339,8 +1337,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         BoxCollider2D mainCollider = hitboxes[0];
         RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x + (Physics2D.defaultContactOffset * 3f), 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
         if (hit) {
-
-            Debug.Log("a");
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
             if (hit.point.y > body.position.y || angle < -89 || angle > 89)
@@ -1358,8 +1354,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
                 if (hit.point.y > body.position.y || angle < -89 || angle > 89)
                     return;
-
-                Debug.Log("b");
 
                 float x = floorAngle != angle ? previousFrameVelocity.x : body.velocity.x;
                 floorAngle = angle;
@@ -1589,7 +1583,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     void HandleWallSlideChecks(Vector2 wallDirection, bool right, bool left) {
-        bool floorCheck = !Physics2D.Raycast(body.position, Vector2.down, 0.5f, ANY_GROUND_MASK);
+        bool floorCheck = !Physics2D.Raycast(body.position, Vector2.down, 0.3f, ANY_GROUND_MASK);
         if (!floorCheck) {
             wallSlideTimer = 0;
             return;
@@ -1603,11 +1597,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!wallCollisionCheck)
             return;
 
-        bool heightUpperCheck = Physics2D.Raycast(body.position + new Vector2(0, .6f), wallDirection, hitboxes[0].size.x * 2, ONLY_GROUND_MASK);
+        bool heightUpperCheck = Physics2D.Raycast(body.position + new Vector2(0, .45f), wallDirection, hitboxes[0].size.x * 2, ONLY_GROUND_MASK);
         if (!heightUpperCheck)
             return;
 
-        bool heightLowerCheck = Physics2D.Raycast(body.position + new Vector2(0, 0), wallDirection, hitboxes[0].size.x * 2, ONLY_GROUND_MASK);
+        bool heightLowerCheck = Physics2D.Raycast(body.position + new Vector2(0, .3f), wallDirection, hitboxes[0].size.x * 2, ONLY_GROUND_MASK);
         if (!heightLowerCheck)
             return;
 
@@ -1635,7 +1629,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             flying &= bounce;
             propeller &= bounce;
 
-            if (onSpinner && !holding) {
+            if (!bounce && onSpinner && !holding) {
                 photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_SpinnerLaunch);
                 photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Spinner_Launch);
                 body.velocity = new Vector2(body.velocity.x, launchVelocity);

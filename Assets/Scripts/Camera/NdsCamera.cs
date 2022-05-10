@@ -9,6 +9,7 @@ public class NdsCamera : MonoBehaviour {
         image = GetComponent<RawImage>();
     }
     void LateUpdate() {
+        image.texture = GlobalController.Instance.ndsTexture;
         SizeToParent(image);
     }
     public Vector2 SizeToParent(RawImage image, float padding = 0) {
@@ -18,7 +19,7 @@ public class NdsCamera : MonoBehaviour {
             return imageTransform.sizeDelta;
         padding = 1 - padding;
         float w, h;
-        float ratio = image.texture.width / (float)image.texture.height;
+        float ratio = image.texture.width / (float) image.texture.height;
         var bounds = new Rect(0, 0, parent.rect.width, parent.rect.height);
         if (Mathf.RoundToInt(imageTransform.eulerAngles.z) % 180 == 90)
               //Invert the bounds if the image is rotated

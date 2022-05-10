@@ -315,7 +315,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
-  m_SortingLayerID: 0
+  m_SortingLayerID: -705177277
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &2556046632617531290
@@ -21921,6 +21921,8 @@ MonoBehaviour:
   previousFramePosition: {x: 0, y: 0}
   onSpinner: {fileID: 0}
   pipeEntering: {fileID: 0}
+  step: 0
+  alreadyGroundpounded: 0
   character: {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
   doIceSkidding: 0
 --- !u!114 &4962373736136367448
