@@ -405,6 +405,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ChangeMaxPlayers(room.MaxPlayers);
         ChangePrivate();
 
+        PhotonNetwork.LocalPlayer.SetCustomProperties(new() {
+            [Enums.NetPlayerProperties.GameState] = null,
+        });
         if (updatePingCoroutine == null)
             updatePingCoroutine = StartCoroutine(UpdatePing());
     }
@@ -654,7 +657,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void JoinSpecificRoom() {
         if (lobbyJoinField.text.Length < 8) {
-            OpenErrorBox("Room IDs are 8 characters long!");
+            OpenErrorBox("Invalid Room ID");
+            return;
         }
         PhotonNetwork.JoinRoom(lobbyJoinField.text.ToUpper());
         privatePrompt.SetActive(false);

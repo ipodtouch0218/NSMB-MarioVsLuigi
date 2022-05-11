@@ -16,6 +16,14 @@ public abstract class HoldableEntity : KillableEntity {
         return;
     }
 
+    public override void FixedUpdate() {
+        if (dead || !photonView || !GameManager.Instance || !photonView.IsMine)
+            return;
+
+        if (body && !holder && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
+            photonView.RPC("SpecialKill", RpcTarget.All, left, false);
+    }
+
     [PunRPC]
     public abstract void Kick(bool fromLeft, float kickFactor, bool groundpound);
 

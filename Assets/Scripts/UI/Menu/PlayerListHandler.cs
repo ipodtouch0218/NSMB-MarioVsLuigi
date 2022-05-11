@@ -13,8 +13,8 @@ public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
 
     //Room callbacks
     public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) { }
-    public void OnMasterClientSwitched(Player newMasterClient) { 
-        UpdatePlayerEntry(newMasterClient); 
+    public void OnMasterClientSwitched(Player newMasterClient) {
+        UpdateAllPlayerEntries();
     }
     public void OnPlayerEnteredRoom(Player newPlayer) {
         if (!newPlayer.IsLocal)
@@ -78,6 +78,10 @@ public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
 
         Destroy(playerListEntries[id].gameObject);
         playerListEntries.Remove(id);
+    }
+
+    public void UpdateAllPlayerEntries() {
+        PhotonNetwork.CurrentRoom.Players.Values.ToList().ForEach(UpdatePlayerEntry);
     }
 
     public void UpdatePlayerEntry(Player player) {

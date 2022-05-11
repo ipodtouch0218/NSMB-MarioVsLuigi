@@ -21,7 +21,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         physics = GetComponent<PhysicsEntity>();
     }
 
-    public void FixedUpdate() {
+    public virtual void FixedUpdate() {
         if (dead || !photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
