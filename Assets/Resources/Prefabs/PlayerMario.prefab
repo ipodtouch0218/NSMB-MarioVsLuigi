@@ -10634,8 +10634,14 @@ MonoBehaviour:
     SynchronizeType: 1
     Name: knockforwards
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: blueshell
+  - Type: 9
+    SynchronizeType: 0
+    Name: New Trigger
+  - Type: 9
+    SynchronizeType: 1
+    Name: deathup
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

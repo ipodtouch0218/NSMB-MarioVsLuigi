@@ -289,6 +289,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 deathUp = true;
                 if (animator.GetBool("firedeath"))
                     controller.PlaySound(Enums.Sounds.Player_Voice_LavaDeath);
+                animator.SetTrigger("deathup");
             }
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));

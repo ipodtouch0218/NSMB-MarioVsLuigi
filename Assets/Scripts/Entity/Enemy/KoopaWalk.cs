@@ -294,7 +294,7 @@ public class KoopaWalk : HoldableEntity {
             return;
 
         left = !hitWallOnLeft;
-        body.velocity = new Vector2(Mathf.Abs(x) * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new Vector2((x > 0 ? Mathf.Abs(x) : speed) * (left ? -1 : 1), body.velocity.y);
         if (shell && !IsStationary())
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
     }
