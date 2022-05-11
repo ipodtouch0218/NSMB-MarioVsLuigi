@@ -60,7 +60,7 @@ sysinfo.txt
 *.apk
 *.aab
 *.unitypackage
-.vscode
+.vsconfig
 .plastic/
 .collabignore
 ingore.conf
