@@ -198,12 +198,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     public void UpdateGameState() {
+        if (!photonView.IsMine)
+            return;
+
         UpdateGameStateVariable(Enums.NetPlayerGameState.Lives, lives);
         UpdateGameStateVariable(Enums.NetPlayerGameState.Stars, stars);
         UpdateGameStateVariable(Enums.NetPlayerGameState.Coins, coins);
         UpdateGameStateVariable(Enums.NetPlayerGameState.PowerupState, (int) state);
 
-        PhotonNetwork.LocalPlayer.SetCustomProperties(gameState);
+        photonView.Owner.SetCustomProperties(gameState);
     }
 
     private void UpdateGameStateVariable(string key, object value) {
@@ -411,7 +414,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);
 
                     return;
-                } else if (inShell && (other.inShell || above)) {
+                } else if (!other.knockback && inShell && (other.inShell || above)) {
                     if (other.inShell) {
                         otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, false, photonView.ViewID);
                         photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, false, otherView.ViewID);
@@ -420,7 +423,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                         body.velocity = new Vector2(-body.velocity.x, body.velocity.y);
                     }
                     return;
-                } else if (!otherAbove && onGround && other.onGround && Mathf.Abs(previousFrameVelocity.x) > walkingMaxSpeed - 0.5) {
+                } else if (!other.knockback && !otherAbove && onGround && other.onGround && Mathf.Abs(previousFrameVelocity.x) > walkingMaxSpeed) {
                     //bump?
 
                     otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
