@@ -15,7 +15,7 @@ public static class NetworkUtils {
         [Enums.NetRoomProperties.NewPowerups] = true,
         [Enums.NetRoomProperties.GameStarted] = false,
         [Enums.NetRoomProperties.HostName] = "",
-        [Enums.NetRoomProperties.Password] = "",
+        //[Enums.NetRoomProperties.Password] = "",
     };
 
     public static Hashtable DefaultRoomProperties {
@@ -33,7 +33,7 @@ public static class NetworkUtils {
         Enums.NetRoomProperties.NewPowerups,
         Enums.NetRoomProperties.GameStarted,
         Enums.NetRoomProperties.HostName,
-        Enums.NetRoomProperties.Password,
+        //Enums.NetRoomProperties.Password,
     };
 
     public static readonly RegionComparer RegionPingComparer = new();

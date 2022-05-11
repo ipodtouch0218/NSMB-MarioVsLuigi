@@ -70,7 +70,7 @@ public class DiscordController : MonoBehaviour {
 
             activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
             activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = ((string) room.CustomProperties[Enums.NetRoomProperties.Password]) == "" ? "In a Public Lobby" : "In a Private Lobby";
+            activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
             activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
 
             if (gm.richPresenceId != "")
@@ -86,11 +86,9 @@ public class DiscordController : MonoBehaviour {
             //in a room
             Room room = PhotonNetwork.CurrentRoom;
 
-            string pw = (string) room.CustomProperties[Enums.NetRoomProperties.Password];
-
             activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
             activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = pw == "" ? "In a Public Lobby" : "In a Private Lobby";
+            activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
             activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
 
             activity.Assets = new() { LargeImage = "mainmenu" };

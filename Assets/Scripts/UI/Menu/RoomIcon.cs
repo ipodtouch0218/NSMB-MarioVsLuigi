@@ -8,6 +8,7 @@ using TMPro;
 public class RoomIcon : MonoBehaviour {
     Image icon;
     public RoomInfo room;
+    public bool joinPrivate;
     public Color defaultColor, highlightColor, selectedColor;
 
     [SerializeField] TMP_Text playersText, nameText, inProgressText, symbolsText;
@@ -16,6 +17,9 @@ public class RoomIcon : MonoBehaviour {
         Unselect();
     }
     public void UpdateUI(RoomInfo newRoom) {
+        if (joinPrivate)
+            return;
+
         room = newRoom;
         ExitGames.Client.Photon.Hashtable prop = room.CustomProperties;
 
@@ -27,16 +31,16 @@ public class RoomIcon : MonoBehaviour {
         bool lives = ((int) prop[Enums.NetRoomProperties.Lives]) >= 1;
         bool powerups = (bool) prop[Enums.NetRoomProperties.NewPowerups];
         bool time = ((int) prop[Enums.NetRoomProperties.Time]) >= 1;
-        bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
+        //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
         if (lives)
-            symbols += " <sprite=9>";
+            symbols += "<sprite=9>";
         if (powerups)
-            symbols += " <sprite=8>";
+            symbols += "<sprite=8>";
         if (time)
-            symbols += " <sprite=6>";
-        if (password)
-            symbols += " <sprite=7>";
+            symbols += "<sprite=6>";
+        //if (password)
+        //    symbols += "<sprite=7>";
 
 
         symbolsText.text = symbols;

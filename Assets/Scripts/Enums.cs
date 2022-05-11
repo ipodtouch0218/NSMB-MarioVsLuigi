@@ -154,14 +154,13 @@ public static class Enums {
         public static string NewPowerups { get; } = "C";
         public static string GameStarted { get; } = "S";
         public static string HostName { get; } = "HN";
-        public static string Password { get; } = "PW";
-        public static string DiscordJoinSecret { get; } = "DJS";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events
         StartGame = 1,
         ChatMessage = 2,
         ChangeMaxPlayers = 3,
+        ChangePrivate = 4,
         // 10-19 = game state events
         PlayerFinishedLoading = 10,
         AllFinishedLoading = 11,

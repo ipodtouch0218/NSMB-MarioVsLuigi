@@ -18,17 +18,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, passwordPrompt;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
     public TMP_Dropdown levelDropdown, characterDropdown, primaryColorDropdown, secondaryColorDropdown;
-    public RoomIcon selectedRoomIcon;
+    public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle, passwordToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public TMP_InputField nicknameField, starsText, livesField, timeField, passwordCreateField, passwordField, chatTextField;
+    public TMP_InputField nicknameField, starsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, passwordSelected, reconnectSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, rebindCountdown, rebindText, reconnectText;
     public TMP_Dropdown region;
@@ -112,6 +112,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             selectedRoom = null;
             selectedRoomIcon = null;
         }
+
+        privateJoinRoom.transform.SetAsLastSibling();
     }
 
     // ROOM CALLBACKS
@@ -129,6 +131,21 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnJoinedRoom() {
         LocalChatMessage(PhotonNetwork.LocalPlayer.NickName + " joined the room", ColorToVector(Color.red));
+
+        Room room = PhotonNetwork.CurrentRoom;
+        Player local = PhotonNetwork.LocalPlayer;
+        if (room.Players.Values.Where(pl => pl != local).Any(pl => pl.NickName.ToLower() == local.NickName.ToLower())) {
+            //rename
+            int dupes = room.Players.Values.Where(pl => pl != local).Where(pl => Regex.Match(pl.NickName, local.NickName + "\\(\\d\\)").Success).Count();
+            for (int i = 1; i <= dupes + 1; i++) {
+                string dupeName = PhotonNetwork.NickName + "(" + i + ")"; ;
+                if (!room.Players.Values.Any(pl => pl.NickName == dupeName)) {
+                    PhotonNetwork.NickName = dupeName;
+                    break;
+                }
+            }
+        }
+
         EnterRoom();
     }
     public void OnPlayerEnteredRoom(Player newPlayer) {
@@ -185,12 +202,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {}
     public void OnCustomAuthenticationFailed(string failure) {}
     public void OnConnectedToMaster() {
-        Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
-        PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
+        JoinMainLobby();
     }
     // MATCHMAKING CALLBACKS
     public void OnFriendListUpdate(List<FriendInfo> friendList) {}
     public void OnLeftRoom() {
+        PhotonNetwork.NickName = nicknameField.text;
         OpenLobbyMenu();
         ClearChat();
         GlobalController.Instance.discordController.UpdateActivity();
@@ -201,6 +218,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnJoinRoomFailed(short reasonId, string reasonMessage) {
         Debug.LogError($"[PHOTON] Join room failed ({reasonId}, {reasonMessage})");
         OpenErrorBox(reasonMessage);
+        JoinMainLobby();
     }
     public void OnCreateRoomFailed(short reasonId, string reasonMessage) {
         Debug.LogError($"[PHOTON] Create room failed ({reasonId}, {reasonMessage})");
@@ -231,7 +249,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             ChangeMaxPlayers((byte) e.CustomData);
             break;
         }
+        case (byte) Enums.NetEventIds.ChangePrivate: {
+            ChangePrivate();
+            break;
         }
+        }
+    }
+
+    private void JoinMainLobby() {
+        Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
+        PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
     }
 
     // CALLBACK REGISTERING
@@ -301,13 +328,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
 
-        //Apply settings
+        //Apply
         nicknameField.text = PhotonNetwork.NickName = Settings.Instance.nickname;
         musicSlider.value = Settings.Instance.VolumeMusic;
         sfxSlider.value = Settings.Instance.VolumeSFX;
         masterSlider.value = Settings.Instance.VolumeMaster;
 
-        ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
+        aspectToggle.interactable = ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
+        aspectToggle.isOn = Settings.Instance.fourByThreeRatio;
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
         fireballToggle.isOn = Settings.Instance.fireballFromSprint;
         vsyncToggle.isOn = Settings.Instance.vsync;
@@ -326,6 +354,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     void Update() {
         bool connected = PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
         connecting.SetActive(!connected);
+        privateJoinRoom.gameObject.SetActive(connected);
 
         joinRoomBtn.interactable = connected && selectedRoomIcon != null && validName;
         createRoomBtn.interactable = connected && validName;
@@ -374,11 +403,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         OnRoomPropertiesUpdate(room.CustomProperties);
         ChangeMaxPlayers(room.MaxPlayers);
+        ChangePrivate();
 
         if (updatePingCoroutine == null)
             updatePingCoroutine = StartCoroutine(UpdatePing());
-
-        settingsPanel.transform.localPosition = new(7, 0);
     }
 
     public void OpenTitleScreen() {
@@ -391,7 +419,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
-        passwordPrompt.SetActive(false);
+        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
     }
@@ -405,7 +433,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
-        passwordPrompt.SetActive(false);
+        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
     }
@@ -419,7 +447,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
-        passwordPrompt.SetActive(false);
+        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(lobbySelected);
     }
@@ -433,11 +461,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(true);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
-        passwordPrompt.SetActive(false);
+        privatePrompt.SetActive(false);
 
-        passwordCreateField.text = "";
-        passwordCreateField.interactable = false;
-        passwordToggle.isOn = false;
+        privateToggle.isOn = false;
 
         EventSystem.current.SetSelectedGameObject(createLobbySelected);
     }
@@ -451,7 +477,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
-        passwordPrompt.SetActive(false);
+        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(optionsSelected);
     }
@@ -465,7 +491,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
-        passwordPrompt.SetActive(false);
+        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(controlsSelected);
     }
@@ -479,7 +505,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(true);
-        passwordPrompt.SetActive(false);
+        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(creditsSelected);
     }
@@ -493,14 +519,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(true);
         creditsMenu.SetActive(false);
-        passwordPrompt.SetActive(false);
+        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(currentLobbySelected);
     }
-    public void OpenPasswordPrompt() {
-        passwordPrompt.SetActive(true);
-
-        EventSystem.current.SetSelectedGameObject(passwordSelected);
+    public void OpenPrivatePrompt() {
+        privatePrompt.SetActive(true);
+        lobbyJoinField.text = "";
+        EventSystem.current.SetSelectedGameObject(privateSelected);
     }
     public void OpenErrorBox(string text) {
         errorBox.SetActive(true);
@@ -612,33 +638,26 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         selectedRoomIcon = room.GetComponent<RoomIcon>();
         selectedRoomIcon.Select();
-        selectedRoom = selectedRoomIcon.room.Name;
+        selectedRoom = selectedRoomIcon.room?.Name ?? null;
 
         joinRoomBtn.interactable = room != null && PhotonNetwork.NickName.Length >= 3;
     }
     public void JoinSelectedRoom() {
+        if (selectedRoomIcon?.joinPrivate ?? false) {
+            OpenPrivatePrompt();
+            return;
+        }
         if (selectedRoom == null)
             return;
 
-        if ((string) selectedRoomIcon.room.CustomProperties[Enums.NetRoomProperties.Password] != "") {
-            OpenPasswordPrompt();
-            return;
-        }
-
         PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
     }
-    public void JoinPasswordedRoom() {
-        string pw = (string) selectedRoomIcon.room.CustomProperties[Enums.NetRoomProperties.Password];
-        if (pw == "")
-            return;
-
-        passwordPrompt.SetActive(false);
-        if (pw == passwordField.text) {
-            PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
-        } else {
-            OpenLobbyMenu();
-            OpenErrorBox("Incorrect Password!");
+    public void JoinSpecificRoom() {
+        if (lobbyJoinField.text.Length < 8) {
+            OpenErrorBox("Room IDs are 8 characters long!");
         }
+        PhotonNetwork.JoinRoom(lobbyJoinField.text.ToUpper());
+        privatePrompt.SetActive(false);
     }
     public void CreateRoom() {
         byte players = (byte) lobbyPlayersSlider.value;
@@ -648,11 +667,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         ExitGames.Client.Photon.Hashtable properties = NetworkUtils.DefaultRoomProperties;
         properties[Enums.NetRoomProperties.HostName] = PhotonNetwork.NickName;
-        properties[Enums.NetRoomProperties.Password] = passwordToggle.isOn ? passwordCreateField.text : "";
 
         RoomOptions options = new() {
             MaxPlayers = players,
-            IsVisible = true,
+            IsVisible = !privateToggle.isOn,
             PublishUserId = true,
             CustomRoomProperties = properties,
             CustomRoomPropertiesForLobby = NetworkUtils.LobbyVisibleRoomProperties,
@@ -711,10 +729,75 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (text == null || text == "") {
             return;
         }
-        
+        if (text.StartsWith("/")) {
+            RunCommand(text[1..].Split(" "));
+            return;
+        }
+
         GlobalChatMessage(PhotonNetwork.NickName + ": " + text, ColorToVector(Color.black));
         StartCoroutine(SelectNextFrame(chatTextField));
     }
+
+    private void RunCommand(string[] args) {
+        if (!PhotonNetwork.IsMasterClient) {
+            LocalChatMessage("You cannot use room commands if you aren't the host!", ColorToVector(Color.red));
+            return;
+        }
+        string command = args.Length > 0 ? args[0].ToLower() : "";
+        switch (command) {
+        case "kick": {
+            if (args.Length < 2) {
+                LocalChatMessage("Usage: /kick <player name>", ColorToVector(Color.red));
+                return;
+            }
+            string strTarget = args[1].ToLower();
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
+            if (target == null) {
+                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                return;
+            }
+            if (target.IsLocal) {
+                LocalChatMessage("While you can kick yourself, it's probably not what you meant to do.", ColorToVector(Color.red));
+                return;
+            }
+            PhotonNetwork.CloseConnection(target);
+            LocalChatMessage($"Successfully kicked {target.NickName}", ColorToVector(Color.red));
+            return;
+        }
+        case "host": {
+            if (args.Length < 2) {
+                LocalChatMessage("Usage: /host <player name>", ColorToVector(Color.red));
+                return;
+            }
+            string strTarget = args[1].ToLower();
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
+            if (target == null) {
+                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                return;
+            }
+            if (target.IsLocal) {
+                LocalChatMessage("You are already the host..?", ColorToVector(Color.red));
+                return;
+            }
+            PhotonNetwork.SetMasterClient(target);
+            LocalChatMessage($"Promoted {target.NickName} to the host!", ColorToVector(Color.red));
+            return;
+        }
+        case "help": {
+            string sub = args.Length > 1 ? args[1] : "";
+            string msg = sub switch {
+                "kick" => "/kick <player name>",
+                "host" => "/host <player name>",
+                _ => "Available commands: kick, host",
+            };
+            LocalChatMessage(msg, ColorToVector(Color.red));
+            return;
+        }
+        }
+        LocalChatMessage($"Unknown command. Try /help for help.", ColorToVector(Color.red));
+        return;
+    }
+
     IEnumerator SelectNextFrame(TMP_InputField input) {
         yield return new WaitForEndOfFrame();
         input.ActivateInputField();
@@ -821,6 +904,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //ChangeStarRequirement(newValue);
     }
 
+    public void CopyRoomCode() {
+        TextEditor te = new();
+        te.text = PhotonNetwork.CurrentRoom.Name;
+        te.SelectAll();
+        te.Copy();
+    }
+
+    public void ChangePrivate() {
+        privateToggleRoom.SetIsOnWithoutNotify(!PhotonNetwork.CurrentRoom.IsVisible);
+    }
+    public void SetPrivate(Toggle toggle) {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        PhotonNetwork.CurrentRoom.IsVisible = !toggle.isOn;
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChangePrivate, null, NetworkUtils.EventAll, SendOptions.SendReliable);
+    }
     public void ChangeMaxPlayers(byte value) {
         changePlayersSlider.SetValueWithoutNotify(value);
         currentMaxPlayers.GetComponent<TextMeshProUGUI>().text = "" + value;
@@ -912,9 +1012,5 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void ChangeLobbyHeader(string name) {
         SetText(lobbyText, $"{name}'s Lobby");
-    }
-
-    public void TogglePasswordCreateField() {
-        passwordCreateField.interactable = passwordToggle.isOn;
     }
 }

@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public GameObject pauseUI, pauseButton;
     public bool gameover = false, musicEnabled = false;
     public readonly List<string> loadedPlayers = new();
-    public int starRequirement, timedGameDuration;
+    public int starRequirement, timedGameDuration = -1;
     public bool hurryup = false;
 
     public int playerCount;
@@ -375,7 +375,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
-        timedGameDuration = (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time];
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
 
         startServerTime = PhotonNetwork.ServerTimestamp;
         startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();

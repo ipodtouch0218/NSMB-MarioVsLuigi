@@ -25,14 +25,22 @@ public class SettingButtonManager : MonoBehaviour {
     }
     public void OnNdsResolutionToggle(Toggle toggle) {
         Settings settings = Settings.Instance;
-        settings.ndsResolution = toggle.isOn;
+        MainMenuManager.Instance.aspectToggle.interactable = settings.ndsResolution = toggle.isOn;
         settings.SaveSettingsToPreferences();
     }
+
+    public void OnAspectToggle(Toggle toggle) {
+        Settings settings = Settings.Instance;
+        settings.fourByThreeRatio = toggle.isOn;
+        settings.SaveSettingsToPreferences();
+    }
+
     public void OnFireballToggle(Toggle toggle) {
         Settings settings = Settings.Instance;
         settings.fireballFromSprint = toggle.isOn;
         settings.SaveSettingsToPreferences();
     }
+
     public void OnFullscreenToggle(Toggle toggle) {
         bool value = toggle.isOn;
         if (value) {

@@ -75,7 +75,7 @@ Material:
     - _ScaleX: 1
     - _ScaleY: 1
     - _ShaderFlags: 0
-    - _Sharpness: 0
+    - _Sharpness: 1
     - _SpecularPower: 2
     - _Stencil: 0
     - _StencilComp: 8
