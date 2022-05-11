@@ -60,6 +60,10 @@ sysinfo.txt
 *.apk
 *.aab
 *.unitypackage
+.vscode
+.plastic/
+.collabignore
+ingore.conf
 
 # Crashlytics generated file
 crashlytics-build.properties
