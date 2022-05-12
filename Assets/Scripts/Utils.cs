@@ -98,6 +98,21 @@ public class Utils {
 
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     }
+    public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize) {
+        Vector3Int minPos = WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
+        Vector3Int size = WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
+
+        for (int x = 0; x <= size.x; x++) {
+            for (int y = 0; y <= size.y; y++) {
+                Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
+                WrapTileLocation(ref tileLocation);
+
+                if (IsTileSolidAtTileLocation(tileLocation))
+                    return true;
+            }
+        }
+        return false;
+    }
 
     public static void GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
         if (properties == null)

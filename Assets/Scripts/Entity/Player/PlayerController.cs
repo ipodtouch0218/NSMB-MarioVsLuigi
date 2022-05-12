@@ -1600,11 +1600,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         if (!wallCollisionCheck)
             return;
 
+        /*
         bool heightUpperCheck = Physics2D.Raycast(body.position + new Vector2(0, .45f), wallDirection, hitboxes[0].size.x * 2, ONLY_GROUND_MASK);
         if (!heightUpperCheck)
             return;
+        */
 
-        bool heightLowerCheck = Physics2D.Raycast(body.position + new Vector2(0, .3f), wallDirection, hitboxes[0].size.x * 2, ONLY_GROUND_MASK);
+        bool heightLowerCheck = Physics2D.Raycast(body.position + new Vector2(0, .2f), wallDirection, hitboxes[0].size.x * 2, ONLY_GROUND_MASK);
         if (!heightLowerCheck)
             return;
 
@@ -1785,8 +1787,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     bool HandleStuckInBlock() {
         if (!body || hitboxes[0] == null)
             return false;
-        Vector2 checkPos = body.position + new Vector2(0, hitboxes[0].size.y / 4f);
-        if (!Utils.IsTileSolidAtWorldLocation(checkPos)) {
+        Vector2 checkPos = body.position + (Vector2.up * hitboxes[0].size / 2);
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, hitboxes[0].size)) {
             stuckInBlock = false;
             return false;
         }
