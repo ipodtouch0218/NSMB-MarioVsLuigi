@@ -29,7 +29,7 @@ public static class Enums {
         [PowerupState.BlueShell] = new(2),
         [PowerupState.MegaMushroom] = new(4),
     };
-    public enum PowerupState {
+    public enum PowerupState : byte {
         None, MiniMushroom, Small, Large, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
     #endregion
@@ -138,22 +138,23 @@ public static class Enums {
         public static string Ping { get; } = "P";
         public static string PrimaryColor { get; } = "C1";
         public static string SecondaryColor { get; } = "C2";
-        public static string GameState { get; } = "GS";
+        public static string GameState { get; } = "S";
     }
     public static class NetPlayerGameState {
         public static string Stars { get; } = "S";
         public static string Coins { get; } = "C";
         public static string Lives { get; } = "L";
-        public static string PowerupState { get; } = "PS";
+        public static string PowerupState { get; } = "P";
+        public static string ReserveItem { get; } = "R";
     }
     public static class NetRoomProperties {
         public static string Level { get; } = "L";
-        public static string StarRequirement { get; } = "SR";
+        public static string StarRequirement { get; } = "S";
         public static string Lives { get; } = "Li";
         public static string Time { get; } = "T";
         public static string NewPowerups { get; } = "C";
-        public static string GameStarted { get; } = "S";
-        public static string HostName { get; } = "HN";
+        public static string GameStarted { get; } = "G";
+        public static string HostName { get; } = "H";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events
@@ -172,6 +173,7 @@ public static class Enums {
         SetTileBatch = 23,
         ResetTiles = 24,
         SyncTilemap = 25,
+        SetCoinState = 26,
         // 30-39 = graphical-only events
         SpawnParticle = 30,
         SpawnResizableParticle = 31,

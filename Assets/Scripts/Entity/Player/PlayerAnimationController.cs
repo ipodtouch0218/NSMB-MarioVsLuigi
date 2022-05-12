@@ -34,12 +34,15 @@ public class PlayerAnimationController : MonoBehaviourPun {
         DisableAllModels();
 
         if (photonView) {
-            if (!photonView.IsMine)
+            if (!photonView.IsMine) {
+                GameManager.Instance.CreateNametag(controller); 
                 glowColor = Color.HSVToRGB(controller.playerId / ((float) PhotonNetwork.PlayerList.Length + 1), 1, 1);
+            }
 
             primaryColor = CustomColors.Primary[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.PrimaryColor]].color.linear;
             secondaryColor = CustomColors.Secondary[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.SecondaryColor]].color.linear;
         }
+
     }
 
     public void Update() {
@@ -358,6 +361,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             controller.koyoteTime = 1;
             controller.crouching = false;
             controller.alreadyGroundpounded = true;
+            controller.pipeTimer = 0.25f;
         }
         pipeTimer += Time.fixedDeltaTime;
     }

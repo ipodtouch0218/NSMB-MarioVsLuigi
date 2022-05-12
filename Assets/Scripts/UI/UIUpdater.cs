@@ -77,20 +77,20 @@ public class UIUpdater : MonoBehaviour {
         if (!player || GameManager.Instance.gameover)
             return;
 
-        uiStars.text = GetSymbolString($"Sx{player.stars}/{GameManager.Instance.starRequirement}");
-        uiCoins.text = GetSymbolString($"Cx{player.coins}/8");
+        uiStars.text = Utils.GetSymbolString($"Sx{player.stars}/{GameManager.Instance.starRequirement}");
+        uiCoins.text = Utils.GetSymbolString($"Cx{player.coins}/8");
         
         if (player.lives < 0) {
             uiLives.gameObject.SetActive(false);
         } else {
             uiLives.gameObject.SetActive(true);
-            uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + GetSymbolString("x" + player.lives);
+            uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + Utils.GetSymbolString("x" + player.lives);
         }
 
         if (GameManager.Instance.timedGameDuration > 0) {
             int seconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000;
             seconds = Mathf.Clamp(seconds, 0, GameManager.Instance.timedGameDuration);
-            uiCountdown.text = GetSymbolString($"cx{seconds / 60}:{seconds % 60:00}");
+            uiCountdown.text = Utils.GetSymbolString($"cx{seconds / 60}:{seconds % 60:00}");
             uiCountdown.gameObject.SetActive(true);
             if (seconds == 0) {
                 if (timerMaterial == null)
@@ -105,17 +105,4 @@ public class UIUpdater : MonoBehaviour {
         }
     }
 
-    private static readonly string charString = "      c    0123456789xCS/:";
-    private static string GetSymbolString(string str) {
-        string ret = "";
-        int index;
-        foreach (char c in str) {
-            if ((index = charString.IndexOf(c)) != -1) {
-                ret += $"<sprite={index}>";
-            } else {
-                ret += c;
-            }
-        }
-        return ret;
-    }
 }

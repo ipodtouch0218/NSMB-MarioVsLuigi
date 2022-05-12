@@ -43,6 +43,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public int startServerTime, endServerTime = -1;
     public long startRealTime = -1, endRealTime = -1;
 
+    public Canvas nametagCanvas;
+    public GameObject nametagPrefab;
+
     //Audio
     public AudioSource music, sfx;
     private LoopingMusic loopMusic;
@@ -59,6 +62,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public int playerCount;
     public PlayerController[] allPlayers;
     public EnemySpawnpoint[] enemySpawnpoints;
+
+    private GameObject[] coins;
 
     public SpectationManager SpectationManager { get; private set; }
 
@@ -174,6 +179,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, null);
             break;
         }
+        case Enums.NetEventIds.SetCoinState: {
+            int view = (int) data[0];
+            bool visible = (bool) data[1];
+            GameObject coin = PhotonView.Find(view).gameObject;
+            coin.GetComponent<SpriteRenderer>().enabled = visible;
+            coin.GetComponent<BoxCollider2D>().enabled = visible;
+            break;
+        }
         case Enums.NetEventIds.SpawnParticle: {
             int x = (int) data[0];
             int y = (int) data[1];
@@ -233,6 +246,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void OnMasterClientSwitched(Player newMaster) {
         //TODO: chat message
+
+        if (newMaster.IsLocal) {
+            //i am de captain now
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
+                [Enums.NetRoomProperties.HostName] = newMaster.NickName
+            });
+        }
     }
     public void OnPlayerEnteredRoom(Player newPlayer) {
         //Spectator joined. Sync the room state.
@@ -245,12 +265,23 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         //SYNCHRONIZE TILEMAPS
         if (PhotonNetwork.IsMasterClient) {
             ExitGames.Client.Photon.Hashtable changes = Utils.GetTilemapChanges(originalTiles, origin, tilemap);
-            RaiseEventOptions options = new() { CachingOption = EventCaching.DoNotCache, TargetActors = new int[]{ newPlayer.ActorNumber } };
+            RaiseEventOptions options = new() { CachingOption = EventCaching.DoNotCache, TargetActors = new int[] { newPlayer.ActorNumber } };
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SyncTilemap, changes, options, SendOptions.SendReliable);
+
+            foreach (GameObject coin in coins) {
+                if (!coin.GetComponent<SpriteRenderer>().enabled)
+                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SetCoinState, new object[] { coin.GetPhotonView().ViewID, false }, options, SendOptions.SendReliable);
+            }
         }
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
         //TODO: player disconnect message
+
+        if (FindObjectsOfType<PlayerController>().Length <= 0) {
+            //all players left.
+            if (PhotonNetwork.IsMasterClient)
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
+        }
     }
 
     // CONNECTION CALLBACKS
@@ -279,6 +310,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         Instance = this;
         SpectationManager = GetComponent<SpectationManager>();
         loopMusic = GetComponent<LoopingMusic>();
+        coins = GameObject.FindGameObjectsWithTag("coin");
 
 #if UNITY_EDITOR
         //Spawning in editor??
@@ -410,7 +442,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         //TOOD: make a results screen?
 
         yield return new WaitForSecondsRealtime(4);
-        PhotonNetwork.DestroyAll();
+        if (PhotonNetwork.IsMasterClient)
+            PhotonNetwork.DestroyAll();
         SceneManager.LoadScene("MainMenu");
     }
 
@@ -474,6 +507,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 currentStar = GameObject.FindGameObjectWithTag("bigstar");
             }
         }
+    }
+
+    public void CreateNametag(PlayerController controller) {
+        GameObject nametag = Instantiate(nametagPrefab, nametagCanvas.transform);
+        nametag.GetComponent<UserNametag>().parent = controller;
+        nametag.SetActive(true);
     }
 
     public void CheckForWinner() {

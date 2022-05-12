@@ -15,8 +15,8 @@ MonoBehaviour:
   state: 5
   prefab: IceFlower
   soundEffect: 16
-  spawnChance: 0.9
+  spawnChance: 0.5
   starModifier: -0.1
   big: 0
-  tall: 0
+  vertical: 0
   custom: 1

@@ -4,7 +4,6 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.Tilemaps;
-using System.Linq;
 
 public class Utils {
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
@@ -222,5 +221,19 @@ public class Utils {
         return tileCache.ContainsKey(tilename) ?
             tileCache[tilename] :
             tileCache[tilename] = Resources.Load(tilename) as TileBase;
+    }
+
+    private static readonly string charString = "      c    0123456789xCS/:";
+    public static string GetSymbolString(string str) {
+        string ret = "";
+        int index;
+        foreach (char c in str) {
+            if (c != ' ' && (index = charString.IndexOf(c)) != -1) {
+                ret += $"<sprite={index}>";
+            } else {
+                ret += c;
+            }
+        }
+        return ret;
     }
 }

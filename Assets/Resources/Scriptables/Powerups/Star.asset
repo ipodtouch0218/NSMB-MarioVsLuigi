@@ -15,8 +15,8 @@ MonoBehaviour:
   state: 0
   prefab: Star
   soundEffect: 16
-  spawnChance: 0.5
-  starModifier: -0.45
+  spawnChance: 0.25
+  starModifier: -0.25
   big: 0
-  tall: 0
+  vertical: 0
   custom: 0

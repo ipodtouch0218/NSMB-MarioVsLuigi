@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     public bool onGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenStruggle;
-    public float invincible, giantTimer, floorAngle, knockbackTimer, unfreezeTimer;
+    public float invincible, giantTimer, floorAngle, knockbackTimer, unfreezeTimer, pipeTimer;
 
     //Walljumping variables
     private float wallSlideTimer, wallJumpTimer;
@@ -145,15 +145,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         playerId = PhotonNetwork.CurrentRoom != null ? System.Array.IndexOf(PhotonNetwork.PlayerList, photonView.Owner) : -1;
         Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out lives);
-        if (lives != -1)
-            lives++;
 
-        InputSystem.controls.Player.Movement.performed += OnMovement;
-        InputSystem.controls.Player.Jump.performed += OnJump;
-        InputSystem.controls.Player.Sprint.started += OnSprint;
-        InputSystem.controls.Player.Sprint.canceled += OnSprint;
-        InputSystem.controls.Player.PowerupAction.performed += OnPowerupAction;
-        InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
+        if (photonView.IsMine) {
+            InputSystem.controls.Player.Movement.performed += OnMovement;
+            InputSystem.controls.Player.Jump.performed += OnJump;
+            InputSystem.controls.Player.Sprint.started += OnSprint;
+            InputSystem.controls.Player.Sprint.canceled += OnSprint;
+            InputSystem.controls.Player.PowerupAction.performed += OnPowerupAction;
+            InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
+        }
     }
 
 
@@ -195,6 +195,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         stars = (int) gs[Enums.NetPlayerGameState.Stars];
         coins = (int) gs[Enums.NetPlayerGameState.Coins];
         state = (Enums.PowerupState) gs[Enums.NetPlayerGameState.PowerupState];
+        if (gs[Enums.NetPlayerGameState.ReserveItem] != null) {
+            storedPowerup = (Powerup) Resources.Load("Scriptables/Powerups/" + (Enums.PowerupState) gs[Enums.NetPlayerGameState.ReserveItem]);
+        } else {
+            storedPowerup = null;
+        }
     }
 
     public void UpdateGameState() {
@@ -204,7 +209,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         UpdateGameStateVariable(Enums.NetPlayerGameState.Lives, lives);
         UpdateGameStateVariable(Enums.NetPlayerGameState.Stars, stars);
         UpdateGameStateVariable(Enums.NetPlayerGameState.Coins, coins);
-        UpdateGameStateVariable(Enums.NetPlayerGameState.PowerupState, (int) state);
+        UpdateGameStateVariable(Enums.NetPlayerGameState.PowerupState, (byte) state);
+        UpdateGameStateVariable(Enums.NetPlayerGameState.ReserveItem, storedPowerup?.state ?? null);
 
         photonView.Owner.SetCustomProperties(gameState);
     }
@@ -670,13 +676,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         }
         usedPropellerThisJump = true;
     }
-
+    
     public void OnReserveItem(InputAction.CallbackContext context) {
         if (!photonView.IsMine || storedPowerup == null || GameManager.Instance.paused || dead)
             return;
 
         SpawnItem(storedPowerup);
         storedPowerup = null;
+        UpdateGameState();
     }
     #endregion
 
@@ -971,6 +978,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     protected void Death(bool deathplane, bool fire) {
         if (dead)
             return;
+
+        animator.Play("deadstart", state >= Enums.PowerupState.Large ? 1 : 0);
+        if (--lives == 0) {
+            GameManager.Instance.CheckForWinner();
+        }
         dead = true;
         onSpinner = null;
         pipeEntering = null;
@@ -991,7 +1003,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         animator.SetBool("knockback", false);
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
-        animator.Play("deadstart", state >= Enums.PowerupState.Large ? 1 : 0);
         PlaySound(Enums.Sounds.Player_Sound_Death);
         SpawnStars(1, deathplane);
         if (holding) {
@@ -1002,7 +1013,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     [PunRPC]
     public void PreRespawn() {
-        if (--lives == 0) {
+        if (lives == 0) {
             GameManager.Instance.CheckForWinner();
             Destroy(trackIcon);
             if (photonView.IsMine) {
@@ -1787,8 +1798,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     bool HandleStuckInBlock() {
         if (!body || hitboxes[0] == null)
             return false;
-        Vector2 checkPos = body.position + (Vector2.up * hitboxes[0].size / 2);
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, hitboxes[0].size)) {
+        Vector2 checkPos = body.position + (Vector2.up * hitboxes[0].size * transform.lossyScale / 2);
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, hitboxes[0].size * transform.lossyScale * 0.8f)) {
             stuckInBlock = false;
             return false;
         }
@@ -1845,7 +1856,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         TickCounter(ref propellerSpinTimer, 0, delta);
         TickCounter(ref propellerTimer, 0, delta);
         TickCounter(ref knockbackTimer, 0, delta);
-
+        TickCounter(ref pipeTimer, 0, delta);
         TickCounter(ref wallSlideTimer, 0, delta);
         TickCounter(ref wallJumpTimer, 0, delta);
 
@@ -1953,7 +1964,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
 
         //Pipes
-        if (!paused) {
+        if (!paused && pipeTimer <= 0) {
             DownwardsPipeCheck();
             UpwardsPipeCheck();
         }

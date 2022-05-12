@@ -15,7 +15,9 @@ Shader "TextMeshPro/Sprite"
 		_ColorMask ("Color Mask", Float) = 15
 		_ClipRect ("Clip Rect", vector) = (-32767, -32767, 32767, 32767)
 
-		[PerRendererData] _VerticalOffsetX ("Vertical Offset based on X pos", Float) = 0
+		[PerRendererData] _VerticalOffsetX("Vertical Offset based on X pos", Float) = 0
+		[PerRendererData] _FirstCharOffset("First char offset", Float) = 0
+		[PerRendererData] _SecondCharOffset("Second char offset", Float) = 0
 
 		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
 	}
@@ -84,11 +86,19 @@ Shader "TextMeshPro/Sprite"
 			float4 _ClipRect;
             float4 _MainTex_ST;
 			float _VerticalOffsetX;
+			float _FirstCharOffset;
+			float _SecondCharOffset;
 
             v2f vert(appdata_t v)
 			{
 				v2f OUT;
 				OUT.worldPosition = v.vertex;
+				if ((uint) (v.id / 4) == 0) {
+					OUT.worldPosition.y += _FirstCharOffset;
+				}
+				else if ((uint) (v.id / 4) == 1) {
+					OUT.worldPosition.y += _SecondCharOffset;
+				}
 				OUT.worldPosition.y += ((v.id / 4) * _VerticalOffsetX);
 				OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
 

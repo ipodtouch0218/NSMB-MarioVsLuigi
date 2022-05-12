@@ -101,7 +101,7 @@ public class CameraController : MonoBehaviour {
         }
 
         currentPosition.x = newPosition.x;
-        Vector3 targetPos = Vector3.SmoothDamp(currentPosition, newPosition, ref smoothDampVel, 0.25f);
+        Vector3 targetPos = Vector3.SmoothDamp(currentPosition, newPosition, ref smoothDampVel, 0.35f);
 
         float vOrtho = targetCamera.orthographicSize;
         float hOrtho = vOrtho * targetCamera.aspect;

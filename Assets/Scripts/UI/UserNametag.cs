@@ -1,25 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using TMPro;
 
 public class UserNametag : MonoBehaviour {
 
-    public TMP_Text usernameText, starText;
-    private PlayerController parent;
-
-    void Start() {
-        parent = GetComponentInParent<PlayerController>();
-        gameObject.SetActive(!parent.photonView.IsMine);
+    private RectTransform parentCanvas;
+    public TMP_Text text;
+    public PlayerController parent;
+    public void Start() {
+        parentCanvas = transform.parent.GetComponent<RectTransform>();
     }
-    
-    void Update() {
-        transform.position = new Vector2(parent.transform.position.x, parent.transform.position.y + (parent.hitboxes[0].size.y * parent.transform.lossyScale.y * 1.2f) + 0.5f);
 
-        usernameText.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName;
-        // this will have to be updated if another character is added
-        starText.text = (parent.lives > 0 ? (Utils.GetCharacterIndex(parent.photonView.Owner) == 0 ? "<sprite=3>" : "<sprite=4>") + parent.lives : "");
-        starText.text += "<sprite=0>" + parent.stars;
+    void Update() {
+        if (parent == null) {
+            Destroy(gameObject);
+            return;
+        }
+
+        text.enabled = !parent.dead;
+
+        Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.hitboxes[0].size.y * parent.transform.lossyScale.y * 1.2f) + 0.2f);
+        transform.position = Camera.main.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentCanvas.rect.size;
+
+        text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName;
+
+        text.text += "\n";
+        if (parent.lives >= 0)
+            text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString($"x{parent.lives} ");
+
+        text.text += Utils.GetSymbolString($"Sx{parent.stars}");
     }
 }
