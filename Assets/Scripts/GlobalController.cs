@@ -5,6 +5,10 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Runtime.InteropServices;
+using System;
+using System.Messaging;
+using System.Diagnostics;
 
 public class GlobalController : Singleton<GlobalController> {
 
@@ -42,7 +46,54 @@ public class GlobalController : Singleton<GlobalController> {
         InputSystem.controls.UI.DebugInfo.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
+
+#if PLATFORM_STANDALONE_WIN && !UNITY_EDITOR
+        ReplaceWinProc();
+#endif
     }
+
+#if PLATFORM_STANDALONE_WIN
+    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
+    [DllImport("user32.dll")]
+    static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")]
+    static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+    [DllImport("user32.dll")]
+    static extern IntPtr GetActiveWindow();
+
+    public delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+    static IntPtr oldWndProcPtr;
+
+    private static void ReplaceWinProc() {
+        IntPtr hwnd = GetActiveWindow();
+        // Get pointer to our replacement WndProc.
+        WndProcDelegate newWndProc = new(WndProc);
+        IntPtr newWndProcPtr = Marshal.GetFunctionPointerForDelegate(newWndProc);
+        // Override Unity's WndProc with our custom one, and save the original WndProc (Unity's) so we can use it later for non-focus related messages.
+        oldWndProcPtr = SetWindowLongPtr(hwnd, -4, newWndProcPtr); // (GWLP_WNDPROC == -4)
+    }
+    private static IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam) {
+        UnityEngine.Debug.Log(msg);
+
+        if (msg == 0x00a4) {
+            SendMessage(hWnd, 0x001F, 0, 0);
+            return IntPtr.Zero;
+        }
+        if (msg == 0x0010) {
+            //close
+            Application.Quit();
+            return IntPtr.Zero;
+        }
+        if (msg != 0x0117) return CallWindowProc(oldWndProcPtr, hWnd, msg, wParam, lParam);
+
+        if (lParam.ToInt32() >> 16 == 1) {
+            SendMessage(hWnd, 0x001F, 0, 0);
+        }
+        return IntPtr.Zero;
+    }
+#endif
 
     void Update() {
         int currentWidth = Screen.width;
@@ -58,7 +109,6 @@ public class GlobalController : Singleton<GlobalController> {
                 ndsTexture = RenderTexture.GetTemporary(targetWidth, targetHeight);
                 ndsTexture.filterMode = FilterMode.Point;
                 ndsTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32;
-                Debug.Log(ndsTexture);
             }
             ndsCanvas.SetActive(true);
         } else {
@@ -75,4 +125,5 @@ public class GlobalController : Singleton<GlobalController> {
         windowHeight = currentHeight;
 #endif
     }
+
 }

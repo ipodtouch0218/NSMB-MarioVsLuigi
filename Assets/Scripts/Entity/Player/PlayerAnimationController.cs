@@ -14,7 +14,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
-    [SerializeField] [ColorUsage(true, false)] Color glowColor = Color.clear;
+    [SerializeField] [ColorUsage(true, false)] public Color glowColor = Color.white;
     [SerializeField] Color primaryColor = Color.clear, secondaryColor = Color.clear;
 
     AudioSource drillParticleAudio;
@@ -34,13 +34,14 @@ public class PlayerAnimationController : MonoBehaviourPun {
         DisableAllModels();
 
         if (photonView) {
+            glowColor = Utils.GetPlayerColor(photonView.Owner);
             if (!photonView.IsMine) {
                 GameManager.Instance.CreateNametag(controller); 
-                glowColor = Color.HSVToRGB(controller.playerId / ((float) PhotonNetwork.PlayerList.Length + 1), 1, 1);
             }
 
-            primaryColor = CustomColors.Primary[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.PrimaryColor]].color.linear;
-            secondaryColor = CustomColors.Secondary[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.SecondaryColor]].color.linear;
+            CustomColors.PlayerColor color = CustomColors.Colors[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.PlayerColor]];
+            primaryColor = color.overalls.linear;
+            secondaryColor = color.hat.linear;
         }
 
     }
@@ -130,7 +131,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         }
 
         if (photonView.IsMine)
-            HorizontalCamera.OFFSET_TARGET = (controller.flying || controller.propeller) ? 0.75f : 0f;
+            HorizontalCamera.OFFSET_TARGET = (controller.flying || controller.propeller) ? 0.5f : 0f;
 
         if (controller.crouching || controller.sliding || controller.skidding) {
             dust.transform.localPosition = Vector2.zero;
@@ -228,7 +229,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
         block.SetFloat("PowerupState", ps);
         block.SetFloat("EyeState", (int) eyeState);
         block.SetFloat("ModelScale", transform.lossyScale.x);
-        block.SetColor("GlowColor", glowColor);
+        if (!photonView.IsMine)
+            block.SetColor("GlowColor", glowColor);
 
         //Customizeable player color
         block.SetVector("OverallsColor", primaryColor);

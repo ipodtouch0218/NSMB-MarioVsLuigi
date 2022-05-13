@@ -1,14 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
 
 public class PlayerListEntry : MonoBehaviour {
 
-    [SerializeField] private TMP_Text nameText, pingText;
+    [SerializeField] TMP_Text nameText, pingText;
+    private Image background;
 
     public void UpdateText(Player player) {
+
+        if (!background)
+            background = GetComponent<Image>();
+        background.color = Utils.GetPlayerColor(player, .2f, 1f);
 
         string permissionSymbol = "";
         if (player.IsMasterClient)

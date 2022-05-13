@@ -154,8 +154,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 8
-        width: 18
-        height: 38
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -175,38 +175,17 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 223
+        width: 23
         height: 8
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 9, y: 0, z: 10, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
       spriteID: 9be485b21ed2e65e0800000000000000
       internalID: -1914542346467782983
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: track_2
-      rect:
-        serializedVersion: 2
-        x: 22
-        y: 8
-        width: 18
-        height: 38
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a736e32f47d5da690800000000000000
-      internalID: -7589307040187653254
       vertices: []
       indices: 
       edges: []

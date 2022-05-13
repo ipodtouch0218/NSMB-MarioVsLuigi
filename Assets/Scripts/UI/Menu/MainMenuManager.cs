@@ -21,7 +21,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
-    public TMP_Dropdown levelDropdown, characterDropdown, primaryColorDropdown, secondaryColorDropdown;
+    public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle;
@@ -37,8 +37,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public string connectThroughSecret = "";
     public string selectedRoom;
     public bool askedToJoin;
+    public Image colorImage;
 
     public Selectable[] roomSettings;
+
+    public Sprite xSprite, normalSprite;
 
     private bool pingsReceived;
     private List<string> formattedRegions;
@@ -55,8 +58,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ExitGames.Client.Photon.Hashtable prop = new() {
             { Enums.NetPlayerProperties.Character, 0 },
             { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() },
-            { Enums.NetPlayerProperties.PrimaryColor, 0 }, 
-            { Enums.NetPlayerProperties.SecondaryColor, 0 },
+            { Enums.NetPlayerProperties.PlayerColor, 0 },
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
@@ -341,10 +343,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         vsyncToggle.isOn = Settings.Instance.vsync;
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
 
-        //custom color dropdown initialization
-        primaryColorDropdown.AddOptions(CustomColors.Primary.Select(c => c.name).ToList());
-        secondaryColorDropdown.AddOptions(CustomColors.Secondary.Select(c => c.name).ToList());
-
         rebindManager.Init();
 
         GlobalController.Instance.discordController.UpdateActivity();
@@ -398,8 +396,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         
         OpenInLobbyMenu();
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
-        primaryColorDropdown.SetValueWithoutNotify((int) PhotonNetwork.LocalPlayer.CustomProperties[Enums.NetPlayerProperties.PrimaryColor]);
-        secondaryColorDropdown.SetValueWithoutNotify((int) PhotonNetwork.LocalPlayer.CustomProperties[Enums.NetPlayerProperties.SecondaryColor]);
+
+        Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value, PhotonNetwork.LocalPlayer.CustomProperties);
+        SetPlayerColor(value);
 
         OnRoomPropertiesUpdate(room.CustomProperties);
         ChangeMaxPlayers(room.MaxPlayers);
@@ -820,22 +819,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
     }
 
-    public void SwapPrimaryColor(TMP_Dropdown dropdown) {
+    public void SetPlayerColor(int index) {
         ExitGames.Client.Photon.Hashtable prop = new() {
-            { Enums.NetPlayerProperties.PrimaryColor, dropdown.value }
+            { Enums.NetPlayerProperties.PlayerColor, index }
         };
+        colorImage.sprite = index == 0 ? xSprite : normalSprite;
+        colorImage.color = index == 0 ? Color.white : CustomColors.Colors[index].hat;
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
-
-        dropdown.captionText.color = dropdown.value == 0 ? Color.white : CustomColors.Primary[dropdown.value].color;
-    }
-
-    public void SwapSecondaryColor(TMP_Dropdown dropdown) {
-        ExitGames.Client.Photon.Hashtable prop = new() {
-            { Enums.NetPlayerProperties.SecondaryColor, dropdown.value }
-        };
-        PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
-
-        dropdown.captionText.color = dropdown.value == 0 ? Color.white : CustomColors.Secondary[dropdown.value].color;
     }
 
     public void SetUsername(TMP_InputField field) {

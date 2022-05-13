@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private AudioSource sfx;
     private Animator animator;
     public Rigidbody2D body;
-    private PlayerAnimationController animationController;
+    public PlayerAnimationController animationController;
 
     public bool onGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenStruggle;
@@ -1796,10 +1796,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     bool HandleStuckInBlock() {
-        if (!body || hitboxes[0] == null)
+        if (!body || hitboxes.Length <= 0)
             return false;
         Vector2 checkPos = body.position + (Vector2.up * hitboxes[0].size * transform.lossyScale / 2);
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, hitboxes[0].size * transform.lossyScale * 0.8f)) {
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, hitboxes[0].size * transform.lossyScale * 0.6f)) {
             stuckInBlock = false;
             return false;
         }
@@ -1887,7 +1887,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         HandleGiantTiles(false);
         yield return null;
         RaycastHit2D hit = Physics2D.BoxCast(body.position + new Vector2(0, 1.6f), new Vector2(0.45f, 2.6f), 0, Vector2.zero, 0, ONLY_GROUND_MASK);
-        photonView.RPC("FinishMegaMario", RpcTarget.All, !(bool)hit);
+        photonView.RPC("FinishMegaMario", RpcTarget.All, !(bool) hit);
     }
     void HandleFacingDirection() {
         //Facing direction
@@ -2040,7 +2040,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             if (holding.CompareTag("frozencube")) {
                 holding.holderOffset = new Vector2(0f, state >= Enums.PowerupState.Large ? 1.2f : 0.5f);
             } else {
-                holding.holderOffset = new Vector2((facingRight ? 1 : -1) * 0.25f, state >= Enums.PowerupState.Large ? 0.5f : 0.25f);
+                holding.holderOffset = new Vector3((facingRight ? 1 : -1) * 0.25f, state >= Enums.PowerupState.Large ? 0.5f : 0.25f, !facingRight ? -0.09f : 0f);
             }
         }
 

@@ -17,12 +17,17 @@ public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
         UpdateAllPlayerEntries();
     }
     public void OnPlayerEnteredRoom(Player newPlayer) {
-        if (!newPlayer.IsLocal)
+        if (!newPlayer.IsLocal) {
             AddPlayerEntry(newPlayer);
+            UpdateAllPlayerEntries();
+        }
     }
+
     public void OnPlayerLeftRoom(Player otherPlayer) {
-        if (!otherPlayer.IsLocal)
+        if (!otherPlayer.IsLocal) {
             RemovePlayerEntry(otherPlayer);
+            UpdateAllPlayerEntries();
+        }
     }
     public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) { 
         UpdatePlayerEntry(targetPlayer); 

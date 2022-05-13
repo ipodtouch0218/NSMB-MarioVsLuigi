@@ -8,7 +8,6 @@ public class TrackIcon : MonoBehaviour {
     public float trackMinX, trackMaxX;
     public GameObject target;
     private PlayerController playerTarget;
-    public Color outlineColor;
     Image image;
     public bool doAnimation;
     public Sprite starSprite;
@@ -27,9 +26,9 @@ public class TrackIcon : MonoBehaviour {
         }
         image.enabled = true;
         if (target.CompareTag("Player")) {
-            image.sprite = Utils.GetCharacterData(target.GetPhotonView().Owner).trackSprite;
             if (!playerTarget)
                 playerTarget = target.GetComponent<PlayerController>();
+            image.color = playerTarget.animationController.glowColor;
             if (playerTarget.dead) {
                 flashTimer += Time.deltaTime;
                 image.enabled = (flashTimer % 0.2f) <= 0.1f;

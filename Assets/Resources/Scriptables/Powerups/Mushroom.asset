@@ -16,7 +16,7 @@ MonoBehaviour:
   prefab: Mushroom
   soundEffect: 16
   spawnChance: 0
-  starModifier: 1
+  starModifier: 2
   big: 0
   vertical: 0
   custom: 0

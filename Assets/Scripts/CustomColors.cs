@@ -5,40 +5,22 @@ using UnityEngine;
 public static class CustomColors {
     public class PlayerColor {
         public string name;
-        public Color color;
-        public PlayerColor(string name, Color32 color) {
+        public Color hat, overalls;
+        public PlayerColor(string name, Color32 hat, Color32 overalls) {
             this.name = name;
-            this.color = color;
+            this.hat = hat;
+            this.overalls = overalls;
         }
     }
 
-    //Overalls colors
-    public static PlayerColor[] Primary = new PlayerColor[] {
-        new("Default", new(0, 0, 0, 0)),
-        new("Red", new(229, 45, 0, 255)),
-        new("Orange", new(229, 118, 0, 255)),
-        new("Yellow", new(229, 212, 0, 255)),
-        new("Green", new(100, 229, 0, 255)),
-        new("Teal", new(0, 229, 179, 255)),
-        new("Blue", new(0, 91, 229, 255)),
-        new("Indigo", new(118, 45, 229, 255)),
-        new("Pink", new(229, 61, 229, 255)),
-        new("Purple", new(181, 22, 229, 255)),
-        new("Black", new(96, 96, 96, 255))
+    public static PlayerColor[] Colors = new PlayerColor[] {
+        new("Default", new(0, 0, 0, 0), new(0, 0, 0, 0)),
+        new("Blue", new(35, 63, 201, 255), new(255, 255, 255, 255)),
+        new("Purple", new(255, 223, 70, 255), new(74, 14, 127, 255)),
+        new("Black", new(74, 14, 127, 255), new(46, 40, 51, 255)),
+        new("Pink", new(255, 110, 170, 255), new(255, 215, 110, 255)),
+        new("Orange", new(242, 124, 42, 255), new(99, 212, 80, 255)),
+        new("Maroon", new(126, 39, 57, 255), new(236, 171, 171, 255)),
     };
-    //Shirt/Hat colors
-    public static PlayerColor[] Secondary = new PlayerColor[] {
-        new("Default", new(0, 0, 0, 0)),
-        new("Red", new(153, 28, 0, 255)),
-        new("Orange", new(153, 76, 0, 255)),
-        new("Yellow", new(153, 140, 0, 255)),
-        new("Green", new(68, 153, 0, 255)),
-        new("Teal", new(0, 153, 117, 255)),
-        new("Blue", new(0, 61, 153, 255)),
-        new("Indigo", new(79, 30, 153, 255)),
-        new("Pink", new(153, 41, 151, 255)),
-        new("Purple", new(120, 15, 153, 255)),
-        new("Black", new(38, 38, 38, 255))
-    };
-    
 }
+

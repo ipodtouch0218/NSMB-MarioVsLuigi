@@ -12,7 +12,7 @@ public abstract class HoldableEntity : KillableEntity {
             return;
 
         body.velocity = Vector2.zero;
-        transform.position = body.position = holder.transform.position + holderOffset;
+        body.position = transform.position = holder.transform.position + holderOffset;
         return;
     }
 

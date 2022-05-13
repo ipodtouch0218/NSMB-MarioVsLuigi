@@ -35,6 +35,9 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private readonly List<ScrollRect> components = new();
     private bool IsFirstParent(Transform target) {
         do {
+            if (target.GetComponent<IFocusIgnore>() != null)
+                return false;
+
             target.GetComponents(components);
 
             if (components.Count >= 1)
@@ -52,4 +55,6 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public void OnPointerExit(PointerEventData eventData) {
         mouseOver = false;
     }
+
+    public interface IFocusIgnore { }
 }

@@ -236,4 +236,9 @@ public class Utils {
         }
         return ret;
     }
+
+    public static Color GetPlayerColor(Player player, float s = 1, float v = 1) {
+        int id = System.Array.IndexOf(PhotonNetwork.PlayerList, player);
+        return Color.HSVToRGB(id / ((float) PhotonNetwork.PlayerList.Length + 1), s, v);
+     }
 }

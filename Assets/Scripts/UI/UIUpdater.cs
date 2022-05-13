@@ -24,7 +24,7 @@ public class UIUpdater : MonoBehaviour {
     }
     
     public GameObject CreatePlayerIcon(PlayerController player) {
-        GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.position, Quaternion.identity, transform);
+        GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
         TrackIcon icon = trackObject.GetComponent<TrackIcon>();
         icon.target = player.gameObject;
 

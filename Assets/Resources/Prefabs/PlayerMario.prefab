@@ -10095,6 +10095,7 @@ MonoBehaviour:
   cameraController: {fileID: 0}
   fadeOut: {fileID: 0}
   body: {fileID: 0}
+  animationController: {fileID: 0}
   onGround: 0
   crushGround: 0
   doGroundSnap: 0
