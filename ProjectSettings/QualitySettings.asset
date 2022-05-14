@@ -227,3 +227,4 @@ QualitySettings:
     Server: 0
     Standalone: 5
     WebGL: 5
+    iPhone: 0
