@@ -108,6 +108,8 @@ public abstract class KillableEntity : MonoBehaviourPun {
 
     [PunRPC]
     public virtual void SpecialKill(bool right = true, bool groundpound = false) {
+        if (dead)
+            return;
         body.velocity = new Vector2(2.5f * (right ? 1 : -1), 2.5f);
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (right ? 1 : -1);
@@ -122,7 +124,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
         
-        if (PhotonNetwork.IsMasterClient && !tag.Contains("frozencube"))
+        if (PhotonNetwork.IsMasterClient && !frozen)
             PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + new Vector2(0, 0.5f), Quaternion.identity);
     } 
 

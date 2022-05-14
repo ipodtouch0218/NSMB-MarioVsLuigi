@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public Enums.MusicState? musicState = null;
 
     public GameObject localPlayer;
-    public bool paused, loaded, starting;
+    public bool paused, loaded, started;
     public GameObject pauseUI, pauseButton;
     public bool gameover = false, musicEnabled = false;
     public readonly List<string> loadedPlayers = new();
@@ -352,7 +352,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     IEnumerator LoadingComplete(int startTimestamp) {
         GlobalController.Instance.discordController.UpdateActivity();
 
-        starting = true;
         loaded = true;
         loadedPlayers.Clear();
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
@@ -385,6 +384,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         allPlayers = FindObjectsOfType<PlayerController>();
         playerCount = allPlayers.Length;
+        started = true;
 
         if (!spectating) {
             foreach (PlayerController controllers in allPlayers)

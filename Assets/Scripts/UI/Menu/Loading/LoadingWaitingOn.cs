@@ -17,7 +17,7 @@ public class LoadingWaitingOn : MonoBehaviour {
             text.text = spectatorText;
             return;
         }
-        if (GameManager.Instance.starting) {
+        if (GameManager.Instance.loaded) {
             text.text = readyToStartText;
             return;
         }

@@ -174,7 +174,7 @@ public class FrozenCube : HoldableEntity {
                 GetComponent<BoxCollider2D>().size = new Vector2(1.35f, 2);
                 frozenCubeCollider.size = new Vector2(1.35f, 2);
                 frozenPlayer = PhotonView.Find(enitiyID).GetComponent<PlayerController>();
-                frozenPlayer.FrozenObject = this;
+                frozenPlayer.frozenObject = this;
                 frozenPlayer.photonView.RPC("Freeze", RpcTarget.All);
             }
             break;

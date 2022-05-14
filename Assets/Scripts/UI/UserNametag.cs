@@ -1,24 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class UserNametag : MonoBehaviour {
 
     private RectTransform parentCanvas;
+    public GameObject nametag;
     public TMP_Text text;
+    public Image arrow;
     public PlayerController parent;
     public void Start() {
         parentCanvas = transform.parent.GetComponent<RectTransform>();
     }
 
-    void Update() {
+    void LateUpdate() {
         if (parent == null) {
             Destroy(gameObject);
             return;
         }
 
-        text.enabled = !parent.dead;
+        arrow.color = parent.animationController.glowColor;
+        nametag.SetActive(!parent.dead);
 
         Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.hitboxes[0].size.y * parent.transform.lossyScale.y * 1.2f) + 0.2f);
         if (GameManager.Instance.loopingLevel && Mathf.Abs(worldPos.x - Camera.main.transform.position.x) > GameManager.Instance.levelWidthTile / 4f)

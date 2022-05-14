@@ -10158,7 +10158,7 @@ MonoBehaviour:
   storedPowerup: {fileID: 0}
   holding: {fileID: 0}
   holdingOld: {fileID: 0}
-  FrozenObject: {fileID: 0}
+  frozenObject: {fileID: 0}
   joystick: {x: 0, y: 0}
   giantSavedVelocity: {x: 0, y: 0}
   previousFrameVelocity: {x: 0, y: 0}

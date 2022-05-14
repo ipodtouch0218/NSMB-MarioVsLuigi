@@ -26,8 +26,14 @@ public class StarBouncer : MonoBehaviourPun {
 
         graphicTransform = transform.Find("Graphic");
 
+        GameObject trackObject = Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.Instance.transform);
+        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
+        icon.target = gameObject;
+        trackObject.SetActive(true);
+
         object[] data = photonView.InstantiationData;
         if (data != null) {
+            trackObject.transform.localScale = new Vector3(3f / 4f, 3f / 4f, 1f);
             stationary = false;
             passthrough = true;
             gameObject.layer = LayerMask.NameToLayer("HitsNothing");
@@ -36,6 +42,10 @@ public class StarBouncer : MonoBehaviourPun {
             fast = direction == 0 || direction == 3;
             creator = (int) data[1];
             becomeCollectibleAt = (int) data[2];
+            body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), deathBoostAmount);
+            if ((bool) data[3]) {
+                body.velocity += Vector2.up * 3;
+            }
             body.isKinematic = false;
         } else {
             GetComponent<Animator>().enabled = true;
@@ -45,14 +55,6 @@ public class StarBouncer : MonoBehaviourPun {
             becomeCollectibleAt = PhotonNetwork.ServerTimestamp;
         }
 
-        GameObject trackObject = Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.Instance.transform);
-        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
-        icon.target = gameObject;
-        if (!stationary) {
-            trackObject.transform.localScale = new Vector3(3f/4f, 3f/4f, 1f);
-            body.velocity += new Vector2(moveSpeed * (left ? -1 : 1), deathBoostAmount);
-        }
-        trackObject.SetActive(true);
 
         if (ANY_GROUND_MASK == -1)
             ANY_GROUND_MASK = LayerMask.GetMask("Ground", "PassthroughInvalid");

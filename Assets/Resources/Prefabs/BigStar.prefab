@@ -4884,7 +4884,7 @@ MonoBehaviour:
   moveSpeed: 1.5
   rotationSpeed: 6
   bounceAmount: 7
-  deathBoostAmount: 10
+  deathBoostAmount: 8.5
   blinkingSpeed: 0.25
   lifespan: 15
   counter: 0
