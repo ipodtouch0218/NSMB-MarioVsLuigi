@@ -18,9 +18,22 @@ public class UIUpdater : MonoBehaviour {
 
     private Material timerMaterial;
 
+    private GameObject starsParent, coinsParent, livesParent, timerParent;
+    private readonly List<Image> backgrounds = new();
+
     void Start() {
         Instance = this;
         pingSample = PhotonNetwork.GetPing();
+
+        starsParent = uiStars.transform.parent.gameObject;
+        coinsParent = uiCoins.transform.parent.gameObject;
+        livesParent = uiLives.transform.parent.gameObject;
+        timerParent = uiCountdown.transform.parent.gameObject;
+
+        backgrounds.Add(starsParent.GetComponentInChildren<Image>());
+        backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
+        backgrounds.Add(livesParent.GetComponentInChildren<Image>());
+        backgrounds.Add(timerParent.GetComponentInChildren<Image>());
     }
     
     public GameObject CreatePlayerIcon(PlayerController player) {
@@ -35,6 +48,7 @@ public class UIUpdater : MonoBehaviour {
 
     void Update() {
         pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Time.unscaledDeltaTime * 0.5f);
+
 
         if (pingSample == float.NaN)
             pingSample = 0;
@@ -77,13 +91,16 @@ public class UIUpdater : MonoBehaviour {
         if (!player || GameManager.Instance.gameover)
             return;
 
+        foreach (Image bg in backgrounds)
+            bg.color = GameManager.Instance.levelUIColor;
+
         uiStars.text = Utils.GetSymbolString($"Sx{player.stars}/{GameManager.Instance.starRequirement}");
         uiCoins.text = Utils.GetSymbolString($"Cx{player.coins}/8");
         
         if (player.lives < 0) {
-            uiLives.gameObject.SetActive(false);
+            livesParent.SetActive(false);
         } else {
-            uiLives.gameObject.SetActive(true);
+            livesParent.SetActive(true);
             uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + Utils.GetSymbolString("x" + player.lives);
         }
 
@@ -91,7 +108,7 @@ public class UIUpdater : MonoBehaviour {
             int seconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000;
             seconds = Mathf.Clamp(seconds, 0, GameManager.Instance.timedGameDuration);
             uiCountdown.text = Utils.GetSymbolString($"cx{seconds / 60}:{seconds % 60:00}");
-            uiCountdown.gameObject.SetActive(true);
+            timerParent.SetActive(true);
             if (seconds == 0) {
                 if (timerMaterial == null)
                     timerMaterial = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>().GetMaterial();
@@ -101,7 +118,7 @@ public class UIUpdater : MonoBehaviour {
                 timerMaterial.SetColor("_Color", new Color32(255, gb, gb, 255));
             }
         } else {
-            uiCountdown.gameObject.SetActive(false);
+            timerParent.SetActive(false);
         }
     }
 

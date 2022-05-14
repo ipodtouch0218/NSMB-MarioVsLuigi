@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     private int starDirection;
     public PlayerData character;
 
+    private bool brickBreakSound = true;
+
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
     public bool doIceSkidding;
@@ -252,6 +254,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             }
             return;
         }
+
+        brickBreakSound = true;
 
         if (!dead) {
             HandleTemporaryInvincibility();
@@ -1063,11 +1067,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
     [PunRPC]
     public void PlaySound(Enums.Sounds sound, byte variant, float volume) {
+        if (sound == Enums.Sounds.Powerup_MegaMushroom_Break_Block) {
+            if (!brickBreakSound)
+                return;
+            brickBreakSound = false;
+        }
         sfx.PlayOneShot(sound.GetClip(character, variant), Mathf.Clamp01(volume));
     }
     [PunRPC]
     public void PlaySound(Enums.Sounds sound, byte variant) {
-        sfx.PlayOneShot(sound.GetClip(character, variant), 1);
+        PlaySound(sound, variant, 1);
     }
     [PunRPC]
     public void PlaySound(Enums.Sounds sound) {

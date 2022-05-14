@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool loopingLevel = true;
     public Vector3 spawnpoint;
     public Tilemap tilemap;
+    [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
     public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     public string levelDesigner = "", richPresenceId = "";
     TileBase[] originalTiles;
@@ -197,9 +198,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             GameObject particle;
             if (particleName == "BrickBreak") {
                 brickBreak.transform.position = worldPos;
-                ParticleSystem.MainModule main = brickBreak.main;
-                main.startColor = new Color(color.x, color.y, color.z, 1);
-                brickBreak.Emit(4);
+                brickBreak.Emit(new() { startColor = new Color(color.x, color.y, color.z, 1) }, 4);
             } else {
                 particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), worldPos, Quaternion.identity);
                 
@@ -311,6 +310,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SpectationManager = GetComponent<SpectationManager>();
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
+        levelUIColor.a = .7f;
 
 #if UNITY_EDITOR
         //Spawning in editor??
