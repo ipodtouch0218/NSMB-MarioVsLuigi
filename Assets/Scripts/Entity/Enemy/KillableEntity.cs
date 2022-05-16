@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 
 public abstract class KillableEntity : MonoBehaviourPun {
-    public bool dead, frozen, left = true;
+    public bool dead, frozen, left = true, collide = true;
     public Rigidbody2D body;
     protected BoxCollider2D hitbox;
     protected Animator animator;
@@ -22,7 +22,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
     }
 
     public virtual void FixedUpdate() {
-        if (dead || !photonView || !GameManager.Instance || !photonView.IsMine)
+        if (!photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
         if (body && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
@@ -30,7 +30,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
     }
 
     public void OnTriggerEnter2D(Collider2D collider) {
-        if (!photonView.IsMine || !collider.GetComponentInParent<KillableEntity>())
+        if (!collide || !photonView.IsMine || !collider.GetComponentInParent<KillableEntity>())
             return;
 
         bool goLeft = body.position.x < collider.attachedRigidbody.position.x;
@@ -84,10 +84,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Freeze);
         frozen = true;
         animator.enabled = false;
-        //audioSource.enabled = false; // Note: I commented this out since it stopped the freeze enemy sound, if it was necessary, revert this change.
-        // Note: disabling hitbox doesn't work for some reason but I left the code here.
         hitbox.enabled = false;
-        transform.Find("Hitbox").gameObject.SetActive(false);
         if (body) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;

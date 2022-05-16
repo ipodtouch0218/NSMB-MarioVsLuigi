@@ -21,6 +21,7 @@ public static class CustomColors {
         new("Pink", new(255, 110, 170, 255), new(255, 215, 110, 255)),
         new("Orange", new(242, 124, 42, 255), new(99, 212, 80, 255)),
         new("Maroon", new(126, 39, 57, 255), new(236, 171, 171, 255)),
+        new("SMW", new(253, 61, 112, 255), new(89, 225, 211, 255)),
     };
 }
 

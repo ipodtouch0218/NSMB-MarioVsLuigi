@@ -75,8 +75,6 @@ public class GlobalController : Singleton<GlobalController> {
         oldWndProcPtr = SetWindowLongPtr(hwnd, -4, newWndProcPtr); // (GWLP_WNDPROC == -4)
     }
     private static IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam) {
-        UnityEngine.Debug.Log(msg);
-
         if (msg == 0x00a4) {
             SendMessage(hWnd, 0x001F, 0, 0);
             return IntPtr.Zero;

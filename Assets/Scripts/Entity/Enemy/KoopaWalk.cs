@@ -16,7 +16,7 @@ public class KoopaWalk : HoldableEntity {
     private float dampVelocity, speed;
     new void Start() {
         base.Start();
-        hitbox = GetComponentInChildren<BoxCollider2D>();
+        base.hitbox = GetComponentInChildren<BoxCollider2D>();
         worldHitbox = GetComponent<BoxCollider2D>();
 
         if (GROUND_LAYER_ID == -1)

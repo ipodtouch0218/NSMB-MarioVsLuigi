@@ -113,8 +113,8 @@ public class UIUpdater : MonoBehaviour {
                 if (timerMaterial == null)
                     timerMaterial = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>().GetMaterial();
 
-                float partialSeconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f % 2f;
-                byte gb = (byte) (Mathf.PingPong(partialSeconds, 1) * 255);
+                float partialSeconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f % 1f;
+                byte gb = (byte) (Mathf.PingPong(partialSeconds, 0.5f) * 255);
                 timerMaterial.SetColor("_Color", new Color32(255, gb, gb, 255));
             }
         } else {

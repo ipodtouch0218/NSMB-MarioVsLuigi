@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public static int ANY_GROUND_MASK = -1, ONLY_GROUND_MASK, GROUND_LAYERID, HITS_NOTHING_LAYERID, DEFAULT_LAYERID;
 
     public int playerId = -1;
-    public bool dead = false;
+    public bool dead = false, spawned = false;
     public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
     public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f;
     public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, propellerDrillBuffer;
@@ -419,13 +419,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                         //we are big, groundpounding a mini opponent. squish.
                         otherView.RPC("Powerdown", RpcTarget.All, false);
                         bounce = false;
-                    } else {
+                    } else if (!(other.state == Enums.PowerupState.BlueShell && (crouching || groundpound))) {
                         otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, (other.state == Enums.PowerupState.MiniMushroom || groundpound || drill) ? 3 : 1, false, photonView.ViewID);
                     }
                     body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);
 
                     return;
-                } else if (!other.knockback && inShell && (other.inShell || above)) {
+                } else if (!knockback && !other.knockback && inShell && (other.inShell || above)) {
                     if (other.inShell) {
                         otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, false, photonView.ViewID);
                         photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, false, otherView.ViewID);
@@ -434,7 +434,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                         body.velocity = new Vector2(-body.velocity.x, body.velocity.y);
                     }
                     return;
-                } else if (!other.knockback && !otherAbove && onGround && other.onGround && Mathf.Abs(previousFrameVelocity.x) > walkingMaxSpeed) {
+                } else if (!knockback && !other.knockback && !otherAbove && onGround && other.onGround && (Mathf.Abs(previousFrameVelocity.x) > walkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > walkingMaxSpeed)) {
                     //bump?
 
                     otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
@@ -467,7 +467,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     public void OnTriggerEnter2D(Collider2D collider) {
-        if (!photonView.IsMine || dead || frozen)
+        if (!photonView.IsMine || dead || frozen || pipeEntering)
             return;
 
         HoldableEntity holdable = collider.GetComponentInParent<HoldableEntity>();
@@ -487,8 +487,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                 break;
 
             fireball.photonView.RPC("Kill", RpcTarget.All);
+            if (knockback)
+                break;
+
             if (!fireball.isIceball) {
-                if (state == Enums.PowerupState.MegaMushroom && state == Enums.PowerupState.BlueShell && (inShell || crouching || groundpound) || invincible > 0)
+                if (state == Enums.PowerupState.MegaMushroom || (state == Enums.PowerupState.BlueShell && (inShell || crouching || groundpound)) || invincible > 0)
                     break;
                 if (state == Enums.PowerupState.MiniMushroom) {
                     photonView.RPC("Powerdown", RpcTarget.All, false);
@@ -826,14 +829,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             return;
         }
         frozen = true;
+        unfreezeTimer = 3;
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
     }
     [PunRPC]
     protected void Unfreeze() {
-        frozenObject.photonView.RPC("SpecialKill", RpcTarget.All, body.position.x > body.position.x, false);
+        if (!frozen)
+            return;
+
         frozen = false;
+        frozenObject.photonView.RPC("SpecialKill", RpcTarget.All, body.position.x > body.position.x, false);
         animator.enabled = true;
         body.isKinematic = false;
         body.simulated = true;
@@ -1007,6 +1014,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
         previousState = state = Enums.PowerupState.Small;
         animationController.DisableAllModels();
         dead = false;
+        spawned = false;
         animator.SetTrigger("respawn");
         invincible = 0;
         unfreezeTimer = 3;
@@ -1027,6 +1035,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     public void Respawn() {
         gameObject.SetActive(true);
         dead = false;
+        spawned = true;
         state = Enums.PowerupState.Small;
         previousState = Enums.PowerupState.Small;
         body.velocity = Vector2.zero;
@@ -1377,7 +1386,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     bool colliding = true;
     void HandleTemporaryInvincibility() {
-        bool shouldntCollide = (hitInvincibilityCounter > 0) || (knockback && !fireballKnockback);
+        bool shouldntCollide = hitInvincibilityCounter > 0 || (knockback && !fireballKnockback);
         if (shouldntCollide && colliding) {
             colliding = false;
             foreach (var player in GameManager.Instance.allPlayers) {
@@ -1782,24 +1791,26 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     bool HandleStuckInBlock() {
         if (!body || hitboxes.Length <= 0)
             return false;
-        Vector2 checkPos = body.position + (Vector2.up * hitboxes[0].size * transform.lossyScale / 2);
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, hitboxes[0].size * transform.lossyScale * 0.6f)) {
+
+        Vector2 checkSize = hitboxes[0].size * transform.lossyScale * 0.6f;
+        Vector2 checkPos = body.position + (Vector2.up * hitboxes[0].size * transform.lossyScale / 2f);
+        
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
             stuckInBlock = false;
             return false;
         }
         stuckInBlock = true;
         body.gravityScale = 0;
         onGround = true;
-        if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(0, 0.3f))) {
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + new Vector2(0, 0.3f), checkSize)) {
             transform.position = body.position = new Vector2(body.position.x, Mathf.Floor((checkPos.y + 0.3f) * 2) / 2 + 0.1f);
-            return false;
-        } else if (!Utils.IsTileSolidAtWorldLocation(checkPos - new Vector2(0, 0.3f))) {
+        } else if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos - new Vector2(0, 0.3f), checkSize)) {
             transform.position = body.position = new Vector2(body.position.x, Mathf.Floor((checkPos.y - 0.3f) * 2) / 2 - 0.1f);
-            return false;
-        } else if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(0.25f, 0))) {
+        }
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + new Vector2(0.25f, 0), checkSize)) {
             body.velocity = Vector2.right * 2f;
             return true;
-        } else if (!Utils.IsTileSolidAtWorldLocation(checkPos + new Vector2(-0.25f, 0))) {
+        } else if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + new Vector2(-0.25f, 0), checkSize)) {
             body.velocity = Vector2.left * 2f;
             return true;
         }
@@ -2280,7 +2291,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
             groundpoundCounter = groundpoundTime * (state == Enums.PowerupState.MegaMushroom ? 1.5f : 1);
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_GroundpoundStart);
             alreadyGroundpounded = true;
-            groundpoundDelay = 0.7f;
+            groundpoundDelay = 0.5f;
         }
     }
 

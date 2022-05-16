@@ -409,6 +409,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         });
         if (updatePingCoroutine == null)
             updatePingCoroutine = StartCoroutine(UpdatePing());
+        GlobalController.Instance.discordController.UpdateActivity();
     }
 
     public void OpenTitleScreen() {
@@ -548,7 +549,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         for (int i = 0; i < lobbiesContent.transform.childCount; i++) {
             GameObject roomObj = lobbiesContent.transform.GetChild(i).gameObject;
-            if (!roomObj.activeSelf)
+            if (roomObj.GetComponent<RoomIcon>().joinPrivate || !roomObj.activeSelf)
                 continue;
 
             Destroy(roomObj);

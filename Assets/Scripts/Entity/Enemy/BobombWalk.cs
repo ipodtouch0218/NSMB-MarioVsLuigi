@@ -27,6 +27,9 @@ public class BobombWalk : HoldableEntity {
             return;
         }
         base.FixedUpdate();
+        if (lit) {
+            animator.SetTrigger("lit");
+        }
 
         if (!photonView || photonView.IsMine)
             HandleCollision();

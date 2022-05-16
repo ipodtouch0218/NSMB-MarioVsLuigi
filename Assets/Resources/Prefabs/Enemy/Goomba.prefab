@@ -180,6 +180,7 @@ MonoBehaviour:
   dead: 0
   frozen: 0
   left: 1
+  collide: 1
   body: {fileID: 0}
   speed: 0.875
   deathTimer: 0.5
