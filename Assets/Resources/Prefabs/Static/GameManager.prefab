@@ -2672,6 +2672,7 @@ GameObject:
   - component: {fileID: 6939580310757319841}
   - component: {fileID: 2609391306392377818}
   - component: {fileID: 8890669765067733994}
+  - component: {fileID: 6995593066183708886}
   m_Layer: 5
   m_Name: JumpButton
   m_TagString: Untagged
@@ -2794,6 +2795,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ControlPath: <Gamepad>/buttonSouth
+--- !u!114 &6995593066183708886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2937760585300493944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1af927340b9b9e2458ee362b0e0dfcdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3057468802821658869
 GameObject:
   m_ObjectHideFlags: 0
@@ -3073,6 +3086,7 @@ GameObject:
   - component: {fileID: 1873791432101449795}
   - component: {fileID: 3160762419075272535}
   - component: {fileID: 7650095390381854199}
+  - component: {fileID: 6125439533482695690}
   m_Layer: 5
   m_Name: AbilityButton
   m_TagString: Untagged
@@ -3195,6 +3209,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ControlPath: <Gamepad>/rightShoulder
+--- !u!114 &6125439533482695690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3661843405483751398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1af927340b9b9e2458ee362b0e0dfcdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3686373741768737108
 GameObject:
   m_ObjectHideFlags: 0
@@ -5296,6 +5322,7 @@ GameObject:
   - component: {fileID: 2794700688307563563}
   - component: {fileID: 7088544063841648022}
   - component: {fileID: 1405058849868832292}
+  - component: {fileID: 2110370907397211267}
   m_Layer: 5
   m_Name: SprintButton
   m_TagString: Untagged
@@ -5418,6 +5445,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ControlPath: <Gamepad>/buttonWest
+--- !u!114 &2110370907397211267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7601403290341143565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1af927340b9b9e2458ee362b0e0dfcdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7646944098808609202
 GameObject:
   m_ObjectHideFlags: 0
