@@ -5089,6 +5089,8 @@ MonoBehaviour:
   frozen: 0
   left: 1
   collide: 0
+  iceCarryable: 1
+  flying: 1
   body: {fileID: 0}
   speed: 1.5
   playerSearchRadius: 12

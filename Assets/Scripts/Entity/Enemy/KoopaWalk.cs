@@ -16,7 +16,7 @@ public class KoopaWalk : HoldableEntity {
     private float dampVelocity, speed;
     new void Start() {
         base.Start();
-        base.hitbox = GetComponentInChildren<BoxCollider2D>();
+        hitbox = GetComponentInChildren<BoxCollider2D>();
         worldHitbox = GetComponent<BoxCollider2D>();
 
         if (GROUND_LAYER_ID == -1)
@@ -157,6 +157,13 @@ public class KoopaWalk : HoldableEntity {
             }
         }
     }
+
+    [PunRPC]
+    public override void Freeze(int cube) {
+        base.Freeze(cube);
+        stationary = true;
+    }
+
 
     [PunRPC]
     public override void Kick(bool fromLeft, float kickFactor, bool groundpound) {

@@ -42,7 +42,7 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.Digit6, "BulletBill");
         DebugEntity(Key.Digit7, "Spiny");
 
-        //FreezePlayer(Key.Digit9);
+        FreezePlayer(Key.Digit9);
         //DebugWorldEntity(Key.Digit0, "FrozenCube");
     }
 
@@ -51,10 +51,8 @@ public class DebugControls : MonoBehaviour {
             return;
 
         PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        if (Keyboard.current[key].wasPressedThisFrame && (!p.frozen && !p.frozenObject && p.state != Enums.PowerupState.MegaMushroom && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0)) {
-
-            GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", p.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-            frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, "Player", p.photonView.ViewID);
+        if (Keyboard.current[key].wasPressedThisFrame && !p.frozen && !p.frozenObject && p.state != Enums.PowerupState.MegaMushroom && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0) {
+            PhotonNetwork.Instantiate("Prefabs/FrozenCube", p.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { p.photonView.ViewID });
         }
     }
     private void DebugItem(Key key, string item) {

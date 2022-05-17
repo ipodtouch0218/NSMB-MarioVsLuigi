@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public static class UIExtensions {
+public static class Extensions {
     // Shared array used to receive result of RectTransform.GetWorldCorners
     static Vector3[] corners = new Vector3[4];
 
@@ -73,5 +73,9 @@ public static class UIExtensions {
         // Normalize and apply the calculated offset
         var scrollPos = scrollRect.verticalNormalizedPosition - scrollRect.NormalizeScrollDistance(1, offset);
         return Mathf.Clamp(scrollPos, 0f, 1f);
+    }
+
+    public static Vector3 Multiply(this Vector3 a, Vector3 b) {
+        return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
     }
 }

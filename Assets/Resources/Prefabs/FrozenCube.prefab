@@ -100,10 +100,10 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.25}
   m_SpriteTilingProperty:
     border: {x: 0.09375, y: 0.09375, z: 0.09375, w: 0.09375}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 0.6875, y: 0.6875}
     newSize: {x: 0.5, y: 0.5}
     adaptiveTilingThreshold: 0.5
@@ -166,7 +166,6 @@ GameObject:
   - component: {fileID: 2249742354441438921}
   - component: {fileID: -5867948262533087669}
   - component: {fileID: -4211955845073762521}
-  - component: {fileID: -3223435254849421410}
   m_Layer: 0
   m_Name: FrozenCube
   m_TagString: frozencube
@@ -206,6 +205,8 @@ MonoBehaviour:
   frozen: 0
   left: 1
   collide: 1
+  iceCarryable: 0
+  flying: 0
   body: {fileID: -1029166702606754831}
   holder: {fileID: 0}
   previousHolder: {fileID: 0}
@@ -213,18 +214,16 @@ MonoBehaviour:
   throwSpeed: 10
   frozenCubeCollider: {fileID: 1182937128297349914}
   spriteRenderer: {fileID: 0}
-  frozenEntity: {fileID: 0}
-  frozenPlayer: {fileID: 0}
-  fallTimer: 5
+  entityView: {fileID: 0}
+  fallTime: 5
   killTimer: 0.5
   fastSlide: 0
   fallen: 0
-  crashed: 0
   deathFlag: 0
   kinematicEntity: 0
   flyingEntity: 0
   plantEntity: 0
-  offset: 0
+  offset: {x: 0, y: 0}
 --- !u!114 &-1720675168950811037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,7 +264,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 3
   m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
@@ -302,7 +301,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.25}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -469,16 +468,3 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &-3223435254849421410
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4465303805189439310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  killTime: 0.1

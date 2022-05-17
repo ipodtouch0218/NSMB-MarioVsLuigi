@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 using Photon.Pun;
 using ExitGames.Client.Photon;
 
-public class PlayerController : MonoBehaviourPun, IPunObservable {
+public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEntity {
 
     public static int ANY_GROUND_MASK = -1, ONLY_GROUND_MASK, GROUND_LAYERID, HITS_NOTHING_LAYERID, DEFAULT_LAYERID;
 
@@ -69,6 +69,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }; //only used to update spectating players
 
     private bool initialKnockbackFacingRight = false;
+
+    bool IFreezableEntity.IsCarryable => true;
+    bool IFreezableEntity.IsFlying => flying || propeller;
+
 
     #region -- SERIALIZATION / EVENTS --
 
@@ -223,15 +227,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     public void LateUpdate() {
-        if (frozen) {
+        if (frozen)
             body.velocity = Vector2.zero;
-            if (inShell || state == Enums.PowerupState.Small) {
-                transform.position = frozenObject.transform.position + new Vector3(0f, -0.3f, 0);
-            } else {
-                transform.position = frozenObject.transform.position + new Vector3(0f, -0.45f, 0);
-            }
-            return;
-        }
     }
 
     public void FixedUpdate() {
@@ -504,8 +501,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
                     photonView.RPC("Powerdown", RpcTarget.All, false);
                 } else if (!frozen && !frozenObject && state != Enums.PowerupState.MegaMushroom && !pipeEntering && !knockback && hitInvincibilityCounter <= 0) {
 
-                    GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-                    frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, gameObject.tag, photonView.ViewID);
+                    GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { photonView.ViewID });
+                    frozenObject = cube.GetComponent<FrozenCube>();
 
                 }
             }
@@ -608,7 +605,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
 
     private void ActivatePowerupAction() {
-        if (knockback || pipeEntering || GameManager.Instance.gameover || dead)
+        if (knockback || pipeEntering || GameManager.Instance.gameover || dead || frozen)
             return;
 
         switch (state) {
@@ -818,41 +815,40 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
     }
     #endregion
 
-
+    #region -- FREEZING --
     [PunRPC]
-    protected void Freeze() {
-        if (knockback || hitInvincibilityCounter > 0 || frozen || state == Enums.PowerupState.BlueShell)
+    public void Freeze(int cube) {
+        if (knockback || hitInvincibilityCounter > 0 || invincible > 0 || frozen)
             return;
-        if (invincible > 0) {
-            Instantiate(Resources.Load("Prefabs/Particle/IceBreak"), transform.position, Quaternion.identity);
-            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_FreezeShatter);
-            return;
-        }
+
+        frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
         frozen = true;
         unfreezeTimer = 3;
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
     }
+
     [PunRPC]
-    protected void Unfreeze() {
+    public void Unfreeze() {
         if (!frozen)
             return;
 
         frozen = false;
-        frozenObject.photonView.RPC("SpecialKill", RpcTarget.All, body.position.x > body.position.x, false);
-        animator.enabled = true;
-        body.isKinematic = false;
-        body.simulated = true;
-        PlaySound(Enums.Sounds.Enemy_Generic_FreezeShatter);
-        photonView.RPC("Knockback", RpcTarget.All, false, 1, true, 0);
         frozenStruggle = 0;
+        animator.enabled = true;
+        body.simulated = true;
+        body.isKinematic = false;
+
+        frozenObject?.Kill();
+        Knockback(false, 1, true, -1);
     }
 
     protected void FrozenStruggle(bool movement = false) {
         // FrozenStruggle is called by OnJump and that is called everytime jump is pushed or letgo so I just put a 4 there.
-        unfreezeTimer = Mathf.Max(0, unfreezeTimer - (movement ? 0.02f : 0.04f));
+        Utils.TickTimer(ref unfreezeTimer, movement ? 0.02f : 0.04f, 0);
     }
+    #endregion
 
     #region -- COIN / STAR COLLECTION --
     [PunRPC]
@@ -2222,7 +2218,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
     public void SetHoldingOffset() {
         if (holding.CompareTag("frozencube")) {
-            holding.holderOffset = new Vector2(0f, state >= Enums.PowerupState.Large ? 1.2f : 0.5f);
+            holding.holderOffset = Vector2.up * hitboxes[0].size;
         } else {
             holding.holderOffset = new Vector3((facingRight ? 1 : -1) * 0.25f, state >= Enums.PowerupState.Large ? 0.5f : 0.25f, !facingRight ? -0.09f : 0f);
         }
@@ -2346,5 +2342,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable {
 
         Gizmos.DrawRay(body.position, body.velocity);
         Gizmos.DrawCube(body.position + new Vector2(0, hitboxes[0].size.y / 2f * transform.lossyScale.y) + (body.velocity * Time.fixedDeltaTime), hitboxes[0].size * transform.lossyScale);
+
+        Gizmos.color = Color.white;
+        foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
+            if (r is ParticleSystemRenderer)
+                continue;
+            Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
+        }
     }
 }

@@ -220,13 +220,13 @@ MonoBehaviour:
   ShowParameterInspector: 1
   m_SynchronizeParameters:
   - Type: 9
-    SynchronizeType: 2
+    SynchronizeType: 1
     Name: lit
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 1
     Name: turnaround
   m_SynchronizeLayers:
-  - SynchronizeType: 2
+  - SynchronizeType: 0
     LayerIndex: 0
 --- !u!114 &3286581577125373967
 MonoBehaviour:
@@ -244,6 +244,8 @@ MonoBehaviour:
   frozen: 0
   left: 1
   collide: 1
+  iceCarryable: 1
+  flying: 0
   body: {fileID: 0}
   holder: {fileID: 0}
   previousHolder: {fileID: 0}

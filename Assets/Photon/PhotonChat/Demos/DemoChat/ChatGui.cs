@@ -578,12 +578,12 @@ public class ChatGui : MonoBehaviour, IChatClientListener
     /// <inheritdoc />
     public void OnChannelPropertiesChanged(string channel, string userId, Dictionary<object, object> properties)
     {
-        Debug.LogFormat("OnChannelPropertiesChanged: {0} by {1}. Props: {2}.", channel, userId, Extensions.ToStringFull(properties));
+        Debug.LogFormat("OnChannelPropertiesChanged: {0} by {1}. Props: {2}.", channel, userId, Photon.Realtime.Extensions.ToStringFull(properties));
     }
 
     public void OnUserPropertiesChanged(string channel, string targetUserId, string senderUserId, Dictionary<object, object> properties)
     {
-        Debug.LogFormat("OnUserPropertiesChanged: (channel:{0} user:{1}) by {2}. Props: {3}.", channel, targetUserId, senderUserId, Extensions.ToStringFull(properties));
+        Debug.LogFormat("OnUserPropertiesChanged: (channel:{0} user:{1}) by {2}. Props: {3}.", channel, targetUserId, senderUserId, Photon.Realtime.Extensions.ToStringFull(properties));
     }
 
     /// <inheritdoc />

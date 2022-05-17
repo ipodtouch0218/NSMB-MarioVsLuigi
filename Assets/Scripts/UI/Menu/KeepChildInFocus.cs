@@ -26,7 +26,7 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
         RectTransform target = EventSystem.current.currentSelectedGameObject.GetComponent<RectTransform>();
 
         if (IsFirstParent(target) && target.name != "Scrollbar Vertical") {
-            scrollPos = UIExtensions.ScrollToCenter(rect, target, false);
+            scrollPos = Extensions.ScrollToCenter(rect, target, false);
         } else {
             scrollPos = rect.verticalNormalizedPosition;
         }

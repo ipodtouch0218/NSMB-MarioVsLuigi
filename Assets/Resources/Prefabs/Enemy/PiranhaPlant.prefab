@@ -284,6 +284,8 @@ MonoBehaviour:
   frozen: 0
   left: 1
   collide: 0
+  iceCarryable: 0
+  flying: 0
   body: {fileID: 0}
   playerDetectSize: {x: 1, y: 1.5}
   popupTimerRequirement: 5.5

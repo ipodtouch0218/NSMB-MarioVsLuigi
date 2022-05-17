@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public abstract class KillableEntity : MonoBehaviourPun {
-    public bool dead, frozen, left = true, collide = true;
+public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
+
+    public bool dead, frozen, left = true, collide = true, iceCarryable = true, flying;
     public Rigidbody2D body;
     protected BoxCollider2D hitbox;
     protected Animator animator;
     protected SpriteRenderer sRenderer;
     protected AudioSource audioSource;
     protected PhysicsEntity physics;
+
+    bool IFreezableEntity.IsCarryable => iceCarryable;
+    bool IFreezableEntity.IsFlying => flying;
 
     public void Start() {
         body = GetComponent<Rigidbody2D>();
@@ -80,7 +84,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
     public abstract void Kill();
 
     [PunRPC]
-    public virtual void Freeze() {
+    public virtual void Freeze(int cube) {
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Freeze);
         frozen = true;
         animator.enabled = false;
@@ -99,14 +103,16 @@ public abstract class KillableEntity : MonoBehaviourPun {
         if (body)
             body.isKinematic = false;
         hitbox.enabled = true;
-        transform.Find("Hitbox").gameObject.SetActive(true);
         audioSource.enabled = true;
+
+        SpecialKill(false, false);
     }
 
     [PunRPC]
     public virtual void SpecialKill(bool right = true, bool groundpound = false) {
         if (dead)
             return;
+
         body.velocity = new Vector2(2.5f * (right ? 1 : -1), 2.5f);
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (right ? 1 : -1);
@@ -121,7 +127,7 @@ public abstract class KillableEntity : MonoBehaviourPun {
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
         
-        if (PhotonNetwork.IsMasterClient && !frozen)
+        if (PhotonNetwork.IsMasterClient)
             PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + new Vector2(0, 0.5f), Quaternion.identity);
     } 
 

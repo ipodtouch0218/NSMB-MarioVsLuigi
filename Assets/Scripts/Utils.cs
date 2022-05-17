@@ -241,5 +241,9 @@ public class Utils {
     public static Color GetPlayerColor(Player player, float s = 1, float v = 1) {
         int id = System.Array.IndexOf(PhotonNetwork.PlayerList, player);
         return Color.HSVToRGB(id / ((float) PhotonNetwork.PlayerList.Length + 1), s, v);
-     }
+    }
+
+    public static void TickTimer(ref float counter, float min, float delta) {
+        counter = Mathf.Max(min, counter - delta);
+    }
 }
