@@ -75,7 +75,7 @@ public class UIUpdater : MonoBehaviour {
             itemReserve.sprite = player.storedPowerup.state switch {
                 Enums.PowerupState.MiniMushroom => storedItemMiniMushroom,
                 //Enums.powerupstae.Small => null
-                Enums.PowerupState.Large => storedItemMushroom,
+                Enums.PowerupState.Mushroom => storedItemMushroom,
                 Enums.PowerupState.FireFlower => storedItemFireFlower,
                 Enums.PowerupState.MegaMushroom => storedItemMegaMushroom,
                 Enums.PowerupState.BlueShell => storedItemBlueShell,

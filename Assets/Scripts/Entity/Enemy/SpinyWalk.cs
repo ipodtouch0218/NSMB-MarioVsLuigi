@@ -32,7 +32,7 @@ public class SpinyWalk : KoopaWalk {
                         player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
                     } else {
                         //non-pickup able, kick.
-                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, player.groundpound);
+                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.runningMaxSpeed, player.groundpound);
                         player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
                         previousHolder = player;
                     }
@@ -55,7 +55,7 @@ public class SpinyWalk : KoopaWalk {
                             //normal mario interactions
                             if (player.groundpound) {
                                 //normal mario is groundpounding, we get kick'd
-                                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, true);
+                                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.runningMaxSpeed, true);
                                 player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
                             } else {
                                 //normal mario isnt groundpounding, we get stopped

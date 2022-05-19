@@ -22,7 +22,7 @@ public static class Enums {
         [PowerupState.None] = new(-1),
         [PowerupState.MiniMushroom] = new(0, 3),
         [PowerupState.Small] = new(-1),
-        [PowerupState.Large] = new(1),
+        [PowerupState.Mushroom] = new(1),
         [PowerupState.FireFlower] = new(2),
         [PowerupState.IceFlower] = new(2),
         [PowerupState.PropellerMushroom] = new(2),
@@ -30,7 +30,7 @@ public static class Enums {
         [PowerupState.MegaMushroom] = new(4),
     };
     public enum PowerupState : byte {
-        None, MiniMushroom, Small, Large, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
+        None, MiniMushroom, Small, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
     #endregion
     #region ANIMATION & MUSIC

@@ -7,7 +7,7 @@ public class CameraController : MonoBehaviour {
     public float screenShakeTimer = 0;
     public bool controlCamera = false;
     public Vector3 currentPosition;
-    
+
     private Vector2 airThreshold = new(0.5f, 1.3f), groundedThreshold = new(0.5f, 0f);
     private Vector2 airOffset = new(0, .65f), groundedOffset = new(0, 1.3f);
 
@@ -50,71 +50,69 @@ public class CameraController : MonoBehaviour {
 
         playerPos = AntiJitter(transform.position);
 
-        if (controller.onGround)
-            floorHeight = AntiJitter(body.position).y;
+        float vOrtho = targetCamera.orthographicSize;
+        float xOrtho = vOrtho * targetCamera.aspect;
 
-        float floorRange = 3f;
-        validGround = body.position.y + (Time.fixedDeltaTime * body.velocity.y) - floorHeight < floorRange && body.position.y - floorHeight > -.5f;
+        // instant camera movements. we dont want to lag behind in these cases
 
-        if ((controller.flying && body.velocity.y > 0) || controller.pipeEntering)
-            validGround = false;
-
-        if (!validGround || controller.dead || controller.flying) {
-            playerPos.y += 24 * Time.fixedDeltaTime * body.velocity.y * (controller.dead ? 0.5f : 1f);
+        float cameraBottomMax = 2.5f;
+        if (playerPos.y - (currentPosition.y - vOrtho) < cameraBottomMax) {
+            //bottom camera clip
+            currentPosition.y = playerPos.y + vOrtho - cameraBottomMax;
         }
-        if (!controller.dead) {
-            RaycastHit2D hit;
-            if (validGround) {
-                playerPos.y = floorHeight;
-            } else if (hit = Physics2D.BoxCast(transform.position, controller.hitboxes[0].size * 0.95f, 0, Vector2.down, 1f, PlayerController.ANY_GROUND_MASK)) {
-                floorHeight = AntiJitter(hit.point).y;
-                playerPos.y = floorHeight;
-                validGround = true;
-            }
+        float playerHeight = controller.hitboxes[0].size.y * transform.lossyScale.y;
+        float cameraTopMax = 1.5f + playerHeight;
+        if (playerPos.y - (currentPosition.y + vOrtho) + cameraTopMax > 0) {
+            //top camera clip
+            currentPosition.y = playerPos.y - vOrtho + cameraTopMax;
         }
-
-        Vector2 threshold = (controller.onGround || validGround) ? groundedThreshold : airThreshold;
-        Vector3 offset = (controller.onGround || validGround) ? groundedOffset : airOffset;
-
-        playerPos += offset;
 
         Utils.WrapWorldLocation(ref playerPos);
-
         float xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
-        float yDifference = Vector2.Distance(Vector2.up * currentPosition.y, Vector2.up * playerPos.y);
+        bool right = currentPosition.x > playerPos.x;
 
-        Vector3 newPosition = currentPosition;
-        bool right = newPosition.x > playerPos.x;
-        bool up = newPosition.y > playerPos.y;
         if (xDifference >= 8) {
-            newPosition.x += (right ? -1 : 1) * GameManager.Instance.levelWidthTile / 2f;
-            xDifference = Vector2.Distance(Vector2.right * newPosition.x, Vector2.right * playerPos.x);
-            right = newPosition.x > playerPos.x;
+            currentPosition.x += (right ? -1 : 1) * GameManager.Instance.levelWidthTile / 2f;
+            xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
+            right = currentPosition.x > playerPos.x;
             if (controlCamera)
                 BackgroundLoop.Instance.wrap = true;
         }
+        Vector2 threshold = new(0.25f, 0);
         if (xDifference > threshold.x) {
-            newPosition.x += (threshold.x - xDifference - 0.01f) * (right ? 1 : -1);
-        }
-        if (yDifference > threshold.y) {
-            newPosition.y += (threshold.y - yDifference - 0.01f) * (up ? 1 : -1);
+            currentPosition.x += (threshold.x - xDifference - 0.01f) * (right ? 1 : -1);
         }
 
-        currentPosition.x = newPosition.x;
-        Vector3 targetPos = Vector3.SmoothDamp(currentPosition, newPosition, ref smoothDampVel, 0.35f);
+        // lagging camera movements
 
-        float vOrtho = targetCamera.orthographicSize;
-        float hOrtho = vOrtho * targetCamera.aspect;
-        targetPos.x = Mathf.Clamp(targetPos.x, minX + hOrtho, maxX - hOrtho);
-        targetPos.y = Mathf.Clamp(targetPos.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
+        Vector3 targetPosition = currentPosition;
+        if (controller.onGround || controller.previousOnGround) {
+            if (playerPos.y - (currentPosition.y + vOrtho) + cameraTopMax + 1.5f > 0) {
+                //top camera clip ON GROUND. slowly pan up, dont do it instantly.
+                targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 1.5f;
+            }
+        }
+
+        // Screen Shake
 
         if ((screenShakeTimer -= Time.deltaTime) > 0)
-            targetPos += new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
+            targetPosition += new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
 
-        targetPos = AntiJitter(targetPos);
-        targetPos.z = startingZ;
+        // Smoothing
 
-        return targetPos;
+        targetPosition = Vector3.SmoothDamp(currentPosition, targetPosition, ref smoothDampVel, .5f);
+
+        // Clamping to within level bounds
+
+        targetPosition.x = Mathf.Clamp(targetPosition.x, minX + xOrtho, maxX - xOrtho);
+        targetPosition.y = Mathf.Clamp(targetPosition.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
+
+        // Z preservation
+
+        //targetPosition = AntiJitter(targetPosition);
+        targetPosition.z = startingZ;
+
+        return targetPosition;
     }
     private void OnDrawGizmos() {
         Gizmos.color = Color.blue;

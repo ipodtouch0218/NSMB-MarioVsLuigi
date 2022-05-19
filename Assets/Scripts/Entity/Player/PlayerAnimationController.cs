@@ -22,7 +22,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
     Enums.PlayerEyeState eyeState;
     float blinkTimer, pipeTimer, deathTimer, propellerVelocity;
-    public bool deathUp, wasTurnaround;
+    public bool deathUp, wasTurnaround, enableGlow;
 
     public void Start() {
         controller = GetComponent<PlayerController>();
@@ -34,6 +34,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         DisableAllModels();
 
         if (photonView) {
+            enableGlow = !photonView.IsMine;
             glowColor = Utils.GetPlayerColor(photonView.Owner);
             if (!photonView.IsMine) {
                 GameManager.Instance.CreateNametag(controller); 
@@ -51,9 +52,11 @@ public class PlayerAnimationController : MonoBehaviourPun {
     }
 
     void HandleAnimations() {
+        bool gameover = GameManager.Instance.gameover;
+
         Vector3 targetEuler = models.transform.eulerAngles;
         bool instant = false, changeFacing = false;
-        if (!GameManager.Instance.gameover && !controller.frozen) {
+        if (!gameover && !controller.frozen) {
             if (controller.knockback) {
                 targetEuler = new Vector3(0, controller.facingRight ? 110 : 250, 0);
                 instant = true;
@@ -108,13 +111,13 @@ public class PlayerAnimationController : MonoBehaviourPun {
         }
 
         //Particles
-        SetParticleEmission(dust, (controller.wallSlideLeft || controller.wallSlideRight || (controller.onGround && ((controller.skidding && !controller.doIceSkidding) || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);
-        SetParticleEmission(drillParticle, controller.drill);
+        SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.onGround && ((controller.skidding && !controller.doIceSkidding) || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);
+        SetParticleEmission(drillParticle, !gameover && controller.drill);
         if (controller.drill)
             drillParticleAudio.clip = (controller.state == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
-        SetParticleEmission(sparkles, controller.invincible > 0);
-        SetParticleEmission(giantParticle, controller.state == Enums.PowerupState.MegaMushroom && controller.giantStartTimer <= 0);
-        SetParticleEmission(fireParticle, animator.GetBool("firedeath") && controller.dead && deathTimer > deathUpTime);
+        SetParticleEmission(sparkles, !gameover && controller.invincible > 0);
+        SetParticleEmission(giantParticle, !gameover && controller.state == Enums.PowerupState.MegaMushroom && controller.giantStartTimer <= 0);
+        SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.dead && deathTimer > deathUpTime);
 
         //Blinking
         if (controller.dead) {
@@ -232,7 +235,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         block.SetFloat("PowerupState", ps);
         block.SetFloat("EyeState", (int) eyeState);
         block.SetFloat("ModelScale", transform.lossyScale.x);
-        if (!photonView.IsMine)
+        if (enableGlow)
             block.SetColor("GlowColor", glowColor);
 
         //Customizeable player color
@@ -257,7 +260,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         UpdateHitbox();
 
         //Model changing
-        bool large = controller.state >= Enums.PowerupState.Large;
+        bool large = controller.state >= Enums.PowerupState.Mushroom;
 
         largeModel.SetActive(large);
         smallModel.SetActive(!large);
@@ -290,7 +293,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             deathUp = false;
             body.gravityScale = 0;
             body.velocity = Vector2.zero;
-            animator.Play("deadstart", controller.state >= Enums.PowerupState.Large ? 1 : 0);
+            animator.Play("deadstart", controller.state >= Enums.PowerupState.Mushroom ? 1 : 0);
         } else {
             if (!deathUp && body.position.y > GameManager.Instance.GetLevelMinY()) {
                 body.velocity = new Vector2(0, deathForce);

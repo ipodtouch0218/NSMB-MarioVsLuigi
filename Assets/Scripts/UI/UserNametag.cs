@@ -22,7 +22,7 @@ public class UserNametag : MonoBehaviour {
         }
 
         arrow.color = parent.animationController.glowColor;
-        nametag.SetActive(!parent.dead);
+        nametag.SetActive(parent.spawned);
 
         Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.hitboxes[0].size.y * parent.transform.lossyScale.y * 1.2f) + 0.2f);
         if (GameManager.Instance.loopingLevel && Mathf.Abs(worldPos.x - Camera.main.transform.position.x) > GameManager.Instance.levelWidthTile / 4f)

@@ -1,6 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 public class MarioBrosPlatform : MonoBehaviour {
@@ -84,8 +84,8 @@ public class MarioBrosPlatform : MonoBehaviour {
     }
 
     public void Bump(PlayerController player, Vector3 worldPos) {
+
         float localPos = transform.InverseTransformPoint(worldPos).x;
-        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + new Vector3(-0.25f, -0.1f));
 
         if (Mathf.Abs(localPos) > platformWidth) {
             worldPos.x += GameManager.Instance.levelWidthTile / 2f;
@@ -96,6 +96,12 @@ public class MarioBrosPlatform : MonoBehaviour {
         localPos += 0.5f; // get rid of negative coords
         localPos *= samplesPerTile * platformWidth;
 
+        if (displacementMap.GetPixel((int) localPos, 0).r != 0) {
+            return;
+        }
+
+        player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
+        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + new Vector3(-0.25f, -0.1f));
         bumps.Add(new BumpInfo(bumpDuration, (int) localPos));
     }
 

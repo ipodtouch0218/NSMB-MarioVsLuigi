@@ -53,7 +53,6 @@ public class FrozenCube : HoldableEntity {
             Renderer[] renderers = entityView.GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in renderers) {
                 renderer.ResetBounds();
-                Debug.Log(renderer.GetType().Name);
                 if (renderer is ParticleSystemRenderer)
                     continue;
                 bounds.Encapsulate(renderer.bounds);
@@ -63,7 +62,14 @@ public class FrozenCube : HoldableEntity {
             hitbox.offset = frozenCubeCollider.offset = Vector2.up * frozenCubeCollider.size / 2;
             
             offset = -(bounds.center - Vector3.up.Multiply(bounds.size/2) - entityView.transform.position);
-            Debug.Log(offset);
+
+            if (entity.IsFlying) {
+                fallen = false;
+                fallTimer = fallTime;
+            } else {
+                fallen = true;
+            }
+            ApplyConstraints();
         }
     }
 
@@ -97,7 +103,7 @@ public class FrozenCube : HoldableEntity {
             return;
         }
         if (photonView.IsMine && body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY()) {
-            entityView.RPC("Unfreeze", RpcTarget.All, photonView.ViewID);
+            entityView.RPC("Unfreeze", RpcTarget.All);
             PhotonNetwork.Destroy(photonView);
             return;
         }
@@ -112,30 +118,30 @@ public class FrozenCube : HoldableEntity {
         if (entity == null) {
             if (photonView.IsMine) {
                 PhotonNetwork.Destroy(photonView);
-            } else {
-                Destroy(gameObject);
             }
+            Destroy(gameObject);
             return;
         }
             
 
         //handle flying timer
         if (!fallen) {
-            if (entity.IsFlying) {
+            if (holder) {
+                fallen = true;
+                ApplyConstraints();
+            } else if (entity.IsFlying) {
                 //count down flying timer
-
-                Utils.TickTimer(ref fallTimer, Time.fixedDeltaTime, 0);
+                Utils.TickTimer(ref fallTimer, 0, Time.fixedDeltaTime);
                 if (fallTimer <= 0) {
                     fallen = true; 
-                    ApplyConstraints();
                 } else {
                     //do shaking animation
                 }
             } else {
                 fallen = true;
-                ApplyConstraints();
             }
         }
+        ApplyConstraints();
 
 
         //handle interactions with tiles
@@ -145,10 +151,12 @@ public class FrozenCube : HoldableEntity {
     }
 
     private void ApplyConstraints() {
-        if (entity.IsCarryable && fallen) {
+        if (entity.IsCarryable && (fallen || holder)) {
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
+            body.isKinematic = false;
         } else {
             body.constraints = RigidbodyConstraints2D.FreezeAll;
+            body.isKinematic = true;
         }
     }
 
