@@ -9,7 +9,7 @@ public class UIUpdater : MonoBehaviour {
     
     public static UIUpdater Instance;
     public GameObject playerTrackTemplate, starTrackTemplate;
-    PlayerController player;
+    public PlayerController player;
     //TODO: refactor
     public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell, storedItemPropellerMushroom, storedItemIceFlower; 
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
@@ -48,19 +48,17 @@ public class UIUpdater : MonoBehaviour {
 
     void Update() {
         pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Time.unscaledDeltaTime * 0.5f);
-
-
         if (pingSample == float.NaN)
             pingSample = 0;
         
         uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: {(int) pingSample}ms</font>";
-        
+
         //Player stuff update.
-        if (GameManager.Instance.localPlayer) { 
+        if (!player && GameManager.Instance.localPlayer) {
             player = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        } else if (GameManager.Instance.SpectationManager.Spectating) {
-            player = GameManager.Instance.SpectationManager.TargetPlayer;
         }
+        if (!player)
+            return;
 
         UpdateStoredItemUI();
         UpdateTextUI();
@@ -121,5 +119,4 @@ public class UIUpdater : MonoBehaviour {
             timerParent.SetActive(false);
         }
     }
-
 }

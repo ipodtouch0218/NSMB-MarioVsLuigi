@@ -224,13 +224,29 @@ public class Utils {
             tileCache[tilename] = Resources.Load(tilename) as TileBase;
     }
 
-    private static readonly string charString = "      c    0123456789xCS/:";
+    private static readonly Dictionary<char, int> charToSymbolIndex = new() {
+        ['c'] = 6,
+        ['0'] = 11,
+        ['1'] = 12,
+        ['2'] = 13,
+        ['3'] = 14,
+        ['4'] = 15,
+        ['5'] = 16,
+        ['6'] = 17,
+        ['7'] = 18,
+        ['8'] = 19,
+        ['9'] = 20,
+        ['x'] = 21,
+        ['C'] = 22,
+        ['S'] = 23,
+        ['/'] = 24,
+        [':'] = 25,
+    };
     public static string GetSymbolString(string str) {
         string ret = "";
-        int index;
         foreach (char c in str) {
-            if (c != ' ' && (index = charString.IndexOf(c)) != -1) {
-                ret += $"<sprite={index}>";
+            if (charToSymbolIndex.ContainsKey(c)) {
+                ret += "<sprite=" + charToSymbolIndex[c] + ">";
             } else {
                 ret += c;
             }

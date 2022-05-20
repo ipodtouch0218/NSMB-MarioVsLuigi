@@ -27,17 +27,16 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
             CustomColors.PlayerColor color = colors[i];
 
             GameObject newButton = Instantiate(template, template.transform.parent);
+            ColorButton cb = newButton.GetComponent<ColorButton>();
+            cb.palette = color;
+            cb.Instantiate();
+
             Button b = newButton.GetComponent<Button>();
             newButton.name = color.name;
-            if (color.hat.a == 0) {
+            if (color.hat.a == 0)
                 b.image.sprite = clearSprite;
-                b.image.color = Color.white;
-            } else {
-                b.image.color = color.hat;
-            }
+
             newButton.SetActive(true);
-
-
             buttons.Add(b);
 
             Navigation navigation = new() { mode = Navigation.Mode.Explicit };

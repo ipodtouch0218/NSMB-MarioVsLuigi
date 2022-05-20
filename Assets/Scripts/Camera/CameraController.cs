@@ -13,10 +13,9 @@ public class CameraController : MonoBehaviour {
 
     private Vector3 smoothDampVel;
     private Camera targetCamera;
+    private List<SecondaryCameraPositioner> secondaryPositioners = new();  
     private float startingZ, floorHeight;
-    private bool validGround;
 
-    private Rigidbody2D body;
     private PlayerController controller;
     private Vector3 playerPos;
 
@@ -25,7 +24,7 @@ public class CameraController : MonoBehaviour {
         targetCamera = Camera.main;
         startingZ = targetCamera.transform.position.z;
         controller = GetComponent<PlayerController>();
-        body = controller.body;
+        targetCamera.GetComponentsInChildren(secondaryPositioners);
     }
 
     public void LateUpdate() {
@@ -33,7 +32,9 @@ public class CameraController : MonoBehaviour {
         if (controlCamera) {
             targetCamera.transform.position = currentPosition;
             if (BackgroundLoop.Instance)
-                BackgroundLoop.Instance.LateUpdate();
+                BackgroundLoop.Instance.Reposition();
+
+            secondaryPositioners.ForEach(scp => scp.UpdatePosition());
         }
     }
 

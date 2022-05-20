@@ -61,7 +61,7 @@ public class WaterSplash : MonoBehaviour {
         properties.SetFloat("PointsPerTile", pointsPerTile);
         properties.SetFloat("Height", height);
         meshRenderer.SetPropertyBlock(properties);
-        meshRenderer.localBounds = new Bounds(collider.offset, collider.size);
+        meshRenderer.localBounds = new Bounds(collider.offset, collider.size + Vector2.up);
     }
 
     void FixedUpdate() {

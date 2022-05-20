@@ -45,6 +45,8 @@ public class SpectationManager : MonoBehaviour {
         spectationUI.SetActive(Spectating);
         if (!Spectating)
             return;
+
+        UIUpdater.Instance.player = TargetPlayer;
         if (!TargetPlayer)
             return;
         

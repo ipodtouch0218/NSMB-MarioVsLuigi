@@ -13,33 +13,39 @@ public class SlantText : MonoBehaviour {
     private RectTransform child;
     private Material mat;
 
-    void Awake() {
-        Update();
+    private bool set;
+
+    void OnValidate() {
+        set = false;
+        Update();    
     }
 
     void Update() {
+        if (set)
+            return;
+
         if (cr == null) {
             try {
                 cr = GetComponentsInChildren<CanvasRenderer>()[1];
+                cr.SetMaterial(mat = new(cr.GetMaterial()), 0);
             } catch {
+                // TMPro didn't generate submesh yet. oh well.
                 return;
             }
         }
-        if (mat == null) {
-            cr.SetMaterial(mat = new(cr.GetMaterial()), 0);
-            mat.SetColor("_Color", Color.white);
-        }
+        mat.SetColor("_Color", Color.white);
         mat.SetFloat("_VerticalOffsetX", slopeAmount);
         mat.SetFloat("_FirstCharOffset", firstChar);
         mat.SetFloat("_SecondCharOffset", secondChar);
-        if (text == null) {
-            text = GetComponent<TMP_Text>();
-        }
+
         if (slopeAmount < 0) {
+            text = GetComponent<TMP_Text>();
             int chars = text.GetTextInfo(text.text).characterCount;
             child = transform.GetChild(0).GetComponent<RectTransform>();
             child.offsetMax = new(0, (chars - 1) * 4);
             child.offsetMin = new(0, (chars - 1) * 4);
         }
+
+        set = true;
     }
 }

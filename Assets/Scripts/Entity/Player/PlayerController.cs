@@ -195,6 +195,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
     }
     
     public void LoadFromGameState() {
+        if (photonView.IsMine)
+            return;
+
         if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not ExitGames.Client.Photon.Hashtable gs)
             return;
 
@@ -300,7 +303,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                             //invalid flooring
                             continue;
                     }
-                    crushGround |= !contact.collider.gameObject.CompareTag("platform");
+                    crushGround |= contact.collider.gameObject.layer == GROUND_LAYERID;
                     down++;
                     tilesStandingOn.Add(vec);
                 } else if (contact.collider.gameObject.layer == GROUND_LAYERID) {

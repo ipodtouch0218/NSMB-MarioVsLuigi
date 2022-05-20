@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SecondaryCameraPositioner : MonoBehaviour {
-    [SerializeField] float multiplier = 1;
-    void Update() {
+    public void UpdatePosition() {
         if (GameManager.Instance) {
             if (!GameManager.Instance.loopingLevel) {
                 Destroy(gameObject);
                 return;
             }
-            transform.localPosition = new Vector3(GameManager.Instance.levelWidthTile * multiplier, 0, 0);
-            Destroy(this);
+            bool right = Camera.main.transform.position.x > GameManager.Instance.GetLevelMiddleX();
+            transform.localPosition = new Vector3(GameManager.Instance.levelWidthTile * (right ? -1 : 1), 0, 0);
         }
     }
 }

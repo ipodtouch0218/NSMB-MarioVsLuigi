@@ -37,11 +37,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public string connectThroughSecret = "";
     public string selectedRoom;
     public bool askedToJoin;
-    public Image colorImage;
+
+    public Image overallColor, shirtColor;
+    public GameObject palette, paletteDisabled;
+
+    public ScrollRect settingsScroll;
 
     public Selectable[] roomSettings;
-
-    public Sprite xSprite, normalSprite;
 
     private bool pingsReceived;
     private List<string> formattedRegions;
@@ -237,7 +239,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         case (byte) Enums.NetEventIds.StartGame: {
             PhotonNetwork.IsMessageQueueRunning = false;
             SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
-            SceneManager.LoadSceneAsync(levelDropdown.value + 2, LoadSceneMode.Additive);
+
+            Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
+            SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Additive);
             break;
         }
         case (byte) Enums.NetEventIds.ChatMessage: {
@@ -404,6 +408,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ChangeMaxPlayers(room.MaxPlayers);
         ChangePrivate();
 
+        StartCoroutine(SetScroll());
+
         PhotonNetwork.LocalPlayer.SetCustomProperties(new() {
             [Enums.NetPlayerProperties.GameState] = null,
         });
@@ -411,6 +417,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             updatePingCoroutine = StartCoroutine(UpdatePing());
         GlobalController.Instance.discordController.UpdateActivity();
     }
+
+    IEnumerator SetScroll() {
+        settingsScroll.verticalNormalizedPosition = 1;
+        yield return null;
+        settingsScroll.verticalNormalizedPosition = 1;
+    }
+
 
     public void OpenTitleScreen() {
         title.SetActive(true);
@@ -824,8 +837,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ExitGames.Client.Photon.Hashtable prop = new() {
             { Enums.NetPlayerProperties.PlayerColor, index }
         };
-        colorImage.sprite = index == 0 ? xSprite : normalSprite;
-        colorImage.color = index == 0 ? Color.white : CustomColors.Colors[index].hat;
+        if (index == 0) {
+            paletteDisabled.SetActive(true);
+            palette.SetActive(false);
+        } else {
+            paletteDisabled.SetActive(false);
+            palette.SetActive(true);
+            overallColor.color = CustomColors.Colors[index].overalls;
+            shirtColor.color = CustomColors.Colors[index].hat;
+        }
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
     }
 

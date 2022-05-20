@@ -644,6 +644,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SceneManager.LoadScene("MainMenu");
     }
 
+
+    public float GetLevelMiddleX() {
+        return (GetLevelMaxX() + GetLevelMinX()) / 2;
+    }
     public float GetLevelMinX() {
         return (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
     }

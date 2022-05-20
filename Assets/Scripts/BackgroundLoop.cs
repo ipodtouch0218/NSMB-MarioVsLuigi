@@ -56,8 +56,9 @@ public class BackgroundLoop : MonoBehaviour {
             }
         }
     }
-    public void LateUpdate() {
+    public void Reposition() {
         float difference = transform.position.x - lastPosition.x;
+
         if (wrap) {
             foreach (GameObject obj in levels) {
                 obj.transform.Translate(difference, 0, 0);
