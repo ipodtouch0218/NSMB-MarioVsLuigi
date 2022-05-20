@@ -237,10 +237,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnEvent(EventData e) {
         switch (e.Code) {
         case (byte) Enums.NetEventIds.StartGame: {
+            Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
             PhotonNetwork.IsMessageQueueRunning = false;
             SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
-
-            Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
             SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Additive);
             break;
         }
@@ -392,9 +391,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (started != null && (bool) started) {
             //start as spectator
             GlobalController.Instance.joinedAsSpectator = true;
-            PhotonNetwork.IsMessageQueueRunning = false;
-            SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
-            SceneManager.LoadSceneAsync(levelDropdown.value + 2, LoadSceneMode.Additive);
+            OnEvent(new() { Code = (byte) Enums.NetEventIds.StartGame });
             return;
         }
         

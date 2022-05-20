@@ -2077,7 +2077,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             wallSlideRight = false;
             jumping = false;
             if (drill)
-                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
+                SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
 
             if (onSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !holding) {
                 Transform spnr = onSpinner.transform;

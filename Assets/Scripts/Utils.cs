@@ -117,7 +117,7 @@ public class Utils {
     public static void GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
         if (properties == null)
             properties = PhotonNetwork.CurrentRoom.CustomProperties;
-        
+
         properties.TryGetValue(key, out object temp);
         if (temp != null) {
             value = (T) temp;

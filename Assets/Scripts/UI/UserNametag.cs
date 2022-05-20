@@ -6,6 +6,7 @@ using TMPro;
 
 public class UserNametag : MonoBehaviour {
 
+    public new Camera camera;
     private RectTransform parentCanvas;
     public GameObject nametag;
     public TMP_Text text;
@@ -28,7 +29,7 @@ public class UserNametag : MonoBehaviour {
         if (GameManager.Instance.loopingLevel && Mathf.Abs(worldPos.x - Camera.main.transform.position.x) > GameManager.Instance.levelWidthTile / 4f)
             worldPos.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(worldPos.x - Camera.main.transform.position.x);
 
-        transform.position = Camera.main.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentCanvas.rect.size;
+        transform.position = camera.WorldToScreenPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentCanvas.rect.size;
 
         text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName;
 
