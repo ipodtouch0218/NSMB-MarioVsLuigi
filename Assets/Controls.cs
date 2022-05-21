@@ -425,6 +425,15 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""Scoreboard"",
+                    ""type"": ""Button"",
+                    ""id"": ""ea6fc54f-16db-43be-9e14-c6c27a387e06"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Debug Info"",
                     ""type"": ""Button"",
                     ""id"": ""8cc650dc-a45e-4887-b332-7b0fdfdb1106"",
@@ -879,7 +888,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""bcc0af49-9727-421a-ba9c-493d50b2caaa"",
-                    ""path"": ""<Gamepad>/select"",
+                    ""path"": """",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -895,6 +904,50 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Debug Info"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""18c51067-d4f9-4332-a5aa-24899ebb4169"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Scoreboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0c696f9d-0e41-4ebd-b149-ddc9b1de7e75"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Scoreboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ab1a59d9-4d52-47ea-a631-a030a7416738"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Scoreboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""70b52a60-bdd3-4fbb-81a2-47f9a138f871"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Scoreboard"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -949,6 +1002,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_UI_Submit = m_UI.FindAction("Submit", throwIfNotFound: true);
         m_UI_Cancel = m_UI.FindAction("Cancel", throwIfNotFound: true);
         m_UI_Pause = m_UI.FindAction("Pause", throwIfNotFound: true);
+        m_UI_Scoreboard = m_UI.FindAction("Scoreboard", throwIfNotFound: true);
         m_UI_DebugInfo = m_UI.FindAction("Debug Info", throwIfNotFound: true);
         m_UI_Point = m_UI.FindAction("!Point", throwIfNotFound: true);
         m_UI_Click = m_UI.FindAction("!Click", throwIfNotFound: true);
@@ -1083,6 +1137,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Submit;
     private readonly InputAction m_UI_Cancel;
     private readonly InputAction m_UI_Pause;
+    private readonly InputAction m_UI_Scoreboard;
     private readonly InputAction m_UI_DebugInfo;
     private readonly InputAction m_UI_Point;
     private readonly InputAction m_UI_Click;
@@ -1097,6 +1152,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         public InputAction @Submit => m_Wrapper.m_UI_Submit;
         public InputAction @Cancel => m_Wrapper.m_UI_Cancel;
         public InputAction @Pause => m_Wrapper.m_UI_Pause;
+        public InputAction @Scoreboard => m_Wrapper.m_UI_Scoreboard;
         public InputAction @DebugInfo => m_Wrapper.m_UI_DebugInfo;
         public InputAction @Point => m_Wrapper.m_UI_Point;
         public InputAction @Click => m_Wrapper.m_UI_Click;
@@ -1124,6 +1180,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Pause.started -= m_Wrapper.m_UIActionsCallbackInterface.OnPause;
                 @Pause.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnPause;
                 @Pause.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnPause;
+                @Scoreboard.started -= m_Wrapper.m_UIActionsCallbackInterface.OnScoreboard;
+                @Scoreboard.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnScoreboard;
+                @Scoreboard.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnScoreboard;
                 @DebugInfo.started -= m_Wrapper.m_UIActionsCallbackInterface.OnDebugInfo;
                 @DebugInfo.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnDebugInfo;
                 @DebugInfo.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnDebugInfo;
@@ -1158,6 +1217,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Pause.started += instance.OnPause;
                 @Pause.performed += instance.OnPause;
                 @Pause.canceled += instance.OnPause;
+                @Scoreboard.started += instance.OnScoreboard;
+                @Scoreboard.performed += instance.OnScoreboard;
+                @Scoreboard.canceled += instance.OnScoreboard;
                 @DebugInfo.started += instance.OnDebugInfo;
                 @DebugInfo.performed += instance.OnDebugInfo;
                 @DebugInfo.canceled += instance.OnDebugInfo;
@@ -1212,6 +1274,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnSubmit(InputAction.CallbackContext context);
         void OnCancel(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
+        void OnScoreboard(InputAction.CallbackContext context);
         void OnDebugInfo(InputAction.CallbackContext context);
         void OnPoint(InputAction.CallbackContext context);
         void OnClick(InputAction.CallbackContext context);

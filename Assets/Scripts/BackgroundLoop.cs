@@ -1,18 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BackgroundLoop : MonoBehaviour {
+
+    public static BackgroundLoop instance = null;
+
     private GameObject[] levels;
     private Camera mainCamera;
     private Vector2 screenBounds;
     private Vector3 lastPosition;
 
-    public static BackgroundLoop Instance = null;
     public bool wrap;
 
-    void Start() {
-        Instance = this;
+    public void Start() {
+        instance = this;
         Transform t = GameObject.FindGameObjectWithTag("Backgrounds").transform;
         levels = new GameObject[t.childCount];
         for (int i = 0; i < t.childCount; i++)
@@ -24,6 +24,10 @@ public class BackgroundLoop : MonoBehaviour {
             LoadChildObjects(obj);
 
         lastPosition = transform.position;
+    }
+
+    public void LateUpdate() {
+        Reposition();
     }
     void LoadChildObjects(GameObject obj) {
         float objectWidth = obj.GetComponent<SpriteRenderer>().bounds.size.x;

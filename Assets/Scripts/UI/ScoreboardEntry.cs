@@ -22,7 +22,7 @@ public class ScoreboardEntry : MonoBehaviour {
         nameText.text = target.photonView.Owner.NickName;
 
         Color c = target.animationController.glowColor;
-        background.color = new(c.r, c.g, c.b, 0.4f);
+        background.color = new(c.r, c.g, c.b, 0.6f);
     }
 
     public void Update() {
@@ -31,7 +31,7 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public void CheckForTextUpdate() {
         if (!target) {
-            // our target lost all lives, disable the updater script
+            // our target lost all lives (or dc'd), disable the updater script
             enabled = false;
             return;
         }
@@ -56,6 +56,9 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public class EntryComparer : IComparer<ScoreboardEntry> {
         public int Compare(ScoreboardEntry x, ScoreboardEntry y) {
+            if (x.target == null ^ y.target == null)
+                return x.target == null ? -1 : 1;
+
             if (x.currentLives == 0 || y.currentLives == 0)
                 return x.currentLives - y.currentLives;
 

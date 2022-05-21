@@ -31,9 +31,10 @@ public class CameraController : MonoBehaviour {
         currentPosition = CalculateNewPosition();
         if (controlCamera) {
             targetCamera.transform.position = currentPosition;
-            if (BackgroundLoop.Instance)
-                BackgroundLoop.Instance.Reposition();
+            if (BackgroundLoop.instance)
+                BackgroundLoop.instance.Reposition();
 
+            secondaryPositioners.Remove(null);
             secondaryPositioners.ForEach(scp => scp.UpdatePosition());
         }
     }
@@ -56,13 +57,13 @@ public class CameraController : MonoBehaviour {
 
         // instant camera movements. we dont want to lag behind in these cases
 
-        float cameraBottomMax = 2.5f;
+        float cameraBottomMax = Mathf.Max(3.5f - transform.lossyScale.y, 1.5f);
         if (playerPos.y - (currentPosition.y - vOrtho) < cameraBottomMax) {
             //bottom camera clip
             currentPosition.y = playerPos.y + vOrtho - cameraBottomMax;
         }
         float playerHeight = controller.hitboxes[0].size.y * transform.lossyScale.y;
-        float cameraTopMax = 1.5f + playerHeight;
+        float cameraTopMax = Mathf.Min(1.5f + playerHeight, 4f);
         if (playerPos.y - (currentPosition.y + vOrtho) + cameraTopMax > 0) {
             //top camera clip
             currentPosition.y = playerPos.y - vOrtho + cameraTopMax;
@@ -77,7 +78,7 @@ public class CameraController : MonoBehaviour {
             xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
             right = currentPosition.x > playerPos.x;
             if (controlCamera)
-                BackgroundLoop.Instance.wrap = true;
+                BackgroundLoop.instance.wrap = true;
         }
         Vector2 threshold = new(0.25f, 0);
         if (xDifference > threshold.x) {

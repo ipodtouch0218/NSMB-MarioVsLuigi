@@ -1642,6 +1642,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             skidding = false;
             turnaround = false;
             sliding = false;
+            wallSlideLeft = false;
+            wallSlideRight = false;
             alreadyGroundpounded = false;
             groundpound = false;
             groundpoundCounter = 0;

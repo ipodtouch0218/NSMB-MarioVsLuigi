@@ -403,6 +403,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Scoreboard",
+                    "type": "Button",
+                    "id": "ea6fc54f-16db-43be-9e14-c6c27a387e06",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Debug Info",
                     "type": "Button",
                     "id": "8cc650dc-a45e-4887-b332-7b0fdfdb1106",
@@ -857,7 +866,7 @@
                 {
                     "name": "",
                     "id": "bcc0af49-9727-421a-ba9c-493d50b2caaa",
-                    "path": "<Gamepad>/select",
+                    "path": "",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -873,6 +882,50 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Debug Info",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "18c51067-d4f9-4332-a5aa-24899ebb4169",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c696f9d-0e41-4ebd-b149-ddc9b1de7e75",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ab1a59d9-4d52-47ea-a631-a030a7416738",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "70b52a60-bdd3-4fbb-81a2-47f9a138f871",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Scoreboard",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

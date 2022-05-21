@@ -3133,7 +3133,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 76.65
+  m_fontSize: 76.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3776,8 +3776,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 125, y: -33}
-  m_SizeDelta: {x: 250, y: 20}
+  m_AnchoredPosition: {x: 125.00001, y: -10}
+  m_SizeDelta: {x: 250.00002, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2998342450094080188
 CanvasRenderer:
@@ -4416,6 +4416,7 @@ GameObject:
   - component: {fileID: 1731295336454021316}
   - component: {fileID: 8406214132052344437}
   - component: {fileID: 6324742379979219190}
+  - component: {fileID: 8246574079928864197}
   m_Layer: 5
   m_Name: Scoreboard
   m_TagString: Untagged
@@ -4442,7 +4443,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.75}
   m_AnchorMax: {x: 0.25, y: 0.75}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -250, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &8406214132052344437
@@ -4484,6 +4485,26 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!95 &8246574079928864197
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6627260256840392872}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e250464c62a11e8438d6eac3bc9f488f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &6710909780320671668
 GameObject:
   m_ObjectHideFlags: 0

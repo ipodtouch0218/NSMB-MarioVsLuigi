@@ -109,8 +109,6 @@ public class FrozenCube : HoldableEntity {
         }
         base.FixedUpdate();
 
-        body.mass = holder != null ? 0 : 1;
-
         if (dead)
             return;
 
@@ -151,12 +149,13 @@ public class FrozenCube : HoldableEntity {
     }
 
     private void ApplyConstraints() {
-        if (entity.IsCarryable && (fallen || holder)) {
-            body.constraints = RigidbodyConstraints2D.FreezeRotation;
-            body.isKinematic = false;
-        } else {
-            body.constraints = RigidbodyConstraints2D.FreezeAll;
-            body.isKinematic = true;
+        body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        if (!holder) {
+            if (!fastSlide)
+                body.constraints |= RigidbodyConstraints2D.FreezePositionX;
+
+            if (entity.IsFlying && !fallen)
+                body.constraints |= RigidbodyConstraints2D.FreezePositionY;
         }
     }
 
@@ -207,6 +206,7 @@ public class FrozenCube : HoldableEntity {
             fallen = true;
             body.isKinematic = false;
         }
+        ApplyConstraints();
 
         if (crouch) {
             body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
@@ -216,15 +216,14 @@ public class FrozenCube : HoldableEntity {
     }
 
     new void OnTriggerEnter2D(Collider2D collider) {
-        if ((photonView && !photonView.IsMine) || dead)
+        if (!(photonView?.IsMine ?? true) || dead)
             return;
 
         GameObject obj = collider.gameObject;
         KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
 
-        if (killa?.dead ?? false) {
+        if (killa?.dead ?? false)
             return;
-        }
 
         switch (obj.tag) {
         case "koopa":

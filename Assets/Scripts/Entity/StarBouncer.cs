@@ -26,7 +26,7 @@ public class StarBouncer : MonoBehaviourPun {
 
         graphicTransform = transform.Find("Graphic");
 
-        GameObject trackObject = Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.position, Quaternion.identity, UIUpdater.Instance.transform);
+        GameObject trackObject = Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.parent);
         TrackIcon icon = trackObject.GetComponent<TrackIcon>();
         icon.target = gameObject;
         trackObject.SetActive(true);

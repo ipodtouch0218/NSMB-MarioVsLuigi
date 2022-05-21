@@ -1,7 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ScoreboardUpdater : MonoBehaviour {
 
@@ -9,10 +8,27 @@ public class ScoreboardUpdater : MonoBehaviour {
     private static IComparer<ScoreboardEntry> entryComparer;
 
     [SerializeField] GameObject entryTemplate;
+    
     private readonly List<ScoreboardEntry> entries = new();
+    private bool toggled = false;
+    private Animator animator;
+
+    public void OnEnable() {
+        InputSystem.controls.UI.Scoreboard.performed += OnToggle;
+    }
+    public void OnDisable() {
+        InputSystem.controls.UI.Scoreboard.performed -= OnToggle;
+    }
+
+    private void OnToggle(InputAction.CallbackContext context) {
+        toggled = !toggled;
+        animator.SetFloat("speed", toggled ? 1 : -1);
+        animator.Play("toggle", 0, Mathf.Clamp01(animator.GetCurrentAnimatorStateInfo(0).normalizedTime));
+    }
 
     public void Awake() {
         instance = this;
+        animator = GetComponent<Animator>();
         if (entryComparer == null)
             entryComparer = new ScoreboardEntry.EntryComparer();
     }
