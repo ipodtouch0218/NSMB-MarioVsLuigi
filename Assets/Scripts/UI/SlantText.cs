@@ -24,7 +24,7 @@ public class SlantText : MonoBehaviour {
         if (set)
             return;
 
-        if (cr == null) {
+        if (cr == null || mat == null) {
             try {
                 cr = GetComponentsInChildren<CanvasRenderer>()[1];
                 cr.SetMaterial(mat = new(cr.GetMaterial()), 0);

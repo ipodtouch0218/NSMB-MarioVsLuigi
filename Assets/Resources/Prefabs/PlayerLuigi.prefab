@@ -21449,6 +21449,7 @@ MonoBehaviour:
   body: {fileID: 0}
   animationController: {fileID: 0}
   onGround: 0
+  previousOnGround: 0
   crushGround: 0
   doGroundSnap: 0
   jumping: 0
@@ -21559,6 +21560,7 @@ MonoBehaviour:
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
   deathUp: 0
   wasTurnaround: 0
+  enableGlow: 0
 --- !u!50 &8636928217783201367
 Rigidbody2D:
   serializedVersion: 4

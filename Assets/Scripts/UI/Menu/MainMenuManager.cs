@@ -130,8 +130,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
                 [Enums.NetRoomProperties.HostName] = newMaster.NickName
             });
-            UpdateSettingEnableStates();
         }
+        UpdateSettingEnableStates();
     }
     public void OnJoinedRoom() {
         LocalChatMessage(PhotonNetwork.LocalPlayer.NickName + " joined the room", ColorToVector(Color.red));

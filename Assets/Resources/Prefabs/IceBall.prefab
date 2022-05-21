@@ -163,6 +163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   bounceHeight: 6
+  terminalVelocity: 6.25
   left: 0
   isIceball: 1
 --- !u!114 &2269455486527583307

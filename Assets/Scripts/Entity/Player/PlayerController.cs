@@ -881,10 +881,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
         PlaySoundEverywhere(photonView.IsMine ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
 
-
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
-        Destroy(star);
+        DestroyImmediate(star);
     }
 
     [PunRPC]

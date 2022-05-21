@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 
 public class FireballMover : MonoBehaviourPun {
-    public float speed = 3f, bounceHeight = 4.5f;
+    public float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
     public bool left;
     public bool isIceball;
     private Rigidbody2D body;
@@ -29,7 +29,7 @@ public class FireballMover : MonoBehaviourPun {
         HandleCollision();
 
         float gravityInOneFrame = body.gravityScale * Physics2D.gravity.y * Time.fixedDeltaTime;
-        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(-speed - gravityInOneFrame, body.velocity.y));
+        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
     void HandleCollision() {
         physics.UpdateCollisions();
