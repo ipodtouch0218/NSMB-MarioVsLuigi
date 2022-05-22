@@ -26,10 +26,21 @@ public class UserNametag : MonoBehaviour {
         nametag.SetActive(parent.spawned);
 
         Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.hitboxes[0].size.y * parent.transform.lossyScale.y * 1.2f) + 0.2f);
-        if (GameManager.Instance.loopingLevel && Mathf.Abs(worldPos.x - Camera.main.transform.position.x) > GameManager.Instance.levelWidthTile / 4f)
-            worldPos.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(worldPos.x - Camera.main.transform.position.x);
+        Rect t = parentCanvas.rect;
+        Vector2 size = new(t.size.y * camera.aspect, t.size.y);
+        Vector3 screenPoint = camera.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;
+        screenPoint.z = 0;
 
-        transform.position = camera.WorldToScreenPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentCanvas.rect.size;
+        // handle black borders
+        float screenW = Screen.width;
+        float screenH = Screen.height;
+        float screenAspect = screenW / screenH;
+        if (screenAspect > camera.aspect) {
+            Debug.Log($"Screen width = {screenW} Camera width = {screenH * camera.aspect}");
+            Debug.Log((screenW - (screenH * camera.aspect)) / 2);
+            screenPoint.x += (screenW - (screenH * camera.aspect)) / 2;
+        }
+        transform.position = screenPoint;
 
         text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName;
 

@@ -469,6 +469,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             }
         }
 
+        if (started) {
+            bool allNull = true;
+            foreach (PlayerController controller in allPlayers) {
+                if (controller) {
+                    allNull = false;
+                    break;
+                }
+            }
+            if (SpectationManager.Spectating && allNull) {
+                StartCoroutine(EndGame(null));
+                return;
+            }
+        }
+
         if (musicEnabled)
             HandleMusic();
         

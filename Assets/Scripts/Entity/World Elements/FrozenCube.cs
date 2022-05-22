@@ -150,6 +150,8 @@ public class FrozenCube : HoldableEntity {
 
     private void ApplyConstraints() {
         body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        body.isKinematic = holder;
+
         if (!holder) {
             if (!fastSlide)
                 body.constraints |= RigidbodyConstraints2D.FreezePositionX;

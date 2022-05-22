@@ -291,7 +291,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Time.timeScale = 1;
 
         if (GlobalController.Instance.disconnectCause != null) {
-            OpenReconnectBox((DisconnectCause) GlobalController.Instance.disconnectCause);
+            OpenErrorBox("Disconnected: " + GlobalController.Instance.disconnectCause.ToString());
+            GlobalController.Instance.disconnectCause = null;
         }
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
@@ -545,11 +546,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorBox.SetActive(true);
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
-    }
-    public void OpenReconnectBox(DisconnectCause cause) {
-        reconnectBox.SetActive(true);
-        reconnectText.text = cause.ToString();
-        EventSystem.current.SetSelectedGameObject(reconnectSelected);
     }
 
     public void ConnectToDropdownRegion() {

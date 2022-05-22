@@ -65,6 +65,7 @@ public class SpectationManager : MonoBehaviour {
         }
         if (players.Length <= 0)
             return;
+            
 
         int nulls = 0;
         while (TargetPlayer == null) {
