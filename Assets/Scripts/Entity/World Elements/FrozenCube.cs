@@ -150,7 +150,7 @@ public class FrozenCube : HoldableEntity {
 
     private void ApplyConstraints() {
         body.constraints = RigidbodyConstraints2D.FreezeRotation;
-        body.isKinematic = holder;
+        body.mass = holder ? 0 : 100000;
 
         if (!holder) {
             if (!fastSlide)
@@ -196,7 +196,7 @@ public class FrozenCube : HoldableEntity {
         if (holder == null)
             return;
 
-        fastSlide = !crouch;
+        fastSlide = true;
         transform.position = new Vector2(holder.facingRight ? holder.transform.position.x + 0.1f : holder.transform.position.x - 0.1f, transform.position.y);
 
         previousHolder = holder;

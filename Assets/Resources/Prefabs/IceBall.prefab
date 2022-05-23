@@ -161,7 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0145365c476308445a9e47dafba82648, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 4.25
   bounceHeight: 6
   terminalVelocity: 6.25
   left: 0

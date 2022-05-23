@@ -34,7 +34,7 @@ public class CameraController : MonoBehaviour {
             if (BackgroundLoop.instance)
                 BackgroundLoop.instance.Reposition();
 
-            secondaryPositioners.Remove(null);
+            secondaryPositioners.RemoveAll(scp => scp == null);
             secondaryPositioners.ForEach(scp => scp.UpdatePosition());
         }
     }

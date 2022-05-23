@@ -36,8 +36,6 @@ public class UserNametag : MonoBehaviour {
         float screenH = Screen.height;
         float screenAspect = screenW / screenH;
         if (screenAspect > camera.aspect) {
-            Debug.Log($"Screen width = {screenW} Camera width = {screenH * camera.aspect}");
-            Debug.Log((screenW - (screenH * camera.aspect)) / 2);
             screenPoint.x += (screenW - (screenH * camera.aspect)) / 2;
         }
         transform.position = screenPoint;

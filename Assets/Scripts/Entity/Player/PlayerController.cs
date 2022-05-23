@@ -829,7 +829,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
 
         frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
         frozen = true;
-        unfreezeTimer = 3;
+        unfreezeTimer = 1.5f;
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
@@ -998,6 +998,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
             holding = null;
         }
+
+        if (photonView.IsMine)
+            ScoreboardUpdater.instance.OnDeathToggle();
     }
 
     [PunRPC]
@@ -1070,6 +1073,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         ResetKnockback();
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
         models.transform.rotation = Quaternion.Euler(0, 180, 0);
+
+        if (photonView.IsMine)
+            ScoreboardUpdater.instance.OnRespawnToggle();
     }
     #endregion
 

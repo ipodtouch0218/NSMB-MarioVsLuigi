@@ -10,7 +10,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     [SerializeField] GameObject entryTemplate;
     
     private readonly List<ScoreboardEntry> entries = new();
-    private bool toggled = false;
+    private bool manuallyToggled = false;
     private Animator animator;
 
     public void OnEnable() {
@@ -21,9 +21,25 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
 
     private void OnToggle(InputAction.CallbackContext context) {
-        toggled = !toggled;
-        animator.SetFloat("speed", toggled ? 1 : -1);
+        manuallyToggled = !manuallyToggled;
+        PlayAnimation(manuallyToggled);
+    }
+    
+    private void PlayAnimation(bool enabled) {
+        animator.SetFloat("speed", enabled ? 1 : -1);
         animator.Play("toggle", 0, Mathf.Clamp01(animator.GetCurrentAnimatorStateInfo(0).normalizedTime));
+    }
+
+    public void OnDeathToggle() {
+        if (!manuallyToggled) {
+            PlayAnimation(true);
+        }
+    }
+
+    public void OnRespawnToggle() {
+        if (!manuallyToggled) {
+            PlayAnimation(false);
+        }
     }
 
     public void Awake() {
