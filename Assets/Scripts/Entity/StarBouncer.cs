@@ -16,6 +16,8 @@ public class StarBouncer : MonoBehaviourPun {
     private PhysicsEntity physics;
     public int creator = -1;
 
+    private BoxCollider2D worldCollider;
+
     private int becomeCollectibleAt = 0;
     private bool alreadyCollectible;
 
@@ -23,6 +25,7 @@ public class StarBouncer : MonoBehaviourPun {
         body = GetComponent<Rigidbody2D>();
         physics = GetComponent<PhysicsEntity>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
+        worldCollider = GetComponent<BoxCollider2D>();
 
         graphicTransform = transform.Find("Graphic");
 
@@ -47,6 +50,7 @@ public class StarBouncer : MonoBehaviourPun {
                 body.velocity += Vector2.up * 3;
             }
             body.isKinematic = false;
+            worldCollider.enabled = true;
         } else {
             GetComponent<Animator>().enabled = true;
             alreadyCollectible = true;
