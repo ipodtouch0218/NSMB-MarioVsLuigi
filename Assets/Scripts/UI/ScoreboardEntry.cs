@@ -21,7 +21,7 @@ public class ScoreboardEntry : MonoBehaviour {
         playerId = target.playerId;
         nameText.text = target.photonView.Owner.NickName;
 
-        Color c = target.animationController.glowColor;
+        Color c = target.AnimationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);
     }
 

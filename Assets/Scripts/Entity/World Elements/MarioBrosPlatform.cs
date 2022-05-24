@@ -3,7 +3,9 @@ using UnityEngine;
 using Photon.Pun;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-public class MarioBrosPlatform : MonoBehaviour {
+public class MarioBrosPlatform : MonoBehaviourPun {
+
+    private static readonly Vector2 BUMP_OFFSET = new(-0.25f, -0.1f);
 
     [Delayed]
     public int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
@@ -73,7 +75,7 @@ public class MarioBrosPlatform : MonoBehaviour {
                 if ((pixels[index].r / 255f) >= color)
                     continue;
 
-                pixels[index] = new Color32((byte) (color * 255), 0, 0, 255);
+                pixels[index].r = (byte) (Mathf.Clamp01(color) * 255);
             }
         }
         displacementMap.SetPixels32(pixels);
@@ -83,7 +85,10 @@ public class MarioBrosPlatform : MonoBehaviour {
         spriteRenderer.SetPropertyBlock(mpb);
     }
 
-    public void Bump(PlayerController player, Vector3 worldPos) {
+    [PunRPC]
+    public void Bump(int id, Vector2 worldPos) {
+
+        PlayerController player = PhotonView.Find(id).GetComponent<PlayerController>();
 
         float localPos = transform.InverseTransformPoint(worldPos).x;
 
@@ -96,12 +101,12 @@ public class MarioBrosPlatform : MonoBehaviour {
         localPos += 0.5f; // get rid of negative coords
         localPos *= samplesPerTile * platformWidth;
 
-        if (displacementMap.GetPixel((int) localPos, 0).r != 0) {
+        if (displacementMap.GetPixel((int) localPos, 0).r != 0)
             return;
-        }
 
-        player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
-        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + new Vector3(-0.25f, -0.1f));
+        player.PlaySound(Enums.Sounds.World_Block_Bump);
+        if (player.photonView.IsMine)
+            InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BUMP_OFFSET);
         bumps.Add(new BumpInfo(bumpDuration, (int) localPos));
     }
 

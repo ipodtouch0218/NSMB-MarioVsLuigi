@@ -25,7 +25,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
     private AudioSource sfx;
     private Animator animator;
     public Rigidbody2D body;
-    public PlayerAnimationController animationController;
+
+    private PlayerAnimationController _animationController;
+    public PlayerAnimationController AnimationController {
+        get {
+            if (_animationController == null)
+                _animationController = GetComponent<PlayerAnimationController>();
+
+            return _animationController;
+        }
+    }
 
     public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenStruggle;
@@ -143,7 +152,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         animator = GetComponentInChildren<Animator>();
         body = GetComponent<Rigidbody2D>();
         sfx = GetComponent<AudioSource>();
-        animationController = GetComponent<PlayerAnimationController>();
         fadeOut = GameObject.FindGameObjectWithTag("FadeUI").GetComponent<FadeOutManager>();
 
         body.position = transform.position = GameManager.Instance.GetSpawnpoint(playerId);
@@ -267,7 +275,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             TickCounters();
             HandleMovement(Time.fixedDeltaTime);
         }
-        animationController.UpdateAnimatorStates();
+        AnimationController.UpdateAnimatorStates();
         previousFrameVelocity = body.velocity;
         previousFramePosition = body.position;
     }
@@ -459,7 +467,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                 avg += point;
             avg /= points.Count;
 
-            collision.gameObject.GetComponent<MarioBrosPlatform>().Bump(this, avg);
+            collision.gameObject.GetPhotonView().RPC("Bump", RpcTarget.All, photonView.ViewID, avg);
             break;
         }
         }
@@ -827,6 +835,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         if (knockback || hitInvincibilityCounter > 0 || invincible > 0 || frozen)
             return;
 
+        PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
         frozen = true;
         unfreezeTimer = 1.5f;
@@ -1019,7 +1028,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         cameraController.Recenter();
         gameObject.layer = DEFAULT_LAYERID;
         previousState = state = Enums.PowerupState.Small;
-        animationController.DisableAllModels();
+        AnimationController.DisableAllModels();
         dead = false;
         spawned = false;
         animator.SetTrigger("respawn");
@@ -1032,8 +1041,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         body.isKinematic = false;
 
         GameObject particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Respawn"), body.position, Quaternion.identity);
-        if (photonView.IsMine)
-            particle.GetComponent<RespawnParticle>().player = this;
+        particle.GetComponent<RespawnParticle>().player = this;
 
         gameObject.SetActive(false);
     }

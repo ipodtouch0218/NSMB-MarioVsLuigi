@@ -14,8 +14,20 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
-    [SerializeField] [ColorUsage(true, false)] public Color glowColor = Color.white;
     [SerializeField] Color primaryColor = Color.clear, secondaryColor = Color.clear;
+
+    [SerializeField] [ColorUsage(true, false)] Color? _glowColor = null;
+    public Color GlowColor {
+        get {
+            if (_glowColor == null)
+                _glowColor = Utils.GetPlayerColor(photonView.Owner);
+
+            return _glowColor ?? Color.white;
+        }
+        set {
+            _glowColor = value;
+        }
+    }
 
     AudioSource drillParticleAudio;
     [SerializeField] AudioClip normalDrill, propellerDrill;
@@ -35,10 +47,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
         if (photonView) {
             enableGlow = !photonView.IsMine;
-            glowColor = Utils.GetPlayerColor(photonView.Owner);
-            if (!photonView.IsMine) {
-                GameManager.Instance.CreateNametag(controller); 
-            }
+            if (!photonView.IsMine)
+                GameManager.Instance.CreateNametag(controller);
 
             CustomColors.PlayerColor color = CustomColors.Colors[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.PlayerColor]];
             primaryColor = color.overalls.linear;
@@ -236,7 +246,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         block.SetFloat("EyeState", (int) eyeState);
         block.SetFloat("ModelScale", transform.lossyScale.x);
         if (enableGlow)
-            block.SetColor("GlowColor", glowColor);
+            block.SetColor("GlowColor", GlowColor);
 
         //Customizeable player color
         block.SetVector("OverallsColor", primaryColor);

@@ -28,7 +28,7 @@ public class TrackIcon : MonoBehaviour {
         if (target.CompareTag("Player")) {
             if (!playerTarget)
                 playerTarget = target.GetComponent<PlayerController>();
-            image.color = playerTarget.animationController.glowColor;
+            image.color = playerTarget.AnimationController.GlowColor;
             if (playerTarget.dead) {
                 flashTimer += Time.deltaTime;
                 image.enabled = (flashTimer % 0.2f) <= 0.1f;

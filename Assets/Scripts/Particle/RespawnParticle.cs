@@ -1,4 +1,5 @@
 using UnityEngine;
+using Photon.Pun;
 
 public class RespawnParticle : MonoBehaviour {
 
@@ -8,7 +9,7 @@ public class RespawnParticle : MonoBehaviour {
     public void Start() {
         foreach (ParticleSystem system in GetComponentsInChildren<ParticleSystem>()) {
             ParticleSystem.MainModule main = system.main;
-            main.startColor = player.animationController.glowColor;
+            main.startColor = player.AnimationController.GlowColor;
 
             system.Play();
         }
@@ -19,6 +20,6 @@ public class RespawnParticle : MonoBehaviour {
             return;
 
         if (respawnTimer > 0 && (respawnTimer -= Time.deltaTime) <= 0)
-            player.photonView.RPC("Respawn", Photon.Pun.RpcTarget.All);
+            player.photonView.RPC("Respawn", RpcTarget.All);
     }
 }

@@ -48,7 +48,7 @@ public class WaterSplash : MonoBehaviour {
 
         heightTex = new Texture2D(totalPoints, 1);
         for (int i = 0; i < totalPoints; i++)
-            colors[i] = new Color(.5f, .5f, .5f, 1f);
+            colors[i] = new Color(.5f, 0, 0, 1);
         heightTex.SetPixels32(colors);
         heightTex.Apply();
 
@@ -69,6 +69,7 @@ public class WaterSplash : MonoBehaviour {
             Initialize();
             initialized = true;
         }
+        float delta = Time.fixedDeltaTime;
 
         for (int i = 0; i < totalPoints; i++) {
             float height = pointHeights[i];
@@ -76,16 +77,16 @@ public class WaterSplash : MonoBehaviour {
             pointVelocities[i] *= damping;
         }
         for (int i = 0; i < totalPoints; i++) {
-            pointHeights[i] += pointVelocities[i] * Time.fixedDeltaTime;
+            pointHeights[i] += pointVelocities[i] * delta;
         }
         for (int i = 0; i < totalPoints; i++) {
             float height = pointHeights[i];
 
-            pointVelocities[i] -= kconstant * Time.fixedDeltaTime * (height - pointHeights[(i + totalPoints - 1) % totalPoints]); //left
-            pointVelocities[i] -= kconstant * Time.fixedDeltaTime * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); //right
+            pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints - 1) % totalPoints]); //left
+            pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); //right
         }
         for (int i = 0; i < totalPoints; i++) {
-            colors[i] = new Color((pointHeights[i]/20f) + 0.5f, 0, 0, 1);
+            colors[i].r = (byte) ((Mathf.Clamp01(pointHeights[i] / 20f) + 0.5f) * 255);
         }
 
         heightTex.SetPixels32(colors, 0);

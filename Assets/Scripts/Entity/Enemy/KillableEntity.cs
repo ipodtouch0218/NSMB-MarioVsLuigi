@@ -85,7 +85,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
 
     [PunRPC]
     public virtual void Freeze(int cube) {
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Freeze);
+        PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozen = true;
         animator.enabled = false;
         hitbox.enabled = false;
