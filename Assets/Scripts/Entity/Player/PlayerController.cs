@@ -387,12 +387,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                     }
 
                     otherView.RPC("Powerdown", RpcTarget.All, false);
+                    body.velocity = previousFrameVelocity;
                     return;
                 }
 
-                bool above = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) > (inShell ? .1f : .7f);
-                bool otherAbove = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up) < -(other.inShell ? .1f : .7f);
+                float dot = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up);
+                bool above = dot > 0.7f;
+                bool otherAbove = dot < -0.7f;
 
+                //mega mushroom cases
                 if (state == Enums.PowerupState.MegaMushroom || other.state == Enums.PowerupState.MegaMushroom) {
                     if (state == Enums.PowerupState.MegaMushroom && other.state == Enums.PowerupState.MegaMushroom) {
                         //both giant
@@ -405,10 +408,39 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                     } else if (state == Enums.PowerupState.MegaMushroom) {
                         //only we are giant
                         otherView.RPC("Powerdown", RpcTarget.All, false);
+                        body.velocity = previousFrameVelocity;
                     }
                     return;
                 }
 
+                //blue shell cases
+                if (inShell || other.inShell) {
+                    if (inShell) {
+                        //we are blue shell
+                        if (above) {
+                            //hit them from above
+                            bounce = true;
+                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, (groundpound || drill) ? 3 : 1, false, photonView.ViewID);
+                        } else if (!otherAbove) {
+                            //hit them from side. powerdown them
+                            if (other.inShell) {
+                                //collide with both
+                                otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
+                                photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
+                            } else {
+                                otherView.RPC("Powerdown", RpcTarget.All, false);
+                            }
+                        }
+                    } else if (above) {
+                        //only they are blue shell
+                        bounce = true;
+                        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+                        if (groundpound)
+                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, (groundpound || drill) ? 3 : 1, false, photonView.ViewID);
+
+                    }
+                    return;
+                }
 
                 if (above) {
                     //hit them from above
@@ -433,17 +465,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                     body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);
 
                     return;
-                } else if (!knockback && !other.knockback && inShell && (other.inShell || above)) {
-                    if (other.inShell) {
-                        otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, false, photonView.ViewID);
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, false, otherView.ViewID);
-                    } else {
-                        otherView.RPC("Powerdown", RpcTarget.All, false);
-                        body.velocity = new Vector2(-body.velocity.x, body.velocity.y);
-                    }
-                    return;
                 } else if (!knockback && !other.knockback && !otherAbove && onGround && other.onGround && (Mathf.Abs(previousFrameVelocity.x) > walkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > walkingMaxSpeed)) {
-                    //bump?
+                    //bump
 
                     otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
                     photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
@@ -687,6 +710,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         propeller = true;
         flying = false;
         crouching = false;
+
+        singlejump = false;
+        doublejump = false;
+        triplejump = false;
+
         if (onGround) {
             onGround = false;
             doGroundSnap = false;

@@ -26,6 +26,9 @@ public class UserNametag : MonoBehaviour {
         nametag.SetActive(parent.spawned);
 
         Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.hitboxes[0].size.y * parent.transform.lossyScale.y * 1.2f) + 0.5f);
+        if (Mathf.Abs(camera.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * (1 / 4f))
+            worldPos.x += Mathf.Sign(camera.transform.position.x) * GameManager.Instance.levelWidthTile / 2f;
+
         Rect t = parentCanvas.rect;
         Vector2 size = new(t.size.y * camera.aspect, t.size.y);
         Vector3 screenPoint = camera.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;
