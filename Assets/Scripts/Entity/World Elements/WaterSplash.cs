@@ -86,7 +86,7 @@ public class WaterSplash : MonoBehaviour {
             pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); //right
         }
         for (int i = 0; i < totalPoints; i++) {
-            colors[i].r = (byte) ((Mathf.Clamp01(pointHeights[i] / 20f) + 0.5f) * 255);
+            colors[i].r = (byte) ((Mathf.Clamp(pointHeights[i] / 20f, -0.5f, 0.5f) + 0.5f) * 255);
         }
 
         heightTex.SetPixels32(colors, 0);

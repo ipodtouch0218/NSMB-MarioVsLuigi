@@ -151,7 +151,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
         if (controller.crouching || controller.sliding || controller.skidding) {
             dust.transform.localPosition = Vector2.zero;
-        } else {
+        } else if (controller.wallSlideLeft || controller.wallSlideRight) {
             dust.transform.localPosition = new Vector2(mainHitbox.size.x * (3f / 4f) * (controller.wallSlideLeft ? -1 : 1), mainHitbox.size.y * (3f / 4f));
         }
     }
@@ -185,7 +185,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                     animatedVelocity = 3.5f;
                 if (controller.iceSliding)
                     animatedVelocity = 0f;
-            } else if (Mathf.Abs(body.velocity.x) > 0.1f && controller.state == Enums.PowerupState.MegaMushroom) {
+            } else if (controller.state == Enums.PowerupState.MegaMushroom && Mathf.Abs(controller.joystick.x) > .2f) {
                 animatedVelocity = 4.5f;
             } 
             animator.SetFloat("velocityX", animatedVelocity);

@@ -2572,7 +2572,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: triplejump
-  m_Speed: 0.7
+  m_Speed: 0.525
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -1376789531444378777}
@@ -7200,7 +7200,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: triplejump
-  m_Speed: 0.7
+  m_Speed: 0.525
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 5930498244109878235}

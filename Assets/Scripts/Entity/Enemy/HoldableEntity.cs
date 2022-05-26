@@ -7,6 +7,8 @@ public abstract class HoldableEntity : KillableEntity {
     public PlayerController holder, previousHolder;
     public Vector3 holderOffset;
 
+    public bool canPlace = true;
+
     public void LateUpdate() {
         if (!holder) 
             return;
@@ -20,7 +22,7 @@ public abstract class HoldableEntity : KillableEntity {
         if (dead || !photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
-        if (body && !holder && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
+        if (body && !frozen && !holder && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false);
     }
 

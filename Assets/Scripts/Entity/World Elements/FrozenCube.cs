@@ -120,7 +120,17 @@ public class FrozenCube : HoldableEntity {
             Destroy(gameObject);
             return;
         }
-            
+        
+        if (fastSlide && physics.onGround) {
+            RaycastHit2D ray = Physics2D.BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, 1 << GROUND_LAYER_ID);
+            if (ray) {
+                body.position = new Vector2(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
+                if (ray.distance < 0.1f)
+                    body.velocity = new Vector2(body.velocity.x, Mathf.Min(0, body.velocity.y));
+            }
+        }
+        
+        body.velocity = new Vector2(throwSpeed * (left ? -1 : 1), body.velocity.y);
 
         //handle flying timer
         if (!fallen) {
@@ -143,9 +153,8 @@ public class FrozenCube : HoldableEntity {
 
 
         //handle interactions with tiles
-        if (entity.IsCarryable && (photonView?.IsMine ?? false)) {
+        if (entity.IsCarryable && (photonView?.IsMine ?? false))
             HandleTile();
-        }
     }
 
     private void ApplyConstraints() {
@@ -166,7 +175,6 @@ public class FrozenCube : HoldableEntity {
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
         if (!holder && player.invincible > 0) {
             photonView.RPC("Kill", RpcTarget.All);
-
         }
         if (holder || player.frozen)
             return;
@@ -175,6 +183,7 @@ public class FrozenCube : HoldableEntity {
 
         } else if (Mathf.Abs(body.velocity.x) >= (throwSpeed/2) && !physics.hitRoof) {
             player.photonView.RPC("Knockback", RpcTarget.All, body.position.x > player.body.position.x, 1, false, photonView.ViewID);
+            photonView.RPC("Kill", RpcTarget.All);
         }
         if (!holder && !dead && !plantEntity) {
             if (player.CanPickup() && player.state != Enums.PowerupState.MiniMushroom && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.wallSlideLeft && !player.wallSlideRight && !player.doublejump && !player.triplejump) {
@@ -196,6 +205,7 @@ public class FrozenCube : HoldableEntity {
         if (holder == null)
             return;
 
+        left = facingLeft;
         fastSlide = true;
         transform.position = new Vector2(holder.facingRight ? holder.transform.position.x + 0.1f : holder.transform.position.x - 0.1f, transform.position.y);
 
@@ -210,11 +220,7 @@ public class FrozenCube : HoldableEntity {
         }
         ApplyConstraints();
 
-        if (crouch) {
-            body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
-        } else {
-            body.velocity = new Vector2(throwSpeed * (facingLeft ? -1 : 1), body.velocity.y);
-        }
+        body.velocity = new Vector2(throwSpeed * (left ? -1 : 1), Mathf.Min(0, body.velocity.y));
     }
 
     new void OnTriggerEnter2D(Collider2D collider) {

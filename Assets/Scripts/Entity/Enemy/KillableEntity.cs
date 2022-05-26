@@ -29,7 +29,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         if (!photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
-        if (body && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
+        if (body && !frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false);
     }
 

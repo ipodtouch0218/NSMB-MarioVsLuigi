@@ -14,7 +14,7 @@ public class CameraController : MonoBehaviour {
     private Vector3 smoothDampVel;
     private Camera targetCamera;
     private List<SecondaryCameraPositioner> secondaryPositioners = new();  
-    private float startingZ, floorHeight;
+    private float startingZ, lastFloor;
 
     private PlayerController controller;
     private Vector3 playerPos;
@@ -41,7 +41,6 @@ public class CameraController : MonoBehaviour {
 
     public void Recenter() {
         currentPosition = (Vector2) transform.position + airOffset;
-        floorHeight = transform.position.y;
         smoothDampVel = Vector3.zero;
         LateUpdate();
     }
@@ -88,11 +87,12 @@ public class CameraController : MonoBehaviour {
         // lagging camera movements
 
         Vector3 targetPosition = currentPosition;
-        if (controller.onGround || controller.previousOnGround) {
-            if (playerPos.y - (currentPosition.y + vOrtho) + cameraTopMax + 1.5f > 0) {
-                //top camera clip ON GROUND. slowly pan up, dont do it instantly.
-                targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 1.5f;
-            }
+        if (controller.onGround) {
+            lastFloor = playerPos.y;
+        }
+        if (lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0) {
+            //top camera clip ON GROUND. slowly pan up, dont do it instantly.
+            targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 2f;
         }
 
         // Screen Shake
@@ -121,7 +121,7 @@ public class CameraController : MonoBehaviour {
         Vector2 threshold = controller.onGround ? groundedThreshold : airThreshold;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(new(playerPos.x, floorHeight), Vector3.right / 2);
+        Gizmos.DrawWireCube(new(playerPos.x, lastFloor), Vector3.right / 2);
     }
 
     private static Vector2 AntiJitter(Vector3 vec) {

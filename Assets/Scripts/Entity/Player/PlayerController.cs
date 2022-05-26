@@ -26,15 +26,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
     private Animator animator;
     public Rigidbody2D body;
 
-    private PlayerAnimationController _animationController;
-    public PlayerAnimationController AnimationController {
-        get {
-            if (_animationController == null)
-                _animationController = GetComponent<PlayerAnimationController>();
-
-            return _animationController;
-        }
-    }
+    public PlayerAnimationController AnimationController { get; private set; }
 
     public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, frozenStruggle;
@@ -44,7 +36,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
     private float wallSlideTimer, wallJumpTimer;
     public bool wallSlideLeft, wallSlideRight;
 
-
+   
     public Vector2 pipeDirection;
     public int stars, coins, lives = -1;
     public Powerup storedPowerup = null;
@@ -152,6 +144,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         animator = GetComponentInChildren<Animator>();
         body = GetComponent<Rigidbody2D>();
         sfx = GetComponent<AudioSource>();
+        AnimationController = GetComponent<PlayerAnimationController>();
         fadeOut = GameObject.FindGameObjectWithTag("FadeUI").GetComponent<FadeOutManager>();
 
         body.position = transform.position = GameManager.Instance.GetSpawnpoint(playerId);
@@ -1283,6 +1276,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         flying = false;
         propeller = false;
         propellerTimer = 0;
+        propellerSpinTimer = 0;
         sliding = false;
         drill = false;
         body.gravityScale = normalGravity;
@@ -1402,7 +1396,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
 
             floorAngle = angle;
 
-            float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x;
+            float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.25f;
             body.velocity = new Vector2(x, change);
             onGround = true;
             doGroundSnap = true;
@@ -1416,7 +1410,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                 float x = floorAngle != angle ? previousFrameVelocity.x : body.velocity.x;
                 floorAngle = angle;
 
-                float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x;
+                float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.25f;
                 body.velocity = new Vector2(x, change);
                 onGround = true;
                 doGroundSnap = true;
@@ -1941,22 +1935,24 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         photonView.RPC("FinishMegaMario", RpcTarget.All, !(bool) hit);
     }
     void HandleFacingDirection() {
+        if (groundpound)
+            return;
+        
         //Facing direction
         bool right = joystick.x > analogDeadzone;
         bool left = joystick.x < -analogDeadzone;
-        if (!sliding && !groundpound) {
-            if (doIceSkidding && !inShell && !groundpound) {
-                if (right || left)
-                    facingRight = right;
-            } else if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
-                if (knockback || (onGround && state != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f)) {
-                    facingRight = body.velocity.x > 0;
-                } else if (((wallJumpTimer <= 0 && !inShell) || giantStartTimer > 0) && (right || left)) {
-                    facingRight = right;
-                }
-                if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5f && crouching) || doIceSkidding) && (right || left))
-                    facingRight = right;
+
+        if (doIceSkidding && !inShell && !sliding) {
+            if (right || left)
+                facingRight = right;
+        } else if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
+            if (knockback || (onGround && state != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f)) {
+                facingRight = body.velocity.x > 0;
+            } else if (((wallJumpTimer <= 0 && !inShell) || giantStartTimer > 0) && (right || left)) {
+                facingRight = right;
             }
+            if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5f && crouching) || doIceSkidding) && (right || left))
+                facingRight = right;
         }
     }
     void HandleMovement(float delta) {
@@ -2203,7 +2199,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         if (!inShell && onGround && !(sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2)) {
             bool abovemax;
             float invincibleSpeedBoost = invincible > 0 ? 2f : 1;
-            bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
+            bool uphill = floorAngle != 0 && Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
             float max = (functionallyRunning ? runningMaxSpeed : walkingMaxSpeed) * invincibleSpeedBoost * (uphill ? (1 - (Mathf.Abs(floorAngle) / 360f)) : 1);
             if (knockback) {
                 abovemax = true;
@@ -2216,7 +2212,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             }
             //Friction...
             if (abovemax) {
-                body.velocity *= 1 - (delta * tileFriction * (knockback ? 3f : 4f) * (sliding ? 0.4f : 1f));
+                body.velocity *= 1 - (delta * tileFriction * (knockback ? 3f : 4f) * (sliding && !uphill ? 0.7f : 1f) * (uphill ? 0.25f : 1f));
                 if (Mathf.Abs(body.velocity.x) < 0.15f)
                     body.velocity = new Vector2(0, body.velocity.y);
             }
@@ -2290,6 +2286,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         bool throwLeft = !facingRight;
         if (left ^ right)
             throwLeft = left;
+
+        crouch &= holding.canPlace;
 
         if (photonView.IsMine)
             holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);

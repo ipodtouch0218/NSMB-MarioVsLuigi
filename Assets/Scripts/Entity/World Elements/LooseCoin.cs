@@ -3,6 +3,8 @@ using Photon.Pun;
 
 public class LooseCoin : MonoBehaviourPun {
 
+    private static int ENTITY_LAYER = -1, HITSNOTHING_LAYER = -1;
+
     public float speed = 1.25f, despawn = 10;
     private float despawnTimer;
     private Rigidbody2D body;
@@ -15,6 +17,11 @@ public class LooseCoin : MonoBehaviourPun {
         physics = GetComponent<PhysicsEntity>();
         animator = GetComponent<Animator>();
         body.velocity = new Vector2(Random.Range(-speed, speed), Random.Range(2, 4));
+
+        if (ENTITY_LAYER == -1) {
+            ENTITY_LAYER = LayerMask.NameToLayer("Entity");
+            HITSNOTHING_LAYER = LayerMask.NameToLayer("HitsNothing");
+        }
     }
 
     void FixedUpdate() {
@@ -24,6 +31,9 @@ public class LooseCoin : MonoBehaviourPun {
             body.isKinematic = true;
             return;
         }
+
+        bool inWall = Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.25f);
+        gameObject.layer = inWall ? HITSNOTHING_LAYER : ENTITY_LAYER;
 
         physics.UpdateCollisions();
         if (physics.onGround) {
