@@ -33,6 +33,13 @@ public class BreakablePipeTile : InteractableTile {
             //exception: dont break out of bounds.
             return false;
 
+        bool bottom = false;
+
+        if (origin.y == GameManager.Instance.levelMinTileY + 1) {
+            //origin += Vector3Int.up;
+            bottom = true;
+        }
+
         int tileHeight;
         bool shrink = false;
         bool addHat = true;
@@ -47,13 +54,26 @@ public class BreakablePipeTile : InteractableTile {
             shrink = true;
         } else {
             //hit left/right side of pipe
-            if (ourLocation == origin)
-                addHat = false;
-            tileHeight = Mathf.Abs(hat.y - ourLocation.y) + (addHat ? 2 : 1);
+
+            Vector2 world = worldLocation;
+            if (upsideDownPipe) {
+                if (ourLocation == origin)
+                    addHat = false;
+
+                tileHeight = Mathf.Abs(hat.y - ourLocation.y) + (addHat ? 2 : 1);
+            } else {
+                addHat = bottom;
+                tileHeight = GetPipeHeight(ourLocation);
+
+                world -= (Vector2) ((Vector3) (ourLocation - origin) / 2f);
+                
+                if (bottom)
+                    world += Vector2.up * 0.5f;
+            }
 
             bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
             
-            object[] parametersParticle = new object[]{(Vector2) worldLocation + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight-(addHat? 1 : 0)), "DestructablePipe" + (alreadyDestroyed ? "-D" : "")};
+            object[] parametersParticle = new object[]{world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), "DestructablePipe" + (alreadyDestroyed ? "-D" : "")};
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnResizableParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         }
         string[] tiles = new string[tileHeight*2];

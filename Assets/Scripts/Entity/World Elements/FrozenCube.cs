@@ -52,6 +52,8 @@ public class FrozenCube : HoldableEntity {
             GameObject rendererObject = entityView.gameObject;
             Renderer[] renderers = entityView.GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in renderers) {
+                if (!renderer.enabled)
+                    continue;
                 if (renderer is ParticleSystemRenderer)
                     continue;
 
@@ -61,6 +63,7 @@ public class FrozenCube : HoldableEntity {
                     tempBounds = new(renderer.bounds.center, renderer.bounds.size);
                 else 
                     ((Bounds) tempBounds).Encapsulate(renderer.bounds);
+                
                 rendererObject = renderer.gameObject;
             }
             Bounds bounds = tempBounds ?? new(entityView.transform.position, Vector2.one / 2);

@@ -275,13 +275,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     // Unity Stuff
-    void Start() {
-        
+    public void Start() {
+
         /*
          * dear god this needs a refactor. does every UI element seriously have to have
          * their callbacks into this one fuckin script?
          */
-        
+
         Instance = this;
 
         //Clear game-specific settings so they don't carry over

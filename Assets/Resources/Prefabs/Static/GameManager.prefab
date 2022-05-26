@@ -1498,20 +1498,6 @@ MonoBehaviour:
   player: {fileID: 0}
   storedItemNull: {fileID: 7194109699264141795, guid: a87d3b028baa82640b06b88398a8c4f0,
     type: 3}
-  storedItemMushroom: {fileID: -6080119536613256813, guid: a87d3b028baa82640b06b88398a8c4f0,
-    type: 3}
-  storedItemFireFlower: {fileID: -4773353537684922170, guid: a87d3b028baa82640b06b88398a8c4f0,
-    type: 3}
-  storedItemMiniMushroom: {fileID: 5709720548119103520, guid: a87d3b028baa82640b06b88398a8c4f0,
-    type: 3}
-  storedItemMegaMushroom: {fileID: 2690215448161037315, guid: a87d3b028baa82640b06b88398a8c4f0,
-    type: 3}
-  storedItemBlueShell: {fileID: 2664608197882872095, guid: a87d3b028baa82640b06b88398a8c4f0,
-    type: 3}
-  storedItemPropellerMushroom: {fileID: -1858463510, guid: a87d3b028baa82640b06b88398a8c4f0,
-    type: 3}
-  storedItemIceFlower: {fileID: -1604689058, guid: a87d3b028baa82640b06b88398a8c4f0,
-    type: 3}
   uiStars: {fileID: 6594008471096808134}
   uiCoins: {fileID: 4574837437836791355}
   uiDebug: {fileID: 2156455714517579465}
@@ -3243,7 +3229,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1.5
+  m_Intensity: 1.1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -4028,6 +4014,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spectationUI: {fileID: 8822165382386283217}
   spectatingText: {fileID: 1800706962885475767}
+  freecam: 0
 --- !u!82 &3063105634746227037
 AudioSource:
   m_ObjectHideFlags: 0

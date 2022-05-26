@@ -929,7 +929,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             if (coin.CompareTag("loosecoin")) {
                 if (coin.GetPhotonView().IsMine)
                     PhotonNetwork.Destroy(coin);
-                Destroy(coin);
+                DestroyImmediate(coin);
             } else {
                 SpriteRenderer renderer = coin.GetComponent<SpriteRenderer>();
                 if (!renderer.enabled)

@@ -57,16 +57,16 @@ public class CameraController : MonoBehaviour {
         // instant camera movements. we dont want to lag behind in these cases
 
         float cameraBottomMax = Mathf.Max(3.5f - transform.lossyScale.y, 1.5f);
-        if (playerPos.y - (currentPosition.y - vOrtho) < cameraBottomMax) {
-            //bottom camera clip
+        //bottom camera clip
+        if (playerPos.y - (currentPosition.y - vOrtho) < cameraBottomMax)
             currentPosition.y = playerPos.y + vOrtho - cameraBottomMax;
-        }
+
         float playerHeight = controller.hitboxes[0].size.y * transform.lossyScale.y;
         float cameraTopMax = Mathf.Min(1.5f + playerHeight, 4f);
-        if (playerPos.y - (currentPosition.y + vOrtho) + cameraTopMax > 0) {
-            //top camera clip
+
+        //top camera clip
+        if (playerPos.y - (currentPosition.y + vOrtho) + cameraTopMax > 0)
             currentPosition.y = playerPos.y - vOrtho + cameraTopMax;
-        }
 
         Utils.WrapWorldLocation(ref playerPos);
         float xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
@@ -79,23 +79,20 @@ public class CameraController : MonoBehaviour {
             if (controlCamera)
                 BackgroundLoop.instance.wrap = true;
         }
-        Vector2 threshold = new(0.25f, 0);
-        if (xDifference > threshold.x) {
-            currentPosition.x += (threshold.x - xDifference - 0.01f) * (right ? 1 : -1);
-        }
+
+        if (xDifference > 0.25f)
+            currentPosition.x += (0.25f - xDifference - 0.01f) * (right ? 1 : -1);
 
         // lagging camera movements
-
         Vector3 targetPosition = currentPosition;
-        if (controller.onGround) {
+        if (controller.onGround || lastFloor < playerPos.y)
             lastFloor = playerPos.y;
-        }
-        if (lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0) {
-            //top camera clip ON GROUND. slowly pan up, dont do it instantly.
-            targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 2f;
-        }
 
-        // Screen Shake
+        //top camera clip ON GROUND. slowly pan up, dont do it instantly.
+        if (lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0)
+            targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 2f;
+
+        // -- Screen Shake --
 
         if ((screenShakeTimer -= Time.deltaTime) > 0)
             targetPosition += new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
