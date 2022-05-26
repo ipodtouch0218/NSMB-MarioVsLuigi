@@ -19,8 +19,7 @@ public class FrozenCube : HoldableEntity {
     public float fallTime = 5, killTimer = .5f;
     float fallTimer;
 
-    public bool fastSlide, fallen, deathFlag;
-    public bool kinematicEntity, flyingEntity, plantEntity;
+    public bool fastSlide, fallen;
 
     public Vector2 offset;
 
@@ -49,19 +48,27 @@ public class FrozenCube : HoldableEntity {
 
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
-            Bounds bounds = new(entityView.transform.position, Vector3.zero);
+            Bounds? tempBounds = null;
+            GameObject rendererObject = entityView.gameObject;
             Renderer[] renderers = entityView.GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in renderers) {
-                renderer.ResetBounds();
                 if (renderer is ParticleSystemRenderer)
                     continue;
-                bounds.Encapsulate(renderer.bounds);
+
+                renderer.ResetBounds();
+
+                if (tempBounds == null)
+                    tempBounds = new(renderer.bounds.center, renderer.bounds.size);
+                else 
+                    ((Bounds) tempBounds).Encapsulate(renderer.bounds);
+                rendererObject = renderer.gameObject;
             }
+            Bounds bounds = tempBounds ?? new(entityView.transform.position, Vector2.one / 2);
 
             hitbox.size = frozenCubeCollider.size = spriteRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size + (Vector3.one * 0.1f);
             hitbox.offset = frozenCubeCollider.offset = Vector2.up * frozenCubeCollider.size / 2;
             
-            offset = -(bounds.center - Vector3.up.Multiply(bounds.size/2) - entityView.transform.position);
+            offset = -(bounds.center - Vector3.up.Multiply(bounds.size/2) - rendererObject.transform.position);
 
             if (entity.IsFlying) {
                 fallen = false;
@@ -85,13 +92,9 @@ public class FrozenCube : HoldableEntity {
             return;
         }
 
-        if (entity.IsCarryable) {
-            //move the entity to be inside of us
+        //move the entity to be inside of us
+        if (entity.IsCarryable)
             entityView.transform.position = (Vector2) transform.position + offset;
-        } else {
-            //move ourselves to be inside the entity
-            transform.position = new Vector2(entityView.transform.position.x, entityView.transform.position.y + (transform.localScale.y / 1));
-        }
     }
 
     new void FixedUpdate() {
@@ -160,6 +163,7 @@ public class FrozenCube : HoldableEntity {
     private void ApplyConstraints() {
         body.constraints = RigidbodyConstraints2D.FreezeRotation;
         body.mass = holder ? 0 : 100000;
+        body.isKinematic = !entity.IsCarryable;
 
         if (!holder) {
             if (!fastSlide)
@@ -185,8 +189,8 @@ public class FrozenCube : HoldableEntity {
             player.photonView.RPC("Knockback", RpcTarget.All, body.position.x > player.body.position.x, 1, false, photonView.ViewID);
             photonView.RPC("Kill", RpcTarget.All);
         }
-        if (!holder && !dead && !plantEntity) {
-            if (player.CanPickup() && player.state != Enums.PowerupState.MiniMushroom && !player.holding && player.running && !player.propeller && !player.flying && !player.crouching && !player.dead && !player.wallSlideLeft && !player.wallSlideRight && !player.doublejump && !player.triplejump) {
+        if (entity.IsCarryable && !holder && !dead) {
+            if (player.CanPickup() && player.onGround) {
                 fallen = true;
                 photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                 player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);

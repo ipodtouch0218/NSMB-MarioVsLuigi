@@ -10,16 +10,15 @@ public class UIUpdater : MonoBehaviour {
     public static UIUpdater Instance;
     public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
-    //TODO: refactor
-    public Sprite storedItemNull, storedItemMushroom, storedItemFireFlower, storedItemMiniMushroom, storedItemMegaMushroom, storedItemBlueShell, storedItemPropellerMushroom, storedItemIceFlower; 
+    public Sprite storedItemNull; 
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     public Image itemReserve;
     public float pingSample = 0;
 
     private Material timerMaterial;
-
     private GameObject starsParent, coinsParent, livesParent, timerParent;
     private readonly List<Image> backgrounds = new();
+    private bool uiHidden;
 
     void Start() {
         Instance = this;
@@ -57,35 +56,34 @@ public class UIUpdater : MonoBehaviour {
         if (!player && GameManager.Instance.localPlayer) {
             player = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
         }
-        if (!player)
+        if (!player) {
+            if (!uiHidden)
+                ToggleUI(true);
             return;
+        }
+        if (uiHidden)
+            ToggleUI(false);
 
         UpdateStoredItemUI();
         UpdateTextUI();
     }
+
+    private void ToggleUI(bool hidden) {
+        uiHidden = hidden;
+
+        starsParent.SetActive(!hidden);
+        livesParent.SetActive(!hidden);
+        coinsParent.SetActive(!hidden);
+        timerParent.SetActive(!hidden);
+    }
     
-    void UpdateStoredItemUI() {
+    private void UpdateStoredItemUI() {
         if (!player)
             return;
 
-        //TODO: refactor
-        if (player.storedPowerup) {
-            itemReserve.sprite = player.storedPowerup.state switch {
-                Enums.PowerupState.MiniMushroom => storedItemMiniMushroom,
-                //Enums.powerupstae.Small => null
-                Enums.PowerupState.Mushroom => storedItemMushroom,
-                Enums.PowerupState.FireFlower => storedItemFireFlower,
-                Enums.PowerupState.MegaMushroom => storedItemMegaMushroom,
-                Enums.PowerupState.BlueShell => storedItemBlueShell,
-                Enums.PowerupState.PropellerMushroom => storedItemPropellerMushroom,
-                Enums.PowerupState.IceFlower => storedItemIceFlower,
-                _ => storedItemNull,
-            };
-        } else {
-            itemReserve.sprite = storedItemNull;
-        }
+        itemReserve.sprite = player.storedPowerup?.reserveSprite ?? storedItemNull;
     }
-    void UpdateTextUI() {
+    private void UpdateTextUI() {
         if (!player || GameManager.Instance.gameover)
             return;
 

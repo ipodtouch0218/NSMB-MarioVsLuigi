@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 
 public class PiranhaPlantController : KillableEntity {
@@ -9,7 +7,6 @@ public class PiranhaPlantController : KillableEntity {
     public float popupTimer;
     private bool upsideDown;
 
-    bool wasFrozen;
     public new void Start() {
         base.Start();
         upsideDown = transform.eulerAngles.z != 0;
@@ -25,9 +22,6 @@ public class PiranhaPlantController : KillableEntity {
             return;
 
         left = false;
-
-        if (frozen)
-            wasFrozen = true;
 
         if (photonView && !dead && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
             photonView.RPC("Kill", RpcTarget.All);
@@ -59,12 +53,13 @@ public class PiranhaPlantController : KillableEntity {
 
     [PunRPC]
     public void Respawn() {
-        if (frozen)
+        if (frozen || !dead)
             return;
-        wasFrozen = false;
+
+        frozen = false;
         dead = false;
         popupTimer = 3;
-        animator.Play("end");
+        animator.Play("end", 0, 1);
 
         hitbox.enabled = true;
     }
@@ -72,18 +67,19 @@ public class PiranhaPlantController : KillableEntity {
     [PunRPC]
     public override void Kill() {
 
-        if (!wasFrozen) {
-            PlaySound(Enums.Sounds.Enemy_Generic_Kick);
-            PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
-        } else {
-            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_FreezeShatter);
-        }
+        PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
+        PlaySound(frozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Generic_Kick);
 
         dead = true;
         hitbox.enabled = false;
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, upsideDown ? -0.5f : 0.5f, 0), Quaternion.identity);
         if (photonView.IsMine)
             PhotonNetwork.Instantiate("Prefabs/LooseCoin", transform.position + new Vector3(0, upsideDown ? -1f : 1f, 0), Quaternion.identity);
+    }
+
+    [PunRPC]
+    public override void SpecialKill(bool right = true, bool groundpound = false) {
+        Kill();
     }
     
     void OnDrawGizmosSelected() {

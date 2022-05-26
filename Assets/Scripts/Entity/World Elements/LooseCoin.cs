@@ -11,9 +11,12 @@ public class LooseCoin : MonoBehaviourPun {
     private SpriteRenderer spriteRenderer;
     private PhysicsEntity physics;
     private Animator animator;
+    private BoxCollider2D hitbox;
+
     void Start() {
         body = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
         animator = GetComponent<Animator>();
         body.velocity = new Vector2(Random.Range(-speed, speed), Random.Range(2, 4));
@@ -32,7 +35,7 @@ public class LooseCoin : MonoBehaviourPun {
             return;
         }
 
-        bool inWall = Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.25f);
+        bool inWall = Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale);
         gameObject.layer = inWall ? HITSNOTHING_LAYER : ENTITY_LAYER;
 
         physics.UpdateCollisions();
@@ -49,5 +52,10 @@ public class LooseCoin : MonoBehaviourPun {
                 PhotonNetwork.Destroy(photonView);
             return;
         }
+    }
+
+    public void OnDrawGizmos() {
+        Gizmos.color = new Color(1, 0, 0, 0.5f);
+        Gizmos.DrawCube(body.position + hitbox.offset, hitbox.size * transform.lossyScale);
     }
 }

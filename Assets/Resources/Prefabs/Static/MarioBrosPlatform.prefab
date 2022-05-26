@@ -102,7 +102,7 @@ MonoBehaviour:
   platformWidth: 12
   samplesPerTile: 16
   bumpWidthPoints: 1
-  bumpBlurPoints: 14
+  bumpBlurPoints: 18
   bumpDuration: 0.25
   changeCollider: 1
 --- !u!61 &717523893114735296

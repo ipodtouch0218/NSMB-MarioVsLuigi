@@ -1,14 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
-using System.Runtime.InteropServices;
-using System;
-using System.Messaging;
-using System.Diagnostics;
 
 public class GlobalController : Singleton<GlobalController> {
 

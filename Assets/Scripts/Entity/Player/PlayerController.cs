@@ -708,6 +708,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         doublejump = false;
         triplejump = false;
 
+        wallSlideLeft = false;
+        wallSlideRight = false;
+
         if (onGround) {
             onGround = false;
             doGroundSnap = false;
@@ -1603,7 +1606,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             }
         } else {
             //walljump starting check
-            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !holding && state != Enums.PowerupState.MegaMushroom && !flying && !drill && !crouching && !sliding;
+            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !holding && state != Enums.PowerupState.MegaMushroom && !flying && !propeller && !drill && !crouching && !sliding;
             if (!canWallslide)
                 return;
 
@@ -1698,7 +1701,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                 return;
             }
 
-
             float vel = state switch {
                 Enums.PowerupState.MegaMushroom => megaJumpVelocity,
                 _ => jumpVelocity + Mathf.Abs(body.velocity.x) / 7.25f,
@@ -1768,11 +1770,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         if ((left && right) || !(left || right))
             return;
 
-        float invincibleSpeedBoost = invincible > 0 ? 2f : 1;
+        if (crouching && state == Enums.PowerupState.BlueShell)
+            return;
+
         float airPenalty = onGround ? 1 : 0.5f;
         float xVel = body.velocity.x;
+        float invincibleSpeedBoost = invincible > 0 ? 1.75f : 1f;
         float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
-        float walkSpeedTotal = walkingMaxSpeed * invincibleSpeedBoost;
+        float walkSpeedTotal = walkingMaxSpeed;
         bool reverseSlowing = onGround && ((left && body.velocity.x > 0.02) || (right && body.velocity.x < -0.02));
         float reverseFloat = reverseSlowing && doIceSkidding ? 0.4f : 1;
         float turnaroundSpeedBoost = turnaround && !reverseSlowing ? 5 : 1;
@@ -1786,7 +1791,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                     skidding = false;
                     turnaround = false;
                     if (xVel > -runSpeedTotal) {
-                        float change = propellerBoost * invincibleSpeedBoost * invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
+                        float change = propellerBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
                         body.velocity += new Vector2(change * -1, 0);
                     }
                 } else {
@@ -1809,7 +1814,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
                     skidding = false;
                     turnaround = false;
                     if (xVel < runSpeedTotal) {
-                        float change = propellerBoost * invincibleSpeedBoost * invincibleSpeedBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
+                        float change = propellerBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * Time.fixedDeltaTime;
                         body.velocity += new Vector2(change * 1, 0);
                     }
                 } else {

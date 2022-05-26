@@ -220,10 +220,6 @@ MonoBehaviour:
   killTimer: 0.5
   fastSlide: 0
   fallen: 0
-  deathFlag: 0
-  kinematicEntity: 0
-  flyingEntity: 0
-  plantEntity: 0
   offset: {x: 0, y: 0}
 --- !u!114 &-1720675168950811037
 MonoBehaviour:

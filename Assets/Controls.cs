@@ -385,6 +385,120 @@ public partial class @Controls : IInputActionCollection2, IDisposable
             ]
         },
         {
+            ""name"": ""Spectating"",
+            ""id"": ""8c178832-e968-474a-97ae-b5748fa4e00a"",
+            ""actions"": [
+                {
+                    ""name"": ""Previous Target"",
+                    ""type"": ""Button"",
+                    ""id"": ""d8e51413-a356-4aa8-8885-0fc40a696157"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Next Target"",
+                    ""type"": ""Button"",
+                    ""id"": ""57b1e633-9f26-40a9-904a-f0c1a1f6ca2c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""b2e15332-02b0-4b40-bca3-0cd0861916bb"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Next Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a91a62ab-40de-4df8-9569-da1418a41601"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Next Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f36dc55c-a865-4c39-8fa8-1684290cf128"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Next Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e4d805f6-063d-426b-aa9b-ba5bb94456ab"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Next Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d917e5e9-92d9-40ed-bc4f-469362c59f4b"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Previous Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bfc3580e-e4e0-4da4-b185-ee280380bff0"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Previous Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d18013dc-5605-4178-a6d0-e2a5368839de"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Previous Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""336c604f-4056-48f8-81e3-82d599805e14"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Previous Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
             ""name"": ""UI"",
             ""id"": ""407e7f51-380f-4302-9bff-60ad8404c389"",
             ""actions"": [
@@ -996,6 +1110,10 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_PowerupAction = m_Player.FindAction("Powerup Action", throwIfNotFound: true);
         m_Player_ReserveItem = m_Player.FindAction("Reserve Item", throwIfNotFound: true);
+        // Spectating
+        m_Spectating = asset.FindActionMap("Spectating", throwIfNotFound: true);
+        m_Spectating_PreviousTarget = m_Spectating.FindAction("Previous Target", throwIfNotFound: true);
+        m_Spectating_NextTarget = m_Spectating.FindAction("Next Target", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1129,6 +1247,47 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Spectating
+    private readonly InputActionMap m_Spectating;
+    private ISpectatingActions m_SpectatingActionsCallbackInterface;
+    private readonly InputAction m_Spectating_PreviousTarget;
+    private readonly InputAction m_Spectating_NextTarget;
+    public struct SpectatingActions
+    {
+        private @Controls m_Wrapper;
+        public SpectatingActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @PreviousTarget => m_Wrapper.m_Spectating_PreviousTarget;
+        public InputAction @NextTarget => m_Wrapper.m_Spectating_NextTarget;
+        public InputActionMap Get() { return m_Wrapper.m_Spectating; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(SpectatingActions set) { return set.Get(); }
+        public void SetCallbacks(ISpectatingActions instance)
+        {
+            if (m_Wrapper.m_SpectatingActionsCallbackInterface != null)
+            {
+                @PreviousTarget.started -= m_Wrapper.m_SpectatingActionsCallbackInterface.OnPreviousTarget;
+                @PreviousTarget.performed -= m_Wrapper.m_SpectatingActionsCallbackInterface.OnPreviousTarget;
+                @PreviousTarget.canceled -= m_Wrapper.m_SpectatingActionsCallbackInterface.OnPreviousTarget;
+                @NextTarget.started -= m_Wrapper.m_SpectatingActionsCallbackInterface.OnNextTarget;
+                @NextTarget.performed -= m_Wrapper.m_SpectatingActionsCallbackInterface.OnNextTarget;
+                @NextTarget.canceled -= m_Wrapper.m_SpectatingActionsCallbackInterface.OnNextTarget;
+            }
+            m_Wrapper.m_SpectatingActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @PreviousTarget.started += instance.OnPreviousTarget;
+                @PreviousTarget.performed += instance.OnPreviousTarget;
+                @PreviousTarget.canceled += instance.OnPreviousTarget;
+                @NextTarget.started += instance.OnNextTarget;
+                @NextTarget.performed += instance.OnNextTarget;
+                @NextTarget.canceled += instance.OnNextTarget;
+            }
+        }
+    }
+    public SpectatingActions @Spectating => new SpectatingActions(this);
 
     // UI
     private readonly InputActionMap m_UI;
@@ -1267,6 +1426,11 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnSprint(InputAction.CallbackContext context);
         void OnPowerupAction(InputAction.CallbackContext context);
         void OnReserveItem(InputAction.CallbackContext context);
+    }
+    public interface ISpectatingActions
+    {
+        void OnPreviousTarget(InputAction.CallbackContext context);
+        void OnNextTarget(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
