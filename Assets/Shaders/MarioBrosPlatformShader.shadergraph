@@ -1485,7 +1485,7 @@
     "m_DefaultRefNameVersion": 1,
     "m_RefNameGeneratedByDisplayName": "PlatformWidth",
     "m_DefaultReferenceName": "_PlatformWidth",
-    "m_OverrideReferenceName": "",
+    "m_OverrideReferenceName": "PlatformWidth",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",

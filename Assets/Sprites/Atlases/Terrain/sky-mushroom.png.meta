@@ -1642,6 +1642,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: cloud
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 80
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 16, y: 0, z: 16, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a2148f413c9c734aa07b1b73dd47233
+      internalID: -1622629767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1659,10 +1680,9 @@ TextureImporter:
       sky-mushroom_39: -1245157445
       sky-mushroom_68: 92950592
       sky-mushroom_6: 808599946
-      sky-mushroom_7: -1622629767
       sky-mushroom_31: 1552576595
-      sky-mushroom_13: 254210657
       sky-mushroom_54: 501609194
+      sky-mushroom_13: 254210657
       sky-mushroom_40: -635548713
       sky-mushroom_1: -1834663070
       sky-mushroom_53: 1674700983
@@ -1686,17 +1706,17 @@ TextureImporter:
       sky-mushroom_59: -1834336738
       sky-mushroom_69: -735782168
       sky-mushroom_32: 2016589490
-      sky-mushroom_44: -1436478757
+      sky-mushroom_24: 2004719036
       sky-mushroom_8: 2118137818
+      sky-mushroom_44: -1436478757
       sky-mushroom_23: -1191485711
-      sky-mushroom_49: 1059551587
       sky-mushroom_78: 1079462644
       sky-mushroom_65: -1113981161
       sky-mushroom_22: 1163571556
       sky-mushroom_64: -256865903
       sky-mushroom_37: 1294597469
-      sky-mushroom_24: 2004719036
       sky-mushroom_57: 1703346087
+      sky-mushroom_49: 1059551587
       sky-mushroom_3: 771976153
       sky-mushroom_28: 1905211350
       sky-mushroom_62: 1885160142
@@ -1710,6 +1730,7 @@ TextureImporter:
       sky-mushroom_45: -838347597
       sky-mushroom_60: -143667299
       sky-mushroom_9: -987451734
+      cloud: -1622629767
       sky-mushroom_77: -205007528
       sky-mushroom_48: -1496549265
       sky-mushroom_38: -1066803188

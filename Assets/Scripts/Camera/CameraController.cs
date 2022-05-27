@@ -85,11 +85,12 @@ public class CameraController : MonoBehaviour {
 
         // lagging camera movements
         Vector3 targetPosition = currentPosition;
-        if (controller.onGround || lastFloor < playerPos.y)
+        if (controller.onGround)
             lastFloor = playerPos.y;
+        bool validFloor = controller.onGround || lastFloor < playerPos.y;
 
         //top camera clip ON GROUND. slowly pan up, dont do it instantly.
-        if (lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0)
+        if (validFloor && lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0)
             targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 2f;
 
         // -- Screen Shake --

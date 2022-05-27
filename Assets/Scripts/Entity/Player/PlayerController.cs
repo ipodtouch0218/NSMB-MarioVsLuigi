@@ -2204,8 +2204,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         if (!inShell && onGround && !(sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2)) {
             bool abovemax;
             float invincibleSpeedBoost = invincible > 0 ? 2f : 1;
-            bool uphill = floorAngle != 0 && Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
-            float max = (functionallyRunning ? runningMaxSpeed : walkingMaxSpeed) * invincibleSpeedBoost * (uphill ? (1 - (Mathf.Abs(floorAngle) / 360f)) : 1);
+            float uphillChange = (floorAngle != 0 && Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x)) ? (1 - (Mathf.Abs(floorAngle) / 360f)) : 1;
+            float max = (functionallyRunning ? runningMaxSpeed : walkingMaxSpeed) * invincibleSpeedBoost * uphillChange;
             if (knockback) {
                 abovemax = true;
             } else if (!sliding && (left ^ right) && !crouching) {
@@ -2217,7 +2217,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             }
             //Friction...
             if (abovemax) {
-                body.velocity *= 1 - (delta * tileFriction * (knockback ? 3f : 4f) * (sliding && !uphill ? 0.7f : 1f) * (uphill ? 0.25f : 1f));
+                body.velocity *= 1 - (delta * tileFriction * (knockback ? 3f : 4f) * (sliding ? 0.7f : 1f) * uphillChange);
                 if (Mathf.Abs(body.velocity.x) < 0.15f)
                     body.velocity = new Vector2(0, body.velocity.y);
             }

@@ -57,6 +57,7 @@ SpriteAtlas:
     - {fileID: 2800000, guid: c55eba81d441d3f439e8289699cf72c8, type: 3}
     - {fileID: 2800000, guid: 437a8c91bf200d54b838bc8c861ba57c, type: 3}
     - {fileID: 2800000, guid: 18672b4e92026df448d06fc811e08fc3, type: 3}
+    - {fileID: 2800000, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -317,6 +318,7 @@ SpriteAtlas:
   - {fileID: -143667299, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
   - {fileID: 2016589490, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
   - {fileID: -224913950, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
+  - {fileID: -1622629767, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
   - {fileID: -987451734, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
   - {fileID: -1348476940, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
   - {fileID: 1708125404, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
@@ -330,6 +332,39 @@ SpriteAtlas:
   - {fileID: 831113144, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
   - {fileID: -1504424827, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
   - {fileID: -326314053, guid: a7d10c255f9f0eb4b8b81a30e5b07483, type: 3}
+  - {fileID: -1076678767, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 2112962912, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 430058671, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -675809948, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 948398763, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -831424576, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1093301734, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -1848021212, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 643915760, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -378664129, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -456271804, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1481947574, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1087931379, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1615552938, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 947971501, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 955899589, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -238799823, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 934842933, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 595581569, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1586660091, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -897508325, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1567402009, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -32966079, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1778087341, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 2069404950, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1628041340, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -1729655039, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1372132074, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 769949663, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -1116071839, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1578661297, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: 1235731233, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
+  - {fileID: -1950439850, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
   - {fileID: -8417162070665421395, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -5313328981683241401, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -8954504132767192025, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
@@ -804,6 +839,7 @@ SpriteAtlas:
   - sky-mushroom_60
   - sky-mushroom_32
   - sky-mushroom_61
+  - cloud
   - sky-mushroom_9
   - sky-mushroom_4
   - sky-mushroom_5
@@ -817,6 +853,39 @@ SpriteAtlas:
   - sky-mushroom_73
   - sky-mushroom_72
   - sky-mushroom_17
+  - volcano_15
+  - volcano_14
+  - volcano_17
+  - volcano_16
+  - volcano_11
+  - volcano_10
+  - volcano_13
+  - volcano_12
+  - volcano_19
+  - volcano_18
+  - volcano_6
+  - volcano_7
+  - volcano_4
+  - volcano_5
+  - volcano_2
+  - volcano_3
+  - volcano_0
+  - volcano_1
+  - volcano_8
+  - volcano_9
+  - volcano_28
+  - volcano_29
+  - volcano_24
+  - volcano_25
+  - volcano_26
+  - volcano_27
+  - volcano_20
+  - volcano_21
+  - volcano_22
+  - volcano_23
+  - volcano_32
+  - volcano_31
+  - volcano_30
   - animation_15
   - animation_14
   - animation_17
