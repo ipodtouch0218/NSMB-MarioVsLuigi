@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public GameObject localPlayer;
     public bool paused, loaded, started;
-    public GameObject pauseUI, pauseButton;
+    public GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
     public bool gameover = false, musicEnabled = false;
     public readonly List<string> loadedPlayers = new();
     public int starRequirement, timedGameDuration = -1;
@@ -646,18 +646,42 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         Pause();
     }
     public void Pause() {
-        if (!musicEnabled)
+        if (gameover || !musicEnabled)
             return;
 
         paused = !paused;
         sfx.PlayOneShot(Enums.Sounds.UI_Pause.GetClip());
-        Instance.pauseUI.SetActive(paused);
+        pauseUI.SetActive(paused);
+        pausePanel.SetActive(true);
+        hostExitUI.SetActive(false);
         EventSystem.current.SetSelectedGameObject(pauseButton);
+    }
+
+    public void AttemptQuit() {
+        if (PhotonNetwork.IsMasterClient) {
+            pausePanel.SetActive(false);
+            hostExitUI.SetActive(true);
+            EventSystem.current.SetSelectedGameObject(hostExitButton);
+            return;
+        }
+
+        Quit();
+    }
+
+    public void HostEndMatch() {
+        Pause();
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
     public void Quit() {
         PhotonNetwork.LeaveRoom();
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void HostQuitCancel() {
+        pausePanel.SetActive(true);
+        hostExitUI.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
 

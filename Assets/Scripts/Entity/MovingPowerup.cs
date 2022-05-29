@@ -16,6 +16,7 @@ public class MovingPowerup : MonoBehaviourPun {
     private PhysicsEntity physics;
     private Animator childAnimator;
     private BoxCollider2D hitbox;
+    private int originalLayer;
 
     public Powerup powerupScriptable;
 
@@ -25,7 +26,9 @@ public class MovingPowerup : MonoBehaviourPun {
         physics = GetComponent<PhysicsEntity>();
         childAnimator = GetComponentInChildren<Animator>();
         hitbox = GetComponent<BoxCollider2D>();
-        
+
+        originalLayer = sRenderer.sortingOrder;
+
         object[] data = photonView.InstantiationData;
         if (data != null) {
             if (data[0] is float ignore) {
@@ -36,6 +39,7 @@ public class MovingPowerup : MonoBehaviourPun {
                 passthrough = true;
                 body.isKinematic = true;
                 gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+                sRenderer.sortingOrder = 15;
             } else {
                 passthrough = false;
             }
@@ -59,6 +63,7 @@ public class MovingPowerup : MonoBehaviourPun {
         sRenderer.enabled = followMeCounter * blinkingRate % 2 > 1;
         if ((followMeCounter -= Time.deltaTime) < 0) {
             followMe = null;
+            sRenderer.sortingOrder = originalLayer;
             if (photonView.IsMine) {
                 photonView.TransferOwnership(PhotonNetwork.MasterClient);
                 passthrough = true;
@@ -85,8 +90,8 @@ public class MovingPowerup : MonoBehaviourPun {
 
         body.isKinematic = false;
         if (passthrough) {
-            Debug.DrawLine(body.position - hitbox.size / 2, body.position + hitbox.size / 2);
-            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, hitbox.size, 0, groundMask)) {
+            Debug.DrawLine(body.position - hitbox.size / 2 * transform.lossyScale, body.position + hitbox.size / 2 * transform.lossyScale);
+            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, hitbox.size * transform.lossyScale, 0, groundMask)) {
                 gameObject.layer = LayerMask.NameToLayer("Entity");
                 passthrough = false;
             } else {

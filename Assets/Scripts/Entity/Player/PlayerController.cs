@@ -1360,7 +1360,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             if (up && state != Enums.PowerupState.MegaMushroom)
                 groundpound = false;
         }
-        if (crouching && Mathf.Abs(floorAngle) >= slopeSlidingAngle && !inShell && state != Enums.PowerupState.MegaMushroom) {
+        if (!((facingRight && hitRight) || (!facingRight && hitLeft)) && crouching && Mathf.Abs(floorAngle) >= slopeSlidingAngle && !inShell && state != Enums.PowerupState.MegaMushroom) {
             sliding = true;
             crouching = false;
             alreadyGroundpounded = true;
@@ -1374,9 +1374,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
             float newX = Mathf.Clamp(body.velocity.x - (Mathf.Sin(angleDeg) * speed), -(runningMaxSpeed * 1.3f), runningMaxSpeed * 1.3f);
             float newY = Mathf.Sin(angleDeg) * newX + 0.4f;
             body.velocity = new Vector2(newX, newY);
+
         }
 
-        if (up || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && Mathf.Abs(body.velocity.x) < 0.1)) {
+        if (up || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && Mathf.Abs(body.velocity.x) < 0.1) || (facingRight && hitRight) || (!facingRight && hitLeft)) {
             sliding = false;
             alreadyGroundpounded = false;
         }
@@ -2225,7 +2226,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IFreezableEnti
         //Terminal velocity
         float terminalVelocityModifier = state switch {
             Enums.PowerupState.MiniMushroom => 0.65f,
-            Enums.PowerupState.MegaMushroom => 3f,
+            Enums.PowerupState.MegaMushroom => 1.5f,
             _ => 1f,
         };
         if (flying) {

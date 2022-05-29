@@ -35,7 +35,7 @@ public class BreakablePipeTile : InteractableTile {
 
         bool bottom = false;
 
-        if (origin.y == GameManager.Instance.levelMinTileY + 1) {
+        if (origin.y <= GameManager.Instance.cameraMinY) {
             //origin += Vector3Int.up;
             bottom = true;
         }
