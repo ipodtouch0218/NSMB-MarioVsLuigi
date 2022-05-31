@@ -40,6 +40,7 @@ public class MovingPowerup : MonoBehaviourPun {
                 body.isKinematic = true;
                 gameObject.layer = LayerMask.NameToLayer("HitsNothing");
                 sRenderer.sortingOrder = 15;
+                transform.position = new(transform.position.x, transform.position.y, -5);
             } else {
                 passthrough = false;
             }

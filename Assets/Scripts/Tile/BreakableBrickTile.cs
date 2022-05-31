@@ -52,9 +52,8 @@ public class BreakableBrickTile : InteractableTile {
         object[] parametersParticle = new object[]{ tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         
-        if (interacter is MonoBehaviourPun pun) {
+        if (interacter is MonoBehaviourPun pun)
             pun.photonView.RPC("PlaySound", RpcTarget.All, sound);
-        }
     }
     public void BumpWithAnimation(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         Bump(interacter, direction, worldLocation);

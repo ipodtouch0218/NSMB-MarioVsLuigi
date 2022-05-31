@@ -11,17 +11,10 @@ public class VolumeWithDistance : MonoBehaviour {
 
     public void Update() {
 
-        Vector3 listener;
-        if (GameManager.Instance && GameManager.Instance.localPlayer) {
-            listener = GameManager.Instance.localPlayer.transform.position;
-            if (GameManager.Instance.loopingLevel && Mathf.Abs(listener.x - soundOrigin.position.x) > GameManager.Instance.levelWidthTile / 4f)
-                listener.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(listener.x - soundOrigin.position.x);
+        GameManager inst = GameManager.Instance;
+        Vector3 listener = (inst && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
 
-        } else {
-            listener = Camera.main.transform.position;
-        }
-
-        float volume = Utils.QuadraticEaseOut(1 - Mathf.Clamp01(Vector2.Distance(listener, soundOrigin.position) / soundRange));
+        float volume = Utils.QuadraticEaseOut(1 - Mathf.Clamp01(Utils.WrappedDistance(listener, soundOrigin.position) / soundRange));
 
         foreach (AudioSource source in audioSources)
             source.volume = volume;

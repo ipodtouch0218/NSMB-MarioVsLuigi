@@ -1,12 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
 public class BulletBillMover : KillableEntity {
     
-    public float speed, playerSearchRadius = 4;
+    public float speed, playerSearchRadius = 4, despawnDistance = 8;
     private Vector2 searchVector;
+
     new void Start() {
         base.Start();
         searchVector = new Vector2(playerSearchRadius * 2, 100);
@@ -35,11 +34,12 @@ public class BulletBillMover : KillableEntity {
             return;
         }
         if (frozen) {
-            body.velocity = new Vector2(0, 0);
+            body.velocity = Vector2.zero;
         } else {
-            body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+            body.velocity = new(speed * (left ? -1 : 1), body.velocity.y);
         }
-        if (photonView.IsMine)
+
+        if (!frozen && photonView.IsMine )
             DespawnCheck();
     }
     public override void InteractWithPlayer(PlayerController player) {
@@ -75,24 +75,12 @@ public class BulletBillMover : KillableEntity {
     }
 
     void DespawnCheck() {
-        foreach (var collision in Physics2D.BoxCastAll(body.position, searchVector, 0f, Vector2.zero)) {
-            if (collision.transform.CompareTag("Player"))
+
+        foreach (PlayerController player in GameManager.Instance.allPlayers) {
+            if (Utils.WrappedDistance(player.body.position, body.position) < despawnDistance)
                 return;
         }
-        //left border check
-        if (body.position.x - playerSearchRadius < GameManager.Instance.GetLevelMinX()) {
-            foreach (var collision in Physics2D.BoxCastAll(body.position + new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector, 0f, Vector2.zero)) {
-                if (collision.transform.CompareTag("Player"))
-                    return;
-            }
-        }
-        //right border check
-        if (body.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX()) {
-            foreach (var collision in Physics2D.BoxCastAll(body.position - new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector, 0f, Vector2.zero)) {
-                if (collision.transform.CompareTag("Player"))
-                    return;
-            }
-        }
+
         PhotonNetwork.Destroy(photonView);
     }
 
@@ -117,6 +105,7 @@ public class BulletBillMover : KillableEntity {
         dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
     } 
+
     void OnDrawGizmosSelected() {
         if (!GameManager.Instance) 
             return;

@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 public class Utils {
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
-        if (!manager) 
+        if (!manager)
             manager = GameManager.Instance;
         Vector3Int tileLocation = manager.tilemap.WorldToCell(worldVec);
         if (wrap)
@@ -33,7 +33,7 @@ public class Utils {
     }
 
     public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {
-        if (!manager) 
+        if (!manager)
             manager = GameManager.Instance;
         if (tileLocation.x < manager.levelMinTileX)
             tileLocation.x += manager.levelWidthTile;
@@ -56,7 +56,7 @@ public class Utils {
     }
 
     public static int GetCharacterIndex(Player player = null) {
-        if (player == null) 
+        if (player == null)
             player = PhotonNetwork.LocalPlayer;
 
         GetCustomProperty(Enums.NetPlayerProperties.Character, out int index, player.CustomProperties);
@@ -89,7 +89,7 @@ public class Utils {
             return true;
 
         return false;
-    } 
+    }
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
         if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
@@ -103,7 +103,7 @@ public class Utils {
 
         for (int x = 0; x <= size.x; x++) {
             for (int y = 0; y <= size.y; y++) {
-                
+
                 Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
                 WrapTileLocation(ref tileLocation);
 
@@ -112,6 +112,13 @@ public class Utils {
             }
         }
         return false;
+    }
+
+    public static float WrappedDistance(Vector2 a, Vector2 b) {
+        if (GameManager.Instance && GameManager.Instance.loopingLevel && Mathf.Abs(a.x - b.x) > GameManager.Instance.levelWidthTile / 4f) 
+            a.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(a.x - b.x);
+
+        return Vector2.Distance(a, b);
     }
 
     public static void GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {

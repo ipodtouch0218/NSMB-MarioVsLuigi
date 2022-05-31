@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 
 public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
@@ -29,7 +27,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         if (!photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
-        if (body && !frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
+        if (body && !dead && !frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false);
     }
 

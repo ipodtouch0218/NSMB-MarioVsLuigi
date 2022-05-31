@@ -5094,6 +5094,7 @@ MonoBehaviour:
   body: {fileID: 0}
   speed: 1.5
   playerSearchRadius: 12
+  despawnDistance: 10
 --- !u!114 &473391894580253470
 MonoBehaviour:
   m_ObjectHideFlags: 0

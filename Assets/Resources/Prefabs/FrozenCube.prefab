@@ -212,7 +212,7 @@ MonoBehaviour:
   previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 0
-  throwSpeed: 6.25
+  throwSpeed: 7.25
   frozenCubeCollider: {fileID: 1182937128297349914}
   spriteRenderer: {fileID: 0}
   entityView: {fileID: 0}

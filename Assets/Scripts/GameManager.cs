@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     private GameObject[] coins;
 
     public SpectationManager SpectationManager { get; private set; }
-
+    
     ParticleSystem brickBreak;
 
     // EVENT CALLBACK
