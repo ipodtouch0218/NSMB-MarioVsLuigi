@@ -281,7 +281,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 4
+  m_Constraints: 5
 --- !u!114 &7157997769683939989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,6 +315,7 @@ MonoBehaviour:
   hitRoof: 0
   hitRight: 0
   hitLeft: 0
+  crushableGround: 0
   floorAngle: 0
   currentCollider: {fileID: 786289218142832792}
   floorAndRoofCutoff: 0.3

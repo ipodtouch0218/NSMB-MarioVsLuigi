@@ -5122,6 +5122,7 @@ MonoBehaviour:
   hitRoof: 0
   hitRight: 0
   hitLeft: 0
+  crushableGround: 0
   floorAngle: 0
   currentCollider: {fileID: 1973747262660636111}
   floorAndRoofCutoff: 0.3
@@ -5304,7 +5305,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: 6326231466481203021, guid: 6afc8664f51abf545987f0a04b8a1125,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

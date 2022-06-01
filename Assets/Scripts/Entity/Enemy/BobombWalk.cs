@@ -116,10 +116,10 @@ public class BobombWalk : HoldableEntity {
     public override void Throw(bool facingLeft, bool crouch) {
         if (!holder)
             return;
-        holder = null;
         if (Utils.IsTileSolidAtWorldLocation(body.position)) {
             transform.position = body.position = new Vector2(holder.transform.position.x, transform.position.y);
         }
+        holder = null;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
         left = facingLeft;
         sRenderer.flipX = left;

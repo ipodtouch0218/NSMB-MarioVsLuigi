@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool hurryup = false;
 
     public int playerCount;
-    public PlayerController[] allPlayers;
+    public List<PlayerController> allPlayers = new();
     public EnemySpawnpoint[] enemySpawnpoints;
 
     private GameObject[] coins;
@@ -146,7 +146,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             Vector3Int loc = new(x, y, 0);
 
-            GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
+            GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f, Quaternion.identity);
             BlockBump bb = bump.GetComponentInChildren<BlockBump>();
 
             bb.fromAbove = downwards;
@@ -169,7 +169,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, Utils.GetTileFromCache(newTile));
             tilemap.RefreshTile(loc);
 
-            GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + new Vector3(0.25f, 0.25f), Quaternion.identity);
+            GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f, Quaternion.identity);
             BlockBump bb = bump.GetComponentInChildren<BlockBump>();
 
             bb.fromAbove = downwards;
@@ -381,9 +381,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             Destroy(source);
         }
 
-
-        allPlayers = FindObjectsOfType<PlayerController>();
-        playerCount = allPlayers.Length;
+        playerCount = allPlayers.Count;
         started = true;
 
         ScoreboardUpdater.instance.Populate(allPlayers);
@@ -745,9 +743,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 Vector3Int loc = new(x+levelMinTileX, y+levelMinTileY, 0);
                 TileBase tile = tilemap.GetTile(loc);
                 if (tile is CoinTile)
-                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + new Vector3(0.25f, 0.25f), "coin");
+                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + Vector3.one * 0.25f, "coin");
                 if (tile is PowerupTile)
-                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + new Vector3(0.25f, 0.25f), "powerup");
+                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + Vector3.one * 0.25f, "powerup");
             }
         }
         

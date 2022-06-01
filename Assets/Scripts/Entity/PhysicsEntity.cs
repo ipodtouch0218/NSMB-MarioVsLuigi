@@ -8,7 +8,7 @@ public class PhysicsEntity : MonoBehaviour {
     
     public bool goUpSlopes;
 
-    public bool onGround, hitRoof, hitRight, hitLeft;
+    public bool onGround, hitRoof, hitRight, hitLeft, crushableGround;
     public float floorAngle = 0;
     public Collider2D currentCollider;
     public float floorAndRoofCutoff = 0.3f;
@@ -22,6 +22,7 @@ public class PhysicsEntity : MonoBehaviour {
     public void UpdateCollisions() {
         int hitRightCount = 0, hitLeftCount = 0;
         float previousHeightY = float.MaxValue;
+        crushableGround = false;
         onGround = false;
         hitRoof = false;
         floorAngle = 0;
@@ -34,6 +35,7 @@ public class PhysicsEntity : MonoBehaviour {
             if (Vector2.Dot(point.normal, Vector2.up) > floorAndRoofCutoff) {
                 //touching floor
                 onGround = true;
+                crushableGround |= !point.collider.gameObject.CompareTag("platform");
                 floorAngle = Vector2.SignedAngle(Vector2.up, point.normal);
             } else if (point.collider.gameObject.layer == GROUND_LAYERID) {
                 if (Vector2.Dot(point.normal, Vector2.down) > floorAndRoofCutoff) {

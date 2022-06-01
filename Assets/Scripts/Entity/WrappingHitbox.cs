@@ -13,13 +13,13 @@ public class WrappingHitbox : MonoBehaviour {
         if (!body)
             body = GetComponentInParent<Rigidbody2D>();
         ourColliders = GetComponents<BoxCollider2D>();
-        Update();
+        LateUpdate();
     }
-    void Update() {
+    public void LateUpdate() {
         if (!GameManager.Instance) 
             return;
         if (!GameManager.Instance.loopingLevel) {
-            this.enabled = false;
+            enabled = false;
             return;
         }
         

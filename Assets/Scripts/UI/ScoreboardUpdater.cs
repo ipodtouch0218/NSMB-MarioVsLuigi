@@ -54,7 +54,7 @@ public class ScoreboardUpdater : MonoBehaviour {
         entries.ForEach(se => se.transform.SetAsLastSibling());
     }
 
-    public void Populate(PlayerController[] players) {
+    public void Populate(IEnumerable<PlayerController> players) {
         foreach (PlayerController player in players) {
             GameObject entryObj = Instantiate(entryTemplate, transform);
             entryObj.SetActive(true);

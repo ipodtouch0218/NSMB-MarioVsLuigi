@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using TMPro;
 
 public class SpectationManager : MonoBehaviour {
@@ -31,39 +31,6 @@ public class SpectationManager : MonoBehaviour {
         }
     }
     private int targetIndex;
-    public bool freecam;
-
-    public void OnEnable() {
-        InputSystem.controls.Spectating.PreviousTarget.started += PreviousTargetButton;
-        InputSystem.controls.Spectating.NextTarget.started += NextTargetButton;
-        InputSystem.controls.Spectating.PreviousTarget.canceled += PreviousTargetButton;
-        InputSystem.controls.Spectating.NextTarget.canceled += NextTargetButton;
-    }
-    public void OnDisable() {
-        InputSystem.controls.Spectating.PreviousTarget.started -= PreviousTargetButton;
-        InputSystem.controls.Spectating.NextTarget.started -= NextTargetButton;
-        InputSystem.controls.Spectating.PreviousTarget.canceled -= PreviousTargetButton;
-        InputSystem.controls.Spectating.NextTarget.canceled -= NextTargetButton;
-    }
-
-    private void NextTargetButton(InputAction.CallbackContext obj) {
-        if (!Spectating)
-            return;
-
-        if (obj.started)
-            SpectateNextPlayer();
-        
-    }
-
-    private void PreviousTargetButton(InputAction.CallbackContext obj) {
-        if (!Spectating)
-            return;
-
-        if (obj.started)
-            SpectatePreviousPlayer();
-        
-    }
-
 
     public void Update() {
         if (!Spectating)
@@ -78,12 +45,6 @@ public class SpectationManager : MonoBehaviour {
         if (!Spectating)
             return;
 
-        if (freecam) {
-            spectatingText.text = "Freecam";
-            UIUpdater.Instance.player = null;
-            return;
-        }
-
         UIUpdater.Instance.player = TargetPlayer;
         if (!TargetPlayer)
             return;
@@ -95,30 +56,18 @@ public class SpectationManager : MonoBehaviour {
         if (TargetPlayer)
             TargetPlayer.cameraController.controlCamera = false;
 
-        PlayerController[] players = GameManager.Instance.allPlayers;
-        if (players.Length <= 0) {
-            GameManager.Instance.allPlayers = FindObjectsOfType<PlayerController>();
-            players = GameManager.Instance.allPlayers;
-        }
-        if (players.Length <= 0)
+        List<PlayerController> players = GameManager.Instance.allPlayers;
+        int count = players.Count;
+        if (count <= 0)
             return;
 
         TargetPlayer = null;
 
-        if (freecam) {
-            targetIndex = 0;
-            freecam = false;
-        }
-
         int nulls = 0;
         while (TargetPlayer == null) {
-            targetIndex++;
-            if (targetIndex >= players.Length) {
-                freecam = true;
-                break;
-            }
+            targetIndex = (targetIndex + 1) % count;
             TargetPlayer = players[targetIndex];
-            if (nulls++ >= players.Length)
+            if (nulls++ >= count)
                 break;
         }
 
@@ -130,29 +79,18 @@ public class SpectationManager : MonoBehaviour {
         if (TargetPlayer)
             TargetPlayer.cameraController.controlCamera = false;
 
-        TargetPlayer = null;
-        PlayerController[] players = GameManager.Instance.allPlayers;
-        if (players.Length <= 0) {
-            GameManager.Instance.allPlayers = FindObjectsOfType<PlayerController>();
-            players = GameManager.Instance.allPlayers;
-        }
-        if (players.Length <= 0)
+        List<PlayerController> players = GameManager.Instance.allPlayers;
+        int count = players.Count;
+        if (count <= 0)
             return;
 
-        if (freecam) {
-            targetIndex = players.Length;
-            freecam = false;
-        }
+        TargetPlayer = null;
 
         int nulls = 0;
         while (TargetPlayer == null) {
-            targetIndex--;
-            if (targetIndex < 0) {
-                freecam = true;
-                break;
-            }
+            targetIndex = (targetIndex + count - 1) % count;
             TargetPlayer = players[targetIndex];
-            if (nulls++ >= players.Length)
+            if (nulls++ >= count)
                 break;
         }
 

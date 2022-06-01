@@ -1,11 +1,19 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.Tilemaps;
 
 public class Utils {
+
+    public static int FirstPlaceStars {
+        get {
+            return GameManager.Instance.allPlayers.Max(pc => pc.stars);
+        }
+    }
+
+
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
         if (!manager)
             manager = GameManager.Instance;
@@ -134,10 +142,12 @@ public class Utils {
     }
 
     public static Powerup[] powerups = null;
-    public static Powerup GetRandomItem(int stars) {
+    public static Powerup GetRandomItem(PlayerController player) {
         GameManager gm = GameManager.Instance;
-        float starPercentage = (float) stars / gm.starRequirement;
-        float totalChance = 0;
+
+        // "losing" variable based on ln(x+1), x being the # of stars we're behind (max being 5)
+        int x = Mathf.Max(0, FirstPlaceStars - player.stars);
+        float losing = Mathf.Log(x + 1, 2.71828f);
 
         if (powerups == null)
             powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
@@ -146,13 +156,14 @@ public class Utils {
         bool big = gm.spawnBigPowerups;
         bool vertical = gm.spawnVerticalPowerups;
 
+        float totalChance = 0;
         foreach (Powerup powerup in powerups) {
             if (powerup.name == "MegaMushroom" && GameManager.Instance.musicState == Enums.MusicState.MegaMushroom)
                 continue;
             if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom))
                 continue;
 
-            totalChance += powerup.GetModifiedChance(starPercentage);
+            totalChance += powerup.GetModifiedChance(losing);
         }
 
         float rand = Random.value * totalChance;
@@ -162,7 +173,7 @@ public class Utils {
             if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom))
                 continue;
 
-            float chance = powerup.GetModifiedChance(starPercentage);
+            float chance = powerup.GetModifiedChance(losing);
 
             if (rand < chance) 
                 return powerup;
@@ -171,9 +182,11 @@ public class Utils {
 
         return powerups[0];
     }
+    
     public static float QuadraticEaseOut(float v) {
         return -1 * v * (v - 2);
     }
+    
 
     public static ExitGames.Client.Photon.Hashtable GetTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap) {
         Dictionary<int, int> changes = new();

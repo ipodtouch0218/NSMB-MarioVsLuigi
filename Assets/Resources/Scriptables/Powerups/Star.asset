@@ -15,8 +15,9 @@ MonoBehaviour:
   state: 0
   prefab: Star
   soundEffect: 16
-  spawnChance: 0.15
-  starModifier: -0.15
+  spawnChance: 0
+  losingSpawnBonus: 3
   big: 0
   vertical: 0
   custom: 0
+  reserveSprite: {fileID: 0}

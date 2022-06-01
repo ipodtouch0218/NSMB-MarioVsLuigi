@@ -10132,6 +10132,7 @@ MonoBehaviour:
   stationaryGiantEnd: 0
   fireballKnockback: 0
   startedSliding: 0
+  groundpounded: 0
   jumpLandingTimer: 0
   landing: 0
   koyoteTime: 0
@@ -10145,12 +10146,11 @@ MonoBehaviour:
   giantEndTimer: 0
   propellerTimer: 0
   propellerSpinTimer: 0
-  frozenStruggle: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0
   knockbackTimer: 0
-  unfreezeTimer: 0
+  frozenTimer: 0
   pipeTimer: 0
   wallSlideLeft: 0
   wallSlideRight: 0
@@ -26818,6 +26818,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f9541b8e97f76f4419778d672831fc42,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f9541b8e97f76f4419778d672831fc42, type: 3}

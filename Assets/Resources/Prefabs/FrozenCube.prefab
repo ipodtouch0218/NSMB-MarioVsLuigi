@@ -213,11 +213,14 @@ MonoBehaviour:
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 0
   throwSpeed: 7.25
+  shakeSpeed: 240
+  shakeAmount: 0.02
   frozenCubeCollider: {fileID: 1182937128297349914}
   spriteRenderer: {fileID: 0}
   entityView: {fileID: 0}
   fallTime: 5
   killTimer: 0.5
+  autoBreakTimer: 10
   fastSlide: 0
   fallen: 0
   offset: {x: 0, y: 0}
@@ -282,6 +285,7 @@ MonoBehaviour:
   hitRoof: 0
   hitRight: 0
   hitLeft: 0
+  crushableGround: 0
   floorAngle: 0
   currentCollider: {fileID: 7126150137336674110}
   floorAndRoofCutoff: 0.2

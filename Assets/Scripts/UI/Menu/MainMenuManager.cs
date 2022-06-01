@@ -289,20 +289,22 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         HorizontalCamera.OFFSET = 0;
         GlobalController.Instance.joinedAsSpectator = false;
         Time.timeScale = 1;
+        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
+        mixer.SetFloat("MusicSpeed", 1f);
+        mixer.SetFloat("MusicPitch", 1f);
 
         if (GlobalController.Instance.disconnectCause != null) {
             OpenErrorBox("Disconnected: " + GlobalController.Instance.disconnectCause.ToString());
             GlobalController.Instance.disconnectCause = null;
         }
 
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
-        mixer.SetFloat("MusicSpeed", 1f);
-        mixer.SetFloat("MusicPitch", 1f);
-
         Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length)].transform.position;
+
+        nicknameField.text = PhotonNetwork.NickName;
 
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
+            LoadSettings();
             OpenTitleScreen();
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
@@ -334,7 +336,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
 
-        //Apply
+
+        rebindManager.Init();
+
+        GlobalController.Instance.discordController.UpdateActivity();
+        EventSystem.current.SetSelectedGameObject(title);
+    }
+
+    private void LoadSettings() {
         nicknameField.text = PhotonNetwork.NickName = Settings.Instance.nickname;
         musicSlider.value = Settings.Instance.VolumeMusic;
         sfxSlider.value = Settings.Instance.VolumeSFX;
@@ -346,11 +355,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         fireballToggle.isOn = Settings.Instance.fireballFromSprint;
         vsyncToggle.isOn = Settings.Instance.vsync;
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
-
-        rebindManager.Init();
-
-        GlobalController.Instance.discordController.UpdateActivity();
-        EventSystem.current.SetSelectedGameObject(title);
     }
 
     void Update() {

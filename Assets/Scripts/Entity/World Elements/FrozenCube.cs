@@ -1,22 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using UnityEngine.Tilemaps;
 
 // maybe a better name for the script
 public class FrozenCube : HoldableEntity {
 
     private static int GROUND_LAYER_ID = -1;
 
-    public float throwSpeed = 10f;
+    public float throwSpeed = 10f, shakeSpeed = 1f, shakeAmount = 0.1f;
     public BoxCollider2D frozenCubeCollider;
     public SpriteRenderer spriteRenderer;
 
     public IFreezableEntity entity;
     public PhotonView entityView;
 
-    public float fallTime = 5, killTimer = .5f;
+    public float fallTime = 5, killTimer = .5f, autoBreakTimer = 10;
     float fallTimer;
 
     public bool fastSlide, fallen;
@@ -95,6 +92,9 @@ public class FrozenCube : HoldableEntity {
             return;
         }
 
+        if (!fastSlide && autoBreakTimer < 2.5f)
+            transform.position = body.position + Mathf.Sin(autoBreakTimer * shakeSpeed) * shakeAmount * Vector2.right;
+
         //move the entity to be inside of us
         if (entity.IsCarryable)
             entityView.transform.position = (Vector2) transform.position + offset;
@@ -137,6 +137,14 @@ public class FrozenCube : HoldableEntity {
         }
         
         body.velocity = new Vector2(throwSpeed * (left ? -1 : 1), body.velocity.y);
+
+        if (autoBreakTimer >= 0) {
+            Utils.TickTimer(ref autoBreakTimer, 0, Time.fixedDeltaTime);
+            if (autoBreakTimer <= 0) {
+                photonView.RPC("Kill", RpcTarget.All);
+                return;
+            }
+        }
 
         //handle flying timer
         if (!fallen) {
@@ -231,13 +239,13 @@ public class FrozenCube : HoldableEntity {
     }
 
     new void OnTriggerEnter2D(Collider2D collider) {
-        if (!(photonView?.IsMine ?? true) || dead)
+        if (!(photonView?.IsMine ?? true) || dead || !fastSlide)
             return;
-
+        
         GameObject obj = collider.gameObject;
         KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
 
-        if (killa?.dead ?? false)
+        if (killa && killa.dead || killa.photonView.ViewID == entityView.ViewID)
             return;
 
         switch (obj.tag) {
@@ -245,22 +253,9 @@ public class FrozenCube : HoldableEntity {
         case "bobomb":
         case "bulletbill":
         case "goomba":
+        case "piranhaplant":
         case "frozencube": {
-            if (!killa)
-                return;
-
-            if (Mathf.Abs(body.velocity.x) >= 1.5f)
-                killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false);
-            break;
-        }
-        case "piranhaplant": {
-            if (!killa)
-                return;
-
-            if (Mathf.Abs(body.velocity.x) >= 2f * 1 && (physics.hitLeft || physics.hitRight))
-                killa.photonView.RPC("Kill", RpcTarget.All);
-            if (holder && (Mathf.Abs(body.velocity.x) >= 2f * 1 && (physics.hitLeft || physics.hitRight)))
-                photonView.RPC("Kill", RpcTarget.All);
+            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.transform.position.x > transform.position.x, false);
             break;
         }
         case "coin": {
@@ -268,10 +263,8 @@ public class FrozenCube : HoldableEntity {
             break;
         }
         case "loosecoin": {
-            if (!holder && previousHolder) {
-                Transform parent = obj.transform.parent;
-                previousHolder.photonView.RPC("CollectCoin", RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, parent.position);
-            }
+            Transform parent = obj.transform.parent;
+            (holder != null ? holder : previousHolder).photonView.RPC("CollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, parent.position);
             break;
         }
         }

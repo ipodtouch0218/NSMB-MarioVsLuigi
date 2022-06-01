@@ -17,6 +17,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] Color primaryColor = Color.clear, secondaryColor = Color.clear;
 
     [SerializeField] [ColorUsage(true, false)] Color? _glowColor = null;
+
+    private MaterialPropertyBlock materialBlock;
+
     public Color GlowColor {
         get {
             if (_glowColor == null)
@@ -233,35 +236,37 @@ public class PlayerAnimationController : MonoBehaviourPun {
             };
         }
 
-        //Enable rainbow effect
-        MaterialPropertyBlock block = new();
-        block.SetFloat("RainbowEnabled", animator.GetBool("invincible") ? 1.1f : 0f);
+        //Shader effects
+        if (materialBlock == null)
+            materialBlock = new();
+
+        materialBlock.SetFloat("RainbowEnabled", animator.GetBool("invincible") ? 1.1f : 0f);
         int ps = controller.state switch {
             Enums.PowerupState.FireFlower => 1,
             Enums.PowerupState.PropellerMushroom => 2,
             Enums.PowerupState.IceFlower => 3,
             _ => 0
         };
-        block.SetFloat("PowerupState", ps);
-        block.SetFloat("EyeState", (int) eyeState);
-        block.SetFloat("ModelScale", transform.lossyScale.x);
+        materialBlock.SetFloat("PowerupState", ps);
+        materialBlock.SetFloat("EyeState", (int) eyeState);
+        materialBlock.SetFloat("ModelScale", transform.lossyScale.x);
         if (enableGlow)
-            block.SetColor("GlowColor", GlowColor);
+            materialBlock.SetColor("GlowColor", GlowColor);
 
         //Customizeable player color
-        block.SetVector("OverallsColor", primaryColor);
-        block.SetVector("ShirtColor", secondaryColor);
+        materialBlock.SetVector("OverallsColor", primaryColor);
+        materialBlock.SetVector("ShirtColor", secondaryColor);
 
         Vector3 giantMultiply = Vector3.one;
         if (controller.giantTimer > 0 && controller.giantTimer < 4) {
             float v = ((Mathf.Sin(controller.giantTimer * 20f) + 1f) / 2f * 0.9f) + 0.1f;
             giantMultiply = new Vector3(v, 1, v);
         }
-        block.SetVector("MultiplyColor", giantMultiply);
+        materialBlock.SetVector("MultiplyColor", giantMultiply);
         foreach (MeshRenderer renderer in GetComponentsInChildren<MeshRenderer>())
-            renderer.SetPropertyBlock(block);
+            renderer.SetPropertyBlock(materialBlock);
         foreach (SkinnedMeshRenderer renderer in GetComponentsInChildren<SkinnedMeshRenderer>())
-            renderer.SetPropertyBlock(block);
+            renderer.SetPropertyBlock(materialBlock);
 
         //hit flash
         models.SetActive(controller.dead || !(controller.hitInvincibilityCounter > 0 && controller.hitInvincibilityCounter * (controller.hitInvincibilityCounter <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
