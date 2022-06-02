@@ -32,7 +32,8 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
     }
 
     public void OnTriggerEnter2D(Collider2D collider) {
-        if (!collide || !photonView.IsMine || !collider.GetComponentInParent<KillableEntity>())
+        KillableEntity entity = collider.GetComponentInParent<KillableEntity>();
+        if (!collide || !photonView.IsMine || !entity || entity.dead)
             return;
 
         bool goLeft = body.position.x < collider.attachedRigidbody.position.x;

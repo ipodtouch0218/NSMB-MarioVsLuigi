@@ -10,15 +10,16 @@ public class FrozenCube : HoldableEntity {
     public BoxCollider2D frozenCubeCollider;
     public SpriteRenderer spriteRenderer;
 
-    public IFreezableEntity entity;
-    public PhotonView entityView;
+    IFreezableEntity entity;
+    PhotonView entityView;
+    Rigidbody2D entityBody;
 
     public float fallTime = 5, killTimer = .5f, autoBreakTimer = 10;
     float fallTimer;
 
     public bool fastSlide, fallen;
 
-    public Vector2 offset;
+    public Vector2 offset, origin;
 
     new void Start() {
         base.Start();
@@ -40,12 +41,14 @@ public class FrozenCube : HoldableEntity {
                 return;
             }
 
+            entityBody = entityView.GetComponentInParent<Rigidbody2D>();
+
             if (photonView.IsMine)
                 entityView.RPC("Freeze", RpcTarget.All, photonView.ViewID);
 
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
-            Bounds? tempBounds = null;
+            Bounds bounds = default;
             GameObject rendererObject = entityView.gameObject;
             Renderer[] renderers = entityView.GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in renderers) {
@@ -56,19 +59,17 @@ public class FrozenCube : HoldableEntity {
 
                 renderer.ResetBounds();
 
-                if (tempBounds == null)
-                    tempBounds = new(renderer.bounds.center, renderer.bounds.size);
-                else 
-                    ((Bounds) tempBounds).Encapsulate(renderer.bounds);
-                
-                rendererObject = renderer.gameObject;
+                if (bounds == default) {
+                    bounds = new(renderer.bounds.center, renderer.bounds.size);
+                    rendererObject = renderer.gameObject;
+                } else
+                    bounds.Encapsulate(renderer.bounds);
             }
-            Bounds bounds = tempBounds ?? new(entityView.transform.position, Vector2.one / 2);
 
             hitbox.size = frozenCubeCollider.size = spriteRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size + (Vector3.one * 0.1f);
             hitbox.offset = frozenCubeCollider.offset = Vector2.up * frozenCubeCollider.size / 2;
             
-            offset = -(bounds.center - Vector3.up.Multiply(bounds.size/2) - rendererObject.transform.position);
+            offset = -(bounds.center - Vector3.up.Multiply(bounds.size / 2) - rendererObject.transform.position);
 
             if (entity.IsFlying) {
                 fallen = false;
@@ -83,7 +84,7 @@ public class FrozenCube : HoldableEntity {
     private new void LateUpdate() {
         base.LateUpdate();
 
-        if (entity == null) {
+        if (entity == null || !entityView) {
             if (photonView.IsMine) {
                 PhotonNetwork.Destroy(gameObject);
             } else {
@@ -92,12 +93,13 @@ public class FrozenCube : HoldableEntity {
             return;
         }
 
-        if (!fastSlide && autoBreakTimer < 2.5f)
-            transform.position = body.position + Mathf.Sin(autoBreakTimer * shakeSpeed) * shakeAmount * Vector2.right;
+        //if (!fastSlide && autoBreakTimer < 2.5f)
+        //    transform.position = new(origin.x + Mathf.Sin(autoBreakTimer * shakeSpeed) * shakeAmount, transform.position.y);
 
         //move the entity to be inside of us
-        if (entity.IsCarryable)
-            entityView.transform.position = (Vector2) transform.position + offset;
+        if (entity.IsCarryable) {
+            entityBody.transform.position = entityBody.position = (Vector2) transform.position + offset;
+        }
     }
 
     new void FixedUpdate() {

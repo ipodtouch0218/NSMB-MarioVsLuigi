@@ -49,7 +49,7 @@ public class RebindManager : MonoBehaviour {
 
         foreach (RebindButton button in buttons) {
             button.targetBinding = button.targetAction.bindings[button.index];
-            button.EndRebind(false);
+            button.SetText();
         }
 
         fireballToggle.isOn = true;

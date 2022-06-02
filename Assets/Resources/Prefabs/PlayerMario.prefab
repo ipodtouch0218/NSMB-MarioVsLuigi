@@ -10150,7 +10150,6 @@ MonoBehaviour:
   giantTimer: 0
   floorAngle: 0
   knockbackTimer: 0
-  frozenTimer: 0
   pipeTimer: 0
   wallSlideLeft: 0
   wallSlideRight: 0

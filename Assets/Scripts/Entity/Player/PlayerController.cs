@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, frozen, stationaryGiantEnd, fireballKnockback, startedSliding, groundpounded;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer;
-    public float invincible, giantTimer, floorAngle, knockbackTimer, frozenTimer, pipeTimer;
+    public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer;
 
     //Walljumping variables
     private float wallSlideTimer, wallJumpTimer;
@@ -247,15 +247,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             animator.enabled = false;
             body.isKinematic = true;
             return;
-        }
-
-        if (frozen) {
-            body.velocity = Vector2.zero;
-            Utils.TickTimer(ref frozenTimer, 0, Time.fixedDeltaTime);
-            if (!dead && frozenTimer <= 0)
-                frozenObject.photonView.RPC("Kill", RpcTarget.All);
-            else
-                return;
         }
 
         previousOnGround = onGround;
@@ -866,7 +857,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
         frozen = true;
-        frozenTimer = 1.5f;
+        frozenObject.autoBreakTimer = 2f;
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
@@ -1008,7 +999,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         inShell = false;
         propeller = false;
         propellerSpinTimer = 0;
-        frozenTimer = 0;
         flying = false;
         drill = false;
         sliding = false;
@@ -1055,7 +1045,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         spawned = false;
         animator.SetTrigger("respawn");
         invincible = 0;
-        frozenTimer = 0;
         giantTimer = 0;
         giantEndTimer = 0;
         giantStartTimer = 0;
@@ -1938,6 +1927,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (photonView.IsMine && body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
             //death via pit
             photonView.RPC("Death", RpcTarget.All, true, false);
+            return;
+        }
+
+        if (frozen) {
+            body.velocity = Vector2.zero;
             return;
         }
 

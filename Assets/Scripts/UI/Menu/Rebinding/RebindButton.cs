@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputActionRebindingExtensions;
@@ -17,7 +16,8 @@ public class RebindButton : MonoBehaviour {
 
     public void Start() {
         ourText = GetComponentInChildren<TMP_Text>();
-        EndRebind(false);
+        SetText();
+        targetAction.actionMap.Enable();
     }
 
     public void StartRebind() {
@@ -31,12 +31,14 @@ public class RebindButton : MonoBehaviour {
             .PerformInteractiveRebinding()
             .WithControlsExcluding("Mouse")
             .WithControlsHavingToMatchPath($"<{targetBinding.groups}>")
+            // .WithCancelingThrough()
+            .WithAction(targetAction)
             .WithTargetBinding(index)
             .WithTimeout(timeoutTime)
-            .OnMatchWaitForAnother(0.1f)
-            .OnApplyBinding((op,str) => ApplyBind(str))
-            .OnCancel(op => CancelRebind())
-            .OnComplete(op => EndRebind(true))
+            .OnMatchWaitForAnother(0.2f)
+            // .OnApplyBinding((op,str) => ApplyBind(str))
+            .OnCancel(op => CleanRebind())
+            .OnComplete(op => OnRebindComplete(op))
             .Start();
 
         countdown = StartCoroutine(TimeoutCountdown());
@@ -50,31 +52,39 @@ public class RebindButton : MonoBehaviour {
     }
 
     void ApplyBind(string path) {
+        Debug.Log("apply " + path);
 
         targetBinding = targetAction.bindings[index];
         targetBinding.overridePath = path;
         targetAction.ApplyBindingOverride(index, targetBinding);
         targetBinding = targetAction.bindings[index];
-
-        //Debug.Log("applied? " + targetBinding.overridePath);
     }
 
-    public void EndRebind(bool cancel) {
-        ourText.text = InputControlPath.ToHumanReadableString(
-            targetBinding.effectivePath,
-            InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
-        targetAction.actionMap.Enable();
-        if (cancel) {
-            CancelRebind();
-            MainMenuManager.Instance.rebindManager.SaveRebindings();
-            InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
-        }
+    public void OnRebindComplete(RebindingOperation operation) {
+        targetBinding = targetAction.bindings[index];
+        SetText();
+        CleanRebind();
     }
 
-    void CancelRebind() {
+    void CleanRebind() {
         targetAction.actionMap.Enable();
         rebinding.Dispose();
         MainMenuManager.Instance.rebindPrompt.SetActive(false);
         StopCoroutine(countdown);
+    }
+
+    public void SetText() {
+        ourText.text = InputControlPath.ToHumanReadableString(
+            targetBinding.effectivePath,
+            InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
+    }
+
+    InputControl GetBestCandidate(RebindingOperation operation) {
+        int index = 0;
+        for (int i = 1; i < operation.candidates.Count; i++) {
+            if (operation.scores[i] > operation.scores[index])
+                index = i;
+        }
+        return operation.candidates[index];
     }
 }
