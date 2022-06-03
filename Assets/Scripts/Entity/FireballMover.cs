@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 
 public class FireballMover : MonoBehaviourPun {
@@ -121,7 +119,7 @@ public class FireballMover : MonoBehaviourPun {
                 if (!bobomb.lit) {
                     bobomb.photonView.RPC("Light", RpcTarget.All);
                 } else {
-                    bobomb.photonView.RPC("Kick", RpcTarget.All, body.position.x < bobomb.body.position.x, 0, false);
+                    bobomb.photonView.RPC("Kick", RpcTarget.All, body.position.x < bobomb.body.position.x, 0f, false);
                 }
                 PhotonNetwork.Destroy(gameObject);
             } else {

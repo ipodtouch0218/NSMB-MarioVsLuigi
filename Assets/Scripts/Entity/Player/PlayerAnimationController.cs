@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
@@ -10,7 +8,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     Rigidbody2D body;
     BoxCollider2D mainHitbox;
 
-    [SerializeField] GameObject models, smallModel, largeModel, blueShell, propellerHelmet, propeller;
+    [SerializeField] GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
@@ -280,6 +278,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         largeModel.SetActive(large);
         smallModel.SetActive(!large);
         blueShell.SetActive(controller.state == Enums.PowerupState.BlueShell);
+        largeShellExclude.SetActive(!(controller.state == Enums.PowerupState.BlueShell && (controller.crouching || controller.inShell)));
         propellerHelmet.SetActive(controller.state == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
 

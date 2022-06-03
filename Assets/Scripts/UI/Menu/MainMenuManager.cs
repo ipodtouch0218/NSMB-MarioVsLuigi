@@ -1,16 +1,18 @@
-﻿using ExitGames.Client.Photon;
-using Photon.Pun;
-using Photon.Realtime;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using TMPro;
+
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
+using TMPro;
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
     public static MainMenuManager Instance;
@@ -211,7 +213,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // MATCHMAKING CALLBACKS
     public void OnFriendListUpdate(List<FriendInfo> friendList) {}
     public void OnLeftRoom() {
-        PhotonNetwork.NickName = nicknameField.text;
         OpenLobbyMenu();
         ClearChat();
         GlobalController.Instance.discordController.UpdateActivity();
@@ -300,19 +301,21 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length)].transform.position;
 
-        nicknameField.text = PhotonNetwork.NickName;
 
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
-            LoadSettings();
             OpenTitleScreen();
+            LoadSettings();
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {
             if (PhotonNetwork.InRoom) {
                 EnterRoom();
+                nicknameField.SetTextWithoutNotify(Settings.Instance.nickname);
+                UpdateNickname();
             } else {
                 PhotonNetwork.Disconnect();
+                nicknameField.text = Settings.Instance.nickname;
             }
 
             List<string> newRegions = new();
@@ -344,7 +347,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     private void LoadSettings() {
-        nicknameField.text = PhotonNetwork.NickName = Settings.Instance.nickname;
+        nicknameField.text = Settings.Instance.nickname;
         musicSlider.value = Settings.Instance.VolumeMusic;
         sfxSlider.value = Settings.Instance.VolumeSFX;
         masterSlider.value = Settings.Instance.VolumeMaster;
@@ -653,7 +656,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         selectedRoomIcon.Select();
         selectedRoom = selectedRoomIcon.room?.Name ?? null;
 
-        joinRoomBtn.interactable = room != null && PhotonNetwork.NickName.Length >= 3;
+        joinRoomBtn.interactable = room != null && nicknameField.text.Length >= 3;
     }
     public void JoinSelectedRoom() {
         if (selectedRoomIcon?.joinPrivate ?? false) {
@@ -663,6 +666,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (selectedRoom == null)
             return;
 
+        PhotonNetwork.NickName = nicknameField.text;
         PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
     }
     public void JoinSpecificRoom() {
@@ -676,6 +680,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void CreateRoom() {
         byte players = (byte) lobbyPlayersSlider.value;
         string roomName = "";
+        PhotonNetwork.NickName = nicknameField.text;
         for (int i = 0; i < 8; i++)
             roomName += roomNameChars[Random.Range(0, roomNameChars.Length)];
 
@@ -846,22 +851,26 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
     }
 
-    public void SetUsername(TMP_InputField field) {
-        PhotonNetwork.NickName = field.text;
-        validName = field.text.Length > 2;
+    private void UpdateNickname() {
+        validName = PhotonNetwork.NickName.Length > 2;
         if (!validName) {
-            ColorBlock colors = field.colors;
+            ColorBlock colors = nicknameField.colors;
             colors.normalColor = new Color(1, 0.7f, 0.7f, 1);
             colors.highlightedColor = new Color(1, 0.55f, 0.55f, 1);
-            field.colors = colors;
+            nicknameField.colors = colors;
         } else {
-            ColorBlock colors = field.colors;
+            ColorBlock colors = nicknameField.colors;
             colors.normalColor = Color.white;
-            field.colors = colors;
+            nicknameField.colors = colors;
         }
+    }
 
-        PlayerPrefs.SetString("Nickname", field.text);
-        PlayerPrefs.Save();
+    public void SetUsername(TMP_InputField field) {
+        PhotonNetwork.NickName = field.text;
+        UpdateNickname();
+
+        Settings.Instance.nickname = field.text;
+        Settings.Instance.SaveSettingsToPreferences();
     }
     private void SetText(GameObject obj, string txt) {
         TextMeshProUGUI textComp = obj.GetComponent<TextMeshProUGUI>();

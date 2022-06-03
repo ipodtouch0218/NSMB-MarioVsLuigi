@@ -14,8 +14,7 @@ public class FrozenCube : HoldableEntity {
     PhotonView entityView;
     Rigidbody2D entityBody;
 
-    public float fallTime = 5, killTimer = .5f, autoBreakTimer = 10;
-    float fallTimer;
+    public float autoBreakTimer = 10;
 
     public bool fastSlide, fallen;
 
@@ -71,12 +70,7 @@ public class FrozenCube : HoldableEntity {
             
             offset = -(bounds.center - Vector3.up.Multiply(bounds.size / 2) - rendererObject.transform.position);
 
-            if (entity.IsFlying) {
-                fallen = false;
-                fallTimer = fallTime;
-            } else {
-                fallen = true;
-            }
+            flying = entity.IsFlying;
             ApplyConstraints();
         }
     }
@@ -128,8 +122,12 @@ public class FrozenCube : HoldableEntity {
             Destroy(gameObject);
             return;
         }
-        
-        if (fastSlide && physics.onGround) {
+
+        //handle interactions with tiles
+        if (entity.IsCarryable && (photonView?.IsMine ?? false))
+            HandleTile();
+
+        if (fastSlide && physics.onGround && physics.floorAngle != 0) {
             RaycastHit2D ray = Physics2D.BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, 1 << GROUND_LAYER_ID);
             if (ray) {
                 body.position = new Vector2(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
@@ -140,37 +138,18 @@ public class FrozenCube : HoldableEntity {
         
         body.velocity = new Vector2(throwSpeed * (left ? -1 : 1), body.velocity.y);
 
-        if (autoBreakTimer >= 0) {
+        if (autoBreakTimer > 0 && (entity is PlayerController || !holder)) {
             Utils.TickTimer(ref autoBreakTimer, 0, Time.fixedDeltaTime);
             if (autoBreakTimer <= 0) {
-                photonView.RPC("Kill", RpcTarget.All);
-                return;
+
+                if (flying)
+                    fallen = true;
+                else
+                    photonView.RPC("Kill", RpcTarget.All);
             }
         }
 
-        //handle flying timer
-        if (!fallen) {
-            if (holder) {
-                fallen = true;
-                ApplyConstraints();
-            } else if (entity.IsFlying) {
-                //count down flying timer
-                Utils.TickTimer(ref fallTimer, 0, Time.fixedDeltaTime);
-                if (fallTimer <= 0) {
-                    fallen = true; 
-                } else {
-                    //do shaking animation
-                }
-            } else {
-                fallen = true;
-            }
-        }
         ApplyConstraints();
-
-
-        //handle interactions with tiles
-        if (entity.IsCarryable && (photonView?.IsMine ?? false))
-            HandleTile();
     }
 
     private void ApplyConstraints() {
@@ -182,7 +161,7 @@ public class FrozenCube : HoldableEntity {
             if (!fastSlide)
                 body.constraints |= RigidbodyConstraints2D.FreezePositionX;
 
-            if (entity.IsFlying && !fallen)
+            if (flying && !fallen)
                 body.constraints |= RigidbodyConstraints2D.FreezePositionY;
         }
     }
@@ -247,7 +226,7 @@ public class FrozenCube : HoldableEntity {
         GameObject obj = collider.gameObject;
         KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
 
-        if (killa && killa.dead || killa.photonView.ViewID == entityView.ViewID)
+        if (killa && (killa.dead ||killa.photonView.ViewID == entityView.ViewID))
             return;
 
         switch (obj.tag) {
@@ -278,9 +257,10 @@ public class FrozenCube : HoldableEntity {
 
         physics.UpdateCollisions();
 
-        if (((physics.hitLeft || physics.hitRight) && fastSlide) || holder && (Mathf.Abs(holder.body.velocity.x) > 4 && (physics.hitLeft || physics.hitRight) || physics.hitRoof)) {
+        if (((fastSlide || holder) && (physics.hitLeft || physics.hitRight || physics.hitRoof))
+            || (flying && fallen && physics.onGround))
+
             photonView.RPC("Kill", RpcTarget.All);
-        }
     }
 
     [PunRPC]

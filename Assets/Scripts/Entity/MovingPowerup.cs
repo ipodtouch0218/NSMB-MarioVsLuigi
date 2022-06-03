@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 
 public class MovingPowerup : MonoBehaviourPun {
@@ -91,8 +89,8 @@ public class MovingPowerup : MonoBehaviourPun {
 
         body.isKinematic = false;
         if (passthrough) {
-            Debug.DrawLine(body.position - hitbox.size / 2 * transform.lossyScale, body.position + hitbox.size / 2 * transform.lossyScale);
-            if (!Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, hitbox.size * transform.lossyScale, 0, groundMask)) {
+            Vector2 origin = body.position + Vector2.up * hitbox.size * transform.lossyScale * 0.5f;
+            if (!Utils.IsTileSolidAtWorldLocation(origin) && !Physics2D.OverlapBox(origin, hitbox.size * transform.lossyScale, 0, groundMask)) {
                 gameObject.layer = LayerMask.NameToLayer("Entity");
                 passthrough = false;
             } else {

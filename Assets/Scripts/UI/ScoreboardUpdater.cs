@@ -10,7 +10,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     [SerializeField] GameObject entryTemplate;
     
     private readonly List<ScoreboardEntry> entries = new();
-    private bool manuallyToggled = false;
+    private bool manuallyToggled = false, autoToggled = false;
     private Animator animator;
 
     public void OnEnable() {
@@ -21,7 +21,13 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
 
     private void OnToggle(InputAction.CallbackContext context) {
-        manuallyToggled = !manuallyToggled;
+        if (autoToggled && !manuallyToggled) {
+            //exception, already open. close.
+            manuallyToggled = false;
+            autoToggled = false;
+        } else {
+            manuallyToggled = !manuallyToggled;
+        }
         PlayAnimation(manuallyToggled);
     }
     
@@ -33,12 +39,14 @@ public class ScoreboardUpdater : MonoBehaviour {
     public void OnDeathToggle() {
         if (!manuallyToggled) {
             PlayAnimation(true);
+            autoToggled = true;
         }
     }
 
     public void OnRespawnToggle() {
         if (!manuallyToggled) {
             PlayAnimation(false);
+            autoToggled = false;
         }
     }
 

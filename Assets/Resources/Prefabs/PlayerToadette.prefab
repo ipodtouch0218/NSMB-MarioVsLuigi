@@ -5437,6 +5437,7 @@ MonoBehaviour:
   stationaryGiantEnd: 0
   fireballKnockback: 0
   startedSliding: 0
+  groundpounded: 0
   jumpLandingTimer: 0
   landing: 0
   koyoteTime: 0
@@ -5450,12 +5451,10 @@ MonoBehaviour:
   giantEndTimer: 0
   propellerTimer: 0
   propellerSpinTimer: 0
-  frozenStruggle: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0
   knockbackTimer: 0
-  unfreezeTimer: 0
   pipeTimer: 0
   wallSlideLeft: 0
   wallSlideRight: 0
@@ -5492,6 +5491,7 @@ MonoBehaviour:
   models: {fileID: 3379949737475461038}
   smallModel: {fileID: 7971845128338001746}
   largeModel: {fileID: 719180744479294967}
+  largeShellExclude: {fileID: 4114536531207556243}
   blueShell: {fileID: 6877159210954244630}
   propellerHelmet: {fileID: 8734402728779644965}
   propeller: {fileID: 8532564325519226310}

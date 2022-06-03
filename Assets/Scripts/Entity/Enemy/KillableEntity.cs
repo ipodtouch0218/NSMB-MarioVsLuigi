@@ -27,7 +27,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         if (!photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
-        if (body && !dead && !frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
+        if (body && !dead && !frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * hitbox.size * transform.lossyScale * 0.5f - hitbox.offset * 0.5f))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false);
     }
 
@@ -84,6 +84,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
 
     [PunRPC]
     public virtual void Freeze(int cube) {
+        audioSource.Stop();
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozen = true;
         animator.enabled = false;

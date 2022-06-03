@@ -217,9 +217,7 @@ MonoBehaviour:
   shakeAmount: 0.01
   frozenCubeCollider: {fileID: 1182937128297349914}
   spriteRenderer: {fileID: 0}
-  fallTime: 5
-  killTimer: 0.5
-  autoBreakTimer: 10
+  autoBreakTimer: 3
   fastSlide: 0
   fallen: 0
   offset: {x: 0, y: 0}
