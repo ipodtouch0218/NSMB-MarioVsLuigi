@@ -33,17 +33,17 @@ public class BulletBillMover : KillableEntity {
             body.isKinematic = true;
             return;
         }
-        if (frozen) {
+        if (Frozen) {
             body.velocity = Vector2.zero;
         } else {
             body.velocity = new(speed * (left ? -1 : 1), body.velocity.y);
         }
 
-        if (!frozen && photonView.IsMine )
+        if (!Frozen && photonView.IsMine )
             DespawnCheck();
     }
     public override void InteractWithPlayer(PlayerController player) {
-        if (player.frozen)
+        if (player.Frozen)
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;

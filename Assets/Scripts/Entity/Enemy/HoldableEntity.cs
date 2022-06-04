@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 
 public abstract class HoldableEntity : KillableEntity {
@@ -22,7 +20,7 @@ public abstract class HoldableEntity : KillableEntity {
         if (dead || !photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
-        if (body && !frozen && !holder && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
+        if (body && !Frozen && !holder && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false);
     }
 

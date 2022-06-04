@@ -53,10 +53,10 @@ public class PiranhaPlantController : KillableEntity {
 
     [PunRPC]
     public void Respawn() {
-        if (frozen || !dead)
+        if (Frozen || !dead)
             return;
 
-        frozen = false;
+        Frozen = false;
         dead = false;
         popupTimer = 3;
         animator.Play("end", 0, 1);
@@ -68,7 +68,7 @@ public class PiranhaPlantController : KillableEntity {
     public override void Kill() {
 
         PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
-        PlaySound(frozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Generic_Kick);
+        PlaySound(Frozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Generic_Kick);
 
         dead = true;
         hitbox.enabled = false;

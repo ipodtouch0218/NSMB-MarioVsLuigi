@@ -40,14 +40,14 @@ TagManager:
   - Water
   - UI
   - 
-  - Player
+  - PlayerPassthrough
   - Ground
   - Entity
   - EntityHitbox
   - HitsNothing
   - Semisolids
   - PassthroughInvalid
-  - 
+  - IceBlock
   - 
   - 
   - 

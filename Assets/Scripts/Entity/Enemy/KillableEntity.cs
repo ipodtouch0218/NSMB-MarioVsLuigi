@@ -3,7 +3,9 @@ using Photon.Pun;
 
 public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
 
-    public bool dead, frozen, left = true, collide = true, iceCarryable = true, flying;
+    public bool Frozen { get; set; }
+
+    public bool dead, left = true, collide = true, iceCarryable = true, flying;
     public Rigidbody2D body;
     protected BoxCollider2D hitbox;
     protected Animator animator;
@@ -27,7 +29,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         if (!photonView || !GameManager.Instance || !photonView.IsMine)
             return;
 
-        if (body && !dead && !frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * hitbox.size * transform.lossyScale * 0.5f - hitbox.offset * 0.5f))
+        if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * hitbox.size * transform.lossyScale * 0.5f - hitbox.offset * 0.5f))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false);
     }
 
@@ -44,7 +46,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
     }
 
     public virtual void InteractWithPlayer(PlayerController player) {
-        if (player.frozen)
+        if (player.Frozen)
             return;
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.onGround;
@@ -86,7 +88,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
     public virtual void Freeze(int cube) {
         audioSource.Stop();
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
-        frozen = true;
+        Frozen = true;
         animator.enabled = false;
         hitbox.enabled = false;
         if (body) {
@@ -98,7 +100,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
 
     [PunRPC]
     public virtual void Unfreeze() {
-        frozen = false;
+        Frozen = false;
         animator.enabled = true;
         if (body)
             body.isKinematic = false;
@@ -123,7 +125,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
         dead = true;
-        photonView.RPC("PlaySound", RpcTarget.All, !frozen ? Enums.Sounds.Enemy_Generic_Kick : Enums.Sounds.Enemy_Generic_FreezeShatter);
+        photonView.RPC("PlaySound", RpcTarget.All, !Frozen ? Enums.Sounds.Enemy_Generic_Kick : Enums.Sounds.Enemy_Generic_FreezeShatter);
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
         

@@ -5385,7 +5385,7 @@ MonoBehaviour:
   megaJumpVelocity: 12.65625
   launchVelocity: 12
   walkingAcceleration: 8
-  runningAcceleration: 2
+  runningAcceleration: 2.75
   walkingMaxSpeed: 2.8125
   runningMaxSpeed: 5.625
   wallslideSpeed: -4.6875
@@ -5393,6 +5393,7 @@ MonoBehaviour:
   giantStartTime: 1.5
   soundRange: 10
   slopeSlidingAngle: 12.5
+  pickupTime: 0.45
   propellerLaunchVelocity: 6
   propellerFallSpeed: 2
   propellerSpinFallSpeed: 1.5
@@ -5433,7 +5434,6 @@ MonoBehaviour:
   stuckInBlock: 0
   propeller: 0
   usedPropellerThisJump: 0
-  frozen: 0
   stationaryGiantEnd: 0
   fireballKnockback: 0
   startedSliding: 0
@@ -5442,6 +5442,7 @@ MonoBehaviour:
   landing: 0
   koyoteTime: 0
   groundpoundCounter: 0
+  pickupTimer: 0
   groundpoundDelay: 0
   hitInvincibilityCounter: 0
   powerupFlash: 0

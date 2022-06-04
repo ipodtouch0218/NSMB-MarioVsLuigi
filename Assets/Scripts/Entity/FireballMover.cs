@@ -68,7 +68,7 @@ public class FireballMover : MonoBehaviourPun {
         case "koopa":
         case "goomba": {
             KillableEntity en = collider.gameObject.GetComponentInParent<KillableEntity>();
-            if (en.dead || en.frozen)
+            if (en.dead || en.Frozen)
                 return;
 
             if (isIceball) {
@@ -104,7 +104,7 @@ public class FireballMover : MonoBehaviourPun {
         }
         case "bulletbill": {
             KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
-            if (isIceball && !bb.frozen) {
+            if (isIceball && !bb.Frozen) {
                 PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bb.photonView.ViewID });
             }
             PhotonNetwork.Destroy(gameObject);
@@ -113,7 +113,7 @@ public class FireballMover : MonoBehaviourPun {
         }
         case "bobomb": {
             BobombWalk bobomb = collider.gameObject.GetComponentInParent<BobombWalk>();
-            if (bobomb.dead || bobomb.frozen)
+            if (bobomb.dead || bobomb.Frozen)
                 return;
             if (!isIceball) {
                 if (!bobomb.lit) {

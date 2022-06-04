@@ -67,7 +67,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
         Vector3 targetEuler = models.transform.eulerAngles;
         bool instant = false, changeFacing = false;
-        if (!gameover && !controller.frozen) {
+        if (!gameover && !controller.Frozen) {
             if (controller.knockback) {
                 targetEuler = new Vector3(0, controller.facingRight ? 110 : 250, 0);
                 instant = true;
@@ -285,16 +285,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         HandleDeathAnimation();
         HandlePipeAnimation();
 
-        if (animator.GetBool("pipe")) {
-            gameObject.layer = PlayerController.HITS_NOTHING_LAYERID;
-            transform.position = new Vector3(body.position.x, body.position.y, 1);
-        } else if (controller.dead || controller.stuckInBlock || controller.giantStartTimer > 0 || (controller.giantEndTimer > 0 &&  controller.stationaryGiantEnd)) {
-            gameObject.layer = PlayerController.HITS_NOTHING_LAYERID;
-            transform.position = new Vector3(body.position.x, body.position.y, -4);
-        } else {
-            gameObject.layer = PlayerController.DEFAULT_LAYERID;
-            transform.position = new Vector3(body.position.x, body.position.y, -4);
-        }
+        transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
     }
     void HandleDeathAnimation() {
         if (!controller.dead) {

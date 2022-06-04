@@ -35,7 +35,7 @@ public class BobombWalk : HoldableEntity {
             HandleCollision();
         sRenderer.flipX = left;
 
-        if (frozen)
+        if (Frozen)
             return;
 
         if (lit && !detonated && !dead) {

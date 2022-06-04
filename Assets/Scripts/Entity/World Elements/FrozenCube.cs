@@ -18,7 +18,7 @@ public class FrozenCube : HoldableEntity {
 
     public bool fastSlide, fallen;
 
-    public Vector2 offset, origin;
+    public Vector2 offset;
 
     new void Start() {
         base.Start();
@@ -35,10 +35,11 @@ public class FrozenCube : HoldableEntity {
             entityView = PhotonView.Find(id);
 
             entity = entityView.GetComponent<IFreezableEntity>();
-            if (entity == null) {
+            if (entity == null || entity.Frozen) {
                 Destroy(gameObject);
                 return;
             }
+            entity.Frozen = true;
 
             entityBody = entityView.GetComponentInParent<Rigidbody2D>();
 
@@ -70,6 +71,8 @@ public class FrozenCube : HoldableEntity {
             
             offset = -(bounds.center - Vector3.up.Multiply(bounds.size / 2) - rendererObject.transform.position);
 
+            transform.position -= (Vector3) offset;
+
             flying = entity.IsFlying;
             ApplyConstraints();
         }
@@ -87,16 +90,15 @@ public class FrozenCube : HoldableEntity {
             return;
         }
 
-        //if (!fastSlide && autoBreakTimer < 2.5f)
-        //    transform.position = new(origin.x + Mathf.Sin(autoBreakTimer * shakeSpeed) * shakeAmount, transform.position.y);
+        if (!fastSlide && autoBreakTimer < 1f)
+            transform.position = new(body.position.x + Mathf.Sin(autoBreakTimer * shakeSpeed) * shakeAmount * Time.deltaTime, transform.position.z);
 
         //move the entity to be inside of us
-        if (entity.IsCarryable) {
+        if (entity.IsCarryable)
             entityBody.transform.position = entityBody.position = (Vector2) transform.position + offset;
-        }
     }
 
-    new void FixedUpdate() {
+    public override void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -172,7 +174,7 @@ public class FrozenCube : HoldableEntity {
         if (!holder && player.invincible > 0) {
             photonView.RPC("Kill", RpcTarget.All);
         }
-        if (holder || player.frozen)
+        if (holder || player.Frozen)
             return;
         else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("Kill", RpcTarget.All);
@@ -257,16 +259,17 @@ public class FrozenCube : HoldableEntity {
 
         physics.UpdateCollisions();
 
-        if (((fastSlide || holder) && (physics.hitLeft || physics.hitRight || physics.hitRoof))
-            || (flying && fallen && physics.onGround))
+        if ((fastSlide && (physics.hitLeft || physics.hitRight))
+            || (flying && fallen && physics.onGround)
+            || (physics.onGround && physics.hitRoof)) {
 
             photonView.RPC("Kill", RpcTarget.All);
+        }
     }
 
     [PunRPC]
     public override void Kill() {
-        if (entity != null)
-            entity.Unfreeze();
+        entity?.Unfreeze();
 
         if (holder)
             holder.holding = null;

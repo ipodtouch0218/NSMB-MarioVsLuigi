@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -7,8 +5,7 @@ using TMPro;
 public class TextSubmitValidator : TMP_InputValidator {
     
     public override char Validate(ref string text, ref int pos, char ch) {
-
-        if (ch == '\n') {
+        if (ch == '\n' || ch == '\x11') {
             //submit
             MainMenuManager.Instance.SendChat();
             text = "";

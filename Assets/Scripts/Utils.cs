@@ -279,7 +279,7 @@ public class Utils {
         return Color.HSVToRGB(id / ((float) PhotonNetwork.PlayerList.Length + 1), s, v);
     }
 
-    public static void TickTimer(ref float counter, float min, float delta) {
-        counter = Mathf.Max(min, counter - delta);
+    public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {
+        counter = Mathf.Clamp(counter - delta, min, max);
     }
 }

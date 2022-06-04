@@ -51,7 +51,7 @@ public class DebugControls : MonoBehaviour {
             return;
 
         PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        if (Keyboard.current[key].wasPressedThisFrame && !p.frozen && !p.frozenObject && p.state != Enums.PowerupState.MegaMushroom && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0) {
+        if (Keyboard.current[key].wasPressedThisFrame && !p.Frozen && !p.frozenObject && p.state != Enums.PowerupState.MegaMushroom && !p.pipeEntering && !p.knockback && p.hitInvincibilityCounter <= 0) {
             PhotonNetwork.Instantiate("Prefabs/FrozenCube", p.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { p.photonView.ViewID });
         }
     }

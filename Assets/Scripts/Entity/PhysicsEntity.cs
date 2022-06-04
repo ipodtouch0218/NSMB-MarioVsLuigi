@@ -32,6 +32,7 @@ public class PhysicsEntity : MonoBehaviour {
         int c = currentCollider.GetContacts(contacts);
         for (int i = 0; i < c; i++) {
             ContactPoint2D point = contacts[i];
+
             if (Vector2.Dot(point.normal, Vector2.up) > floorAndRoofCutoff) {
                 //touching floor
                 onGround = true;
@@ -58,9 +59,5 @@ public class PhysicsEntity : MonoBehaviour {
         }
         hitRight = hitRightCount >= 1;
         hitLeft = hitLeftCount >= 1;
-    }
-
-    public void HandleSlopes() {
-
     }
 }

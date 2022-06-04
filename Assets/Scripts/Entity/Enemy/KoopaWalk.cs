@@ -37,7 +37,7 @@ public class KoopaWalk : HoldableEntity {
         }
         base.FixedUpdate();
 
-        if (frozen)
+        if (Frozen)
             return;
 
         sRenderer.flipX = !left ^ flipXFlip;

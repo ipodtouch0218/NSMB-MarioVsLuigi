@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1182937128297349914}
   - component: {fileID: 1482905306660078958}
   - component: {fileID: 3852760734466000956}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Hitbox
   m_TagString: frozencube
   m_Icon: {fileID: 0}
@@ -166,7 +166,7 @@ GameObject:
   - component: {fileID: 2249742354441438921}
   - component: {fileID: -5867948262533087669}
   - component: {fileID: -4211955845073762521}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: FrozenCube
   m_TagString: frozencube
   m_Icon: {fileID: 0}
@@ -202,7 +202,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dead: 0
-  frozen: 0
   left: 1
   collide: 1
   iceCarryable: 0
@@ -214,14 +213,13 @@ MonoBehaviour:
   canPlace: 0
   throwSpeed: 7.25
   shakeSpeed: 80
-  shakeAmount: 0.01
+  shakeAmount: 0.6
   frozenCubeCollider: {fileID: 1182937128297349914}
   spriteRenderer: {fileID: 0}
   autoBreakTimer: 3
   fastSlide: 0
   fallen: 0
   offset: {x: 0, y: 0}
-  origin: {x: 0, y: 0}
 --- !u!114 &-1720675168950811037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,7 +262,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &-4753383432991643724
 MonoBehaviour:
