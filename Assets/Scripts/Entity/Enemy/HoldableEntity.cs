@@ -17,11 +17,8 @@ public abstract class HoldableEntity : KillableEntity {
     }
 
     public override void FixedUpdate() {
-        if (dead || !photonView || !GameManager.Instance || !photonView.IsMine)
-            return;
-
-        if (body && !Frozen && !holder && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.3f))
-            photonView.RPC("SpecialKill", RpcTarget.All, left, false);
+        if (!holder)
+            base.FixedUpdate();
     }
 
     [PunRPC]

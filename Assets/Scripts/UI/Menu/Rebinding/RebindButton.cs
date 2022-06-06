@@ -51,19 +51,11 @@ public class RebindButton : MonoBehaviour {
         }
     }
 
-    void ApplyBind(string path) {
-        Debug.Log("apply " + path);
-
-        targetBinding = targetAction.bindings[index];
-        targetBinding.overridePath = path;
-        targetAction.ApplyBindingOverride(index, targetBinding);
-        targetBinding = targetAction.bindings[index];
-    }
-
     public void OnRebindComplete(RebindingOperation operation) {
         targetBinding = targetAction.bindings[index];
         SetText();
         CleanRebind();
+        RebindManager.Instance.SaveRebindings();
     }
 
     void CleanRebind() {
@@ -77,14 +69,5 @@ public class RebindButton : MonoBehaviour {
         ourText.text = InputControlPath.ToHumanReadableString(
             targetBinding.effectivePath,
             InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
-    }
-
-    InputControl GetBestCandidate(RebindingOperation operation) {
-        int index = 0;
-        for (int i = 1; i < operation.candidates.Count; i++) {
-            if (operation.scores[i] > operation.scores[index])
-                index = i;
-        }
-        return operation.candidates[index];
     }
 }

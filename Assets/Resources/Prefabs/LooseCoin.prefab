@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 1694848990786736830}
   - component: {fileID: 7157997769683939989}
   - component: {fileID: 5943513950730874965}
-  m_Layer: 9
+  m_Layer: 15
   m_Name: LooseCoin
   m_TagString: loosecoin
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786289218142832788}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.9381035, y: 0.83, z: -2455.4814}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

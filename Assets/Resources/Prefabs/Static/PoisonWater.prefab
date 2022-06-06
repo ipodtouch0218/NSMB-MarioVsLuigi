@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -1668006257832877074}
   - component: {fileID: 6004104070224972752}
   - component: {fileID: 2500780753419200967}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PoisonWater
   m_TagString: poison
   m_Icon: {fileID: 0}

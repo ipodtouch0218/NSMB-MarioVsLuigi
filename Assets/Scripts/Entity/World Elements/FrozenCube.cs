@@ -35,11 +35,10 @@ public class FrozenCube : HoldableEntity {
             entityView = PhotonView.Find(id);
 
             entity = entityView.GetComponent<IFreezableEntity>();
-            if (entity == null || entity.Frozen) {
+            if (entity == null || (photonView.IsMine && entity.Frozen)) {
                 Destroy(gameObject);
                 return;
             }
-            entity.Frozen = true;
 
             entityBody = entityView.GetComponentInParent<Rigidbody2D>();
 
@@ -66,12 +65,12 @@ public class FrozenCube : HoldableEntity {
                     bounds.Encapsulate(renderer.bounds);
             }
 
-            hitbox.size = frozenCubeCollider.size = spriteRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size + (Vector3.one * 0.1f);
+            hitbox.size = frozenCubeCollider.size = spriteRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size;
             hitbox.offset = frozenCubeCollider.offset = Vector2.up * frozenCubeCollider.size / 2;
             
             offset = -(bounds.center - Vector3.up.Multiply(bounds.size / 2) - rendererObject.transform.position);
 
-            transform.position -= (Vector3) offset;
+            transform.position -= (Vector3) offset - Vector3.down * 0.1f;
 
             flying = entity.IsFlying;
             ApplyConstraints();
@@ -90,8 +89,6 @@ public class FrozenCube : HoldableEntity {
             return;
         }
 
-        if (!fastSlide && autoBreakTimer < 1f)
-            transform.position = new(body.position.x + Mathf.Sin(autoBreakTimer * shakeSpeed) * shakeAmount * Time.deltaTime, transform.position.z);
 
         //move the entity to be inside of us
         if (entity.IsCarryable)
@@ -111,7 +108,14 @@ public class FrozenCube : HoldableEntity {
             PhotonNetwork.Destroy(photonView);
             return;
         }
-        base.FixedUpdate();
+        if (photonView.IsMine && holder && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale)) {
+            photonView.RPC("Kill", RpcTarget.All);
+            return;
+        }
+
+
+        if (!fastSlide && autoBreakTimer < 1f)
+            transform.position = new(body.position.x + Mathf.Sin(autoBreakTimer * shakeSpeed) * shakeAmount * Time.fixedDeltaTime, transform.position.y, transform.position.z);
 
         if (dead)
             return;
@@ -140,7 +144,7 @@ public class FrozenCube : HoldableEntity {
         
         body.velocity = new Vector2(throwSpeed * (left ? -1 : 1), body.velocity.y);
 
-        if (autoBreakTimer > 0 && (entity is PlayerController || !holder)) {
+        if (autoBreakTimer > 0 && (entity is PlayerController || (!holder && !fastSlide))) {
             Utils.TickTimer(ref autoBreakTimer, 0, Time.fixedDeltaTime);
             if (autoBreakTimer <= 0) {
 
@@ -156,7 +160,7 @@ public class FrozenCube : HoldableEntity {
 
     private void ApplyConstraints() {
         body.constraints = RigidbodyConstraints2D.FreezeRotation;
-        body.mass = holder ? 0 : 100000;
+        body.mass = holder ? 0 : 1;
         body.isKinematic = !entity.IsCarryable;
 
         if (!holder) {
@@ -261,7 +265,7 @@ public class FrozenCube : HoldableEntity {
 
         if ((fastSlide && (physics.hitLeft || physics.hitRight))
             || (flying && fallen && physics.onGround)
-            || (physics.onGround && physics.hitRoof)) {
+            || ((holder || physics.onGround) && physics.hitRoof)) {
 
             photonView.RPC("Kill", RpcTarget.All);
         }

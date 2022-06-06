@@ -213,7 +213,7 @@ MonoBehaviour:
   canPlace: 0
   throwSpeed: 7.25
   shakeSpeed: 80
-  shakeAmount: 0.6
+  shakeAmount: 2
   frozenCubeCollider: {fileID: 1182937128297349914}
   spriteRenderer: {fileID: 0}
   autoBreakTimer: 3
@@ -255,7 +255,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1000000
+  m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 3

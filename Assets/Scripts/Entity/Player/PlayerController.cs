@@ -197,7 +197,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         photonView.RPC("PreRespawn", RpcTarget.All);
 
         gameState = new() {
-            [Enums.NetPlayerProperties.GameState] = new ExitGames.Client.Photon.Hashtable()
+            [Enums.NetPlayerProperties.GameState] = new Hashtable()
         };
     }
     
@@ -205,7 +205,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (photonView.IsMine)
             return;
 
-        if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not ExitGames.Client.Photon.Hashtable gs)
+        if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not Hashtable gs)
             return;
 
         lives = (int) gs[Enums.NetPlayerGameState.Lives];
@@ -401,31 +401,28 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 }
 
                 //blue shell cases
-                if (inShell || other.inShell) {
-                    if (inShell) {
-                        //we are blue shell
-                        if (above) {
-                            //hit them from above
-                            bounce = true;
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, (groundpound || drill) ? 3 : 1, false, photonView.ViewID);
-                        } else if (!otherAbove) {
-                            //hit them from side. powerdown them
-                            if (other.inShell) {
-                                //collide with both
-                                otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
-                                photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
-                            } else {
-                                otherView.RPC("Powerdown", RpcTarget.All, false);
-                            }
+                if (inShell) {
+                    //we are blue shell
+                    if (!otherAbove) {
+                        //hit them from side. powerdown them
+                        if (other.inShell) {
+                            //collide with both
+                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
+                            photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
+                            facingRight = !facingRight;
+                        } else {
+                            otherView.RPC("Powerdown", RpcTarget.All, false);
                         }
-                    } else if (above) {
-                        //only they are blue shell
-                        bounce = true;
-                        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
-                        if (groundpound)
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, (groundpound || drill) ? 3 : 1, false, photonView.ViewID);
-
+                        return;
                     }
+                }
+                if (other.inShell && !above)
+                    return;
+
+                if (!above && other.state == Enums.PowerupState.BlueShell && !other.inShell && other.crouching && !groundpound && !drill) {
+                    //they are blue shell
+                    bounce = true;
+                    photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
                     return;
                 }
 
@@ -446,7 +443,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                         //we are big, groundpounding a mini opponent. squish.
                         otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 3, false, photonView.ViewID);
                         bounce = false;
-                    } else if (!(other.state == Enums.PowerupState.BlueShell && (crouching || groundpound))) {
+                    } else {
                         if (other.state == Enums.PowerupState.MiniMushroom) {
                             otherView.RPC("Powerdown", RpcTarget.All, false);
                         } else {
@@ -494,6 +491,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         HoldableEntity holdable = collider.GetComponentInParent<HoldableEntity>();
         if (holdable && (holding == holdable || (holdingOld == holdable && throwInvincibility > 0)))
             return;
+
         KillableEntity killable = collider.GetComponentInParent<KillableEntity>();
         if (killable && !killable.dead && !killable.Frozen) {
             killable.InteractWithPlayer(this);
@@ -551,6 +549,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         if (!photonView.IsMine || dead || Frozen)
             return;
+
+        if (collider.GetComponentInParent<FrozenCube>() is FrozenCube cube) {
+            if (!(cube && (holding == cube || (holdingOld == cube && throwInvincibility > 0))))
+                cube.InteractWithPlayer(this);
+        }
 
         switch (obj.tag) {
         case "Powerup": {
@@ -862,6 +865,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
+        Debug.Log("a");
 
         propellerTimer = 0;
         skidding = false;
@@ -1268,7 +1272,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", facingRight != fromRight);
 
-        body.velocity = new Vector2((fromRight ? -1 : 1) * 3 * (starsToDrop + 1) * (state == Enums.PowerupState.MegaMushroom ? 3 : 1) * (fireball ? 0.7f : 1f), fireball ? 0 : 4);
+        body.velocity = new Vector2((fromRight ? -1 : 1) * 6 * (starsToDrop + 1) * (state == Enums.PowerupState.MegaMushroom ? 3 : 1) * (fireball ? 0.7f : 1f), fireball ? 0 : 4);
         if (onGround && !fireball)
             body.position += Vector2.up * 0.15f;
 
@@ -1668,6 +1672,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         bool topSpeed = Mathf.Abs(body.velocity.x) + 0.5f > (runningMaxSpeed * (invincible > 0 ? 1.5F : 1));
         if (bounce || (jump && (onGround || (koyoteTime < 0.07f && !propeller)) && !startedSliding)) {
+
+            bool canSpecialJump = (jump || (bounce && jumpHeld)) && properJump && !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && invincible <= 0 && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, ONLY_GROUND_MASK);
+            float jumpBoost = 0;
+
             koyoteTime = 1;
             jumpBuffer = 0;
             skidding = false;
@@ -1700,8 +1708,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 Enums.PowerupState.MegaMushroom => megaJumpVelocity,
                 _ => jumpVelocity + Mathf.Abs(body.velocity.x) / runningMaxSpeed * 0.7f,
             };
-            bool canSpecialJump = jump && (properJump || (bounce && (jumpHeld || jumpBuffer > 0))) && !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && invincible <= 0 && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, ONLY_GROUND_MASK);
-            float jumpBoost = 0;
+
 
             if (canSpecialJump && singlejump) {
                 //Double jump
@@ -1848,16 +1855,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + heightInTiles) / 2);
         }
         // eject
-        if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.right * 0.4f)) {
+        if (!Utils.IsTileSolidAtWorldLocation(checkPos + Vector2.right * 0.4f)) {
             body.velocity = Vector2.right * 2f;
             return true;
-        } else if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.left * 0.4f)) {
+        } else if (!Utils.IsTileSolidAtWorldLocation(checkPos + Vector2.left * 0.4f)) {
             body.velocity = Vector2.left * 2f;
             return true;
         }
 
-        RaycastHit2D rightRaycast = Physics2D.Raycast(body.position + (Vector2.left * checkSize / 2), Vector2.right, 15, ONLY_GROUND_MASK);
-        RaycastHit2D leftRaycast = Physics2D.Raycast(body.position + (Vector2.right * checkSize / 2), Vector2.left, 15, ONLY_GROUND_MASK);
+        RaycastHit2D rightRaycast = Physics2D.Raycast(checkPos, Vector2.right, 15, ONLY_GROUND_MASK);
+        RaycastHit2D leftRaycast = Physics2D.Raycast(checkPos, Vector2.left, 15, ONLY_GROUND_MASK);
+        
         float rightDistance = float.MaxValue, leftDistance = float.MaxValue;
         if (rightRaycast)
             rightDistance = rightRaycast.distance;
@@ -1952,17 +1960,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         }
 
         if (Frozen) {
-            body.velocity = Vector2.zero;
-            return;
+            if (!frozenObject) {
+                Unfreeze();
+            } else {
+                body.velocity = Vector2.zero;
+                return;
+            }
         }
 
         bool paused = GameManager.Instance.paused && photonView.IsMine;
 
-        if (giantStartTimer > 0) {
+        if (giantStartTimer > 0 && photonView.IsMine) {
             body.velocity = Vector2.zero;
             transform.position = body.position = previousFramePosition;
             if (giantStartTimer - delta <= 0) {
-                photonView.RPC("FinishMegaMario", RpcTarget.All, true);
+                    photonView.RPC("FinishMegaMario", RpcTarget.All, true);
                 giantStartTimer = 0;
             } else {
                 body.isKinematic = true;
