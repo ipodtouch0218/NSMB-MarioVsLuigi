@@ -175,11 +175,13 @@ public class FrozenCube : HoldableEntity {
 	public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
-        if (!holder && player.invincible > 0) {
+        if (!holder && (player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.inShell)) {
             photonView.RPC("Kill", RpcTarget.All);
+            return;
         }
         if (holder || player.Frozen)
             return;
+
         else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("Kill", RpcTarget.All);
 

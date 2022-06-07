@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
 
@@ -31,12 +29,13 @@ public class BobombWalk : HoldableEntity {
             animator.SetTrigger("lit");
         }
 
+        if (Frozen)
+            return;
+
         if (!photonView || photonView.IsMine)
             HandleCollision();
         sRenderer.flipX = left;
 
-        if (Frozen)
-            return;
 
         if (lit && !detonated && !dead) {
                 

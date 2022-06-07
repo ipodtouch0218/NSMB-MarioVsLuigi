@@ -640,7 +640,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     return;
             }
 
-            Vector2 pos = body.position + new Vector2(facingRight ? 0.5f : -0.5f, 0.5f);
+            Vector2 pos = body.position + new Vector2(facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.35f);
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/FireballWall", pos);
             } else {
@@ -661,7 +661,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     return;
             }
 
-            Vector2 pos = body.position + new Vector2(facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.5f);
+            Vector2 pos = body.position + new Vector2(facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.35f);
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/IceballWall", pos);
             } else {
@@ -684,7 +684,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     [PunRPC]
     protected void StartPropeller() {
-        if (usedPropellerThisJump ) {
+        if (usedPropellerThisJump) {
             if (wallSlideLeft || wallSlideRight)
                 return;
 
@@ -999,6 +999,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (--lives == 0) {
             GameManager.Instance.CheckForWinner();
         }
+        if (deathplane)
+            spawned = false;
         dead = true;
         onSpinner = null;
         pipeEntering = null;
@@ -1602,7 +1604,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             }
         } else {
             //walljump starting check
-            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !holding && state != Enums.PowerupState.MegaMushroom && !flying && !propeller && !drill && !crouching && !sliding;
+            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !holding && state != Enums.PowerupState.MegaMushroom && !flying && !drill && !crouching && !sliding;
             if (!canWallslide)
                 return;
 
@@ -1706,7 +1708,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
             float vel = state switch {
                 Enums.PowerupState.MegaMushroom => megaJumpVelocity,
-                _ => jumpVelocity + Mathf.Abs(body.velocity.x) / runningMaxSpeed * 0.7f,
+                _ => jumpVelocity + Mathf.Abs(body.velocity.x) / runningMaxSpeed * 1.1f,
             };
 
 
@@ -1970,10 +1972,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         bool paused = GameManager.Instance.paused && photonView.IsMine;
 
-        if (giantStartTimer > 0 && photonView.IsMine) {
+        if (giantStartTimer > 0) {
             body.velocity = Vector2.zero;
             transform.position = body.position = previousFramePosition;
-            if (giantStartTimer - delta <= 0) {
+            if (giantStartTimer - delta <= 0 && photonView.IsMine) {
                     photonView.RPC("FinishMegaMario", RpcTarget.All, true);
                 giantStartTimer = 0;
             } else {
@@ -2101,8 +2103,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (!crouch)
             alreadyGroundpounded = false;
 
-        if (powerupButtonHeld) {
-            if (body.velocity.y < -0.1f && (propeller || usedPropellerThisJump) && !drill && !wallSlideLeft && !wallSlideRight && wallJumpTimer <= 0 && propellerSpinTimer < propellerSpinTime / 4f) {
+        if (powerupButtonHeld && wallJumpTimer <= 0) {
+            if (body.velocity.y < -0.1f && (propeller || usedPropellerThisJump) && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
                 propellerSpinTimer = propellerSpinTime;
                 propeller = true;
                 photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_PropellerMushroom_Spin);
