@@ -43,7 +43,7 @@ public class BulletBillMover : KillableEntity {
             DespawnCheck();
     }
     public override void InteractWithPlayer(PlayerController player) {
-        if (player.Frozen)
+        if (Frozen || player.Frozen)
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
@@ -77,6 +77,9 @@ public class BulletBillMover : KillableEntity {
     void DespawnCheck() {
 
         foreach (PlayerController player in GameManager.Instance.allPlayers) {
+            if (!player)
+                continue;
+
             if (Utils.WrappedDistance(player.body.position, body.position) < despawnDistance)
                 return;
         }

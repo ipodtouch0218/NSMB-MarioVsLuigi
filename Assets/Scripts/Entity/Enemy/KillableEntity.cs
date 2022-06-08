@@ -83,9 +83,6 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
     }
 
     [PunRPC]
-    public abstract void Kill();
-
-    [PunRPC]
     public virtual void Freeze(int cube) {
         audioSource.Stop();
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
@@ -96,7 +93,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             body.isKinematic = true;
-		}
+        }
     }
 
     [PunRPC]
@@ -108,6 +105,11 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         hitbox.enabled = true;
         audioSource.enabled = true;
 
+        SpecialKill(false, false);
+    }
+
+    [PunRPC]
+    public virtual void Kill() {
         SpecialKill(false, false);
     }
 
@@ -128,10 +130,10 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, !Frozen ? Enums.Sounds.Enemy_Generic_Kick : Enums.Sounds.Enemy_Generic_FreezeShatter);
         if (groundpound)
-            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
+            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.up * 0.5f, Quaternion.identity);
         
         if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + new Vector2(0, 0.5f), Quaternion.identity);
+            PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + Vector2.up * 0.5f, Quaternion.identity);
     } 
 
     [PunRPC]

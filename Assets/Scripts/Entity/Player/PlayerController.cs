@@ -524,7 +524,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     photonView.RPC("Powerdown", RpcTarget.All, false);
                 } else if (!Frozen && !frozenObject && state != Enums.PowerupState.MegaMushroom && !pipeEntering) {
 
-                    GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { photonView.ViewID });
+                    GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position, Quaternion.identity, 0, new object[] { photonView.ViewID });
                     frozenObject = cube.GetComponent<FrozenCube>();
                 }
             }
@@ -1262,6 +1262,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             return;
         }
 
+        if (knockback)
+            starsToDrop = Mathf.Max(1, starsToDrop);
+
         knockback = true;
         knockbackTimer = 0.5f;
         fireballKnockback = fireball;
@@ -1274,7 +1277,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", facingRight != fromRight);
 
-        body.velocity = new Vector2((fromRight ? -1 : 1) * 6 * (starsToDrop + 1) * (state == Enums.PowerupState.MegaMushroom ? 3 : 1) * (fireball ? 0.7f : 1f), fireball ? 0 : 4);
+        body.velocity = new Vector2((fromRight ? -1 : 1) * 3 * (starsToDrop + 1) * (state == Enums.PowerupState.MegaMushroom ? 3 : 1) * (fireball ? 0.7f : 1f), fireball ? 0 : 4);
         if (onGround && !fireball)
             body.position += Vector2.up * 0.15f;
 
@@ -1324,7 +1327,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             return;
         }
         holding = PhotonView.Find(view).GetComponent<HoldableEntity>();
-        if (holding.CompareTag("frozencube")) {
+        if (holding is FrozenCube) {
             animator.Play("head-pickup", state >= Enums.PowerupState.Mushroom ? 1 : 0);
             PlaySound(Enums.Sounds.Player_Voice_DoubleJump, 2);
             pickupTimer = 0;
@@ -1530,19 +1533,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     void HandleCrouching(bool crouchInput) {
         if (!photonView.IsMine || sliding || propeller || knockback)
             return;
+
         if (state == Enums.PowerupState.MegaMushroom) {
             crouching = false;
             return;
         }
-        bool prevCrouchState = crouching;
+        bool prevCrouchState = crouching || groundpound;
         crouching = ((onGround && crouchInput) || (!onGround && crouchInput && crouching) || (crouching && ForceCrouchCheck())) && !holding;
         if (crouching && !prevCrouchState) {
             //crouch start sound
-            if (state == Enums.PowerupState.BlueShell) {
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_BlueShell_Enter);
-            } else {
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Crouch);
-            }
+            photonView.RPC("PlaySound", RpcTarget.All, state == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
         }
     }
 
@@ -2284,7 +2284,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             }
             //Friction...
             if (abovemax) {
-                float multiplier = 1 - (delta * tileFriction * (knockback ? 3f : 4f) * (sliding ? 0.7f : 1f) * uphillChange);
+                float multiplier = 1 - (delta * tileFriction * (knockback ? 1f : 4f) * (sliding ? 0.7f : 1f) * uphillChange);
                 body.velocity = new(body.velocity.x * multiplier, body.velocity.y);
                 if (Mathf.Abs(body.velocity.x) < 0.15f)
                     body.velocity = new Vector2(0, body.velocity.y);

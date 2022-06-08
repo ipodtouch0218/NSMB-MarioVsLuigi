@@ -343,6 +343,7 @@ public class KoopaWalk : HoldableEntity {
         shell = true;
         if (holder)
             holder.photonView.RPC("SetHolding", RpcTarget.All, -1);
+
         holder = null;
     } 
 }

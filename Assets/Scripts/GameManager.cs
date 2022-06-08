@@ -513,8 +513,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
                     currentStar = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", spawnPos, Quaternion.identity);
                     remainingSpawns.RemoveAt(index);
-                    if (musicEnabled)
-                        sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
                     spawnStarCount = 10.4f - (PhotonNetwork.CurrentRoom.PlayerCount / 5f);
                 }
             } else {
@@ -598,8 +596,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         bool speedup = false;
         
         foreach (var player in allPlayers) {
-            if (player == null) 
-                return;
+            if (!player) 
+                continue;
+
             if (player.state == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
                 mega = true;
             if (player.invincible > 0)

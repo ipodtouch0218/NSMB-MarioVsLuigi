@@ -179,10 +179,10 @@ public class FrozenCube : HoldableEntity {
             photonView.RPC("Kill", RpcTarget.All);
             return;
         }
-        if (holder || player.Frozen)
+        if (holder || fallen || player.Frozen)
             return;
 
-        else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
+        if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("Kill", RpcTarget.All);
 
         } else if (Mathf.Abs(body.velocity.x) >= (throwSpeed/2) && !physics.hitRoof) {
@@ -209,6 +209,8 @@ public class FrozenCube : HoldableEntity {
         if (holder == null)
             return;
 
+        fallen = false;
+        flying = false;
         left = facingLeft;
         fastSlide = true;
         transform.position = new Vector2(holder.facingRight ? holder.transform.position.x + 0.1f : holder.transform.position.x - 0.1f, transform.position.y);
@@ -266,7 +268,7 @@ public class FrozenCube : HoldableEntity {
         physics.UpdateCollisions();
 
         if ((fastSlide && (physics.hitLeft || physics.hitRight))
-            || (flying && fallen && physics.onGround)
+            || (flying && fallen && physics.onGround && !holder)
             || ((holder || physics.onGround) && physics.hitRoof)) {
 
             photonView.RPC("Kill", RpcTarget.All);

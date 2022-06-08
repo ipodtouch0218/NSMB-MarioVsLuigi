@@ -135,7 +135,7 @@ public class MovingPowerup : MonoBehaviourPun {
         }
         if (physics.onGround) {
             body.velocity = new Vector2(speed * (right ? 1 : -1), bouncePower);
-            if (physics.hitRoof && photonView.IsMine) {
+            if ((physics.hitRoof || (physics.hitLeft && physics.hitRight)) && photonView.IsMine) {
                 photonView.RPC("DespawnWithPoof", RpcTarget.All);
                 return;
             }

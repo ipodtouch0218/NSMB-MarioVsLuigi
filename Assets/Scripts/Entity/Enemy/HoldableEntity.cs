@@ -37,4 +37,26 @@ public abstract class HoldableEntity : KillableEntity {
         previousHolder = holder;
         photonView.TransferOwnership(holderView.Owner);
     }
+
+    [PunRPC]
+    public override void Kill() {
+        if (dead)
+            return;
+
+        if (holder)
+            holder.SetHolding(-1);
+
+        base.Kill();
+    }
+
+    [PunRPC]
+    public override void SpecialKill(bool right = true, bool groundpound = false) {
+        if (dead)
+            return;
+
+        if (holder)
+            holder.SetHolding(-1);
+
+        base.SpecialKill(right, groundpound);
+    }
 }

@@ -57,6 +57,9 @@ public class StarBouncer : MonoBehaviourPun {
             body.isKinematic = true;
             body.velocity = Vector2.zero;
             becomeCollectibleAt = PhotonNetwork.ServerTimestamp;
+
+            if (GameManager.Instance.musicEnabled)
+                GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
         }
 
 
