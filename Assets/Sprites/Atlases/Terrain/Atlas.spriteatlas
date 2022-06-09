@@ -389,6 +389,10 @@ SpriteAtlas:
   - {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: 105889491633116753, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: 2286950547735446004, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -1993281826, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -644409675, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 1300903088, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 550154214, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: 5242519309527336308, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -5785169764808499753, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: 4602633912051959003, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
@@ -911,6 +915,10 @@ SpriteAtlas:
   - animation_9
   - animation_31
   - animation_30
+  - animated-blocks_2
+  - animated-blocks_3
+  - animated-blocks_0
+  - animated-blocks_1
   - animation_28
   - animation_29
   - animation_24

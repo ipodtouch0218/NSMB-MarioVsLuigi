@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     public bool Frozen { get; set; }
     public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, groundpounded;
-    public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer;
+    public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer;
     public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer;
 
     //Walljumping variables
@@ -259,6 +259,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             HandleTileProperties();
             TickCounters();
             HandleMovement(Time.fixedDeltaTime);
+            HandleGiantTiles(true);
         }
         AnimationController.UpdateAnimatorStates();
         HandleLayerState();
@@ -684,17 +685,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     [PunRPC]
     protected void StartPropeller() {
-        if (usedPropellerThisJump) {
-            if (wallSlideLeft || wallSlideRight)
-                return;
+        if (usedPropellerThisJump)
+            return;
 
-            propellerSpinTimer = propellerSpinTime;
-            PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
-        } else {
-            body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity);
-            propellerTimer = 1f;
-            PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
-        }
+        body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity);
+        propellerTimer = 1f;
+        PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
+        
         animator.Play("propeller_up", 1);
         propeller = true;
         flying = false;
@@ -1172,35 +1169,36 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     #region -- TILE COLLISIONS --
     void HandleGiantTiles(bool pipes) {
-        if (!photonView.IsMine)
+        if (state != Enums.PowerupState.MegaMushroom || !photonView.IsMine || giantStartTimer > 0)
             return;
 
         Vector2 checkSize = hitboxes[0].size * transform.lossyScale * 1.1f;
-        Vector2 normalizedVelocity = body.velocity;
-        if (!groundpound)
-            normalizedVelocity.y = Mathf.Max(0, body.velocity.y);
-        
+
+        bool grounded = singlejump && onGround;
         Vector2 offset = Vector2.zero;
-        if (singlejump && onGround)
+        if (grounded)
             offset = Vector2.down / 2f;
 
-        Vector2 checkPosition = body.position + (5 * Time.fixedDeltaTime * normalizedVelocity) + new Vector2(0, checkSize.y / 2) + offset;
+        Vector2 checkPosition = body.position + (Vector2.up * checkSize * 0.5f) + (2 * Time.fixedDeltaTime * body.velocity) + offset;
 
-        Vector3Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
-        Vector3Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
-
+        Vector3Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
+        Vector3Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
 
         for (int x = 0; x <= size.x; x++) {
             for (int y = 0; y <= size.y; y++) {
                 Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
+                Vector2 worldPosCenter = Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f;
                 Utils.WrapTileLocation(ref tileLocation);
 
                 InteractableTile.InteractionDirection dir = InteractableTile.InteractionDirection.Up;
-                if (y == 0 && singlejump && onGround) {
+                if (worldPosCenter.y - 0.25f + Physics2D.defaultContactOffset * 2f <= body.position.y) {
+                    if (!grounded && !groundpound)
+                        continue;
+
                     dir = InteractableTile.InteractionDirection.Down;
-                } else if (tileLocation.x / 2f < checkPosition.x && y != size.y) {
+                } else if (worldPosCenter.x - 0.25f < checkPosition.x - checkSize.x * 0.5f) {
                     dir = InteractableTile.InteractionDirection.Left;
-                } else if (tileLocation.x / 2f > checkPosition.x && y != size.y) {
+                } else if (worldPosCenter.x + 0.25f > checkPosition.x + checkSize.x * 0.5f) {
                     dir = InteractableTile.InteractionDirection.Right;
                 }
 
@@ -1215,14 +1213,18 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             for (int x = 0; x <= size.x; x++) {
                 for (int y = size.y; y >= 0; y--) {
                     Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
+                    Vector2 worldPosCenter = Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f;
                     Utils.WrapTileLocation(ref tileLocation);
 
                     InteractableTile.InteractionDirection dir = InteractableTile.InteractionDirection.Up;
-                    if (y == 0 && singlejump && onGround) {
+                    if (worldPosCenter.y - 0.25f + Physics2D.defaultContactOffset * 2f <= body.position.y) {
+                        if (!grounded && !groundpound)
+                            continue;
+                        
                         dir = InteractableTile.InteractionDirection.Down;
-                    } else if (tileLocation.x / 2f < checkPosition.x && y != size.y) {
+                    } else if (worldPosCenter.x - 0.25f < checkPosition.x - checkSize.x * 0.5f) {
                         dir = InteractableTile.InteractionDirection.Left;
-                    } else if (tileLocation.x / 2f > checkPosition.x && y != size.y) {
+                    } else if (worldPosCenter.x + 0.25f > checkPosition.x + checkSize.x * 0.5f) {
                         dir = InteractableTile.InteractionDirection.Right;
                     }
 
@@ -2103,8 +2105,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (!crouch)
             alreadyGroundpounded = false;
 
-        if (powerupButtonHeld && wallJumpTimer <= 0) {
-            if (body.velocity.y < -0.1f && (propeller || usedPropellerThisJump) && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
+        if (powerupButtonHeld && wallJumpTimer <= 0 && !usedPropellerThisJump) {
+            if (body.velocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
                 propellerSpinTimer = propellerSpinTime;
                 propeller = true;
                 photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_PropellerMushroom_Spin);
@@ -2171,8 +2173,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         HandleSlopes();
 
-        if (crouch && !alreadyGroundpounded)
+        if (crouch && !alreadyGroundpounded) {
             HandleGroundpoundStart(left, right);
+        } else {
+            groundpoundStartTimer = 0;
+        }
         HandleGroundpound();
 
         if (onGround) {
@@ -2360,6 +2365,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     void HandleGroundpoundStart(bool left, bool right) {
         if (!photonView.IsMine)
             return;
+
+        if (groundpoundStartTimer == 0)
+            groundpoundStartTimer = 0.1f;
+
+        Utils.TickTimer(ref groundpoundStartTimer, 0, Time.fixedDeltaTime);
+        
+        if (groundpoundStartTimer != 0)
+            return;
+
         if (onGround || knockback || groundpound || drill
             || holding || crouching || sliding
             || wallSlideLeft || wallSlideRight || groundpoundDelay > 0)

@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             int y = (int) data[1];
             bool downwards = (bool) data[2];
             string newTile = (string) data[3];
-            BlockBump.SpawnResult spawnResult = (BlockBump.SpawnResult) data[4];
+            string spawnResult = (string) data[4];
 
             Vector3Int loc = new(x, y, 0);
 
@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             bb.fromAbove = downwards;
             bb.resultTile = newTile;
             bb.sprite = tilemap.GetSprite(loc);
-            bb.spawn = spawnResult;
+            bb.prefab = spawnResult;
 
             tilemap.SetTile(loc, null);
             break;
@@ -162,7 +162,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             int y = (int) data[1];
             bool downwards = (bool) data[2];
             string newTile = (string) data[3];
-            BlockBump.SpawnResult spawnResult = (BlockBump.SpawnResult) data[4];
+            string spawnResult = (string) data[4];
 
             Vector3Int loc = new(x, y, 0);
 
@@ -175,7 +175,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             bb.fromAbove = downwards;
             bb.resultTile = newTile;
             bb.sprite = tilemap.GetSprite(loc);
-            bb.spawn = spawnResult;
+            bb.prefab = spawnResult;
 
             tilemap.SetTile(loc, null);
             break;

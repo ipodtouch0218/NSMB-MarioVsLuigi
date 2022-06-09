@@ -10137,6 +10137,7 @@ MonoBehaviour:
   landing: 0
   koyoteTime: 0
   groundpoundCounter: 0
+  groundpoundStartTimer: 0
   pickupTimer: 0
   groundpoundDelay: 0
   hitInvincibilityCounter: 0

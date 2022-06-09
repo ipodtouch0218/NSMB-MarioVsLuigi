@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
@@ -60,7 +58,7 @@ public class BreakableBrickTile : InteractableTile {
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Bump
-        object[] parametersBump = new object[]{tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, "SpecialTiles/" + name, BlockBump.SpawnResult.Nothing};
+        object[] parametersBump = new object[]{tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, "SpecialTiles/" + name, ""};
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
     }
     public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5347700891599547490}
   - component: {fileID: 6376301830782892370}
+  - component: {fileID: 16106175369852631}
   - component: {fileID: 1392538299819834460}
   m_Layer: 8
   m_Name: BlockBump
@@ -60,6 +61,23 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &16106175369852631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6769544900703878166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc22b60a21898684990112e398fb492f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resultTile: 
+  spawn: 0
+  sprite: {fileID: 0}
+  fromAbove: 0
+  hitter: {fileID: 0}
 --- !u!95 &1392538299819834460
 Animator:
   serializedVersion: 4
@@ -90,8 +108,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8461069782552266576}
   - component: {fileID: 1823532614964199511}
-  - component: {fileID: 6635612350756669907}
-  - component: {fileID: 818179426048036755}
   - component: {fileID: 8649210667712108321}
   - component: {fileID: 8722656727595672907}
   m_Layer: 8
@@ -169,43 +185,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &6635612350756669907
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7449169019672523127}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b716080342d71e24998de9dd4ba5b871, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &818179426048036755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7449169019672523127}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc22b60a21898684990112e398fb492f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  resultTile: 
-  spawn: 0
-  sprite: {fileID: 0}
-  fromAbove: 0
-  hitter: {fileID: 0}
 --- !u!82 &8649210667712108321
 AudioSource:
   m_ObjectHideFlags: 0

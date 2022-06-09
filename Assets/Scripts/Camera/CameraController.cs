@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
@@ -30,7 +29,12 @@ public class CameraController : MonoBehaviour {
     public void LateUpdate() {
         currentPosition = CalculateNewPosition();
         if (controlCamera) {
-            targetCamera.transform.position = currentPosition;
+
+            Vector3 shakeOffset = Vector3.zero;
+            if ((screenShakeTimer -= Time.deltaTime) > 0)
+                shakeOffset = new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
+
+            targetCamera.transform.position = currentPosition + shakeOffset;
             if (BackgroundLoop.instance)
                 BackgroundLoop.instance.Reposition();
 
@@ -93,10 +97,6 @@ public class CameraController : MonoBehaviour {
         if (validFloor && lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0)
             targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 2f;
 
-        // -- Screen Shake --
-
-        if ((screenShakeTimer -= Time.deltaTime) > 0)
-            targetPosition += new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
 
         // Smoothing
 

@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using Photon.Pun;
 
 public class TrackIcon : MonoBehaviour {
     public float trackMinX, trackMaxX;
@@ -12,12 +9,16 @@ public class TrackIcon : MonoBehaviour {
     public bool doAnimation;
     public Sprite starSprite;
     private float flashTimer;
+    private Material mat;
+
     void Start() {
         image = GetComponent<Image>();
 
         StarBouncer star;
         if (star = target.GetComponent<StarBouncer>())
             GetComponent<Animator>().enabled = star.stationary;
+
+        mat = image.material;
     }
     void Update() {
         if (target == null) {
@@ -37,6 +38,9 @@ public class TrackIcon : MonoBehaviour {
                 image.enabled = true;
             }
             transform.localScale = Vector3.one * (playerTarget.cameraController.controlCamera ? 1 : (2 / 3f));
+
+            mat.SetColor("OverlayColor", playerTarget.AnimationController.GlowColor);
+            mat.SetFloat("Star", playerTarget.invincible > 0 ? 1 : 0);
         } else {
             image.sprite = starSprite;
         }
