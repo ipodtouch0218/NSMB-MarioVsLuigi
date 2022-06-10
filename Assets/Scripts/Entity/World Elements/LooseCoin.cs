@@ -5,7 +5,7 @@ public class LooseCoin : MonoBehaviourPun {
 
     private static int COIN_LAYER = -1, HITSNOTHING_LAYER = -1;
 
-    public float speed = 1.25f, despawn = 10;
+    public float despawn = 10;
     private float despawnTimer;
     private Rigidbody2D body;
     private SpriteRenderer spriteRenderer;
@@ -19,7 +19,7 @@ public class LooseCoin : MonoBehaviourPun {
         hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
         animator = GetComponent<Animator>();
-        body.velocity = new Vector2(Random.Range(-speed, speed), Random.Range(2, 4));
+        body.velocity = Vector2.up * Random.Range(2f, 3f);
 
         if (COIN_LAYER == -1) {
             COIN_LAYER = LayerMask.NameToLayer("LooseCoin");
@@ -35,7 +35,7 @@ public class LooseCoin : MonoBehaviourPun {
             return;
         }
 
-        bool inWall = Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale);
+        bool inWall = Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.5f);
         gameObject.layer = inWall ? HITSNOTHING_LAYER : COIN_LAYER;
 
         physics.UpdateCollisions();

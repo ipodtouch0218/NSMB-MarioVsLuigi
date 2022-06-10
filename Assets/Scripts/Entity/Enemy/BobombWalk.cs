@@ -24,21 +24,22 @@ public class BobombWalk : HoldableEntity {
             body.isKinematic = true;
             return;
         }
-        base.FixedUpdate();
-        if (lit) {
-            animator.SetTrigger("lit");
-        }
 
-        if (Frozen)
+        base.FixedUpdate();
+        if (Frozen || dead)
             return;
+
+
+        if (lit)
+            animator.SetTrigger("lit");
+
 
         if (!photonView || photonView.IsMine)
             HandleCollision();
+
         sRenderer.flipX = left;
 
-
-        if (lit && !detonated && !dead) {
-                
+        if (lit && !detonated) {
             if ((detonateCount -= Time.fixedDeltaTime) < 0) {
                 if (photonView.IsMine)
                     photonView.RPC("Detonate", RpcTarget.All);

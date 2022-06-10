@@ -37,8 +37,8 @@ public class RebindButton : MonoBehaviour {
             .WithTimeout(timeoutTime)
             .OnMatchWaitForAnother(0.2f)
             // .OnApplyBinding((op,str) => ApplyBind(str))
-            .OnCancel(op => CleanRebind())
-            .OnComplete(op => OnRebindComplete(op))
+            .OnCancel(CleanRebind)
+            .OnComplete(OnRebindComplete)
             .Start();
 
         countdown = StartCoroutine(TimeoutCountdown());
@@ -54,11 +54,11 @@ public class RebindButton : MonoBehaviour {
     public void OnRebindComplete(RebindingOperation operation) {
         targetBinding = targetAction.bindings[index];
         SetText();
-        CleanRebind();
+        CleanRebind(operation);
         RebindManager.Instance.SaveRebindings();
     }
 
-    void CleanRebind() {
+    void CleanRebind(RebindingOperation operation) {
         targetAction.actionMap.Enable();
         rebinding.Dispose();
         MainMenuManager.Instance.rebindPrompt.SetActive(false);

@@ -234,7 +234,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 554259371d06ef74fb69f2282f4bdfff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1.2
   despawn: 8
 --- !u!114 &786289218142832794
 MonoBehaviour:
@@ -281,7 +280,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 5
+  m_Constraints: 4
 --- !u!114 &7157997769683939989
 MonoBehaviour:
   m_ObjectHideFlags: 0

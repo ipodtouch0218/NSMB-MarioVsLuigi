@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -8,19 +6,25 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
     [SerializeField] Image shirt, overalls, overlay;
     public CustomColors.PlayerColor palette;
-    public Color deselectedColor, selectedColor;
+    [SerializeField] Sprite overlayUnpressed, overlayPressed;
 
     public void Instantiate() {
         shirt.color = palette.hat;
         overalls.color = palette.overalls;
-        overlay.color = deselectedColor;
+        overlay.enabled = false;
     }
 
     public void OnSelect(BaseEventData eventData) {
-        overlay.color = selectedColor;
+        overlay.enabled = true;
+        overlay.sprite = overlayUnpressed;
     }
 
     public void OnDeselect(BaseEventData eventData) {
-        overlay.color = deselectedColor;
+        overlay.enabled = false;
+        overlay.sprite = overlayUnpressed;
+    }
+
+    public void OnPress() {
+        overlay.sprite = overlayPressed;
     }
 }

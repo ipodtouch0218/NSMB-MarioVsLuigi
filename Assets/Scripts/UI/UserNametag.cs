@@ -34,12 +34,22 @@ public class UserNametag : MonoBehaviour {
         Vector3 screenPoint = camera.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;
         screenPoint.z = 0;
 
-        // handle black borders
-        float screenW = Screen.width;
-        float screenH = Screen.height;
-        float screenAspect = screenW / screenH;
-        if (screenAspect > camera.aspect) {
-            screenPoint.x += (screenW - (screenH * camera.aspect)) / 2;
+        if (GlobalController.Instance.settings.ndsResolution && GlobalController.Instance.settings.fourByThreeRatio) {
+            // handle black borders
+            float screenW = Screen.width;
+            float screenH = Screen.height;
+            float screenAspect = screenW / screenH;
+
+            if (screenAspect > camera.aspect) {
+                screenPoint.x += (screenW - (screenH * camera.aspect)) / 2;
+            } else {
+                float availableHeight = screenW * (1f / camera.aspect);
+                float heightPercentage = availableHeight / screenH;
+                screenPoint.y *= heightPercentage;
+                screenPoint.y += (screenH - availableHeight) / 2;
+
+                screenPoint.x *= heightPercentage;
+            }
         }
         transform.position = screenPoint;
 

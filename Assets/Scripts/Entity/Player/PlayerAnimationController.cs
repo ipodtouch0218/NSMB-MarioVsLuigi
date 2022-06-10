@@ -278,7 +278,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
         largeModel.SetActive(large);
         smallModel.SetActive(!large);
         blueShell.SetActive(controller.state == Enums.PowerupState.BlueShell);
-        largeShellExclude.SetActive(!(controller.state == Enums.PowerupState.BlueShell && (controller.crouching || controller.inShell)));
+        
+        largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(1).IsName("in-shell"));
         propellerHelmet.SetActive(controller.state == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
 

@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             stream.SendNext(body.position);
             stream.SendNext(body.velocity);
 
-            ExitGames.Client.Photon.Hashtable controls = new() {
+            Hashtable controls = new() {
                 ["joystick"] = joystick,
                 ["sprintHeld"] = running,
                 ["jumpHeld"] = jumpHeld
@@ -129,7 +129,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     public void Awake() {
         //todo: move to layers constant?
         if (ANY_GROUND_MASK == -1) {
-            ANY_GROUND_MASK = LayerMask.GetMask("Ground", "Semisolids");
+            ANY_GROUND_MASK = LayerMask.GetMask("Ground", "Semisolids", "IceBlock");
             ONLY_GROUND_MASK = LayerMask.GetMask("Ground");
             GROUND_LAYERID = LayerMask.NameToLayer("Ground");
             HITS_NOTHING_LAYERID = LayerMask.NameToLayer("HitsNothing");
@@ -404,7 +404,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 //blue shell cases
                 if (inShell) {
                     //we are blue shell
-                    if (!otherAbove) {
+                    if (!above && !otherAbove) {
                         //hit them from side. powerdown them
                         if (other.inShell) {
                             //collide with both
@@ -1031,6 +1031,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     [PunRPC]
     public void PreRespawn() {
+        sfx.enabled = true;
         if (lives == 0) {
             GameManager.Instance.CheckForWinner();
             Destroy(trackIcon);
@@ -1463,8 +1464,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (dead || (body.velocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering)
             return false;
 
+        bool prev = Physics2D.queriesStartInColliders;
+        Physics2D.queriesStartInColliders = false;
         BoxCollider2D hitbox = hitboxes[0];
         RaycastHit2D hit = Physics2D.BoxCast(body.position + new Vector2(0, 0.1f), new Vector2(hitbox.size.x * transform.lossyScale.x, 0.05f), 0, Vector2.down, 0.4f, ANY_GROUND_MASK);
+        Physics2D.queriesStartInColliders = prev;
         if (hit) {
             body.position = new Vector2(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
             return true;
@@ -1579,18 +1583,18 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         HandleWallSlideChecks(currentWallDirection, holdingRight, holdingLeft);
 
-        wallSlideRight &= wallSlideTimer > 0 && hitRight;
-        wallSlideLeft &= wallSlideTimer > 0 && hitLeft;
+        wallSlideRight &= wallSlideTimer > 0 /* && hitRight */;
+        wallSlideLeft &= wallSlideTimer > 0 /* && hitLeft */;
 
         if (wallSlideLeft || wallSlideRight) {
             //walljump check
+            facingRight = wallSlideLeft;
             if (jump && wallJumpTimer <= 0) {
                 //perform walljump
 
                 hitRight = false;
                 hitLeft = false;
                 body.velocity = new Vector2(runningMaxSpeed * (3 / 4f) * (wallSlideLeft ? 1 : -1), walljumpVelocity);
-                facingRight = wallSlideLeft;
                 singlejump = false;
                 doublejump = false;
                 triplejump = false;
@@ -1635,8 +1639,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             propeller = false;
         }
 
-        wallSlideRight &= wallSlideTimer > 0 && hitRight;
-        wallSlideLeft &= wallSlideTimer > 0 && hitLeft;
+        wallSlideRight &= wallSlideTimer > 0 /* && hitRight */;
+        wallSlideLeft &= wallSlideTimer > 0 /* && hitLeft */;
     }
 
     void HandleWallSlideChecks(Vector2 wallDirection, bool right, bool left) {
@@ -1710,7 +1714,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
             float vel = state switch {
                 Enums.PowerupState.MegaMushroom => megaJumpVelocity,
-                _ => jumpVelocity + Mathf.Abs(body.velocity.x) / runningMaxSpeed * 1.1f,
+                _ => jumpVelocity + Mathf.Abs(body.velocity.x) / runningMaxSpeed * 1.05f,
             };
 
 
@@ -1833,7 +1837,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         }
 
         inShell |= state == Enums.PowerupState.BlueShell && onGround && !inShell && functionallyRunning && !holding && Mathf.Abs(xVel) + 0.25f >= runningMaxSpeed && landing > 0.15f;
-        if (onGround)
+        if (onGround || previousOnGround)
             body.velocity = new(body.velocity.x, 0);
     }
 
@@ -1969,6 +1973,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             } else {
                 body.velocity = Vector2.zero;
                 return;
+            }
+        }
+
+        FrozenCube holdingCube;
+        if (((holdingCube = holding as FrozenCube) && holdingCube) || ((holdingCube = holdingOld as FrozenCube) && holdingCube)) {
+            foreach (BoxCollider2D hitbox in hitboxes) {
+                Physics2D.IgnoreCollision(hitbox, holdingCube.hitbox, throwInvincibility > 0);
             }
         }
 
@@ -2367,7 +2378,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             return;
 
         if (groundpoundStartTimer == 0)
-            groundpoundStartTimer = 0.1f;
+            groundpoundStartTimer = 0.065f;
 
         Utils.TickTimer(ref groundpoundStartTimer, 0, Time.fixedDeltaTime);
         

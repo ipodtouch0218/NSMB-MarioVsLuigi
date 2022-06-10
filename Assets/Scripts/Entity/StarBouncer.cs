@@ -125,6 +125,10 @@ public class StarBouncer : MonoBehaviourPun {
         }
     }
 
+    public void DisableAnimator() {
+        GetComponent<Animator>().enabled = false;
+    }
+
     [PunRPC]
     public void Crushed() {
         if (photonView.IsMine)

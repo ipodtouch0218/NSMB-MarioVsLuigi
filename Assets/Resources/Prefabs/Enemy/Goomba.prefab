@@ -183,6 +183,7 @@ MonoBehaviour:
   iceCarryable: 1
   flying: 0
   body: {fileID: 0}
+  hitbox: {fileID: 0}
   speed: 0.875
   deathTimer: -1
   terminalVelocity: -8

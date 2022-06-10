@@ -20,7 +20,17 @@ public class GoombaWalk : KillableEntity {
             body.isKinematic = true;
             return;
         }
+
         base.FixedUpdate();
+        if (dead) {
+            if (deathTimer >= 0 && (photonView?.IsMine ?? true)) {
+                Utils.TickTimer(ref deathTimer, 0, Time.fixedDeltaTime);
+                if (deathTimer == 0)
+                    PhotonNetwork.Destroy(gameObject);
+            }
+            return;
+        }
+
 
         physics.UpdateCollisions();
         if (physics.hitLeft || physics.hitRight) {
@@ -29,11 +39,6 @@ public class GoombaWalk : KillableEntity {
         body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
         sRenderer.flipX = !left;
         
-        if (dead && deathTimer >= 0 && (photonView?.IsMine ?? true)) {
-            Utils.TickTimer(ref deathTimer, 0, Time.fixedDeltaTime);
-            if (deathTimer == 0)
-                PhotonNetwork.Destroy(gameObject);
-        }
     }
 
     [PunRPC]

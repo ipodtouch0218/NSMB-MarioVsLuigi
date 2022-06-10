@@ -7,7 +7,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
 
     public bool dead, left = true, collide = true, iceCarryable = true, flying;
     public Rigidbody2D body;
-    protected BoxCollider2D hitbox;
+    public BoxCollider2D hitbox;
     protected Animator animator;
     protected SpriteRenderer sRenderer;
     protected AudioSource audioSource;
@@ -118,8 +118,10 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         if (dead)
             return;
 
-        body.velocity = new Vector2(2.5f * (right ? 1 : -1), 2.5f);
+        dead = true;
+
         body.constraints = RigidbodyConstraints2D.None;
+        body.velocity = new(2f * (right ? 1 : -1), 2.5f);
         body.angularVelocity = 400f * (right ? 1 : -1);
         body.gravityScale = 1.5f;
         audioSource.enabled = true;
@@ -127,13 +129,14 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         hitbox.enabled = false;
         animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-        dead = true;
         photonView.RPC("PlaySound", RpcTarget.All, !Frozen ? Enums.Sounds.Enemy_Generic_Kick : Enums.Sounds.Enemy_Generic_FreezeShatter);
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.up * 0.5f, Quaternion.identity);
         
         if (PhotonNetwork.IsMasterClient)
             PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + Vector2.up * 0.5f, Quaternion.identity);
+
+        body.velocity = new(2f * (right ? 1 : -1), 2.5f);
     } 
 
     [PunRPC]

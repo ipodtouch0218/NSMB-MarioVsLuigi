@@ -170,7 +170,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Debug, ChangeDebugState);
     }
+
+    public void ChangeDebugState(bool enabled) {
+        if (enabled) {
+            if (!levelDropdown.options.Any(od => od.text == "[C] Bonus"))
+                levelDropdown.AddOptions(new string[] { "[C] Bonus" }.ToList());
+        }
+    }
+
     private void AttemptToUpdateProperty<T>(ExitGames.Client.Photon.Hashtable updatedProperties, string key, System.Action<T> updateAction) {
         if (updatedProperties[key] == null)
             return;
@@ -299,7 +308,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             GlobalController.Instance.disconnectCause = null;
         }
 
-        Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length)].transform.position;
+        Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length - 1)].transform.position;
 
 
         //Photon stuff.
@@ -641,6 +650,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (newLevelIndex == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Level]) 
             return;
 
+        ChangeLevel(newLevelIndex);
         GlobalChatMessage("Map set to: " + levelDropdown.captionText.text, ColorToVector(Color.red));
 
         ExitGames.Client.Photon.Hashtable table = new() {
@@ -807,13 +817,31 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string msg = sub switch {
                 "kick" => "/kick <player name>",
                 "host" => "/host <player name>",
+                "debug" => "/debug",
                 _ => "Available commands: kick, host",
             };
             LocalChatMessage(msg, ColorToVector(Color.red));
             return;
         }
+        case "debug": {
+            Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debugEnabled);
+            if (debugEnabled) {
+                LocalChatMessage("Error: Debug features are already enabled.", ColorToVector(Color.red));
+                return;
+            }
+            if (PhotonNetwork.CurrentRoom.IsVisible) {
+                LocalChatMessage("Error: You can only enable debug/in development features in private lobbies.", ColorToVector(Color.red));
+                return;
+            }
+
+            LocalChatMessage("Debug features have been enabled.", ColorToVector(Color.red));
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
+                [Enums.NetRoomProperties.Debug] = true
+            });
+            return;
         }
-        LocalChatMessage($"Unknown command. Try /help for help.", ColorToVector(Color.red));
+        }
+        LocalChatMessage($"Error: Unknown command. Try /help for help.", ColorToVector(Color.red));
         return;
     }
 

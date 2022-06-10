@@ -182,6 +182,7 @@ MonoBehaviour:
   iceCarryable: 1
   flying: 0
   body: {fileID: 0}
+  hitbox: {fileID: 0}
   holder: {fileID: 0}
   previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}

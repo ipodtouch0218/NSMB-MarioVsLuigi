@@ -37,25 +37,23 @@ public class KoopaWalk : HoldableEntity {
         }
         base.FixedUpdate();
 
-        if (Frozen)
+        if (Frozen || dead)
             return;
 
         sRenderer.flipX = !left ^ flipXFlip;
-      
-        if (!dead) {
-            if (upsideDown) {
-                dampVelocity = Mathf.Min(dampVelocity + Time.fixedDeltaTime * 3, 1);
-                transform.eulerAngles = new Vector3(
-                    transform.eulerAngles.x, 
-                    transform.eulerAngles.y, 
-                    Mathf.Lerp(transform.eulerAngles.z, 180f, dampVelocity) + (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0));
-            } else {
-                dampVelocity = 0;
-                transform.eulerAngles = new Vector3(
-                    transform.eulerAngles.x, 
-                    transform.eulerAngles.y, 
-                    wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0);
-            }
+
+        if (upsideDown) {
+            dampVelocity = Mathf.Min(dampVelocity + Time.fixedDeltaTime * 3, 1);
+            transform.eulerAngles = new Vector3(
+                transform.eulerAngles.x,
+                transform.eulerAngles.y,
+                Mathf.Lerp(transform.eulerAngles.z, 180f, dampVelocity) + (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0));
+        } else {
+            dampVelocity = 0;
+            transform.eulerAngles = new Vector3(
+                transform.eulerAngles.x,
+                transform.eulerAngles.y,
+                wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0);
         }
 
         if (shell) {

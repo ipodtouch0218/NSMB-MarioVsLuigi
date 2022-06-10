@@ -15,6 +15,7 @@ public static class NetworkUtils {
         [Enums.NetRoomProperties.NewPowerups] = true,
         [Enums.NetRoomProperties.GameStarted] = false,
         [Enums.NetRoomProperties.HostName] = "",
+        [Enums.NetRoomProperties.Debug] = false,
         //[Enums.NetRoomProperties.Password] = "",
     };
 

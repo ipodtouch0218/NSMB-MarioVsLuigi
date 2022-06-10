@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -10,7 +9,6 @@ public class RebindManager : MonoBehaviour {
 
     public static RebindManager Instance;
 
-    public FileInfo file;
     public InputActionAsset controls;
     public GameObject headerTemplate, buttonTemplate, axisTemplate, playerSettings, resetAll;
     public Toggle fireballToggle;
@@ -18,26 +16,11 @@ public class RebindManager : MonoBehaviour {
     private readonly List<RebindButton> buttons = new();
 
     public void Init() {
+        Instance = this;
+
         buttonTemplate.SetActive(false);
         axisTemplate.SetActive(false);
         headerTemplate.SetActive(false);
-
-        file = new(Application.persistentDataPath + "/controls.json");
-
-        if (GlobalController.Instance.controlsJson != "") {
-            // we have old bindings...
-            controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
-            SaveRebindings();
-
-        } else if (file.Exists) {
-            //load bindings...
-            try {
-                controls.LoadBindingOverridesFromJson(File.ReadAllText(file.FullName));
-                GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
-            } catch (System.Exception e) {
-                Debug.LogError(e.Message);
-            }
-        }
 
         CreateActions();
         resetAll.transform.SetAsLastSibling();
@@ -45,7 +28,7 @@ public class RebindManager : MonoBehaviour {
 
     public void ResetActions() {
         controls.RemoveAllBindingOverrides();
-        File.WriteAllText(file.FullName, controls.SaveBindingOverridesAsJson());
+        File.WriteAllText(InputSystem.file.FullName, controls.SaveBindingOverridesAsJson());
 
         foreach (RebindButton button in buttons) {
             button.targetBinding = button.targetAction.bindings[button.index];
@@ -125,10 +108,11 @@ public class RebindManager : MonoBehaviour {
     public void SaveRebindings() {
         string json = controls.SaveBindingOverridesAsJson();
         
-        if (!file.Exists)
-            file.Directory.Create();
+        if (!InputSystem.file.Exists)
+            InputSystem.file.Directory.Create();
 
-        File.WriteAllText(file.FullName, json);
-        GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
+        print(json);
+        File.WriteAllText(InputSystem.file.FullName, json);
+        GlobalController.Instance.controlsJson = json;
     }
 }

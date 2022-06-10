@@ -1,16 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputSystem : MonoBehaviour {
 
     public static Controls controls;
-    
+    public static FileInfo file;
+
     public void Awake() {
+        if (controls != null)
+            return;
+
         controls = new();
         controls.Enable();
-        if (GlobalController.Instance.controlsJson != null)
+
+        file = new(Application.persistentDataPath + "/controls.json");
+
+        if (GlobalController.Instance.controlsJson != null) {
+            // we have old bindings...
             controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
+
+        } else if (file.Exists) {
+            //load bindings...
+            try {
+                controls.LoadBindingOverridesFromJson(File.ReadAllText(file.FullName));
+                GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
+            } catch (System.Exception e) {
+                Debug.LogError(e.Message);
+            }
+        }
     }
 }

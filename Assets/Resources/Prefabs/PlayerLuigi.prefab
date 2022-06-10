@@ -21430,8 +21430,8 @@ MonoBehaviour:
   jumpVelocity: 6.7382812
   megaJumpVelocity: 12.65625
   launchVelocity: 12
-  walkingAcceleration: 8
-  runningAcceleration: 2.75
+  walkingAcceleration: 8.5
+  runningAcceleration: 3
   walkingMaxSpeed: 2.8125
   runningMaxSpeed: 5.625
   wallslideSpeed: -4.6875
@@ -21488,6 +21488,7 @@ MonoBehaviour:
   landing: 0
   koyoteTime: 0
   groundpoundCounter: 0
+  groundpoundStartTimer: 0
   pickupTimer: 0
   groundpoundDelay: 0
   hitInvincibilityCounter: 0
@@ -21652,7 +21653,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8636928217783201362}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}

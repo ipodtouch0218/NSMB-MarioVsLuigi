@@ -5091,6 +5091,7 @@ MonoBehaviour:
   iceCarryable: 1
   flying: 1
   body: {fileID: 0}
+  hitbox: {fileID: 0}
   speed: 1.5
   playerSearchRadius: 12
   despawnDistance: 10
