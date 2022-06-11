@@ -257,6 +257,7 @@ MonoBehaviour:
   fireballFromSprint: 1
   vsync: 0
   fourByThreeRatio: 0
+  scoreboardAlways: 0
   nickname: 
 --- !u!82 &1776850482587567145
 AudioSource:
@@ -493,6 +494,7 @@ GameObject:
   - component: {fileID: 3705524681634286818}
   - component: {fileID: 6763956776082004296}
   - component: {fileID: 330130830461101649}
+  - component: {fileID: 4687170132880179745}
   m_Layer: 5
   m_Name: RawImage
   m_TagString: Untagged
@@ -565,6 +567,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e406ddc510864a4408115627a881482f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aspect: 1.3333334
+--- !u!114 &4687170132880179745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5702730948920837123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7711d3856d0c9bb4e87211ccc7add4fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7354798521325473033

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Audio;
 using Photon.Pun;
@@ -60,7 +61,7 @@ public class Settings : Singleton<Settings> {
         scoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 0) == 1;
     }
     public void SaveSettingsToPreferences() {
-        PlayerPrefs.SetString("Nickname", PhotonNetwork.NickName);
+        PlayerPrefs.SetString("Nickname", Regex.Replace(PhotonNetwork.NickName, "\\(\\d*\\)", ""));
         PlayerPrefs.SetFloat("volumeSFX", VolumeSFX);
         PlayerPrefs.SetFloat("volumeMusic", VolumeMusic);
         PlayerPrefs.SetFloat("volumeMaster", VolumeMaster);

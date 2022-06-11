@@ -29,6 +29,7 @@ public class GlobalController : Singleton<GlobalController> {
     void Awake() {
         if (!InstanceCheck())
             return;
+
         Instance = this;
         settings = GetComponent<Settings>();
         discordController = GetComponent<DiscordController>();

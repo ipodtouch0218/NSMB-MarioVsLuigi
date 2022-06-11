@@ -15,10 +15,13 @@ public class TrackIcon : MonoBehaviour {
         image = GetComponent<Image>();
 
         StarBouncer star;
-        if (star = target.GetComponent<StarBouncer>())
-            GetComponent<Animator>().enabled = star.stationary;
+        if ((star = target.GetComponent<StarBouncer>()) && star.stationary) {
+            GetComponent<Animator>().enabled = true;
+            transform.localScale = Vector2.zero;
+        }
 
         mat = image.material;
+        Update();
     }
     void Update() {
         if (target == null) {
@@ -43,6 +46,7 @@ public class TrackIcon : MonoBehaviour {
             mat.SetFloat("Star", playerTarget.invincible > 0 ? 1 : 0);
         } else {
             image.sprite = starSprite;
+            image.enabled = true;
         }
         float levelWidth = GameManager.Instance.GetLevelMaxX() - GameManager.Instance.GetLevelMinX();
         float trackWidth = trackMaxX - trackMinX;

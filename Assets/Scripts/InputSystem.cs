@@ -1,6 +1,5 @@
 using System.IO;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class InputSystem : MonoBehaviour {
 
@@ -15,19 +14,5 @@ public class InputSystem : MonoBehaviour {
         controls.Enable();
 
         file = new(Application.persistentDataPath + "/controls.json");
-
-        if (GlobalController.Instance.controlsJson != null) {
-            // we have old bindings...
-            controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
-
-        } else if (file.Exists) {
-            //load bindings...
-            try {
-                controls.LoadBindingOverridesFromJson(File.ReadAllText(file.FullName));
-                GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
-            } catch (System.Exception e) {
-                Debug.LogError(e.Message);
-            }
-        }
     }
 }

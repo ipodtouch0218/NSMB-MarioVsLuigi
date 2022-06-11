@@ -22,13 +22,33 @@ public class RebindManager : MonoBehaviour {
         axisTemplate.SetActive(false);
         headerTemplate.SetActive(false);
 
+        LoadBindings();
         CreateActions();
         resetAll.transform.SetAsLastSibling();
     }
 
+    public void LoadBindings() {
+        string json = GlobalController.Instance.controlsJson;
+
+        if (json != null && json != "") {
+            // we have old bindings...
+            controls.LoadBindingOverridesFromJson(json);
+            Debug.Log("load from globalcontroller: " + json);
+
+        } else if (InputSystem.file.Exists) {
+            //load bindings...
+            try {
+                Debug.Log("load from file: " + File.ReadAllText(InputSystem.file.FullName));
+                controls.LoadBindingOverridesFromJson(File.ReadAllText(InputSystem.file.FullName));
+                GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
+            } catch (System.Exception e) {
+                Debug.LogError(e.Message);
+            }
+        }
+    }
+
     public void ResetActions() {
         controls.RemoveAllBindingOverrides();
-        File.WriteAllText(InputSystem.file.FullName, controls.SaveBindingOverridesAsJson());
 
         foreach (RebindButton button in buttons) {
             button.targetBinding = button.targetAction.bindings[button.index];
@@ -38,6 +58,7 @@ public class RebindManager : MonoBehaviour {
         fireballToggle.isOn = true;
         Settings.Instance.fireballFromSprint = true;
         Settings.Instance.SaveSettingsToPreferences();
+        SaveRebindings();
     }
 
     void CreateActions() {
@@ -111,7 +132,6 @@ public class RebindManager : MonoBehaviour {
         if (!InputSystem.file.Exists)
             InputSystem.file.Directory.Create();
 
-        print(json);
         File.WriteAllText(InputSystem.file.FullName, json);
         GlobalController.Instance.controlsJson = json;
     }

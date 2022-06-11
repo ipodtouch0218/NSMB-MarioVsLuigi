@@ -33,7 +33,7 @@ public class FireballMover : MonoBehaviourPun {
         physics.UpdateCollisions();
 
         if (physics.onGround) {
-            float boost = bounceHeight * Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad) * 1.5f;
+            float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)) * 1.25f;
             if (Mathf.Sign(physics.floorAngle) != Mathf.Sign(body.velocity.x))
                 boost = 0;
             

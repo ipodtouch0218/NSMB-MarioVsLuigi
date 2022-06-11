@@ -52,7 +52,6 @@ public class RebindButton : MonoBehaviour {
     }
 
     public void OnRebindComplete(RebindingOperation operation) {
-        targetBinding = targetAction.bindings[index];
         SetText();
         CleanRebind(operation);
         RebindManager.Instance.SaveRebindings();
@@ -66,6 +65,7 @@ public class RebindButton : MonoBehaviour {
     }
 
     public void SetText() {
+        targetBinding = targetAction.bindings[index];
         ourText.text = InputControlPath.ToHumanReadableString(
             targetBinding.effectivePath,
             InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);

@@ -312,6 +312,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
 
+        InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
+
 #if UNITY_EDITOR
         //Spawning in editor??
         if (!PhotonNetwork.IsConnectedAndReady) {
@@ -522,7 +524,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public void CreateNametag(PlayerController controller) {
-        GameObject nametag = Instantiate(nametagPrefab, nametagCanvas.transform);
+        GameObject nametag = Instantiate(nametagPrefab, nametagPrefab.transform.parent);
         nametag.GetComponent<UserNametag>().parent = controller;
         nametag.SetActive(true);
     }

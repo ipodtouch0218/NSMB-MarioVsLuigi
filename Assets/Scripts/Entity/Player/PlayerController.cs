@@ -227,7 +227,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         UpdateGameStateVariable(Enums.NetPlayerGameState.Stars, stars);
         UpdateGameStateVariable(Enums.NetPlayerGameState.Coins, coins);
         UpdateGameStateVariable(Enums.NetPlayerGameState.PowerupState, (byte) state);
-        UpdateGameStateVariable(Enums.NetPlayerGameState.ReserveItem, storedPowerup?.state ?? null);
+        UpdateGameStateVariable(Enums.NetPlayerGameState.ReserveItem, storedPowerup ? storedPowerup.state : null);
 
         photonView.Owner.SetCustomProperties(gameState);
     }
@@ -344,6 +344,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             tileFriction = 1;
     }
 
+    private ContactPoint2D[] contacts = new ContactPoint2D[0];
     public void OnCollisionStay2D(Collision2D collision) {
         if (!photonView.IsMine || (knockback && !fireballKnockback) || Frozen)
             return;
@@ -351,7 +352,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         switch (collision.gameObject.tag) {
         case "Player": {
             //hit players
-            foreach (ContactPoint2D contact in collision.contacts) {
+
+            if (contacts.Length < collision.contactCount)
+                contacts = new ContactPoint2D[collision.contactCount];
+            collision.GetContacts(contacts);
+            
+            foreach (ContactPoint2D contact in contacts) {
                 GameObject otherObj = collision.gameObject;
                 PlayerController other = otherObj.GetComponent<PlayerController>();
                 PhotonView otherView = other.photonView;
@@ -410,10 +416,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                             //collide with both
                             otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
                             photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
-                            facingRight = !facingRight;
                         } else {
                             otherView.RPC("Powerdown", RpcTarget.All, false);
                         }
+                        float dotRight = Vector2.Dot((body.position - other.body.position).normalized, Vector2.right);
+                        facingRight = dotRight > 0;
                         return;
                     }
                 }
@@ -641,7 +648,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     return;
             }
 
-            Vector2 pos = body.position + new Vector2(facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.35f);
+            Vector2 pos = body.position + new Vector2(facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.3f);
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/FireballWall", pos);
             } else {
@@ -713,7 +720,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     }
     
     public void OnReserveItem(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || storedPowerup == null || GameManager.Instance.paused || dead)
+        if (!photonView.IsMine || storedPowerup == null || GameManager.Instance.paused || GameManager.Instance.gameover || dead)
             return;
 
         SpawnItem(storedPowerup);
@@ -878,7 +885,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         body.simulated = true;
         body.isKinematic = false;
 
-        frozenObject?.Kill();
+        if (frozenObject)
+            frozenObject.Kill();
+
         Knockback(false, 1, true, -1);
     }
     #endregion
@@ -1043,10 +1052,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         }
         transform.localScale = Vector2.one;
         transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
+        dead = false;
         cameraController.Recenter();
         previousState = state = Enums.PowerupState.Small;
         AnimationController.DisableAllModels();
-        dead = false;
         spawned = false;
         animator.SetTrigger("respawn");
         invincible = 0;
@@ -1256,7 +1265,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     [PunRPC]
     protected void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
-        if (!GameManager.Instance.started || invincible > 0 || (knockback && !fireballKnockback) || hitInvincibilityCounter > 0 || pipeEntering)
+        if (!GameManager.Instance.started || (knockback && fireballKnockback && invincible > 0) || (knockback && !fireballKnockback) || hitInvincibilityCounter > 0 || pipeEntering)
             return;
 
         if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -1265,8 +1274,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             return;
         }
 
-        if (knockback)
-            starsToDrop = Mathf.Max(1, starsToDrop);
+        if (knockback || fireballKnockback)
+            starsToDrop = Mathf.Min(1, starsToDrop);
 
         knockback = true;
         knockbackTimer = 0.5f;
@@ -1332,6 +1341,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         holding = PhotonView.Find(view).GetComponent<HoldableEntity>();
         if (holding is FrozenCube) {
             animator.Play("head-pickup", state >= Enums.PowerupState.Mushroom ? 1 : 0);
+            animator.ResetTrigger("fireball");
             PlaySound(Enums.Sounds.Player_Voice_DoubleJump, 2);
             pickupTimer = 0;
         } else {
@@ -1545,7 +1555,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             return;
         }
         bool prevCrouchState = crouching || groundpound;
-        crouching = ((onGround && crouchInput) || (!onGround && crouchInput && crouching) || (crouching && ForceCrouchCheck())) && !holding;
+        crouching = ((onGround && crouchInput && !groundpound) || (!onGround && crouchInput && crouching) || (crouching && ForceCrouchCheck())) && !holding;
         if (crouching && !prevCrouchState) {
             //crouch start sound
             photonView.RPC("PlaySound", RpcTarget.All, state == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
@@ -1583,8 +1593,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         HandleWallSlideChecks(currentWallDirection, holdingRight, holdingLeft);
 
-        wallSlideRight &= wallSlideTimer > 0 /* && hitRight */;
-        wallSlideLeft &= wallSlideTimer > 0 /* && hitLeft */;
+        wallSlideRight &= wallSlideTimer > 0 && hitRight;
+        wallSlideLeft &= wallSlideTimer > 0 && hitLeft;
 
         if (wallSlideLeft || wallSlideRight) {
             //walljump check
@@ -1599,6 +1609,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 doublejump = false;
                 triplejump = false;
                 onGround = false;
+                bounce = false;
                 photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_WallJump);
                 photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_WallJump, (byte) Random.Range(1, 3));
 
@@ -1639,8 +1650,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             propeller = false;
         }
 
-        wallSlideRight &= wallSlideTimer > 0 /* && hitRight */;
-        wallSlideLeft &= wallSlideTimer > 0 /* && hitLeft */;
+        wallSlideRight &= wallSlideTimer > 0 && hitRight;
+        wallSlideLeft &= wallSlideTimer > 0 && hitLeft;
     }
 
     void HandleWallSlideChecks(Vector2 wallDirection, bool right, bool left) {
@@ -2042,6 +2053,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             HandleGiantTiles(true);
             if (onGround && singlejump) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
+                cameraController.screenShakeTimer = 0.15f;
                 singlejump = false;
             }
             invincible = 0;
@@ -2338,8 +2350,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             wallSlideRight = false;
         }
 
-        if (previousOnGround && !onGround && !properJump)
-            body.velocity = new(body.velocity.x, crouching && !inShell ? -3.75f : 0);
+        if (previousOnGround && !onGround && !properJump && crouching && !inShell && !groundpound)
+            body.velocity = new(body.velocity.x, -3.75f);
     }
 
     public void SetHoldingOffset() {

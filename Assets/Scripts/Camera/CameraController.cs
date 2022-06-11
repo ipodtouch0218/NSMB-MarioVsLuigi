@@ -53,7 +53,8 @@ public class CameraController : MonoBehaviour {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
-        playerPos = AntiJitter(transform.position);
+        if (!controller.dead)
+            playerPos = AntiJitter(transform.position);
 
         float vOrtho = targetCamera.orthographicSize;
         float xOrtho = vOrtho * targetCamera.aspect;

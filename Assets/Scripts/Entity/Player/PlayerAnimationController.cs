@@ -214,6 +214,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             controller.wallSlideRight = animator.GetBool("onRight");
             controller.onGround = animator.GetBool("onGround");
             controller.skidding = animator.GetBool("skidding");
+            controller.groundpound = animator.GetBool("groundpound");
             controller.turnaround = animator.GetBool("turnaround");
             controller.crouching = animator.GetBool("crouching");
             controller.invincible = animator.GetBool("invincible") ? 1f : 0f;
@@ -334,7 +335,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             height = heightLargeModel;
         }
 
-        if (controller.state != Enums.PowerupState.MiniMushroom && (controller.crouching || controller.inShell || controller.sliding || controller.triplejump))
+        if (controller.state != Enums.PowerupState.MiniMushroom && ((controller.crouching && !controller.groundpound) || controller.inShell || controller.sliding || controller.triplejump))
             height *= controller.state <= Enums.PowerupState.Small ? 0.7f : 0.5f;
 
         mainHitbox.size = new Vector2(width, height);

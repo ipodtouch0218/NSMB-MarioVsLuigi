@@ -47,6 +47,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public Selectable[] roomSettings;
 
+    public List<string> maps, debugMaps;
+
     private bool pingsReceived;
     private List<string> formattedRegions;
     private Region[] pingSortedRegions;
@@ -174,10 +176,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void ChangeDebugState(bool enabled) {
+        int index = levelDropdown.value;
+        levelDropdown.SetValueWithoutNotify(0);
+        levelDropdown.ClearOptions();
+        levelDropdown.AddOptions(maps);
+        levelDropdown.SetValueWithoutNotify(Mathf.Clamp(index, 0, maps.Count - 1));
+
         if (enabled) {
-            if (!levelDropdown.options.Any(od => od.text == "[C] Bonus"))
-                levelDropdown.AddOptions(new string[] { "[C] Bonus" }.ToList());
+            levelDropdown.AddOptions(debugMaps);
         }
+        UpdateSettingEnableStates();
     }
 
     private void AttemptToUpdateProperty<T>(ExitGames.Client.Photon.Hashtable updatedProperties, string key, System.Action<T> updateAction) {
@@ -308,13 +316,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             GlobalController.Instance.disconnectCause = null;
         }
 
-        Camera.main.transform.position = levelCameraPositions[Random.Range(0, levelCameraPositions.Length - 1)].transform.position;
-
+        Camera.main.transform.position = levelCameraPositions[Random.Range(0, maps.Count)].transform.position;
+        levelDropdown.AddOptions(maps);
+        LoadSettings(!PhotonNetwork.InRoom);
 
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
             OpenTitleScreen();
-            LoadSettings();
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {
@@ -322,11 +330,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 EnterRoom();
                 nicknameField.SetTextWithoutNotify(Settings.Instance.nickname);
                 UpdateNickname();
+
             } else {
                 PhotonNetwork.Disconnect();
                 nicknameField.text = Settings.Instance.nickname;
             }
+        }
 
+        if (PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.Count > 0) {
             List<string> newRegions = new();
             pingSortedRegions = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.ToArray();
             System.Array.Sort(pingSortedRegions, NetworkUtils.RegionPingComparer);
@@ -345,18 +356,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             region.value = index;
         }
 
-
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
-
-
+        
         rebindManager.Init();
 
         GlobalController.Instance.discordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
     }
 
-    private void LoadSettings() {
-        nicknameField.text = Settings.Instance.nickname;
+    private void LoadSettings(bool nickname) {
+        if (nickname)
+            nicknameField.text = Settings.Instance.nickname;
+        else
+            nicknameField.SetTextWithoutNotify(Settings.Instance.nickname);
+
         musicSlider.value = Settings.Instance.VolumeMusic;
         sfxSlider.value = Settings.Instance.VolumeSFX;
         masterSlider.value = Settings.Instance.VolumeMaster;
@@ -722,7 +735,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         timeField.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
-        changePlayersSlider.interactable = PhotonNetwork.IsMasterClient;
+
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
+        privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
     }
     
     public void GlobalChatMessage(string message, Vector3 color) {
@@ -815,10 +830,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         case "help": {
             string sub = args.Length > 1 ? args[1] : "";
             string msg = sub switch {
-                "kick" => "/kick <player name>",
-                "host" => "/host <player name>",
-                "debug" => "/debug",
-                _ => "Available commands: kick, host",
+                "kick" => "/kick <player name> - Kick a player from the room",
+                "host" => "/host <player name> - Make a player the host for the room",
+                "debug" => "/debug - Enables debug & in-development features",
+                _ => "Available commands: /kick, /host, /debug",
             };
             LocalChatMessage(msg, ColorToVector(Color.red));
             return;
@@ -830,7 +845,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 return;
             }
             if (PhotonNetwork.CurrentRoom.IsVisible) {
-                LocalChatMessage("Error: You can only enable debug/in development features in private lobbies.", ColorToVector(Color.red));
+                LocalChatMessage("Error: You can only enable debug / in development features in private lobbies.", ColorToVector(Color.red));
                 return;
             }
 
