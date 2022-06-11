@@ -79,6 +79,8 @@ public class DiscordController : MonoBehaviour {
 
             if (gm.richPresenceId != "")
                 activity.Assets = new() { LargeImage = $"level-{gm.richPresenceId}" };
+            else
+                activity.Assets = new() { LargeImage = "mainmenu" };
 
             if (gm.timedGameDuration == -1) {
                 activity.Timestamps = new() { Start = gm.startRealTime / 1000 };
