@@ -30,6 +30,9 @@ public class UserNametag : MonoBehaviour {
 
         Rect t = parentCanvas.rect;
         Vector2 size = new(t.size.y * camera.aspect, t.size.y);
+#if PLATFORM_WEBGL
+        size /= 2;
+#endif
         Vector3 screenPoint = camera.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;
         screenPoint.z = 0;
 
