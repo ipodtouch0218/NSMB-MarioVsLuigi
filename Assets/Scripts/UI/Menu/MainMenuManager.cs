@@ -337,7 +337,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             }
         }
 
-        if (PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.Count > 0) {
+        if (PhotonNetwork.NetworkingClient.RegionHandler != null) {
             List<string> newRegions = new();
             pingSortedRegions = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.ToArray();
             System.Array.Sort(pingSortedRegions, NetworkUtils.RegionPingComparer);

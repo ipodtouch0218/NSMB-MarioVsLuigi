@@ -77,10 +77,14 @@ public class DiscordController : MonoBehaviour {
             activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
             activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
 
+            ActivityAssets assets = new();
             if (gm.richPresenceId != "")
-                activity.Assets = new() { LargeImage = $"level-{gm.richPresenceId}" };
+                assets.LargeImage = $"level-{gm.richPresenceId}";
             else
-                activity.Assets = new() { LargeImage = "mainmenu" };
+                assets.LargeImage = "mainmenu";
+            assets.LargeText = gm.levelName;
+
+            activity.Assets = assets;
 
             if (gm.timedGameDuration == -1) {
                 activity.Timestamps = new() { Start = gm.startRealTime / 1000 };

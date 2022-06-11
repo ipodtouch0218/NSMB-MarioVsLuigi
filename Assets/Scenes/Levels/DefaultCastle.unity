@@ -11539,6 +11539,11 @@ PrefabInstance:
       objectReference: {fileID: 122372281}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
+      propertyPath: levelName
+      value: Fortress
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
       propertyPath: spawnpoint.x
       value: -2.25
       objectReference: {fileID: 0}
