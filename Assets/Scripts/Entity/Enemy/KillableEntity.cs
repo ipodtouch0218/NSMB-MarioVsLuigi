@@ -128,7 +128,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         hitbox.enabled = false;
         animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-        photonView.RPC("PlaySound", RpcTarget.All, !Frozen ? Enums.Sounds.Enemy_Generic_Kick : Enums.Sounds.Enemy_Generic_FreezeShatter);
+        PlaySound(!Frozen ? Enums.Sounds.Enemy_Generic_Kick : Enums.Sounds.Enemy_Generic_FreezeShatter);
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.up * 0.5f, Quaternion.identity);
         

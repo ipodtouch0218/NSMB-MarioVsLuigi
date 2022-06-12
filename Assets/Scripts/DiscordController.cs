@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using Discord;
 
-#pragma warning disable CS0162 // Unreachable code, but it isnt unreachable
 public class DiscordController : MonoBehaviour {
 
     public Discord.Discord discord;
@@ -23,7 +20,9 @@ public class DiscordController : MonoBehaviour {
         activityManager.OnActivityJoin += TryJoinGame;
 
 #if UNITY_STANDALONE_WIN
-        activityManager.RegisterCommand(System.Windows.Forms.Application.ExecutablePath);
+        try {
+            activityManager.RegisterCommand(System.Windows.Forms.Application.ExecutablePath);
+        } catch { }
 #endif
     }
 
@@ -43,9 +42,9 @@ public class DiscordController : MonoBehaviour {
 
     //TODO this doesn't work???
     public void AskToJoin(ref User user) {
-        activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
-            Debug.Log($"[DISCORD] Ask to Join response: {res}");
-        });
+        //activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
+        //    Debug.Log($"[DISCORD] Ask to Join response: {res}");
+        //});
     }
 
     public void Update() {
@@ -64,6 +63,8 @@ public class DiscordController : MonoBehaviour {
 #if UNITY_WEBGL
         return;
 #endif
+        if (discord == null || activityManager == null)
+            return;
 
         Activity activity = new();
 

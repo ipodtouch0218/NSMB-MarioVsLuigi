@@ -235,6 +235,12 @@ MonoBehaviour:
     m_Scale: 1
     m_Name: ui_24
     m_HashCode: 142358885
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 26
+    m_Scale: 1
+    m_Name: ui_25
+    m_HashCode: 142358884
   m_SpriteGlyphTable:
   - m_Index: 0
     m_Metrics:
@@ -632,5 +638,20 @@ MonoBehaviour:
     m_Scale: 1
     m_AtlasIndex: 0
     sprite: {fileID: 1420784344, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 26
+    m_Metrics:
+      m_Width: 24
+      m_Height: 24
+      m_HorizontalBearingX: 0
+      m_HorizontalBearingY: 23
+      m_HorizontalAdvance: 28
+    m_GlyphRect:
+      m_X: 92
+      m_Y: 17
+      m_Width: 24
+      m_Height: 24
+    m_Scale: 1
+    m_AtlasIndex: 0
+    sprite: {fileID: 286214285, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   spriteInfoList: []
   fallbackSpriteAssets: []

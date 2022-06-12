@@ -20,6 +20,10 @@ public class PlayerListEntry : MonoBehaviour {
         if (player.IsMasterClient)
             permissionSymbol += "<sprite=5>";
 
+        Utils.GetCustomProperty(Enums.NetPlayerProperties.Status, out bool status, player.CustomProperties);
+        if (status)
+            permissionSymbol += "<sprite=26>";
+
         string characterSymbol = Utils.GetCharacterData(player).uistring;
         Utils.GetCustomProperty(Enums.NetPlayerProperties.Ping, out int ping, player.CustomProperties);
 

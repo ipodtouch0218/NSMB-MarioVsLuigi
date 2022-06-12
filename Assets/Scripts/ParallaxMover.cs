@@ -2,8 +2,13 @@
 
 public class ParallaxMover : MonoBehaviour {
     [SerializeField] float speed;
-    
+    private Vector3 moveBy;
+
+    void Start() {
+        moveBy = new(speed, 0, 0);    
+    }
+
     void Update() {
-        transform.position += new Vector3(speed * Time.deltaTime, 0, 0);
+        transform.position += moveBy * Time.deltaTime;
     }
 }

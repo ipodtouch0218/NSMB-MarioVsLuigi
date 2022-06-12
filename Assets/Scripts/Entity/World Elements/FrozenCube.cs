@@ -60,7 +60,8 @@ public class FrozenCube : HoldableEntity {
 
                 if (bounds == default) {
                     bounds = new(renderer.bounds.center, renderer.bounds.size);
-                    rendererObject = renderer.gameObject;
+                    //rendererObject = renderer.gameObject;
+                    //Debug.Log(rendererObject.name + " - " + rendererObject.transform.position + " - " + bounds.center);
                 } else
                     bounds.Encapsulate(renderer.bounds);
             }

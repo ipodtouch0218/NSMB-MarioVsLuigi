@@ -869,7 +869,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
-        Debug.Log("a");
 
         propellerTimer = 0;
         skidding = false;
@@ -1867,12 +1866,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         body.gravityScale = 0;
         onGround = true;
 
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.up * 0.55f, checkSize * Vector2.right)) {
-            transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2);
-        } else if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.down * 0.45f, checkSize * Vector2.right)) {
-            float heightInTiles = Mathf.Floor(hitboxes[0].size.y * transform.lossyScale.y * 2);
-            transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + heightInTiles) / 2);
+        if (Utils.IsTileSolidAtWorldLocation(body.position)) {
+            if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.5f)) {
+                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2);
+            } else if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.down * 0.5f)) {
+                float heightInTiles = Mathf.Floor(hitboxes[0].size.y * transform.lossyScale.y * 2);
+                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 - heightInTiles) / 2);
+            }
         }
+
         // eject
         if (!Utils.IsTileSolidAtWorldLocation(checkPos + Vector2.right * 0.4f)) {
             body.velocity = Vector2.right * 2f;
@@ -1882,8 +1884,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             return true;
         }
 
-        RaycastHit2D rightRaycast = Physics2D.Raycast(checkPos, Vector2.right, 15, ONLY_GROUND_MASK);
-        RaycastHit2D leftRaycast = Physics2D.Raycast(checkPos, Vector2.left, 15, ONLY_GROUND_MASK);
+        RaycastHit2D rightRaycast = Physics2D.BoxCast(checkPos, checkSize, 0, Vector2.right, 15, ONLY_GROUND_MASK);
+        RaycastHit2D leftRaycast = Physics2D.BoxCast(checkPos, checkSize, 0, Vector2.left, 15, ONLY_GROUND_MASK);
         
         float rightDistance = float.MaxValue, leftDistance = float.MaxValue;
         if (rightRaycast)
@@ -1969,9 +1971,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     void HandleMovement(float delta) {
         functionallyRunning = running || state == Enums.PowerupState.MegaMushroom || propeller;
 
-        if (dead)
+        if (dead || !spawned)
             return;
 
+        sfx.enabled = true;
         if (photonView.IsMine && body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
             //death via pit
             photonView.RPC("Death", RpcTarget.All, true, false);
@@ -2128,7 +2131,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (!crouch)
             alreadyGroundpounded = false;
 
-        if (powerupButtonHeld && wallJumpTimer <= 0 && !usedPropellerThisJump) {
+        if (powerupButtonHeld && wallJumpTimer <= 0 && (propeller || !usedPropellerThisJump)) {
             if (body.velocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
                 propellerSpinTimer = propellerSpinTime;
                 propeller = true;

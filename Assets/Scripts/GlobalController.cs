@@ -45,7 +45,9 @@ public class GlobalController : Singleton<GlobalController> {
         };
 
 #if PLATFORM_STANDALONE_WIN && !UNITY_EDITOR
-        ReplaceWinProc();
+        try {        
+            ReplaceWinProc();
+        } catch {}
 #endif
     }
 

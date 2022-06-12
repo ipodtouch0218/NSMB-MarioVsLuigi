@@ -28,11 +28,7 @@ public class UserNametag : MonoBehaviour {
         if (Mathf.Abs(camera.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * (1 / 4f))
             worldPos.x += Mathf.Sign(camera.transform.position.x) * GameManager.Instance.levelWidthTile / 2f;
 
-        Rect t = parentCanvas.rect;
-        Vector2 size = new(t.size.y * camera.aspect, t.size.y);
-#if PLATFORM_WEBGL
-        size /= 2;
-#endif
+        Vector2 size = new(Screen.width, Screen.height);
         Vector3 screenPoint = camera.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;
         screenPoint.z = 0;
 
@@ -43,7 +39,11 @@ public class UserNametag : MonoBehaviour {
             float screenAspect = screenW / screenH;
 
             if (screenAspect > camera.aspect) {
-                screenPoint.x += (screenW - (screenH * camera.aspect)) / 2;
+                float availableWidth = screenH * camera.aspect;
+                float widthPercentage = availableWidth / screenW;
+
+                screenPoint.x *= widthPercentage;
+                screenPoint.x += (screenW - availableWidth) / 2;
             } else {
                 float availableHeight = screenW * (1f / camera.aspect);
                 float heightPercentage = availableHeight / screenH;

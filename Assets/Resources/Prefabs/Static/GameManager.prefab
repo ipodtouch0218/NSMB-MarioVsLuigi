@@ -680,7 +680,7 @@ Camera:
   m_GameObject: {fileID: 482268096050949616}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 4
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -5216,6 +5216,7 @@ MonoBehaviour:
   spawnVerticalPowerups: 1
   levelDesigner: 
   richPresenceId: 
+  levelName: Unknown
   startServerTime: 0
   endServerTime: -1
   startRealTime: -1
