@@ -1869,7 +1869,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         onGround = true;
 
         if (Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
-            if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.5f)) {
+            if (Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.1f) && !Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.5f)) {
                 transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2);
             } else if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.down * 0.5f)) {
                 float heightInTiles = Mathf.Floor(hitboxes[0].size.y * transform.lossyScale.y * 2);
