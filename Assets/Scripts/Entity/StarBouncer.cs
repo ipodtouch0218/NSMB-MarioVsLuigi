@@ -45,6 +45,8 @@ public class StarBouncer : MonoBehaviourPun {
             fast = direction == 0 || direction == 3;
             creator = (int) data[1];
             becomeCollectibleAt = (int) data[2];
+            if (becomeCollectibleAt < PhotonNetwork.ServerTimestamp)
+                alreadyCollectible = true;
             body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), deathBoostAmount);
             if ((bool) data[3]) {
                 body.velocity += Vector2.up * 3;

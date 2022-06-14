@@ -105,12 +105,12 @@ public class UIUpdater : MonoBehaviour {
             seconds = Mathf.Clamp(seconds, 0, GameManager.Instance.timedGameDuration);
             uiCountdown.text = Utils.GetSymbolString($"cx{seconds / 60}:{seconds % 60:00}");
             timerParent.SetActive(true);
-            if (seconds == 0) {
+            if (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp < 0) {
                 if (timerMaterial == null)
                     timerMaterial = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>().GetMaterial();
 
-                float partialSeconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f % 1f;
-                byte gb = (byte) (Mathf.PingPong(partialSeconds, 0.5f) * 255);
+                float partialSeconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f % 2f;
+                byte gb = (byte) (Mathf.PingPong(partialSeconds, 1f) * 255);
                 timerMaterial.SetColor("_Color", new Color32(255, gb, gb, 255));
             }
         } else {

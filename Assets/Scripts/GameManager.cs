@@ -534,8 +534,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             return;
 
         bool starGame = starRequirement != -1;
-        bool timeUp = endServerTime != -1 && endServerTime - PhotonNetwork.ServerTimestamp < 0;
-        int winningStars = 0;
+        bool timeUp = endServerTime != -1 && endServerTime - Time.deltaTime - PhotonNetwork.ServerTimestamp < 0;
+        int winningStars = -1;
         List<PlayerController> winningPlayers = new();
         List<PlayerController> alivePlayers = new();
         foreach (var player in allPlayers) {
@@ -547,13 +547,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if ((starGame && player.stars >= starRequirement) || timeUp) {
                 //we're in a state where this player would win.
                 //check if someone has more stars
-                if (player.stars >= winningStars) {
-                    //we have more stars than the current winners. clear them
-                    if (player.stars > winningStars) {
-                        winningPlayers.Clear();
-                    }
-
+                if (player.stars > winningStars) {
+                    winningPlayers.Clear();
                     winningStars = player.stars;
+                    winningPlayers.Add(player);
+                } else if (player.stars == winningStars) {
                     winningPlayers.Add(player);
                 }
             }

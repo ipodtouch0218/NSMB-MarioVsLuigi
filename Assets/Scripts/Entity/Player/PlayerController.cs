@@ -869,6 +869,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
+        knockback = false;
 
         propellerTimer = 0;
         skidding = false;
@@ -1264,7 +1265,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     [PunRPC]
     protected void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
-        if (!GameManager.Instance.started || (knockback && fireballKnockback && invincible > 0) || (knockback && !fireballKnockback) || hitInvincibilityCounter > 0 || pipeEntering)
+        if (!GameManager.Instance.started || (knockback && fireballKnockback && invincible > 0) || (knockback && !fireballKnockback) || hitInvincibilityCounter > 0 || pipeEntering || Frozen)
             return;
 
         if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -1303,6 +1304,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         sliding = false;
         drill = false;
         body.gravityScale = normalGravity;
+        wallSlideLeft = wallSlideRight = false;
 
         SpawnStars(starsToDrop, false);
         HandleLayerState();
@@ -1620,7 +1622,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             }
         } else {
             //walljump starting check
-            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !holding && state != Enums.PowerupState.MegaMushroom && !flying && !drill && !crouching && !sliding;
+            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !holding && state != Enums.PowerupState.MegaMushroom && !flying && !drill && !crouching && !sliding && !knockback;
             if (!canWallslide)
                 return;
 
@@ -1866,7 +1868,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         body.gravityScale = 0;
         onGround = true;
 
-        if (Utils.IsTileSolidAtWorldLocation(body.position)) {
+        if (Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
             if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.5f)) {
                 transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2);
             } else if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.down * 0.5f)) {
@@ -1884,19 +1886,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             return true;
         }
 
-        RaycastHit2D rightRaycast = Physics2D.BoxCast(checkPos, checkSize, 0, Vector2.right, 15, ONLY_GROUND_MASK);
-        RaycastHit2D leftRaycast = Physics2D.BoxCast(checkPos, checkSize, 0, Vector2.left, 15, ONLY_GROUND_MASK);
-        
-        float rightDistance = float.MaxValue, leftDistance = float.MaxValue;
-        if (rightRaycast)
-            rightDistance = rightRaycast.distance;
-        if (leftRaycast)
-            leftDistance = leftRaycast.distance;
-        if (rightDistance <= leftDistance) {
-            body.velocity = Vector2.right * 2f;
-        } else {
-            body.velocity = Vector2.left * 2f;
-        }
+        body.velocity = Vector2.right * 2f;
         return true;
     }
 
