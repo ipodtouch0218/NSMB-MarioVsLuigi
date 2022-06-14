@@ -870,6 +870,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         body.isKinematic = true;
         body.simulated = false;
         knockback = false;
+        skidding = false;
+        drill = false;
+        wallSlideLeft = false;
+        wallSlideRight = false;
+        propeller = false;
 
         propellerTimer = 0;
         skidding = false;
@@ -1336,6 +1341,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     [PunRPC]
     public void SetHolding(int view) {
         if (view == -1) {
+            if (holding)
+                holding.holder = null;
             holding = null;
             return;
         }
@@ -1490,7 +1497,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     #region -- PIPES --
 
     void DownwardsPipeCheck() {
-        if (!photonView.IsMine || !(crouching || sliding) || state == Enums.PowerupState.MegaMushroom || !onGround || knockback || inShell)
+        if (!photonView.IsMine || !(crouching || sliding || groundpound) || state == Enums.PowerupState.MegaMushroom || !onGround || knockback || inShell)
             return;
 
         foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.position, Vector2.down, 0.5f)) {
@@ -1964,7 +1971,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (dead || !spawned)
             return;
 
-        sfx.enabled = true;
         if (photonView.IsMine && body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
             //death via pit
             photonView.RPC("Death", RpcTarget.All, true, false);
@@ -1979,6 +1985,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 return;
             }
         }
+
+        if (photonView.IsMine && holding && (holding.dead || Frozen || holding.Frozen))
+            photonView.RPC("SetHolding", RpcTarget.All, -1);
 
         FrozenCube holdingCube;
         if (((holdingCube = holding as FrozenCube) && holdingCube) || ((holdingCube = holdingOld as FrozenCube) && holdingCube)) {

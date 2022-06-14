@@ -631,6 +631,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (newValue < 1)
             newValue = 5;
+        ChangeLives(newValue);
         if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Lives])
             return;
 
@@ -638,7 +639,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Lives] = newValue
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        //ChangeLives(newValue);
     }
     public void SetNewPowerups(Toggle toggle) {
         ExitGames.Client.Photon.Hashtable properties = new() {

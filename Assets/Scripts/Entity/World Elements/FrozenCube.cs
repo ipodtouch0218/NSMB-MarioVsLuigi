@@ -94,6 +94,7 @@ public class FrozenCube : HoldableEntity {
         //move the entity to be inside of us
         if (entity.IsCarryable)
             entityBody.transform.position = entityBody.position = (Vector2) transform.position + offset;
+        transform.position = new(transform.position.x, transform.position.y, -5);
     }
 
     public override void FixedUpdate() {
