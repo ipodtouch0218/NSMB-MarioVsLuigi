@@ -15,13 +15,11 @@ MonoBehaviour:
   soundFolder: mario
   prefab: PlayerMario
   uistring: <sprite=3>
-  buttonSprite: {fileID: 1397318092014332696, guid: 30a572745e4ddb449aca4d8f7cfb7112,
-    type: 3}
-  trackSprite: {fileID: 2894126367625617641, guid: 3279a4c4726060841b216b3de72d86a5,
-    type: 3}
   loadingSmallSprite: {fileID: 1040450253486601905, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
   loadingBigSprite: {fileID: -1751142936083476856, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
   readySprite: {fileID: 7263181891274304025, guid: 70672da71d9d71a4daaf5f3fc58531e6,
     type: 3}
+  smallOverrides: {fileID: 22100000, guid: 347b7f77a47c4db4b85584fbfdecf63b, type: 2}
+  largeOverrides: {fileID: 9100000, guid: fa2b2fc953f5f444291d26193e0ac7fb, type: 2}

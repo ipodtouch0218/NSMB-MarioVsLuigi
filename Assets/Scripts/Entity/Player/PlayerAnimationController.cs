@@ -283,6 +283,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(1).IsName("in-shell"));
         propellerHelmet.SetActive(controller.state == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
+        animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
 
         HandleDeathAnimation();
         HandlePipeAnimation();
@@ -300,7 +301,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             deathUp = false;
             body.gravityScale = 0;
             body.velocity = Vector2.zero;
-            animator.Play("deadstart", controller.state >= Enums.PowerupState.Mushroom ? 1 : 0);
+            animator.Play("deadstart");
         } else {
             if (!deathUp && body.position.y > GameManager.Instance.GetLevelMinY()) {
                 body.velocity = new Vector2(0, deathForce);

@@ -1006,7 +1006,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (dead)
             return;
 
-        animator.Play("deadstart", state >= Enums.PowerupState.Mushroom ? 1 : 0);
+        animator.Play("deadstart");
         if (--lives == 0) {
             GameManager.Instance.CheckForWinner();
         }
@@ -1348,7 +1348,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         }
         holding = PhotonView.Find(view).GetComponent<HoldableEntity>();
         if (holding is FrozenCube) {
-            animator.Play("head-pickup", state >= Enums.PowerupState.Mushroom ? 1 : 0);
+            animator.Play("head-pickup");
             animator.ResetTrigger("fireball");
             PlaySound(Enums.Sounds.Player_Voice_DoubleJump, 2);
             pickupTimer = 0;
@@ -2228,7 +2228,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     if (!doIceSkidding)
                         body.velocity = Vector2.zero;
 
-                    animator.Play("jumplanding" + (edgeLanding ? "-edge" : ""), state >= Enums.PowerupState.Mushroom ? 1 : 0);
+                    animator.Play("jumplanding" + (edgeLanding ? "-edge" : ""));
                     if (edgeLanding)
                         jumpLandingTimer = 0.15f;
                 }

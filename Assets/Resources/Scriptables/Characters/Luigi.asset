@@ -15,13 +15,11 @@ MonoBehaviour:
   soundFolder: luigi
   prefab: PlayerLuigi
   uistring: <sprite=4>
-  buttonSprite: {fileID: 1843265063739331133, guid: 30a572745e4ddb449aca4d8f7cfb7112,
-    type: 3}
-  trackSprite: {fileID: -7589307040187653254, guid: 3279a4c4726060841b216b3de72d86a5,
-    type: 3}
   loadingSmallSprite: {fileID: -3599161207798135845, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
   loadingBigSprite: {fileID: -309644342959843524, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
   readySprite: {fileID: -7975249404588759376, guid: 70672da71d9d71a4daaf5f3fc58531e6,
     type: 3}
+  smallOverrides: {fileID: 22100000, guid: a1854453357bb034e89ec419b0f57906, type: 2}
+  largeOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e, type: 2}
