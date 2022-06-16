@@ -26,7 +26,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
     }
 
     public virtual void FixedUpdate() {
-        if (!photonView || !GameManager.Instance || !photonView.IsMine)
+        if (!(photonView?.IsMine ?? true) || !GameManager.Instance || !photonView.IsMine)
             return;
 
         if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale))

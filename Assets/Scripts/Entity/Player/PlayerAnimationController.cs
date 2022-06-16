@@ -81,7 +81,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             } else if (animator.GetBool("pipe")) {
                 targetEuler = new Vector3(0, 180, 0);
                 instant = true;
-            } else if (animator.GetBool("inShell") && !controller.onSpinner) {
+            } else if (animator.GetBool("inShell") && (!controller.onSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
                 targetEuler += Mathf.Abs(body.velocity.x) / controller.runningMaxSpeed * Time.deltaTime * new Vector3(0, 1800 * (controller.facingRight ? -1 : 1));
                 instant = true;
             } else if (wasTurnaround || controller.skidding || controller.turnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
@@ -280,7 +280,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         smallModel.SetActive(!large);
         blueShell.SetActive(controller.state == Enums.PowerupState.BlueShell);
         
-        largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(1).IsName("in-shell"));
+        largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(0).IsName("in-shell"));
         propellerHelmet.SetActive(controller.state == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
         animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;

@@ -699,7 +699,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         propellerTimer = 1f;
         PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
         
-        animator.Play("propeller_up", 1);
+        animator.Play("propeller_up");
         propeller = true;
         flying = false;
         crouching = false;
@@ -1864,7 +1864,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (!body || hitboxes.Length <= 0)
             return false;
 
-        Vector2 checkSize = hitboxes[0].size * transform.lossyScale * 0.7f;
+        Vector2 checkSize = hitboxes[0].size * transform.lossyScale;
         Vector2 checkPos = body.position + (Vector2.up * hitboxes[0].size * transform.lossyScale / 2f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
@@ -1876,12 +1876,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         onGround = true;
 
         if (Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
-            if (Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.1f) && !Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.5f)) {
+
+            if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.up * 0.25f, checkPos * Vector2.right)) {
+                Debug.Log("a");
                 transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2);
-            } else if (!Utils.IsTileSolidAtWorldLocation(body.position + Vector2.down * 0.5f)) {
+
+            } else if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.up * 0.75f, checkPos * Vector2.right)) {
+                Debug.Log("b");
+                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 2) / 2);
+
+            } else if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.down * 0.4f, checkPos * Vector2.right)) {
+                Debug.Log("c");
                 float heightInTiles = Mathf.Floor(hitboxes[0].size.y * transform.lossyScale.y * 2);
-                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 - heightInTiles) / 2);
+                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 - heightInTiles - 1) / 2);
             }
+
         }
 
         // eject
@@ -1938,7 +1947,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             storedPowerup = (Powerup) Resources.Load("Scriptables/Powerups/MegaMushroom");
             giantTimer = 0;
             animator.enabled = true;
-            animator.Play("mega-cancel", 1, 1 - (giantEndTimer / giantStartTime));
+            animator.Play("mega-cancel", 0, 1 - (giantEndTimer / giantStartTime));
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         }
         body.isKinematic = false;
@@ -2007,7 +2016,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             } else {
                 body.isKinematic = true;
                 if (animator.GetCurrentAnimatorClipInfo(1).Length <= 0 || animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale")
-                    animator.Play("mega-scale", 1);
+                    animator.Play("mega-scale");
 
 
                 Vector2 checkSize = hitboxes[0].size * transform.lossyScale * 1.1f;

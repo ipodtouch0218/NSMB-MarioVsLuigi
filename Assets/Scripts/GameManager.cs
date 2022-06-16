@@ -386,8 +386,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         playerCount = allPlayers.Count;
         started = true;
 
-        ScoreboardUpdater.instance.Populate(allPlayers);
-
         if (!spectating) {
             foreach (PlayerController controllers in allPlayers)
                 controllers.gameObject.SetActive(false);
@@ -405,6 +403,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             localPlayer.GetComponent<PlayerController>().OnGameStart();
         }
+
+        try {
+            ScoreboardUpdater.instance.Populate(allPlayers);
+        } catch { }
 
         yield return new WaitForSeconds(1f);
 
