@@ -197,8 +197,8 @@ TextureImporter:
       name: clown_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 48
+        x: 32
+        y: 144
         width: 16
         height: 16
       alignment: 0
@@ -218,8 +218,8 @@ TextureImporter:
       name: clown_1
       rect:
         serializedVersion: 2
-        x: 16
-        y: 48
+        x: 48
+        y: 144
         width: 16
         height: 16
       alignment: 0
@@ -239,8 +239,8 @@ TextureImporter:
       name: clown_2
       rect:
         serializedVersion: 2
-        x: 32
-        y: 48
+        x: 0
+        y: 144
         width: 16
         height: 16
       alignment: 0
@@ -260,8 +260,8 @@ TextureImporter:
       name: clown_3
       rect:
         serializedVersion: 2
-        x: 48
-        y: 48
+        x: 16
+        y: 144
         width: 16
         height: 16
       alignment: 0
@@ -281,8 +281,8 @@ TextureImporter:
       name: clown_4
       rect:
         serializedVersion: 2
-        x: 0
-        y: 32
+        x: 32
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -302,8 +302,8 @@ TextureImporter:
       name: clown_5
       rect:
         serializedVersion: 2
-        x: 16
-        y: 32
+        x: 48
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -323,8 +323,8 @@ TextureImporter:
       name: clown_6
       rect:
         serializedVersion: 2
-        x: 32
-        y: 32
+        x: 0
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -344,8 +344,8 @@ TextureImporter:
       name: clown_7
       rect:
         serializedVersion: 2
-        x: 48
-        y: 32
+        x: 16
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -365,8 +365,8 @@ TextureImporter:
       name: clown_8
       rect:
         serializedVersion: 2
-        x: 0
-        y: 16
+        x: 32
+        y: 176
         width: 16
         height: 16
       alignment: 0
@@ -386,8 +386,8 @@ TextureImporter:
       name: clown_9
       rect:
         serializedVersion: 2
-        x: 16
-        y: 16
+        x: 48
+        y: 176
         width: 16
         height: 16
       alignment: 0
@@ -407,8 +407,8 @@ TextureImporter:
       name: clown_10
       rect:
         serializedVersion: 2
-        x: 32
-        y: 16
+        x: 64
+        y: 176
         width: 16
         height: 16
       alignment: 0
@@ -428,8 +428,8 @@ TextureImporter:
       name: clown_11
       rect:
         serializedVersion: 2
-        x: 48
-        y: 16
+        x: 0
+        y: 176
         width: 16
         height: 16
       alignment: 0
@@ -449,8 +449,8 @@ TextureImporter:
       name: clown_12
       rect:
         serializedVersion: 2
-        x: 64
-        y: 16
+        x: 16
+        y: 176
         width: 16
         height: 16
       alignment: 0
@@ -470,8 +470,8 @@ TextureImporter:
       name: clown_13
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
+        x: 32
+        y: 160
         width: 16
         height: 16
       alignment: 0
@@ -491,8 +491,8 @@ TextureImporter:
       name: clown_14
       rect:
         serializedVersion: 2
-        x: 16
-        y: 0
+        x: 48
+        y: 160
         width: 16
         height: 16
       alignment: 0
@@ -512,8 +512,8 @@ TextureImporter:
       name: clown_15
       rect:
         serializedVersion: 2
-        x: 48
-        y: 0
+        x: 0
+        y: 160
         width: 16
         height: 16
       alignment: 0
@@ -533,8 +533,8 @@ TextureImporter:
       name: clown_16
       rect:
         serializedVersion: 2
-        x: 64
-        y: 0
+        x: 16
+        y: 160
         width: 16
         height: 16
       alignment: 0
@@ -554,8 +554,8 @@ TextureImporter:
       name: clown_17
       rect:
         serializedVersion: 2
-        x: 64
-        y: 48
+        x: 48
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -577,6 +577,426 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: bonus_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 112
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3c44fcbc4948e44d94ff2ae2c21a91a
+      internalID: -671801442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_1
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 112
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 11ee949f0c76cbf4ea3dd129382e9e69
+      internalID: -1394567960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_2
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 112
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c42fd96f3a81d86459c407483ea92fb1
+      internalID: -1647841331
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_3
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 48
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef81aa31d6b727846a4734dc07f29cb2
+      internalID: 120059877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c497186141dfabc43a867784c7435b90
+      internalID: 963225843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_5
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 96
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e13245b9f6cc84d478e9c50aff77f032
+      internalID: 63873621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_6
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 96
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50c39a4dcd425ec4b9a644f4df012262
+      internalID: 486768647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 80
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 937cc4396ec0ba942b8bf689e22f56e0
+      internalID: -1107212481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_8
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 80
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be9ae419016722a4781f9554d107c8f7
+      internalID: -723277319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_9
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 80
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15f2f4c303d57e9478251da6aeddc6c1
+      internalID: -1958766692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 279291ad2eba2b94e8e9596d0621f143
+      internalID: -766508114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_11
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 64
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96e4c681f09f1cb479862fb38863fee3
+      internalID: 1911295945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_12
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 64
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 338f1231a85ee904284e72905923e81b
+      internalID: -1728517974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_13
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 96
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f89dc7fc466a224080aaba309fa61ee
+      internalID: 1684036044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_14
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 80
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 90f75486035b0fc4abeacd515cc26a37
+      internalID: -937223238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_15
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 64
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b0ec25d98cfff794b9949199be1e491d
+      internalID: 1767055595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 48
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 71c6ce2703b1a284b94d93f9d8feea69
+      internalID: -2017251207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_17
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 48
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3ac08bb4be048c42abe59842bc97ad4
+      internalID: -69304690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_18
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 48
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17064ec145296c140a74b1ff835853a5
+      internalID: 605119561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_19
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 160
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a02bd147c252df46869a0fceaafca55
+      internalID: -731808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -590,20 +1010,40 @@ TextureImporter:
     nameFileIdTable:
       clown_5: -2940530314470319842
       clown_11: 7133476376080681217
+      bonus_0: -671801442
+      bonus_7: -1107212481
+      bonus_1: -1394567960
       clown_2: 4994258414075552032
       clown_13: 6865342142685912013
       clown_15: -7962056515094391696
+      bonus_14: -937223238
+      bonus_17: -69304690
       clown_14: -2610124089118400910
+      bonus_13: 1684036044
       clown_4: 3036753812775530641
+      bonus_5: 63873621
+      bonus_12: -1728517974
+      bonus_16: -2017251207
+      bonus_2: -1647841331
       clown_9: -1082198178173625565
       clown_16: -7488802388398291836
+      bonus_9: -1958766692
       clown_8: 3661830941288844219
+      bonus_18: 605119561
       clown_3: 1433433934713897156
+      bonus_3: 120059877
+      bonus_8: -723277319
+      bonus_15: 1767055595
       clown_0: 6594603699599502552
       clown_10: 4006730704514478162
+      bonus_19: -731808
       clown_6: -2832822836231408507
       clown_12: -9110447509335122878
+      bonus_4: 963225843
       clown_7: -5033442435760880955
+      bonus_11: 1911295945
+      bonus_10: -766508114
+      bonus_6: 486768647
       clown_1: 2763954904775634219
       clown_17: -6450420347727313635
   spritePackingTag: 
