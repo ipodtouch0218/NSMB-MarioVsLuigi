@@ -985,7 +985,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -993,6 +993,90 @@ TextureImporter:
       bones: []
       spriteID: 3a02bd147c252df46869a0fceaafca55
       internalID: -731808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_20
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 0
+        width: 38
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 190}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5995fe6e56b70314f8e3bece1dca8587
+      internalID: -2103662274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_21
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 0
+        width: 38
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 190}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 477541b929d1a5d4c9b733ecf576974f
+      internalID: -1848089947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_22
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 0
+        width: 38
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 190}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8caeb37a98cac8f409dfaea94e2cd2e8
+      internalID: 1038974077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_23
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 0
+        width: 38
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 190}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce5c28a23a876b9428052ad1584810ad
+      internalID: 1669150104
       vertices: []
       indices: 
       edges: []
@@ -1010,10 +1094,12 @@ TextureImporter:
     nameFileIdTable:
       clown_5: -2940530314470319842
       clown_11: 7133476376080681217
-      bonus_0: -671801442
+      bonus_20: -2103662274
       bonus_7: -1107212481
       bonus_1: -1394567960
+      clown_17: -6450420347727313635
       clown_2: 4994258414075552032
+      bonus_22: 1038974077
       clown_13: 6865342142685912013
       clown_15: -7962056515094391696
       bonus_14: -937223238
@@ -1024,6 +1110,8 @@ TextureImporter:
       bonus_5: 63873621
       bonus_12: -1728517974
       bonus_16: -2017251207
+      bonus_21: -1848089947
+      bonus_23: 1669150104
       bonus_2: -1647841331
       clown_9: -1082198178173625565
       clown_16: -7488802388398291836
@@ -1045,7 +1133,7 @@ TextureImporter:
       bonus_10: -766508114
       bonus_6: 486768647
       clown_1: 2763954904775634219
-      clown_17: -6450420347727313635
+      bonus_0: -671801442
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

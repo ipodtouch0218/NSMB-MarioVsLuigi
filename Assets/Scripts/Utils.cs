@@ -109,6 +109,8 @@ public class Utils {
         Vector3Int minPos = WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
         Vector3Int size = WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
 
+        Debug.Log("size" + size);
+
         for (int x = 0; x <= size.x; x++) {
             for (int y = 0; y <= size.y; y++) {
 
