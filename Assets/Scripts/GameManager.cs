@@ -143,6 +143,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             bool downwards = (bool) data[2];
             string newTile = (string) data[3];
             string spawnResult = (string) data[4];
+            Vector2 spawnOffset = data.Length > 5 ? (Vector2) data[5] : Vector2.zero;
 
             Vector3Int loc = new(x, y, 0);
 
@@ -153,6 +154,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             bb.resultTile = newTile;
             bb.sprite = tilemap.GetSprite(loc);
             bb.prefab = spawnResult;
+            bb.spawnOffset = spawnOffset;
 
             tilemap.SetTile(loc, null);
             break;

@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 using UnityEngine.Tilemaps;
 
 public class KoopaWalk : HoldableEntity {
+
     private static int GROUND_LAYER_ID = -1, GROUND_AND_SEMISOLIDS_LAYER_ID = -1;
 
     public float walkSpeed, kickSpeed, wakeup = 15;
@@ -14,9 +13,13 @@ public class KoopaWalk : HoldableEntity {
     private BoxCollider2D worldHitbox;
     Vector2 blockOffset = new Vector3(0, 0.05f), velocityLastFrame;
     private float dampVelocity, speed;
+
+    [SerializeField] Vector2 outShellHitboxSize, inShellHitboxSize;
+    [SerializeField] Vector2 outShellHitboxOffset, inShellHitboxOffset;
+
     new void Start() {
         base.Start();
-        hitbox = GetComponentInChildren<BoxCollider2D>();
+        hitbox = transform.GetChild(0).GetComponent<BoxCollider2D>();
         worldHitbox = GetComponent<BoxCollider2D>();
 
         if (GROUND_LAYER_ID == -1)
@@ -57,6 +60,9 @@ public class KoopaWalk : HoldableEntity {
         }
 
         if (shell) {
+            worldHitbox.size = hitbox.size = inShellHitboxSize;
+            worldHitbox.offset = hitbox.offset = inShellHitboxOffset;
+            
             if (stationary) {
                 if (physics.onGround)
                     body.velocity = new Vector2(0, body.velocity.y);
@@ -67,6 +73,9 @@ public class KoopaWalk : HoldableEntity {
             } else {
                 wakeupTimer = wakeup;
             }
+        } else {
+            worldHitbox.size = hitbox.size = outShellHitboxSize;
+            worldHitbox.offset = hitbox.offset = outShellHitboxOffset;
         }
 
         if (photonView && !photonView.IsMine)

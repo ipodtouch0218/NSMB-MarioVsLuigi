@@ -9,6 +9,7 @@ public class BlockBump : MonoBehaviour {
     public bool fromAbove;
     SpriteRenderer sRenderer;
     public PlayerController hitter;
+    public Vector2 spawnOffset = Vector2.zero;
 
     void Start() {
         Animator anim = GetComponent<Animator>();
@@ -40,6 +41,6 @@ public class BlockBump : MonoBehaviour {
             return;
 
         Vector3 pos = transform.position + Vector3.up * (fromAbove ? -0.5f : 0.25f);
-        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, pos, Quaternion.identity);
+        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, pos + (Vector3) spawnOffset, Quaternion.identity);
     }
 }

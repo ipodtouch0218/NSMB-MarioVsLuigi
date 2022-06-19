@@ -3,7 +3,9 @@ using Photon.Pun;
 
 [CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile", order = 5)]
 public class RouletteTile : BreakableBrickTile {
+    
     public string resultTile;
+    public Vector2 topSpawnOffset, bottomSpawnOffset;
 
     public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (base.Interact(interacter, direction, worldLocation))
@@ -22,9 +24,15 @@ public class RouletteTile : BreakableBrickTile {
                 object[] parametersTile = new object[] { tileLocation.x, tileLocation.y, null };
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetTile, parametersTile, ExitGames.Client.Photon.SendOptions.SendReliable);
 
-                //Particle
-                object[] parametersParticle = new object[] { tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
-                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+                //Particles
+                for (int x = 0; x < 2; x++) {
+                    for (int y = 0; y < 2; y++) {
+
+                        object[] parametersParticle = new object[] { tileLocation.x + x, tileLocation.y - y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
+                        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+
+                    }
+                }
 
                 if (interacter is MonoBehaviourPun pun)
                     pun.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Break);
@@ -36,7 +44,7 @@ public class RouletteTile : BreakableBrickTile {
 
         Bump(interacter, direction, worldLocation);
 
-        object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult };
+        object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, direction == InteractionDirection.Down ? bottomSpawnOffset : topSpawnOffset };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
 
         if (interacter is MonoBehaviourPun pun2)

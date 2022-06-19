@@ -1004,10 +1004,10 @@ TextureImporter:
         x: 104
         y: 0
         width: 38
-        height: 192
+        height: 256
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 190}
+      border: {x: 0, y: 0, z: 0, w: 254}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1025,10 +1025,10 @@ TextureImporter:
         x: 142
         y: 0
         width: 38
-        height: 192
+        height: 256
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 190}
+      border: {x: 0, y: 0, z: 0, w: 254}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1046,10 +1046,10 @@ TextureImporter:
         x: 180
         y: 0
         width: 38
-        height: 192
+        height: 256
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 190}
+      border: {x: 0, y: 0, z: 0, w: 254}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1067,16 +1067,121 @@ TextureImporter:
         x: 218
         y: 0
         width: 38
-        height: 192
+        height: 256
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 190}
+      border: {x: 0, y: 0, z: 0, w: 254}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
       spriteID: ce5c28a23a876b9428052ad1584810ad
       internalID: 1669150104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 224
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0.75}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 662bed8adee4b79428546094cacc449f
+      internalID: 775316621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_25
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 224
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0.75}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3a993d1d02971542a8bb1097c90a6e6
+      internalID: -1228109020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_26
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 224
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0.75}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b538d11f599ef144925be2a8a263f3a
+      internalID: 1345986596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_27
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0.75}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e56d45069b63b645bbd6542f7c9b4c7
+      internalID: 1044801654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus_28
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 192
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0.75}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af1e4f9577c7d094fa2ef43b2cb1f15e
+      internalID: 1850814868
       vertices: []
       indices: 
       edges: []
@@ -1092,48 +1197,53 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      clown_5: -2940530314470319842
       clown_11: 7133476376080681217
-      bonus_20: -2103662274
       bonus_7: -1107212481
-      bonus_1: -1394567960
-      clown_17: -6450420347727313635
+      bonus_28: 1850814868
       clown_2: 4994258414075552032
-      bonus_22: 1038974077
       clown_13: 6865342142685912013
-      clown_15: -7962056515094391696
       bonus_14: -937223238
       bonus_17: -69304690
       clown_14: -2610124089118400910
-      bonus_13: 1684036044
-      clown_4: 3036753812775530641
+      bonus_16: -2017251207
       bonus_5: 63873621
       bonus_12: -1728517974
-      bonus_16: -2017251207
+      bonus_24: 775316621
       bonus_21: -1848089947
-      bonus_23: 1669150104
       bonus_2: -1647841331
-      clown_9: -1082198178173625565
       clown_16: -7488802388398291836
-      bonus_9: -1958766692
       clown_8: 3661830941288844219
       bonus_18: 605119561
       clown_3: 1433433934713897156
+      bonus_26: 1345986596
       bonus_3: 120059877
       bonus_8: -723277319
-      bonus_15: 1767055595
       clown_0: 6594603699599502552
-      clown_10: 4006730704514478162
       bonus_19: -731808
       clown_6: -2832822836231408507
-      clown_12: -9110447509335122878
-      bonus_4: 963225843
-      clown_7: -5033442435760880955
       bonus_11: 1911295945
-      bonus_10: -766508114
-      bonus_6: 486768647
-      clown_1: 2763954904775634219
+      bonus_4: 963225843
+      bonus_27: 1044801654
       bonus_0: -671801442
+      clown_5: -2940530314470319842
+      bonus_20: -2103662274
+      bonus_1: -1394567960
+      clown_17: -6450420347727313635
+      bonus_22: 1038974077
+      clown_15: -7962056515094391696
+      bonus_13: 1684036044
+      clown_4: 3036753812775530641
+      bonus_23: 1669150104
+      clown_9: -1082198178173625565
+      bonus_9: -1958766692
+      bonus_15: 1767055595
+      bonus_25: -1228109020
+      bonus_6: 486768647
+      clown_10: 4006730704514478162
+      clown_12: -9110447509335122878
+      clown_7: -5033442435760880955
+      bonus_10: -766508114
+      clown_1: 2763954904775634219
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
