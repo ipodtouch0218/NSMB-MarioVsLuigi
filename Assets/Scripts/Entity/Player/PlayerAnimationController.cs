@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Photon.Pun;
 
 public class PlayerAnimationController : MonoBehaviourPun {
@@ -8,6 +10,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
     Rigidbody2D body;
     BoxCollider2D mainHitbox;
 
+    [SerializeField] Material glowMaterial;
+
     [SerializeField] GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
     [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
@@ -15,6 +19,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] Color primaryColor = Color.clear, secondaryColor = Color.clear;
 
     [SerializeField] [ColorUsage(true, false)] Color? _glowColor = null;
+
+    private CommandBuffer glowBuffer;
 
     private MaterialPropertyBlock materialBlock;
 
@@ -55,7 +61,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
             primaryColor = color.overalls.linear;
             secondaryColor = color.hat.linear;
         }
-
     }
 
     public void Update() {

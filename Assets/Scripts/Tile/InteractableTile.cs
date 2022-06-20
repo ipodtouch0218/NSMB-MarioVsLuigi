@@ -39,7 +39,11 @@ public abstract class InteractableTile : AnimatedTile {
                 obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false);
                 continue;
             }
+            case "loosecoin":
             case "coin": {
+                if (!obj)
+                    continue;
+
                 if (interacter is PlayerController pl)
                     pl.photonView.RPC("CollectCoin", RpcTarget.All, obj.GetComponentInParent<PhotonView>().ViewID, obj.transform.position);
                 continue;

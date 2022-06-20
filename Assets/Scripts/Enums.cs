@@ -168,7 +168,7 @@ public static class Enums {
         // 20-29 = world-based game events
         SetTile = 20,
         BumpTile = 21,
-        SetAndBumpTile = 22,
+        SetThenBumpTile = 22,
         SetTileBatch = 23,
         ResetTiles = 24,
         SyncTilemap = 25,
