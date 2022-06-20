@@ -22,6 +22,10 @@ public class BlockBump : MonoBehaviour {
             GameObject coin = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/CoinFromBlock"), transform.position + new Vector3(0,(fromAbove ? -0.25f : 0.5f)), Quaternion.identity);
             coin.GetComponentInChildren<Animator>().SetBool("down", fromAbove);
         }
+
+        BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
+        hitbox.size = sprite.bounds.size;
+        hitbox.offset = hitbox.size * new Vector2(1/4f, -1/4f);
     }
     
     public void Kill() {

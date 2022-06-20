@@ -1986,7 +1986,7 @@ GameObject:
   - component: {fileID: 1080608883}
   - component: {fileID: 1080608884}
   m_Layer: 1
-  m_Name: LeftOfBlueBonus
+  m_Name: RightOfBlueBonus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21738,7 +21738,7 @@ GameObject:
   - component: {fileID: 1937306560}
   - component: {fileID: 1937306561}
   m_Layer: 1
-  m_Name: LeftOfRedBonus
+  m_Name: RightOfRedBonus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
