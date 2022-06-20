@@ -75,8 +75,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (eventOptions == null)
             eventOptions = NetworkUtils.EventOthers;
 
-        PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
         HandleEvent((byte) eventId, parameters);
+        PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
     }
     public void OnEvent(EventData e) {
         HandleEvent(e.Code, e.CustomData);
@@ -147,6 +147,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             Vector3Int loc = new(x, y, 0);
 
+            if (tilemap.GetTile(loc) == null)
+                return;
+
             GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f, Quaternion.identity);
             BlockBump bb = bump.GetComponentInChildren<BlockBump>();
 
@@ -159,7 +162,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, null);
             break;
         }
-        case Enums.NetEventIds.SetAndBumpTile: {
+        case Enums.NetEventIds.SetThenBumpTile: {
             int x = (int) data[0];
             int y = (int) data[1];
             bool downwards = (bool) data[2];

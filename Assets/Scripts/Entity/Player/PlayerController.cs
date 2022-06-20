@@ -366,8 +366,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     //They are invincible. let them decide if they've hit us.
                     if (invincible > 0) {
                         //oh, we both are. bonk.
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
-                        other.photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
+                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
+                        other.photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, true, photonView.ViewID);
                     }
                     return;
                 }
@@ -376,7 +376,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     //we are invincible. murder time :)
                     if (other.state == Enums.PowerupState.MegaMushroom) {
                         //wait fuck-
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
+                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
                         return;
                     }
 
@@ -437,25 +437,26 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 if (above) {
                     //hit them from above
                     bounce = !groundpound && !drill;
+                    bool groundpounded = groundpound || drill;
 
                     if (state == Enums.PowerupState.MiniMushroom && other.state != Enums.PowerupState.MiniMushroom) {
                         //we are mini, they arent. special rules.
-                        if (groundpound || drill) {
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 3, false, photonView.ViewID);
+                        if (groundpounded) {
+                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, false, photonView.ViewID);
                             groundpound = false;
                             bounce = true;
                         } else {
                             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
                         }
-                    } else if (other.state == Enums.PowerupState.MiniMushroom && (groundpound || drill)) {
+                    } else if (other.state == Enums.PowerupState.MiniMushroom && groundpounded) {
                         //we are big, groundpounding a mini opponent. squish.
                         otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 3, false, photonView.ViewID);
                         bounce = false;
                     } else {
-                        if (other.state == Enums.PowerupState.MiniMushroom) {
+                        if (other.state == Enums.PowerupState.MiniMushroom && groundpounded) {
                             otherView.RPC("Powerdown", RpcTarget.All, false);
                         } else {
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, (groundpound || drill) ? 3 : 1, false, photonView.ViewID);
+                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, groundpounded ? 3 : 1, false, photonView.ViewID);
                         }
                     }
                     body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);

@@ -5490,6 +5490,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf9d71929a202541b352e506ca0197e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  glowMaterial: {fileID: 0}
   models: {fileID: 3379949737475461038}
   smallModel: {fileID: 7971845128338001746}
   largeModel: {fileID: 719180744479294967}
@@ -21156,7 +21157,6 @@ SkinnedMeshRenderer:
   - {fileID: 2100000, guid: c552fbd95bf99ea479a863acd36d9342, type: 2}
   - {fileID: 2100000, guid: 1262472bc4dcff244bb23e997ddcc21c, type: 2}
   - {fileID: 2100000, guid: c552fbd95bf99ea479a863acd36d9342, type: 2}
-  - {fileID: 2100000, guid: 2cfa80f93994da44c9bdacad018e6ff5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -26997,7 +26997,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: f9541b8e97f76f4419778d672831fc42,
         type: 3}
       propertyPath: m_Materials.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: f9541b8e97f76f4419778d672831fc42,
         type: 3}
@@ -27113,7 +27113,7 @@ PrefabInstance:
     - target: {fileID: -4656471593961653199, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}
       propertyPath: m_Materials.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4656471593961653199, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}
@@ -27128,7 +27128,7 @@ PrefabInstance:
     - target: {fileID: -3950336303720331650, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}
       propertyPath: m_Materials.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -3950336303720331650, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}

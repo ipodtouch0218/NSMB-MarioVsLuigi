@@ -270,6 +270,10 @@ MonoBehaviour:
   flipXFlip: 1
   putdown: 0
   wakeupTimer: 0
+  outShellHitboxSize: {x: 0.1, y: 0.1}
+  inShellHitboxSize: {x: 0.1, y: 0.1}
+  outShellHitboxOffset: {x: 0, y: -0.02}
+  inShellHitboxOffset: {x: 0, y: -0.02}
 --- !u!114 &7346982284271418879
 MonoBehaviour:
   m_ObjectHideFlags: 0

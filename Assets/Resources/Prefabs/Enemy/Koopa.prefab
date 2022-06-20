@@ -129,7 +129,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
-  m_Mass: 0.153
+  m_Mass: 0.11606278
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 2.2
@@ -151,7 +151,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.02}
+  m_Offset: {x: 0, y: -0.0005206801}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.25}
@@ -162,7 +162,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.1, y: 0.17}
+  m_Size: {x: 0.1, y: 0.12895864}
   m_EdgeRadius: 0
 --- !u!114 &8836298984178612580
 MonoBehaviour:
@@ -200,9 +200,9 @@ MonoBehaviour:
   putdown: 0
   wakeupTimer: 0
   outShellHitboxSize: {x: 0.1, y: 0.17}
-  inShellHitboxSize: {x: 0.1, y: 0.1}
+  inShellHitboxSize: {x: 0.1, y: 0.129}
   outShellHitboxOffset: {x: 0, y: 0.02}
-  inShellHitboxOffset: {x: 0, y: -0.015}
+  inShellHitboxOffset: {x: 0, y: 0}
 --- !u!114 &-8304985406365087950
 MonoBehaviour:
   m_ObjectHideFlags: 0
