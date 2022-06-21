@@ -44,6 +44,6 @@ MonoBehaviour:
   breakableByGiantMario: 1
   breakableByShells: 0
   breakableByBombs: 1
-  bumpIfNotBroken: 1
+  bumpIfNotBroken: 0
   bumpIfBroken: 0
   resultTile: SpecialTiles/EmptyBlueQuestion

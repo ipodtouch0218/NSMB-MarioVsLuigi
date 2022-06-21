@@ -143,7 +143,8 @@ MonoBehaviour:
     - {x: 0, y: -1, z: 0}
     - {x: 1, y: 1, z: 0}
     m_RuleTransform: 2
+  siblings: []
   isBackgroundTile: 0
   iceSkidding: 0
-  footstepMaterial: snow
+  footstepSound: 24
   frictionFactor: 1

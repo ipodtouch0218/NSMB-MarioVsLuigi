@@ -25,7 +25,7 @@ public class BlockBump : MonoBehaviour {
 
         BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
         hitbox.size = sprite.bounds.size;
-        hitbox.offset = hitbox.size * new Vector2(1/4f, -1/4f);
+        hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(1/2f, -1/2f);
     }
     
     public void Kill() {
