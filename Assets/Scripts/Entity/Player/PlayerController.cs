@@ -1572,8 +1572,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     }
 
     bool ForceCrouchCheck() {
-        if (state < Enums.PowerupState.Mushroom || state == Enums.PowerupState.BlueShell)
+        if (state < Enums.PowerupState.Mushroom || (state == Enums.PowerupState.BlueShell && !onGround))
             return false;
+
         float width = hitboxes[0].bounds.extents.x;
 
         bool triggerState = Physics2D.queriesHitTriggers;
