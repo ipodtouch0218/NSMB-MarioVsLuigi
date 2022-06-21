@@ -138,6 +138,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             break;
         }
         case Enums.NetEventIds.BumpTile: {
+
             int x = (int) data[0];
             int y = (int) data[1];
             bool downwards = (bool) data[2];
