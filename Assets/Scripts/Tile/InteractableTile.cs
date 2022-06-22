@@ -23,8 +23,7 @@ public abstract class InteractableTile : AnimatedTile {
                 if (player.state == Enums.PowerupState.MegaMushroom)
                     return;
 
-                player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, false, null);
-                player.photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/PlayerBounce", player.body.position);
+                player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, false, (interacter as MonoBehaviourPun)?.photonView.ViewID ?? -1);
                 continue;
             }
             case "koopa": {
