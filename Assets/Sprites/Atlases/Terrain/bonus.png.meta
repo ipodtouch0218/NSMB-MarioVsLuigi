@@ -198,7 +198,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 144
+        y: 96
         width: 16
         height: 16
       alignment: 0
@@ -219,7 +219,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 144
+        y: 96
         width: 16
         height: 16
       alignment: 0
@@ -240,7 +240,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 144
+        y: 96
         width: 16
         height: 16
       alignment: 0
@@ -261,7 +261,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 144
+        y: 96
         width: 16
         height: 16
       alignment: 0
@@ -282,7 +282,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 128
+        y: 80
         width: 16
         height: 16
       alignment: 0
@@ -303,7 +303,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 128
+        y: 80
         width: 16
         height: 16
       alignment: 0
@@ -324,7 +324,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 128
+        y: 80
         width: 16
         height: 16
       alignment: 0
@@ -345,7 +345,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 128
+        y: 80
         width: 16
         height: 16
       alignment: 0
@@ -366,7 +366,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 176
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -387,7 +387,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 176
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -408,7 +408,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 176
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -429,7 +429,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 176
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -450,7 +450,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 176
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -471,7 +471,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 160
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -492,7 +492,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 160
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -513,7 +513,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 160
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -534,7 +534,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 160
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -555,7 +555,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 112
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -582,7 +582,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 112
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -602,8 +602,8 @@ TextureImporter:
       name: bonus_1
       rect:
         serializedVersion: 2
-        x: 16
-        y: 112
+        x: 15
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -624,7 +624,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 112
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -645,7 +645,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 48
+        y: 0
         width: 16
         height: 16
       alignment: 0
@@ -666,7 +666,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 96
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -687,7 +687,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 96
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -708,7 +708,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 96
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -729,7 +729,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 80
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -750,7 +750,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 80
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -771,7 +771,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 80
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -792,7 +792,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 64
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -813,7 +813,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 64
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -834,7 +834,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 64
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -855,7 +855,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 96
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -876,7 +876,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 80
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -897,7 +897,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 64
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -918,7 +918,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 48
+        y: 0
         width: 16
         height: 16
       alignment: 0
@@ -939,7 +939,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 48
+        y: 0
         width: 16
         height: 16
       alignment: 0
@@ -960,7 +960,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 48
+        y: 0
         width: 16
         height: 16
       alignment: 0
@@ -981,7 +981,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 160
+        y: 112
         width: 16
         height: 16
       alignment: 0
@@ -998,95 +998,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: bonus_20
-      rect:
-        serializedVersion: 2
-        x: 104
-        y: 0
-        width: 38
-        height: 256
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 254}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5995fe6e56b70314f8e3bece1dca8587
-      internalID: -2103662274
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: bonus_21
-      rect:
-        serializedVersion: 2
-        x: 142
-        y: 0
-        width: 38
-        height: 256
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 254}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 477541b929d1a5d4c9b733ecf576974f
-      internalID: -1848089947
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: bonus_22
-      rect:
-        serializedVersion: 2
-        x: 180
-        y: 0
-        width: 38
-        height: 256
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 254}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8caeb37a98cac8f409dfaea94e2cd2e8
-      internalID: 1038974077
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: bonus_23
-      rect:
-        serializedVersion: 2
-        x: 218
-        y: 0
-        width: 38
-        height: 256
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 254}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ce5c28a23a876b9428052ad1584810ad
-      internalID: 1669150104
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: bonus_24
       rect:
         serializedVersion: 2
         x: 0
-        y: 224
+        y: 176
         width: 32
         height: 32
       alignment: 9
@@ -1107,7 +1023,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 224
+        y: 176
         width: 32
         height: 32
       alignment: 9
@@ -1128,7 +1044,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 224
+        y: 176
         width: 32
         height: 32
       alignment: 9
@@ -1149,7 +1065,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 192
+        y: 144
         width: 32
         height: 32
       alignment: 9
@@ -1170,7 +1086,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 192
+        y: 144
         width: 32
         height: 32
       alignment: 9
@@ -1224,11 +1140,11 @@ TextureImporter:
       bonus_11: 1911295945
       bonus_4: 963225843
       bonus_27: 1044801654
-      bonus_0: -671801442
+      clown_17: -6450420347727313635
       clown_5: -2940530314470319842
       bonus_20: -2103662274
       bonus_1: -1394567960
-      clown_17: -6450420347727313635
+      bonus_0: -671801442
       bonus_22: 1038974077
       clown_15: -7962056515094391696
       bonus_13: 1684036044

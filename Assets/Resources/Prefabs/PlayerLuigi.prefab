@@ -21533,6 +21533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf9d71929a202541b352e506ca0197e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  glowMaterial: {fileID: 0}
   models: {fileID: 4741703498087908288}
   smallModel: {fileID: 1717812904357955791}
   largeModel: {fileID: 3839069354041722077}
