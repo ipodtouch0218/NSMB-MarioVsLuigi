@@ -777,6 +777,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             Destroy(view.gameObject);
 
             return;
+        } else if (powerup.prefab == "1-Up") {
+            lives++;
+            UpdateGameState();
+            PlaySound(powerup.soundEffect);
+            GameObject thing = (GameObject)Instantiate(Resources.Load("Prefabs/Particle/1Up"), transform.position, Quaternion.identity);
+
+            if (view.IsMine)
+                PhotonNetwork.Destroy(view);
+            Destroy(view.gameObject);
+
+            return;
         }
 
         if (reserve) {
@@ -1076,6 +1087,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         gameObject.SetActive(false);
     }
+
 
     [PunRPC]
     public void Respawn() {
