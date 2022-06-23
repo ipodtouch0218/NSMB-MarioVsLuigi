@@ -894,7 +894,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (frozenObject)
             frozenObject.Kill();
 
-        Knockback(false, 1, true, -1);
+        Knockback(facingRight, 1, true, -1);
     }
     #endregion
 
@@ -1271,7 +1271,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     [PunRPC]
     protected void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
-        if (!GameManager.Instance.started || (knockback && fireballKnockback && invincible > 0) || (knockback && !fireballKnockback) || hitInvincibilityCounter > 0 || pipeEntering || Frozen)
+        if (!GameManager.Instance.started || (knockback && fireballKnockback && invincible > 0) || (knockback && !fireballKnockback) || hitInvincibilityCounter > 0 || pipeEntering || Frozen || dead)
             return;
 
         if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -1289,9 +1289,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         initialKnockbackFacingRight = facingRight;
 
         PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
-        if (attacker)
-            SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
+        if (attackerView >= 0) {
+            if (attacker)
+                SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
 
+            if (fireballKnockback)
+                PlaySound(Enums.Sounds.Player_Sound_Collision_Fireball);
+            else
+                PlaySound(Enums.Sounds.Player_Sound_Collision);
+        }
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", facingRight != fromRight);
 
