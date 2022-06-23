@@ -87,7 +87,9 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         Frozen = true;
         animator.enabled = false;
-        hitbox.enabled = false;
+        foreach (BoxCollider2D hitboxes in GetComponentsInChildren<BoxCollider2D>()) {
+            hitboxes.enabled = false;
+        }
         if (body) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;

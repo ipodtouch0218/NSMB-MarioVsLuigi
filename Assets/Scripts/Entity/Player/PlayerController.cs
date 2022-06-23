@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     public CameraController cameraController;
     public FadeOutManager fadeOut;
 
-    private AudioSource sfx, sfxBrick;
+    public AudioSource sfx, sfxBrick;
     private Animator animator;
     public Rigidbody2D body;
 
@@ -1396,7 +1396,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     body.velocity = new Vector2(-Mathf.Sign(floorAngle) * groundpoundVelocity, 0);
                     startedSliding = true;
                 } else {
-                    alreadyGroundpounded = false;
                     body.velocity = Vector2.zero;
                     if (!down || state == Enums.PowerupState.MegaMushroom) {
                         groundpound = false;
@@ -1426,7 +1425,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         if (up || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && !down) || (facingRight && hitRight) || (!facingRight && hitLeft)) {
             sliding = false;
-            alreadyGroundpounded = false;
+            //alreadyGroundpounded = false;
         }
     }
 
@@ -1436,7 +1435,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             return;
         }
         BoxCollider2D mainCollider = hitboxes[0];
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x + (Physics2D.defaultContactOffset * 2f), 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((mainCollider.size.x + Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
         if (hit) {
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
@@ -1452,7 +1451,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             onGround = true;
             doGroundSnap = true;
         } else {
-            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2(mainCollider.size.x + (Physics2D.defaultContactOffset * 3f), 0.1f), 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
+            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((mainCollider.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
             if (hit) {
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
                 if (hit.point.y > body.position.y || Mathf.Abs(angle) > 89 || Utils.IsTileSolidAtWorldLocation(hit.point))
@@ -1718,7 +1717,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             sliding = false;
             wallSlideLeft = false;
             wallSlideRight = false;
-            alreadyGroundpounded = false;
+            //alreadyGroundpounded = false;
             groundpound = false;
             groundpoundCounter = 0;
             drill = false;
@@ -2117,6 +2116,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         bool right = joystick.x > analogDeadzone && !paused;
         bool left = joystick.x < -analogDeadzone && !paused;
         bool crouch = joystick.y < -analogDeadzone && !paused;
+        alreadyGroundpounded &= crouch;
         bool up = joystick.y > analogDeadzone && !paused;
         bool jump = jumpBuffer > 0 && (onGround || koyoteTime < 0.07f || wallSlideLeft || wallSlideRight) && !paused;
 
@@ -2135,9 +2135,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         if (propellerTimer > 0)
             body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity - (propellerTimer < .4f ? (1 - (propellerTimer / .4f)) * propellerLaunchVelocity : 0));
-
-        if (!crouch)
-            alreadyGroundpounded = false;
 
         if (powerupButtonHeld && wallJumpTimer <= 0 && (propeller || !usedPropellerThisJump)) {
             if (body.velocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
@@ -2433,7 +2430,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         } else {
             //start groundpound
             //check if high enough above ground
-            if (Physics2D.BoxCast(body.position, hitboxes[0].size * transform.localScale, 0, Vector2.down, 0.15f * (state == Enums.PowerupState.MegaMushroom ? 2.5f : 1), ANY_GROUND_MASK))
+            if (Physics2D.BoxCast(body.position, hitboxes[0].size * Vector2.right * transform.localScale, 0, Vector2.down, 0.15f * (state == Enums.PowerupState.MegaMushroom ? 2.5f : 1), ANY_GROUND_MASK))
                 return;
 
             wallSlideLeft = false;

@@ -383,6 +383,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             controller.crouching = false;
             controller.alreadyGroundpounded = true;
             controller.pipeTimer = 0.25f;
+            body.velocity = Vector2.zero;
         }
         pipeTimer += Time.fixedDeltaTime;
     }

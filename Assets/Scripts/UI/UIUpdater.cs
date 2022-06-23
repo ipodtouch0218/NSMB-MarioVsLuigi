@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +11,7 @@ public class UIUpdater : MonoBehaviour {
     public PlayerController player;
     public Sprite storedItemNull; 
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
-    public Image itemReserve;
+    public Image itemReserve, itemColor;
     public float pingSample = 0;
 
     private Material timerMaterial;
@@ -33,8 +32,12 @@ public class UIUpdater : MonoBehaviour {
         backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
+
+        foreach (Image bg in backgrounds)
+            bg.color = GameManager.Instance.levelUIColor;
+        itemColor.color = new(GameManager.Instance.levelUIColor.r - 0.2f, GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f, GameManager.Instance.levelUIColor.a);
     }
-    
+
     public GameObject CreatePlayerIcon(PlayerController player) {
         GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
         TrackIcon icon = trackObject.GetComponent<TrackIcon>();
@@ -86,9 +89,6 @@ public class UIUpdater : MonoBehaviour {
     private void UpdateTextUI() {
         if (!player || GameManager.Instance.gameover)
             return;
-
-        foreach (Image bg in backgrounds)
-            bg.color = GameManager.Instance.levelUIColor;
 
         uiStars.text = Utils.GetSymbolString($"Sx{player.stars}/{GameManager.Instance.starRequirement}");
         uiCoins.text = Utils.GetSymbolString($"Cx{player.coins}/8");

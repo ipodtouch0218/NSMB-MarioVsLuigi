@@ -408,6 +408,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 wfgs.AttemptExecute();
 
             localPlayer.GetComponent<PlayerController>().OnGameStart();
+        } else {
+            foreach (PlayerController player in allPlayers)
+                player.sfx.enabled = true;
         }
 
         try {

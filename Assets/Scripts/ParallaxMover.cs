@@ -5,7 +5,13 @@ public class ParallaxMover : MonoBehaviour {
     private Vector3 moveBy;
 
     void Start() {
-        moveBy = new(speed, 0, 0);    
+        moveBy = new(speed, 0, 0);
+        foreach (var mover in GetComponentsInParent<ParallaxMover>()) {
+            if (mover.transform != transform) {
+                enabled = false;
+                break;
+            }
+        }
     }
 
     void Update() {

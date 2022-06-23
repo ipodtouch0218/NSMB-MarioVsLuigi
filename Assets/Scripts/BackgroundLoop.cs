@@ -4,7 +4,10 @@ public class BackgroundLoop : MonoBehaviour {
 
     public static BackgroundLoop instance = null;
 
-    private GameObject[] levels;
+    private GameObject[] children;
+    private Vector3[] truePositions, positionsAfterPixelSnap;
+    private float[] ppus;
+
     private Camera mainCamera;
     private Vector2 screenBounds;
     private Vector3 lastPosition;
@@ -14,13 +17,19 @@ public class BackgroundLoop : MonoBehaviour {
     public void Start() {
         instance = this;
         Transform t = GameObject.FindGameObjectWithTag("Backgrounds").transform;
-        levels = new GameObject[t.childCount];
-        for (int i = 0; i < t.childCount; i++)
-            levels[i] = t.GetChild(i).gameObject;
+        children = new GameObject[t.childCount];
+        ppus = new float[t.childCount];
+        truePositions = new Vector3[t.childCount];
+        positionsAfterPixelSnap = new Vector3[t.childCount];
+        for (int i = 0; i < t.childCount; i++) {
+            children[i] = t.GetChild(i).gameObject;
+            ppus[i] = children[i].GetComponent<SpriteRenderer>().sprite.pixelsPerUnit;
+            positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
+        }
 
         mainCamera = gameObject.GetComponent<Camera>();
         screenBounds = new Vector2(mainCamera.orthographicSize * mainCamera.aspect, mainCamera.orthographicSize) * 2.5f; // mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
-        foreach (GameObject obj in levels)
+        foreach (GameObject obj in children)
             LoadChildObjects(obj);
 
         lastPosition = transform.position;
@@ -61,21 +70,48 @@ public class BackgroundLoop : MonoBehaviour {
         }
     }
     public void Reposition() {
-        float difference = transform.position.x - lastPosition.x;
 
         if (wrap) {
-            foreach (GameObject obj in levels) {
-                obj.transform.Translate(difference, 0, 0);
+            for (int i = 0; i < children.Length; i++) {
+                GameObject obj = children[i];
+                float difference = (transform.position.x - lastPosition.x) + (obj.transform.position.x - truePositions[i].x);
+
+                truePositions[i] += difference * Vector3.right;
+                obj.transform.position = positionsAfterPixelSnap[i] = PixelClamp(truePositions[i], obj.transform.lossyScale, ppus[i]);
+
                 RepositionChildObjects(obj);
             }
             wrap = false;
         } else {
-            foreach (GameObject obj in levels) {
-                RepositionChildObjects(obj); 
+            for (int i = 0; i < children.Length; i++) {
+                GameObject obj = children[i];
+                float difference = (transform.position.x - lastPosition.x) + (obj.transform.position.x - positionsAfterPixelSnap[i].x);
                 float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(lastPosition.z / obj.transform.position.z));
-                obj.transform.Translate(difference * parallaxSpeed * Vector3.right);
+
+                truePositions[i] += difference * parallaxSpeed * Vector3.right;
+                obj.transform.position = positionsAfterPixelSnap[i] = PixelClamp(truePositions[i], obj.transform.lossyScale, ppus[i]);
+
+                RepositionChildObjects(obj);
             }
         }
         lastPosition = transform.position;
+    }
+
+    private static Vector3 PixelClamp(Vector3 pos, Vector3 scale, float pixelsPerUnit) {
+
+        if (!Settings.Instance.ndsResolution)
+            return pos;
+
+        pos *= pixelsPerUnit;
+        pos = pos.Divide(scale);
+
+        pos.x = Mathf.CeilToInt(pos.x);
+        pos.y = Mathf.CeilToInt(pos.y);
+        pos.z = Mathf.CeilToInt(pos.z);
+
+        pos /= pixelsPerUnit;
+        pos = pos.Multiply(scale);
+        
+        return pos;
     }
 }

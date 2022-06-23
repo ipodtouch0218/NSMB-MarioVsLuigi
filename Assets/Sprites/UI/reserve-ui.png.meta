@@ -313,7 +313,7 @@ TextureImporter:
         width: 140
         height: 140
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -321,6 +321,27 @@ TextureImporter:
       bones: []
       spriteID: 55fbd9f7cb079fd42b870af01a74b064
       internalID: -1604689058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: reserve-ui_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 301
+        width: 140
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d9d02a1ee756cf4f804e5c7d321cc19
+      internalID: -14430133
       vertices: []
       indices: 
       edges: []
@@ -343,6 +364,7 @@ TextureImporter:
       reserve-ui_0: 7194109699264141795
       reserve-ui_7: -1604689058
       reserve-ui_5: 2664608197882872095
+      reserve-ui_8: -14430133
       reserve-ui_2: -4773353537684922170
   spritePackingTag: 
   pSDRemoveMatte: 0
