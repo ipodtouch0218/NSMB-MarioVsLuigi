@@ -44,4 +44,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CustomGhostHouse.unity
     guid: a34162175f56dc843b78a21605d4bcf7
+  - enabled: 1
+    path: Assets/Scenes/Levels/CustomCheeseWorld.unity
+    guid: c8e85a6f9aac9494a80222aa96e8718b
   m_configObjects: {}
