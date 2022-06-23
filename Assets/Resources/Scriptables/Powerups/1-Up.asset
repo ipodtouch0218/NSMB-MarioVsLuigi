@@ -15,8 +15,8 @@ MonoBehaviour:
   state: 0
   prefab: 1-Up
   soundEffect: 13
-  spawnChance: 100
-  losingSpawnBonus: 3
+  spawnChance: 0
+  losingSpawnBonus: 0
   big: 0
   vertical: 0
   custom: 1
