@@ -84,11 +84,11 @@ GameObject:
   - component: {fileID: 1435431862184428452}
   - component: {fileID: 1435431862184428450}
   - component: {fileID: 1435431862184428453}
+  - component: {fileID: -2672154236049144105}
   - component: {fileID: 7346982284271418879}
   - component: {fileID: 8264916374906224327}
   - component: {fileID: 3216175395817112741}
   - component: {fileID: 3278359404849032757}
-  - component: {fileID: -224464597432840520}
   - component: {fileID: 618591213112214912}
   - component: {fileID: 7066327238497152073}
   - component: {fileID: 5072740182388110993}
@@ -205,7 +205,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 2.2
   m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -235,6 +235,45 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.1, y: 0.1}
   m_EdgeRadius: 0
+--- !u!114 &-2672154236049144105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1435431862184428451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e768199a4ce91b94996259efa32e1d03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dead: 0
+  left: 1
+  collide: 1
+  iceCarryable: 1
+  flying: 0
+  body: {fileID: 0}
+  hitbox: {fileID: 0}
+  holder: {fileID: 0}
+  previousHolder: {fileID: 0}
+  holderOffset: {x: 0, y: 0, z: 0}
+  canPlace: 1
+  walkSpeed: 0.875
+  kickSpeed: 5
+  wakeup: 15
+  red: 1
+  blue: 0
+  shell: 0
+  stationary: 0
+  upsideDown: 0
+  canBeFlipped: 0
+  flipXFlip: 1
+  putdown: 0
+  wakeupTimer: 0
+  outShellHitboxSize: {x: 0.1, y: 0.1}
+  inShellHitboxSize: {x: 0.1, y: 0.1}
+  outShellHitboxOffset: {x: 0, y: -0.02}
+  inShellHitboxOffset: {x: 0, y: -0.02}
 --- !u!114 &7346982284271418879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,7 +312,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters: []
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 0
+    Name: shell
+  - Type: 1
+    SynchronizeType: 0
+    Name: xVel
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
@@ -305,45 +350,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-224464597432840520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1435431862184428451}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e768199a4ce91b94996259efa32e1d03, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dead: 0
-  left: 1
-  collide: 1
-  iceCarryable: 1
-  flying: 0
-  body: {fileID: 0}
-  hitbox: {fileID: 0}
-  holder: {fileID: 0}
-  previousHolder: {fileID: 0}
-  holderOffset: {x: 0, y: 0, z: 0}
-  canPlace: 1
-  walkSpeed: 0
-  kickSpeed: 0
-  wakeup: 15
-  red: 0
-  blue: 0
-  shell: 0
-  stationary: 0
-  upsideDown: 0
-  canBeFlipped: 1
-  flipXFlip: 0
-  putdown: 0
-  wakeupTimer: 0
-  outShellHitboxSize: {x: 0, y: 0}
-  inShellHitboxSize: {x: 0, y: 0}
-  outShellHitboxOffset: {x: 0, y: 0}
-  inShellHitboxOffset: {x: 0, y: 0}
 --- !u!114 &618591213112214912
 MonoBehaviour:
   m_ObjectHideFlags: 0

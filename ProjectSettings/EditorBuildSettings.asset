@@ -47,4 +47,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CustomCheeseWorld.unity
     guid: c8e85a6f9aac9494a80222aa96e8718b
+  - enabled: 1
+    path: Assets/Scenes/Levels/CustomIceCaverns.unity
+    guid: 932371202ca396e4a98adf7b4798007a
   m_configObjects: {}

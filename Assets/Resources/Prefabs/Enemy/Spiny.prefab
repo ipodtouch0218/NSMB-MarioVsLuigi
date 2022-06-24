@@ -178,7 +178,7 @@ Animator:
   m_GameObject: {fileID: 1435431862184428451}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fe02b20d8837d014f865e3ae7db9e77a, type: 2}
+  m_Controller: {fileID: 9100000, guid: d8e933624af09bd4e90f77888bce717c, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -312,13 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters:
-  - Type: 4
-    SynchronizeType: 1
-    Name: shell
-  - Type: 1
-    SynchronizeType: 1
-    Name: xVel
+  m_SynchronizeParameters: []
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
