@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class BackgroundLoop : MonoBehaviour {
 
@@ -7,6 +8,7 @@ public class BackgroundLoop : MonoBehaviour {
     private GameObject[] children;
     private Vector3[] truePositions, positionsAfterPixelSnap;
     private float[] ppus;
+    private float[] halfWidths;
 
     private Camera mainCamera;
     private Vector2 screenBounds;
@@ -21,10 +23,14 @@ public class BackgroundLoop : MonoBehaviour {
         ppus = new float[t.childCount];
         truePositions = new Vector3[t.childCount];
         positionsAfterPixelSnap = new Vector3[t.childCount];
+        halfWidths = new float[t.childCount];
         for (int i = 0; i < t.childCount; i++) {
             children[i] = t.GetChild(i).gameObject;
-            ppus[i] = children[i].GetComponent<SpriteRenderer>().sprite.pixelsPerUnit;
+            SpriteRenderer sr = children[i].GetComponent<SpriteRenderer>();
+            ppus[i] = sr.sprite.pixelsPerUnit;
+            halfWidths[i] = sr.bounds.extents.x - (1f/ppus[i]);
             positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
+
         }
 
         mainCamera = gameObject.GetComponent<Camera>();
@@ -55,11 +61,11 @@ public class BackgroundLoop : MonoBehaviour {
         if (!obj)
             return;
 
-        Transform[] children = obj.GetComponentsInChildren<Transform>();
-        if (children.Length > 1) {
-            GameObject firstChild = children[1].gameObject;
-            GameObject lastChild = children[^1].gameObject;
-            float halfObjectWidth = lastChild.GetComponent<SpriteRenderer>().bounds.extents.x;
+        Transform parent = obj.transform;
+        if (parent.childCount > 1) {
+            GameObject firstChild = parent.GetChild(0).gameObject;
+            GameObject lastChild = parent.GetChild(parent.childCount - 1).gameObject;
+            float halfObjectWidth = halfWidths[Array.IndexOf(children, obj)];
             if (transform.position.x + screenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
                 firstChild.transform.SetAsLastSibling();
                 firstChild.transform.position = new Vector3(lastChild.transform.position.x + halfObjectWidth * 2, lastChild.transform.position.y, lastChild.transform.position.z);
