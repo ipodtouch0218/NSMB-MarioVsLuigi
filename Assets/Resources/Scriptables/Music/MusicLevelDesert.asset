@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: MusicLevelDesert
   m_EditorClassIdentifier: 
   clip: {fileID: 8300000, guid: dfea42422a802de45bb16841e9be3a70, type: 3}
-  loopStartSample: 1
-  loopEndSample: 0
+  loopStartSample: 0
+  loopEndSample: -1
