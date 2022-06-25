@@ -312,7 +312,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters: []
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 0
+    Name: shell
+  - Type: 1
+    SynchronizeType: 0
+    Name: xVel
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

@@ -12,42 +12,51 @@ EditorBuildSettings:
     path: Assets/Scenes/Loading.unity
     guid: 6409d3c7bca161147972aa4b7c811199
   - enabled: 1
-    path: Assets/Scenes/Levels/DefaultGrassLevel.unity
+    path: Assets/Scenes/Levels/GrassLevel.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/Levels/DefaultBrickLevel.unity
+    path: Assets/Scenes/Levels/BrickLevel.unity
     guid: eccd61e23b609ef4f97a643aa84d51d5
   - enabled: 1
-    path: Assets/Scenes/Levels/DefaultCastle.unity
+    path: Assets/Scenes/Levels/Castle.unity
     guid: 2c88ad1eb18532241acee4483fed211d
   - enabled: 1
-    path: Assets/Scenes/Levels/DefaultPipes.unity
+    path: Assets/Scenes/Levels/Pipes.unity
     guid: 3f5866ca86038b44384372ab3dadfffc
   - enabled: 1
-    path: Assets/Scenes/Levels/DefaultSnow.unity
+    path: Assets/Scenes/Levels/Snow.unity
     guid: 42e7b04a277dea44eab7edc32729f7a5
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomJungle.unity
+    path: Assets/Scenes/Levels/Jungle.unity
     guid: de8e2edb54b6b5e489c97578fa670804
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomSky.unity
+    path: Assets/Scenes/Levels/Sky.unity
     guid: addb28d9cb6d8a6498a3b328a6e57f33
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomVolcano.unity
+    path: Assets/Scenes/Levels/Volcano.unity
     guid: 48dfbffbd41b62a41a8135ce450497f5
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomBonus.unity
+    path: Assets/Scenes/Levels/Bonus.unity
     guid: ce4cf98f31007b44ea19a2fb2ab0924a
   - enabled: 0
     path: Assets/Scenes/Levels/ChrisLevel.unity
     guid: 726270b3f73301e4d86c79f4ef9e818c
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomGhostHouse.unity
+    path: Assets/Scenes/Levels/GhostHouse.unity
     guid: a34162175f56dc843b78a21605d4bcf7
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomCheeseWorld.unity
+    path: Assets/Scenes/Levels/CheeseWorld.unity
     guid: c8e85a6f9aac9494a80222aa96e8718b
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomIceCaverns.unity
+    path: Assets/Scenes/Levels/IceCaverns.unity
     guid: 932371202ca396e4a98adf7b4798007a
+  - enabled: 1
+    path: Assets/Scenes/Levels/Beach.unity
+    guid: 5f15f2a1bbf424a4294e28eb0e186f8a
+  - enabled: 1
+    path: Assets/Scenes/Levels/Desert.unity
+    guid: a4fcde89c0635cc499429c70ac74def6
+  - enabled: 1
+    path: Assets/Scenes/Levels/SMB1-1.unity
+    guid: cf8e23a3dae7f994b9c6b161d52fdd42
   m_configObjects: {}
