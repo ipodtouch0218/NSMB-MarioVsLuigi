@@ -10386,6 +10386,8 @@ MonoBehaviour:
   hitboxes: []
   cameraController: {fileID: 0}
   fadeOut: {fileID: 0}
+  sfx: {fileID: 0}
+  sfxBrick: {fileID: 0}
   body: {fileID: 0}
   onGround: 0
   previousOnGround: 0
