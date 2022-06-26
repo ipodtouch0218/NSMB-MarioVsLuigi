@@ -65,6 +65,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
     public void Update() {
         HandleAnimations();
+
+        //Hitbox changing
+        UpdateHitbox();
     }
 
     void HandleAnimations() {
@@ -274,9 +277,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
         //hit flash
         models.SetActive(controller.dead || !(controller.hitInvincibilityCounter > 0 && controller.hitInvincibilityCounter * (controller.hitInvincibilityCounter <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
-
-        //Hitbox changing
-        UpdateHitbox();
 
         //Model changing
         bool large = controller.state >= Enums.PowerupState.Mushroom;

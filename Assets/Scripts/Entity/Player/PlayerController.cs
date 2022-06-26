@@ -261,6 +261,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             HandleMovement(Time.fixedDeltaTime);
             HandleGiantTiles(true);
         }
+        if (holding && holding.dead)
+            holding = null;
+
         AnimationController.UpdateAnimatorStates();
         HandleLayerState();
         previousFrameVelocity = body.velocity;
@@ -348,6 +351,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     public void OnCollisionStay2D(Collision2D collision) {
         if (!photonView.IsMine || (knockback && !fireballKnockback) || Frozen)
             return;
+
+        GameObject obj = collision.gameObject;
 
         switch (collision.gameObject.tag) {
         case "Player": {
@@ -487,7 +492,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 avg += point;
             avg /= points.Count;
 
-            collision.gameObject.GetPhotonView().RPC("Bump", RpcTarget.All, photonView.ViewID, avg);
+            obj.GetPhotonView().RPC("Bump", RpcTarget.All, photonView.ViewID, avg);
+            break;
+        }
+        case "frozencube": {
+            Debug.Log(holdingOld);
+            if (holding == obj || (holdingOld == obj && throwInvincibility > 0))
+                return;
+
+            obj.GetComponent<FrozenCube>().InteractWithPlayer(this);
             break;
         }
         }
@@ -512,15 +525,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         case "Fireball": {
             FireballMover fireball = obj.GetComponentInParent<FireballMover>();
             if (fireball.photonView.IsMine || hitInvincibilityCounter > 0)
-                break;
+                return;
 
             fireball.photonView.RPC("Kill", RpcTarget.All);
             if (knockback || invincible > 0 || state == Enums.PowerupState.MegaMushroom)
-                break;
+                return;
 
             if (!fireball.isIceball) {
                 if (state == Enums.PowerupState.BlueShell && (inShell || crouching || groundpound))
-                    break;
+                    return;
 
                 if (state == Enums.PowerupState.MiniMushroom) {
                     photonView.RPC("Powerdown", RpcTarget.All, false);
@@ -537,16 +550,18 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     frozenObject = cube.GetComponent<FrozenCube>();
                 }
             }
-            break;
+            return;
         }
         case "lava":
         case "poison": {
             if (!photonView.IsMine)
                 return;
             photonView.RPC("Death", RpcTarget.All, false, obj.CompareTag("lava"));
-            break;
+            return;
         }
         }
+
+        OnTriggerStay2D(collider);
     }
 
     protected void OnTriggerStay2D(Collider2D collider) {
@@ -558,11 +573,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         if (!photonView.IsMine || dead || Frozen)
             return;
-
-        if (collider.GetComponentInParent<FrozenCube>() is FrozenCube cube) {
-            if (!(cube && (holding == cube || (holdingOld == cube && throwInvincibility > 0))))
-                cube.InteractWithPlayer(this);
-        }
 
         switch (obj.tag) {
         case "Powerup": {
@@ -1135,7 +1145,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             sfxBrick.clip = sound.GetClip(character, variant);
             sfxBrick.Play();
         } else {
-            sfx.PlayOneShot(sound.GetClip(character, variant), Mathf.Clamp01(volume));
+            sfx.PlayOneShot(sound.GetClip(character, variant), volume);
         }
     }
     [PunRPC]
@@ -1296,9 +1306,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
 
             if (fireballKnockback)
-                PlaySound(Enums.Sounds.Player_Sound_Collision_Fireball);
+                PlaySound(Enums.Sounds.Player_Sound_Collision_Fireball, 0, 3);
             else
-                PlaySound(Enums.Sounds.Player_Sound_Collision);
+                PlaySound(Enums.Sounds.Player_Sound_Collision, 0, 3);
         }
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", facingRight != fromRight);
@@ -1579,7 +1589,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     }
 
     bool ForceCrouchCheck() {
-        if (state < Enums.PowerupState.Mushroom || (state == Enums.PowerupState.BlueShell && !onGround))
+        if (state == Enums.PowerupState.BlueShell && !onGround)
             return false;
 
         float width = hitboxes[0].bounds.extents.x;
@@ -1587,7 +1597,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         bool triggerState = Physics2D.queriesHitTriggers;
         Physics2D.queriesHitTriggers = false;
 
-        bool ret = Physics2D.BoxCast(body.position + new Vector2(0, 0.86f / 2f + 0.05f), new Vector2(width, 0.71f), 0, Vector2.zero, 0, ONLY_GROUND_MASK);
+        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width, 0.05f), 0, Vector2.up, hitboxes[0].size.y / 0.5f, ONLY_GROUND_MASK);
 
         Physics2D.queriesHitTriggers = triggerState;
         return ret;
@@ -1873,8 +1883,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (!body || hitboxes.Length <= 0 || state == Enums.PowerupState.MegaMushroom)
             return false;
 
-        Vector2 checkSize = hitboxes[0].size * transform.lossyScale;
-        Vector2 checkPos = body.position + (Vector2.up * hitboxes[0].size * transform.lossyScale / 2f);
+        Vector2 checkSize = hitboxes[0].size * transform.lossyScale * (Vector2.up * 0.8f + Vector2.right);
+        Vector2 checkPos = body.position + (Vector2.up * checkSize / 2f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
             stuckInBlock = false;
@@ -1887,11 +1897,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
             if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.up * 0.5f, checkSize * Vector2.right)) {
                 transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2);
+                return true;
             } else if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.down * 0.5f, checkSize * Vector2.right)) {
                 float heightInTiles = Mathf.Floor(hitboxes[0].size.y * transform.lossyScale.y * 2);
                 transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 - heightInTiles - 1) / 2);
+                return true;
             }
-
         }
 
         // eject
@@ -2374,7 +2385,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         }
     }
 
-    [PunRPC]
     void ThrowHeldItem(bool left, bool right, bool crouch) {
         if (!((!functionallyRunning || state == Enums.PowerupState.MiniMushroom || state == Enums.PowerupState.MegaMushroom || invincible > 0 || flying || propeller) && holding))
             return;
@@ -2385,6 +2395,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         crouch &= holding.canPlace;
 
+        holdingOld = holding;
+        throwInvincibility = 0.15f;
+
         if (photonView.IsMine)
             holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
 
@@ -2393,7 +2406,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             throwInvincibility = 0.5f;
             animator.SetTrigger("throw");
         }
-        holdingOld = holding;
+
         holding = null;
     }
 

@@ -311,8 +311,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         InputSystem.controls.UI.Pause.performed -= OnPause;
     }
 
-    public void Start() {
+    public void Awake() {
         Instance = this;
+    }
+
+    public void Start() {
         SpectationManager = GetComponent<SpectationManager>();
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");

@@ -13,7 +13,7 @@ public class FrozenCube : HoldableEntity {
     PhotonView entityView;
     Rigidbody2D entityBody;
 
-    public float autoBreakTimer = 10;
+    public float autoBreakTimer = 10, throwTimer;
 
     public bool fastSlide, fallen;
 
@@ -49,18 +49,14 @@ public class FrozenCube : HoldableEntity {
             GameObject rendererObject = entityView.gameObject;
             Renderer[] renderers = entityView.GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in renderers) {
-                if (!renderer.enabled)
-                    continue;
-                if (renderer is ParticleSystemRenderer)
+                if (!renderer.enabled || renderer is ParticleSystemRenderer)
                     continue;
 
                 renderer.ResetBounds();
 
-                if (bounds == default) {
+                if (bounds == default)
                     bounds = new(renderer.bounds.center, renderer.bounds.size);
-                    //rendererObject = renderer.gameObject;
-                    //Debug.Log(rendererObject.name + " - " + rendererObject.transform.position + " - " + bounds.center);
-                } else
+                else
                     bounds.Encapsulate(renderer.bounds);
             }
 
@@ -152,6 +148,11 @@ public class FrozenCube : HoldableEntity {
             }
         }
 
+        if (throwTimer > 0 && throwTimer - Time.fixedDeltaTime <= 0) {
+            Physics2D.IgnoreCollision(hitbox, previousHolder.hitboxes[0], false);
+        }
+        Utils.TickTimer(ref throwTimer, 0, Time.fixedDeltaTime);
+
         ApplyConstraints();
     }
 
@@ -172,11 +173,14 @@ public class FrozenCube : HoldableEntity {
 	public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
+        if (previousHolder == player && throwTimer > 0)
+            return;
+
         if (!holder && (player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.inShell)) {
             photonView.RPC("Kill", RpcTarget.All);
             return;
         }
-        if (holder || fallen || player.Frozen)
+        if (holder || fallen || player.Frozen || (player.throwInvincibility > 0 && player.holdingOld == gameObject))
             return;
 
         if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
@@ -210,10 +214,12 @@ public class FrozenCube : HoldableEntity {
         flying = false;
         left = facingLeft;
         fastSlide = true;
-        transform.position = new Vector2(holder.facingRight ? holder.transform.position.x + 0.1f : holder.transform.position.x - 0.1f, transform.position.y);
+        transform.position = new(holder.facingRight ? holder.transform.position.x + 0.1f : holder.transform.position.x - 0.1f, transform.position.y, transform.position.z);
 
         previousHolder = holder;
+        holder.SetHoldingOld(photonView.ViewID);
         holder = null;
+        throwTimer = 1f;
 
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
 
@@ -270,6 +276,12 @@ public class FrozenCube : HoldableEntity {
 
             photonView.RPC("Kill", RpcTarget.All);
         }
+    }
+
+    [PunRPC]
+    public override void Pickup(int view) {
+        base.Pickup(view);
+        Physics2D.IgnoreCollision(hitbox, holder.hitboxes[0]);
     }
 
     [PunRPC]
