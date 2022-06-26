@@ -44,7 +44,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -119,12 +119,12 @@ TextureImporter:
       name: VolcanoBackgroundALT_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 494
-        width: 506
-        height: 488
+        x: 2
+        y: 498
+        width: 504
+        height: 486
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -140,12 +140,12 @@ TextureImporter:
       name: VolcanoBackgroundALT_1
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 506
-        height: 488
+        x: 4
+        y: 7
+        width: 501
+        height: 484
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -153,6 +153,195 @@ TextureImporter:
       bones: []
       spriteID: 82c84f2adec919e4c88a92d48d79c7da
       internalID: -2119563631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_0
+      rect:
+        serializedVersion: 2
+        x: 517
+        y: 500
+        width: 504
+        height: 486
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d459a63e812a87499c23c8165117ec5
+      internalID: 788310345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_1
+      rect:
+        serializedVersion: 2
+        x: 1027
+        y: 500
+        width: 504
+        height: 486
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3ff8b752d438aa4da43a39b363c1eba
+      internalID: 1594017817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_2
+      rect:
+        serializedVersion: 2
+        x: 1028
+        y: 5
+        width: 503
+        height: 486
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19f8c162d2263284f8a5fe695644a079
+      internalID: 2098053974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_3
+      rect:
+        serializedVersion: 2
+        x: 1539
+        y: 5
+        width: 502
+        height: 485
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d2f76df32fc9734a9d9f510c01a3864
+      internalID: 1590995978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_4
+      rect:
+        serializedVersion: 2
+        x: 2558
+        y: 503
+        width: 504
+        height: 486
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc903eb628880b9418dc8ba602621b23
+      internalID: 1971471035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_5
+      rect:
+        serializedVersion: 2
+        x: 2557
+        y: 5
+        width: 503
+        height: 487
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a78bd06ebc6709409d4703d6d17be7d
+      internalID: -1086402579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_6
+      rect:
+        serializedVersion: 2
+        x: 1539
+        y: 500
+        width: 502
+        height: 485
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d2d6b0977d8563845902bf35b8139639
+      internalID: 1225238780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_7
+      rect:
+        serializedVersion: 2
+        x: 2119
+        y: 5
+        width: 388
+        height: 159
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fc88a5d39228de4db3e3ead64ed331d
+      internalID: 409092957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: volcano-bg_8
+      rect:
+        serializedVersion: 2
+        x: 517
+        y: 7
+        width: 504
+        height: 484
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc4339a797ec8bf4f85c12a60d511640
+      internalID: -212848695
       vertices: []
       indices: 
       edges: []
@@ -168,7 +357,16 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      volcano-bg_0: 788310345
+      volcano-bg_3: 1590995978
+      volcano-bg_4: 1971471035
+      volcano-bg_1: 1594017817
       VolcanoBackgroundALT_0: 1158597893
+      volcano-bg_2: 2098053974
+      volcano-bg_7: 409092957
+      volcano-bg_5: -1086402579
+      volcano-bg_6: 1225238780
+      volcano-bg_8: -212848695
       VolcanoBackgroundALT_1: -2119563631
   spritePackingTag: 
   pSDRemoveMatte: 0

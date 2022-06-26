@@ -59,4 +59,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/SMB1-1.unity
     guid: cf8e23a3dae7f994b9c6b161d52fdd42
+  - enabled: 1
+    path: Assets/Scenes/Levels/coopTest.unity
+    guid: c571fc105232aa54cb38b4d5899c0d27
   m_configObjects: {}
