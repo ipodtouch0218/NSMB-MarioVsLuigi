@@ -13,7 +13,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks {
     private static GameManager _instance;
-    public static GameManager Instance { 
+    public static GameManager Instance {
         get {
             if (_instance == null && SceneManager.GetActiveScene().buildIndex > 2)
                 _instance = FindObjectOfType<GameManager>();
@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     private GameObject[] coins;
 
     public SpectationManager SpectationManager { get; private set; }
-    
+
     ParticleSystem brickBreak;
 
     // EVENT CALLBACK
@@ -207,7 +207,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 brickBreak.Emit(new() { startColor = new Color(color.x, color.y, color.z, 1) }, 4);
             } else {
                 particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), worldPos, Quaternion.identity);
-                
+
                 ParticleSystem system = particle.GetComponent<ParticleSystem>();
                 ParticleSystem.MainModule main = system.main;
                 main.startColor = new Color(color.x, color.y, color.z, 1);
@@ -327,8 +327,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         //Spawning in editor??
         if (!PhotonNetwork.IsConnectedAndReady) {
             PhotonNetwork.OfflineMode = true;
-            PhotonNetwork.CreateRoom("Debug", new() { 
-                CustomRoomProperties = NetworkUtils.DefaultRoomProperties 
+            PhotonNetwork.CreateRoom("Debug", new() {
+                CustomRoomProperties = NetworkUtils.DefaultRoomProperties
             });
         }
 #endif
@@ -369,7 +369,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         bool spectating = GlobalController.Instance.joinedAsSpectator;
 
         if (PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode) {
-            //clear buffered loading complete events. 
+            //clear buffered loading complete events.
             RaiseEventOptions options = new() { Receivers = ReceiverGroup.All, CachingOption = EventCaching.RemoveFromRoomCache };
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);
         }
@@ -499,7 +499,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (musicEnabled)
             HandleMusic();
-        
+
         if (PhotonNetwork.IsMasterClient) {
             int players = PhotonNetwork.CurrentRoom.PlayerCount;
             if (!loaded && loadedPlayers.Count >= players) {
@@ -597,7 +597,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     private void PlaySong(Enums.MusicState state, MusicData musicToPlay) {
-        if (musicState == state) 
+        if (musicState == state)
             return;
 
         loopMusic.Play(musicToPlay);
@@ -608,9 +608,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         bool invincible = false;
         bool mega = false;
         bool speedup = false;
-        
+
         foreach (var player in allPlayers) {
-            if (!player) 
+            if (!player)
                 continue;
 
             if (player.state == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
@@ -641,13 +641,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void ResetTiles() {
         tilemap.SetTilesBlock(origin, originalTiles);
-        
+
         foreach (GameObject coin in GameObject.FindGameObjectsWithTag("coin")) {
             coin.GetComponent<SpriteRenderer>().enabled = true;
             coin.GetComponent<BoxCollider2D>().enabled = true;
         }
 
-        if (!PhotonNetwork.IsMasterClient) 
+        if (!PhotonNetwork.IsMasterClient)
             return;
         foreach (EnemySpawnpoint point in enemySpawnpoints)
             point.AttemptSpawning();
@@ -722,7 +722,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2 ? scale * ySize : 0), 0);
         if (spawn.x < GetLevelMinX())
             spawn += new Vector3(levelWidthTile/2f, 0);
-        if (spawn.x > GetLevelMaxX()) 
+        if (spawn.x > GetLevelMaxX())
             spawn -= new Vector3(levelWidthTile/2f, 0);
         return spawn;
     }
@@ -749,7 +749,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         Gizmos.DrawWireCube(origin, size);
 
 
-        if (!tilemap) 
+        if (!tilemap)
             return;
         for (int x = 0; x < levelWidthTile; x++) {
             for (int y = 0; y < levelHeightTile; y++) {
@@ -761,7 +761,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + Vector3.one * 0.25f, "powerup");
             }
         }
-        
+
         Gizmos.color = new Color(1, 0.9f, 0.2f, 0.2f);
         foreach (GameObject starSpawn in GameObject.FindGameObjectsWithTag("StarSpawn")) {
             Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);

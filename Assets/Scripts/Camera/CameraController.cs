@@ -116,6 +116,9 @@ public class CameraController : MonoBehaviour {
         return targetPosition;
     }
     private void OnDrawGizmos() {
+        if (!controller)
+            return;
+
         Gizmos.color = Color.blue;
         Vector2 threshold = controller.onGround ? groundedThreshold : airThreshold;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
