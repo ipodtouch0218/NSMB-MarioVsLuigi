@@ -674,7 +674,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/IceballWall", pos);
             } else {
-                PhotonNetwork.Instantiate("Prefabs/Iceball", pos, Quaternion.identity, 0, new object[] { !facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") });
+                PhotonNetwork.Instantiate("Prefabs/Iceball", pos, Quaternion.identity, 0, new object[] { !facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround"), body.velocity.x });
             }
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_Iceball_Shoot);
 
@@ -1212,9 +1212,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                         continue;
 
                     dir = InteractableTile.InteractionDirection.Down;
-                } else if (worldPosCenter.x - 0.25f < checkPosition.x - checkSize.x * 0.5f) {
+                } else if (worldPosCenter.y + Physics2D.defaultContactOffset * 2f >= body.position.y + size.y) {
+                    dir = InteractableTile.InteractionDirection.Up;
+                } else if (worldPosCenter.x <= body.position.x) {
                     dir = InteractableTile.InteractionDirection.Left;
-                } else if (worldPosCenter.x + 0.25f > checkPosition.x + checkSize.x * 0.5f) {
+                } else if (worldPosCenter.x >= body.position.x) {
                     dir = InteractableTile.InteractionDirection.Right;
                 }
 
@@ -1439,7 +1441,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         if (hit) {
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
-            if (hit.point.y > body.position.y || Mathf.Abs(angle) > 89 || Utils.IsTileSolidAtWorldLocation(hit.point))
+            if (Mathf.Abs(angle) > 89)
                 return;
 
             float x = floorAngle != angle ? previousFrameVelocity.x : body.velocity.x;
@@ -1454,7 +1456,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((mainCollider.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
             if (hit) {
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
-                if (hit.point.y > body.position.y || Mathf.Abs(angle) > 89 || Utils.IsTileSolidAtWorldLocation(hit.point))
+                if (Mathf.Abs(angle) > 89)
                     return;
 
                 float x = floorAngle != angle ? previousFrameVelocity.x : body.velocity.x;
@@ -1812,7 +1814,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         float airPenalty = onGround ? 1 : 0.5f;
         float xVel = Mathf.Abs(body.velocity.x);
-        float invincibleSpeedBoost = onGround && invincible > 0 ? 1.5f : 1f;
+        float invincibleSpeedBoost = onGround && invincible > 0 ? 2f : 1f;
         float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
         float walkSpeedTotal = walkingMaxSpeed;
         bool reverseDirection = (left ? 1 : -1) == Mathf.Sign(body.velocity.x); // ((left && body.velocity.x > 0.02) || (right && body.velocity.x < -0.02));
@@ -1868,7 +1870,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     }
 
     bool HandleStuckInBlock() {
-        if (!body || hitboxes.Length <= 0)
+        if (!body || hitboxes.Length <= 0 || state == Enums.PowerupState.MegaMushroom)
             return false;
 
         Vector2 checkSize = hitboxes[0].size * transform.lossyScale;
@@ -2014,7 +2016,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 giantStartTimer = 0;
             } else {
                 body.isKinematic = true;
-                if (animator.GetCurrentAnimatorClipInfo(1).Length <= 0 || animator.GetCurrentAnimatorClipInfo(1)[0].clip.name != "mega-scale")
+                if (animator.GetCurrentAnimatorClipInfo(0).Length <= 0 || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "mega-scale")
                     animator.Play("mega-scale");
 
 
@@ -2037,7 +2039,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     Utils.WrapTileLocation(ref tileLocation);
                     TileBase tile = Utils.GetTileAtTileLocation(tileLocation);
 
-                    if ((!(tile as BreakableBrickTile)?.breakableByGiantMario) ?? tile) {
+                    if ((!(tile as BreakableBrickTile)?.breakableByGiantMario) ?? Utils.IsTileSolidAtTileLocation(tileLocation)) {
                         photonView.RPC("FinishMegaMario", RpcTarget.All, false);
                         return;
                     }
@@ -2311,6 +2313,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
             if (knockback) {
                 abovemax = true;
+            } else if (flying || propeller) {
+                abovemax = !(left || right);
             } else if (!sliding && (left ^ right) && !crouching) {
                 abovemax = Mathf.Abs(body.velocity.x) > max;
             } else if ((left ^ right) && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2) {
@@ -2513,6 +2517,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
             if (r is ParticleSystemRenderer)
                 continue;
+            
             Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
         }
     }

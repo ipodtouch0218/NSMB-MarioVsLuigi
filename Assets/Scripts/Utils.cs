@@ -111,7 +111,7 @@ public class Utils {
             worldLocation += (Vector3) it.offset * 0.5f;
 
         Vector3Int tileLocation = WorldToTilemapPosition(worldLocation);
-        Matrix4x4 transform = GameManager.Instance.tilemap.GetTransformMatrix(tileLocation);
+        Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix(tileLocation);
 
         Sprite sprite = GameManager.Instance.tilemap.GetSprite(tileLocation);
         switch (GetColliderType(tileLocation)) {
@@ -124,11 +124,19 @@ public class Utils {
                 List<Vector2> points = new();
                 sprite.GetPhysicsShape(i, points);
 
-                for (int j = 0; j < points.Count; j++)
-                    points[i] = transform.MultiplyPoint3x4(points[i]);
-                
+                for (int j = 0; j < points.Count; j++) {
+                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10f); 
+                }
+
                 Vector2 tilePosition = TilemapToWorldPosition(WorldToTilemapPosition(worldLocation));
-                if (IsInside(points.ToArray(), (Vector2) ogWorldLocation - tilePosition))
+                Vector2 playerLoc = (Vector2) ogWorldLocation - tilePosition;
+                playerLoc += Vector2.down * 0.25f;
+                playerLoc *= tileTransform.lossyScale * 2f;
+                playerLoc += 0.5f * tileTransform.lossyScale.x * Vector2.left;
+
+                Debug.DrawLine(playerLoc, playerLoc + Vector2.up, Color.blue, 10f);
+
+                if (IsInside(points.ToArray(), playerLoc))
                     return true;
             }
             return false;

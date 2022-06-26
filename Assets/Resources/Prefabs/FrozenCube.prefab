@@ -215,7 +215,6 @@ MonoBehaviour:
   throwSpeed: 7.25
   shakeSpeed: 80
   shakeAmount: 2
-  frozenCubeCollider: {fileID: 1182937128297349914}
   spriteRenderer: {fileID: 0}
   autoBreakTimer: 3
   fastSlide: 0

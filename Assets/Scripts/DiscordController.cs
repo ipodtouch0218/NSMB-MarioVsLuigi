@@ -20,9 +20,11 @@ public class DiscordController : MonoBehaviour {
         activityManager.OnActivityJoin += TryJoinGame;
 
 #if UNITY_STANDALONE_WIN
+        /*
         try {
             activityManager.RegisterCommand(System.Windows.Forms.Application.ExecutablePath);
         } catch { }
+        */
 #endif
     }
 

@@ -368,7 +368,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
             Vector2 offset = controller.pipeDirection * (pipeDuration / 2f);
             if (pe.otherPipe.bottom) {
                 offset -= controller.pipeDirection;
-                offset.y -= heightLargeModel - (mainHitbox.size.y * transform.localScale.y);
+                float size = mainHitbox.size.y * transform.localScale.y;
+                offset.y -= size;
             }
             transform.position = body.position = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);

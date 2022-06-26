@@ -13,7 +13,11 @@ public class FireballMover : MonoBehaviourPun {
         body = GetComponent<Rigidbody2D>();
         physics = GetComponent<PhysicsEntity>();
 
-        left = (bool) photonView.InstantiationData[0];
+        object[] data = photonView.InstantiationData;
+        left = (bool) data[0];
+        if (data.Length > 1)
+            speed += Mathf.Abs((float) data[1] / 3f);
+
         body.velocity = new Vector2(speed * (left ? -1 : 1), -speed);
     }
     void FixedUpdate() {
