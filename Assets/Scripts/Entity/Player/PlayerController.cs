@@ -5,7 +5,9 @@ using UnityEngine.InputSystem;
 using Photon.Pun;
 using ExitGames.Client.Photon;
 
-public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservable, IOnPhotonViewPreNetDestroy {
+public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSerializeView, IOnPhotonViewPreNetDestroy {
+
+    public bool Active { get; set; } = true;
 
     public static int ANY_GROUND_MASK = -1, ONLY_GROUND_MASK, GROUND_LAYERID, HITS_NOTHING_LAYERID, DEFAULT_LAYERID, PASSTHROUGH_LAYERID;
 
@@ -36,7 +38,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     private float wallSlideTimer, wallJumpTimer;
     public bool wallSlideLeft, wallSlideRight;
 
-   
+
     public Vector2 pipeDirection;
     public int stars, coins, lives = -1;
     public Powerup storedPowerup = null;
@@ -75,54 +77,33 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
     #region -- SERIALIZATION / EVENTS --
 
-    private long localFrameId = 0;
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
-        if (stream.IsWriting) {
-            stream.SendNext(body.position);
-            stream.SendNext(body.velocity);
+    public void Serialize(List<byte> buffer) {
+        //serialize control joystick position for interpolation reasons
+        SerializationUtils.PackToShort(buffer, joystick, -1, 1);
 
-            Hashtable controls = new() {
-                ["joystick"] = joystick,
-                ["sprintHeld"] = running,
-                ["jumpHeld"] = jumpHeld
-            };
-
-            stream.SendNext(controls);
-            stream.SendNext(localFrameId++);
-
-        } else if (stream.IsReading) {
-            Vector2 pos = (Vector2) stream.ReceiveNext();
-            Vector2 vel = (Vector2) stream.ReceiveNext();
-            ExitGames.Client.Photon.Hashtable controls = (ExitGames.Client.Photon.Hashtable) stream.ReceiveNext();
-            long frameId = (long) stream.ReceiveNext();
-
-            if (frameId < localFrameId)
-                //recevied info older than what we have
-                return;
-
-            if (GameManager.Instance && GameManager.Instance.gameover)
-                //we're DONE with you
-                return;
-
-            float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
-
-            body.position = pos;
-            body.velocity = vel;
-            localFrameId = frameId;
-
-            joystick = (Vector2) controls["joystick"];
-            running = (bool) controls["sprintHeld"];
-            jumpHeld = (bool) controls["jumpHeld"];
-
-            //HandleMovement(lag);
-            int fullResims = (int) (lag / Time.fixedDeltaTime);
-            float partialResim = lag % Time.fixedDeltaTime;
-
-            while (fullResims-- > 0)
-                HandleMovement(Time.fixedDeltaTime);
-            HandleMovement(partialResim);
-        }
+        //serialize control flags
+        SerializationUtils.PackToByte(buffer, running, jumpHeld);
     }
+
+    public void Deserialize(List<byte> buffer, ref int index, PhotonMessageInfo info) {
+        //controller position
+        SerializationUtils.UnpackFromShort(buffer, ref index, -1, 1, out joystick);
+
+        //controller flags
+        SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags);
+        running = flags[0];
+        jumpHeld = flags[1];
+
+        //resimulations
+        float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
+        int fullResims = (int) (lag / Time.fixedDeltaTime);
+        float partialResim = lag % Time.fixedDeltaTime;
+
+        while (fullResims-- > 0)
+            HandleMovement(Time.fixedDeltaTime);
+        HandleMovement(partialResim);
+    }
+
     #endregion
 
     #region -- START / UPDATE --
@@ -180,7 +161,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         LoadFromGameState();
     }
-    
+
     public void OnDestroy() {
         if (!photonView.IsMine)
             return;
@@ -200,7 +181,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             [Enums.NetPlayerProperties.GameState] = new Hashtable()
         };
     }
-    
+
     public void LoadFromGameState() {
         if (photonView.IsMine)
             return;
@@ -361,7 +342,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             if (contacts.Length < collision.contactCount)
                 contacts = new ContactPoint2D[collision.contactCount];
             collision.GetContacts(contacts);
-            
+
             foreach (ContactPoint2D contact in contacts) {
                 GameObject otherObj = collision.gameObject;
                 PlayerController other = otherObj.GetComponent<PlayerController>();
@@ -627,7 +608,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         running = context.started;
 
-        if (Frozen) 
+        if (Frozen)
             return;
 
         if (running && (state == Enums.PowerupState.FireFlower || state == Enums.PowerupState.IceFlower) && GlobalController.Instance.settings.fireballFromSprint)
@@ -666,7 +647,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                 PhotonNetwork.Instantiate("Prefabs/Fireball", pos, Quaternion.identity, 0, new object[] { !facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") });
             }
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_Fireball_Shoot);
-            
+
             animator.SetTrigger("fireball");
             break;
         }
@@ -709,7 +690,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity);
         propellerTimer = 1f;
         PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
-        
+
         animator.Play("propeller_up");
         propeller = true;
         flying = false;
@@ -729,7 +710,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         }
         usedPropellerThisJump = true;
     }
-    
+
     public void OnReserveItem(InputAction.CallbackContext context) {
         if (!photonView.IsMine || storedPowerup == null || GameManager.Instance.paused || GameManager.Instance.gameover || dead)
             return;
@@ -791,7 +772,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         if (reserve) {
             if (storedPowerup == null || (storedPowerup != null && Enums.PowerupStatePriority[storedPowerup.state].itemPriority <= pp.itemPriority) && !(state == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom)) {
-                //dont reserve mushrooms 
+                //dont reserve mushrooms
                 storedPowerup = powerup;
             }
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
@@ -809,7 +790,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             usedPropellerThisJump = false;
             drill &= flying;
             propellerTimer = 0;
-            
+
             if (!soundPlayed)
                 PlaySound(powerup.soundEffect);
         }
@@ -965,7 +946,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         coins++;
         if (coins >= 8) {
             coins = 0;
-            if (photonView.IsMine) 
+            if (photonView.IsMine)
                 SpawnItem();
         }
 
@@ -1100,7 +1081,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         wallSlideTimer = 0;
         wallJumpTimer = 0;
         flying = false;
-        
+
         propeller = false;
         propellerSpinTimer = 0;
         usedPropellerThisJump = false;
@@ -1248,7 +1229,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     if (worldPosCenter.y - 0.25f + Physics2D.defaultContactOffset * 2f <= body.position.y) {
                         if (!grounded && !groundpound)
                             continue;
-                        
+
                         dir = InteractableTile.InteractionDirection.Down;
                     } else if (worldPosCenter.x - 0.25f < checkPosition.x - checkSize.x * 0.5f) {
                         dir = InteractableTile.InteractionDirection.Left;
@@ -1375,7 +1356,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             pickupTimer = pickupTime;
         }
         animator.SetBool("holding", true);
-        
+
         SetHoldingOffset();
     }
     [PunRPC]
@@ -1642,7 +1623,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
                 Vector2 offset = new(hitboxes[0].size.x / 2f * (wallSlideLeft ? -1 : 1), hitboxes[0].size.y / 2f);
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Vector3.zero : Vector3.up * 180);
-                
+
                 wallJumpTimer = 16 / 60f;
                 wallSlideTimer = 0;
             }
@@ -1968,7 +1949,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     void HandleFacingDirection() {
         if (groundpound)
             return;
-        
+
         //Facing direction
         bool right = joystick.x > analogDeadzone;
         bool left = joystick.x < -analogDeadzone;
@@ -2050,7 +2031,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
                     Utils.WrapTileLocation(ref tileLocation);
                     TileBase tile = Utils.GetTileAtTileLocation(tileLocation);
 
-                    if ((!(tile as BreakableBrickTile)?.breakableByGiantMario) ?? Utils.IsTileSolidAtTileLocation(tileLocation)) {
+                    bool cancelMega;
+                    if (tile is BreakableBrickTile bbt)
+                        cancelMega = !bbt.breakableByGiantMario;
+                    else
+                        cancelMega = Utils.IsTileSolidAtTileLocation(tileLocation);
+
+                    if (cancelMega) {
                         photonView.RPC("FinishMegaMario", RpcTarget.All, false);
                         return;
                     }
@@ -2212,7 +2199,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
 
         //Crouching
         HandleCrouching(crouch);
-        
+
         HandleWallslide(left, right, jump);
 
         HandleSlopes();
@@ -2418,7 +2405,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             groundpoundStartTimer = 0.065f;
 
         Utils.TickTimer(ref groundpoundStartTimer, 0, Time.fixedDeltaTime);
-        
+
         if (groundpoundStartTimer != 0)
             return;
 
@@ -2530,9 +2517,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
             if (r is ParticleSystemRenderer)
                 continue;
-            
+
             Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
         }
     }
-
 }

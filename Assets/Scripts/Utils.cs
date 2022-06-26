@@ -13,6 +13,9 @@ public class Utils {
         }
     }
 
+    public static bool BitTest(byte bit, int index) {
+        return (bit & (1 << index)) != 0;
+    }
 
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
         if (!manager)

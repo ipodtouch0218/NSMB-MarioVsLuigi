@@ -59,6 +59,7 @@ public class StarBouncer : MonoBehaviourPun {
             body.isKinematic = true;
             body.velocity = Vector2.zero;
             becomeCollectibleAt = PhotonNetwork.ServerTimestamp;
+            GetComponent<CustomRigidbodySerializer>().enabled = false;
 
             if (GameManager.Instance.musicEnabled)
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
@@ -135,7 +136,7 @@ public class StarBouncer : MonoBehaviourPun {
     public void Crushed() {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
-        
+
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
     }
     [PunRPC]

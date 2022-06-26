@@ -6,11 +6,11 @@ public class WrappingObject : MonoBehaviour {
     private Rigidbody2D body;
     void Start() {
         body = GetComponent<Rigidbody2D>();
-        if (!body) 
+        if (!body)
             body = GetComponentInParent<Rigidbody2D>();
     }
     void FixedUpdate() {
-        if (!GameManager.Instance) 
+        if (!GameManager.Instance)
             return;
         if (!GameManager.Instance.loopingLevel) {
             enabled = false;

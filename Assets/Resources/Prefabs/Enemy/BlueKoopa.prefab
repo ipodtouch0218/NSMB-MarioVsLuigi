@@ -22,7 +22,7 @@ PrefabInstance:
         type: 3}
       propertyPath: ObservedComponents.Array.data[0]
       value: 
-      objectReference: {fileID: 2558873171136878799}
+      objectReference: {fileID: 8296659976516503275}
     - target: {fileID: 1651255696094252028, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: floorAndRoofCutoff
@@ -128,15 +128,15 @@ PrefabInstance:
     - {fileID: 452667592475924850, guid: 8cf8f49ac0882ed44953ea53ff901f11, type: 3}
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 8cf8f49ac0882ed44953ea53ff901f11, type: 3}
---- !u!114 &2558873171136878799 stripped
+--- !u!114 &8296659976516503275 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6366107566266917648, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+  m_CorrespondingSourceObject: {fileID: 646737995656314164, guid: 8cf8f49ac0882ed44953ea53ff901f11,
     type: 3}
   m_PrefabInstance: {fileID: 8924450616560860127}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e7cb724808c322458aa4d15f5035fa9, type: 3}
+  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

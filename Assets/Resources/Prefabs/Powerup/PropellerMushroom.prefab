@@ -12,10 +12,11 @@ GameObject:
   - component: {fileID: 3953063015163593096}
   - component: {fileID: 3953063015163593099}
   - component: {fileID: 3823340048821041100}
-  - component: {fileID: 1339251745795356753}
   - component: {fileID: 3528435960999641482}
   - component: {fileID: 7950379585148690368}
-  - component: {fileID: 1301735144694123111}
+  - component: {fileID: 1339251745795356753}
+  - component: {fileID: 5247024083749697112}
+  - component: {fileID: 6178971401145464007}
   m_Layer: 9
   m_Name: PropellerMushroom
   m_TagString: Powerup
@@ -109,29 +110,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.45, y: 0.45}
   m_EdgeRadius: 0
---- !u!114 &1339251745795356753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3953063015163593095}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 1301735144694123111}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!114 &3528435960999641482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,7 +144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killTime: 0
---- !u!114 &1301735144694123111
+--- !u!114 &1339251745795356753
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -175,13 +153,48 @@ MonoBehaviour:
   m_GameObject: {fileID: 3953063015163593095}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e7cb724808c322458aa4d15f5035fa9, type: 3}
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 0
-  m_TeleportEnabled: 1
-  m_TeleportIfDistanceGreaterThan: 3
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 1
+  OwnershipTransfer: 1
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 5247024083749697112}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &5247024083749697112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3953063015163593095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializableViews:
+  - {fileID: 6178971401145464007}
+--- !u!114 &6178971401145464007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3953063015163593095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interpolate: 1
+  body: {fileID: 3953063015163593099}
 --- !u!1 &6675190630988046938
 GameObject:
   m_ObjectHideFlags: 0
