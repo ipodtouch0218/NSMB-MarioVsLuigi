@@ -95,6 +95,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         jumpHeld = flags[1];
 
         //resimulations
+        /*
         float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
         int fullResims = (int) (lag / Time.fixedDeltaTime);
         float partialResim = lag % Time.fixedDeltaTime;
@@ -102,6 +103,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         while (fullResims-- > 0)
             HandleMovement(Time.fixedDeltaTime);
         HandleMovement(partialResim);
+        */
     }
 
     #endregion
@@ -348,7 +350,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 PlayerController other = otherObj.GetComponent<PlayerController>();
                 PhotonView otherView = other.photonView;
 
-                if (other.animator.GetBool("invincible")) {
+                if (other.invincible > 0) {
                     //They are invincible. let them decide if they've hit us.
                     if (invincible > 0) {
                         //oh, we both are. bonk.
@@ -1153,9 +1155,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte) (step ? 1 : 2));
         step = !step;
     }
-    protected void Footstep(int layer) {
-        if ((state <= Enums.PowerupState.Small ? 0 : 1) != layer)
-            return;
+    protected void Footstep() {
         if (state == Enums.PowerupState.MegaMushroom)
             return;
         if (doIceSkidding && skidding) {
@@ -1876,7 +1876,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         onGround = true;
 
         if (Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
-            if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.up * 0.5f, checkSize * Vector2.right)) {
+
+            //feet in ground
+            if (Utils.IsAnyTileSolidBetweenWorldBox(body.position, checkSize * Vector2.right) && !Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.5f)) {
+                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2 + 0.05f);
+                return true;
+            } else if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.up * 0.5f, checkSize * Vector2.right)) {
                 transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2);
                 return true;
             } else if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.down * 0.5f, checkSize * Vector2.right)) {

@@ -9,8 +9,9 @@ public class CustomAnimatorSerializer : MonoBehaviour, ICustomSerializeView {
     [SerializeField]
     private Animator animator;
     private object[] currentValues;
+    private readonly List<byte> cachedChanges = new();
 
-    public void Start() {
+    public void Awake() {
         currentValues = new object[animator.parameterCount];
         for (int i = 0; i < animator.parameterCount; i++) {
             var parameter = animator.parameters[i];
@@ -29,6 +30,28 @@ public class CustomAnimatorSerializer : MonoBehaviour, ICustomSerializeView {
         }
     }
 
+    public void Update() {
+        for (byte i = 0; i < animator.parameterCount; i++) {
+            if (cachedChanges.Contains(i))
+                continue;
+
+            var param = animator.GetParameter(i);
+            switch (param.type) {
+            case AnimatorControllerParameterType.Trigger:
+                if (animator.GetBool(param.name))
+                    cachedChanges.Add(i);
+
+                break;
+            case AnimatorControllerParameterType.Bool:
+                bool value = animator.GetBool(param.name);
+                if (value != (bool) currentValues[i])
+                    cachedChanges.Add(i);
+
+                break;
+            }
+        }
+    }
+
     public void Serialize(List<byte> buffer) {
         for (byte i = 0; i < animator.parameterCount; i++) {
             var parameter = animator.GetParameter(i);
@@ -36,12 +59,22 @@ public class CustomAnimatorSerializer : MonoBehaviour, ICustomSerializeView {
             object newValue;
 
             switch (parameter.type) {
-            case AnimatorControllerParameterType.Bool:
             case AnimatorControllerParameterType.Trigger:
-                newValue = animator.GetBool(parameter.name);
-                if ((bool) newValue == (bool) oldValue)
-                    continue;
+                bool triggered = cachedChanges.Contains(i) || animator.GetBool(parameter.name);
+                if (!triggered)
+                    break;
 
+                cachedChanges.Remove(i);
+                buffer.Add(i);
+                break;
+
+            case AnimatorControllerParameterType.Bool:
+                newValue = animator.GetBool(parameter.name);
+                bool changed = (bool) newValue != (bool) oldValue || cachedChanges.Contains(i);
+                if (!changed)
+                    break;
+
+                cachedChanges.Remove(i);
                 byte newId = i;
                 if ((bool) newValue)
                     newId |= 0x80;
@@ -55,7 +88,7 @@ public class CustomAnimatorSerializer : MonoBehaviour, ICustomSerializeView {
                 newValue = animator.GetFloat(parameter.name);
                 //0.01 delta
                 if (Mathf.Abs((float) newValue - (float) oldValue) <= 0.01)
-                    continue;
+                    break;
 
                 buffer.Add(i);
                 SerializationUtils.PackToShort(buffer, (float) newValue, -100, 100);
@@ -74,8 +107,10 @@ public class CustomAnimatorSerializer : MonoBehaviour, ICustomSerializeView {
             var parameter = animator.GetParameter(id & 0x7F);
 
             switch (parameter.type) {
-            case AnimatorControllerParameterType.Bool:
             case AnimatorControllerParameterType.Trigger:
+                animator.SetTrigger(parameter.name);
+                break;
+            case AnimatorControllerParameterType.Bool:
                 //toggle
                 animator.SetBool(parameter.name, Utils.BitTest(id, 7));
                 break;
