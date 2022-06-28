@@ -28,7 +28,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 <details>
   <summary><h2>Building</h2></summary>
 
-Install Unity 2021.2.15f1 from Unity's [archive](https://unity3d.com/get-unity/download/archive).
+Install Unity 2022.1.6f1 via Unity Hub
 
 Clone the project using [git](https://git-scm.com/downloads). Do NOT use the .zip download as a substitute for installing Git, as Unity uses Git to resolve dependencies once imported.
 
