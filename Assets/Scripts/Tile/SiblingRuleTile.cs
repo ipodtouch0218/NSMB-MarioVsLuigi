@@ -7,7 +7,6 @@ using UnityEngine.Tilemaps;
 public class SiblingRuleTile : RuleTile {
     public List<TileBase> siblings;
     public override bool RuleMatch(int neighbor, TileBase other) {
-        Debug.Log(neighbor);
         return neighbor switch {
             TilingRuleOutput.Neighbor.This => siblings.Contains(other) || base.RuleMatch(neighbor, other),
             TilingRuleOutput.Neighbor.NotThis => !siblings.Contains(other) && base.RuleMatch(neighbor, other),
