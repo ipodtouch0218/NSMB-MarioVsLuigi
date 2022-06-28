@@ -94,8 +94,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         running = flags[0];
         jumpHeld = flags[1];
 
-        //resimulations
         /*
+        //resimulations
         float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
         int fullResims = (int) (lag / Time.fixedDeltaTime);
         float partialResim = lag % Time.fixedDeltaTime;

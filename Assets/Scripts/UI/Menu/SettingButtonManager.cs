@@ -46,11 +46,18 @@ public class SettingButtonManager : MonoBehaviour {
         if (value) {
             prevWidth = Screen.width;
             prevHeight = Screen.height;
-            Resolution max = Screen.resolutions[^1];
-            Screen.SetResolution(max.width, max.height, FullScreenMode.FullScreenWindow);
+            Screen.SetResolution(Screen.mainWindowDisplayInfo.width, Screen.mainWindowDisplayInfo.height, FullScreenMode.FullScreenWindow);
         } else {
             Screen.SetResolution(prevWidth, prevHeight, FullScreenMode.Windowed);
         }
+#if UNITY_WEBGL
+        StartCoroutine(WaitAFrame());
+#endif
+    }
+
+    IEnumerator WaitAFrame() {
+        yield return null;
+        Screen.SetResolution(Screen.width, Screen.height, Screen.fullScreenMode);
     }
 
     public void OnVsyncToggle(Toggle toggle) {

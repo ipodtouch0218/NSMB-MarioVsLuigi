@@ -24,7 +24,7 @@ public class ResizeToFit : MonoBehaviour {
         if (Mathf.RoundToInt(rect.eulerAngles.z) % 180 == 90)
               //Invert the bounds if the image is rotated
               bounds.size = new(bounds.height, bounds.width);
-        
+
         //Size by height first
         h = bounds.height * padding;
         w = h * aspect;

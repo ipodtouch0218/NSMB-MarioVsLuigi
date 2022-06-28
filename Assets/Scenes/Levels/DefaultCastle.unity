@@ -11372,7 +11372,7 @@ CompositeCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 361225195}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 6200000, guid: 6339c618a49b1c44d8c044c6b67f319f, type: 2}
   m_IsTrigger: 0
@@ -11502,6 +11502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  extrapolate: 0
   interpolate: 1
   body: {fileID: 361225201}
 --- !u!114 &361225207
@@ -12047,7 +12048,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 624197901}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -19, y: 4, z: 0}
+  m_LocalPosition: {x: 13, y: 4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
