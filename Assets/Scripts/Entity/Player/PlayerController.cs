@@ -1478,7 +1478,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     bool GroundSnapCheck() {
-        if (dead || (body.velocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering)
+        if (dead || (body.velocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering || gameObject.layer == HITS_NOTHING_LAYERID)
             return false;
 
         bool prev = Physics2D.queriesStartInColliders;
@@ -1562,7 +1562,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
         bool prevCrouchState = crouching || groundpound;
-        crouching = ((onGround && crouchInput && !groundpound) || (!onGround && crouchInput && crouching) || (crouching && ForceCrouchCheck())) && !holding;
+        crouching = ((onGround && crouchInput && !groundpound) || (!onGround && crouchInput && crouching) || (state != Enums.PowerupState.BlueShell && prevCrouchState && ForceCrouchCheck())) && !holding;
         if (crouching && !prevCrouchState) {
             //crouch start sound
             photonView.RPC("PlaySound", RpcTarget.All, state == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
@@ -1864,7 +1864,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!body || hitboxes.Length <= 0 || state == Enums.PowerupState.MegaMushroom)
             return false;
 
-        Vector2 checkSize = hitboxes[0].size * transform.lossyScale * (Vector2.up * 0.8f + Vector2.right);
+        Vector2 checkSize = hitboxes[0].size * transform.lossyScale * new Vector2(1, 0.75f);
         Vector2 checkPos = body.position + (Vector2.up * checkSize / 2f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
@@ -1873,22 +1873,22 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
         stuckInBlock = true;
         body.gravityScale = 0;
+        body.velocity = Vector2.zero;
+        groundpound = false;
+        propeller = false;
+        drill = false;
+        flying = false;
         onGround = true;
 
-        if (Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
-
-            //feet in ground
-            if (Utils.IsAnyTileSolidBetweenWorldBox(body.position, checkSize * Vector2.right) && !Utils.IsTileSolidAtWorldLocation(body.position + Vector2.up * 0.5f)) {
-                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2 + 0.05f);
-                return true;
-            } else if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.up * 0.5f, checkSize * Vector2.right)) {
-                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2);
-                return true;
-            } else if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.down * 0.5f, checkSize * Vector2.right)) {
-                float heightInTiles = Mathf.Floor(hitboxes[0].size.y * transform.lossyScale.y * 2);
-                transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 - heightInTiles - 1) / 2);
-                return true;
-            }
+        //feet in ground
+        if (Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.up * 0.05f, new Vector2(checkSize.x * 1, 0.1f)) && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.up * 0.55f, new Vector2(checkSize.x * 1, 0.1f))) {
+            transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 + 1) / 2 + 0.05f);
+            return true;
+        }
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.down * 0.5f, checkSize * Vector2.right)) {
+            float heightInTiles = Mathf.Floor(hitboxes[0].size.y * transform.lossyScale.y * 2);
+            transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 - heightInTiles - 1) / 2);
+            return true;
         }
 
         // eject
