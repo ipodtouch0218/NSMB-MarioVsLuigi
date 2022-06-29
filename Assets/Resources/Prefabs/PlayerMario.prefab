@@ -10862,7 +10862,7 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 3
+  Synchronization: 2
   OwnershipTransfer: 0
   observableSearch: 1
   ObservedComponents:
@@ -10912,6 +10912,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1ec092acf651e542acfcdd4d0d2045a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoredParameters:
+  - onLeft
+  - onRight
+  - onGround
+  - skidding
+  - groundpound
+  - crouching
+  - flying
+  - drill
+  - sliding
+  - facingRight
+  - propellerSpin
   animator: {fileID: 2254935152879088866}
 --- !u!1 &4824223342336871188
 GameObject:

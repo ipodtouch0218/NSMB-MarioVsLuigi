@@ -76,13 +76,31 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
 
     #region -- SERIALIZATION / EVENTS --
-
+    private static readonly float EPSILON = 0.2f, RESEND_RATE = 0.5f;
+    private Vector2 previousJoystick;
+    private short previousFlags;
+    private float lastSendTimestamp;
     public void Serialize(List<byte> buffer) {
-        //serialize control joystick position for interpolation reasons
-        SerializationUtils.PackToShort(buffer, joystick, -1, 1);
+        bool updateJoystick = Vector2.Distance(joystick, previousJoystick) > EPSILON;
 
-        //serialize control flags
-        SerializationUtils.PackToByte(buffer, running, jumpHeld);
+        SerializationUtils.PackToShort(out short flags, running, jumpHeld, crouching, groundpound,
+                facingRight, onGround, knockback, flying, drill, sliding, skidding, wallSlideLeft,
+                propeller, propellerSpinTimer > 0);
+        bool updateFlags = flags != previousFlags;
+
+        bool forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
+
+        if (forceResend || updateJoystick || updateFlags) {
+            //send joystick for simulation reasons
+            SerializationUtils.PackToShort(buffer, joystick, -1, 1);
+            previousJoystick = joystick;
+
+            //serialize movement flags
+            SerializationUtils.WriteShort(buffer, flags);
+            previousFlags = flags;
+
+            lastSendTimestamp = (float) PhotonNetwork.Time;
+        }
     }
 
     public void Deserialize(List<byte> buffer, ref int index, PhotonMessageInfo info) {
@@ -90,11 +108,23 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         SerializationUtils.UnpackFromShort(buffer, ref index, -1, 1, out joystick);
 
         //controller flags
-        SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags);
+        SerializationUtils.UnpackFromShort(buffer, ref index, out bool[] flags);
         running = flags[0];
         jumpHeld = flags[1];
+        crouching = flags[2];
+        groundpound = flags[3];
+        facingRight = flags[4];
+        previousOnGround = doGroundSnap = onGround = flags[5];
+        knockback = flags[6];
+        flying = flags[7];
+        drill = flags[8];
+        sliding = flags[9];
+        skidding = flags[10];
+        wallSlideLeft = flags[11];
+        wallSlideRight = flags[12];
+        propeller = flags[13];
+        propellerSpinTimer = flags[14] ? 1 : 0;
 
-        /*
         //resimulations
         float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
         int fullResims = (int) (lag / Time.fixedDeltaTime);
@@ -103,7 +133,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         while (fullResims-- > 0)
             HandleMovement(Time.fixedDeltaTime);
         HandleMovement(partialResim);
-        */
     }
 
     #endregion
@@ -1562,7 +1591,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
         bool prevCrouchState = crouching || groundpound;
-        crouching = ((onGround && crouchInput && !groundpound) || (!onGround && crouchInput && crouching) || (state != Enums.PowerupState.BlueShell && prevCrouchState && ForceCrouchCheck())) && !holding;
+        crouching = ((onGround && crouchInput && !groundpound) || (!onGround && crouchInput && crouching) || (state != Enums.PowerupState.BlueShell && crouching && ForceCrouchCheck())) && !holding;
         if (crouching && !prevCrouchState) {
             //crouch start sound
             photonView.RPC("PlaySound", RpcTarget.All, state == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
@@ -1578,7 +1607,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool triggerState = Physics2D.queriesHitTriggers;
         Physics2D.queriesHitTriggers = false;
 
-        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width, 0.05f), 0, Vector2.up, hitboxes[0].size.y / 0.5f, ONLY_GROUND_MASK);
+        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width, 0.05f), 0, Vector2.up, hitboxes[0].size.y / 0.75f, ONLY_GROUND_MASK);
 
         Physics2D.queriesHitTriggers = triggerState;
         return ret;
