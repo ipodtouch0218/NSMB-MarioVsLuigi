@@ -16,6 +16,9 @@ public class Utils {
     public static bool BitTest(byte bit, int index) {
         return (bit & (1 << index)) != 0;
     }
+    public static bool BitTest(short bit, int index) {
+        return (bit & (1 << index)) != 0;
+    }
 
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
         if (!manager)
@@ -128,7 +131,7 @@ public class Utils {
                 sprite.GetPhysicsShape(i, points);
 
                 for (int j = 0; j < points.Count; j++) {
-                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10f); 
+                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10f);
                 }
 
                 Vector2 tilePosition = TilemapToWorldPosition(WorldToTilemapPosition(worldLocation));
@@ -277,7 +280,7 @@ public class Utils {
     }
 
     public static float WrappedDistance(Vector2 a, Vector2 b) {
-        if (GameManager.Instance && GameManager.Instance.loopingLevel && Mathf.Abs(a.x - b.x) > GameManager.Instance.levelWidthTile / 4f) 
+        if (GameManager.Instance && GameManager.Instance.loopingLevel && Mathf.Abs(a.x - b.x) > GameManager.Instance.levelWidthTile / 4f)
             a.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(a.x - b.x);
 
         return Vector2.Distance(a, b);
@@ -329,18 +332,18 @@ public class Utils {
 
             float chance = powerup.GetModifiedChance(losing);
 
-            if (rand < chance) 
+            if (rand < chance)
                 return powerup;
             rand -= chance;
         }
 
         return powerups[0];
     }
-    
+
     public static float QuadraticEaseOut(float v) {
         return -1 * v * (v - 2);
     }
-    
+
 
     public static ExitGames.Client.Photon.Hashtable GetTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap) {
         Dictionary<int, int> changes = new();
@@ -362,7 +365,7 @@ public class Utils {
 
             if (!tiles.Contains(path))
                 tiles.Add(path);
-            
+
             changes[i] = tiles.IndexOf(path);
         }
 
@@ -389,7 +392,7 @@ public class Utils {
     public static TileBase GetTileFromCache(string tilename) {
         if (tilename == null || tilename == "")
             return null;
-        
+
         if (!tilename.StartsWith("Tilemaps/Tiles/"))
             tilename = "Tilemaps/Tiles/" + tilename;
 
