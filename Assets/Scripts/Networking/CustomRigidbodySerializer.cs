@@ -4,7 +4,7 @@ using Photon.Pun;
 
 public class CustomRigidbodySerializer : MonoBehaviourPun, ICustomSerializeView {
 
-    private static readonly float EPSILON = 0.02f, TELEPORT_DISTANCE = 0.75f, RESEND_RATE = 0.5f;
+    private static readonly float EPSILON = 0.02f, TELEPORT_DISTANCE = 0.4f, RESEND_RATE = 0.5f;
 
     public bool Active { get; set; } = true;
 
@@ -27,8 +27,9 @@ public class CustomRigidbodySerializer : MonoBehaviourPun, ICustomSerializeView 
 
     public void FixedUpdate() {
         if (!photonView.IsMine && interpolate) {
-            interpPosition += body.velocity * Time.fixedDeltaTime;
-            body.position = Vector2.MoveTowards(body.position, interpPosition, 1f / PhotonNetwork.SerializationRate);
+            //makes it worse?
+            //interpPosition += Time.fixedDeltaTime * body.velocity;
+            body.position = Vector2.MoveTowards(body.position, interpPosition, 0.4f / PhotonNetwork.SerializationRate);
         }
     }
 

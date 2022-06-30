@@ -321,6 +321,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
 
+        StartCoroutine(DataLog());
+
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
 
 #if UNITY_EDITOR
@@ -359,6 +361,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
     }
 
+    long prevOut, prevIn;
+    IEnumerator DataLog() {
+        while (true) {
+            yield return new WaitForSeconds(1);
+            long bOut = PhotonNetwork.NetworkingClient.LoadBalancingPeer.BytesOut;
+            long bIn = PhotonNetwork.NetworkingClient.LoadBalancingPeer.BytesIn;
+            Debug.Log($"outgoing: {bOut - prevOut} incoming: {bIn - prevIn}");
+            prevOut = bOut;
+            prevIn = bIn;
+        }
+    }
 
     IEnumerator LoadingComplete(int startTimestamp) {
         GlobalController.Instance.discordController.UpdateActivity();

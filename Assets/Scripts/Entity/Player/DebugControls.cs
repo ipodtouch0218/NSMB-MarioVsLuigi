@@ -43,7 +43,15 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.Digit7, "Spiny");
 
         FreezePlayer(Key.Digit9);
-        //DebugWorldEntity(Key.Digit0, "FrozenCube");
+
+        if (kb[Key.F1].wasPressedThisFrame) {
+            GameObject nametag = GameManager.Instance.transform.Find("NametagCanvas").gameObject;
+            nametag.SetActive(!nametag.activeSelf);
+        }
+        if (kb[Key.F2].wasPressedThisFrame) {
+            CanvasGroup group = GameManager.Instance.transform.Find("New HUD").GetComponent<CanvasGroup>();
+            group.alpha = 1f - group.alpha;
+        }
     }
 
     private void FreezePlayer(Key key) {
@@ -82,22 +90,4 @@ public class DebugControls : MonoBehaviour {
             frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.tag, en.GetComponent<KillableEntity>().photonView.ViewID);
         }
     }
-
-    /*
-    // The event zone 
-
-    public void specialSettings() {
-        if (Keyboard.current[Key.P].wasPressedThisFrame)
-            editMode = !editMode;
-        Vector3 pos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-
-        if (editMode == true) {
-            if (Mouse.current.rightButton.wasPressedThisFrame)
-            GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("PlaceTile", RpcTarget.All, pos.x, pos.y, pos.z);
-
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-                GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("RemoveTile", RpcTarget.All, pos.x, pos.y, pos.z);
-        }
-    }
-    */
 }

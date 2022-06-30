@@ -248,7 +248,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (materialBlock == null)
             materialBlock = new();
 
-        materialBlock.SetFloat("RainbowEnabled", animator.GetBool("invincible") ? 1.1f : 0f);
+        materialBlock.SetFloat("RainbowEnabled", controller.invincible > 0? 1.1f : 0f);
         int ps = controller.state switch {
             Enums.PowerupState.FireFlower => 1,
             Enums.PowerupState.PropellerMushroom => 2,
