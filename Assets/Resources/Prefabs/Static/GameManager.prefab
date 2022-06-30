@@ -1746,6 +1746,7 @@ GameObject:
   - component: {fileID: 4513564558618700270}
   - component: {fileID: 7148505065367146638}
   - component: {fileID: 7156616037079317633}
+  - component: {fileID: 77425761379163978}
   m_Layer: 5
   m_Name: New HUD
   m_TagString: Untagged
@@ -1873,6 +1874,18 @@ MonoBehaviour:
   itemReserve: {fileID: 2321423708915906539}
   itemColor: {fileID: 2568638592884976754}
   pingSample: 20
+--- !u!225 &77425761379163978
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230832738604519832}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1627754979071236275
 GameObject:
   m_ObjectHideFlags: 0

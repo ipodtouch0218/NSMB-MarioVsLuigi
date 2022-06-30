@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         SerializationUtils.PackToShort(out short flags, running, jumpHeld, crouching, groundpound,
                 facingRight, onGround, knockback, flying, drill, sliding, skidding, wallSlideLeft,
-                propeller, propellerSpinTimer > 0);
+                propeller, propellerSpinTimer > 0, wallJumpTimer > 0);
         bool updateFlags = flags != previousFlags;
 
         bool forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
@@ -124,6 +124,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         wallSlideRight = flags[12];
         propeller = flags[13];
         propellerSpinTimer = flags[14] ? 1 : 0;
+        wallJumpTimer = flags[15] ? 1 : 0;
 
         //resimulations
         float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
@@ -1599,7 +1600,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     bool ForceCrouchCheck() {
-        if (state == Enums.PowerupState.BlueShell && !onGround)
+        if ((state == Enums.PowerupState.BlueShell  && !onGround) || state <= Enums.PowerupState.MiniMushroom)
             return false;
 
         float width = hitboxes[0].bounds.extents.x;
@@ -1607,7 +1608,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool triggerState = Physics2D.queriesHitTriggers;
         Physics2D.queriesHitTriggers = false;
 
-        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width, 0.05f), 0, Vector2.up, hitboxes[0].size.y / 0.75f, ONLY_GROUND_MASK);
+        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width + 0.05f, 0.05f), 0, Vector2.up, hitboxes[0].size.y * 2f, ONLY_GROUND_MASK);
 
         Physics2D.queriesHitTriggers = triggerState;
         return ret;
@@ -1654,6 +1655,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Vector3.zero : Vector3.up * 180);
 
                 wallJumpTimer = 16 / 60f;
+                animator.SetTrigger("walljump");
                 wallSlideTimer = 0;
             }
         } else {
@@ -1988,7 +1990,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool right = joystick.x > analogDeadzone;
         bool left = joystick.x < -analogDeadzone;
 
-        if (doIceSkidding && !inShell && !sliding) {
+        if (wallJumpTimer > 0) {
+            facingRight = body.velocity.x > 0;
+        } else if (doIceSkidding && !inShell && !sliding) {
             if (right || left)
                 facingRight = right;
         } else if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
