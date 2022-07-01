@@ -5438,6 +5438,7 @@ MonoBehaviour:
   fireballKnockback: 0
   startedSliding: 0
   groundpounded: 0
+  inNormalLevel: 0
   jumpLandingTimer: 0
   landing: 0
   koyoteTime: 0

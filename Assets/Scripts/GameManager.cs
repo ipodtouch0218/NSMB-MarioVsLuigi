@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
+    public bool normalLevel = false;
     public bool loopingLevel = true;
     public bool coopLevel = false;
     public Vector3 spawnpoint;
@@ -66,10 +67,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public EnemySpawnpoint[] enemySpawnpoints;
 
     private GameObject[] coins;
-
+    
     public SpectationManager SpectationManager { get; private set; }
     
     ParticleSystem brickBreak;
+
     // EVENT CALLBACK
     public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
         if (eventOptions == null)
@@ -317,8 +319,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
-
+        //if (normalLevel == true) {
+        //    PlayerController.inNormalLevel = true;
+        //} else {
+        //    PlayerController.inNormalLevel = false;
+        //}
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
+        
 
 #if UNITY_EDITOR
         //Spawning in editor??

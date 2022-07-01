@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
     public PlayerAnimationController AnimationController { get; private set; }
 
     public bool Frozen { get; set; }
-    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, groundpounded;
+    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, groundpounded, inNormalLevel;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer;
     public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer;
 
@@ -925,9 +925,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
             PhotonNetwork.Destroy(view);
         DestroyImmediate(star);
     }
-
+    
     [PunRPC]
-    protected void CollectCoin(int coinID, Vector3 position) {
+    public void CollectCoin(int coinID, Vector3 position) {
         if (coinID != -1) {
             PhotonView coinView = PhotonView.Find(coinID);
             if (!coinView)
@@ -951,14 +951,25 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, IPunObservab
         GameObject num = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity);
         num.GetComponentInChildren<NumberParticle>().SetSprite(coins);
         Destroy(num, 1.5f);
-
+        
         coins++;
+
+        if (inNormalLevel == true) {
+            if (coins >= 100) {
+            coins = 0;
+            if (photonView.IsMine) {
+                lives = lives + 1;
+            }
+        }
+        } else {
         if (coins >= 8) {
             coins = 0;
-            if (photonView.IsMine) 
-                SpawnItem();
+            if (photonView.IsMine) {
+                    SpawnItem();
+            }
         }
-
+        }
+        
         UpdateGameState();
     }
 

@@ -4,8 +4,10 @@ using Photon.Pun;
 using Photon.Realtime;
 using Discord;
 
-public class DiscordController : MonoBehaviour {
+// const string secret = "mlkcK31IurHxFWCGeu0EQ2-6ljeplP4P";
 
+public class DiscordController : MonoBehaviour {
+ 
     public Discord.Discord discord;
     public ActivityManager activityManager;
 
@@ -14,7 +16,7 @@ public class DiscordController : MonoBehaviour {
         return;
 #endif
 
-        discord = new Discord.Discord(962073502469459999, (ulong) CreateFlags.NoRequireDiscord);
+        discord = new Discord.Discord(991412340408987739, (ulong) CreateFlags.NoRequireDiscord);
         activityManager = discord.GetActivityManager();
         activityManager.OnActivityJoinRequest += AskToJoin;
         activityManager.OnActivityJoin += TryJoinGame;
