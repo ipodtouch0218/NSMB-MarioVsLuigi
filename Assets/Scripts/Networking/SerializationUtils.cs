@@ -81,6 +81,12 @@ public static class SerializationUtils {
         WriteByte(buffer, byteValue);
     }
 
+    public static void PackToByte(out byte output, params bool[] flags) {
+        output = 0;
+        for (int i = 0; i < flags.Length; i++)
+            output |= (byte) ((flags[i] ? 1 : 0) << i);
+    }
+
     public static void UnpackFromByte(List<byte> buffer, ref int index, float min, float max, out float output) {
         float range = max - min;
         ReadByte(buffer, ref index, out byte byteValue);
@@ -88,11 +94,8 @@ public static class SerializationUtils {
     }
 
     public static void PackToByte(List<byte> buffer, params bool[] flags) {
-        byte byteValue = 0;
-        for (int i = 0; i < flags.Length; i++)
-            byteValue |= (byte) ((flags[i] ? 1 : 0) << i);
-
-        WriteByte(buffer, byteValue);
+        PackToShort(out short byteValue, flags);
+        WriteShort(buffer, byteValue);
     }
 
     public static void UnpackFromByte(List<byte> buffer, ref int index, out bool[] output) {

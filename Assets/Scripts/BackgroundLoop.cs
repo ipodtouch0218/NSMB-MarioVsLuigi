@@ -30,7 +30,6 @@ public class BackgroundLoop : MonoBehaviour {
             ppus[i] = sr.sprite.pixelsPerUnit;
             halfWidths[i] = sr.bounds.extents.x - (0.5f/ppus[i]);
             positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
-
         }
 
         mainCamera = gameObject.GetComponent<Camera>();

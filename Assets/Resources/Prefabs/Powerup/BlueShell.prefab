@@ -69,7 +69,7 @@ GameObject:
   - component: {fileID: 6558671881710548967}
   - component: {fileID: 4010706745742754910}
   - component: {fileID: 7898932526447635219}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: sparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5042,7 +5042,7 @@ MonoBehaviour:
   speed: 0
   bouncePower: 0
   terminalVelocity: 8
-  blinkingRate: 4
+  blinkingRate: 6
   passthrough: 0
   avoidPlayers: 0
   followMe: {fileID: 0}

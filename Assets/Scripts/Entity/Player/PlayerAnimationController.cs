@@ -277,7 +277,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             renderer.SetPropertyBlock(materialBlock);
 
         //hit flash
-        models.SetActive(controller.dead || !(controller.hitInvincibilityCounter > 0 && controller.hitInvincibilityCounter * (controller.hitInvincibilityCounter <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
+        models.SetActive(GameManager.Instance.gameover || controller.dead || !(controller.hitInvincibilityCounter > 0 && controller.hitInvincibilityCounter * (controller.hitInvincibilityCounter <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
 
         //Model changing
         bool large = controller.state >= Enums.PowerupState.Mushroom;

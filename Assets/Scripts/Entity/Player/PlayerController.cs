@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private static readonly float EPSILON = 0.2f, RESEND_RATE = 0.5f;
     private Vector2 previousJoystick;
     private short previousFlags;
+    private byte previousFlags2;
     private float lastSendTimestamp;
     public void Serialize(List<byte> buffer) {
         bool updateJoystick = Vector2.Distance(joystick, previousJoystick) > EPSILON;
@@ -86,7 +87,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         SerializationUtils.PackToShort(out short flags, running, jumpHeld, crouching, groundpound,
                 facingRight, onGround, knockback, flying, drill, sliding, skidding, wallSlideLeft,
                 propeller, propellerSpinTimer > 0, wallJumpTimer > 0);
-        bool updateFlags = flags != previousFlags;
+        SerializationUtils.PackToByte(out byte flags2, invincible > 0);
+        bool updateFlags = flags != previousFlags && flags2 != previousFlags2;
 
         bool forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
 
@@ -98,6 +100,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //serialize movement flags
             SerializationUtils.WriteShort(buffer, flags);
             previousFlags = flags;
+            SerializationUtils.WriteByte(buffer, flags2);
+            previousFlags2 = flags2;
 
             lastSendTimestamp = (float) PhotonNetwork.Time;
         }
@@ -125,6 +129,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propeller = flags[13];
         propellerSpinTimer = flags[14] ? 1 : 0;
         wallJumpTimer = flags[15] ? 1 : 0;
+
+        SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags2);
+        invincible = flags2[0] ? 1 : 0;
 
         //resimulations
         float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
@@ -723,7 +730,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propellerTimer = 1f;
         PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
 
-        animator.Play("propeller_up");
+        animator.SetTrigger("propeller_start");
         propeller = true;
         flying = false;
         crouching = false;
@@ -1846,7 +1853,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         float propellerBoost = propellerTimer > 0 ? 2.5f : 1;
         float drillSlowing = drill ? 0.25f : 1f;
 
-        bool run = functionallyRunning && !crouching && !flying;
+        bool run = functionallyRunning && !flying;
 
         if ((crouching && !onGround) || !crouching) {
             if (run && xVel >= walkSpeedTotal && !reverseDirection) {
@@ -1917,9 +1924,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return true;
         }
         if (!Utils.IsAnyTileSolidBetweenWorldBox(body.position + Vector2.down * 0.5f, checkSize * Vector2.right)) {
-            float heightInTiles = Mathf.Floor(hitboxes[0].size.y * transform.lossyScale.y * 2);
-            transform.position = body.position = new(body.position.x, Mathf.Floor(body.position.y * 2 - heightInTiles - 1) / 2);
-            return true;
+            float height = hitboxes[0].size.y * transform.lossyScale.y;
+
+            var hit = Physics2D.Raycast(body.position + Vector2.down * height, Vector2.up, height + 1, ONLY_GROUND_MASK);
+            if (hit) {
+                float neweY = hit.point.y - height;
+                transform.position = body.position = new(body.position.x, neweY);
+                return true;
+            }
         }
 
         // eject

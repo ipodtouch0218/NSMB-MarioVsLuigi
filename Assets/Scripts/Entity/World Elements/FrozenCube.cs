@@ -28,7 +28,7 @@ public class FrozenCube : HoldableEntity {
         if (GROUND_LAYER_ID == -1)
             GROUND_LAYER_ID = LayerMask.NameToLayer("Ground");
 
-        if (photonView.InstantiationData != null) {
+        if (photonView && photonView.InstantiationData != null) {
             int id = (int) photonView.InstantiationData[0];
             entityView = PhotonView.Find(id);
 
@@ -102,7 +102,7 @@ public class FrozenCube : HoldableEntity {
             PhotonNetwork.Destroy(photonView);
             return;
         }
-        if (photonView.IsMine && holder && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale)) {
+        if (photonView.IsMineOrLocal() && holder && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale)) {
             photonView.RPC("Kill", RpcTarget.All);
             return;
         }
@@ -115,7 +115,7 @@ public class FrozenCube : HoldableEntity {
 
         //our entity despawned. remove.
         if (entity == null) {
-            if (photonView.IsMine) {
+            if (photonView.IsMineOrLocal()) {
                 PhotonNetwork.Destroy(photonView);
             }
             Destroy(gameObject);
@@ -123,7 +123,7 @@ public class FrozenCube : HoldableEntity {
         }
 
         //handle interactions with tiles
-        if (entity.IsCarryable && (photonView?.IsMine ?? false))
+        if (entity.IsCarryable && photonView.IsMineOrLocal())
             HandleTile();
 
         if (fastSlide && physics.onGround && physics.floorAngle != 0) {
@@ -235,7 +235,7 @@ public class FrozenCube : HoldableEntity {
     }
 
     new void OnTriggerEnter2D(Collider2D collider) {
-        if (!(photonView?.IsMine ?? true) || dead || !fastSlide)
+        if (!photonView.IsMineOrLocal() || dead || !fastSlide)
             return;
 
         GameObject obj = collider.gameObject;
@@ -267,7 +267,7 @@ public class FrozenCube : HoldableEntity {
     }
 
     void HandleTile() {
-        if (!photonView.IsMine)
+        if (!photonView.IsMineOrLocal())
             return;
 
         physics.UpdateCollisions();

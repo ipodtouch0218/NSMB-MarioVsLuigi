@@ -116,7 +116,7 @@ MonoBehaviour:
   speed: 1.5
   bouncePower: 3.5
   terminalVelocity: 6
-  blinkingRate: 4
+  blinkingRate: 6
   passthrough: 0
   avoidPlayers: 1
   followMe: {fileID: 0}
