@@ -348,6 +348,20 @@ Tilemap:
       dummyAlignment: 0
       m_AllTileFlags: 0
   m_AnimatedTiles:
+  - first: {x: -4, y: -2, z: 0}
+    second:
+      m_AnimatedSprites:
+      - {fileID: 0}
+      m_AnimationSpeed: 0
+      m_AnimationTimeOffset: 0
+      m_IsLooping: 1
+  - first: {x: -3, y: -2, z: 0}
+    second:
+      m_AnimatedSprites:
+      - {fileID: 0}
+      m_AnimationSpeed: 0
+      m_AnimationTimeOffset: 0
+      m_IsLooping: 1
   - first: {x: -4, y: -1, z: 0}
     second:
       m_AnimatedSprites:
@@ -357,6 +371,13 @@ Tilemap:
       - {fileID: 1044801654, guid: 0370724d18844184d950a518e4daf31d, type: 3}
       - {fileID: 775316621, guid: 0370724d18844184d950a518e4daf31d, type: 3}
       m_AnimationSpeed: 8
+      m_AnimationTimeOffset: 0
+      m_IsLooping: 1
+  - first: {x: -3, y: -1, z: 0}
+    second:
+      m_AnimatedSprites:
+      - {fileID: 0}
+      m_AnimationSpeed: 0
       m_AnimationTimeOffset: 0
       m_IsLooping: 1
   m_TileAssetArray:

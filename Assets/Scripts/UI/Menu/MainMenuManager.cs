@@ -280,8 +280,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     private void JoinMainLobby() {
-        Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
-        PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
+        //Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
+        //PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
+
+        PhotonNetwork.JoinLobby();
     }
 
     // CALLBACK REGISTERING
@@ -324,6 +326,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (!PhotonNetwork.IsConnected) {
             OpenTitleScreen();
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
+
+            //version separation
+            Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
+            PhotonNetwork.NetworkingClient.AppVersion = match.Groups[0].Value;
+
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {
             if (PhotonNetwork.InRoom) {

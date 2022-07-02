@@ -107,12 +107,131 @@ public class Utils {
         return Tile.ColliderType.None;
     }
 
+    public static bool IsTileSolidBetweenWorldBox(Vector3Int tileLocation, Vector2 worldLocation, Vector2 worldBox) {
+        Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
+        if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
+            return true;
+
+        Vector2 ogWorldLocation = worldLocation;
+        Vector3Int ogTileLocation = tileLocation;
+        while (GetTileAtTileLocation(tileLocation) is TileInteractionRelocator it) {
+            worldLocation += (Vector2)(Vector3) it.offset * 0.5f;
+            tileLocation += it.offset;
+        }
+
+        Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix(tileLocation);
+
+        Vector2 halfBox = worldBox * 0.5f;
+        List<Vector2> boxPoints = new();
+        boxPoints.Add(ogWorldLocation + Vector2.up * halfBox + Vector2.right * halfBox); // ++
+        boxPoints.Add(ogWorldLocation + Vector2.up * halfBox + Vector2.left * halfBox); // +-
+        boxPoints.Add(ogWorldLocation + Vector2.down * halfBox + Vector2.left * halfBox); // --
+        boxPoints.Add(ogWorldLocation + Vector2.down * halfBox + Vector2.right * halfBox); // -+
+
+        Sprite sprite = GameManager.Instance.tilemap.GetSprite(tileLocation);
+        switch (GetColliderType(tileLocation)) {
+        case Tile.ColliderType.Grid:
+            List<Vector2> tilePoints = new();
+            tilePoints.Add(new(0.5f, 0.5f));
+            tilePoints.Add(new(0.5f, -0.5f));
+            tilePoints.Add(new(-0.5f, -0.5f));
+            tilePoints.Add(new(-0.5f, 0.5f));
+
+            return PolygonsOverlap(tilePoints, boxPoints);
+        case Tile.ColliderType.None:
+            return false;
+        case Tile.ColliderType.Sprite:
+
+            for (int i = 0; i < sprite.GetPhysicsShapeCount(); i++) {
+                List<Vector2> points = new();
+                sprite.GetPhysicsShape(i, points);
+
+                for (int j = 0; j < points.Count; j++) {
+                    Vector2 point = points[j];
+                    point *= 0.5f;
+                    point = tileTransform.MultiplyPoint(point);
+                    point += (Vector2)(Vector3) tileLocation * 0.5f;
+                    point += (Vector2) GameManager.Instance.tilemap.transform.position;
+                    point += Vector2.one * 0.25f;
+                    points[j] = point;
+                }
+                /*
+                Debug.Log(string.Join(",", points));
+
+                for (int j = 0; j < points.Count; j++) {
+                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10f);
+                }
+                for (int j = 0; j < boxPoints.Count; j++) {
+                    Debug.DrawLine(boxPoints[j], boxPoints[(j + 1) % boxPoints.Count], Color.blue, 10f);
+                }
+                */
+
+                if (PolygonsOverlap(points, boxPoints))
+                    return true;
+            }
+            return false;
+        }
+
+        return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
+    }
+
+    public static void ProjectPolygon(Vector2 axis, List<Vector2> polygon, ref float min, ref float max) {
+        // To project a point on an axis use the dot product
+        float dot = Vector2.Dot(axis, polygon[0]);
+        min = dot;
+        max = dot;
+        for (int i = 0; i < polygon.Count; i++) {
+            dot = Vector2.Dot(axis, polygon[i]);
+            min = Mathf.Min(min, dot);
+            max = Mathf.Max(max, dot);
+        }
+    }
+
+    public static float IntervalDistance(float minA, float maxA, float minB, float maxB) {
+        if (minA < minB) {
+            return minB - maxA;
+        } else {
+            return minA - maxB;
+        }
+    }
+
+    public static bool PolygonsOverlap(List<Vector2> polygonA, List<Vector2> polygonB) {
+        int edgeCountA = polygonA.Count;
+        int edgeCountB = polygonB.Count;
+        Vector2 edge;
+
+        // Loop through all the edges of both polygons
+        for (int edgeIndex = 0; edgeIndex < edgeCountA + edgeCountB; edgeIndex++) {
+            if (edgeIndex < edgeCountA) {
+                edge = polygonA[edgeIndex];
+            } else {
+                edge = polygonB[edgeIndex - edgeCountA];
+            }
+
+            // ===== 1. Find if the polygons are currently intersecting =====
+
+            // Find the axis perpendicular to the current edge
+            Vector2 axis = new(-edge.y, edge.x);
+            axis.Normalize();
+
+            // Find the projection of the polygon on the current axis
+            float minA = 0; float minB = 0; float maxA = 0; float maxB = 0;
+            ProjectPolygon(axis, polygonA, ref minA, ref maxA);
+            ProjectPolygon(axis, polygonB, ref minB, ref maxB);
+
+            // Check if the polygon projections are currentlty intersecting
+            if (IntervalDistance(minA, maxA, minB, maxB) > 0)
+                return false;
+        }
+
+        return true;
+    }
+
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
         if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
             return true;
 
-        Vector3 ogWorldLocation = worldLocation;
         while (GetTileAtWorldLocation(worldLocation) is TileInteractionRelocator it)
             worldLocation += (Vector3) it.offset * 0.5f;
 
@@ -131,18 +250,16 @@ public class Utils {
                 sprite.GetPhysicsShape(i, points);
 
                 for (int j = 0; j < points.Count; j++) {
-                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10f);
+                    Vector2 point = points[j];
+                    point *= 0.5f;
+                    point = tileTransform.MultiplyPoint(point);
+                    point += (Vector2) (Vector3) tileLocation * 0.5f;
+                    point += (Vector2) GameManager.Instance.tilemap.transform.position;
+                    point += Vector2.one * 0.25f;
+                    points[j] = point;
                 }
 
-                Vector2 tilePosition = TilemapToWorldPosition(WorldToTilemapPosition(worldLocation));
-                Vector2 playerLoc = (Vector2) ogWorldLocation - tilePosition;
-                playerLoc += Vector2.down * 0.25f;
-                playerLoc *= tileTransform.lossyScale * 2f;
-                playerLoc += 0.5f * tileTransform.lossyScale.x * Vector2.left;
-
-                Debug.DrawLine(playerLoc, playerLoc + Vector2.up, Color.blue, 10f);
-
-                if (IsInside(points.ToArray(), playerLoc))
+                if (IsInside(points.ToArray(), worldLocation))
                     return true;
             }
             return false;
@@ -272,7 +389,7 @@ public class Utils {
                 Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
                 WrapTileLocation(ref tileLocation);
 
-                if (IsTileSolidAtTileLocation(tileLocation))
+                if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize))
                     return true;
             }
         }

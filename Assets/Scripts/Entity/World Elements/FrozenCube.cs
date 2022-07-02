@@ -16,7 +16,7 @@ public class FrozenCube : HoldableEntity {
     public float autoBreakTimer = 10, throwTimer;
 
     public bool fastSlide, fallen;
-
+    private int combo;
     public Vector2 offset;
 
     new void Start() {
@@ -251,7 +251,7 @@ public class FrozenCube : HoldableEntity {
         case "goomba":
         case "piranhaplant":
         case "frozencube": {
-            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.transform.position.x > transform.position.x, false);
+            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.transform.position.x > transform.position.x, false, combo++);
             break;
         }
         case "coin": {
@@ -303,7 +303,7 @@ public class FrozenCube : HoldableEntity {
     }
 
 	[PunRPC]
-    public override void SpecialKill(bool right = true, bool groundpound = false) {
+    public override void SpecialKill(bool right, bool groundpound, int combo) {
         Kill();
     }
 }

@@ -36,7 +36,7 @@ public class GoombaWalk : KillableEntity {
         }
         body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
         sRenderer.flipX = !left;
-        
+
     }
 
     [PunRPC]

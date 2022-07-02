@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         SerializationUtils.PackToShort(out short flags, running, jumpHeld, crouching, groundpound,
                 facingRight, onGround, knockback, flying, drill, sliding, skidding, wallSlideLeft,
-                propeller, propellerSpinTimer > 0, wallJumpTimer > 0);
+                invincible > 0, propellerSpinTimer > 0, wallJumpTimer > 0);
         SerializationUtils.PackToByte(out byte flags2, invincible > 0);
         bool updateFlags = flags != previousFlags && flags2 != previousFlags2;
 
@@ -126,7 +126,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         skidding = flags[10];
         wallSlideLeft = flags[11];
         wallSlideRight = flags[12];
-        propeller = flags[13];
+        invincible = flags[13] ? 1 : 0;
         propellerSpinTimer = flags[14] ? 1 : 0;
         wallJumpTimer = flags[15] ? 1 : 0;
 
@@ -336,8 +336,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                         up++;
                         tilesJumpedInto.Add(vec);
                     }
-                } else {
-                    ignoreRoof = true;
                 }
             }
         }
@@ -345,7 +343,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         onGround = down >= 1;
         hitLeft = left >= 1;
         hitRight = right >= 1;
-        hitRoof = !ignoreRoof && up >= 2;
+        hitRoof = !ignoreRoof && up > 1;
     }
     void HandleTileProperties() {
         doIceSkidding = false;
@@ -798,7 +796,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PlaySound(powerup.soundEffect);
 
             if (holding && photonView.IsMine) {
-                holding.photonView.RPC("SpecialKill", RpcTarget.All, facingRight, false);
+                holding.photonView.RPC("SpecialKill", RpcTarget.All, facingRight, false, 0);
                 holding = null;
             }
 
@@ -807,17 +805,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             Destroy(view.gameObject);
 
             return;
+        } else if (state == Enums.PowerupState.MiniMushroom) {
+            //check if we're in a mini area
+            if (onGround && Physics2D.Raycast(body.position, Vector2.up, 0.3f, ONLY_GROUND_MASK)) {
+                reserve = true;
+            }
         }
 
         if (reserve) {
-            if (storedPowerup == null || (storedPowerup != null && Enums.PowerupStatePriority[storedPowerup.state].itemPriority <= pp.itemPriority) && !(state == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom)) {
+            if (storedPowerup == null || storedPowerup != null && Enums.PowerupStatePriority[storedPowerup.state].statePriority <= pp.statePriority && !(state == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom)) {
                 //dont reserve mushrooms
                 storedPowerup = powerup;
             }
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         } else {
-
-            if (!(state == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (storedPowerup == null || Enums.PowerupStatePriority[storedPowerup.state].itemPriority <= cp.itemPriority)) {
+            if (!(state == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (storedPowerup == null || Enums.PowerupStatePriority[storedPowerup.state].statePriority <= cp.statePriority)) {
                 storedPowerup = (Powerup) Resources.Load("Scriptables/Powerups/" + state);
             }
 
@@ -1928,7 +1930,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             var hit = Physics2D.Raycast(body.position + Vector2.down * height, Vector2.up, height + 1, ONLY_GROUND_MASK);
             if (hit) {
-                float neweY = hit.point.y - height;
+                float neweY = hit.point.y - height - Physics2D.defaultContactOffset * 2f;
                 transform.position = body.position = new(body.position.x, neweY);
                 return true;
             }

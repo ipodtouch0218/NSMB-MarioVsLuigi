@@ -106,16 +106,27 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         hitbox.enabled = true;
         audioSource.enabled = true;
 
-        SpecialKill(false, false);
+        SpecialKill(false, false, 0);
     }
 
     [PunRPC]
     public virtual void Kill() {
-        SpecialKill(false, false);
+        SpecialKill(false, false, 0);
     }
 
+    private static readonly Enums.Sounds[] COMBOS = {
+        Enums.Sounds.Enemy_Shell_Kick,
+        Enums.Sounds.Enemy_Shell_Combo1,
+        Enums.Sounds.Enemy_Shell_Combo2,
+        Enums.Sounds.Enemy_Shell_Combo3,
+        Enums.Sounds.Enemy_Shell_Combo4,
+        Enums.Sounds.Enemy_Shell_Combo5,
+        Enums.Sounds.Enemy_Shell_Combo6,
+        Enums.Sounds.Enemy_Shell_Combo7,
+    };
+
     [PunRPC]
-    public virtual void SpecialKill(bool right = true, bool groundpound = false) {
+    public virtual void SpecialKill(bool right, bool groundpound, int combo) {
         if (dead)
             return;
 
@@ -130,15 +141,15 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
         hitbox.enabled = false;
         animator.speed = 0;
         gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-        PlaySound(!Frozen ? Enums.Sounds.Enemy_Generic_Kick : Enums.Sounds.Enemy_Generic_FreezeShatter);
+        PlaySound(!Frozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, combo)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.up * 0.5f, Quaternion.identity);
-        
+
         if (PhotonNetwork.IsMasterClient)
             PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + Vector2.up * 0.5f, Quaternion.identity);
 
         body.velocity = new(2f * (right ? 1 : -1), 2.5f);
-    } 
+    }
 
     [PunRPC]
     public void PlaySound(Enums.Sounds sound) {
