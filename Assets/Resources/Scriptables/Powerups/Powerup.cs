@@ -7,7 +7,7 @@ public class Powerup : ScriptableObject {
     public string prefab;
     public Enums.Sounds soundEffect = Enums.Sounds.Player_Sound_PowerupCollect;
     public float spawnChance = 0.1f, losingSpawnBonus = 0f;
-    public bool big, vertical, custom;
+    public bool big, vertical, custom, lives;
     public Sprite reserveSprite;
 
     public float GetModifiedChance(float losing) {

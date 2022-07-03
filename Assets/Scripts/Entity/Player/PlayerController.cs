@@ -805,6 +805,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             Destroy(view.gameObject);
 
             return;
+        } else if (powerup.prefab == "1-Up") {
+            lives++;
+            UpdateGameState();
+            PlaySound(powerup.soundEffect);
+            GameObject thing = (GameObject)Instantiate(Resources.Load("Prefabs/Particle/1Up"), transform.position, Quaternion.identity);
+
+            if (view.IsMine)
+                PhotonNetwork.Destroy(view);
+            Destroy(view.gameObject);
+
+            return;
         } else if (state == Enums.PowerupState.MiniMushroom) {
             //check if we're in a mini area
             if (onGround && Physics2D.Raycast(body.position, Vector2.up, 0.3f, ONLY_GROUND_MASK)) {
@@ -1108,6 +1119,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         gameObject.SetActive(false);
     }
+
 
     [PunRPC]
     public void Respawn() {

@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   prefab: Star
-  soundEffect: 16
+  soundEffect: 18
   spawnChance: 0
   losingSpawnBonus: 3
   big: 0
   vertical: 0
   custom: 0
+  lives: 0
   reserveSprite: {fileID: 0}

@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
-  m_Name: IceFlower
+  m_Name: 1-Up
   m_EditorClassIdentifier: 
-  state: 5
-  prefab: IceFlower
-  soundEffect: 18
-  spawnChance: 1.5
-  losingSpawnBonus: 1
+  state: 0
+  prefab: 1-Up
+  soundEffect: 13
+  spawnChance: 0
+  losingSpawnBonus: 0
   big: 0
   vertical: 0
   custom: 1
-  lives: 0
-  reserveSprite: {fileID: -1604689058, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
+  lives: 1
+  reserveSprite: {fileID: 0}

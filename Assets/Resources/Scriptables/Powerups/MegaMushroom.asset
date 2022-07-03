@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 8
   prefab: MegaMushroom
-  soundEffect: 40
+  soundEffect: 42
   spawnChance: 0
   losingSpawnBonus: 2
   big: 1
   vertical: 0
   custom: 0
+  lives: 0
   reserveSprite: {fileID: 2690215448161037315, guid: a87d3b028baa82640b06b88398a8c4f0,
     type: 3}
