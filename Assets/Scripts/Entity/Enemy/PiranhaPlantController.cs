@@ -68,7 +68,7 @@ public class PiranhaPlantController : KillableEntity {
     public override void Kill() {
 
         PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
-        PlaySound(Frozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Generic_Kick);
+        PlaySound(Frozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
 
         dead = true;
         hitbox.enabled = false;
@@ -78,10 +78,10 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     [PunRPC]
-    public override void SpecialKill(bool right = true, bool groundpound = false) {
+    public override void SpecialKill(bool right, bool groundpound, int combo) {
         Kill();
     }
-    
+
     void OnDrawGizmosSelected() {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(transform.position + (Vector3) (playerDetectSize * new Vector2(0, transform.eulerAngles.z != 0 ? -0.5f : 0.5f)), playerDetectSize);

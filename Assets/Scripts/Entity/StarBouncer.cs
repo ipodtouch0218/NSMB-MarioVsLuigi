@@ -19,7 +19,7 @@ public class StarBouncer : MonoBehaviourPun {
     private BoxCollider2D worldCollider;
 
     private int becomeCollectibleAt = 0;
-    private bool alreadyCollectible;
+    private bool alreadyCollectible, canBounce;
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
@@ -59,6 +59,7 @@ public class StarBouncer : MonoBehaviourPun {
             body.isKinematic = true;
             body.velocity = Vector2.zero;
             becomeCollectibleAt = PhotonNetwork.ServerTimestamp;
+            GetComponent<CustomRigidbodySerializer>().enabled = false;
 
             if (GameManager.Instance.musicEnabled)
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
@@ -96,6 +97,7 @@ public class StarBouncer : MonoBehaviourPun {
             return;
 
         body.velocity = new Vector2(moveSpeed * (left ? -1 : 1) * (fast ? 1.5f : 1f), body.velocity.y);
+        canBounce |= body.velocity.y < 0;
 
         HandleCollision();
 
@@ -120,7 +122,7 @@ public class StarBouncer : MonoBehaviourPun {
 
         if (physics.hitLeft || physics.hitRight)
             photonView.RPC("Turnaround", RpcTarget.All, physics.hitLeft);
-        if (physics.onGround && body.velocity.y <= 0.01f) {
+        if (physics.onGround && canBounce) {
             body.velocity = new Vector2(body.velocity.x, bounceAmount);
             if (physics.hitRoof)
                 photonView.RPC("Crushed", RpcTarget.All);
@@ -135,7 +137,7 @@ public class StarBouncer : MonoBehaviourPun {
     public void Crushed() {
         if (photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
-        
+
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
     }
     [PunRPC]

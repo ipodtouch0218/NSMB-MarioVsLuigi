@@ -9,22 +9,23 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3379984366894124868}
-  - component: {fileID: 3379984366894124871}
   - component: {fileID: 3379984366894124870}
+  - component: {fileID: 3379984366894124871}
   - component: {fileID: 3379984366894124869}
   - component: {fileID: 3379984366894124866}
-  - component: {fileID: 5111157548884678091}
-  - component: {fileID: 4160259203262991432}
   - component: {fileID: 2949046552459704907}
   - component: {fileID: 3203905593021969376}
   - component: {fileID: 3370984598777677660}
   - component: {fileID: 8142288132489407299}
+  - component: {fileID: 5111157548884678091}
+  - component: {fileID: 1327096901491533370}
+  - component: {fileID: 3348339991063947105}
   m_Layer: 9
   m_Name: MiniMushroom
   m_TagString: Powerup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &3379984366894124868
 Transform:
@@ -42,6 +43,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3379984366894124870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3379984366894124873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92a2c7e0961057346829575aceae0464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 2
+  bouncePower: 0
+  terminalVelocity: 8
+  blinkingRate: 6
+  passthrough: 1
+  avoidPlayers: 0
+  followMe: {fileID: 0}
+  followMeCounter: 0
+  despawnCounter: 15
+  ignoreCounter: 0
+  powerupScriptable: {fileID: 11400000, guid: b3cbb6a3699975d4fb0a2e641a09684c, type: 2}
 --- !u!212 &3379984366894124871
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -94,29 +118,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3379984366894124870
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3379984366894124873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92a2c7e0961057346829575aceae0464, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 2
-  bouncePower: 0
-  terminalVelocity: 8
-  blinkingRate: 4
-  passthrough: 1
-  avoidPlayers: 0
-  followMe: {fileID: 0}
-  followMeCounter: 0
-  despawnCounter: 15
-  ignoreCounter: 0
-  powerupScriptable: {fileID: 11400000, guid: b3cbb6a3699975d4fb0a2e641a09684c, type: 2}
 --- !u!50 &3379984366894124869
 Rigidbody2D:
   serializedVersion: 4
@@ -164,45 +165,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.6, y: 0.55}
   m_EdgeRadius: 0
---- !u!114 &5111157548884678091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3379984366894124873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 4160259203262991432}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &4160259203262991432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3379984366894124873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e7cb724808c322458aa4d15f5035fa9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 0
-  m_TeleportEnabled: 1
-  m_TeleportIfDistanceGreaterThan: 3
 --- !u!114 &2949046552459704907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,6 +223,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88eb6ee564c020f48a3b1cf851277386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5111157548884678091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3379984366894124873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 1
+  OwnershipTransfer: 1
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 1327096901491533370}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &1327096901491533370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3379984366894124873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializableViews:
+  - {fileID: 3348339991063947105}
+--- !u!114 &3348339991063947105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3379984366894124873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interpolate: 1
+  body: {fileID: 3379984366894124869}
 --- !u!1 &6433809598137731468
 GameObject:
   m_ObjectHideFlags: 0

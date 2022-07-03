@@ -37,7 +37,9 @@ public class GlobalController : Singleton<GlobalController> {
 
     void Start() {
         //Photon settings.
+
         PhotonNetwork.SerializationRate = 30;
+        PhotonNetwork.SendRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
 
         InputSystem.controls.UI.DebugInfo.performed += (context) => {
@@ -45,7 +47,7 @@ public class GlobalController : Singleton<GlobalController> {
         };
 
 #if PLATFORM_STANDALONE_WIN && !UNITY_EDITOR
-        try {        
+        try {
             ReplaceWinProc();
         } catch {}
 #endif

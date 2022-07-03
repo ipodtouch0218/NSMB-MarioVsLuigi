@@ -6,6 +6,7 @@ public class KoopaWalk : HoldableEntity {
 
     private static int GROUND_LAYER_ID = -1, GROUND_AND_SEMISOLIDS_LAYER_ID = -1;
 
+    protected int combo;
     public float walkSpeed, kickSpeed, wakeup = 15;
     public bool red, blue, shell, stationary, upsideDown, canBeFlipped = true, flipXFlip = false;
     public bool putdown = false;
@@ -62,7 +63,7 @@ public class KoopaWalk : HoldableEntity {
         if (shell) {
             worldHitbox.size = hitbox.size = inShellHitboxSize;
             worldHitbox.offset = hitbox.offset = inShellHitboxOffset;
-            
+
             if (stationary) {
                 if (physics.onGround)
                     body.velocity = new Vector2(0, body.velocity.y);
@@ -78,58 +79,66 @@ public class KoopaWalk : HoldableEntity {
             worldHitbox.offset = hitbox.offset = outShellHitboxOffset;
         }
 
-        if (photonView && !photonView.IsMine)
-            return;
-
-        HandleTile();
-        animator.SetBool("shell", shell || holder != null);
-        if (!blue)
-            animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
-
+        if (physics.hitRight && !left) {
+            if (photonView && photonView.IsMine) {
+                photonView.RPC("Turnaround", RpcTarget.All, false, velocityLastFrame.x);
+            } else {
+                Turnaround(false, velocityLastFrame.x);
+            }
+        } else if (physics.hitLeft && left) {
+            if (photonView && photonView.IsMine) {
+                photonView.RPC("Turnaround", RpcTarget.All, true, velocityLastFrame.x);
+            } else {
+                Turnaround(true, velocityLastFrame.x);
+            }
+        }
 
         if (physics.onGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, GROUND_AND_SEMISOLIDS_LAYER_ID) && red && !shell) {
             Vector3 redCheckPos = body.position + new Vector2(0.1f * (left ? -1 : 1), 0);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref redCheckPos);
+
             if (!Physics2D.Raycast(redCheckPos, Vector2.down, 0.5f, GROUND_AND_SEMISOLIDS_LAYER_ID)) {
-                if (photonView) {
+                if (photonView && photonView.IsMine) {
                     photonView.RPC("Turnaround", RpcTarget.All, left, velocityLastFrame.x);
                 } else {
                     Turnaround(left, velocityLastFrame.x);
                 }
             }
         }
-        if (physics.hitRight && !left) {
-            if (photonView) {
-                photonView.RPC("Turnaround", RpcTarget.All, false, velocityLastFrame.x);
+
+        if (physics.onGround) {
+            if (stationary) {
+                body.velocity = new(body.velocity.x, 0);
             } else {
-                Turnaround(false, velocityLastFrame.x);
-            }
-        } else if (physics.hitLeft && left) {
-            if (photonView) {
-                photonView.RPC("Turnaround", RpcTarget.All, true, velocityLastFrame.x);
-            } else {
-                Turnaround(true, velocityLastFrame.x);
+                body.velocity = new Vector2((shell ? speed : walkSpeed) * (left ? -1 : 1), 0);
             }
         }
-        if (!stationary && physics.onGround)
-            body.velocity = new Vector2((shell ? speed : walkSpeed) * (left ? -1 : 1), body.velocity.y);
 
         velocityLastFrame = body.velocity;
+
+        if (!(photonView?.IsMine ?? true))
+            return;
+
+        HandleTile();
+        animator.SetBool("shell", shell || holder != null);
+        if (!blue)
+            animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
     }
     public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
-        if (holder) 
+        if (holder)
             return;
 
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
+            player.body.velocity = new(0, player.body.velocity.y);
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
         } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.drill) {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false);
+            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, 0);
         } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("EnterShell", RpcTarget.All);
             if (!blue) {
@@ -171,25 +180,25 @@ public class KoopaWalk : HoldableEntity {
         stationary = true;
     }
 
-
     [PunRPC]
     public override void Kick(bool fromLeft, float kickFactor, bool groundpound) {
         left = !fromLeft;
         stationary = false;
         speed = kickSpeed + 1.5f * kickFactor;
         body.velocity = new Vector2(speed * (left ? -1 : 1), groundpound ? 3.5f : 0);
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
     }
+
     [PunRPC]
     public override void Throw(bool facingLeft, bool crouch) {
         if (holder == null)
             return;
-        
+
         stationary = crouch;
         speed = kickSpeed + 1.5f * (Mathf.Abs(holder.body.velocity.x) / holder.runningMaxSpeed);
-        if (Utils.IsTileSolidAtWorldLocation(body.position)) {
+        if (Utils.IsTileSolidAtWorldLocation(body.position))
             transform.position = body.position = new Vector2(holder.transform.position.x, transform.position.y);
-        }
+
         previousHolder = holder;
         holder = null;
         shell = true;
@@ -209,7 +218,7 @@ public class KoopaWalk : HoldableEntity {
         left = true;
         upsideDown = false;
         stationary = false;
-        if (holder)
+        if (holder && photonView.IsMine)
             holder.photonView.RPC("HoldingWakeup", RpcTarget.All);
         holder = null;
         previousHolder = null;
@@ -225,6 +234,7 @@ public class KoopaWalk : HoldableEntity {
         }
         body.velocity = Vector2.zero;
         wakeupTimer = wakeup;
+        combo = 0;
         shell = true;
         stationary = true;
     }
@@ -236,8 +246,6 @@ public class KoopaWalk : HoldableEntity {
         if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown || dead)
             return;
 
-
-
         GameObject obj = collider.gameObject;
         KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
         switch (obj.tag) {
@@ -246,25 +254,25 @@ public class KoopaWalk : HoldableEntity {
         case "bulletbill":
         case "frozencube":
         case "goomba":
-            if (killa.dead) 
+            if (killa.dead)
                 break;
-            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false);
+            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false, combo++);
             if (holder)
                 photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false);
             break;
         case "piranhaplant":
-            if (killa.dead) 
+            if (killa.dead)
                 break;
             killa.photonView.RPC("Kill", RpcTarget.All);
             if (holder)
                 photonView.RPC("Kill", RpcTarget.All);
 
             break;
-        case "coin": 
+        case "coin":
             if (!holder && !stationary && previousHolder)
                 previousHolder.photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
             break;
-        case "loosecoin": 
+        case "loosecoin":
             if (!holder && !stationary && previousHolder) {
                 Transform parent = obj.transform.parent;
                 previousHolder.photonView.RPC("CollectCoin", RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, parent.position);
@@ -277,7 +285,7 @@ public class KoopaWalk : HoldableEntity {
         if (holder)
             return;
         physics.UpdateCollisions();
-        
+
         ContactPoint2D[] collisions = new ContactPoint2D[20];
         int collisionAmount = worldHitbox.GetContacts(collisions);
         for (int i = 0; i < collisionAmount; i++) {
@@ -287,11 +295,11 @@ public class KoopaWalk : HoldableEntity {
                 if (!putdown && shell && !stationary) {
                     Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
                     TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
-                    if (tile == null) 
+                    if (tile == null)
                         continue;
-                    if (!shell) 
+                    if (!shell)
                         continue;
-                    
+
                     if (tile is InteractableTile it)
                         it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
                 }
@@ -301,16 +309,19 @@ public class KoopaWalk : HoldableEntity {
             }
         }
     }
-    
+
     [PunRPC]
     protected void Turnaround(bool hitWallOnLeft, float x) {
         if (IsStationary())
             return;
 
+        if (shell && hitWallOnLeft != left)
+            PlaySound(Enums.Sounds.World_Block_Bump);
+
         left = !hitWallOnLeft;
         body.velocity = new Vector2((x > 0 ? Mathf.Abs(x) : speed) * (left ? -1 : 1), body.velocity.y);
         if (shell && !IsStationary())
-            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
+            PlaySound(Enums.Sounds.World_Block_Bump);
     }
 
     [PunRPC]
@@ -332,7 +343,7 @@ public class KoopaWalk : HoldableEntity {
         shell = true;
         upsideDown = canBeFlipped;
         body.velocity = new Vector2(body.velocity.x, 5.5f);
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
     }
 
     public bool IsStationary() {
@@ -345,12 +356,12 @@ public class KoopaWalk : HoldableEntity {
     }
 
     [PunRPC]
-    public override void SpecialKill(bool right = true, bool groundpound = false) {
-        base.SpecialKill(right, groundpound);
+    public override void SpecialKill(bool right, bool groundpound, int combo) {
+        base.SpecialKill(right, groundpound, combo);
         shell = true;
         if (holder)
             holder.photonView.RPC("SetHolding", RpcTarget.All, -1);
 
         holder = null;
-    } 
+    }
 }

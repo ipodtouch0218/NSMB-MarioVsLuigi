@@ -43,17 +43,17 @@ public class SettingButtonManager : MonoBehaviour {
 
     public void OnFullscreenToggle(Toggle toggle) {
         bool value = toggle.isOn;
+
         if (value) {
             prevWidth = Screen.width;
             prevHeight = Screen.height;
-            Resolution max = Screen.resolutions[^1];
-            Screen.SetResolution(max.width, max.height, FullScreenMode.FullScreenWindow);
+            Screen.SetResolution(Screen.mainWindowDisplayInfo.width, Screen.mainWindowDisplayInfo.height, FullScreenMode.FullScreenWindow);
         } else {
             Screen.SetResolution(prevWidth, prevHeight, FullScreenMode.Windowed);
         }
     }
 
-    public void OnVsyncToggle(Toggle toggle) {
+        public void OnVsyncToggle(Toggle toggle) {
         Settings settings = Settings.Instance;
         settings.vsync = toggle.isOn;
         QualitySettings.vSyncCount = toggle.isOn ? 1 : 0;

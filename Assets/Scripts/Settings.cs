@@ -7,28 +7,28 @@ public class Settings : Singleton<Settings> {
     public AudioMixer mixer;
 
     private float _volumeMaster, _volumeMusic, _volumeSFX;
-    public float VolumeMaster { 
+    public float VolumeMaster {
         get {
             return _volumeMaster;
-        } 
+        }
         set {
             _volumeMaster = Mathf.Clamp01(value);
             ApplyVolumeSettings();
         }
     }
-    public float VolumeSFX { 
+    public float VolumeSFX {
         get {
             return _volumeSFX;
-        } 
+        }
         set {
             _volumeSFX = Mathf.Clamp01(value);
             ApplyVolumeSettings();
         }
     }
-    public float VolumeMusic { 
+    public float VolumeMusic {
         get {
             return _volumeMusic;
-        } 
+        }
         set {
             _volumeMusic = Mathf.Clamp01(value);
             ApplyVolumeSettings();
@@ -39,7 +39,7 @@ public class Settings : Singleton<Settings> {
     public string nickname;
 
     void Awake() {
-        if (!InstanceCheck()) 
+        if (!InstanceCheck())
             return;
         Instance = this;
         LoadSettingsFromPreferences();

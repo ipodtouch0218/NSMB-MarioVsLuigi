@@ -15,7 +15,7 @@ public abstract class InteractableTile : AnimatedTile {
         //check for entities above to bump
         foreach (Collider2D collider in Physics2D.OverlapBoxAll(worldLocation + bumpOffset, bumpSize, 0f)) {
             GameObject obj = collider.gameObject;
-            if (obj == interacter.gameObject) 
+            if (obj == interacter.gameObject)
                 continue;
             switch (obj.tag) {
             case "Player": {
@@ -49,6 +49,9 @@ public abstract class InteractableTile : AnimatedTile {
             }
             case "MainStar":
             case "bigstar":
+                continue;
+            case "frozencube":
+                obj.GetPhotonView().RPC("Kill", RpcTarget.All);
                 continue;
             default: {
                 if (obj.layer != LayerMask.NameToLayer("Entity"))

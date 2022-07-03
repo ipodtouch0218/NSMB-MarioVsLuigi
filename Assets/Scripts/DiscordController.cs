@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using Discord;
+using System;
 
 public class DiscordController : MonoBehaviour {
 
@@ -19,11 +20,11 @@ public class DiscordController : MonoBehaviour {
         activityManager.OnActivityJoinRequest += AskToJoin;
         activityManager.OnActivityJoin += TryJoinGame;
 
-#if UNITY_STANDALONE_WIN
+//#if UNITY_STANDALONE_WIN
         try {
-            activityManager.RegisterCommand(System.Windows.Forms.Application.ExecutablePath);
+            activityManager.RegisterCommand(AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName);
         } catch { }
-#endif
+//#endif
     }
 
     public void TryJoinGame(string secret) {

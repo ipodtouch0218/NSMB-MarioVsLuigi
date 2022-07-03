@@ -8,7 +8,7 @@ public abstract class HoldableEntity : KillableEntity {
     public bool canPlace = true;
 
     public void LateUpdate() {
-        if (!holder) 
+        if (!holder)
             return;
 
         body.velocity = Vector2.zero;
@@ -28,8 +28,8 @@ public abstract class HoldableEntity : KillableEntity {
     public abstract void Throw(bool facingLeft, bool crouching);
 
     [PunRPC]
-    public void Pickup(int view) {
-        if (holder) 
+    public virtual void Pickup(int view) {
+        if (holder)
             return;
 
         PhotonView holderView = PhotonView.Find(view);
@@ -50,13 +50,13 @@ public abstract class HoldableEntity : KillableEntity {
     }
 
     [PunRPC]
-    public override void SpecialKill(bool right = true, bool groundpound = false) {
+    public override void SpecialKill(bool right, bool groundpound, int combo) {
         if (dead)
             return;
 
         if (holder)
             holder.SetHolding(-1);
 
-        base.SpecialKill(right, groundpound);
+        base.SpecialKill(right, groundpound, combo);
     }
 }

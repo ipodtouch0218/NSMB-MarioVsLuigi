@@ -28,9 +28,8 @@ public class BackgroundLoop : MonoBehaviour {
             children[i] = t.GetChild(i).gameObject;
             SpriteRenderer sr = children[i].GetComponent<SpriteRenderer>();
             ppus[i] = sr.sprite.pixelsPerUnit;
-            halfWidths[i] = sr.bounds.extents.x - (1f/ppus[i]);
+            halfWidths[i] = sr.bounds.extents.x - (0.35f/ppus[i]);
             positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
-
         }
 
         mainCamera = gameObject.GetComponent<Camera>();
@@ -117,7 +116,7 @@ public class BackgroundLoop : MonoBehaviour {
 
         pos /= pixelsPerUnit;
         pos = pos.Multiply(scale);
-        
+
         return pos;
     }
 }

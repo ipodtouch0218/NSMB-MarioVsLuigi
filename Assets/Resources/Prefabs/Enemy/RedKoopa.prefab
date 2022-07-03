@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8304985406365087950, guid: 4f50cb5e806289d43bf820de1f1347bb,
@@ -16,6 +17,11 @@ PrefabInstance:
         type: 3}
       propertyPath: floorAndRoofCutoff
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8786985841086654504, guid: 4f50cb5e806289d43bf820de1f1347bb,
+        type: 3}
+      propertyPath: interpolate
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8836298984178612580, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -104,4 +110,5 @@ PrefabInstance:
       value: 0.15296769
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f50cb5e806289d43bf820de1f1347bb, type: 3}
