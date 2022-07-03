@@ -63,6 +63,9 @@ public class DebugControls : MonoBehaviour {
         if (kb[Key.F6].wasPressedThisFrame) {
             GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera;
         }
+        if (kb[Key.F12].wasPressedThisFrame) {
+            GameManager.Instance.localPlayer.GetPhotonView().RPC("Death", RpcTarget.All, false, false);
+        }
     }
 
     private void FreezePlayer(Key key) {
