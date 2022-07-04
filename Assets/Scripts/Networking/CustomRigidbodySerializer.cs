@@ -26,14 +26,14 @@ public class CustomRigidbodySerializer : MonoBehaviourPun, ICustomSerializeView 
     }
 
     public void FixedUpdate() {
-        if (!photonView.IsMineOrLocal() && interpolate) {
+        if (!photonView.IsMineOrLocal() && interpolate && body) {
             //interpPosition += Time.fixedDeltaTime * body.velocity; // makes it worse?
             body.position = Vector2.MoveTowards(body.position, interpPosition, 0.4f / PhotonNetwork.SerializationRate);
         }
     }
 
     public void OnDrawGizmos() {
-        if (!photonView.IsMine && interpolate) {
+        if (!photonView.IsMineOrLocal() && interpolate) {
             Gizmos.color = Color.cyan;
             Gizmos.DrawCube(interpPosition + 0.25f * Vector2.up, Vector2.one * 0.5f);
         }

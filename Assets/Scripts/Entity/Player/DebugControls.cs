@@ -8,10 +8,12 @@ public class DebugControls : MonoBehaviour {
     public bool editMode;
     public ScriptableRendererFeature feature;
     public void Start() {
-        //if (!Debug.isDebugBuild && !Application.isEditor) {
-        //    enabled = false;
-        //    return;
-        //}
+        /*
+        if (!Debug.isDebugBuild && !Application.isEditor) {
+            enabled = false;
+            return;
+        }
+        */
     }
 
     public void Update() {

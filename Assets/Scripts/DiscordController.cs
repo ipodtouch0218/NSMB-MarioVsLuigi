@@ -52,8 +52,9 @@ public class DiscordController : MonoBehaviour {
 #if UNITY_WEBGL
         return;
 #endif
-
-        discord.RunCallbacks();
+        try {
+            discord.RunCallbacks();
+        } catch { }
     }
 
     public void OnDisable() {

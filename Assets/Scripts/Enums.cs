@@ -66,7 +66,6 @@ public static class Enums {
         //Player
         [SoundData("player/collision")]                 Player_Sound_Collision = 17,
         [SoundData("player/collision_fireball")]        Player_Sound_Collision_Fireball = 18,
-        [SoundData("player/1-up")]                      Player_Sound_Life = 78, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
         [SoundData("player/crouch")]                    Player_Sound_Crouch = 19,
         [SoundData("player/death")]                     Player_Sound_Death = 20,
         [SoundData("player/drill")]                     Player_Sound_Drill = 21,
@@ -93,6 +92,7 @@ public static class Enums {
         [SoundData("character/{char}/walljump")]        Player_Voice_WallJump = 39,
 
         //Powerup
+        [SoundData("powerup/1-up")]                     Powerup_Sound_1UP = 78, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
         [SoundData("powerup/blueshell_enter")]          Powerup_BlueShell_Enter = 41,
         [SoundData("powerup/blueshell_slide")]          Powerup_BlueShell_Slide = 42,
         [SoundData("powerup/fireball_break")]           Powerup_Fireball_Break = 43,

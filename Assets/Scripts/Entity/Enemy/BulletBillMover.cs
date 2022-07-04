@@ -53,7 +53,7 @@ public class BulletBillMover : KillableEntity {
             || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.state == Enums.PowerupState.MegaMushroom) {
 
-            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
+            photonView.RPC("Kill", RpcTarget.All);
             return;
         }
         if (attackedFromAbove) {

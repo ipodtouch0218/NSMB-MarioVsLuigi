@@ -131,13 +131,7 @@ public class Utils {
         Sprite sprite = GameManager.Instance.tilemap.GetSprite(tileLocation);
         switch (GetColliderType(tileLocation)) {
         case Tile.ColliderType.Grid:
-            List<Vector2> tilePoints = new();
-            tilePoints.Add(new(0.5f, 0.5f));
-            tilePoints.Add(new(0.5f, -0.5f));
-            tilePoints.Add(new(-0.5f, -0.5f));
-            tilePoints.Add(new(-0.5f, 0.5f));
-
-            return PolygonsOverlap(tilePoints, boxPoints);
+            return true;
         case Tile.ColliderType.None:
             return false;
         case Tile.ColliderType.Sprite:
@@ -155,16 +149,14 @@ public class Utils {
                     point += Vector2.one * 0.25f;
                     points[j] = point;
                 }
-                /*
-                Debug.Log(string.Join(",", points));
 
                 for (int j = 0; j < points.Count; j++) {
-                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10f);
+                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10);
                 }
                 for (int j = 0; j < boxPoints.Count; j++) {
-                    Debug.DrawLine(boxPoints[j], boxPoints[(j + 1) % boxPoints.Count], Color.blue, 10f);
+                    Debug.DrawLine(boxPoints[j], boxPoints[(j + 1) % boxPoints.Count], Color.blue, 3);
                 }
-                */
+
 
                 if (PolygonsOverlap(points, boxPoints))
                     return true;
@@ -175,56 +167,22 @@ public class Utils {
         return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
     }
 
-    public static void ProjectPolygon(Vector2 axis, List<Vector2> polygon, ref float min, ref float max) {
-        // To project a point on an axis use the dot product
-        float dot = Vector2.Dot(axis, polygon[0]);
-        min = dot;
-        max = dot;
-        for (int i = 0; i < polygon.Count; i++) {
-            dot = Vector2.Dot(axis, polygon[i]);
-            min = Mathf.Min(min, dot);
-            max = Mathf.Max(max, dot);
-        }
-    }
-
-    public static float IntervalDistance(float minA, float maxA, float minB, float maxB) {
-        if (minA < minB) {
-            return minB - maxA;
-        } else {
-            return minA - maxB;
-        }
-    }
-
     public static bool PolygonsOverlap(List<Vector2> polygonA, List<Vector2> polygonB) {
         int edgeCountA = polygonA.Count;
         int edgeCountB = polygonB.Count;
-        Vector2 edge;
 
         // Loop through all the edges of both polygons
-        for (int edgeIndex = 0; edgeIndex < edgeCountA + edgeCountB; edgeIndex++) {
-            if (edgeIndex < edgeCountA) {
-                edge = polygonA[edgeIndex];
-            } else {
-                edge = polygonB[edgeIndex - edgeCountA];
-            }
-
-            // ===== 1. Find if the polygons are currently intersecting =====
-
-            // Find the axis perpendicular to the current edge
-            Vector2 axis = new(-edge.y, edge.x);
-            axis.Normalize();
-
-            // Find the projection of the polygon on the current axis
-            float minA = 0; float minB = 0; float maxA = 0; float maxB = 0;
-            ProjectPolygon(axis, polygonA, ref minA, ref maxA);
-            ProjectPolygon(axis, polygonB, ref minB, ref maxB);
-
-            // Check if the polygon projections are currentlty intersecting
-            if (IntervalDistance(minA, maxA, minB, maxB) > 0)
-                return false;
+        for (int i = 0; i < edgeCountA; i++) {
+            if (IsInside(polygonB, polygonA[i]))
+                return true;
         }
 
-        return true;
+        for (int i = 0; i < edgeCountB; i++) {
+            if (IsInside(polygonA, polygonB[i]))
+                return true;
+        }
+
+        return false;
     }
 
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
@@ -259,7 +217,7 @@ public class Utils {
                     points[j] = point;
                 }
 
-                if (IsInside(points.ToArray(), worldLocation))
+                if (IsInside(points, worldLocation))
                     return true;
             }
             return false;
@@ -343,9 +301,9 @@ public class Utils {
 
     // Returns true if the point p lies
     // inside the polygon[] with n vertices
-    static bool IsInside(Vector2[] polygon, Vector2 p) {
+    static bool IsInside(List<Vector2> polygon, Vector2 p) {
         // There must be at least 3 vertices in polygon[]
-        if (polygon.Length < 3) {
+        if (polygon.Count < 3) {
             return false;
         }
 
@@ -356,7 +314,7 @@ public class Utils {
         // with sides of polygon
         int count = 0, i = 0;
         do {
-            int next = (i + 1) % polygon.Length;
+            int next = (i + 1) % polygon.Count;
 
             // Check if the line segment from 'p' to
             // 'extreme' intersects with the line

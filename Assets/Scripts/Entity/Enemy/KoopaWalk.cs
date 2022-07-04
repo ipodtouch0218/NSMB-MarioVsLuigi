@@ -117,7 +117,7 @@ public class KoopaWalk : HoldableEntity {
 
         velocityLastFrame = body.velocity;
 
-        if (!(photonView?.IsMine ?? true))
+        if (!photonView.IsMineOrLocal())
             return;
 
         HandleTile();
@@ -326,12 +326,15 @@ public class KoopaWalk : HoldableEntity {
 
     [PunRPC]
     protected void Bump() {
+        if (dead)
+            return;
+
         if (blue) {
             if (photonView.IsMine)
                 PhotonNetwork.Destroy(photonView);
 
             if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.Instantiate("Prefabs/Powerup/BlueShell", transform.position, Quaternion.identity);
+                PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/BlueShell", transform.position, Quaternion.identity);
 
             return;
         }
@@ -342,8 +345,8 @@ public class KoopaWalk : HoldableEntity {
         wakeupTimer = wakeup;
         shell = true;
         upsideDown = canBeFlipped;
-        body.velocity = new Vector2(body.velocity.x, 5.5f);
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
+        body.velocity = new Vector2(body.velocity.x, 5.5f);
     }
 
     public bool IsStationary() {
