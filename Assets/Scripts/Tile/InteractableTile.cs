@@ -20,8 +20,11 @@ public abstract class InteractableTile : AnimatedTile {
             switch (obj.tag) {
             case "Player": {
                 PlayerController player = obj.GetComponent<PlayerController>();
+
+                // fall on ass when bumped from below
                 if (player.state == Enums.PowerupState.MegaMushroom)
-                    return;
+                    player.photonView.RPC("KnockbackMegaMushroom", RpcTarget.All);
+        
 
                 player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, false, (interacter as MonoBehaviourPun)?.photonView.ViewID ?? -1);
                 continue;
