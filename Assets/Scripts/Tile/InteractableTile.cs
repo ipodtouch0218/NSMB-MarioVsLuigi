@@ -30,15 +30,15 @@ public abstract class InteractableTile : AnimatedTile {
                 continue;
             }
             case "koopa": {
-                if (!obj.GetPhotonView() || obj.GetComponent<KillableEntity>().dead)
+                if (!obj.GetPhotonView())
                     continue;
                 obj.GetPhotonView().RPC("Bump", RpcTarget.All);
                 continue;
             }
             case "goomba": {
-                if (!obj.GetPhotonView() || obj.GetComponent<KillableEntity>().dead)
+                if (!obj.GetPhotonView())
                     continue;
-                obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false);
+                obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false, 0);
                 continue;
             }
             case "loosecoin":

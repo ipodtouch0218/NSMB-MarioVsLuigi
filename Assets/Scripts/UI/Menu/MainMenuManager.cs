@@ -280,8 +280,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     private void JoinMainLobby() {
-        Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
-        PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
+        //Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
+        //PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
+
+        PhotonNetwork.JoinLobby();
     }
 
     // CALLBACK REGISTERING
@@ -324,6 +326,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (!PhotonNetwork.IsConnected) {
             OpenTitleScreen();
             PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
+
+            //version separation
+            Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
+            PhotonNetwork.NetworkingClient.AppVersion = match.Groups[0].Value;
+
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {
             if (PhotonNetwork.InRoom) {
@@ -362,6 +369,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         GlobalController.Instance.discordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
+
+#if PLATFORM_WEBGL
+        fullscreenToggle.interactable = false;
+#endif
     }
 
     private void LoadSettings(bool nickname) {
@@ -769,7 +780,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
     }
     public void SendChat() {
-        string text = chatTextField.text.Trim();
+        string text = chatTextField.text.Replace("<", "«").Replace(">", "»").Trim();
         chatTextField.text = "";
         if (text == null || text == "") {
             return;

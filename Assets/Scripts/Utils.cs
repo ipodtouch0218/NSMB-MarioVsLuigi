@@ -16,6 +16,9 @@ public class Utils {
     public static bool BitTest(byte bit, int index) {
         return (bit & (1 << index)) != 0;
     }
+    public static bool BitTest(short bit, int index) {
+        return (bit & (1 << index)) != 0;
+    }
 
     public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
         if (!manager)
@@ -104,12 +107,89 @@ public class Utils {
         return Tile.ColliderType.None;
     }
 
+    public static bool IsTileSolidBetweenWorldBox(Vector3Int tileLocation, Vector2 worldLocation, Vector2 worldBox) {
+        Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
+        if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
+            return true;
+
+        Vector2 ogWorldLocation = worldLocation;
+        Vector3Int ogTileLocation = tileLocation;
+        while (GetTileAtTileLocation(tileLocation) is TileInteractionRelocator it) {
+            worldLocation += (Vector2)(Vector3) it.offset * 0.5f;
+            tileLocation += it.offset;
+        }
+
+        Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix(tileLocation);
+
+        Vector2 halfBox = worldBox * 0.5f;
+        List<Vector2> boxPoints = new();
+        boxPoints.Add(ogWorldLocation + Vector2.up * halfBox + Vector2.right * halfBox); // ++
+        boxPoints.Add(ogWorldLocation + Vector2.up * halfBox + Vector2.left * halfBox); // +-
+        boxPoints.Add(ogWorldLocation + Vector2.down * halfBox + Vector2.left * halfBox); // --
+        boxPoints.Add(ogWorldLocation + Vector2.down * halfBox + Vector2.right * halfBox); // -+
+
+        Sprite sprite = GameManager.Instance.tilemap.GetSprite(tileLocation);
+        switch (GetColliderType(tileLocation)) {
+        case Tile.ColliderType.Grid:
+            return true;
+        case Tile.ColliderType.None:
+            return false;
+        case Tile.ColliderType.Sprite:
+
+            for (int i = 0; i < sprite.GetPhysicsShapeCount(); i++) {
+                List<Vector2> points = new();
+                sprite.GetPhysicsShape(i, points);
+
+                for (int j = 0; j < points.Count; j++) {
+                    Vector2 point = points[j];
+                    point *= 0.5f;
+                    point = tileTransform.MultiplyPoint(point);
+                    point += (Vector2)(Vector3) tileLocation * 0.5f;
+                    point += (Vector2) GameManager.Instance.tilemap.transform.position;
+                    point += Vector2.one * 0.25f;
+                    points[j] = point;
+                }
+
+                for (int j = 0; j < points.Count; j++) {
+                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10);
+                }
+                for (int j = 0; j < boxPoints.Count; j++) {
+                    Debug.DrawLine(boxPoints[j], boxPoints[(j + 1) % boxPoints.Count], Color.blue, 3);
+                }
+
+
+                if (PolygonsOverlap(points, boxPoints))
+                    return true;
+            }
+            return false;
+        }
+
+        return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
+    }
+
+    public static bool PolygonsOverlap(List<Vector2> polygonA, List<Vector2> polygonB) {
+        int edgeCountA = polygonA.Count;
+        int edgeCountB = polygonB.Count;
+
+        // Loop through all the edges of both polygons
+        for (int i = 0; i < edgeCountA; i++) {
+            if (IsInside(polygonB, polygonA[i]))
+                return true;
+        }
+
+        for (int i = 0; i < edgeCountB; i++) {
+            if (IsInside(polygonA, polygonB[i]))
+                return true;
+        }
+
+        return false;
+    }
+
     public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
         Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
         if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
             return true;
 
-        Vector3 ogWorldLocation = worldLocation;
         while (GetTileAtWorldLocation(worldLocation) is TileInteractionRelocator it)
             worldLocation += (Vector3) it.offset * 0.5f;
 
@@ -128,18 +208,16 @@ public class Utils {
                 sprite.GetPhysicsShape(i, points);
 
                 for (int j = 0; j < points.Count; j++) {
-                    Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10f); 
+                    Vector2 point = points[j];
+                    point *= 0.5f;
+                    point = tileTransform.MultiplyPoint(point);
+                    point += (Vector2) (Vector3) tileLocation * 0.5f;
+                    point += (Vector2) GameManager.Instance.tilemap.transform.position;
+                    point += Vector2.one * 0.25f;
+                    points[j] = point;
                 }
 
-                Vector2 tilePosition = TilemapToWorldPosition(WorldToTilemapPosition(worldLocation));
-                Vector2 playerLoc = (Vector2) ogWorldLocation - tilePosition;
-                playerLoc += Vector2.down * 0.25f;
-                playerLoc *= tileTransform.lossyScale * 2f;
-                playerLoc += 0.5f * tileTransform.lossyScale.x * Vector2.left;
-
-                Debug.DrawLine(playerLoc, playerLoc + Vector2.up, Color.blue, 10f);
-
-                if (IsInside(points.ToArray(), playerLoc))
+                if (IsInside(points, worldLocation))
                     return true;
             }
             return false;
@@ -223,9 +301,9 @@ public class Utils {
 
     // Returns true if the point p lies
     // inside the polygon[] with n vertices
-    static bool IsInside(Vector2[] polygon, Vector2 p) {
+    static bool IsInside(List<Vector2> polygon, Vector2 p) {
         // There must be at least 3 vertices in polygon[]
-        if (polygon.Length < 3) {
+        if (polygon.Count < 3) {
             return false;
         }
 
@@ -236,7 +314,7 @@ public class Utils {
         // with sides of polygon
         int count = 0, i = 0;
         do {
-            int next = (i + 1) % polygon.Length;
+            int next = (i + 1) % polygon.Count;
 
             // Check if the line segment from 'p' to
             // 'extreme' intersects with the line
@@ -269,7 +347,7 @@ public class Utils {
                 Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
                 WrapTileLocation(ref tileLocation);
 
-                if (IsTileSolidAtTileLocation(tileLocation))
+                if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize))
                     return true;
             }
         }
@@ -277,7 +355,7 @@ public class Utils {
     }
 
     public static float WrappedDistance(Vector2 a, Vector2 b) {
-        if (GameManager.Instance && GameManager.Instance.loopingLevel && Mathf.Abs(a.x - b.x) > GameManager.Instance.levelWidthTile / 4f) 
+        if (GameManager.Instance && GameManager.Instance.loopingLevel && Mathf.Abs(a.x - b.x) > GameManager.Instance.levelWidthTile / 4f)
             a.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(a.x - b.x);
 
         return Vector2.Distance(a, b);
@@ -286,6 +364,10 @@ public class Utils {
     public static void GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
         if (properties == null)
             properties = PhotonNetwork.CurrentRoom.CustomProperties;
+        if (properties == null) {
+            value = default;
+            return;
+        }
 
         properties.TryGetValue(key, out object temp);
         if (temp != null) {
@@ -307,6 +389,11 @@ public class Utils {
             powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
 
         GetCustomProperty(Enums.NetRoomProperties.NewPowerups, out bool custom);
+        GetCustomProperty(Enums.NetRoomProperties.Lives, out int livesOn);
+        bool lives = false;
+        if (livesOn > 0)
+            lives = true;
+
         bool big = gm.spawnBigPowerups;
         bool vertical = gm.spawnVerticalPowerups;
 
@@ -314,7 +401,7 @@ public class Utils {
         foreach (Powerup powerup in powerups) {
             if (powerup.name == "MegaMushroom" && GameManager.Instance.musicState == Enums.MusicState.MegaMushroom)
                 continue;
-            if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom))
+            if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
                 continue;
 
             totalChance += powerup.GetModifiedChance(losing);
@@ -324,23 +411,23 @@ public class Utils {
         foreach (Powerup powerup in powerups) {
             if (powerup.name == "MegaMushroom" && gm.musicState == Enums.MusicState.MegaMushroom)
                 continue;
-            if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom))
+            if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
                 continue;
 
             float chance = powerup.GetModifiedChance(losing);
 
-            if (rand < chance) 
+            if (rand < chance)
                 return powerup;
             rand -= chance;
         }
 
         return powerups[0];
     }
-    
+
     public static float QuadraticEaseOut(float v) {
         return -1 * v * (v - 2);
     }
-    
+
 
     public static ExitGames.Client.Photon.Hashtable GetTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap) {
         Dictionary<int, int> changes = new();
@@ -362,7 +449,7 @@ public class Utils {
 
             if (!tiles.Contains(path))
                 tiles.Add(path);
-            
+
             changes[i] = tiles.IndexOf(path);
         }
 
@@ -389,7 +476,7 @@ public class Utils {
     public static TileBase GetTileFromCache(string tilename) {
         if (tilename == null || tilename == "")
             return null;
-        
+
         if (!tilename.StartsWith("Tilemaps/Tiles/"))
             tilename = "Tilemaps/Tiles/" + tilename;
 

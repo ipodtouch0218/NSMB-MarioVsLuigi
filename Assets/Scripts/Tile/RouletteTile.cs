@@ -3,7 +3,7 @@ using Photon.Pun;
 
 [CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile", order = 5)]
 public class RouletteTile : BreakableBrickTile {
-    
+
     public string resultTile;
     public Vector2 topSpawnOffset, bottomSpawnOffset;
 
@@ -44,7 +44,6 @@ public class RouletteTile : BreakableBrickTile {
 
         Bump(interacter, direction, worldLocation);
 
-        Debug.Log("A");
         object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, direction == InteractionDirection.Down ? bottomSpawnOffset : topSpawnOffset };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
 

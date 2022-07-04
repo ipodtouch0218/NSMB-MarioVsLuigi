@@ -25,7 +25,7 @@ GameObject:
   m_TagString: Powerup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &3379984366894124868
 Transform:
@@ -58,7 +58,7 @@ MonoBehaviour:
   speed: 2
   bouncePower: 0
   terminalVelocity: 8
-  blinkingRate: 4
+  blinkingRate: 6
   passthrough: 1
   avoidPlayers: 0
   followMe: {fileID: 0}

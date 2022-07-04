@@ -39,6 +39,7 @@ public class GlobalController : Singleton<GlobalController> {
         //Photon settings.
 
         PhotonNetwork.SerializationRate = 30;
+        PhotonNetwork.SendRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
 
         InputSystem.controls.UI.DebugInfo.performed += (context) => {

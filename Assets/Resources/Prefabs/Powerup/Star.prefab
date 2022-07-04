@@ -58,7 +58,7 @@ MonoBehaviour:
   speed: 2
   bouncePower: 6
   terminalVelocity: 8
-  blinkingRate: 4
+  blinkingRate: 6
   passthrough: 0
   avoidPlayers: 0
   followMe: {fileID: 0}
@@ -261,7 +261,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  extrapolate: 0
   interpolate: 1
   body: {fileID: 387509546018045311}
 --- !u!1 &387509546627058580
@@ -275,7 +274,7 @@ GameObject:
   - component: {fileID: 387509546627058581}
   - component: {fileID: 387509546627058583}
   - component: {fileID: 387509546627058582}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}

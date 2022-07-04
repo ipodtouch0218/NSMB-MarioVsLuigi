@@ -1,18 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
-using UnityEngine.Tilemaps;
+using UnityEngine.Rendering.Universal;
 
 public class DebugControls : MonoBehaviour {
 
     public bool editMode;
+    public ScriptableRendererFeature feature;
     public void Start() {
+        /*
         if (!Debug.isDebugBuild && !Application.isEditor) {
             enabled = false;
             return;
         }
+        */
     }
 
     public void Update() {
@@ -34,6 +35,7 @@ public class DebugControls : MonoBehaviour {
         DebugItem(Key.Numpad6, "Star");
         DebugItem(Key.Numpad7, "PropellerMushroom");
         DebugItem(Key.Numpad8, "IceFlower");
+        DebugItem(Key.Numpad9, "1-Up");
         DebugEntity(Key.Digit1, "Koopa");
         DebugEntity(Key.Digit2, "RedKoopa");
         DebugEntity(Key.Digit3, "BlueKoopa");
@@ -43,7 +45,30 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.Digit7, "Spiny");
 
         FreezePlayer(Key.Digit9);
-        //DebugWorldEntity(Key.Digit0, "FrozenCube");
+
+        if (kb[Key.F1].wasPressedThisFrame) {
+            GameObject nametag = GameManager.Instance.transform.Find("NametagCanvas").gameObject;
+            nametag.SetActive(!nametag.activeSelf);
+        }
+        if (kb[Key.F2].wasPressedThisFrame) {
+            CanvasGroup group = GameManager.Instance.transform.Find("New HUD").GetComponent<CanvasGroup>();
+            group.alpha = 1f - group.alpha;
+        }
+        if (kb[Key.F3].wasPressedThisFrame) {
+            Settings.Instance.ndsResolution = !Settings.Instance.ndsResolution;
+        }
+        if (kb[Key.F4].wasPressedThisFrame) {
+            Settings.Instance.fourByThreeRatio = !Settings.Instance.fourByThreeRatio;
+        }
+        if (kb[Key.F5].wasPressedThisFrame) {
+            feature.SetActive(!feature.isActive);
+        }
+        if (kb[Key.F6].wasPressedThisFrame) {
+            GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera;
+        }
+        if (kb[Key.F12].wasPressedThisFrame) {
+            GameManager.Instance.localPlayer.GetPhotonView().RPC("Death", RpcTarget.All, false, false);
+        }
     }
 
     private void FreezePlayer(Key key) {
@@ -82,22 +107,4 @@ public class DebugControls : MonoBehaviour {
             frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.tag, en.GetComponent<KillableEntity>().photonView.ViewID);
         }
     }
-
-    /*
-    // The event zone 
-
-    public void specialSettings() {
-        if (Keyboard.current[Key.P].wasPressedThisFrame)
-            editMode = !editMode;
-        Vector3 pos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-
-        if (editMode == true) {
-            if (Mouse.current.rightButton.wasPressedThisFrame)
-            GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("PlaceTile", RpcTarget.All, pos.x, pos.y, pos.z);
-
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-                GameManager.Instance.localPlayer.GetComponent<PlayerController>().photonView.RPC("RemoveTile", RpcTarget.All, pos.x, pos.y, pos.z);
-        }
-    }
-    */
 }

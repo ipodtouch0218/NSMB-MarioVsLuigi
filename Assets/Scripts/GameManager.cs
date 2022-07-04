@@ -323,7 +323,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
 
-#if UNITY_EDITOR
         //Spawning in editor??
         if (!PhotonNetwork.IsConnectedAndReady) {
             PhotonNetwork.OfflineMode = true;
@@ -331,7 +330,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 CustomRoomProperties = NetworkUtils.DefaultRoomProperties
             });
         }
-#endif
 
         //Respawning Tilemaps
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
@@ -340,7 +338,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         //Star spawning
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
         Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out starRequirement);
-
 
         SceneManager.SetActiveScene(gameObject.scene);
 
@@ -358,7 +355,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
     }
-
 
     IEnumerator LoadingComplete(int startTimestamp) {
         GlobalController.Instance.discordController.UpdateActivity();

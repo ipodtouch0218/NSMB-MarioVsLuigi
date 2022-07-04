@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
-    public float screenShakeTimer = 0;
+    public static float ScreenShake = 0;
     public bool controlCamera = false;
     public Vector3 currentPosition;
 
@@ -12,7 +12,7 @@ public class CameraController : MonoBehaviour {
 
     private Vector3 smoothDampVel;
     private Camera targetCamera;
-    private List<SecondaryCameraPositioner> secondaryPositioners = new();  
+    private List<SecondaryCameraPositioner> secondaryPositioners = new();
     private float startingZ, lastFloor;
 
     private PlayerController controller;
@@ -31,8 +31,8 @@ public class CameraController : MonoBehaviour {
         if (controlCamera) {
 
             Vector3 shakeOffset = Vector3.zero;
-            if ((screenShakeTimer -= Time.deltaTime) > 0)
-                shakeOffset = new Vector3((Random.value - 0.5f) * screenShakeTimer, (Random.value - 0.5f) * screenShakeTimer);
+            if ((ScreenShake -= Time.deltaTime) > 0)
+                shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
 
             targetCamera.transform.position = currentPosition + shakeOffset;
             if (BackgroundLoop.instance)

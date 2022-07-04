@@ -9,7 +9,7 @@ public class SpinyWalk : KoopaWalk {
     public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
-        if (holder) 
+        if (holder)
             return;
 
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
@@ -21,7 +21,7 @@ public class SpinyWalk : KoopaWalk {
                 //Do knockback to player, colliding with us in shell going opposite ways
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
 
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false);
+            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, combo++);
         } else if (!holder) {
             if (shell) {
                 if (IsStationary()) {
