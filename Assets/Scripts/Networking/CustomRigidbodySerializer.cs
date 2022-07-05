@@ -33,7 +33,7 @@ public class CustomRigidbodySerializer : MonoBehaviourPun, ICustomSerializeView 
     }
 
     public void OnDrawGizmos() {
-        if (!photonView.IsMineOrLocal() && interpolate) {
+        if (Application.IsPlaying(this) && !photonView.IsMineOrLocal() && interpolate) {
             Gizmos.color = Color.cyan;
             Gizmos.DrawCube(interpPosition + 0.25f * Vector2.up, Vector2.one * 0.5f);
         }

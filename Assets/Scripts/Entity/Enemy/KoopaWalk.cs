@@ -243,7 +243,7 @@ public class KoopaWalk : HoldableEntity {
         if (!shell)
             base.OnTriggerEnter2D(collider);
 
-        if ((photonView && !photonView.IsMine) || !shell || IsStationary() || putdown || dead)
+        if (!photonView.IsMineOrLocal() || !shell || IsStationary() || putdown || dead)
             return;
 
         GameObject obj = collider.gameObject;

@@ -4,8 +4,8 @@ using Photon.Realtime;
 
 public static class NetworkUtils {
 
-    public static readonly RaiseEventOptions EventOthers = new() { Receivers = ReceiverGroup.Others };
-    public static readonly RaiseEventOptions EventAll = new() { Receivers = ReceiverGroup.All };
+    public static RaiseEventOptions EventOthers { get; } = new() { Receivers = ReceiverGroup.Others };
+    public static RaiseEventOptions EventAll { get; } = new() { Receivers = ReceiverGroup.All };
 
     private readonly static Hashtable _defaultRoomProperties = new() {
         [Enums.NetRoomProperties.Level] = 0,
@@ -16,7 +16,6 @@ public static class NetworkUtils {
         [Enums.NetRoomProperties.GameStarted] = false,
         [Enums.NetRoomProperties.HostName] = "",
         [Enums.NetRoomProperties.Debug] = false,
-        //[Enums.NetRoomProperties.Password] = "",
     };
 
     public static Hashtable DefaultRoomProperties {
@@ -34,7 +33,6 @@ public static class NetworkUtils {
         Enums.NetRoomProperties.NewPowerups,
         Enums.NetRoomProperties.GameStarted,
         Enums.NetRoomProperties.HostName,
-        //Enums.NetRoomProperties.Password,
     };
 
     public static readonly RegionComparer RegionPingComparer = new();

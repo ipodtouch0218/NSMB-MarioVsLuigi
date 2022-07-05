@@ -10413,6 +10413,7 @@ MonoBehaviour:
   groundpound: 0
   sliding: 0
   knockback: 0
+  megaKnockBottom: 0
   hitBlock: 0
   running: 0
   functionallyRunning: 0
@@ -10430,6 +10431,7 @@ MonoBehaviour:
   fireballKnockback: 0
   startedSliding: 0
   groundpounded: 0
+  canShootProjectile: 0
   jumpLandingTimer: 0
   landing: 0
   koyoteTime: 0
@@ -10445,6 +10447,7 @@ MonoBehaviour:
   giantEndTimer: 0
   propellerTimer: 0
   propellerSpinTimer: 0
+  fireballTimer: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0

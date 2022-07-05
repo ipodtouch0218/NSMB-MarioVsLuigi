@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 1
   prefab: MiniMushroom
-  soundEffect: 47
+  soundEffect: 45
   spawnChance: 2
   losingSpawnBonus: -1
   big: 0

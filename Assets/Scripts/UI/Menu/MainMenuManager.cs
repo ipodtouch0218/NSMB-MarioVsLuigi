@@ -134,6 +134,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
                 [Enums.NetRoomProperties.HostName] = newMaster.NickName
             });
+            LocalChatMessage("You are the room's host! You can use chat commands to control your room. Do /help for help.", ColorToVector(Color.red));
         }
         UpdateSettingEnableStates();
     }
@@ -197,6 +198,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // CONNECTION CALLBACKS
     public void OnConnected() {
         Debug.Log("[PHOTON] Connected to Photon.");
+        PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
     }
     public void OnDisconnected(DisconnectCause cause) {
         Debug.Log("[PHOTON] Disconnected: " + cause.ToString());
@@ -222,10 +224,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             pingsReceived = true;
         }, "");
     }
-    public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {}
-    public void OnCustomAuthenticationFailed(string failure) {}
+    public void OnCustomAuthenticationResponse(Dictionary<string, object> response) { }
+    public void OnCustomAuthenticationFailed(string failure) { }
     public void OnConnectedToMaster() {
         JoinMainLobby();
+
+        string reconnectRoom = PlayerPrefs.GetString("in-room", null);
+        if (reconnectRoom != null) {
+            PhotonNetwork.RejoinRoom(reconnectRoom);
+        }
     }
     // MATCHMAKING CALLBACKS
     public void OnFriendListUpdate(List<FriendInfo> friendList) {}
@@ -255,6 +262,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnEvent(EventData e) {
         switch (e.Code) {
         case (byte) Enums.NetEventIds.StartGame: {
+            PlayerPrefs.SetString("in-room", PhotonNetwork.CurrentRoom.Name);
+            PlayerPrefs.Save();
             Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
             PhotonNetwork.IsMessageQueueRunning = false;
             SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
@@ -330,6 +339,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             //version separation
             Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
             PhotonNetwork.NetworkingClient.AppVersion = match.Groups[0].Value;
+
+            string id = PlayerPrefs.GetString("id", null);
+            if (id != null)
+                PhotonNetwork.AuthValues = new() { UserId = id };
 
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {
@@ -427,6 +440,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     void EnterRoom() {
         Room room = PhotonNetwork.CurrentRoom;
+        PlayerPrefs.SetString("in-room", null);
+        PlayerPrefs.Save();
 
         object started = room.CustomProperties[Enums.NetRoomProperties.GameStarted];
         if (started != null && (bool) started) {
@@ -438,6 +453,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         OpenInLobbyMenu();
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
+
+        if (PhotonNetwork.IsMasterClient)
+            LocalChatMessage("You are the room's host! You can use chat commands to control your room. Do /help for help.", ColorToVector(Color.red));
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value, PhotonNetwork.LocalPlayer.CustomProperties);
         SetPlayerColor(value);
@@ -728,6 +746,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PublishUserId = true,
             CustomRoomProperties = properties,
             CustomRoomPropertiesForLobby = NetworkUtils.LobbyVisibleRoomProperties,
+            PlayerTtl = 120 * 1000,
         };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         createLobbyPrompt.SetActive(false);
