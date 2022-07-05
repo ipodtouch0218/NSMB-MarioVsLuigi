@@ -3998,7 +3998,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 67.45
+  m_fontSize: 67.25
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5659,7 +5659,7 @@ MonoBehaviour:
     Value: 3
   loop:
     Enabled: 1
-    Value: 0
+    Value: 363
   endTicks:
     Enabled: 0
     Value: 0
