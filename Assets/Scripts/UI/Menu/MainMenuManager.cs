@@ -229,10 +229,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnConnectedToMaster() {
         JoinMainLobby();
 
+        /*
         string reconnectRoom = PlayerPrefs.GetString("in-room", null);
         if (reconnectRoom != null) {
             PhotonNetwork.RejoinRoom(reconnectRoom);
         }
+        */
     }
     // MATCHMAKING CALLBACKS
     public void OnFriendListUpdate(List<FriendInfo> friendList) {}
@@ -746,7 +748,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PublishUserId = true,
             CustomRoomProperties = properties,
             CustomRoomPropertiesForLobby = NetworkUtils.LobbyVisibleRoomProperties,
-            PlayerTtl = 120 * 1000,
+//          PlayerTtl = 120 * 1000,
         };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         createLobbyPrompt.SetActive(false);
