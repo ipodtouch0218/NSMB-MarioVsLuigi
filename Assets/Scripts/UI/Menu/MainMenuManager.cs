@@ -127,7 +127,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // ROOM CALLBACKS
     public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {
         // increase or remove when toadette or another character is added
-        if (PhotonNetwork.IsMasterClient && Utils.GetCharacterIndex(player) > 1)
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug, PhotonNetwork.CurrentRoom.CustomProperties);
+        if (PhotonNetwork.IsMasterClient && Utils.GetCharacterIndex(player) > 1 && !debug)
         {
             PhotonNetwork.CloseConnection(player);
         }
