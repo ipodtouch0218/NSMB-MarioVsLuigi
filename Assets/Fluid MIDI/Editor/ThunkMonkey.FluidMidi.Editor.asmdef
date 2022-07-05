@@ -1,0 +1,17 @@
+{
+    "name": "ThunkMonkey.FluidMidi.Editor",
+    "references": [
+        "GUID:35f1bc730d5a2104ab671ec4245fe32b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

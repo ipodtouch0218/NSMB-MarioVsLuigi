@@ -10,6 +10,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
+using FluidMidi;
 
 public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks {
     private static GameManager _instance;
@@ -25,7 +26,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
+    public SongPlayer mainMusic, invincibleMusic, megaMushroomMusic;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
@@ -49,7 +50,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     //Audio
     public AudioSource music, sfx;
-    private LoopingMusic loopMusic;
     public Enums.MusicState? musicState = null;
 
     public GameObject localPlayer;
@@ -317,7 +317,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void Start() {
         SpectationManager = GetComponent<SpectationManager>();
-        loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
 
@@ -437,17 +436,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     IEnumerator EndGame(Player winner) {
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
-        music.Stop();
-        music.Stop();
+        StopAllMusic();
         GameObject text = GameObject.FindWithTag("wintext");
         text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.NickName } Wins!" : "It's a draw!";
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
-
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
-        mixer.SetFloat("MusicSpeed", 1f);
-        mixer.SetFloat("MusicPitch", 1f);
 
         bool win = winner != null && winner.IsLocal;
         music.PlayOneShot((win ? Enums.Sounds.UI_Match_Win : Enums.Sounds.UI_Match_Lose).GetClip());
@@ -591,12 +585,21 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             return;
         }
     }
+    
+    private void StopAllMusic()
+    {
+        //we can make this and the speedup code prettier if we check the music state.
+        megaMushroomMusic.Stop();
+        invincibleMusic.Stop();
+        mainMusic.Stop();
+        music.Stop();
+    }
 
-    private void PlaySong(Enums.MusicState state, MusicData musicToPlay) {
+    private void PlaySong(Enums.MusicState state, SongPlayer musicToPlay) {
         if (musicState == state)
             return;
 
-        loopMusic.Play(musicToPlay);
+        musicToPlay.Play();
         musicState = state;
     }
 
@@ -625,13 +628,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             PlaySong(Enums.MusicState.Normal, mainMusic);
         }
 
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         if (speedup) {
-            mixer.SetFloat("MusicSpeed", 1.25f);
-            mixer.SetFloat("MusicPitch", 1f / 1.25f);
-        } else {
-            mixer.SetFloat("MusicSpeed", 1f);
-            mixer.SetFloat("MusicPitch", 1f);
+            megaMushroomMusic.Tempo = 1.3f;
+            invincibleMusic.Tempo = 1.3f;
+            mainMusic.Tempo = 1.3f;
+        }
+        else {
+            megaMushroomMusic.Tempo = 1f;
+            invincibleMusic.Tempo = 1f;
+            mainMusic.Tempo = 1f;
         }
     }
 
