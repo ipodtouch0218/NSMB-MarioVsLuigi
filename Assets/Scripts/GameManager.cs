@@ -91,18 +91,22 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         case PunEvent.Instantiation: {
             string prefab = (string) ((Hashtable) parameters.paramDict[245])[0];
 
+            //server room instantiation
+            if (sender == null)
+                return;
+
             if (!PhotonNetwork.IsMasterClient || sender.IsMasterClient)
                 return;
 
-            if (prefab.Contains("Enemy") /*|| prefab.Contains("Powerup")*/) {
+            if (prefab.Contains("Enemy") || prefab.Contains("Powerup")) {
                 PhotonNetwork.CloseConnection(sender);
             }
-
             break;
         }
         case (byte) Enums.NetEventIds.AllFinishedLoading: {
             if (loaded)
                 break;
+
             StartCoroutine(LoadingComplete((int) customData));
             break;
         }
@@ -429,14 +433,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                     point.AttemptSpawning();
 
-            foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
-                wfgs.AttemptExecute();
 
             localPlayer.GetComponent<PlayerController>().OnGameStart();
         } else {
             foreach (PlayerController player in allPlayers)
                 player.sfx.enabled = true;
         }
+
+        startServerTime = startTimestamp + 3500;
+        foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
+            wfgs.AttemptExecute();
 
         try {
             ScoreboardUpdater.instance.Populate(allPlayers);
@@ -447,7 +453,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         musicEnabled = true;
         Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
 
-        startServerTime = PhotonNetwork.ServerTimestamp;
         startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
         if (timedGameDuration > 0) {
             endServerTime = startTimestamp + 4500 + timedGameDuration * 1000;

@@ -8,12 +8,10 @@ public class DebugControls : MonoBehaviour {
     public bool editMode;
     public ScriptableRendererFeature feature;
     public void Start() {
-        /*
         if (!Debug.isDebugBuild && !Application.isEditor) {
             enabled = false;
             return;
         }
-        */
     }
 
     public void Update() {
@@ -84,12 +82,23 @@ public class DebugControls : MonoBehaviour {
         if (!GameManager.Instance.localPlayer)
             return;
 
-        if (Keyboard.current[key].wasPressedThisFrame)
-            if (item == null)
-                GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem();
-            else
-                GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem(item);
+        if (Keyboard.current[key].wasPressedThisFrame) {
+            SpawnDebugItem(item);
+        }
     }
+
+    private void SpawnDebugItem(string prefab) {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        PlayerController local = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
+
+        if (prefab == null)
+            prefab = Utils.GetRandomItem(local).prefab;
+
+        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, local.body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { local.photonView.ViewID });
+    }
+
     private void DebugEntity(Key key, string entity) {
         if (!GameManager.Instance.localPlayer)
             return;

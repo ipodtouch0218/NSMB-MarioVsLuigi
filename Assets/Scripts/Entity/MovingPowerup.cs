@@ -18,7 +18,7 @@ public class MovingPowerup : MonoBehaviourPun {
 
     public Powerup powerupScriptable;
 
-    void Start() {
+    public void Awake() {
         body = GetComponent<Rigidbody2D>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
