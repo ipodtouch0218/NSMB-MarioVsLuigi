@@ -27,13 +27,13 @@ public class BlockBump : MonoBehaviour {
         hitbox.size = sprite.bounds.size;
         hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(1/2f, -1/2f);
     }
-    
+
     public void Kill() {
         Destroy(gameObject);
-        
+
         Tilemap tm = GameManager.Instance.tilemap;
         Vector3Int loc = Utils.WorldToTilemapPosition(transform.position);
-        
+
         Object tile = Resources.Load("Tilemaps/Tiles/" + resultTile);
         if (tile is AnimatedTile animatedTile) {
             tm.SetTile(loc, animatedTile);

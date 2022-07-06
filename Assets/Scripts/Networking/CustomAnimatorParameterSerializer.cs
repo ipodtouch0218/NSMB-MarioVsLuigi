@@ -54,10 +54,8 @@ public class CustomAnimatorParameterSerializer : MonoBehaviourPun, ICustomSerial
 
                 switch (param.type) {
                 case AnimatorControllerParameterType.Trigger:
-                    if (animator.GetBool(param.name)) {
+                    if (animator.GetBool(param.name))
                         cachedChanges.Add(i);
-                        Debug.Log("cached " + param.name);
-                    }
 
                     break;
                 case AnimatorControllerParameterType.Bool:

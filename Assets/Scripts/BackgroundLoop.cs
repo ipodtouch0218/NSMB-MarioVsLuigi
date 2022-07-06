@@ -28,7 +28,7 @@ public class BackgroundLoop : MonoBehaviour {
             children[i] = t.GetChild(i).gameObject;
             SpriteRenderer sr = children[i].GetComponent<SpriteRenderer>();
             ppus[i] = sr.sprite.pixelsPerUnit;
-            halfWidths[i] = sr.bounds.extents.x - (0.25f/ppus[i]);
+            halfWidths[i] = sr.bounds.extents.x - (0.15f/ppus[i]);
             positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
         }
 

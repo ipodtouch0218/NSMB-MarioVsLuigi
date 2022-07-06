@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Audio;
@@ -11,8 +12,9 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
 using FluidMidi;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks {
+public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks, IMatchmakingCallbacks {
     private static GameManager _instance;
     public static GameManager Instance {
         get {
@@ -65,7 +67,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public EnemySpawnpoint[] enemySpawnpoints;
 
     private GameObject[] coins;
-
+    private readonly Dictionary<Player, List<double>> powerupSummons = new();
     public SpectationManager SpectationManager { get; private set; }
 
     ParticleSystem brickBreak;
@@ -75,28 +77,41 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (eventOptions == null)
             eventOptions = NetworkUtils.EventOthers;
 
-        HandleEvent((byte) eventId, parameters);
+        HandleEvent((byte) eventId, parameters, PhotonNetwork.LocalPlayer, null);
         PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
     }
     public void OnEvent(EventData e) {
-        HandleEvent(e.Code, e.CustomData);
+        var players = PhotonNetwork.CurrentRoom.Players;
+        HandleEvent(e.Code, e.CustomData, players.ContainsKey(e.Sender) ? players[e.Sender] : null, e.Parameters);
     }
-    public void HandleEvent(byte eventId, object customData) {
+    public void HandleEvent(byte eventId, object customData, Player sender, ParameterDictionary parameters) {
         object[] data = customData as object[];
 
-        switch ((Enums.NetEventIds) eventId) {
-        case Enums.NetEventIds.AllFinishedLoading: {
+        switch (eventId) {
+        case PunEvent.Instantiation: {
+            string prefab = (string) ((Hashtable) parameters.paramDict[245])[0];
+
+            if (!PhotonNetwork.IsMasterClient || sender.IsMasterClient)
+                return;
+
+            if (prefab.Contains("Enemy") /*|| prefab.Contains("Powerup")*/) {
+                PhotonNetwork.CloseConnection(sender);
+            }
+
+            break;
+        }
+        case (byte) Enums.NetEventIds.AllFinishedLoading: {
             if (loaded)
                 break;
             StartCoroutine(LoadingComplete((int) customData));
             break;
         }
-        case Enums.NetEventIds.EndGame: {
+        case (byte) Enums.NetEventIds.EndGame: {
             Player winner = (Player) customData;
             StartCoroutine(EndGame(winner));
             break;
         }
-        case Enums.NetEventIds.SetTile: {
+        case (byte) Enums.NetEventIds.SetTile: {
             int x = (int) data[0];
             int y = (int) data[1];
             string tilename = (string) data[2];
@@ -106,7 +121,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, tile);
             break;
         }
-        case Enums.NetEventIds.SetTileBatch: {
+        case (byte) Enums.NetEventIds.SetTileBatch: {
             int x = (int) data[0];
             int y = (int) data[1];
             int width = (int) data[2];
@@ -123,21 +138,21 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
             break;
         }
-        case Enums.NetEventIds.ResetTiles: {
+        case (byte) Enums.NetEventIds.ResetTiles: {
             ResetTiles();
             break;
         }
-        case Enums.NetEventIds.SyncTilemap: {
+        case (byte) Enums.NetEventIds.SyncTilemap: {
             ExitGames.Client.Photon.Hashtable changes = (ExitGames.Client.Photon.Hashtable) customData;
             Utils.ApplyTilemapChanges(originalTiles, origin, tilemap, changes);
             break;
         }
-        case Enums.NetEventIds.PlayerFinishedLoading: {
+        case (byte) Enums.NetEventIds.PlayerFinishedLoading: {
             Player player = (Player) customData;
             loadedPlayers.Add(player.NickName);
             break;
         }
-        case Enums.NetEventIds.BumpTile: {
+        case (byte) Enums.NetEventIds.BumpTile: {
 
             int x = (int) data[0];
             int y = (int) data[1];
@@ -163,7 +178,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, null);
             break;
         }
-        case Enums.NetEventIds.SetThenBumpTile: {
+        case (byte) Enums.NetEventIds.SetThenBumpTile: {
             int x = (int) data[0];
             int y = (int) data[1];
             bool downwards = (bool) data[2];
@@ -186,7 +201,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, null);
             break;
         }
-        case Enums.NetEventIds.SetCoinState: {
+        case (byte) Enums.NetEventIds.SetCoinState: {
             int view = (int) data[0];
             bool visible = (bool) data[1];
             GameObject coin = PhotonView.Find(view).gameObject;
@@ -194,7 +209,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             coin.GetComponent<BoxCollider2D>().enabled = visible;
             break;
         }
-        case Enums.NetEventIds.SpawnParticle: {
+        case (byte) Enums.NetEventIds.SpawnParticle: {
             int x = (int) data[0];
             int y = (int) data[1];
             string particleName = (string) data[2];
@@ -215,7 +230,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             break;
         }
-        case Enums.NetEventIds.SpawnResizableParticle: {
+        case (byte) Enums.NetEventIds.SpawnResizableParticle: {
             Vector2 pos = (Vector2) data[0];
             bool right = (bool) data[1];
             bool upsideDown = (bool) data[2];
@@ -234,6 +249,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             break;
         }
         }
+    }
+
+    // MATCHMAKING CALLBACKS
+
+    public void OnFriendListUpdate(List<FriendInfo> friendList) { }
+    public void OnCreatedRoom() { }
+    public void OnCreateRoomFailed(short returnCode, string message) { }
+    public void OnJoinRoomFailed(short returnCode, string message) { }
+    public void OnJoinRandomFailed(short returnCode, string message) { }
+    public void OnLeftRoom() {
+        OnDisconnected(DisconnectCause.DisconnectByServerLogic);
     }
 
     // ROOM CALLBACKS
@@ -769,4 +795,5 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             Gizmos.DrawIcon(starSpawn.transform.position, "star", true, new Color(1, 1, 1, 0.5f));
         }
     }
+
 }
