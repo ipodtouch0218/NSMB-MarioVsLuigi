@@ -228,12 +228,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not Hashtable gs)
             return;
 
-        lives = (int)gs[Enums.NetPlayerGameState.Lives];
-        stars = (int)gs[Enums.NetPlayerGameState.Stars];
-        coins = (int)gs[Enums.NetPlayerGameState.Coins];
-        state = (Enums.PowerupState)gs[Enums.NetPlayerGameState.PowerupState];
+        lives = (int) gs[Enums.NetPlayerGameState.Lives];
+        stars = (int) gs[Enums.NetPlayerGameState.Stars];
+        coins = (int) gs[Enums.NetPlayerGameState.Coins];
+        state = (Enums.PowerupState) gs[Enums.NetPlayerGameState.PowerupState];
         if (gs[Enums.NetPlayerGameState.ReserveItem] != null) {
-            storedPowerup = (Powerup)Resources.Load("Scriptables/Powerups/" + (Enums.PowerupState)gs[Enums.NetPlayerGameState.ReserveItem]);
+            storedPowerup = (Powerup) Resources.Load("Scriptables/Powerups/" + (Enums.PowerupState) gs[Enums.NetPlayerGameState.ReserveItem]);
         } else {
             storedPowerup = null;
         }
@@ -253,7 +253,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     private void UpdateGameStateVariable(string key, object value) {
-        ((Hashtable)gameState[Enums.NetPlayerProperties.GameState])[key] = value;
+        ((Hashtable) gameState[Enums.NetPlayerProperties.GameState])[key] = value;
     }
 
     public void FixedUpdate() {
@@ -804,7 +804,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             lives++;
             UpdateGameState();
             PlaySound(powerup.soundEffect);
-            GameObject thing = (GameObject)Instantiate(Resources.Load("Prefabs/Particle/1Up"), transform.position, Quaternion.identity);
+            Instantiate(Resources.Load("Prefabs/Particle/1Up"), transform.position, Quaternion.identity);
 
             if (view.IsMine)
                 PhotonNetwork.Destroy(view);

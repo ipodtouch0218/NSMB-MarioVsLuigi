@@ -26,7 +26,7 @@ public class PowerupTile : BreakableBrickTile {
                 //Particle
                 object[] parametersParticle = new object[]{tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b)};
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
-                
+
                 if (interacter is MonoBehaviourPun pun)
                     pun.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Break);
                 return true;
@@ -34,7 +34,7 @@ public class PowerupTile : BreakableBrickTile {
 
             spawnResult = player.state <= Enums.PowerupState.Small ? "Mushroom" : "FireFlower";
         }
-        
+
         Bump(interacter, direction, worldLocation);
 
         object[] parametersBump = new object[]{tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult};

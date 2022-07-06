@@ -57,6 +57,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     private static readonly string roomNameChars = "BCDFGHJKLMNPRQSTVWXYZ";
 
+    private readonly Dictionary<Player, double> lastMessage = new();
+
     Coroutine updatePingCoroutine;
 
     // LOBBY CALLBACKS
@@ -284,7 +286,22 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             object[] data = (object[]) e.CustomData;
             string message = (string) data[0];
             Vector3 color = (Vector3) data[1];
-            LocalChatMessage(message, color);
+
+            var players = PhotonNetwork.CurrentRoom.Players;
+            if (players.ContainsKey(e.Sender)) {
+
+                Player pl = players[e.Sender];
+                if (!pl.IsMasterClient) {
+
+                    double time = lastMessage.GetValueOrDefault(pl);
+                    if (PhotonNetwork.Time - time < 0.8f)
+                        return;
+
+                    lastMessage[pl] = PhotonNetwork.Time;
+                }
+            }
+
+            LocalChatMessage(message.Replace("<", "«").Replace(">", "»").Substring(0, Mathf.Min(128, message.Length)), color);
             break;
         }
         case (byte) Enums.NetEventIds.ChangeMaxPlayers: {

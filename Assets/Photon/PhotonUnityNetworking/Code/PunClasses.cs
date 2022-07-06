@@ -474,7 +474,7 @@ namespace Photon.Pun
 
 
     /// <summary>Defines Photon event-codes as used by PUN.</summary>
-    internal class PunEvent
+    public class PunEvent
     {
         public const byte RPC = 200;
         public const byte SendSerialize = 201;

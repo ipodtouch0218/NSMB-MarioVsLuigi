@@ -30,7 +30,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
             return;
 
         if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale))
-            photonView.RPC("SpecialKill", RpcTarget.All, left, false);
+            photonView.RPC("SpecialKill", RpcTarget.All, left, false, 0);
     }
 
     public void OnTriggerEnter2D(Collider2D collider) {

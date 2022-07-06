@@ -103,7 +103,7 @@ namespace Photon.Pun
         /// <summary>
         /// The maximum number of assigned PhotonViews <i>per player</i> (or scene). See the [General Documentation](@ref general) topic "Limitations" on how to raise this limitation.
         /// </summary>
-        public static readonly int MAX_VIEW_IDS = 1000; // VIEW & PLAYER LIMIT CAN BE EASILY CHANGED, SEE DOCS
+        public static readonly int MAX_VIEW_IDS = 50; // VIEW & PLAYER LIMIT CAN BE EASILY CHANGED, SEE DOCS
 
 
         /// <summary>Name of the PhotonServerSettings file (used to load and by PhotonEditor to save new files).</summary>
