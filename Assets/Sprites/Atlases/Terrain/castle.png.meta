@@ -215,6 +215,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -258,6 +259,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -972,7 +974,7 @@ TextureImporter:
       name: castle_4
       rect:
         serializedVersion: 2
-        x: 64
+        x: 80
         y: 32
         width: 16
         height: 16
@@ -1075,7 +1077,6 @@ TextureImporter:
       Castle_30: -2204218097580962714
   spritePackingTag: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
