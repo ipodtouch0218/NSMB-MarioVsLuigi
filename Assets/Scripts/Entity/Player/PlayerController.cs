@@ -976,7 +976,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Destroy(num, 1.5f);
 
         coins++;
-        if (coins >= 8) {
+        if (coins >= GameManager.Instance.coinRequirement) {
             coins = 0;
             if (photonView.IsMine)
                 SpawnItem();
