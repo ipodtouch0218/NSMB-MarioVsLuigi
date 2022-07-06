@@ -11,7 +11,7 @@ public class DiscordController : MonoBehaviour {
     public ActivityManager activityManager;
 
     public void Awake() {
-#if UNITY_WEBGL
+#if UNITY_WEBGL || UNITY_ANDROID
         return;
 #endif
 
@@ -49,7 +49,7 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void Update() {
-#if UNITY_WEBGL
+#if UNITY_WEBGL || UNITY_ANDROID
         return;
 #endif
         try {
@@ -62,7 +62,7 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void UpdateActivity() {
-#if UNITY_WEBGL
+#if UNITY_WEBGL || UNITY_ANDROID
         return;
 #endif
         if (discord == null || activityManager == null)
