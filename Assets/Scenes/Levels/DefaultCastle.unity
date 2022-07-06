@@ -3931,11 +3931,8 @@ GameObject:
   - component: {fileID: 361225201}
   - component: {fileID: 361225204}
   - component: {fileID: 361225200}
-  - component: {fileID: 361225199}
+  - component: {fileID: 361225208}
   - component: {fileID: 361225205}
-  - component: {fileID: 361225203}
-  - component: {fileID: 361225207}
-  - component: {fileID: 361225206}
   m_Layer: 8
   m_Name: Tilemap_Squishy
   m_TagString: Untagged
@@ -11345,26 +11342,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!95 &361225199
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 361225195}
-  m_Enabled: 0
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 797900de116024b4e86122fc046695fd, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!66 &361225200
 CompositeCollider2D:
   m_ObjectHideFlags: 0
@@ -11435,29 +11412,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &361225203
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 361225195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 361225207}
-  sceneViewId: 11
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!19719996 &361225204
 TilemapCollider2D:
   m_ObjectHideFlags: 0
@@ -11487,38 +11441,88 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fedcefda7c82c5f4483ddc0098f43865, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: 1
+  target: 0
   behaviours:
-  - {fileID: 361225199}
---- !u!114 &361225206
+  - {fileID: 361225208}
+--- !u!114 &361225208
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 361225195}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
+  m_Script: {fileID: 11500000, guid: 8e08d8b87ed0623468df5e282f4df8ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  extrapolate: 0
-  interpolate: 1
-  body: {fileID: 361225201}
---- !u!114 &361225207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 361225195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: 361225206}
+  x:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  y:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: -0.00024797916
+      outSlope: -0.00024797916
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.058746867
+      value: -0.000014567999
+      inSlope: 0.023996731
+      outSlope: 0.023996731
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 1
+    - serializedVersion: 3
+      time: 0.47004
+      value: 2.9963522
+      inSlope: 0.2808621
+      outSlope: 0.2808621
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.48555663
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.58811504
+      value: 2.9991837
+      inSlope: 0.09137737
+      outSlope: 0.09137737
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.9417039
+      value: 0.0013540215
+      inSlope: 0.018324602
+      outSlope: 0.018324602
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.3484507
+    - serializedVersion: 3
+      time: 1.0000927
+      value: -0.00018905941
+      inSlope: -0.026427673
+      outSlope: -0.026427673
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 1
+    m_PostInfinity: 1
+    m_RotationOrder: 4
+  animationTimeSeconds: 17
 --- !u!1001 &379146488
 PrefabInstance:
   m_ObjectHideFlags: 0

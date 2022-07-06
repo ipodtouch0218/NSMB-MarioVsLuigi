@@ -10413,7 +10413,6 @@ MonoBehaviour:
   groundpound: 0
   sliding: 0
   knockback: 0
-  megaKnockBottom: 0
   hitBlock: 0
   running: 0
   functionallyRunning: 0
@@ -10453,6 +10452,7 @@ MonoBehaviour:
   floorAngle: 0
   knockbackTimer: 0
   pipeTimer: 0
+  slowdownTimer: 0
   wallSlideLeft: 0
   wallSlideRight: 0
   pipeDirection: {x: 0, y: 0}
@@ -10925,7 +10925,6 @@ MonoBehaviour:
   - drill
   - sliding
   - facingRight
-  - propellerSpin
   animator: {fileID: 2254935152879088866}
 --- !u!1 &4824223342336871188
 GameObject:
