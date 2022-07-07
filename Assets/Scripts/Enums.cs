@@ -157,8 +157,10 @@ public static class Enums {
     public static class NetRoomProperties {
         public static string Level { get; } = "L";
         public static string StarRequirement { get; } = "S";
+        public static string CoinRequirement { get; } = "Co";
         public static string Lives { get; } = "Li";
         public static string Time { get; } = "T";
+        public static string DrawTime { get; } = "Dt";
         public static string NewPowerups { get; } = "C";
         public static string GameStarted { get; } = "G";
         public static string HostName { get; } = "H";

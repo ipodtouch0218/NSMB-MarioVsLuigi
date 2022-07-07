@@ -27,9 +27,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public TMP_InputField nicknameField, starsText, livesField, timeField, lobbyJoinField, chatTextField;
+    public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
@@ -199,9 +199,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Debug, ChangeDebugState);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
+        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.DrawTime, ChangeDrawTime);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
     }
 
@@ -815,6 +817,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         timeField.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
+        drawTimeupToggle.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
         privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
@@ -1118,6 +1121,28 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         //ChangeStarRequirement(newValue);
     }
+    
+    public void ChangeCoinRequirement(int coins) {
+        coinsText.text = coins.ToString();
+    }
+    public void SetCoinRequirement(TMP_InputField input) {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        int.TryParse(input.text, out int newValue);
+        if (newValue < 1) {
+            newValue = 8;
+            input.text = newValue.ToString();
+        }
+        if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.CoinRequirement])
+            return;
+
+        ExitGames.Client.Photon.Hashtable table = new() {
+            [Enums.NetRoomProperties.CoinRequirement] = newValue
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        //ChangeCoinRequirement(newValue);
+    }
 
     public void CopyRoomCode() {
         TextEditor te = new();
@@ -1171,6 +1196,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         timeField.SetTextWithoutNotify($"{minutes}:{seconds:D2}");
     }
+
     public void SetTime(TMP_InputField input) {
         if (!PhotonNetwork.IsMasterClient)
             return;
@@ -1201,7 +1227,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }
-
+    public void ChangeDrawTime(bool value) {
+        drawTimeupToggle.SetIsOnWithoutNotify(value);
+    }
+    public void SetDrawTime(Toggle toggle) {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+        ExitGames.Client.Photon.Hashtable properties = new() {
+            [Enums.NetRoomProperties.DrawTime] = toggle.isOn
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
     public int ParseTimeToSeconds(string time) {
 
         int minutes;
