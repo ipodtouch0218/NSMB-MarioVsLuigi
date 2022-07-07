@@ -189,6 +189,8 @@ public static class Enums {
         // 30-39 = graphical-only events
         SpawnParticle = 30,
         SpawnResizableParticle = 31,
+        // 40-49 = player-related events
+        PlayerDamagePlayer = 40,
     }
     #endregion
 }

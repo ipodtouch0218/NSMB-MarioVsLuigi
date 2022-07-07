@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     private static GameManager _instance;
     public static GameManager Instance {
         get {
-            if (_instance == null && SceneManager.GetActiveScene().buildIndex > 2)
+            if (!_instance && SceneManager.GetActiveScene().buildIndex >= 2)
                 _instance = FindObjectOfType<GameManager>();
 
             return _instance;
@@ -253,6 +253,36 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             body.angularVelocity = right ^ upsideDown ? -300 : 300;
 
             particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (upsideDown ? -1 : 1));
+            break;
+        }
+        case (byte) Enums.NetEventIds.PlayerDamagePlayer: {
+            PhotonView attacker = PhotonView.Find((int) data[0]);
+            PhotonView target = PhotonView.Find((int) data[1]);
+
+            if (!attacker || !target)
+                return;
+
+            PlayerController attackerPlayer = attacker.GetComponent<PlayerController>();
+            PlayerController targetPlayer = target.GetComponent<PlayerController>();
+
+            if (!targetPlayer || !attackerPlayer)
+                return;
+
+            //attacker must be invincible or mega, and near the player
+            if (Utils.WrappedDistance(targetPlayer.body.position, attackerPlayer.body.position) > 2)
+                return;
+
+            if (targetPlayer.invincible > 0 || targetPlayer.hitInvincibilityCounter > 0)
+                return;
+
+            if (!((attackerPlayer.state == Enums.PowerupState.BlueShell && attackerPlayer.inShell) ||
+                attackerPlayer.invincible > 0 ||
+                (attackerPlayer.state == Enums.PowerupState.MegaMushroom && attackerPlayer.giantTimer > 0) ||
+                (attackerPlayer.groundpound && targetPlayer.state == Enums.PowerupState.MiniMushroom)))
+
+                return;
+
+            targetPlayer.photonView.RPC("Powerdown", RpcTarget.All, false);
             break;
         }
         }
@@ -627,7 +657,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             bool draw = false;
             Utils.GetCustomProperty(Enums.NetRoomProperties.DrawTime, out draw);
             //time up! check who has most stars, if a tie keep playing, if draw is on end game in a draw
-            if (!draw) 
+            if (!draw)
                     // it's a draw! Thanks for playing the demo!
                     PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
             else {

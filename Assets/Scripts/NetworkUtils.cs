@@ -1,13 +1,11 @@
-using UnityEngine;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
-using System.Collections.Generic;
-using System.IO;
 
 public static class NetworkUtils {
 
     public static RaiseEventOptions EventOthers { get; } = new() { Receivers = ReceiverGroup.Others };
     public static RaiseEventOptions EventAll { get; } = new() { Receivers = ReceiverGroup.All };
+    public static RaiseEventOptions EventMasterClient { get; } = new() { Receivers = ReceiverGroup.MasterClient };
 
     private readonly static Hashtable _defaultRoomProperties = new() {
         [Enums.NetRoomProperties.Level] = 0,
