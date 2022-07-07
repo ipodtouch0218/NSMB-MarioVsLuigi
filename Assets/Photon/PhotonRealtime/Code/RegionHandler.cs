@@ -115,16 +115,14 @@ namespace Photon.Realtime
         public string GetResults()
         {
             StringBuilder sb = new StringBuilder();
+            
             sb.AppendFormat("Region Pinging Result: {0}\n", this.BestRegion.ToString());
-            if (this.pingerList != null)
+            foreach (RegionPinger region in this.pingerList)
             {
-                foreach (RegionPinger region in this.pingerList)
-                {
-                    sb.AppendFormat(region.GetResults() + "\n");
-                }
+                sb.AppendFormat(region.GetResults() + "\n");
             }
-
             sb.AppendFormat("Previous summary: {0}", this.previousSummaryProvided);
+
             return sb.ToString();
         }
 
@@ -147,13 +145,19 @@ namespace Photon.Realtime
                 //Debug.LogError("The region arrays from Name Server are not ok. Must be non-null and same length. " + (regions == null) + " " + (servers == null) + "\n" + opGetRegions.ToStringFull());
                 return;
             }
-
+            
             this.bestRegionCache = null;
             this.EnabledRegions = new List<Region>(regions.Length);
 
             for (int i = 0; i < regions.Length; i++)
             {
-                Region tmp = new Region(regions[i], servers[i]);
+                string server = servers[i];
+                if (PortToPingOverride != 0)
+                {
+                    server = LoadBalancingClient.ReplacePortWithAlternative(servers[i], PortToPingOverride);
+                }
+
+                Region tmp = new Region(regions[i], server);
                 if (string.IsNullOrEmpty(tmp.Code))
                 {
                     continue;
@@ -166,11 +170,19 @@ namespace Photon.Realtime
             this.availableRegionCodes = string.Join(",", regions);
         }
 
-        private List<RegionPinger> pingerList;
+        private List<RegionPinger> pingerList = new List<RegionPinger>();
         private Action<RegionHandler> onCompleteCall;
         private int previousPing;
         public bool IsPinging { get; private set; }
         private string previousSummaryProvided;
+
+        protected internal static ushort PortToPingOverride;
+
+
+        public RegionHandler(ushort masterServerPortOverride = 0)
+        {
+            PortToPingOverride = masterServerPortOverride;
+        }
 
 
         public bool PingMinimumOfRegions(Action<RegionHandler> onCompleteCallback, string previousSummary)
@@ -235,8 +247,15 @@ namespace Photon.Realtime
             // let's check only the preferred region to detect if it's still "good enough"
             this.previousPing = prevBestRegionPing;
 
+            
             Region preferred = this.EnabledRegions.Find(r => r.Code.Equals(prevBestRegionCode));
             RegionPinger singlePinger = new RegionPinger(preferred, this.OnPreferredRegionPinged);
+
+            lock (this.pingerList)
+            {
+                this.pingerList.Add(singlePinger);
+            }
+
             singlePinger.Start();
             return true;
         }
@@ -267,20 +286,10 @@ namespace Photon.Realtime
                 return false;
             }
 
-            if (this.pingerList == null)
-            {
-                this.pingerList = new List<RegionPinger>();
-            }
-            else
-            {
-                lock (this.pingerList)
-                {
-                    this.pingerList.Clear();
-                }
-            }
-
             lock (this.pingerList)
             {
+                this.pingerList.Clear();
+
                 foreach (Region region in this.EnabledRegions)
                 {
                     RegionPinger rp = new RegionPinger(region, this.OnRegionDone);

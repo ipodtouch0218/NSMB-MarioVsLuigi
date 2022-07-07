@@ -3,8 +3,8 @@ $webSocketInstances: [],
 
 SocketCreate: function(url, protocols)
 {
-    var str = Pointer_stringify(url);
-    var prot = Pointer_stringify(protocols);
+    var str = UTF8ToString(url);
+    var prot = UTF8ToString(protocols);
     var socket = {
         socket: new WebSocket(str, [prot]),
         buffer: new Uint8Array(0),

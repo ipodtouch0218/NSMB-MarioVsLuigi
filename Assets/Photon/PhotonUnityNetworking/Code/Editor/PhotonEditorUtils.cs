@@ -8,6 +8,9 @@
 // <author>developer@exitgames.com</author>
 // ----------------------------------------------------------------------------
 
+#pragma warning disable 618 // Deprecation warnings
+
+
 #if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
@@ -32,13 +35,22 @@ namespace Photon.Realtime
     [InitializeOnLoad]
     public static class PhotonEditorUtils
     {
+        /// <summary>Stores a flag which tells Editor scripts if the PhotonEditor.OnProjectChanged got called since initialization.</summary>
+        /// <remarks>If not, the AssetDatabase is likely not usable yet and instances of ScriptableObject can't be loaded.</remarks>
+        public static bool ProjectChangedWasCalled;
+
+
         /// <summary>True if the ChatClient of the Photon Chat API is available. If so, the editor may (e.g.) show additional options in settings.</summary>
         public static bool HasChat;
 
         /// <summary>True if the VoiceClient of the Photon Voice API is available. If so, the editor may (e.g.) show additional options in settings.</summary>
         public static bool HasVoice;
 
+        /// <summary>True if PUN is in the project.</summary>
         public static bool HasPun;
+
+        /// <summary>True if Photon Fusion is available in the project (and enabled).</summary>
+        public static bool HasFusion;
 
         /// <summary>True if the PhotonEditorUtils checked the available products / APIs. If so, the editor may (e.g.) show additional options in settings.</summary>
         public static bool HasCheckedProducts;
@@ -48,6 +60,9 @@ namespace Photon.Realtime
             HasVoice = Type.GetType("Photon.Voice.VoiceClient, Assembly-CSharp") != null || Type.GetType("Photon.Voice.VoiceClient, Assembly-CSharp-firstpass") != null || Type.GetType("Photon.Voice.VoiceClient, PhotonVoice.API") != null;
             HasChat = Type.GetType("Photon.Chat.ChatClient, Assembly-CSharp") != null || Type.GetType("Photon.Chat.ChatClient, Assembly-CSharp-firstpass") != null || Type.GetType("Photon.Chat.ChatClient, PhotonChat") != null;
             HasPun = Type.GetType("Photon.Pun.PhotonNetwork, Assembly-CSharp") != null || Type.GetType("Photon.Pun.PhotonNetwork, Assembly-CSharp-firstpass") != null || Type.GetType("Photon.Pun.PhotonNetwork, PhotonUnityNetworking") != null;
+            #if FUSION_WEAVER
+            HasFusion = true;
+            #endif
             PhotonEditorUtils.HasCheckedProducts = true;
 
             if (EditorPrefs.HasKey("DisablePun") && EditorPrefs.GetBool("DisablePun"))
@@ -188,8 +203,10 @@ namespace Photon.Realtime
 		/// <param name="go">The GameObject to check</param>
 		public static bool IsPrefab(GameObject go)
 		{
-            #if UNITY_2018_3_OR_NEWER
+            #if UNITY_2021_2_OR_NEWER
             return UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(go) != null || EditorUtility.IsPersistent(go);
+            #elif UNITY_2018_3_OR_NEWER
+            return UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(go) != null || EditorUtility.IsPersistent(go);
             #else
             return EditorUtility.IsPersistent(go);
 			#endif

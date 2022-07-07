@@ -2,6 +2,70 @@
 Photon Realtime C# Client - Changelog
 Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
+
+Version 4.1.6.11 (22. November 2021)
+    Changed: For Unity, PhotonEditorUtils.IsPrefab to use the correct prefab stage utility for Unity 2021.2 and up.
+    Added: CustomAuthenticationType.Epic to authenticate via Epic Online Services (EOS).
+    Added: CustomAuthenticationType.FacebookGaming to authenticate via Facebook Gaming services.
+
+Version 4.1.6.8 (12. October 2021)
+    Changed: CustomTypesUnity. The default Quaternion is now Quaternion.identity (which is a legit Quaterion, as opposed to the previously used new Quaternion). Added const values for each type's byte-size.
+    Added: Checks to avoid creating a player for actorNumber 0.
+    Added: CheckIfOpCanBeSent to OpJoinOrCreateRoom and OpRejoinRoom. Avoids changing state and repeating operation.
+    Removed: Surplus checks if the LoadBalancingPeer is non-null. This is done in CheckIfOpCanBeSent(), too.
+
+Version 4.1.6.7 (27. September 2021)
+    Replaced: Pointer_stringify with UTF8ToString in WebSocket.jslib. It was removed from newer Emscripten versions and is no longer working when exporting from Unity 2021.2. betas. Replaced with UTF8ToString. Tested in 2018.4.x and a current beta.
+    Fixed: Usage of websocketType for console.
+
+Version 4.1.6.6 (17. September 2021)
+    Removed: Usage of class EncryptorNative. This needs to be replaced by EncryptorNativeSource where the Native Socket Plugin should be used.
+    Changed: The Native Socket Plugin can also be used for UDP on Xbox (not in Editor).
+    Removed: CheckConnectSetupXboxOne() as platform requirements were turned into recommendations.
+    Changed: For Xbox, order of checked assemblies when getting Type SocketNativeSource. It's more likely to be in Assembly-CSharp.
+
+Version 4.1.6.5 (24. August 2021)
+    Updated: The default name server host to "ns.photonengine.io". When using WSS on this, it expects TLS1.2 (Win 7 and old Unity versions may not support this).
+    Fixed: Internally used OpJoinRoom() will now send custom room properties (all RoomOptions set) to the Master Server, too. This allows the Master Server to immediately find the room, even if property filtering is used. This was affecting matchmaking with OpJoinOrCreateRoom.
+
+Version 4.1.6.4 (26. July 2021)
+    Internal: Added PhotonEditorTools.HasFusion value and added AppSettings.AppIdFusion as well as ClientAppType.Fusion.
+    Added: ConnectionHandler.DisconnectAfterKeepAlive to let the fallback thread call Disconnect after the KeepAliveInBackground time. Default: false.
+    Changed: ConnectionHandler timer implementation to use a Stopwatch, which is a little more clear about what happens. PUN does not expose this value, so you need to set it in code (change the default).
+    Added: Hashtable specific extension methods StripKeysWithNullValues and StripToStringKeys which allocates less.
+
+Version 4.1.6.3 (06. July 2021)
+    Added: Handling of ErrorCode Invalid Operation (-2) for Authenticate requests. This becomes a DisconnectCause = OperationNotAllowedInCurrentState.
+
+Version 4.1.6.2 (17. June 2021)
+    Changed: The enumeration CustomAuthenticationType was changed to fix naming inconsistencies. Use PlayStation4 and PlayStation5 respectively. Old variants are available as obsolete.
+
+Version 4.1.6.0 (19. May 2021)
+    Changed: As tokenless auth is no longer allowed when using a Name Server, there is now an error log and authentication will not be done from the client. This is not happening in the normal workflow but a precaution to detect issues, should something unpredicted happen.
+    Changed: SupportLogger formatting of the timestamp to include the minutes (if available). Hours will not be logged (so in the logs, there is a wrap around of log-timestamps after 60 min).
+
+Version 4.1.5.4 (13. April 2021)
+    Changed: Connect-methods in the LoadBalancingClient now fail "early" when the peer is already connected. This prevents unintentional modifications of the state and auth token.
+    Added: The LoadBalancingClient will now check if the token is available when the AuthMode 'AuthOnce' or 'AuthOnceWss' require it. If it's not available, the client will log an error and prevent the connection attempt. If this happens, the client is already in a bad state and won't connect anyways.
+
+Version 4.1.5.3 (07. April 2021)
+    Fixed: Protocol Fallback will now connect correctly when a fixed region is set.
+    Changed: ConnectUsingSettings internally sets connectToBestRegion value, based on CloudRegion (equals appSettings.FixedRegion). This avoids pinging when a fixed region is set. Leads to callback OnDisconnected(InvalidRegion).
+
+Version 4.1.5.2 (12. March 2021)
+    Changed: Region pinging will now apply port overrides for the Master Server port for UDP and address-based pinging (in the address and the UDP pings).
+    Changed: The RegionHandler gets the override port from lbc.ServerPortOverrides.MasterServerPort. If it's 0, the default port 5055 is being used.
+    Changed: The LoadBalancingClient.ReplacePortWithAlternative is now static and internal and can be used by the RegionHandler.
+    Added: TargetFramework (of the used dll) to SupportLogger output.
+    Added: Room.GetPlayer() option to find the Master Client, if the id is 0 (which is commonly used as "owned/controlled by the room, so it requires the Master Client).
+
+Version 4.1.5.1 (09. March 2021)
+    Removed: Setting of protocol 1.6 when connecting directly to a Master Server. This was a workaround for older Photon Server SDKs.
+    Note: If you host Photon yourself, you can set the LoadBalancingClient.SerializationProtocol to SerializationProtocol.GpBinaryV16, before you connect.
+    Changed: OpLeaveRoom will now clear the GameServerAddress and private room-entering cache. This cleans the state and prevents accidental success for ReconnectAndRejoinRoom calls.
+    Changed: ReconnectToMaster will check if MasterServerAddress and authToken are known. These are minimum requirements to reconnect to the master (after a connection loss).
+    Added: CustomAuthenticationType.Playstation5 (value 12).
+
 Version 4.1.5.0 (23. February 2021)
     Added: LoadBalancingClient.ClientType and related code. Defines which sort of AppId should be expected. The LoadBalancingClient supports Realtime and Voice app types. Default: Realtime.
     Note: This allows using AppSettings for Voice and Realtime clients more easily. ConnectUsingSettings will pick the relevant appid with this info.
@@ -96,8 +160,8 @@ Version 4.1.4.0 (27. April 2020 rev5469)
     Changed: StripKeysWithNullValues to reuse a list of key with null-values. This causes less allocations and garbage to clean. As a downside, the method now runs only for one thread (even for distinct IDictionary instances). This should not be a problem for the expected use case.
     Changed: The LoadBalancingClient.OnStatusChanged will handle StatusCode.SendError as disconnect due to Exception. Log level INFO should log the inner exception when sending.
     Fixed: Cleanup of the RoomReference for the local player object on disconnect. This prevents issues when setting properties, after joining and leaving a room (back on Master Server).
-	Internal: LoadBalancingClient.ExpectedProtocol is now a nullable property with private setter. It's used internally (only) to switch to the target transport protocol when Authmode AuthOnceWss is "done".
-	Fixed: EventLeave handling. When a player gets removed from the room, the IsInactive property must be set to false before doing the OnPlayerLeftRoom callback. Use Player.IsInactive to know the 'reason' for the callback.
+    Internal: LoadBalancingClient.ExpectedProtocol is now a nullable property with private setter. It's used internally (only) to switch to the target transport protocol when Authmode AuthOnceWss is "done".
+    Fixed: EventLeave handling. When a player gets removed from the room, the IsInactive property must be set to false before doing the OnPlayerLeftRoom callback. Use Player.IsInactive to know the 'reason' for the callback.
 
 Version 4.1.3.0 (23.03.2020 rev5394)
     Changed: Trying to set empty custom properties Hashtable will fail (return false) and log error.

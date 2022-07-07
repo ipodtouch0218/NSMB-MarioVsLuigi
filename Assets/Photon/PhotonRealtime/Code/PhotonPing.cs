@@ -43,6 +43,7 @@ namespace Photon.Realtime
     public abstract class PhotonPing : IDisposable
     {
         public string DebugString = "";
+        
         public bool Successful;
 
         protected internal bool GotResult;
@@ -109,7 +110,8 @@ namespace Photon.Realtime
                     }
 
                     this.sock.ReceiveTimeout = 5000;
-                    this.sock.Connect(ip, 5055);
+                    int port = (RegionHandler.PortToPingOverride != 0) ? RegionHandler.PortToPingOverride : 5055;
+                    this.sock.Connect(ip, port);
                 }
 
 
@@ -196,7 +198,8 @@ namespace Photon.Realtime
             {
                 this.Init();
 
-                EndpointPair endPoint = new EndpointPair(null, string.Empty, new HostName(host), "5055");
+                int port = (RegionHandler.PortToPingOverride != 0) ? RegionHandler.PortToPingOverride : 5055;
+                EndpointPair endPoint = new EndpointPair(null, string.Empty, new HostName(host), port.ToString());
                 this.sock = new DatagramSocket();
                 this.sock.MessageReceived += this.OnMessageReceived;
 

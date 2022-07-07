@@ -27,7 +27,7 @@ public class CustomRigidbodySerializer : MonoBehaviourPun, ICustomSerializeView 
 
     public void FixedUpdate() {
         if (!photonView.IsMineOrLocal() && interpolate && body) {
-            interpPosition += Time.fixedDeltaTime * body.velocity; // makes it worse?
+            //interpPosition += Time.fixedDeltaTime * body.velocity; // makes it worse?
             body.position = Vector2.MoveTowards(body.position, interpPosition, 1f / PhotonNetwork.SerializationRate);
         }
     }

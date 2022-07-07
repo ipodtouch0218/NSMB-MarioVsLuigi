@@ -182,6 +182,10 @@ namespace Photon.Pun.UtilityScripts
                 {
                     PhotonNetwork.LeaveRoom();
                 }
+                if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.PlayerTtl>0 && GUILayout.Button("Leave(abandon)"))
+                {
+                    PhotonNetwork.LeaveRoom(false);
+                }
                 if (PhotonNetwork.IsConnected && !PhotonNetwork.InRoom && GUILayout.Button("Join Random"))
                 {
                     PhotonNetwork.JoinRandomRoom();

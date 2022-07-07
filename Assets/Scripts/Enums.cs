@@ -163,6 +163,8 @@ public static class Enums {
         public static string GameStarted { get; } = "G";
         public static string HostName { get; } = "H";
         public static string Debug { get; } = "D";
+        public static string Mutes { get; } = "M";
+        public static string Bans { get; } = "B";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events

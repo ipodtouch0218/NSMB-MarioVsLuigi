@@ -83,7 +83,7 @@ namespace Photon.Realtime
             }
             else
             {
-                return string.Format("{0}[{2}]: {1}ms ", regionCluster, this.Ping, this.HostAndPort);
+                return string.Format("{0}[{2}]: {1}ms", regionCluster, this.Ping, this.HostAndPort);
             }
         }
     }

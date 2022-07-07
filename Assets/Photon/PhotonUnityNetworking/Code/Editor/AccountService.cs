@@ -45,7 +45,7 @@ namespace Photon.Realtime
         /// <summary>
         /// third parties custom context, if null, defaults to DefaultContext property value
         /// </summary>
-        public string CustomContext = null;
+        public string CustomContext = null;     // "PartnerCode" on the server
 
         /// <summary>
         /// third parties custom token. If null, defaults to DefaultToken property value
@@ -67,7 +67,8 @@ namespace Photon.Realtime
         /// <param name="serviceTypes">Defines which type of Photon-service is being requested.</param>
         /// <param name="callback">Called when the result is available.</param>
         /// <param name="errorCallback">Called when the request failed.</param>
-        public bool RegisterByEmail(string email, List<ServiceTypes> serviceTypes, Action<AccountServiceResponse> callback = null, Action<string> errorCallback = null)
+        /// <param name="origin">Can be used to identify the origin of the registration (which package is being used).</param>
+        public bool RegisterByEmail(string email, List<ServiceTypes> serviceTypes, Action<AccountServiceResponse> callback = null, Action<string> errorCallback = null, string origin = null)
         {
             if (this.RequestPendingResult)
             {
@@ -88,7 +89,7 @@ namespace Photon.Realtime
                 return false;
             }
 
-            string fullUrl = GetUrlWithQueryStringEscaped(email, serviceTypeString);
+            string fullUrl = GetUrlWithQueryStringEscaped(email, serviceTypeString, origin);
 
             RequestHeaders["x-functions-key"] = string.IsNullOrEmpty(CustomToken) ? DefaultToken : CustomToken;
 
@@ -139,15 +140,14 @@ namespace Photon.Realtime
         }
 
 
-        private string GetUrlWithQueryStringEscaped(string email, string serviceTypes)
+        private string GetUrlWithQueryStringEscaped(string email, string serviceTypes, string originAv)
         {
             string emailEscaped = UnityEngine.Networking.UnityWebRequest.EscapeURL(email);
             string st = UnityEngine.Networking.UnityWebRequest.EscapeURL(serviceTypes);
             string uv = UnityEngine.Networking.UnityWebRequest.EscapeURL(Application.unityVersion);
-            string av = UnityEngine.Networking.UnityWebRequest.EscapeURL(new PhotonPeer(ConnectionProtocol.Udp).ClientVersion);
             string serviceUrl = string.Format(ServiceUrl, string.IsNullOrEmpty(CustomContext) ? DefaultContext : CustomContext );
 
-            return string.Format("{0}?email={1}&st={2}&uv={3}&av={4}", serviceUrl, emailEscaped, st, uv, av);
+            return string.Format("{0}?email={1}&st={2}&uv={3}&av={4}", serviceUrl, emailEscaped, st, uv, originAv);
         }
 
         /// <summary>

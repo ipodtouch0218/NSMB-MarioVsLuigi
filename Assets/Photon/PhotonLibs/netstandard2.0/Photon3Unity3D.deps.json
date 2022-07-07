@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.0": {},
     ".NETStandard,Version=v2.0/": {
-      "Photon3Unity3D/4.1.5.0": {
+      "Photon3Unity3D/4.1.6.11": {
         "dependencies": {
           "NETStandard.Library": "2.0.3"
         },
@@ -24,7 +24,7 @@
     }
   },
   "libraries": {
-    "Photon3Unity3D/4.1.5.0": {
+    "Photon3Unity3D/4.1.6.11": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

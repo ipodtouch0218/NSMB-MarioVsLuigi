@@ -21982,12 +21982,12 @@ MonoBehaviour:
   - onRight
   - onGround
   - skidding
-  - groundpound
   - crouching
   - flying
   - drill
   - sliding
   - facingRight
+  - groundpound
   animator: {fileID: 3054775863929652862}
 --- !u!1 &8636928219237579144
 GameObject:
