@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
     public bool gameover = false, musicEnabled = false;
     public readonly List<string> loadedPlayers = new();
-    public int starRequirement, timedGameDuration = -1;
+    public int starRequirement, timedGameDuration = -1, coinRequirement;
     public bool hurryup = false;
 
     public int playerCount;
@@ -382,6 +382,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         //Star spawning
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
         Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out starRequirement);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
 
         SceneManager.SetActiveScene(gameObject.scene);
 
@@ -623,9 +624,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         //TIMED CHECKS
         if (timeUp) {
-            //time up! check who has most stars, if a tie keep playing
-            if (winningPlayers.Count == 1)
-                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
+            bool draw = false;
+            Utils.GetCustomProperty(Enums.NetRoomProperties.DrawTime, out draw);
+            //time up! check who has most stars, if a tie keep playing, if draw is on end game in a draw
+            if (!draw) 
+                    // it's a draw! Thanks for playing the demo!
+                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
+            else {
+                if (winningPlayers.Count == 1)
+                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
+            }
 
             return;
         }

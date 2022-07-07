@@ -1005,7 +1005,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Destroy(num, 1.5f);
 
         coins++;
-        if (coins >= 8) {
+        if (coins >= GameManager.Instance.coinRequirement) {
             if (PhotonNetwork.IsMasterClient)
                 SpawnCoinItem();
             coins = 0;
@@ -1033,7 +1033,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!PhotonNetwork.IsMasterClient)
             return;
 
-        if (coins < 8)
+        if (coins < GameManager.Instance.coinRequirement)
             return;
 
         string prefab = Utils.GetRandomItem(this).prefab;
