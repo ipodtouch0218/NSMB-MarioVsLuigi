@@ -91,7 +91,7 @@ public class UIUpdater : MonoBehaviour {
             return;
 
         uiStars.text = Utils.GetSymbolString($"Sx{player.stars}/{GameManager.Instance.starRequirement}");
-        uiCoins.text = Utils.GetSymbolString($"Cx{player.coins}/8");
+        uiCoins.text = Utils.GetSymbolString($"Cx{player.coins}/{GameManager.Instance.coinRequirement}");
         
         if (player.lives < 0) {
             livesParent.SetActive(false);
