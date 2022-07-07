@@ -18,6 +18,7 @@
 
 namespace Photon.Realtime
 {
+    using System;
     using System.Text;
     using System.Collections;
     using System.Collections.Generic;
@@ -43,7 +44,9 @@ namespace Photon.Realtime
     /// </remarks>
     #if SUPPORTED_UNITY
     [DisallowMultipleComponent]
+    #if PUN_2_OR_NEWER || FUSION_UNITY
 	[AddComponentMenu("")] // hide from Unity Menus and searches
+    #endif
 	public class SupportLogger : MonoBehaviour, IConnectionCallbacks , IMatchmakingCallbacks , IInRoomCallbacks, ILobbyCallbacks, IErrorInfoCallback
     #else
 	public class SupportLogger : IConnectionCallbacks, IInRoomCallbacks, IMatchmakingCallbacks , ILobbyCallbacks
@@ -58,6 +61,9 @@ namespace Photon.Realtime
         private LoadBalancingClient client;
 
         private Stopwatch startStopwatch;
+
+        /// helps skip the initial OnApplicationPause call, which is not really of interest on start
+        private bool initialOnApplicationPauseSkipped = false;
 
         private int pingMax;
         private int pingMin;
@@ -100,12 +106,18 @@ namespace Photon.Realtime
 
         protected void OnDestroy()
         {
-            this.Client = null; // will remove this SupportLogger as callback target 
+            this.Client = null; // will remove this SupportLogger as callback target
         }
 
         protected void OnApplicationPause(bool pause)
         {
-            Debug.Log(this.GetFormattedTimestamp() + " SupportLogger OnApplicationPause: " + pause + " connected: " + (this.client == null ? "no (client is null)" : this.client.IsConnected.ToString()));
+            if (!this.initialOnApplicationPauseSkipped)
+            {
+                this.initialOnApplicationPauseSkipped = true;
+                return;
+            }
+
+            Debug.Log(string.Format("{0} SupportLogger OnApplicationPause({1}). Client: {2}.", this.GetFormattedTimestamp(), pause, this.client == null ? "null" : this.client.State.ToString()));
         }
 
         protected void OnApplicationQuit()
@@ -157,7 +169,14 @@ namespace Photon.Realtime
                 this.startStopwatch = new Stopwatch();
                 this.startStopwatch.Start();
             }
-            return string.Format("[{0}.{1}]", this.startStopwatch.Elapsed.Seconds, this.startStopwatch.Elapsed.Milliseconds);
+
+            TimeSpan span = this.startStopwatch.Elapsed;
+            if (span.Minutes > 0)
+            {
+                return string.Format("[{0}:{1}.{1}]", span.Minutes, span.Seconds, span.Milliseconds);
+            }
+
+            return string.Format("[{0}.{1}]", span.Seconds, span.Milliseconds);
         }
 
 
@@ -191,7 +210,7 @@ namespace Photon.Realtime
 
             if (this.LogTrafficStats)
             {
-                Debug.Log(this.GetFormattedTimestamp() + " SupportLogger " + this.client.LoadBalancingPeer.VitalStatsToString(false) + " Ping min/max: " + this.pingMin + "/" + this.pingMax);
+                Debug.Log(string.Format("{0} SupportLogger {1} Ping min/max: {2}/{3}", this.GetFormattedTimestamp() , this.client.LoadBalancingPeer.VitalStatsToString(false) , this.pingMin , this.pingMax));
             }
         }
 
@@ -234,6 +253,9 @@ namespace Photon.Realtime
                 #if UNITY_64
                 buildProperties.Add("UNITY_64");
                 #endif
+                #if UNITY_FUSION
+                buildProperties.Add("UNITY_FUSION");
+                #endif
 
 
                 StringBuilder sb = new StringBuilder();
@@ -241,12 +263,12 @@ namespace Photon.Realtime
                 string appIdShort = string.IsNullOrEmpty(this.client.AppId) || this.client.AppId.Length < 8 ? this.client.AppId : string.Concat(this.client.AppId.Substring(0, 8), "***");
 
                 sb.AppendFormat("{0} SupportLogger Info: ", this.GetFormattedTimestamp());
-                sb.AppendFormat("AppID: \"{0}\" AppVersion: \"{1}\" Client: v{2} Build: {3} ", appIdShort, this.client.AppVersion, this.client.LoadBalancingPeer.ClientVersion, string.Join(", ", buildProperties.ToArray()));
+                sb.AppendFormat("AppID: \"{0}\" AppVersion: \"{1}\" Client: v{2} ({4}) Build: {3} ", appIdShort, this.client.AppVersion, PhotonPeer.Version, string.Join(", ", buildProperties.ToArray()), this.client.LoadBalancingPeer.TargetFramework);
                 if (this.client != null && this.client.LoadBalancingPeer != null && this.client.LoadBalancingPeer.SocketImplementation != null)
                 {
                     sb.AppendFormat("Socket: {0} ", this.client.LoadBalancingPeer.SocketImplementation.Name);
                 }
-                
+
                 sb.AppendFormat("UserId: \"{0}\" AuthType: {1} AuthMode: {2} {3} ", this.client.UserId, (this.client.AuthValues != null) ? this.client.AuthValues.AuthType.ToString() : "N/A", this.client.AuthMode, this.client.EncryptionMode);
 
                 sb.AppendFormat("State: {0} ", this.client.State);

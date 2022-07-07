@@ -27,6 +27,11 @@ namespace Photon.Realtime
     /// </summary>
     internal static class CustomTypesUnity
     {
+        private const int SizeV2 = 2 * 4;
+        private const int SizeV3 = 3 * 4;
+        private const int SizeQuat = 4 * 4;
+
+
         /// <summary>Register de/serializer methods for Unity specific types. Makes the types usable in RaiseEvent and PUN.</summary>
         internal static void Register()
         {
@@ -38,7 +43,7 @@ namespace Photon.Realtime
 
         #region Custom De/Serializer Methods
 
-        public static readonly byte[] memVector3 = new byte[3 * 4];
+        public static readonly byte[] memVector3 = new byte[SizeV3];
 
         private static short SerializeVector3(StreamBuffer outStream, object customobject)
         {
@@ -51,18 +56,23 @@ namespace Photon.Realtime
                 Protocol.Serialize(vo.x, bytes, ref index);
                 Protocol.Serialize(vo.y, bytes, ref index);
                 Protocol.Serialize(vo.z, bytes, ref index);
-                outStream.Write(bytes, 0, 3 * 4);
+                outStream.Write(bytes, 0, SizeV3);
             }
 
-            return 3 * 4;
+            return SizeV3;
         }
 
         private static object DeserializeVector3(StreamBuffer inStream, short length)
         {
             Vector3 vo = new Vector3();
+            if (length != SizeV3)
+            {
+                return vo;
+            }
+
             lock (memVector3)
             {
-                inStream.Read(memVector3, 0, 3 * 4);
+                inStream.Read(memVector3, 0, SizeV3);
                 int index = 0;
                 Protocol.Deserialize(out vo.x, memVector3, ref index);
                 Protocol.Deserialize(out vo.y, memVector3, ref index);
@@ -73,7 +83,7 @@ namespace Photon.Realtime
         }
 
 
-        public static readonly byte[] memVector2 = new byte[2 * 4];
+        public static readonly byte[] memVector2 = new byte[SizeV2];
 
         private static short SerializeVector2(StreamBuffer outStream, object customobject)
         {
@@ -84,18 +94,23 @@ namespace Photon.Realtime
                 int index = 0;
                 Protocol.Serialize(vo.x, bytes, ref index);
                 Protocol.Serialize(vo.y, bytes, ref index);
-                outStream.Write(bytes, 0, 2 * 4);
+                outStream.Write(bytes, 0, SizeV2);
             }
 
-            return 2 * 4;
+            return SizeV2;
         }
 
         private static object DeserializeVector2(StreamBuffer inStream, short length)
         {
             Vector2 vo = new Vector2();
+            if (length != SizeV2)
+            {
+                return vo;
+            }
+
             lock (memVector2)
             {
-                inStream.Read(memVector2, 0, 2 * 4);
+                inStream.Read(memVector2, 0, SizeV2);
                 int index = 0;
                 Protocol.Deserialize(out vo.x, memVector2, ref index);
                 Protocol.Deserialize(out vo.y, memVector2, ref index);
@@ -105,7 +120,7 @@ namespace Photon.Realtime
         }
 
 
-        public static readonly byte[] memQuarternion = new byte[4 * 4];
+        public static readonly byte[] memQuarternion = new byte[SizeQuat];
 
         private static short SerializeQuaternion(StreamBuffer outStream, object customobject)
         {
@@ -119,7 +134,7 @@ namespace Photon.Realtime
                 Protocol.Serialize(o.x, bytes, ref index);
                 Protocol.Serialize(o.y, bytes, ref index);
                 Protocol.Serialize(o.z, bytes, ref index);
-                outStream.Write(bytes, 0, 4 * 4);
+                outStream.Write(bytes, 0, SizeQuat);
             }
 
             return 4 * 4;
@@ -127,11 +142,15 @@ namespace Photon.Realtime
 
         private static object DeserializeQuaternion(StreamBuffer inStream, short length)
         {
-            Quaternion o = new Quaternion();
+            Quaternion o = Quaternion.identity;
+            if (length != SizeQuat)
+            {
+                return o;
+            }
 
             lock (memQuarternion)
             {
-                inStream.Read(memQuarternion, 0, 4 * 4);
+                inStream.Read(memQuarternion, 0, SizeQuat);
                 int index = 0;
                 Protocol.Deserialize(out o.w, memQuarternion, ref index);
                 Protocol.Deserialize(out o.x, memQuarternion, ref index);

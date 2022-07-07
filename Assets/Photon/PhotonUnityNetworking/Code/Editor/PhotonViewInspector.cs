@@ -189,6 +189,26 @@ namespace Photon.Pun
             return count;
         }
 
+        /// <summary>
+        /// Find Observables, and then baking them into the serialized object.
+        /// </summary>
+        private void EditorFindObservables()
+        {
+            Undo.RecordObject(serializedObject.targetObject, "Find Observables");
+            var property = serializedObject.FindProperty("ObservedComponents");
+            
+            // Just doing a Find updates the Observables list, but Unity fails to save that change.
+            // Instead we do the find, and then iterate the found objects into the serialize property, then apply that.
+            property.ClearArray();
+            m_Target.FindObservables(true);
+            for(int i = 0; i <  m_Target.ObservedComponents.Count; ++i)
+            {
+                property.InsertArrayElementAtIndex(i);
+                property.GetArrayElementAtIndex(i).objectReferenceValue = m_Target.ObservedComponents[i];
+            }
+            serializedObject.ApplyModifiedProperties();
+        }
+
         private void DrawObservedComponentsList(bool disabled = false)
         {
             SerializedProperty listProperty = this.serializedObject.FindProperty("ObservedComponents");
@@ -202,7 +222,7 @@ namespace Photon.Pun
             float containerHeight = listProperty.arraySize * containerElementHeight;
 
             string foldoutLabel = "Observed Components (" + this.GetObservedComponentsCount() + ")";
-            bool isOpen = PhotonGUI.ContainerHeaderFoldout(foldoutLabel, this.serializedObject.FindProperty("ObservedComponentsFoldoutOpen").boolValue, () => m_Target.FindObservables(true), "Find");
+            bool isOpen = PhotonGUI.ContainerHeaderFoldout(foldoutLabel, this.serializedObject.FindProperty("ObservedComponentsFoldoutOpen").boolValue, () => EditorFindObservables(), "Find");
             this.serializedObject.FindProperty("ObservedComponentsFoldoutOpen").boolValue = isOpen;
 
             if (isOpen == false)

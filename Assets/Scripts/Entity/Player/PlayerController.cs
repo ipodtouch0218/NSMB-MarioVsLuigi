@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         SerializationUtils.PackToShort(out short flags, running, jumpHeld, crouching, groundpound,
                 facingRight, onGround, knockback, flying, drill, sliding, skidding, wallSlideLeft,
-                invincible > 0, propellerSpinTimer > 0, wallJumpTimer > 0);
+                wallSlideRight, invincible > 0, propellerSpinTimer > 0, wallJumpTimer > 0);
         SerializationUtils.PackToByte(out byte flags2);
         bool updateFlags = flags != previousFlags && flags2 != previousFlags2;
 
@@ -221,9 +221,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void LoadFromGameState() {
-        //if (photonView.IsMine)
-        //   return;
-
         if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not Hashtable gs)
             return;
 
@@ -552,11 +549,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (state == Enums.PowerupState.BlueShell && (inShell || crouching || groundpound)) {
                 if (fireball.isIceball) {
                     //slowdown
-
-                } else {
-                    //immune
-                    return;
+                    slowdownTimer = 0.3f;
                 }
+                return;
             }
 
             if (state == Enums.PowerupState.MiniMushroom) {
@@ -1485,7 +1480,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     }
                 }
             }
-            if (up && state != Enums.PowerupState.MegaMushroom) {
+            if (up && groundpoundCounter <= 0.05f) {
                 groundpound = false;
                 body.velocity = Vector2.down * groundpoundVelocity;
             }
@@ -1669,7 +1664,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool triggerState = Physics2D.queriesHitTriggers;
         Physics2D.queriesHitTriggers = false;
 
-        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width + 0.05f, 0.05f), 0, Vector2.up, hitboxes[0].size.y * 2f, ONLY_GROUND_MASK);
+        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width + 0.05f, 0.05f), 0, Vector2.up, hitboxes[0].size.y * 1.3f, ONLY_GROUND_MASK);
 
         Physics2D.queriesHitTriggers = triggerState;
         return ret;
@@ -1879,7 +1874,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             skidding = false;
 
         if (inShell) {
-            body.velocity = new (runningMaxSpeed * 0.9f * (facingRight ? 1 : -1), body.velocity.y);
+            body.velocity = new (runningMaxSpeed * 0.9f * (facingRight ? 1 : -1) * (1f - slowdownTimer), body.velocity.y);
             return;
         }
 
@@ -2032,7 +2027,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Utils.TickTimer(ref jumpLandingTimer, 0, delta);
         Utils.TickTimer(ref pickupTimer, 0, -delta, pickupTime);
         Utils.TickTimer(ref fireballTimer, 0, delta);
-        Utils.TickTimer(ref slowdownTimer, 0, delta);
+        Utils.TickTimer(ref slowdownTimer, 0, delta * 0.5f);
 
         if (onGround)
             Utils.TickTimer(ref landing, 0, -delta);

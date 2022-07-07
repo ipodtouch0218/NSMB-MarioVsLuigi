@@ -3,6 +3,105 @@ Photon C# Client Library - Changelog
 Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
+Version 4.1.6.11 (23. November 2021 - rev6288)
+	Fixed: Payload encryption initialization (without DiffieHellman) for TCP connection.
+    Fixed: Protocol16.DeserializeCustom() to check if length of read bytes is available (else, a byte[] is returned).
+    Changed: Custom Type arrays will return UnknownType[] if the array's item-type is unknown. If the custom type is known but items do not read properly, they will be null.
+    Added: Checks if each generated Custom Type instance can be assigned to the Custom Type array (and skips those that are null or can't be assigned).
+    Changed: Protocol18Read.ReadCustomType() and ReadCustomTypeArray() to throw error for size < 0. In that case, it is not possible to continue reading and the data is compromized.
+    Removed: Some logging code that was specific for Unity.
+    Removed: Exception handling for OnEvent and OnOperationResponse calls. This turned out somewhat inflexible and was hiding valuable debug information. Instead of the low level try/catch, projects should wrap DispatchIncomingCommands in try/catch blocks.
+
+Version 4.1.6.10 (21. October 2021 - rev6243)
+    Fixed: ReadCustomTypeArray to return an object[], if any item in the array is unreadable. This object[] contains any properly read custom types but also items of UnknownType. This is of course likely to cause exceptions in the dispatch callbacks.
+    Added: Exception handling to OnEvent and OnOperationResponse calls.
+
+Version 4.1.6.9 (12. October 2021 - rev6231)
+	Fixed: Reliable UDP protocol to send pings, if no reliable command was acknowledged or sent recently. This bug was preventing a client timeout in some cases.
+
+Version 4.1.6.8 (30. September 2021 - rev6222)
+    Fixed: ReadCustomType to not use custom deserialization methods, should the reported size be less than available bytes.
+    Fixed: ReadCustomType and ReadCustomTypeArray to also skip custom types when size is 0.
+
+Version 4.1.6.7 (27. September 2021 - rev6214)
+    Fixed: A bug in Protocol18 reader for very long arrays.
+
+Version 4.1.6.6 (21. September 2021 - rev6204)
+    Changed: Dns resolution. It is suspected to fail sometimes due to a Mono/Unity bug (issue 6940). Changing from only attempting Dns.GetHostEntry to first attempting Dns.GetHostAddresses followed by Dns.GetHostByName in case of an Exception (yes obsolete api but maybe a different implementation).
+    Removed: C# wrapper classes for native plugins (sockets and encryption). These classes will be part of the plugin packages.
+    Changed: PhotonPeer values NativeSocketLibAvailable, NativePayloadEncryptionLibAvailable and NativeDatagramEncryptionLibAvailable are now obsolete. Unity's IL2CPP does not implement PrelinkAll in IL2CPP and we moved the wrapper classes for native libs out of the assembly.
+    Added: PayloadEncryptorType and related usage to be able to set another Payload Encryption implementation. This is only for completeness. The managed implementation, which is used by default, is fine.
+    Fixed: TrafficStatsIncoming for PhotonClientWebSocket (used by default in WS/WSS connections in the .Net Standard 2.0 dll).
+
+Version 4.1.6.5 (24. August 2021 - rev6181)
+    Fixed: Protocol16 to throw a NotSupportedException when a length value can not be serialized as short (as defined). This affects arrays (except byte[]), strings, hashtables, dictionaries and other variable length values.
+    Updated: C# classes to the latest state of the native PhotonEncryptorPlugin API.
+
+Version 4.1.6.4 (26. July 2021 - rev6143)
+    Changed: ByteArraySlice and ByteArraySlicePool to achieve thread safety.
+    Changed: PhotonClientWebSocket.AsyncConnectAndReceive to reuse memory. It may still grow somewhat as memory allocated for very large messages is not released but rather held to receive as big messages. This class is not used for WebGL exports.
+    Removed: Surplus logging in PhotonClientWebSocket implementation.
+    Added: Null-check in PhotonClientWebSocket.Send() if the socket may be disconnecting already. Added fitting error log.
+    Changed: TCP implementation to avoid memory allocations. It now uses a Queue<StreamBuffer> which is pooled and re-used. DispatchIncomingCommands() releases the StreamBuffers back into the pool.
+    Fixed: TrafficStats counting of ping-result command size. This was still counting the buffer size instead of received-data size (usually less).
+
+Version 4.1.6.3 (24. June 2021 - rev6099)
+    Fixed: An issue with deserialization of custom types.
+
+Version 4.1.6.2 (23. June 2021 - rev6092)
+    Fixed: Potential NullReferenceException in PhotonClientWebSocket.Disconnect(). If called before the connect-flow finished, the instance was null.
+
+Version 4.1.6.1 (09. June 2021 - rev6086)
+    Fixed: TPeer.TotalPacketCount and TotalCommandsInPackets counters. They were increased in two places for the Init message.
+    Fixed: TPeer.TrafficStatsOutgoing.TotalCommandsInPackets counting in SendData, which was adding the remaining count in queues instead of +1.
+    Changed: TPeer.SendOutgoingCommands(), which will now stop sending if more than MTU size of data was sent.
+    Note: Messages are not fragmented for TCP/WSS, so they can be well over MTU size as such. But SendOutgoingCommands() will now return if there are more messages, so sending can be limited somewhat.
+    Changed: PhotonClientWebSocket will pause the task only for 50ms if nothing was received.
+    Changed: Log level of PhotonClientWebSocket incoming bytes logging. It's now level "ALL".
+
+Version 4.1.6.0 (19. May 2021 - rev6070)
+    Changed: PhotonPeer.ClientVersion is now marked as obsolete. The value should be static and so we added PhotonPeer.Version instead as replacement.
+    Internal: EnetPeer.Reset() now sets the timeoutInt = 0 and does a sentReliableCommands.Clear() instead of replacing it.
+    Changed: PhotonPeer.IsSendingOnlyAcks is now obsolete. Use SendAcksOnly() where needed.
+    Changed: EnetPeer.QueueSentCommand will not set the timeoutInt. Instead, this should be set when the next resends are checked in SendOutgoing.
+    Changed: Resends of reliable commands are now done directly, without them ever leaving the sentReliableCommands list. This has the benefit of being able to resend those commands in sequence.
+    Internal: On resend, timeoutInt becomes the lowest value found in the sentReliableCommands. It stays unchanged, if any command wasn't resent.
+    Added: SerializeCommandToBuffer, which is split out of SerializeToBuffer(Queue<NCommand> commandList). Allows sending single commands.
+    Changed: QueueSentCommand will not add reliable commands to the sentReliableCommands list, if the parameter signals it was in there already.
+    Changed: PepareWebSocketUrl() will now write the parameter "libversion" instead of "clientversion". Renamed according to Slack discussion.
+    Changed: PhotonPeer time keeping to use a Stopwatch per peer, instead of one in the SupportClass.
+    Changed: PeerBase now has a Stopwatch and PeerBase.timeInt will use that.
+    Removed: All internal usages of SupportClass.GetTickCount().
+    Note: Socket implementations should replace their usage of SupportClass.GetTickCount() - peerBase.timeBase with this.peerBase.timeInt.
+    Changed: PhotonPeer.LocalMsTimestampDelegate, SupportClass.IntegerMillisecondsDelegate, .IntegerMilliseconds and .GetTickCount() are obsolete now.
+    Added: EnetPeer.QUICK_RESEND_QUEUELIMIT (value: 25) to suspend quick resending if the sent-queue is larger than that value.
+    Internal: Minor changes to NCommand.
+    Added: PhotonPeer SequenceDeltaLimitSends and SequenceDeltaLimitResends to prevent sending more commands, when the server does not keep up with acknowledging them. If those values are 0, this new logic is disabled.
+    Added: EnetChannel.highestReceivedAck to keep track of the highest sequence number ACKed by the server.
+    Changed: EnetPeer.SendOutgoingCommands() and .SendAcksOnly() to implement the limit.
+
+Version 4.1.5.5 (06. May 2021 - rev6050)
+    Changed: Protocol18 ReadCustomType to no longer throw an exception when a unknown custom type arrives. Instead pass UnknownType.
+    Added: Type "UnknownType", which is used to pass not-deserialized custom types to the game logic.
+    Changed: Protocol18 ReadCustomType to use a "boundedSize" to read remaining data if the incoming size value is > remaining message data.
+    Internal: StreamBuffer.Available to get remaining bytes in buffer. Returns value >= 0.
+    Fixed: Protocol18 WriteArraySegmentByte to not write any bytes, if count is 0.
+    Fixed: Potential deserialization issues in protocol 1.6, which could be exposed to crash clients.
+    Changed: String deserialization in protocol 1.6 avoids some memory allocation.
+    Changed: String deserialization in protocol 1.6 throws a NotSupportedException if the length is negative (was never supported but now it's a clear error).
+    Changed: DeserializeDictionary in Protocol16, will no longer allow key- or value-types Dictionary or Array. Both were read incorrectly.
+    Changed: DeserializeDictionaryType in Protocol16, will no longer allow key- or value-types Dictionary or Array. Both were read incorrectly.
+    Fixed: Error message in 1.8 GetAllowedDictionaryKeyTypes.
+
+Version 4.1.5.2 (12. March 2021 - rev6017)
+    Fixed: A compatibility issue of the Native Encryptor API v2 and Unity UWP exports using the .Net Runtime as runtime. The incompatibility made the reference rewriter fail. Introduced in the Metro build of the library in v4.1.5.0.
+    Fixed: EncryptorNative will not use the new "native-to-managed callback API" when compiling for NETFX_CORE (UWP Metro).
+
+Version 4.1.5.1 (01. March 2021 - rev5999)
+    Note: Release as SDK.
+
+Version 4.1.5.1 (25. February 2021 - rev5991)
+    Fixed: Handling of IPv6 addresses (bug was introduced in v4.1.5.0).
 
 Version 4.1.5.0 (23. February 2021 - rev5986)
     Added: Optional parameter CustomInitData to Connect() methods. This data/object is used in InitV3.
@@ -14,7 +113,6 @@ Version 4.1.5.0 (23. February 2021 - rev5986)
     Added: StatusCode ServerAddressInvalid = 1050 and DnsExceptionOnConnect = 1051. Used in IPhotonPeerListener.OnStatusChanged().
     Changed: Native Encryptor API v2 is now required. This affects native Datagram Encryption plugins (and allows GCM / Mode 13).
     Changed: PDB files are now in "portable" format. This should be equivalent to "full" (previously used) but compatible with latest Unity versions.
-
 
 Version 4.1.4.9 (11. January 2021 - rev5966)
     Fixed: EnetPeer to reset values for unsequenced commands on connect. Before, clients would send illegal command numbers after switching connections.

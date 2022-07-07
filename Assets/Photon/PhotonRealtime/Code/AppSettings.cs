@@ -35,10 +35,13 @@ namespace Photon.Realtime
         /// <summary>AppId for Realtime or PUN.</summary>
         public string AppIdRealtime;
 
-        /// <summary>AppId for the Chat Api.</summary>
+        /// <summary>AppId for Photon Fusion.</summary>
+        public string AppIdFusion;
+
+        /// <summary>AppId for Photon Chat.</summary>
         public string AppIdChat;
 
-        /// <summary>AppId for use in the Voice Api.</summary>
+        /// <summary>AppId for Photon Voice.</summary>
         public string AppIdVoice;
 
         /// <summary>The AppVersion can be used to identify builds and will split the AppId distinct "Virtual AppIds" (important for matchmaking).</summary>
@@ -127,16 +130,17 @@ namespace Photon.Realtime
                                  "use ns: {4}, reg: {5}, {9}, " +
                                  "{6}{7}{8}" +
                                  "auth: {10}",
-                                 String.IsNullOrEmpty(this.AppIdRealtime) ? string.Empty : "rt: " + this.HideAppId(this.AppIdRealtime) + ", ",
-                                 String.IsNullOrEmpty(this.AppIdChat) ? string.Empty : "chat: " + this.HideAppId(this.AppIdChat) + ", ",
-                                 String.IsNullOrEmpty(this.AppIdVoice) ? string.Empty : "voice: " + this.HideAppId(this.AppIdVoice) + ", ",
-                                 String.IsNullOrEmpty(this.AppVersion) ? string.Empty : "appV: " + this.AppVersion + ", ",
-                                 this.UseNameServer,
-                                 this.IsBestRegion ? "/best/" : this.FixedRegion,
+                                 String.IsNullOrEmpty(this.AppIdRealtime) ? string.Empty : "Realtime/PUN: " + this.HideAppId(this.AppIdRealtime) + ", ",
+                                 String.IsNullOrEmpty(this.AppIdFusion) ? string.Empty : "Fusion: " + this.HideAppId(this.AppIdFusion) + ", ",
+                                 String.IsNullOrEmpty(this.AppIdChat) ? string.Empty : "Chat: " + this.HideAppId(this.AppIdChat) + ", ",
+                                 String.IsNullOrEmpty(this.AppIdVoice) ? string.Empty : "Voice: " + this.HideAppId(this.AppIdVoice) + ", ",
+                                 String.IsNullOrEmpty(this.AppVersion) ? string.Empty : "AppVersion: " + this.AppVersion + ", ",
+                                 "UseNameServer: " + this.UseNameServer + ", ",
+                                 "Fixed Region: " + this.FixedRegion + ", ",
                                  //this.BestRegionSummaryFromStorage,
-                                 String.IsNullOrEmpty(this.Server) ? string.Empty : "server: " + this.Server + ", ",
-                                 this.IsDefaultPort ? string.Empty : "port: " + this.Port + ", ",
-                                 String.IsNullOrEmpty(ProxyServer) ? string.Empty : "proxy: " + this.ProxyServer + ", ",
+                                 String.IsNullOrEmpty(this.Server) ? string.Empty : "Server: " + this.Server + ", ",
+                                 this.IsDefaultPort ? string.Empty : "Port: " + this.Port + ", ",
+                                 String.IsNullOrEmpty(ProxyServer) ? string.Empty : "Proxy: " + this.ProxyServer + ", ",
                                  this.Protocol,
                                  this.AuthMode
                                  //this.EnableLobbyStatistics,
@@ -173,6 +177,7 @@ namespace Photon.Realtime
         public AppSettings CopyTo(AppSettings d)
         {
             d.AppIdRealtime = this.AppIdRealtime;
+            d.AppIdFusion = this.AppIdFusion;
             d.AppIdChat = this.AppIdChat;
             d.AppIdVoice = this.AppIdVoice;
             d.AppVersion = this.AppVersion;

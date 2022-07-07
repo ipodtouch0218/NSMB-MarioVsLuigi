@@ -72,6 +72,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     ParticleSystem brickBreak;
 
+
+
     // EVENT CALLBACK
     public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
         if (eventOptions == null)
@@ -98,8 +100,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (!PhotonNetwork.IsMasterClient || sender.IsMasterClient)
                 return;
 
-            if (prefab.Contains("Enemy") || prefab.Contains("Powerup")) {
+            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin")) {
                 PhotonNetwork.CloseConnection(sender);
+                PhotonNetwork.DestroyPlayerObjects(sender);
             }
             break;
         }
@@ -147,7 +150,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             break;
         }
         case (byte) Enums.NetEventIds.SyncTilemap: {
-            ExitGames.Client.Photon.Hashtable changes = (ExitGames.Client.Photon.Hashtable) customData;
+            Hashtable changes = (Hashtable) customData;
             Utils.ApplyTilemapChanges(originalTiles, origin, tilemap, changes);
             break;
         }
@@ -268,7 +271,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     // ROOM CALLBACKS
     public void OnJoinedRoom() { }
-    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {
+    public void OnPlayerPropertiesUpdate(Player player, Hashtable playerProperties) {
         foreach (PlayerController players in allPlayers) {
             if (players == null)
                 continue;
@@ -277,7 +280,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 players.LoadFromGameState();
         }
     }
-    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) { }
+    public void OnRoomPropertiesUpdate(Hashtable properties) { }
 
     public void OnMasterClientSwitched(Player newMaster) {
         //TODO: chat message
@@ -289,9 +292,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             });
         }
     }
+
     public void OnPlayerEnteredRoom(Player newPlayer) {
         //Spectator joined. Sync the room state.
         //TODO: chat message
+
+        if (PhotonNetwork.IsMasterClient) {
+            Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
+            List<NameIdPair> banList = bans.Cast<NameIdPair>().ToList();
+            if (banList.Any(nip => nip.userId == newPlayer.UserId)) {
+
+                PhotonNetwork.CloseConnection(newPlayer);
+                return;
+            }
+        }
 
         //SYNCHRONIZE PLAYER STATE
         if (localPlayer)
@@ -299,7 +313,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         //SYNCHRONIZE TILEMAPS
         if (PhotonNetwork.IsMasterClient) {
-            ExitGames.Client.Photon.Hashtable changes = Utils.GetTilemapChanges(originalTiles, origin, tilemap);
+            Hashtable changes = Utils.GetTilemapChanges(originalTiles, origin, tilemap);
             RaiseEventOptions options = new() { CachingOption = EventCaching.DoNotCache, TargetActors = new int[] { newPlayer.ActorNumber } };
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SyncTilemap, changes, options, SendOptions.SendReliable);
 

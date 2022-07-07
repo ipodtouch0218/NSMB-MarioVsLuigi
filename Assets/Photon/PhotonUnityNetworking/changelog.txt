@@ -1,7 +1,117 @@
 
-PUN 2 Change Log
+PUN 2 - Changelog
 Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
+
+v2.40 (22. November 2021)
+Fixed: Unity 2021.2 support. PhotonEditorUtils.IsPrefab now uses the correct prefab stage utility for Unity 2021.2 and up.
+Changed: PhotonHandler.Dispatch is now catching exceptions. It will count them but only provide the first one's callstack (to avoid log spamming).
+Note: While the Photon lib caught exceptions in v4.1.6.10, that has not been a good solution. This new approach can be changed in source and is more flexible overall.
+Changed: On Xbox, the peer classes no longer assume a native socket plugin exists. This was setting the UDP implementation to null in some cases, which failed to connect.
+Updated: Library and Realtime to 4.1.6.11. More details in the change logs.
+
+v2.39 (21. October 2021)
+Changed: PhotonTransformView interpolation of position and rotation. It's now framerate independent.
+Updated: Library to 4.1.6.10. More details in changes-library.txt.
+
+v2.38 (12. October 2021)
+Updated: Library to 4.1.6.9. More details in changes-library.txt.
+
+v2.37 (27. September 2021)
+Added: CustomType deserialization length checks.
+Added: PhotonNetwork.EnableCloseConnection which defaults to false. This is a breaking change: Only if you set this to true, CloseConnection will work anymore.
+Updated: Library to 4.1.6.7. More details in changes-library.txt.
+
+v2.36 (20. September 2021)
+Updated: Realtime API. Check out changes-realtime.txt.
+Updated: Library to 4.1.6.6. More details in changes-library.txt.
+
+v2.35 (24. August 2021)
+Changed: CheckConnectSetupXboxOne() to allow AuthOnceWss and Datagram Encryption (GCM mode). It will set ExpectedProtocol and EncryptionMode silently. Datagram Encryption is only possible with a native plugin.
+Changed: Interest Culling in UtilityScripts/Culling/.
+    Added: Rate limiting for interest group changes per second. No matter what the algorithm tells us, it makes sense to not change interest groups more than 4-6x per second.
+    Changed: The GetActiveCells method to sort the "nearby" part of the cells list. This allows us to not change interest groups if just the order changed (due to "nearby" calculation, that could happen).
+    Changed: The scene view grid now displaces the various area-indexes for cells that overlap (root, node and leaf).
+    Note: Overall, the algorithm to select cells is just a quick showcase. It should avoid unsubscribing groups one by one and also avoid subscribing nearby groups one by one (while moving only along one axis of the areas).
+Fixed: A potential NullReferenceException for OwnershipUpdate events. If the PhotonView is unknown, this gets logged now. This is caused most frequently by loading scenes (or initializing them) without pausing the incoming message queue (dispatch). If ownership changed for objects, the Master Client will let new players know this but that failed, if the joining client didn't know the objects yet.
+Updated: Realtime API. Check out changes-realtime.txt.
+Updated: Library to 4.1.6.5. More details in changes-library.txt.
+
+v2.34.1 (28. July 2021)
+Updated: PhotonNetwork.PunVersion to "2.34.1" now. The previous version accidentally used "2.33.3" still.
+Updated: For Unity 2021, the obsoltete CompilationPipeline.assemblyCompilationStarted got replaced with CompilationPipeline.compilationStarted.
+
+v2.34 (26. July 2021)
+Changed: The PhotonView.Owner and .Controller for "room PhotonViews" will be changed properly whenever the Master Client switches. Room PhotonViews are identified by IsRoomView (which checks CreatorActorNr == 0).
+Changed: PUN needs to exit play mode in Editor, if there is a recompilation (due to code change, etc) to prevent running into endless NullReferenceExceptions and a flood of other errors. As the connection can't be held up after recompile, this is no big step back. The log will include a hint why the client exited playmode.
+Changed: The PhotonNetwork constructor creates a NetworkingClient (in Editor) to avoid exceptions due to possible recompilation.
+Changed: PhotonNetwork.StaticReset was running as RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad) but will run earlier now, using AfterAssembliesLoaded.
+Updated: Library to 4.1.6.4. More details in changes-library.txt.
+
+v2.33.3 (07. July 2021)
+Fixed: Skipping cleanup of PhotonViews if they never had a legit ViewID. This could result in a NullReferenceException (e.g. when exiting play mode).
+Internal: RegisterPhotonView will set view.removedFromLocalViewList to false now. This is an internally used value.
+
+v2.33.2 (06. July 2021)
+Fixed: Assigning photonView.ViewID = 0 will remove the PhotonView from the list of active views.
+Added: Namespaces for various classes that were not having any.
+    
+v2.33.1 (24. June 2021)
+Updated: Library to 4.1.6.3. More details in changes-library.txt.
+Note: This has no distinct value for PhotonNetwork.PunVersion and no separate release in the Asset Store (the previous release was on the same day).
+
+v2.33 (24. June 2021)
+Fixed: Calculation of PhotonView.AmOwner. It is possible that the owner is set to actorNumber 0, which instead will apply the Master Client as owner. This caused AmOwner to be wrong.
+Fixed: Controller updates when players enter a room. Every client has to update the views, as an owner may return and regain control.
+Fixed: ControllerActorNr assignment will check if the assigned controller is inactive. In that case, the Master Client will step in (right during assignment).
+Added: Additional check if the settings file exists, to avoid using CreateAsset, when it does.
+Added: JoinRandomOrCreateRoom(). This was implemented in Realtime but not PUN.
+Changed: The enumeration CustomAuthenticationType was changed to fix naming inconsistencies. Use PlayStation4 and PlayStation5 respectively. Old variants are available as obsolete.
+Fixed: In Asteroids Demo, remote ships are not reacting to input when remote controller is inactive. 
+Fixed: Potential KeyNotFound issue in the Asteroids Demo, PlayerOverviewPanel if remote players left or the object got destroyed.
+Added: PlayerDetailsController.OnDisable() override (used in cockpit) to unsubscribe from callbacks which are subscribed in OnEnable(). Both override the inherited implementation and call base.
+Updated: Library to 4.1.6.2 with several smaller adjustments. More details in changes-library.txt.
+
+v2.32 (09. June 2021)
+Fixed: Editor scripts to not overwrite the PhotonServerSettings when upgrading projects or loading them without a library folder. While the Editor starts up, the settings may be blank but not null. As before, if the asset is not available, it gets created.
+Updated: Library to 4.1.6.1 with several smaller adjustments. More details in changes-library.txt.
+
+v2.31 (19. May 2021)
+Fixed: RpcList updating. Assumptions about editor-callbacks order were incorrect and caused a variable to not be set as needed.
+Changed: The PhotonViewHandler now resets the sceneViewId to 0 for prefabs. This avoids leaking sceneViewIds to the prefabs.
+Updated: Export platforms for .Net 3.5 lib. It was still enabled for some platforms accidentally. Now the minimum of data is in that meta file.
+Updated: Export platforms for .Net Standard 2.0 dll. It should be used in all platforms except .Net UWP.
+Internal: AccountService can now send an "origin" as reference to the package the registration originates from.
+Updated: Library to 4.1.6.0 with various changes for timeout detection and resends.
+
+v2.30 (13. April 2021)
+Changed: When the PhotonView.ControllerActorNumber should be set to 0, it now sets the backing field to the Master Client's actorNumber instead. This prevents misunderstandings when updates are sent with the Master Client's actual actorNumber
+Changed: Setting the PhotonView.ControllerActorNumber will now refresh the Controller in all cases. This makes sure that (e.g.) scene objects get a Controller value OnJoinedRoom (they might exist before a room is joined).
+Updated: EventSystemSpawner to log an error and pause the execution, if only the new input system is being used. The PUN demos are not compatible with it unless you set Active Input Handling to "Both".
+Note: Only the PUN demos are incompatible with the new input system. PUN itself is not affected. As the demos are in separate folders, you can easily delete all of them and use the new input system in your project.
+Updated: Realtime API to 4.1.5.4, preventing several error cases.
+
+v2.29 (15. March 2021)
+Updated: Minimum supported Unity version to 2018.4.x. We develop PUN 2 in Unity 2018.4.22 from now on. Also the language compatibility level '.Net 4.x' or '.Net Standard 2.0' is now expected.
+Updated: Export settings for the dlls in Assets\PhotonLibs. All platforms will use .Net Standard 2.0, except the UWP export with .Net Runtime (which uses Metro with a placeholder being the lib in PhotonLibs\).
+Removed: Setting of protocol 1.6 when connecting directly to a Master Server. This was a workaround for older Photon Server SDKs.
+Note: If you host Photon yourself, you can set the LoadBalancingClient.SerializationProtocol to SerializationProtocol.GpBinaryV16, before you connect.
+Added: IPunOwnershipCallbacks.OnOwnershipTransferFailed. This helps react when an Ownership Transfer request failed (due to earlier changes). This might mean you have to implement OnOwnershipTransferFailed in some scripts.
+Changed: PhotonView OwnerActorNr and ControllerActorNr to make use of the new Room.GetPlayer() option (to get the Master Client instance if the owner/controller is set to 0).
+Fixed: The PhotonView's "Find" button was not saving the observed components in scenes, which meant the script wasn't called at runtime. 
+Updated: Library to 4.1.5.2.
+
+v2.28.3 (03. March 2021)
+Fixed: PhotonView.AmOwner was not updated ever.
+
+v2.28.2 (03. March 2021)
+Fixed: A potential issue with the execution order of the PhotonView component. It now sets it's own execution order to -16000 to get initialized before other scripts (especially on scene loading).
+Changed: Conditionals and logging output for Xbox builds. In the Editor, it's impossible to get a token, so PUN should not enforce this.
+Changed: PhotonView.ControllerActorNr will make sure the PhotonNetwork.LocalPlayer is not null when accessing the actorNumber through that.
+Changed: Instantiate will set PhotonView lastOnSerializeDataSent and lastOnSerializeDataReceived to null (which keeps instantiation for reused objects cleaner).
+
+v2.28.1 (25. February 2021)
+Updated: Library to v4.1.5.1. which fixes a problem with IPv6 addresses which was introduced in v4.1.5.0.
 
 v2.28 (23. February 2021)
 Changed: PhotonView code to cache Owner and Controller, as well as storing the sceneViewId for objects which load with the scene. This is a bigger change and complex, so it may break some projects, despite the testing! Mail us, if you run into issues with ViewIDs, Ownership, etc: developer@photonengine.com.
@@ -20,7 +130,7 @@ Updated: The Realtime API and Photon3Unity3d.dll to v4.1.4.9.
 
 v2.26.1 (15. December 2020)
 Note: This fix release does not have a new PhotonNetwork.PunVersion. The changes were just for the Editor.
-Fixed: Some edge cases for the included "Simple" addon. 
+Fixed: Some edge cases for the included "Simple" addon.
 Added: Changelog for Simple.
 
 v2.26 (09. December 2020)
@@ -40,7 +150,7 @@ Updated: Realtime API in a few ways. See respective changelog.
 v2.24 (25. November 2020)
 Added: PhotonTransformView.UseLocal. It defaults to true for any new PhotonTransformView but allows to get the "old" behaviour with world position and rotation data being synced.
 Fixed: Inspector UI for PhotonTransformView and PhotonAnimatorView. Warning box for using triggers broke horizonal bounds, causing horizontal scrollbars on inspector. Switched to standard helpbox.
-Changed: Drastically lowered the MaxDatagrams value, to not send too much in one frame. 
+Changed: Drastically lowered the MaxDatagrams value, to not send too much in one frame.
 Changed: Default sendFrequency to 33ms. PUN will send in more frames but less datagrams in each.
 Changed: SendRate does not affect the SerializationRate value anymore. Also, SerializationRate can be set independent from the SendRate.
 Updated: Documentation about SerializationRate and SendRate. This now explains more details about sending.

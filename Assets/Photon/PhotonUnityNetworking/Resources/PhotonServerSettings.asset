@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppSettings:
     AppIdRealtime: ce540834-2db9-40b5-a311-e58be39e726a
+    AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
     AppVersion: 
@@ -68,6 +69,21 @@ MonoBehaviour:
   - Turnaround
   - WakeUp
   - Win
+  - Bump
+  - DespawnWithPoof
+  - DestroySpaceship
+  - FinishMegaMario
+  - Fire
+  - Freeze
+  - HoldingWakeup
+  - PlaySoundEverywhere
+  - RespawnSpaceship
+  - SetHolding
+  - SetHoldingOld
+  - SetLeft
+  - SpawnReserveItem
+  - StartPropeller
+  - Unfreeze
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

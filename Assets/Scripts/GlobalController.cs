@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 public class GlobalController : Singleton<GlobalController> {
 
@@ -35,9 +36,10 @@ public class GlobalController : Singleton<GlobalController> {
         discordController = GetComponent<DiscordController>();
     }
 
+    [Obsolete]
     void Start() {
         //Photon settings.
-
+        PhotonPeer.RegisterType(typeof(NameIdPair), 69, NameIdPair.Serialize, NameIdPair.Deserialize);
         PhotonNetwork.SerializationRate = 30;
         PhotonNetwork.SendRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
