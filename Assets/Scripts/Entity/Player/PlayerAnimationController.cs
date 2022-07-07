@@ -217,7 +217,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             animator.SetBool("blueshell", controller.state == Enums.PowerupState.BlueShell);
             animator.SetBool("mini", controller.state == Enums.PowerupState.MiniMushroom);
             animator.SetBool("mega", controller.state == Enums.PowerupState.MegaMushroom);
-            animator.SetBool("inShell", controller.inShell || (controller.state == Enums.PowerupState.BlueShell && (controller.crouching || (controller.groundpound && body.velocity.y < 0))));
+            animator.SetBool("inShell", controller.inShell || (controller.state == Enums.PowerupState.BlueShell && (controller.crouching || (controller.groundpound && controller.groundpoundStartTimer <= 0.2f))));
         } else {
             //controller.wallSlideLeft = animator.GetBool("onLeft");
             //controller.wallSlideRight = animator.GetBool("onRight");
@@ -277,7 +277,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             renderer.SetPropertyBlock(materialBlock);
 
         //hit flash
-        models.SetActive(controller.dead || !(controller.hitInvincibilityCounter > 0 && controller.hitInvincibilityCounter * (controller.hitInvincibilityCounter <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
+        models.SetActive(GameManager.Instance.gameover || controller.dead || !(controller.hitInvincibilityCounter > 0 && controller.hitInvincibilityCounter * (controller.hitInvincibilityCounter <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
 
         //Model changing
         bool large = controller.state >= Enums.PowerupState.Mushroom;

@@ -20,4 +20,5 @@ MonoBehaviour:
   big: 0
   vertical: 0
   custom: 0
+  lives: 0
   reserveSprite: {fileID: 0}

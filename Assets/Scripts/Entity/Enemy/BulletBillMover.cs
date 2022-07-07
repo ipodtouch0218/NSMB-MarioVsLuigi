@@ -2,7 +2,7 @@ using UnityEngine;
 using Photon.Pun;
 
 public class BulletBillMover : KillableEntity {
-    
+
     public float speed, playerSearchRadius = 4, despawnDistance = 8;
     private Vector2 searchVector;
 
@@ -53,7 +53,7 @@ public class BulletBillMover : KillableEntity {
             || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.state == Enums.PowerupState.MegaMushroom) {
 
-            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound);
+            photonView.RPC("Kill", RpcTarget.All);
             return;
         }
         if (attackedFromAbove) {
@@ -89,11 +89,11 @@ public class BulletBillMover : KillableEntity {
 
     [PunRPC]
     public override void Kill() {
-        SpecialKill(!left, false);
+        SpecialKill(!left, false, 0);
     }
-    
+
     [PunRPC]
-    public override void SpecialKill(bool right, bool groundpound) {
+    public override void SpecialKill(bool right, bool groundpound, int combo) {
         body.velocity = new Vector2(0, 2.5f);
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (right ? 1 : -1);
@@ -106,11 +106,11 @@ public class BulletBillMover : KillableEntity {
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
 
         dead = true;
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
-    } 
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
+    }
 
     void OnDrawGizmosSelected() {
-        if (!GameManager.Instance) 
+        if (!GameManager.Instance)
             return;
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(body.position, searchVector);

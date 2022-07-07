@@ -20,22 +20,26 @@ public abstract class InteractableTile : AnimatedTile {
             switch (obj.tag) {
             case "Player": {
                 PlayerController player = obj.GetComponent<PlayerController>();
+
+                /*
+                // fall on ass when bumped from below
                 if (player.state == Enums.PowerupState.MegaMushroom)
-                    return;
+                    player.photonView.RPC("KnockbackMegaMushroom", RpcTarget.All);
+                */
 
                 player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, false, (interacter as MonoBehaviourPun)?.photonView.ViewID ?? -1);
                 continue;
             }
             case "koopa": {
-                if (!obj.GetPhotonView() || obj.GetComponent<KillableEntity>().dead)
+                if (!obj.GetPhotonView())
                     continue;
                 obj.GetPhotonView().RPC("Bump", RpcTarget.All);
                 continue;
             }
             case "goomba": {
-                if (!obj.GetPhotonView() || obj.GetComponent<KillableEntity>().dead)
+                if (!obj.GetPhotonView())
                     continue;
-                obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false);
+                obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false, 0);
                 continue;
             }
             case "loosecoin":

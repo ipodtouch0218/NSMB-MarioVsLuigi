@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
+  m_Name: 1-Up
+  m_EditorClassIdentifier: 
+  state: 0
+  prefab: 1-Up
+  soundEffect: 78
+  spawnChance: 0
+  losingSpawnBonus: 0
+  big: 0
+  vertical: 0
+  custom: 1
+  lives: 1
+  reserveSprite: {fileID: 0}

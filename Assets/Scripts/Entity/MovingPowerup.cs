@@ -18,7 +18,7 @@ public class MovingPowerup : MonoBehaviourPun {
 
     public Powerup powerupScriptable;
 
-    void Start() {
+    public void Awake() {
         body = GetComponent<Rigidbody2D>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
@@ -31,9 +31,10 @@ public class MovingPowerup : MonoBehaviourPun {
         if (data != null) {
             if (data[0] is float ignore) {
                 ignoreCounter = ignore;
+                gameObject.layer = LayerMask.NameToLayer("Entity");
             } else if (data[0] is int follow) {
                 followMe = PhotonView.Find(follow).GetComponent<PlayerController>();
-                followMeCounter = 1.5f;
+                followMeCounter = 1f;
                 passthrough = true;
                 body.isKinematic = true;
                 gameObject.layer = LayerMask.NameToLayer("HitsNothing");
@@ -44,6 +45,7 @@ public class MovingPowerup : MonoBehaviourPun {
             }
         } else {
             passthrough = false;
+            gameObject.layer = LayerMask.NameToLayer("Entity");
         }
 
         if (groundMask == -1)
@@ -52,7 +54,7 @@ public class MovingPowerup : MonoBehaviourPun {
 
     void LateUpdate() {
         ignoreCounter -= Time.deltaTime;
-        if (!followMe) 
+        if (!followMe)
             return;
 
         //Following someone.
@@ -76,7 +78,7 @@ public class MovingPowerup : MonoBehaviourPun {
             body.isKinematic = true;
             return;
         }
-        if (followMe) 
+        if (followMe)
             return;
 
         despawnCounter -= Time.fixedDeltaTime;
@@ -111,13 +113,13 @@ public class MovingPowerup : MonoBehaviourPun {
             Vector2 closestPosition = Vector2.zero;
             float distance = float.MaxValue;
             foreach (var hit in Physics2D.OverlapCircleAll(body.position, 10f)) {
-                if (!hit.CompareTag("Player")) 
+                if (!hit.CompareTag("Player"))
                     continue;
                 Vector2 actualPosition = hit.attachedRigidbody.position + hit.offset;
                 float tempDistance = Vector2.Distance(actualPosition, body.position);
-                if (tempDistance > distance) 
+                if (tempDistance > distance)
                     continue;
-                distance = tempDistance;    
+                distance = tempDistance;
                 closest = hit;
                 closestPosition = actualPosition;
             }

@@ -83,18 +83,18 @@ namespace Photon.Realtime
         {
             Type websocketType = null;
             #if (UNITY_XBOXONE || UNITY_GAMECORE) && !UNITY_EDITOR
-            websocketType = Type.GetType("ExitGames.Client.Photon.SocketNativeSource, PhotonRealtime", false);
+            websocketType = Type.GetType("ExitGames.Client.Photon.SocketNativeSource, Assembly-CSharp", false);
             if (websocketType == null)
             {
                 websocketType = Type.GetType("ExitGames.Client.Photon.SocketNativeSource, Assembly-CSharp-firstpass", false);
             }
             if (websocketType == null)
             {
-                websocketType = Type.GetType("ExitGames.Client.Photon.SocketNativeSource, Assembly-CSharp", false);
+                websocketType = Type.GetType("ExitGames.Client.Photon.SocketNativeSource, PhotonRealtime", false);
             }
-            if (websocketType == null)
+            if (websocketType != null)
             {
-                Debug.LogError("UNITY_XBOXONE is defined but peer could not find SocketNativeSource. Check your project files to make sure the native WSS implementation is available. Won't connect.");
+                this.SocketImplementationConfig[ConnectionProtocol.Udp] = websocketType;    // on Xbox, the native socket plugin supports UDP as well
             }
             #else
             // to support WebGL export in Unity, we find and assign the SocketWebTcp class (if it's in the project).
@@ -348,7 +348,7 @@ namespace Photon.Realtime
                     op[ParameterCode.LobbyName] = opParams.Lobby.Name;
                     op[ParameterCode.LobbyType] = (byte)opParams.Lobby.Type;
                 }
-            } 
+            }
             else if (opParams.JoinMode == JoinMode.RejoinOnly)
             {
                 op[ParameterCode.JoinMode] = (byte)JoinMode.RejoinOnly; // changed from JoinMode.JoinOrRejoin
@@ -366,11 +366,11 @@ namespace Photon.Realtime
                     op[ParameterCode.PlayerProperties] = opParams.PlayerProperties;
                 }
                 op[ParameterCode.Broadcast] = true; // broadcast actor properties
+            }
 
-                if (opParams.JoinMode == JoinMode.CreateIfNotExists)
-                {
-                    this.RoomOptionsToOpParameters(op, opParams.RoomOptions);
-                }
+            if (opParams.OnGameServer || opParams.JoinMode == JoinMode.CreateIfNotExists)
+            {
+                this.RoomOptionsToOpParameters(op, opParams.RoomOptions);
             }
 
             //this.Listener.DebugReturn(DebugLevel.INFO, "OpJoinRoom: " + SupportClass.DictionaryToString(op));
@@ -2065,31 +2065,44 @@ namespace Photon.Realtime
     /// </summary>
     public enum CustomAuthenticationType : byte
     {
-        /// <summary>Use a custom authentification service. Currently the only implemented option.</summary>
+        /// <summary>Use a custom authentication service. Currently the only implemented option.</summary>
         Custom = 0,
 
-        /// <summary>Authenticates users by their Steam Account. Set auth values accordingly!</summary>
+        /// <summary>Authenticates users by their Steam Account. Set Steam's ticket as "ticket" via AddAuthParameter().</summary>
         Steam = 1,
 
-        /// <summary>Authenticates users by their Facebook Account. Set auth values accordingly!</summary>
+        /// <summary>Authenticates users by their Facebook Account.  Set Facebooks's tocken as "token" via AddAuthParameter().</summary>
         Facebook = 2,
 
-        /// <summary>Authenticates users by their Oculus Account and token.</summary>
+        /// <summary>Authenticates users by their Oculus Account and token. Set Oculus' userid as "userid" and nonce as "nonce" via AddAuthParameter().</summary>
         Oculus = 3,
 
-        /// <summary>Authenticates users by their PSN Account and token.</summary>
+        /// <summary>Authenticates users by their PSN Account and token on PS4. Set token as "token", env as "env" and userName as "userName" via AddAuthParameter().</summary>
+        PlayStation4 = 4,
+        [Obsolete("Use PlayStation4 or PlayStation5 as needed")]
         PlayStation = 4,
 
-        /// <summary>Authenticates users by their Xbox Account and XSTS token.</summary>
+        /// <summary>Authenticates users by their Xbox Account. Pass the XSTS token via SetAuthPostData().</summary>
         Xbox = 5,
 
-        /// <summary>Authenticates users by their HTC Viveport Account and user token. Set AuthGetParameters to "userToken=[userToken]"</summary>
+        /// <summary>Authenticates users by their HTC Viveport Account. Set userToken as "userToken" via AddAuthParameter().</summary>
         Viveport = 10,
 
-        /// <summary>Authenticates users by their NSA ID.</summary>
+        /// <summary>Authenticates users by their NSA ID. Set token  as "token" and appversion as "appversion" via AddAuthParameter(). The appversion is optional.</summary>
         NintendoSwitch = 11,
 
-        /// <summary>Disables custom authentification. Same as not providing any AuthenticationValues for connect (more precisely for: OpAuthenticate).</summary>
+        /// <summary>Authenticates users by their PSN Account and token on PS5. Set token as "token", env as "env" and userName as "userName" via AddAuthParameter().</summary>
+        PlayStation5 = 12,
+        [Obsolete("Use PlayStation4 or PlayStation5 as needed")]
+        Playstation5 = 12,
+
+        /// <summary>Authenticates users with Epic Online Services (EOS). Set token as "token" and ownershipToken as "ownershipToken" via AddAuthParameter(). The ownershipToken is optional.</summary>
+        Epic = 13,
+
+        /// <summary>Authenticates users with Facebook Gaming api. Set token as "token" via AddAuthParameter().</summary>
+        FacebookGaming = 15,
+
+        /// <summary>Disables custom authentication. Same as not providing any AuthenticationValues for connect (more precisely for: OpAuthenticate).</summary>
         None = byte.MaxValue
     }
 

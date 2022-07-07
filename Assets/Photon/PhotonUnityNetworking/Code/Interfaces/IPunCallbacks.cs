@@ -39,7 +39,7 @@ namespace Photon.Pun
 
 
     /// <summary>
-    /// Global Callback interface for ownership changes. These callbacks will fire for chagnes to ANY PhotonView that changes.
+    /// Global Callback interface for ownership changes. These callbacks will fire for changes to ANY PhotonView that changes.
     /// Consider using IOnPhotonViewControllerChange for callbacks from a specific PhotonView.
     /// </summary>
     public interface IPunOwnershipCallbacks
@@ -76,6 +76,17 @@ namespace Photon.Pun
         /// <param name="targetView">PhotonView for which ownership changed.</param>
         /// <param name="previousOwner">Player who was the previous owner (or null, if none).</param>
         void OnOwnershipTransfered(PhotonView targetView, Player previousOwner);
+        
+        /// <summary>
+        /// Called when an Ownership Request fails for objects with "takeover" setting.
+        /// </summary>
+        /// <remarks>
+        /// Each request asks to take ownership from a specific controlling player. This can fail if anyone
+        /// else took over ownership briefly before the request arrived.
+        /// </remarks>
+        /// <param name="targetView"></param>
+        /// <param name="senderOfFailedRequest"></param>
+        void OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest);
     }
 
     /// \ingroup callbacks

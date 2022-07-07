@@ -20,4 +20,5 @@ MonoBehaviour:
   big: 0
   vertical: 0
   custom: 1
+  lives: 0
   reserveSprite: {fileID: -1604689058, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}

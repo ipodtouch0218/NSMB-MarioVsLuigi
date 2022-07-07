@@ -10430,6 +10430,7 @@ MonoBehaviour:
   fireballKnockback: 0
   startedSliding: 0
   groundpounded: 0
+  canShootProjectile: 0
   jumpLandingTimer: 0
   landing: 0
   koyoteTime: 0
@@ -10445,11 +10446,13 @@ MonoBehaviour:
   giantEndTimer: 0
   propellerTimer: 0
   propellerSpinTimer: 0
+  fireballTimer: 0
   invincible: 0
   giantTimer: 0
   floorAngle: 0
   knockbackTimer: 0
   pipeTimer: 0
+  slowdownTimer: 0
   wallSlideLeft: 0
   wallSlideRight: 0
   pipeDirection: {x: 0, y: 0}
@@ -10613,7 +10616,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenShakeTimer: 0
   controlCamera: 0
   currentPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &2102992499848127643
@@ -10917,13 +10919,12 @@ MonoBehaviour:
   - onRight
   - onGround
   - skidding
-  - groundpound
   - crouching
   - flying
   - drill
   - sliding
   - facingRight
-  - propellerSpin
+  - groundpound
   animator: {fileID: 2254935152879088866}
 --- !u!1 &4824223342336871188
 GameObject:

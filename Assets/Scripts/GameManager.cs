@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Audio;
@@ -10,8 +11,9 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks {
+public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks, IMatchmakingCallbacks {
     private static GameManager _instance;
     public static GameManager Instance {
         get {
@@ -65,38 +67,58 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public EnemySpawnpoint[] enemySpawnpoints;
 
     private GameObject[] coins;
-
+    private readonly Dictionary<Player, List<double>> powerupSummons = new();
     public SpectationManager SpectationManager { get; private set; }
 
     ParticleSystem brickBreak;
+
+
 
     // EVENT CALLBACK
     public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
         if (eventOptions == null)
             eventOptions = NetworkUtils.EventOthers;
 
-        HandleEvent((byte) eventId, parameters);
+        HandleEvent((byte) eventId, parameters, PhotonNetwork.LocalPlayer, null);
         PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
     }
     public void OnEvent(EventData e) {
-        HandleEvent(e.Code, e.CustomData);
+        var players = PhotonNetwork.CurrentRoom.Players;
+        HandleEvent(e.Code, e.CustomData, players.ContainsKey(e.Sender) ? players[e.Sender] : null, e.Parameters);
     }
-    public void HandleEvent(byte eventId, object customData) {
+    public void HandleEvent(byte eventId, object customData, Player sender, ParameterDictionary parameters) {
         object[] data = customData as object[];
 
-        switch ((Enums.NetEventIds) eventId) {
-        case Enums.NetEventIds.AllFinishedLoading: {
+        switch (eventId) {
+        case PunEvent.Instantiation: {
+            string prefab = (string) ((Hashtable) parameters.paramDict[245])[0];
+
+            //server room instantiation
+            if (sender == null)
+                return;
+
+            if (!PhotonNetwork.IsMasterClient || sender.IsMasterClient)
+                return;
+
+            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin")) {
+                PhotonNetwork.CloseConnection(sender);
+                PhotonNetwork.DestroyPlayerObjects(sender);
+            }
+            break;
+        }
+        case (byte) Enums.NetEventIds.AllFinishedLoading: {
             if (loaded)
                 break;
+
             StartCoroutine(LoadingComplete((int) customData));
             break;
         }
-        case Enums.NetEventIds.EndGame: {
+        case (byte) Enums.NetEventIds.EndGame: {
             Player winner = (Player) customData;
             StartCoroutine(EndGame(winner));
             break;
         }
-        case Enums.NetEventIds.SetTile: {
+        case (byte) Enums.NetEventIds.SetTile: {
             int x = (int) data[0];
             int y = (int) data[1];
             string tilename = (string) data[2];
@@ -106,7 +128,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, tile);
             break;
         }
-        case Enums.NetEventIds.SetTileBatch: {
+        case (byte) Enums.NetEventIds.SetTileBatch: {
             int x = (int) data[0];
             int y = (int) data[1];
             int width = (int) data[2];
@@ -123,21 +145,21 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
             break;
         }
-        case Enums.NetEventIds.ResetTiles: {
+        case (byte) Enums.NetEventIds.ResetTiles: {
             ResetTiles();
             break;
         }
-        case Enums.NetEventIds.SyncTilemap: {
-            ExitGames.Client.Photon.Hashtable changes = (ExitGames.Client.Photon.Hashtable) customData;
+        case (byte) Enums.NetEventIds.SyncTilemap: {
+            Hashtable changes = (Hashtable) customData;
             Utils.ApplyTilemapChanges(originalTiles, origin, tilemap, changes);
             break;
         }
-        case Enums.NetEventIds.PlayerFinishedLoading: {
+        case (byte) Enums.NetEventIds.PlayerFinishedLoading: {
             Player player = (Player) customData;
             loadedPlayers.Add(player.NickName);
             break;
         }
-        case Enums.NetEventIds.BumpTile: {
+        case (byte) Enums.NetEventIds.BumpTile: {
 
             int x = (int) data[0];
             int y = (int) data[1];
@@ -163,7 +185,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, null);
             break;
         }
-        case Enums.NetEventIds.SetThenBumpTile: {
+        case (byte) Enums.NetEventIds.SetThenBumpTile: {
             int x = (int) data[0];
             int y = (int) data[1];
             bool downwards = (bool) data[2];
@@ -186,7 +208,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTile(loc, null);
             break;
         }
-        case Enums.NetEventIds.SetCoinState: {
+        case (byte) Enums.NetEventIds.SetCoinState: {
             int view = (int) data[0];
             bool visible = (bool) data[1];
             GameObject coin = PhotonView.Find(view).gameObject;
@@ -194,7 +216,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             coin.GetComponent<BoxCollider2D>().enabled = visible;
             break;
         }
-        case Enums.NetEventIds.SpawnParticle: {
+        case (byte) Enums.NetEventIds.SpawnParticle: {
             int x = (int) data[0];
             int y = (int) data[1];
             string particleName = (string) data[2];
@@ -215,7 +237,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             break;
         }
-        case Enums.NetEventIds.SpawnResizableParticle: {
+        case (byte) Enums.NetEventIds.SpawnResizableParticle: {
             Vector2 pos = (Vector2) data[0];
             bool right = (bool) data[1];
             bool upsideDown = (bool) data[2];
@@ -236,9 +258,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
+    // MATCHMAKING CALLBACKS
+
+    public void OnFriendListUpdate(List<FriendInfo> friendList) { }
+    public void OnCreatedRoom() { }
+    public void OnCreateRoomFailed(short returnCode, string message) { }
+    public void OnJoinRoomFailed(short returnCode, string message) { }
+    public void OnJoinRandomFailed(short returnCode, string message) { }
+    public void OnLeftRoom() {
+        OnDisconnected(DisconnectCause.DisconnectByServerLogic);
+    }
+
     // ROOM CALLBACKS
     public void OnJoinedRoom() { }
-    public void OnPlayerPropertiesUpdate(Player player, ExitGames.Client.Photon.Hashtable playerProperties) {
+    public void OnPlayerPropertiesUpdate(Player player, Hashtable playerProperties) {
         foreach (PlayerController players in allPlayers) {
             if (players == null)
                 continue;
@@ -247,7 +280,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 players.LoadFromGameState();
         }
     }
-    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable properties) { }
+    public void OnRoomPropertiesUpdate(Hashtable properties) { }
 
     public void OnMasterClientSwitched(Player newMaster) {
         //TODO: chat message
@@ -259,9 +292,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             });
         }
     }
+
     public void OnPlayerEnteredRoom(Player newPlayer) {
         //Spectator joined. Sync the room state.
         //TODO: chat message
+
+        if (PhotonNetwork.IsMasterClient) {
+            Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
+            List<NameIdPair> banList = bans.Cast<NameIdPair>().ToList();
+            if (banList.Any(nip => nip.userId == newPlayer.UserId)) {
+
+                PhotonNetwork.CloseConnection(newPlayer);
+                return;
+            }
+        }
 
         //SYNCHRONIZE PLAYER STATE
         if (localPlayer)
@@ -269,7 +313,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         //SYNCHRONIZE TILEMAPS
         if (PhotonNetwork.IsMasterClient) {
-            ExitGames.Client.Photon.Hashtable changes = Utils.GetTilemapChanges(originalTiles, origin, tilemap);
+            Hashtable changes = Utils.GetTilemapChanges(originalTiles, origin, tilemap);
             RaiseEventOptions options = new() { CachingOption = EventCaching.DoNotCache, TargetActors = new int[] { newPlayer.ActorNumber } };
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SyncTilemap, changes, options, SendOptions.SendReliable);
 
@@ -325,7 +369,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
 
-#if UNITY_EDITOR
         //Spawning in editor??
         if (!PhotonNetwork.IsConnectedAndReady) {
             PhotonNetwork.OfflineMode = true;
@@ -333,7 +376,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 CustomRoomProperties = NetworkUtils.DefaultRoomProperties
             });
         }
-#endif
 
         //Respawning Tilemaps
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
@@ -343,7 +385,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
         Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out starRequirement);
         Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
-
 
         SceneManager.SetActiveScene(gameObject.scene);
 
@@ -360,18 +401,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
-    }
-
-    long prevOut, prevIn;
-    IEnumerator DataLog() {
-        while (true) {
-            yield return new WaitForSeconds(1);
-            long bOut = PhotonNetwork.NetworkingClient.LoadBalancingPeer.BytesOut;
-            long bIn = PhotonNetwork.NetworkingClient.LoadBalancingPeer.BytesIn;
-            Debug.Log($"outgoing: {bOut - prevOut} incoming: {bIn - prevIn}");
-            prevOut = bOut;
-            prevIn = bIn;
-        }
     }
 
     IEnumerator LoadingComplete(int startTimestamp) {
@@ -421,14 +450,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                     point.AttemptSpawning();
 
-            foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
-                wfgs.AttemptExecute();
 
             localPlayer.GetComponent<PlayerController>().OnGameStart();
         } else {
             foreach (PlayerController player in allPlayers)
                 player.sfx.enabled = true;
         }
+
+        startServerTime = startTimestamp + 3500;
+        foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
+            wfgs.AttemptExecute();
 
         try {
             ScoreboardUpdater.instance.Populate(allPlayers);
@@ -439,7 +470,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         musicEnabled = true;
         Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
 
-        startServerTime = PhotonNetwork.ServerTimestamp;
         startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
         if (timedGameDuration > 0) {
             endServerTime = startTimestamp + 4500 + timedGameDuration * 1000;
@@ -788,4 +818,5 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             Gizmos.DrawIcon(starSpawn.transform.position, "star", true, new Color(1, 1, 1, 0.5f));
         }
     }
+
 }

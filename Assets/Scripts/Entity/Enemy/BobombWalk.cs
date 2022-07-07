@@ -135,7 +135,7 @@ public class BobombWalk : HoldableEntity {
         left = !fromLeft;
         sRenderer.flipX = left;
         body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Kick);
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
     }
 
     public override void InteractWithPlayer(PlayerController player) {

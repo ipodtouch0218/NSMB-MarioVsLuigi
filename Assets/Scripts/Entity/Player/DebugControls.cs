@@ -1,13 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
-using UnityEngine.Tilemaps;
+using UnityEngine.Rendering.Universal;
 
 public class DebugControls : MonoBehaviour {
 
     public bool editMode;
+    public ScriptableRendererFeature feature;
     public void Start() {
         if (!Debug.isDebugBuild && !Application.isEditor) {
             enabled = false;
@@ -34,6 +33,7 @@ public class DebugControls : MonoBehaviour {
         DebugItem(Key.Numpad6, "Star");
         DebugItem(Key.Numpad7, "PropellerMushroom");
         DebugItem(Key.Numpad8, "IceFlower");
+        DebugItem(Key.Numpad9, "1-Up");
         DebugEntity(Key.Digit1, "Koopa");
         DebugEntity(Key.Digit2, "RedKoopa");
         DebugEntity(Key.Digit3, "BlueKoopa");
@@ -52,6 +52,21 @@ public class DebugControls : MonoBehaviour {
             CanvasGroup group = GameManager.Instance.transform.Find("New HUD").GetComponent<CanvasGroup>();
             group.alpha = 1f - group.alpha;
         }
+        if (kb[Key.F3].wasPressedThisFrame) {
+            Settings.Instance.ndsResolution = !Settings.Instance.ndsResolution;
+        }
+        if (kb[Key.F4].wasPressedThisFrame) {
+            Settings.Instance.fourByThreeRatio = !Settings.Instance.fourByThreeRatio;
+        }
+        if (kb[Key.F5].wasPressedThisFrame) {
+            feature.SetActive(!feature.isActive);
+        }
+        if (kb[Key.F6].wasPressedThisFrame) {
+            GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera;
+        }
+        if (kb[Key.F12].wasPressedThisFrame) {
+            GameManager.Instance.localPlayer.GetPhotonView().RPC("Death", RpcTarget.All, false, false);
+        }
     }
 
     private void FreezePlayer(Key key) {
@@ -67,27 +82,28 @@ public class DebugControls : MonoBehaviour {
         if (!GameManager.Instance.localPlayer)
             return;
 
-        if (Keyboard.current[key].wasPressedThisFrame)
-            if (item == null)
-                GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem();
-            else
-                GameManager.Instance.localPlayer.GetComponent<PlayerController>().SpawnItem(item);
+        if (Keyboard.current[key].wasPressedThisFrame) {
+            SpawnDebugItem(item);
+        }
     }
+
+    private void SpawnDebugItem(string prefab) {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        PlayerController local = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
+
+        if (prefab == null)
+            prefab = Utils.GetRandomItem(local).prefab;
+
+        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, local.body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { local.photonView.ViewID });
+    }
+
     private void DebugEntity(Key key, string entity) {
         if (!GameManager.Instance.localPlayer)
             return;
 
         if (Keyboard.current[key].wasPressedThisFrame)
             PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity, GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().facingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
-    }
-    private void DebugWorldEntity(Key key, string entity) {
-        if (!GameManager.Instance.localPlayer)
-            return;
-
-        if (Keyboard.current[key].wasPressedThisFrame) {
-            GameObject en = PhotonNetwork.Instantiate("Prefabs/Enemy/Goomba", GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().facingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
-            GameObject frozenBlock = PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity);
-            frozenBlock.GetComponent<FrozenCube>().photonView.RPC("setFrozenEntity", RpcTarget.All, en.tag, en.GetComponent<KillableEntity>().photonView.ViewID);
-        }
     }
 }

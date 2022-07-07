@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
 public class EnemySpawnpoint : MonoBehaviour {
-    
+
     public string prefab;
     public GameObject currentEntity;
 

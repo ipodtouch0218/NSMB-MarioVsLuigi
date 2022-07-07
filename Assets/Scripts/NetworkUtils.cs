@@ -1,11 +1,13 @@
 using UnityEngine;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
+using System.Collections.Generic;
+using System.IO;
 
 public static class NetworkUtils {
 
-    public static readonly RaiseEventOptions EventOthers = new() { Receivers = ReceiverGroup.Others };
-    public static readonly RaiseEventOptions EventAll = new() { Receivers = ReceiverGroup.All };
+    public static RaiseEventOptions EventOthers { get; } = new() { Receivers = ReceiverGroup.Others };
+    public static RaiseEventOptions EventAll { get; } = new() { Receivers = ReceiverGroup.All };
 
     private readonly static Hashtable _defaultRoomProperties = new() {
         [Enums.NetRoomProperties.Level] = 0,
@@ -18,7 +20,8 @@ public static class NetworkUtils {
         [Enums.NetRoomProperties.GameStarted] = false,
         [Enums.NetRoomProperties.HostName] = "",
         [Enums.NetRoomProperties.Debug] = false,
-        //[Enums.NetRoomProperties.Password] = "",
+        [Enums.NetRoomProperties.Mutes] = new string[0],
+        [Enums.NetRoomProperties.Bans] = new object[0],
     };
 
     public static Hashtable DefaultRoomProperties {
@@ -36,7 +39,6 @@ public static class NetworkUtils {
         Enums.NetRoomProperties.NewPowerups,
         Enums.NetRoomProperties.GameStarted,
         Enums.NetRoomProperties.HostName,
-        //Enums.NetRoomProperties.Password,
     };
 
     public static readonly RegionComparer RegionPingComparer = new();
@@ -44,5 +46,31 @@ public static class NetworkUtils {
         public int Compare(Region r1, Region r2) {
             return r1.Ping - r2.Ping;
         }
+    }
+}
+
+public class NameIdPair {
+    public string name, userId;
+
+    [System.Obsolete]
+    public static object Deserialize(StreamBuffer inStream, short length) {
+        byte[] buffer = new byte[length];
+        inStream.Read(buffer, 0, length);
+
+        string[] nameIdPair = ((string) Protocol.Deserialize(buffer)).Split(":");
+        NameIdPair newPair = new() {
+            name = nameIdPair[0],
+            userId = nameIdPair[1],
+        };
+        return newPair;
+    }
+
+    [System.Obsolete]
+    public static short Serialize(StreamBuffer outStream, object obj) {
+        NameIdPair pair = (NameIdPair) obj;
+        byte[] bytes = Protocol.Serialize(pair.name + ":" + pair.userId);
+        outStream.Write(bytes, 0, bytes.Length);
+
+        return (short) bytes.Length;
     }
 }

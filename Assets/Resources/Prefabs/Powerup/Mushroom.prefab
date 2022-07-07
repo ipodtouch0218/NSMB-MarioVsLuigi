@@ -58,7 +58,7 @@ MonoBehaviour:
   speed: 2
   bouncePower: 0
   terminalVelocity: 8
-  blinkingRate: 4
+  blinkingRate: 6
   passthrough: 1
   avoidPlayers: 0
   followMe: {fileID: 0}
@@ -153,7 +153,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.4}
+  m_Offset: {x: 0, y: 0.45}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}

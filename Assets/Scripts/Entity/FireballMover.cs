@@ -40,7 +40,7 @@ public class FireballMover : MonoBehaviourPun {
             float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)) * 1.25f;
             if (Mathf.Sign(physics.floorAngle) != Mathf.Sign(body.velocity.x))
                 boost = 0;
-            
+
             body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
         } else if (isIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
@@ -79,7 +79,7 @@ public class FireballMover : MonoBehaviourPun {
                 PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { en.photonView.ViewID });
                 PhotonNetwork.Destroy(gameObject);
             } else {
-                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false);
+                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false, 0);
                 PhotonNetwork.Destroy(gameObject);
             }
             break;
