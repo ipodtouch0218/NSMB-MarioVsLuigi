@@ -365,8 +365,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
 
-        StartCoroutine(DataLog());
-
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
 
         //Spawning in editor??
@@ -628,8 +626,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (timeUp) {
             bool draw = false;
             Utils.GetCustomProperty(Enums.NetRoomProperties.DrawTime, out draw);
-            //time up! check who has most stars, if a tie keep playing
+            //time up! check who has most stars, if a tie keep playing, if draw is on end game in a draw
             if (!draw) 
+                    // it's a draw! Thanks for playing the demo!
                     PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
             else {
                 if (winningPlayers.Count == 1)
