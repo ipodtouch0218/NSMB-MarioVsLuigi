@@ -213,7 +213,7 @@ TextureImporter:
         width: 15
         height: 15
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 6, y: 8, z: 8, w: 6}
       outline: []
       physicsShape: []
@@ -221,6 +221,27 @@ TextureImporter:
       bones: []
       spriteID: d41a709d6f9bf3141ae3f4d5902fe780
       internalID: 918296707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: option_tog
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 6, y: 8, z: 8, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6522dc5410b5b8f4389d9cc14db628a1
+      internalID: 921158468
       vertices: []
       indices: 
       edges: []
@@ -240,6 +261,7 @@ TextureImporter:
       option_0: 918296707
       option_sel: -634966080
       option: -1008673158
+      option_tog: 921158468
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 
