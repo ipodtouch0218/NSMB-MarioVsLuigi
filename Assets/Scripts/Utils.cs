@@ -516,8 +516,24 @@ public class Utils {
     }
 
     public static Color GetPlayerColor(Player player, float s = 1, float v = 1) {
-        int id = System.Array.IndexOf(PhotonNetwork.PlayerList, player);
-        return Color.HSVToRGB(id / ((float) PhotonNetwork.PlayerList.Length + 1), s, v);
+
+        int result = -1;
+        int count = 0;
+        foreach (var pl in PhotonNetwork.PlayerList) {
+            GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, pl.CustomProperties);
+            if (spectating)
+                continue;
+
+            if (pl == player)
+                result = count;
+
+            count++;
+        }
+
+        if (result == -1)
+            return new Color(0.9f, 0.9f, 0.9f, 0.7f);
+
+        return Color.HSVToRGB(result / ((float) count + 1), s, v);
     }
 
     public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {
