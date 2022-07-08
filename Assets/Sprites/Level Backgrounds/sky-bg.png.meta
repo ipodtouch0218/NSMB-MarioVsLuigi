@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5718d1b63fad5244fa910df9f2c0034c
+guid: b9936b6cd8ec9f24b998701e36c38cb4
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -20,6 +20,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -43,8 +44,8 @@ TextureImporter:
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
-  spriteExtrude: 1
-  spriteMeshType: 1
+  spriteExtrude: 3
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -63,6 +64,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -101,6 +103,18 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
     buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -116,43 +130,43 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: VolcanoBackgroundALT_0
+      name: sky-bg_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 494
-        width: 506
-        height: 488
+        y: 135
+        width: 256
+        height: 137
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 136, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d3d36b97894efcc43b3300803226639d
-      internalID: 1158597893
+      spriteID: eb9b14683c3008a488b70c9041cdd445
+      internalID: 871296641
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: VolcanoBackgroundALT_1
+      name: sky-bg_1
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 506
-        height: 488
+        width: 256
+        height: 135
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 71, z: 0, w: 62}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 82c84f2adec919e4c88a92d48d79c7da
-      internalID: -2119563631
+      spriteID: f0b5c763b829f0e4eb0d05bce1be6f39
+      internalID: -171732608
       vertices: []
       indices: 
       edges: []
@@ -168,11 +182,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      VolcanoBackgroundALT_0: 1158597893
-      VolcanoBackgroundALT_1: -2119563631
+      sky-bg_0: 871296641
+      sky-bg_1: 1134209974
   spritePackingTag: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

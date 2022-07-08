@@ -1,7 +1,22 @@
 fileFormatVersion: 2
-guid: b08893e20c2acde4c9098402dcff37c6
+guid: 22b2c9d34d2b76a48aec31184f2183ba
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: -1958262001321784805
+    second: snow-bg_0
+  - first:
+      213: -3686395583018577398
+    second: snow-bg_1
+  - first:
+      213: 4933718115762173890
+    second: snow-bg_2
+  - first:
+      213: 5092894349905452716
+    second: snow-bg_3
+  - first:
+      213: -7078120473667872263
+    second: snow-bg_4
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -20,6 +35,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -63,6 +79,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -81,31 +98,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: Server
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -117,7 +110,19 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -129,7 +134,19 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -140,43 +157,64 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: castle-bg_0
+      name: snow-bg_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 128
-        height: 487
+        width: 256
+        height: 424
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 2, z: 0, w: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4cc21b505b6a86c41b85bc024ed75c3b
-      internalID: -233493336
+      spriteID: b1ac11ac51bd2d4e0800000000000000
+      internalID: -1958262001321784805
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: castle-bg_1
+      name: snow-bg_1
       rect:
         serializedVersion: 2
-        x: 128
-        y: 240
-        width: 127
-        height: 247
+        x: 256
+        y: 238
+        width: 504
+        height: 186
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 231, z: 0, w: 0}
+      border: {x: 0, y: 0, z: 0, w: 163}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 90b8ea1315d00da4299bc2dbeb670366
-      internalID: 352803760
+      spriteID: a02db94afba47dcc0800000000000000
+      internalID: -3686395583018577398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: snow-bg_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 71
+        width: 256
+        height: 167
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57955119e9a969d42b728d0a78fd01cc
+      internalID: 4933718115762173890
       vertices: []
       indices: 
       edges: []
@@ -192,11 +230,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      castle-bg_1: 352803760
-      castle-bg_0: -233493336
+      snow-bg_2: 4933718115762173890
+      snow-bg_0: -1958262001321784805
+      snow-bg_1: -3686395583018577398
   spritePackingTag: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -8,7 +8,7 @@ public class MovingPowerup : MonoBehaviourPun {
     private Rigidbody2D body;
     private SpriteRenderer sRenderer;
     private bool right = true;
-    public bool passthrough, avoidPlayers;
+    public bool avoidPlayers;
     public PlayerController followMe;
     public float followMeCounter, despawnCounter = 15, ignoreCounter;
     private PhysicsEntity physics;
@@ -35,16 +35,12 @@ public class MovingPowerup : MonoBehaviourPun {
             } else if (data[0] is int follow) {
                 followMe = PhotonView.Find(follow).GetComponent<PlayerController>();
                 followMeCounter = 1f;
-                passthrough = true;
                 body.isKinematic = true;
                 gameObject.layer = LayerMask.NameToLayer("HitsNothing");
                 sRenderer.sortingOrder = 15;
                 transform.position = new(transform.position.x, transform.position.y, -5);
-            } else {
-                passthrough = false;
             }
         } else {
-            passthrough = false;
             gameObject.layer = LayerMask.NameToLayer("Entity");
         }
 
@@ -65,10 +61,8 @@ public class MovingPowerup : MonoBehaviourPun {
         if ((followMeCounter -= Time.deltaTime) < 0) {
             followMe = null;
             sRenderer.sortingOrder = originalLayer;
-            if (photonView.IsMine) {
+            if (photonView.IsMine)
                 photonView.TransferOwnership(PhotonNetwork.MasterClient);
-                passthrough = true;
-            }
         }
     }
 
@@ -90,24 +84,27 @@ public class MovingPowerup : MonoBehaviourPun {
         }
 
         body.isKinematic = false;
-        if (passthrough) {
-            Vector2 origin = body.position + Vector2.up * hitbox.size * transform.lossyScale * 0.5f;
-            if (!Utils.IsTileSolidAtWorldLocation(origin) && !Physics2D.OverlapBox(origin, hitbox.size * transform.lossyScale, 0, groundMask)) {
-                gameObject.layer = LayerMask.NameToLayer("Entity");
-                passthrough = false;
-            } else {
-                return;
-            }
+
+        Vector2 size = hitbox.size * transform.lossyScale * 0.9f;
+        Vector2 origin = body.position + Vector2.up * size * 0.5f;
+
+        if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Physics2D.OverlapBox(origin, size, 0, groundMask)) {
+            Debug.Log("A");
+            gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+            return;
         } else {
+            Debug.Log("B");
+            gameObject.layer = LayerMask.NameToLayer("Entity");
             HandleCollision();
         }
 
-        if (physics.onGround && !passthrough && childAnimator) {
+        if (physics.onGround && childAnimator) {
             childAnimator.SetTrigger("trigger");
             hitbox.enabled = false;
             body.isKinematic = true;
             body.gravityScale = 0;
         }
+
         if (avoidPlayers && physics.onGround && !followMe) {
             Collider2D closest = null;
             Vector2 closestPosition = Vector2.zero;
