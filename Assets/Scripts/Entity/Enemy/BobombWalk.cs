@@ -46,14 +46,14 @@ public class BobombWalk : HoldableEntity {
                 return;
             }
             float redOverlayPercent = 5.39f/(detonateCount+2.695f)*10f % 1f;
-            MaterialPropertyBlock block = new(); 
+            MaterialPropertyBlock block = new();
             block.SetFloat("FlashAmount", redOverlayPercent);
             sRenderer.SetPropertyBlock(block);
         }
     }
     [PunRPC]
     public void Detonate() {
-        
+
         sRenderer.enabled = false;
         hitbox.enabled = false;
         detonated = true;
@@ -77,7 +77,7 @@ public class BobombWalk : HoldableEntity {
             case "bobomb": {
                 if (obj == gameObject || obj == gameObject.transform.Find("Hitbox").gameObject)
                     continue;
-                obj.GetComponentInParent<PhotonView>().RPC("SpecialKill", RpcTarget.All, transform.position.x < obj.transform.position.x, false);
+                obj.GetComponentInParent<PhotonView>().RPC("SpecialKill", RpcTarget.All, transform.position.x < obj.transform.position.x, false, 0);
                 break;
             }
             }
@@ -145,7 +145,7 @@ public class BobombWalk : HoldableEntity {
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
         } else if(player.sliding || player.inShell || player.invincible > 0) {
-            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false);
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false, 0);
             return;
         } else if (attackedFromAbove && !lit) {
             if (player.state != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
@@ -185,7 +185,7 @@ public class BobombWalk : HoldableEntity {
                 body.velocity = new Vector2(0, body.velocity.y);
             }
         }
-        
+
         if (photonView && !photonView.IsMine) {
             return;
         }

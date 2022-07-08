@@ -137,7 +137,7 @@ public class KoopaWalk : HoldableEntity {
         } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.drill) {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
+                player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
             photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, 0);
         } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("EnterShell", RpcTarget.All);
@@ -258,7 +258,7 @@ public class KoopaWalk : HoldableEntity {
                 break;
             killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false, combo++);
             if (holder)
-                photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false);
+                photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false, combo++);
             break;
         case "piranhaplant":
             if (killa.dead)
