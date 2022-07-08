@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 919785a51397c1a44816e9462ed989f9
+guid: ffcfac77d0b45164caea30a2521fe98a
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,8 +48,8 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
-  spriteBorder: {x: 6, y: 8, z: 9, w: 7}
+  spritePixelsToUnits: 50
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -83,19 +83,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -107,7 +95,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -115,23 +103,11 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Android
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: iPhone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -142,85 +118,106 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: option
+      name: slider_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 15
-        height: 15
+        y: 32
+        width: 12
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 6, y: 8, z: 8, w: 6}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 382cf134f6735c242a3233868ff13bcc
-      internalID: -1008673158
+      spriteID: b4a6a0545a77666438adde99bfbb4bc5
+      internalID: 2007549078
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_sel
+      name: slider_1
       rect:
         serializedVersion: 2
         x: 16
-        y: 0
-        width: 15
-        height: 15
+        y: 32
+        width: 12
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 6, y: 8, z: 8, w: 6}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3981b0a8f2a9e1c40aab68b08ba546ed
-      internalID: -634966080
+      spriteID: ebdcfcb589e7f8a44a8058dcc699e07d
+      internalID: 451822582
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_pres
+      name: slider_2
       rect:
         serializedVersion: 2
         x: 32
-        y: 0
-        width: 15
-        height: 15
+        y: 32
+        width: 12
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 7, y: 7, z: 7, w: 7}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0376020ab64a6e649b0eb704cf4f7c4f
-      internalID: 1292347602
+      spriteID: 7636cd647be1cba42b7837594a305783
+      internalID: -1734519822
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_0
+      name: slider_3
       rect:
         serializedVersion: 2
-        x: 48
-        y: 0
-        width: 15
-        height: 15
+        x: 9
+        y: 23
+        width: 8
+        height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 6, y: 8, z: 8, w: 6}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 3, y: 4, z: 4, w: 3}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d41a709d6f9bf3141ae3f4d5902fe780
-      internalID: 918296707
+      spriteID: 5bca69e343c20d644afb4e6984bc04e1
+      internalID: 1550525289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slider_4
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 23
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 3, y: 4, z: 4, w: 3}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62491f04b3b8e654987093ed2f1f3698
+      internalID: 1530686218
       vertices: []
       indices: 
       edges: []
@@ -229,17 +226,18 @@ TextureImporter:
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      option_pres: 1292347602
-      option_0: 918296707
-      option_sel: -634966080
-      option: -1008673158
+      slider_4: 1530686218
+      slider_0: 2007549078
+      slider_2: -1734519822
+      slider_1: 451822582
+      slider_3: 1550525289
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 

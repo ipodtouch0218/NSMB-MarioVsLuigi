@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 919785a51397c1a44816e9462ed989f9
+guid: 33c4e9e9bbf9ab449ac91420ff10a854
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -49,7 +49,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 6, y: 8, z: 9, w: 7}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -83,19 +83,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -107,7 +95,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -115,23 +103,11 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Android
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: iPhone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -142,85 +118,127 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: option
+      name: vert-scrollbar_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 15
-        height: 15
+        y: 43
+        width: 24
+        height: 21
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 6, y: 8, z: 8, w: 6}
+      border: {x: 0, y: 10, z: 0, w: 10}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 382cf134f6735c242a3233868ff13bcc
-      internalID: -1008673158
+      spriteID: caf38b4b02ed0fb4da54fa0fa4103bcf
+      internalID: -964232057
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_sel
+      name: vert-scrollbar_1
       rect:
         serializedVersion: 2
-        x: 16
-        y: 0
-        width: 15
-        height: 15
+        x: 0
+        y: 20
+        width: 24
+        height: 21
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 6, y: 8, z: 8, w: 6}
+      border: {x: 0, y: 8, z: 0, w: 12}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3981b0a8f2a9e1c40aab68b08ba546ed
-      internalID: -634966080
+      spriteID: 9e5b900784cd81e43a702ba147009e61
+      internalID: -265149210
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_pres
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 0
-        width: 15
-        height: 15
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 7, y: 7, z: 7, w: 7}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0376020ab64a6e649b0eb704cf4f7c4f
-      internalID: 1292347602
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: option_0
+      name: vert-scrollbar_2
       rect:
         serializedVersion: 2
         x: 48
-        y: 0
-        width: 15
-        height: 15
+        y: 43
+        width: 9
+        height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 6, y: 8, z: 8, w: 6}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 2, z: 0, w: 2}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d41a709d6f9bf3141ae3f4d5902fe780
-      internalID: 918296707
+      spriteID: b5373959f0a61eb41bbddaf4e847faf3
+      internalID: 2060702691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vert-scrollbar_3
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 50
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c78763157b9fdd640ad35b957d1d2b97
+      internalID: 457992260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vert-scrollbar_4
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 50
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2dc687cdb1ed2b246bba5eb1afe368c9
+      internalID: -555397579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vert-scrollbar_5
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 34
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 062eeaa75b97f1d42b6c781c7ffccc43
+      internalID: -819065232
       vertices: []
       indices: 
       edges: []
@@ -229,17 +247,19 @@ TextureImporter:
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      option_pres: 1292347602
-      option_0: 918296707
-      option_sel: -634966080
-      option: -1008673158
+      vert-scrollbar_3: 457992260
+      vert-scrollbar_2: 2060702691
+      vert-scrollbar_4: -555397579
+      vert-scrollbar_0: -964232057
+      vert-scrollbar_1: -265149210
+      vert-scrollbar_5: -819065232
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 
