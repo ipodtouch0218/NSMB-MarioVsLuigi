@@ -14,7 +14,7 @@ public class PlayerListEntry : MonoBehaviour {
 
         if (!background)
             background = GetComponent<Image>();
-        background.color = Utils.GetPlayerColor(player, .2f, 1f);
+        background.color = Utils.GetPlayerColor(player, 2f, 1f);
 
         string permissionSymbol = "";
         if (player.IsMasterClient)
