@@ -3,7 +3,8 @@ using Photon.Pun;
 
 public class MovingPowerup : MonoBehaviourPun {
 
-    private static int groundMask = -1;
+    private static int groundMask = -1, HITS_NOTHING_LAYERID, ENTITY_LAYERID;
+
     public float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
     private Rigidbody2D body;
     private SpriteRenderer sRenderer;
@@ -27,25 +28,29 @@ public class MovingPowerup : MonoBehaviourPun {
 
         originalLayer = sRenderer.sortingOrder;
 
+        if (groundMask == -1) {
+            groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
+            HITS_NOTHING_LAYERID = LayerMask.NameToLayer("HitsNothing");
+            ENTITY_LAYERID = LayerMask.NameToLayer("Entity");
+        }
+
         object[] data = photonView.InstantiationData;
         if (data != null) {
             if (data[0] is float ignore) {
                 ignoreCounter = ignore;
-                gameObject.layer = LayerMask.NameToLayer("Entity");
+                gameObject.layer = ENTITY_LAYERID;
             } else if (data[0] is int follow) {
                 followMe = PhotonView.Find(follow).GetComponent<PlayerController>();
                 followMeCounter = 1f;
                 body.isKinematic = true;
-                gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+                gameObject.layer = HITS_NOTHING_LAYERID;
                 sRenderer.sortingOrder = 15;
                 transform.position = new(transform.position.x, transform.position.y, -5);
             }
         } else {
-            gameObject.layer = LayerMask.NameToLayer("Entity");
+            gameObject.layer = ENTITY_LAYERID;
         }
 
-        if (groundMask == -1)
-            groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
     }
 
     void LateUpdate() {
@@ -85,16 +90,14 @@ public class MovingPowerup : MonoBehaviourPun {
 
         body.isKinematic = false;
 
-        Vector2 size = hitbox.size * transform.lossyScale * 0.9f;
-        Vector2 origin = body.position + Vector2.up * size * 0.5f;
+        Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
+        Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
         if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Physics2D.OverlapBox(origin, size, 0, groundMask)) {
-            Debug.Log("A");
-            gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+            gameObject.layer = HITS_NOTHING_LAYERID;
             return;
         } else {
-            Debug.Log("B");
-            gameObject.layer = LayerMask.NameToLayer("Entity");
+            gameObject.layer = ENTITY_LAYERID;
             HandleCollision();
         }
 

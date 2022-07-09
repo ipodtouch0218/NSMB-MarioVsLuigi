@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 facingRight, onGround, knockback, flying, drill, sliding, skidding, wallSlideLeft,
                 wallSlideRight, invincible > 0, propellerSpinTimer > 0, wallJumpTimer > 0);
         SerializationUtils.PackToByte(out byte flags2);
-        bool updateFlags = flags != previousFlags && flags2 != previousFlags2;
+        bool updateFlags = flags != previousFlags || flags2 != previousFlags2;
 
         bool forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
 
@@ -876,7 +876,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     [PunRPC]
     protected void Powerdown(bool ignoreInvincible, PhotonMessageInfo info) {
-        if (!ignoreInvincible && hitInvincibilityCounter > 0)
+        if (!ignoreInvincible && (hitInvincibilityCounter > 0 || invincible > 0))
             return;
 
         previousState = state;
