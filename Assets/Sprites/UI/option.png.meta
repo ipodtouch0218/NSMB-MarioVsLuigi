@@ -226,7 +226,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_tog
+      name: option_b
       rect:
         serializedVersion: 2
         x: 64
@@ -402,7 +402,7 @@ TextureImporter:
         width: 15
         height: 15
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 6, y: 8, z: 8, w: 6}
       outline: []
       physicsShape: []
@@ -423,7 +423,7 @@ TextureImporter:
         width: 15
         height: 15
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 6, y: 8, z: 8, w: 6}
       outline: []
       physicsShape: []
@@ -444,7 +444,7 @@ TextureImporter:
         width: 15
         height: 15
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 7, y: 7, z: 7, w: 7}
       outline: []
       physicsShape: []
@@ -465,7 +465,7 @@ TextureImporter:
         width: 15
         height: 15
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 6, y: 8, z: 8, w: 6}
       outline: []
       physicsShape: []
@@ -473,6 +473,69 @@ TextureImporter:
       bones: []
       spriteID: 9d291059c7c57694a87f73ccca9b9afd
       internalID: 613028815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: option_b_sel
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 48
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 6, y: 8, z: 8, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7e7f071bc38c59d4cb42fcefe5d2f1f0
+      internalID: 1303659493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: option_b_pres
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 48
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 7, y: 7, z: 7, w: 7}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 81cb299411e32d6488e075f73db9414c
+      internalID: 995382058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: option_b_dis
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 48
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 6, y: 8, z: 8, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3eb1177fc835e724e9773968ba960fcd
+      internalID: 1291356150
       vertices: []
       indices: 
       edges: []
@@ -489,19 +552,22 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       option_g_dis: 613028815
+      option_b_sel: 1303659493
       option_g: -655794942
+      option_b: 921158468
       option_bar_pres: 1361422749
       option_pres: 1292347602
       option_g_pres: 1611290607
       option_bar: 1573181257
+      option_b_dis: 1291356150
       option_meter_dis: 2135415530
       option_meter_1: -93316979
       option_0: 918296707
       option_bar_sel: -1311239854
+      option_b_pres: 995382058
       option_sel: -634966080
       option_g_sel: -808684277
       option: -1008673158
-      option_tog: 921158468
       option_bar_dis: 594883156
       option_meter_0: 850112226
   spritePackingTag: 
