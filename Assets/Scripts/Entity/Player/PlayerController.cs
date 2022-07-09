@@ -670,6 +670,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         switch (state) {
+        case Enums.PowerupState.HammerSuit:
         case Enums.PowerupState.IceFlower:
         case Enums.PowerupState.FireFlower: {
             if (wallSlideLeft || wallSlideRight || groundpound || triplejump || flying || drill || crouching || sliding)
@@ -694,7 +695,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
 
             bool ice = state == Enums.PowerupState.IceFlower;
-            string projectile = ice ? "Iceball" : "Fireball";
+            bool hammer = state == Enums.PowerupState.HammerSuit;
+            string projectile = ice ? "Iceball" : hammer ? "Hammer" : "Fireball";
             Enums.Sounds sound = ice ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot;
 
             Vector2 pos = body.position + new Vector2(facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.3f);

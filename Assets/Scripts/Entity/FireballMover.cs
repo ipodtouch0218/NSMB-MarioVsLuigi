@@ -5,6 +5,7 @@ public class FireballMover : MonoBehaviourPun {
     public float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
     public bool left;
     public bool isIceball;
+    public bool isHammer;
     private Rigidbody2D body;
     private PhysicsEntity physics;
     bool breakOnImpact;
@@ -17,8 +18,11 @@ public class FireballMover : MonoBehaviourPun {
         left = (bool) data[0];
         if (data.Length > 1)
             speed += Mathf.Abs((float) data[1] / 3f);
-
-        body.velocity = new Vector2(speed * (left ? -1 : 1), -speed);
+        if (!isHammer) {
+            body.velocity = new Vector2(speed * (left ? -1 : 1), -speed);
+        } else {
+            body.velocity = new Vector2(speed * (left ? -2 : 2), speed * 2);
+        }
     }
     void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
@@ -35,13 +39,16 @@ public class FireballMover : MonoBehaviourPun {
     }
     void HandleCollision() {
         physics.UpdateCollisions();
-
         if (physics.onGround) {
             float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)) * 1.25f;
+            boost = 0;
             if (Mathf.Sign(physics.floorAngle) != Mathf.Sign(body.velocity.x))
                 boost = 0;
-
-            body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
+            if (!isHammer) {
+                body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
+            } else {
+                body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
+            }
         } else if (isIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
         }
@@ -55,7 +62,7 @@ public class FireballMover : MonoBehaviourPun {
     }
 
     void OnDestroy() {
-        Instantiate(Resources.Load("Prefabs/Particle/" + (isIceball ? "IceballWall" : "FireballWall")), transform.position, Quaternion.identity);
+        Instantiate(Resources.Load("Prefabs/Particle/" + (isHammer ? "HammerWall" : isIceball ? "IceballWall" : "FireballWall")), transform.position, Quaternion.identity);
     }
 
     [PunRPC]
@@ -78,6 +85,8 @@ public class FireballMover : MonoBehaviourPun {
             if (isIceball) {
                 PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { en.photonView.ViewID });
                 PhotonNetwork.Destroy(gameObject);
+            } else if (isHammer) {
+                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false, 0);
             } else {
                 en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false, 0);
                 PhotonNetwork.Destroy(gameObject);
@@ -100,7 +109,7 @@ public class FireballMover : MonoBehaviourPun {
         }
         case "Fireball": {
             FireballMover otherball = collider.gameObject.GetComponentInParent<FireballMover>();
-            if (isIceball ^ otherball.isIceball) {
+            if (isIceball ^ otherball.isIceball || isHammer ^ otherball.isHammer) {
                 PhotonNetwork.Destroy(collider.gameObject);
                 PhotonNetwork.Destroy(gameObject);
             }
@@ -119,13 +128,15 @@ public class FireballMover : MonoBehaviourPun {
             BobombWalk bobomb = collider.gameObject.GetComponentInParent<BobombWalk>();
             if (bobomb.dead || bobomb.Frozen)
                 return;
-            if (!isIceball) {
+            if (!isIceball && !isHammer) {
                 if (!bobomb.lit) {
                     bobomb.photonView.RPC("Light", RpcTarget.All);
                 } else {
                     bobomb.photonView.RPC("Kick", RpcTarget.All, body.position.x < bobomb.body.position.x, 0f, false);
                 }
                 PhotonNetwork.Destroy(gameObject);
+            } else if (isHammer) {
+                bobomb.photonView.RPC("Kill", RpcTarget.All);
             } else {
                 PhotonNetwork.Instantiate("Prefabs/FrozenCube", bobomb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bobomb.photonView.ViewID });
                 PhotonNetwork.Destroy(gameObject);

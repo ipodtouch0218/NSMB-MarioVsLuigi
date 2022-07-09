@@ -61,6 +61,7 @@ MonoBehaviour:
   terminalVelocity: 6.25
   left: 0
   isIceball: 1
+  isHammer: 0
 --- !u!212 &1011982274984717419
 SpriteRenderer:
   m_ObjectHideFlags: 0
