@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
@@ -127,7 +128,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         skidding = flags[10];
         wallSlideLeft = flags[11];
         wallSlideRight = flags[12];
-        //invincible = flags[13] ? 1 : 0;
+        invincible = flags[13] ? 1 : 0;
         propellerSpinTimer = flags[14] ? 1 : 0;
         wallJumpTimer = flags[15] ? 1 : 0;
 
@@ -173,7 +174,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         models = transform.Find("Models").gameObject;
         starDirection = Random.Range(0, 4);
 
-        playerId = PhotonNetwork.CurrentRoom != null ? System.Array.IndexOf(PhotonNetwork.PlayerList, photonView.Owner) : -1;
+        int count = 0;
+        foreach (var player in PhotonNetwork.PlayerList) {
+
+            Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, photonView.Owner.CustomProperties);
+            if (spectating)
+                continue;
+
+            if (player == photonView.Owner)
+                break;
+            count++;
+        }
+
+        playerId = count;
         Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out lives);
 
         if (photonView.IsMine) {
@@ -552,7 +565,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (state == Enums.PowerupState.BlueShell && (inShell || crouching || groundpound)) {
                 if (fireball.isIceball) {
                     //slowdown
-                    slowdownTimer = 0.3f;
+                    slowdownTimer = 0.65f;
                 }
                 return;
             }
@@ -865,9 +878,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     [PunRPC]
     protected void Powerdown(bool ignoreInvincible, PhotonMessageInfo info) {
-        if (info.Sender != photonView.Owner)
-            return;
-
         if (!ignoreInvincible && hitInvincibilityCounter > 0)
             return;
 
@@ -1360,7 +1370,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     protected void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
         if (fireball && fireballKnockback && knockback)
             return;
-        if (!GameManager.Instance.started || (knockback && fireballKnockback && invincible > 0) || (knockback && !fireballKnockback) || hitInvincibilityCounter > 0 || pipeEntering || Frozen || dead || giantStartTimer > 0 || giantEndTimer > 0)
+        if (knockback && !fireballKnockback)
+            return;
+
+        if (!GameManager.Instance.started || hitInvincibilityCounter > 0 || pipeEntering || Frozen || dead || giantTimer > 0 || giantStartTimer > 0 || giantEndTimer > 0)
             return;
 
         if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1 && photonView.IsMineOrLocal()) {
@@ -1678,7 +1691,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     bool ForceCrouchCheck() {
-        if ((state == Enums.PowerupState.BlueShell && !onGround) || state <= Enums.PowerupState.MiniMushroom)
+        if (state == Enums.PowerupState.BlueShell && !onGround)
+            return true;
+        if (state <= Enums.PowerupState.MiniMushroom)
             return false;
 
         float width = MainHitbox.bounds.extents.x;
@@ -1964,13 +1979,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     bool HandleStuckInBlock() {
-        if (!body || hitboxes.Length <= 0 || state == Enums.PowerupState.MegaMushroom)
+        if (!body || state == Enums.PowerupState.MegaMushroom)
             return false;
 
         Vector2 checkSize = MainHitbox.size * transform.lossyScale * new Vector2(1, 0.75f);
         Vector2 checkPos = body.position + (Vector2.up * checkSize / 2f);
 
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize)) {
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f)) {
             stuckInBlock = false;
             return false;
         }
@@ -1988,7 +2003,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool orig = Physics2D.queriesStartInColliders;
         Physics2D.queriesStartInColliders = false;
 
-        var hitTop = Physics2D.BoxCast(body.position + (size.y * 1.5f) * Vector2.up, size, 0, Vector2.down, size.y + 0.5f, ONLY_GROUND_MASK);
+        var hitTop = Physics2D.BoxCast(body.position + (size.y + 0.5f) * Vector2.up, new(size.x, 0.01f), 0, Vector2.down, size.y + 0.5f, ONLY_GROUND_MASK);
 
         if (hitTop) {
             Debug.DrawRay(hitTop.point, Vector2.right, Color.blue, 5f);
@@ -1997,19 +2012,41 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (hitTop.point.y > body.position.y && !Utils.IsTileSolidAtWorldLocation(newPoint + Vector2.up * 0.25f)) {
                 transform.position = body.position = newPoint;
             } else {
-                var hitBottom = Physics2D.BoxCast(new Vector2(body.position.x, hitTop.point.y - 0.1f + (size.y * 0.5f)), MainHitbox.size, 0, Vector2.down, size.y, ONLY_GROUND_MASK);
+                var hitBottom = Physics2D.BoxCast(new Vector2(body.position.x, hitTop.point.y - 0.1f), new(size.x, 0.01f), 0, Vector2.down, size.y, ONLY_GROUND_MASK);
 
                 if (!hitBottom) {
                     transform.position = body.position = new(body.position.x, hitTop.point.y - size.y);
                 } else {
-                    Debug.DrawRay(hitBottom.point, Vector2.right, Color.red, 5f);
+                    Debug.DrawRay(hitBottom.point, Vector2.up, Color.red, 5f);
                 }
             }
         }
 
         Physics2D.queriesStartInColliders = orig;
 
+
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.975f)) {
+            stuckInBlock = false;
+            return false;
+        }
+
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + (Vector2.left * 0.5f), checkSize * 0.975f)) {
+            transform.position = body.position = new(checkPos.x - 0.5f, body.position.y);
+            stuckInBlock = false;
+            return false;
+        }
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + (Vector2.right * 0.5f), checkSize * 0.975f)) {
+            transform.position = body.position = new(checkPos.x + 0.5f, body.position.y);
+            stuckInBlock = false;
+            return false;
+        }
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.left, checkSize * 0.975f)) {
+            transform.position = body.position = new(checkPos.x - 1f, body.position.y);
+            stuckInBlock = false;
+            return false;
+        }
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.right, checkSize * 0.975f)) {
+            transform.position = body.position = new(checkPos.x + 1f, body.position.y);
             stuckInBlock = false;
             return false;
         }
@@ -2445,7 +2482,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
             //Friction...
             if (abovemax) {
-                float multiplier = 1 - (delta * tileFriction * (knockback ? 1f : 4f) * (sliding ? 0.7f : 1f) * uphillChange);
+                float multiplier = 1 - (delta * tileFriction * (knockback ? 1f : 4f) * (sliding ? 0.7f : 1f) * (crouching ? 0.5f : 1f ) * uphillChange);
                 body.velocity = new(body.velocity.x * multiplier, body.velocity.y);
                 if (Mathf.Abs(body.velocity.x) < 0.15f)
                     body.velocity = new Vector2(0, body.velocity.y);

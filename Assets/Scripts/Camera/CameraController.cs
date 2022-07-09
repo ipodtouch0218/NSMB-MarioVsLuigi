@@ -34,6 +34,9 @@ public class CameraController : MonoBehaviour {
             if ((ScreenShake -= Time.deltaTime) > 0)
                 shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
 
+            if (!controller.onGround)
+                shakeOffset = Vector3.zero;
+
             targetCamera.transform.position = currentPosition + shakeOffset;
             if (BackgroundLoop.instance)
                 BackgroundLoop.instance.Reposition();

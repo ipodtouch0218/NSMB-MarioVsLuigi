@@ -10500,7 +10500,7 @@ MonoBehaviour:
   fireParticle: {fileID: 5320528148583097166}
   blinkDuration: 0.1
   pipeDuration: 2
-  heightSmallModel: 0.46
+  heightSmallModel: 0.42
   heightLargeModel: 0.82
   deathUpTime: 0.6
   deathForce: 7
@@ -10525,7 +10525,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 1
-  m_Mass: 0.1288
+  m_Mass: 0.147
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -10547,7 +10547,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.23}
+  m_Offset: {x: 0, y: 0.21}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
@@ -10558,7 +10558,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.28, y: 0.46}
+  m_Size: {x: 0.35, y: 0.42}
   m_EdgeRadius: 0
 --- !u!95 &2254935152879088866
 Animator:

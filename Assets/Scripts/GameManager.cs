@@ -573,7 +573,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             HandleMusic();
 
         if (PhotonNetwork.IsMasterClient) {
-            int players = PhotonNetwork.CurrentRoom.PlayerCount;
+            int players = 0;
+            foreach (var player in PhotonNetwork.CurrentRoom.Players) {
+                Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, player.Value.CustomProperties);
+                if (!spectating)
+                    players++;
+            }
+
             if (!loaded && loadedPlayers.Count >= players) {
                 RaiseEventOptions options = new() { CachingOption = EventCaching.AddToRoomCacheGlobal, Receivers = ReceiverGroup.All };
                 SendAndExecuteEvent(Enums.NetEventIds.AllFinishedLoading, PhotonNetwork.ServerTimestamp + ((players-1) * 250) + 1000, SendOptions.SendReliable, options);
