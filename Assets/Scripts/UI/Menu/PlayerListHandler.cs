@@ -111,15 +111,5 @@ public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
 
             playerListEntries[id].transform.SetAsFirstSibling();
         }
-        foreach (var players in PhotonNetwork.PlayerList) {
-            string id = players.UserId;
-            if (!playerListEntries.ContainsKey(id))
-                continue;
-
-            Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, players.CustomProperties);
-            if (spectating)
-                playerListEntries[id].transform.SetAsLastSibling();
-        }
     }
-
 }

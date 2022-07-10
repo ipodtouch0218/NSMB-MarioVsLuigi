@@ -17,7 +17,7 @@ public class GlobalController : Singleton<GlobalController> {
     public DiscordController discordController;
     public string controlsJson = null;
 
-    public bool joinedAsSpectator = false;
+    public bool joinedAsSpectator = false, checkedForVersion;
     public DisconnectCause? disconnectCause = null;
 
     private int windowWidth, windowHeight;

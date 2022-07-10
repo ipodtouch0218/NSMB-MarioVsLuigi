@@ -11,7 +11,9 @@ public class UpdateChecker {
     /// <summary>
     /// Returns if we're up to date, OR newer, compared to the latest GitHub release version number
     /// </summary>
-    public static bool IsUpToDate() {
+    public static bool IsUpToDate(out string newVersion) {
+
+        newVersion = null;
 
         //get http results
         HttpWebRequest request = (HttpWebRequest) WebRequest.Create(API_URL);
@@ -28,6 +30,7 @@ public class UpdateChecker {
             JObject data = JObject.Parse(json);
 
             string tag = data.Value<string>("tag_name");
+            newVersion = tag;
             if (tag.StartsWith("v"))
                 tag = tag[1..];
 
