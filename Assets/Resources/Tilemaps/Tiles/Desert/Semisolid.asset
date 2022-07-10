@@ -172,5 +172,5 @@ MonoBehaviour:
   siblings: []
   isBackgroundTile: 0
   iceSkidding: 0
-  footstepSound: 24
+  footstepSound: 31
   frictionFactor: 1

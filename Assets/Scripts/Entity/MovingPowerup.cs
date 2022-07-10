@@ -3,12 +3,13 @@ using Photon.Pun;
 
 public class MovingPowerup : MonoBehaviourPun {
 
-    private static int groundMask = -1;
+    private static int groundMask = -1, HITS_NOTHING_LAYERID, ENTITY_LAYERID;
+
     public float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
     private Rigidbody2D body;
     private SpriteRenderer sRenderer;
     private bool right = true;
-    public bool passthrough, avoidPlayers;
+    public bool avoidPlayers;
     public PlayerController followMe;
     public float followMeCounter, despawnCounter = 15, ignoreCounter;
     private PhysicsEntity physics;
@@ -27,29 +28,29 @@ public class MovingPowerup : MonoBehaviourPun {
 
         originalLayer = sRenderer.sortingOrder;
 
+        if (groundMask == -1) {
+            groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
+            HITS_NOTHING_LAYERID = LayerMask.NameToLayer("HitsNothing");
+            ENTITY_LAYERID = LayerMask.NameToLayer("Entity");
+        }
+
         object[] data = photonView.InstantiationData;
         if (data != null) {
             if (data[0] is float ignore) {
                 ignoreCounter = ignore;
-                gameObject.layer = LayerMask.NameToLayer("Entity");
+                gameObject.layer = ENTITY_LAYERID;
             } else if (data[0] is int follow) {
                 followMe = PhotonView.Find(follow).GetComponent<PlayerController>();
                 followMeCounter = 1f;
-                passthrough = true;
                 body.isKinematic = true;
-                gameObject.layer = LayerMask.NameToLayer("HitsNothing");
+                gameObject.layer = HITS_NOTHING_LAYERID;
                 sRenderer.sortingOrder = 15;
                 transform.position = new(transform.position.x, transform.position.y, -5);
-            } else {
-                passthrough = false;
             }
         } else {
-            passthrough = false;
-            gameObject.layer = LayerMask.NameToLayer("Entity");
+            gameObject.layer = ENTITY_LAYERID;
         }
 
-        if (groundMask == -1)
-            groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
     }
 
     void LateUpdate() {
@@ -65,10 +66,8 @@ public class MovingPowerup : MonoBehaviourPun {
         if ((followMeCounter -= Time.deltaTime) < 0) {
             followMe = null;
             sRenderer.sortingOrder = originalLayer;
-            if (photonView.IsMine) {
+            if (photonView.IsMine)
                 photonView.TransferOwnership(PhotonNetwork.MasterClient);
-                passthrough = true;
-            }
         }
     }
 
@@ -90,24 +89,25 @@ public class MovingPowerup : MonoBehaviourPun {
         }
 
         body.isKinematic = false;
-        if (passthrough) {
-            Vector2 origin = body.position + Vector2.up * hitbox.size * transform.lossyScale * 0.5f;
-            if (!Utils.IsTileSolidAtWorldLocation(origin) && !Physics2D.OverlapBox(origin, hitbox.size * transform.lossyScale, 0, groundMask)) {
-                gameObject.layer = LayerMask.NameToLayer("Entity");
-                passthrough = false;
-            } else {
-                return;
-            }
+
+        Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
+        Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
+
+        if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Physics2D.OverlapBox(origin, size, 0, groundMask)) {
+            gameObject.layer = HITS_NOTHING_LAYERID;
+            return;
         } else {
+            gameObject.layer = ENTITY_LAYERID;
             HandleCollision();
         }
 
-        if (physics.onGround && !passthrough && childAnimator) {
+        if (physics.onGround && childAnimator) {
             childAnimator.SetTrigger("trigger");
             hitbox.enabled = false;
             body.isKinematic = true;
             body.gravityScale = 0;
         }
+
         if (avoidPlayers && physics.onGround && !followMe) {
             Collider2D closest = null;
             Vector2 closestPosition = Vector2.zero;

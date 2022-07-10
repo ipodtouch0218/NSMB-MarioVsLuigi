@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 facingRight, onGround, knockback, flying, drill, sliding, skidding, wallSlideLeft,
                 wallSlideRight, invincible > 0, propellerSpinTimer > 0, wallJumpTimer > 0);
         SerializationUtils.PackToByte(out byte flags2);
-        bool updateFlags = flags != previousFlags && flags2 != previousFlags2;
+        bool updateFlags = flags != previousFlags || flags2 != previousFlags2;
 
         bool forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
 
@@ -876,7 +876,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     [PunRPC]
     protected void Powerdown(bool ignoreInvincible, PhotonMessageInfo info) {
-        if (!ignoreInvincible && hitInvincibilityCounter > 0)
+        if (!ignoreInvincible && (hitInvincibilityCounter > 0 || invincible > 0))
             return;
 
         previousState = state;
@@ -1618,7 +1618,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!photonView.IsMine || joystick.y > -analogDeadzone || state == Enums.PowerupState.MegaMushroom || !onGround || knockback || inShell)
             return;
 
-        foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.position, Vector2.down, 0.5f)) {
+        foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.position, Vector2.down, 0.1f)) {
             GameObject obj = hit.transform.gameObject;
             if (!obj.CompareTag("pipe"))
                 continue;

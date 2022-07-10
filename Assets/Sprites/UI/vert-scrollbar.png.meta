@@ -210,7 +210,7 @@ TextureImporter:
         width: 12
         height: 14
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -231,7 +231,7 @@ TextureImporter:
         width: 12
         height: 14
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -239,6 +239,27 @@ TextureImporter:
       bones: []
       spriteID: 062eeaa75b97f1d42b6c781c7ffccc43
       internalID: -819065232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vert-scrollbar_6
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 34
+        width: 6
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c67091155565b44485fb6e290dd0444
+      internalID: -1099363511
       vertices: []
       indices: 
       edges: []
@@ -260,6 +281,7 @@ TextureImporter:
       vert-scrollbar_0: -964232057
       vert-scrollbar_1: -265149210
       vert-scrollbar_5: -819065232
+      vert-scrollbar_6: -1099363511
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 
