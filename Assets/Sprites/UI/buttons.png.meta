@@ -1,13 +1,7 @@
 fileFormatVersion: 2
-guid: 9c0359cfe6b4fe34f8508db0b835cde0
+guid: b1010e6c03fc02d4599c4840ed8413c8
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: 3624413539235301459
-    second: pipes_0
-  - first:
-      213: 7631404538767374335
-    second: pipes_1
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -89,7 +83,19 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -101,7 +107,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -112,43 +118,64 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pipes_0
+      name: back_sel
       rect:
         serializedVersion: 2
-        x: 0
-        y: 37
-        width: 15
-        height: 35
+        x: 1
+        y: 34
+        width: 30
+        height: 30
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 14, y: 0, z: 0, w: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3588c3539e08c4230800000000000000
-      internalID: 3624413539235301459
+      spriteID: a0407ea1e12f8b0468b90ee7910199d1
+      internalID: -319978117
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pipes_1
+      name: back_btn
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 15
-        height: 35
+        x: 1
+        y: 3
+        width: 30
+        height: 30
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 14, y: 0, z: 0, w: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ff7788ebef138e960800000000000000
-      internalID: 7631404538767374335
+      spriteID: b920c75f059b8324a961815d46a6f182
+      internalID: 49889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: back_pres
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 34
+        width: 30
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d71ef2abbea8c143ab3a48347bf2d7e
+      internalID: -1924069400
       vertices: []
       indices: 
       edges: []
@@ -164,8 +191,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      pipes_0: 3624413539235301459
-      pipes_1: 7631404538767374335
+      back_sel: -319978117
+      back_pres: -1924069400
+      back_btn: 49889
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 
