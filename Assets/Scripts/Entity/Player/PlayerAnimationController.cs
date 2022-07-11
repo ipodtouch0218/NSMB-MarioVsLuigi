@@ -366,7 +366,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             if (pe.otherPipe.bottom == pe.bottom)
                 controller.pipeDirection *= -1;
 
-            Vector2 offset = controller.pipeDirection * (pipeDuration * 0.5f);
+            Vector2 offset = controller.pipeDirection * (pipeDuration / 2f);
             if (pe.otherPipe.bottom) {
                 offset -= controller.pipeDirection;
                 float size = mainHitbox.size.y * transform.localScale.y;

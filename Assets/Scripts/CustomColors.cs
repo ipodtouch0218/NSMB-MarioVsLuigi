@@ -16,7 +16,7 @@ public static class CustomColors {
     public static PlayerColor[] Colors = new PlayerColor[] {
                             //HAT                      //OVERALLS
         new("Default",      new(0, 0, 0, 0),            new(0, 0, 0, 0)        ), //default
-        new("Blue",         new(70, 155, 255, 255),     new(168, 68, 255, 255) ), //blue - mario bros gba player 4
+        new("Blue",         new(74, 68, 244, 255),      new(68, 150, 246, 255) ), //blue - mario bros gba player 4
         new("Wario",        new(255, 223, 70, 255),     new(74, 14, 127, 255)  ), //wario
         new("Waluigi",      new(74, 14, 127, 255),      new(46, 40, 51, 255)   ), //waluigi
         new("Pink",         new(255, 110, 170, 255),    new(255, 215, 110, 255)),

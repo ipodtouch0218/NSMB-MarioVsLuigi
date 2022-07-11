@@ -450,6 +450,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
 #if PLATFORM_WEBGL
         fullscreenToggle.interactable = false;
+#else
+        if (!GlobalController.Instance.checkedForVersion) {
+            UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
+
+                if (upToDate)
+                    return;
+
+                updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
+                updateBox.SetActive(true);
+                EventSystem.current.SetSelectedGameObject(updateBoxSelected);
+
+            });
+            GlobalController.Instance.checkedForVersion = true;
+        }
 #endif
     }
 
@@ -579,15 +593,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
 
-        if (!GlobalController.Instance.checkedForVersion) {
-            if (!UpdateChecker.IsUpToDate(out string version)) {
-                updateText.text = $"An update is available:\n\nNew Version: {version}\nCurrent Version: {Application.version}";
-                updateBox.SetActive(true);
-                EventSystem.current.SetSelectedGameObject(updateBoxSelected);
-            }
-
-            GlobalController.Instance.checkedForVersion = true;
-        }
     }
     public void OpenLobbyMenu() {
         title.SetActive(false);
@@ -913,7 +918,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
                 return;
             }
             if (target.IsLocal) {
@@ -932,7 +937,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
                 return;
             }
             if (target.IsLocal) {
@@ -981,7 +986,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
                 return;
             }
             if (target.IsLocal) {

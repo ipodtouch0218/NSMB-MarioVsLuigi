@@ -3,6 +3,8 @@ using System.Net;
 using UnityEngine;
 
 using Newtonsoft.Json.Linq;
+using System;
+using System.Threading.Tasks;
 
 public class UpdateChecker {
 
@@ -11,18 +13,19 @@ public class UpdateChecker {
     /// <summary>
     /// Returns if we're up to date, OR newer, compared to the latest GitHub release version number
     /// </summary>
-    public static bool IsUpToDate(out string newVersion) {
-
-        newVersion = null;
+    public async static void IsUpToDate(Action<bool, string> callback) {
 
         //get http results
         HttpWebRequest request = (HttpWebRequest) WebRequest.Create(API_URL);
         request.Accept = "application/json";
         request.UserAgent = "ipodtouch0218/NSMB-MarioVsLuigi";
 
-        HttpWebResponse response = (HttpWebResponse) request.GetResponse();
+        HttpWebResponse response = (HttpWebResponse) await request.GetResponseAsync();
+
         if (response.StatusCode != HttpStatusCode.OK)
-            return true;
+            return;
+
+        bool ret;
 
         try {
             //get the latest release version number from github
@@ -30,7 +33,6 @@ public class UpdateChecker {
             JObject data = JObject.Parse(json);
 
             string tag = data.Value<string>("tag_name");
-            newVersion = tag;
             if (tag.StartsWith("v"))
                 tag = tag[1..];
 
@@ -52,12 +54,14 @@ public class UpdateChecker {
                 if (local == remote)
                     continue;
 
-                return local > remote;
+                ret = local > remote;
             }
 
-            return true;
+            ret = true;
+
+            callback(ret, tag);
         } catch {
-            return false;
+            ret = false;
         }
     }
 }

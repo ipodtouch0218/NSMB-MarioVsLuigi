@@ -1644,14 +1644,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
             crouching = false;
             sliding = false;
+            propeller = false;
             drill = false;
+            usedPropellerThisJump = false;
             groundpound = false;
             break;
         }
     }
 
     void UpwardsPipeCheck() {
-        if (!photonView.IsMine || !hitRoof || joystick.y < analogDeadzone || state == Enums.PowerupState.MegaMushroom)
+        if (!photonView.IsMine || groundpound || !hitRoof || joystick.y < analogDeadzone || state == Enums.PowerupState.MegaMushroom)
             return;
 
         //todo: change to nonalloc?
@@ -1674,6 +1676,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             crouching = false;
             sliding = false;
             propeller = false;
+            usedPropellerThisJump = false;
             flying = false;
             break;
         }
@@ -1989,7 +1992,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return false;
 
         Vector2 checkSize = MainHitbox.size * transform.lossyScale * new Vector2(1, 0.75f);
-        Vector2 checkPos = body.position + (Vector2.up * checkSize / 2f);
+        Vector2 checkPos = transform.position + (Vector3) (Vector2.up * checkSize / 2f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f)) {
             stuckInBlock = false;
