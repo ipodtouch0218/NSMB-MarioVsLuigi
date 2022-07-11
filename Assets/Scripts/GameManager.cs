@@ -660,16 +660,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         //TIMED CHECKS
         if (timeUp) {
-            bool draw = false;
-            Utils.GetCustomProperty(Enums.NetRoomProperties.DrawTime, out draw);
+            Utils.GetCustomProperty(Enums.NetRoomProperties.DrawTime, out bool draw);
             //time up! check who has most stars, if a tie keep playing, if draw is on end game in a draw
-            if (!draw)
-                    // it's a draw! Thanks for playing the demo!
-                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
-            else {
-                if (winningPlayers.Count == 1)
-                    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
-            }
+            if (draw)
+                // it's a draw! Thanks for playing the demo!
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
+            else if (winningPlayers.Count == 1)
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
 
             return;
         }

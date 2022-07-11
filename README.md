@@ -51,6 +51,10 @@ You can make a build in the File Section in the top left, and hitting build sett
 * [@TheMoogle](https://github.com/TheMoogle)
 * [@Skillz](https://github.com/Skillz808)
 * [@skarph](https://github.com/skarph)
+* [@Zest](https://github.com/zestydevy)
+* [@kittenchilly](https://github.com/kittenchilly)
+* [@Amy54Desu](https://github.com/Amy54Desu)
+* [@Kraken](https://github.com/KrakHub)
   
 ### QA Testing:
 * TheCyVap

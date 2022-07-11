@@ -540,6 +540,69 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: option_r
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 33
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 6, y: 8, z: 8, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7c16c02939b71524bab30d37155bd045
+      internalID: -248825290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: option_r_sel
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 33
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 6, y: 8, z: 8, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5c61f3b3cb84464ca9a106a68d6b0d1
+      internalID: 1150358858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: option_r_pres
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 33
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 7, y: 7, z: 7, w: 7}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f0d6bed31b5271469071da00f03b003
+      internalID: 87811832
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -562,11 +625,14 @@ TextureImporter:
       option_b_dis: 1291356150
       option_meter_dis: 2135415530
       option_meter_1: -93316979
+      option_r: -248825290
       option_0: 918296707
       option_bar_sel: -1311239854
       option_b_pres: 995382058
       option_sel: -634966080
       option_g_sel: -808684277
+      option_r_sel: 1150358858
+      option_r_pres: 87811832
       option: -1008673158
       option_bar_dis: 594883156
       option_meter_0: 850112226

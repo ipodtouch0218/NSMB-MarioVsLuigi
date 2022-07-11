@@ -22,7 +22,9 @@ public class DiscordController : MonoBehaviour {
 
 //#if UNITY_STANDALONE_WIN
         try {
-            string dir = AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
+            string filename = AppDomain.CurrentDomain.ToString();
+            filename = string.Join(" ", filename.Split(" ")[..^2]);
+            string dir = AppDomain.CurrentDomain.BaseDirectory + "\\" + filename;
             activityManager.RegisterCommand(dir);
             Debug.Log($"[DISCORD] Set launch path to \"{dir}\"");
         } catch {

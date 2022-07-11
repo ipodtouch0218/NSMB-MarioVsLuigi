@@ -18,7 +18,7 @@ public class StarBouncer : MonoBehaviourPun {
 
     private BoxCollider2D worldCollider;
 
-    private int becomeCollectibleAt = 0;
+    private int? becomeCollectibleAt = null;
     private bool alreadyCollectible, canBounce;
 
     void Start() {
@@ -113,8 +113,9 @@ public class StarBouncer : MonoBehaviourPun {
             }
         }
 
-        if (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY()))
-            photonView.RPC("Crushed", RpcTarget.All);
+        if (photonView.IsMine)
+            if (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY()))
+                photonView.RPC("Crushed", RpcTarget.All);
     }
 
     void HandleCollision() {
@@ -147,6 +148,6 @@ public class StarBouncer : MonoBehaviourPun {
     }
 
     public bool IsCollectible() {
-        return becomeCollectibleAt != 0 && (alreadyCollectible || PhotonNetwork.ServerTimestamp - becomeCollectibleAt > 0);
+        return becomeCollectibleAt == null || alreadyCollectible || PhotonNetwork.ServerTimestamp - becomeCollectibleAt > 0;
     }
 }

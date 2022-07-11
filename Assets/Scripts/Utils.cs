@@ -485,7 +485,7 @@ public class Utils {
             tileCache[tilename] = Resources.Load(tilename) as TileBase;
     }
 
-    private static readonly Dictionary<char, int> charToSymbolIndex = new() {
+    private static readonly Dictionary<char, int> uiSymbols = new() {
         ['c'] = 6,
         ['0'] = 11,
         ['1'] = 12,
@@ -503,11 +503,38 @@ public class Utils {
         ['/'] = 24,
         [':'] = 25,
     };
-    public static string GetSymbolString(string str) {
+    public static readonly Dictionary<char, int> numberSymbols = new() {
+        ['0'] = 27,
+        ['1'] = 28,
+        ['2'] = 29,
+        ['3'] = 30,
+        ['4'] = 31,
+        ['5'] = 32,
+        ['6'] = 33,
+        ['7'] = 34,
+        ['8'] = 35,
+        ['9'] = 36,
+    };
+    public static readonly Dictionary<char, int> smallSymbols = new() {
+        ['0'] = 48,
+        ['1'] = 39,
+        ['2'] = 40,
+        ['3'] = 41,
+        ['4'] = 42,
+        ['5'] = 43,
+        ['6'] = 44,
+        ['7'] = 45,
+        ['8'] = 46,
+        ['9'] = 47,
+    };
+    public static string GetSymbolString(string str, Dictionary<char, int> dict = null) {
+        if (dict == null)
+            dict = uiSymbols;
+
         string ret = "";
         foreach (char c in str) {
-            if (charToSymbolIndex.ContainsKey(c)) {
-                ret += "<sprite=" + charToSymbolIndex[c] + ">";
+            if (dict.ContainsKey(c)) {
+                ret += "<sprite=" + dict[c] + ">";
             } else {
                 ret += c;
             }

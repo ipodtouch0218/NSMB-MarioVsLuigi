@@ -33,6 +33,8 @@ public static class NetworkUtils {
 
     public static readonly string[] LobbyVisibleRoomProperties = new string[] {
         Enums.NetRoomProperties.Lives,
+        Enums.NetRoomProperties.StarRequirement,
+        Enums.NetRoomProperties.CoinRequirement,
         Enums.NetRoomProperties.Time,
         Enums.NetRoomProperties.NewPowerups,
         Enums.NetRoomProperties.GameStarted,

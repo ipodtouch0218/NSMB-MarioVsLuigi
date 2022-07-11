@@ -127,7 +127,7 @@ TextureImporter:
         height: 35
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 48, y: 0, z: 15, w: 0}
+      border: {x: 5, y: 0, z: 8, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -139,190 +139,43 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: playerribbons_p2
+      name: playerribbons_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 55
-        width: 64
-        height: 35
+        y: 0
+        width: 14
+        height: 19
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 48, y: 0, z: 15, w: 0}
+      pivot: {x: 0, y: 0}
+      border: {x: 5, y: 8, z: 8, w: 10}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 717251d098291e5499004b877ce4abaa
-      internalID: -1773238144
+      spriteID: ab551f50868ddd243b7fbaa23758ee16
+      internalID: -1709532258
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: playerribbons_p3
+      name: playerribbons_1
       rect:
         serializedVersion: 2
-        x: 68
-        y: 93
-        width: 64
-        height: 35
+        x: 14
+        y: 0
+        width: 14
+        height: 19
       alignment: 0
       pivot: {x: 0, y: 0}
-      border: {x: 48, y: 0, z: 15, w: 0}
+      border: {x: 5, y: 8, z: 8, w: 10}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 33a898dff00bb6e4d9f90ca3f63b3a34
-      internalID: 618077070
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: playerribbons_p4
-      rect:
-        serializedVersion: 2
-        x: 68
-        y: 55
-        width: 64
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 48, y: 0, z: 15, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 75f12b7b159f5b74d8cc2ded1edcc274
-      internalID: -941610350
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: playerribbons_p5
-      rect:
-        serializedVersion: 2
-        x: 136
-        y: 93
-        width: 64
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 48, y: 0, z: 15, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 12b6680ac071e7c46a76064ed7d9a9e6
-      internalID: 1689510898
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: playerribbons_p6
-      rect:
-        serializedVersion: 2
-        x: 136
-        y: 55
-        width: 64
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 48, y: 0, z: 15, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: cd85de96a1b48b64587cfd20058bea9c
-      internalID: -1627344593
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: playerribbons_p8
-      rect:
-        serializedVersion: 2
-        x: 204
-        y: 55
-        width: 64
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 48, y: 0, z: 15, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 403a8412efdf62b4c8cb29029da6b404
-      internalID: 1407695535
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: playerribbons_p7
-      rect:
-        serializedVersion: 2
-        x: 204
-        y: 93
-        width: 64
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 48, y: 0, z: 15, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3fd2bcf86542b684cb225c55c4c6fae1
-      internalID: -106754767
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: playerribbons_p9
-      rect:
-        serializedVersion: 2
-        x: 272
-        y: 93
-        width: 64
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 48, y: 0, z: 15, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e87b2c9424658d443833f8059a2c47c9
-      internalID: 171656210
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: playerribbons_p10
-      rect:
-        serializedVersion: 2
-        x: 272
-        y: 55
-        width: 64
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 48, y: 0, z: 15, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f0d61484e9e5f6c42bd857162f9b7091
-      internalID: -2128627715
+      spriteID: 28b006dd08b864c4db411cacf12d5cec
+      internalID: -1862560836
       vertices: []
       indices: 
       edges: []
@@ -347,6 +200,8 @@ TextureImporter:
       playerribbons_p5: 1689510898
       playerribbons_p8: 1407695535
       playerribbons_p6: -1627344593
+      playerribbons_0: -1709532258
+      playerribbons_1: -1862560836
       playerribbons_p10: -2128627715
   spritePackingTag: 
   pSDRemoveMatte: 0
