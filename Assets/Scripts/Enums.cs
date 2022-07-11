@@ -122,6 +122,14 @@ public static class Enums {
         [SoundData("ui/pause")]                                 UI_Pause = 64,
         [SoundData("ui/quit")]                                  UI_Quit = 65,
         [SoundData("ui/start_game")]                            UI_StartGame = 66,
+        [SoundData("ui/player_connect")]                        UI_PlayerConnect = 79,
+        [SoundData("ui/player_disconnect")]                     UI_PlayerDisconnect = 80,
+        [SoundData("ui/decide")]                                UI_Decide = 81,
+        [SoundData("ui/back")]                                  UI_Back = 82,
+        [SoundData("ui/cursor")]                                UI_Cursor = 83,
+        [SoundData("ui/warn")]                                  UI_Error = 84,
+        [SoundData("ui/windowclosed")]                          UI_WindowClose = 85,
+        [SoundData("ui/windowopen")]                            UI_WindowOpen = 86,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,

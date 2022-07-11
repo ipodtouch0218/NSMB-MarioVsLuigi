@@ -185,6 +185,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
         LocalChatMessage(newPlayer.NickName + " joined the room", ColorToVector(Color.red));
+        sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
@@ -193,6 +194,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
         LocalChatMessage(otherPlayer.NickName + " left the room", ColorToVector(Color.red));
+        sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
     public void OnRoomPropertiesUpdate(Hashtable updatedProperties) {
         if (updatedProperties == null)
@@ -689,6 +691,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorBox.SetActive(true);
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
+        sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
     }
 
     public void ConnectToDropdownRegion() {
