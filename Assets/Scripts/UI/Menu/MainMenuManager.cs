@@ -688,10 +688,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EventSystem.current.SetSelectedGameObject(privateSelected);
     }
     public void OpenErrorBox(string text) {
+        if (!errorBox.activeSelf)
+            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+
         errorBox.SetActive(true);
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
-        sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
     }
 
     public void BackSound() {

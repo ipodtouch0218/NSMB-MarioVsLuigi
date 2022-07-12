@@ -27,7 +27,7 @@ public class UpdateChecker {
 
 
         try {
-            bool ret = false;
+            bool ret = true;
 
             //get the latest release version number from github
             string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
@@ -55,7 +55,7 @@ public class UpdateChecker {
                 if (local == remote)
                     continue;
 
-                ret = local > remote;
+                ret &= local >= remote;
             }
 
             callback(ret, tag);

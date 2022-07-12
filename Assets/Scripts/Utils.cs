@@ -107,13 +107,14 @@ public class Utils {
         return Tile.ColliderType.None;
     }
 
-    public static bool IsTileSolidBetweenWorldBox(Vector3Int tileLocation, Vector2 worldLocation, Vector2 worldBox) {
-        Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
-        if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
-            return true;
+    public static bool IsTileSolidBetweenWorldBox(Vector3Int tileLocation, Vector2 worldLocation, Vector2 worldBox, bool boxcast = true) {
+        if (boxcast) {
+            Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
+            if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
+                return true;
+        }
 
         Vector2 ogWorldLocation = worldLocation;
-        Vector3Int ogTileLocation = tileLocation;
         while (GetTileAtTileLocation(tileLocation) is TileInteractionRelocator it) {
             worldLocation += (Vector2)(Vector3) it.offset * 0.5f;
             tileLocation += it.offset;
@@ -337,7 +338,7 @@ public class Utils {
         return (count % 2 == 1); // Same as (count%2 == 1)
     }
 
-    public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize) {
+    public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize, bool boxcast = true) {
         Vector3Int minPos = WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
         Vector3Int size = WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
 
@@ -347,7 +348,7 @@ public class Utils {
                 Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
                 WrapTileLocation(ref tileLocation);
 
-                if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize))
+                if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize, boxcast))
                     return true;
             }
         }

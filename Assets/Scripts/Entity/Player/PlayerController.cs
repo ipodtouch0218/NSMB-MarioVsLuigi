@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Photon.Pun;
 using ExitGames.Client.Photon;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSerializeView, IOnPhotonViewPreNetDestroy {
 
@@ -721,7 +722,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
                 photonView.RPC("SpawnParticle", RpcTarget.All, $"Prefabs/Particle/{projectile}Wall", pos);
             } else {
-                PhotonNetwork.Instantiate($"Prefabs/{projectile}", pos, Quaternion.identity, 0, new object[] { !facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") });
+                PhotonNetwork.Instantiate($"Prefabs/{projectile}", pos, Quaternion.identity, 0, new object[] { !facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround"), body.velocity.x });
             }
             photonView.RPC("PlaySound", RpcTarget.All, sound);
 
@@ -1692,7 +1693,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
         bool prevCrouchState = crouching || groundpound;
-        crouching = ((onGround && crouchInput && !groundpound) || (!onGround && crouchInput && crouching) || ForceCrouchCheck()) && !holding;
+        crouching = ((onGround && crouchInput && !groundpound) || (!onGround && crouchInput && crouching) || (crouching && ForceCrouchCheck())) && !holding;
         if (crouching && !prevCrouchState) {
             //crouch start sound
             photonView.RPC("PlaySound", RpcTarget.All, state == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
@@ -1700,19 +1701,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     bool ForceCrouchCheck() {
-        if (!(state == Enums.PowerupState.BlueShell && (crouching || groundpound || inShell) && !onGround))
+        if (state == Enums.PowerupState.BlueShell && onGround && SceneManager.GetActiveScene().buildIndex != 4)
             return false;
         if (state <= Enums.PowerupState.MiniMushroom)
             return false;
 
         float width = MainHitbox.bounds.extents.x;
 
-        //bool triggerState = Physics2D.queriesHitTriggers;
-        //Physics2D.queriesHitTriggers = false;
+        bool triggerState = Physics2D.queriesHitTriggers;
+        Physics2D.queriesHitTriggers = false;
 
-        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width + 0.05f, 0.05f), 0, Vector2.up, MainHitbox.size.y * 2f, ONLY_GROUND_MASK);
+        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.1f, new(width - 0.05f, 0.05f), 0, Vector2.up, MainHitbox.size.y * 2f, ONLY_GROUND_MASK);
 
-        //Physics2D.queriesHitTriggers = triggerState;
+        Physics2D.queriesHitTriggers = triggerState;
         return ret;
     }
 
@@ -1994,7 +1995,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Vector2 checkSize = MainHitbox.size * transform.lossyScale * new Vector2(1, 0.75f);
         Vector2 checkPos = transform.position + (Vector3) (Vector2.up * checkSize / 2f);
 
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f)) {
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f, false)) {
             stuckInBlock = false;
             return false;
         }
@@ -2012,11 +2013,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool orig = Physics2D.queriesStartInColliders;
         Physics2D.queriesStartInColliders = false;
 
-        var hitTop = Physics2D.BoxCast(body.position + (size.y + 0.5f) * Vector2.up, new(size.x, 0.01f), 0, Vector2.down, size.y + 0.5f, ONLY_GROUND_MASK);
+        var hitTop = Physics2D.BoxCast(body.position + (size.y + 0.75f) * Vector2.up, new(size.x, 0.01f), 0, Vector2.down, size.y + 0.75f, ONLY_GROUND_MASK);
 
         if (hitTop) {
             Vector2 newPoint = new(body.position.x, hitTop.point.y);
-            if (hitTop.point.y > body.position.y && hitTop.point.y < body.position.y + MainHitbox.size.y && !Utils.IsTileSolidAtWorldLocation(newPoint + Vector2.up * 0.25f)) {
+            if (hitTop.point.y > body.position.y && hitTop.point.y < body.position.y + (size.y + 0.35f) && !Utils.IsTileSolidAtWorldLocation(newPoint + Vector2.up * 0.25f)) {
                 transform.position = body.position = newPoint;
             } else {
                 var hitBottom = Physics2D.BoxCast(body.position, new(size.x, 0.01f), 0, Vector2.down, size.y, ONLY_GROUND_MASK);
@@ -2461,10 +2462,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         }
 
-        if (!inShell && !(sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2)) {
+        bool uphill = sliding && (floorAngle != 0 && Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x));
+        if (!inShell && !(sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2 && !uphill)) {
             bool abovemax = false;
             float invincibleSpeedBoost = invincible > 0 ? 1.5f : 1;
-            float uphillChange = (floorAngle != 0 && Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x)) ? (1 - (Mathf.Abs(floorAngle) / 360f)) : 1;
+            float uphillChange = uphill ? (1 - (Mathf.Abs(floorAngle) / 360f)) : 1;
             float max;
             if (onGround) {
                 max = functionallyRunning ? runningMaxSpeed * invincibleSpeedBoost : walkingMaxSpeed;
