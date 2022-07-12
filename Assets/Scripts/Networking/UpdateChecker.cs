@@ -25,9 +25,10 @@ public class UpdateChecker {
         if (response.StatusCode != HttpStatusCode.OK)
             return;
 
-        bool ret;
 
         try {
+            bool ret = false;
+
             //get the latest release version number from github
             string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
             JObject data = JObject.Parse(json);
@@ -57,11 +58,7 @@ public class UpdateChecker {
                 ret = local > remote;
             }
 
-            ret = true;
-
             callback(ret, tag);
-        } catch {
-            ret = false;
-        }
+        } catch { }
     }
 }

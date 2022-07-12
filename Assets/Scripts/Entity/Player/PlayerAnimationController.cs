@@ -217,7 +217,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             animator.SetBool("blueshell", controller.state == Enums.PowerupState.BlueShell);
             animator.SetBool("mini", controller.state == Enums.PowerupState.MiniMushroom);
             animator.SetBool("mega", controller.state == Enums.PowerupState.MegaMushroom);
-            animator.SetBool("inShell", controller.inShell || (controller.state == Enums.PowerupState.BlueShell && (controller.crouching || (controller.groundpound && controller.groundpoundStartTimer <= 0.2f))));
+            animator.SetBool("inShell", controller.inShell || (controller.state == Enums.PowerupState.BlueShell && (controller.crouching || controller.groundpound) && controller.groundpoundCounter <= 0.15f));
         } else {
             //controller.wallSlideLeft = animator.GetBool("onLeft");
             //controller.wallSlideRight = animator.GetBool("onRight");
@@ -342,7 +342,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             height = heightLargeModel;
         }
 
-        if (controller.state != Enums.PowerupState.MiniMushroom && ((controller.crouching && !controller.groundpound) || controller.inShell || controller.sliding || controller.triplejump))
+        if (controller.state != Enums.PowerupState.MiniMushroom && controller.pipeEntering == null && ((controller.crouching && !controller.groundpound) || controller.inShell || controller.sliding || controller.triplejump))
             height *= controller.state <= Enums.PowerupState.Small ? 0.7f : 0.5f;
 
         mainHitbox.size = new Vector2(width, height);
@@ -356,6 +356,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
             return;
         }
 
+        UpdateHitbox();
+
         PipeManager pe = controller.pipeEntering;
 
         body.isKinematic = true;
@@ -368,9 +370,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
             Vector2 offset = controller.pipeDirection * (pipeDuration / 2f);
             if (pe.otherPipe.bottom) {
-                offset -= controller.pipeDirection;
-                float size = mainHitbox.size.y * transform.localScale.y;
-                offset.y -= size;
+                float size = controller.MainHitbox.size.y * transform.localScale.y;
+                offset.y += size;
             }
             transform.position = body.position = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);

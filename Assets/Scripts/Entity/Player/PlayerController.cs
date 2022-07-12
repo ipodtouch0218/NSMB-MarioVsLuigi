@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     bool IFreezableEntity.IsCarryable => true;
     bool IFreezableEntity.IsFlying => flying || propeller;
 
-    BoxCollider2D MainHitbox => hitboxes[0];
+    public BoxCollider2D MainHitbox => hitboxes[0];
 
     #region -- SERIALIZATION / EVENTS --
     private static readonly float EPSILON = 0.2f, RESEND_RATE = 0.5f;
@@ -1710,7 +1710,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         //bool triggerState = Physics2D.queriesHitTriggers;
         //Physics2D.queriesHitTriggers = false;
 
-        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width + 0.05f, 0.05f), 0, Vector2.up, MainHitbox.size.y * 1.7f, ONLY_GROUND_MASK);
+        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.025f, new(width + 0.05f, 0.05f), 0, Vector2.up, MainHitbox.size.y * 2f, ONLY_GROUND_MASK);
 
         //Physics2D.queriesHitTriggers = triggerState;
         return ret;

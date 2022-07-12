@@ -5043,7 +5043,6 @@ MonoBehaviour:
   bouncePower: 0
   terminalVelocity: 8
   blinkingRate: 6
-  passthrough: 0
   avoidPlayers: 0
   followMe: {fileID: 0}
   followMeCounter: 0

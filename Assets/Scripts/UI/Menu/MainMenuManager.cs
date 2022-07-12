@@ -455,14 +455,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 #else
         if (!GlobalController.Instance.checkedForVersion) {
             UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
-
                 if (upToDate)
                     return;
+
+                Debug.Log("a");
 
                 updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
                 updateBox.SetActive(true);
                 EventSystem.current.SetSelectedGameObject(updateBoxSelected);
-
             });
             GlobalController.Instance.checkedForVersion = true;
         }
@@ -692,6 +692,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
         sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+    }
+
+    public void BackSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
+    }
+
+    public void ConfirmSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
     }
 
     public void ConnectToDropdownRegion() {
@@ -1024,7 +1032,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             string targetId = target?.UserId;
             if (targetId == null && (targetId = pairs.FirstOrDefault(nip => nip.name.ToLower() == strTarget)?.userId) == null) {
-                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
                 return;
             }
             if (targetId == PhotonNetwork.LocalPlayer.UserId) {
