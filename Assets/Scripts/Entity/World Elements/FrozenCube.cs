@@ -102,7 +102,7 @@ public class FrozenCube : HoldableEntity {
             PhotonNetwork.Destroy(photonView);
             return;
         }
-        if (photonView.IsMineOrLocal() && holder && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale)) {
+        if (photonView.IsMine && holder && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale)) {
             photonView.RPC("Kill", RpcTarget.All);
             return;
         }
@@ -115,7 +115,7 @@ public class FrozenCube : HoldableEntity {
 
         //our entity despawned. remove.
         if (entity == null) {
-            if (photonView.IsMineOrLocal()) {
+            if (photonView.IsMine) {
                 PhotonNetwork.Destroy(photonView);
             }
             Destroy(gameObject);
@@ -143,7 +143,7 @@ public class FrozenCube : HoldableEntity {
 
                 if (flying)
                     fallen = true;
-                else
+                else if (photonView.IsMine)
                     photonView.RPC("Kill", RpcTarget.All);
             }
         }

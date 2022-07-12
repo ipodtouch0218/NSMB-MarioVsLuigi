@@ -28,20 +28,25 @@ public class RoomIcon : MonoBehaviour {
         inProgressText.text = (bool) prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
 
         string symbols = "";
-        bool lives = ((int) prop[Enums.NetRoomProperties.Lives]) >= 1;
+        Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int stars, newRoom.CustomProperties);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out int coins, newRoom.CustomProperties);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out int lives, newRoom.CustomProperties);
         bool powerups = (bool) prop[Enums.NetRoomProperties.NewPowerups];
         bool time = ((int) prop[Enums.NetRoomProperties.Time]) >= 1;
         //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
-        if (lives)
-            symbols += "<sprite=9>";
         if (powerups)
             symbols += "<sprite=8>";
         if (time)
             symbols += "<sprite=6>";
+
+        if (lives >= 1)
+            symbols += "<sprite=9>" + Utils.GetSymbolString(lives.ToString(), Utils.smallSymbols);
+
+        symbols += "<sprite=38>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);
+        symbols += "<sprite=37>" + Utils.GetSymbolString(coins.ToString(), Utils.smallSymbols);
         //if (password)
         //    symbols += "<sprite=7>";
-
 
         symbolsText.text = symbols;
     }

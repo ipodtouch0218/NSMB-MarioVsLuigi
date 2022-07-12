@@ -1,20 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Realtime;
 using TMPro;
+
+using Photon.Realtime;
 
 public class PlayerListEntry : MonoBehaviour {
 
-    [SerializeField] TMP_Text nameText, pingText;
-    private Image background;
+    [SerializeField] private TMP_Text nameText, pingText;
+    [SerializeField] private Image background;
 
     public void UpdateText(Player player) {
 
         if (!background)
             background = GetComponent<Image>();
-        background.color = Utils.GetPlayerColor(player, .2f, 1f);
+        background.color = Utils.GetPlayerColor(player, 1f, 1f);
 
         string permissionSymbol = "";
         if (player.IsMasterClient)
@@ -39,7 +38,7 @@ public class PlayerListEntry : MonoBehaviour {
         }
 
         nameText.text = permissionSymbol + characterSymbol + player.NickName;
-        pingText.text = $"<color={pingColor}>{ping}</color>";
+        pingText.text = $"<color={pingColor}>{ping}";
     }
 
 }

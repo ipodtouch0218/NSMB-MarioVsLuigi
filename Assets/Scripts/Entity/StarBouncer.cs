@@ -18,8 +18,7 @@ public class StarBouncer : MonoBehaviourPun {
 
     private BoxCollider2D worldCollider;
 
-    private int becomeCollectibleAt = 0;
-    private bool alreadyCollectible, canBounce;
+    private bool collectable, canBounce;
 
     void Start() {
         body = GetComponent<Rigidbody2D>();
@@ -44,9 +43,6 @@ public class StarBouncer : MonoBehaviourPun {
             left = direction <= 1;
             fast = direction == 0 || direction == 3;
             creator = (int) data[1];
-            becomeCollectibleAt = (int) data[2];
-            if (becomeCollectibleAt < PhotonNetwork.ServerTimestamp)
-                alreadyCollectible = true;
             body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), deathBoostAmount);
             if ((bool) data[3]) {
                 body.velocity += Vector2.up * 3;
@@ -55,10 +51,9 @@ public class StarBouncer : MonoBehaviourPun {
             worldCollider.enabled = true;
         } else {
             GetComponent<Animator>().enabled = true;
-            alreadyCollectible = true;
+            collectable = true;
             body.isKinematic = true;
             body.velocity = Vector2.zero;
-            becomeCollectibleAt = PhotonNetwork.ServerTimestamp;
             GetComponent<CustomRigidbodySerializer>().enabled = false;
 
             if (GameManager.Instance.musicEnabled)
@@ -97,7 +92,9 @@ public class StarBouncer : MonoBehaviourPun {
             return;
 
         body.velocity = new Vector2(moveSpeed * (left ? -1 : 1) * (fast ? 1.5f : 1f), body.velocity.y);
+
         canBounce |= body.velocity.y < 0;
+        collectable |= body.velocity.y < 0;
 
         HandleCollision();
 
@@ -113,8 +110,9 @@ public class StarBouncer : MonoBehaviourPun {
             }
         }
 
-        if (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY()))
-            photonView.RPC("Crushed", RpcTarget.All);
+        if (photonView.IsMine)
+            if (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY()))
+                photonView.RPC("Crushed", RpcTarget.All);
     }
 
     void HandleCollision() {
@@ -147,6 +145,6 @@ public class StarBouncer : MonoBehaviourPun {
     }
 
     public bool IsCollectible() {
-        return becomeCollectibleAt != 0 && (alreadyCollectible || PhotonNetwork.ServerTimestamp - becomeCollectibleAt > 0);
+        return collectable;
     }
 }

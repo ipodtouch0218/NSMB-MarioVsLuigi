@@ -21,7 +21,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
     public TMP_Dropdown levelDropdown, characterDropdown;
@@ -31,9 +31,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, rebindCountdown, rebindText, reconnectText;
+    public TMP_Text errorText, rebindCountdown, rebindText, reconnectText, updateText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
@@ -50,7 +50,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public List<string> maps, debugMaps;
 
-    private bool pingsReceived;
+    private bool pingsReceived, joinedLate;
     private List<string> formattedRegions;
     private Region[] pingSortedRegions;
 
@@ -185,6 +185,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
         LocalChatMessage(newPlayer.NickName + " joined the room", ColorToVector(Color.red));
+        sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
@@ -193,6 +194,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
         LocalChatMessage(otherPlayer.NickName + " left the room", ColorToVector(Color.red));
+        sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
     public void OnRoomPropertiesUpdate(Hashtable updatedProperties) {
         if (updatedProperties == null)
@@ -218,11 +220,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (enabled) {
             levelDropdown.AddOptions(debugMaps);
+        } else if (PhotonNetwork.IsMasterClient) {
+            Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
+            if (level >= maps.Count) {
+                Hashtable props = new() {
+                    [Enums.NetRoomProperties.Level] = maps.Count - 1,
+                };
+
+                PhotonNetwork.CurrentRoom.SetCustomProperties(props);
+            }
         }
         UpdateSettingEnableStates();
     }
 
-    private void AttemptToUpdateProperty<T>(ExitGames.Client.Photon.Hashtable updatedProperties, string key, System.Action<T> updateAction) {
+    private void AttemptToUpdateProperty<T>(Hashtable updatedProperties, string key, System.Action<T> updateAction) {
         if (updatedProperties[key] == null)
             return;
 
@@ -300,7 +311,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PlayerPrefs.SetString("in-room", PhotonNetwork.CurrentRoom.Name);
             PlayerPrefs.Save();
             Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectate, PhotonNetwork.LocalPlayer.CustomProperties);
-            GlobalController.Instance.joinedAsSpectator = spectate;
+            GlobalController.Instance.joinedAsSpectator = spectate || joinedLate;
             Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
             PhotonNetwork.IsMessageQueueRunning = false;
             SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
@@ -441,6 +452,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
 #if PLATFORM_WEBGL
         fullscreenToggle.interactable = false;
+#else
+        if (!GlobalController.Instance.checkedForVersion) {
+            UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
+                if (upToDate)
+                    return;
+
+                Debug.Log("a");
+
+                updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
+                updateBox.SetActive(true);
+                EventSystem.current.SetSelectedGameObject(updateBoxSelected);
+            });
+            GlobalController.Instance.checkedForVersion = true;
+        }
 #endif
     }
 
@@ -499,15 +524,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PlayerPrefs.SetString("in-room", null);
         PlayerPrefs.Save();
 
-        object started = room.CustomProperties[Enums.NetRoomProperties.GameStarted];
-        if (started != null && (bool) started) {
+        Utils.GetCustomProperty(Enums.NetRoomProperties.GameStarted, out bool started);
+        if (started) {
             //start as spectator
-
-            Hashtable prop = new() {
-                [Enums.NetPlayerProperties.Spectator] = true,
-            };
-            PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
-
+            joinedLate = true;
             OnEvent(new() { Code = (byte) Enums.NetEventIds.StartGame });
             return;
         }
@@ -571,8 +591,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
         privatePrompt.SetActive(false);
+        updateBox.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
+
     }
     public void OpenLobbyMenu() {
         title.SetActive(false);
@@ -666,9 +688,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EventSystem.current.SetSelectedGameObject(privateSelected);
     }
     public void OpenErrorBox(string text) {
+        if (!errorBox.activeSelf)
+            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+
         errorBox.SetActive(true);
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
+    }
+
+    public void BackSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
+    }
+
+    public void ConfirmSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
     }
 
     public void ConnectToDropdownRegion() {
@@ -857,17 +890,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             y -= child.GetComponent<RectTransform>().rect.height + 20;
         }
 
-        GameObject chat = Instantiate(chatPrefab, Vector3.zero, Quaternion.identity);
-        chat.transform.SetParent(chatContent.transform);
-        chat.transform.localPosition = new Vector3(0, y, 0);
-        chat.transform.localScale = Vector3.one;
+        GameObject chat = Instantiate(chatPrefab, Vector3.zero, Quaternion.identity, chatContent.transform);
         chat.SetActive(true);
+
         GameObject txtObject = chat.transform.Find("Text").gameObject;
         SetText(txtObject, message, new Color(color.x, color.y, color.z));
         Canvas.ForceUpdateCanvases();
-        RectTransform tf = txtObject.GetComponent<RectTransform>();
-        Bounds bounds = txtObject.GetComponent<TextMeshProUGUI>().textBounds;
-        tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
+
+        //RectTransform tf = txtObject.GetComponent<RectTransform>();
+        //Bounds bounds = txtObject.GetComponent<TextMeshProUGUI>().textBounds;
+        //tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
     }
     public void SendChat() {
         string text = chatTextField.text.Replace("<", "«").Replace(">", "»").Trim();
@@ -899,7 +931,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
                 return;
             }
             if (target.IsLocal) {
@@ -918,7 +950,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
                 return;
             }
             if (target.IsLocal) {
@@ -967,7 +999,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
                 return;
             }
             if (target.IsLocal) {
@@ -1002,7 +1034,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             string targetId = target?.UserId;
             if (targetId == null && (targetId = pairs.FirstOrDefault(nip => nip.name.ToLower() == strTarget)?.userId) == null) {
-                LocalChatMessage($"Unknown player {args[2]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
                 return;
             }
             if (targetId == PhotonNetwork.LocalPlayer.UserId) {
@@ -1149,7 +1181,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
 
         int.TryParse(input.text, out int newValue);
-        if (newValue < 1 || newValue > 8) {
+        if (newValue < 1 || newValue > 99) {
             newValue = 8;
             input.text = newValue.ToString();
         }
@@ -1168,6 +1200,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         te.text = PhotonNetwork.CurrentRoom.Name;
         te.SelectAll();
         te.Copy();
+    }
+
+    public void OpenDownloadsPage() {
+        Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest");
+        OpenMainMenu();
     }
 
     public void ChangePrivate() {

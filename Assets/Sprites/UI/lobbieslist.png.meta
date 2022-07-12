@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 92ced5b700c3c3a499669728b2b0697a
+guid: 1734af0643b778446a466577b7f2cf53
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 50
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -118,43 +118,43 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: desert_0
+      name: lobbieslist_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 207
-        width: 256
-        height: 256
+        y: 14
+        width: 18
+        height: 18
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 6, y: 7, z: 8, w: 6}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3914d2b22880c3a43a57f415345390e5
-      internalID: -1512085271
+      spriteID: 272290bfeaa36fa4d95959a2b87f9d21
+      internalID: -1574957570
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: desert_1
+      name: lobbieslist_1
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 505
-        height: 207
+        x: 19
+        y: 26
+        width: 5
+        height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 2, y: 2, z: 2, w: 2}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 49dc5d48bc7e02b40b4715d117d594e1
-      internalID: -801090714
+      spriteID: a9b4cff0f79f17748a5894f0afb6f6c1
+      internalID: -1141311977
       vertices: []
       indices: 
       edges: []
@@ -170,8 +170,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      desert_0: -1512085271
-      desert_1: -801090714
+      lobbieslist_0: -1574957570
+      lobbieslist_1: -1141311977
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 

@@ -107,13 +107,14 @@ public class Utils {
         return Tile.ColliderType.None;
     }
 
-    public static bool IsTileSolidBetweenWorldBox(Vector3Int tileLocation, Vector2 worldLocation, Vector2 worldBox) {
-        Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
-        if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
-            return true;
+    public static bool IsTileSolidBetweenWorldBox(Vector3Int tileLocation, Vector2 worldLocation, Vector2 worldBox, bool boxcast = true) {
+        if (boxcast) {
+            Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
+            if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
+                return true;
+        }
 
         Vector2 ogWorldLocation = worldLocation;
-        Vector3Int ogTileLocation = tileLocation;
         while (GetTileAtTileLocation(tileLocation) is TileInteractionRelocator it) {
             worldLocation += (Vector2)(Vector3) it.offset * 0.5f;
             tileLocation += it.offset;
@@ -337,7 +338,7 @@ public class Utils {
         return (count % 2 == 1); // Same as (count%2 == 1)
     }
 
-    public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize) {
+    public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize, bool boxcast = true) {
         Vector3Int minPos = WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
         Vector3Int size = WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
 
@@ -347,7 +348,7 @@ public class Utils {
                 Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
                 WrapTileLocation(ref tileLocation);
 
-                if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize))
+                if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize, boxcast))
                     return true;
             }
         }
@@ -485,7 +486,7 @@ public class Utils {
             tileCache[tilename] = Resources.Load(tilename) as TileBase;
     }
 
-    private static readonly Dictionary<char, int> charToSymbolIndex = new() {
+    private static readonly Dictionary<char, int> uiSymbols = new() {
         ['c'] = 6,
         ['0'] = 11,
         ['1'] = 12,
@@ -503,11 +504,38 @@ public class Utils {
         ['/'] = 24,
         [':'] = 25,
     };
-    public static string GetSymbolString(string str) {
+    public static readonly Dictionary<char, int> numberSymbols = new() {
+        ['0'] = 27,
+        ['1'] = 28,
+        ['2'] = 29,
+        ['3'] = 30,
+        ['4'] = 31,
+        ['5'] = 32,
+        ['6'] = 33,
+        ['7'] = 34,
+        ['8'] = 35,
+        ['9'] = 36,
+    };
+    public static readonly Dictionary<char, int> smallSymbols = new() {
+        ['0'] = 48,
+        ['1'] = 39,
+        ['2'] = 40,
+        ['3'] = 41,
+        ['4'] = 42,
+        ['5'] = 43,
+        ['6'] = 44,
+        ['7'] = 45,
+        ['8'] = 46,
+        ['9'] = 47,
+    };
+    public static string GetSymbolString(string str, Dictionary<char, int> dict = null) {
+        if (dict == null)
+            dict = uiSymbols;
+
         string ret = "";
         foreach (char c in str) {
-            if (charToSymbolIndex.ContainsKey(c)) {
-                ret += "<sprite=" + charToSymbolIndex[c] + ">";
+            if (dict.ContainsKey(c)) {
+                ret += "<sprite=" + dict[c] + ">";
             } else {
                 ret += c;
             }

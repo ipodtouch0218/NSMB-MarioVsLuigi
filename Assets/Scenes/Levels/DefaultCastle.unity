@@ -3939,7 +3939,7 @@ GameObject:
   - component: {fileID: 361225205}
   m_Layer: 8
   m_Name: Tilemap_Squishy
-  m_TagString: Untagged
+  m_TagString: Squishy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4181,7 +4181,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 6
-      m_TileSpriteIndex: 10
+      m_TileSpriteIndex: 6
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -11268,8 +11268,9 @@ Tilemap:
   - m_RefCount: 56
     m_Data: {fileID: -4555241164079809555, guid: 437a8c91bf200d54b838bc8c861ba57c,
       type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: 8220105646016656977, guid: 437a8c91bf200d54b838bc8c861ba57c,
+      type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 2755618445371018580, guid: 437a8c91bf200d54b838bc8c861ba57c,
       type: 3}
@@ -11279,7 +11280,7 @@ Tilemap:
   - m_RefCount: 504
     m_Data: {fileID: -5379535959924532667, guid: 437a8c91bf200d54b838bc8c861ba57c,
       type: 3}
-  - m_RefCount: 48
+  - m_RefCount: 47
     m_Data: {fileID: 9027231124237481164, guid: 437a8c91bf200d54b838bc8c861ba57c,
       type: 3}
   - m_RefCount: 5

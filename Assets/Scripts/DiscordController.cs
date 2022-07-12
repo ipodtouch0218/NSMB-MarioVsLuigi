@@ -22,8 +22,14 @@ public class DiscordController : MonoBehaviour {
 
 //#if UNITY_STANDALONE_WIN
         try {
-            activityManager.RegisterCommand(AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName);
-        } catch { }
+            string filename = AppDomain.CurrentDomain.ToString();
+            filename = string.Join(" ", filename.Split(" ")[..^2]);
+            string dir = AppDomain.CurrentDomain.BaseDirectory + "\\" + filename;
+            activityManager.RegisterCommand(dir);
+            Debug.Log($"[DISCORD] Set launch path to \"{dir}\"");
+        } catch {
+            Debug.Log($"[DISCORD] Failed to set launch path (on {Application.platform})");
+        }
 //#endif
     }
 
@@ -77,7 +83,7 @@ public class DiscordController : MonoBehaviour {
 
             activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
             activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
+            activity.State = room.IsVisible ? "In a Public Game" : "In a Private Game";
             activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
 
             ActivityAssets assets = new();
