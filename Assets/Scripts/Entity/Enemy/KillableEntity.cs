@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using NSMB.Utils;
 
 public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
 

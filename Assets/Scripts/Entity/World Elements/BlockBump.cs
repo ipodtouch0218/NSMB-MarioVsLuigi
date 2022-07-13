@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
+using NSMB.Utils;
 
 public class BlockBump : MonoBehaviour {
     public string resultTile = "";

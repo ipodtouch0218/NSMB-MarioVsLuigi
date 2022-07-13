@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Photon.Pun;
+using NSMB.Utils;
 
 public class PlayerAnimationController : MonoBehaviourPun {
 
@@ -333,7 +334,14 @@ public class PlayerAnimationController : MonoBehaviourPun {
     }
 
     void UpdateHitbox() {
-        float width = mainHitbox.size.x;
+        bool crouchHitbox = controller.state != Enums.PowerupState.MiniMushroom && controller.pipeEntering == null && ((controller.crouching && !controller.groundpound) || controller.inShell || controller.sliding);
+        Vector2 hitbox = GetHitboxSize(crouchHitbox);
+
+        mainHitbox.size = hitbox;
+        mainHitbox.offset = Vector2.up * 0.5f * hitbox;
+    }
+
+    public Vector2 GetHitboxSize(bool crouching) {
         float height;
 
         if (controller.state <= Enums.PowerupState.Small || (controller.invincible > 0 && !controller.onGround && !controller.crouching && !controller.sliding && !controller.flying && !controller.propeller) || controller.groundpound) {
@@ -342,12 +350,12 @@ public class PlayerAnimationController : MonoBehaviourPun {
             height = heightLargeModel;
         }
 
-        if (controller.state != Enums.PowerupState.MiniMushroom && controller.pipeEntering == null && ((controller.crouching && !controller.groundpound) || controller.inShell || controller.sliding || controller.triplejump))
+        if (crouching)
             height *= controller.state <= Enums.PowerupState.Small ? 0.7f : 0.5f;
 
-        mainHitbox.size = new Vector2(width, height);
-        mainHitbox.offset = new Vector2(0, height / 2f);
+        return new(mainHitbox.size.x, height);
     }
+
     void HandlePipeAnimation() {
         if (!photonView.IsMine)
             return;

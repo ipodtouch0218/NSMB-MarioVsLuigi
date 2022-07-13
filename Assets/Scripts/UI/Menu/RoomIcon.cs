@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
+using NSMB.Utils;
 
 public class RoomIcon : MonoBehaviour {
     Image icon;

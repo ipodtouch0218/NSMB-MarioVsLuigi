@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using NSMB.Utils;
 using UnityEngine;
 
 public class VolumeWithDistance : MonoBehaviour {

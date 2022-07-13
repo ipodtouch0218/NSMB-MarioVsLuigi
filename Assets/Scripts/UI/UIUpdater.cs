@@ -3,13 +3,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
+using NSMB.Utils;
 
 public class UIUpdater : MonoBehaviour {
-    
+
     public static UIUpdater Instance;
     public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
-    public Sprite storedItemNull; 
+    public Sprite storedItemNull;
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     public Image itemReserve, itemColor;
     public float pingSample = 0;
@@ -19,7 +20,7 @@ public class UIUpdater : MonoBehaviour {
     private readonly List<Image> backgrounds = new();
     private bool uiHidden;
 
-    void Start() {
+    public void Start() {
         Instance = this;
         pingSample = PhotonNetwork.GetPing();
 
@@ -38,21 +39,11 @@ public class UIUpdater : MonoBehaviour {
         itemColor.color = new(GameManager.Instance.levelUIColor.r - 0.2f, GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f, GameManager.Instance.levelUIColor.a);
     }
 
-    public GameObject CreatePlayerIcon(PlayerController player) {
-        GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
-        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
-        icon.target = player.gameObject;
-
-        trackObject.SetActive(true);
-
-        return trackObject;
-    }
-
-    void Update() {
+    public void Update() {
         pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Time.unscaledDeltaTime * 0.5f);
         if (pingSample == float.NaN)
             pingSample = 0;
-        
+
         uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: {(int) pingSample}ms</font>";
 
         //Player stuff update.
@@ -79,20 +70,21 @@ public class UIUpdater : MonoBehaviour {
         coinsParent.SetActive(!hidden);
         timerParent.SetActive(!hidden);
     }
-    
+
     private void UpdateStoredItemUI() {
         if (!player)
             return;
 
         itemReserve.sprite = player.storedPowerup?.reserveSprite ?? storedItemNull;
     }
+
     private void UpdateTextUI() {
         if (!player || GameManager.Instance.gameover)
             return;
 
         uiStars.text = Utils.GetSymbolString($"Sx{player.stars}/{GameManager.Instance.starRequirement}");
         uiCoins.text = Utils.GetSymbolString($"Cx{player.coins}/{GameManager.Instance.coinRequirement}");
-        
+
         if (player.lives < 0) {
             livesParent.SetActive(false);
         } else {
@@ -116,5 +108,15 @@ public class UIUpdater : MonoBehaviour {
         } else {
             timerParent.SetActive(false);
         }
+    }
+
+    public GameObject CreatePlayerIcon(PlayerController player) {
+        GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
+        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
+        icon.target = player.gameObject;
+
+        trackObject.SetActive(true);
+
+        return trackObject;
     }
 }

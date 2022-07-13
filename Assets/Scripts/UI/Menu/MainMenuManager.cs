@@ -14,6 +14,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using NSMB.Utils;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
     public static MainMenuManager Instance;
@@ -251,8 +252,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         selectedRoom = null;
         selectedRoomIcon = null;
-        if (!PhotonNetwork.IsConnectedAndReady)
+        if (!PhotonNetwork.IsConnectedAndReady) {
+
+            foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
+                Destroy(value);
+                currentRooms.Remove(key);
+            }
+
             PhotonNetwork.ConnectToRegion(lastRegion);
+        }
     }
     public void OnRegionListReceived(RegionHandler handler) {
         handler.PingMinimumOfRegions((handler) => {
@@ -489,7 +497,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     void Update() {
         bool connected = PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
-        connecting.SetActive(!connected);
+        connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
         privateJoinRoom.gameObject.SetActive(connected);
 
         joinRoomBtn.interactable = connected && selectedRoomIcon != null && validName;

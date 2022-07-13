@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+using NSMB.Utils;
 
 public class GoombaWalk : KillableEntity {
     [SerializeField] float speed, deathTimer = -1, terminalVelocity = -8;

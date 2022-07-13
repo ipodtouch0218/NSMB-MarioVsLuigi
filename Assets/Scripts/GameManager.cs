@@ -12,6 +12,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using NSMB.Utils;
 
 public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks, IMatchmakingCallbacks {
     private static GameManager _instance;
@@ -67,7 +68,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public EnemySpawnpoint[] enemySpawnpoints;
 
     private GameObject[] coins;
-    private readonly Dictionary<Player, List<double>> powerupSummons = new();
     public SpectationManager SpectationManager { get; private set; }
 
     ParticleSystem brickBreak;
@@ -468,7 +468,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (!spectating) {
             foreach (PlayerController controllers in allPlayers)
-                controllers.gameObject.SetActive(false);
+                if (controllers)
+                    controllers.gameObject.SetActive(false);
 
             yield return new WaitForSeconds(3.5f);
 
