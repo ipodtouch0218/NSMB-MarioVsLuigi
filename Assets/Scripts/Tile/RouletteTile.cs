@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile", order = 5)]
 public class RouletteTile : BreakableBrickTile {

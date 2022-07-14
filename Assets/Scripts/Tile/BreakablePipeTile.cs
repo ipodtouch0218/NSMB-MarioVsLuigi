@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
+using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "BreakablePipeTile", menuName = "ScriptableObjects/Tiles/BreakablePipeTile", order = 4)]
 public class BreakablePipeTile : InteractableTile {

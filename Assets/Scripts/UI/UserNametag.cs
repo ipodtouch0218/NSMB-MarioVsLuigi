@@ -1,21 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using NSMB.Utils;
 
 public class UserNametag : MonoBehaviour {
 
     [SerializeField] new Camera camera;
-    private RectTransform parentCanvas;
     public GameObject nametag;
     public TMP_Text text;
     public Image arrow;
     public PlayerController parent;
 
-    public void Start() {
-        parentCanvas = transform.parent.GetComponent<RectTransform>();
-    }
-
-    void LateUpdate() {
+    public void LateUpdate() {
         if (parent == null) {
             Destroy(gameObject);
             return;
@@ -24,7 +20,7 @@ public class UserNametag : MonoBehaviour {
         arrow.color = parent.AnimationController.GlowColor;
         nametag.SetActive(parent.spawned);
 
-        Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.hitboxes[0].size.y * parent.transform.lossyScale.y * 1.2f) + 0.5f);
+        Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.WorldHitboxSize.y * 1.2f) + 0.5f);
         if (GameManager.Instance.loopingLevel && Mathf.Abs(camera.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * (1 / 4f))
             worldPos.x += Mathf.Sign(camera.transform.position.x) * GameManager.Instance.levelWidthTile / 2f;
 

@@ -1,18 +1,29 @@
 using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using TMPro;
+
 using Photon.Pun;
 using ExitGames.Client.Photon;
-using TMPro;
-using UnityEngine.SceneManagement;
+using NSMB.Utils;
 
 public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSerializeView, IOnPhotonViewPreNetDestroy {
 
-    public bool Active { get; set; } = true;
+    #region Variables
 
-    public static int ANY_GROUND_MASK = -1, ONLY_GROUND_MASK, GROUND_LAYERID, HITS_NOTHING_LAYERID, DEFAULT_LAYERID, PASSTHROUGH_LAYERID;
+    // == NETWORKING VARIABLES ==
+    private static readonly float EPSILON = 0.2f, RESEND_RATE = 0.5f;
+
+    public bool Active { get; set; } = true;
+    private Vector2 previousJoystick;
+    private short previousFlags;
+    private byte previousFlags2;
+    private float lastSendTimestamp;
+
+    // == MONOBEHAVIOURS ==
 
     public int playerId = -1;
     public bool dead = false, spawned = false;
@@ -20,7 +31,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
     public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, propellerDrillBuffer;
 
-    public BoxCollider2D[] hitboxes;
+    BoxCollider2D[] hitboxes;
     GameObject models;
 
     public CameraController cameraController;
@@ -32,8 +43,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public PlayerAnimationController AnimationController { get; private set; }
 
-    public bool Frozen { get; set; }
-    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, groundpounded, canShootProjectile;
+    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, groundpounded, canShootProjectile;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, fireballTimer;
     public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer, slowdownTimer;
 
@@ -74,17 +84,18 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     private bool initialKnockbackFacingRight = false;
 
+    // == FREEZING VARIABLES ==
+    public bool Frozen { get; set; }
     bool IFreezableEntity.IsCarryable => true;
-    bool IFreezableEntity.IsFlying => flying || propeller;
+    bool IFreezableEntity.IsFlying => flying || propeller; //doesn't work consistently?
+
 
     public BoxCollider2D MainHitbox => hitboxes[0];
+    public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
+
+    #endregion
 
     #region -- SERIALIZATION / EVENTS --
-    private static readonly float EPSILON = 0.2f, RESEND_RATE = 0.5f;
-    private Vector2 previousJoystick;
-    private short previousFlags;
-    private byte previousFlags2;
-    private float lastSendTimestamp;
     public void Serialize(List<byte> buffer) {
         bool updateJoystick = Vector2.Distance(joystick, previousJoystick) > EPSILON;
 
@@ -104,8 +115,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //serialize movement flags
             SerializationUtils.WriteShort(buffer, flags);
             previousFlags = flags;
-            SerializationUtils.WriteByte(buffer, flags2);
-            previousFlags2 = flags2;
+            //SerializationUtils.WriteByte(buffer, flags2);
+            //previousFlags2 = flags2;
 
             lastSendTimestamp = (float) PhotonNetwork.Time;
         }
@@ -134,7 +145,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propellerSpinTimer = flags[14] ? 1 : 0;
         wallJumpTimer = flags[15] ? 1 : 0;
 
-        SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags2);
+        //SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags2);
 
         //resimulations
         float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
@@ -150,16 +161,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- START / UPDATE --
     public void Awake() {
-        //todo: move to layers constant?
-        if (ANY_GROUND_MASK == -1) {
-            ANY_GROUND_MASK = LayerMask.GetMask("Ground", "Semisolids", "IceBlock");
-            ONLY_GROUND_MASK = LayerMask.GetMask("Ground");
-            GROUND_LAYERID = LayerMask.NameToLayer("Ground");
-            HITS_NOTHING_LAYERID = LayerMask.NameToLayer("HitsNothing");
-            DEFAULT_LAYERID = LayerMask.NameToLayer("Default");
-            PASSTHROUGH_LAYERID = LayerMask.NameToLayer("PlayerPassthrough");
-        }
-
         cameraController = GetComponent<CameraController>();
         cameraController.controlCamera = photonView.IsMineOrLocal();
 
@@ -339,7 +340,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     crushGround |= !go.CompareTag("platform") && !go.CompareTag("frozencube");
                     down++;
                     tilesStandingOn.Add(vec);
-                } else if (contact.collider.gameObject.layer == GROUND_LAYERID) {
+                } else if (contact.collider.gameObject.layer == Layers.LayerGround) {
                     if (Vector2.Dot(n, Vector2.left) > .9f) {
                         right++;
                         tilesHitSide.Add(vec);
@@ -844,7 +845,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         } else if (state == Enums.PowerupState.MiniMushroom) {
             //check if we're in a mini area to avoid crushing ourselves
-            if (onGround && Physics2D.Raycast(body.position, Vector2.up, 0.3f, ONLY_GROUND_MASK)) {
+            if (onGround && Physics2D.Raycast(body.position, Vector2.up, 0.3f, Layers.MaskOnlyGround)) {
                 reserve = true;
             }
         }
@@ -1097,8 +1098,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (dead)
             return;
 
-        if (info.Sender != photonView.Owner)
-            return;
+        //if (info.Sender != photonView.Owner)
+        //    return;
 
         animator.Play("deadstart");
         if (--lives == 0) {
@@ -1140,8 +1141,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     [PunRPC]
     public void PreRespawn(PhotonMessageInfo info) {
-        if (info.Sender != photonView.Owner)
-            return;
+        //if (info.Sender != photonView.Owner)
+        //    return;
 
         sfx.enabled = true;
         if (lives == 0) {
@@ -1556,7 +1557,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
 
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, ANY_GROUND_MASK);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, Layers.MaskAnyGround);
         if (hit) {
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
@@ -1572,7 +1573,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             onGround = true;
             doGroundSnap = true;
         } else if (onGround) {
-            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, ANY_GROUND_MASK);
+            hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, Layers.MaskAnyGround);
             if (hit) {
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
                 if (Mathf.Abs(angle) > 89)
@@ -1595,24 +1596,24 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool hitsNothing = animator.GetBool("pipe") || dead || stuckInBlock || giantStartTimer > 0 || (giantEndTimer > 0 && stationaryGiantEnd);
         bool shouldntCollide = (hitInvincibilityCounter > 0 && invincible <= 0) || (knockback && !fireballKnockback);
 
-        int layer = DEFAULT_LAYERID;
+        int layer = Layers.LayerDefault;
         if (hitsNothing) {
-            layer = HITS_NOTHING_LAYERID;
+            layer = Layers.LayerHitsNothing;
         } else if (shouldntCollide) {
-            layer = PASSTHROUGH_LAYERID;
+            layer = Layers.LayerPassthrough;
         }
 
         gameObject.layer = layer;
     }
 
     bool GroundSnapCheck() {
-        if (dead || (body.velocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering || gameObject.layer == HITS_NOTHING_LAYERID)
+        if (dead || (body.velocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering || gameObject.layer == Layers.LayerHitsNothing)
             return false;
 
         bool prev = Physics2D.queriesStartInColliders;
         Physics2D.queriesStartInColliders = false;
         BoxCollider2D hitbox = MainHitbox;
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + Vector2.up * 0.1f, new Vector2(hitbox.size.x * transform.lossyScale.x, 0.05f), 0, Vector2.down, 0.4f, ANY_GROUND_MASK);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + Vector2.up * 0.1f, new Vector2(hitbox.size.x * transform.lossyScale.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
         Physics2D.queriesStartInColliders = prev;
         if (hit) {
             body.position = new Vector2(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
@@ -1703,6 +1704,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     bool ForceCrouchCheck() {
+        //janky fortress ceilingn check, m8
         if (state == Enums.PowerupState.BlueShell && onGround && SceneManager.GetActiveScene().buildIndex != 4)
             return false;
         if (state <= Enums.PowerupState.MiniMushroom)
@@ -1713,7 +1715,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool triggerState = Physics2D.queriesHitTriggers;
         Physics2D.queriesHitTriggers = false;
 
-        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.1f, new(width - 0.05f, 0.05f), 0, Vector2.up, MainHitbox.size.y * 2f, ONLY_GROUND_MASK);
+        float uncrouchHeight = AnimationController.GetHitboxSize(false).y * transform.lossyScale.y;
+
+        bool ret = Physics2D.BoxCast(body.position + Vector2.up * 0.1f, new(width - 0.05f, 0.05f), 0, Vector2.up, uncrouchHeight - 0.1f, Layers.MaskOnlyGround);
 
         Physics2D.queriesHitTriggers = triggerState;
         return ret;
@@ -1799,7 +1803,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void HandleWallSlideChecks(Vector2 wallDirection, bool right, bool left) {
-        bool floorCheck = !Physics2D.Raycast(body.position, Vector2.down, 0.3f, ANY_GROUND_MASK);
+        bool floorCheck = !Physics2D.Raycast(body.position, Vector2.down, 0.3f, Layers.MaskAnyGround);
         if (!floorCheck) {
             wallSlideTimer = 0;
             return;
@@ -1813,7 +1817,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!wallCollisionCheck)
             return;
 
-        bool heightLowerCheck = Physics2D.Raycast(body.position + new Vector2(0, .2f), wallDirection, MainHitbox.size.x * 2, ONLY_GROUND_MASK);
+        bool heightLowerCheck = Physics2D.Raycast(body.position + new Vector2(0, .2f), wallDirection, MainHitbox.size.x * 2, Layers.MaskOnlyGround);
         if (!heightLowerCheck)
             return;
 
@@ -1830,7 +1834,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool topSpeed = Mathf.Abs(body.velocity.x) + 0.5f > (runningMaxSpeed * (invincible > 0 ? 1.5F : 1));
         if (bounce || (jump && (onGround || (koyoteTime < 0.07f && !propeller)) && !startedSliding)) {
 
-            bool canSpecialJump = (jump || (bounce && jumpHeld)) && properJump && !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && invincible <= 0 && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, ONLY_GROUND_MASK);
+            bool canSpecialJump = (jump || (bounce && jumpHeld)) && properJump && !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && invincible <= 0 && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
             float jumpBoost = 0;
 
             koyoteTime = 1;
@@ -1998,7 +2002,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Vector2 checkPos = transform.position + (Vector3) (Vector2.up * checkSize / 2f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f, false)) {
-            stuckInBlock = false;
+            alreadyStuckInBlock = stuckInBlock = false;
             return false;
         }
         stuckInBlock = true;
@@ -2015,14 +2019,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool orig = Physics2D.queriesStartInColliders;
         Physics2D.queriesStartInColliders = false;
 
-        var hitTop = Physics2D.BoxCast(body.position + (size.y + 0.75f) * Vector2.up, new(size.x, 0.01f), 0, Vector2.down, size.y + 0.75f, ONLY_GROUND_MASK);
+        var hitTop = Physics2D.BoxCast(body.position + 0.9f * Vector2.up, new(size.x, 0.01f), 0, Vector2.down, 0.9f, Layers.MaskOnlyGround);
 
         if (hitTop) {
             Vector2 newPoint = new(body.position.x, hitTop.point.y);
-            if (hitTop.point.y > body.position.y && hitTop.point.y < body.position.y + (size.y + 0.35f) && !Utils.IsTileSolidAtWorldLocation(newPoint + Vector2.up * 0.25f)) {
+            if (hitTop.point.y > body.position.y && hitTop.point.y < body.position.y + (size.y + 0.35f) && !Utils.IsAnyTileSolidBetweenWorldBox(newPoint + size.y * 0.5f * Vector2.up, size)) {
                 transform.position = body.position = newPoint;
             } else {
-                var hitBottom = Physics2D.BoxCast(body.position, new(size.x, 0.01f), 0, Vector2.down, size.y, ONLY_GROUND_MASK);
+                var hitBottom = Physics2D.BoxCast(body.position, new(size.x, 0.01f), 0, Vector2.down, size.y, Layers.MaskOnlyGround);
 
                 if (!hitBottom) {
                     transform.position = body.position = new(body.position.x, hitTop.point.y - size.y);
@@ -2032,32 +2036,35 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         Physics2D.queriesStartInColliders = orig;
 
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.975f)) {
-            stuckInBlock = false;
-            return false;
+        if (!alreadyStuckInBlock) {
+            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.975f)) {
+                stuckInBlock = false;
+                return false;
+            }
+
+            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + (Vector2.left * 0.5f), checkSize * 0.975f)) {
+                transform.position = body.position = new(checkPos.x - 0.5f, body.position.y);
+                stuckInBlock = false;
+                return false;
+            }
+            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + (Vector2.right * 0.5f), checkSize * 0.975f)) {
+                transform.position = body.position = new(checkPos.x + 0.5f, body.position.y);
+                stuckInBlock = false;
+                return false;
+            }
+            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.left, checkSize * 0.975f)) {
+                transform.position = body.position = new(checkPos.x - 1f, body.position.y);
+                stuckInBlock = false;
+                return false;
+            }
+            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.right, checkSize * 0.975f)) {
+                transform.position = body.position = new(checkPos.x + 1f, body.position.y);
+                stuckInBlock = false;
+                return false;
+            }
         }
 
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + (Vector2.left * 0.5f), checkSize * 0.975f)) {
-            transform.position = body.position = new(checkPos.x - 0.5f, body.position.y);
-            stuckInBlock = false;
-            return false;
-        }
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + (Vector2.right * 0.5f), checkSize * 0.975f)) {
-            transform.position = body.position = new(checkPos.x + 0.5f, body.position.y);
-            stuckInBlock = false;
-            return false;
-        }
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.left, checkSize * 0.975f)) {
-            transform.position = body.position = new(checkPos.x - 1f, body.position.y);
-            stuckInBlock = false;
-            return false;
-        }
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.right, checkSize * 0.975f)) {
-            transform.position = body.position = new(checkPos.x + 1f, body.position.y);
-            stuckInBlock = false;
-            return false;
-        }
-
+        alreadyStuckInBlock = true;
         body.velocity = Vector2.right * 2f;
         return true;
     }
@@ -2386,7 +2393,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             flying = false;
             drill = false;
             if (landing <= Time.fixedDeltaTime + 0.01f && !groundpound && !crouching && !inShell && !holding && state != Enums.PowerupState.MegaMushroom) {
-                bool edge = !Physics2D.BoxCast(body.position, MainHitbox.size * 0.75f, 0, Vector2.down, 0, ANY_GROUND_MASK);
+                bool edge = !Physics2D.BoxCast(body.position, MainHitbox.size * 0.75f, 0, Vector2.down, 0, Layers.MaskAnyGround);
                 bool edgeLanding = false;
                 if (edge) {
                     bool rightEdge = edge && Utils.IsTileSolidAtWorldLocation(body.position + new Vector2(0.25f, -0.25f));
@@ -2602,7 +2609,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         } else {
             //start groundpound
             //check if high enough above ground
-            if (Physics2D.BoxCast(body.position, MainHitbox.size * Vector2.right * transform.localScale, 0, Vector2.down, 0.15f * (state == Enums.PowerupState.MegaMushroom ? 2.5f : 1), ANY_GROUND_MASK))
+            if (Physics2D.BoxCast(body.position, MainHitbox.size * Vector2.right * transform.localScale, 0, Vector2.down, 0.15f * (state == Enums.PowerupState.MegaMushroom ? 2.5f : 1), Layers.MaskAnyGround))
                 return;
 
             wallSlideLeft = false;
