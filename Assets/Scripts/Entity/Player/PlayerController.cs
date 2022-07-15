@@ -1668,6 +1668,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PipeManager pipe = obj.GetComponent<PipeManager>();
             if (pipe.miniOnly && state != Enums.PowerupState.MiniMushroom)
                 continue;
+            if (!pipe.entryAllowed)
+                continue;
 
             //pipe found
             pipeEntering = pipe;
