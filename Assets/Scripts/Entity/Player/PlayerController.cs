@@ -1638,7 +1638,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PipeManager pipe = obj.GetComponent<PipeManager>();
             if (pipe.miniOnly && state != Enums.PowerupState.MiniMushroom)
                 continue;
-
+            if (!pipe.entryAllowed)
+                continue;
+                
             //Enter pipe
             pipeEntering = pipe;
             pipeDirection = Vector2.down;
@@ -1668,6 +1670,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 continue;
             PipeManager pipe = obj.GetComponent<PipeManager>();
             if (pipe.miniOnly && state != Enums.PowerupState.MiniMushroom)
+                continue;
+            if (!pipe.entryAllowed)
                 continue;
 
             //pipe found

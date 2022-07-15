@@ -518,7 +518,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         music.Stop();
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.NickName } Wins!" : "It's a draw!";
+        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.NickName } Wins!" : "It's a draw...";
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
@@ -528,10 +528,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         mixer.SetFloat("MusicPitch", 1f);
 
         bool win = winner != null && winner.IsLocal;
-        music.PlayOneShot((win ? Enums.Sounds.UI_Match_Win : Enums.Sounds.UI_Match_Lose).GetClip());
+        bool draw = winner == null;
+        var secs = 0;
+        secs = (draw ? 5 : 4);
+        if (!draw) music.PlayOneShot((win ? Enums.Sounds.UI_Match_Win : Enums.Sounds.UI_Match_Lose).GetClip());
+        else music.PlayOneShot((Enums.Sounds.UI_Match_Draw).GetClip());
         //TOOD: make a results screen?
 
-        yield return new WaitForSecondsRealtime(4);
+        yield return new WaitForSecondsRealtime(secs);
         if (PhotonNetwork.IsMasterClient)
             PhotonNetwork.DestroyAll();
         SceneManager.LoadScene("MainMenu");
@@ -693,6 +697,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         bool mega = false;
         bool speedup = false;
 
+        List<PlayerController> alivePlayers = new();
+        foreach (var player in allPlayers) {
+            if (player == null || player.lives == 0)
+                continue;
+
+            alivePlayers.Add(player);
+        }
+
         foreach (var player in allPlayers) {
             if (!player)
                 continue;
@@ -702,6 +714,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (player.invincible > 0)
                 invincible = true;
             if ((player.stars + 1f) / starRequirement >= 0.95f || hurryup != false)
+                speedup = true;
+            if (player.lives == 1 && alivePlayers.Count <= 2)
                 speedup = true;
         }
 
