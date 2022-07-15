@@ -42,16 +42,16 @@ public class SpectationManager : MonoBehaviour {
 
     public void UpdateSpectateUI() {
         spectationUI.SetActive(Spectating);
-        if (!Spectating)
+        if (!Spectating || !UIUpdater.Instance)
             return;
 
         UIUpdater.Instance.player = TargetPlayer;
-        if (!TargetPlayer)
+        if (!TargetPlayer || !TargetPlayer.photonView)
             return;
-        
+
         spectatingText.text = $"Spectating: { TargetPlayer.photonView.Owner.NickName }";
     }
-    
+
     public void SpectateNextPlayer() {
         if (TargetPlayer)
             TargetPlayer.cameraController.controlCamera = false;

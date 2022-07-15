@@ -1,3 +1,4 @@
+using NSMB.Utils;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "InteractionRelocator", menuName = "ScriptableObjects/Tiles/InteractionRelocator", order = 8)]

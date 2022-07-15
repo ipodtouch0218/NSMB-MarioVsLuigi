@@ -10389,7 +10389,6 @@ MonoBehaviour:
   propellerSpinFallSpeed: 1.5
   propellerSpinTime: 0.5
   propellerDrillBuffer: 0
-  hitboxes: []
   cameraController: {fileID: 0}
   fadeOut: {fileID: 0}
   sfx: {fileID: 0}
@@ -10424,6 +10423,7 @@ MonoBehaviour:
   hitRight: 0
   iceSliding: 0
   stuckInBlock: 0
+  alreadyStuckInBlock: 0
   propeller: 0
   usedPropellerThisJump: 0
   stationaryGiantEnd: 0

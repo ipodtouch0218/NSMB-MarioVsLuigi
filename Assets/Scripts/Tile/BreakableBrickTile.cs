@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "BreakableBrickTile", menuName = "ScriptableObjects/Tiles/BreakableBrickTile", order = 0)]
 public class BreakableBrickTile : InteractableTile {
@@ -31,11 +32,11 @@ public class BreakableBrickTile : InteractableTile {
             doBump = false;
             doBreak = breakableByBombs;
         }
-        if (doBump && doBreak && bumpIfBroken) 
+        if (doBump && doBreak && bumpIfBroken)
             Bump(interacter, direction, worldLocation);
-        if (doBump && !doBreak && bumpIfNotBroken) 
+        if (doBump && !doBreak && bumpIfNotBroken)
             BumpWithAnimation(interacter, direction, worldLocation);
-        if (doBreak) 
+        if (doBreak)
             Break(interacter, worldLocation, giantBreak ? Enums.Sounds.Powerup_MegaMushroom_Break_Block : Enums.Sounds.World_Block_Break);
         return doBreak;
     }
@@ -49,7 +50,7 @@ public class BreakableBrickTile : InteractableTile {
         //Particle
         object[] parametersParticle = new object[]{ tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
-        
+
         if (interacter is MonoBehaviourPun pun)
             pun.photonView.RPC("PlaySound", RpcTarget.All, sound);
     }
