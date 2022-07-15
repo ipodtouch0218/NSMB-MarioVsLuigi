@@ -483,7 +483,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             localPlayer.GetComponent<PlayerController>().OnGameStart();
         } else {
             foreach (PlayerController player in allPlayers)
-                player.sfx.enabled = true;
+                if (player && player.sfx)
+                    player.sfx.enabled = true;
         }
 
         startServerTime = startTimestamp + 3500;

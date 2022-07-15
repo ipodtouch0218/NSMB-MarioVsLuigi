@@ -466,8 +466,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 if (upToDate)
                     return;
 
-                Debug.Log("a");
-
                 updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
                 updateBox.SetActive(true);
                 EventSystem.current.SetSelectedGameObject(updateBoxSelected);

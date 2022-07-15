@@ -535,7 +535,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             break;
         }
         case "frozencube": {
-            Debug.Log(holdingOld);
             if (holding == obj || (holdingOld == obj && throwInvincibility > 0))
                 return;
 
@@ -770,8 +769,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void OnReserveItem(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || storedPowerup == null || GameManager.Instance.paused || GameManager.Instance.gameover || dead)
+        if (!photonView.IsMine || GameManager.Instance.paused || GameManager.Instance.gameover || dead)
             return;
+        if (storedPowerup == null) {
+            PlaySound(Enums.Sounds.UI_Error);
+            return;
+        }
 
         photonView.RPC("SpawnReserveItem", RpcTarget.MasterClient, null);
         storedPowerup = null;
