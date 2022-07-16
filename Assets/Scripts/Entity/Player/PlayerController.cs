@@ -2022,8 +2022,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!alreadyStuckInBlock) {
             // Code for mario to instantly teleport to the closest free position when he gets stuck
             
-            float distanceInterval = 0.05f;
+            float distanceInterval = 0.025f;
             float minimDistance = 1000;
+            float travelDistance = 0;
             float targetInd = -1; // Basically represents the index of the interval that'll be chosen for mario to be popped out
             int angleInterval = 45;
 
@@ -2041,17 +2042,24 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 }
                 while (Utils.IsAnyTileSolidBetweenWorldBox(testPos, checkSize * 0.975f));
 
+                // This is to give right angles more priority over others when deciding
+                float adjustedDistance = testDistance * (1 + Mathf.Abs(Mathf.Sin(radAngle * 2) / 2));
+
                 // Set the new minimum only if the new position is inside of the visible level
-                if (testDistance < minimDistance && (testPos.y > GameManager.Instance.cameraMinY)) {
-                    minimDistance = testDistance;
-                    targetInd = i;
+                if (testPos.y > GameManager.Instance.cameraMinY && testPos.x > GameManager.Instance.cameraMinX && testPos.x < GameManager.Instance.cameraMaxX){
+                    if (adjustedDistance < minimDistance) {
+                        minimDistance = adjustedDistance;
+                        travelDistance = testDistance;
+                        targetInd = i;
+                    }
                 }
             }
             
+            // Move him
             if (targetInd != -1) {
                 float radAngle = Mathf.PI * (targetInd * angleInterval) / 180;
                 Vector2 lastPos = checkPos;
-                checkPos += new Vector2(Mathf.Cos(radAngle) * minimDistance, Mathf.Sin(radAngle) * minimDistance);
+                checkPos += new Vector2(Mathf.Cos(radAngle) * travelDistance, Mathf.Sin(radAngle) * travelDistance);
                 transform.position = body.position = new(checkPos.x, body.position.y + (checkPos.y - lastPos.y));
                 stuckInBlock = false;
                 return false; // Freed
