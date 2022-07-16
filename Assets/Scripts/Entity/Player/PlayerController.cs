@@ -2024,15 +2024,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             
             float distanceInterval = 0.05f;
             float minimDistance = 1000;
-            float targetInd = -1;
-            int angleInterval = 90;
+            float targetInd = -1; // Basically represents the index of the interval that'll be chosen for mario to be popped out
+            int angleInterval = 45;
 
-            for (float i = 0; i < 360 / angleInterval; i ++) {
+            for (float i = 0; i < 360 / angleInterval; i ++) { // Test for every angle in the given interval
                 float ang = i * angleInterval;
                 float testDistance = 0;
 
                 float radAngle = Mathf.PI * ang / 180;
                 Vector2 testPos;
+
+                // Calculate the distance mario would have to be moved on a certain angle to stop collisioning
                 do {
                     testPos = checkPos + new Vector2(Mathf.Cos(radAngle) * testDistance, Mathf.Sin(radAngle) * testDistance);
                     testDistance += distanceInterval;
