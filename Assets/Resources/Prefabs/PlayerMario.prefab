@@ -10389,6 +10389,8 @@ MonoBehaviour:
   propellerSpinFallSpeed: 1.5
   propellerSpinTime: 0.5
   propellerDrillBuffer: 0
+  heightSmallModel: 0.42
+  heightLargeModel: 0.82
   cameraController: {fileID: 0}
   fadeOut: {fileID: 0}
   sfx: {fileID: 0}
@@ -10500,8 +10502,6 @@ MonoBehaviour:
   fireParticle: {fileID: 5320528148583097166}
   blinkDuration: 0.1
   pipeDuration: 2
-  heightSmallModel: 0.42
-  heightLargeModel: 0.82
   deathUpTime: 0.6
   deathForce: 7
   smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}

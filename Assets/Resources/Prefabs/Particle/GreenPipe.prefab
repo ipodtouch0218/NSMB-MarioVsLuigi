@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2536965306057111103}
   - component: {fileID: 1164111855989132747}
   m_Layer: 11
-  m_Name: DestructablePipe
+  m_Name: GreenPipe
   m_TagString: DestructablePipe
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
