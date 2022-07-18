@@ -245,6 +245,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -288,6 +289,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -1948,7 +1950,7 @@ TextureImporter:
         width: 32
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 8, z: 0, w: 8}
       outline: []
       physicsShape: []
@@ -1956,6 +1958,48 @@ TextureImporter:
       bones: []
       spriteID: d1f2de63938348148a79ae7c5875bf6c
       internalID: 1742602189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pipes_75
+      rect:
+        serializedVersion: 2
+        x: 272
+        y: 16
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 6, z: 0, w: 16}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8711882105204d349bfd4c630181f70e
+      internalID: -451536297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pipes_76
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 8, z: 0, w: 8}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f380f11f8b3bad246a335f5a096ff7ab
+      internalID: 285360261
       vertices: []
       indices: 
       edges: []
@@ -1983,6 +2027,7 @@ TextureImporter:
       pipes_28: -2327602286159423677
       pipes_55: -1929204281742509723
       pipeHat: 884178632
+      pipes_75: -451536297
       pipes_67: 2369423171760336778
       pipes_48: -1953529368460209623
       pipes_0: 3624413539235301459
@@ -2049,10 +2094,10 @@ TextureImporter:
       pipes_2: -4752754735582442470
       pipes_51: -8119707064633845689
       pipes_32: -7790559066171626889
+      pipes_76: 285360261
       pipes_12: -2054774350801148439
   spritePackingTag: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

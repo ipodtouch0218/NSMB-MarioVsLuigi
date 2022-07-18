@@ -21,5 +21,6 @@ MonoBehaviour:
   m_TileColliderType: 2
   leftDestroy: GreenLUD
   rightDestroy: GreenRUD
+  pipeParticle: GreenPipe
   upsideDownPipe: 0
   leftOfPipe: 0
