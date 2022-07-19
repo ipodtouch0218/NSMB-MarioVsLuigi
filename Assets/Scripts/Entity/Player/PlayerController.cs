@@ -2047,8 +2047,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!alreadyStuckInBlock) {
             // Code for mario to instantly teleport to the closest free position when he gets stuck
 
+            //prevent mario from clipping to the floor if we got pushed in via our hitbox changing (shell on ice, for example)
+            transform.position = body.position = previousFramePosition;
+            checkPos = transform.position + (Vector3) (Vector2.up * checkSize / 2f);
+
             float distanceInterval = 0.025f;
-            float minimDistance = 0.45f; // if the minimum actual distance is anything above this value this code will have no effect
+            float minimDistance = 0.95f; // if the minimum actual distance is anything above this value this code will have no effect
             float travelDistance = 0;
             float targetInd = -1; // Basically represents the index of the interval that'll be chosen for mario to be popped out
             int angleInterval = 45;
@@ -2079,7 +2083,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     }
                 }
             }
-            
+
             // Move him
             if (targetInd != -1) {
                 float radAngle = Mathf.PI * (targetInd * angleInterval) / 180;
