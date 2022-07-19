@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8179939065131723427
+--- !u!114 &-7710109865171164033
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LavaMaterial
+  m_Name: WaterMaterialB
   m_Shader: {fileID: -6465566751694194690, guid: 219c4434dcc531e4886d9626fc332d7c,
     type: 3}
   m_Parent: {fileID: 0}
@@ -38,7 +38,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - Heightmap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: ce5f11cd993284c4f9c54f854bdc8c9c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2DLOD_14fea36738ec45e9afaddff6a22b8796_Texture_1:
@@ -67,8 +67,8 @@ Material:
     - WaveWidth: 1
     - _Points: 160
     m_Colors:
-    - BackgroundColor: {r: 0.14509803, g: 0.7145495, b: 1, a: 0.8}
-    - FoamColor: {r: 1, g: 1, b: 1, a: 1}
-    - RippleColor: {r: 0.73794055, g: 0.9047793, b: 0.9716981, a: 1}
-    - TopColor: {r: 0, g: 0.51428366, b: 1, a: 1}
+    - BackgroundColor: {r: 0, g: 0.64128995, b: 1, a: 0.49803922}
+    - FoamColor: {r: 1, g: 1, b: 1, a: 0.92941177}
+    - RippleColor: {r: 0.9198113, g: 0.97704405, b: 1, a: 0.70980394}
+    - TopColor: {r: 0, g: 0.51428366, b: 1, a: 0.49803922}
   m_BuildTextureStacks: []
