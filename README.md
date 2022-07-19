@@ -58,6 +58,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [@Amy54Desu](https://github.com/Amy54Desu)
 * [@Kraken](https://github.com/KrakHub)
 * [@ShadowWalker13](https://github.com/ShadowWalker13)
+* [@GithubSPerez](https://github.com/GithubSPerez)
   
 ### QA Testing:
 * TheCyVap
@@ -84,7 +85,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Treeki (UI)
 * Double S (Models)
 * KartMakerBrosU (Models)
-* TeridaxXDOO1 (Models
+* TeridaxXDOO1 (Models)
 * Skarph (Models/Sound)
 * LukeWarnut (Sound)
 * Luke Hackett (Sound)

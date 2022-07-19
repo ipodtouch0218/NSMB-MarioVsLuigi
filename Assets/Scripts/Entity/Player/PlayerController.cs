@@ -2044,53 +2044,54 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         flying = false;
         onGround = true;
 
-        ////
-        Vector2 size = MainHitbox.size * transform.lossyScale;
-        bool orig = Physics2D.queriesStartInColliders;
-        Physics2D.queriesStartInColliders = false;
+        if (!alreadyStuckInBlock) {
+            // Code for mario to instantly teleport to the closest free position when he gets stuck
 
-        var hitTop = Physics2D.BoxCast(body.position + 0.9f * Vector2.up, new(size.x, 0.01f), 0, Vector2.down, 0.9f, Layers.MaskOnlyGround);
+            //prevent mario from clipping to the floor if we got pushed in via our hitbox changing (shell on ice, for example)
+            transform.position = body.position = previousFramePosition;
+            checkPos = transform.position + (Vector3) (Vector2.up * checkSize / 2f);
 
-        if (hitTop) {
-            Vector2 newPoint = new(body.position.x, hitTop.point.y);
-            if (hitTop.point.y > body.position.y && hitTop.point.y < body.position.y + (size.y + 0.35f) && !Utils.IsAnyTileSolidBetweenWorldBox(newPoint + size.y * 0.5f * Vector2.up, size)) {
-                transform.position = body.position = newPoint;
-            } else {
-                var hitBottom = Physics2D.BoxCast(body.position, new(size.x, 0.01f), 0, Vector2.down, size.y, Layers.MaskOnlyGround);
+            float distanceInterval = 0.025f;
+            float minimDistance = 0.95f; // if the minimum actual distance is anything above this value this code will have no effect
+            float travelDistance = 0;
+            float targetInd = -1; // Basically represents the index of the interval that'll be chosen for mario to be popped out
+            int angleInterval = 45;
 
-                if (!hitBottom) {
-                    transform.position = body.position = new(body.position.x, hitTop.point.y - size.y);
+            for (float i = 0; i < 360 / angleInterval; i ++) { // Test for every angle in the given interval
+                float ang = i * angleInterval;
+                float testDistance = 0;
+
+                float radAngle = Mathf.PI * ang / 180;
+                Vector2 testPos;
+
+                // Calculate the distance mario would have to be moved on a certain angle to stop collisioning
+                do {
+                    testPos = checkPos + new Vector2(Mathf.Cos(radAngle) * testDistance, Mathf.Sin(radAngle) * testDistance);
+                    testDistance += distanceInterval;
+                }
+                while (Utils.IsAnyTileSolidBetweenWorldBox(testPos, checkSize * 0.975f));
+
+                // This is to give right angles more priority over others when deciding
+                float adjustedDistance = testDistance * (1 + Mathf.Abs(Mathf.Sin(radAngle * 2) / 2));
+
+                // Set the new minimum only if the new position is inside of the visible level
+                if (testPos.y > GameManager.Instance.cameraMinY && testPos.x > GameManager.Instance.cameraMinX && testPos.x < GameManager.Instance.cameraMaxX){
+                    if (adjustedDistance < minimDistance) {
+                        minimDistance = adjustedDistance;
+                        travelDistance = testDistance;
+                        targetInd = i;
+                    }
                 }
             }
-        }
 
-        Physics2D.queriesStartInColliders = orig;
-
-        if (!alreadyStuckInBlock) {
-            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.975f)) {
+            // Move him
+            if (targetInd != -1) {
+                float radAngle = Mathf.PI * (targetInd * angleInterval) / 180;
+                Vector2 lastPos = checkPos;
+                checkPos += new Vector2(Mathf.Cos(radAngle) * travelDistance, Mathf.Sin(radAngle) * travelDistance);
+                transform.position = body.position = new(checkPos.x, body.position.y + (checkPos.y - lastPos.y));
                 stuckInBlock = false;
-                return false;
-            }
-
-            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + (Vector2.left * 0.5f), checkSize * 0.975f)) {
-                transform.position = body.position = new(checkPos.x - 0.5f, body.position.y);
-                stuckInBlock = false;
-                return false;
-            }
-            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + (Vector2.right * 0.5f), checkSize * 0.975f)) {
-                transform.position = body.position = new(checkPos.x + 0.5f, body.position.y);
-                stuckInBlock = false;
-                return false;
-            }
-            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.left, checkSize * 0.975f)) {
-                transform.position = body.position = new(checkPos.x - 1f, body.position.y);
-                stuckInBlock = false;
-                return false;
-            }
-            if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos + Vector2.right, checkSize * 0.975f)) {
-                transform.position = body.position = new(checkPos.x + 1f, body.position.y);
-                stuckInBlock = false;
-                return false;
+                return false; // Freed
             }
         }
 
