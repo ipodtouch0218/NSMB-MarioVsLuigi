@@ -62,9 +62,12 @@ Material:
     - Height: 1.05
     - Points: 256
     - PointsPerTile: 4
-    - WaveHeight: 0.1
+    - WaveHeight: 0.25
     - WaveSpeed: 2
     - WaveWidth: 1
+    - WidthTiles: 64
+    - _BUILTIN_QueueControl: -1
+    - _BUILTIN_QueueOffset: 0
     - _Points: 160
     m_Colors:
     - BackgroundColor: {r: 1, g: 0, b: 0.019174099, a: 0.8}
@@ -72,3 +75,16 @@ Material:
     - RippleColor: {r: 1, g: 0.630872, b: 0, a: 1}
     - TopColor: {r: 1, g: 0.14068651, b: 0, a: 1}
   m_BuildTextureStacks: []
+--- !u!114 &7893850056676362737
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 639247ca83abc874e893eb93af2b5e44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 0
