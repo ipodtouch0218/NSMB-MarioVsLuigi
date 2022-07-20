@@ -304,12 +304,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     // ROOM CALLBACKS
     public void OnJoinedRoom() { }
     public void OnPlayerPropertiesUpdate(Player player, Hashtable playerProperties) {
-        foreach (PlayerController players in allPlayers) {
-            if (players == null)
+        foreach (PlayerController pl in allPlayers) {
+            if (!pl)
                 continue;
 
-            if (players.photonView.Owner == player)
-                players.LoadFromGameState();
+            if (pl.photonView.Owner == player)
+                pl.LoadFromGameState();
         }
     }
     public void OnRoomPropertiesUpdate(Hashtable properties) { }

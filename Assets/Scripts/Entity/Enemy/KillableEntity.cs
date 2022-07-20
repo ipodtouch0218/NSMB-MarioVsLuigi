@@ -58,7 +58,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
             || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.state == Enums.PowerupState.MegaMushroom) {
 
-            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound, 0);
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound, player.StarCombo++);
         } else if (attackedFromAbove) {
             if (player.state == Enums.PowerupState.MiniMushroom && !player.drill && !player.groundpound) {
                 player.groundpound = false;

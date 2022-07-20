@@ -54,7 +54,7 @@ public class MovingPowerup : MonoBehaviourPun {
 
     }
 
-    void LateUpdate() {
+    public void LateUpdate() {
         ignoreCounter -= Time.deltaTime;
         if (!followMe)
             return;
@@ -72,7 +72,7 @@ public class MovingPowerup : MonoBehaviourPun {
         }
     }
 
-    void FixedUpdate() {
+    public void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
@@ -134,18 +134,21 @@ public class MovingPowerup : MonoBehaviourPun {
 
     [PunRPC]
     public void Bump() {
-        Debug.Log(body.velocity);
-        body.velocity = new(body.velocity.x, 100f);
+        if (followMe)
+            return;
+
+        body.velocity = new(body.velocity.x, 5f);
     }
 
     public void HandleCollision() {
         physics.UpdateCollisions();
         if (physics.hitLeft || physics.hitRight) {
             right = physics.hitLeft;
-            body.velocity = new Vector2(speed * (right ? 1 : -1), body.velocity.y);
+            body.velocity = new(speed * (right ? 1 : -1), body.velocity.y);
         }
         if (physics.onGround) {
-            body.velocity = new Vector2(speed * (right ? 1 : -1), bouncePower);
+            body.velocity = new(speed * (right ? 1 : -1), Mathf.Max(body.velocity.y, bouncePower));
+
             if ((physics.hitRoof || (physics.hitLeft && physics.hitRight)) && photonView.IsMine) {
                 photonView.RPC("DespawnWithPoof", RpcTarget.All);
                 return;

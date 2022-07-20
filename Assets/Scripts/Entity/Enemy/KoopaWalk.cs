@@ -103,7 +103,7 @@ public class KoopaWalk : HoldableEntity {
 
         if (physics.onGround) {
             if (stationary) {
-                body.velocity = new(body.velocity.x, 0);
+                //body.velocity = new(body.velocity.x, 0);
             } else {
                 body.velocity = new Vector2((shell ? speed : walkSpeed) * (left ? -1 : 1), 0);
             }
@@ -132,7 +132,7 @@ public class KoopaWalk : HoldableEntity {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, 0);
+            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
         } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("EnterShell", RpcTarget.All);
             if (!blue) {

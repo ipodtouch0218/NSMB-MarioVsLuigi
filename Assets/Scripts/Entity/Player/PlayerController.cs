@@ -51,6 +51,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private float wallSlideTimer, wallJumpTimer;
     public bool wallSlideLeft, wallSlideRight;
 
+    private int _starCombo;
+    public int StarCombo {
+        get => (invincible > 0 ? _starCombo : 0);
+        set => _starCombo = (invincible > 0 ? value : 0);
+    }
 
     public Vector2 pipeDirection;
     public int stars, coins, lives = -1;
@@ -776,10 +781,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void OnReserveItem(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused || GameManager.Instance.gameover || dead)
+        if (!photonView.IsMine || GameManager.Instance.paused || GameManager.Instance.gameover)
             return;
 
-        if (storedPowerup == null) {
+        if (storedPowerup == null || dead || !spawned) {
             PlaySound(Enums.Sounds.UI_Error);
             return;
         }
@@ -829,6 +834,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         } else if (powerup.prefab == "Star") {
             //starman
+            if (invincible <= 0)
+                StarCombo = 0;
+
             invincible = 10f;
             PlaySound(powerup.soundEffect);
 
@@ -989,12 +997,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     [PunRPC]
     protected void CollectBigStar(int starID) {
         PhotonView view = PhotonView.Find(starID);
-        if (view == null)
+        if (!view)
             return;
 
         GameObject star = view.gameObject;
         StarBouncer starScript = star.GetComponent<StarBouncer>();
-        if (!starScript.IsCollectible())
+        if (!starScript.Collectable)
             return;
 
         if (photonView.IsMine && starScript.stationary)
@@ -1071,8 +1079,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         string prefab = Utils.GetRandomItem(this).prefab;
         PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
+
         coins = 0;
-        UpdateGameState();
     }
 
     void SpawnStars(int amount, bool deathplane) {
@@ -1097,6 +1105,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             amount--;
         }
         GameManager.Instance.CheckForWinner();
+        UpdateGameState();
     }
 
     void SpawnStar(bool deathplane) {
@@ -1302,7 +1311,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (state != Enums.PowerupState.MegaMushroom || !photonView.IsMine || giantStartTimer > 0)
             return;
 
-        Vector2 checkSize = MainHitbox.size * transform.lossyScale * 1.1f;
+        Vector2 checkSize = WorldHitboxSize * 1.1f;
 
         bool grounded = previousFrameVelocity.y < -8f && onGround;
         Vector2 offset = Vector2.zero;
@@ -1494,6 +1503,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         } else {
             pickupTimer = pickupTime;
         }
+        animator.ResetTrigger("throw");
         animator.SetBool("holding", true);
 
         SetHoldingOffset();
@@ -1624,8 +1634,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         bool prev = Physics2D.queriesStartInColliders;
         Physics2D.queriesStartInColliders = false;
-        BoxCollider2D hitbox = MainHitbox;
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + Vector2.up * 0.1f, new Vector2(hitbox.size.x * transform.lossyScale.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
         Physics2D.queriesStartInColliders = prev;
         if (hit) {
             body.position = new Vector2(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
@@ -2036,7 +2045,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!body || state == Enums.PowerupState.MegaMushroom)
             return false;
 
-        Vector2 checkSize = MainHitbox.size * transform.lossyScale * new Vector2(1, 0.75f);
+        Vector2 checkSize = WorldHitboxSize * new Vector2(1, 0.75f);
         Vector2 checkPos = transform.position + (Vector3) (Vector2.up * checkSize / 2f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f, false)) {
@@ -2146,15 +2155,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             giantSavedVelocity = Vector2.zero;
             state = Enums.PowerupState.Mushroom;
             giantEndTimer = giantStartTime - giantStartTimer;
+            animator.enabled = true;
+            animator.Play("mega-cancel", 0, 1f - (giantEndTimer / giantStartTime));
             giantStartTimer = 0;
             stationaryGiantEnd = true;
             storedPowerup = (Powerup) Resources.Load("Scriptables/Powerups/MegaMushroom");
             giantTimer = 0;
-            animator.enabled = true;
-            animator.Play("mega-cancel", 0, 1 - (giantEndTimer / giantStartTime));
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         }
         body.isKinematic = false;
+        UpdateGameState();
     }
 
     void HandleFacingDirection() {
@@ -2225,7 +2235,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     animator.Play("mega-scale");
 
 
-                Vector2 checkSize = MainHitbox.size * transform.lossyScale * new Vector2(0.75f, 1.1f);
+                Vector2 checkSize = WorldHitboxSize * new Vector2(0.75f, 1.1f);
                 Vector2 normalizedVelocity = body.velocity;
                 if (!groundpound)
                     normalizedVelocity.y = Mathf.Max(0, body.velocity.y);
@@ -2268,6 +2278,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 body.velocity = giantSavedVelocity;
                 animator.enabled = true;
                 body.isKinematic = false;
+                state = previousState;
+                UpdateGameState();
             }
             return;
         }
@@ -2725,7 +2737,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         Gizmos.DrawRay(body.position, body.velocity);
-        Gizmos.DrawCube(body.position + new Vector2(0, MainHitbox.size.y / 2f * transform.lossyScale.y) + (body.velocity * Time.fixedDeltaTime), MainHitbox.size * transform.lossyScale);
+        Gizmos.DrawCube(body.position + new Vector2(0, WorldHitboxSize.y * 0.5f) + (body.velocity * Time.fixedDeltaTime), WorldHitboxSize);
 
         Gizmos.color = Color.white;
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
