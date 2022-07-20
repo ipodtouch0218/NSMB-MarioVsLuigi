@@ -5,13 +5,13 @@ using NSMB.Utils;
 public class GoombaWalk : KillableEntity {
     [SerializeField] float speed, deathTimer = -1, terminalVelocity = -8;
 
-    new void Start() {
+    public new void Start() {
         base.Start();
         body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
         animator.SetBool("dead", false);
     }
 
-    new void FixedUpdate() {
+    public new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -37,7 +37,6 @@ public class GoombaWalk : KillableEntity {
         }
         body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
         sRenderer.flipX = !left;
-
     }
 
     [PunRPC]

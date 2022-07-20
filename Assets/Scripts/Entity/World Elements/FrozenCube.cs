@@ -8,6 +8,8 @@ public class FrozenCube : HoldableEntity {
     public float throwSpeed = 10f, shakeSpeed = 1f, shakeAmount = 0.1f;
     public SpriteRenderer spriteRenderer;
 
+    public IFreezableEntity.UnfreezeReason reason = IFreezableEntity.UnfreezeReason.Other;
+
     IFreezableEntity entity;
     PhotonView entityView;
     Rigidbody2D entityBody;
@@ -18,7 +20,7 @@ public class FrozenCube : HoldableEntity {
     private int combo;
     public Vector2 offset;
 
-    new void Start() {
+    public new void Start() {
         base.Start();
         dead = false;
         holderOffset = Vector2.one;
@@ -68,7 +70,7 @@ public class FrozenCube : HoldableEntity {
         }
     }
 
-    private new void LateUpdate() {
+    public new void LateUpdate() {
         base.LateUpdate();
 
         if (entity == null || !entityView) {
@@ -94,11 +96,12 @@ public class FrozenCube : HoldableEntity {
             return;
         }
         if (photonView.IsMine && body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY()) {
-            entityView.RPC("Unfreeze", RpcTarget.All);
+            entityView.RPC("Unfreeze", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Other);
             PhotonNetwork.Destroy(photonView);
             return;
         }
         if (photonView.IsMine && holder && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale)) {
+            reason = IFreezableEntity.UnfreezeReason.HitWall;
             photonView.RPC("Kill", RpcTarget.All);
             return;
         }
@@ -136,11 +139,14 @@ public class FrozenCube : HoldableEntity {
         if (autoBreakTimer > 0 && (entity is PlayerController || (!holder && !fastSlide))) {
             Utils.TickTimer(ref autoBreakTimer, 0, Time.fixedDeltaTime);
             if (autoBreakTimer <= 0) {
+                if (!fastSlide)
+                    reason = IFreezableEntity.UnfreezeReason.Timer;
 
                 if (flying)
                     fallen = true;
-                else if (photonView.IsMine)
+                else if (photonView.IsMine) {
                     photonView.RPC("Kill", RpcTarget.All);
+                }
             }
         }
 
@@ -280,11 +286,12 @@ public class FrozenCube : HoldableEntity {
     public override void Pickup(int view) {
         base.Pickup(view);
         Physics2D.IgnoreCollision(hitbox, holder.MainHitbox);
+        autoBreakTimer += 1f;
     }
 
     [PunRPC]
     public override void Kill() {
-        entity?.Unfreeze();
+        entity?.Unfreeze((byte) reason);
 
         if (holder)
             holder.holding = null;

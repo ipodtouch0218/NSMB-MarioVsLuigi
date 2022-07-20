@@ -90,6 +90,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         object[] data = customData as object[];
 
         switch (eventId) {
+        /*
         case PunEvent.Instantiation: {
             string prefab = (string) ((Hashtable) parameters.paramDict[245])[0];
 
@@ -106,6 +107,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             }
             break;
         }
+        */
         case (byte) Enums.NetEventIds.AllFinishedLoading: {
             if (loaded)
                 break;
@@ -529,13 +531,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         bool win = winner != null && winner.IsLocal;
         bool draw = winner == null;
-        var secs = 0;
-        secs = (draw ? 5 : 4);
-        if (!draw) music.PlayOneShot((win ? Enums.Sounds.UI_Match_Win : Enums.Sounds.UI_Match_Lose).GetClip());
-        else music.PlayOneShot((Enums.Sounds.UI_Match_Draw).GetClip());
+        int secondsUntilMenu;
+        secondsUntilMenu = draw ? 5 : 4;
+
+        if (draw)
+            music.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
+        else if (win)
+            music.PlayOneShot(Enums.Sounds.UI_Match_Win.GetClip());
+        else
+            music.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
+
         //TOOD: make a results screen?
 
-        yield return new WaitForSecondsRealtime(secs);
+        yield return new WaitForSecondsRealtime(secondsUntilMenu);
         if (PhotonNetwork.IsMasterClient)
             PhotonNetwork.DestroyAll();
         SceneManager.LoadScene("MainMenu");
@@ -767,6 +775,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public void AttemptQuit() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+
         if (PhotonNetwork.IsMasterClient) {
             pausePanel.SetActive(false);
             hostExitUI.SetActive(true);
@@ -779,6 +789,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void HostEndMatch() {
         Pause();
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
@@ -790,6 +801,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void HostQuitCancel() {
         pausePanel.SetActive(true);
         hostExitUI.SetActive(false);
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 

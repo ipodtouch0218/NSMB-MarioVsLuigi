@@ -99,7 +99,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
     }
 
     [PunRPC]
-    public virtual void Unfreeze() {
+    public virtual void Unfreeze(byte reasonByte) {
         Frozen = false;
         animator.enabled = true;
         if (body)

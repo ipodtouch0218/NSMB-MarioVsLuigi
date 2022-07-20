@@ -10,6 +10,15 @@ public interface IFreezableEntity {
     public void Freeze(int cube);
 
     [PunRPC]
-    public void Unfreeze();
+    public void Unfreeze(byte reasonByte);
+
+
+    public enum UnfreezeReason : byte {
+        Other,
+        Timer,
+        Groundpounded,
+        BlockBump,
+        HitWall,
+    }
 
 }

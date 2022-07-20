@@ -238,6 +238,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void LoadFromGameState() {
+
+        //Don't load from our own state
+        if (photonView.IsMine)
+            return;
+
+        //We don't have a state to load
         if (photonView.Owner.CustomProperties[Enums.NetPlayerProperties.GameState] is not Hashtable gs)
             return;
 
@@ -253,7 +259,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void UpdateGameState() {
-        if (!photonView.IsMine && !PhotonNetwork.IsMasterClient)
+        if (!photonView.IsMine)
             return;
 
         UpdateGameStateVariable(Enums.NetPlayerGameState.Lives, lives);
@@ -772,13 +778,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void OnReserveItem(InputAction.CallbackContext context) {
         if (!photonView.IsMine || GameManager.Instance.paused || GameManager.Instance.gameover || dead)
             return;
+
         if (storedPowerup == null) {
             PlaySound(Enums.Sounds.UI_Error);
             return;
         }
 
-        photonView.RPC("SpawnReserveItem", RpcTarget.MasterClient, null);
-        storedPowerup = null;
+        SpawnReserveItem();
     }
     #endregion
 
@@ -940,7 +946,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
         Frozen = true;
-        frozenObject.autoBreakTimer = 2f;
+        frozenObject.autoBreakTimer = 1.75f;
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
@@ -956,7 +962,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     [PunRPC]
-    public void Unfreeze() {
+    public void Unfreeze(byte reasonByte) {
         if (!Frozen)
             return;
 
@@ -965,10 +971,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.simulated = true;
         body.isKinematic = false;
 
-        if (frozenObject && frozenObject.photonView.IsMineOrLocal())
-            frozenObject.Kill();
+        bool doKnockback = reasonByte != (byte) IFreezableEntity.UnfreezeReason.Timer;
 
-        Knockback(facingRight, 1, true, -1);
+        if (frozenObject && frozenObject.photonView.IsMine) {
+            frozenObject.holder?.photonView.RPC("Knockback", RpcTarget.All, frozenObject.holder.facingRight, 1, true, photonView.ViewID);
+            frozenObject.Kill();
+        }
+
+        if (doKnockback)
+            Knockback(facingRight, 1, true, -1);
+        else
+            hitInvincibilityCounter = 1.5f;
     }
     #endregion
 
@@ -1030,44 +1043,42 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         coins++;
         if (coins >= GameManager.Instance.coinRequirement) {
-            if (PhotonNetwork.IsMasterClient)
-                SpawnCoinItem();
+            SpawnCoinItem();
             coins = 0;
         }
 
         UpdateGameState();
     }
 
-    [PunRPC]
-    public void SpawnReserveItem(PhotonMessageInfo info) {
-        if (!PhotonNetwork.IsMasterClient || info.Sender != photonView.Owner)
-            return;
-
+    public void SpawnReserveItem() {
         if (storedPowerup == null)
             return;
 
         string prefab = storedPowerup.prefab;
-        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
         storedPowerup = null;
         UpdateGameState();
     }
 
     public void SpawnCoinItem() {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-
         if (coins < GameManager.Instance.coinRequirement)
             return;
 
+        if (!photonView.IsMine)
+            return;
+
         string prefab = Utils.GetRandomItem(this).prefab;
-        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
         coins = 0;
         UpdateGameState();
     }
 
-    void SpawnStars(float amount, bool deathplane) {
+    void SpawnStars(int amount, bool deathplane) {
+
+        if (!photonView.IsMine)
+            return;
 
         bool fastStars = amount > 2 && stars > 2;
 
@@ -1089,8 +1100,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void SpawnStar(bool deathplane) {
-        if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
+        PhotonNetwork.Instantiate("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
 
         starDirection = (starDirection + 1) % 4;
     }
@@ -1144,9 +1154,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     [PunRPC]
-    public void PreRespawn(PhotonMessageInfo info) {
-        //if (info.Sender != photonView.Owner)
-        //    return;
+    public void PreRespawn() {
 
         sfx.enabled = true;
         if (lives == 0) {
@@ -2186,7 +2194,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (Frozen) {
             if (!frozenObject) {
-                Unfreeze();
+                Unfreeze((byte) IFreezableEntity.UnfreezeReason.Other);
             } else {
                 body.velocity = Vector2.zero;
                 return;

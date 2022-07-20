@@ -128,9 +128,17 @@ public class MovingPowerup : MonoBehaviourPun {
                 right = (closestPosition.x - body.position.x) < 0;
         }
 
-        body.velocity = new Vector2(body.velocity.x, Mathf.Max(-terminalVelocity, body.velocity.y));
+        if (body.velocity.y < -terminalVelocity)
+            body.velocity = new Vector2(body.velocity.x, Mathf.Max(-terminalVelocity, body.velocity.y));
     }
-    void HandleCollision() {
+
+    [PunRPC]
+    public void Bump() {
+        Debug.Log(body.velocity);
+        body.velocity = new(body.velocity.x, 100f);
+    }
+
+    public void HandleCollision() {
         physics.UpdateCollisions();
         if (physics.hitLeft || physics.hitRight) {
             right = physics.hitLeft;

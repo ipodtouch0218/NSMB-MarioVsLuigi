@@ -69,6 +69,7 @@ MonoBehaviour:
   shakeSpeed: 80
   shakeAmount: 2
   spriteRenderer: {fileID: 0}
+  reason: 0
   autoBreakTimer: 3
   throwTimer: 0
   fastSlide: 0
