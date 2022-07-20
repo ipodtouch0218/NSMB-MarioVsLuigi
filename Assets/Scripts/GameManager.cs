@@ -775,9 +775,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public void AttemptQuit() {
-        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
 
         if (PhotonNetwork.IsMasterClient) {
+            sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
             pausePanel.SetActive(false);
             hostExitUI.SetActive(true);
             EventSystem.current.SetSelectedGameObject(hostExitButton);
@@ -788,12 +788,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public void HostEndMatch() {
-        Pause();
+        pauseUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
     public void Quit() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
         PhotonNetwork.LeaveRoom();
         SceneManager.LoadScene("MainMenu");
     }
@@ -801,7 +802,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void HostQuitCancel() {
         pausePanel.SetActive(true);
         hostExitUI.SetActive(false);
-        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
