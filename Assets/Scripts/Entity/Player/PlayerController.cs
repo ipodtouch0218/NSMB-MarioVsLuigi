@@ -1198,8 +1198,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     [PunRPC]
     public void Respawn(PhotonMessageInfo info) {
-        if (info.Sender != photonView.Owner)
-            return;
 
         gameObject.SetActive(true);
         dead = false;
@@ -1242,6 +1240,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (photonView.IsMine)
             ScoreboardUpdater.instance.OnRespawnToggle();
+
+        UpdateGameState();
     }
     #endregion
 
