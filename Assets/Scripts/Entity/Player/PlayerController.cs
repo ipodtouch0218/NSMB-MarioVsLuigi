@@ -796,9 +796,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #region -- POWERUP / POWERDOWN --
     [PunRPC]
     protected void Powerup(int actor, PhotonMessageInfo info) {
-        if (info.Sender != photonView.Owner)
-            return;
-
         PhotonView view;
         if (dead || !(view = PhotonView.Find(actor)))
             return;
@@ -902,7 +899,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     [PunRPC]
-    protected void Powerdown(bool ignoreInvincible, PhotonMessageInfo info) {
+    protected void Powerdown(bool ignoreInvincible) {
         if (!ignoreInvincible && (hitInvincibilityCounter > 0 || invincible > 0))
             return;
 
@@ -1019,6 +1016,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
         DestroyImmediate(star);
+        DestroyImmediate(star);
     }
 
     [PunRPC]
@@ -1117,7 +1115,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- DEATH / RESPAWNING --
     [PunRPC]
-    protected void Death(bool deathplane, bool fire, PhotonMessageInfo info) {
+    protected void Death(bool deathplane, bool fire) {
         if (dead)
             return;
 
@@ -1157,6 +1155,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
             holding = null;
         }
+        holdingOld = null;
 
         if (photonView.IsMine)
             ScoreboardUpdater.instance.OnDeathToggle();
@@ -1484,7 +1483,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         holding = null;
         holdingOld = null;
         throwInvincibility = 0;
-        Powerdown(false, info);
+        Powerdown(false);
     }
     [PunRPC]
     public void SetHolding(int view) {
