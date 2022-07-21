@@ -5169,7 +5169,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1973747262981084695}
   - component: {fileID: 1973747262981084692}
-  - component: {fileID: 3770681904034704963}
   m_Layer: 10
   m_Name: Hitbox
   m_TagString: bigstar
@@ -5218,18 +5217,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.9, y: 0.9}
   m_EdgeRadius: 0
---- !u!114 &3770681904034704963
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973747262981084694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &9209823662088345179
 GameObject:
   m_ObjectHideFlags: 0
