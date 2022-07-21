@@ -448,7 +448,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8836298985264993978}
   - component: {fileID: 8836298985264993979}
-  - component: {fileID: 2923871750627057164}
   m_Layer: 10
   m_Name: Hitbox
   m_TagString: koopa
@@ -497,15 +496,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.1, y: 0.17}
   m_EdgeRadius: 0
---- !u!114 &2923871750627057164
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8836298985264993977}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

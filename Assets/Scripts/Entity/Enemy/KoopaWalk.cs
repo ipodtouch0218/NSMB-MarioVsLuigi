@@ -17,7 +17,7 @@ public class KoopaWalk : HoldableEntity {
     [SerializeField] Vector2 outShellHitboxSize, inShellHitboxSize;
     [SerializeField] Vector2 outShellHitboxOffset, inShellHitboxOffset;
 
-    new void Start() {
+    public new void Start() {
         base.Start();
         hitbox = transform.GetChild(0).GetComponent<BoxCollider2D>();
         worldHitbox = GetComponent<BoxCollider2D>();
@@ -25,7 +25,7 @@ public class KoopaWalk : HoldableEntity {
         body.velocity = new Vector2(-walkSpeed, 0);
     }
 
-    new void FixedUpdate() {
+    public new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -103,7 +103,7 @@ public class KoopaWalk : HoldableEntity {
 
         if (physics.onGround) {
             if (stationary) {
-                body.velocity = new(body.velocity.x, 0);
+                //body.velocity = new(body.velocity.x, 0);
             } else {
                 body.velocity = new Vector2((shell ? speed : walkSpeed) * (left ? -1 : 1), 0);
             }
@@ -121,7 +121,7 @@ public class KoopaWalk : HoldableEntity {
     }
     public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
+        bool attackedFromAbove = damageDirection.y > 0;
         if (holder)
             return;
 
@@ -132,7 +132,7 @@ public class KoopaWalk : HoldableEntity {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, 0);
+            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
         } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("EnterShell", RpcTarget.All);
             if (!blue) {

@@ -5,7 +5,7 @@ using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "BreakablePipeTile", menuName = "ScriptableObjects/Tiles/BreakablePipeTile", order = 4)]
 public class BreakablePipeTile : InteractableTile {
-    public string leftDestroy, rightDestroy;
+    public string leftDestroy, rightDestroy, pipeParticle;
     public bool upsideDownPipe, leftOfPipe;
     public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (!(interacter is PlayerController))
@@ -81,7 +81,7 @@ public class BreakablePipeTile : InteractableTile {
 
             bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
 
-            object[] parametersParticle = new object[]{world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), "DestructablePipe" + (alreadyDestroyed ? "-D" : "")};
+            object[] parametersParticle = new object[]{world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), pipeParticle + (alreadyDestroyed ? "-D" : "")};
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnResizableParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
         }
         string[] tiles = new string[tileHeight*2];

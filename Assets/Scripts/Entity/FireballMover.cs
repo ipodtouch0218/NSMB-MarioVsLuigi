@@ -36,7 +36,7 @@ public class FireballMover : MonoBehaviourPun {
     void HandleCollision() {
         physics.UpdateCollisions();
 
-        if (physics.onGround) {
+        if (physics.onGround && !breakOnImpact) {
             float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)) * 1.25f;
             if (Mathf.Sign(physics.floorAngle) != Mathf.Sign(body.velocity.x))
                 boost = 0;
@@ -45,7 +45,7 @@ public class FireballMover : MonoBehaviourPun {
         } else if (isIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
         }
-        bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact);
+        bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact && body.velocity.y <= 0);
         if (photonView && breaking) {
             if (photonView.IsMine)
                 PhotonNetwork.Destroy(gameObject);

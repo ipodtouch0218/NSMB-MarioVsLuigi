@@ -15,13 +15,11 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
     [SerializeField] GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
     [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
-    [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, heightSmallModel = 0.46f, heightLargeModel = 0.82f, deathUpTime = 0.6f, deathForce = 7f;
+    [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] Avatar smallAvatar, largeAvatar;
     [SerializeField] Color primaryColor = Color.clear, secondaryColor = Color.clear;
 
     [SerializeField] [ColorUsage(true, false)] Color? _glowColor = null;
-
-    private CommandBuffer glowBuffer;
 
     private MaterialPropertyBlock materialBlock;
 
@@ -66,9 +64,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
     public void Update() {
         HandleAnimations();
-
-        //Hitbox changing
-        UpdateHitbox();
     }
 
     void HandleAnimations() {
@@ -333,29 +328,6 @@ public class PlayerAnimationController : MonoBehaviourPun {
         }
     }
 
-    void UpdateHitbox() {
-        bool crouchHitbox = controller.state != Enums.PowerupState.MiniMushroom && controller.pipeEntering == null && ((controller.crouching && !controller.groundpound) || controller.inShell || controller.sliding);
-        Vector2 hitbox = GetHitboxSize(crouchHitbox);
-
-        mainHitbox.size = hitbox;
-        mainHitbox.offset = Vector2.up * 0.5f * hitbox;
-    }
-
-    public Vector2 GetHitboxSize(bool crouching) {
-        float height;
-
-        if (controller.state <= Enums.PowerupState.Small || (controller.invincible > 0 && !controller.onGround && !controller.crouching && !controller.sliding && !controller.flying && !controller.propeller) || controller.groundpound) {
-            height = heightSmallModel;
-        } else {
-            height = heightLargeModel;
-        }
-
-        if (crouching)
-            height *= controller.state <= Enums.PowerupState.Small ? 0.7f : 0.5f;
-
-        return new(mainHitbox.size.x, height);
-    }
-
     void HandlePipeAnimation() {
         if (!photonView.IsMine)
             return;
@@ -364,7 +336,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             return;
         }
 
-        UpdateHitbox();
+        controller.UpdateHitbox();
 
         PipeManager pe = controller.pipeEntering;
 
