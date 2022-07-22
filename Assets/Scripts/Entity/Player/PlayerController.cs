@@ -2215,14 +2215,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (!contact || contact.normal.y < 0.1f) {
             //we didn't hit the ground, we must've hit a ceiling or something.
-            Debug.Log("b");
             return;
         }
 
         float point = contact.point.y + Physics2D.defaultContactOffset;
         if (body.position.y > point + Physics2D.defaultContactOffset) {
             //dont snap when we're above the block
-            Debug.Log("c");
             return;
         }
 
@@ -2230,7 +2228,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (Utils.IsAnyTileSolidBetweenWorldBox(newPosition + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize)) {
             //it's an invalid position anyway, we'd be inside something.
-            Debug.Log("d");
             return;
         }
 
