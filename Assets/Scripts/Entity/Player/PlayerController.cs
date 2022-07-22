@@ -296,6 +296,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         previousOnGround = onGround;
         if (!dead) {
+            HandleBlockSnapping();
             bool snapped = GroundSnapCheck();
             HandleGroundCollision();
             onGround |= snapped;
@@ -353,15 +354,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     down++;
                     tilesStandingOn.Add(vec);
                 } else if (contact.collider.gameObject.layer == Layers.LayerGround) {
-                    if (Vector2.Dot(n, Vector2.left) > .9f) {
-                        right++;
-                        tilesHitSide.Add(vec);
-                    } else if (Vector2.Dot(n, Vector2.right) > .9f) {
-                        left++;
-                        tilesHitSide.Add(vec);
-                    } else if (Vector2.Dot(n, Vector2.down) > .9f) {
+                    if (Vector2.Dot(n, Vector2.down) > .9f) {
                         up++;
                         tilesJumpedInto.Add(vec);
+                    } else {
+                        if (n.x < 0) {
+                            right++;
+                        } else {
+                            left++;
+                        }
+                        tilesHitSide.Add(vec);
                     }
                 }
             }
@@ -1578,7 +1580,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
 
-        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, Layers.MaskAnyGround);
+        RaycastHit2D hit = Physics2D.BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x - Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, Layers.MaskAnyGround);
         if (hit) {
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
@@ -2189,6 +2191,53 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 facingRight = right;
         }
     }
+
+    public void HandleBlockSnapping() {
+        //if we're about to be in the top 2 pixels of a block, snap up to it, (if we can fit)
+
+        if (body.velocity.y > 0)
+            return;
+
+        Vector2 nextPos = body.position + Time.fixedDeltaTime * 2f * body.velocity;
+
+        Debug.DrawLine(nextPos + WorldHitboxSize.y * 0.5f * Vector2.up - WorldHitboxSize * 0.5f, nextPos + WorldHitboxSize.y * 0.5f * Vector2.up + WorldHitboxSize * 0.5f);
+
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(nextPos + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize))
+            //we are not going to be inside a block next fixed update
+            return;
+
+        //we ARE inside a block. figure out the height of the contact
+        // 32 pixels per unit
+        bool orig = Physics2D.queriesStartInColliders;
+        Physics2D.queriesStartInColliders = true;
+        RaycastHit2D contact = Physics2D.BoxCast(nextPos + 3f / 32f * Vector2.up, new(WorldHitboxSize.y, 1f / 32f), 0, Vector2.down, 3f / 32f, Layers.MaskAnyGround);
+        Physics2D.queriesStartInColliders = orig;
+
+        if (!contact || contact.normal.y < 0.1f) {
+            //we didn't hit the ground, we must've hit a ceiling or something.
+            Debug.Log("b");
+            return;
+        }
+
+        float point = contact.point.y + Physics2D.defaultContactOffset;
+        if (body.position.y > point + Physics2D.defaultContactOffset) {
+            //dont snap when we're above the block
+            Debug.Log("c");
+            return;
+        }
+
+        Vector2 newPosition = new(body.position.x, point);
+
+        if (Utils.IsAnyTileSolidBetweenWorldBox(newPosition + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize)) {
+            //it's an invalid position anyway, we'd be inside something.
+            Debug.Log("d");
+            return;
+        }
+
+        //valid position, snap upwards
+        body.position = newPosition;
+    }
+
     void HandleMovement(float delta) {
         functionallyRunning = running || state == Enums.PowerupState.MegaMushroom || propeller;
 

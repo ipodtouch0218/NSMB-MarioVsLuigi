@@ -19,4 +19,18 @@ public class EnemySpawnpoint : MonoBehaviour {
         currentEntity = PhotonNetwork.InstantiateRoomObject(prefab, transform.position, transform.rotation);
         return true;
     }
+
+    public void OnDrawGizmos() {
+        string icon = prefab.Split("/")[^1];
+        float offset = prefab switch {
+            "Prefabs/Enemy/BlueKoopa" => 0.15f,
+            "Prefabs/Enemy/RedKoopa" => 0.15f,
+            "Prefabs/Enemy/Koopa" => 0.15f,
+            "Prefabs/Enemy/Bobomb" => 0.22f,
+            "Prefabs/Enemy/Goomba" => 0.22f,
+            "Prefabs/Enemy/Spiny" => -0.03125f,
+            _ => 0,
+        };
+        Gizmos.DrawIcon(transform.position + offset * Vector3.up, icon, true, new Color(1, 1, 1, 0.5f));
+    }
 }
