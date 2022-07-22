@@ -2200,8 +2200,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         Vector2 nextPos = body.position + Time.fixedDeltaTime * 2f * body.velocity;
 
-        Debug.DrawLine(nextPos + WorldHitboxSize.y * 0.5f * Vector2.up - WorldHitboxSize * 0.5f, nextPos + WorldHitboxSize.y * 0.5f * Vector2.up + WorldHitboxSize * 0.5f);
-
         if (!Utils.IsAnyTileSolidBetweenWorldBox(nextPos + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize))
             //we are not going to be inside a block next fixed update
             return;
