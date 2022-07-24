@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public int starRequirement, timedGameDuration = -1, coinRequirement;
     public bool hurryup = false;
 
-    public int playerCount;
+    public int playerCount = 1;
     public List<PlayerController> allPlayers = new();
     public EnemySpawnpoint[] enemySpawnpoints;
 
@@ -90,24 +90,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         object[] data = customData as object[];
 
         switch (eventId) {
-        /*
         case PunEvent.Instantiation: {
             string prefab = (string) ((Hashtable) parameters.paramDict[245])[0];
 
             //server room instantiation
-            if (sender == null)
+            if (sender == null || sender.IsMasterClient)
                 return;
 
-            if (!PhotonNetwork.IsMasterClient || sender.IsMasterClient)
-                return;
-
-            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin")) {
+            if (prefab.Contains("Enemy") || /*prefab.Contains("Powerup") ||*/ prefab.Contains("Static") || prefab.Contains("Bump") || /*prefab.Contains("BigStar") ||*/ prefab.Contains("Coin")) {
                 PhotonNetwork.CloseConnection(sender);
                 PhotonNetwork.DestroyPlayerObjects(sender);
             }
             break;
         }
-        */
         case (byte) Enums.NetEventIds.AllFinishedLoading: {
             if (loaded)
                 break;
@@ -440,6 +435,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         loadedPlayers.Clear();
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
         bool spectating = GlobalController.Instance.joinedAsSpectator;
+        bool gameStarting = startTimestamp - PhotonNetwork.ServerTimestamp > 0;
 
         if (PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode) {
             //clear buffered loading complete events.
@@ -447,12 +443,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);
         }
 
-
-        if (!spectating) {
-            yield return new WaitForSecondsRealtime((startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f);
-        } else {
-            yield return new WaitForSeconds(3f);
-        }
+        yield return new WaitForSecondsRealtime(Mathf.Max(3f, (startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f));
 
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
         if (canvas) {
@@ -468,25 +459,25 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         playerCount = allPlayers.Count;
         started = true;
 
-        if (!spectating) {
-            foreach (PlayerController controllers in allPlayers)
-                if (controllers)
-                    controllers.gameObject.SetActive(false);
+        foreach (PlayerController controllers in allPlayers)
+            if (controllers) {
+                if (spectating && controllers.sfx) {
+                    controllers.sfxBrick.enabled = true;
+                    controllers.sfx.enabled = true;
+                }
+                controllers.gameObject.SetActive(false);
+            }
 
+        if (gameStarting) {
             yield return new WaitForSeconds(3.5f);
-
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
             if (PhotonNetwork.IsMasterClient)
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                     point.AttemptSpawning();
 
-
-            localPlayer.GetComponent<PlayerController>().OnGameStart();
-        } else {
-            foreach (PlayerController player in allPlayers)
-                if (player && player.sfx)
-                    player.sfx.enabled = true;
+            if (localPlayer)
+                localPlayer.GetComponent<PlayerController>().OnGameStart();
         }
 
         startServerTime = startTimestamp + 3500;
@@ -621,7 +612,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
                     currentStar = PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", spawnPos, Quaternion.identity);
                     remainingSpawns.RemoveAt(index);
-                    spawnStarCount = 10.4f - (PhotonNetwork.CurrentRoom.PlayerCount / 5f);
+                    spawnStarCount = 10.4f - (playerCount / 5f);
                 }
             } else {
                 currentStar = GameObject.FindGameObjectWithTag("bigstar");
@@ -827,7 +818,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public float size = 1.39f, ySize = 0.8f;
     public Vector3 GetSpawnpoint(int playerIndex, int players = -1) {
         if (players <= -1)
-            players = PhotonNetwork.CurrentRoom.PlayerCount;
+            players = playerCount;
+        if (players == 0)
+            players = 1;
+
         float comp = (float) playerIndex/players * 2 * Mathf.PI + (Mathf.PI/2f) + (Mathf.PI/(2*players));
         float scale = (2-(players+1f)/players) * size;
         Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2 ? scale * ySize : 0), 0);

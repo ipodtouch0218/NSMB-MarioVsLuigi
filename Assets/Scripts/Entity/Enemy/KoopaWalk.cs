@@ -339,7 +339,7 @@ public class KoopaWalk : HoldableEntity {
         wakeupTimer = wakeup;
         shell = true;
         upsideDown = canBeFlipped;
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
+        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
         body.velocity = new Vector2(body.velocity.x, 5.5f);
     }
 
