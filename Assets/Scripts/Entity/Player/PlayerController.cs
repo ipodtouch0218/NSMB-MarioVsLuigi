@@ -1044,10 +1044,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), position, Quaternion.identity);
 
         PlaySound(Enums.Sounds.World_Coin_Collect);
-        GameObject num = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity);
-        TMP_Text text = num.GetComponentInChildren<TMP_Text>();
-        text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
-        Destroy(num, 1f);
+        NumberParticle num = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity)).GetComponentInChildren<NumberParticle>();
+        num.text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
+        num.color = AnimationController.GlowColor;
 
         coins++;
         if (coins >= GameManager.Instance.coinRequirement) {
@@ -2192,6 +2191,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
     }
 
+    [PunRPC]
+    public void EndMega() {
+        giantEndTimer = giantStartTime / 2f;
+        state = Enums.PowerupState.Mushroom;
+        stationaryGiantEnd = false;
+        hitInvincibilityCounter = 3f;
+        PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
+        body.velocity = new(body.velocity.x, body.velocity.y > 0 ? (body.velocity.y / 3f) : body.velocity.y);
+    }
+
     public void HandleBlockSnapping() {
         //if we're about to be in the top 2 pixels of a block, snap up to it, (if we can fit)
 
@@ -2524,13 +2533,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
 
 
-        if (state == Enums.PowerupState.MegaMushroom && giantTimer <= 0) {
-            giantEndTimer = giantStartTime / 2f;
-            state = Enums.PowerupState.Mushroom;
-            stationaryGiantEnd = false;
-            hitInvincibilityCounter = 3f;
-            PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
-            body.velocity = new(body.velocity.x, body.velocity.y > 0 ? (body.velocity.y / 3f) : body.velocity.y);
+        if (state == Enums.PowerupState.MegaMushroom && giantTimer <= 0 && photonView.IsMine) {
+            photonView.RPC("EndMega", RpcTarget.All);
         }
 
         HandleSlopes();
