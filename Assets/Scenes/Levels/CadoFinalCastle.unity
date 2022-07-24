@@ -20864,6 +20864,16 @@ PrefabInstance:
       propertyPath: splashVelocity
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 3106545712320729601, guid: 2dd296828f2080541ab2b41eeda650a7,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 62
+      objectReference: {fileID: 0}
+    - target: {fileID: 3106545712320729601, guid: 2dd296828f2080541ab2b41eeda650a7,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 53edeadfad8bf9d41b9c81364e52ea77, type: 2}
     - target: {fileID: 6004104070224972751, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Name
@@ -20887,7 +20897,7 @@ PrefabInstance:
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Size.y
-      value: 1.4
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
@@ -20897,7 +20907,7 @@ PrefabInstance:
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Offset.y
-      value: 0.45
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
@@ -20913,6 +20923,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_UsedByComposite
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.x
+      value: 62
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972753, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
