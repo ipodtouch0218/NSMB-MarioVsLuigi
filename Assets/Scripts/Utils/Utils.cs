@@ -12,7 +12,7 @@ namespace NSMB.Utils {
 
         public static int FirstPlaceStars {
             get {
-                return GameManager.Instance.allPlayers.Max(pc => pc.stars);
+                return GameManager.Instance.allPlayers.Where(pl => pl.lives != 0).Max(pc => pc.stars);
             }
         }
 

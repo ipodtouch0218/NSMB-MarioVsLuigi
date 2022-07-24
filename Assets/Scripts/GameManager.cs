@@ -443,7 +443,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);
         }
 
-        yield return new WaitForSecondsRealtime(Mathf.Max(3f, (startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f));
+        yield return new WaitForSeconds(Mathf.Max(1f, (startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f));
 
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
         if (canvas) {
@@ -456,16 +456,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             Destroy(source);
         }
 
-        playerCount = allPlayers.Count;
         started = true;
 
+        playerCount = allPlayers.Count;
         foreach (PlayerController controllers in allPlayers)
             if (controllers) {
                 if (spectating && controllers.sfx) {
                     controllers.sfxBrick.enabled = true;
                     controllers.sfx.enabled = true;
                 }
-                controllers.gameObject.SetActive(false);
+                controllers.gameObject.SetActive(spectating);
             }
 
         if (gameStarting) {
