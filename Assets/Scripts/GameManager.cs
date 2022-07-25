@@ -506,10 +506,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SceneManager.UnloadSceneAsync("Loading");
     }
 
-    IEnumerator CountdownSound(float t, int times) {
+    IEnumerator CountdownSound(float t, float times) { //The match countdown sound system. t is the tempo, and times is the # of times the sound will play (variable if match is started at 10s or less)
         for (int i=0;i<times;i++) {
-            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
-            yield return new WaitForSeconds(t);
+            if (gameover != true) { //This is to ensure that if a win or draw occurs in the last 10 seconds, the countdown sound doesn't play past the match's length.
+                if (i>=(times/2)) { //Countdown sound will speed up and play twice per second as a match's end draws near.
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                    yield return new WaitForSeconds(t/2);
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                    yield return new WaitForSeconds(t/2);
+                }
+                else { //Or it'll just play normally.
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                    yield return new WaitForSeconds(t);
+                }
+            }
         }
     }
 
@@ -557,13 +567,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             if (timeRemaining > 0 && gameover != true) {
                 timeRemaining -= Time.deltaTime;
-                //play hurry sound if time < 10 OR less than 10%
-                if (hurryup != true && (timeRemaining <= 10 || timeRemaining < (timedGameDuration * 0.2f))) {
+                //play hurry sound if time < 60 (will play instantly when a match starts with a time limit less than 60s)
+                if (hurryup != true && (timeRemaining <= 60)) {
                     hurryup = true;
                     sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
                 }
-                if (tenSecondCountdown != true && (timeRemaining <= 9)) {
-                    StartCoroutine(CountdownSound(1.0f, 9));
+                if (tenSecondCountdown != true && (timeRemaining <= 10)) {
+                    StartCoroutine(CountdownSound(1.0f, timeRemaining));
                     tenSecondCountdown = true;
                 }
                 if (timeRemaining - Time.deltaTime <= 0) {
