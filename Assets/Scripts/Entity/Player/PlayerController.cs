@@ -2202,6 +2202,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void HandleBlockSnapping() {
+        if (pipeEntering)
+            return;
+
         //if we're about to be in the top 2 pixels of a block, snap up to it, (if we can fit)
 
         if (body.velocity.y > 0)
