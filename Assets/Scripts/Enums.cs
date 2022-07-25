@@ -131,6 +131,8 @@ public static class Enums {
         [SoundData("ui/windowclosed")]                          UI_WindowClose = 85,
         [SoundData("ui/windowopen")]                            UI_WindowOpen = 86,
         [SoundData("ui/match_draw")]                            UI_Match_Draw = 87,
+        [SoundData("ui/countdown1")]                            UI_Countdown_0 = 88,
+        [SoundData("ui/countdown0")]                            UI_Countdown_1 = 89,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,

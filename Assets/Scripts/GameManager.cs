@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public readonly List<string> loadedPlayers = new();
     public int starRequirement, timedGameDuration = -1, coinRequirement;
     public bool hurryup = false;
+    public bool tenSecondCountdown = false;
 
     public int playerCount = 1;
     public List<PlayerController> allPlayers = new();
@@ -505,6 +506,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SceneManager.UnloadSceneAsync("Loading");
     }
 
+    IEnumerator CountdownSound(float t, int times) {
+        for (int i=0;i<times;i++) {
+            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+            yield return new WaitForSeconds(t);
+        }
+    }
+
     IEnumerator EndGame(Player winner) {
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
@@ -554,7 +562,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     hurryup = true;
                     sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
                 }
+                if (tenSecondCountdown != true && (timeRemaining <= 9)) {
+                    StartCoroutine(CountdownSound(1.0f, 9));
+                    tenSecondCountdown = true;
+                }
                 if (timeRemaining - Time.deltaTime <= 0) {
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
                     CheckForWinner();
                 }
             }
