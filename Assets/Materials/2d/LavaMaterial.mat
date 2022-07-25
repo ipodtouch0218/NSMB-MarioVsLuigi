@@ -71,8 +71,8 @@ Material:
     - _Points: 160
     m_Colors:
     - BackgroundColor: {r: 1, g: 0, b: 0, a: 0.8}
-    - FoamColor: {r: 1, g: 1, b: 1, a: 1}
-    - RippleColor: {r: 0.972549, g: 0.74853635, b: 0.7372549, a: 1}
+    - FoamColor: {r: 1, g: 0.91055405, b: 0.1745283, a: 1}
+    - RippleColor: {r: 1, g: 0.7477621, b: 0.3537736, a: 1}
     - TopColor: {r: 1, g: 0.27103722, b: 0.2028302, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &7893850056676362737

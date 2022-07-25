@@ -41,4 +41,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CustomDesert.unity
     guid: 0a445e83695e8424e9e56da3e5b773e4
+  - enabled: 1
+    path: Assets/Scenes/Levels/CadoMountain.unity
+    guid: a2428cbc96a029748bcb0c6d37569232
+  - enabled: 1
+    path: Assets/Scenes/Levels/CadoDark.unity
+    guid: 57e70d2991dd2624caf06eec136b989c
+  - enabled: 1
+    path: Assets/Scenes/Levels/CadoBeach.unity
+    guid: 600d3df3bb8263f40ab993c3cb740a83
+  - enabled: 1
+    path: Assets/Scenes/Levels/CadoFinalCastle.unity
+    guid: 99b3124c5814a544d8dc129396bc28ac
   m_configObjects: {}
