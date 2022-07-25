@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (sender == null || sender.IsMasterClient)
                 return;
 
-            if (prefab.Contains("Enemy") || /*prefab.Contains("Powerup") ||*/ prefab.Contains("Static") || prefab.Contains("Bump") || /*prefab.Contains("BigStar") ||*/ prefab.Contains("Coin")) {
+            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin")) {
                 PhotonNetwork.CloseConnection(sender);
                 PhotonNetwork.DestroyPlayerObjects(sender);
             }
@@ -298,15 +298,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     // ROOM CALLBACKS
     public void OnJoinedRoom() { }
-    public void OnPlayerPropertiesUpdate(Player player, Hashtable playerProperties) {
-        foreach (PlayerController pl in allPlayers) {
-            if (!pl)
-                continue;
-
-            if (pl.photonView.Owner == player)
-                pl.LoadFromGameState();
-        }
-    }
+    public void OnPlayerPropertiesUpdate(Player player, Hashtable playerProperties) { }
     public void OnRoomPropertiesUpdate(Hashtable properties) { }
 
     public void OnMasterClientSwitched(Player newMaster) {

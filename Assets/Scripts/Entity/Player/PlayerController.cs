@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 using Photon.Pun;
 using ExitGames.Client.Photon;
@@ -791,7 +789,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
 
-        SpawnReserveItem();
+        photonView.RPC("SpawnReserveItem", RpcTarget.All);
+        storedPowerup = null;
+
+        UpdateGameState();
     }
     #endregion
 
@@ -1057,12 +1058,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         UpdateGameState();
     }
 
+    [PunRPC]
     public void SpawnReserveItem() {
         if (storedPowerup == null)
             return;
 
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
         string prefab = storedPowerup.prefab;
-        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
         storedPowerup = null;
         UpdateGameState();
@@ -1072,20 +1077,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (coins < GameManager.Instance.coinRequirement)
             return;
 
-        if (!photonView.IsMine)
+        if (!PhotonNetwork.IsMasterClient)
             return;
 
         string prefab = Utils.GetRandomItem(this).prefab;
-        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
 
         coins = 0;
     }
 
     void SpawnStars(int amount, bool deathplane) {
-
-        if (!photonView.IsMine)
+        if (!PhotonNetwork.IsMasterClient) {
+            stars = Mathf.Max(0, stars - amount);
             return;
+        }
 
         bool fastStars = amount > 2 && stars > 2;
 
@@ -1108,8 +1114,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void SpawnStar(bool deathplane) {
-        PhotonNetwork.Instantiate("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
-
+        PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
         starDirection = (starDirection + 1) % 4;
     }
     #endregion
@@ -1127,6 +1132,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (--lives == 0) {
             GameManager.Instance.CheckForWinner();
         }
+
         if (deathplane)
             spawned = false;
         dead = true;
@@ -2202,7 +2208,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void HandleBlockSnapping() {
-        if (pipeEntering)
+        if (pipeEntering || drill)
             return;
 
         //if we're about to be in the top 2 pixels of a block, snap up to it, (if we can fit)
