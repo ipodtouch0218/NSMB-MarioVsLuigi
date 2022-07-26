@@ -1634,7 +1634,7 @@ GameObject:
   m_Component:
   - component: {fileID: 48385958}
   m_Layer: 0
-  m_Name: CameraPositionDark
+  m_Name: CameraPositionSpooky
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5682,7 +5682,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 34.9
+  m_fontSize: 27.4
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -24090,7 +24090,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18.85
+  m_fontSize: 18
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -24870,7 +24870,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.83, y: 0.28}
   m_AnchorMax: {x: 0.93, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.9999981}
+  m_AnchoredPosition: {x: 0, y: -1}
   m_SizeDelta: {x: 0, y: 1.9999962}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &778236497
@@ -33335,7 +33335,7 @@ MonoBehaviour:
   - '[WIP] Bonus'
   - '[WIP] Desert'
   - '[WIP] Mountain'
-  - '[WIP] Dark'
+  - '[WIP] Spooky'
   - '[WIP] Beach'
   - '[WIP] Castle'
 --- !u!4 &887693662
@@ -41572,7 +41572,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18.85
+  m_fontSize: 18
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -89516,7 +89516,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1930364255}
   m_Layer: 0
-  m_Name: DarkLevel
+  m_Name: SpookyLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

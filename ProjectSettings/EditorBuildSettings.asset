@@ -45,7 +45,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Levels/CadoMountain.unity
     guid: a2428cbc96a029748bcb0c6d37569232
   - enabled: 1
-    path: Assets/Scenes/Levels/CadoDark.unity
+    path: Assets/Scenes/Levels/CadoSpooky.unity
     guid: 57e70d2991dd2624caf06eec136b989c
   - enabled: 1
     path: Assets/Scenes/Levels/CadoBeach.unity
