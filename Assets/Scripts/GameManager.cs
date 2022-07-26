@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public readonly List<string> loadedPlayers = new();
     public int starRequirement, timedGameDuration = -1, coinRequirement;
     public bool hurryup = false;
+    public bool tenSecondCountdown = false;
 
     public int playerCount = 1;
     public List<PlayerController> allPlayers = new();
@@ -97,7 +98,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (sender == null || sender.IsMasterClient)
                 return;
 
-            if (prefab.Contains("Enemy") || /*prefab.Contains("Powerup") ||*/ prefab.Contains("Static") || prefab.Contains("Bump") || /*prefab.Contains("BigStar") ||*/ prefab.Contains("Coin")) {
+            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin")) {
                 PhotonNetwork.CloseConnection(sender);
                 PhotonNetwork.DestroyPlayerObjects(sender);
             }
@@ -298,15 +299,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     // ROOM CALLBACKS
     public void OnJoinedRoom() { }
-    public void OnPlayerPropertiesUpdate(Player player, Hashtable playerProperties) {
-        foreach (PlayerController pl in allPlayers) {
-            if (!pl)
-                continue;
-
-            if (pl.photonView.Owner == player)
-                pl.LoadFromGameState();
-        }
-    }
+    public void OnPlayerPropertiesUpdate(Player player, Hashtable playerProperties) { }
     public void OnRoomPropertiesUpdate(Hashtable properties) { }
 
     public void OnMasterClientSwitched(Player newMaster) {
@@ -505,6 +498,23 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SceneManager.UnloadSceneAsync("Loading");
     }
 
+    IEnumerator CountdownSound(float t, float times) { //The match countdown sound system. t is the tempo, and times is the # of times the sound will play (variable if match is started at 10s or less)
+        for (int i=0;i<times;i++) {
+            if (gameover != true) { //This is to ensure that if a win or draw occurs in the last 10 seconds, the countdown sound doesn't play past the match's length.
+                if (i>=(times/2)) { //Countdown sound will speed up and play twice per second as a match's end draws near.
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                    yield return new WaitForSeconds(t/2);
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                    yield return new WaitForSeconds(t/2);
+                }
+                else { //Or it'll just play normally.
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                    yield return new WaitForSeconds(t);
+                }
+            }
+        }
+    }
+
     IEnumerator EndGame(Player winner) {
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
@@ -549,12 +559,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             if (timeRemaining > 0 && gameover != true) {
                 timeRemaining -= Time.deltaTime;
-                //play hurry sound if time < 10 OR less than 10%
-                if (hurryup != true && (timeRemaining <= 10 || timeRemaining < (timedGameDuration * 0.2f))) {
+                //play hurry sound if time < 60 (will play instantly when a match starts with a time limit less than 60s)
+                if (hurryup != true && (timeRemaining <= 60)) {
                     hurryup = true;
                     sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
                 }
+                if (tenSecondCountdown != true && (timeRemaining <= 10)) {
+                    StartCoroutine(CountdownSound(1.0f, timeRemaining));
+                    tenSecondCountdown = true;
+                }
                 if (timeRemaining - Time.deltaTime <= 0) {
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
                     CheckForWinner();
                 }
             }
