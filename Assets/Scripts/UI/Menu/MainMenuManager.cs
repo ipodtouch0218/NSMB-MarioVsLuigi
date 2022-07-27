@@ -156,9 +156,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         Room room = PhotonNetwork.CurrentRoom;
         Player local = PhotonNetwork.LocalPlayer;
-        if (room.Players.Values.Where(pl => pl != local).Any(pl => pl.NickName.ToLower() == local.NickName.ToLower())) {
+        if (room.Players.Values.Where(pl => pl != local).Any(pl => pl.NickName.Filter().ToLower() == local.NickName.Filter().ToLower())) {
             //rename
-            int dupes = room.Players.Values.Where(pl => pl != local).Where(pl => Regex.Match(pl.NickName, local.NickName + "\\(\\d\\)").Success).Count();
+            int dupes = room.Players.Values.Where(pl => pl != local).Where(pl => Regex.Match(pl.NickName.Filter(), local.NickName.Filter() + "\\(\\d\\)").Success).Count();
             for (int i = 1; i <= dupes + 1; i++) {
                 string dupeName = PhotonNetwork.NickName + "(" + i + ")"; ;
                 if (!room.Players.Values.Any(pl => pl.NickName == dupeName)) {
@@ -613,6 +613,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
         privatePrompt.SetActive(false);
+
+        foreach (RoomIcon room in currentRooms.Values)
+            room.UpdateUI(room.room);
 
         EventSystem.current.SetSelectedGameObject(lobbySelected);
     }
@@ -1128,11 +1131,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     private void SetText(GameObject obj, string txt) {
         TextMeshProUGUI textComp = obj.GetComponent<TextMeshProUGUI>();
-        textComp.text = txt;
+        textComp.text = txt.Filter();
     }
     private void SetText(GameObject obj, string txt, Color color) {
         TextMeshProUGUI textComp = obj.GetComponent<TextMeshProUGUI>();
-        textComp.text = txt;
+        textComp.text = txt.Filter();
         textComp.color = color;
     }
     public void OpenLinks() {

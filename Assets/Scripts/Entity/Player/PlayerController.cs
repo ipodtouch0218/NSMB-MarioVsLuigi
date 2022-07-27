@@ -635,20 +635,24 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             MovingPowerup powerup = obj.GetComponentInParent<MovingPowerup>();
             if (powerup.followMeCounter > 0 || powerup.ignoreCounter > 0)
                 break;
-            photonView.RPC("Powerup", RpcTarget.AllViaServer, powerup.photonView.ViewID);
+            photonView.RPC("AttemptCollectPowerup", RpcTarget.All, powerup.photonView.ViewID);
             Destroy(collider);
             break;
         }
-        case "bigstar":
-            photonView.RPC("CollectBigStar", RpcTarget.AllViaServer, obj.transform.parent.gameObject.GetPhotonView().ViewID);
+        case "bigstar": {
+            Transform parent = obj.transform.parent;
+            photonView.RPC("AttemptCollectBigStar", RpcTarget.MasterClient, parent.gameObject.GetPhotonView().ViewID);
             break;
-        case "loosecoin":
+        }
+        case "loosecoin": {
             Transform parent = obj.transform.parent;
             photonView.RPC("CollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, parent.position);
             break;
-        case "coin":
+        }
+        case "coin": {
             photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
             break;
+        }
         }
     }
 
@@ -798,14 +802,36 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- POWERUP / POWERDOWN --
     [PunRPC]
+    public void AttemptCollectPowerup(int powerupID, PhotonMessageInfo info) {
+        //only the owner can request a powerup, and only the master client can decide for us
+        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
+            return;
+
+        //powerup doesn't eixst?
+        PhotonView view = PhotonView.Find(powerupID);
+        if (!view || view.gameObject.GetComponent<MovingPowerup>() is not MovingPowerup powerup)
+            return;
+
+        if (powerup.Collected || powerup.followMeCounter > 0)
+            return;
+
+        powerup.Collected = true;
+
+        //we can collect
+        photonView.RPC("Powerup", RpcTarget.All, powerupID);
+    }
+
+    [PunRPC]
     protected void Powerup(int actor, PhotonMessageInfo info) {
+        //only trust the master client
+        if (!info.Sender.IsMasterClient)
+            return;
+
         PhotonView view;
         if (dead || !(view = PhotonView.Find(actor)))
             return;
 
         MovingPowerup powerupObj = view.GetComponent<MovingPowerup>();
-        if (powerupObj.followMeCounter > 0)
-            return;
 
         Powerup powerup = powerupObj.powerupScriptable;
         Enums.PowerupState newState = powerup.state;
@@ -995,31 +1021,54 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- COIN / STAR COLLECTION --
     [PunRPC]
-    protected void CollectBigStar(int starID) {
+    protected void AttemptCollectBigStar(int starID, PhotonMessageInfo info) {
+        //only the owner can request a big star, and only the master client can decide for us
+        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
+            return;
+
+        //star doesn't eixst?
         PhotonView view = PhotonView.Find(starID);
         if (!view)
             return;
 
-        GameObject star = view.gameObject;
-        StarBouncer starScript = star.GetComponent<StarBouncer>();
-        if (!starScript.Collectable)
+        StarBouncer starScript = view.gameObject.GetComponent<StarBouncer>();
+        if (!starScript.Collectable || starScript.Collected)
             return;
 
-        if (photonView.IsMine && starScript.stationary)
+        starScript.Collected = true;
+
+        //we can collect
+        photonView.RPC("CollectBigStar", RpcTarget.All, starID);
+        if (starScript.stationary)
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+    }
 
+    [PunRPC]
+    public void CollectBigStar(int starID, PhotonMessageInfo info) {
+        //only trust the master client
+        if (!info.Sender.IsMasterClient)
+            return;
+
+        PhotonView view = PhotonView.Find(starID);
+        GameObject star = view.gameObject;
+
+        //state
         stars = Mathf.Min(stars + 1, GameManager.Instance.starRequirement);
-
         UpdateGameState();
+
+        //game mechanics
         GameManager.Instance.CheckForWinner();
 
+        //fx
         Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
         PlaySoundEverywhere(photonView.IsMine ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
 
+        //destroy star
+
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
-        DestroyImmediate(star);
-        DestroyImmediate(star);
+        else if (star)
+            DestroyImmediate(star);
     }
 
     [PunRPC]
