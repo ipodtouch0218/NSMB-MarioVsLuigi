@@ -1,3 +1,4 @@
+using NSMB.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,6 +22,10 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
 
     private void OnToggle(InputAction.CallbackContext context) {
+        ManualToggle();
+    }
+
+    public void ManualToggle() {
         if (autoToggled && !manuallyToggled) {
             //exception, already open. close.
             manuallyToggled = false;

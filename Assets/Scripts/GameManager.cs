@@ -479,6 +479,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         try {
             ScoreboardUpdater.instance.Populate(allPlayers);
+            if (Settings.Instance.scoreboardAlways)
+                ScoreboardUpdater.instance.ManualToggle();
         } catch { }
 
         yield return new WaitForSeconds(1f);
@@ -521,7 +523,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         music.Stop();
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.NickName } Wins!" : "It's a draw...";
+        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.NickName.Filter() } Wins!" : "It's a draw...";
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
