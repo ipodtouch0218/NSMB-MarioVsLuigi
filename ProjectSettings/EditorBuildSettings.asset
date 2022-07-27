@@ -53,4 +53,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CadoFinalCastle.unity
     guid: 99b3124c5814a544d8dc129396bc28ac
+  - enabled: 1
+    path: Assets/Scenes/Levels/CadoSnowy.unity
+    guid: 52d6910408d2f294aa3a01155ca53d2c
   m_configObjects: {}
