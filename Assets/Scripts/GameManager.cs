@@ -422,7 +422,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     IEnumerator LoadingComplete(int startTimestamp) {
-        GlobalController.Instance.discordController.UpdateActivity();
+        GlobalController.Instance.DiscordController.UpdateActivity();
 
         loaded = true;
         loadedPlayers.Clear();
@@ -494,7 +494,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             endRealTime = startRealTime + 4500 + timedGameDuration * 1000;
         }
 
-        GlobalController.Instance.discordController.UpdateActivity();
+        GlobalController.Instance.DiscordController.UpdateActivity();
 
         if (canvas)
             SceneManager.UnloadSceneAsync("Loading");

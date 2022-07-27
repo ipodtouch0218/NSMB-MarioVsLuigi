@@ -29,14 +29,22 @@ namespace NSMB.Utils {
         public static string FilterString(string input) {
             DecodeFilter();
 
-            input = input.ToLower();
-            input = ApplySubsitutions(input);
+            StringBuilder result = new(input);
+
+            string filtered = input.ToLower();
+            filtered = ApplySubsitutions(filtered);
 
             foreach (string word in filteredWords) {
-                input = Regex.Replace(input, word, new string('*', Regex.Replace(word, "(?<=\\w*)\\W.*", "").Length), RegexOptions.IgnoreCase);
+                foreach (Match m in Regex.Matches(filtered, word)) {
+                    foreach (Capture c in m.Captures) {
+                        for (int i = c.Index; i < c.Index + c.Length; i++) {
+                            result[i] = '*';
+                        }
+                    }
+                }
             }
 
-            return input;
+            return result.ToString();
         }
 
         private static string ApplySubsitutions(string input) {
