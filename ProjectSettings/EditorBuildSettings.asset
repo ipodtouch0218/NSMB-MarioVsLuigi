@@ -41,4 +41,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CustomDesert.unity
     guid: 0a445e83695e8424e9e56da3e5b773e4
-  m_configObjects: {}
+  - enabled: 1
+    path: Assets/Scenes/Test.unity
+    guid: 2df97d7daa82ea64fa50fff868f28001
+  - enabled: 1
+    path: Assets/Scenes/Levels/DebugLevel.unity
+    guid: 73f3b6526cecdb847a5602d33bd0ecb6
+  - enabled: 1
+    path: Assets/Scenes/1-1.unity
+    guid: d98785c21fac7be4ab503cdfd6b9cdde
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: 73eb32fc0b6fbdb4dab6cb8a6f8d6380,
+      type: 2}

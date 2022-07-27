@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -13,12 +15,12 @@ public class SlantText : MonoBehaviour {
 
     private bool set;
 
-    public void OnValidate() {
+    void OnValidate() {
         set = false;
-        Update();
+        Update();    
     }
 
-    public void Update() {
+    void Update() {
         if (set)
             return;
 

@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using UnityEngine.Tilemaps;
-using NSMB.Utils;
 
 public class KoopaWalk : HoldableEntity {
+
+    private static int GROUND_LAYER_ID = -1, GROUND_AND_SEMISOLIDS_LAYER_ID = -1;
 
     protected int combo;
     public float walkSpeed, kickSpeed, wakeup = 15;
@@ -17,15 +18,20 @@ public class KoopaWalk : HoldableEntity {
     [SerializeField] Vector2 outShellHitboxSize, inShellHitboxSize;
     [SerializeField] Vector2 outShellHitboxOffset, inShellHitboxOffset;
 
-    public new void Start() {
+    new void Start() {
         base.Start();
         hitbox = transform.GetChild(0).GetComponent<BoxCollider2D>();
         worldHitbox = GetComponent<BoxCollider2D>();
 
+        if (GROUND_LAYER_ID == -1)
+            GROUND_LAYER_ID = LayerMask.NameToLayer("Ground");
+        if (GROUND_AND_SEMISOLIDS_LAYER_ID == -1)
+            GROUND_AND_SEMISOLIDS_LAYER_ID = LayerMask.GetMask("Ground", "Semisolids");
+
         body.velocity = new Vector2(-walkSpeed, 0);
     }
 
-    public new void FixedUpdate() {
+    new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -87,12 +93,12 @@ public class KoopaWalk : HoldableEntity {
             }
         }
 
-        if (physics.onGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && red && !shell) {
+        if (physics.onGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, GROUND_AND_SEMISOLIDS_LAYER_ID) && red && !shell) {
             Vector3 redCheckPos = body.position + new Vector2(0.1f * (left ? -1 : 1), 0);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref redCheckPos);
 
-            if (!Physics2D.Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround)) {
+            if (!Physics2D.Raycast(redCheckPos, Vector2.down, 0.5f, GROUND_AND_SEMISOLIDS_LAYER_ID)) {
                 if (photonView && photonView.IsMine) {
                     photonView.RPC("Turnaround", RpcTarget.All, left, velocityLastFrame.x);
                 } else {
@@ -103,7 +109,7 @@ public class KoopaWalk : HoldableEntity {
 
         if (physics.onGround) {
             if (stationary) {
-                //body.velocity = new(body.velocity.x, 0);
+                body.velocity = new(body.velocity.x, 0);
             } else {
                 body.velocity = new Vector2((shell ? speed : walkSpeed) * (left ? -1 : 1), 0);
             }
@@ -121,7 +127,7 @@ public class KoopaWalk : HoldableEntity {
     }
     public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = damageDirection.y > 0;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
         if (holder)
             return;
 
@@ -132,7 +138,7 @@ public class KoopaWalk : HoldableEntity {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
+            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, 0);
         } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC("EnterShell", RpcTarget.All);
             if (!blue) {
@@ -285,7 +291,7 @@ public class KoopaWalk : HoldableEntity {
         for (int i = 0; i < collisionAmount; i++) {
             var point = collisions[i];
             Vector2 p = point.point + (point.normal * -0.15f);
-            if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
+            if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == GROUND_LAYER_ID) {
                 if (!putdown && shell && !stationary) {
                     Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
                     TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
@@ -339,7 +345,7 @@ public class KoopaWalk : HoldableEntity {
         wakeupTimer = wakeup;
         shell = true;
         upsideDown = canBeFlipped;
-        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
         body.velocity = new Vector2(body.velocity.x, 5.5f);
     }
 

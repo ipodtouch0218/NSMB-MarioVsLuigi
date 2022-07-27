@@ -2,18 +2,16 @@
 using UnityEngine.UI;
 
 public class TrackIcon : MonoBehaviour {
-
     public float trackMinX, trackMaxX;
     public GameObject target;
+    private PlayerController playerTarget;
+    Image image;
     public bool doAnimation;
     public Sprite starSprite;
-
     private float flashTimer;
-    private PlayerController playerTarget;
     private Material mat;
-    private Image image;
 
-    public void Start() {
+    void Start() {
         image = GetComponent<Image>();
 
         StarBouncer star;
@@ -25,18 +23,15 @@ public class TrackIcon : MonoBehaviour {
         mat = image.material;
         Update();
     }
-
-    public void Update() {
+    void Update() {
         if (target == null) {
             Destroy(gameObject);
             return;
         }
-
         image.enabled = true;
         if (target.CompareTag("Player")) {
             if (!playerTarget)
                 playerTarget = target.GetComponent<PlayerController>();
-
             image.color = playerTarget.AnimationController.GlowColor;
             if (playerTarget.dead) {
                 flashTimer += Time.deltaTime;
@@ -45,7 +40,7 @@ public class TrackIcon : MonoBehaviour {
                 flashTimer = 0;
                 image.enabled = true;
             }
-            transform.localScale = playerTarget.cameraController.controlCamera ? new(1, -1, 1) : Vector3.one * (2f / 3f);
+            transform.localScale = Vector3.one * (playerTarget.cameraController.controlCamera ? 1 : (2 / 3f));
 
             mat.SetColor("OverlayColor", playerTarget.AnimationController.GlowColor);
             mat.SetFloat("Star", playerTarget.invincible > 0 ? 1 : 0);
@@ -53,10 +48,9 @@ public class TrackIcon : MonoBehaviour {
             image.sprite = starSprite;
             image.enabled = true;
         }
-
         float levelWidth = GameManager.Instance.GetLevelMaxX() - GameManager.Instance.GetLevelMinX();
         float trackWidth = trackMaxX - trackMinX;
         float percentage = (target.transform.position.x - GameManager.Instance.GetLevelMinX()) / levelWidth;
-        transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y);
+        transform.localPosition = new Vector2(percentage * trackWidth - trackMaxX, transform.localPosition.y);
     }
 }

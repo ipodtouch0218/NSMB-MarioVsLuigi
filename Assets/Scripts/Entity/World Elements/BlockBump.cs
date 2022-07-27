@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
-using NSMB.Utils;
 
 public class BlockBump : MonoBehaviour {
     public string resultTile = "";
     public string prefab;
+    public bool x10 = false;
     public Sprite sprite;
     public bool fromAbove;
     SpriteRenderer sRenderer;
     public PlayerController hitter;
     public Vector2 spawnOffset = Vector2.zero;
 
-    void Start() {
+    void Start() 
+    {
         Animator anim = GetComponent<Animator>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
         sRenderer.sprite = sprite;
@@ -29,16 +30,21 @@ public class BlockBump : MonoBehaviour {
         hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(1/2f, -1/2f);
     }
 
-    public void Kill() {
+    public void Kill()
+    {
+
         Destroy(gameObject);
 
         Tilemap tm = GameManager.Instance.tilemap;
         Vector3Int loc = Utils.WorldToTilemapPosition(transform.position);
 
         Object tile = Resources.Load("Tilemaps/Tiles/" + resultTile);
-        if (tile is AnimatedTile animatedTile) {
+        if (tile is AnimatedTile animatedTile)
+        {
             tm.SetTile(loc, animatedTile);
-        } else if (tile is Tile normalTile) {
+        }
+        else if (tile is Tile normalTile)
+        {
             tm.SetTile(loc, normalTile);
         }
 
@@ -46,6 +52,6 @@ public class BlockBump : MonoBehaviour {
             return;
 
         Vector3 pos = transform.position + Vector3.up * (fromAbove ? -0.7f : 0.25f);
-        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, pos + (Vector3) spawnOffset, Quaternion.identity);
+        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, pos + (Vector3)spawnOffset, Quaternion.identity);
     }
 }

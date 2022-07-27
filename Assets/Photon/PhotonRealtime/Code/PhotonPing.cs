@@ -32,7 +32,7 @@ namespace Photon.Realtime
     using System.Net.Sockets;
     #endif
 
-    #if UNITY_WEBGL
+    #if UNITY_WEBGL || UNITY_ANDROID
     // import WWW class
     using UnityEngine;
     #endif
@@ -446,7 +446,7 @@ namespace Photon.Realtime
     #endif
 
 
-    #if UNITY_WEBGL
+    #if UNITY_WEBGL || UNITY_ANDROID
     public class PingHttp : PhotonPing
     {
         private WWW webRequest;

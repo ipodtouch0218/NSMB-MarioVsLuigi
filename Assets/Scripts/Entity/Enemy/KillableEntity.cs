@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Photon.Pun;
-using NSMB.Utils;
 
 public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
 
@@ -58,7 +57,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
             || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.state == Enums.PowerupState.MegaMushroom) {
 
-            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound, player.StarCombo++);
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound, 0);
         } else if (attackedFromAbove) {
             if (player.state == Enums.PowerupState.MiniMushroom && !player.drill && !player.groundpound) {
                 player.groundpound = false;
@@ -99,7 +98,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
     }
 
     [PunRPC]
-    public virtual void Unfreeze(byte reasonByte) {
+    public virtual void Unfreeze() {
         Frozen = false;
         animator.enabled = true;
         if (body)

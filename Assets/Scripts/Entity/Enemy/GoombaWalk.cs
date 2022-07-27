@@ -1,17 +1,16 @@
 using UnityEngine;
 using Photon.Pun;
-using NSMB.Utils;
 
 public class GoombaWalk : KillableEntity {
     [SerializeField] float speed, deathTimer = -1, terminalVelocity = -8;
 
-    public new void Start() {
+    new void Start() {
         base.Start();
         body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
         animator.SetBool("dead", false);
     }
 
-    public new void FixedUpdate() {
+    new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -37,6 +36,7 @@ public class GoombaWalk : KillableEntity {
         }
         body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
         sRenderer.flipX = !left;
+
     }
 
     [PunRPC]

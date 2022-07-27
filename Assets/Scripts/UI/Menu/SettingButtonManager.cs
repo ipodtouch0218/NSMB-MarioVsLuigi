@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+using System.Diagnostics;
+using ExitGames.Client.Photon;
 
 public class SettingButtonManager : MonoBehaviour {
 
@@ -42,15 +45,23 @@ public class SettingButtonManager : MonoBehaviour {
     }
 
     public void OnFullscreenToggle(Toggle toggle) {
-        bool value = toggle.isOn;
+        #if !UNITY_ANDROID
+        {
+            bool value = toggle.isOn;
 
-        if (value) {
-            prevWidth = Screen.width;
-            prevHeight = Screen.height;
-            Screen.SetResolution(Screen.mainWindowDisplayInfo.width, Screen.mainWindowDisplayInfo.height, FullScreenMode.FullScreenWindow);
-        } else {
-            Screen.SetResolution(prevWidth, prevHeight, FullScreenMode.Windowed);
+            if (value)
+            {
+                prevWidth = Screen.width;
+                prevHeight = Screen.height;
+                Screen.SetResolution(Screen.mainWindowDisplayInfo.width, Screen.mainWindowDisplayInfo.height, FullScreenMode.FullScreenWindow);
+            }
+            else
+            {
+                Screen.SetResolution(prevWidth, prevHeight, FullScreenMode.Windowed);
+            }
         }
+        #endif
+
     }
 
         public void OnVsyncToggle(Toggle toggle) {

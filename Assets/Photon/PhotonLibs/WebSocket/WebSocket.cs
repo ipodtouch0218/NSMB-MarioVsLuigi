@@ -1,4 +1,4 @@
-﻿#if UNITY_WEBGL || WEBSOCKET || ((UNITY_XBOXONE || UNITY_GAMECORE) && UNITY_EDITOR)
+﻿#if UNITY_WEBGL || UNITY_ANDROID || WEBSOCKET || ((UNITY_XBOXONE || UNITY_GAMECORE) && UNITY_EDITOR)
 
 // --------------------------------------------------------------------------------------------------------------------
 // <summary>
@@ -12,13 +12,13 @@ namespace ExitGames.Client.Photon
 {
     using System;
     using System.Text;
-    #if UNITY_WEBGL && !UNITY_EDITOR
+#if (UNITY_WEBGL) && !UNITY_EDITOR
     using System.Runtime.InteropServices;
-    #else
+#else
     using WebSocketSharp;
     using System.Collections.Generic;
     using System.Security.Authentication;
-    #endif
+#endif
 
 
     public class WebSocket
@@ -53,7 +53,7 @@ namespace ExitGames.Client.Photon
             return Encoding.UTF8.GetString (retval);
         }
 
-    #if UNITY_WEBGL && !UNITY_EDITOR
+#if (UNITY_WEBGL) && !UNITY_EDITOR
         [DllImport("__Internal")]
         private static extern int SocketCreate (string url, string protocols);
 
@@ -123,7 +123,7 @@ namespace ExitGames.Client.Photon
                 return Encoding.UTF8.GetString (buffer);
             }
         }
-    #else
+#else
         WebSocketSharp.WebSocket m_Socket;
         Queue<byte[]> m_Messages = new Queue<byte[]>();
         bool m_IsConnected = false;
@@ -182,7 +182,7 @@ namespace ExitGames.Client.Photon
                 return m_Error;
             }
         }
-    #endif
+#endif
     }
 }
 #endif

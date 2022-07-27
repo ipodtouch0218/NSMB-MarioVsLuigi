@@ -14,7 +14,6 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
-using NSMB.Utils;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
     public static MainMenuManager Instance;
@@ -22,7 +21,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, offlineLevels, creditsMenu, controlsMenu, privatePrompt, updateBox;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
     public TMP_Dropdown levelDropdown, characterDropdown;
@@ -87,7 +86,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         List<string> invalidRooms = new();
 
         foreach (RoomInfo room in roomList) {
-            if (!room.IsVisible || room.RemovedFromList || room.MaxPlayers > 10 || room.MaxPlayers == 0) {
+            if (!room.IsVisible || room.RemovedFromList || room.MaxPlayers > 15 || room.MaxPlayers == 0) {
                 invalidRooms.Add(room.Name);
                 continue;
             }
@@ -252,15 +251,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         selectedRoom = null;
         selectedRoomIcon = null;
-        if (!PhotonNetwork.IsConnectedAndReady) {
-
-            foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
-                Destroy(value);
-                currentRooms.Remove(key);
-            }
-
+        if (!PhotonNetwork.IsConnectedAndReady)
             PhotonNetwork.ConnectToRegion(lastRegion);
-        }
     }
     public void OnRegionListReceived(RegionHandler handler) {
         handler.PingMinimumOfRegions((handler) => {
@@ -458,13 +450,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         GlobalController.Instance.discordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
 
-#if PLATFORM_WEBGL
+#if PLATFORM_WEBGL || PLATFORM_ANDROID
         fullscreenToggle.interactable = false;
 #else
         if (!GlobalController.Instance.checkedForVersion) {
             UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
                 if (upToDate)
                     return;
+
+                Debug.Log("a");
 
                 updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
                 updateBox.SetActive(true);
@@ -495,7 +489,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     void Update() {
         bool connected = PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
-        connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
+        connecting.SetActive(!connected);
         privateJoinRoom.gameObject.SetActive(connected);
 
         joinRoomBtn.interactable = connected && selectedRoomIcon != null && validName;
@@ -542,7 +536,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
 
         if (PhotonNetwork.IsMasterClient)
-            LocalChatMessage("You are the room's host! You can use chat commands like /ban, /mute, /kick, etc. to control your room. Do /help for help.", ColorToVector(Color.red));
+            LocalChatMessage("You are the room's host! You can use chat commands to control your room. Do /help for help.", ColorToVector(Color.red));
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value, PhotonNetwork.LocalPlayer.CustomProperties);
         SetPlayerColor(value);
@@ -847,6 +841,29 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             MaxPlayers = players,
             IsVisible = !privateToggle.isOn,
             PublishUserId = true,
+            CustomRoomProperties = properties,
+            CustomRoomPropertiesForLobby = NetworkUtils.LobbyVisibleRoomProperties,
+        };
+        PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
+        createLobbyPrompt.SetActive(false);
+        ChangeMaxPlayers(players);
+    }
+    public void Offline()
+    {
+        byte players = 1;
+        string roomName = "";
+        PhotonNetwork.NickName = "Mario";
+        for (int i = 0; i < 8; i++)
+            roomName += roomNameChars[Random.Range(0, roomNameChars.Length)];
+
+        Hashtable properties = NetworkUtils.DefaultRoomProperties;
+        properties[Enums.NetRoomProperties.HostName] = PhotonNetwork.NickName;
+
+        RoomOptions options = new()
+        {
+            MaxPlayers = players,
+            IsVisible = false,
+            PublishUserId = false,
             CustomRoomProperties = properties,
             CustomRoomPropertiesForLobby = NetworkUtils.LobbyVisibleRoomProperties,
         };

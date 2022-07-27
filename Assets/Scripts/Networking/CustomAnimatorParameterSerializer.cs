@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Photon.Pun;
-using NSMB.Utils;
 
 public class CustomAnimatorParameterSerializer : MonoBehaviourPun, ICustomSerializeView {
 

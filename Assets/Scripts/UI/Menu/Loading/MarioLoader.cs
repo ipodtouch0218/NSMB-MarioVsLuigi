@@ -1,21 +1,22 @@
-using NSMB.Utils;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MarioLoader : MonoBehaviour {
-
+    
     public int scale = 0, previousScale;
     public float scaleTimer, blinkSpeed = 0.5f;
     private Image image;
     public PlayerData data;
-    public void Start() {
+    void Start() {
         image = GetComponent<Image>();
         data = Utils.GetCharacterData();
     }
 
-    public void Update() {
+    void Update() {
         int scaleDisplay = scale;
-
+        
         if ((scaleTimer += Time.deltaTime) < 0.5f) {
             if (scaleTimer % blinkSpeed < blinkSpeed / 2f)
                 scaleDisplay = previousScale;

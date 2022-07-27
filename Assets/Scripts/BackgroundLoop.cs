@@ -44,17 +44,25 @@ public class BackgroundLoop : MonoBehaviour {
         Reposition();
     }
     void LoadChildObjects(GameObject obj) {
-        float objectWidth = obj.GetComponent<SpriteRenderer>().bounds.size.x;
-        int childsNeeded = (int) Mathf.Ceil(screenBounds.x / objectWidth) + 1;
-        GameObject clone = Instantiate(obj);
-        for (int i = 0; i <= childsNeeded; i++) {
-            GameObject c = Instantiate(clone);
-            c.transform.SetParent(obj.transform);
-            c.transform.position = new Vector3(objectWidth * i, obj.transform.position.y, obj.transform.position.z);
-            c.name = obj.name + i;
+        if (obj.tag == "Start")
+        { 
+
         }
-        Destroy(clone);
-        Destroy(obj.GetComponent<SpriteRenderer>());
+        else 
+        {
+            float objectWidth = obj.GetComponent<SpriteRenderer>().bounds.size.x;
+            int childsNeeded = (int)Mathf.Ceil(screenBounds.x / objectWidth) + 1;
+            GameObject clone = Instantiate(obj);
+            for (int i = 0; i <= childsNeeded; i++)
+            {
+                GameObject c = Instantiate(clone);
+                c.transform.SetParent(obj.transform);
+                c.transform.position = new Vector3(objectWidth * i, obj.transform.position.y, obj.transform.position.z);
+                c.name = obj.name + i;
+            }
+            Destroy(clone);
+            Destroy(obj.GetComponent<SpriteRenderer>());
+        }
     }
     void RepositionChildObjects(GameObject obj) {
         if (!obj)

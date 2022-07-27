@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using TMPro;
 
 using Photon.Realtime;
-using NSMB.Utils;
 
 public class PlayerListEntry : MonoBehaviour {
 

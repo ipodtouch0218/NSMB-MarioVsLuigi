@@ -1,9 +1,10 @@
-using NSMB.Utils;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LoadingReadyIcon : MonoBehaviour {
-    public void Start() {
+    void Start() {
         GetComponent<Image>().sprite = Utils.GetCharacterData().readySprite;
     }
 }

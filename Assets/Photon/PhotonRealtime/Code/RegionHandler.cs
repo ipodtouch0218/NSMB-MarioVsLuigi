@@ -14,7 +14,7 @@
 #define SUPPORTED_UNITY
 #endif
 
-#if UNITY_WEBGL
+#if UNITY_WEBGL || UNITY_ANDROID
 #define PING_VIA_COROUTINE
 #endif
 
@@ -29,14 +29,14 @@ namespace Photon.Realtime
     using System.Diagnostics;
     using ExitGames.Client.Photon;
 
-    #if SUPPORTED_UNITY
+    //#if SUPPORTED_UNITY
     using UnityEngine;
     using Debug = UnityEngine.Debug;
-    #endif
-    #if SUPPORTED_UNITY || NETFX_CORE
+    //#endif
+    //#if SUPPORTED_UNITY || NETFX_CORE
     using Hashtable = ExitGames.Client.Photon.Hashtable;
     using SupportClass = ExitGames.Client.Photon.SupportClass;
-    #endif
+    //#endif
 
     /// <summary>
     /// Provides methods to work with Photon's regions (Photon Cloud) and can be use to find the one with best ping.
@@ -373,7 +373,7 @@ namespace Photon.Realtime
             {
                 ping = new PingNativeDynamic();
             }
-            #elif UNITY_WEBGL
+            #elif UNITY_WEBGL || UNITY_ANDROID
             if (RegionHandler.PingImplementation == null || RegionHandler.PingImplementation == typeof(PingHttp))
             {
                 ping = new PingHttp();
@@ -525,7 +525,7 @@ namespace Photon.Realtime
         }
 
 
-        #if SUPPORTED_UNITY
+       // #if SUPPORTED_UNITY
         /// <remarks>
         /// Affected by frame-rate of app, as this Coroutine checks the socket for a result once per frame.
         /// </remarks>
@@ -592,7 +592,7 @@ namespace Photon.Realtime
             this.onDoneCall(this.region);
             yield return null;
         }
-        #endif
+        //#endif
 
 
         public string GetResults()
@@ -625,7 +625,7 @@ namespace Photon.Realtime
 
             try
             {
-                #if UNITY_WSA || NETFX_CORE || UNITY_WEBGL
+                #if UNITY_WSA || NETFX_CORE || UNITY_WEBGL || UNITY_ANDROID
                 return hostName;
                 #else
 

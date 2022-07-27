@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultTile: 
   prefab: 
+  x10: 0
   sprite: {fileID: 0}
   fromAbove: 0
   hitter: {fileID: 0}

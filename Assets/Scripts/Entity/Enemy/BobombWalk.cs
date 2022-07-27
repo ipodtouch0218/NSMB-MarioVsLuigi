@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
-using NSMB.Utils;
 
 public class BobombWalk : HoldableEntity {
 
@@ -67,18 +66,18 @@ public class BobombWalk : HoldableEntity {
         RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position + new Vector3(0,0.5f), 1.2f, Vector2.zero);
         foreach (RaycastHit2D hit in hits) {
             GameObject obj = hit.collider.gameObject;
-
-            if (obj == gameObject)
-                continue;
-
-            if (obj.GetComponent<KillableEntity>() is KillableEntity en) {
-                en.photonView.RPC("SpecialKill", RpcTarget.All, transform.position.x < obj.transform.position.x, false, 0);
-                continue;
-            }
-
             switch (hit.collider.tag) {
             case "Player": {
                 obj.GetPhotonView().RPC("Powerdown", RpcTarget.All, false);
+                break;
+            }
+            case "goomba":
+            case "koopa":
+            case "bulletbill":
+            case "bobomb": {
+                if (obj == gameObject || obj == gameObject.transform.Find("Hitbox").gameObject)
+                    continue;
+                obj.GetComponentInParent<PhotonView>().RPC("SpecialKill", RpcTarget.All, transform.position.x < obj.transform.position.x, false, 0);
                 break;
             }
             }
@@ -146,7 +145,7 @@ public class BobombWalk : HoldableEntity {
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
         } else if(player.sliding || player.inShell || player.invincible > 0) {
-            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false, player.StarCombo++);
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false, 0);
             return;
         } else if (attackedFromAbove && !lit) {
             if (player.state != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
@@ -187,9 +186,9 @@ public class BobombWalk : HoldableEntity {
             }
         }
 
-        if (!photonView.IsMineOrLocal())
+        if (photonView && !photonView.IsMine) {
             return;
-
+        }
         if (physics.hitRight && !left) {
             if (photonView) {
                 photonView.RPC("Turnaround", RpcTarget.All, false);
@@ -205,7 +204,7 @@ public class BobombWalk : HoldableEntity {
         }
 
         if (physics.onGround && physics.hitRoof)
-            photonView.RPC("SpecialKill", RpcTarget.All);
+            photonView.RPC("Detonate", RpcTarget.All);
     }
     [PunRPC]
     void Turnaround(bool hitWallOnLeft) {

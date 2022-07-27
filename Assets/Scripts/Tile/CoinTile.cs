@@ -1,6 +1,5 @@
 using UnityEngine;
 using Photon.Pun;
-using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "CoinTile", menuName = "ScriptableObjects/Tiles/CoinTile", order = 1)]
 public class CoinTile : BreakableBrickTile {

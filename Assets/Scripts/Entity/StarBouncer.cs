@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using NSMB.Utils;
 
 public class StarBouncer : MonoBehaviourPun {
 
@@ -19,11 +18,9 @@ public class StarBouncer : MonoBehaviourPun {
 
     private BoxCollider2D worldCollider;
 
-    private bool canBounce;
+    private bool collectable, canBounce;
 
-    public bool Collectable { get; private set; }
-
-    public void Start() {
+    void Start() {
         body = GetComponent<Rigidbody2D>();
         physics = GetComponent<PhysicsEntity>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -38,25 +35,23 @@ public class StarBouncer : MonoBehaviourPun {
 
         object[] data = photonView.InstantiationData;
         if (data != null) {
-            trackObject.transform.localScale = new(3f / 4f, 3f / 4f, 1f);
+            trackObject.transform.localScale = new Vector3(3f / 4f, 3f / 4f, 1f);
             stationary = false;
             passthrough = true;
-            gameObject.layer = Layers.LayerHitsNothing;
+            gameObject.layer = LayerMask.NameToLayer("HitsNothing");
             int direction = (int) data[0];
             left = direction <= 1;
             fast = direction == 0 || direction == 3;
             creator = (int) data[1];
-            body.velocity = new(moveSpeed * (left ? -1 : 1), deathBoostAmount);
-
-            //death via pit boost
-            if ((bool) data[3])
+            body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), deathBoostAmount);
+            if ((bool) data[3]) {
                 body.velocity += Vector2.up * 3;
-
+            }
             body.isKinematic = false;
             worldCollider.enabled = true;
         } else {
             GetComponent<Animator>().enabled = true;
-            Collectable = true;
+            collectable = true;
             body.isKinematic = true;
             body.velocity = Vector2.zero;
             GetComponent<CustomRigidbodySerializer>().enabled = false;
@@ -65,11 +60,12 @@ public class StarBouncer : MonoBehaviourPun {
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
         }
 
+
         if (ANY_GROUND_MASK == -1)
             ANY_GROUND_MASK = LayerMask.GetMask("Ground", "PassthroughInvalid");
     }
 
-    public void Update() {
+    void Update() {
         if (GameManager.Instance && GameManager.Instance.gameover)
             return;
 
@@ -82,10 +78,10 @@ public class StarBouncer : MonoBehaviourPun {
 
         lifespan -= Time.deltaTime;
         sRenderer.enabled = !(lifespan < 5 && lifespan * 2 % (blinkingSpeed * 2) < blinkingSpeed);
-        graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (left ? 1 : -1) * Time.deltaTime), Space.Self);
+        graphicTransform.Rotate(new Vector3(0, 0, rotationSpeed * 30 * (left ? 1 : -1) * Time.deltaTime), Space.Self);
     }
 
-    public void FixedUpdate() {
+    void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
@@ -95,42 +91,38 @@ public class StarBouncer : MonoBehaviourPun {
         if (stationary)
             return;
 
-        body.velocity = new(moveSpeed * (left ? -1 : 1) * (fast ? 1.5f : 1f), body.velocity.y);
+        body.velocity = new Vector2(moveSpeed * (left ? -1 : 1) * (fast ? 1.5f : 1f), body.velocity.y);
 
         canBounce |= body.velocity.y < 0;
-        Collectable |= body.velocity.y < 0;
+        collectable |= body.velocity.y < 0;
 
         HandleCollision();
 
-        if (passthrough && Collectable && body.velocity.y <= 0 && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, ANY_GROUND_MASK)) {
+        if (passthrough && IsCollectible() && body.velocity.y <= 0 && !Utils.IsTileSolidAtWorldLocation(body.position) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, ANY_GROUND_MASK)) {
             passthrough = false;
-            gameObject.layer = Layers.LayerEntity;
+            gameObject.layer = LayerMask.NameToLayer("Entity");
         }
         if (!passthrough) {
-            if (Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale)) {
-                gameObject.layer = Layers.LayerHitsNothing;
+            if (Utils.IsTileSolidAtWorldLocation(body.position)) {
+                gameObject.layer = LayerMask.NameToLayer("HitsNothing");
             } else {
-                gameObject.layer = Layers.LayerEntity;
+                gameObject.layer = LayerMask.NameToLayer("Entity");
             }
         }
 
-        if (photonView.IsMine && (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY())))
-            photonView.RPC("Crushed", RpcTarget.All);
+        if (photonView.IsMine)
+            if (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY()))
+                photonView.RPC("Crushed", RpcTarget.All);
     }
 
     void HandleCollision() {
         physics.UpdateCollisions();
 
-        if (physics.hitLeft || physics.hitRight) {
-            if (photonView.IsMine)
-                photonView.RPC("Turnaround", RpcTarget.All, physics.hitLeft);
-            else
-                Turnaround(physics.hitLeft);
-        }
-
+        if (physics.hitLeft || physics.hitRight)
+            photonView.RPC("Turnaround", RpcTarget.All, physics.hitLeft);
         if (physics.onGround && canBounce) {
-            body.velocity = new(body.velocity.x, bounceAmount);
-            if (photonView.IsMine && physics.hitRoof)
+            body.velocity = new Vector2(body.velocity.x, bounceAmount);
+            if (physics.hitRoof)
                 photonView.RPC("Crushed", RpcTarget.All);
         }
     }
@@ -146,10 +138,13 @@ public class StarBouncer : MonoBehaviourPun {
 
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
     }
-
     [PunRPC]
     public void Turnaround(bool hitLeft) {
         left = !hitLeft;
         body.velocity = new Vector2(moveSpeed * (left ? -1 : 1), body.velocity.y);
+    }
+
+    public bool IsCollectible() {
+        return collectable;
     }
 }

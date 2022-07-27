@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using Photon.Pun;
 
 //This is pretty much just the koopawalk script but it causes damage when you stand on it.
@@ -19,7 +21,7 @@ public class SpinyWalk : KoopaWalk {
                 //Do knockback to player, colliding with us in shell going opposite ways
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
 
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
+            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, combo++);
         } else if (!holder) {
             if (shell) {
                 if (IsStationary()) {

@@ -125,7 +125,7 @@ namespace Photon.Realtime
 
         public void StartFallbackSendAckThread()
         {
-            #if !UNITY_WEBGL
+            #if !UNITY_WEBGL || UNITY_ANDROID
             if (this.FallbackThreadRunning)
             {
                 return;
@@ -141,7 +141,7 @@ namespace Photon.Realtime
 
         public void StopFallbackSendAckThread()
         {
-            #if !UNITY_WEBGL
+            #if !UNITY_WEBGL || UNITY_ANDROID
             if (!this.FallbackThreadRunning)
             {
                 return;

@@ -61,7 +61,7 @@ namespace Photon.Realtime
             if (instance != null)
             {
                 Debug.LogWarning("Instance is not null. Will not LoadOrCreateSettings().");
-                return;
+                //return;
             }
 
 
@@ -75,7 +75,7 @@ namespace Photon.Realtime
             if (instance != null)
             {
                 //Debug.LogWarning("Settings from Resources."); // DEBUG
-                return;
+                //return;
             }
 
 
@@ -86,7 +86,7 @@ namespace Photon.Realtime
                 if (instance == null)
                 {
                     Debug.LogError("Failed to create ServerSettings. PUN is unable to run this way. If you deleted it from the project, reload the Editor.");
-                    return;
+                    //return;
                 }
 
                 //Debug.LogWarning("Settings created!"); // DEBUG

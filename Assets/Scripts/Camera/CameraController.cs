@@ -1,5 +1,4 @@
-﻿using NSMB.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
@@ -70,7 +69,7 @@ public class CameraController : MonoBehaviour {
         if (playerPos.y - (currentPosition.y - vOrtho) < cameraBottomMax)
             currentPosition.y = playerPos.y + vOrtho - cameraBottomMax;
 
-        float playerHeight = controller.WorldHitboxSize.y;
+        float playerHeight = controller.hitboxes[0].size.y * transform.lossyScale.y;
         float cameraTopMax = Mathf.Min(1.5f + playerHeight, 4f);
 
         //top camera clip

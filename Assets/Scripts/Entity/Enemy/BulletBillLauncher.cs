@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using NSMB.Utils;
 
 public class BulletBillLauncher : MonoBehaviourPun {
 
@@ -17,7 +16,7 @@ public class BulletBillLauncher : MonoBehaviourPun {
         searchOffset = new(playerSearchRadius/2 + playerCloseCutoff, 0);
     }
     void Update() {
-        if (!PhotonNetwork.IsMasterClient || GameManager.Instance.gameover)
+        if (!PhotonNetwork.IsMasterClient || GameManager.Instance.gameover) 
             return;
 
         if ((shootTimer -= Time.deltaTime) <= 0) {

@@ -18,6 +18,8 @@ public class BuildScript : EditorWindow
     bool LinuxBuild = true;
     bool LinuxDebug = false;
     bool LinuxIL = false;
+    bool AndroidBuild = true;
+    bool AndroidDebug = false;
     bool macBuild = true;
     bool macDebug = false;
     bool macIL = false;
@@ -41,6 +43,7 @@ public class BuildScript : EditorWindow
         build.BuildWindows64();
         build.BuildWindows32();
         build.BuildLinux();
+        build.BuildAndroid();
         build.BuildMac();
         build.BuildWebGL();
     }
@@ -94,6 +97,17 @@ public class BuildScript : EditorWindow
             EditorGUILayout.EndHorizontal();
         }
         EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("WebGL Build: ");
+        WebBuild = EditorGUILayout.Toggle(WebBuild);
+        EditorGUILayout.EndHorizontal();
+        if (AndroidBuild)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Use WebGL Debug: ");
+            WebDebug = EditorGUILayout.Toggle(WebDebug);
+            EditorGUILayout.EndHorizontal();
+        }
+        EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("MacOS Build: ");
         macBuild = EditorGUILayout.Toggle(macBuild);
         EditorGUILayout.EndHorizontal();
@@ -126,6 +140,8 @@ public class BuildScript : EditorWindow
             if (windows32Build)
                 BuildWindows32();
             if (LinuxBuild)
+                BuildLinux();
+            if (AndroidBuild)
                 BuildLinux();
             if (macBuild)
                 BuildMac();
@@ -177,6 +193,26 @@ public class BuildScript : EditorWindow
     }
 
     void BuildLinux()
+    {
+        BuildOptions options = LinuxDebug ? BuildOptions.AllowDebugging : BuildOptions.None;
+        EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneLinux64);
+        if (LinuxIL)
+        {
+            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.IL2CPP);
+            if (LinuxDebug)
+                PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Debug);
+            else
+                PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Release);
+        }
+        else
+        {
+            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
+        }
+
+        BuildPipeline.BuildPlayer(EditorBuildSettings.scenes.Where(s => s.enabled).ToArray(), Path.Combine(path, "Linux", "NSMB-MarioVsLuigi.x86_64"), BuildTarget.StandaloneLinux64, options);
+    }
+
+    void BuildAndroid()
     {
         BuildOptions options = LinuxDebug ? BuildOptions.AllowDebugging : BuildOptions.None;
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneLinux64);

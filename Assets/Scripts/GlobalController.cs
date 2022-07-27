@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
-using NSMB.Utils;
 
 public class GlobalController : Singleton<GlobalController> {
 

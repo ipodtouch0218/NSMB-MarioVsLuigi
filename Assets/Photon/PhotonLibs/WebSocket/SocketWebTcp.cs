@@ -1,4 +1,4 @@
-#if UNITY_WEBGL || WEBSOCKET || ((UNITY_XBOXONE || UNITY_GAMECORE) && UNITY_EDITOR)
+#if UNITY_WEBGL || UNITY_ANDROID || WEBSOCKET || ((UNITY_XBOXONE || UNITY_GAMECORE) && UNITY_EDITOR)
 
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SocketWebTcp.cs" company="Exit Games GmbH">
@@ -19,11 +19,11 @@ namespace ExitGames.Client.Photon
     using SupportClassPun = ExitGames.Client.Photon.SupportClass;
 
 
-    #if !(UNITY_WEBGL || NETFX_CORE)
+#if !(UNITY_WEBGL || UNITY_ANDROID || NETFX_CORE)
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
-    #endif
+#endif
 
     /// <summary>
     /// Yield Instruction to Wait for real seconds. Very important to keep connection working if Time.TimeScale is altered, we still want accurate network events
@@ -107,21 +107,21 @@ namespace ExitGames.Client.Photon
             this.websocketConnectionObject.hideFlags = HideFlags.HideInHierarchy;
             UnityEngine.Object.DontDestroyOnLoad(this.websocketConnectionObject);
 
-            #if UNITY_WEBGL || NETFX_CORE
+#if UNITY_WEBGL || UNITY_ANDROID || NETFX_CORE
             this.sock = new WebSocket(new Uri(this.ConnectAddress), this.SerializationProtocol);
             this.sock.Connect();
 
             mb.StartCoroutine(this.ReceiveLoop());
-            #else
+#else
 
             mb.StartCoroutine(this.DetectIpVersionAndConnect(mb));
 
-            #endif
+#endif
             return true;
         }
 
 
-        #if !(UNITY_WEBGL || NETFX_CORE)
+#if !(UNITY_WEBGL || UNITY_ANDROID || NETFX_CORE)
         private bool ipVersionDetectDone;
         private IEnumerator DetectIpVersionAndConnect(MonoBehaviour mb)
         {
@@ -191,7 +191,7 @@ namespace ExitGames.Client.Photon
 
             this.ipVersionDetectDone = true;
         }
-        #endif
+#endif
 
 
         public override bool Disconnect()

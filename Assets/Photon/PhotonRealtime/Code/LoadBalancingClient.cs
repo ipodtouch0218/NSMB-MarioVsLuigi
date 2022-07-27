@@ -781,7 +781,7 @@ namespace Photon.Realtime
             CustomTypesUnity.Register();
             #endif
 
-            #if UNITY_WEBGL
+            #if UNITY_WEBGL || UNITY_ANDROID
             if (this.LoadBalancingPeer.TransportProtocol == ConnectionProtocol.Tcp || this.LoadBalancingPeer.TransportProtocol == ConnectionProtocol.Udp)
             {
                 this.LoadBalancingPeer.Listener.DebugReturn(DebugLevel.WARNING, "WebGL requires WebSockets. Switching TransportProtocol to WebSocketSecure.");
@@ -1117,10 +1117,10 @@ namespace Photon.Realtime
             return true;
         }
 
-        [Conditional("UNITY_WEBGL")]
+        [Conditional("UNITY_WEBGL") , Conditional("UNITY_ANDROID")]
         private void CheckConnectSetupWebGl()
         {
-            #if UNITY_WEBGL
+            #if UNITY_WEBGL || UNITY_ANDROID
             if (this.LoadBalancingPeer.TransportProtocol != ConnectionProtocol.WebSocket && this.LoadBalancingPeer.TransportProtocol != ConnectionProtocol.WebSocketSecure)
             {
                 this.DebugReturn(DebugLevel.WARNING, "WebGL requires WebSockets. Switching TransportProtocol to WebSocketSecure.");

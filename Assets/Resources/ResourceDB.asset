@@ -66,6 +66,42 @@ MonoBehaviour:
     type: 2
     objectTypeName: TMPro.TMP_FontAsset, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  - name: SuperMarioDsRegular-Ea4R8 Blue Outline
+    ext: mat
+    path: Fonts
+    type: 2
+    objectTypeName: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: SuperMarioDsRegular-Ea4R8 CheckMark
+    ext: mat
+    path: Fonts
+    type: 2
+    objectTypeName: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: SuperMarioDsRegular-Ea4R8 Outline 2
+    ext: mat
+    path: Fonts
+    type: 2
+    objectTypeName: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: SuperMarioDsRegular-Ea4R8 Outline
+    ext: mat
+    path: Fonts
+    type: 2
+    objectTypeName: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: SuperMarioDsRegular-Ea4R8 SDF
+    ext: asset
+    path: Fonts
+    type: 2
+    objectTypeName: TMPro.TMP_FontAsset, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: SuperMarioDsRegular-Ea4R8
+    ext: ttf
+    path: Fonts
+    type: 2
+    objectTypeName: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: UISymbols
     ext: asset
     path: Fonts
@@ -82,6 +118,12 @@ MonoBehaviour:
     path: Prefabs
     type: 1
     objectTypeName: 
+  - name: BlockBump 1
+    ext: prefab
+    path: Prefabs/Bump
+    type: 2
+    objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: BlockBump
     ext: prefab
     path: Prefabs/Bump
@@ -146,6 +188,12 @@ MonoBehaviour:
     path: Prefabs
     type: 1
     objectTypeName: 
+  - name: 1Up
+    ext: prefab
+    path: Prefabs/Particle
+    type: 2
+    objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: BrickBreak
     ext: prefab
     path: Prefabs/Particle
@@ -277,6 +325,12 @@ MonoBehaviour:
     path: Prefabs
     type: 1
     objectTypeName: 
+  - name: 1-Up
+    ext: prefab
+    path: Prefabs/Powerup
+    type: 2
+    objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: BlueShell
     ext: prefab
     path: Prefabs/Powerup
@@ -444,12 +498,6 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: PlayerToadette
-    ext: prefab
-    path: Prefabs
-    type: 2
-    objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
   - name: Scriptables
     ext: 
     path: 
@@ -478,12 +526,6 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEditor.MonoScript, UnityEditor.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: Toadette
-    ext: asset
-    path: Scriptables/Characters
-    type: 2
-    objectTypeName: PlayerData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   - name: Music
     ext: 
     path: Scriptables
@@ -524,6 +566,11 @@ MonoBehaviour:
     path: Scriptables
     type: 1
     objectTypeName: 
+  - name: 1-Up
+    ext: asset
+    path: Scriptables/Powerups
+    type: 2
+    objectTypeName: Powerup, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   - name: BlueShell
     ext: asset
     path: Scriptables/Powerups
@@ -615,13 +662,19 @@ MonoBehaviour:
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: lava_death
-    ext: ogg
+    ext: wav
     path: Sound/character/luigi
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: mega_mushroom
     ext: wav
+    path: Sound/character/luigi
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: mega_mushroom_collect
+    ext: ogg
     path: Sound/character/luigi
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
@@ -685,6 +738,12 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: mega_mushroom_collect
+    ext: ogg
+    path: Sound/character/mario
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: selected
     ext: wav
     path: Sound/character/mario
@@ -715,56 +774,9 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: toadette
-    ext: 
-    path: Sound/character
-    type: 1
-    objectTypeName: 
-  - name: doublejump_1
-    ext: wav
-    path: Sound/character/toadette
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: doublejump_2
-    ext: wav
-    path: Sound/character/toadette
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: mega_mushroom
-    ext: wav
-    path: Sound/character/toadette
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: selected
-    ext: wav
-    path: Sound/character/toadette
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: spinner_launch
-    ext: wav
-    path: Sound/character/toadette
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: triplejump
-    ext: wav
-    path: Sound/character/toadette
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: walljump_1
-    ext: wav
-    path: Sound/character/toadette
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: walljump_2
-    ext: wav
-    path: Sound/character/toadette
+  - name: warn
+    ext: ogg
+    path: Sound/character/mario
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
@@ -803,12 +815,6 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: kick
-    ext: ogg
-    path: Sound/enemy
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
   - name: piranhaplant_chomp
     ext: ogg
     path: Sound/enemy
@@ -816,6 +822,54 @@ MonoBehaviour:
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: piranhaplant_death
+    ext: ogg
+    path: Sound/enemy
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: shell_combo1
+    ext: ogg
+    path: Sound/enemy
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: shell_combo2
+    ext: ogg
+    path: Sound/enemy
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: shell_combo3
+    ext: ogg
+    path: Sound/enemy
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: shell_combo4
+    ext: ogg
+    path: Sound/enemy
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: shell_combo5
+    ext: ogg
+    path: Sound/enemy
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: shell_combo6
+    ext: ogg
+    path: Sound/enemy
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: shell_combo7
+    ext: ogg
+    path: Sound/enemy
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: shell_kick
     ext: ogg
     path: Sound/enemy
     type: 2
@@ -897,6 +951,12 @@ MonoBehaviour:
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: collision
+    ext: ogg
+    path: Sound/player
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: collision_fireball
     ext: ogg
     path: Sound/player
     type: 2
@@ -985,6 +1045,12 @@ MonoBehaviour:
     path: Sound
     type: 1
     objectTypeName: 
+  - name: 1-up
+    ext: ogg
+    path: Sound/powerup
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: blueshell_enter
     ext: ogg
     path: Sound/powerup
@@ -992,6 +1058,18 @@ MonoBehaviour:
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: blueshell_slide
+    ext: ogg
+    path: Sound/powerup
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: collision
+    ext: ogg
+    path: Sound/powerup
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: collision_fireball
     ext: ogg
     path: Sound/powerup
     type: 2
@@ -1028,12 +1106,6 @@ MonoBehaviour:
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: megamushroom_break_pipe
-    ext: ogg
-    path: Sound/powerup
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: megamushroom_collect
     ext: ogg
     path: Sound/powerup
     type: 2
@@ -1116,6 +1188,36 @@ MonoBehaviour:
     path: Sound
     type: 1
     objectTypeName: 
+  - name: back
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: boot
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: cursor
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: decide
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: file_select
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: hurry_up
     ext: ogg
     path: Sound/ui
@@ -1146,6 +1248,18 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: player_connect
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: player_disconnect
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: quit
     ext: ogg
     path: Sound/ui
@@ -1153,6 +1267,24 @@ MonoBehaviour:
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: start_game
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: warn
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: windowclosed
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: windowopen
     ext: ogg
     path: Sound/ui
     type: 2
@@ -1263,6 +1395,12 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: Desert
+    ext: prefab
+    path: Tilemaps/Palettes
+    type: 2
+    objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: Grassland
     ext: prefab
     path: Tilemaps/Palettes
@@ -1338,6 +1476,149 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: Bonus
+    ext: 
+    path: Tilemaps/Tiles
+    type: 1
+    objectTypeName: 
+  - name: 2x2empty
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: BreakableBrickTile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: bonus_0
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: bonus_1
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: bonus_19
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: bonus_2
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_0
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_1
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_10
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_11
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_12
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_13
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_14
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_15
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_16
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_17
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_2
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_3
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_4
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_5
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_6
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_7
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_8
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: clown_9
+    ext: asset
+    path: Tilemaps/Tiles/Bonus
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: Castle
     ext: 
     path: Tilemaps/Tiles
@@ -1367,6 +1648,30 @@ MonoBehaviour:
     type: 2
     objectTypeName: TileWithProperties, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  - name: squishy_3
+    ext: asset
+    path: Tilemaps/Tiles/Castle
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: squishy_5
+    ext: asset
+    path: Tilemaps/Tiles/Castle
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: squishy_6
+    ext: asset
+    path: Tilemaps/Tiles/Castle
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: squishy_8
+    ext: asset
+    path: Tilemaps/Tiles/Castle
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: Cave
     ext: 
     path: Tilemaps/Tiles
@@ -1378,119 +1683,334 @@ MonoBehaviour:
     type: 2
     objectTypeName: TileWithProperties, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  - name: Clown
+  - name: Desert
     ext: 
     path: Tilemaps/Tiles
     type: 1
     objectTypeName: 
-  - name: clown_0
+  - name: tree
+    ext: 
+    path: Tilemaps/Tiles/Desert
+    type: 1
+    objectTypeName: 
+  - name: desert_34
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_1
+  - name: desert_35
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_10
+  - name: desert_36
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_11
+  - name: desert_37
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_12
+  - name: desert_46
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_13
+  - name: desert_47
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_14
+  - name: desert_48
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_15
+  - name: desert_49
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_16
+  - name: desert_56
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_17
+  - name: desert_57
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_2
+  - name: desert_58
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_3
+  - name: desert_59
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_4
+  - name: desert_63
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_5
+  - name: desert_64
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_6
+  - name: desert_65
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_7
+  - name: desert_66
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_8
+  - name: desert_70
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: clown_9
+  - name: desert_71
     ext: asset
-    path: Tilemaps/Tiles/Clown
+    path: Tilemaps/Tiles/Desert/tree
     type: 2
     objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: desert_72
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_73
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_77
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_78
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_79
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_80
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_81
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_82
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_83
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_84
+    ext: asset
+    path: Tilemaps/Tiles/Desert/tree
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: DesertGround
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: TileWithProperties, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: desert_14
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_26
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_27
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_28
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_29
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_30
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_31
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_32
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_33
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_38
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_39
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_40
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_41
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_42
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_43
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_44
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_45
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_50
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_51
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_52
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_53
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_54
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: desert_55
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: UnityEngine.Tilemaps.Tile, UnityEngine.TilemapModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: Semisolid
+    ext: asset
+    path: Tilemaps/Tiles/Desert
+    type: 2
+    objectTypeName: TileWithProperties, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   - name: Grass
     ext: 
     path: Tilemaps/Tiles
@@ -2648,6 +3168,52 @@ MonoBehaviour:
     path: Tilemaps/Tiles
     type: 1
     objectTypeName: 
+  - name: Relocators
+    ext: 
+    path: Tilemaps/Tiles/SpecialTiles
+    type: 1
+    objectTypeName: 
+  - name: Left
+    ext: asset
+    path: Tilemaps/Tiles/SpecialTiles/Relocators
+    type: 2
+    objectTypeName: TileInteractionRelocator, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: Up
+    ext: asset
+    path: Tilemaps/Tiles/SpecialTiles/Relocators
+    type: 2
+    objectTypeName: TileInteractionRelocator, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: UpLeft
+    ext: asset
+    path: Tilemaps/Tiles/SpecialTiles/Relocators
+    type: 2
+    objectTypeName: TileInteractionRelocator, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: x10Coins
+    ext: 
+    path: Tilemaps/Tiles/SpecialTiles
+    type: 1
+    objectTypeName: 
+  - name: BrownBrick2Coins
+    ext: asset
+    path: Tilemaps/Tiles/SpecialTiles/x10Coins
+    type: 2
+    objectTypeName: CoinTile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: BrownBrick3Coins
+    ext: asset
+    path: Tilemaps/Tiles/SpecialTiles/x10Coins
+    type: 2
+    objectTypeName: CoinTile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: BrownBrickCoin
+    ext: asset
+    path: Tilemaps/Tiles/SpecialTiles/x10Coins
+    type: 2
+    objectTypeName: CoinTile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   - name: BlueBrick
     ext: asset
     path: Tilemaps/Tiles/SpecialTiles
@@ -2683,6 +3249,12 @@ MonoBehaviour:
     path: Tilemaps/Tiles/SpecialTiles
     type: 2
     objectTypeName: BreakableBrickTile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: BrownBrickCoin
+    ext: asset
+    path: Tilemaps/Tiles/SpecialTiles
+    type: 2
+    objectTypeName: CoinTile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   - name: EmptyBlueQuestion
     ext: asset
@@ -2737,6 +3309,12 @@ MonoBehaviour:
     path: Tilemaps/Tiles/SpecialTiles
     type: 2
     objectTypeName: PowerupTile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: Roulette2x2Tile
+    ext: asset
+    path: Tilemaps/Tiles/SpecialTiles
+    type: 2
+    objectTypeName: RouletteTile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   - name: RouletteTile
     ext: asset
@@ -2854,6 +3432,6 @@ MonoBehaviour:
     type: 2
     objectTypeName: TMPro.TMP_Settings, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  m_FileCount: 439
-  m_FolderCount: 43
+  m_FileCount: 533
+  m_FolderCount: 46
   UpdateAutomatically: 1

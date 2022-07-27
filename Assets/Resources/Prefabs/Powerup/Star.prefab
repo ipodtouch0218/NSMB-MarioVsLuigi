@@ -59,6 +59,7 @@ MonoBehaviour:
   bouncePower: 6
   terminalVelocity: 8
   blinkingRate: 6
+  passthrough: 0
   avoidPlayers: 0
   followMe: {fileID: 0}
   followMeCounter: 0
@@ -163,7 +164,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 1
   serializedVersion: 2
-  m_Size: {x: 0.65, y: 0.9}
+  m_Size: {x: 0.8, y: 0.9}
   m_EdgeRadius: 0
 --- !u!114 &5952491850947264864
 MonoBehaviour:

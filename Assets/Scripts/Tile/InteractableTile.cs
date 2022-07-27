@@ -17,12 +17,6 @@ public abstract class InteractableTile : AnimatedTile {
             GameObject obj = collider.gameObject;
             if (obj == interacter.gameObject)
                 continue;
-
-            if (obj.GetComponent<MovingPowerup>() is MovingPowerup powerup) {
-                powerup.photonView.RPC("Bump", RpcTarget.All);
-                continue;
-            }
-
             switch (obj.tag) {
             case "Player": {
                 PlayerController player = obj.GetComponent<PlayerController>();

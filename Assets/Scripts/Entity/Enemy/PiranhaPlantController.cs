@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Photon.Pun;
-using NSMB.Utils;
 
 public class PiranhaPlantController : KillableEntity {
     public Vector2 playerDetectSize = new(3,3);
