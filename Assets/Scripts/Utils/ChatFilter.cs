@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace NSMB.Utils {
     public static class ChatFilter {
 
-        private static readonly string FILTER_BASE64 = "YWJibyxhYm8sY2hpbmFtYW4sY2hpbmFtZW4sY2hpbmssY29vaWllLGNvb24sY3JhemllLGNyYXp5LGNyaXAsY3VudCxkYWdvLGRheWdvLGRlZ28sZHlrZSxlc2tpbW8sZmFnLGZhZ2dvdCxnYXNoLGdvbGxpd29nLGdvb2ssZ295LGdveWltLGd5cCxneXBzeSxoZWViLGthZmZlcixrYWZmaXIsa2FmZmlyLGthZmZyZSxrYWZpcixraWtlLGtyYXV0LGxlc2JvLGx1bmF0aWMsbWljayxuZWdyZXNzLG5lZ3JvLG5pZyxuaWctbm9nLG5pZ2dhLG5pZ2dlcixuaWdndWgsbmlwLHBhamVldCxwYWtpLHBpY2thbmlubmllLHBpY2thbmlubnkscHJvc3RpdHV0ZSxyYWdoZWFkLHJldGFyZCxzYW1ibyxzaGVtYWxlLHNrYW5rLHNsdXQsc295Ym95LHNwZXJnLHNwaWMsc3F1YXcsc3RyZWV0LXNoaXR0ZXIsdGFyZCx0aXRzLHRpdHQsdHJhbm5pZSx0cmFubnksd2V0YmFjayx3aG9yZSx3aWdnZXIsd29wLHlpZCx6b2c=";
+        private static readonly string FILTER_BASE64 = "YWJibyxjaGluYW1hbixjaGluYW1lbixjaGluayxjb29paWUsY29vbixjcmlwLGN1bnQsZGFnbyxkYXlnbyxkZWdvLGR5a2UsZXNraW1vLGZhZyxmYWdnb3QsZ2FzaCxnb2xsaXdvZyxnb29rLGdveSxnb3lpbSxneXAsZ3lwc3ksaGVlYixrYWZmZXIsa2FmZmlyLGthZmZpcixrYWZmcmUsa2FmaXIsa2lrZSxrcmF1dCxsZXNibyxtaWNrLG5lZ3Jlc3MsbmVncm8sbmlncixuaWdhLG5pZy1ub2csbmlnZ2EsbmlnZ2VyLG5pZ2dyLG5pZ2d1aCxwYWplZXQscGFraSxwaWNrYW5pbm5pZSxwaWNrYW5pbm55LHByb3N0aXR1dGUscmFnaGVhZCxyZXRhcmQsc2FtYm8sc2hlbWFsZSxza2FuayxzbHV0LHNveWJveSxzcGVyZyxzcGljLHNxdWF3LHN0cmVldC1zaGl0dGVyLHJ0YXJkLHRpdHMsdGl0dCx0cmFubmllLHRyYW5ueSx3ZXRiYWNrLHdob3JlLHdpZ2dlcix3b3AseWlkLHpvZyxuaWcoPz1cV3wkKSxuaWdn";
         private static readonly Dictionary<char, char> REPLACEMENTS = new() {
             ['5'] = 's',
             ['0'] = 'o',
@@ -33,7 +33,7 @@ namespace NSMB.Utils {
             input = ApplySubsitutions(input);
 
             foreach (string word in filteredWords) {
-                input = Regex.Replace(input, word, new string('*', word.Length), RegexOptions.IgnoreCase);
+                input = Regex.Replace(input, word, new string('*', Regex.Replace(word, "(?<=\\w*)\\W.*", "").Length), RegexOptions.IgnoreCase);
             }
 
             return input;
