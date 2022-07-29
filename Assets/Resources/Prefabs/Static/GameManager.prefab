@@ -4011,7 +4011,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 76.75
+  m_fontSize: 76.65
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5410,6 +5410,7 @@ MonoBehaviour:
   timedGameDuration: 0
   coinRequirement: 0
   hurryup: 0
+  tenSecondCountdown: 0
   playerCount: 0
   allPlayers: []
   enemySpawnpoints: []
@@ -6215,7 +6216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 782f71f697b93444fa7b4ef9dff72dc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 482268096050949619}
+  cam: {fileID: 482268096050949619}
   nametag: {fileID: 9063751199218773167}
   text: {fileID: 8322583947159690890}
   arrow: {fileID: 2157337876634904996}

@@ -13123,7 +13123,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36.35
+  m_fontSize: 36.3
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -44137,12 +44137,12 @@ PrefabInstance:
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Size.y
-      value: 1.5
+      value: 1.4
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Offset.y
-      value: 0.75
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
@@ -46484,8 +46484,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 47220571}
   m_HandleRect: {fileID: 47220570}
   m_Direction: 2
-  m_Value: 1.0000002
-  m_Size: 0.7469095
+  m_Value: 1
+  m_Size: 0.74633735
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -79059,7 +79059,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1752548003}
         m_TargetAssemblyTypeName: PlayerListEntry, Assembly-CSharp
         m_MethodName: HideDropdown
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -84914,12 +84914,12 @@ PrefabInstance:
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Size.y
-      value: 1.5
+      value: 1.4
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Offset.y
-      value: 0.75
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}

@@ -264,12 +264,12 @@ public class KoopaWalk : HoldableEntity {
             break;
         case "coin":
             if (!holder && !stationary && previousHolder)
-                previousHolder.photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
+                previousHolder.photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector2(obj.transform.position.x, collider.transform.position.y));
             break;
         case "loosecoin":
             if (!holder && !stationary && previousHolder) {
                 Transform parent = obj.transform.parent;
-                previousHolder.photonView.RPC("CollectCoin", RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, parent.position);
+                previousHolder.photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
             }
             break;
         }

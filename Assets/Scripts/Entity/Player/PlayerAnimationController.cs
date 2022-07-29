@@ -69,6 +69,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
     void HandleAnimations() {
         bool gameover = GameManager.Instance.gameover;
 
+        if (gameover)
+            models.SetActive(true);
+
         Vector3 targetEuler = models.transform.eulerAngles;
         bool instant = false, changeFacing = false;
         if (!gameover && !controller.Frozen) {

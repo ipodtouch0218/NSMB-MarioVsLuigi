@@ -11,9 +11,7 @@ namespace NSMB.Utils {
     public class Utils {
 
         public static int FirstPlaceStars {
-            get {
-                return GameManager.Instance.allPlayers.Where(pl => pl.lives != 0).Max(pc => pc.stars);
-            }
+            get => GameManager.Instance.allPlayers.Where(pl => pl.lives != 0).Max(pc => pc.stars);
         }
 
         public static bool BitTest(long bit, int index) {

@@ -87,7 +87,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         List<string> invalidRooms = new();
 
         foreach (RoomInfo room in roomList) {
-            if (!room.IsVisible || room.RemovedFromList || room.MaxPlayers > 10 || room.MaxPlayers == 0) {
+            Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out int lives, room.CustomProperties);
+            Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int stars, room.CustomProperties);
+            Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out int coins, room.CustomProperties);
+
+            if (!room.IsVisible || room.RemovedFromList || room.MaxPlayers > 10 || room.MaxPlayers <= 0 || lives > 99 || stars > 99 || stars <= 0 || coins > 99 || coins <= 0) {
                 invalidRooms.Add(room.Name);
                 continue;
             }
@@ -179,10 +183,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnPlayerEnteredRoom(Player newPlayer) {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
         List<NameIdPair> banList = bans.Cast<NameIdPair>().ToList();
-        if (banList.Any(nip => nip.userId == newPlayer.UserId)) {
-
+        if (newPlayer.NickName.Trim().Length < 3 || newPlayer.NickName.Trim().Length > 16 || banList.Any(nip => nip.userId == newPlayer.UserId)) {
             if (PhotonNetwork.IsMasterClient)
                 StartCoroutine(KickPlayer(newPlayer));
+
             return;
         }
         LocalChatMessage(newPlayer.NickName + " joined the room", ColorToVector(Color.red));

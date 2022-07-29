@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     ParticleSystem brickBreak;
 
-
+    private List<Player> validPlayers;
 
     // EVENT CALLBACK
     public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (sender == null || sender.IsMasterClient)
                 return;
 
-            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin")) {
+            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin") || (!validPlayers.Contains(sender) && prefab.Contains("Player"))) {
                 PhotonNetwork.CloseConnection(sender);
                 PhotonNetwork.DestroyPlayerObjects(sender);
             }
@@ -419,6 +419,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
+        validPlayers = PhotonNetwork.CurrentRoom.Players.Values.ToList();
     }
 
     IEnumerator LoadingComplete(int startTimestamp) {
@@ -461,6 +462,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 controllers.gameObject.SetActive(spectating);
             }
 
+        try {
+            ScoreboardUpdater.instance.Populate(allPlayers);
+            if (Settings.Instance.scoreboardAlways)
+                ScoreboardUpdater.instance.SetEnabled();
+        } catch { }
+
         if (gameStarting) {
             yield return new WaitForSeconds(3.5f);
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
@@ -476,12 +483,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         startServerTime = startTimestamp + 3500;
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
             wfgs.AttemptExecute();
-
-        try {
-            ScoreboardUpdater.instance.Populate(allPlayers);
-            if (Settings.Instance.scoreboardAlways)
-                ScoreboardUpdater.instance.ManualToggle();
-        } catch { }
 
         yield return new WaitForSeconds(1f);
 
@@ -501,18 +502,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     IEnumerator CountdownSound(float t, float times) { //The match countdown sound system. t is the tempo, and times is the # of times the sound will play (variable if match is started at 10s or less)
-        for (int i=0;i<times;i++) {
-            if (gameover != true) { //This is to ensure that if a win or draw occurs in the last 10 seconds, the countdown sound doesn't play past the match's length.
-                if (i>=(times/2)) { //Countdown sound will speed up and play twice per second as a match's end draws near.
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
-                    yield return new WaitForSeconds(t/2);
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
-                    yield return new WaitForSeconds(t/2);
-                }
-                else { //Or it'll just play normally.
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
-                    yield return new WaitForSeconds(t);
-                }
+        for (int i = 0;i < times; i++) {
+            if (gameover) //This is to ensure that if a win or draw occurs in the last 10 seconds, the countdown sound doesn't play past the match's length.
+                yield break;
+
+            if (i >= (times / 2)) { //Countdown sound will speed up and play twice per second as a match's end draws near.
+                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                yield return new WaitForSeconds(t / 2);
+                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                yield return new WaitForSeconds(t / 2);
+            } else { //Or it'll just play normally.
+                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                yield return new WaitForSeconds(t);
             }
         }
     }

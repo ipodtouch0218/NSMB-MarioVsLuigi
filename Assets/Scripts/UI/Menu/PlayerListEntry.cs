@@ -49,8 +49,8 @@ public class PlayerListEntry : MonoBehaviour {
             foreach (byte b in bytes)
                 sb.Append(b.ToString("X2"));
 
-            if (SPECIAL_PLAYERS.Contains(sb.ToString().ToLower()))
-                enabled = true;
+            //if (SPECIAL_PLAYERS.Contains(sb.ToString().ToLower()))
+                //enabled = true;
         }
 
         string permissionSymbol = "";
@@ -107,32 +107,35 @@ public class PlayerListEntry : MonoBehaviour {
         options.anchoredPosition = new(options.anchoredPosition.x, -options.rect.height);
 
         EventSystem.current.SetSelectedGameObject(firstButton);
+        MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor.GetClip());
     }
 
-    public void HideDropdown() {
+    public void HideDropdown(bool didAction) {
         Destroy(blockerInstance);
 
         background.offsetMin = new(background.offsetMin.x, 0);
         options.anchoredPosition = new(options.anchoredPosition.x, 0);
+
+        MainMenuManager.Instance.sfx.PlayOneShot((didAction ? Enums.Sounds.UI_Decide : Enums.Sounds.UI_Back).GetClip());
     }
 
     public void BanPlayer() {
         MainMenuManager.Instance.Ban(player);
-        HideDropdown();
+        HideDropdown(true);
     }
 
     public void KickPlayer() {
         MainMenuManager.Instance.Kick(player);
-        HideDropdown();
+        HideDropdown(true);
     }
 
     public void MutePlayer() {
         MainMenuManager.Instance.Mute(player);
-        HideDropdown();
+        HideDropdown(true);
     }
 
     public void PromotePlayer() {
         MainMenuManager.Instance.Promote(player);
-        HideDropdown();
+        HideDropdown(true);
     }
 }

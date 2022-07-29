@@ -45,8 +45,8 @@ public class WaterSplash : MonoBehaviour {
         heightTex.SetPixels32(colors);
         heightTex.Apply();
 
-        collider.offset = new(0, heightTiles * 0.25f);
-        collider.size = new(widthTiles * 0.5f, heightTiles * 0.5f);
+        collider.offset = new(0, heightTiles * 0.25f - 0.2f);
+        collider.size = new(widthTiles * 0.5f, heightTiles * 0.5f - 0.1f);
         spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
 
         properties = new();
