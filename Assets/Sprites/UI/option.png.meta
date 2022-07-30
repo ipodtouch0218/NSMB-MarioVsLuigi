@@ -142,7 +142,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: option
+      name: option_yellow
       rect:
         serializedVersion: 2
         x: 0
@@ -163,7 +163,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_sel
+      name: option_yellow_selected
       rect:
         serializedVersion: 2
         x: 16
@@ -184,7 +184,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_pres
+      name: option_yellow_pressed
       rect:
         serializedVersion: 2
         x: 32
@@ -205,7 +205,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_0
+      name: option_yellow_disabled
       rect:
         serializedVersion: 2
         x: 48
@@ -226,7 +226,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_b
+      name: option_blue
       rect:
         serializedVersion: 2
         x: 64
@@ -247,13 +247,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_bar
+      name: bar_yellow
       rect:
         serializedVersion: 2
         x: 0
-        y: 16
+        y: 18
         width: 12
-        height: 32
+        height: 30
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -268,13 +268,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_bar_sel
+      name: bar_yellow_selected
       rect:
         serializedVersion: 2
         x: 16
-        y: 16
+        y: 18
         width: 12
-        height: 32
+        height: 30
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -289,13 +289,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_bar_pres
+      name: bar_yellow_pressed
       rect:
         serializedVersion: 2
         x: 32
-        y: 16
+        y: 18
         width: 12
-        height: 32
+        height: 30
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -310,13 +310,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_bar_dis
+      name: bar_yellow_disabled
       rect:
         serializedVersion: 2
         x: 48
-        y: 16
+        y: 18
         width: 12
-        height: 32
+        height: 30
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -331,11 +331,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_meter_0
+      name: bar_yellow_filled
       rect:
         serializedVersion: 2
         x: 0
-        y: 8
+        y: 10
         width: 8
         height: 8
       alignment: 0
@@ -352,11 +352,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_meter_1
+      name: bar_yelllow_empty
       rect:
         serializedVersion: 2
-        x: 8
-        y: 8
+        x: 48
+        y: 10
         width: 8
         height: 8
       alignment: 0
@@ -373,32 +373,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_meter_dis
+      name: option_green
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 3, y: 4, z: 4, w: 3}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 55f4c39cfddb5704ca58f8a08bfdfa79
-      internalID: 2135415530
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: option_g
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
+        x: 192
+        y: 48
         width: 15
         height: 15
       alignment: 0
@@ -415,11 +394,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_g_sel
+      name: option_green_selected
       rect:
         serializedVersion: 2
-        x: 80
-        y: 0
+        x: 208
+        y: 48
         width: 15
         height: 15
       alignment: 0
@@ -436,11 +415,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_g_pres
+      name: option_green_pressed
       rect:
         serializedVersion: 2
-        x: 96
-        y: 0
+        x: 224
+        y: 48
         width: 15
         height: 15
       alignment: 0
@@ -457,11 +436,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_g_dis
+      name: option_green_disabled
       rect:
         serializedVersion: 2
-        x: 112
-        y: 0
+        x: 240
+        y: 48
         width: 15
         height: 15
       alignment: 0
@@ -478,7 +457,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_b_sel
+      name: option_blue_selected
       rect:
         serializedVersion: 2
         x: 80
@@ -499,7 +478,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_b_pres
+      name: option_blue_pressed
       rect:
         serializedVersion: 2
         x: 96
@@ -520,7 +499,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_b_dis
+      name: option_blue_disabled
       rect:
         serializedVersion: 2
         x: 112
@@ -541,15 +520,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_r
+      name: option_red
       rect:
         serializedVersion: 2
-        x: 64
-        y: 33
+        x: 128
+        y: 48
         width: 15
         height: 15
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 6, y: 8, z: 8, w: 6}
       outline: []
       physicsShape: []
@@ -562,15 +541,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_r_sel
+      name: option_red_selected
       rect:
         serializedVersion: 2
-        x: 80
-        y: 33
+        x: 144
+        y: 48
         width: 15
         height: 15
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 6, y: 8, z: 8, w: 6}
       outline: []
       physicsShape: []
@@ -583,15 +562,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: option_r_pres
+      name: option_red_pressed
       rect:
         serializedVersion: 2
-        x: 96
-        y: 33
+        x: 160
+        y: 48
         width: 15
         height: 15
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 7, y: 7, z: 7, w: 7}
       outline: []
       physicsShape: []
@@ -599,6 +578,153 @@ TextureImporter:
       bones: []
       spriteID: 9f0d6bed31b5271469071da00f03b003
       internalID: 87811832
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: option_red_disabled
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 48
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 6, y: 8, z: 8, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0c288175b56aadd408d7acf7c4f621a2
+      internalID: 1657813663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bar_green
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 18
+        width: 12
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0c1e58a351f76094f84fa735af13a15c
+      internalID: 1988032188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bar_green_selected
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 18
+        width: 12
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 218ca13307db9db4da28724296197a05
+      internalID: -232672358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bar_green_pressed
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 18
+        width: 12
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77c1cc27ad5db4344be5dae036648fe9
+      internalID: 1253250550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bar_green_disabled
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 18
+        width: 12
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3d11d8b4c480f14b8e78ad96756d144
+      internalID: -136452746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bar_green_filled
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 10
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 3, y: 4, z: 4, w: 3}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2cbca7e5a7be1f84d9f46455efab73d3
+      internalID: 2056141543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bar_green_empty
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 10
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 3, y: 4, z: 4, w: 3}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 54cf70e714d9a3f4d97594b7779913a1
+      internalID: 654580174
       vertices: []
       indices: 
       edges: []
@@ -614,28 +740,35 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      option_g_dis: 613028815
-      option_b_sel: 1303659493
-      option_g: -655794942
-      option_b: 921158468
-      option_bar_pres: 1361422749
-      option_pres: 1292347602
-      option_g_pres: 1611290607
-      option_bar: 1573181257
-      option_b_dis: 1291356150
+      bar_yellow_selected: -1311239854
+      option_green_pressed: 1611290607
+      option_red_pressed: 87811832
+      bar_green_pressed: 1253250550
+      bar_green: 1988032188
+      option_green_disabled: 613028815
+      option_yellow_selected: -634966080
+      option_red_selected: 1150358858
+      bar_green_filled: 2056141543
+      option_red_disabled: 1657813663
+      option_yellow_pressed: 1292347602
+      bar_yellow_filled: 850112226
+      bar_yellow: 1573181257
+      bar_green_selected: 1264872561
       option_meter_dis: 2135415530
-      option_meter_1: -93316979
-      option_r: -248825290
-      option_0: 918296707
-      option_bar_sel: -1311239854
-      option_b_pres: 995382058
-      option_sel: -634966080
-      option_g_sel: -808684277
-      option_r_sel: 1150358858
-      option_r_pres: 87811832
-      option: -1008673158
-      option_bar_dis: 594883156
-      option_meter_0: 850112226
+      option_yellow_disabled: 918296707
+      bar_yellow_pressed: 1361422749
+      option_green: -655794942
+      option_blue_disabled: 1291356150
+      bar_green_empty: 654580174
+      option_yellow: -1008673158
+      bar_green_disabled: -136452746
+      option_green_selected: -808684277
+      bar_yelllow_empty: -93316979
+      option_red: -248825290
+      bar_yellow_disabled: 594883156
+      option_blue_pressed: 995382058
+      option_blue_selected: 1303659493
+      option_blue: 921158468
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 

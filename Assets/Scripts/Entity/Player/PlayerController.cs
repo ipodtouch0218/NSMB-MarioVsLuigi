@@ -51,8 +51,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     private int _starCombo;
     public int StarCombo {
-        get => (invincible > 0 ? _starCombo : 0);
-        set => _starCombo = (invincible > 0 ? value : 0);
+        get => invincible > 0 ? _starCombo : 0;
+        set => _starCombo = invincible > 0 ? value : 0;
     }
 
     public Vector2 pipeDirection;
@@ -95,6 +95,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public BoxCollider2D MainHitbox => hitboxes[0];
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
+
+    private readonly Dictionary<GameObject, double> lastCollectTime = new();
 
     #endregion
 
@@ -399,6 +401,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         GameObject obj = collision.gameObject;
 
+        double time = PhotonNetwork.Time;
+        if (time - lastCollectTime.GetValueOrDefault(obj) < 0.5d)
+            return;
+
+        lastCollectTime[obj] = time;
+
         switch (collision.gameObject.tag) {
         case "Player": {
             //hit players
@@ -628,6 +636,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!photonView.IsMine || dead || Frozen)
             return;
 
+        double time = PhotonNetwork.Time;
+        if (time - lastCollectTime.GetValueOrDefault(obj) < 0.5d)
+            return;
+
         switch (obj.tag) {
         case "Powerup": {
             if (!photonView.IsMine)
@@ -635,22 +647,23 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             MovingPowerup powerup = obj.GetComponentInParent<MovingPowerup>();
             if (powerup.followMeCounter > 0 || powerup.ignoreCounter > 0)
                 break;
-            photonView.RPC("AttemptCollectPowerup", RpcTarget.All, powerup.photonView.ViewID);
+
+            photonView.RPC("AttemptCollectPowerup", RpcTarget.AllViaServer, powerup.photonView.ViewID);
             Destroy(collider);
             break;
         }
         case "bigstar": {
             Transform parent = obj.transform.parent;
-            photonView.RPC("AttemptCollectBigStar", RpcTarget.MasterClient, parent.gameObject.GetPhotonView().ViewID);
+            photonView.RPC("AttemptCollectBigStar", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID);
             break;
         }
         case "loosecoin": {
             Transform parent = obj.transform.parent;
-            photonView.RPC("CollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, parent.position);
+            photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
             break;
         }
         case "coin": {
-            photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
+            photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector2(obj.transform.position.x, collider.transform.position.y));
             break;
         }
         }
@@ -805,6 +818,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void AttemptCollectPowerup(int powerupID, PhotonMessageInfo info) {
         //only the owner can request a powerup, and only the master client can decide for us
         if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
+            return;
+
+        if (dead || !spawned)
             return;
 
         //powerup doesn't eixst?
@@ -1026,6 +1042,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
             return;
 
+        if (dead || !spawned)
+            return;
+
         //star doesn't eixst?
         PhotonView view = PhotonView.Find(starID);
         if (!view)
@@ -1038,19 +1057,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         starScript.Collected = true;
 
         //we can collect
-        photonView.RPC("CollectBigStar", RpcTarget.All, starID);
+        photonView.RPC("CollectBigStar", RpcTarget.All, (Vector2) starScript.transform.position, starID);
         if (starScript.stationary)
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
 
     [PunRPC]
-    public void CollectBigStar(int starID, PhotonMessageInfo info) {
+    public void CollectBigStar(Vector2 particle, int starView, PhotonMessageInfo info) {
         //only trust the master client
         if (!info.Sender.IsMasterClient)
             return;
-
-        PhotonView view = PhotonView.Find(starID);
-        GameObject star = view.gameObject;
 
         //state
         stars = Mathf.Min(stars + 1, GameManager.Instance.starRequirement);
@@ -1060,37 +1076,68 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         GameManager.Instance.CheckForWinner();
 
         //fx
-        Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
         PlaySoundEverywhere(photonView.IsMine ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
+        Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), particle, Quaternion.identity);
 
-        //destroy star
-
-        if (view.IsMine)
-            PhotonNetwork.Destroy(view);
-        else if (star)
-            DestroyImmediate(star);
+        //destroy
+        PhotonView star = PhotonView.Find(starView);
+        if (star && star.IsMine) {
+            PhotonNetwork.Destroy(star);
+        } else {
+            Destroy(star.gameObject);
+        }
     }
 
     [PunRPC]
-    protected void CollectCoin(int coinID, Vector3 position) {
+    public void AttemptCollectCoin(int coinID, Vector2 particle, PhotonMessageInfo info) {
+        //only the owner can request a coin, and only the master client can decide for us
+        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
+            return;
+
+        if (dead || !spawned)
+            return;
+
         if (coinID != -1) {
-            PhotonView coinView = PhotonView.Find(coinID);
-            if (!coinView)
+            PhotonView coin = PhotonView.Find(coinID);
+            if (!coin)
                 return;
 
-            GameObject coin = coinView.gameObject;
-            if (coin.CompareTag("loosecoin")) {
-                if (coin.GetPhotonView().IsMine)
-                    PhotonNetwork.Destroy(coin);
-                DestroyImmediate(coin);
-            } else {
-                SpriteRenderer renderer = coin.GetComponent<SpriteRenderer>();
-                if (!renderer.enabled)
+            //coins should ALWAYS be controlled by the host
+            if (!coin.IsMine || !coin.GetComponent<SpriteRenderer>().enabled)
+                return;
+
+            if (coin.GetComponent<LooseCoin>() is LooseCoin lc) {
+                if (lc.Collected)
                     return;
-                renderer.enabled = false;
+
+                lc.Collected = true;
+            }
+        }
+
+        photonView.RPC("CollectCoin", RpcTarget.All, coinID, particle);
+    }
+
+    [PunRPC]
+    protected void CollectCoin(int coinID, Vector2 position, PhotonMessageInfo info) {
+        //only trust the master client
+        if (!info.Sender.IsMasterClient)
+            return;
+
+        PhotonView coin = PhotonView.Find(coinID);
+        if (coin) {
+            if (coin.CompareTag("loosecoin")) {
+                //loose coin, just destroy
+                if (coin.IsMine) {
+                    PhotonNetwork.Destroy(coin);
+                }
+                Destroy(coin.gameObject);
+            } else {
+                //floating coin, just disable collision + graphic
+                coin.GetComponent<SpriteRenderer>().enabled = false;
                 coin.GetComponent<BoxCollider2D>().enabled = false;
             }
         }
+
         Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), position, Quaternion.identity);
 
         PlaySound(Enums.Sounds.World_Coin_Collect);
