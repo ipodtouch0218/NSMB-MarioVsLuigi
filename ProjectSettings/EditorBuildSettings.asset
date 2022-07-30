@@ -29,7 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CustomJungle.unity
     guid: de8e2edb54b6b5e489c97578fa670804
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Levels/CustomSky.unity
     guid: addb28d9cb6d8a6498a3b328a6e57f33
   - enabled: 1
@@ -56,4 +56,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CadoSnowy.unity
     guid: 52d6910408d2f294aa3a01155ca53d2c
+  - enabled: 1
+    path: Assets/Scenes/Levels/CadoHills.unity
+    guid: 8633be09f6d0fcb43a88adaeec3ddf6a
+  - enabled: 1
+    path: Assets/Scenes/Levels/CustomColdSky.unity
+    guid: a04f2b9a59bb942409e7ebe1c6689f8c
   m_configObjects: {}
