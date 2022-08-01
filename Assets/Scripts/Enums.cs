@@ -183,9 +183,10 @@ public static class Enums {
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events
         StartGame = 1,
-        ChatMessage = 2,
-        ChangeMaxPlayers = 3,
-        ChangePrivate = 4,
+        SystemMessage = 2,
+        PlayerChatMessage = 3,
+        ChangeMaxPlayers = 4,
+        ChangePrivate = 5,
         // 10-19 = game state events
         PlayerFinishedLoading = 10,
         AllFinishedLoading = 11,

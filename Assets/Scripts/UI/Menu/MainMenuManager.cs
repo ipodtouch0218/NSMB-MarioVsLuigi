@@ -17,6 +17,9 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using NSMB.Utils;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
+
+    public const int NICKNAME_MIN = 2, NICKNAME_MAX = 16;
+
     public static MainMenuManager Instance;
     public AudioSource sfx, music;
     public GameObject lobbiesContent, lobbyPrefab;
@@ -144,28 +147,28 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void OnMasterClientSwitched(Player newMaster) {
-        LocalChatMessage(newMaster.NickName + " has become the Host", ColorToVector(Color.red));
+        LocalChatMessage(newMaster.NickName.AsUsername() + " has become the Host", Color.red);
 
         if (newMaster.IsLocal) {
             //i am de captain now
             PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
-                [Enums.NetRoomProperties.HostName] = newMaster.NickName
+                [Enums.NetRoomProperties.HostName] = newMaster.NickName.AsUsername()
             });
-            LocalChatMessage("You are the room's host! You can use chat commands like /ban, /mute, /kick, etc. to control your room. Do /help for help.", ColorToVector(Color.red));
+            LocalChatMessage("You are the room's host! You can click on player names to control your room, or use chat commands. Do /help for more help.", Color.red);
         }
         UpdateSettingEnableStates();
     }
     public void OnJoinedRoom() {
-        LocalChatMessage(PhotonNetwork.LocalPlayer.NickName + " joined the room", ColorToVector(Color.red));
+        LocalChatMessage(PhotonNetwork.LocalPlayer.NickName.AsUsername() + " joined the room", Color.red);
 
         Room room = PhotonNetwork.CurrentRoom;
         Player local = PhotonNetwork.LocalPlayer;
-        if (room.Players.Values.Where(pl => pl != local).Any(pl => pl.NickName.Filter().ToLower() == local.NickName.Filter().ToLower())) {
+        if (room.Players.Values.Where(pl => pl != local).Any(pl => pl.NickName.AsUsername().ToLower() == local.NickName.AsUsername().ToLower())) {
             //rename
-            int dupes = room.Players.Values.Where(pl => pl != local).Where(pl => Regex.Match(pl.NickName.Filter(), local.NickName.Filter() + "\\(\\d\\)").Success).Count();
+            int dupes = room.Players.Values.Where(pl => pl != local).Where(pl => Regex.Match(pl.NickName.AsUsername(), local.NickName.AsUsername() + "\\(\\d\\)").Success).Count();
             for (int i = 1; i <= dupes + 1; i++) {
-                string dupeName = PhotonNetwork.NickName + "(" + i + ")"; ;
-                if (!room.Players.Values.Any(pl => pl.NickName == dupeName)) {
+                string dupeName = PhotonNetwork.NickName.AsUsername() + "(" + i + ")"; ;
+                if (!room.Players.Values.Any(pl => pl.NickName.AsUsername() == dupeName)) {
                     PhotonNetwork.NickName = dupeName;
                     break;
                 }
@@ -183,13 +186,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnPlayerEnteredRoom(Player newPlayer) {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
         List<NameIdPair> banList = bans.Cast<NameIdPair>().ToList();
-        if (newPlayer.NickName.Trim().Length < 3 || newPlayer.NickName.Trim().Length > 16 || banList.Any(nip => nip.userId == newPlayer.UserId)) {
+        if (newPlayer.NickName.Length < NICKNAME_MIN || newPlayer.NickName.Length > NICKNAME_MAX || banList.Any(nip => nip.userId == newPlayer.UserId)) {
             if (PhotonNetwork.IsMasterClient)
                 StartCoroutine(KickPlayer(newPlayer));
 
             return;
         }
-        LocalChatMessage(newPlayer.NickName + " joined the room", ColorToVector(Color.red));
+        LocalChatMessage(newPlayer.NickName.AsUsername() + " joined the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
@@ -198,7 +201,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (banList.Any(nip => nip.userId == otherPlayer.UserId)) {
             return;
         }
-        LocalChatMessage(otherPlayer.NickName + " left the room", ColorToVector(Color.red));
+        LocalChatMessage(otherPlayer.NickName.AsUsername() + " left the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
     public void OnRoomPropertiesUpdate(Hashtable updatedProperties) {
@@ -318,8 +321,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     // CUSTOM EVENT CALLBACKS
     public void OnEvent(EventData e) {
+        Player sender = null;
+
+        if (PhotonNetwork.CurrentRoom != null)
+            sender = PhotonNetwork.CurrentRoom.GetPlayer(e.Sender);
+
         switch (e.Code) {
         case (byte) Enums.NetEventIds.StartGame: {
+            if (!(sender?.IsMasterClient ?? false))
+                return;
+
             PlayerPrefs.SetString("in-room", PhotonNetwork.CurrentRoom.Name);
             PlayerPrefs.Save();
             Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectate, PhotonNetwork.LocalPlayer.CustomProperties);
@@ -330,30 +341,32 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Additive);
             break;
         }
-        case (byte) Enums.NetEventIds.ChatMessage: {
-            object[] data = (object[]) e.CustomData;
-            string message = (string) data[0];
-            Vector3 color = (Vector3) data[1];
+        case (byte) Enums.NetEventIds.PlayerChatMessage: {
+            string message = e.CustomData as string;
 
-            var players = PhotonNetwork.CurrentRoom.Players;
-            if (players.ContainsKey(e.Sender)) {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
 
-                Player pl = players[e.Sender];
+            if (sender == null)
+                return;
 
-                double time = lastMessage.GetValueOrDefault(pl);
-                if (PhotonNetwork.Time - time < 1f)
+            double time = lastMessage.GetValueOrDefault(sender);
+            if (PhotonNetwork.Time - time < 0.75f)
+                return;
+
+            lastMessage[sender] = PhotonNetwork.Time;
+
+            if (!sender.IsMasterClient) {
+                Utils.GetCustomProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
+                if (mutes.Contains(sender.UserId))
                     return;
-
-                lastMessage[pl] = PhotonNetwork.Time;
-
-                if (!pl.IsMasterClient) {
-                    Utils.GetCustomProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
-                    if (mutes.Contains(pl.UserId))
-                        return;
-                }
             }
 
-            LocalChatMessage(message.Replace("<", "«").Replace(">", "»").Substring(0, Mathf.Min(128, message.Length)), color);
+            message = sender.NickName.AsUsername() + ": " + message;
+            message = message.Replace("<", "«").Replace(">", "»").Trim();
+            message = message.Substring(0, Mathf.Min(128, message.Length));
+
+            LocalChatMessage(message, Color.black);
             break;
         }
         case (byte) Enums.NetEventIds.ChangeMaxPlayers: {
@@ -531,7 +544,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
     }
 
-    void EnterRoom() {
+    public void EnterRoom() {
         Room room = PhotonNetwork.CurrentRoom;
         PlayerPrefs.SetString("in-room", null);
         PlayerPrefs.Save();
@@ -548,7 +561,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
 
         if (PhotonNetwork.IsMasterClient)
-            LocalChatMessage("You are the room's host! You can use chat commands like /ban, /mute, /kick, etc. to control your room. Do /help for help.", ColorToVector(Color.red));
+            LocalChatMessage("You are the room's host! You can use chat commands like /ban, /mute, /kick, etc. to control your room. Do /help for help.", Color.red);
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value, PhotonNetwork.LocalPlayer.CustomProperties);
         SetPlayerColor(value);
@@ -776,25 +789,27 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Lives])
             return;
 
-        ExitGames.Client.Photon.Hashtable table = new() {
+        Hashtable table = new() {
             [Enums.NetRoomProperties.Lives] = newValue
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
     public void SetNewPowerups(Toggle toggle) {
-        ExitGames.Client.Photon.Hashtable properties = new() {
+        Hashtable properties = new() {
             [Enums.NetRoomProperties.NewPowerups] = toggle.isOn
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }
     public void EnableLives(Toggle toggle) {
-        ExitGames.Client.Photon.Hashtable properties = new() {
+        Hashtable properties = new() {
             [Enums.NetRoomProperties.Lives] = toggle.isOn ? int.Parse(livesField.text) : -1
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }
+
     public void ChangeLevel(int index) {
         levelDropdown.SetValueWithoutNotify(index);
+        LocalChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
     }
     public void SetLevelIndex() {
@@ -806,9 +821,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
 
         ChangeLevel(newLevelIndex);
-        GlobalChatMessage("Map set to: " + levelDropdown.captionText.text, ColorToVector(Color.red));
 
-        ExitGames.Client.Photon.Hashtable table = new() {
+        Hashtable table = new() {
             [Enums.NetRoomProperties.Level] = levelDropdown.value
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
@@ -821,7 +835,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         selectedRoomIcon.Select();
         selectedRoom = selectedRoomIcon.room?.Name ?? null;
 
-        joinRoomBtn.interactable = room != null && nicknameField.text.Length >= 3;
+        joinRoomBtn.interactable = room != null && nicknameField.text.Length >= NICKNAME_MIN;
     }
     public void JoinSelectedRoom() {
         if (selectedRoomIcon?.joinPrivate ?? false) {
@@ -890,12 +904,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         startGameBtn.interactable = PhotonNetwork.IsMasterClient && playingPlayers >= 1;
     }
 
-    public void GlobalChatMessage(string message, Vector3 color) {
-        RaiseEventOptions options = new() { Receivers = ReceiverGroup.All };
-        object[] parameters = new object[] { message, color };
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChatMessage, parameters, options, SendOptions.SendReliable);
+    public void PlayerChatMessage(string message) {
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerChatMessage, message, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
-    public void LocalChatMessage(string message, Vector3 color) {
+
+    public void LocalChatMessage(string message, Color? color = null) {
         float y = 0;
         for (int i = 0; i < chatContent.transform.childCount; i++) {
             GameObject child = chatContent.transform.GetChild(i).gameObject;
@@ -908,8 +921,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         GameObject chat = Instantiate(chatPrefab, Vector3.zero, Quaternion.identity, chatContent.transform);
         chat.SetActive(true);
 
+        if (color != null) {
+            Color fColor = (Color) color;
+            message = $"<color=#{(byte) (fColor.r * 255):X2}{(byte) (fColor.g * 255):X2}{(byte) (fColor.b * 255):X2}>" + message;
+        }
+
         GameObject txtObject = chat.transform.Find("Text").gameObject;
-        SetText(txtObject, message, new Color(color.x, color.y, color.z));
+        SetText(txtObject, message);
         Canvas.ForceUpdateCanvases();
 
         //RectTransform tf = txtObject.GetComponent<RectTransform>();
@@ -927,40 +945,40 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
 
-        GlobalChatMessage(PhotonNetwork.NickName + ": " + text, ColorToVector(Color.black));
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerChatMessage, text, NetworkUtils.EventAll, SendOptions.SendReliable);
         StartCoroutine(SelectNextFrame(chatTextField));
     }
 
     public void Kick(Player target) {
         if (target.IsLocal) {
-            LocalChatMessage("While you can kick yourself, it's probably not what you meant to do.", ColorToVector(Color.red));
+            LocalChatMessage("While you can kick yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
         PhotonNetwork.CloseConnection(target);
-        LocalChatMessage($"Successfully kicked {target.NickName}", ColorToVector(Color.red));
+        LocalChatMessage($"Successfully kicked {target.NickName.AsUsername()}", Color.red);
     }
 
     public void Promote(Player target) {
         if (target.IsLocal) {
-            LocalChatMessage("You are already the host..?", ColorToVector(Color.red));
+            LocalChatMessage("You are already the host..?", Color.red);
             return;
         }
         PhotonNetwork.SetMasterClient(target);
-        LocalChatMessage($"Promoted {target.NickName} to the host!", ColorToVector(Color.red));
+        LocalChatMessage($"Promoted {target.NickName.AsUsername()} to the host!", Color.red);
     }
 
     public void Mute(Player target) {
         if (target.IsLocal) {
-            LocalChatMessage("While you can mute yourself, it's probably not what you meant to do.", ColorToVector(Color.red));
+            LocalChatMessage("While you can mute yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
         Utils.GetCustomProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
         List<object> mutesList = new(mutes);
         if (mutes.Contains(target.UserId)) {
-            LocalChatMessage($"Successfully unmuted {target.NickName}", ColorToVector(Color.red));
+            LocalChatMessage($"Successfully unmuted {target.NickName.AsUsername()}", Color.red);
             mutesList.Remove(target.UserId);
         } else {
-            LocalChatMessage($"Successfully muted {target.NickName}", ColorToVector(Color.red));
+            LocalChatMessage($"Successfully muted {target.NickName.AsUsername()}", Color.red);
             mutesList.Add(target.UserId);
         }
         Hashtable table = new() {
@@ -970,7 +988,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void BanOrUnban(string playername) {
-        Player onlineTarget = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == playername);
+        Player onlineTarget = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.AsUsername().ToLower() == playername);
         if (onlineTarget != null) {
             //player is in room, ban them
             Ban(onlineTarget);
@@ -989,12 +1007,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
 
-        LocalChatMessage($"Unknown player {playername}", ColorToVector(Color.red));
+        LocalChatMessage($"Unknown player {playername}", Color.red);
     }
 
     public void Ban(Player target) {
         if (target.IsLocal) {
-            LocalChatMessage("While you can ban yourself, it's probably not what you meant to do.", ColorToVector(Color.red));
+            LocalChatMessage("While you can ban yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
 
@@ -1013,7 +1031,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         PhotonNetwork.CloseConnection(target);
-        LocalChatMessage($"Successfully banned {target.NickName.Filter()}", ColorToVector(Color.red));
+        LocalChatMessage($"Successfully banned {target.NickName.AsUsername()}", Color.red);
     }
 
     private void Unban(NameIdPair targetPair) {
@@ -1026,25 +1044,25 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Bans] = pairs.ToArray(),
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        LocalChatMessage($"Successfully unbanned {targetPair.name.Filter()}", ColorToVector(Color.red));
+        LocalChatMessage($"Successfully unbanned {targetPair.name.AsUsername()}", Color.red);
     }
 
     private void RunCommand(string[] args) {
         if (!PhotonNetwork.IsMasterClient) {
-            LocalChatMessage("You cannot use room commands if you aren't the host!", ColorToVector(Color.red));
+            LocalChatMessage("You cannot use room commands if you aren't the host!", Color.red);
             return;
         }
         string command = args.Length > 0 ? args[0].ToLower() : "";
         switch (command) {
         case "kick": {
             if (args.Length < 2) {
-                LocalChatMessage("Usage: /kick <player name>", ColorToVector(Color.red));
+                LocalChatMessage("Usage: /kick <player name>", Color.red);
                 return;
             }
             string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.AsUsername().ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", Color.red);
                 return;
             }
             Kick(target);
@@ -1052,13 +1070,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
         case "host": {
             if (args.Length < 2) {
-                LocalChatMessage("Usage: /host <player name>", ColorToVector(Color.red));
+                LocalChatMessage("Usage: /host <player name>", Color.red);
                 return;
             }
             string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.AsUsername().ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", Color.red);
                 return;
             }
             Promote(target);
@@ -1074,20 +1092,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 "debug" => "/debug - Enables debug & in-development features",
                 _ => "Available commands: /kick, /host, /debug, /mute, /ban",
             };
-            LocalChatMessage(msg, ColorToVector(Color.red));
+            LocalChatMessage(msg, Color.red);
             return;
         }
         case "debug": {
             Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debugEnabled);
             if (PhotonNetwork.CurrentRoom.IsVisible) {
-                LocalChatMessage("Error: You can only enable debug / in development features in private lobbies.", ColorToVector(Color.red));
+                LocalChatMessage("Error: You can only enable debug / in development features in private lobbies.", Color.red);
                 return;
             }
 
             if (debugEnabled) {
-                LocalChatMessage("Debug features have been disabled.", ColorToVector(Color.red));
+                LocalChatMessage("Debug features have been disabled.", Color.red);
             } else {
-                LocalChatMessage("Debug features have been enabled.", ColorToVector(Color.red));
+                LocalChatMessage("Debug features have been enabled.", Color.red);
             }
             PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
                 [Enums.NetRoomProperties.Debug] = !debugEnabled
@@ -1096,13 +1114,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
         case "mute": {
             if (args.Length < 2) {
-                LocalChatMessage("Usage: /mute <player name>", ColorToVector(Color.red));
+                LocalChatMessage("Usage: /mute <player name>", Color.red);
                 return;
             }
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[1]}", ColorToVector(Color.red));
+                LocalChatMessage($"Unknown player {args[1]}", Color.red);
                 return;
             }
             Mute(target);
@@ -1110,14 +1128,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
         case "ban": {
             if (args.Length < 2) {
-                LocalChatMessage("Usage: /ban <player name>", ColorToVector(Color.red));
+                LocalChatMessage("Usage: /ban <player name>", Color.red);
                 return;
             }
             BanOrUnban(args[1]);
             return;
         }
         }
-        LocalChatMessage($"Error: Unknown command. Try /help for help.", ColorToVector(Color.red));
+        LocalChatMessage($"Error: Unknown command. Try /help for help.", Color.red);
         return;
     }
 
@@ -1125,9 +1143,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         yield return new WaitForEndOfFrame();
         input.ActivateInputField();
     }
-    public static Vector3 ColorToVector(Color color) {
-        return new Vector3(color.r, color.g, color.b);
-    }
+
     public void SwapCharacter(TMP_Dropdown dropdown) {
         Hashtable prop = new() {
             { Enums.NetPlayerProperties.Character, dropdown.value }
@@ -1156,7 +1172,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     private void UpdateNickname() {
-        validName = PhotonNetwork.NickName.Length > 2;
+        validName = PhotonNetwork.NickName.Length >= NICKNAME_MIN;
         if (!validName) {
             ColorBlock colors = nicknameField.colors;
             colors.normalColor = new Color(1, 0.7f, 0.7f, 1);

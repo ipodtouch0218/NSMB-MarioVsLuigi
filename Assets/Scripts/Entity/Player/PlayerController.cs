@@ -1275,6 +1275,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 PhotonNetwork.Destroy(photonView);
                 GameManager.Instance.SpectationManager.Spectating = true;
             }
+            Destroy(gameObject);
             return;
         }
         transform.localScale = Vector2.one;

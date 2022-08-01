@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (sender == null || sender.IsMasterClient)
                 return;
 
-            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin") || (!validPlayers.Contains(sender) && prefab.Contains("Player"))) {
+            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin") || ((!validPlayers.Contains(sender) || musicEnabled) && prefab.Contains("Player"))) {
                 PhotonNetwork.CloseConnection(sender);
                 PhotonNetwork.DestroyPlayerObjects(sender);
             }
@@ -112,6 +112,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             break;
         }
         case (byte) Enums.NetEventIds.EndGame: {
+            if (!(sender?.IsMasterClient ?? false))
+                return;
+
             Player winner = (Player) customData;
             StartCoroutine(EndGame(winner));
             break;
@@ -253,6 +256,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (upsideDown ? -1 : 1));
             break;
         }
+        /*
         case (byte) Enums.NetEventIds.PlayerDamagePlayer: {
             PhotonView attacker = PhotonView.Find((int) data[0]);
             PhotonView target = PhotonView.Find((int) data[1]);
@@ -283,6 +287,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             targetPlayer.photonView.RPC("Powerdown", RpcTarget.All, false);
             break;
         }
+        */
         }
     }
 
@@ -524,7 +529,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         music.Stop();
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.NickName.Filter() } Wins!" : "It's a draw...";
+        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.NickName.AsUsername() } Wins!" : "It's a draw...";
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");

@@ -19,13 +19,6 @@ namespace NSMB.Utils {
         private static readonly StringLengthComparer STRING_LENGTH_COMPARER = new();
         private static string[] filteredWords;
 
-        public static string Filter(this string input) {
-            if (Settings.Instance.filter)
-                return FilterString(input);
-
-            return input;
-        }
-
         public static string FilterString(string input) {
             DecodeFilter();
 
