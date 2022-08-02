@@ -121,8 +121,8 @@ TextureImporter:
       name: desert_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 128
+        x: 48
+        y: 102
         width: 16
         height: 16
       alignment: 0
