@@ -51,7 +51,7 @@ public class UserNametag : MonoBehaviour {
         }
         transform.position = screenPoint;
 
-        text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName.Filter();
+        text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.GetUniqueNickname();
 
         text.text += "\n";
         if (parent.lives >= 0)

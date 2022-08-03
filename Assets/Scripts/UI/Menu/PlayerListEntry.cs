@@ -75,7 +75,7 @@ public class PlayerListEntry : MonoBehaviour {
             pingColor = "red";
         }
 
-        nameText.text = permissionSymbol + characterSymbol + player.NickName.AsUsername();
+        nameText.text = permissionSymbol + characterSymbol + player.GetUniqueNickname();
         pingText.text = $"<color={pingColor}>{ping}";
 
         Transform parent = transform.parent;

@@ -180,16 +180,17 @@ public class KoopaWalk : HoldableEntity {
         stationary = false;
         speed = kickSpeed + 1.5f * kickFactor;
         body.velocity = new Vector2(speed * (left ? -1 : 1), groundpound ? 3.5f : 0);
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
+        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
     [PunRPC]
-    public override void Throw(bool facingLeft, bool crouch) {
+    public override void Throw(bool facingLeft, bool crouch, Vector2 pos) {
         if (holder == null)
             return;
 
         stationary = crouch;
         speed = kickSpeed + 1.5f * (Mathf.Abs(holder.body.velocity.x) / holder.runningMaxSpeed);
+        body.position = pos;
         if (Utils.IsTileSolidAtWorldLocation(body.position))
             transform.position = body.position = new Vector2(holder.transform.position.x, transform.position.y);
 

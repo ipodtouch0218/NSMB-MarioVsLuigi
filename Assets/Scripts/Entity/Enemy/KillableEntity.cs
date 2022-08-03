@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using NSMB.Utils;
+using System.Collections.Generic;
 
-public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
+public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICustomSerializeView {
+
+    private static readonly float RESEND_RATE = 0.5f;
 
     public bool Frozen { get; set; }
 
@@ -16,6 +19,30 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity {
 
     bool IFreezableEntity.IsCarryable => iceCarryable;
     bool IFreezableEntity.IsFlying => flying;
+
+    public bool Active { get; set; } = true;
+    private byte previousFlags;
+    private double lastSendTimestamp;
+
+    public void Serialize(List<byte> buffer) {
+        SerializationUtils.PackToByte(out byte flags, dead, left);
+
+        bool forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
+
+        if (flags != previousFlags || forceResend) {
+            SerializationUtils.WriteByte(buffer, flags);
+
+            previousFlags = flags;
+            lastSendTimestamp = PhotonNetwork.Time;
+        }
+    }
+
+    public void Deserialize(List<byte> buffer, ref int index, PhotonMessageInfo info) {
+        SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags);
+
+        //dead = flags[0];
+        left = flags[1];
+    }
 
     public void Start() {
         body = GetComponent<Rigidbody2D>();

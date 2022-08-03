@@ -114,12 +114,14 @@ public class BobombWalk : HoldableEntity {
         PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
     }
     [PunRPC]
-    public override void Throw(bool facingLeft, bool crouch) {
+    public override void Throw(bool facingLeft, bool crouch, Vector2 pos) {
         if (!holder)
             return;
-        if (Utils.IsTileSolidAtWorldLocation(body.position)) {
-            transform.position = body.position = new Vector2(holder.transform.position.x, transform.position.y);
-        }
+
+        body.position = pos;
+        if (Utils.IsTileSolidAtWorldLocation(body.position))
+            transform.position = body.position = new(holder.transform.position.x, transform.position.y);
+
         holder = null;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
         left = facingLeft;
@@ -135,8 +137,8 @@ public class BobombWalk : HoldableEntity {
     public override void Kick(bool fromLeft, float speed, bool groundpound) {
         left = !fromLeft;
         sRenderer.flipX = left;
-        body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 2f);
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
+        body.velocity = new(kickSpeed * (left ? -1 : 1), 4f);
+        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
     public override void InteractWithPlayer(PlayerController player) {

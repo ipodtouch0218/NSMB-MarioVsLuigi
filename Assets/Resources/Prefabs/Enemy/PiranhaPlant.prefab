@@ -358,6 +358,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializableViews:
   - {fileID: 7244889019862401011}
+  - {fileID: 5617925178328362155}
 --- !u!114 &7244889019862401011
 MonoBehaviour:
   m_ObjectHideFlags: 0

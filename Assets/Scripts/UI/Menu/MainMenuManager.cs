@@ -8,8 +8,8 @@ using UnityEngine.Audio;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
 using TMPro;
+
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -60,6 +60,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
 
+    private readonly List<string> allRegions = new();
     private static readonly string roomNameChars = "BCDFGHJKLMNPRQSTVWXYZ";
 
     private readonly Dictionary<Player, double> lastMessage = new();
@@ -90,11 +91,21 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         List<string> invalidRooms = new();
 
         foreach (RoomInfo room in roomList) {
+            Utils.GetCustomProperty(Enums.NetRoomProperties.HostName, out string host, room.CustomProperties);
             Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out int lives, room.CustomProperties);
             Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int stars, room.CustomProperties);
             Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out int coins, room.CustomProperties);
 
-            if (!room.IsVisible || room.RemovedFromList || room.MaxPlayers > 10 || room.MaxPlayers <= 0 || lives > 99 || stars > 99 || stars <= 0 || coins > 99 || coins <= 0) {
+            bool valid = true;
+            valid &= room.IsVisible && room.IsOpen;
+            valid &= !room.RemovedFromList;
+            valid &= room.MaxPlayers >= 2 && room.MaxPlayers <= 10;
+            valid &= lives <= 99;
+            valid &= stars >= 1 && stars <= 99;
+            valid &= coins >= 1 && coins <= 99;
+            //valid &= host.IsValidUsername();
+
+            if (!valid) {
                 invalidRooms.Add(room.Name);
                 continue;
             }
@@ -147,34 +158,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void OnMasterClientSwitched(Player newMaster) {
-        LocalChatMessage(newMaster.NickName.AsUsername() + " has become the Host", Color.red);
+        LocalChatMessage(newMaster.GetUniqueNickname() + " has become the Host", Color.red);
 
         if (newMaster.IsLocal) {
             //i am de captain now
             PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
-                [Enums.NetRoomProperties.HostName] = newMaster.NickName.AsUsername()
+                [Enums.NetRoomProperties.HostName] = newMaster.GetUniqueNickname()
             });
             LocalChatMessage("You are the room's host! You can click on player names to control your room, or use chat commands. Do /help for more help.", Color.red);
         }
         UpdateSettingEnableStates();
     }
     public void OnJoinedRoom() {
-        LocalChatMessage(PhotonNetwork.LocalPlayer.NickName.AsUsername() + " joined the room", Color.red);
-
-        Room room = PhotonNetwork.CurrentRoom;
-        Player local = PhotonNetwork.LocalPlayer;
-        if (room.Players.Values.Where(pl => pl != local).Any(pl => pl.NickName.AsUsername().ToLower() == local.NickName.AsUsername().ToLower())) {
-            //rename
-            int dupes = room.Players.Values.Where(pl => pl != local).Where(pl => Regex.Match(pl.NickName.AsUsername(), local.NickName.AsUsername() + "\\(\\d\\)").Success).Count();
-            for (int i = 1; i <= dupes + 1; i++) {
-                string dupeName = PhotonNetwork.NickName.AsUsername() + "(" + i + ")"; ;
-                if (!room.Players.Values.Any(pl => pl.NickName.AsUsername() == dupeName)) {
-                    PhotonNetwork.NickName = dupeName;
-                    break;
-                }
-            }
-        }
-
+        LocalChatMessage(PhotonNetwork.LocalPlayer.GetUniqueNickname() + " joined the room", Color.red);
         EnterRoom();
     }
     IEnumerator KickPlayer(Player player) {
@@ -192,7 +188,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             return;
         }
-        LocalChatMessage(newPlayer.NickName.AsUsername() + " joined the room", Color.red);
+        LocalChatMessage(newPlayer.GetUniqueNickname() + " joined the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
@@ -201,7 +197,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (banList.Any(nip => nip.userId == otherPlayer.UserId)) {
             return;
         }
-        LocalChatMessage(otherPlayer.NickName.AsUsername() + " left the room", Color.red);
+        LocalChatMessage(otherPlayer.GetUniqueNickname() + " left the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
     public void OnRoomPropertiesUpdate(Hashtable updatedProperties) {
@@ -267,6 +263,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             }
 
             PhotonNetwork.ConnectToRegion(lastRegion);
+
+            for (int i = 0; i < pingSortedRegions.Length; i++) {
+                Region r = pingSortedRegions[i];
+                if (r.Code == lastRegion) {
+                    region.value = i;
+                    break;
+                }
+            }
         }
     }
     public void OnRegionListReceived(RegionHandler handler) {
@@ -274,7 +278,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             formattedRegions = new();
             pingSortedRegions = handler.EnabledRegions.ToArray();
-            System.Array.Sort(pingSortedRegions, NetworkUtils.RegionPingComparer);
+            System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
 
             foreach (Region r in pingSortedRegions)
                 formattedRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
@@ -327,8 +331,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             sender = PhotonNetwork.CurrentRoom.GetPlayer(e.Sender);
 
         switch (e.Code) {
+        case EventCode.PropertiesChanged: {
+            if ((int) e.Parameters[253] == 1 && PhotonNetwork.IsMasterClient && sender != null && !sender.IsMasterClient)
+                StartCoroutine(KickPlayer(sender));
+
+            break;
+        }
         case (byte) Enums.NetEventIds.StartGame: {
-            if (!(sender?.IsMasterClient ?? false))
+
+            if (!(sender?.IsMasterClient ?? false) && e.SenderKey != 255)
                 return;
 
             PlayerPrefs.SetString("in-room", PhotonNetwork.CurrentRoom.Name);
@@ -362,7 +373,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                     return;
             }
 
-            message = sender.NickName.AsUsername() + ": " + message;
+            message = sender.GetUniqueNickname() + ": " + message;
             message = message.Replace("<", "«").Replace(">", "»").Trim();
             message = message.Substring(0, Mathf.Min(128, message.Length));
 
@@ -450,9 +461,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
 
         if (PhotonNetwork.NetworkingClient.RegionHandler != null) {
+
+            allRegions.AddRange(PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.Select(r => r.Code));
+            allRegions.Sort();
+
             List<string> newRegions = new();
             pingSortedRegions = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.ToArray();
-            System.Array.Sort(pingSortedRegions, NetworkUtils.RegionPingComparer);
+            System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
 
             int index = 0;
             for (int i = 0; i < pingSortedRegions.Length; i++) {
@@ -522,6 +537,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         region.interactable = connected;
 
         if (pingsReceived) {
+
+            allRegions.Clear();
+            allRegions.AddRange(PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.Select(r => r.Code));
+            allRegions.Sort();
+
             pingsReceived = false;
 
             region.ClearOptions();
@@ -553,7 +573,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (started) {
             //start as spectator
             joinedLate = true;
-            OnEvent(new() { Code = (byte) Enums.NetEventIds.StartGame });
+            OnEvent(new() { Code = (byte) Enums.NetEventIds.StartGame, SenderKey = 255 });
             return;
         }
 
@@ -849,18 +869,29 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
     }
     public void JoinSpecificRoom() {
-        if (lobbyJoinField.text.Length < 8) {
+        string id = lobbyJoinField.text.ToUpper();
+        int index = roomNameChars.IndexOf(id[0]);
+        if (id.Length < 8 || index < 0 || index >= allRegions.Count) {
             OpenErrorBox("Invalid Room ID");
             return;
         }
-        PhotonNetwork.JoinRoom(lobbyJoinField.text.ToUpper());
+        string region = allRegions[index];
+        if (PhotonNetwork.NetworkingClient.CloudRegion.Split("/")[0] != region) {
+            lastRegion = region;
+            connectThroughSecret = id;
+            PhotonNetwork.Disconnect();
+        } else {
+            PhotonNetwork.JoinRoom(id);
+        }
         privatePrompt.SetActive(false);
     }
     public void CreateRoom() {
         byte players = (byte) lobbyPlayersSlider.value;
         string roomName = "";
         PhotonNetwork.NickName = nicknameField.text;
-        for (int i = 0; i < 8; i++)
+
+        roomName += roomNameChars[allRegions.IndexOf(PhotonNetwork.NetworkingClient.CloudRegion.Split("/")[0])];
+        for (int i = 0; i < 7; i++)
             roomName += roomNameChars[Random.Range(0, roomNameChars.Length)];
 
         Hashtable properties = NetworkUtils.DefaultRoomProperties;
@@ -955,7 +986,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
         PhotonNetwork.CloseConnection(target);
-        LocalChatMessage($"Successfully kicked {target.NickName.AsUsername()}", Color.red);
+        LocalChatMessage($"Successfully kicked {target.GetUniqueNickname()}", Color.red);
     }
 
     public void Promote(Player target) {
@@ -964,7 +995,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
         PhotonNetwork.SetMasterClient(target);
-        LocalChatMessage($"Promoted {target.NickName.AsUsername()} to the host!", Color.red);
+        LocalChatMessage($"Promoted {target.GetUniqueNickname()} to the host!", Color.red);
     }
 
     public void Mute(Player target) {
@@ -975,10 +1006,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Utils.GetCustomProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
         List<object> mutesList = new(mutes);
         if (mutes.Contains(target.UserId)) {
-            LocalChatMessage($"Successfully unmuted {target.NickName.AsUsername()}", Color.red);
+            LocalChatMessage($"Successfully unmuted {target.GetUniqueNickname()}", Color.red);
             mutesList.Remove(target.UserId);
         } else {
-            LocalChatMessage($"Successfully muted {target.NickName.AsUsername()}", Color.red);
+            LocalChatMessage($"Successfully muted {target.GetUniqueNickname()}", Color.red);
             mutesList.Add(target.UserId);
         }
         Hashtable table = new() {
@@ -988,7 +1019,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void BanOrUnban(string playername) {
-        Player onlineTarget = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.AsUsername().ToLower() == playername);
+        Player onlineTarget = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == playername);
         if (onlineTarget != null) {
             //player is in room, ban them
             Ban(onlineTarget);
@@ -1031,7 +1062,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         PhotonNetwork.CloseConnection(target);
-        LocalChatMessage($"Successfully banned {target.NickName.AsUsername()}", Color.red);
+        LocalChatMessage($"Successfully banned {target.GetUniqueNickname()}", Color.red);
     }
 
     private void Unban(NameIdPair targetPair) {
@@ -1044,7 +1075,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Bans] = pairs.ToArray(),
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        LocalChatMessage($"Successfully unbanned {targetPair.name.AsUsername()}", Color.red);
+        LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
     }
 
     private void RunCommand(string[] args) {
@@ -1060,7 +1091,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 return;
             }
             string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.AsUsername().ToLower() == strTarget);
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
             if (target == null) {
                 LocalChatMessage($"Unknown player {args[1]}", Color.red);
                 return;
@@ -1074,7 +1105,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 return;
             }
             string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.AsUsername().ToLower() == strTarget);
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
             if (target == null) {
                 LocalChatMessage($"Unknown player {args[1]}", Color.red);
                 return;
@@ -1172,7 +1203,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     private void UpdateNickname() {
-        validName = PhotonNetwork.NickName.Length >= NICKNAME_MIN;
+        validName = PhotonNetwork.NickName.IsValidUsername();
         if (!validName) {
             ColorBlock colors = nicknameField.colors;
             colors.normalColor = new Color(1, 0.7f, 0.7f, 1);
@@ -1398,6 +1429,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         return seconds;
     }
     public void ChangeLobbyHeader(string name) {
-        SetText(lobbyText, $"{name}'s Lobby");
+        SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby");
     }
 }

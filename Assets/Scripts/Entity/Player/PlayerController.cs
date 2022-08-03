@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private Vector2 previousJoystick;
     private short previousFlags;
     private byte previousFlags2;
-    private float lastSendTimestamp;
+    private double lastSendTimestamp;
 
     // == MONOBEHAVIOURS ==
 
@@ -123,7 +123,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //SerializationUtils.WriteByte(buffer, flags2);
             //previousFlags2 = flags2;
 
-            lastSendTimestamp = (float) PhotonNetwork.Time;
+            lastSendTimestamp = PhotonNetwork.Time;
         }
     }
 
@@ -206,11 +206,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
         }
 
-        GameManager.Instance.allPlayers.Add(this);
+        GameManager.Instance.alivePlayers.Add(this);
     }
 
     public void OnPreNetDestroy(PhotonView rootView) {
-        GameManager.Instance.allPlayers.Remove(this);
+        GameManager.Instance.alivePlayers.Remove(this);
     }
 
     public void Start() {
@@ -424,8 +424,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     //They are invincible. let them decide if they've hit us.
                     if (invincible > 0) {
                         //oh, we both are. bonk.
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
-                        other.photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, true, photonView.ViewID);
+                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
+                        other.photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
                     }
                     return;
                 }
@@ -828,6 +828,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!view || view.gameObject.GetComponent<MovingPowerup>() is not MovingPowerup powerup)
             return;
 
+        if (Utils.WrappedDistance(body.position, view.transform.position) > 1.75f)
+            return;
+
         if (powerup.Collected || powerup.followMeCounter > 0)
             return;
 
@@ -1046,11 +1049,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         //star doesn't eixst?
-        PhotonView view = PhotonView.Find(starID);
-        if (!view)
+        PhotonView star = PhotonView.Find(starID);
+        if (!star)
             return;
 
-        StarBouncer starScript = view.gameObject.GetComponent<StarBouncer>();
+        if (Utils.WrappedDistance(body.position, star.transform.position) > 1.75f)
+            return;
+
+        StarBouncer starScript = star.gameObject.GetComponent<StarBouncer>();
         if (!starScript.Collectable || starScript.Collected)
             return;
 
@@ -1104,6 +1110,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             //coins should ALWAYS be controlled by the host
             if (!coin.IsMine || !coin.GetComponent<SpriteRenderer>().enabled)
+                return;
+
+            if (Utils.WrappedDistance(body.position, coin.transform.position) > 1.75f)
                 return;
 
             if (coin.GetComponent<LooseCoin>() is LooseCoin lc) {
@@ -1255,7 +1264,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.isKinematic = false;
         groundpounded = false;
         if (holding) {
-            holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
+            holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true, body.position);
             holding = null;
         }
         holdingOld = null;
@@ -1301,7 +1310,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
 
     [PunRPC]
-    public void Respawn(PhotonMessageInfo info) {
+    public void Respawn() {
 
         gameObject.SetActive(true);
         dead = false;
@@ -1541,7 +1550,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             3 *
             (starsToDrop + 1) *
             megaVelo *
-            (fireball ? 0.7f : 1f),
+            (fireball ? 0.35f : 1f),
 
             fireball ? 0 : 4
         );
@@ -2476,7 +2485,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (photonView.IsMine && onGround && Mathf.Abs(body.velocity.x) < 0.2f && knockbackTimer <= 0)
                 photonView.RPC("ResetKnockback", RpcTarget.All);
             if (holding) {
-                holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
+                holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true, body.position);
                 holding = null;
             }
         }
@@ -2765,7 +2774,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         throwInvincibility = 0.15f;
 
         if (photonView.IsMine)
-            holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
+            holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch, body.position);
 
         if (!crouch && !knockback) {
             PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);

@@ -144,7 +144,7 @@ public class FrozenCube : HoldableEntity {
                 if (flying)
                     fallen = true;
                 else if (photonView.IsMine) {
-                    photonView.RPC("Kill", RpcTarget.All);
+                    photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Timer);
                 }
             }
         }
@@ -213,7 +213,7 @@ public class FrozenCube : HoldableEntity {
     public override void Kick(bool fromLeft, float kickFactor, bool groundpound) { }
 
     [PunRPC]
-    public override void Throw(bool facingLeft, bool crouch) {
+    public override void Throw(bool facingLeft, bool crouch, Vector2 pos) {
         if (holder == null)
             return;
 
@@ -221,7 +221,7 @@ public class FrozenCube : HoldableEntity {
         flying = false;
         left = facingLeft;
         fastSlide = true;
-        transform.position = new(holder.facingRight ? holder.transform.position.x + 0.1f : holder.transform.position.x - 0.1f, transform.position.y, transform.position.z);
+        body.position = new(pos.x + (holder.facingRight ? 0.1f : -0.1f), pos.y);
 
         previousHolder = holder;
         holder.SetHoldingOld(photonView.ViewID);

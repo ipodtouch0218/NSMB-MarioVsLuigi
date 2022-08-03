@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace NSMB.Utils {
     public static class ChatFilter {
 
-        private static readonly string FILTER_BASE64 = "YWJibyxjaGluYW1hbixjaGluYW1lbixjaGluayxjb29paWUsY29vbixjcmlwLGN1bnQsZGFnbyxkYXlnbyxkZWdvLGR5a2UsZXNraW1vLGZhZyxmYWdnb3QsZ2FzaCxnb2xsaXdvZyxnb29rLGdveSxnb3lpbSxneXAsZ3lwc3ksaGVlYixrYWZmZXIsa2FmZmlyLGthZmZpcixrYWZmcmUsa2FmaXIsa2lrZSxrcmF1dCxsZXNibyxtaWNrLG5lZ3Jlc3MsbmVncm8sbmlncixuaWdhLG5pZy1ub2csbmlnZ2EsbmlnZ2VyLG5pZ2dyLG5pZ2d1aCxwYWplZXQscGFraSxwaWNrYW5pbm5pZSxwaWNrYW5pbm55LHByb3N0aXR1dGUscmFnaGVhZCxyZXRhcmQsc2FtYm8sc2hlbWFsZSxza2FuayxzbHV0LHNveWJveSxzcGVyZyxzcGljLHNxdWF3LHN0cmVldC1zaGl0dGVyLHJ0YXJkLHRpdHMsdGl0dCx0cmFubmllLHRyYW5ueSx3ZXRiYWNrLHdob3JlLHdpZ2dlcix3b3AseWlkLHpvZyxuaWcoPz1cV3wkKSxuaWdn";
+        private static readonly string FILTER_BASE64 = "Y2hpbmFtYW4sY2hpbmFtZW4sY29vaWllLGNyaXAsY3VudCxkYWdvLGRheWdvLGRlZ28sZHlrZSxlc2tpbW8sZmFnLGZhZ2dvdCxnb29rLGdveSxnb3lpbSxoZWViLGthZmZlcixrYWZmaXIsa2FmZnJlLGthZmlyLGtpa2Usa3JhdXQsaWVzYm8sbWljayxuZWdyZXNzLG5lZ3JvLG5pZ3IsbmlnYSxuaWdnYSxuaWdnZXIsbmlnZ3IsbmlnZ3VoLG5pZyg/PVxXfCQpLG5pZ2cscGFqZWV0LHBha2koPz1cV3wkKSxwaWNrYW5pbm5pZSxwaWNrYW5pbm55LHByb3N0aXR1dGUscmFnaGVhZCxyZXRhcmQscnRhcmQsdGFyZCxzYW1ibyxzaGVtYWllLHNrYW5rLHNpdXQsc295Ym95LHNwZXJnLHNxdWF3LHRpdHMsdHJhbm5pZSx0cmFubnksd2hvcmUsd2lnZ2VyLHdvcCx5aWQsem9n";
         private static readonly Dictionary<char, char> REPLACEMENTS = new() {
             ['5'] = 's',
             ['0'] = 'o',
@@ -14,7 +14,8 @@ namespace NSMB.Utils {
             ['6'] = 'g',
             ['l'] = 'i',
             ['1'] = 'i',
-            ['!'] = 'i',
+            ['|'] = 'i',
+            ['@'] = 'a',
         };
         private static readonly StringLengthComparer STRING_LENGTH_COMPARER = new();
         private static string[] filteredWords;

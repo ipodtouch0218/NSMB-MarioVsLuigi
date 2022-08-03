@@ -56,7 +56,7 @@ public class SpectationManager : MonoBehaviour {
         if (TargetPlayer)
             TargetPlayer.cameraController.controlCamera = false;
 
-        List<PlayerController> players = GameManager.Instance.allPlayers;
+        List<PlayerController> players = GameManager.Instance.alivePlayers;
         int count = players.Count;
         if (count <= 0)
             return;
@@ -79,7 +79,7 @@ public class SpectationManager : MonoBehaviour {
         if (TargetPlayer)
             TargetPlayer.cameraController.controlCamera = false;
 
-        List<PlayerController> players = GameManager.Instance.allPlayers;
+        List<PlayerController> players = GameManager.Instance.alivePlayers;
         int count = players.Count;
         if (count <= 0)
             return;
