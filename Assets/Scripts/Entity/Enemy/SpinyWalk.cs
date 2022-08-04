@@ -22,7 +22,7 @@ public class SpinyWalk : KoopaWalk {
             photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
         } else if (!holder) {
             if (shell) {
-                if (IsStationary()) {
+                if (IsStationary) {
                     //we aren't moving. check for kicks & pickups
                     if (player.CanPickup()) {
                         //pickup-able

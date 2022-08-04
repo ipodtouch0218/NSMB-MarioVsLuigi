@@ -100,7 +100,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #endregion
 
-    #region -- SERIALIZATION / EVENTS --
+    #region Pun Serialization
     public void Serialize(List<byte> buffer) {
         bool updateJoystick = Vector2.Distance(joystick, previousJoystick) > EPSILON;
 
@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #endregion
 
-    #region -- START / UPDATE --
+    #region Unity Methods
     public void Awake() {
         cameraController = GetComponent<CameraController>();
         cameraController.controlCamera = photonView.IsMineOrLocal();
@@ -206,11 +206,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
         }
 
-        GameManager.Instance.alivePlayers.Add(this);
+        GameManager.Instance.players.Add(this);
     }
 
     public void OnPreNetDestroy(PhotonView rootView) {
-        GameManager.Instance.alivePlayers.Remove(this);
+        GameManager.Instance.players.Remove(this);
     }
 
     public void Start() {
@@ -677,14 +677,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- CONTROLLER FUNCTIONS --
     public void OnMovement(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         joystick = context.ReadValue<Vector2>();
     }
 
     public void OnJump(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         jumpHeld = context.ReadValue<float>() >= 0.5f;
@@ -693,7 +693,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void OnSprint(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         running = context.started;
@@ -828,7 +828,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!view || view.gameObject.GetComponent<MovingPowerup>() is not MovingPowerup powerup)
             return;
 
-        if (Utils.WrappedDistance(body.position, view.transform.position) > 1.75f)
+        if (Utils.WrappedDistance(body.position, view.transform.position) > 1.75f && powerup.powerupScriptable.state != Enums.PowerupState.PropellerMushroom)
             return;
 
         if (powerup.Collected || powerup.followMeCounter > 0)
@@ -1110,9 +1110,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             //coins should ALWAYS be controlled by the host
             if (!coin.IsMine || !coin.GetComponent<SpriteRenderer>().enabled)
-                return;
-
-            if (Utils.WrappedDistance(body.position, coin.transform.position) > 1.75f)
                 return;
 
             if (coin.GetComponent<LooseCoin>() is LooseCoin lc) {

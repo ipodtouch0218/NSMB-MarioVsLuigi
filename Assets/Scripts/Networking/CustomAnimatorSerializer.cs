@@ -29,8 +29,7 @@ public class CustomAnimatorSerializer : MonoBehaviour, ICustomSerializeView {
 
     public void Serialize(List<byte> buffer) {
 
-        if (lastSentState != null || (PhotonNetwork.Time - lastSendTimestamp < 1000))
-        {
+        if (lastSentState != null || (PhotonNetwork.Time - lastSendTimestamp < 1000)) {
             //don't send anything
             return;
         }

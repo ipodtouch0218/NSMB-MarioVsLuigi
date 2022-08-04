@@ -74,6 +74,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -117,6 +118,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -450,7 +452,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1
-        y: 2
+        y: 0
         width: 17
         height: 30
       alignment: 9
@@ -471,7 +473,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 19
-        y: 2
+        y: 0
         width: 17
         height: 30
       alignment: 9
@@ -492,7 +494,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 38
-        y: 2
+        y: 0
         width: 17
         height: 30
       alignment: 9
@@ -513,7 +515,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 56
-        y: 2
+        y: 0
         width: 16
         height: 15
       alignment: 0
@@ -534,7 +536,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 74
-        y: 2
+        y: 0
         width: 16
         height: 15
       alignment: 0
@@ -555,7 +557,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 92
-        y: 2
+        y: 0
         width: 16
         height: 15
       alignment: 0
@@ -567,6 +569,27 @@ TextureImporter:
       bones: []
       spriteID: d6fdb0ef0bb45e000800000000000000
       internalID: 64540993215258477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: koopa-blue_18
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 16
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a4a692f45fe9fe64f828e5f5417d0904
+      internalID: -2101635104
       vertices: []
       indices: 
       edges: []
@@ -594,6 +617,7 @@ TextureImporter:
       koopa-blue_12: 4288369980945784781
       koopa-blue_16: 1982076295540741864
       koopa-blue_15: 8252686961211432577
+      koopa-blue_18: -2101635104
       koopa-blue_3: -3966318328118112903
       koopa-blue_13: 5894452475274308847
       koopa-blue_6: -829171787373596523
@@ -602,7 +626,6 @@ TextureImporter:
       koopa-blue_2: 5443230004347411077
   spritePackingTag: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

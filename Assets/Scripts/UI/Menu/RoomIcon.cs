@@ -1,17 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using Photon.Realtime;
 using TMPro;
+
+using Photon.Realtime;
 using NSMB.Utils;
 
 public class RoomIcon : MonoBehaviour {
 
-    private Image icon;
+    [SerializeField] private Color defaultColor, highlightColor, selectedColor;
+    [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText;
+
     public RoomInfo room;
     public bool joinPrivate;
-    public Color defaultColor, highlightColor, selectedColor;
 
-    [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText;
+    private Image icon;
 
     public void Start() {
         icon = GetComponent<Image>();

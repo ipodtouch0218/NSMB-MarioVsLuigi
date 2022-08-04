@@ -1,13 +1,28 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
 using Photon.Pun;
 using NSMB.Utils;
-using System.Collections.Generic;
 
 public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICustomSerializeView {
 
     private static readonly float RESEND_RATE = 0.5f;
 
-    public bool Frozen { get; set; }
+    private static readonly Enums.Sounds[] COMBOS = {
+        Enums.Sounds.Enemy_Shell_Kick,
+        Enums.Sounds.Enemy_Shell_Combo1,
+        Enums.Sounds.Enemy_Shell_Combo2,
+        Enums.Sounds.Enemy_Shell_Combo3,
+        Enums.Sounds.Enemy_Shell_Combo4,
+        Enums.Sounds.Enemy_Shell_Combo5,
+        Enums.Sounds.Enemy_Shell_Combo6,
+        Enums.Sounds.Enemy_Shell_Combo7,
+    };
+
+    public bool Frozen { get; set; } = false;
+    public bool IsCarryable => iceCarryable;
+    public bool IsFlying => flying;
+    public bool Active { get; set; } = true;
 
     public bool dead, left = true, collide = true, iceCarryable = true, flying;
     public Rigidbody2D body;
@@ -17,13 +32,10 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     protected AudioSource audioSource;
     protected PhysicsEntity physics;
 
-    bool IFreezableEntity.IsCarryable => iceCarryable;
-    bool IFreezableEntity.IsFlying => flying;
-
-    public bool Active { get; set; } = true;
     private byte previousFlags;
     private double lastSendTimestamp;
 
+    #region Pun Serialization
     public void Serialize(List<byte> buffer) {
         SerializationUtils.PackToByte(out byte flags, dead, left);
 
@@ -40,11 +52,13 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public void Deserialize(List<byte> buffer, ref int index, PhotonMessageInfo info) {
         SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags);
 
-        //dead = flags[0];
+        //dead = flags[0]; //synchronizing dead state causes issues with laggy players dying to dead enemies on their screen
         left = flags[1];
     }
+    #endregion
 
-    public void Start() {
+    #region Unity Methods
+    public virtual void Start() {
         body = GetComponent<Rigidbody2D>();
         hitbox = GetComponent<BoxCollider2D>();
         animator = GetComponent<Animator>();
@@ -60,7 +74,9 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false, 0);
     }
+    #endregion
 
+    #region Unity Callbacks
     public void OnTriggerEnter2D(Collider2D collider) {
         KillableEntity entity = collider.GetComponentInParent<KillableEntity>();
         if (!collide || !photonView.IsMine || !entity || entity.dead)
@@ -72,7 +88,9 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         }
         photonView.RPC("SetLeft", RpcTarget.All, goLeft);
     }
+    #endregion
 
+    #region Helper Methods
     public virtual void InteractWithPlayer(PlayerController player) {
         if (player.Frozen)
             return;
@@ -102,7 +120,9 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
         }
     }
+    #endregion
 
+    #region PunRPCs
     [PunRPC]
     public void SetLeft(bool left) {
         this.left = left;
@@ -142,17 +162,6 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         SpecialKill(false, false, 0);
     }
 
-    private static readonly Enums.Sounds[] COMBOS = {
-        Enums.Sounds.Enemy_Shell_Kick,
-        Enums.Sounds.Enemy_Shell_Combo1,
-        Enums.Sounds.Enemy_Shell_Combo2,
-        Enums.Sounds.Enemy_Shell_Combo3,
-        Enums.Sounds.Enemy_Shell_Combo4,
-        Enums.Sounds.Enemy_Shell_Combo5,
-        Enums.Sounds.Enemy_Shell_Combo6,
-        Enums.Sounds.Enemy_Shell_Combo7,
-    };
-
     [PunRPC]
     public virtual void SpecialKill(bool right, bool groundpound, int combo) {
         if (dead)
@@ -183,4 +192,5 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public void PlaySound(Enums.Sounds sound) {
         audioSource.PlayOneShot(sound.GetClip());
     }
+    #endregion
 }

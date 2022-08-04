@@ -76,16 +76,11 @@ public static class SerializationUtils {
     }
     #endregion
 
+    #region BYTE PRECISION
     public static void PackToByte(List<byte> buffer, float input, float min, float max) {
         float range = max - min;
         byte byteValue = (byte) ((input - min) / range * byte.MaxValue);
         WriteByte(buffer, byteValue);
-    }
-
-    public static void PackToByte(out byte output, params bool[] flags) {
-        output = 0;
-        for (int i = 0; i < flags.Length; i++)
-            output |= (byte) ((flags[i] ? 1 : 0) << i);
     }
 
     public static void UnpackFromByte(List<byte> buffer, ref int index, float min, float max, out float output) {
@@ -93,10 +88,18 @@ public static class SerializationUtils {
         ReadByte(buffer, ref index, out byte byteValue);
         output = ((float) byteValue / byte.MaxValue * range) + min;
     }
+    #endregion
 
+    #region FLAGS
     public static void PackToByte(List<byte> buffer, params bool[] flags) {
         PackToShort(out short byteValue, flags);
         WriteShort(buffer, byteValue);
+    }
+
+    public static void PackToByte(out byte output, params bool[] flags) {
+        output = 0;
+        for (int i = 0; i < flags.Length; i++)
+            output |= (byte) ((flags[i] ? 1 : 0) << i);
     }
 
     public static void UnpackFromByte(List<byte> buffer, ref int index, out bool[] output) {
@@ -109,12 +112,12 @@ public static class SerializationUtils {
         for (int i = 0; i < 8; i++)
             output[i] = Utils.BitTest(input, i);
     }
+    #endregion
 
-
-    #region helpers
+    #region Helper Methods
     public static void WriteInt(List<byte> buffer, int input) {
         WriteShort(buffer, (short) (input >> 16));
-        WriteShort(buffer, (short) (input >> 16));
+        WriteShort(buffer, (short) (input >> 0));
     }
 
     public static void WriteShort(List<byte> buffer, short input) {

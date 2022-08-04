@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool tenSecondCountdown = false;
 
     public int playerCount = 1;
-    public List<PlayerController> alivePlayers = new();
+    public List<PlayerController> players = new();
     public EnemySpawnpoint[] enemySpawnpoints;
 
     private GameObject[] coins;
@@ -105,10 +105,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (sender == null || sender.IsMasterClient)
                 return;
 
-            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin") || ((!nonSpectatingPlayers.Contains(sender) || musicEnabled) && prefab.Contains("Player"))) {
+            PlayerController controller = players.FirstOrDefault(pl => sender == pl.photonView.Owner);
+            bool doKick = controller.state != Enums.PowerupState.FireFlower && prefab.Contains("Fireball");
+            doKick |= controller.state != Enums.PowerupState.IceFlower && prefab.Contains("Iceball");
+
+            if (doKick || prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin") || ((!nonSpectatingPlayers.Contains(sender) || musicEnabled) && prefab.Contains("Player"))) {
+                Debug.Log($"kick {controller} when spawning {prefab}");
                 PhotonNetwork.CloseConnection(sender);
                 PhotonNetwork.DestroyPlayerObjects(sender);
             }
+
             break;
         }
         case (byte) Enums.NetEventIds.AllFinishedLoading: {
@@ -196,8 +202,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         case (byte) Enums.NetEventIds.BumpTile: {
 
             PlayerController pl = GetController(sender);
-            if (pl == null || pl.dead || !pl.spawned)
+            if (pl.dead || !pl.spawned) {
+                Debug.Log("cancelled bumptime: " + pl);
                 return;
+            }
 
             int x = (int) data[0];
             int y = (int) data[1];
@@ -221,7 +229,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             bb.fromAbove = downwards;
             bb.resultTile = newTile;
             bb.sprite = tilemap.GetSprite(loc);
-            bb.prefab = spawnResult;
+            bb.resultPrefab = spawnResult;
             bb.spawnOffset = spawnOffset;
 
             tilemap.SetTile(loc, null);
@@ -254,7 +262,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             bb.fromAbove = downwards;
             bb.resultTile = newTile;
             bb.sprite = tilemap.GetSprite(loc);
-            bb.prefab = spawnResult;
+            bb.resultPrefab = spawnResult;
 
             tilemap.SetTile(loc, null);
             break;
@@ -412,7 +420,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
-        nonSpectatingPlayers = PhotonNetwork.CurrentRoom.Players.Values.Where(pl => !pl.IsSpectator()).ToList();
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
 
@@ -423,6 +430,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 CustomRoomProperties = NetworkUtils.DefaultRoomProperties
             });
         }
+
+        nonSpectatingPlayers = PhotonNetwork.CurrentRoom.Players.Values.Where(pl => !pl.IsSpectator()).ToList();
 
         //Respawning Tilemaps
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
@@ -460,7 +469,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     private PlayerController GetController(Player player) {
-        foreach (PlayerController pl in alivePlayers) {
+        foreach (PlayerController pl in players) {
             if (pl.photonView.Owner == player)
                 return pl;
         }
@@ -499,8 +508,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         started = true;
 
-        playerCount = alivePlayers.Count;
-        foreach (PlayerController controllers in alivePlayers)
+        playerCount = players.Count;
+        foreach (PlayerController controllers in players)
             if (controllers) {
                 if (spectating && controllers.sfx) {
                     controllers.sfxBrick.enabled = true;
@@ -510,7 +519,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             }
 
         try {
-            ScoreboardUpdater.instance.Populate(alivePlayers);
+            ScoreboardUpdater.instance.Populate(players);
             if (Settings.Instance.scoreboardAlways)
                 ScoreboardUpdater.instance.SetEnabled();
         } catch { }
@@ -656,7 +665,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (started) {
             bool allNull = true;
-            foreach (PlayerController controller in alivePlayers) {
+            foreach (PlayerController controller in players) {
                 if (controller) {
                     allNull = false;
                     break;
@@ -687,7 +696,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         int winningStars = -1;
         List<PlayerController> winningPlayers = new();
         List<PlayerController> alivePlayers = new();
-        foreach (var player in this.alivePlayers) {
+        foreach (var player in players) {
             if (player == null || player.lives == 0)
                 continue;
 
@@ -749,14 +758,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         bool speedup = false;
 
         List<PlayerController> alivePlayers = new();
-        foreach (var player in this.alivePlayers) {
+        foreach (var player in players) {
             if (player == null || player.lives == 0)
                 continue;
 
             alivePlayers.Add(player);
         }
 
-        foreach (var player in this.alivePlayers) {
+        foreach (var player in alivePlayers) {
             if (!player)
                 continue;
 

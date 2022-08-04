@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace NSMB.Utils {
     public static class ChatFilter {
 
-        private static readonly string FILTER_BASE64 = "Y2hpbmFtYW4sY2hpbmFtZW4sY29vaWllLGNyaXAsY3VudCxkYWdvLGRheWdvLGRlZ28sZHlrZSxlc2tpbW8sZmFnLGZhZ2dvdCxnb29rLGdveSxnb3lpbSxoZWViLGthZmZlcixrYWZmaXIsa2FmZnJlLGthZmlyLGtpa2Usa3JhdXQsaWVzYm8sbWljayxuZWdyZXNzLG5lZ3JvLG5pZ3IsbmlnYSxuaWdnYSxuaWdnZXIsbmlnZ3IsbmlnZ3VoLG5pZyg/PVxXfCQpLG5pZ2cscGFqZWV0LHBha2koPz1cV3wkKSxwaWNrYW5pbm5pZSxwaWNrYW5pbm55LHByb3N0aXR1dGUscmFnaGVhZCxyZXRhcmQscnRhcmQsdGFyZCxzYW1ibyxzaGVtYWllLHNrYW5rLHNpdXQsc295Ym95LHNwZXJnLHNxdWF3LHRpdHMsdHJhbm5pZSx0cmFubnksd2hvcmUsd2lnZ2VyLHdvcCx5aWQsem9n";
+        private static readonly string FILTER_BASE64 = "Y2hpbmFtYW4sY2hpbmFtZW4sY29vaWllLGNyaXAsY3VudCxkYWdvLGRheWdvLGRlZ28sZHlrZSxlc2tpbW8sZmFnLGZhZ2dvdCxnb29rLGdveSxnb3lpbSxoZWViLGthZmZlcixrYWZmaXIsa2FmZnJlLGthZmlyLGtpa2Usa3JhdXQsaWVzYm8sbWljayxuZWdyZXNzLG5lZ3JvLG5pZ3IsbmlnYSxuaWdnYSxuaWdnZXIsbmlnZ3IsbmlnZ3VoLG5pZyg/PVxXfCQpLG5pZ2cscGFqZWV0LHBha2koPz1cV3wkKSxwaWNrYW5pbm5pZSxwaWNrYW5pbm55LHByb3N0aXR1dGUscmFnaGVhZCxyZXRhcmQscnRhcmQsdGFyZCxzYW1ibyxzaGVtYWllLHNrYW5rLHNpdXQsc295Ym95LHNwZXJnLHNxdWF3LHRpdHMsdHJhbm5pZSx0cmFubnksd2hvcmUsd2lnZ2VyLHdvcCx5aWQsem9nLGZ1Y2ssZnVja2Esc2hpdCxjb2NrLHBlbmlzLHZhZyx2YWdpbmEsc3BpYw==";
         private static readonly Dictionary<char, char> REPLACEMENTS = new() {
             ['5'] = 's',
             ['0'] = 'o',

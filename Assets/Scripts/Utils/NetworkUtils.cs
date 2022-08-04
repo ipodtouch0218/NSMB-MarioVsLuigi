@@ -72,7 +72,7 @@ namespace NSMB.Utils {
 
         public static bool IsSpectator(this Player player) {
             bool valid = Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool value, player.CustomProperties);
-            return !valid || value;
+            return valid && value;
         }
 
         public static readonly Dictionary<Player, string> nicknameCache = new();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.EventSystems;
@@ -18,7 +17,7 @@ using NSMB.Utils;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
 
-    public const int NICKNAME_MIN = 2, NICKNAME_MAX = 16;
+    public const int NICKNAME_MIN = 2, NICKNAME_MAX = 20;
 
     public static MainMenuManager Instance;
     public AudioSource sfx, music;
@@ -374,7 +373,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             }
 
             message = sender.GetUniqueNickname() + ": " + message;
-            message = message.Replace("<", "«").Replace(">", "»").Trim();
+            message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
             message = message.Substring(0, Mathf.Min(128, message.Length));
 
             LocalChatMessage(message, Color.black);
@@ -484,6 +483,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
+        nicknameField.characterLimit = NICKNAME_MAX;
 
         rebindManager.Init();
 
@@ -581,7 +581,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
 
         if (PhotonNetwork.IsMasterClient)
-            LocalChatMessage("You are the room's host! You can use chat commands like /ban, /mute, /kick, etc. to control your room. Do /help for help.", Color.red);
+            LocalChatMessage("You are the room's host! You can click on player names to control your room, or use chat commands. Do /help for more help.", Color.red);
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value, PhotonNetwork.LocalPlayer.CustomProperties);
         SetPlayerColor(value);
@@ -840,7 +840,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (newLevelIndex == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Level])
             return;
 
-        ChangeLevel(newLevelIndex);
+        //ChangeLevel(newLevelIndex);
 
         Hashtable table = new() {
             [Enums.NetRoomProperties.Level] = levelDropdown.value
