@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
@@ -12,10 +13,10 @@ using NSMB.Utils;
 
 public class PlayerListEntry : MonoBehaviour {
 
-    private static readonly string[] SPECIAL_PLAYERS = { "d5ba21667a5da00967cc5ebd64c0d648e554fb671637adb3d22a688157d39bf6", //nomad client
-                                                         "cf03abdb5d2ef1b6f0d30ae40303936f9ab22f387f8a1072e2849c8292470af1", //ipod client
-                                                         "3b0ddbb7cc172445b256c3b2cfee11175969fa61715eae6887c1da752cee135d", //ipod editor
-                                                       };
+    private static readonly Dictionary<string, string> SPECIAL_PLAYERS = new() {
+        ["cf03abdb5d2ef1b6f0d30ae40303936f9ab22f387f8a1072e2849c8292470af1"] = "ipodtouch0218",
+        ["d5ba21667a5da00967cc5ebd64c0d648e554fb671637adb3d22a688157d39bf6"] = "mindnomad",
+    };
 
     public Player player;
 
@@ -49,8 +50,9 @@ public class PlayerListEntry : MonoBehaviour {
             foreach (byte b in bytes)
                 sb.Append(b.ToString("X2"));
 
-            //if (SPECIAL_PLAYERS.Contains(sb.ToString().ToLower()))
-                //enabled = true;
+            string hash = sb.ToString().ToLower();
+            if (SPECIAL_PLAYERS.ContainsKey(hash) && player.NickName == SPECIAL_PLAYERS[hash])
+                enabled = true;
         }
 
         string permissionSymbol = "";

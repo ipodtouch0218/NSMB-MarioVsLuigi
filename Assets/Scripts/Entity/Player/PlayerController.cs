@@ -1105,11 +1105,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (coinID != -1) {
             PhotonView coin = PhotonView.Find(coinID);
-            if (!coin)
-                return;
-
-            //coins should ALWAYS be controlled by the host
-            if (!coin.IsMine || !coin.GetComponent<SpriteRenderer>().enabled)
+            if (!coin || !coin.IsMine || !coin.gameObject.activeInHierarchy)
                 return;
 
             if (coin.GetComponent<LooseCoin>() is LooseCoin lc) {
@@ -1126,21 +1122,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     [PunRPC]
     protected void CollectCoin(int coinID, Vector2 position, PhotonMessageInfo info) {
         //only trust the master client
-        if (!info.Sender.IsMasterClient)
+        if (!info.Sender.IsLocal && !info.Sender.IsMasterClient)
             return;
 
         PhotonView coin = PhotonView.Find(coinID);
         if (coin) {
-            if (coin.CompareTag("loosecoin")) {
+            coin.gameObject.SetActive(false);
+            if (coin.CompareTag("loosecoin") && coin.IsMine) {
                 //loose coin, just destroy
-                if (coin.IsMine) {
-                    PhotonNetwork.Destroy(coin);
-                }
-                Destroy(coin.gameObject);
-            } else {
-                //floating coin, just disable collision + graphic
-                coin.GetComponent<SpriteRenderer>().enabled = false;
-                coin.GetComponent<BoxCollider2D>().enabled = false;
+                PhotonNetwork.Destroy(coin);
             }
         }
 

@@ -245,7 +245,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // CONNECTION CALLBACKS
     public void OnConnected() {
         Debug.Log("[PHOTON] Connected to Photon.");
-        PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
     }
     public void OnDisconnected(DisconnectCause cause) {
         Debug.Log("[PHOTON] Disconnected: " + cause.ToString());
@@ -286,8 +285,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             pingsReceived = true;
         }, "");
     }
-    public void OnCustomAuthenticationResponse(Dictionary<string, object> response) { }
-    public void OnCustomAuthenticationFailed(string failure) { }
+    public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {
+        PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
+        if (response.ContainsKey("Token"))
+            PlayerPrefs.SetString("token", (string) response["Token"]);
+
+        PlayerPrefs.Save();
+    }
+    public void OnCustomAuthenticationFailed(string failure) {
+        OpenErrorBox(failure);
+    }
     public void OnConnectedToMaster() {
         JoinMainLobby();
 
@@ -443,8 +450,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PhotonNetwork.NetworkingClient.AppVersion = match.Groups[0].Value;
 
             string id = PlayerPrefs.GetString("id", null);
-            if (id != null)
-                PhotonNetwork.AuthValues = new() { UserId = id };
+            string token = PlayerPrefs.GetString("token", null);
+
+            AuthenticationValues auth = new();
+            auth.AuthType = CustomAuthenticationType.Custom;
+            auth.UserId = id;
+            auth.AddAuthParameter("userid", id);
+            auth.AddAuthParameter("token", token);
+            PhotonNetwork.AuthValues = auth;
 
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
         } else {

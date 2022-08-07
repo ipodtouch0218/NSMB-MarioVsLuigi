@@ -69,6 +69,10 @@ MonoBehaviour:
   previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 1
+  outShellHitboxSize: {x: 0.1, y: 0.17}
+  inShellHitboxSize: {x: 0.1, y: 0.129}
+  outShellHitboxOffset: {x: 0, y: 0.02}
+  inShellHitboxOffset: {x: 0, y: 0}
   walkSpeed: 0.875
   kickSpeed: 5
   wakeup: 15
@@ -80,11 +84,6 @@ MonoBehaviour:
   canBeFlipped: 1
   flipXFlip: 0
   putdown: 0
-  wakeupTimer: 0
-  outShellHitboxSize: {x: 0.1, y: 0.17}
-  inShellHitboxSize: {x: 0.1, y: 0.129}
-  outShellHitboxOffset: {x: 0, y: 0.02}
-  inShellHitboxOffset: {x: 0, y: 0}
 --- !u!212 &8836298984178612586
 SpriteRenderer:
   m_ObjectHideFlags: 0

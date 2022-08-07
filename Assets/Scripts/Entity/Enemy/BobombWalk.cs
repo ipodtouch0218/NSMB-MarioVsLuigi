@@ -7,7 +7,7 @@ using NSMB.Utils;
 public class BobombWalk : HoldableEntity {
 
     [SerializeField] private GameObject explosionPrefab;
-    [SerializeField] private float walkSpeed = 0.6f, kickSpeed = 5f, detonationTime = 4f;
+    [SerializeField] private float walkSpeed = 0.6f, kickSpeed = 4.5f, detonationTime = 4f;
     [SerializeField] private int explosionTileSize = 2;
 
     public bool lit, detonated;
@@ -217,7 +217,7 @@ public class BobombWalk : HoldableEntity {
     public override void Kick(bool fromLeft, float speed, bool groundpound) {
         left = !fromLeft;
         sRenderer.flipX = left;
-        body.velocity = new(kickSpeed * (left ? -1 : 1), 4f);
+        body.velocity = new(kickSpeed * (left ? -1 : 1), 3f);
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 

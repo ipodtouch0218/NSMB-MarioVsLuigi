@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using Photon.Pun;
 
 public interface ICustomSerializeView {

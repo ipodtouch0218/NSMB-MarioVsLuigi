@@ -91,7 +91,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         //Debug.Log($"id:{eventId} sender:{sender} master:{sender?.IsMasterClient ?? false}");
         switch (eventId) {
         case PunEvent.Instantiation: {
-            string prefab = (string) ((Hashtable) parameters.paramDict[245])[0];
+            Hashtable table = (Hashtable) parameters.paramDict[245];
+            string prefab = (string) table[0];
+            int viewId = (int) table[7];
 
             //even the host can't be trusted...
             if ((sender?.IsMasterClient ?? false) && (prefab.Contains("Static") || prefab.Contains("1-Up") || (musicEnabled && prefab.Contains("Player")))) {
@@ -106,11 +108,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 return;
 
             PlayerController controller = players.FirstOrDefault(pl => sender == pl.photonView.Owner);
-            bool doKick = controller.state != Enums.PowerupState.FireFlower && prefab.Contains("Fireball");
-            doKick |= controller.state != Enums.PowerupState.IceFlower && prefab.Contains("Iceball");
+            bool invalidProjectile = controller.state != Enums.PowerupState.FireFlower && prefab.Contains("Fireball");
+            invalidProjectile |= controller.state != Enums.PowerupState.IceFlower && prefab.Contains("Iceball");
 
-            if (doKick || prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin") || ((!nonSpectatingPlayers.Contains(sender) || musicEnabled) && prefab.Contains("Player"))) {
-                Debug.Log($"kick {controller} when spawning {prefab}");
+            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin") || ((!nonSpectatingPlayers.Contains(sender) || musicEnabled) && prefab.Contains("Player"))) {
                 PhotonNetwork.CloseConnection(sender);
                 PhotonNetwork.DestroyPlayerObjects(sender);
             }
@@ -169,8 +170,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTilesBlock(origin, originalTiles);
 
             foreach (GameObject coin in coins) {
-                coin.GetComponent<SpriteRenderer>().enabled = true;
-                coin.GetComponent<BoxCollider2D>().enabled = true;
+                coin.SetActive(true);
             }
 
             StartCoroutine(BigStarRespawn());
@@ -210,7 +210,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             int x = (int) data[0];
             int y = (int) data[1];
 
-            if (Utils.WrappedDistance(pl.transform.position, Utils.TilemapToWorldPosition(new Vector3Int(x, y, 0))) > 1.5f)
+            if (Utils.WrappedDistance(pl.transform.position, Utils.TilemapToWorldPosition(new Vector3Int(x, y, 0))) > 3f)
                 return;
 
             bool downwards = (bool) data[2];
@@ -238,13 +238,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         case (byte) Enums.NetEventIds.SetThenBumpTile: {
 
             PlayerController pl = GetController(sender);
-            if (pl == null || pl.dead || !pl.spawned)
+            if (pl.dead || !pl.spawned)
                 return;
 
             int x = (int) data[0];
             int y = (int) data[1];
 
-            if (Utils.WrappedDistance(pl.transform.position, Utils.TilemapToWorldPosition(new Vector3Int(x, y, 0))) > 1.5f)
+            if (Utils.WrappedDistance(pl.transform.position, Utils.TilemapToWorldPosition(new Vector3Int(x, y, 0))) > 3.5f)
                 return;
 
             bool downwards = (bool) data[2];
@@ -270,11 +270,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         case (byte) Enums.NetEventIds.SetCoinState: {
             if (!(sender?.IsMasterClient ?? false))
                 return;
+
             int view = (int) data[0];
             bool visible = (bool) data[1];
             GameObject coin = PhotonView.Find(view).gameObject;
-            coin.GetComponent<SpriteRenderer>().enabled = visible;
-            coin.GetComponent<BoxCollider2D>().enabled = visible;
+            coin.SetActive(visible);
             break;
         }
         case (byte) Enums.NetEventIds.SpawnParticle: {
