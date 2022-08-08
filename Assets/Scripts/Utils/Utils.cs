@@ -11,9 +11,7 @@ namespace NSMB.Utils {
     public class Utils {
 
         public static int FirstPlaceStars {
-            get {
-                return GameManager.Instance.allPlayers.Max(pc => pc.stars);
-            }
+            get => GameManager.Instance.players.Where(pl => pl.lives != 0).Max(pc => pc.stars);
         }
 
         public static bool BitTest(long bit, int index) {
@@ -368,19 +366,21 @@ namespace NSMB.Utils {
             return Vector2.Distance(a, b);
         }
 
-        public static void GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
+        public static bool GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
             if (properties == null)
                 properties = PhotonNetwork.CurrentRoom.CustomProperties;
             if (properties == null) {
                 value = default;
-                return;
+                return false;
             }
 
             properties.TryGetValue(key, out object temp);
             if (temp != null) {
                 value = (T) temp;
+                return true;
             } else {
                 value = default;
+                return false;
             }
         }
 

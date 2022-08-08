@@ -854,7 +854,7 @@ namespace Photon.Pun
             {
                 Debug.Log("Network destroy Instantiated GO: " + go.name);
             }
-            
+
             foundPVs.Clear();           // as foundPVs is re-used, clean it to avoid lingering references
 
             go.SetActive(false);        // PUN 2 disables objects before the return to the pool

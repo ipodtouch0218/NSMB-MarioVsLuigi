@@ -22,6 +22,7 @@ public class StarBouncer : MonoBehaviourPun {
     private bool canBounce;
 
     public bool Collectable { get; private set; }
+    public bool Collected { get; set; }
 
     public void Start() {
         body = GetComponent<Rigidbody2D>();

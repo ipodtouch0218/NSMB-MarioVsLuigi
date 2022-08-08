@@ -85,6 +85,12 @@ MonoBehaviour:
   - StartPropeller
   - Unfreeze
   - KillWithReason
+  - EndMega
+  - AttemptCollectBigStar
+  - AttemptCollectPowerup
+  - AttemptCollectCoin
+  - BlueBecomeItem
+  - CancelCollectCoin
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

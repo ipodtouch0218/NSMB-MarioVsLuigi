@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,38 +6,45 @@ public class SettingButtonManager : MonoBehaviour {
     private int prevWidth = 1280;
     private int prevHeight = 720;
 
+    private Settings Settings => Settings.Instance;
+
     public void SetVolumeMusic(Slider slider) {
-        Settings settings = Settings.Instance;
-        settings.VolumeMusic = slider.value;
-        settings.SaveSettingsToPreferences();
+        Settings.VolumeMusic = slider.value;
+        Settings.SaveSettingsToPreferences();
     }
     public void SetVolumeSFX(Slider slider) {
-        Settings settings = Settings.Instance;
-        settings.VolumeSFX = slider.value;
-        settings.SaveSettingsToPreferences();
+        Settings.VolumeSFX = slider.value;
+        Settings.SaveSettingsToPreferences();
     }
     public void SetVolumeMaster(Slider slider) {
-        Settings settings = Settings.Instance;
-        settings.VolumeMaster = slider.value;
-        settings.SaveSettingsToPreferences();
+        Settings.VolumeMaster = slider.value;
+        Settings.SaveSettingsToPreferences();
     }
     public void OnNdsResolutionToggle(Toggle toggle) {
-        Settings settings = Settings.Instance;
-        MainMenuManager.Instance.aspectToggle.interactable = settings.ndsResolution = toggle.isOn;
-        settings.SaveSettingsToPreferences();
+        MainMenuManager.Instance.aspectToggle.interactable = Settings.ndsResolution = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
     }
 
     public void OnAspectToggle(Toggle toggle) {
-        Settings settings = Settings.Instance;
-        settings.fourByThreeRatio = toggle.isOn;
-        settings.SaveSettingsToPreferences();
+        Settings.fourByThreeRatio = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
     }
 
     public void OnFireballToggle(Toggle toggle) {
-        Settings settings = Settings.Instance;
-        settings.fireballFromSprint = toggle.isOn;
-        settings.SaveSettingsToPreferences();
+        Settings.fireballFromSprint = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
     }
+
+    public void OnScoreboardToggle(Toggle toggle) {
+        Settings.scoreboardAlways = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
+    }
+
+    public void OnChatFilterToggle(Toggle toggle) {
+        Settings.filter = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
+    }
+
 
     public void OnFullscreenToggle(Toggle toggle) {
         bool value = toggle.isOn;

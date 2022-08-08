@@ -147,7 +147,7 @@ TextureImporter:
         width: 14
         height: 19
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 5, y: 8, z: 8, w: 10}
       outline: []
       physicsShape: []
@@ -168,7 +168,7 @@ TextureImporter:
         width: 14
         height: 19
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 5, y: 8, z: 8, w: 10}
       outline: []
       physicsShape: []
@@ -176,6 +176,48 @@ TextureImporter:
       bones: []
       spriteID: 28b006dd08b864c4db411cacf12d5cec
       internalID: -1862560836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerribbons_2
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 2
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 5, y: 5, z: 5, w: 1}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 793bc70dbd7f0854db674f9cfffbea53
+      internalID: 6740235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerribbons_3
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 3
+        width: 11
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 5, y: 4, z: 5, w: 1}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3d6c761c9c805040b3ab3893caba625
+      internalID: 95362073
       vertices: []
       indices: 
       edges: []
@@ -198,6 +240,8 @@ TextureImporter:
       playerribbons_p9: 171656210
       playerribbons_p1: -1881540139
       playerribbons_p5: 1689510898
+      playerribbons_3: 95362073
+      playerribbons_2: 6740235
       playerribbons_p8: 1407695535
       playerribbons_p6: -1627344593
       playerribbons_0: -1709532258

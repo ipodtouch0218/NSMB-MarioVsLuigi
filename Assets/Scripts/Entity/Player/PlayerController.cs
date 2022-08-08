@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 using Photon.Pun;
 using ExitGames.Client.Photon;
@@ -21,7 +19,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private Vector2 previousJoystick;
     private short previousFlags;
     private byte previousFlags2;
-    private float lastSendTimestamp;
+    private double lastSendTimestamp;
 
     // == MONOBEHAVIOURS ==
 
@@ -53,8 +51,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     private int _starCombo;
     public int StarCombo {
-        get => (invincible > 0 ? _starCombo : 0);
-        set => _starCombo = (invincible > 0 ? value : 0);
+        get => invincible > 0 ? _starCombo : 0;
+        set => _starCombo = invincible > 0 ? value : 0;
     }
 
     public Vector2 pipeDirection;
@@ -98,9 +96,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public BoxCollider2D MainHitbox => hitboxes[0];
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
 
+    private readonly Dictionary<GameObject, double> lastCollectTime = new();
+
     #endregion
 
-    #region -- SERIALIZATION / EVENTS --
+    #region Pun Serialization
     public void Serialize(List<byte> buffer) {
         bool updateJoystick = Vector2.Distance(joystick, previousJoystick) > EPSILON;
 
@@ -123,7 +123,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //SerializationUtils.WriteByte(buffer, flags2);
             //previousFlags2 = flags2;
 
-            lastSendTimestamp = (float) PhotonNetwork.Time;
+            lastSendTimestamp = PhotonNetwork.Time;
         }
     }
 
@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #endregion
 
-    #region -- START / UPDATE --
+    #region Unity Methods
     public void Awake() {
         cameraController = GetComponent<CameraController>();
         cameraController.controlCamera = photonView.IsMineOrLocal();
@@ -206,11 +206,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
         }
 
-        GameManager.Instance.allPlayers.Add(this);
+        GameManager.Instance.players.Add(this);
     }
 
     public void OnPreNetDestroy(PhotonView rootView) {
-        GameManager.Instance.allPlayers.Remove(this);
+        GameManager.Instance.players.Remove(this);
     }
 
     public void Start() {
@@ -401,6 +401,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         GameObject obj = collision.gameObject;
 
+        double time = PhotonNetwork.Time;
+        if (time - lastCollectTime.GetValueOrDefault(obj) < 0.5d)
+            return;
+
+        lastCollectTime[obj] = time;
+
         switch (collision.gameObject.tag) {
         case "Player": {
             //hit players
@@ -418,8 +424,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     //They are invincible. let them decide if they've hit us.
                     if (invincible > 0) {
                         //oh, we both are. bonk.
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
-                        other.photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, true, photonView.ViewID);
+                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
+                        other.photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
                     }
                     return;
                 }
@@ -630,6 +636,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!photonView.IsMine || dead || Frozen)
             return;
 
+        double time = PhotonNetwork.Time;
+        if (time - lastCollectTime.GetValueOrDefault(obj) < 0.5d)
+            return;
+
         switch (obj.tag) {
         case "Powerup": {
             if (!photonView.IsMine)
@@ -637,20 +647,25 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             MovingPowerup powerup = obj.GetComponentInParent<MovingPowerup>();
             if (powerup.followMeCounter > 0 || powerup.ignoreCounter > 0)
                 break;
-            photonView.RPC("Powerup", RpcTarget.AllViaServer, powerup.photonView.ViewID);
+
+            photonView.RPC("AttemptCollectPowerup", RpcTarget.AllViaServer, powerup.photonView.ViewID);
             Destroy(collider);
             break;
         }
-        case "bigstar":
-            photonView.RPC("CollectBigStar", RpcTarget.AllViaServer, obj.transform.parent.gameObject.GetPhotonView().ViewID);
-            break;
-        case "loosecoin":
+        case "bigstar": {
             Transform parent = obj.transform.parent;
-            photonView.RPC("CollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, parent.position);
+            photonView.RPC("AttemptCollectBigStar", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID);
             break;
-        case "coin":
-            photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
+        }
+        case "loosecoin": {
+            Transform parent = obj.transform.parent;
+            photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
             break;
+        }
+        case "coin": {
+            photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector2(obj.transform.position.x, collider.transform.position.y));
+            break;
+        }
         }
     }
 
@@ -662,14 +677,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- CONTROLLER FUNCTIONS --
     public void OnMovement(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         joystick = context.ReadValue<Vector2>();
     }
 
     public void OnJump(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         jumpHeld = context.ReadValue<float>() >= 0.5f;
@@ -678,7 +693,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void OnSprint(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         running = context.started;
@@ -791,20 +806,51 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
 
-        SpawnReserveItem();
+        photonView.RPC("SpawnReserveItem", RpcTarget.All);
+        storedPowerup = null;
+
+        UpdateGameState();
     }
     #endregion
 
     #region -- POWERUP / POWERDOWN --
     [PunRPC]
+    public void AttemptCollectPowerup(int powerupID, PhotonMessageInfo info) {
+        //only the owner can request a powerup, and only the master client can decide for us
+        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
+            return;
+
+        if (dead || !spawned)
+            return;
+
+        //powerup doesn't eixst?
+        PhotonView view = PhotonView.Find(powerupID);
+        if (!view || view.gameObject.GetComponent<MovingPowerup>() is not MovingPowerup powerup)
+            return;
+
+        if (Utils.WrappedDistance(body.position, view.transform.position) > 1.75f && powerup.powerupScriptable.state != Enums.PowerupState.PropellerMushroom)
+            return;
+
+        if (powerup.Collected || powerup.followMeCounter > 0)
+            return;
+
+        powerup.Collected = true;
+
+        //we can collect
+        photonView.RPC("Powerup", RpcTarget.All, powerupID);
+    }
+
+    [PunRPC]
     protected void Powerup(int actor, PhotonMessageInfo info) {
+        //only trust the master client
+        if (!info.Sender.IsMasterClient)
+            return;
+
         PhotonView view;
         if (dead || !(view = PhotonView.Find(actor)))
             return;
 
         MovingPowerup powerupObj = view.GetComponent<MovingPowerup>();
-        if (powerupObj.followMeCounter > 0)
-            return;
 
         Powerup powerup = powerupObj.powerupScriptable;
         Enums.PowerupState newState = powerup.state;
@@ -994,60 +1040,106 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- COIN / STAR COLLECTION --
     [PunRPC]
-    protected void CollectBigStar(int starID) {
-        PhotonView view = PhotonView.Find(starID);
-        if (!view)
+    protected void AttemptCollectBigStar(int starID, PhotonMessageInfo info) {
+        //only the owner can request a big star, and only the master client can decide for us
+        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
             return;
 
-        GameObject star = view.gameObject;
-        StarBouncer starScript = star.GetComponent<StarBouncer>();
-        if (!starScript.Collectable)
+        if (dead || !spawned)
             return;
 
-        if (photonView.IsMine && starScript.stationary)
+        //star doesn't eixst?
+        PhotonView star = PhotonView.Find(starID);
+        if (!star)
+            return;
+
+        if (Utils.WrappedDistance(body.position, star.transform.position) > 1.75f)
+            return;
+
+        StarBouncer starScript = star.gameObject.GetComponent<StarBouncer>();
+        if (!starScript.Collectable || starScript.Collected)
+            return;
+
+        starScript.Collected = true;
+
+        //we can collect
+        photonView.RPC("CollectBigStar", RpcTarget.All, (Vector2) starScript.transform.position, starID);
+        if (starScript.stationary)
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
-
-        stars = Mathf.Min(stars + 1, GameManager.Instance.starRequirement);
-
-        UpdateGameState();
-        GameManager.Instance.CheckForWinner();
-
-        Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), star.transform.position, Quaternion.identity);
-        PlaySoundEverywhere(photonView.IsMine ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
-
-        if (view.IsMine)
-            PhotonNetwork.Destroy(view);
-        DestroyImmediate(star);
-        DestroyImmediate(star);
     }
 
     [PunRPC]
-    protected void CollectCoin(int coinID, Vector3 position) {
+    public void CollectBigStar(Vector2 particle, int starView, PhotonMessageInfo info) {
+        //only trust the master client
+        if (!info.Sender.IsMasterClient)
+            return;
+
+        //state
+        stars = Mathf.Min(stars + 1, GameManager.Instance.starRequirement);
+        UpdateGameState();
+
+        //game mechanics
+        GameManager.Instance.CheckForWinner();
+
+        //fx
+        PlaySoundEverywhere(photonView.IsMine ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
+        Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), particle, Quaternion.identity);
+
+        //destroy
+        PhotonView star = PhotonView.Find(starView);
+        if (star && star.IsMine) {
+            PhotonNetwork.Destroy(star);
+        } else {
+            Destroy(star.gameObject);
+        }
+    }
+
+    [PunRPC]
+    public void AttemptCollectCoin(int coinID, Vector2 particle, PhotonMessageInfo info) {
+        //only the owner can request a coin, and only the master client can decide for us
+        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
+            return;
+
+        if (dead || !spawned)
+            return;
+
         if (coinID != -1) {
-            PhotonView coinView = PhotonView.Find(coinID);
-            if (!coinView)
+            PhotonView coin = PhotonView.Find(coinID);
+            if (!coin || !coin.IsMine || !coin.gameObject.activeInHierarchy)
                 return;
 
-            GameObject coin = coinView.gameObject;
-            if (coin.CompareTag("loosecoin")) {
-                if (coin.GetPhotonView().IsMine)
-                    PhotonNetwork.Destroy(coin);
-                DestroyImmediate(coin);
-            } else {
-                SpriteRenderer renderer = coin.GetComponent<SpriteRenderer>();
-                if (!renderer.enabled)
+            if (coin.GetComponent<LooseCoin>() is LooseCoin lc) {
+                if (lc.Collected)
                     return;
-                renderer.enabled = false;
-                coin.GetComponent<BoxCollider2D>().enabled = false;
+
+                lc.Collected = true;
             }
         }
+
+        photonView.RPC("CollectCoin", RpcTarget.All, coinID, particle);
+    }
+
+    [PunRPC]
+    protected void CollectCoin(int coinID, Vector2 position, PhotonMessageInfo info) {
+        //only trust the master client
+        if (!info.Sender.IsLocal && !info.Sender.IsMasterClient)
+            return;
+
+        PhotonView coin = PhotonView.Find(coinID);
+        if (coin) {
+            coin.gameObject.SetActive(false);
+            if (coin.CompareTag("loosecoin") && coin.IsMine) {
+                //loose coin, just destroy
+                PhotonNetwork.Destroy(coin);
+            }
+        }
+
         Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), position, Quaternion.identity);
 
         PlaySound(Enums.Sounds.World_Coin_Collect);
-        GameObject num = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity);
-        TMP_Text text = num.GetComponentInChildren<TMP_Text>();
-        text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
-        Destroy(num, 1f);
+        NumberParticle num = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity)).GetComponentInChildren<NumberParticle>();
+        num.text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
+        num.color = AnimationController.GlowColor;
 
         coins++;
         if (coins >= GameManager.Instance.coinRequirement) {
@@ -1058,12 +1150,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         UpdateGameState();
     }
 
+    [PunRPC]
     public void SpawnReserveItem() {
         if (storedPowerup == null)
             return;
 
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
         string prefab = storedPowerup.prefab;
-        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
         storedPowerup = null;
         UpdateGameState();
@@ -1073,20 +1169,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (coins < GameManager.Instance.coinRequirement)
             return;
 
-        if (!photonView.IsMine)
+        if (!PhotonNetwork.IsMasterClient)
             return;
 
         string prefab = Utils.GetRandomItem(this).prefab;
-        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
 
         coins = 0;
     }
 
     void SpawnStars(int amount, bool deathplane) {
-
-        if (!photonView.IsMine)
+        if (!PhotonNetwork.IsMasterClient) {
+            stars = Mathf.Max(0, stars - amount);
             return;
+        }
 
         bool fastStars = amount > 2 && stars > 2;
 
@@ -1109,8 +1206,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void SpawnStar(bool deathplane) {
-        PhotonNetwork.Instantiate("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
-
+        PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
         starDirection = (starDirection + 1) % 4;
     }
     #endregion
@@ -1128,6 +1224,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (--lives == 0) {
             GameManager.Instance.CheckForWinner();
         }
+
         if (deathplane)
             spawned = false;
         dead = true;
@@ -1154,7 +1251,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.isKinematic = false;
         groundpounded = false;
         if (holding) {
-            holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
+            holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true, body.position);
             holding = null;
         }
         holdingOld = null;
@@ -1174,6 +1271,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 PhotonNetwork.Destroy(photonView);
                 GameManager.Instance.SpectationManager.Spectating = true;
             }
+            Destroy(gameObject);
             return;
         }
         transform.localScale = Vector2.one;
@@ -1199,7 +1297,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
 
     [PunRPC]
-    public void Respawn(PhotonMessageInfo info) {
+    public void Respawn() {
 
         gameObject.SetActive(true);
         dead = false;
@@ -1439,7 +1537,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             3 *
             (starsToDrop + 1) *
             megaVelo *
-            (fireball ? 0.7f : 1f),
+            (fireball ? 0.35f : 1f),
 
             fireball ? 0 : 4
         );
@@ -2192,7 +2290,20 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
     }
 
+    [PunRPC]
+    public void EndMega() {
+        giantEndTimer = giantStartTime / 2f;
+        state = Enums.PowerupState.Mushroom;
+        stationaryGiantEnd = false;
+        hitInvincibilityCounter = 3f;
+        PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
+        body.velocity = new(body.velocity.x, body.velocity.y > 0 ? (body.velocity.y / 3f) : body.velocity.y);
+    }
+
     public void HandleBlockSnapping() {
+        if (pipeEntering || drill)
+            return;
+
         //if we're about to be in the top 2 pixels of a block, snap up to it, (if we can fit)
 
         if (body.velocity.y > 0)
@@ -2361,7 +2472,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (photonView.IsMine && onGround && Mathf.Abs(body.velocity.x) < 0.2f && knockbackTimer <= 0)
                 photonView.RPC("ResetKnockback", RpcTarget.All);
             if (holding) {
-                holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
+                holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true, body.position);
                 holding = null;
             }
         }
@@ -2524,13 +2635,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
 
 
-        if (state == Enums.PowerupState.MegaMushroom && giantTimer <= 0) {
-            giantEndTimer = giantStartTime / 2f;
-            state = Enums.PowerupState.Mushroom;
-            stationaryGiantEnd = false;
-            hitInvincibilityCounter = 3f;
-            PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
-            body.velocity = new(body.velocity.x, body.velocity.y > 0 ? (body.velocity.y / 3f) : body.velocity.y);
+        if (state == Enums.PowerupState.MegaMushroom && giantTimer <= 0 && photonView.IsMine) {
+            photonView.RPC("EndMega", RpcTarget.All);
         }
 
         HandleSlopes();
@@ -2655,7 +2761,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         throwInvincibility = 0.15f;
 
         if (photonView.IsMine)
-            holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
+            holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch, body.position);
 
         if (!crouch && !knockback) {
             PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);

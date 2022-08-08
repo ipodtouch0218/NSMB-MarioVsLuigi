@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
 using NSMB.Utils;
 
 public class ScoreboardEntry : MonoBehaviour {
 
-    [SerializeField] TMP_Text nameText, valuesText;
-    [SerializeField] Image background;
+    [SerializeField] private TMP_Text nameText, valuesText;
+    [SerializeField] private Image background;
 
     public PlayerController target;
 
@@ -20,7 +21,7 @@ public class ScoreboardEntry : MonoBehaviour {
         }
 
         playerId = target.playerId;
-        nameText.text = target.photonView.Owner.NickName;
+        nameText.text = target.photonView.Owner.GetUniqueNickname();
 
         Color c = target.AnimationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);

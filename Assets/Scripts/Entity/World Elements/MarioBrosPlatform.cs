@@ -13,10 +13,10 @@ public class MarioBrosPlatform : MonoBehaviourPun {
     public bool changeCollider = true;
 
     private readonly List<BumpInfo> bumps = new();
-    private MaterialPropertyBlock mpb;
-    private Texture2D displacementMap;
     private SpriteRenderer spriteRenderer;
+    private MaterialPropertyBlock mpb;
     private Color32[] pixels;
+    private Texture2D displacementMap;
 
     public void Start() {
         Initialize();
@@ -59,7 +59,7 @@ public class MarioBrosPlatform : MonoBehaviourPun {
                 bumps.RemoveAt(i);
                 continue;
             }
-            
+
             float percentageCompleted = bump.timer / bumpDuration;
             float v = Mathf.Sin(Mathf.PI * percentageCompleted);
             for (int x = -bumpWidthPoints - bumpBlurPoints; x <= bumpWidthPoints + bumpBlurPoints; x++) {

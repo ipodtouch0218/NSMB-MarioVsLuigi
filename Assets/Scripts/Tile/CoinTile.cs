@@ -34,7 +34,7 @@ public class CoinTile : BreakableBrickTile {
             }
 
             //Give coin to player
-            player.photonView.RPC("CollectCoin", RpcTarget.All, -1, worldLocation + Vector3.one/4f);
+            player.photonView.RPC("AttemptCollectCoin", RpcTarget.All, -1, (Vector2) worldLocation + Vector2.one/4f);
         } else {
             interacter.gameObject.GetPhotonView().RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Coin_Collect);
         }

@@ -1,22 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using Photon.Realtime;
 using TMPro;
+
+using Photon.Realtime;
 using NSMB.Utils;
 
 public class RoomIcon : MonoBehaviour {
-    Image icon;
+
+    [SerializeField] private Color defaultColor, highlightColor, selectedColor;
+    [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText;
+
     public RoomInfo room;
     public bool joinPrivate;
-    public Color defaultColor, highlightColor, selectedColor;
 
-    [SerializeField] TMP_Text playersText, nameText, inProgressText, symbolsText;
-    void Start() {
+    private Image icon;
+
+    public void Start() {
         icon = GetComponent<Image>();
         Unselect();
     }
+
     public void UpdateUI(RoomInfo newRoom) {
         if (joinPrivate)
             return;
@@ -24,7 +27,7 @@ public class RoomIcon : MonoBehaviour {
         room = newRoom;
         ExitGames.Client.Photon.Hashtable prop = room.CustomProperties;
 
-        nameText.text = $"{prop[Enums.NetRoomProperties.HostName]}'s Lobby";
+        nameText.text = $"{((string) prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}'s Lobby";
         playersText.text = $"Players: {room.PlayerCount}/{room.MaxPlayers}";
         inProgressText.text = (bool) prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
 
@@ -51,15 +54,19 @@ public class RoomIcon : MonoBehaviour {
 
         symbolsText.text = symbols;
     }
+
     public void Select() {
         icon.color = selectedColor;
     }
+
     public void Unselect() {
         icon.color = defaultColor;
     }
+
     public void Hover() {
         icon.color = highlightColor;
     }
+
     public void Unhover() {
         if (MainMenuManager.Instance.selectedRoomIcon == this) {
             Select();

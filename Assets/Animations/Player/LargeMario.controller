@@ -10013,7 +10013,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: knockback-fireball-forwards
-  m_Speed: 0.7
+  m_Speed: 0.675
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 7884938258899651026}
@@ -10288,7 +10288,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: knockback-fireball-backwards
-  m_Speed: 0.7
+  m_Speed: 0.675
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -7759181854989402631}

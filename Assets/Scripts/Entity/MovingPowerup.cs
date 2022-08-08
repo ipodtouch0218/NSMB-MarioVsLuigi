@@ -20,6 +20,8 @@ public class MovingPowerup : MonoBehaviourPun {
 
     public Powerup powerupScriptable;
 
+    public bool Collected { get; set; }
+
     public void Awake() {
         body = GetComponent<Rigidbody2D>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
