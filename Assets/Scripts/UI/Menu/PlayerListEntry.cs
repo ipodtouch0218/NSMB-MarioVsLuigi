@@ -35,7 +35,7 @@ public class PlayerListEntry : MonoBehaviour {
     private float color;
 
     public void Update() {
-        color += Time.deltaTime * 0.05f;
+        color += Time.deltaTime * 0.1f;
         color %= 1;
         nameText.color = Color.HSVToRGB(color, 1, 1);
     }

@@ -20,7 +20,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public DiscordController DiscordController { get; private set; }
     public string controlsJson = null;
 
-    public bool joinedAsSpectator = false, checkedForVersion;
+    public bool joinedAsSpectator = false, checkedForVersion, authenticated;
     public DisconnectCause? disconnectCause = null;
 
     private int windowWidth, windowHeight;
