@@ -1137,12 +1137,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 "ban" => "/ban <player name> - Ban a player from rejoining the room",
                 "host" => "/host <player name> - Make a player the host for the room",
                 "mute" => "/mute <playername> - Prevents a player from talking in chat",
-                "debug" => "/debug - Enables debug & in-development features",
-                _ => "Available commands: /kick, /host, /debug, /mute, /ban",
+                //"debug" => "/debug - Enables debug & in-development features",
+                _ => "Available commands: /kick, /host, /mute, /ban",
             };
             LocalChatMessage(msg, Color.red);
             return;
         }
+        /*
         case "debug": {
             Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debugEnabled);
             if (PhotonNetwork.CurrentRoom.IsVisible) {
@@ -1160,6 +1161,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             });
             return;
         }
+        */
         case "mute": {
             if (args.Length < 2) {
                 LocalChatMessage("Usage: /mute <player name>", Color.red);
