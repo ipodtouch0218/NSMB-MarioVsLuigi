@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public PlayerAnimationController AnimationController { get; private set; }
 
-    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, groundpounded, canShootProjectile;
+    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, canShootProjectile;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, fireballTimer;
     public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer, slowdownTimer;
 
@@ -1247,9 +1247,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
         PlaySound(Enums.Sounds.Player_Sound_Death);
-        SpawnStars(groundpounded ? 3 : 1, deathplane);
+        SpawnStars(1, deathplane);
         body.isKinematic = false;
-        groundpounded = false;
         if (holding) {
             holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true, body.position);
             holding = null;
@@ -1504,9 +1503,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!GameManager.Instance.started || hitInvincibilityCounter > 0 || pipeEntering || Frozen || dead || giantStartTimer > 0 || giantEndTimer > 0)
             return;
 
-        if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1 && photonView.IsMineOrLocal()) {
-            groundpounded = true;
-            photonView.RPC("Powerdown", RpcTarget.All, false);
+        if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
+            SpawnStars(2, false);
+            Powerdown(false);
             return;
         }
 

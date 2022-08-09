@@ -248,7 +248,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnDisconnected(DisconnectCause cause) {
         Debug.Log("[PHOTON] Disconnected: " + cause.ToString());
-        if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic))
+        if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic || cause == DisconnectCause.CustomAuthenticationFailed))
             OpenErrorBox("Disconnected: " + cause.ToString());
 
         selectedRoom = null;
@@ -265,9 +265,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 string token = PlayerPrefs.GetString("token", null);
 
                 AuthenticationHandler.Authenticate(id, token);
-
-                PhotonNetwork.ConnectToRegion(lastRegion);
             }
+            PhotonNetwork.ConnectToRegion(lastRegion);
 
             for (int i = 0; i < pingSortedRegions.Length; i++) {
                 Region r = pingSortedRegions[i];
@@ -293,7 +292,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }, "");
     }
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {
-
         GlobalController.Instance.authenticated = true;
 
         PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
@@ -304,6 +302,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnCustomAuthenticationFailed(string failure) {
         OpenErrorBox(failure);
+        GlobalController.Instance.authenticated = false;
     }
     public void OnConnectedToMaster() {
         JoinMainLobby();

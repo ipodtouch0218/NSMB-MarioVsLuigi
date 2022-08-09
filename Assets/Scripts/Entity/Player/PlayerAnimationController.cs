@@ -193,7 +193,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (photonView.IsMine) {
             //Animation
             animator.SetBool("turnaround", controller.turnaround);
-            float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.floorAngle * Mathf.Deg2Rad));
+            float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.floorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.floorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);
             if (controller.stuckInBlock) {
                 animatedVelocity = 0;
             } else if (controller.propeller) {

@@ -202,16 +202,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         case (byte) Enums.NetEventIds.BumpTile: {
 
             PlayerController pl = GetController(sender);
-            if (pl.dead || !pl.spawned) {
-                Debug.Log("cancelled bumptime: " + pl);
+            if (pl == null || pl.dead)
                 return;
-            }
 
             int x = (int) data[0];
             int y = (int) data[1];
 
-            if (Utils.WrappedDistance(pl.transform.position, Utils.TilemapToWorldPosition(new Vector3Int(x, y, 0))) > 3f)
-                return;
+           // if (Utils.WrappedDistance(pl.transform.position, Utils.TilemapToWorldPosition(new Vector3Int(x, y, 0))) > 3f)
+           //     return;
 
             bool downwards = (bool) data[2];
             string newTile = (string) data[3];
@@ -238,7 +236,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         case (byte) Enums.NetEventIds.SetThenBumpTile: {
 
             PlayerController pl = GetController(sender);
-            if (pl.dead || !pl.spawned)
+            if (pl == null || pl.dead)
                 return;
 
             int x = (int) data[0];

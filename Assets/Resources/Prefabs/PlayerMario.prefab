@@ -10431,7 +10431,6 @@ MonoBehaviour:
   stationaryGiantEnd: 0
   fireballKnockback: 0
   startedSliding: 0
-  groundpounded: 0
   canShootProjectile: 0
   jumpLandingTimer: 0
   landing: 0

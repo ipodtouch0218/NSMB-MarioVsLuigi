@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -33,11 +32,12 @@ public class PlayerListEntry : MonoBehaviour {
     private GameObject blockerInstance;
 
     private bool checkedHash;
-    private float color;
+    private static float color;
 
     public void Update() {
         color += Time.deltaTime * 0.1f;
         color %= 1;
+
         nameText.color = Color.HSVToRGB(color, 1, 1);
     }
 
@@ -140,5 +140,12 @@ public class PlayerListEntry : MonoBehaviour {
     public void PromotePlayer() {
         MainMenuManager.Instance.Promote(player);
         HideDropdown(true);
+    }
+
+    public void CopyPlayerId() {
+        TextEditor te = new();
+        te.text = player.UserId;
+        te.SelectAll();
+        te.Copy();
     }
 }
