@@ -380,7 +380,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         nonSpectatingPlayers = PhotonNetwork.CurrentRoom.Players.Values.Where(pl => !pl.IsSpectator()).ToList();
         CheckIfAllLoaded();
 
-        if (FindObjectsOfType<PlayerController>().Length <= 0) {
+        if (musicEnabled && FindObjectsOfType<PlayerController>().Length <= 0) {
             //all players left.
             if (PhotonNetwork.IsMasterClient)
                 PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
@@ -661,7 +661,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             }
         }
 
-        if (started) {
+        if (started && musicEnabled) {
             bool allNull = true;
             foreach (PlayerController controller in players) {
                 if (controller) {

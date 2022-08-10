@@ -8,31 +8,38 @@ public class AuthenticationHandler {
     private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
 
     public async static void Authenticate(string userid, string token) {
-
-        HttpClient client = new();
         try {
+            HttpClient client = new();
             string request = URL + "?";
             if (userid != null)
                 request += "&userid=" + userid;
             if (token != null)
                 request += "&token=" + token;
 
-            string signedData = await client.GetStringAsync(request);
+            HttpResponseMessage resp = await client.GetAsync(request);
+            string responseString = await resp.Content.ReadAsStringAsync();
+
+            if (!resp.IsSuccessStatusCode) {
+
+                if (MainMenuManager.Instance)
+                    MainMenuManager.Instance.OpenErrorBox(responseString);
+                return;
+            }
+
 
             AuthenticationValues values = new();
             values.AuthType = CustomAuthenticationType.Custom;
             values.UserId = userid;
-            values.AddAuthParameter("data", signedData.Trim());
+            values.AddAuthParameter("data", responseString.Trim());
             PhotonNetwork.AuthValues = values;
 
             PhotonNetwork.NetworkingClient.ConnectToNameServer();
 
         } catch (HttpRequestException e) {
-            if (MainMenuManager.Instance) {
+
+            if (MainMenuManager.Instance)
                 MainMenuManager.Instance.OpenErrorBox(e.Message);
-            }
             return;
         }
-
     }
 }

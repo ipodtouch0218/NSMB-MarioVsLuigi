@@ -7,15 +7,16 @@ public class WaterSplash : MonoBehaviour {
     public int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
     [Delayed]
     public float heightTiles = 1;
-    public float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f;
+    public float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f, animationSpeed = 1f;
     public string splashParticle;
-    private Texture2D heightTex;
-    private float[] pointHeights, pointVelocities;
-    private Color32[] colors;
 
-    private int totalPoints;
+    private Texture2D heightTex;
     private SpriteRenderer spriteRenderer;
-    MaterialPropertyBlock properties;
+    private MaterialPropertyBlock properties;
+    private Color32[] colors;
+    private float[] pointHeights, pointVelocities;
+    private float animTimer;
+    private int totalPoints;
     private bool initialized;
 
     private void Awake() {
@@ -56,7 +57,7 @@ public class WaterSplash : MonoBehaviour {
         spriteRenderer.SetPropertyBlock(properties);
     }
 
-    void FixedUpdate() {
+    public void FixedUpdate() {
         if (!initialized) {
             Initialize();
             initialized = true;
@@ -83,8 +84,13 @@ public class WaterSplash : MonoBehaviour {
 
         heightTex.SetPixels32(colors, 0);
         heightTex.Apply();
+
+        animTimer += animationSpeed * Time.fixedDeltaTime;
+        animTimer %= 8;
+        properties.SetFloat("TextureIndex", animTimer);
+        spriteRenderer.SetPropertyBlock(properties);
     }
-    void OnTriggerEnter2D(Collider2D collider) {
+    public void OnTriggerEnter2D(Collider2D collider) {
         Instantiate(Resources.Load(splashParticle), collider.transform.position, Quaternion.identity);
 
         Rigidbody2D body = collider.attachedRigidbody;
@@ -96,7 +102,7 @@ public class WaterSplash : MonoBehaviour {
             pointVelocities[pointsX] = -splashVelocity * power;
         }
     }
-    void OnTriggerStay2D(Collider2D collision) {
+    public void OnTriggerStay2D(Collider2D collision) {
         if (collision.attachedRigidbody == null)
             return;
 
