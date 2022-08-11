@@ -82,6 +82,7 @@ Material:
     - FoamColor: {r: 1, g: 0.96761364, b: 0.36226404, a: 1}
     - RippleColor: {r: 1, g: 0.630872, b: 0, a: 1}
     - TopColor: {r: 1, g: 0.14068651, b: 0, a: 1}
+    - _Glow: {r: 1, g: 0.48083812, b: 0, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &7893850056676362737
 MonoBehaviour:

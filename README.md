@@ -75,7 +75,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
  
 ### Rippers:
   
-* Demon2Warrier (Background)
+* Demon2Warrior (Background)
 * VentureSonic (Background)
 * Keira (Background)
 * Ohthatguy (Background)

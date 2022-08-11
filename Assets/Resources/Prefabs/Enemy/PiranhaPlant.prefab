@@ -92,9 +92,8 @@ MonoBehaviour:
   flying: 0
   body: {fileID: 0}
   hitbox: {fileID: 0}
-  playerDetectSize: {x: 1, y: 1.5}
+  playerDetectSize: 1
   popupTimerRequirement: 3.6
-  popupTimer: 0
 --- !u!212 &1900118008454034842
 SpriteRenderer:
   m_ObjectHideFlags: 0

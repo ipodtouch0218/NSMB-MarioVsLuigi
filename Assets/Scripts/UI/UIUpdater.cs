@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
 using NSMB.Utils;
+using System.Text;
 
 public class UIUpdater : MonoBehaviour {
 
@@ -19,6 +20,8 @@ public class UIUpdater : MonoBehaviour {
     private GameObject starsParent, coinsParent, livesParent, timerParent;
     private readonly List<Image> backgrounds = new();
     private bool uiHidden;
+
+    private int coins = -1, stars = -1, lives = -1, timer = -1;
 
     public void Start() {
         Instance = this;
@@ -40,21 +43,23 @@ public class UIUpdater : MonoBehaviour {
     }
 
     public void Update() {
-        pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Time.unscaledDeltaTime * 0.5f);
+        pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Mathf.Clamp01(Time.unscaledDeltaTime * 0.5f));
         if (pingSample == float.NaN)
             pingSample = 0;
 
-        uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: {(int) pingSample}ms</font>";
+        uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: " + (int) pingSample + "ms</font>";
 
         //Player stuff update.
-        if (!player && GameManager.Instance.localPlayer) {
+        if (!player && GameManager.Instance.localPlayer)
             player = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        }
+
         if (!player) {
             if (!uiHidden)
                 ToggleUI(true);
+
             return;
         }
+
         if (uiHidden)
             ToggleUI(false);
 
@@ -75,28 +80,40 @@ public class UIUpdater : MonoBehaviour {
         if (!player)
             return;
 
-        itemReserve.sprite = player.storedPowerup?.reserveSprite ?? storedItemNull;
+        itemReserve.sprite = player.storedPowerup != null ? player.storedPowerup.reserveSprite : storedItemNull;
     }
 
     private void UpdateTextUI() {
         if (!player || GameManager.Instance.gameover)
             return;
 
-        uiStars.text = Utils.GetSymbolString($"Sx{player.stars}/{GameManager.Instance.starRequirement}");
-        uiCoins.text = Utils.GetSymbolString($"Cx{player.coins}/{GameManager.Instance.coinRequirement}");
+        if (player.stars != stars) {
+            stars = player.stars;
+            uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + GameManager.Instance.starRequirement);
+        }
+        if (player.coins != coins) {
+            coins = player.coins;
+            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + GameManager.Instance.coinRequirement);
+        }
 
-        if (player.lives < 0) {
-            livesParent.SetActive(false);
+        if (player.lives >= 0) {
+            if (player.lives != lives) {
+                lives = player.lives;
+                uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + Utils.GetSymbolString("x" + lives);
+            }
         } else {
-            livesParent.SetActive(true);
-            uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + Utils.GetSymbolString("x" + player.lives);
+            livesParent.SetActive(false);
         }
 
         if (GameManager.Instance.timedGameDuration > 0) {
             int seconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000;
             seconds = Mathf.Clamp(seconds, 0, GameManager.Instance.timedGameDuration);
-            uiCountdown.text = Utils.GetSymbolString($"cx{seconds / 60}:{seconds % 60:00}");
+            if (seconds != timer) {
+                timer = seconds;
+                uiCountdown.text = Utils.GetSymbolString("cx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
+            }
             timerParent.SetActive(true);
+
             if (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp < 0) {
                 if (timerMaterial == null)
                     timerMaterial = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>().GetMaterial();

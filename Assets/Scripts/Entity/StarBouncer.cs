@@ -71,7 +71,7 @@ public class StarBouncer : MonoBehaviourPun {
     }
 
     public void Update() {
-        if (GameManager.Instance && GameManager.Instance.gameover)
+        if (GameManager.Instance?.gameover ?? false)
             return;
 
         if (stationary) {
@@ -87,7 +87,7 @@ public class StarBouncer : MonoBehaviourPun {
     }
 
     public void FixedUpdate() {
-        if (GameManager.Instance && GameManager.Instance.gameover) {
+        if (GameManager.Instance?.gameover ?? false) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
             return;

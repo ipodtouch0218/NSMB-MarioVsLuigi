@@ -5007,10 +5007,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 5
-  soundOrigin: {fileID: 1973747262660636105}
   audioSources:
   - {fileID: 7844204986304545686}
+  soundOrigin: {fileID: 1973747262660636105}
+  soundRange: 5
 --- !u!82 &7844204986304545686
 AudioSource:
   m_ObjectHideFlags: 0

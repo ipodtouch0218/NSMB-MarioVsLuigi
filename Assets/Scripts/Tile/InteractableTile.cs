@@ -52,7 +52,7 @@ public abstract class InteractableTile : AnimatedTile {
                     continue;
 
                 if (interacter is PlayerController pl)
-                    pl.photonView.RPC("AttemptCollectCoin", RpcTarget.All, obj.GetComponentInParent<PhotonView>().ViewID, (Vector2) obj.transform.position);
+                    pl.photonView.RPC("AttemptCollectCoin", RpcTarget.All, obj.GetComponentInParent<PhotonView>()?.ViewID ?? -1, (Vector2) obj.transform.position);
                 continue;
             }
             case "MainStar":

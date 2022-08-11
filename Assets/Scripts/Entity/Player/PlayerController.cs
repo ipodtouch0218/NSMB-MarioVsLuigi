@@ -75,9 +75,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
     public bool doIceSkidding;
     private float tileFriction = 1;
-    private readonly HashSet<Vector3Int> tilesStandingOn = new(),
-        tilesJumpedInto = new(),
-        tilesHitSide = new();
+    private readonly List<Vector3Int> tilesStandingOn = new(), tilesJumpedInto = new(), tilesHitSide = new();
 
     private GameObject trackIcon;
 

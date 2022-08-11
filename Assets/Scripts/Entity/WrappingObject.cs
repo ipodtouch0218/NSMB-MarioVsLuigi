@@ -1,29 +1,33 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class WrappingObject : MonoBehaviour {
+
+    private static GameManager gm;
     private Rigidbody2D body;
-    void Start() {
+
+    public void Start() {
         body = GetComponent<Rigidbody2D>();
         if (!body)
             body = GetComponentInParent<Rigidbody2D>();
     }
-    void FixedUpdate() {
-        if (!GameManager.Instance)
+    public void FixedUpdate() {
+        if (!gm)
+            gm = GameManager.Instance;
+        if (!gm)
             return;
-        if (!GameManager.Instance.loopingLevel) {
+
+        if (!gm.loopingLevel) {
             enabled = false;
             return;
         }
 
         WrapMainObject();
     }
-    void WrapMainObject() {
-        float width = GameManager.Instance.levelWidthTile / 2;
-        if (body.position.x < GameManager.Instance.GetLevelMinX()) {
+    public void WrapMainObject() {
+        float width = gm.levelWidthTile / 2;
+        if (body.position.x < gm.GetLevelMinX()) {
             transform.position = body.position += new Vector2(width, 0);
-        } else if (body.position.x > GameManager.Instance.GetLevelMaxX()) {
+        } else if (body.position.x > gm.GetLevelMaxX()) {
             transform.position = body.position += new Vector2(-width, 0);
         }
         body.centerOfMass = Vector2.zero;

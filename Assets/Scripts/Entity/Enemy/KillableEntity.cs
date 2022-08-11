@@ -68,10 +68,11 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     }
 
     public virtual void FixedUpdate() {
-        if (!(photonView?.IsMine ?? true) || !GameManager.Instance || !photonView.IsMine)
+        if (!(photonView?.IsMine ?? true) || !GameManager.Instance || !photonView.IsMine || !body)
             return;
 
-        if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset * transform.lossyScale))
+        Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
+        if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc))
             photonView.RPC("SpecialKill", RpcTarget.All, left, false, 0);
     }
     #endregion

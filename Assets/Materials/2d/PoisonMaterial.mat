@@ -66,7 +66,7 @@ Material:
     - Height: 1.05
     - Points: 256
     - PointsPerTile: 4
-    - TextureIndex: 5
+    - TextureIndex: 7
     - WaveHeight: 0.3
     - WaveSpeed: 1.2
     - WaveWidth: 1
@@ -82,6 +82,7 @@ Material:
     - FoamColor: {r: 1, g: 0.96761364, b: 0.36226404, a: 1}
     - RippleColor: {r: 1, g: 0.630872, b: 0, a: 1}
     - TopColor: {r: 1, g: 0.14068651, b: 0, a: 1}
+    - _Glow: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &7893850056676362737
 MonoBehaviour:

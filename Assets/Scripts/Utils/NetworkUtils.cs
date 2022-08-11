@@ -82,7 +82,7 @@ namespace NSMB.Utils {
                 return nicknameCache[player];
 
             //generate valid username
-            string nickname = player.NickName.ToValidUsername();
+            string nickname = player.NickName.ToValidUsername(false);
 
             //nickname duplicates
             List<KeyValuePair<int, Player>> players = PhotonNetwork.CurrentRoom.Players.ToList();

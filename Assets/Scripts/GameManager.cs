@@ -7,25 +7,28 @@ using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using TMPro;
+
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
-using TMPro;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using NSMB.Utils;
 
 public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks, IMatchmakingCallbacks {
+
     private static GameManager _instance;
     public static GameManager Instance {
         get {
-            if (!_instance && SceneManager.GetActiveScene().buildIndex >= 2)
-                _instance = FindObjectOfType<GameManager>();
+            if (_instance != null)
+                return _instance;
 
-            return _instance;
+            if (SceneManager.GetActiveScene().buildIndex >= 2)
+                return _instance = FindObjectOfType<GameManager>();
+
+            return null;
         }
-        private set {
-            _instance = value;
-        }
+        private set => _instance = value;
     }
 
     public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
@@ -750,20 +753,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         musicState = state;
     }
 
-    void HandleMusic() {
+    private bool fastMusic;
+    private void HandleMusic() {
         bool invincible = false;
         bool mega = false;
         bool speedup = false;
 
-        List<PlayerController> alivePlayers = new();
         foreach (var player in players) {
-            if (player == null || player.lives == 0)
-                continue;
-
-            alivePlayers.Add(player);
-        }
-
-        foreach (var player in alivePlayers) {
             if (!player)
                 continue;
 
@@ -773,7 +769,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 invincible = true;
             if ((player.stars + 1f) / starRequirement >= 0.95f || hurryup != false)
                 speedup = true;
-            if (player.lives == 1 && alivePlayers.Count <= 2)
+            if (player.lives == 1 && players.Count <= 2)
                 speedup = true;
         }
 
@@ -787,11 +783,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         if (speedup) {
-            mixer.SetFloat("MusicSpeed", 1.25f);
-            mixer.SetFloat("MusicPitch", 1f / 1.25f);
+            if (!fastMusic) {
+                mixer.SetFloat("MusicSpeed", 1.25f);
+                mixer.SetFloat("MusicPitch", 1f / 1.25f);
+                fastMusic = true;
+            }
         } else {
-            mixer.SetFloat("MusicSpeed", 1f);
-            mixer.SetFloat("MusicPitch", 1f);
+            if (fastMusic) {
+                mixer.SetFloat("MusicSpeed", 1f);
+                mixer.SetFloat("MusicPitch", 1f);
+                fastMusic = false;
+            }
         }
     }
 
@@ -842,21 +844,32 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
-
+    //lazy mofo
+    private float? middleX, minX, minY, maxX, maxY;
     public float GetLevelMiddleX() {
-        return (GetLevelMaxX() + GetLevelMinX()) / 2;
+        if (middleX == null)
+            middleX = (GetLevelMaxX() + GetLevelMinX()) / 2;
+        return (float) middleX;
     }
     public float GetLevelMinX() {
-        return (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+        if (minX == null)
+            minX = (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+        return (float) minX;
     }
     public float GetLevelMinY() {
-        return (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+        if (minY == null)
+            minY = (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+        return (float) minY;
     }
     public float GetLevelMaxX() {
-        return ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+        if (maxX == null)
+            maxX = ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+        return (float) maxX;
     }
     public float GetLevelMaxY() {
-        return ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+        if (maxY == null)
+            maxY =  ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+        return (float) maxY;
     }
 
 

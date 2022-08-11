@@ -6,21 +6,19 @@ using NSMB.Utils;
 
 public class PlayerAnimationController : MonoBehaviourPun {
 
-    PlayerController controller;
-    Animator animator;
-    Rigidbody2D body;
-    BoxCollider2D mainHitbox;
+    [SerializeField] private Avatar smallAvatar, largeAvatar;
+    [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
+    [SerializeField] private GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
+    [SerializeField] private Material glowMaterial;
+    [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
+    [SerializeField] [ColorUsage(true, false)] private Color? _glowColor = null;
+    [SerializeField] private float blinkDuration = 0.1f, pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
 
-    [SerializeField] Material glowMaterial;
-
-    [SerializeField] GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
-    [SerializeField] ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
-    [SerializeField] float blinkDuration = 0.1f, pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
-    [SerializeField] Avatar smallAvatar, largeAvatar;
-    [SerializeField] Color primaryColor = Color.clear, secondaryColor = Color.clear;
-
-    [SerializeField] [ColorUsage(true, false)] Color? _glowColor = null;
-
+    private PlayerController controller;
+    private Animator animator;
+    private Rigidbody2D body;
+    private BoxCollider2D mainHitbox;
+    private List<Renderer> renderers = new();
     private MaterialPropertyBlock materialBlock;
 
     public Color GlowColor {
@@ -30,9 +28,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
             return _glowColor ?? Color.white;
         }
-        set {
-            _glowColor = value;
-        }
+        set => _glowColor = value;
     }
 
     AudioSource drillParticleAudio;
@@ -60,13 +56,19 @@ public class PlayerAnimationController : MonoBehaviourPun {
             primaryColor = color.overalls.linear;
             secondaryColor = color.hat.linear;
         }
+
     }
 
     public void Update() {
         HandleAnimations();
+
+        if (renderers.Count == 0) {
+            renderers.AddRange(GetComponentsInChildren<MeshRenderer>(true));
+            renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
+        }
     }
 
-    void HandleAnimations() {
+    public void HandleAnimations() {
         bool gameover = GameManager.Instance.gameover;
 
         if (gameover)
@@ -247,7 +249,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (materialBlock == null)
             materialBlock = new();
 
-        materialBlock.SetFloat("RainbowEnabled", controller.invincible > 0? 1.1f : 0f);
+        materialBlock.SetFloat("RainbowEnabled", controller.invincible > 0 ? 1.1f : 0f);
         int ps = controller.state switch {
             Enums.PowerupState.FireFlower => 1,
             Enums.PowerupState.PropellerMushroom => 2,
@@ -270,10 +272,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
             giantMultiply = new Vector3(v, 1, v);
         }
         materialBlock.SetVector("MultiplyColor", giantMultiply);
-        foreach (MeshRenderer renderer in GetComponentsInChildren<MeshRenderer>())
-            renderer.SetPropertyBlock(materialBlock);
-        foreach (SkinnedMeshRenderer renderer in GetComponentsInChildren<SkinnedMeshRenderer>())
-            renderer.SetPropertyBlock(materialBlock);
+
+        foreach (Renderer r in renderers)
+            r.SetPropertyBlock(materialBlock);
 
         //hit flash
         models.SetActive(GameManager.Instance.gameover || controller.dead || !(controller.hitInvincibilityCounter > 0 && controller.hitInvincibilityCounter * (controller.hitInvincibilityCounter <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));

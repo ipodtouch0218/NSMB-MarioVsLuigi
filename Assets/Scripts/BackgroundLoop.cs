@@ -52,7 +52,7 @@ public class BackgroundLoop : MonoBehaviour {
     public void Reposition() {
         for (int i = 0; i < children.Length; i++) {
             GameObject obj = children[i];
-            float difference = (transform.position.x - lastPosition.x) + (obj.transform.position.x - positionsAfterPixelSnap[i].x);
+            float difference = transform.position.x - lastPosition.x + (obj.transform.position.x - positionsAfterPixelSnap[i].x);
             float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(lastPosition.z / obj.transform.position.z));
 
             if (wrap)
