@@ -769,7 +769,7 @@ PrefabInstance:
         type: 3}
       propertyPath: mainMusic
       value: 
-      objectReference: {fileID: 11400000, guid: edbf6938440c0524da32b47ade61d924,
+      objectReference: {fileID: 11400000, guid: ea2fed39edda0ae4c8d4ffe7bf5f52ba,
         type: 2}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}

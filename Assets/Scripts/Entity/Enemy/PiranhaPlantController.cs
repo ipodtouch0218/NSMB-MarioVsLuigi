@@ -40,12 +40,14 @@ public class PiranhaPlantController : KillableEntity {
             return;
 
         if ((popupTimer += Time.deltaTime) >= popupTimerRequirement) {
-            foreach (PlayerController pl in gm.players) {
-                if (!pl)
-                    continue;
+            if (gm) {
+                foreach (PlayerController pl in gm.players) {
+                    if (!pl)
+                        continue;
 
-                if (Utils.WrappedDistance(transform.position, pl.transform.position) < playerDetectSize)
-                    return;
+                    if (Utils.WrappedDistance(transform.position, pl.transform.position) < playerDetectSize)
+                        return;
+                }
             }
 
             animator.SetTrigger("popup");

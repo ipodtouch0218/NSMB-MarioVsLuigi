@@ -45,6 +45,30 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, fireballTimer;
     public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer, slowdownTimer;
 
+    //MOVEMENT STAGES
+    private static readonly float[] SPEED_STAGE_MAX = { 0.9375f, 2.8125f, 4.21875f, 5.625f };
+    private static readonly float[] SPEED_STAGE_ACC = { 0.131835975f, 0.06591802875f, 0.05859375f, 0.0439453125f };
+    private static readonly float SKIDDING_THRESHOLD = 4.6875f;
+    private static readonly float SKIDDING_DEC = 0.17578125f;
+    private static readonly float TURNAROUND_THRESHOLD = 2.8125f;
+    private static readonly float TURNAROUND_ACC = 0.46875f;
+    private static readonly float[] WALK_TURNAROUND_ACC = { 0.0659179686f, 0.146484375f, 0.3515625f };
+    private static readonly int WALK_STAGE = 1;
+
+    private byte turnaroundFrames;
+
+    private int MovementStage {
+        get {
+            float xVel = Mathf.Abs(body.velocity.x);
+            int i;
+            for (i = 0; i < SPEED_STAGE_MAX.Length; i++) {
+                if (xVel <= SPEED_STAGE_MAX[i])
+                    return i;
+            }
+            return -1;
+        }
+    }
+
     //Walljumping variables
     private float wallSlideTimer, wallJumpTimer;
     public bool wallSlideLeft, wallSlideRight;
@@ -181,6 +205,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         starDirection = Random.Range(0, 4);
 
         int count = 0;
+
         foreach (var player in PhotonNetwork.PlayerList) {
 
             Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, photonView.Owner.CustomProperties);
@@ -197,6 +222,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (photonView.IsMine) {
             InputSystem.controls.Player.Movement.performed += OnMovement;
+            InputSystem.controls.Player.Movement.canceled += OnMovement;
             InputSystem.controls.Player.Jump.performed += OnJump;
             InputSystem.controls.Player.Sprint.started += OnSprint;
             InputSystem.controls.Player.Sprint.canceled += OnSprint;
@@ -225,6 +251,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         InputSystem.controls.Player.Movement.performed -= OnMovement;
+        InputSystem.controls.Player.Movement.canceled -= OnMovement;
         InputSystem.controls.Player.Jump.performed -= OnJump;
         InputSystem.controls.Player.Sprint.started -= OnSprint;
         InputSystem.controls.Player.Sprint.canceled -= OnSprint;
@@ -2066,34 +2093,100 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 iceSliding = true;
         }
 
-        if (Mathf.Abs(body.velocity.x) < 0.5f || !onGround)
+        if (!onGround)
             skidding = false;
 
         if (inShell) {
-            body.velocity = new(runningMaxSpeed * 0.9f * (facingRight ? 1 : -1) * (1f - slowdownTimer), body.velocity.y);
+            body.velocity = new(SPEED_STAGE_MAX[^1] * 0.9f * (facingRight ? 1 : -1) * (1f - slowdownTimer), body.velocity.y);
             return;
         }
 
-        if (!(left ^ right))
-            return;
-
-        if (crouching && state == Enums.PowerupState.BlueShell)
-            return;
-
+        /*
         float airPenalty = onGround ? 1 : 0.5f;
         float xVel = Mathf.Abs(body.velocity.x);
         float invincibleSpeedBoost = onGround && invincible > 0 ? 2f : 1f;
         float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
         float walkSpeedTotal = walkingMaxSpeed;
-        bool reverseDirection = (left ? 1 : -1) == Mathf.Sign(body.velocity.x); // ((left && body.velocity.x > 0.02) || (right && body.velocity.x < -0.02));
+         // ((left && body.velocity.x > 0.02) || (right && body.velocity.x < -0.02));
         float reverseFloat = reverseDirection && doIceSkidding ? 0.4f : 1;
         float turnaroundSpeedBoost = turnaround && !reverseDirection ? 5 : 1;
         float stationarySpeedBoost = Mathf.Abs(body.velocity.x) <= 0.005f ? 1f : 1f;
         float propellerBoost = propellerTimer > 0 ? 2.5f : 1;
         float drillSlowing = drill ? 0.25f : 1f;
+        */
 
         bool run = functionallyRunning && !flying;
+        int stage = MovementStage;
+        float acc = stage == -1 ? SPEED_STAGE_ACC[^1] : SPEED_STAGE_ACC[stage];
 
+        Debug.Log(MovementStage + " " + body.velocity.x + " " + skidding + " " + turnaround);
+
+        if ((left ^ right) && (!crouching || (crouching && !onGround && state != Enums.PowerupState.BlueShell))) {
+            //we can walk here
+
+            float sign = Mathf.Sign(body.velocity.x);
+            bool reverse = (left ? 1 : -1) == sign;
+            float speed = Mathf.Abs(body.velocity.x);
+
+            //check that we're not going above our limit
+            float max = run ? SPEED_STAGE_MAX[^1] : SPEED_STAGE_MAX[WALK_STAGE];
+            if (speed > max) {
+                acc = -(run ? SPEED_STAGE_ACC[^1] : SPEED_STAGE_ACC[WALK_STAGE]);
+            }
+
+            if (reverse) {
+                turnaround = false;
+                if (speed >= SKIDDING_THRESHOLD)
+                    skidding = true;
+
+                if (skidding) {
+                    acc = SKIDDING_DEC;
+                    turnaroundFrames = 255;
+                } else {
+                    turnaroundFrames = (byte) Mathf.Min(turnaroundFrames + 1, WALK_TURNAROUND_ACC.Length - 1);
+                    acc = WALK_TURNAROUND_ACC[turnaroundFrames];
+                }
+            } else {
+                skidding = false;
+                turnaroundFrames = 255;
+
+                if (turnaround && speed < TURNAROUND_THRESHOLD) {
+                    acc = TURNAROUND_ACC;
+                } else {
+                    turnaround = false;
+                }
+            }
+
+            int direction = left ? -1 : 1;
+            float newX = body.velocity.x + acc * direction;
+
+            if (Mathf.Abs(newX) - speed > 0)
+                newX = Mathf.Clamp(newX, -max, max);
+
+            body.velocity = new(newX, body.velocity.y);
+
+            if (skidding && Mathf.Sign(newX) != sign) {
+                //turnaround
+                turnaround = true;
+            }
+
+        } else if (onGround) {
+            //not holding anything, crouch sliding, or holding both directions. decelerate
+
+            if (body.velocity.x == 0)
+                return;
+
+            acc = -acc;
+            int direction = (int) Mathf.Sign(body.velocity.x);
+            float newX = body.velocity.x + acc * direction;
+
+            if ((direction == -1) ^ (newX <= 0))
+                newX = 0;
+
+            body.velocity = new(newX, body.velocity.y);
+        }
+
+        /*
         if ((crouching && !onGround) || !crouching) {
             if (run && xVel >= walkSpeedTotal && !reverseDirection) {
                 //running
@@ -2131,8 +2224,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             turnaround = false;
             skidding = false;
         }
+        */
 
-        inShell |= state == Enums.PowerupState.BlueShell && onGround && !inShell && functionallyRunning && !holding && Mathf.Abs(xVel) + 0.25f >= runningMaxSpeed && landing > 0.15f;
+        inShell |= state == Enums.PowerupState.BlueShell && onGround && !inShell && functionallyRunning && !holding && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[^1] * 0.9f && landing > 0.15f;
         if (onGround || previousOnGround)
             body.velocity = new(body.velocity.x, 0);
     }
@@ -2668,6 +2762,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         }
 
+        /*
+
         bool uphill = sliding && (floorAngle != 0 && Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x));
         if (!inShell && !(sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2 && !uphill)) {
             bool abovemax = false;
@@ -2700,6 +2796,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     body.velocity = new Vector2(0, body.velocity.y);
             }
         }
+        */
         //Terminal velocity
         float terminalVelocityModifier = state switch {
             Enums.PowerupState.MiniMushroom => 0.625f,

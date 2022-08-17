@@ -63,10 +63,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Height: 1.05
+    - Height: 2.69
     - Points: 256
     - PointsPerTile: 4
-    - TextureIndex: 5
+    - TextureIndex: 0
     - WaveHeight: 0.3
     - WaveSpeed: 1.2
     - WaveWidth: 1
@@ -74,7 +74,7 @@ Material:
     - _BUILTIN_QueueControl: -1
     - _BUILTIN_QueueOffset: 0
     - _Points: 160
-    - _RandomizeOffset: 0
+    - _RandomizeOffset: 1
     - _TextureIndex: 0
     - _WaveWidth: 2.5
     m_Colors:

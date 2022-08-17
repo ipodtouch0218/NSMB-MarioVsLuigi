@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,16 +30,36 @@ public class PlayerListEntry : MonoBehaviour {
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private LayoutElement layout;
 
+    [SerializeField] private GameObject[] adminOnlyOptions;
+
     private GameObject blockerInstance;
 
     private bool checkedHash;
-    private static float color;
+
+    private static Coroutine rainbow;
+    private static Color color;
+    private static float colorTimer;
 
     public void Update() {
-        color += Time.deltaTime * 0.1f;
-        color %= 1;
+        nameText.color = color;
+    }
 
-        nameText.color = Color.HSVToRGB(color, 1, 1);
+    public void OnEnable() {
+        if (rainbow == null)
+            rainbow = StartCoroutine(RainbowRoutine());
+    }
+
+    public void OnDisable() {
+        nameText.color = Color.white;
+    }
+
+    private IEnumerator RainbowRoutine() {
+        while (true) {
+            colorTimer += Time.deltaTime * 0.1f;
+            colorTimer %= 1;
+            color = Color.HSVToRGB(colorTimer, 1, 1);
+            yield return null;
+        }
     }
 
     public void UpdateText() {
@@ -98,8 +119,12 @@ public class PlayerListEntry : MonoBehaviour {
         if (blockerInstance)
             Destroy(blockerInstance);
 
-        if (!PhotonNetwork.IsMasterClient || player.IsMasterClient)
-            return;
+        bool admin = PhotonNetwork.IsMasterClient && !player.IsMasterClient;
+        foreach (GameObject option in adminOnlyOptions) {
+            option.SetActive(admin);
+        }
+
+        Canvas.ForceUpdateCanvases();
 
         blockerInstance = Instantiate(blockerTemplate, rootCanvas.transform);
         RectTransform blockerTransform = blockerInstance.GetComponent<RectTransform>();
@@ -147,5 +172,6 @@ public class PlayerListEntry : MonoBehaviour {
         te.text = player.UserId;
         te.SelectAll();
         te.Copy();
+        HideDropdown(true);
     }
 }
