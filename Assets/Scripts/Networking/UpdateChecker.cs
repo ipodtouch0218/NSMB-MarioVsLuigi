@@ -1,10 +1,9 @@
+using System;
 using System.IO;
 using System.Net;
 using UnityEngine;
 
 using Newtonsoft.Json.Linq;
-using System;
-using System.Threading.Tasks;
 
 public class UpdateChecker {
 
@@ -24,7 +23,6 @@ public class UpdateChecker {
 
         if (response.StatusCode != HttpStatusCode.OK)
             return;
-
 
         try {
             //get the latest release version number from github

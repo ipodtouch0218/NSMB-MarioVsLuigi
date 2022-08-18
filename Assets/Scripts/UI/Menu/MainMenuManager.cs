@@ -90,7 +90,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         List<string> invalidRooms = new();
 
         foreach (RoomInfo room in roomList) {
-            Utils.GetCustomProperty(Enums.NetRoomProperties.HostName, out string host, room.CustomProperties);
             Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out int lives, room.CustomProperties);
             Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int stars, room.CustomProperties);
             Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out int coins, room.CustomProperties);
@@ -173,6 +172,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EnterRoom();
     }
     IEnumerator KickPlayer(Player player) {
+        if (player.IsMasterClient)
+            yield break;
+
         while (PhotonNetwork.CurrentRoom.Players.Values.Contains(player)) {
             PhotonNetwork.CloseConnection(player);
             yield return new WaitForSecondsRealtime(0.5f);
@@ -347,7 +349,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         switch (e.Code) {
         case EventCode.PropertiesChanged: {
-            Debug.Log(e.ToStringFull());
+            if ((int) e.Parameters[253] == 1)
+                Debug.Log(e.ToStringFull());
+
             if ((int) e.Parameters[253] == 1 && PhotonNetwork.IsMasterClient && sender != null && !sender.IsMasterClient)
                 StartCoroutine(KickPlayer(sender));
 
@@ -453,8 +457,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
             OpenTitleScreen();
-            //PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
-            PhotonNetwork.NetworkingClient.AppId = "40c2f241-79f7-4721-bdac-3c0366d00f58";
+            PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
 
             //version separation
             Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");

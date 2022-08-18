@@ -24,7 +24,7 @@ namespace NSMB.Utils {
             string discriminator = input.Length >= 3 ? input[^3..] : "";
 
             //valid characters
-            input = Regex.Replace(input, "[^0-9A-Za-z]", "");
+            input = Regex.Replace(input, @"(\([0-9]\))|[^A-Za-z0-9]", "");
 
             //name character maximum
             input = input.Substring(0, Mathf.Min(input.Length, MainMenuManager.NICKNAME_MAX));
@@ -36,7 +36,7 @@ namespace NSMB.Utils {
             //name filtering
             input = input.Filter();
 
-            if (discrim && Regex.IsMatch(discriminator, "^\\([0-9]\\)$"))
+            if (discrim && Regex.IsMatch(discriminator, @"^\([0-9]\)$"))
                 input += discriminator;
 
             return input;

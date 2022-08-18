@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using System.Text.RegularExpressions;
 
 namespace NSMB.Utils {
     public static class NetworkUtils {
@@ -75,11 +73,11 @@ namespace NSMB.Utils {
             return valid && value;
         }
 
-        public static readonly Dictionary<Player, string> nicknameCache = new();
+        public static readonly Dictionary<string, string> nicknameCache = new();
 
         public static string GetUniqueNickname(this Player player, bool checkCache = true) {
-            if (checkCache && nicknameCache.ContainsKey(player))
-                return nicknameCache[player];
+            if (checkCache && nicknameCache.ContainsKey(player.UserId ?? "none"))
+                return nicknameCache[player.UserId ?? "none"];
 
             //generate valid username
             string nickname = player.NickName.ToValidUsername(false);
@@ -100,7 +98,7 @@ namespace NSMB.Utils {
                 nickname += $"({count})";
 
             //update cache
-            nicknameCache[player] = nickname;
+            nicknameCache[player.UserId ?? "none"] = nickname;
 
             return nickname;
         }

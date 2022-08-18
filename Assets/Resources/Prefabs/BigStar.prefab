@@ -4880,7 +4880,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa60e0a51f0cba44fa8367033bc452f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stationary: 1
   pulseAmount: 0.15
   pulseSpeed: 16
   moveSpeed: 1.5
@@ -4889,12 +4888,11 @@ MonoBehaviour:
   deathBoostAmount: 8.5
   blinkingSpeed: 0.25
   lifespan: 15
-  counter: 0
   body: {fileID: 0}
+  stationary: 1
   passthrough: 0
   left: 1
   fast: 0
-  creator: -1
 --- !u!50 &1973747262660636108
 Rigidbody2D:
   serializedVersion: 4

@@ -133,5 +133,5 @@ MonoBehaviour:
   damping: 0.985
   splashVelocity: 10
   resistance: 0
-  animationSpeed: 7
+  animationSpeed: 1
   splashParticle: Prefabs/Particle/PoisonWaterSplash

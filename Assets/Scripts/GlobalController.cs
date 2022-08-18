@@ -143,11 +143,11 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     }
 
     public void OnPlayerEnteredRoom(Player newPlayer) {
-        NetworkUtils.nicknameCache.Remove(newPlayer);
+        NetworkUtils.nicknameCache.Remove(newPlayer.UserId);
     }
 
     public void OnPlayerLeftRoom(Player otherPlayer) {
-        NetworkUtils.nicknameCache.Remove(otherPlayer);
+        NetworkUtils.nicknameCache.Remove(otherPlayer.UserId);
     }
 
     public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) { }

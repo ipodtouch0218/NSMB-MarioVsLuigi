@@ -33,33 +33,12 @@ public class PlayerListEntry : MonoBehaviour {
     [SerializeField] private GameObject[] adminOnlyOptions;
 
     private GameObject blockerInstance;
-
     private bool checkedHash;
 
-    private static Coroutine rainbow;
-    private static Color color;
-    private static float colorTimer;
-
     public void Update() {
-        nameText.color = color;
-    }
-
-    public void OnEnable() {
-        if (rainbow == null)
-            rainbow = StartCoroutine(RainbowRoutine());
-    }
-
-    public void OnDisable() {
-        nameText.color = Color.white;
-    }
-
-    private IEnumerator RainbowRoutine() {
-        while (true) {
-            colorTimer += Time.deltaTime * 0.1f;
-            colorTimer %= 1;
-            color = Color.HSVToRGB(colorTimer, 1, 1);
-            yield return null;
-        }
+        double time = PhotonNetwork.Time * 0.1;
+        time %= 1;
+        nameText.color = Color.HSVToRGB((float) time, 1, 1);
     }
 
     public void UpdateText() {

@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class LoopingMusic : MonoBehaviour {
 
-    public AudioSource audioSource;
-    public MusicData currentSong;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private MusicData currentSong;
 
     public void Start() {
         if (currentSong)
@@ -28,5 +28,4 @@ public class LoopingMusic : MonoBehaviour {
         if (currentSong.loopEndSample != -1 && audioSource.time >= currentSong.loopEndSample)
             audioSource.time = currentSong.loopStartSample + (audioSource.time - currentSong.loopEndSample);
     }
-
 }

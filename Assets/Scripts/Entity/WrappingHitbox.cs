@@ -1,42 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class WrappingHitbox : MonoBehaviour {
-    
+
     private Rigidbody2D body;
     private BoxCollider2D[] ourColliders, childColliders;
+    private Vector2 offset;
     private float levelMiddle, levelWidth;
-    private Vector2 offset = Vector2.zero;
-    void Awake() {
+
+    public void Awake() {
         body = GetComponent<Rigidbody2D>();
         if (!body)
             body = GetComponentInParent<Rigidbody2D>();
         ourColliders = GetComponents<BoxCollider2D>();
-        LateUpdate();
-    }
-    public void LateUpdate() {
-        if (!GameManager.Instance) 
-            return;
-        if (!GameManager.Instance.loopingLevel) {
+
+        // null propagation is ok w/ GameManager.Instance
+        if (!(GameManager.Instance?.loopingLevel ?? false)) {
             enabled = false;
             return;
         }
-        
-        if (offset == Vector2.zero) {
-            childColliders = new BoxCollider2D[ourColliders.Length];
-            for (int i = 0; i < ourColliders.Length; i++)
-                childColliders[i] = gameObject.AddComponent<BoxCollider2D>();
-            levelWidth = GameManager.Instance.levelWidthTile/2f;
-            levelMiddle = GameManager.Instance.GetLevelMinX() + levelWidth/2f;
-            offset = new Vector2(levelWidth, 0);
-        }
 
+        childColliders = new BoxCollider2D[ourColliders.Length];
+        for (int i = 0; i < ourColliders.Length; i++)
+            childColliders[i] = gameObject.AddComponent<BoxCollider2D>();
+        levelWidth = GameManager.Instance.levelWidthTile / 2f;
+        levelMiddle = GameManager.Instance.GetLevelMinX() + levelWidth / 2f;
+        offset = new(levelWidth, 0);
+
+        LateUpdate();
+    }
+
+    public void LateUpdate() {
         for (int i = 0; i < ourColliders.Length; i++)
             UpdateChildColliders(i);
     }
-    
-    void UpdateChildColliders(int index) {
+
+    private void UpdateChildColliders(int index) {
         BoxCollider2D ourCollider = ourColliders[index];
         BoxCollider2D childCollider = childColliders[index];
 

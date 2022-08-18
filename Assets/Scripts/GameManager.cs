@@ -12,22 +12,14 @@ using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
 using NSMB.Utils;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks, IMatchmakingCallbacks {
 
     private static GameManager _instance;
     public static GameManager Instance {
-        get {
-            if (_instance != null)
-                return _instance;
-
-            if (SceneManager.GetActiveScene().buildIndex >= 2)
-                return _instance = FindObjectOfType<GameManager>();
-
-            return null;
-        }
+        get => _instance ? _instance : null;
         private set => _instance = value;
     }
 
@@ -406,10 +398,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void OnEnable() {
         PhotonNetwork.AddCallbackTarget(this);
         InputSystem.controls.UI.Pause.performed += OnPause;
+        Instance = this;
     }
     public void OnDisable() {
         PhotonNetwork.RemoveCallbackTarget(this);
         InputSystem.controls.UI.Pause.performed -= OnPause;
+
+        foreach (GameManager gm in FindObjectsOfType<GameManager>()) {
+            if (gm != this) {
+                Instance = gm;
+                return;
+            }
+        }
     }
 
     public void Awake() {

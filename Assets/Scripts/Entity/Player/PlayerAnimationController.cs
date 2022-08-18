@@ -94,7 +94,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 targetEuler += Mathf.Abs(body.velocity.x) / controller.runningMaxSpeed * Time.deltaTime * new Vector3(0, 1800 * (controller.facingRight ? -1 : 1));
                 instant = true;
             } else if (wasTurnaround || controller.skidding || controller.turnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
-                if (controller.facingRight ^ (wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.turnaround)) {
+                if (controller.facingRight ^ (wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.skidding)) {
                     targetEuler = new Vector3(0, 250, 0);
                 } else {
                     targetEuler = new Vector3(0, 110, 0);
@@ -177,6 +177,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
     public void UpdateAnimatorStates() {
 
+        bool right = controller.joystick.x > 0.35f;
+        bool left = controller.joystick.x < -0.35f;
+
         animator.SetBool("onLeft", controller.wallSlideLeft);
         animator.SetBool("onRight", controller.wallSlideRight);
         animator.SetBool("onGround", controller.onGround);
@@ -188,7 +191,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         animator.SetBool("groundpound", controller.groundpound);
         animator.SetBool("sliding", controller.sliding);
         animator.SetBool("knockback", controller.knockback);
-        animator.SetBool("facingRight", controller.facingRight);
+        animator.SetBool("facingRight", (left ^ right) ? right : controller.facingRight);
         animator.SetBool("flying", controller.flying);
         animator.SetBool("drill", controller.drill);
 
@@ -207,6 +210,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
                     animatedVelocity = 0f;
             } else if (controller.state == Enums.PowerupState.MegaMushroom && Mathf.Abs(controller.joystick.x) > .2f) {
                 animatedVelocity = 4.5f;
+            } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
+                animatedVelocity = Mathf.Max(2.5f, animatedVelocity);
             }
             animator.SetFloat("velocityX", animatedVelocity);
             animator.SetFloat("velocityY", body.velocity.y);
