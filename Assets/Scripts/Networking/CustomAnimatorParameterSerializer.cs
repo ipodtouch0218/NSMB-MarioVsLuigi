@@ -23,7 +23,7 @@ public class CustomAnimatorParameterSerializer : MonoBehaviourPun, ICustomSerial
 
     private float[] lastSendTimestamps;
 
-    public void Awake() {
+    public void Start() {
         paramCount = animator.parameterCount;
         parameters = animator.parameters;
 
@@ -96,7 +96,7 @@ public class CustomAnimatorParameterSerializer : MonoBehaviourPun, ICustomSerial
 
             switch (param.type) {
             case AnimatorControllerParameterType.Trigger:
-                bool triggered = cachedChanges[i] || animator.GetBool(i);
+                bool triggered = cachedChanges[i] || animator.GetBool(param.name);
                 if (!triggered)
                     continue;
 
@@ -105,7 +105,7 @@ public class CustomAnimatorParameterSerializer : MonoBehaviourPun, ICustomSerial
                 break;
 
             case AnimatorControllerParameterType.Bool:
-                newValue = animator.GetBool(i);
+                newValue = animator.GetBool(param.name);
                 bool changed = (bool) newValue != (bool) oldValue;
                 bool cached = cachedChanges[i];
                 if (!forceResend && !changed && !cached)
@@ -126,7 +126,7 @@ public class CustomAnimatorParameterSerializer : MonoBehaviourPun, ICustomSerial
 
             case AnimatorControllerParameterType.Int:
             case AnimatorControllerParameterType.Float:
-                newValue = animator.GetFloat(i);
+                newValue = animator.GetFloat(param.name);
                 if (!forceResend && Mathf.Abs((float) newValue - (float) oldValue) <= EPSILON)
                     continue;
 

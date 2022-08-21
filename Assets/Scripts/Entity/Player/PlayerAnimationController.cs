@@ -91,10 +91,10 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 targetEuler = new Vector3(0, 180, 0);
                 instant = true;
             } else if (animator.GetBool("inShell") && (!controller.onSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
-                targetEuler += Mathf.Abs(body.velocity.x) / controller.runningMaxSpeed * Time.deltaTime * new Vector3(0, 1800 * (controller.facingRight ? -1 : 1));
+                targetEuler += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * Time.deltaTime * new Vector3(0, 1800 * (controller.facingRight ? -1 : 1));
                 instant = true;
             } else if (wasTurnaround || controller.skidding || controller.turnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
-                if (controller.facingRight ^ (wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.skidding)) {
+                if (controller.facingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.skidding)) {
                     targetEuler = new Vector3(0, 250, 0);
                 } else {
                     targetEuler = new Vector3(0, 110, 0);
@@ -115,7 +115,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.flying || controller.propeller || controller.usedPropellerThisJump) ? -1 : 1) * Time.deltaTime), -2500, -300);
             propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
 
-            if (instant) {
+            if (instant || wasTurnaround) {
                 models.transform.rotation = Quaternion.Euler(targetEuler);
             } else {
                 float maxRotation = 2000f * Time.deltaTime;
@@ -128,10 +128,12 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
             if (changeFacing)
                 controller.facingRight = models.transform.eulerAngles.y < 180;
+
+            wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
         }
 
         //Particles
-        SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.onGround && ((controller.skidding && !controller.doIceSkidding) || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);
+        SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.onGround && (controller.skidding || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);
         SetParticleEmission(drillParticle, !gameover && controller.drill);
         if (controller.drill)
             drillParticleAudio.clip = (controller.state == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
@@ -184,7 +186,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         animator.SetBool("onRight", controller.wallSlideRight);
         animator.SetBool("onGround", controller.onGround);
         animator.SetBool("invincible", controller.invincible > 0);
-        animator.SetBool("skidding", !controller.doIceSkidding && controller.skidding);
+        animator.SetBool("skidding", controller.skidding);
         animator.SetBool("propeller", controller.propeller);
         animator.SetBool("propellerSpin", controller.propellerSpinTimer > 0);
         animator.SetBool("crouching", controller.crouching);
@@ -203,15 +205,12 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 animatedVelocity = 0;
             } else if (controller.propeller) {
                 animatedVelocity = 2.5f;
-            } else if (controller.doIceSkidding) {
-                if (controller.skidding)
-                    animatedVelocity = 3.5f;
-                if (controller.iceSliding)
-                    animatedVelocity = 0f;
             } else if (controller.state == Enums.PowerupState.MegaMushroom && Mathf.Abs(controller.joystick.x) > .2f) {
                 animatedVelocity = 4.5f;
             } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
-                animatedVelocity = Mathf.Max(2.5f, animatedVelocity);
+                animatedVelocity = Mathf.Max(3.5f, animatedVelocity);
+            } else if (controller.onIce) {
+                animatedVelocity = 0;
             }
             animator.SetFloat("velocityX", animatedVelocity);
             animator.SetFloat("velocityY", body.velocity.y);

@@ -54,20 +54,21 @@ public class BulletBillMover : KillableEntity {
             || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.state == Enums.PowerupState.MegaMushroom) {
 
+            if (player.drill) {
+                player.bounce = true;
+                player.drill = false;
+            }
             photonView.RPC("Kill", RpcTarget.All);
             return;
         }
         if (attackedFromAbove) {
-            if (player.state == Enums.PowerupState.MiniMushroom && !player.drill && !player.groundpound) {
-                player.groundpound = false;
-                player.bounce = true;
-            } else {
+            if (!(player.state == Enums.PowerupState.MiniMushroom && !player.groundpound)) {
                 photonView.RPC("Kill", RpcTarget.All);
-                player.groundpound = false;
-                player.bounce = !player.drill;
             }
             player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;
+            player.groundpound = false;
+            player.bounce = true;
             return;
         }
 

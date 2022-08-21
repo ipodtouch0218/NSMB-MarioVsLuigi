@@ -73,11 +73,12 @@ public class BobombWalk : HoldableEntity {
                 photonView.RPC("Light", RpcTarget.All);
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom) {
-                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.runningMaxSpeed, player.groundpound);
+                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
             } else {
                 player.bounce = true;
                 player.groundpound = false;
             }
+            player.drill = false;
         } else {
             if (lit) {
                 if (!holder) {
@@ -85,7 +86,7 @@ public class BobombWalk : HoldableEntity {
                         photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                         player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
                     } else {
-                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.runningMaxSpeed, player.groundpound);
+                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
                     }
                 }
             } else if (player.hitInvincibilityCounter <= 0) {

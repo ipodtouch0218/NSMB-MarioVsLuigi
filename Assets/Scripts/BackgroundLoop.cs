@@ -31,12 +31,12 @@ public class BackgroundLoop : MonoBehaviour {
             children[i] = t.GetChild(i).gameObject;
             SpriteRenderer sr = children[i].GetComponent<SpriteRenderer>();
             ppus[i] = sr.sprite.pixelsPerUnit;
-            halfWidths[i] = sr.bounds.extents.x - (0.30f/ppus[i]);
+            halfWidths[i] = sr.bounds.extents.x - 0.00004f;
             positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
         }
 
         mainCamera = gameObject.GetComponent<Camera>();
-        screenBounds = new Vector2(mainCamera.orthographicSize * mainCamera.aspect, mainCamera.orthographicSize) * 2.5f; // mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
+        screenBounds = new Vector2(mainCamera.orthographicSize * mainCamera.aspect, mainCamera.orthographicSize) * 3f; // mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
         foreach (GameObject obj in children)
             LoadChildObjects(obj);
 
@@ -70,7 +70,7 @@ public class BackgroundLoop : MonoBehaviour {
 
     #region Helper Methods
     private void LoadChildObjects(GameObject obj) {
-        float objectWidth = obj.GetComponent<SpriteRenderer>().bounds.size.x;
+        float objectWidth = halfWidths[Array.IndexOf(children, obj)] * 2f;
         int childsNeeded = (int) Mathf.Ceil(screenBounds.x / objectWidth) + 1;
         GameObject clone = Instantiate(obj);
         for (int i = 0; i <= childsNeeded; i++) {

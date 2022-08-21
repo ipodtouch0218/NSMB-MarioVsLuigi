@@ -95,6 +95,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public virtual void InteractWithPlayer(PlayerController player) {
         if (player.Frozen)
             return;
+
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.onGround;
 
@@ -106,16 +107,20 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
 
             photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound, player.StarCombo++);
         } else if (attackedFromAbove) {
-            if (player.state == Enums.PowerupState.MiniMushroom && !player.drill && !player.groundpound) {
-                player.groundpound = false;
+
+            if (player.state == Enums.PowerupState.MiniMushroom) {
+                if (player.groundpound) {
+                    player.groundpound = false;
+                    photonView.RPC("Kill", RpcTarget.All);
+                }
                 player.bounce = true;
             } else {
                 photonView.RPC("Kill", RpcTarget.All);
-                player.groundpound = false;
-                player.bounce = !player.drill;
+                player.bounce = !player.groundpound;
             }
             player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;
+
         } else if (player.hitInvincibilityCounter <= 0) {
             player.photonView.RPC("Powerdown", RpcTarget.All, false);
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);

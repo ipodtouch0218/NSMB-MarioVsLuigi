@@ -1,8 +1,9 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 using TMPro;
+
+using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 
 public class RebindButton : MonoBehaviour {
 
@@ -44,20 +45,20 @@ public class RebindButton : MonoBehaviour {
         countdown = StartCoroutine(TimeoutCountdown());
     }
 
-    IEnumerator TimeoutCountdown() {
+    private IEnumerator TimeoutCountdown() {
         for (int i = timeoutTime; i > 0; i--) {
             MainMenuManager.Instance.rebindCountdown.text = i.ToString();
             yield return new WaitForSecondsRealtime(1);
         }
     }
 
-    public void OnRebindComplete(RebindingOperation operation) {
+    private void OnRebindComplete(RebindingOperation operation) {
         SetText();
         CleanRebind(operation);
         RebindManager.Instance.SaveRebindings();
     }
 
-    void CleanRebind(RebindingOperation operation) {
+    private void CleanRebind(RebindingOperation operation) {
         targetAction.actionMap.Enable();
         rebinding.Dispose();
         MainMenuManager.Instance.rebindPrompt.SetActive(false);

@@ -181,7 +181,7 @@ public class KoopaWalk : HoldableEntity {
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             player.body.velocity = new(0, player.body.velocity.y);
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
-        } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.drill) {
+        } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
@@ -194,13 +194,18 @@ public class KoopaWalk : HoldableEntity {
                 previousHolder = player;
             }
         } else if (attackedFromAbove && (!shell || !IsStationary)) {
-            if (player.state != Enums.PowerupState.MiniMushroom || player.groundpound) {
-                photonView.RPC("EnterShell", RpcTarget.All);
-                if (player.state == Enums.PowerupState.MiniMushroom)
+            if (player.state == Enums.PowerupState.MiniMushroom) {
+                if (player.groundpound) {
                     player.groundpound = false;
+                    photonView.RPC("EnterShell", RpcTarget.All);
+                }
+                player.bounce = true;
+            } else {
+                photonView.RPC("EnterShell", RpcTarget.All);
+                player.bounce = !player.groundpound;
             }
             player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
-            player.bounce = true;
+            player.drill = false;
         } else {
             if (shell && IsStationary) {
                 if (!holder) {
@@ -208,7 +213,7 @@ public class KoopaWalk : HoldableEntity {
                         photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
                         player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
                     } else {
-                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.runningMaxSpeed, player.groundpound);
+                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
                         player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
                         previousHolder = player;
                     }
@@ -275,7 +280,7 @@ public class KoopaWalk : HoldableEntity {
             return;
 
         stationary = crouch;
-        currentSpeed = kickSpeed + 1.5f * (Mathf.Abs(holder.body.velocity.x) / holder.runningMaxSpeed);
+        currentSpeed = kickSpeed + 1.5f * (Mathf.Abs(holder.body.velocity.x) / holder.RunningMaxSpeed);
         body.position = pos;
         if (Utils.IsTileSolidAtWorldLocation(body.position))
             transform.position = body.position = new Vector2(holder.transform.position.x, transform.position.y);

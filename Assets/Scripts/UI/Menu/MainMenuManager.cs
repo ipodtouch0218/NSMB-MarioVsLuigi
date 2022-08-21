@@ -262,7 +262,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 currentRooms.Remove(key);
             }
 
-            if (!GlobalController.Instance.authenticated) {
+            if (PhotonNetwork.AuthValues.Token == null) {
                 string id = PlayerPrefs.GetString("id", null);
                 string token = PlayerPrefs.GetString("token", null);
 
@@ -294,8 +294,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }, "");
     }
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {
-        GlobalController.Instance.authenticated = true;
-
         PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
         if (response.ContainsKey("Token"))
             PlayerPrefs.SetString("token", (string) response["Token"]);
@@ -304,7 +302,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnCustomAuthenticationFailed(string failure) {
         OpenErrorBox(failure);
-        GlobalController.Instance.authenticated = false;
     }
     public void OnConnectedToMaster() {
         JoinMainLobby();
@@ -348,15 +345,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             sender = PhotonNetwork.CurrentRoom.GetPlayer(e.Sender);
 
         switch (e.Code) {
-        case EventCode.PropertiesChanged: {
-            if ((int) e.Parameters[253] == 1)
-                Debug.Log(e.ToStringFull());
+        //case EventCode.PropertiesChanged: {
+        //    if ((int) e.Parameters[253] == 1)
+        //        Debug.Log(e.ToStringFull());
 
-            if ((int) e.Parameters[253] == 1 && PhotonNetwork.IsMasterClient && sender != null && !sender.IsMasterClient)
-                StartCoroutine(KickPlayer(sender));
+        //    if ((int) e.Parameters[253] == 1 && PhotonNetwork.IsMasterClient && sender != null && !sender.IsMasterClient)
+        //        StartCoroutine(KickPlayer(sender));
 
-            break;
-        }
+        //    break;
+        //}
         case (byte) Enums.NetEventIds.StartGame: {
 
             if (!(sender?.IsMasterClient ?? false) && e.SenderKey != 255)
@@ -457,7 +454,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
             OpenTitleScreen();
-            PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
+            //PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
+            PhotonNetwork.NetworkingClient.AppId = "40c2f241-79f7-4721-bdac-3c0366d00f58";
 
             //version separation
             Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");

@@ -165,7 +165,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTilesBlock(origin, originalTiles);
 
             foreach (GameObject coin in coins) {
-                coin.SetActive(true);
+                //dont use setactive cause it breaks animation cycles being syncewd
+                coin.GetComponent<SpriteRenderer>().enabled = true;
+                coin.GetComponent<BoxCollider2D>().enabled = true;
             }
 
             StartCoroutine(BigStarRespawn());
@@ -267,7 +269,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             int view = (int) data[0];
             bool visible = (bool) data[1];
             GameObject coin = PhotonView.Find(view).gameObject;
-            coin.SetActive(visible);
+            coin.GetComponent<SpriteRenderer>().enabled = visible;
+            coin.GetComponent<BoxCollider2D>().enabled = visible;
             break;
         }
         case (byte) Enums.NetEventIds.SpawnParticle: {
@@ -613,7 +616,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (wait)
             yield return new WaitForSecondsRealtime(10.4f - playerCount / 5f);
 
-        if (!PhotonNetwork.IsMasterClient)
+        if (!PhotonNetwork.IsMasterClient || gameover)
             yield break;
 
         bigwhile:
