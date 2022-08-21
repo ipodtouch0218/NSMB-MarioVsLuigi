@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
+
 using Photon.Pun;
 using NSMB.Utils;
 
 public class PiranhaPlantController : KillableEntity {
-    public Vector2 playerDetectSize = new(3,3);
-    public float popupTimerRequirement = 6f;
-    public float popupTimer;
+
+    [SerializeField] private float playerDetectSize = 1;
+    [SerializeField] private float popupTimerRequirement = 6f;
+
+    private float popupTimer;
     private bool upsideDown;
 
     public new void Start() {
@@ -14,17 +17,20 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public void Update() {
-        if (GameManager.Instance && GameManager.Instance.gameover) {
-            animator.enabled = false;
-            return;
-        }
+        GameManager gm = GameManager.Instance;
+        if (gm) {
+            if (gm.gameover) {
+                animator.enabled = false;
+                return;
+            }
 
-        if (GameManager.Instance && !GameManager.Instance.musicEnabled)
-            return;
+            if (!gm.musicEnabled)
+                return;
+        }
 
         left = false;
 
-        if (photonView && !dead && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
+        if (!dead && photonView && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
             photonView.RPC("Kill", RpcTarget.All);
             return;
         }
@@ -33,12 +39,17 @@ public class PiranhaPlantController : KillableEntity {
         if (dead || (photonView && !photonView.IsMine))
             return;
 
-        foreach (var hit in Physics2D.OverlapBoxAll(transform.transform.position + (Vector3) (playerDetectSize * new Vector2(0, upsideDown ? -0.5f : 0.5f)), playerDetectSize, transform.eulerAngles.z)) {
-            if (hit.transform.CompareTag("Player"))
-                return;
-        }
-
         if ((popupTimer += Time.deltaTime) >= popupTimerRequirement) {
+            if (gm) {
+                foreach (PlayerController pl in gm.players) {
+                    if (!pl)
+                        continue;
+
+                    if (Utils.WrappedDistance(transform.position, pl.transform.position) < playerDetectSize)
+                        return;
+                }
+            }
+
             animator.SetTrigger("popup");
             popupTimer = 0;
         }
@@ -83,8 +94,8 @@ public class PiranhaPlantController : KillableEntity {
         Kill();
     }
 
-    void OnDrawGizmosSelected() {
+    private void OnDrawGizmosSelected() {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(transform.position + (Vector3) (playerDetectSize * new Vector2(0, transform.eulerAngles.z != 0 ? -0.5f : 0.5f)), playerDetectSize);
+        Gizmos.DrawSphere(transform.position + (Vector3) (playerDetectSize * new Vector2(0, transform.eulerAngles.z != 0 ? -0.5f : 0.5f)), playerDetectSize);
     }
 }

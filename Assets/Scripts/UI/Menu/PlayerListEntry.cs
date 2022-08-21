@@ -1,6 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -12,10 +13,11 @@ using NSMB.Utils;
 
 public class PlayerListEntry : MonoBehaviour {
 
-    private static readonly string[] SPECIAL_PLAYERS = { "d5ba21667a5da00967cc5ebd64c0d648e554fb671637adb3d22a688157d39bf6", //nomad client
-                                                         "cf03abdb5d2ef1b6f0d30ae40303936f9ab22f387f8a1072e2849c8292470af1", //ipod client
-                                                         "3b0ddbb7cc172445b256c3b2cfee11175969fa61715eae6887c1da752cee135d", //ipod editor
-                                                       };
+    private static readonly Dictionary<string, string> SPECIAL_PLAYERS = new() {
+        ["cf03abdb5d2ef1b6f0d30ae40303936f9ab22f387f8a1072e2849c8292470af1"] = "ipodtouch0218",
+        ["d5ba21667a5da00967cc5ebd64c0d648e554fb671637adb3d22a688157d39bf6"] = "mindnomad",
+        ["95962949aacdbb42a6123732dabe9c7200ded59d7eeb39c889067bafeebecc72"] = "MPS64",
+    };
 
     public Player player;
 
@@ -28,15 +30,15 @@ public class PlayerListEntry : MonoBehaviour {
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private LayoutElement layout;
 
-    private GameObject blockerInstance;
+    [SerializeField] private GameObject[] adminOnlyOptions;
 
+    private GameObject blockerInstance;
     private bool checkedHash;
-    private float color;
 
     public void Update() {
-        color += Time.deltaTime * 0.05f;
-        color %= 1;
-        nameText.color = Color.HSVToRGB(color, 1, 1);
+        double time = PhotonNetwork.Time * 0.1;
+        time %= 1;
+        nameText.color = Color.HSVToRGB((float) time, 1, 1);
     }
 
     public void UpdateText() {
@@ -49,8 +51,9 @@ public class PlayerListEntry : MonoBehaviour {
             foreach (byte b in bytes)
                 sb.Append(b.ToString("X2"));
 
-            //if (SPECIAL_PLAYERS.Contains(sb.ToString().ToLower()))
-                //enabled = true;
+            string hash = sb.ToString().ToLower();
+            if (SPECIAL_PLAYERS.ContainsKey(hash) && player.NickName == SPECIAL_PLAYERS[hash])
+                enabled = true;
         }
 
         string permissionSymbol = "";
@@ -75,7 +78,7 @@ public class PlayerListEntry : MonoBehaviour {
             pingColor = "red";
         }
 
-        nameText.text = permissionSymbol + characterSymbol + player.NickName.Filter();
+        nameText.text = permissionSymbol + characterSymbol + player.GetUniqueNickname();
         pingText.text = $"<color={pingColor}>{ping}";
 
         Transform parent = transform.parent;
@@ -95,8 +98,12 @@ public class PlayerListEntry : MonoBehaviour {
         if (blockerInstance)
             Destroy(blockerInstance);
 
-        if (!PhotonNetwork.IsMasterClient || player.IsMasterClient)
-            return;
+        bool admin = PhotonNetwork.IsMasterClient && !player.IsMasterClient;
+        foreach (GameObject option in adminOnlyOptions) {
+            option.SetActive(admin);
+        }
+
+        Canvas.ForceUpdateCanvases();
 
         blockerInstance = Instantiate(blockerTemplate, rootCanvas.transform);
         RectTransform blockerTransform = blockerInstance.GetComponent<RectTransform>();
@@ -136,6 +143,14 @@ public class PlayerListEntry : MonoBehaviour {
 
     public void PromotePlayer() {
         MainMenuManager.Instance.Promote(player);
+        HideDropdown(true);
+    }
+
+    public void CopyPlayerId() {
+        TextEditor te = new();
+        te.text = player.UserId;
+        te.SelectAll();
+        te.Copy();
         HideDropdown(true);
     }
 }

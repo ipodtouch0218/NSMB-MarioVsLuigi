@@ -1,10 +1,13 @@
+using System.Collections;
 using UnityEngine;
+
 using Photon.Pun;
 
 public class RespawnParticle : MonoBehaviour {
 
-    [SerializeField] float respawnTimer = 1.5f;
     public PlayerController player;
+
+    [SerializeField] private float respawnTimer = 1.5f;
 
     public void Start() {
         foreach (ParticleSystem system in GetComponentsInChildren<ParticleSystem>()) {
@@ -13,13 +16,15 @@ public class RespawnParticle : MonoBehaviour {
 
             system.Play();
         }
+
+        // null propagation should be ok
+        if (player?.photonView.IsMine ?? false) {
+            StartCoroutine(RespawnRoutine());
+        }
     }
 
-    public void Update() {
-        if (!player || !player.photonView.IsMine) 
-            return;
-
-        if (respawnTimer > 0 && (respawnTimer -= Time.deltaTime) <= 0)
-            player.photonView.RPC("Respawn", RpcTarget.All);
+    private IEnumerator RespawnRoutine() {
+        yield return new WaitForSeconds(respawnTimer);
+        player.photonView.RPC("Respawn", RpcTarget.All);
     }
 }

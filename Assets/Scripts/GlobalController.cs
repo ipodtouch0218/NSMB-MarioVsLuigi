@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,7 +10,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
 
-public class GlobalController : Singleton<GlobalController> {
+public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, ILobbyCallbacks {
 
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
 
@@ -36,6 +37,8 @@ public class GlobalController : Singleton<GlobalController> {
         Instance = this;
         settings = GetComponent<Settings>();
         DiscordController = GetComponent<DiscordController>();
+
+        PhotonNetwork.AddCallbackTarget(this);
     }
 
     [Obsolete]
@@ -139,4 +142,29 @@ public class GlobalController : Singleton<GlobalController> {
 #endif
     }
 
+    public void OnPlayerEnteredRoom(Player newPlayer) {
+        NetworkUtils.nicknameCache.Remove(newPlayer.UserId);
+    }
+
+    public void OnPlayerLeftRoom(Player otherPlayer) {
+        NetworkUtils.nicknameCache.Remove(otherPlayer.UserId);
+    }
+
+    public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) { }
+
+    public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) { }
+
+    public void OnMasterClientSwitched(Player newMasterClient) { }
+
+    public void OnJoinedLobby() {
+        NetworkUtils.nicknameCache.Clear();
+    }
+
+    public void OnLeftLobby() {
+        NetworkUtils.nicknameCache.Clear();
+    }
+
+    public void OnRoomListUpdate(List<RoomInfo> roomList) { }
+
+    public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics) { }
 }

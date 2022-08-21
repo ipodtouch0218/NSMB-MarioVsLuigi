@@ -67,15 +67,16 @@ MonoBehaviour:
   hitbox: {fileID: 0}
   holder: {fileID: 0}
   previousHolder: {fileID: 0}
-  holderOffset: {x: 0, y: 0, z: 0}
+  holderOffset: {x: 0, y: -0.2, z: 0}
   canPlace: 1
+  explosionPrefab: {fileID: 1681235843256999355, guid: a89a150bbd7d5d74aa28f02a5d5a0dfb,
+    type: 3}
   walkSpeed: 0.6
-  kickSpeed: 5
-  detonateTimer: 4
+  kickSpeed: 4.5
+  detonationTime: 4
+  explosionTileSize: 2
   lit: 0
   detonated: 0
-  explosion: {fileID: 1681235843256999355, guid: a89a150bbd7d5d74aa28f02a5d5a0dfb,
-    type: 3}
 --- !u!212 &3286581577125373961
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -253,10 +254,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 3286581577125373960}
   audioSources:
   - {fileID: -3689537593968581114}
+  soundOrigin: {fileID: 3286581577125373960}
+  soundRange: 12
 --- !u!82 &-3689537593968581114
 AudioSource:
   m_ObjectHideFlags: 0
@@ -401,6 +402,7 @@ MonoBehaviour:
   serializableViews:
   - {fileID: 6513581928866091161}
   - {fileID: 746595948144697788}
+  - {fileID: 3286581577125373967}
 --- !u!114 &6513581928866091161
 MonoBehaviour:
   m_ObjectHideFlags: 0

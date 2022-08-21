@@ -104,9 +104,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1062070206634343210}
+  - component: {fileID: 9006241837872920554}
   - component: {fileID: 5419776802840818205}
   - component: {fileID: 5736572734822788709}
-  - component: {fileID: 9006241837872920554}
   m_Layer: 0
   m_Name: spin_obj
   m_TagString: spinner
@@ -129,6 +129,22 @@ Transform:
   m_Father: {fileID: 7020551328166419880}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9006241837872920554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7253224997873802793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa5979d0e1adc55409bf911b004d25ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idleSpinSpeed: {x: 0, y: -100, z: 0}
+  fastSpinSpeed: {x: 0, y: -1800, z: 0}
+  topArmBone: {fileID: 5801919727347960438}
+  playerCollider: {fileID: 0}
 --- !u!137 &5419776802840818205
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
@@ -214,22 +230,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.96, y: 0.6090225}
   m_EdgeRadius: 0
---- !u!114 &9006241837872920554
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7253224997873802793}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa5979d0e1adc55409bf911b004d25ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleSpinSpeed: {x: 0, y: -100, z: 0}
-  fastSpinSpeed: {x: 0, y: -1800, z: 0}
-  topArmBone: {fileID: 5801919727347960438}
-  playerCollider: {fileID: 0}
 --- !u!1 &7648751058351671058
 GameObject:
   m_ObjectHideFlags: 0

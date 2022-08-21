@@ -1,14 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
 using NSMB.Utils;
 
 public class UserNametag : MonoBehaviour {
 
     [SerializeField] private Camera cam;
-    public GameObject nametag;
-    public TMP_Text text;
-    public Image arrow;
+    [SerializeField] private GameObject nametag;
+    [SerializeField] private TMP_Text text;
+    [SerializeField] private Image arrow;
+
     public PlayerController parent;
 
     public void LateUpdate() {
@@ -51,7 +53,7 @@ public class UserNametag : MonoBehaviour {
         }
         transform.position = screenPoint;
 
-        text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.NickName.Filter();
+        text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.GetUniqueNickname();
 
         text.text += "\n";
         if (parent.lives >= 0)

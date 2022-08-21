@@ -39,8 +39,8 @@ public class CameraController : MonoBehaviour {
                 shakeOffset = Vector3.zero;
 
             targetCamera.transform.position = currentPosition + shakeOffset;
-            if (BackgroundLoop.instance)
-                BackgroundLoop.instance.Reposition();
+            if (BackgroundLoop.Instance)
+                BackgroundLoop.Instance.Reposition();
 
             secondaryPositioners.RemoveAll(scp => scp == null);
             secondaryPositioners.ForEach(scp => scp.UpdatePosition());
@@ -86,7 +86,7 @@ public class CameraController : MonoBehaviour {
             xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
             right = currentPosition.x > playerPos.x;
             if (controlCamera)
-                BackgroundLoop.instance.wrap = true;
+                BackgroundLoop.Instance.wrap = true;
         }
 
         if (xDifference > 0.25f)

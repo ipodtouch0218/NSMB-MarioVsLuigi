@@ -19,14 +19,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private Vector2 previousJoystick;
     private short previousFlags;
     private byte previousFlags2;
-    private float lastSendTimestamp;
+    private double lastSendTimestamp;
 
     // == MONOBEHAVIOURS ==
 
     public int playerId = -1;
     public bool dead = false, spawned = false;
     public Enums.PowerupState state = Enums.PowerupState.Small, previousState;
-    public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, walkingAcceleration = 8f, runningAcceleration = 3f, walkingMaxSpeed = 2.7f, runningMaxSpeed = 5, wallslideSpeed = -4.25f, walljumpVelocity = 5.6f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
+    public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, wallslideSpeed = -4.25f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
     public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, propellerDrillBuffer, heightSmallModel = 0.42f, heightLargeModel = 0.82f;
 
     BoxCollider2D[] hitboxes;
@@ -41,9 +41,53 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public PlayerAnimationController AnimationController { get; private set; }
 
-    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, iceSliding, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, groundpounded, canShootProjectile;
+    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, canShootProjectile;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, fireballTimer;
     public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer, slowdownTimer;
+
+    //MOVEMENT STAGES
+    private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
+    private static readonly float[] SPEED_STAGE_MAX = { 0.9375f, 2.8125f, 4.21875f, 5.625f, 8.4375f };
+    private static readonly float[] SPEED_STAGE_ACC = { 0.131835975f, 0.06591802875f, 0.05859375f, 0.0439453125f, 1.40625f };
+    private static readonly float[] WALK_TURNAROUND_ACC = { 0.0659179686f, 0.146484375f, 0.234375f };
+    private static readonly float BUTTON_RELEASE_DEC = 0.0659179686f;
+    private static readonly float SKIDDING_THRESHOLD = 4.6875f;
+    private static readonly float SKIDDING_DEC = 0.17578125f;
+
+    private static readonly float WALLJUMP_HSPEED = 4.21874f;
+    private static readonly float WALLJUMP_VSPEED = 6.4453125f;
+
+    private static readonly float[] SPEED_STAGE_SPINNER_MAX = { 1.12060546875f, 2.8125f };
+    private static readonly float[] SPEED_STAGE_SPINNER_ACC = { 0.1318359375f, 0.06591796875f };
+    private static readonly float WALK_TURNAROUND_SPINNER_ACC = 0.1318359375f;
+
+    private static readonly float[] SPEED_STAGE_MEGA_ACC = { 0.46875f, 0.0805664061f, 0.0805664061f, 0.0805664061f, 0.0805664061f };
+    private static readonly float[] WALK_TURNAROUND_MEGA_ACC = { 0.0769042968f, 0.17578125f, 0.3515625f };
+
+    private static readonly float TURNAROUND_THRESHOLD = 2.8125f;
+    private static readonly float TURNAROUND_ACC = 0.46875f;
+    private float turnaroundFrames;
+    private int turnaroundBoostFrames;
+
+    private static readonly float[] BUTTON_RELEASE_ICE_DEC = { 0.00732421875f, 0.02471923828125f, 0.02471923828125f, 0.02471923828125f, 0.02471923828125f };
+    private static readonly float SKIDDING_ICE_DEC = 0.06591796875f;
+    private static readonly float WALK_TURNAROUND_ICE_ACC = 0.0439453125f;
+
+
+    public float RunningMaxSpeed => SPEED_STAGE_MAX[RUN_STAGE];
+    public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
+
+    private int MovementStage {
+        get {
+            float xVel = Mathf.Abs(body.velocity.x);
+            float[] arr = flying ? SPEED_STAGE_SPINNER_MAX : SPEED_STAGE_MAX;
+            for (int i = 0; i < arr.Length; i++) {
+                if (xVel <= arr[i])
+                    return i;
+            }
+            return arr.Length - 1;
+        }
+    }
 
     //Walljumping variables
     private float wallSlideTimer, wallJumpTimer;
@@ -73,11 +117,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
-    public bool doIceSkidding;
-    private float tileFriction = 1;
-    private readonly HashSet<Vector3Int> tilesStandingOn = new(),
-        tilesJumpedInto = new(),
-        tilesHitSide = new();
+    public bool onIce;
+    private readonly List<Vector3Int> tilesStandingOn = new(), tilesJumpedInto = new(), tilesHitSide = new();
 
     private GameObject trackIcon;
 
@@ -100,7 +141,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #endregion
 
-    #region -- SERIALIZATION / EVENTS --
+    #region Pun Serialization
     public void Serialize(List<byte> buffer) {
         bool updateJoystick = Vector2.Distance(joystick, previousJoystick) > EPSILON;
 
@@ -123,7 +164,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //SerializationUtils.WriteByte(buffer, flags2);
             //previousFlags2 = flags2;
 
-            lastSendTimestamp = (float) PhotonNetwork.Time;
+            lastSendTimestamp = PhotonNetwork.Time;
         }
     }
 
@@ -164,7 +205,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #endregion
 
-    #region -- START / UPDATE --
+    #region Unity Methods
     public void Awake() {
         cameraController = GetComponent<CameraController>();
         cameraController.controlCamera = photonView.IsMineOrLocal();
@@ -183,6 +224,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         starDirection = Random.Range(0, 4);
 
         int count = 0;
+
         foreach (var player in PhotonNetwork.PlayerList) {
 
             Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, photonView.Owner.CustomProperties);
@@ -199,6 +241,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (photonView.IsMine) {
             InputSystem.controls.Player.Movement.performed += OnMovement;
+            InputSystem.controls.Player.Movement.canceled += OnMovement;
             InputSystem.controls.Player.Jump.performed += OnJump;
             InputSystem.controls.Player.Sprint.started += OnSprint;
             InputSystem.controls.Player.Sprint.canceled += OnSprint;
@@ -206,11 +249,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
         }
 
-        GameManager.Instance.allPlayers.Add(this);
+        GameManager.Instance.players.Add(this);
     }
 
     public void OnPreNetDestroy(PhotonView rootView) {
-        GameManager.Instance.allPlayers.Remove(this);
+        GameManager.Instance.players.Remove(this);
     }
 
     public void Start() {
@@ -227,6 +270,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         InputSystem.controls.Player.Movement.performed -= OnMovement;
+        InputSystem.controls.Player.Movement.canceled -= OnMovement;
         InputSystem.controls.Player.Jump.performed -= OnJump;
         InputSystem.controls.Player.Sprint.started -= OnSprint;
         InputSystem.controls.Player.Sprint.canceled -= OnSprint;
@@ -235,7 +279,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void OnGameStart() {
-        photonView.RPC("PreRespawn", RpcTarget.All);
+        photonView.RPC(nameof(PreRespawn), RpcTarget.All);
 
         gameState = new() {
             [Enums.NetPlayerProperties.GameState] = new Hashtable()
@@ -375,8 +419,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         hitRoof = !ignoreRoof && up > 1;
     }
     void HandleTileProperties() {
-        doIceSkidding = false;
-        tileFriction = -1;
+        onIce = false;
         footstepSound = Enums.Sounds.Player_Walk_Grass;
         foreach (Vector3Int pos in tilesStandingOn) {
             TileBase tile = Utils.GetTileAtTileLocation(pos);
@@ -384,14 +427,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 continue;
             if (tile is TileWithProperties propTile) {
                 footstepSound = propTile.footstepSound;
-                doIceSkidding = propTile.iceSkidding;
-                tileFriction = Mathf.Max(tileFriction, propTile.frictionFactor);
-            } else {
-                tileFriction = 1;
+                onIce = propTile.iceSkidding;
             }
         }
-        if (tileFriction == -1)
-            tileFriction = 1;
     }
 
     private ContactPoint2D[] contacts = new ContactPoint2D[0];
@@ -424,8 +462,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     //They are invincible. let them decide if they've hit us.
                     if (invincible > 0) {
                         //oh, we both are. bonk.
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
-                        other.photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, true, photonView.ViewID);
+                        photonView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
+                        other.photonView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
                     }
                     return;
                 }
@@ -434,11 +472,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     //we are invincible. murder time :)
                     if (other.state == Enums.PowerupState.MegaMushroom) {
                         //wait fuck-
-                        photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
+                        photonView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
                         return;
                     }
 
-                    otherView.RPC("Powerdown", RpcTarget.All, false);
+                    otherView.RPC(nameof(Powerdown), RpcTarget.All, false);
                     body.velocity = previousFrameVelocity;
                     return;
                 }
@@ -455,14 +493,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                             bounce = true;
                             groundpound = false;
                             drill = false;
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, false, photonView.ViewID);
+                            photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
                         } else if (!otherAbove) {
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, true, photonView.ViewID);
-                            photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
+                            otherView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x < body.position.x, 0, true, photonView.ViewID);
+                            photonView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x > body.position.x, 0, true, otherView.ViewID);
                         }
                     } else if (state == Enums.PowerupState.MegaMushroom) {
                         //only we are giant
-                        otherView.RPC("Powerdown", RpcTarget.All, false);
+                        otherView.RPC(nameof(Powerdown), RpcTarget.All, false);
                         body.velocity = previousFrameVelocity;
                     }
                     return;
@@ -475,10 +513,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                         //hit them. powerdown them
                         if (other.inShell) {
                             //collide with both
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
-                            photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
+                            otherView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
+                            photonView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
                         } else {
-                            otherView.RPC("Powerdown", RpcTarget.All, false);
+                            otherView.RPC(nameof(Powerdown), RpcTarget.All, false);
                         }
                         float dotRight = Vector2.Dot((body.position - other.body.position).normalized, Vector2.right);
                         facingRight = dotRight > 0;
@@ -486,7 +524,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     }
                 }
                 if (state == Enums.PowerupState.BlueShell && otherAbove && (!other.groundpound && !other.drill) && (crouching || groundpound)) {
-                    body.velocity = new(runningMaxSpeed * 0.9f * (otherObj.transform.position.x < body.position.x ? 1 : -1), body.velocity.y);
+                    body.velocity = new(SPEED_STAGE_MAX[RUN_STAGE] * 0.9f * (otherObj.transform.position.x < body.position.x ? 1 : -1), body.velocity.y);
                 }
                 if (other.inShell && !above)
                     return;
@@ -494,7 +532,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 if (!above && other.state == Enums.PowerupState.BlueShell && !other.inShell && other.crouching && !groundpound && !drill) {
                     //they are blue shell
                     bounce = true;
-                    photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+                    photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
                     return;
                 }
 
@@ -506,31 +544,31 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     if (state == Enums.PowerupState.MiniMushroom && other.state != Enums.PowerupState.MiniMushroom) {
                         //we are mini, they arent. special rules.
                         if (groundpounded) {
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, false, photonView.ViewID);
+                            otherView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, false, photonView.ViewID);
                             groundpound = false;
                             bounce = true;
                         } else {
-                            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+                            photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
                         }
                     } else if (other.state == Enums.PowerupState.MiniMushroom && groundpounded) {
                         //we are big, groundpounding a mini opponent. squish.
-                        otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 3, false, photonView.ViewID);
+                        otherView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x > body.position.x, 3, false, photonView.ViewID);
                         bounce = false;
                     } else {
                         if (other.state == Enums.PowerupState.MiniMushroom && groundpounded) {
-                            otherView.RPC("Powerdown", RpcTarget.All, false);
+                            otherView.RPC(nameof(Powerdown), RpcTarget.All, false);
                         } else {
-                            otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, groundpounded ? 3 : 1, false, photonView.ViewID);
+                            otherView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x < body.position.x, groundpounded ? 3 : 1, false, photonView.ViewID);
                         }
                     }
                     body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);
 
                     return;
-                } else if (!knockback && !other.knockback && !otherAbove && onGround && other.onGround && (Mathf.Abs(previousFrameVelocity.x) > walkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > walkingMaxSpeed)) {
+                } else if (!knockback && !other.knockback && !otherAbove && onGround && other.onGround && (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed)) {
                     //bump
 
-                    otherView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
-                    photonView.RPC("Knockback", RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
+                    otherView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x < body.position.x, 1, true, photonView.ViewID);
+                    photonView.RPC(nameof(Knockback), RpcTarget.All, otherObj.transform.position.x > body.position.x, 1, true, otherView.ViewID);
                 }
             }
             break;
@@ -551,7 +589,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 avg += point;
             avg /= points.Count;
 
-            obj.GetPhotonView().RPC("Bump", RpcTarget.All, photonView.ViewID, avg);
+            obj.GetPhotonView().RPC(nameof(MarioBrosPlatform.Bump), RpcTarget.All, photonView.ViewID, avg);
             break;
         }
         case "frozencube": {
@@ -585,7 +623,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (fireball.photonView.IsMine || hitInvincibilityCounter > 0)
                 return;
 
-            fireball.photonView.RPC("Kill", RpcTarget.All);
+            fireball.photonView.RPC(nameof(KillableEntity.Kill), RpcTarget.All);
 
             if (knockback || invincible > 0 || state == Enums.PowerupState.MegaMushroom)
                 return;
@@ -599,12 +637,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
 
             if (state == Enums.PowerupState.MiniMushroom) {
-                photonView.RPC("Powerdown", RpcTarget.All, false);
+                photonView.RPC(nameof(Powerdown), RpcTarget.All, false);
                 return;
             }
 
             if (!fireball.isIceball) {
-                photonView.RPC("Knockback", RpcTarget.All, fireball.left, 1, true, fireball.photonView.ViewID);
+                photonView.RPC(nameof(Knockback), RpcTarget.All, fireball.left, 1, true, fireball.photonView.ViewID);
             } else {
                 if (!Frozen && !frozenObject && !pipeEntering) {
                     GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position, Quaternion.identity, 0, new object[] { photonView.ViewID });
@@ -618,7 +656,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         case "poison": {
             if (!photonView.IsMine)
                 return;
-            photonView.RPC("Death", RpcTarget.All, false, obj.CompareTag("lava"));
+            photonView.RPC(nameof(Death), RpcTarget.All, false, obj.CompareTag("lava"));
             return;
         }
         }
@@ -648,22 +686,22 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (powerup.followMeCounter > 0 || powerup.ignoreCounter > 0)
                 break;
 
-            photonView.RPC("AttemptCollectPowerup", RpcTarget.AllViaServer, powerup.photonView.ViewID);
+            photonView.RPC(nameof(AttemptCollectPowerup), RpcTarget.AllViaServer, powerup.photonView.ViewID);
             Destroy(collider);
             break;
         }
         case "bigstar": {
             Transform parent = obj.transform.parent;
-            photonView.RPC("AttemptCollectBigStar", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID);
+            photonView.RPC(nameof(AttemptCollectBigStar), RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID);
             break;
         }
         case "loosecoin": {
             Transform parent = obj.transform.parent;
-            photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
+            photonView.RPC(nameof(AttemptCollectCoin), RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
             break;
         }
         case "coin": {
-            photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector2(obj.transform.position.x, collider.transform.position.y));
+            photonView.RPC(nameof(AttemptCollectCoin), RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector2(obj.transform.position.x, collider.transform.position.y));
             break;
         }
         }
@@ -677,14 +715,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- CONTROLLER FUNCTIONS --
     public void OnMovement(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         joystick = context.ReadValue<Vector2>();
     }
 
     public void OnJump(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         jumpHeld = context.ReadValue<float>() >= 0.5f;
@@ -693,7 +731,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void OnSprint(InputAction.CallbackContext context) {
-        if (!photonView.IsMine || GameManager.Instance.paused)
+        if (!photonView.IsMine)
             return;
 
         running = context.started;
@@ -708,6 +746,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void OnPowerupAction(InputAction.CallbackContext context) {
         if (!photonView.IsMine || dead || GameManager.Instance.paused)
             return;
+
         powerupButtonHeld = context.ReadValue<float>() >= 0.5f;
         if (!powerupButtonHeld)
             return;
@@ -749,20 +788,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             Vector2 pos = body.position + new Vector2(facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.3f);
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
-                photonView.RPC("SpawnParticle", RpcTarget.All, $"Prefabs/Particle/{projectile}Wall", pos);
+                photonView.RPC(nameof(SpawnParticle), RpcTarget.All, $"Prefabs/Particle/{projectile}Wall", pos);
             } else {
                 PhotonNetwork.Instantiate($"Prefabs/{projectile}", pos, Quaternion.identity, 0, new object[] { !facingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround"), body.velocity.x });
             }
-            photonView.RPC("PlaySound", RpcTarget.All, sound);
+            photonView.RPC(nameof(PlaySound), RpcTarget.All, sound);
 
             animator.SetTrigger("fireball");
+            wallJumpTimer = 0;
             break;
         }
         case Enums.PowerupState.PropellerMushroom: {
             if (groundpound || (flying && drill) || propeller || crouching || sliding || wallJumpTimer > 0)
                 return;
 
-            photonView.RPC("StartPropeller", RpcTarget.All);
+            photonView.RPC(nameof(StartPropeller), RpcTarget.All);
             break;
         }
         }
@@ -806,7 +846,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
 
-        photonView.RPC("SpawnReserveItem", RpcTarget.All);
+        photonView.RPC(nameof(SpawnReserveItem), RpcTarget.All);
         storedPowerup = null;
 
         UpdateGameState();
@@ -828,13 +868,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!view || view.gameObject.GetComponent<MovingPowerup>() is not MovingPowerup powerup)
             return;
 
+        if (Utils.WrappedDistance(body.position, view.transform.position) > 5f && powerup.powerupScriptable.state != Enums.PowerupState.PropellerMushroom)
+            return;
+
         if (powerup.Collected || powerup.followMeCounter > 0)
             return;
 
         powerup.Collected = true;
 
         //we can collect
-        photonView.RPC("Powerup", RpcTarget.All, powerupID);
+        photonView.RPC(nameof(Powerup), RpcTarget.All, powerupID);
     }
 
     [PunRPC]
@@ -883,7 +926,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PlaySound(powerup.soundEffect);
 
             if (holding && photonView.IsMine) {
-                holding.photonView.RPC("SpecialKill", RpcTarget.All, facingRight, false, 0);
+                holding.photonView.RPC(nameof(KillableEntity.SpecialKill), RpcTarget.All, facingRight, false, 0);
                 holding = null;
             }
 
@@ -955,7 +998,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         case Enums.PowerupState.MiniMushroom:
         case Enums.PowerupState.Small: {
             if (photonView.IsMine)
-                photonView.RPC("Death", RpcTarget.All, false, false);
+                photonView.RPC(nameof(Death), RpcTarget.All, false, false);
             nowDead = true;
             break;
         }
@@ -1046,18 +1089,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         //star doesn't eixst?
-        PhotonView view = PhotonView.Find(starID);
-        if (!view)
+        PhotonView star = PhotonView.Find(starID);
+        if (!star)
             return;
 
-        StarBouncer starScript = view.gameObject.GetComponent<StarBouncer>();
+        if (Utils.WrappedDistance(body.position, star.transform.position) > 5f)
+            return;
+
+        StarBouncer starScript = star.gameObject.GetComponent<StarBouncer>();
         if (!starScript.Collectable || starScript.Collected)
             return;
 
         starScript.Collected = true;
 
         //we can collect
-        photonView.RPC("CollectBigStar", RpcTarget.All, (Vector2) starScript.transform.position, starID);
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) starScript.transform.position, starID);
         if (starScript.stationary)
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
@@ -1099,11 +1145,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (coinID != -1) {
             PhotonView coin = PhotonView.Find(coinID);
-            if (!coin)
-                return;
-
-            //coins should ALWAYS be controlled by the host
-            if (!coin.IsMine || !coin.GetComponent<SpriteRenderer>().enabled)
+            if (!coin || !coin.IsMine || !coin.gameObject.activeInHierarchy)
                 return;
 
             if (coin.GetComponent<LooseCoin>() is LooseCoin lc) {
@@ -1114,27 +1156,22 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         }
 
-        photonView.RPC("CollectCoin", RpcTarget.All, coinID, particle);
+        photonView.RPC(nameof(CollectCoin), RpcTarget.All, coinID, particle);
     }
 
     [PunRPC]
     protected void CollectCoin(int coinID, Vector2 position, PhotonMessageInfo info) {
         //only trust the master client
-        if (!info.Sender.IsMasterClient)
+        if (!info.Sender.IsLocal && !info.Sender.IsMasterClient)
             return;
 
         PhotonView coin = PhotonView.Find(coinID);
         if (coin) {
-            if (coin.CompareTag("loosecoin")) {
+            coin.GetComponent<SpriteRenderer>().enabled = false;
+            coin.GetComponent<BoxCollider2D>().enabled = false;
+            if (coin.CompareTag("loosecoin") && coin.IsMine) {
                 //loose coin, just destroy
-                if (coin.IsMine) {
-                    PhotonNetwork.Destroy(coin);
-                }
-                Destroy(coin.gameObject);
-            } else {
-                //floating coin, just disable collision + graphic
-                coin.GetComponent<SpriteRenderer>().enabled = false;
-                coin.GetComponent<BoxCollider2D>().enabled = false;
+                PhotonNetwork.Destroy(coin);
             }
         }
 
@@ -1164,7 +1201,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         string prefab = storedPowerup.prefab;
         PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
+        photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
         storedPowerup = null;
         UpdateGameState();
     }
@@ -1178,7 +1215,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         string prefab = Utils.GetRandomItem(this).prefab;
         PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
+        photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
 
         coins = 0;
     }
@@ -1251,11 +1288,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
         PlaySound(Enums.Sounds.Player_Sound_Death);
-        SpawnStars(groundpounded ? 3 : 1, deathplane);
+        SpawnStars(1, deathplane);
         body.isKinematic = false;
-        groundpounded = false;
         if (holding) {
-            holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
+            holding.photonView.RPC(nameof(HoldableEntity.Throw), RpcTarget.All, !facingRight, true, body.position);
             holding = null;
         }
         holdingOld = null;
@@ -1275,6 +1311,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 PhotonNetwork.Destroy(photonView);
                 GameManager.Instance.SpectationManager.Spectating = true;
             }
+            Destroy(gameObject);
             return;
         }
         transform.localScale = Vector2.one;
@@ -1300,7 +1337,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
 
     [PunRPC]
-    public void Respawn(PhotonMessageInfo info) {
+    public void Respawn() {
 
         gameObject.SetActive(true);
         dead = false;
@@ -1392,7 +1429,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     protected void Footstep() {
         if (state == Enums.PowerupState.MegaMushroom)
             return;
-        if (doIceSkidding && skidding) {
+
+        bool right = joystick.x > analogDeadzone;
+        bool left = joystick.x < -analogDeadzone;
+        bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == Mathf.Sign(body.velocity.x));
+        if (onIce && (left ^ right) && reverse) {
             PlaySound(Enums.Sounds.World_Ice_Skidding);
             return;
         }
@@ -1400,10 +1441,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Kick);
             return;
         }
-        if (Mathf.Abs(body.velocity.x) < walkingMaxSpeed)
+        if (Mathf.Abs(body.velocity.x) < WalkingMaxSpeed)
             return;
 
-        PlaySound(footstepSound, (byte) (step ? 1 : 2), Mathf.Abs(body.velocity.x) / (runningMaxSpeed + 4));
+        PlaySound(footstepSound, (byte) (step ? 1 : 2), Mathf.Abs(body.velocity.x) / (RunningMaxSpeed + 4));
         step = !step;
     }
     #endregion
@@ -1507,9 +1548,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!GameManager.Instance.started || hitInvincibilityCounter > 0 || pipeEntering || Frozen || dead || giantStartTimer > 0 || giantEndTimer > 0)
             return;
 
-        if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1 && photonView.IsMineOrLocal()) {
-            groundpounded = true;
-            photonView.RPC("Powerdown", RpcTarget.All, false);
+        if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
+            SpawnStars(2, false);
+            Powerdown(false);
             return;
         }
 
@@ -1540,7 +1581,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             3 *
             (starsToDrop + 1) *
             megaVelo *
-            (fireball ? 0.7f : 1f),
+            (fireball ? 0.35f : 1f),
 
             fireball ? 0 : 4
         );
@@ -1567,7 +1608,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public void ResetKnockbackFromAnim() {
         if (photonView.IsMine)
-            photonView.RPC("ResetKnockback", RpcTarget.All);
+            photonView.RPC(nameof(ResetKnockback), RpcTarget.All);
     }
 
     [PunRPC]
@@ -1661,9 +1702,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             float angleDeg = floorAngle * Mathf.Deg2Rad;
 
             bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
-            float speed = Time.fixedDeltaTime * 5f * (uphill ? Mathf.Clamp01(1f - (Mathf.Abs(body.velocity.x) / runningMaxSpeed)) : 4f);
+            float speed = Time.fixedDeltaTime * 5f * (uphill ? Mathf.Clamp01(1f - (Mathf.Abs(body.velocity.x) / RunningMaxSpeed)) : 4f);
 
-            float newX = Mathf.Clamp(body.velocity.x - (Mathf.Sin(angleDeg) * speed), -(runningMaxSpeed * 1.3f), runningMaxSpeed * 1.3f);
+            float newX = Mathf.Clamp(body.velocity.x - (Mathf.Sin(angleDeg) * speed), -(RunningMaxSpeed * 1.3f), RunningMaxSpeed * 1.3f);
             float newY = Mathf.Sin(angleDeg) * newX + 0.4f;
             body.velocity = new Vector2(newX, newY);
 
@@ -1824,7 +1865,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         crouching = ((onGround && crouchInput && !groundpound) || (!onGround && crouchInput && crouching) || (crouching && ForceCrouchCheck())) && !holding;
         if (crouching && !prevCrouchState) {
             //crouch start sound
-            photonView.RPC("PlaySound", RpcTarget.All, state == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
+            photonView.RPC(nameof(PlaySound), RpcTarget.All, state == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
         }
     }
 
@@ -1876,17 +1917,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
                 hitRight = false;
                 hitLeft = false;
-                body.velocity = new Vector2(runningMaxSpeed * (3 / 4f) * (wallSlideLeft ? 1 : -1), walljumpVelocity);
+                body.velocity = new Vector2(WALLJUMP_HSPEED * (wallSlideLeft ? 1 : -1), WALLJUMP_VSPEED);
                 singlejump = false;
                 doublejump = false;
                 triplejump = false;
                 onGround = false;
                 bounce = false;
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_WallJump);
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_WallJump, (byte) Random.Range(1, 3));
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_WallJump);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Voice_WallJump, (byte) Random.Range(1, 3));
 
                 Vector2 offset = new(MainHitbox.size.x / 2f * (wallSlideLeft ? -1 : 1), MainHitbox.size.y / 2f);
-                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Vector3.zero : Vector3.up * 180);
+                photonView.RPC(nameof(SpawnParticle), RpcTarget.All, "Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Vector3.zero : Vector3.up * 180);
 
                 wallJumpTimer = 16 / 60f;
                 animator.SetTrigger("walljump");
@@ -1956,10 +1997,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (knockback || drill || (state == Enums.PowerupState.MegaMushroom && singlejump))
             return;
 
-        bool topSpeed = Mathf.Abs(body.velocity.x) + 0.5f > (runningMaxSpeed * (invincible > 0 ? 1.5F : 1));
+        bool topSpeed = Mathf.Abs(body.velocity.x) >= RunningMaxSpeed;
         if (bounce || (jump && (onGround || (koyoteTime < 0.07f && !propeller)) && !startedSliding)) {
 
-            bool canSpecialJump = (jump || (bounce && jumpHeld)) && properJump && !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && invincible <= 0 && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
+            bool canSpecialJump = (jump || (bounce && jumpHeld)) && properJump && !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
             float jumpBoost = 0;
 
             koyoteTime = 1;
@@ -1977,8 +2018,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             propeller &= bounce;
 
             if (!bounce && onSpinner && !holding) {
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_SpinnerLaunch);
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Spinner_Launch);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Voice_SpinnerLaunch);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Spinner_Launch);
                 body.velocity = new Vector2(body.velocity.x, launchVelocity);
                 flying = true;
                 onGround = false;
@@ -1992,7 +2033,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             float vel = state switch {
                 Enums.PowerupState.MegaMushroom => megaJumpVelocity,
-                _ => jumpVelocity + Mathf.Abs(body.velocity.x) / runningMaxSpeed * 1.05f,
+                _ => jumpVelocity + Mathf.Abs(body.velocity.x) / RunningMaxSpeed * 1.05f,
             };
 
 
@@ -2001,14 +2042,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 singlejump = false;
                 doublejump = true;
                 triplejump = false;
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_DoubleJump, (byte) Random.Range(1, 3));
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Voice_DoubleJump, (byte) Random.Range(1, 3));
             } else if (canSpecialJump && doublejump) {
                 //Triple Jump
                 singlejump = false;
                 doublejump = false;
                 triplejump = true;
                 jumpBoost = 0.5f;
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Voice_TripleJump);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Voice_TripleJump);
             } else {
                 //Normal jump
                 singlejump = true;
@@ -2030,7 +2071,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     Enums.PowerupState.MegaMushroom => Enums.Sounds.Powerup_MegaMushroom_Jump,
                     _ => Enums.Sounds.Player_Sound_Jump,
                 };
-                photonView.RPC("PlaySound", RpcTarget.All, sound);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, sound);
             }
             bounce = false;
         }
@@ -2048,7 +2089,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public Vector2 GetHitboxSize(bool crouching) {
         float height;
 
-        if (state <= Enums.PowerupState.Small || (invincible > 0 && !onGround && !crouching && !sliding && !flying && !propeller) || groundpound) {
+        if (state <= Enums.PowerupState.Small || (invincible > 0 && !onGround && !crouching && !sliding && !flying && !propeller && !doublejump && !triplejump) || groundpound) {
             height = heightSmallModel;
         } else {
             height = heightLargeModel;
@@ -2061,84 +2102,142 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void HandleWalkingRunning(bool left, bool right) {
-        if (groundpound || groundpoundCounter > 0 || sliding || knockback || pipeEntering || jumpLandingTimer > 0 || !(wallJumpTimer <= 0 || onGround || body.velocity.y < 0))
-            return;
 
-        iceSliding = false;
-        if (!left && !right) {
-            skidding = false;
-            turnaround = false;
-            if (doIceSkidding)
-                iceSliding = true;
+        if (wallJumpTimer > 0) {
+            body.velocity = new(WALLJUMP_HSPEED * (facingRight ? 1 : -1), body.velocity.y);
+            return;
         }
 
-        if (Mathf.Abs(body.velocity.x) < 0.5f || !onGround)
+        if (groundpound || groundpoundCounter > 0 || knockback || pipeEntering || jumpLandingTimer > 0 || !(wallJumpTimer <= 0 || onGround || body.velocity.y < 0))
+            return;
+
+        if (!onGround)
             skidding = false;
 
         if (inShell) {
-            body.velocity = new(runningMaxSpeed * 0.9f * (facingRight ? 1 : -1) * (1f - slowdownTimer), body.velocity.y);
+            body.velocity = new(SPEED_STAGE_MAX[RUN_STAGE] * 0.9f * (facingRight ? 1 : -1) * (1f - slowdownTimer), body.velocity.y);
             return;
         }
-
-        if (!(left ^ right))
-            return;
-
-        if (crouching && state == Enums.PowerupState.BlueShell)
-            return;
-
-        float airPenalty = onGround ? 1 : 0.5f;
-        float xVel = Mathf.Abs(body.velocity.x);
-        float invincibleSpeedBoost = onGround && invincible > 0 ? 2f : 1f;
-        float runSpeedTotal = runningMaxSpeed * invincibleSpeedBoost;
-        float walkSpeedTotal = walkingMaxSpeed;
-        bool reverseDirection = (left ? 1 : -1) == Mathf.Sign(body.velocity.x); // ((left && body.velocity.x > 0.02) || (right && body.velocity.x < -0.02));
-        float reverseFloat = reverseDirection && doIceSkidding ? 0.4f : 1;
-        float turnaroundSpeedBoost = turnaround && !reverseDirection ? 5 : 1;
-        float stationarySpeedBoost = Mathf.Abs(body.velocity.x) <= 0.005f ? 1f : 1f;
-        float propellerBoost = propellerTimer > 0 ? 2.5f : 1;
-        float drillSlowing = drill ? 0.25f : 1f;
 
         bool run = functionallyRunning && !flying;
 
-        if ((crouching && !onGround) || !crouching) {
-            if (run && xVel >= walkSpeedTotal && !reverseDirection) {
-                //running
-                skidding = false;
+        int maxStage;
+        if (invincible > 0 && run && onGround)
+            maxStage = STAR_STAGE;
+        else if (run)
+            maxStage = RUN_STAGE;
+        else
+            maxStage = WALK_STAGE;
+
+        int stage = MovementStage;
+        float acc = state == Enums.PowerupState.MegaMushroom ? SPEED_STAGE_MEGA_ACC[stage] : SPEED_STAGE_ACC[stage];
+
+        if ((left ^ right) && (!crouching || (crouching && !onGround && state != Enums.PowerupState.BlueShell)) && !knockback && !sliding) {
+            //we can walk here
+
+            float speed = Mathf.Abs(body.velocity.x);
+            float sign = Mathf.Sign(body.velocity.x);
+            bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == sign);
+
+            //check that we're not going above our limit
+            float max = SPEED_STAGE_MAX[maxStage];
+            if (speed > max) {
+                acc = -acc;
+            }
+
+            if (reverse) {
                 turnaround = false;
-                float change = propellerBoost * invincibleSpeedBoost * turnaroundSpeedBoost * runningAcceleration * airPenalty * stationarySpeedBoost * drillSlowing * Time.fixedDeltaTime;
-                if (invincibleSpeedBoost > 1 && xVel > runningMaxSpeed)
-                    change *= 5;
-
-                change *= left ? -1 : 1;
-                body.velocity = new(Mathf.Clamp(body.velocity.x + change, -runSpeedTotal, runSpeedTotal), body.velocity.y);
-
-            } else {
-                //walking
-                float change = propellerBoost * invincibleSpeedBoost * reverseFloat * turnaroundSpeedBoost * walkingAcceleration * stationarySpeedBoost * drillSlowing * Time.fixedDeltaTime;
-                change *= left ? -1 : 1;
-                if (xVel <= walkSpeedTotal || reverseDirection) {
-                    body.velocity += Vector2.right * change;
-                    if (!reverseDirection)
-                        body.velocity = new(Mathf.Clamp(body.velocity.x, -walkSpeedTotal, walkSpeedTotal), body.velocity.y);
-
-                    if (xVel == walkSpeedTotal) {
-                        skidding = false;
-                        turnaround = false;
+                if (onGround) {
+                    if (speed >= SKIDDING_THRESHOLD && !holding && state != Enums.PowerupState.MegaMushroom) {
+                        skidding = true;
+                        facingRight = sign == 1;
                     }
+
+                    if (skidding) {
+                        if (onIce) {
+                            acc = SKIDDING_ICE_DEC;
+                        } else {
+                            acc = SKIDDING_DEC;
+                        }
+                        turnaroundFrames = 0;
+                    } else {
+                        if (onIce) {
+                            acc = WALK_TURNAROUND_ICE_ACC;
+                        } else {
+                            turnaroundFrames = Mathf.Min(turnaroundFrames + 0.2f, WALK_TURNAROUND_ACC.Length - 1);
+                            acc = state == Enums.PowerupState.MegaMushroom ? WALK_TURNAROUND_MEGA_ACC[(int) turnaroundFrames] : WALK_TURNAROUND_ACC[(int) turnaroundFrames];
+                        }
+                    }
+                } else {
+                    acc = SPEED_STAGE_ACC[0];
+                }
+            } else {
+
+                if (skidding && !turnaround) {
+                    skidding = false;
                 }
 
-                if (state != Enums.PowerupState.MegaMushroom && reverseDirection && xVel >= runningMaxSpeed - 2 && onGround) {
-                    skidding = true;
-                    turnaround = true;
-                    facingRight = left;
+                if (turnaround && turnaroundBoostFrames > 0 && speed != 0) {
+                    turnaround = false;
+                    skidding = false;
+                }
+
+                if (turnaround && speed < TURNAROUND_THRESHOLD) {
+                    if (--turnaroundBoostFrames <= 0) {
+                        acc = TURNAROUND_ACC;
+                        skidding = false;
+                    } else {
+                        acc = 0;
+                    }
+                } else {
+                    turnaround = false;
                 }
             }
-        } else {
-            turnaround = false;
+
+            int direction = left ? -1 : 1;
+            float newX = body.velocity.x + acc * direction;
+
+            if (Mathf.Abs(newX) - speed > 0) {
+                //clamp only if accelerating
+                newX = Mathf.Clamp(newX, -max, max);
+            }
+
+            if (skidding && !turnaround && Mathf.Sign(newX) != sign) {
+                //turnaround
+                turnaround = true;
+                turnaroundBoostFrames = 5;
+                newX = 0;
+            }
+
+            body.velocity = new(newX, body.velocity.y);
+
+        } else if (onGround) {
+            //not holding anything, crouch sliding, or holding both directions. decelerate
+
             skidding = false;
+            turnaround = false;
+
+            if (body.velocity.x == 0)
+                return;
+
+            if (onIce)
+                acc = -BUTTON_RELEASE_ICE_DEC[stage];
+            else
+                acc = -BUTTON_RELEASE_DEC;
+
+            int direction = (int) Mathf.Sign(body.velocity.x);
+            float newX = body.velocity.x + acc * direction;
+
+            if ((direction == -1) ^ (newX <= 0))
+                newX = 0;
+
+            body.velocity = new(newX, body.velocity.y);
+
+            if (newX != 0)
+                facingRight = newX > 0;
         }
 
-        inShell |= state == Enums.PowerupState.BlueShell && onGround && !inShell && functionallyRunning && !holding && Mathf.Abs(xVel) + 0.25f >= runningMaxSpeed && landing > 0.15f;
+        inShell |= state == Enums.PowerupState.BlueShell && onGround && functionallyRunning && !holding && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
         if (onGround || previousOnGround)
             body.velocity = new(body.velocity.x, 0);
     }
@@ -2270,7 +2369,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void HandleFacingDirection() {
-        if (groundpound)
+        if (groundpound && !onGround)
             return;
 
         //Facing direction
@@ -2279,8 +2378,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (wallJumpTimer > 0) {
             facingRight = body.velocity.x > 0;
-        } else if (doIceSkidding && !inShell && !sliding) {
-            if (right || left)
+        } else if (!inShell && !sliding && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
+            if (right ^ left)
                 facingRight = right;
         } else if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
             if (knockback || (onGround && state != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f)) {
@@ -2288,7 +2387,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             } else if (((wallJumpTimer <= 0 && !inShell) || giantStartTimer > 0) && (right || left)) {
                 facingRight = right;
             }
-            if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5f && crouching) || doIceSkidding) && (right || left))
+            if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5f && crouching) || onIce) && (right || left))
                 facingRight = right;
         }
     }
@@ -2355,7 +2454,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (photonView.IsMine && body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
             //death via pit
-            photonView.RPC("Death", RpcTarget.All, true, false);
+            photonView.RPC(nameof(Death), RpcTarget.All, true, false);
             return;
         }
 
@@ -2369,7 +2468,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
 
         if (photonView.IsMine && holding && (holding.dead || Frozen || holding.Frozen))
-            photonView.RPC("SetHolding", RpcTarget.All, -1);
+            photonView.RPC(nameof(SetHolding), RpcTarget.All, -1);
 
         FrozenCube holdingCube;
         if (((holdingCube = holding as FrozenCube) && holdingCube) || ((holdingCube = holdingOld as FrozenCube) && holdingCube)) {
@@ -2384,7 +2483,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             body.velocity = Vector2.zero;
             transform.position = body.position = previousFramePosition;
             if (giantStartTimer - delta <= 0 && photonView.IsMine) {
-                photonView.RPC("FinishMegaMario", RpcTarget.All, true);
+                photonView.RPC(nameof(FinishMegaMario), RpcTarget.All, true);
                 giantStartTimer = 0;
             } else {
                 body.isKinematic = true;
@@ -2418,7 +2517,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                         cancelMega = Utils.IsTileSolidAtTileLocation(tileLocation);
 
                     if (cancelMega) {
-                        photonView.RPC("FinishMegaMario", RpcTarget.All, false);
+                        photonView.RPC(nameof(FinishMegaMario), RpcTarget.All, false);
                         return;
                     }
                 }
@@ -2444,7 +2543,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (state == Enums.PowerupState.MegaMushroom) {
             HandleGiantTiles(true);
             if (onGround && singlejump) {
-                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
+                photonView.RPC(nameof(SpawnParticle), RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
                 CameraController.ScreenShake = 0.15f;
                 singlejump = false;
             }
@@ -2465,7 +2564,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (knockback) {
             if (bounce && photonView.IsMine)
-                photonView.RPC("ResetKnockback", RpcTarget.All);
+                photonView.RPC(nameof(ResetKnockback), RpcTarget.All);
 
             wallSlideLeft = false;
             wallSlideRight = false;
@@ -2473,9 +2572,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             inShell = false;
             body.velocity -= body.velocity * (delta * 2f);
             if (photonView.IsMine && onGround && Mathf.Abs(body.velocity.x) < 0.2f && knockbackTimer <= 0)
-                photonView.RPC("ResetKnockback", RpcTarget.All);
+                photonView.RPC(nameof(ResetKnockback), RpcTarget.All);
             if (holding) {
-                holding.photonView.RPC("Throw", RpcTarget.All, !facingRight, true);
+                holding.photonView.RPC(nameof(HoldableEntity.Throw), RpcTarget.All, !facingRight, true, body.position);
                 holding = null;
             }
         }
@@ -2491,7 +2590,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
             if (tempHitBlock && state == Enums.PowerupState.MegaMushroom) {
                 CameraController.ScreenShake = 0.15f;
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Block_Bump);
             }
         }
 
@@ -2522,7 +2621,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (body.velocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
                 propellerSpinTimer = propellerSpinTime;
                 propeller = true;
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_PropellerMushroom_Spin);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Powerup_PropellerMushroom_Spin);
             }
         }
 
@@ -2545,7 +2644,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 foreach (var tile in tilesHitSide)
                     InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
                 facingRight = hitLeft;
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Bump);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Block_Bump);
             }
         }
 
@@ -2553,7 +2652,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (onGround) {
             if (photonView.IsMine && hitRoof && crushGround && body.velocity.y <= 0.1 && state != Enums.PowerupState.MegaMushroom) {
                 //Crushed.
-                photonView.RPC("Powerdown", RpcTarget.All, true);
+                photonView.RPC(nameof(Powerdown), RpcTarget.All, true);
             }
 
             koyoteTime = 0;
@@ -2613,7 +2712,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     || edgeLanding
                     || (Mathf.Abs(body.velocity.x) < 0.1f)) {
 
-                    if (!doIceSkidding)
+                    if (!onIce)
                         body.velocity = Vector2.zero;
 
                     animator.Play("jumplanding" + (edgeLanding ? "-edge" : ""));
@@ -2629,7 +2728,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
 
 
-        if ((wallJumpTimer <= 0 || onGround) && !(groundpound && !onGround)) {
+        if (!(groundpound && !onGround)) {
             //Normal walking/running
             HandleWalkingRunning(left, right);
 
@@ -2639,7 +2738,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
 
         if (state == Enums.PowerupState.MegaMushroom && giantTimer <= 0 && photonView.IsMine) {
-            photonView.RPC("EndMega", RpcTarget.All);
+            photonView.RPC(nameof(EndMega), RpcTarget.All);
         }
 
         HandleSlopes();
@@ -2674,38 +2773,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         }
 
-        bool uphill = sliding && (floorAngle != 0 && Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x));
-        if (!inShell && !(sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2 && !uphill)) {
-            bool abovemax = false;
-            float invincibleSpeedBoost = invincible > 0 ? 1.5f : 1;
-            float uphillChange = uphill ? (1 - (Mathf.Abs(floorAngle) / 360f)) : 1;
-            float max;
-            if (onGround) {
-                max = functionallyRunning ? runningMaxSpeed * invincibleSpeedBoost : walkingMaxSpeed;
-                max *= uphillChange;
-            } else {
-                max = runningMaxSpeed;
-            }
-
-            if (knockback) {
-                abovemax = true;
-            } else if (flying || propeller) {
-                abovemax = !(left || right);
-            } else if (!sliding && (left ^ right) && !crouching) {
-                abovemax = Mathf.Abs(body.velocity.x) > max;
-            } else if ((left ^ right) && Mathf.Abs(floorAngle) > slopeSlidingAngle * 2) {
-                abovemax = Mathf.Abs(body.velocity.x) > (Mathf.Abs(floorAngle) / 30f);
-            } else if (onGround) {
-                abovemax = true;
-            }
-            //Friction...
-            if (abovemax) {
-                float multiplier = 1 - (delta * tileFriction * (knockback ? 1f : 4f) * (sliding ? 0.7f : 1f) * (crouching ? 0.5f : 1f ) * uphillChange);
-                body.velocity = new(body.velocity.x * multiplier, body.velocity.y);
-                if (Mathf.Abs(body.velocity.x) < 0.15f)
-                    body.velocity = new Vector2(0, body.velocity.y);
-            }
-        }
         //Terminal velocity
         float terminalVelocityModifier = state switch {
             Enums.PowerupState.MiniMushroom => 0.625f,
@@ -2714,15 +2781,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         };
         if (flying) {
             if (drill) {
-                body.velocity = new(Mathf.Clamp(body.velocity.x, -walkingMaxSpeed, walkingMaxSpeed), -drillVelocity);
+                body.velocity = new(body.velocity.x, -drillVelocity);
             } else {
-                body.velocity = new(Mathf.Clamp(body.velocity.x, -walkingMaxSpeed, walkingMaxSpeed), Mathf.Max(body.velocity.y, -flyingTerminalVelocity));
+                body.velocity = new(body.velocity.x, Mathf.Max(body.velocity.y, -flyingTerminalVelocity));
             }
         } else if (propeller) {
             if (drill) {
-                body.velocity = new(Mathf.Clamp(body.velocity.x, -walkingMaxSpeed, walkingMaxSpeed), -drillVelocity);
+                body.velocity = new(Mathf.Clamp(body.velocity.x, -WalkingMaxSpeed, WalkingMaxSpeed), -drillVelocity);
             } else {
-                float htv = walkingMaxSpeed * 1.18f + (propellerTimer * 2f);
+                float htv = WalkingMaxSpeed * 1.18f + (propellerTimer * 2f);
                 body.velocity = new(Mathf.Clamp(body.velocity.x, -htv, htv), Mathf.Max(body.velocity.y, propellerSpinTimer > 0 ? -propellerSpinFallSpeed : -propellerFallSpeed));
             }
         } else if (wallSlideLeft || wallSlideRight) {
@@ -2764,7 +2831,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         throwInvincibility = 0.15f;
 
         if (photonView.IsMine)
-            holding.photonView.RPC("Throw", RpcTarget.All, throwLeft, crouch);
+            holding.photonView.RPC(nameof(HoldableEntity.Throw), RpcTarget.All, throwLeft, crouch, body.position);
 
         if (!crouch && !knockback) {
             PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);
@@ -2825,7 +2892,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             sliding = false;
             body.velocity = Vector2.up * 1.5f;
             groundpoundCounter = groundpoundTime * (state == Enums.PowerupState.MegaMushroom ? 1.5f : 1);
-            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_GroundpoundStart);
+            photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_GroundpoundStart);
             alreadyGroundpounded = true;
             //groundpoundDelay = 0.75f;
         }
@@ -2864,8 +2931,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                         Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Groundpound,
                         _ => Enums.Sounds.Player_Sound_GroundpoundLanding,
                     };
-                    photonView.RPC("PlaySound", RpcTarget.All, sound);
-                    photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
+                    photonView.RPC(nameof(PlaySound), RpcTarget.All, sound);
+                    photonView.RPC(nameof(SpawnParticle), RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
                     groundpoundDelay = 0;
                 } else {
                     CameraController.ScreenShake = 0.15f;
@@ -2874,8 +2941,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (hitBlock) {
                 koyoteTime = 1.5f;
             } else if (state == Enums.PowerupState.MegaMushroom) {
-                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Powerup_MegaMushroom_Groundpound);
-                photonView.RPC("SpawnParticle", RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
+                photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Powerup_MegaMushroom_Groundpound);
+                photonView.RPC(nameof(SpawnParticle), RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
                 CameraController.ScreenShake = 0.35f;
             }
         }

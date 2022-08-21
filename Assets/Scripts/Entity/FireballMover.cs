@@ -45,7 +45,7 @@ public class FireballMover : MonoBehaviourPun {
         } else if (isIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
         }
-        bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact && body.velocity.y <= 0);
+        bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact);
         if (photonView && breaking) {
             if (photonView.IsMine)
                 PhotonNetwork.Destroy(gameObject);

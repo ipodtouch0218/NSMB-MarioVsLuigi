@@ -1,10 +1,9 @@
+using System;
 using System.IO;
 using System.Net;
 using UnityEngine;
 
 using Newtonsoft.Json.Linq;
-using System;
-using System.Threading.Tasks;
 
 public class UpdateChecker {
 
@@ -25,10 +24,7 @@ public class UpdateChecker {
         if (response.StatusCode != HttpStatusCode.OK)
             return;
 
-
         try {
-            bool ret = true;
-
             //get the latest release version number from github
             string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
             JObject data = JObject.Parse(json);
@@ -48,17 +44,21 @@ public class UpdateChecker {
             Debug.Log($"[UPDATE CHECK] Local version: {Application.version} / Remote version: {tag}");
 
             //check if we're a higher version
+            bool upToDate = true;
             for (int i = 0; i < 4; i++) {
                 int.TryParse(splitTag[i], out int remote);
                 int.TryParse(splitVer[i], out int local);
 
+                if (local > remote)
+                    break;
                 if (local == remote)
                     continue;
 
-                ret &= local >= remote;
+                upToDate = false;
+                break;
             }
 
-            callback(ret, tag);
+            callback(upToDate, tag);
         } catch { }
     }
 }

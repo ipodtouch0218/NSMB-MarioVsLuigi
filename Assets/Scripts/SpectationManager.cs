@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+using NSMB.Utils;
+
 public class SpectationManager : MonoBehaviour {
 
     [SerializeField] private GameObject spectationUI;
     [SerializeField] private TMP_Text spectatingText;
     private bool _spectating = false;
     public bool Spectating {
-        get {
-            return _spectating;
-        }
+        get => _spectating;
         set {
             _spectating = value;
             if (TargetPlayer == null)
@@ -21,9 +21,7 @@ public class SpectationManager : MonoBehaviour {
     }
     private PlayerController _targetPlayer;
     public PlayerController TargetPlayer {
-        get {
-            return _targetPlayer;
-        }
+        get => _targetPlayer;
         set {
             _targetPlayer = value;
             if (value != null)
@@ -49,14 +47,14 @@ public class SpectationManager : MonoBehaviour {
         if (!TargetPlayer || !TargetPlayer.photonView)
             return;
 
-        spectatingText.text = $"Spectating: { TargetPlayer.photonView.Owner.NickName }";
+        spectatingText.text = $"Spectating: { TargetPlayer.photonView.Owner.GetUniqueNickname() }";
     }
 
     public void SpectateNextPlayer() {
         if (TargetPlayer)
             TargetPlayer.cameraController.controlCamera = false;
 
-        List<PlayerController> players = GameManager.Instance.allPlayers;
+        List<PlayerController> players = GameManager.Instance.players;
         int count = players.Count;
         if (count <= 0)
             return;
@@ -79,7 +77,7 @@ public class SpectationManager : MonoBehaviour {
         if (TargetPlayer)
             TargetPlayer.cameraController.controlCamera = false;
 
-        List<PlayerController> players = GameManager.Instance.allPlayers;
+        List<PlayerController> players = GameManager.Instance.players;
         int count = players.Count;
         if (count <= 0)
             return;

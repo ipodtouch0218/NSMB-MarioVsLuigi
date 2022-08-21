@@ -54,7 +54,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -876546973899608171, guid: 219c4434dcc531e4886d9626fc332d7c, type: 3}
+  - {fileID: 2100000, guid: 5ea3a4b035481cf4aa3b3a922760ee9c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -133,4 +133,5 @@ MonoBehaviour:
   damping: 0.985
   splashVelocity: 10
   resistance: 0
+  animationSpeed: 7
   splashParticle: Prefabs/Particle/PoisonWaterSplash

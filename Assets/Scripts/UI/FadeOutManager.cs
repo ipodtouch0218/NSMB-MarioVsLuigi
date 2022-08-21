@@ -1,20 +1,26 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class FadeOutManager : MonoBehaviour {
 
-    private Image image;
     public float fadeTimer, fadeTime, blackTime, totalTime;
+
+    private Image image;
+    private Coroutine fadeCoroutine;
 
     public void Start() {
         image = GetComponent<Image>();
     }
 
-    public void Update() {
-        fadeTimer = Mathf.Clamp(fadeTimer - Time.deltaTime, -totalTime, totalTime);
-        image.color = new Color(0, 0, 0, 1 - Mathf.Clamp01((Mathf.Abs(fadeTimer)-blackTime) / fadeTime));
+    private IEnumerator Fade() {
+        while (fadeTimer > -totalTime) {
+            fadeTimer -= Time.deltaTime;
+            image.color = new(0, 0, 0, 1 - Mathf.Clamp01((Mathf.Abs(fadeTimer) - blackTime) / fadeTime));
+            yield return null;
+        }
+        image.color = new(0, 0, 0, 0);
+        fadeCoroutine = null;
     }
 
     public void FadeOutAndIn(float fadeTime, float blackTime) {
@@ -22,5 +28,8 @@ public class FadeOutManager : MonoBehaviour {
         this.blackTime = blackTime;
         totalTime = fadeTime + blackTime;
         fadeTimer = totalTime;
+
+        if (fadeCoroutine == null)
+            fadeCoroutine = StartCoroutine(Fade());
     }
 }

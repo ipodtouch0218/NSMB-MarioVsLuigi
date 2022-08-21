@@ -1,9 +1,10 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 using Photon.Pun;
 using Photon.Realtime;
 using Discord;
-using System;
 
 public class DiscordController : MonoBehaviour {
 

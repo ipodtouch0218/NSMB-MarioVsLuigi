@@ -33,6 +33,22 @@ MonoBehaviour:
     - {x: 0, y: 1, z: 0}
     - {x: 1, y: 1, z: 0}
     m_RuleTransform: 2
+  - m_Id: 7
+    m_Sprites:
+    - {fileID: 3313547660045521459, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae, type: 3}
+    m_GameObject: {fileID: 0}
+    m_MinAnimationSpeed: 1
+    m_MaxAnimationSpeed: 1
+    m_PerlinScale: 0.5
+    m_Output: 0
+    m_ColliderType: 2
+    m_RandomTransform: 0
+    m_Neighbors: 010000000100000002000000
+    m_NeighborPositions:
+    - {x: 0, y: -1, z: 0}
+    - {x: -1, y: 0, z: 0}
+    - {x: -1, y: -1, z: 0}
+    m_RuleTransform: 2
   - m_Id: 1
     m_Sprites:
     - {fileID: -1238084574743955201, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae, type: 3}
@@ -146,5 +162,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 37b12b99b00090c469bd7f86c35b5f3f, type: 2}
   isBackgroundTile: 0
   iceSkidding: 0
-  footstepMaterial: 
+  footstepSound: 31
   frictionFactor: 1

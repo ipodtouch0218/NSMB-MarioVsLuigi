@@ -69,6 +69,10 @@ MonoBehaviour:
   previousHolder: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 1
+  outShellHitboxSize: {x: 0.1, y: 0.17}
+  inShellHitboxSize: {x: 0.1, y: 0.129}
+  outShellHitboxOffset: {x: 0, y: 0.02}
+  inShellHitboxOffset: {x: 0, y: 0}
   walkSpeed: 0.875
   kickSpeed: 5
   wakeup: 15
@@ -80,11 +84,6 @@ MonoBehaviour:
   canBeFlipped: 1
   flipXFlip: 0
   putdown: 0
-  wakeupTimer: 0
-  outShellHitboxSize: {x: 0.1, y: 0.17}
-  inShellHitboxSize: {x: 0.1, y: 0.129}
-  outShellHitboxOffset: {x: 0, y: 0.02}
-  inShellHitboxOffset: {x: 0, y: 0}
 --- !u!212 &8836298984178612586
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -262,10 +261,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 8836298984178612587}
   audioSources:
   - {fileID: 3399800873378663516}
+  soundOrigin: {fileID: 8836298984178612587}
+  soundRange: 12
 --- !u!82 &3399800873378663516
 AudioSource:
   m_ObjectHideFlags: 0
@@ -410,6 +409,7 @@ MonoBehaviour:
   serializableViews:
   - {fileID: 8786985841086654504}
   - {fileID: -8194209068108725650}
+  - {fileID: 8836298984178612580}
 --- !u!114 &8786985841086654504
 MonoBehaviour:
   m_ObjectHideFlags: 0

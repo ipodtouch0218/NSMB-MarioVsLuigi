@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+
 using Photon.Pun;
+using NSMB.Utils;
 
 public class CustomRigidbodySerializer : MonoBehaviourPun, ICustomSerializeView {
 
