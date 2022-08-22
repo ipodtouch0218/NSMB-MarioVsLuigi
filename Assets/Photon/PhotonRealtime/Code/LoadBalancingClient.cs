@@ -898,7 +898,7 @@ namespace Photon.Realtime
                 this.LoadBalancingPeer.TransportProtocol = appSettings.Protocol;
                 this.ExpectedProtocol = null;
             }
-            
+
             this.EnableProtocolFallback = appSettings.EnableProtocolFallback;
 
             this.bestRegionSummaryFromStorage = appSettings.BestRegionSummaryFromStorage;

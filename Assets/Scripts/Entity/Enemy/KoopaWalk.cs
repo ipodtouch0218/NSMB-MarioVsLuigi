@@ -108,7 +108,7 @@ public class KoopaWalk : HoldableEntity {
             if (stationary) {
                 //body.velocity = new(body.velocity.x, 0);
             } else {
-                body.velocity = new Vector2((shell ? currentSpeed : walkSpeed) * (left ? -1 : 1), 0);
+                body.velocity = new Vector2((shell ? currentSpeed : walkSpeed) * (left ? -1 : 1), body.velocity.y);
             }
         }
 

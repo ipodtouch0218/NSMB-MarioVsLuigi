@@ -53,13 +53,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private static readonly float BUTTON_RELEASE_DEC = 0.0659179686f;
     private static readonly float SKIDDING_THRESHOLD = 4.6875f;
     private static readonly float SKIDDING_DEC = 0.17578125f;
+    private static readonly float SKIDDING_STAR_DEC = 1.40625f;
 
     private static readonly float WALLJUMP_HSPEED = 4.21874f;
     private static readonly float WALLJUMP_VSPEED = 6.4453125f;
 
+    private static readonly float KNOCKBACK_DEC = 0.131835975f;
+
     private static readonly float[] SPEED_STAGE_SPINNER_MAX = { 1.12060546875f, 2.8125f };
     private static readonly float[] SPEED_STAGE_SPINNER_ACC = { 0.1318359375f, 0.06591796875f };
-    private static readonly float WALK_TURNAROUND_SPINNER_ACC = 0.1318359375f;
 
     private static readonly float[] SPEED_STAGE_MEGA_ACC = { 0.46875f, 0.0805664061f, 0.0805664061f, 0.0805664061f, 0.0805664061f };
     private static readonly float[] WALK_TURNAROUND_MEGA_ACC = { 0.0769042968f, 0.17578125f, 0.3515625f };
@@ -148,7 +150,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         SerializationUtils.PackToShort(out short flags, running, jumpHeld, crouching, groundpound,
                 facingRight, onGround, knockback, flying, drill, sliding, skidding, wallSlideLeft,
                 wallSlideRight, invincible > 0, propellerSpinTimer > 0, wallJumpTimer > 0);
-        SerializationUtils.PackToByte(out byte flags2);
+        SerializationUtils.PackToByte(out byte flags2, turnaround, propeller);
         bool updateFlags = flags != previousFlags || flags2 != previousFlags2;
 
         bool forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
@@ -161,8 +163,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //serialize movement flags
             SerializationUtils.WriteShort(buffer, flags);
             previousFlags = flags;
-            //SerializationUtils.WriteByte(buffer, flags2);
-            //previousFlags2 = flags2;
+            SerializationUtils.WriteByte(buffer, flags2);
+            previousFlags2 = flags2;
 
             lastSendTimestamp = PhotonNetwork.Time;
         }
@@ -191,7 +193,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propellerSpinTimer = flags[14] ? 1 : 0;
         wallJumpTimer = flags[15] ? 1 : 0;
 
-        //SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags2);
+        SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags2);
+        turnaround = flags2[0];
+        propeller = flags2[1];
 
         //resimulations
         float lag = (float) (PhotonNetwork.Time - info.SentServerTime);
@@ -1103,19 +1107,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         starScript.Collected = true;
 
         //we can collect
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) starScript.transform.position, starID);
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) starScript.transform.position, starID, stars + 1);
         if (starScript.stationary)
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
 
     [PunRPC]
-    public void CollectBigStar(Vector2 particle, int starView, PhotonMessageInfo info) {
+    public void CollectBigStar(Vector2 particle, int starView, int newCount, PhotonMessageInfo info) {
         //only trust the master client
         if (!info.Sender.IsMasterClient)
             return;
 
         //state
-        stars = Mathf.Min(stars + 1, GameManager.Instance.starRequirement);
+        stars = Mathf.Min(newCount, GameManager.Instance.starRequirement);
         UpdateGameState();
 
         //game mechanics
@@ -1145,7 +1149,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (coinID != -1) {
             PhotonView coin = PhotonView.Find(coinID);
-            if (!coin || !coin.IsMine || !coin.gameObject.activeInHierarchy)
+            if (!coin || !coin.IsMine || !coin.GetComponent<SpriteRenderer>().enabled)
                 return;
 
             if (coin.GetComponent<LooseCoin>() is LooseCoin lc) {
@@ -1156,11 +1160,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         }
 
-        photonView.RPC(nameof(CollectCoin), RpcTarget.All, coinID, particle);
+        photonView.RPC(nameof(CollectCoin), RpcTarget.All, coinID, coins + 1, particle);
     }
 
     [PunRPC]
-    protected void CollectCoin(int coinID, Vector2 position, PhotonMessageInfo info) {
+    protected void CollectCoin(int coinID, int newCount, Vector2 position, PhotonMessageInfo info) {
         //only trust the master client
         if (!info.Sender.IsLocal && !info.Sender.IsMasterClient)
             return;
@@ -1182,7 +1186,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         num.text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
         num.color = AnimationController.GlowColor;
 
-        coins++;
+        coins = newCount;
         if (coins >= GameManager.Instance.coinRequirement) {
             SpawnCoinItem();
             coins = 0;
@@ -1578,12 +1582,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         float megaVelo = (state == Enums.PowerupState.MegaMushroom ? 3 : 1);
         body.velocity = new Vector2(
             (fromRight ? -1 : 1) *
-            3 *
-            (starsToDrop + 1) *
+            ((starsToDrop + 1) / 2f) *
+            4f *
             megaVelo *
-            (fireball ? 0.35f : 1f),
+            (fireball ? 0.5f : 1f),
 
-            fireball ? 0 : 4
+            fireball ? 0 : 4.5f
         );
 
         if (onGround && !fireball)
@@ -1816,6 +1820,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             drill = false;
             usedPropellerThisJump = false;
             groundpound = false;
+            inShell = false;
             break;
         }
     }
@@ -1848,6 +1853,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             propeller = false;
             usedPropellerThisJump = false;
             flying = false;
+            inShell = false;
             break;
         }
     }
@@ -2156,7 +2162,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     if (skidding) {
                         if (onIce) {
                             acc = SKIDDING_ICE_DEC;
-                        } else {
+                        } else if (speed > SPEED_STAGE_MAX[RUN_STAGE]) {
+                            acc = SKIDDING_STAR_DEC;
+                        }  else {
                             acc = SKIDDING_DEC;
                         }
                         turnaroundFrames = 0;
@@ -2222,6 +2230,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             if (onIce)
                 acc = -BUTTON_RELEASE_ICE_DEC[stage];
+            else if (knockback)
+                acc = -KNOCKBACK_DEC;
             else
                 acc = -BUTTON_RELEASE_DEC;
 

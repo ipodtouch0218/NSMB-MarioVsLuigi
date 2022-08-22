@@ -251,7 +251,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnDisconnected(DisconnectCause cause) {
         Debug.Log("[PHOTON] Disconnected: " + cause.ToString());
         if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic || cause == DisconnectCause.CustomAuthenticationFailed))
-            OpenErrorBox("Disconnected: " + cause.ToString());
+            OpenErrorBox(cause);
 
         selectedRoom = null;
         selectedRoomIcon = null;
@@ -443,7 +443,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         mixer.SetFloat("MusicPitch", 1f);
 
         if (GlobalController.Instance.disconnectCause != null) {
-            OpenErrorBox("Disconnected: " + GlobalController.Instance.disconnectCause.ToString());
+            OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
             GlobalController.Instance.disconnectCause = null;
         }
 
@@ -754,6 +754,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         lobbyJoinField.text = "";
         EventSystem.current.SetSelectedGameObject(privateSelected);
     }
+
+    public void OpenErrorBox(DisconnectCause cause) {
+        if (!errorBox.activeSelf)
+            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+
+        errorBox.SetActive(true);
+        errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
+        EventSystem.current.SetSelectedGameObject(errorButton);
+    }
+
     public void OpenErrorBox(string text) {
         if (!errorBox.activeSelf)
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());

@@ -143,7 +143,7 @@ public class BobombWalk : HoldableEntity {
         if (!photonView.IsMine)
             return;
 
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position + new Vector3(0,0.5f), 1.2f, Vector2.zero);
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position + new Vector3(0,0.5f), 1f, Vector2.zero);
         foreach (RaycastHit2D hit in hits) {
             GameObject obj = hit.collider.gameObject;
 
@@ -226,7 +226,7 @@ public class BobombWalk : HoldableEntity {
     public void Turnaround(bool hitWallOnLeft) {
         left = !hitWallOnLeft;
         sRenderer.flipX = left;
-        body.velocity = new(walkSpeed * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new(body.velocity.x * (left ? -1 : 1), body.velocity.y);
         animator.SetTrigger("turnaround");
     }
     #endregion

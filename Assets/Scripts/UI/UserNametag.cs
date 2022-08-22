@@ -3,15 +3,22 @@ using UnityEngine.UI;
 using TMPro;
 
 using NSMB.Utils;
+using Photon.Pun;
 
 public class UserNametag : MonoBehaviour {
+
+    public PlayerController parent;
 
     [SerializeField] private Camera cam;
     [SerializeField] private GameObject nametag;
     [SerializeField] private TMP_Text text;
     [SerializeField] private Image arrow;
 
-    public PlayerController parent;
+    private bool rainbowName;
+
+    public void Start() {
+        rainbowName = parent.photonView.Owner.HasRainbowName();
+    }
 
     public void LateUpdate() {
         if (parent == null) {
@@ -60,5 +67,8 @@ public class UserNametag : MonoBehaviour {
             text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString($"x{parent.lives} ");
 
         text.text += Utils.GetSymbolString($"Sx{parent.stars}");
+
+        if (rainbowName)
+            text.color = Utils.GetRainbowColor();
     }
 }
