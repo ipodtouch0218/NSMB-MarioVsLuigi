@@ -579,5 +579,11 @@ namespace NSMB.Utils {
         public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {
             counter = Mathf.Clamp(counter - delta, min, max);
         }
+
+        public static Color GetRainbowColor() {
+            double time = PhotonNetwork.Time * 0.1;
+            time %= 1;
+            return Color.HSVToRGB((float) time, 1, 1);
+        }
     }
 }

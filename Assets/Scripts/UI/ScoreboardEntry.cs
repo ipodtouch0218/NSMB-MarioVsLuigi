@@ -13,6 +13,7 @@ public class ScoreboardEntry : MonoBehaviour {
     public PlayerController target;
 
     private int playerId, currentLives, currentStars;
+    private bool rainbowEnabled;
 
     public void Start() {
         if (!target) {
@@ -25,10 +26,15 @@ public class ScoreboardEntry : MonoBehaviour {
 
         Color c = target.AnimationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);
+
+        rainbowEnabled = target.photonView.Owner.HasRainbowName();
     }
 
     public void Update() {
         CheckForTextUpdate();
+
+        if (rainbowEnabled)
+            nameText.color = Utils.GetRainbowColor();
     }
 
     public void CheckForTextUpdate() {

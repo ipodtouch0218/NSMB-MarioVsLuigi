@@ -72,7 +72,7 @@ public class DiscordController : MonoBehaviour {
 #if UNITY_WEBGL
         return;
 #endif
-        if (discord == null || activityManager == null)
+        if (discord == null || activityManager == null || !Application.isPlaying)
             return;
 
         Activity activity = new();

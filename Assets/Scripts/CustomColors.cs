@@ -31,9 +31,9 @@ public static class CustomColors {
         new("Chibi",        new(255, 255, 0, 255),      new(54, 54, 54, 255)   ),
 
         new("Strawberry",   new(255, 112, 205, 255),    new(184, 0, 0, 255)    ),
-        new("Lavender",     new(106, 90, 250, 255),     new(223, 138, 255, 255)),
+        new("Metal",        new(169, 169, 169, 255),    new(102, 102, 102, 255)),
         new("Cotton Candy", new(255, 127, 237, 255),    new(0, 148, 255, 255)  ),
-        new("Midnight",     new(47, 47, 47, 255),       new(222, 27, 154, 255) ),
+        new("Mud",          new(76, 103, 88, 255),      new(34, 34, 84, 255)   ),
 
     };
 }

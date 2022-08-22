@@ -8,6 +8,14 @@ using Photon.Realtime;
 namespace NSMB.Utils {
     public static class NetworkUtils {
 
+        public static Dictionary<DisconnectCause, string> disconnectMessages = new() {
+
+            [DisconnectCause.MaxCcuReached] = "Max player count reached (100/100)",
+            [DisconnectCause.CustomAuthenticationFailed] = "Failed to authenticate with the auth server",
+            //[DisconnectCause.DisconnectByServerLogic] = "",
+
+        };
+
         public static RaiseEventOptions EventOthers { get; } = new() { Receivers = ReceiverGroup.Others };
         public static RaiseEventOptions EventAll { get; } = new() { Receivers = ReceiverGroup.All };
         public static RaiseEventOptions EventMasterClient { get; } = new() { Receivers = ReceiverGroup.MasterClient };

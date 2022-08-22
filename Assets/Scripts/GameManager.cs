@@ -19,7 +19,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     private static GameManager _instance;
     public static GameManager Instance {
-        get => _instance ? _instance : null;
+        get {
+            if (_instance)
+                return _instance;
+
+            _instance = FindObjectOfType<GameManager>();
+            return _instance;
+        }
         private set => _instance = value;
     }
 
@@ -399,20 +405,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     //Register callbacks & controls
     public void OnEnable() {
+        Instance = this;
         PhotonNetwork.AddCallbackTarget(this);
         InputSystem.controls.UI.Pause.performed += OnPause;
-        Instance = this;
     }
     public void OnDisable() {
-        PhotonNetwork.RemoveCallbackTarget(this);
-        InputSystem.controls.UI.Pause.performed -= OnPause;
-
         foreach (GameManager gm in FindObjectsOfType<GameManager>()) {
             if (gm != this) {
                 Instance = gm;
                 return;
             }
         }
+        PhotonNetwork.RemoveCallbackTarget(this);
+        InputSystem.controls.UI.Pause.performed -= OnPause;
     }
 
     public void Awake() {
