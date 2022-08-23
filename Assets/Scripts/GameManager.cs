@@ -23,7 +23,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (_instance)
                 return _instance;
 
-            _instance = FindObjectOfType<GameManager>();
+            if (SceneManager.GetActiveScene().buildIndex > 2)
+                _instance = FindObjectOfType<GameManager>();
+
             return _instance;
         }
         private set => _instance = value;

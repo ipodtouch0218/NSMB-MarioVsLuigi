@@ -2095,7 +2095,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public Vector2 GetHitboxSize(bool crouching) {
         float height;
 
-        if (state <= Enums.PowerupState.Small || (invincible > 0 && !onGround && !crouching && !sliding && !flying && !propeller && !doublejump && !triplejump) || groundpound) {
+        if (state <= Enums.PowerupState.Small || (invincible > 0 && !onGround && !crouching && !sliding && !flying && !propeller) || groundpound) {
             height = heightSmallModel;
         } else {
             height = heightLargeModel;
@@ -2228,7 +2228,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (body.velocity.x == 0)
                 return;
 
-            if (onIce)
+            if (sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle)
+                acc = BUTTON_RELEASE_ICE_DEC[stage] * Mathf.Sign(floorAngle);
+            else if (onIce)
                 acc = -BUTTON_RELEASE_ICE_DEC[stage];
             else if (knockback)
                 acc = -KNOCKBACK_DEC;

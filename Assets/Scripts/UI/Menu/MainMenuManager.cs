@@ -15,7 +15,7 @@ using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using NSMB.Utils;
 
-public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
+public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks, IWebRpcCallback {
 
     public const int NICKNAME_MIN = 2, NICKNAME_MAX = 20;
 
@@ -69,9 +69,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
         Hashtable prop = new() {
-            { Enums.NetPlayerProperties.Character, 0 },
+            { Enums.NetPlayerProperties.Character, Settings.Instance.character },
             { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() },
-            { Enums.NetPlayerProperties.PlayerColor, 0 },
+            { Enums.NetPlayerProperties.PlayerColor, Settings.Instance.skin },
             { Enums.NetPlayerProperties.Spectator, false },
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
@@ -294,11 +294,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }, "");
     }
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {
-        PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
-        if (response.ContainsKey("Token"))
-            PlayerPrefs.SetString("token", (string) response["Token"]);
+        //PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
+        //if (response.ContainsKey("Token"))
+        //    PlayerPrefs.SetString("token", (string) response["Token"]);
 
-        PlayerPrefs.Save();
+        //PlayerPrefs.Save();
     }
     public void OnCustomAuthenticationFailed(string failure) {
         OpenErrorBox(failure);
@@ -407,6 +407,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
         }
     }
+    public void OnWebRpcResponse(OperationResponse response) {
+        if (response.ReturnCode != 0)
+            OpenErrorBox(response.DebugMessage);
+    }
 
     private void JoinMainLobby() {
         //Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
@@ -461,8 +465,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
             PhotonNetwork.NetworkingClient.AppVersion = match.Groups[0].Value;
 
-            string id = PlayerPrefs.GetString("id", null);
+            //string id = PlayerPrefs.GetString("id", null);
             string token = PlayerPrefs.GetString("token", null);
+
+            string id = null;
 
             AuthenticationHandler.Authenticate(id, token);
 
@@ -1211,9 +1217,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             { Enums.NetPlayerProperties.Character, dropdown.value }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+        Settings.Instance.character = dropdown.value;
+        Settings.Instance.SaveSettingsToPreferences();
 
         PlayerData data = GlobalController.Instance.characters[dropdown.value];
-
         sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
     }
 
@@ -1231,6 +1238,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             shirtColor.color = CustomColors.Colors[index].hat;
         }
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+
+        Settings.Instance.skin = index;
+        Settings.Instance.SaveSettingsToPreferences();
     }
 
     private void UpdateNickname() {

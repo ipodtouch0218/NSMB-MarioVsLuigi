@@ -20,9 +20,10 @@ public class AuthenticationHandler {
             string responseString = await resp.Content.ReadAsStringAsync();
 
             if (!resp.IsSuccessStatusCode) {
-
-                if (MainMenuManager.Instance)
+                if (MainMenuManager.Instance) {
                     MainMenuManager.Instance.OpenErrorBox(responseString);
+                    MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
+                }
                 return;
             }
 

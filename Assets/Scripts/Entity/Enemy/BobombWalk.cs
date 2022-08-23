@@ -12,6 +12,7 @@ public class BobombWalk : HoldableEntity {
 
     public bool lit, detonated;
 
+    private Vector3 previousFrameVelocity;
     private float detonateCount;
 
     #region Unity Methods
@@ -55,6 +56,8 @@ public class BobombWalk : HoldableEntity {
             block.SetFloat("FlashAmount", redOverlayPercent);
             sRenderer.SetPropertyBlock(block);
         }
+
+        previousFrameVelocity = body.velocity;
     }
     #endregion
 
@@ -226,7 +229,7 @@ public class BobombWalk : HoldableEntity {
     public void Turnaround(bool hitWallOnLeft) {
         left = !hitWallOnLeft;
         sRenderer.flipX = left;
-        body.velocity = new(body.velocity.x * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new((lit ? -previousFrameVelocity.x : walkSpeed) * (left ? -1 : 1), body.velocity.y);
         animator.SetTrigger("turnaround");
     }
     #endregion
