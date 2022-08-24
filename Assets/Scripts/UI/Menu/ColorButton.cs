@@ -4,13 +4,21 @@ using UnityEngine.EventSystems;
 
 public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
-    [SerializeField] Image shirt, overalls, overlay;
-    public CustomColors.PlayerColor palette;
-    [SerializeField] Sprite overlayUnpressed, overlayPressed;
+    [SerializeField] private Sprite overlayUnpressed, overlayPressed;
+    [SerializeField] private Image shirt, overalls, overlay;
 
-    public void Instantiate() {
-        shirt.color = palette.hat;
-        overalls.color = palette.overalls;
+    public PlayerColorSet palette;
+
+    public void Instantiate(PlayerData player) {
+        if (palette == null) {
+            shirt.enabled = false;
+            overalls.enabled = false;
+            return;
+        }
+
+        PlayerColors col = palette.GetPlayerColors(player);
+        shirt.color = col.hatColor;
+        overalls.color = col.overallsColor;
         overlay.enabled = false;
     }
 

@@ -66,6 +66,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     Coroutine updatePingCoroutine;
 
+    public ColorChooser colorManager;
+
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
         Hashtable prop = new() {
@@ -294,11 +296,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }, "");
     }
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {
-        //PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
-        //if (response.ContainsKey("Token"))
-        //    PlayerPrefs.SetString("token", (string) response["Token"]);
+        PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
+        if (response.ContainsKey("Token"))
+            PlayerPrefs.SetString("token", (string) response["Token"]);
 
-        //PlayerPrefs.Save();
+        PlayerPrefs.Save();
     }
     public void OnCustomAuthenticationFailed(string failure) {
         OpenErrorBox(failure);
@@ -465,10 +467,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
             PhotonNetwork.NetworkingClient.AppVersion = match.Groups[0].Value;
 
-            //string id = PlayerPrefs.GetString("id", null);
+            string id = PlayerPrefs.GetString("id", null);
             string token = PlayerPrefs.GetString("token", null);
-
-            string id = null;
 
             AuthenticationHandler.Authenticate(id, token);
 
@@ -1030,7 +1030,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
         PhotonNetwork.SetMasterClient(target);
-        LocalChatMessage($"Promoted {target.GetUniqueNickname()} to the host!", Color.red);
+        LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
     }
 
     public void Mute(Player target) {
@@ -1073,7 +1073,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
 
-        LocalChatMessage($"Unknown player {playername}", Color.red);
+        LocalChatMessage($"Error: Unknown player {playername}", Color.red);
     }
 
     public void Ban(Player target) {
@@ -1095,7 +1095,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Hashtable table = new() {
             [Enums.NetRoomProperties.Bans] = pairs.ToArray(),
         };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
         PhotonNetwork.CloseConnection(target);
         LocalChatMessage($"Successfully banned {target.GetUniqueNickname()}", Color.red);
     }
@@ -1109,7 +1109,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Hashtable table = new() {
             [Enums.NetRoomProperties.Bans] = pairs.ToArray(),
         };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
         LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
     }
 
@@ -1128,7 +1128,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[1]}", Color.red);
+                LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
                 return;
             }
             Kick(target);
@@ -1142,7 +1142,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string strTarget = args[1].ToLower();
             Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
             if (target == null) {
-                LocalChatMessage($"Unknown player {args[1]}", Color.red);
+                LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
                 return;
             }
             Promote(target);
@@ -1222,6 +1222,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PlayerData data = GlobalController.Instance.characters[dropdown.value];
         sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
+        colorManager.ChangeCharacter(data);
+
+        Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int index, PhotonNetwork.LocalPlayer.CustomProperties);
+        if (index == 0) {
+            paletteDisabled.SetActive(true);
+            palette.SetActive(false);
+        } else {
+            paletteDisabled.SetActive(false);
+            palette.SetActive(true);
+            PlayerColors colors = GlobalController.Instance.skins[index].GetPlayerColors(data);
+            overallColor.color = colors.overallsColor;
+            shirtColor.color = colors.hatColor;
+        }
     }
 
     public void SetPlayerColor(int index) {
@@ -1234,8 +1247,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         } else {
             paletteDisabled.SetActive(false);
             palette.SetActive(true);
-            overallColor.color = CustomColors.Colors[index].overalls;
-            shirtColor.color = CustomColors.Colors[index].hat;
+            PlayerColors colors = GlobalController.Instance.skins[index].GetPlayerColors(Utils.GetCharacterData());
+            overallColor.color = colors.overallsColor;
+            shirtColor.color = colors.hatColor;
         }
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 

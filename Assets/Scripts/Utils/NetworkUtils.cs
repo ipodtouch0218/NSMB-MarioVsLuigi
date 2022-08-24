@@ -8,6 +8,8 @@ using Photon.Realtime;
 namespace NSMB.Utils {
     public static class NetworkUtils {
 
+        public static WebFlags forward = new(WebFlags.HttpForwardConst);
+
         public static Dictionary<DisconnectCause, string> disconnectMessages = new() {
 
             [DisconnectCause.MaxCcuReached] = "Max player count reached (100/100)",

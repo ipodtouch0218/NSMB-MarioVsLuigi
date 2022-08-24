@@ -12,6 +12,8 @@ using NSMB.Utils;
 
 public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, ILobbyCallbacks {
 
+    public PlayerColorSet[] skins;
+
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
 
     public RenderTexture ndsTexture;
