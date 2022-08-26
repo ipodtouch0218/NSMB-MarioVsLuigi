@@ -66,7 +66,7 @@ public class KoopaWalk : HoldableEntity {
                     body.velocity = new Vector2(0, body.velocity.y);
                 if ((wakeupTimer -= Time.fixedDeltaTime) < 0) {
                     if (photonView.IsMine)
-                        photonView.RPC("WakeUp", RpcTarget.All);
+                        photonView.RPC(nameof(WakeUp), RpcTarget.All);
                 }
             } else {
                 wakeupTimer = wakeup;
@@ -78,13 +78,13 @@ public class KoopaWalk : HoldableEntity {
 
         if (physics.hitRight && !left) {
             if (photonView && photonView.IsMine) {
-                photonView.RPC("Turnaround", RpcTarget.All, false, velocityLastFrame.x);
+                photonView.RPC(nameof(Turnaround), RpcTarget.All, false, velocityLastFrame.x);
             } else {
                 Turnaround(false, velocityLastFrame.x);
             }
         } else if (physics.hitLeft && left) {
             if (photonView && photonView.IsMine) {
-                photonView.RPC("Turnaround", RpcTarget.All, true, velocityLastFrame.x);
+                photonView.RPC(nameof(Turnaround), RpcTarget.All, true, velocityLastFrame.x);
             } else {
                 Turnaround(true, velocityLastFrame.x);
             }
@@ -97,7 +97,7 @@ public class KoopaWalk : HoldableEntity {
 
             if (!Physics2D.Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround)) {
                 if (photonView && photonView.IsMine) {
-                    photonView.RPC("Turnaround", RpcTarget.All, left, velocityLastFrame.x);
+                    photonView.RPC(nameof(Turnaround), RpcTarget.All, left, velocityLastFrame.x);
                 } else {
                     Turnaround(left, velocityLastFrame.x);
                 }
@@ -139,26 +139,26 @@ public class KoopaWalk : HoldableEntity {
         case "goomba":
             if (killa.dead)
                 break;
-            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x > body.position.x, false, combo++);
+            killa.photonView.RPC(nameof(SpecialKill), RpcTarget.All, killa.body.position.x > body.position.x, false, combo++);
             if (holder)
-                photonView.RPC("SpecialKill", RpcTarget.All, killa.body.position.x < body.position.x, false, combo++);
+                photonView.RPC(nameof(SpecialKill), RpcTarget.All, killa.body.position.x < body.position.x, false, combo++);
             break;
         case "piranhaplant":
             if (killa.dead)
                 break;
-            killa.photonView.RPC("Kill", RpcTarget.All);
+            killa.photonView.RPC(nameof(Kill), RpcTarget.All);
             if (holder)
-                photonView.RPC("Kill", RpcTarget.All);
+                photonView.RPC(nameof(Kill), RpcTarget.All);
 
             break;
         case "coin":
             if (!holder && !stationary && previousHolder)
-                previousHolder.photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector2(obj.transform.position.x, collider.transform.position.y));
+                previousHolder.photonView.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector2(obj.transform.position.x, collider.transform.position.y));
             break;
         case "loosecoin":
             if (!holder && !stationary && previousHolder) {
                 Transform parent = obj.transform.parent;
-                previousHolder.photonView.RPC("AttemptCollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
+                previousHolder.photonView.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
             }
             break;
         }
@@ -175,53 +175,53 @@ public class KoopaWalk : HoldableEntity {
 
 
         if (shell && blue && player.groundpound && !player.onGround) {
-            photonView.RPC("BlueBecomeItem", RpcTarget.All);
+            photonView.RPC(nameof(BlueBecomeItem), RpcTarget.All);
             return;
         }
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             player.body.velocity = new(0, player.body.velocity.y);
-            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
+            photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x > 0);
         } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
+                player.photonView.RPC(nameof(PlayerController.Knockback), RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
+            photonView.RPC(nameof(SpecialKill), RpcTarget.All, !originalFacing, false, player.StarCombo++);
         } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
-            photonView.RPC("EnterShell", RpcTarget.All);
+            photonView.RPC(nameof(EnterShell), RpcTarget.All);
             if (!blue) {
-                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, 1f, player.groundpound);
-                player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                photonView.RPC(nameof(Kick), RpcTarget.All, player.body.position.x < body.position.x, 1f, player.groundpound);
+                player.photonView.RPC(nameof(PlayerController.SetHoldingOld), RpcTarget.All, photonView.ViewID);
                 previousHolder = player;
             }
         } else if (attackedFromAbove && (!shell || !IsStationary)) {
             if (player.state == Enums.PowerupState.MiniMushroom) {
                 if (player.groundpound) {
                     player.groundpound = false;
-                    photonView.RPC("EnterShell", RpcTarget.All);
+                    photonView.RPC(nameof(EnterShell), RpcTarget.All);
                 }
                 player.bounce = true;
             } else {
-                photonView.RPC("EnterShell", RpcTarget.All);
+                photonView.RPC(nameof(EnterShell), RpcTarget.All);
                 player.bounce = !player.groundpound;
             }
-            player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+            player.photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;
         } else {
             if (shell && IsStationary) {
                 if (!holder) {
                     if (player.CanPickup()) {
-                        photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
-                        player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
+                        photonView.RPC(nameof(Pickup), RpcTarget.All, player.photonView.ViewID);
+                        player.photonView.RPC(nameof(PlayerController.SetHolding), RpcTarget.All, photonView.ViewID);
                     } else {
-                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
-                        player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                        photonView.RPC(nameof(Kick), RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
+                        player.photonView.RPC(nameof(PlayerController.SetHoldingOld), RpcTarget.All, photonView.ViewID);
                         previousHolder = player;
                     }
                 }
             } else if (player.hitInvincibilityCounter <= 0) {
-                player.photonView.RPC("Powerdown", RpcTarget.All, false);
+                player.photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
                 if (!shell)
-                    photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
+                    photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x < 0);
             }
         }
     }

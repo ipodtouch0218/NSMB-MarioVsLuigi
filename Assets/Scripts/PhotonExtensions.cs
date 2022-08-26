@@ -17,6 +17,9 @@ public static class PhotonExtensions {
     }
 
     public static bool HasRainbowName(this Player player) {
+        if (player == null || player.UserId == null)
+            return false;
+
         byte[] bytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(player.UserId));
         StringBuilder sb = new();
         foreach (byte b in bytes)

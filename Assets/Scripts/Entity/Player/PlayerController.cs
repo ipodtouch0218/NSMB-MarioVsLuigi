@@ -991,7 +991,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     [PunRPC]
-    protected void Powerdown(bool ignoreInvincible) {
+    public void Powerdown(bool ignoreInvincible) {
         if (!ignoreInvincible && (hitInvincibilityCounter > 0 || invincible > 0))
             return;
 
@@ -1543,7 +1543,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #region -- KNOCKBACK --
 
     [PunRPC]
-    protected void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
+    public void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
         if (fireball && fireballKnockback && knockback)
             return;
         if (knockback && !fireballKnockback)
@@ -2883,7 +2883,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         } else if (propeller) {
             //start propeller drill
-            if (propellerTimer < 0.6f) {
+            if (propellerTimer < 0.6f && body.velocity.y < 3) {
                 drill = true;
                 propellerTimer = 0;
                 hitBlock = true;

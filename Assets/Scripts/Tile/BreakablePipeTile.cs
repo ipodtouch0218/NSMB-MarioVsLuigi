@@ -45,7 +45,7 @@ public class BreakablePipeTile : InteractableTile {
 
         bool bottom = false;
 
-        if (origin.y < (GameManager.Instance.cameraMinY - 9f))
+        if (origin.y < (GameManager.Instance.cameraMinY - 9f) || (origin.y + height) >= GameManager.Instance.levelMinTileY + GameManager.Instance.levelHeightTile)
             bottom = true;
 
         int tileHeight;
@@ -64,11 +64,17 @@ public class BreakablePipeTile : InteractableTile {
             //hit left/right side of pipe
 
             Vector2 world = worldLocation;
+            bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
+
             if (upsideDownPipe) {
                 if (ourLocation == origin)
                     addHat = false;
 
                 tileHeight = Mathf.Abs(hat.y - ourLocation.y) + (addHat ? 2 : 1);
+
+                if (bottom && ourLocation == origin && (tileHeight != 1 || alreadyDestroyed))
+                    return false;
+
             } else {
                 addHat = bottom;
                 tileHeight = GetPipeHeight(ourLocation);
@@ -79,7 +85,6 @@ public class BreakablePipeTile : InteractableTile {
                     world += Vector2.up * 0.5f;
             }
 
-            bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
 
             object[] parametersParticle = new object[]{world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), pipeParticle + (alreadyDestroyed ? "-D" : "")};
             GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnResizableParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);

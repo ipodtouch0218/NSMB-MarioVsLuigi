@@ -74,6 +74,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -117,6 +118,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -1102,6 +1104,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: bonus_20
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 80
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0f9ba5deec82094a88e1e6740b41158
+      internalID: -2103662274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1140,11 +1163,11 @@ TextureImporter:
       bonus_11: 1911295945
       bonus_4: 963225843
       bonus_27: 1044801654
-      clown_17: -6450420347727313635
+      bonus_0: -671801442
       clown_5: -2940530314470319842
       bonus_20: -2103662274
       bonus_1: -1394567960
-      bonus_0: -671801442
+      clown_17: -6450420347727313635
       bonus_22: 1038974077
       clown_15: -7962056515094391696
       bonus_13: 1684036044
@@ -1162,7 +1185,6 @@ TextureImporter:
       clown_1: 2763954904775634219
   spritePackingTag: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

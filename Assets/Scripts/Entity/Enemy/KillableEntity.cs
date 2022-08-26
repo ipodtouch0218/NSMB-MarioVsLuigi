@@ -73,7 +73,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
 
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
         if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc))
-            photonView.RPC("SpecialKill", RpcTarget.All, left, false, 0);
+            photonView.RPC(nameof(SpecialKill), RpcTarget.All, left, false, 0);
     }
     #endregion
 
@@ -100,30 +100,29 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.onGround;
 
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
-            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
+            photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x > 0);
         } else if (player.invincible > 0 || player.inShell || player.sliding
-            || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
+            || (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.state == Enums.PowerupState.MegaMushroom) {
 
-            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, player.groundpound, player.StarCombo++);
+            photonView.RPC(nameof(SpecialKill), RpcTarget.All, player.body.velocity.x > 0, player.groundpound, player.StarCombo++);
         } else if (attackedFromAbove) {
-
             if (player.state == Enums.PowerupState.MiniMushroom) {
                 if (player.groundpound) {
                     player.groundpound = false;
-                    photonView.RPC("Kill", RpcTarget.All);
+                    photonView.RPC(nameof(Kill), RpcTarget.All);
                 }
                 player.bounce = true;
             } else {
-                photonView.RPC("Kill", RpcTarget.All);
+                photonView.RPC(nameof(Kill), RpcTarget.All);
                 player.bounce = !player.groundpound;
             }
-            player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+            player.photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;
 
         } else if (player.hitInvincibilityCounter <= 0) {
-            player.photonView.RPC("Powerdown", RpcTarget.All, false);
-            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
+            player.photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
+            photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x < 0);
         }
     }
     #endregion

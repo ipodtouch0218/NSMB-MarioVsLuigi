@@ -28,7 +28,7 @@ public class RespawningInvisibleBlock : MonoBehaviour {
     }
 
     public void DoBump(Vector3Int tileLocation, PhotonView player) {
-        player.RPC("CollectCoin", RpcTarget.All, -1, Utils.TilemapToWorldPosition(tileLocation) + Vector3.one / 4f);
+        player.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.All, -1, (Vector2) Utils.TilemapToWorldPosition(tileLocation) + Vector2.one / 4f);
 
         object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, false, "SpecialTiles/EmptyYellowQuestion", "Coin" };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetThenBumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
