@@ -70,8 +70,10 @@ public class SpectationManager : MonoBehaviour {
         if (count <= 0)
             return;
 
+        TargetPlayer = null;
+
         int nulls = 0;
-        while (TargetPlayer == null) {
+        while (!TargetPlayer) {
             targetIndex = (targetIndex + 1) % count;
             TargetPlayer = players[targetIndex];
             if (nulls++ >= count)
@@ -85,8 +87,10 @@ public class SpectationManager : MonoBehaviour {
         if (count <= 0)
             return;
 
+        TargetPlayer = null;
+
         int nulls = 0;
-        while (TargetPlayer == null) {
+        while (!TargetPlayer) {
             targetIndex = (targetIndex + count - 1) % count;
             TargetPlayer = players[targetIndex];
             if (nulls++ >= count)
@@ -110,7 +114,7 @@ public class SpectationManager : MonoBehaviour {
 
             PlayerController newTarget = sortedPlayers[index];
 
-            if (newTarget == null)
+            if (!newTarget)
                 return;
 
             TargetPlayer = newTarget;

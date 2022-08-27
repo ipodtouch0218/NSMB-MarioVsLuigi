@@ -282,7 +282,7 @@ public class KoopaWalk : HoldableEntity {
         stationary = crouch;
         currentSpeed = kickSpeed + 1.5f * (Mathf.Abs(holder.body.velocity.x) / holder.RunningMaxSpeed);
         body.position = pos;
-        if (Utils.IsTileSolidAtWorldLocation(body.position))
+        if (Utils.IsAnyTileSolidBetweenWorldBox(body.position, hitbox.size))
             transform.position = body.position = new Vector2(holder.transform.position.x, transform.position.y);
 
         previousHolder = holder;

@@ -1,29 +1,39 @@
 using UnityEngine;
 using Photon.Pun;
+
 using NSMB.Utils;
 
 public class RespawningInvisibleBlock : MonoBehaviour {
 
+    private double bumpTime;
+
     public void OnTriggerEnter2D(Collider2D collision) {
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(transform.position);
 
-        if (!collision.CompareTag("Player") || Utils.GetTileAtTileLocation(tileLocation) != null)
+        if (PhotonNetwork.Time - bumpTime < 0)
             return;
 
-        if (!collision.gameObject.GetPhotonView().IsMine)
+        if (Utils.GetTileAtTileLocation(tileLocation) != null)
+            return;
+
+        if (collision.gameObject.GetComponent<PlayerController>() is not PlayerController player)
+            return;
+
+        if (!player.photonView.IsMine)
             return;
 
         Rigidbody2D body = collision.attachedRigidbody;
-        if (body.velocity.y <= 0)
+        if (player.previousFrameVelocity.y <= 0)
             return;
 
         BoxCollider2D bc = collision as BoxCollider2D;
         if (bc == null)
             return;
-        if (body.position.y + (bc.size.y * body.transform.lossyScale.y) - (body.velocity.y * Time.fixedDeltaTime) > transform.position.y)
+        if (body.position.y + (bc.size.y * body.transform.lossyScale.y) - (player.previousFrameVelocity.y * Time.fixedDeltaTime) > transform.position.y)
             return;
 
         DoBump(tileLocation, collision.gameObject.GetPhotonView());
+        bumpTime = PhotonNetwork.Time + 0.25d;
         collision.attachedRigidbody.velocity = new(body.velocity.x, 0);
     }
 

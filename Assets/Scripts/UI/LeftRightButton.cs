@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -17,10 +15,12 @@ public class LeftRightButton : Selectable {
 
     protected override void OnEnable() {
         base.OnEnable();
+        Debug.Log("A");
         InputSystem.controls.UI.Navigate.performed += OnNavigation;
     }
     protected override void OnDisable() {
         base.OnDisable();
+        Debug.Log("A");
         InputSystem.controls.UI.Navigate.performed -= OnNavigation;
     }
 
@@ -33,7 +33,8 @@ public class LeftRightButton : Selectable {
         EventSystem.current.SetSelectedGameObject(gameObject);
     }
 
-    void OnNavigation(InputAction.CallbackContext context) {
+    private void OnNavigation(InputAction.CallbackContext context) {
+        Debug.Log("A");
         if (GameManager.Instance.paused) {
             leftSelected = false;
             rightSelected = false;
@@ -68,7 +69,7 @@ public class LeftRightButton : Selectable {
         }
     }
 
-    void SetOffset(bool right, bool selected) {
+    private void SetOffset(bool right, bool selected) {
         RectTransform transform = right ? rightTransform: leftTransform;
         float offset = right ? rightOffset : leftOffset;
         float selOffset = selected ? offset : 0;

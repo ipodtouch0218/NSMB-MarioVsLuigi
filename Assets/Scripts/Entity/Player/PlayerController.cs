@@ -2249,7 +2249,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 facingRight = newX > 0;
         }
 
-        inShell |= state == Enums.PowerupState.BlueShell && onGround && functionallyRunning && !holding && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
+        inShell |= state == Enums.PowerupState.BlueShell && !sliding && onGround && functionallyRunning && !holding && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
         if (onGround || previousOnGround)
             body.velocity = new(body.velocity.x, 0);
     }

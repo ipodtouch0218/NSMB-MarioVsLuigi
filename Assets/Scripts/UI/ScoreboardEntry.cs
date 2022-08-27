@@ -39,8 +39,7 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public void CheckForTextUpdate() {
         if (!target) {
-            // our target lost all lives (or dc'd), disable the updater script
-            enabled = false;
+            // our target lost all lives (or dc'd)
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
             return;
         }

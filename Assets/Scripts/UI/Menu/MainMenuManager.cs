@@ -15,7 +15,7 @@ using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using NSMB.Utils;
 
-public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks, IWebRpcCallback {
+public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
 
     public const int NICKNAME_MIN = 2, NICKNAME_MAX = 20;
 
@@ -264,7 +264,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 currentRooms.Remove(key);
             }
 
-            if (PhotonNetwork.AuthValues.Token == null) {
+            if (!GlobalController.Instance.authenticated) {
                 string id = PlayerPrefs.GetString("id", null);
                 string token = PlayerPrefs.GetString("token", null);
 
@@ -296,24 +296,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }, "");
     }
     public void OnCustomAuthenticationResponse(Dictionary<string, object> response) {
+        Debug.Log("[PHOTON] Auth Successful!");
         PlayerPrefs.SetString("id", PhotonNetwork.AuthValues.UserId);
         if (response.ContainsKey("Token"))
             PlayerPrefs.SetString("token", (string) response["Token"]);
-
         PlayerPrefs.Save();
+
+        GlobalController.Instance.authenticated = true;
     }
     public void OnCustomAuthenticationFailed(string failure) {
+        Debug.Log("[PHOTON] Auth Failure: " + failure);
         OpenErrorBox(failure);
     }
     public void OnConnectedToMaster() {
         JoinMainLobby();
-
-        /*
-        string reconnectRoom = PlayerPrefs.GetString("in-room", null);
-        if (reconnectRoom != null) {
-            PhotonNetwork.RejoinRoom(reconnectRoom);
-        }
-        */
     }
     // MATCHMAKING CALLBACKS
     public void OnFriendListUpdate(List<FriendInfo> friendList) {}
@@ -347,15 +343,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             sender = PhotonNetwork.CurrentRoom.GetPlayer(e.Sender);
 
         switch (e.Code) {
-        //case EventCode.PropertiesChanged: {
-        //    if ((int) e.Parameters[253] == 1)
-        //        Debug.Log(e.ToStringFull());
-
-        //    if ((int) e.Parameters[253] == 1 && PhotonNetwork.IsMasterClient && sender != null && !sender.IsMasterClient)
-        //        StartCoroutine(KickPlayer(sender));
-
-        //    break;
-        //}
         case (byte) Enums.NetEventIds.StartGame: {
 
             if (!(sender?.IsMasterClient ?? false) && e.SenderKey != 255)
@@ -392,11 +379,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                     return;
             }
 
-            message = sender.GetUniqueNickname() + ": " + message;
+            message = sender.GetUniqueNickname() + ": " + message.Filter();
             message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
             message = message.Substring(0, Mathf.Min(128, message.Length));
 
-            LocalChatMessage(message, Color.black);
+            LocalChatMessage(message, Color.black, false);
             break;
         }
         case (byte) Enums.NetEventIds.ChangeMaxPlayers: {
@@ -408,10 +395,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             break;
         }
         }
-    }
-    public void OnWebRpcResponse(OperationResponse response) {
-        if (response.ReturnCode != 0)
-            OpenErrorBox(response.DebugMessage);
     }
 
     private void JoinMainLobby() {
@@ -460,8 +443,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
             OpenTitleScreen();
-            //PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
-            PhotonNetwork.NetworkingClient.AppId = "40c2f241-79f7-4721-bdac-3c0366d00f58";
+            PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
+            //PhotonNetwork.NetworkingClient.AppId = "40c2f241-79f7-4721-bdac-3c0366d00f58";
 
             //version separation
             Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
@@ -974,7 +957,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerChatMessage, message, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
-    public void LocalChatMessage(string message, Color? color = null) {
+    public void LocalChatMessage(string message, Color? color = null, bool filter = true) {
         float y = 0;
         for (int i = 0; i < chatContent.transform.childCount; i++) {
             GameObject child = chatContent.transform.GetChild(i).gameObject;
@@ -993,7 +976,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
 
         GameObject txtObject = chat.transform.Find("Text").gameObject;
-        SetText(txtObject, message);
+        SetText(txtObject, message, filter);
         Canvas.ForceUpdateCanvases();
 
         //RectTransform tf = txtObject.GetComponent<RectTransform>();
@@ -1278,9 +1261,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Settings.Instance.nickname = field.text;
         Settings.Instance.SaveSettingsToPreferences();
     }
-    private void SetText(GameObject obj, string txt) {
+    private void SetText(GameObject obj, string txt, bool filter) {
         TextMeshProUGUI textComp = obj.GetComponent<TextMeshProUGUI>();
-        textComp.text = txt.Filter();
+        textComp.text = filter ? txt.Filter() : txt;
     }
     private void SetText(GameObject obj, string txt, Color color) {
         TextMeshProUGUI textComp = obj.GetComponent<TextMeshProUGUI>();
@@ -1484,6 +1467,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         return seconds;
     }
     public void ChangeLobbyHeader(string name) {
-        SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby");
+        SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
     }
 }
