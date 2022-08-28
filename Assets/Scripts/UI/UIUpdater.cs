@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Pun;
 using TMPro;
+
+using Photon.Pun;
 using NSMB.Utils;
-using System.Text;
+
 
 public class UIUpdater : MonoBehaviour {
 
@@ -115,8 +116,10 @@ public class UIUpdater : MonoBehaviour {
             timerParent.SetActive(true);
 
             if (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp < 0) {
-                if (timerMaterial == null)
-                    timerMaterial = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>().GetMaterial();
+                if (timerMaterial == null) {
+                    CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
+                    cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
+                }
 
                 float partialSeconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f % 2f;
                 byte gb = (byte) (Mathf.PingPong(partialSeconds, 1f) * 255);

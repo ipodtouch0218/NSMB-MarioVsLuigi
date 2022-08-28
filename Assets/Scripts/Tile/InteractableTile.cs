@@ -20,7 +20,7 @@ public abstract class InteractableTile : AnimatedTile {
                 continue;
 
             if (obj.GetComponent<MovingPowerup>() is MovingPowerup powerup) {
-                powerup.photonView.RPC("Bump", RpcTarget.All);
+                powerup.photonView.RPC(nameof(MovingPowerup.Bump), RpcTarget.All);
                 continue;
             }
 
@@ -37,29 +37,30 @@ public abstract class InteractableTile : AnimatedTile {
             case "koopa": {
                 if (!obj.GetPhotonView())
                     continue;
-                obj.GetPhotonView().RPC("Bump", RpcTarget.All);
+                obj.GetPhotonView().RPC(nameof(KoopaWalk.Bump), RpcTarget.All);
                 continue;
             }
             case "goomba": {
                 if (!obj.GetPhotonView())
                     continue;
-                obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false, 0);
+                obj.GetPhotonView().RPC(nameof(KillableEntity.SpecialKill), RpcTarget.All, obj.transform.position.x < worldLocation.x, false, 0);
                 continue;
             }
             case "loosecoin":
             case "coin": {
-                if (!obj)
+                PhotonView view;
+                if (!obj || !(view = obj.GetComponentInParent<PhotonView>()))
                     continue;
 
                 if (interacter is PlayerController pl)
-                    pl.photonView.RPC("AttemptCollectCoin", RpcTarget.All, obj.GetComponentInParent<PhotonView>()?.ViewID ?? -1, (Vector2) obj.transform.position);
+                    pl.photonView.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.All, view.GetComponentInParent<PhotonView>().ViewID, (Vector2) obj.transform.position);
                 continue;
             }
             case "MainStar":
             case "bigstar":
                 continue;
             case "frozencube":
-                obj.GetPhotonView().RPC("Kill", RpcTarget.All);
+                obj.GetPhotonView().RPC(nameof(KillableEntity.Kill), RpcTarget.All);
                 continue;
             default: {
                 if (obj.layer != LayerMask.NameToLayer("Entity"))

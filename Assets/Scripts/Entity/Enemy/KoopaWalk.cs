@@ -345,19 +345,10 @@ public class KoopaWalk : HoldableEntity {
     }
 
     [PunRPC]
-    protected void Bump() {
+    public void Bump() {
         if (dead)
             return;
 
-        //if (blue) {
-        //    if (photonView.IsMine)
-        //        PhotonNetwork.Destroy(photonView);
-        //
-        //    if (PhotonNetwork.IsMasterClient)
-        //        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/BlueShell", transform.position, Quaternion.identity);
-        //
-        //    return;
-        //}
         if (!shell) {
             stationary = true;
             putdown = true;

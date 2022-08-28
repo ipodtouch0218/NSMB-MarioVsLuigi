@@ -1,7 +1,6 @@
 using UnityEngine;
 using TMPro;
 
-[ExecuteAlways]
 [RequireComponent(typeof(TMP_Text))]
 public class SlantText : MonoBehaviour {
 
@@ -9,38 +8,37 @@ public class SlantText : MonoBehaviour {
 
     private TMP_Text text;
     private TMP_SubMeshUI subtext;
-    private Mesh mesh;
-    private Vector3[] verts;
-    private bool set;
 
-
-    public void OnValidate() {
-        set = false;
-        LateUpdate();
+    public void Awake() {
+        text = GetComponent<TMP_Text>();
     }
 
-    public void LateUpdate() {
-        if (!text || !subtext) {
-            text = GetComponent<TMP_Text>();
-            subtext = GetComponentInChildren<TMP_SubMeshUI>();
+    public void OnEnable() {
+        TMPro_EventManager.TEXT_CHANGED_EVENT.Add(MoveVerts);
+    }
 
-            if (subtext && !set) {
-                subtext.material = new(subtext.material);
-                set = true;
-            }
+    public void OnDisable() {
+        TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(MoveVerts);
+    }
+
+    public void MoveVerts(Object a) {
+        if (!text || a != text)
             return;
+
+        if (!subtext) {
+            subtext = GetComponentInChildren<TMP_SubMeshUI>();
+            if (!subtext)
+                return;
         }
 
-        text.ForceMeshUpdate();
-        mesh = subtext.mesh;
-        verts = mesh.vertices;
+        TMP_TextInfo info = text.textInfo;
+        Mesh mesh = subtext.mesh;
+        Vector3[] verts = mesh.vertices;
 
-        Vector3 adjust = slopeAmount < 0 ? -slopeAmount * text.textInfo.characterCount * Vector3.up : Vector3.zero;
-        for (int i = 0; i < text.textInfo.characterCount; i++) {
-            TMP_CharacterInfo c = text.textInfo.characterInfo[i];
-
-            int index = c.vertexIndex;
-            Vector3 offset = adjust;
+        Vector3 adjustment = slopeAmount < 0 ? -slopeAmount * text.textInfo.characterCount * Vector3.up : Vector3.zero;
+        for (int i = 0; i < info.characterCount; i++) {
+            int index = info.characterInfo[i].vertexIndex;
+            Vector3 offset = adjustment;
 
             if (i == 0) {
                 offset.y += firstChar;

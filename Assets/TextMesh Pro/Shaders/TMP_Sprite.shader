@@ -3,7 +3,7 @@ Shader "TextMeshPro/Sprite"
 	Properties
 	{
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
-		_Color ("Tint", Color) = (1,1,1,1)
+		_Color("Tint", Color) = (1,1,1,1)
 
 		_StencilComp ("Stencil Comparison", Float) = 8
 		_Stencil ("Stencil ID", Float) = 0

@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     //MOVEMENT STAGES
     private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
     private static readonly float[] SPEED_STAGE_MAX = { 0.9375f, 2.8125f, 4.21875f, 5.625f, 8.4375f };
+    private static readonly float SPEED_SLIDE_MAX = 7.5f;
     private static readonly float[] SPEED_STAGE_ACC = { 0.131835975f, 0.06591802875f, 0.05859375f, 0.0439453125f, 1.40625f };
     private static readonly float[] WALK_TURNAROUND_ACC = { 0.0659179686f, 0.146484375f, 0.234375f };
     private static readonly float BUTTON_RELEASE_DEC = 0.0659179686f;
@@ -75,6 +76,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private static readonly float SKIDDING_ICE_DEC = 0.06591796875f;
     private static readonly float WALK_TURNAROUND_ICE_ACC = 0.0439453125f;
 
+    private static readonly float SLIDING_45_ACC = 0.2197265625f;
+    private static readonly float SLIDING_22_ACC = 0.087890625f;
 
     public float RunningMaxSpeed => SPEED_STAGE_MAX[RUN_STAGE];
     public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
@@ -1669,7 +1672,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
     #endregion
 
-    void HandleSliding(bool up, bool down) {
+    private void HandleSliding(bool up, bool down, bool left, bool right) {
         startedSliding = false;
         if (groundpound) {
             if (onGround) {
@@ -1682,7 +1685,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     groundpound = false;
                     sliding = true;
                     alreadyGroundpounded = true;
-                    body.velocity = new Vector2(-Mathf.Sign(floorAngle) * groundpoundVelocity, 0);
+                    body.velocity = new Vector2(-Mathf.Sign(floorAngle) * SPEED_SLIDE_MAX, 0);
                     startedSliding = true;
                 } else {
                     body.velocity = Vector2.zero;
@@ -1714,8 +1717,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         }
 
-        if (up || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && !down) || (facingRight && hitRight) || (!facingRight && hitLeft)) {
+        if (up || ((left ^ right) && !down) || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && body.velocity.x == 0) || (facingRight && hitRight) || (!facingRight && hitLeft)) {
             sliding = false;
+            PlaySound(Enums.Sounds.Player_Sound_SlideEnd);
             //alreadyGroundpounded = false;
         }
     }
@@ -2137,12 +2141,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         int stage = MovementStage;
         float acc = state == Enums.PowerupState.MegaMushroom ? SPEED_STAGE_MEGA_ACC[stage] : SPEED_STAGE_ACC[stage];
+        float sign = Mathf.Sign(body.velocity.x);
 
         if ((left ^ right) && (!crouching || (crouching && !onGround && state != Enums.PowerupState.BlueShell)) && !knockback && !sliding) {
             //we can walk here
 
             float speed = Mathf.Abs(body.velocity.x);
-            float sign = Mathf.Sign(body.velocity.x);
             bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == sign);
 
             //check that we're not going above our limit
@@ -2220,7 +2224,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             body.velocity = new(newX, body.velocity.y);
 
         } else if (onGround) {
-            //not holding anything, crouch sliding, or holding both directions. decelerate
+            //not holding anything, sliding, or holding both directions. decelerate
 
             skidding = false;
             turnaround = false;
@@ -2228,9 +2232,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (body.velocity.x == 0)
                 return;
 
-            if (sliding && Mathf.Abs(floorAngle) > slopeSlidingAngle)
-                acc = BUTTON_RELEASE_ICE_DEC[stage] * Mathf.Sign(floorAngle);
-            else if (onIce)
+            if (sliding) {
+                float angle = Mathf.Abs(floorAngle);
+                if (angle > slopeSlidingAngle) {
+                    //uphill / downhill
+                    acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * ((Mathf.Sign(floorAngle) == sign) ? -1 : 1);
+                } else {
+                    //flat ground
+                    acc = -SPEED_STAGE_ACC[0];
+                }
+            } else if (onIce)
                 acc = -BUTTON_RELEASE_ICE_DEC[stage];
             else if (knockback)
                 acc = -KNOCKBACK_DEC;
@@ -2242,6 +2253,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             if ((direction == -1) ^ (newX <= 0))
                 newX = 0;
+
+            if (sliding) {
+                newX = Mathf.Clamp(newX, -SPEED_SLIDE_MAX, SPEED_SLIDE_MAX);
+            }
 
             body.velocity = new(newX, body.velocity.y);
 
@@ -2390,7 +2405,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (wallJumpTimer > 0) {
             facingRight = body.velocity.x > 0;
-        } else if (!inShell && !sliding && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
+        } else if (!inShell && !sliding && !skidding && !knockback && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
             if (right ^ left)
                 facingRight = right;
         } else if (giantStartTimer <= 0 && giantEndTimer <= 0 && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
@@ -2754,7 +2769,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
 
         HandleSlopes();
-        HandleSliding(up, crouch);
+        HandleSliding(up, crouch, left, right);
         HandleFacingDirection();
 
         //slow-rise check

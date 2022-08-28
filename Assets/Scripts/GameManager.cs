@@ -573,13 +573,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (gameover) //This is to ensure that if a win or draw occurs in the last 10 seconds, the countdown sound doesn't play past the match's length.
                 yield break;
 
-            if (i >= (times / 2)) { //Countdown sound will speed up and play twice per second as a match's end draws near.
-                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+            if (i >= (times * 0.7f)) { //Countdown sound will speed up and play twice per second as a match's end draws near.
+                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
                 yield return new WaitForSeconds(t / 2);
-                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
                 yield return new WaitForSeconds(t / 2);
             } else { //Or it'll just play normally.
-                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
                 yield return new WaitForSeconds(t);
             }
         }
@@ -668,7 +668,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     tenSecondCountdown = true;
                 }
                 if (timeRemaining - Time.deltaTime <= 0) {
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
                     CheckForWinner();
                 }
             }

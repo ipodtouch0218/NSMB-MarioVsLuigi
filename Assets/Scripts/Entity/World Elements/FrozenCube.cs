@@ -98,12 +98,12 @@ public class FrozenCube : HoldableEntity {
             return;
         }
         if (photonView.IsMine && body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY()) {
-            entityView.RPC("Unfreeze", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Other);
+            entityView.RPC(nameof(IFreezableEntity.Unfreeze), RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Other);
             PhotonNetwork.Destroy(photonView);
             return;
         }
         if (photonView.IsMine && holder && Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f)) {
-            photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.HitWall);
+            photonView.RPC(nameof(KillWithReason), RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.HitWall);
             return;
         }
 
@@ -146,7 +146,7 @@ public class FrozenCube : HoldableEntity {
                 if (flying)
                     fallen = true;
                 else if (photonView.IsMine) {
-                    photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Timer);
+                    photonView.RPC(nameof(KillWithReason), RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Timer);
                 }
             }
         }
@@ -168,26 +168,21 @@ public class FrozenCube : HoldableEntity {
         GameObject obj = collider.gameObject;
         KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
 
-        if (killa && (killa.dead ||killa.photonView.ViewID == entityView.ViewID))
-            return;
+        if (killa) {
+            if (killa.dead || killa.photonView.ViewID == entityView.ViewID)
+                return;
+
+            killa.photonView.RPC(nameof(KillableEntity.SpecialKill), RpcTarget.All, killa.transform.position.x > transform.position.x, false, combo++);
+        }
 
         switch (obj.tag) {
-        case "koopa":
-        case "bobomb":
-        case "bulletbill":
-        case "goomba":
-        case "piranhaplant":
-        case "frozencube": {
-            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.transform.position.x > transform.position.x, false, combo++);
-            break;
-        }
         case "coin": {
-            (holder != null ? holder : previousHolder).photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
+            (holder != null ? holder : previousHolder).photonView.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.All, obj.GetPhotonView().ViewID, (Vector2) obj.transform.position);
             break;
         }
         case "loosecoin": {
             Transform parent = obj.transform.parent;
-            (holder != null ? holder : previousHolder).photonView.RPC("CollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, parent.position);
+            (holder != null ? holder : previousHolder).photonView.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.All, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
             break;
         }
         }

@@ -43,4 +43,8 @@ public class RespawningInvisibleBlock : MonoBehaviour {
         object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, false, "SpecialTiles/EmptyYellowQuestion", "Coin" };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetThenBumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
     }
+
+    public void OnDrawGizmos() {
+        Gizmos.DrawIcon(transform.position, "HiddenBlock", true, new Color(1, 1, 1, 0.5f));
+    }
 }
