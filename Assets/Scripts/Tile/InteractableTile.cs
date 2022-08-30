@@ -20,7 +20,8 @@ public abstract class InteractableTile : AnimatedTile {
                 continue;
 
             if (obj.GetComponent<MovingPowerup>() is MovingPowerup powerup) {
-                powerup.photonView.RPC(nameof(MovingPowerup.Bump), RpcTarget.All);
+                if (powerup.powerupScriptable.state != Enums.PowerupState.PropellerMushroom)
+                    powerup.photonView.RPC(nameof(MovingPowerup.Bump), RpcTarget.All);
                 continue;
             }
 

@@ -59,6 +59,7 @@ SpriteAtlas:
     - {fileID: 2800000, guid: 18672b4e92026df448d06fc811e08fc3, type: 3}
     - {fileID: 2800000, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
     - {fileID: 2800000, guid: a775520159383d847b8ce31256b06b01, type: 3}
+    - {fileID: 2800000, guid: 34660a1de22c6a34aac084333e781433, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -511,6 +512,44 @@ SpriteAtlas:
   - {fileID: -1732289050, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
   - {fileID: -2170712247897187164, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
   - {fileID: -2189475840094043951, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
+  - {fileID: 2111862159, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -697328687, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 2065498208, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 1920608493, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 2074334732, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -553013343, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -525322719, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -25946883, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -2147480664, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -100346723, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 759273064, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 1271870944, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 525403743, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -1921318900, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 1894856318, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 1754984331, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -1580583522, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -957090550, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 328177050, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -861886342, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 189196711, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -1370889496, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 1837041086, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 413761678, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 363712120, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -1816623825, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 809517357, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -977740889, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 1958602249, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -251985357, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 2105570718, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 111970168, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 1091554259, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 2134080601, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 2057431226, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 88885150, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: 1864524432, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  - {fileID: -1852396629, guid: 34660a1de22c6a34aac084333e781433, type: 3}
   - {fileID: 2092874529498962018, guid: 2845314df9e561d4abdd9e9e7b4db417, type: 3}
   - {fileID: -4457632624933860982, guid: 2845314df9e561d4abdd9e9e7b4db417, type: 3}
   - {fileID: 7933572893953263569, guid: 2845314df9e561d4abdd9e9e7b4db417, type: 3}
@@ -1167,6 +1206,44 @@ SpriteAtlas:
   - launcher_2
   - launcher_0
   - launcher_1
+  - 31 Volcano (yellow)_8
+  - 31 Volcano (yellow)_20
+  - 31 Volcano (yellow)_7
+  - 31 Volcano (yellow)_6
+  - 31 Volcano (yellow)_5
+  - 31 Volcano (yellow)_4
+  - 31 Volcano (yellow)_3
+  - 31 Volcano (yellow)_2
+  - 31 Volcano (yellow)_1
+  - 31 Volcano (yellow)_29
+  - 31 Volcano (yellow)_0
+  - 31 Volcano (yellow)_28
+  - 31 Volcano (yellow)_18
+  - 31 Volcano (yellow)_19
+  - 31 Volcano (yellow)_12
+  - 31 Volcano (yellow)_13
+  - 31 Volcano (yellow)_10
+  - 31 Volcano (yellow)_11
+  - 31 Volcano (yellow)_16
+  - 31 Volcano (yellow)_17
+  - 31 Volcano (yellow)_14
+  - 31 Volcano (yellow)_15
+  - 31 Volcano (yellow)_34
+  - 31 Volcano (yellow)_35
+  - 31 Volcano (yellow)_36
+  - 31 Volcano (yellow)_37
+  - 31 Volcano (yellow)_27
+  - 31 Volcano (yellow)_30
+  - 31 Volcano (yellow)_26
+  - 31 Volcano (yellow)_31
+  - 31 Volcano (yellow)_25
+  - 31 Volcano (yellow)_32
+  - 31 Volcano (yellow)_24
+  - 31 Volcano (yellow)_33
+  - 31 Volcano (yellow)_23
+  - 31 Volcano (yellow)_22
+  - 31 Volcano (yellow)_9
+  - 31 Volcano (yellow)_21
   - forest_5
   - forest_4
   - forest_6

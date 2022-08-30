@@ -97,7 +97,7 @@ public class FrozenCube : HoldableEntity {
             body.isKinematic = true;
             return;
         }
-        if (photonView.IsMine && body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY()) {
+        if (photonView.IsMine && (body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY() || Utils.IsTileSolidAtWorldLocation(body.position + (hitbox.size.y / 2f) * Vector2.up))) {
             entityView.RPC(nameof(IFreezableEntity.Unfreeze), RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Other);
             PhotonNetwork.Destroy(photonView);
             return;

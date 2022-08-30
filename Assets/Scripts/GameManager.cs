@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (_instance)
                 return _instance;
 
-            if (SceneManager.GetActiveScene().buildIndex > 2)
+            if (SceneManager.GetActiveScene().buildIndex >= 2)
                 _instance = FindObjectOfType<GameManager>();
 
             return _instance;
@@ -206,15 +206,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         case (byte) Enums.NetEventIds.BumpTile: {
 
-            PlayerController pl = GetController(sender);
-            if (pl == null || pl.dead)
-                return;
-
             int x = (int) data[0];
             int y = (int) data[1];
-
-           // if (Utils.WrappedDistance(pl.transform.position, Utils.TilemapToWorldPosition(new Vector3Int(x, y, 0))) > 3f)
-           //     return;
 
             bool downwards = (bool) data[2];
             string newTile = (string) data[3];
@@ -240,15 +233,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         case (byte) Enums.NetEventIds.SetThenBumpTile: {
 
-            PlayerController pl = GetController(sender);
-            if (pl == null || pl.dead)
-                return;
-
             int x = (int) data[0];
             int y = (int) data[1];
-
-            if (Utils.WrappedDistance(pl.transform.position, Utils.TilemapToWorldPosition(new Vector3Int(x, y, 0))) > 3.5f)
-                return;
 
             bool downwards = (bool) data[2];
             string newTile = (string) data[3];
@@ -569,7 +555,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     IEnumerator CountdownSound(float t, float times) { //The match countdown sound system. t is the tempo, and times is the # of times the sound will play (variable if match is started at 10s or less)
-        for (int i = 0;i < times; i++) {
+        for (int i = 0; i < times; i++) {
             if (gameover) //This is to ensure that if a win or draw occurs in the last 10 seconds, the countdown sound doesn't play past the match's length.
                 yield break;
 
@@ -621,7 +607,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     private IEnumerator BigStarRespawn(bool wait = true) {
         if (wait)
-            yield return new WaitForSecondsRealtime(10.4f - playerCount / 5f);
+            yield return new WaitForSeconds(10.4f - playerCount / 5f);
 
         if (!PhotonNetwork.IsMasterClient || gameover)
             yield break;
@@ -638,7 +624,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 if (hit.gameObject.CompareTag("Player")) {
                     //cant spawn here
                     remainingSpawns.RemoveAt(index);
-                    yield return new WaitForSecondsRealtime(0.2f);
+                    yield return new WaitForSeconds(0.2f);
                     goto bigwhile;
                 }
             }
@@ -782,6 +768,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (player.lives == 1 && players.Count <= 2)
                 speedup = true;
         }
+
+        speedup |= players.All(pl => !pl || pl.lives == 1);
 
         if (mega) {
             PlaySong(Enums.MusicState.MegaMushroom, megaMushroomMusic);

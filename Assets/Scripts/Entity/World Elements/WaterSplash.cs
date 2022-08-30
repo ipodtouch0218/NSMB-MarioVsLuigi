@@ -24,9 +24,7 @@ public class WaterSplash : MonoBehaviour {
         Initialize();
     }
     private void OnValidate() {
-        ValidationUtility.SafeOnValidate(() => {
-            Initialize();
-        });
+        ValidationUtility.SafeOnValidate(Initialize);
     }
 
     private void Initialize() {

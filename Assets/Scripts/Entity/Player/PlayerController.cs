@@ -1144,10 +1144,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     [PunRPC]
     public void AttemptCollectCoin(int coinID, Vector2 particle, PhotonMessageInfo info) {
         //only the owner can request a coin, and only the master client can decide for us
-        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
-            return;
-
-        if (dead || !spawned)
+        if (!PhotonNetwork.IsMasterClient)
             return;
 
         if (coinID != -1) {
@@ -1187,7 +1184,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         PlaySound(Enums.Sounds.World_Coin_Collect);
         NumberParticle num = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity)).GetComponentInChildren<NumberParticle>();
         num.text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
-        num.color = AnimationController.GlowColor;
+        num.ApplyColor(AnimationController.GlowColor);
 
         coins = newCount;
         if (coins >= GameManager.Instance.coinRequirement) {
@@ -1717,9 +1714,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         }
 
-        if (up || ((left ^ right) && !down) || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && body.velocity.x == 0) || (facingRight && hitRight) || (!facingRight && hitLeft)) {
+        if (sliding && (up || ((left ^ right) && !down) || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && body.velocity.x == 0 && !down) || (facingRight && hitRight) || (!facingRight && hitLeft))) {
             sliding = false;
-            PlaySound(Enums.Sounds.Player_Sound_SlideEnd);
+            if (body.velocity.x == 0)
+                PlaySound(Enums.Sounds.Player_Sound_SlideEnd);
+
             //alreadyGroundpounded = false;
         }
     }
@@ -2114,8 +2113,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     void HandleWalkingRunning(bool left, bool right) {
 
         if (wallJumpTimer > 0) {
-            body.velocity = new(WALLJUMP_HSPEED * (facingRight ? 1 : -1), body.velocity.y);
-            return;
+            if (wallJumpTimer < (14 / 60f) && (hitLeft || hitRight)) {
+                wallJumpTimer = 0;
+            } else {
+                body.velocity = new(WALLJUMP_HSPEED * (facingRight ? 1 : -1), body.velocity.y);
+                return;
+            }
         }
 
         if (groundpound || groundpoundCounter > 0 || knockback || pipeEntering || jumpLandingTimer > 0 || !(wallJumpTimer <= 0 || onGround || body.velocity.y < 0))
@@ -2898,7 +2901,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         } else if (propeller) {
             //start propeller drill
-            if (propellerTimer < 0.6f && body.velocity.y < 3) {
+            if (propellerTimer < 0.6f && body.velocity.y < 7) {
                 drill = true;
                 propellerTimer = 0;
                 hitBlock = true;

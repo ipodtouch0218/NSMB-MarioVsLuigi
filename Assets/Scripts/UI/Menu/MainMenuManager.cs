@@ -380,8 +380,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             }
 
             message = sender.GetUniqueNickname() + ": " + message.Filter();
-            message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
             message = message.Substring(0, Mathf.Min(128, message.Length));
+            message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
 
             LocalChatMessage(message, Color.black, false);
             break;
@@ -984,11 +984,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
     }
     public void SendChat() {
-        string text = chatTextField.text.Replace("<", "«").Replace(">", "»").Trim();
-        chatTextField.text = "";
-        if (text == null || text == "") {
+        double time = lastMessage.GetValueOrDefault(PhotonNetwork.LocalPlayer);
+        if (PhotonNetwork.Time - time < 0.75f)
             return;
-        }
+
+        string text = chatTextField.text.Replace("<", "«").Replace(">", "»").Trim();
+        if (text == null || text == "")
+            return;
+
         if (text.StartsWith("/")) {
             RunCommand(text[1..].Split(" "));
             return;
@@ -1192,6 +1195,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     IEnumerator SelectNextFrame(TMP_InputField input) {
         yield return new WaitForEndOfFrame();
+        input.text = "";
         input.ActivateInputField();
     }
 

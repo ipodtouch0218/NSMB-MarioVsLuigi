@@ -9,8 +9,7 @@ public class TextSubmitValidator : TMP_InputValidator {
         if (ch == '\n' || ch == '\xB') {
             //submit
             MainMenuManager.Instance.SendChat();
-            text = "";
-            pos = 0;
+            return '\0';
         } else {
             if (text.Length >= 128)
                 return '\0';

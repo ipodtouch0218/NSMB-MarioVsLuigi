@@ -15,13 +15,13 @@ public class LeftRightButton : Selectable {
 
     protected override void OnEnable() {
         base.OnEnable();
-        Debug.Log("A");
-        InputSystem.controls.UI.Navigate.performed += OnNavigation;
+        InputSystem.controls.Player.Movement.performed += OnNavigation;
+        InputSystem.controls.Player.Movement.canceled += OnNavigation;
     }
     protected override void OnDisable() {
         base.OnDisable();
-        Debug.Log("A");
-        InputSystem.controls.UI.Navigate.performed -= OnNavigation;
+        InputSystem.controls.Player.Movement.performed -= OnNavigation;
+        InputSystem.controls.Player.Movement.canceled -= OnNavigation;
     }
 
     protected override void Start() {
