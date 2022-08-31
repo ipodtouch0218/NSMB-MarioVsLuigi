@@ -427,9 +427,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         HorizontalCamera.OFFSET = 0;
         GlobalController.Instance.joinedAsSpectator = false;
         Time.timeScale = 1;
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
-        mixer.SetFloat("MusicSpeed", 1f);
-        mixer.SetFloat("MusicPitch", 1f);
 
         if (GlobalController.Instance.disconnectCause != null) {
             OpenErrorBox(GlobalController.Instance.disconnectCause.Value);

@@ -1723,7 +1723,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
     }
 
-    void HandleSlopes() {
+    private void HandleSlopes() {
         if (!onGround) {
             floorAngle = 0;
             return;

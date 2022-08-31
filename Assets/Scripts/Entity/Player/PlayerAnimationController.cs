@@ -146,7 +146,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             eyeState = Enums.PlayerEyeState.Death;
         } else {
             if ((blinkTimer -= Time.fixedDeltaTime) < 0)
-                blinkTimer = 3f + (Random.value * 2f);
+                blinkTimer = 3f + (Random.value * 6f);
             if (blinkTimer < blinkDuration) {
                 eyeState = Enums.PlayerEyeState.HalfBlink;
             } else if (blinkTimer < blinkDuration * 2f) {

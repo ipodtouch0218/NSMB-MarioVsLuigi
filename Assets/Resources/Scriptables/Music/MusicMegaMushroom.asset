@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: MusicMegaMushroom
   m_EditorClassIdentifier: 
   clip: {fileID: 8300000, guid: b19d40ba33fd0c04d85f36e6a03b5484, type: 3}
+  fastClip: {fileID: 8300000, guid: 01858ce519d68404e993c7aafc929413, type: 3}
   loopStartSample: 0
   loopEndSample: -1

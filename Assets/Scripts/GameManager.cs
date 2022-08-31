@@ -749,7 +749,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         musicState = state;
     }
 
-    private bool fastMusic;
     private void HandleMusic() {
         bool invincible = false;
         bool mega = false;
@@ -779,25 +778,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             PlaySong(Enums.MusicState.Normal, mainMusic);
         }
 
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
-        if (speedup) {
-            if (!fastMusic) {
-                mixer.SetFloat("MusicSpeed", 1.25f);
-                mixer.SetFloat("MusicPitch", 1f / 1.25f);
-                fastMusic = true;
-            }
-        } else {
-            if (fastMusic) {
-                mixer.SetFloat("MusicSpeed", 1f);
-                mixer.SetFloat("MusicPitch", 1f);
-                fastMusic = false;
-            }
-        }
+        loopMusic.FastMusic = speedup;
     }
 
     public void OnPause(InputAction.CallbackContext context) {
         Pause();
     }
+
     public void Pause() {
         if (gameover || !musicEnabled)
             return;

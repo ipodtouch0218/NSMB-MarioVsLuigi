@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: MusicLevelSky
   m_EditorClassIdentifier: 
   clip: {fileID: 8300000, guid: bc18c4110a655b349b6023be6688170f, type: 3}
+  fastClip: {fileID: 8300000, guid: da5dee2ae9ef65f4cac1ed601e905a64, type: 3}
   loopStartSample: 7.38461
   loopEndSample: 51.692314

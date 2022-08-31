@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: MusicLevelBonus
   m_EditorClassIdentifier: 
   clip: {fileID: 8300000, guid: 8c57c2448164aa34caad69a2d0865456, type: 3}
+  fastClip: {fileID: 8300000, guid: 57a3d2c4ff7f22f41b389760e080be4c, type: 3}
   loopStartSample: 8
   loopEndSample: 48
