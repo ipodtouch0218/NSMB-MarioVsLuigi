@@ -107,7 +107,7 @@ public class UIUpdater : MonoBehaviour {
         }
 
         if (GameManager.Instance.timedGameDuration > 0) {
-            int seconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000;
+            int seconds = Mathf.CeilToInt((GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f);
             seconds = Mathf.Clamp(seconds, 0, GameManager.Instance.timedGameDuration);
             if (seconds != timer) {
                 timer = seconds;

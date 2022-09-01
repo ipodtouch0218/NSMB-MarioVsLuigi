@@ -217,7 +217,7 @@ public class FrozenCube : HoldableEntity {
         if (holder || fallen || player.Frozen || (player.throwInvincibility > 0 && player.holdingOld == gameObject))
             return;
 
-        if (player.groundpound && attackedFromAbove && player.state != Enums.PowerupState.MiniMushroom) {
+        if ((player.groundpound || player.groundpoundLastFrame) && attackedFromAbove && player.state != Enums.PowerupState.MiniMushroom) {
             photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Groundpounded);
             if (entity is PlayerController pc)
                 pc.photonView.RPC("Knockback", RpcTarget.All, pc.facingRight, 1, false, player.photonView.ViewID);
