@@ -5,12 +5,17 @@ using NSMB.Utils;
 public class LooseCoin : MonoBehaviourPun {
 
     public float despawn = 10;
-    private float despawnTimer;
+
     private Rigidbody2D body;
     private SpriteRenderer spriteRenderer;
     private PhysicsEntity physics;
     private Animator animator;
     private BoxCollider2D hitbox;
+    private AudioSource sfx;
+    private Vector2 prevFrameVelocity;
+    private float despawnTimer;
+
+    public bool Collected { get; set; }
 
     public void Start() {
         body = GetComponent<Rigidbody2D>();
@@ -18,6 +23,7 @@ public class LooseCoin : MonoBehaviourPun {
         hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
         animator = GetComponent<Animator>();
+        sfx = GetComponent<AudioSource>();
         body.velocity = Vector2.up * Random.Range(2f, 3f);
     }
 
@@ -37,9 +43,15 @@ public class LooseCoin : MonoBehaviourPun {
             body.velocity -= body.velocity * Time.fixedDeltaTime;
             if (physics.hitRoof && photonView.IsMine)
                 PhotonNetwork.Destroy(photonView);
+
+            if (prevFrameVelocity.y < -1f) {
+                sfx.PlayOneShot(Enums.Sounds.World_Coin_Drop.GetClip());
+            }
         }
 
         spriteRenderer.enabled = !(despawnTimer > despawn-3 && despawnTimer % 0.3f >= 0.15f);
+
+        prevFrameVelocity = body.velocity;
 
         if ((despawnTimer += Time.deltaTime) >= despawn) {
             if (photonView.IsMine)

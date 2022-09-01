@@ -58,6 +58,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 2
   m_TargetDisplay: 0
@@ -228,6 +229,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2db399dc5ed094c8b01e459636e673, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skins:
+  - {fileID: 0}
+  - {fileID: 11400000, guid: f63a082ed1de1ac46a4d175774638d5a, type: 2}
+  - {fileID: 11400000, guid: 8af1f8b5ba79cd049815d2650240b98c, type: 2}
+  - {fileID: 11400000, guid: b64a87dbaa8184d4b865712efee298f4, type: 2}
+  - {fileID: 11400000, guid: 49daddea50a684d4a90c97b006f72d5d, type: 2}
+  - {fileID: 11400000, guid: 6dac31169dec15444bae7e4839c1d015, type: 2}
+  - {fileID: 11400000, guid: 9f9900ffd217e0045bdcd9ea3a2d34aa, type: 2}
+  - {fileID: 11400000, guid: 6515d3ef9d0c3bd43ac4e3929756e63d, type: 2}
+  - {fileID: 11400000, guid: de9f9a7f672095f44a57282c61d019ae, type: 2}
+  - {fileID: 11400000, guid: f83e89891288e5e478a5a58f234378b7, type: 2}
+  - {fileID: 11400000, guid: 60d3730ab1b17f644bbb11fc34ea6a27, type: 2}
+  - {fileID: 11400000, guid: cac922f297f268e449a78c6771201040, type: 2}
+  - {fileID: 11400000, guid: a8c174de2dd567e42ab2dc347d0d049b, type: 2}
+  - {fileID: 11400000, guid: 8bafc3c7840b969449455cc52e12a5b0, type: 2}
+  - {fileID: 11400000, guid: 90095050131f1f24589e75ffe7755bba, type: 2}
+  - {fileID: 11400000, guid: b4869f2279eca3d4492309f6333b6e77, type: 2}
+  - {fileID: 11400000, guid: dad94b67e7d7bc548a6f59716db157d2, type: 2}
+  - {fileID: 11400000, guid: df93808b9a7f2cd4faa25234bc48b4c1, type: 2}
+  - {fileID: 11400000, guid: edcd276a8acb45a46948d7f46b3acc57, type: 2}
+  - {fileID: 11400000, guid: 3211edc9ee1951f4780bd104a9fbd597, type: 2}
   ndsCanvas: {fileID: 1955773772637164072}
   fourByThreeImage: {fileID: 0}
   anyAspectImage: {fileID: 0}
@@ -237,9 +259,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
   - {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
   settings: {fileID: 0}
-  discordController: {fileID: 0}
   controlsJson: 
   joinedAsSpectator: 0
+  checkedForVersion: 0
 --- !u!114 &1776850482587567144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,12 +275,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
+  nickname: 
+  character: 0
+  skin: 0
   ndsResolution: 0
   fireballFromSprint: 1
   vsync: 0
   fourByThreeRatio: 0
   scoreboardAlways: 0
-  nickname: 
+  filter: 1
 --- !u!82 &1776850482587567145
 AudioSource:
   m_ObjectHideFlags: 0
@@ -439,6 +464,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: -1
   m_TargetDisplay: 0
@@ -669,6 +695,7 @@ MonoBehaviour:
     type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
 --- !u!1 &8208988859403881550
 GameObject:
   m_ObjectHideFlags: 0
@@ -711,6 +738,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 1776850482587567143}
     m_Modifications:
     - target: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
@@ -878,6 +906,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
 --- !u!224 &8895848656777689062 stripped
 RectTransform:

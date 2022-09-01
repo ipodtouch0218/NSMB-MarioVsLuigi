@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+
 using Photon.Pun;
 
 public abstract class InteractableTile : AnimatedTile {
@@ -9,8 +10,8 @@ public abstract class InteractableTile : AnimatedTile {
     public abstract bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation);
     public static void Bump(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
 
-        if (direction == InteractionDirection.Down)
-            return;
+        //if (direction == InteractionDirection.Down)
+        //    return;
 
         //check for entities above to bump
         foreach (Collider2D collider in Physics2D.OverlapBoxAll(worldLocation + bumpOffset, bumpSize, 0f)) {
@@ -19,7 +20,8 @@ public abstract class InteractableTile : AnimatedTile {
                 continue;
 
             if (obj.GetComponent<MovingPowerup>() is MovingPowerup powerup) {
-                powerup.photonView.RPC("Bump", RpcTarget.All);
+                if (powerup.powerupScriptable.state != Enums.PowerupState.PropellerMushroom)
+                    powerup.photonView.RPC(nameof(MovingPowerup.Bump), RpcTarget.All);
                 continue;
             }
 
@@ -27,11 +29,8 @@ public abstract class InteractableTile : AnimatedTile {
             case "Player": {
                 PlayerController player = obj.GetComponent<PlayerController>();
 
-                /*
-                // fall on ass when bumped from below
-                if (player.state == Enums.PowerupState.MegaMushroom)
-                    player.photonView.RPC("KnockbackMegaMushroom", RpcTarget.All);
-                */
+                if (player.gameObject == interacter.gameObject)
+                    continue;
 
                 player.photonView.RPC("Knockback", RpcTarget.All, obj.transform.position.x < interacter.transform.position.x, 1, false, (interacter as MonoBehaviourPun)?.photonView.ViewID ?? -1);
                 continue;
@@ -39,29 +38,30 @@ public abstract class InteractableTile : AnimatedTile {
             case "koopa": {
                 if (!obj.GetPhotonView())
                     continue;
-                obj.GetPhotonView().RPC("Bump", RpcTarget.All);
+                obj.GetPhotonView().RPC(nameof(KoopaWalk.Bump), RpcTarget.All);
                 continue;
             }
             case "goomba": {
                 if (!obj.GetPhotonView())
                     continue;
-                obj.GetPhotonView().RPC("SpecialKill", RpcTarget.All, obj.transform.position.x < worldLocation.x, false, 0);
+                obj.GetPhotonView().RPC(nameof(KillableEntity.SpecialKill), RpcTarget.All, obj.transform.position.x < worldLocation.x, false, 0);
                 continue;
             }
             case "loosecoin":
             case "coin": {
-                if (!obj)
+                PhotonView view;
+                if (!obj || !(view = obj.GetComponentInParent<PhotonView>()))
                     continue;
 
                 if (interacter is PlayerController pl)
-                    pl.photonView.RPC("CollectCoin", RpcTarget.All, obj.GetComponentInParent<PhotonView>().ViewID, obj.transform.position);
+                    pl.photonView.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.All, view.GetComponentInParent<PhotonView>().ViewID, (Vector2) obj.transform.position);
                 continue;
             }
             case "MainStar":
             case "bigstar":
                 continue;
             case "frozencube":
-                obj.GetPhotonView().RPC("Kill", RpcTarget.All);
+                obj.GetPhotonView().RPC(nameof(KillableEntity.Kill), RpcTarget.All);
                 continue;
             default: {
                 if (obj.layer != LayerMask.NameToLayer("Entity"))

@@ -92,9 +92,8 @@ MonoBehaviour:
   flying: 0
   body: {fileID: 0}
   hitbox: {fileID: 0}
-  playerDetectSize: {x: 1, y: 1.5}
-  popupTimerRequirement: 5.5
-  popupTimer: 0
+  playerDetectSize: 1
+  popupTimerRequirement: 3.6
 --- !u!212 &1900118008454034842
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -358,6 +357,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializableViews:
   - {fileID: 7244889019862401011}
+  - {fileID: 5617925178328362155}
 --- !u!114 &7244889019862401011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -370,4 +370,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1ec092acf651e542acfcdd4d0d2045a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoredParameters: []
   animator: {fileID: 1900118008454034843}

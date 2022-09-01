@@ -5038,10 +5038,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 2627485830306083583}
   audioSources:
   - {fileID: 5407584048357268515}
+  soundOrigin: {fileID: 2627485830306083583}
+  soundRange: 12
 --- !u!82 &5407584048357268515
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5176,6 +5176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializableViews:
   - {fileID: -2593818233479442467}
+  - {fileID: 2721581803245764244}
 --- !u!114 &-2593818233479442467
 MonoBehaviour:
   m_ObjectHideFlags: 0

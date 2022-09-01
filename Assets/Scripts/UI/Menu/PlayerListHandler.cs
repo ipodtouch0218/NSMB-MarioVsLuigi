@@ -69,6 +69,7 @@ public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
             go.name = $"{player.NickName} ({player.UserId})";
             go.SetActive(true);
             playerListEntries[id] = go.GetComponent<PlayerListEntry>();
+            playerListEntries[id].player = player;
         }
 
         UpdatePlayerEntry(player);
@@ -99,7 +100,7 @@ public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
             return;
         }
 
-        playerListEntries[id].UpdateText(player);
+        playerListEntries[id].UpdateText();
         ReorderEntries();
     }
 

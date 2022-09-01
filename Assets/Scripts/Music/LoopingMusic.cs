@@ -2,8 +2,25 @@ using UnityEngine;
 
 public class LoopingMusic : MonoBehaviour {
 
-    public AudioSource audioSource;
-    public MusicData currentSong;
+    private bool _fastMusic;
+    public bool FastMusic {
+        set {
+            if (_fastMusic ^ value) {
+                audioSource.time *= value ? 0.8f : 1.25f;
+                audioSource.clip = value && currentSong.fastClip ? currentSong.fastClip : currentSong.clip;
+                audioSource.Play();
+
+                if (currentSong.loopEndSample != -1 && audioSource.time >= currentSong.loopEndSample)
+                    audioSource.time = currentSong.loopStartSample + (audioSource.time - currentSong.loopEndSample);
+            }
+
+            _fastMusic = value;
+        }
+        get => _fastMusic && currentSong.fastClip;
+    }
+
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private MusicData currentSong;
 
     public void Start() {
         if (currentSong)
@@ -13,7 +30,7 @@ public class LoopingMusic : MonoBehaviour {
     public void Play(MusicData song) {
         currentSong = song;
         audioSource.loop = true;
-        audioSource.clip = song.clip;
+        audioSource.clip = _fastMusic && song.fastClip ? song.fastClip : song.clip;
         audioSource.time = 0;
         audioSource.Play();
     }
@@ -25,8 +42,8 @@ public class LoopingMusic : MonoBehaviour {
         if (!audioSource.isPlaying)
             return;
 
-        if (currentSong.loopEndSample != -1 && audioSource.time >= currentSong.loopEndSample)
-            audioSource.time = currentSong.loopStartSample + (audioSource.time - currentSong.loopEndSample);
+        float end = currentSong.loopEndSample * (FastMusic ? 0.8f : 1f);
+        if (currentSong.loopEndSample != -1 && audioSource.time >= end)
+            audioSource.time = (currentSong.loopStartSample * (FastMusic ? 0.8f : 1f)) + (audioSource.time - end);
     }
-
 }

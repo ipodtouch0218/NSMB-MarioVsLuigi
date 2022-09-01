@@ -59,7 +59,11 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [@Kraken](https://github.com/KrakHub)
 * [@ShadowWalker13](https://github.com/ShadowWalker13)
 * [@GithubSPerez](https://github.com/GithubSPerez)
-  
+* [@mindnomad](https://github.com/mindnomad)
+
+### Music:
+* [RENREN](https://mistajub.bandcamp.com/)
+
 ### QA Testing:
 * TheCyVap
 * Shadow_Walker13
@@ -71,12 +75,16 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
  
 ### Rippers:
   
-* Demon2Warrier (Background)
+* Demon2Warrior (Background)
 * VentureSonic (Background)
+* Keira (Background)
+* Ohthatguy (Background)
 * Poudink (Tiles)
 * Someone (Tiles)
 * Hiccup (Tiles)
 * Jouv (Tiles)
+* Mr-SUGOI (Tiles)
+* mindnomad (Tiles/Sound)
 * Symbolcom (Enemies)
 * Mr. C (Enemies)
 * Ragey (Enemies)
@@ -89,6 +97,5 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Skarph (Models/Sound)
 * LukeWarnut (Sound)
 * Luke Hackett (Sound)
-* mindnomad (Sound)
 
 </details>

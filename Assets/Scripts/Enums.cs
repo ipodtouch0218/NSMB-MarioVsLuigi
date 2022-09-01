@@ -45,6 +45,8 @@ public static class Enums {
     //Sound effects
     public enum Sounds : byte {
 
+        //CURRENT MAX: 93
+
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
         [SoundData("enemy/freeze_shatter")]                     Enemy_Generic_FreezeShatter = 1,
@@ -72,16 +74,19 @@ public static class Enums {
         [SoundData("player/groundpound_start")]                 Player_Sound_GroundpoundStart = 22,
         [SoundData("player/groundpound_landing")]               Player_Sound_GroundpoundLanding = 23,
         [SoundData("player/jump")]                              Player_Sound_Jump = 24,
+        [SoundData("player/lava_hiss")]                         Player_Sound_LavaHiss = 90,
         [SoundData("player/powerup")]                           Player_Sound_PowerupCollect = 16, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
         [SoundData("player/powerup_reserve_store")]             Player_Sound_PowerupReserveStore = 25,
         [SoundData("player/powerup_reserve_use")]               Player_Sound_PowerupReserveUse = 26,
         [SoundData("player/powerdown")]                         Player_Sound_Powerdown = 27,
         [SoundData("player/respawn")]                           Player_Sound_Respawn = 28,
+        [SoundData("player/slide_end")]                         Player_Sound_SlideEnd = 92,
         [SoundData("player/walljump")]                          Player_Sound_WallJump = 29,
         [SoundData("player/wallslide")]                         Player_Sound_WallSlide = 30,
 
         [SoundData("player/walk/grass")]                        Player_Walk_Grass = 31,
         [SoundData("player/walk/snow")]                         Player_Walk_Snow = 32,
+        [SoundData("player/walk/sand")]                         Player_Walk_Sand = 93,
 
         [SoundData("character/{char}/doublejump")]              Player_Voice_DoubleJump = 33,
         [SoundData("character/{char}/lava_death")]              Player_Voice_LavaDeath = 34,
@@ -131,12 +136,15 @@ public static class Enums {
         [SoundData("ui/windowclosed")]                          UI_WindowClose = 85,
         [SoundData("ui/windowopen")]                            UI_WindowOpen = 86,
         [SoundData("ui/match_draw")]                            UI_Match_Draw = 87,
+        [SoundData("ui/countdown0")]                            UI_Countdown_0 = 88,
+        [SoundData("ui/countdown1")]                            UI_Countdown_1 = 89,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,
         [SoundData("world/block_bump")]                         World_Block_Bump = 68,
         [SoundData("world/block_powerup")]                      World_Block_Powerup = 69, //nice
         [SoundData("world/coin_collect")]                       World_Coin_Collect = 70,
+        [SoundData("world/coin_drop")]                          World_Coin_Drop = 91,
         [SoundData("world/ice_skidding")]                       World_Ice_Skidding = 71,
         [SoundData("world/spinner_launch")]                     World_Spinner_Launch = 72,
         [SoundData("world/star_collect")]                       World_Star_Collect_Self = 73,
@@ -181,9 +189,10 @@ public static class Enums {
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events
         StartGame = 1,
-        ChatMessage = 2,
-        ChangeMaxPlayers = 3,
-        ChangePrivate = 4,
+        SystemMessage = 2,
+        PlayerChatMessage = 3,
+        ChangeMaxPlayers = 4,
+        ChangePrivate = 5,
         // 10-19 = game state events
         PlayerFinishedLoading = 10,
         AllFinishedLoading = 11,

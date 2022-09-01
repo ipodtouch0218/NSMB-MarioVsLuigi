@@ -1,49 +1,59 @@
 using UnityEngine;
 using TMPro;
 
-[ExecuteAlways]
 [RequireComponent(typeof(TMP_Text))]
 public class SlantText : MonoBehaviour {
 
-    [SerializeField] float slopeAmount = 0, firstChar = 0, secondChar = 0;
-    private CanvasRenderer cr;
+    [SerializeField] private float slopeAmount = 0, firstChar = 0, secondChar = 0;
+
     private TMP_Text text;
-    private RectTransform child;
-    private Material mat;
+    private TMP_SubMeshUI subtext;
 
-    private bool set;
-
-    public void OnValidate() {
-        set = false;
-        Update();
+    public void Awake() {
+        text = GetComponent<TMP_Text>();
     }
 
-    public void Update() {
-        if (set)
+    public void OnEnable() {
+        TMPro_EventManager.TEXT_CHANGED_EVENT.Add(MoveVerts);
+    }
+
+    public void OnDisable() {
+        TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(MoveVerts);
+    }
+
+    public void MoveVerts(Object a) {
+        if (!text || a != text)
             return;
 
-        if (cr == null || mat == null) {
-            try {
-                cr = GetComponentsInChildren<CanvasRenderer>()[1];
-                cr.SetMaterial(mat = new(cr.GetMaterial()), 0);
-            } catch {
-                // TMPro didn't generate submesh yet. oh well.
+        if (!subtext) {
+            subtext = GetComponentInChildren<TMP_SubMeshUI>();
+            if (!subtext)
                 return;
+        }
+
+        TMP_TextInfo info = text.textInfo;
+        Mesh mesh = subtext.mesh;
+        Vector3[] verts = mesh.vertices;
+
+        Vector3 adjustment = slopeAmount < 0 ? -slopeAmount * text.textInfo.characterCount * Vector3.up : Vector3.zero;
+        for (int i = 0; i < info.characterCount; i++) {
+            int index = info.characterInfo[i].vertexIndex;
+            Vector3 offset = adjustment;
+
+            if (i == 0) {
+                offset.y += firstChar;
+            } else if (i == 1) {
+                offset.y += secondChar;
             }
-        }
-        mat.SetColor("_Color", Color.white);
-        mat.SetFloat("_VerticalOffsetX", slopeAmount);
-        mat.SetFloat("_FirstCharOffset", firstChar);
-        mat.SetFloat("_SecondCharOffset", secondChar);
+            offset.y += i * slopeAmount;
 
-        if (slopeAmount < 0) {
-            text = GetComponent<TMP_Text>();
-            int chars = text.GetTextInfo(text.text).characterCount;
-            child = transform.GetChild(0).GetComponent<RectTransform>();
-            child.offsetMax = new(0, (chars - 1) * 4);
-            child.offsetMin = new(0, (chars - 1) * 4);
+            verts[index] += offset;
+            verts[index + 1] += offset;
+            verts[index + 2] += offset;
+            verts[index + 3] += offset;
         }
 
-        set = true;
+        mesh.vertices = verts;
+        subtext.canvasRenderer.SetMesh(mesh);
     }
 }

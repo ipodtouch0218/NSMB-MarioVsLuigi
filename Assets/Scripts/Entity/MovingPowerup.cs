@@ -20,6 +20,8 @@ public class MovingPowerup : MonoBehaviourPun {
 
     public Powerup powerupScriptable;
 
+    public bool Collected { get; set; }
+
     public void Awake() {
         body = GetComponent<Rigidbody2D>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -50,8 +52,14 @@ public class MovingPowerup : MonoBehaviourPun {
             }
         } else {
             gameObject.layer = ENTITY_LAYERID;
-        }
+            Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
+            Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
+            if (photonView.IsMine && (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Physics2D.OverlapBox(origin, size, 0, groundMask))) {
+                photonView.RPC("DespawnWithPoof", RpcTarget.All);
+                return;
+            }
+        }
     }
 
     public void LateUpdate() {

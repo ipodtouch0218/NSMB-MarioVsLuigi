@@ -179,12 +179,11 @@ MonoBehaviour:
     - {x: 1, y: 0, z: 0}
     m_RuleTransform: 0
   siblings:
-  - {fileID: 11400000, guid: dcc57da3b80926843b6249fdc33fa0ed, type: 2}
-  - {fileID: 11400000, guid: fb5f58bcb4f5883409f44d5bd036075f, type: 2}
-  - {fileID: 11400000, guid: 0f888d589678a3544ac45bb83436a9d0, type: 2}
-  - {fileID: 11400000, guid: 13b21092859061649b853ce72085fadb, type: 2}
-  - {fileID: 11400000, guid: 5b757c22b022b1541b9e1e6d7c4f3bc2, type: 2}
+  - {fileID: 11400000, guid: 2f992da1b511dea41be30f8c72097d85, type: 2}
+  - {fileID: 11400000, guid: e6ce5add89fcebe42a09ee6189bca0fb, type: 2}
+  - {fileID: 11400000, guid: 008eef3beeda7424d8dbd4dcfb5f1949, type: 2}
+  - {fileID: 11400000, guid: de699f2ab41a645468ef0e5e3b6bb74b, type: 2}
+  - {fileID: 11400000, guid: 4c2ac97eb99a4754990584e8c9bf5ea7, type: 2}
   isBackgroundTile: 0
   iceSkidding: 0
-  footstepSound: 31
-  frictionFactor: 1
+  footstepSound: 93

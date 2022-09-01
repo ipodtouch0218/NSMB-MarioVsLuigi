@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Audio;
+
 using Photon.Pun;
 
 public class Settings : Singleton<Settings> {
@@ -8,39 +9,36 @@ public class Settings : Singleton<Settings> {
 
     private float _volumeMaster, _volumeMusic, _volumeSFX;
     public float VolumeMaster {
-        get {
-            return _volumeMaster;
-        }
+        get => _volumeMaster;
         set {
             _volumeMaster = Mathf.Clamp01(value);
             ApplyVolumeSettings();
         }
     }
     public float VolumeSFX {
-        get {
-            return _volumeSFX;
-        }
+        get => _volumeSFX;
         set {
             _volumeSFX = Mathf.Clamp01(value);
             ApplyVolumeSettings();
         }
     }
     public float VolumeMusic {
-        get {
-            return _volumeMusic;
-        }
+        get => _volumeMusic;
         set {
             _volumeMusic = Mathf.Clamp01(value);
             ApplyVolumeSettings();
         }
     }
-    public bool ndsResolution = false, fireballFromSprint = true, vsync = false, fourByThreeRatio = false;
-    public bool scoreboardAlways = false;
-    public string nickname;
 
-    void Awake() {
+    public string nickname;
+    public int character, skin;
+    public bool ndsResolution = false, fireballFromSprint = true, vsync = false, fourByThreeRatio = false;
+    public bool scoreboardAlways = false, filter = true;
+
+    public void Awake() {
         if (!InstanceCheck())
             return;
+
         Instance = this;
         LoadSettingsFromPreferences();
         ApplyVolumeSettings();
@@ -58,7 +56,10 @@ public class Settings : Singleton<Settings> {
         fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         vsync = PlayerPrefs.GetInt("VSync", 0) == 1;
         fourByThreeRatio = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
-        scoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 0) == 1;
+        scoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
+        filter = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
+        character = PlayerPrefs.GetInt("Character", 0);
+        skin = PlayerPrefs.GetInt("Skin", 0);
     }
     public void SaveSettingsToPreferences() {
         PlayerPrefs.SetString("Nickname", Regex.Replace(PhotonNetwork.NickName, "\\(\\d*\\)", ""));
@@ -70,6 +71,9 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("VSync", vsync ? 1 : 0);
         PlayerPrefs.SetInt("NDS4by3", fourByThreeRatio ? 1 : 0);
         PlayerPrefs.SetInt("ScoreboardAlwaysVisible", scoreboardAlways ? 1 : 0);
+        PlayerPrefs.SetInt("ChatFilter", filter ? 1 : 0);
+        PlayerPrefs.SetInt("Character", character);
+        PlayerPrefs.SetInt("Skin", skin);
         PlayerPrefs.Save();
     }
 

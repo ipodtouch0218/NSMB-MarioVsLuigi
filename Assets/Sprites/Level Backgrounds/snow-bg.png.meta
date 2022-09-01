@@ -59,7 +59,7 @@ TextureImporter:
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
-  spriteExtrude: 1
+  spriteExtrude: 0
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
@@ -86,7 +86,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -181,7 +181,7 @@ TextureImporter:
       name: snow-bg_1
       rect:
         serializedVersion: 2
-        x: 256
+        x: 257
         y: 238
         width: 504
         height: 186
@@ -202,7 +202,7 @@ TextureImporter:
       name: snow-bg_2
       rect:
         serializedVersion: 2
-        x: 256
+        x: 257
         y: 71
         width: 256
         height: 167

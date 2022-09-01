@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
+
 using Photon.Pun;
 using NSMB.Utils;
 
@@ -38,37 +39,37 @@ public class DebugControls : MonoBehaviour {
         DebugItem(Key.Numpad7, "PropellerMushroom");
         DebugItem(Key.Numpad8, "IceFlower");
         DebugItem(Key.Numpad9, "1-Up");
-        DebugEntity(Key.Digit1, "Koopa");
-        DebugEntity(Key.Digit2, "RedKoopa");
-        DebugEntity(Key.Digit3, "BlueKoopa");
-        DebugEntity(Key.Digit4, "Goomba");
-        DebugEntity(Key.Digit5, "Bobomb");
-        DebugEntity(Key.Digit6, "BulletBill");
-        DebugEntity(Key.Digit7, "Spiny");
+        DebugEntity(Key.F1, "Koopa");
+        DebugEntity(Key.F2, "RedKoopa");
+        DebugEntity(Key.F3, "BlueKoopa");
+        DebugEntity(Key.F4, "Goomba");
+        DebugEntity(Key.F5, "Bobomb");
+        DebugEntity(Key.F6, "BulletBill");
+        DebugEntity(Key.F7, "Spiny");
 
-        FreezePlayer(Key.Digit9);
+        FreezePlayer(Key.F9);
 
-        if (kb[Key.F1].wasPressedThisFrame) {
+        if (kb[Key.R].wasPressedThisFrame) {
             GameObject nametag = GameManager.Instance.transform.Find("NametagCanvas").gameObject;
             nametag.SetActive(!nametag.activeSelf);
         }
-        if (kb[Key.F2].wasPressedThisFrame) {
+        if (kb[Key.T].wasPressedThisFrame) {
             CanvasGroup group = GameManager.Instance.transform.Find("New HUD").GetComponent<CanvasGroup>();
             group.alpha = 1f - group.alpha;
         }
-        if (kb[Key.F3].wasPressedThisFrame) {
+        if (kb[Key.Y].wasPressedThisFrame) {
             Settings.Instance.ndsResolution = !Settings.Instance.ndsResolution;
         }
-        if (kb[Key.F4].wasPressedThisFrame) {
+        if (kb[Key.U].wasPressedThisFrame) {
             Settings.Instance.fourByThreeRatio = !Settings.Instance.fourByThreeRatio;
         }
-        if (kb[Key.F5].wasPressedThisFrame) {
+        if (kb[Key.I].wasPressedThisFrame) {
             feature.SetActive(!feature.isActive);
         }
-        if (kb[Key.F6].wasPressedThisFrame) {
+        if (kb[Key.O].wasPressedThisFrame) {
             GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera;
         }
-        if (kb[Key.F12].wasPressedThisFrame) {
+        if (kb[Key.P].wasPressedThisFrame) {
             GameManager.Instance.localPlayer.GetPhotonView().RPC("Death", RpcTarget.All, false, false);
         }
     }

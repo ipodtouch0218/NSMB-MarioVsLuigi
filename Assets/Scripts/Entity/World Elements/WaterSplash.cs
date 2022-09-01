@@ -7,24 +7,24 @@ public class WaterSplash : MonoBehaviour {
     public int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
     [Delayed]
     public float heightTiles = 1;
-    public float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f;
+    public float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f, animationSpeed = 1f;
     public string splashParticle;
-    private Texture2D heightTex;
-    private float[] pointHeights, pointVelocities;
-    private Color32[] colors;
 
-    private int totalPoints;
+    private Texture2D heightTex;
     private SpriteRenderer spriteRenderer;
-    MaterialPropertyBlock properties;
+    private MaterialPropertyBlock properties;
+    private Color32[] colors;
+    private float[] pointHeights, pointVelocities;
+    private float animTimer;
+    private int totalPoints;
     private bool initialized;
+
 
     private void Awake() {
         Initialize();
     }
     private void OnValidate() {
-        ValidationUtility.SafeOnValidate(() => {
-            Initialize();
-        });
+        ValidationUtility.SafeOnValidate(Initialize);
     }
 
     private void Initialize() {
@@ -37,16 +37,18 @@ public class WaterSplash : MonoBehaviour {
         totalPoints = widthTiles * pointsPerTile;
         pointHeights = new float[totalPoints];
         pointVelocities = new float[totalPoints];
-        colors = new Color32[totalPoints];
 
-        heightTex = new Texture2D(totalPoints, 1);
+        heightTex = new Texture2D(totalPoints, 1, TextureFormat.RGBA32, false);
+
+        Color32 gray = new(128, 0, 0, 255);
+        colors = new Color32[totalPoints];
         for (int i = 0; i < totalPoints; i++)
-            colors[i] = new Color(.5f, 0, 0, 1);
-        heightTex.SetPixels32(colors);
+            colors[i] = gray;
+
         heightTex.Apply();
 
-        collider.offset = new(0, heightTiles * 0.25f);
-        collider.size = new(widthTiles * 0.5f, heightTiles * 0.5f);
+        collider.offset = new(0, heightTiles * 0.25f - 0.2f);
+        collider.size = new(widthTiles * 0.5f, heightTiles * 0.5f - 0.1f);
         spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
 
         properties = new();
@@ -56,12 +58,14 @@ public class WaterSplash : MonoBehaviour {
         spriteRenderer.SetPropertyBlock(properties);
     }
 
-    void FixedUpdate() {
+    public void FixedUpdate() {
         if (!initialized) {
             Initialize();
             initialized = true;
         }
         float delta = Time.fixedDeltaTime;
+
+        bool valuesChanged = false;
 
         for (int i = 0; i < totalPoints; i++) {
             float height = pointHeights[i];
@@ -78,13 +82,22 @@ public class WaterSplash : MonoBehaviour {
             pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); //right
         }
         for (int i = 0; i < totalPoints; i++) {
-            colors[i].r = (byte) ((Mathf.Clamp(pointHeights[i] / 20f, -0.5f, 0.5f) + 0.5f) * 255);
+            byte newR = (byte) (Mathf.Clamp01((pointHeights[i] / 20f) + 0.5f) * 255f);
+            valuesChanged |= colors[i].r != newR;
+            colors[i].r = newR;
         }
 
-        heightTex.SetPixels32(colors, 0);
-        heightTex.Apply();
+        if (valuesChanged) {
+            heightTex.SetPixels32(colors);
+            heightTex.Apply(false);
+        }
+
+        animTimer += animationSpeed * Time.fixedDeltaTime;
+        animTimer %= 8;
+        properties.SetFloat("TextureIndex", animTimer);
+        spriteRenderer.SetPropertyBlock(properties);
     }
-    void OnTriggerEnter2D(Collider2D collider) {
+    public void OnTriggerEnter2D(Collider2D collider) {
         Instantiate(Resources.Load(splashParticle), collider.transform.position, Quaternion.identity);
 
         Rigidbody2D body = collider.attachedRigidbody;
@@ -96,7 +109,7 @@ public class WaterSplash : MonoBehaviour {
             pointVelocities[pointsX] = -splashVelocity * power;
         }
     }
-    void OnTriggerStay2D(Collider2D collision) {
+    public void OnTriggerStay2D(Collider2D collision) {
         if (collision.attachedRigidbody == null)
             return;
 

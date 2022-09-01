@@ -10374,12 +10374,7 @@ MonoBehaviour:
   jumpVelocity: 6.7382812
   megaJumpVelocity: 12.65625
   launchVelocity: 12
-  walkingAcceleration: 8.5
-  runningAcceleration: 3
-  walkingMaxSpeed: 2.8125
-  runningMaxSpeed: 5.625
   wallslideSpeed: -4.6875
-  walljumpVelocity: 6.328125
   giantStartTime: 1.5
   soundRange: 10
   slopeSlidingAngle: 12.5
@@ -10412,6 +10407,7 @@ MonoBehaviour:
   bounce: 0
   crouching: 0
   groundpound: 0
+  groundpoundLastFrame: 0
   sliding: 0
   knockback: 0
   hitBlock: 0
@@ -10423,7 +10419,6 @@ MonoBehaviour:
   inShell: 0
   hitLeft: 0
   hitRight: 0
-  iceSliding: 0
   stuckInBlock: 0
   alreadyStuckInBlock: 0
   propeller: 0
@@ -10431,7 +10426,6 @@ MonoBehaviour:
   stationaryGiantEnd: 0
   fireballKnockback: 0
   startedSliding: 0
-  groundpounded: 0
   canShootProjectile: 0
   jumpLandingTimer: 0
   landing: 0
@@ -10474,7 +10468,7 @@ MonoBehaviour:
   step: 0
   alreadyGroundpounded: 0
   character: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
-  doIceSkidding: 0
+  onIce: 0
 --- !u!114 &79918617084146557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10487,7 +10481,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf9d71929a202541b352e506ca0197e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  glowMaterial: {fileID: 2100000, guid: 2cfa80f93994da44c9bdacad018e6ff5, type: 2}
+  smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
+  largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
+  dust: {fileID: 4824223342336871185}
+  sparkles: {fileID: 4824223340723290478}
+  drillParticle: {fileID: 599751029868069242}
+  giantParticle: {fileID: 8077331287960115309}
+  fireParticle: {fileID: 5320528148583097166}
   models: {fileID: 8422425992379838812}
   smallModel: {fileID: 8422425991972032533}
   largeModel: {fileID: 6784312141689353033}
@@ -10495,19 +10495,13 @@ MonoBehaviour:
   blueShell: {fileID: 3629787967981286811}
   propellerHelmet: {fileID: 8712194458326895251}
   propeller: {fileID: 8626919663303982960}
-  dust: {fileID: 4824223342336871185}
-  sparkles: {fileID: 4824223340723290478}
-  drillParticle: {fileID: 599751029868069242}
-  giantParticle: {fileID: 8077331287960115309}
-  fireParticle: {fileID: 5320528148583097166}
+  glowMaterial: {fileID: 2100000, guid: 2cfa80f93994da44c9bdacad018e6ff5, type: 2}
+  primaryColor: {r: 0, g: 0, b: 0, a: 0}
+  secondaryColor: {r: 0, g: 0, b: 0, a: 0}
   blinkDuration: 0.1
   pipeDuration: 2
   deathUpTime: 0.6
   deathForce: 7
-  smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
-  largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
-  primaryColor: {r: 0, g: 0, b: 0, a: 0}
-  secondaryColor: {r: 0, g: 0, b: 0, a: 0}
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
   deathUp: 0
@@ -10630,13 +10624,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 4824223341387914440}
   audioSources:
   - {fileID: 8020350199704251203}
   - {fileID: 6648400330319602470}
   - {fileID: 5377451828833222271}
   - {fileID: 3452636116809643534}
+  soundOrigin: {fileID: 4824223341387914440}
+  soundRange: 12
 --- !u!82 &5377451828833222271
 AudioSource:
   m_ObjectHideFlags: 0
@@ -26810,7 +26804,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: f9541b8e97f76f4419778d672831fc42,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

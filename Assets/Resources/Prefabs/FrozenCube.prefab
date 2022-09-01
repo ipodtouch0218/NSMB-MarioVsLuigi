@@ -68,13 +68,8 @@ MonoBehaviour:
   throwSpeed: 7.25
   shakeSpeed: 80
   shakeAmount: 2
-  spriteRenderer: {fileID: 0}
-  reason: 0
+  unfreezeReason: 0
   autoBreakTimer: 3
-  throwTimer: 0
-  fastSlide: 0
-  fallen: 0
-  offset: {x: 0, y: 0}
 --- !u!212 &5302927234469735370
 SpriteRenderer:
   m_ObjectHideFlags: 0

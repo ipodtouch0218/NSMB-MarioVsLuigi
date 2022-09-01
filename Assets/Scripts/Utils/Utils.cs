@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Text;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Tilemaps;
 
 using Photon.Pun;
@@ -11,9 +11,7 @@ namespace NSMB.Utils {
     public class Utils {
 
         public static int FirstPlaceStars {
-            get {
-                return GameManager.Instance.allPlayers.Where(pl => pl.lives != 0).Max(pc => pc.stars);
-            }
+            get => GameManager.Instance.players.Where(pl => pl.lives != 0).Max(pc => pc.stars);
         }
 
         public static bool BitTest(long bit, int index) {
@@ -24,9 +22,6 @@ namespace NSMB.Utils {
             if (!manager)
                 manager = GameManager.Instance;
 
-            Assert.IsNotNull(manager, "GameManager is null, are we not in a level?");
-            Assert.IsNotNull(manager.tilemap, "tilemap is null, is it not set in GameManager?");
-
             Vector3Int tileLocation = manager.tilemap.WorldToCell(worldVec);
             if (wrap)
                 WrapTileLocation(ref tileLocation, manager);
@@ -35,8 +30,9 @@ namespace NSMB.Utils {
         }
 
         public static bool WrapWorldLocation(ref Vector3 location, GameManager manager = null) {
-            if (!manager)
+            if (manager == null)
                 manager = GameManager.Instance;
+
             if (!manager.loopingLevel)
                 return false;
 
@@ -51,12 +47,17 @@ namespace NSMB.Utils {
         }
 
         public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {
-            if (!manager)
+            if (manager == null)
                 manager = GameManager.Instance;
-            if (tileLocation.x < manager.levelMinTileX)
+
+            if (!manager.loopingLevel)
+                return;
+
+            if (tileLocation.x < manager.levelMinTileX) {
                 tileLocation.x += manager.levelWidthTile;
-            if (tileLocation.x >= manager.levelMinTileX + manager.levelWidthTile)
+            } else if (tileLocation.x >= manager.levelMinTileX + manager.levelWidthTile) {
                 tileLocation.x -= manager.levelWidthTile;
+            }
         }
 
         public static Vector3Int WorldToTilemapPosition(float worldX, float worldY) {
@@ -77,7 +78,7 @@ namespace NSMB.Utils {
             if (player == null)
                 player = PhotonNetwork.LocalPlayer;
 
-            Assert.IsNotNull(player, "player is null, are we not connected to Photon?");
+            //Assert.IsNotNull(player, "player is null, are we not connected to Photon?");
 
             GetCustomProperty(Enums.NetPlayerProperties.Character, out int index, player.CustomProperties);
             return index;
@@ -101,14 +102,16 @@ namespace NSMB.Utils {
 
         private static Tile.ColliderType GetColliderType(Vector3Int tileLocation) {
 
-            if (GameManager.Instance.tilemap.GetTile<Tile>(tileLocation) is Tile tile)
+            Tilemap tm = GameManager.Instance.tilemap;
+
+            if (tm.GetTile<Tile>(tileLocation) is Tile tile)
                 return tile.colliderType;
 
-            if (GameManager.Instance.tilemap.GetTile<AnimatedTile>(tileLocation) is AnimatedTile animated)
-                return animated.m_TileColliderType;
-
-            if (GameManager.Instance.tilemap.GetTile<RuleTile>(tileLocation) is RuleTile rule)
+            if (tm.GetTile<RuleTile>(tileLocation) is RuleTile rule)
                 return rule.m_DefaultColliderType;
+
+            if (tm.GetTile<AnimatedTile>(tileLocation) is AnimatedTile animated)
+                return animated.m_TileColliderType;
 
             return Tile.ColliderType.None;
         }
@@ -362,25 +365,28 @@ namespace NSMB.Utils {
         }
 
         public static float WrappedDistance(Vector2 a, Vector2 b) {
-            if (GameManager.Instance && GameManager.Instance.loopingLevel && Mathf.Abs(a.x - b.x) > GameManager.Instance.levelWidthTile / 4f)
-                a.x -= GameManager.Instance.levelWidthTile / 2f * Mathf.Sign(a.x - b.x);
+            GameManager gm = GameManager.Instance;
+            if ((gm?.loopingLevel ?? false) && Mathf.Abs(a.x - b.x) > gm.levelWidthTile / 4f)
+                a.x -= gm.levelWidthTile / 2f * Mathf.Sign(a.x - b.x);
 
             return Vector2.Distance(a, b);
         }
 
-        public static void GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
+        public static bool GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
             if (properties == null)
                 properties = PhotonNetwork.CurrentRoom.CustomProperties;
             if (properties == null) {
                 value = default;
-                return;
+                return false;
             }
 
             properties.TryGetValue(key, out object temp);
             if (temp != null) {
                 value = (T) temp;
+                return true;
             } else {
                 value = default;
+                return false;
             }
         }
 
@@ -492,7 +498,7 @@ namespace NSMB.Utils {
                 tileCache[tilename] = Resources.Load(tilename) as TileBase;
         }
 
-        private static readonly Dictionary<char, int> uiSymbols = new() {
+        private static readonly Dictionary<char, byte> uiSymbols = new() {
             ['c'] = 6,
             ['0'] = 11,
             ['1'] = 12,
@@ -510,7 +516,7 @@ namespace NSMB.Utils {
             ['/'] = 24,
             [':'] = 25,
         };
-        public static readonly Dictionary<char, int> numberSymbols = new() {
+        public static readonly Dictionary<char, byte> numberSymbols = new() {
             ['0'] = 27,
             ['1'] = 28,
             ['2'] = 29,
@@ -522,7 +528,7 @@ namespace NSMB.Utils {
             ['8'] = 35,
             ['9'] = 36,
         };
-        public static readonly Dictionary<char, int> smallSymbols = new() {
+        public static readonly Dictionary<char, byte> smallSymbols = new() {
             ['0'] = 48,
             ['1'] = 39,
             ['2'] = 40,
@@ -534,19 +540,19 @@ namespace NSMB.Utils {
             ['8'] = 46,
             ['9'] = 47,
         };
-        public static string GetSymbolString(string str, Dictionary<char, int> dict = null) {
+        public static string GetSymbolString(string str, Dictionary<char, byte> dict = null) {
             if (dict == null)
                 dict = uiSymbols;
 
-            string ret = "";
+            StringBuilder ret = new();
             foreach (char c in str) {
-                if (dict.ContainsKey(c)) {
-                    ret += "<sprite=" + dict[c] + ">";
+                if (dict.TryGetValue(c, out byte index)) {
+                    ret.Append("<sprite=").Append(index).Append(">");
                 } else {
-                    ret += c;
+                    ret.Append(c);
                 }
             }
-            return ret;
+            return ret.ToString();
         }
 
         public static Color GetPlayerColor(Player player, float s = 1, float v = 1) {
@@ -572,6 +578,12 @@ namespace NSMB.Utils {
 
         public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {
             counter = Mathf.Clamp(counter - delta, min, max);
+        }
+
+        public static Color GetRainbowColor() {
+            double time = PhotonNetwork.Time * 0.1;
+            time %= 1;
+            return Color.HSVToRGB((float) time, 1, 1);
         }
     }
 }

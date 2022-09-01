@@ -1,8 +1,22 @@
+using System.Collections.Generic;
+using System.Linq;
+
 using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
 
 namespace NSMB.Utils {
     public static class NetworkUtils {
+
+        public static WebFlags forward = new(WebFlags.HttpForwardConst);
+
+        public static Dictionary<DisconnectCause, string> disconnectMessages = new() {
+
+            [DisconnectCause.MaxCcuReached] = "Max player count reached (100/100)",
+            [DisconnectCause.CustomAuthenticationFailed] = "Failed to authenticate with the auth server",
+            //[DisconnectCause.DisconnectByServerLogic] = "",
+
+        };
 
         public static RaiseEventOptions EventOthers { get; } = new() { Receivers = ReceiverGroup.Others };
         public static RaiseEventOptions EventAll { get; } = new() { Receivers = ReceiverGroup.All };
@@ -42,11 +56,61 @@ namespace NSMB.Utils {
         Enums.NetRoomProperties.HostName,
     };
 
-        public static readonly RegionComparer RegionPingComparer = new();
-        public class RegionComparer : System.Collections.Generic.IComparer<Region> {
+        public static readonly RegionPingComparer PingComparer = new();
+        public class RegionPingComparer : IComparer<Region> {
             public int Compare(Region r1, Region r2) {
                 return r1.Ping - r2.Ping;
             }
+        }
+
+        public static readonly RegionNameComparer NameComparer = new();
+        public class RegionNameComparer : IComparer<Region> {
+            public int Compare(Region r1, Region r2) {
+                return r1.Code.CompareTo(r2.Code);
+            }
+        }
+
+
+        public static readonly PlayerIdComparer PlayerComparer = new();
+        public class PlayerIdComparer : IComparer<KeyValuePair<int, Player>> {
+            public int Compare(KeyValuePair<int, Player> r1, KeyValuePair<int, Player> r2) {
+                return r1.Key - r2.Key;
+            }
+        }
+
+        public static bool IsSpectator(this Player player) {
+            bool valid = Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool value, player.CustomProperties);
+            return valid && value;
+        }
+
+        public static readonly Dictionary<string, string> nicknameCache = new();
+
+        public static string GetUniqueNickname(this Player player, bool checkCache = true) {
+            if (checkCache && nicknameCache.ContainsKey(player.UserId ?? "none"))
+                return nicknameCache[player.UserId ?? "none"];
+
+            //generate valid username
+            string nickname = player.NickName.ToValidUsername(false);
+
+            //nickname duplicates
+            List<KeyValuePair<int, Player>> players = PhotonNetwork.CurrentRoom.Players.ToList();
+            players.Sort(PlayerComparer);
+
+            int count = 0;
+            foreach ((int id, Player pl) in players) {
+                if (pl == player)
+                    break;
+
+                if (nickname == GetUniqueNickname(pl))
+                    count++;
+            }
+            if (count > 0)
+                nickname += $"({count})";
+
+            //update cache
+            nicknameCache[player.UserId ?? "none"] = nickname;
+
+            return nickname;
         }
     }
 

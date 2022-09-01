@@ -3,12 +3,11 @@ using UnityEngine;
 
 public class BackgroundLoop : MonoBehaviour {
 
-    public static BackgroundLoop instance = null;
+    public static BackgroundLoop Instance { get; private set; }
 
     private GameObject[] children;
     private Vector3[] truePositions, positionsAfterPixelSnap;
-    private float[] ppus;
-    private float[] halfWidths;
+    private float[] ppus, halfWidths;
 
     private Camera mainCamera;
     private Vector2 screenBounds;
@@ -16,24 +15,28 @@ public class BackgroundLoop : MonoBehaviour {
 
     public bool wrap;
 
+    #region Unity Methods
     public void Start() {
-        instance = this;
+        Instance = this;
+
         Transform t = GameObject.FindGameObjectWithTag("Backgrounds").transform;
+
         children = new GameObject[t.childCount];
         ppus = new float[t.childCount];
         truePositions = new Vector3[t.childCount];
         positionsAfterPixelSnap = new Vector3[t.childCount];
         halfWidths = new float[t.childCount];
+
         for (int i = 0; i < t.childCount; i++) {
             children[i] = t.GetChild(i).gameObject;
             SpriteRenderer sr = children[i].GetComponent<SpriteRenderer>();
             ppus[i] = sr.sprite.pixelsPerUnit;
-            halfWidths[i] = sr.bounds.extents.x - (0.30f/ppus[i]);
+            halfWidths[i] = sr.bounds.extents.x - 0.00004f;
             positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
         }
 
         mainCamera = gameObject.GetComponent<Camera>();
-        screenBounds = new Vector2(mainCamera.orthographicSize * mainCamera.aspect, mainCamera.orthographicSize) * 2.5f; // mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
+        screenBounds = new Vector2(mainCamera.orthographicSize * mainCamera.aspect, mainCamera.orthographicSize) * 3f; // mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
         foreach (GameObject obj in children)
             LoadChildObjects(obj);
 
@@ -43,8 +46,31 @@ public class BackgroundLoop : MonoBehaviour {
     public void LateUpdate() {
         Reposition();
     }
-    void LoadChildObjects(GameObject obj) {
-        float objectWidth = obj.GetComponent<SpriteRenderer>().bounds.size.x;
+    #endregion
+
+    #region Public Methods
+    public void Reposition() {
+        for (int i = 0; i < children.Length; i++) {
+            GameObject obj = children[i];
+            float difference = transform.position.x - lastPosition.x + (obj.transform.position.x - positionsAfterPixelSnap[i].x);
+            float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(lastPosition.z / obj.transform.position.z));
+
+            if (wrap)
+                parallaxSpeed = 1;
+
+            truePositions[i] += difference * parallaxSpeed * Vector3.right;
+            obj.transform.position = positionsAfterPixelSnap[i] = PixelClamp(truePositions[i], obj.transform.lossyScale, ppus[i]);
+
+            RepositionChildObjects(obj);
+        }
+        wrap = false;
+        lastPosition = transform.position;
+    }
+    #endregion
+
+    #region Helper Methods
+    private void LoadChildObjects(GameObject obj) {
+        float objectWidth = halfWidths[Array.IndexOf(children, obj)] * 2f;
         int childsNeeded = (int) Mathf.Ceil(screenBounds.x / objectWidth) + 1;
         GameObject clone = Instantiate(obj);
         for (int i = 0; i <= childsNeeded; i++) {
@@ -56,7 +82,7 @@ public class BackgroundLoop : MonoBehaviour {
         Destroy(clone);
         Destroy(obj.GetComponent<SpriteRenderer>());
     }
-    void RepositionChildObjects(GameObject obj) {
+    private void RepositionChildObjects(GameObject obj) {
         if (!obj)
             return;
 
@@ -73,33 +99,6 @@ public class BackgroundLoop : MonoBehaviour {
                 lastChild.transform.position = new Vector3(firstChild.transform.position.x - halfObjectWidth * 2, firstChild.transform.position.y, firstChild.transform.position.z);
             }
         }
-    }
-    public void Reposition() {
-
-        if (wrap) {
-            for (int i = 0; i < children.Length; i++) {
-                GameObject obj = children[i];
-                float difference = (transform.position.x - lastPosition.x) + (obj.transform.position.x - truePositions[i].x);
-
-                truePositions[i] += difference * Vector3.right;
-                obj.transform.position = positionsAfterPixelSnap[i] = PixelClamp(truePositions[i], obj.transform.lossyScale, ppus[i]);
-
-                RepositionChildObjects(obj);
-            }
-            wrap = false;
-        } else {
-            for (int i = 0; i < children.Length; i++) {
-                GameObject obj = children[i];
-                float difference = (transform.position.x - lastPosition.x) + (obj.transform.position.x - positionsAfterPixelSnap[i].x);
-                float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(lastPosition.z / obj.transform.position.z));
-
-                truePositions[i] += difference * parallaxSpeed * Vector3.right;
-                obj.transform.position = positionsAfterPixelSnap[i] = PixelClamp(truePositions[i], obj.transform.lossyScale, ppus[i]);
-
-                RepositionChildObjects(obj);
-            }
-        }
-        lastPosition = transform.position;
     }
 
     private static Vector3 PixelClamp(Vector3 pos, Vector3 scale, float pixelsPerUnit) {
@@ -119,4 +118,5 @@ public class BackgroundLoop : MonoBehaviour {
 
         return pos;
     }
+    #endregion
 }
