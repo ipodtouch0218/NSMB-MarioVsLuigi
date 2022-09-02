@@ -65,7 +65,7 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void OnDisable() {
-        discord.Dispose();
+        discord?.Dispose();
     }
 
     public void UpdateActivity() {

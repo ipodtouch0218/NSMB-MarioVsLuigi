@@ -1,4 +1,5 @@
 using UnityEngine;
+
 using Photon.Pun;
 using NSMB.Utils;
 
@@ -7,7 +8,7 @@ public class BulletBillMover : KillableEntity {
     public float speed, playerSearchRadius = 4, despawnDistance = 8;
     private Vector2 searchVector;
 
-    new void Start() {
+    public new void Start() {
         base.Start();
         searchVector = new Vector2(playerSearchRadius * 2, 100);
         left = photonView && photonView.InstantiationData != null && (bool) photonView.InstantiationData[0];
@@ -26,7 +27,7 @@ public class BulletBillMover : KillableEntity {
         sRenderer.flipX = !left;
     }
 
-    new void FixedUpdate() {
+    public new void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -58,26 +59,25 @@ public class BulletBillMover : KillableEntity {
                 player.bounce = true;
                 player.drill = false;
             }
-            photonView.RPC("Kill", RpcTarget.All);
+            photonView.RPC(nameof(Kill), RpcTarget.All);
             return;
         }
         if (attackedFromAbove) {
             if (!(player.state == Enums.PowerupState.MiniMushroom && !player.groundpound)) {
-                photonView.RPC("Kill", RpcTarget.All);
+                photonView.RPC(nameof(Kill), RpcTarget.All);
             }
-            player.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+            player.photonView.RPC(nameof(PlayerController.PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;
             player.groundpound = false;
             player.bounce = true;
             return;
         }
 
-        player.photonView.RPC("Powerdown", RpcTarget.All, false);
+        player.photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
         // left = damageDirection.x < 0;
     }
 
-    void DespawnCheck() {
-
+    private void DespawnCheck() {
         foreach (PlayerController player in GameManager.Instance.players) {
             if (!player)
                 continue;
@@ -108,12 +108,13 @@ public class BulletBillMover : KillableEntity {
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
 
         dead = true;
-        photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Shell_Kick);
+        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
-    void OnDrawGizmosSelected() {
+    public void OnDrawGizmosSelected() {
         if (!GameManager.Instance)
             return;
+
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(body.position, searchVector);
         //left border check

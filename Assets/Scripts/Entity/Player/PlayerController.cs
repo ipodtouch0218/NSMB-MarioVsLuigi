@@ -2605,7 +2605,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             crouching = false;
             inShell = false;
             body.velocity -= body.velocity * (delta * 2f);
-            if (photonView.IsMine && onGround && ((Mathf.Abs(body.velocity.x) < 0.2f && knockbackTimer <= 0) || knockbackTimer > -3f))
+            if (photonView.IsMine && onGround && ((Mathf.Abs(body.velocity.x) < 0.2f && knockbackTimer <= 0) || knockbackTimer < -3f))
                 photonView.RPC(nameof(ResetKnockback), RpcTarget.All);
             if (holding) {
                 holding.photonView.RPC(nameof(HoldableEntity.Throw), RpcTarget.All, !facingRight, true, body.position);

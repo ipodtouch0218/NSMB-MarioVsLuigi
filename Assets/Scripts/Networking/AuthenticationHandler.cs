@@ -1,46 +1,39 @@
-using System.Net.Http;
+using UnityEngine.Networking;
 
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
 
 public class AuthenticationHandler {
 
     private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
 
-    public async static void Authenticate(string userid, string token) {
-        try {
-            HttpClient client = new();
-            string request = URL + "?";
-            if (userid != null)
-                request += "&userid=" + userid;
-            if (token != null)
-                request += "&token=" + token;
+    public static void Authenticate(string userid, string token, string region) {
 
-            HttpResponseMessage resp = await client.GetAsync(request);
-            string responseString = await resp.Content.ReadAsStringAsync();
+        string request = URL + "?";
+        if (userid != null)
+            request += "&userid=" + userid;
+        if (token != null)
+            request += "&token=" + token;
 
-            if (!resp.IsSuccessStatusCode) {
+        UnityWebRequest client = UnityWebRequest.Get(request);
+        UnityWebRequestAsyncOperation resp = client.SendWebRequest();
+        resp.completed += (a) => {
+            if (client.result != UnityWebRequest.Result.Success) {
                 if (MainMenuManager.Instance) {
-                    MainMenuManager.Instance.OpenErrorBox(responseString);
+                    MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode);
                     MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
                 }
                 return;
             }
 
-
             AuthenticationValues values = new();
             values.AuthType = CustomAuthenticationType.Custom;
             values.UserId = userid;
-            values.AddAuthParameter("data", responseString.Trim());
+            values.AddAuthParameter("data", client.downloadHandler.text.Trim());
             PhotonNetwork.AuthValues = values;
 
-            PhotonNetwork.NetworkingClient.ConnectToNameServer();
-
-        } catch (HttpRequestException e) {
-
-            if (MainMenuManager.Instance)
-                MainMenuManager.Instance.OpenErrorBox(e.Message);
-            return;
-        }
+            PhotonNetwork.ConnectToRegion(region);
+        };
     }
 }

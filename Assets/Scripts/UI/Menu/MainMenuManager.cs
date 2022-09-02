@@ -264,13 +264,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 currentRooms.Remove(key);
             }
 
-            if (!GlobalController.Instance.authenticated) {
-                string id = PlayerPrefs.GetString("id", null);
-                string token = PlayerPrefs.GetString("token", null);
-
-                AuthenticationHandler.Authenticate(id, token);
-            }
-            PhotonNetwork.ConnectToRegion(lastRegion);
+            AuthenticationHandler.Authenticate(PlayerPrefs.GetString("id", null), PlayerPrefs.GetString("token", null), lastRegion);
 
             for (int i = 0; i < pingSortedRegions.Length; i++) {
                 Region r = pingSortedRegions[i];
@@ -301,8 +295,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (response.ContainsKey("Token"))
             PlayerPrefs.SetString("token", (string) response["Token"]);
         PlayerPrefs.Save();
-
-        GlobalController.Instance.authenticated = true;
     }
     public void OnCustomAuthenticationFailed(string failure) {
         Debug.Log("[PHOTON] Auth Failure: " + failure);
@@ -450,7 +442,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             string id = PlayerPrefs.GetString("id", null);
             string token = PlayerPrefs.GetString("token", null);
 
-            AuthenticationHandler.Authenticate(id, token);
+            PhotonNetwork.NetworkingClient.ConnectToNameServer();
 
         } else {
             if (PhotonNetwork.InRoom) {

@@ -21470,6 +21470,7 @@ MonoBehaviour:
   bounce: 0
   crouching: 0
   groundpound: 0
+  groundpoundLastFrame: 0
   sliding: 0
   knockback: 0
   hitBlock: 0

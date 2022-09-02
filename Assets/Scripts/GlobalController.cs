@@ -25,7 +25,6 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public bool joinedAsSpectator = false, checkedForVersion;
     public DisconnectCause? disconnectCause = null;
 
-    public bool authenticated;
     private int windowWidth, windowHeight;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -43,6 +42,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
 
         PhotonNetwork.AddCallbackTarget(this);
     }
+
 
     [Obsolete]
     public void Start() {
