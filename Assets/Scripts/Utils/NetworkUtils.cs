@@ -12,7 +12,7 @@ namespace NSMB.Utils {
 
         public static Dictionary<DisconnectCause, string> disconnectMessages = new() {
 
-            [DisconnectCause.MaxCcuReached] = "Max player count reached (100/100)",
+            [DisconnectCause.MaxCcuReached] = "Max player count reached in this region (100 players MAX)",
             [DisconnectCause.CustomAuthenticationFailed] = "Failed to authenticate with the auth server",
             //[DisconnectCause.DisconnectByServerLogic] = "",
 
