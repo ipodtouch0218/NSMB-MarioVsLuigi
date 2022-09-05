@@ -117,7 +117,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public GameObject onSpinner;
     public PipeManager pipeEntering;
     public bool step, alreadyGroundpounded;
-    private int starDirection;
     public PlayerData character;
 
     //Tile data
@@ -228,7 +227,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.position = transform.position = GameManager.Instance.GetSpawnpoint(playerId);
 
         models = transform.Find("Models").gameObject;
-        starDirection = Random.Range(0, 4);
 
         int count = 0;
 
@@ -1232,6 +1230,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
 
         bool fastStars = amount > 2 && stars > 2;
+        int starDirection = facingRight ? 1 : 2;
 
         while (amount > 0) {
             if (stars <= 0)
@@ -1243,17 +1242,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 if (starDirection == 3)
                     starDirection = 1;
             }
-            SpawnStar(deathplane);
+            PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
+
+            starDirection = (starDirection + 1) % 4;
             stars--;
             amount--;
         }
         GameManager.Instance.CheckForWinner();
         UpdateGameState();
-    }
-
-    void SpawnStar(bool deathplane) {
-        PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
-        starDirection = (starDirection + 1) % 4;
     }
     #endregion
 

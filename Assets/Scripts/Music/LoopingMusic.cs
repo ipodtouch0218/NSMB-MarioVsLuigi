@@ -6,17 +6,25 @@ public class LoopingMusic : MonoBehaviour {
     public bool FastMusic {
         set {
             if (_fastMusic ^ value) {
-                audioSource.time *= value ? 0.8f : 1.25f;
-                audioSource.clip = value && currentSong.fastClip ? currentSong.fastClip : currentSong.clip;
-                audioSource.Play();
+                float scaleFactor = value ? 0.8f : 1.25f;
+                float newTime = audioSource.time * scaleFactor;
 
-                if (currentSong.loopEndSample != -1 && audioSource.time >= currentSong.loopEndSample)
-                    audioSource.time = currentSong.loopStartSample + (audioSource.time - currentSong.loopEndSample);
+                if (currentSong.loopEndSample != -1) {
+                    float songStart = currentSong.loopStartSample * (value ? 0.8f : 1f);
+                    float songEnd = currentSong.loopEndSample * (value ? 0.8f : 1f);
+
+                    if (newTime >= songEnd)
+                        newTime = songStart + (newTime - songEnd);
+                }
+
+                audioSource.clip = value && currentSong.fastClip ? currentSong.fastClip : currentSong.clip;
+                audioSource.time = newTime;
+                audioSource.Play();
             }
 
             _fastMusic = value;
         }
-        get => _fastMusic && currentSong.fastClip;
+        get => currentSong.fastClip && _fastMusic;
     }
 
     [SerializeField] private AudioSource audioSource;
@@ -42,8 +50,13 @@ public class LoopingMusic : MonoBehaviour {
         if (!audioSource.isPlaying)
             return;
 
-        float end = currentSong.loopEndSample * (FastMusic ? 0.8f : 1f);
-        if (currentSong.loopEndSample != -1 && audioSource.time >= end)
-            audioSource.time = (currentSong.loopStartSample * (FastMusic ? 0.8f : 1f)) + (audioSource.time - end);
+        if (currentSong.loopEndSample != -1) {
+            float time = audioSource.time;
+            float songStart = currentSong.loopStartSample * (FastMusic ? 0.8f : 1f);
+            float songEnd = currentSong.loopEndSample * (FastMusic ? 0.8f : 1f);
+
+            if (time >= songEnd)
+                audioSource.time = songStart + (time - songEnd);
+        }
     }
 }

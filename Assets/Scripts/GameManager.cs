@@ -768,7 +768,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 speedup = true;
         }
 
-        speedup |= players.All(pl => !pl || pl.lives == 1);
+        speedup |= players.All(pl => !pl || pl.lives == 1 || pl.lives == 0);
 
         if (mega) {
             PlaySong(Enums.MusicState.MegaMushroom, megaMushroomMusic);
@@ -778,7 +778,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             PlaySong(Enums.MusicState.Normal, mainMusic);
         }
 
-        loopMusic.FastMusic = speedup;
+        //loopMusic.FastMusic = speedup;
+        loopMusic.FastMusic = Keyboard.current[Key.G].isPressed;
     }
 
     public void OnPause(InputAction.CallbackContext context) {

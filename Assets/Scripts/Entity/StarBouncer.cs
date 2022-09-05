@@ -43,6 +43,7 @@ public class StarBouncer : MonoBehaviourPun {
             trackObject.transform.localScale = new(3f / 4f, 3f / 4f, 1f);
             stationary = false;
             passthrough = true;
+            sRenderer.color = new(1, 1, 1, 0.55f);
             gameObject.layer = Layers.LayerHitsNothing;
             int direction = (int) data[0];
             left = direction <= 1;
@@ -108,6 +109,7 @@ public class StarBouncer : MonoBehaviourPun {
         if (passthrough && Collectable && body.velocity.y <= 0 && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, ANY_GROUND_MASK)) {
             passthrough = false;
             gameObject.layer = Layers.LayerEntity;
+            sRenderer.color = Color.white;
         }
         if (!passthrough) {
             if (Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale)) {
