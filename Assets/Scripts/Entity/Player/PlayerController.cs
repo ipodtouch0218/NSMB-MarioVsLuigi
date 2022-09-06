@@ -2131,7 +2131,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
 
-        bool run = functionallyRunning && !flying;
+        bool run = functionallyRunning && (!flying || state == Enums.PowerupState.MegaMushroom);
 
         int maxStage;
         if (invincible > 0 && run && onGround)

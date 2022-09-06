@@ -18,6 +18,7 @@ public class LeftRightButton : Selectable {
         InputSystem.controls.Player.Movement.performed += OnNavigation;
         InputSystem.controls.Player.Movement.canceled += OnNavigation;
     }
+
     protected override void OnDisable() {
         base.OnDisable();
         InputSystem.controls.Player.Movement.performed -= OnNavigation;
@@ -34,7 +35,6 @@ public class LeftRightButton : Selectable {
     }
 
     private void OnNavigation(InputAction.CallbackContext context) {
-        Debug.Log("A");
         if (GameManager.Instance.paused) {
             leftSelected = false;
             rightSelected = false;

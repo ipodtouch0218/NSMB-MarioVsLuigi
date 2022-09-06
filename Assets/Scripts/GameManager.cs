@@ -98,6 +98,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             string prefab = (string) table[0];
             int viewId = (int) table[7];
 
+            //Debug.Log(sender.NickName + " " + sender.UserId + " instantiating " + prefab);
+
             //even the host can't be trusted...
             if ((sender?.IsMasterClient ?? false) && (prefab.Contains("Static") || prefab.Contains("1-Up") || (musicEnabled && prefab.Contains("Player")))) {
 
