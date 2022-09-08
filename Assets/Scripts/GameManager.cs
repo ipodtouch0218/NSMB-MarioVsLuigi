@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             string prefab = (string) table[0];
             int viewId = (int) table[7];
 
-            //Debug.Log(sender.NickName + " " + sender.UserId + " instantiating " + prefab);
+            Debug.Log((sender.IsMasterClient ? "[H] " : "") + sender.NickName + " (" + sender.UserId + ") - Instantiating " + prefab);
 
             //even the host can't be trusted...
             if ((sender?.IsMasterClient ?? false) && (prefab.Contains("Static") || prefab.Contains("1-Up") || (musicEnabled && prefab.Contains("Player")))) {
@@ -780,8 +780,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             PlaySong(Enums.MusicState.Normal, mainMusic);
         }
 
-        //loopMusic.FastMusic = speedup;
-        loopMusic.FastMusic = Keyboard.current[Key.G].isPressed;
+        loopMusic.FastMusic = speedup;
     }
 
     public void OnPause(InputAction.CallbackContext context) {

@@ -2,7 +2,6 @@ using UnityEngine.Networking;
 
 using Photon.Pun;
 using Photon.Realtime;
-using UnityEngine;
 
 public class AuthenticationHandler {
 
@@ -17,6 +16,12 @@ public class AuthenticationHandler {
             request += "&token=" + token;
 
         UnityWebRequest client = UnityWebRequest.Get(request);
+
+        client.certificateHandler = new MvLCertificateHandler();
+        client.disposeCertificateHandlerOnDispose = true;
+        client.disposeDownloadHandlerOnDispose = true;
+        client.disposeUploadHandlerOnDispose = true;
+
         UnityWebRequestAsyncOperation resp = client.SendWebRequest();
         resp.completed += (a) => {
             if (client.result != UnityWebRequest.Result.Success) {
@@ -34,6 +39,8 @@ public class AuthenticationHandler {
             PhotonNetwork.AuthValues = values;
 
             PhotonNetwork.ConnectToRegion(region);
+
+            client.Dispose();
         };
     }
 }

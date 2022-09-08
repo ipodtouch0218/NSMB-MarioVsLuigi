@@ -2,14 +2,16 @@
 using Photon.Pun;
 
 public class FireballMover : MonoBehaviourPun {
-    public float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
-    public bool left;
-    public bool isIceball;
+
+    public bool left, isIceball;
+
+    [SerializeField] private float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
+
     private Rigidbody2D body;
     private PhysicsEntity physics;
-    bool breakOnImpact;
+    private bool breakOnImpact;
 
-    void Start() {
+    public void Start() {
         body = GetComponent<Rigidbody2D>();
         physics = GetComponent<PhysicsEntity>();
 
@@ -20,7 +22,8 @@ public class FireballMover : MonoBehaviourPun {
 
         body.velocity = new Vector2(speed * (left ? -1 : 1), -speed);
     }
-    void FixedUpdate() {
+
+    public void FixedUpdate() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             GetComponent<Animator>().enabled = false;
@@ -33,7 +36,8 @@ public class FireballMover : MonoBehaviourPun {
         float gravityInOneFrame = body.gravityScale * Physics2D.gravity.y * Time.fixedDeltaTime;
         body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
-    void HandleCollision() {
+
+    private void HandleCollision() {
         physics.UpdateCollisions();
 
         if (physics.onGround && !breakOnImpact) {
@@ -54,8 +58,9 @@ public class FireballMover : MonoBehaviourPun {
         }
     }
 
-    void OnDestroy() {
-        Instantiate(Resources.Load("Prefabs/Particle/" + (isIceball ? "IceballWall" : "FireballWall")), transform.position, Quaternion.identity);
+    public void OnDestroy() {
+        if (!GameManager.Instance.gameover)
+            Instantiate(Resources.Load("Prefabs/Particle/" + (isIceball ? "IceballWall" : "FireballWall")), transform.position, Quaternion.identity);
     }
 
     [PunRPC]
@@ -64,7 +69,7 @@ public class FireballMover : MonoBehaviourPun {
             PhotonNetwork.Destroy(photonView);
     }
 
-    void OnTriggerEnter2D(Collider2D collider) {
+    private void OnTriggerEnter2D(Collider2D collider) {
         if (!photonView.IsMine)
             return;
 

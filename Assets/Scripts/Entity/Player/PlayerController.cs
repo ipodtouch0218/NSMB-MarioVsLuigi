@@ -1408,8 +1408,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         PlaySound(sound, variant, 1);
     }
     [PunRPC]
-    public void PlaySound(Enums.Sounds sound) {
+    public void PlaySound(Enums.Sounds sound, PhotonMessageInfo info) {
+        Debug.Log(info.Sender?.NickName + " " + info.Sender?.UserId + " - " + sound);
+
         PlaySound(sound, 0, 1);
+    }
+    public void PlaySound(Enums.Sounds sound) {
+        PlaySound(sound, new PhotonMessageInfo());
     }
 
     [PunRPC]
@@ -1786,7 +1791,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         RaycastHit2D hit = Physics2D.BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
         Physics2D.queriesStartInColliders = prev;
         if (hit) {
-            body.position = new Vector2(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
+            body.position = new(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
             return true;
         }
         return false;

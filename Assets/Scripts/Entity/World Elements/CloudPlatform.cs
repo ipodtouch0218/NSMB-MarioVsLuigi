@@ -12,9 +12,8 @@ public class CloudPlatform : MonoBehaviour {
 
     public EdgeCollider2D ground;
     public BoxCollider2D trigger;
-    
-    [SerializeField]
-    public List<CloudContact> positions = new();
+
+    [SerializeField] private List<CloudContact> positions = new();
 
     private MaterialPropertyBlock mpb;
     private Texture2D displacementMap;
@@ -182,7 +181,7 @@ public class CloudPlatform : MonoBehaviour {
             this.platform = platform;
             this.obj = obj;
             this.collider = collider;
-            timer = platform.time;
+            timer = 0.05f;
         }
     }
 }

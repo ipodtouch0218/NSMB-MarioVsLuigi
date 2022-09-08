@@ -391,16 +391,18 @@ namespace NSMB.Utils {
         }
 
         public static Powerup[] powerups = null;
+        // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
         public static Powerup GetRandomItem(PlayerController player) {
             GameManager gm = GameManager.Instance;
 
             // "losing" variable based on ln(x+1), x being the # of stars we're behind (max being 5)
-            int x = Mathf.Max(0, FirstPlaceStars - player.stars);
-            float losing = Mathf.Log(x + 1, 2.71828f);
+            int ourStars = player.stars;
+            int leaderStars = FirstPlaceStars;
 
             if (powerups == null)
                 powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
 
+            GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int starsToWin);
             GetCustomProperty(Enums.NetRoomProperties.NewPowerups, out bool custom);
             GetCustomProperty(Enums.NetRoomProperties.Lives, out int livesOn);
             bool lives = false;
@@ -412,12 +414,12 @@ namespace NSMB.Utils {
 
             float totalChance = 0;
             foreach (Powerup powerup in powerups) {
-                if (powerup.name == "MegaMushroom" && GameManager.Instance.musicState == Enums.MusicState.MegaMushroom)
+                if (powerup.name == "MegaMushroom" && gm.musicState == Enums.MusicState.MegaMushroom)
                     continue;
                 if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
                     continue;
 
-                totalChance += powerup.GetModifiedChance(losing);
+                totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
             }
 
             float rand = Random.value * totalChance;
@@ -427,20 +429,19 @@ namespace NSMB.Utils {
                 if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
                     continue;
 
-                float chance = powerup.GetModifiedChance(losing);
+                float chance = powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
 
                 if (rand < chance)
                     return powerup;
                 rand -= chance;
             }
 
-            return powerups[0];
+            return powerups[1];
         }
 
         public static float QuadraticEaseOut(float v) {
             return -1 * v * (v - 2);
         }
-
 
         public static ExitGames.Client.Photon.Hashtable GetTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap) {
             Dictionary<int, int> changes = new();
