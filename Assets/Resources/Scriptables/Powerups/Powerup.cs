@@ -13,7 +13,6 @@ public class Powerup : ScriptableObject {
     public float GetModifiedChance(float starsToWin, float leaderStars, float ourStars) {
         float starDifference = leaderStars - ourStars;
         float bonus = losingSpawnBonus * Mathf.Log(starDifference + 1) * (1f - ((starsToWin - leaderStars) / starsToWin));
-        Debug.Log(state + ", leader at " + leaderStars + ", win at " + starsToWin + ", we're at " + ourStars + " = " + (spawnChance + bonus));
         return Mathf.Max(0, spawnChance + bonus);
     }
 }
