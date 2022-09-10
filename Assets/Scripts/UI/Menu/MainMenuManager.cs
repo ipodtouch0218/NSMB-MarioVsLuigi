@@ -170,6 +170,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         UpdateSettingEnableStates();
     }
     public void OnJoinedRoom() {
+        Debug.Log($"[PHOTON] Joined Room ({PhotonNetwork.CurrentRoom.Name})");
         LocalChatMessage(PhotonNetwork.LocalPlayer.GetUniqueNickname() + " joined the room", Color.red);
         EnterRoom();
     }
@@ -371,9 +372,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                     return;
             }
 
-            message = sender.GetUniqueNickname() + ": " + message.Filter();
             message = message.Substring(0, Mathf.Min(128, message.Length));
             message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
+            message = sender.GetUniqueNickname() + ": " + message.Filter();
 
             LocalChatMessage(message, Color.black, false);
             break;
@@ -599,6 +600,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, PhotonNetwork.LocalPlayer.CustomProperties);
         spectateToggle.isOn = spectating;
+        chatTextField.SetTextWithoutNotify("");
     }
 
     IEnumerator SetScroll() {

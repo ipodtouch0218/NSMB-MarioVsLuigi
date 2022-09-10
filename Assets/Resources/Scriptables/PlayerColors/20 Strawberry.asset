@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
-  m_Name: 19 Orange
+  m_Name: 20 Strawberry
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 0.27058825, g: 0.5921569, b: 0.9803922, a: 1}
-    overallsColor: {r: 0.17254902, g: 0.17254902, b: 0.17254902, a: 1}
+    hatColor: {r: 1, g: 0.5518868, b: 0.9110614, a: 1}
+    overallsColor: {r: 0.7735849, g: 0, b: 0, a: 1}

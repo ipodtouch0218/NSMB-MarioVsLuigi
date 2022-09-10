@@ -48,7 +48,7 @@ public class StarBouncer : MonoBehaviourPun {
             int direction = (int) data[0];
             left = direction <= 1;
             fast = direction == 0 || direction == 3;
-            body.velocity = new(moveSpeed * (left ? -1 : 1), deathBoostAmount);
+            body.velocity = new(moveSpeed * (left ? -1 : 1) * (fast ? 2f : 1f), deathBoostAmount);
 
             //death via pit boost
             if ((bool) data[3])
@@ -99,7 +99,7 @@ public class StarBouncer : MonoBehaviourPun {
             return;
         }
 
-        body.velocity = new(moveSpeed * (left ? -1 : 1) * (fast ? 1.5f : 1f), body.velocity.y);
+        body.velocity = new(moveSpeed * (left ? -1 : 1) * (fast ? 2f : 1f), body.velocity.y);
 
         canBounce |= body.velocity.y < 0;
         Collectable |= body.velocity.y < 0;

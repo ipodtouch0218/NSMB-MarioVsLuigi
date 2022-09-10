@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using TMPro;
 
 using NSMB.Utils;
-using Photon.Pun;
 
 public class UserNametag : MonoBehaviour {
 

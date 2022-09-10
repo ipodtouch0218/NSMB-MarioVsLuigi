@@ -250,6 +250,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: df93808b9a7f2cd4faa25234bc48b4c1, type: 2}
   - {fileID: 11400000, guid: edcd276a8acb45a46948d7f46b3acc57, type: 2}
   - {fileID: 11400000, guid: 3211edc9ee1951f4780bd104a9fbd597, type: 2}
+  - {fileID: 11400000, guid: 245cea6ccab8e0d47a215ef6df104e09, type: 2}
+  - {fileID: 11400000, guid: 2ea8c39849fd3704cb659e2d4ef905c3, type: 2}
   ndsCanvas: {fileID: 1955773772637164072}
   fourByThreeImage: {fileID: 0}
   anyAspectImage: {fileID: 0}

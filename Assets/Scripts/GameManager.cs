@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             string prefab = (string) table[0];
             int viewId = (int) table[7];
 
-            Debug.Log((sender.IsMasterClient ? "[H] " : "") + sender.NickName + " (" + sender.UserId + ") - Instantiating " + prefab);
+            //Debug.Log((sender.IsMasterClient ? "[H] " : "") + sender.NickName + " (" + sender.UserId + ") - Instantiating " + prefab);
 
             //even the host can't be trusted...
             if ((sender?.IsMasterClient ?? false) && (prefab.Contains("Static") || prefab.Contains("1-Up") || (musicEnabled && prefab.Contains("Player")))) {
@@ -142,6 +142,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             break;
         }
         case (byte) Enums.NetEventIds.SetTile: {
+
             int x = (int) data[0];
             int y = (int) data[1];
             string tilename = (string) data[2];
@@ -149,6 +150,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             TileBase tile = Utils.GetTileFromCache(tilename);
             tilemap.SetTile(loc, tile);
+            Debug.Log($"SetTile by {sender?.NickName} ({sender?.UserId}): {tilename}");
             break;
         }
         case (byte) Enums.NetEventIds.SetTileBatch: {
