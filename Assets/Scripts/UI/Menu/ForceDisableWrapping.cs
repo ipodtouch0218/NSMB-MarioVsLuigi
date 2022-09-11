@@ -7,9 +7,6 @@ public class ForceDisableWrapping : MonoBehaviour {
 
     public void Start() {
         text = GetComponent<TMP_Text>();
-    }
-
-    public void OnEnable() {
         text.enableWordWrapping = false;
     }
 }

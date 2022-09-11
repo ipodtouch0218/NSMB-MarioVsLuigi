@@ -1,25 +1,25 @@
-﻿using NSMB.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+
+using NSMB.Utils;
 
 public class CameraController : MonoBehaviour {
 
+    private static readonly Vector2 airOffset = new(0, .65f);
+
     public static float ScreenShake = 0;
-    public bool controlCamera = false;
+    public bool IsControllingCamera { get; set; } = false;
     public Vector3 currentPosition;
 
     private Vector2 airThreshold = new(0.5f, 1.3f), groundedThreshold = new(0.5f, 0f);
-    private Vector2 airOffset = new(0, .65f), groundedOffset = new(0, 1.3f);
 
-    private Vector3 smoothDampVel;
-    private Camera targetCamera;
     private List<SecondaryCameraPositioner> secondaryPositioners = new();
+    private PlayerController controller;
+    private Vector3 smoothDampVel, playerPos;
+    private Camera targetCamera;
     private float startingZ, lastFloor;
 
-    private PlayerController controller;
-    private Vector3 playerPos;
-
-    void Awake() {
+    public void Awake() {
         //only control the camera if we're the local player.
         targetCamera = Camera.main;
         startingZ = targetCamera.transform.position.z;
@@ -29,7 +29,7 @@ public class CameraController : MonoBehaviour {
 
     public void LateUpdate() {
         currentPosition = CalculateNewPosition();
-        if (controlCamera) {
+        if (IsControllingCamera) {
 
             Vector3 shakeOffset = Vector3.zero;
             if ((ScreenShake -= Time.deltaTime) > 0)
@@ -85,7 +85,7 @@ public class CameraController : MonoBehaviour {
             currentPosition.x += (right ? -1 : 1) * GameManager.Instance.levelWidthTile / 2f;
             xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
             right = currentPosition.x > playerPos.x;
-            if (controlCamera)
+            if (IsControllingCamera)
                 BackgroundLoop.Instance.wrap = true;
         }
 

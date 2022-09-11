@@ -158,7 +158,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             }
         }
 
-        if (controller.cameraController.controlCamera)
+        if (controller.cameraController.IsControllingCamera)
             HorizontalCamera.OFFSET_TARGET = (controller.flying || controller.propeller) ? 0.5f : 0f;
 
         if (controller.crouching || controller.sliding || controller.skidding) {

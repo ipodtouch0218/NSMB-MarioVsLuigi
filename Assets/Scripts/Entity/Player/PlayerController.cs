@@ -214,7 +214,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #region Unity Methods
     public void Awake() {
         cameraController = GetComponent<CameraController>();
-        cameraController.controlCamera = photonView.IsMineOrLocal();
+        cameraController.IsControllingCamera = photonView.IsMineOrLocal();
 
         animator = GetComponentInChildren<Animator>();
         body = GetComponent<Rigidbody2D>();
@@ -1290,7 +1290,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
 
-        PlaySound(photonView.IsMine ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
+        PlaySound(cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
 
         SpawnStars(1, deathplane);
         body.isKinematic = false;
@@ -1410,7 +1410,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
     [PunRPC]
     public void PlaySound(Enums.Sounds sound, PhotonMessageInfo info) {
-        //Debug.Log(info.Sender?.NickName + " " + info.Sender?.UserId + " - " + sound);
+        Debug.Log(info.Sender?.NickName + " " + info.Sender?.UserId + " - " + sound);
 
         PlaySound(sound, 0, 1);
     }
@@ -2891,10 +2891,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         if (onGround || knockback || groundpound || drill
-            || holding || crouching || sliding
+            || holding || crouching || sliding || inShell
             || wallSlideLeft || wallSlideRight || groundpoundDelay > 0)
-
             return;
+
         if (!propeller && !flying && (left || right))
             return;
 

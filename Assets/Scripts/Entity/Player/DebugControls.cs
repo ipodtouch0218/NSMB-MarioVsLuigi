@@ -67,7 +67,7 @@ public class DebugControls : MonoBehaviour {
             feature.SetActive(!feature.isActive);
         }
         if (kb[Key.O].wasPressedThisFrame) {
-            GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.controlCamera;
+            GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.IsControllingCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.IsControllingCamera;
         }
         if (kb[Key.P].wasPressedThisFrame) {
             GameManager.Instance.localPlayer.GetPhotonView().RPC("Death", RpcTarget.All, false, false);

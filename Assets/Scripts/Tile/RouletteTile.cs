@@ -45,7 +45,8 @@ public class RouletteTile : BreakableBrickTile {
 
         Bump(interacter, direction, worldLocation);
 
-        object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, direction == InteractionDirection.Down ? bottomSpawnOffset : topSpawnOffset };
+        Vector2 offset = direction == InteractionDirection.Down ? bottomSpawnOffset + ( spawnResult == "MegaMushroom" ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
+        object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, offset };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
 
         if (interacter is MonoBehaviourPun pun2)

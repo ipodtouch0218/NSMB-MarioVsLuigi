@@ -48,7 +48,7 @@ public class TrackIcon : MonoBehaviour {
                 flashTimer = 0;
                 image.enabled = true;
             }
-            transform.localScale = playerTarget.cameraController.controlCamera ? new(1, -1, 1) : Vector3.one * (2f / 3f);
+            transform.localScale = playerTarget.cameraController.IsControllingCamera ? new(1, -1, 1) : Vector3.one * (2f / 3f);
         } else if (!changedSprite) {
             image.sprite = starSprite;
             image.enabled = true;

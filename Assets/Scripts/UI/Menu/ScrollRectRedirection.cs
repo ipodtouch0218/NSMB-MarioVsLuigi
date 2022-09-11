@@ -8,7 +8,7 @@ public class ScrollRectRedirection : MonoBehaviour {
     private GameObject rect;
     private bool passingEvent = false;
 
-    public void OnEnable() {
+    public void Start() {
         rect = GetComponentsInParent<ScrollRect>()[^1].gameObject;
 
         EventTrigger trigger = GetComponent<EventTrigger>();

@@ -56,7 +56,7 @@ public class MovingPowerup : MonoBehaviourPun {
             Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
             if (photonView.IsMine && (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Physics2D.OverlapBox(origin, size, 0, groundMask))) {
-                photonView.RPC("DespawnWithPoof", RpcTarget.All);
+                photonView.RPC(nameof(DespawnWithPoof), RpcTarget.All);
                 return;
             }
         }
@@ -93,7 +93,7 @@ public class MovingPowerup : MonoBehaviourPun {
         sRenderer.enabled = !(despawnCounter <= 3 && despawnCounter * blinkingRate % 1 < 0.5f);
 
         if (despawnCounter <= 0 && photonView.IsMine) {
-            photonView.RPC("DespawnWithPoof", RpcTarget.All);
+            photonView.RPC(nameof(DespawnWithPoof), RpcTarget.All);
             return;
         }
 

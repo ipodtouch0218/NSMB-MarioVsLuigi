@@ -25,12 +25,12 @@ public class SpectationManager : MonoBehaviour {
         get => _targetPlayer;
         set {
             if (_targetPlayer)
-                _targetPlayer.cameraController.controlCamera = false;
+                _targetPlayer.cameraController.IsControllingCamera = false;
 
             _targetPlayer = value;
             if (value != null) {
                 UpdateSpectateUI();
-                value.cameraController.controlCamera = true;
+                value.cameraController.IsControllingCamera = true;
             }
         }
     }
