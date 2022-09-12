@@ -252,6 +252,35 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3211edc9ee1951f4780bd104a9fbd597, type: 2}
   - {fileID: 11400000, guid: 245cea6ccab8e0d47a215ef6df104e09, type: 2}
   - {fileID: 11400000, guid: 2ea8c39849fd3704cb659e2d4ef905c3, type: 2}
+  rainbowGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 0.13913044, b: 0.11304349, a: 1}
+    key1: {r: 1, g: 0.40000004, b: 0, a: 1}
+    key2: {r: 1, g: 0.6509804, b: 0, a: 0}
+    key3: {r: 0.8313726, g: 1, b: 0, a: 0}
+    key4: {r: 0, g: 1, b: 0.6313726, a: 0}
+    key5: {r: 0.17511517, g: 0.31336403, b: 1, a: 0}
+    key6: {r: 0.8060319, g: 0.32599998, b: 1, a: 0}
+    key7: {r: 1, g: 0.13725491, b: 0.1137255, a: 0}
+    ctime0: 0
+    ctime1: 7710
+    ctime2: 14456
+    ctime3: 22552
+    ctime4: 33539
+    ctime5: 45104
+    ctime6: 57247
+    ctime7: 65535
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 8
+    m_NumAlphaKeys: 2
   ndsCanvas: {fileID: 1955773772637164072}
   fourByThreeImage: {fileID: 0}
   anyAspectImage: {fileID: 0}

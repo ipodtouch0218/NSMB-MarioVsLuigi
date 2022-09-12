@@ -15,8 +15,8 @@ MonoBehaviour:
   state: 3
   prefab: Mushroom
   soundEffect: 16
-  spawnChance: 10
-  losingSpawnBonus: -5
+  spawnChance: 8
+  losingSpawnBonus: -8
   big: 0
   vertical: 0
   custom: 0

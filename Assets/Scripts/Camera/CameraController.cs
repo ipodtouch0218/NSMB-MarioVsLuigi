@@ -8,12 +8,11 @@ public class CameraController : MonoBehaviour {
     private static readonly Vector2 airOffset = new(0, .65f);
 
     public static float ScreenShake = 0;
-    public bool IsControllingCamera { get; set; } = false;
     public Vector3 currentPosition;
+    public bool IsControllingCamera { get; set; } = false;
 
     private Vector2 airThreshold = new(0.5f, 1.3f), groundedThreshold = new(0.5f, 0f);
-
-    private List<SecondaryCameraPositioner> secondaryPositioners = new();
+    private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
     private PlayerController controller;
     private Vector3 smoothDampVel, playerPos;
     private Camera targetCamera;
@@ -32,11 +31,8 @@ public class CameraController : MonoBehaviour {
         if (IsControllingCamera) {
 
             Vector3 shakeOffset = Vector3.zero;
-            if ((ScreenShake -= Time.deltaTime) > 0)
+            if ((ScreenShake -= Time.deltaTime) > 0 && controller.onGround)
                 shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
-
-            if (!controller.onGround)
-                shakeOffset = Vector3.zero;
 
             targetCamera.transform.position = currentPosition + shakeOffset;
             if (BackgroundLoop.Instance)

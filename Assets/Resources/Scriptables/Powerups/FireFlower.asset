@@ -16,7 +16,7 @@ MonoBehaviour:
   prefab: FireFlower
   soundEffect: 16
   spawnChance: 2
-  losingSpawnBonus: 0
+  losingSpawnBonus: 0.75
   big: 0
   vertical: 0
   custom: 0

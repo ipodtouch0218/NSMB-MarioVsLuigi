@@ -4,6 +4,7 @@ using TMPro;
 
 using Photon.Realtime;
 using NSMB.Utils;
+using ExitGames.Client.Photon;
 
 public class RoomIcon : MonoBehaviour {
 
@@ -25,7 +26,7 @@ public class RoomIcon : MonoBehaviour {
             return;
 
         room = newRoom;
-        ExitGames.Client.Photon.Hashtable prop = room.CustomProperties;
+        Hashtable prop = room.CustomProperties;
 
         nameText.text = $"{((string) prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}'s Lobby";
         playersText.text = $"Players: {room.PlayerCount}/{room.MaxPlayers}";

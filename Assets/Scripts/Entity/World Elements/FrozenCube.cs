@@ -211,32 +211,30 @@ public class FrozenCube : HoldableEntity {
             return;
 
         if (!holder && (player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.inShell)) {
-            photonView.RPC("Kill", RpcTarget.All);
+            photonView.RPC(nameof(Kill), RpcTarget.All);
             return;
         }
         if (holder || fallen || player.Frozen || (player.throwInvincibility > 0 && player.holdingOld == gameObject))
             return;
 
         if ((player.groundpound || player.groundpoundLastFrame) && attackedFromAbove && player.state != Enums.PowerupState.MiniMushroom) {
-            photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Groundpounded);
-            if (entity is PlayerController pc)
-                pc.photonView.RPC("Knockback", RpcTarget.All, pc.facingRight, 1, false, player.photonView.ViewID);
+            photonView.RPC(nameof(KillWithReason), RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Groundpounded);
 
         } else if (!attackedFromAbove && player.state != Enums.PowerupState.MiniMushroom) {
 
-            photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.BlockBump);
+            photonView.RPC(nameof(KillWithReason), RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.BlockBump);
 
         } else if (fastSlide) {
-            player.photonView.RPC("Knockback", RpcTarget.All, body.position.x > player.body.position.x, 1, false, photonView.ViewID);
-            photonView.RPC("Kill", RpcTarget.All);
+            player.photonView.RPC(nameof(PlayerController.Knockback), RpcTarget.All, body.position.x > player.body.position.x, 1, false, photonView.ViewID);
+            photonView.RPC(nameof(Kill), RpcTarget.All);
         }
         if (entity.IsCarryable && !holder && !dead) {
             if (player.CanPickup() && player.onGround) {
                 fallen = true;
-                photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
-                player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
+                photonView.RPC(nameof(Pickup), RpcTarget.All, player.photonView.ViewID);
+                player.photonView.RPC(nameof(PlayerController.SetHolding), RpcTarget.All, photonView.ViewID);
             } else {
-                player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                player.photonView.RPC(nameof(PlayerController.SetHoldingOld), RpcTarget.All, photonView.ViewID);
                 previousHolder = player;
             }
         }

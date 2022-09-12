@@ -395,7 +395,7 @@ namespace NSMB.Utils {
         public static Powerup GetRandomItem(PlayerController player) {
             GameManager gm = GameManager.Instance;
 
-            // "losing" variable based on ln(x+1), x being the # of stars we're behind (max being 5)
+            // "losing" variable based on ln(x+1), x being the # of stars we're behind
             int ourStars = player.stars;
             int leaderStars = FirstPlaceStars;
 
@@ -584,7 +584,7 @@ namespace NSMB.Utils {
         public static Color GetRainbowColor() {
             double time = PhotonNetwork.Time * 0.1;
             time %= 1;
-            return Color.HSVToRGB((float) time, 1, 1);
+            return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
         }
     }
 }

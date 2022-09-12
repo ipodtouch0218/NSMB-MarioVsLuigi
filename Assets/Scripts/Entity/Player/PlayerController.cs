@@ -1071,15 +1071,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.simulated = true;
         body.isKinematic = false;
 
-        bool doKnockback = reasonByte != (byte) IFreezableEntity.UnfreezeReason.Timer;
+        int knockbackStars = reasonByte switch {
+            (byte) IFreezableEntity.UnfreezeReason.Timer => 0,
+            (byte) IFreezableEntity.UnfreezeReason.Groundpounded => 2,
+            _ => 1
+        };
 
         if (frozenObject && frozenObject.photonView.IsMine) {
             frozenObject.holder?.photonView.RPC(nameof(Knockback), RpcTarget.All, frozenObject.holder.facingRight, 1, true, photonView.ViewID);
             frozenObject.Kill();
         }
 
-        if (doKnockback)
-            Knockback(facingRight, 1, true, -1);
+        if (knockbackStars > 0)
+            Knockback(facingRight, knockbackStars, true, -1);
         else
             hitInvincibilityCounter = 1.5f;
     }
@@ -1224,7 +1228,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         coins = 0;
     }
 
-    void SpawnStars(int amount, bool deathplane) {
+    private void SpawnStars(int amount, bool deathplane) {
         if (!PhotonNetwork.IsMasterClient) {
             stars = Mathf.Max(0, stars - amount);
             return;
@@ -1410,7 +1414,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
     [PunRPC]
     public void PlaySound(Enums.Sounds sound, PhotonMessageInfo info) {
-        Debug.Log(info.Sender?.NickName + " " + info.Sender?.UserId + " - " + sound);
+        //Debug.Log(info.Sender?.NickName + " " + info.Sender?.UserId + " - " + sound);
 
         PlaySound(sound, 0, 1);
     }

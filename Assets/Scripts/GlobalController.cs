@@ -13,6 +13,7 @@ using NSMB.Utils;
 public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, ILobbyCallbacks {
 
     public PlayerColorSet[] skins;
+    public Gradient rainbowGradient;
 
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
 

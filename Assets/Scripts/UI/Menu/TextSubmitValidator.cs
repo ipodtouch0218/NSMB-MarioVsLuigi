@@ -5,7 +5,6 @@ using TMPro;
 public class TextSubmitValidator : TMP_InputValidator {
 
     public override char Validate(ref string text, ref int pos, char ch) {
-
         if (ch == '\n' || ch == '\xB') {
             //submit
             MainMenuManager.Instance.SendChat();
@@ -13,6 +12,7 @@ public class TextSubmitValidator : TMP_InputValidator {
         } else {
             if (text.Length >= 128)
                 return '\0';
+
             text = text.Insert(pos, ch.ToString());
             pos++;
         }
