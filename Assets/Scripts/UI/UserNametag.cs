@@ -62,10 +62,10 @@ public class UserNametag : MonoBehaviour {
         text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.GetUniqueNickname();
 
         text.text += "\n";
-        if (parent.lives >= 0)
-            text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString($"x{parent.lives} ");
+        if (parent.Lives >= 0)
+            text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString($"x{parent.Lives} ");
 
-        text.text += Utils.GetSymbolString($"Sx{parent.stars}");
+        text.text += Utils.GetSymbolString($"Sx{parent.Stars}");
 
         if (rainbowName)
             text.color = Utils.GetRainbowColor();

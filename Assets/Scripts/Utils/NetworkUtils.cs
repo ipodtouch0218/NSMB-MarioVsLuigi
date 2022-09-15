@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using ExitGames.Client.Photon;
+using Fusion;
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -22,7 +23,7 @@ namespace NSMB.Utils {
         public static RaiseEventOptions EventAll { get; } = new() { Receivers = ReceiverGroup.All };
         public static RaiseEventOptions EventMasterClient { get; } = new() { Receivers = ReceiverGroup.MasterClient };
 
-        private readonly static Hashtable _defaultRoomProperties = new() {
+        private readonly static Dictionary<string, SessionProperty> _defaultRoomProperties = new() {
             [Enums.NetRoomProperties.Level] = 0,
             [Enums.NetRoomProperties.StarRequirement] = 10,
             [Enums.NetRoomProperties.CoinRequirement] = 8,
@@ -37,9 +38,9 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.Bans] = new object[0],
         };
 
-        public static Hashtable DefaultRoomProperties {
+        public static Dictionary<string, SessionProperty> DefaultRoomProperties {
             get {
-                Hashtable ret = new();
+                Dictionary<string, SessionProperty> ret = new();
                 ret.Merge(_defaultRoomProperties);
                 return ret;
             }

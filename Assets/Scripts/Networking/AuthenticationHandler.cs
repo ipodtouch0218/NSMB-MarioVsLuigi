@@ -1,13 +1,13 @@
+using System;
 using UnityEngine.Networking;
 
-using Photon.Pun;
-using Photon.Realtime;
+using Fusion.Photon.Realtime;
 
 public class AuthenticationHandler {
 
     private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
 
-    public static void Authenticate(string userid, string token, string region) {
+    public static void Authenticate(string userid, string token, Action<AuthenticationValues> OnComplete) {
 
         string request = URL + "?";
         if (userid != null)
@@ -22,12 +22,12 @@ public class AuthenticationHandler {
         client.disposeDownloadHandlerOnDispose = true;
         client.disposeUploadHandlerOnDispose = true;
 
-        UnityWebRequestAsyncOperation resp = client.SendWebRequest();
-        resp.completed += (a) => {
+        UnityWebRequestAsyncOperation a = client.SendWebRequest();
+        a.completed += (a) => {
             if (client.result != UnityWebRequest.Result.Success) {
                 if (MainMenuManager.Instance) {
                     MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode);
-                    MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
+                    //MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
                 }
                 return;
             }
@@ -36,11 +36,10 @@ public class AuthenticationHandler {
             values.AuthType = CustomAuthenticationType.Custom;
             values.UserId = userid;
             values.AddAuthParameter("data", client.downloadHandler.text.Trim());
-            PhotonNetwork.AuthValues = values;
-
-            PhotonNetwork.ConnectToRegion(region);
 
             client.Dispose();
+
+            OnComplete(values);
         };
     }
 }

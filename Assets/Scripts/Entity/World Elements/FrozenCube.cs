@@ -210,17 +210,17 @@ public class FrozenCube : HoldableEntity {
         if (previousHolder == player && throwTimer > 0)
             return;
 
-        if (!holder && (player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.inShell)) {
+        if (!holder && (player.invincible > 0 || player.State == Enums.PowerupState.MegaMushroom || player.inShell)) {
             photonView.RPC(nameof(Kill), RpcTarget.All);
             return;
         }
         if (holder || fallen || player.Frozen || (player.throwInvincibility > 0 && player.holdingOld == gameObject))
             return;
 
-        if ((player.groundpound || player.groundpoundLastFrame) && attackedFromAbove && player.state != Enums.PowerupState.MiniMushroom) {
+        if ((player.groundpound || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
             photonView.RPC(nameof(KillWithReason), RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Groundpounded);
 
-        } else if (!attackedFromAbove && player.state != Enums.PowerupState.MiniMushroom) {
+        } else if (!attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
 
             photonView.RPC(nameof(KillWithReason), RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.BlockBump);
 

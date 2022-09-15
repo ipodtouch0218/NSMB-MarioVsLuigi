@@ -81,25 +81,25 @@ public class UIUpdater : MonoBehaviour {
         if (!player)
             return;
 
-        itemReserve.sprite = player.storedPowerup != null ? player.storedPowerup.reserveSprite : storedItemNull;
+        itemReserve.sprite = player.StoredPowerup != null ? player.StoredPowerup.reserveSprite : storedItemNull;
     }
 
     private void UpdateTextUI() {
         if (!player || GameManager.Instance.gameover)
             return;
 
-        if (player.stars != stars) {
-            stars = player.stars;
+        if (player.Stars != stars) {
+            stars = player.Stars;
             uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + GameManager.Instance.starRequirement);
         }
-        if (player.coins != coins) {
-            coins = player.coins;
+        if (player.Coins != coins) {
+            coins = player.Coins;
             uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + GameManager.Instance.coinRequirement);
         }
 
-        if (player.lives >= 0) {
-            if (player.lives != lives) {
-                lives = player.lives;
+        if (player.Lives >= 0) {
+            if (player.Lives != lives) {
+                lives = player.Lives;
                 uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + Utils.GetSymbolString("x" + lives);
             }
         } else {

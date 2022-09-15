@@ -15,7 +15,7 @@ public class PowerupTile : BreakableBrickTile {
 
         if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.previousHolder != null)) {
             PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk)interacter).previousHolder;
-            if (player.state == Enums.PowerupState.MegaMushroom) {
+            if (player.State == Enums.PowerupState.MegaMushroom) {
                 //Break
 
                 //Tilemap
@@ -31,7 +31,7 @@ public class PowerupTile : BreakableBrickTile {
                 return true;
             }
 
-            spawnResult = player.state <= Enums.PowerupState.Small ? "Mushroom" : "FireFlower";
+            spawnResult = player.State <= Enums.PowerupState.Small ? "Mushroom" : "FireFlower";
         }
 
         Bump(interacter, direction, worldLocation);

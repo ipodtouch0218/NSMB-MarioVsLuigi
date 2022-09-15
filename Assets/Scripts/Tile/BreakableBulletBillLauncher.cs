@@ -10,7 +10,7 @@ public class BreakableBulletBillLauncher : InteractableTile {
             return false;
 
         PlayerController player = (PlayerController)interacter;
-        if (player.state != Enums.PowerupState.MegaMushroom)
+        if (player.State != Enums.PowerupState.MegaMushroom)
             return false;
         if (direction == InteractionDirection.Down || direction == InteractionDirection.Up)
             return false;

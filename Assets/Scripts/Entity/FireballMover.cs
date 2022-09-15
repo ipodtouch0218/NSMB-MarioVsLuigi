@@ -1,29 +1,43 @@
 ﻿using UnityEngine;
-using Photon.Pun;
 
-public class FireballMover : MonoBehaviourPun {
+using Fusion;
 
-    public bool left, isIceball;
+public class FireballMover : NetworkBehaviour {
 
+    //---Networked Variables
+    [Networked] public NetworkBool FacingRight { get; set; }
+    [Networked] public NetworkBool IsIceball { get; set; }
+
+    //---Public Variables
+    public GameObject wallHitPrefab;
+    public PlayerRef owner;
+
+    //---Serialized Variables
     [SerializeField] private float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
 
+    //---Private Variables
     private Rigidbody2D body;
     private PhysicsEntity physics;
     private bool breakOnImpact;
 
-    public void Start() {
+    public void Awake() {
         body = GetComponent<Rigidbody2D>();
         physics = GetComponent<PhysicsEntity>();
-
-        object[] data = photonView.InstantiationData;
-        left = (bool) data[0];
-        if (data.Length > 1 && isIceball)
-            speed += Mathf.Abs((float) data[1] / 3f);
-
-        body.velocity = new Vector2(speed * (left ? -1 : 1), -speed);
     }
 
-    public void FixedUpdate() {
+    public void OnBeforeSpawned(PlayerRef owner, bool right, float shooterSpeed) {
+        this.owner = owner;
+        FacingRight = right;
+
+        if (IsIceball)
+            speed += Mathf.Abs(shooterSpeed / 3f);
+    }
+
+    public void Start() {
+        body.velocity = new Vector2(speed * (FacingRight ? 1 : -1), -speed);
+    }
+
+    public override void FixedUpdateNetwork() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             GetComponent<Animator>().enabled = false;
@@ -34,7 +48,7 @@ public class FireballMover : MonoBehaviourPun {
         HandleCollision();
 
         float gravityInOneFrame = body.gravityScale * Physics2D.gravity.y * Time.fixedDeltaTime;
-        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(-terminalVelocity, body.velocity.y));
+        body.velocity = new Vector2(speed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
     private void HandleCollision() {
@@ -46,33 +60,23 @@ public class FireballMover : MonoBehaviourPun {
                 boost = 0;
 
             body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
-        } else if (isIceball && body.velocity.y > 1.5f)  {
+        } else if (IsIceball && body.velocity.y > 1.5f)  {
             breakOnImpact = true;
         }
         bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact);
-        if (photonView && breaking) {
-            if (photonView.IsMine)
-                PhotonNetwork.Destroy(gameObject);
-            else
-                Destroy(gameObject);
+        if (breaking) {
+            Runner.Despawn(Object, true);
+
         }
     }
 
     public void OnDestroy() {
         if (!GameManager.Instance.gameover)
-            Instantiate(Resources.Load("Prefabs/Particle/" + (isIceball ? "IceballWall" : "FireballWall")), transform.position, Quaternion.identity);
+            Instantiate(wallHitPrefab, transform.position, Quaternion.identity);
     }
 
-    [PunRPC]
-    protected void Kill() {
-        if (photonView.IsMine)
-            PhotonNetwork.Destroy(photonView);
-    }
 
     private void OnTriggerEnter2D(Collider2D collider) {
-        if (!photonView.IsMine)
-            return;
-
         switch (collider.tag) {
         case "koopa":
         case "goomba": {
@@ -80,61 +84,61 @@ public class FireballMover : MonoBehaviourPun {
             if (en.dead || en.Frozen)
                 return;
 
-            if (isIceball) {
-                PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { en.photonView.ViewID });
-                PhotonNetwork.Destroy(gameObject);
+            if (IsIceball) {
+                //TODO:
+                //PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { en.photonView.ViewID });
             } else {
-                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false, 0);
-                PhotonNetwork.Destroy(gameObject);
+                en.SpecialKill(FacingRight, false, 0);
             }
+            Runner.Despawn(Object, true);
             break;
         }
         case "frozencube": {
-            FrozenCube fc = collider.gameObject.GetComponentInParent<FrozenCube>();
+            FrozenCube fc = collider.gameObject.GetComponent<FrozenCube>();
             if (fc.dead)
                 return;
-            // TODO: Stuff here
 
-            if (isIceball) {
-                PhotonNetwork.Destroy(gameObject);
-            } else {
-                fc.gameObject.GetComponent<FrozenCube>().photonView.RPC("Kill", RpcTarget.All);
-                PhotonNetwork.Destroy(gameObject);
+            if (!IsIceball) {
+                fc.Kill();
             }
+
+            Runner.Despawn(Object, true);
             break;
         }
         case "Fireball": {
             FireballMover otherball = collider.gameObject.GetComponentInParent<FireballMover>();
-            if (isIceball ^ otherball.isIceball) {
-                PhotonNetwork.Destroy(collider.gameObject);
-                PhotonNetwork.Destroy(gameObject);
+            if (IsIceball ^ otherball.IsIceball) {
+                Runner.Despawn(Object, true);
+                Runner.Despawn(otherball.Object, true);
             }
             break;
         }
         case "bulletbill": {
             KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
-            if (isIceball && !bb.Frozen) {
-                PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bb.photonView.ViewID });
+            if (IsIceball && !bb.Frozen) {
+                //TODO:
+                //PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bb.photonView.ViewID });
             }
-            PhotonNetwork.Destroy(gameObject);
-
+            Runner.Despawn(Object, true);
             break;
         }
         case "bobomb": {
             BobombWalk bobomb = collider.gameObject.GetComponentInParent<BobombWalk>();
             if (bobomb.dead || bobomb.Frozen)
                 return;
-            if (!isIceball) {
+
+            if (!IsIceball) {
                 if (!bobomb.lit) {
-                    bobomb.photonView.RPC("Light", RpcTarget.All);
+                    bobomb.Light();
                 } else {
-                    bobomb.photonView.RPC("Kick", RpcTarget.All, body.position.x < bobomb.body.position.x, 0f, false);
+                    bobomb.Kick(body.position.x < bobomb.body.position.x, 0f, false);
                 }
-                PhotonNetwork.Destroy(gameObject);
             } else {
-                PhotonNetwork.Instantiate("Prefabs/FrozenCube", bobomb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bobomb.photonView.ViewID });
-                PhotonNetwork.Destroy(gameObject);
+                //TODO:
+                //PhotonNetwork.Instantiate("Prefabs/FrozenCube", bobomb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bobomb.photonView.ViewID });
             }
+
+            Runner.Despawn(Object, true);
             break;
         }
         case "piranhaplant": {
@@ -144,12 +148,14 @@ public class FireballMover : MonoBehaviourPun {
             AnimatorStateInfo asi = killa.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
             if (asi.IsName("end") && asi.normalizedTime > 0.5f)
                 return;
-            if (!isIceball) {
-                killa.photonView.RPC("Kill", RpcTarget.All);
-                PhotonNetwork.Destroy(gameObject);
+
+            if (!IsIceball) {
+                killa.Kill();
             } else {
-                PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { killa.photonView.ViewID });
+                //TODO:
+                //PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { killa.photonView.ViewID });
             }
+            Runner.Despawn(Object, true);
             break;
         }
         }

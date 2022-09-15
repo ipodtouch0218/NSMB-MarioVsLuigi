@@ -136,9 +136,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
         SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.onGround && (controller.skidding || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);
         SetParticleEmission(drillParticle, !gameover && controller.drill);
         if (controller.drill)
-            drillParticleAudio.clip = (controller.state == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
+            drillParticleAudio.clip = (controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
         SetParticleEmission(sparkles, !gameover && controller.invincible > 0);
-        SetParticleEmission(giantParticle, !gameover && controller.state == Enums.PowerupState.MegaMushroom && controller.giantStartTimer <= 0);
+        SetParticleEmission(giantParticle, !gameover && controller.State == Enums.PowerupState.MegaMushroom && controller.giantStartTimer <= 0);
         SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.dead && deathTimer > deathUpTime);
 
         //Blinking
@@ -205,7 +205,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 animatedVelocity = 0;
             } else if (controller.propeller) {
                 animatedVelocity = 2.5f;
-            } else if (controller.state == Enums.PowerupState.MegaMushroom && Mathf.Abs(controller.joystick.x) > .2f) {
+            } else if (controller.State == Enums.PowerupState.MegaMushroom && Mathf.Abs(controller.joystick.x) > .2f) {
                 animatedVelocity = 4.5f;
             } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
                 animatedVelocity = Mathf.Max(3.5f, animatedVelocity);
@@ -219,10 +219,10 @@ public class PlayerAnimationController : MonoBehaviourPun {
             animator.SetBool("holding", controller.holding != null);
             animator.SetBool("head carry", controller.holding != null && controller.holding is FrozenCube);
             animator.SetBool("pipe", controller.pipeEntering != null);
-            animator.SetBool("blueshell", controller.state == Enums.PowerupState.BlueShell);
-            animator.SetBool("mini", controller.state == Enums.PowerupState.MiniMushroom);
-            animator.SetBool("mega", controller.state == Enums.PowerupState.MegaMushroom);
-            animator.SetBool("inShell", controller.inShell || (controller.state == Enums.PowerupState.BlueShell && (controller.crouching || controller.groundpound) && controller.groundpoundCounter <= 0.15f));
+            animator.SetBool("blueshell", controller.State == Enums.PowerupState.BlueShell);
+            animator.SetBool("mini", controller.State == Enums.PowerupState.MiniMushroom);
+            animator.SetBool("mega", controller.State == Enums.PowerupState.MegaMushroom);
+            animator.SetBool("inShell", controller.inShell || (controller.State == Enums.PowerupState.BlueShell && (controller.crouching || controller.groundpound) && controller.groundpoundCounter <= 0.15f));
         } else {
             //controller.wallSlideLeft = animator.GetBool("onLeft");
             //controller.wallSlideRight = animator.GetBool("onRight");
@@ -242,7 +242,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         if (controller.giantEndTimer > 0) {
             transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, controller.giantEndTimer / (controller.giantStartTime / 2f)) * 2.6f));
         } else {
-            transform.localScale = controller.state switch {
+            transform.localScale = controller.State switch {
                 Enums.PowerupState.MiniMushroom => Vector3.one / 2,
                 Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (controller.giantStartTimer / controller.giantStartTime)) * 2.6f)),
                 _ => Vector3.one,
@@ -254,7 +254,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             materialBlock = new();
 
         materialBlock.SetFloat("RainbowEnabled", controller.invincible > 0 ? 1.1f : 0f);
-        int ps = controller.state switch {
+        int ps = controller.State switch {
             Enums.PowerupState.FireFlower => 1,
             Enums.PowerupState.PropellerMushroom => 2,
             Enums.PowerupState.IceFlower => 3,
@@ -284,14 +284,14 @@ public class PlayerAnimationController : MonoBehaviourPun {
         models.SetActive(GameManager.Instance.gameover || controller.dead || !(controller.hitInvincibilityCounter > 0 && controller.hitInvincibilityCounter * (controller.hitInvincibilityCounter <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
 
         //Model changing
-        bool large = controller.state >= Enums.PowerupState.Mushroom;
+        bool large = controller.State >= Enums.PowerupState.Mushroom;
 
         largeModel.SetActive(large);
         smallModel.SetActive(!large);
-        blueShell.SetActive(controller.state == Enums.PowerupState.BlueShell);
+        blueShell.SetActive(controller.State == Enums.PowerupState.BlueShell);
 
         largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(0).IsName("in-shell"));
-        propellerHelmet.SetActive(controller.state == Enums.PowerupState.PropellerMushroom);
+        propellerHelmet.SetActive(controller.State == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
         animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
 

@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
-using Photon.Pun;
-using NSMB.Utils;
 
-public class MovingPowerup : MonoBehaviourPun {
+using NSMB.Utils;
+using Fusion;
+
+public class MovingPowerup : NetworkObject {
 
     private static int groundMask = -1, HITS_NOTHING_LAYERID, ENTITY_LAYERID;
 
@@ -22,7 +23,7 @@ public class MovingPowerup : MonoBehaviourPun {
 
     public bool Collected { get; set; }
 
-    public void Awake() {
+    protected override void Awake() {
         body = GetComponent<Rigidbody2D>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();

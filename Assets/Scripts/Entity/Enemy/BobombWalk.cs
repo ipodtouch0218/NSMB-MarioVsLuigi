@@ -66,16 +66,16 @@ public class BobombWalk : HoldableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
         } else if (player.sliding || player.inShell || player.invincible > 0) {
             photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false, player.StarCombo++);
             return;
         } else if (attackedFromAbove && !lit) {
-            if (player.state != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
+            if (player.State != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
                 photonView.RPC("Light", RpcTarget.All);
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
-            if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom) {
+            if (player.groundpound && player.State != Enums.PowerupState.MiniMushroom) {
                 photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
             } else {
                 player.bounce = true;

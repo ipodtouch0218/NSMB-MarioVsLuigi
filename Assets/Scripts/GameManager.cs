@@ -9,13 +9,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using TMPro;
 
-using Photon.Pun;
-using Photon.Realtime;
-using ExitGames.Client.Photon;
 using NSMB.Utils;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Fusion;
 
-public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks, IMatchmakingCallbacks {
+public class GameManager : NetworkBehaviour {
 
     private static GameManager _instance;
     public static GameManager Instance {
@@ -60,7 +57,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
     public bool gameover = false, musicEnabled = false;
-    public readonly HashSet<Player> loadedPlayers = new();
+    public readonly HashSet<PlayerRef> loadedPlayers = new();
     public int starRequirement, timedGameDuration = -1, coinRequirement;
     public bool hurryup = false;
     public bool tenSecondCountdown = false;
@@ -74,7 +71,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     private ParticleSystem brickBreak;
 
-    public HashSet<Player> nonSpectatingPlayers;
+    public HashSet<PlayerRef> nonSpectatingPlayers;
 
     // EVENT CALLBACK
     public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
@@ -93,35 +90,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         //Debug.Log($"id:{eventId} sender:{sender} master:{sender?.IsMasterClient ?? false}");
         switch (eventId) {
-        case PunEvent.Instantiation: {
-            Hashtable table = (Hashtable) parameters.paramDict[245];
-            string prefab = (string) table[0];
-            int viewId = (int) table[7];
-
-            //Debug.Log((sender.IsMasterClient ? "[H] " : "") + sender.NickName + " (" + sender.UserId + ") - Instantiating " + prefab);
-
-            //even the host can't be trusted...
-            if ((sender?.IsMasterClient ?? false) && (prefab.Contains("Static") || prefab.Contains("1-Up") || (musicEnabled && prefab.Contains("Player")))) {
-                //abandon ship
-                PhotonNetwork.Disconnect();
-                return;
-            }
-
-            //server room instantiation
-            if (sender == null || sender.IsMasterClient)
-                return;
-
-            PlayerController controller = players.FirstOrDefault(pl => sender == pl.photonView.Owner);
-            bool invalidProjectile = controller.state != Enums.PowerupState.FireFlower && prefab.Contains("Fireball");
-            invalidProjectile |= controller.state != Enums.PowerupState.IceFlower && prefab.Contains("Iceball");
-
-            if (prefab.Contains("Enemy") || prefab.Contains("Powerup") || prefab.Contains("Static") || prefab.Contains("Bump") || prefab.Contains("BigStar") || prefab.Contains("Coin") || ((!nonSpectatingPlayers.Contains(sender) || musicEnabled) && prefab.Contains("Player"))) {
-                PhotonNetwork.CloseConnection(sender);
-                PhotonNetwork.DestroyPlayerObjects(sender);
-            }
-
-            break;
-        }
         case (byte) Enums.NetEventIds.AllFinishedLoading: {
             if (!(sender?.IsMasterClient ?? true))
                 return;
@@ -184,7 +152,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             StartCoroutine(BigStarRespawn());
 
-            if (!PhotonNetwork.IsMasterClient)
+            if (Runner.IsClient)
                 return;
 
             foreach (EnemySpawnpoint point in enemySpawnpoints)
@@ -316,20 +284,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     // MATCHMAKING CALLBACKS
-
-    public void OnFriendListUpdate(List<FriendInfo> friendList) { }
-    public void OnCreatedRoom() { }
-    public void OnCreateRoomFailed(short returnCode, string message) { }
-    public void OnJoinRoomFailed(short returnCode, string message) { }
-    public void OnJoinRandomFailed(short returnCode, string message) { }
     public void OnLeftRoom() {
         OnDisconnected(DisconnectCause.DisconnectByServerLogic);
     }
 
     // ROOM CALLBACKS
-    public void OnJoinedRoom() { }
-    public void OnPlayerPropertiesUpdate(Player player, Hashtable playerProperties) { }
-    public void OnRoomPropertiesUpdate(Hashtable properties) { }
 
     public void OnMasterClientSwitched(Player newMaster) {
         //TODO: chat message
@@ -344,7 +303,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void OnPlayerEnteredRoom(Player newPlayer) {
         //Spectator joined. Sync the room state.
-        //TODO: chat message
+        //TODO: chat message?
 
         if (PhotonNetwork.IsMasterClient) {
             Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
@@ -355,10 +314,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 return;
             }
         }
-
-        //SYNCHRONIZE PLAYER STATE
-        if (localPlayer)
-            localPlayer.GetComponent<PlayerController>().UpdateGameState();
 
         //SYNCHRONIZE TILEMAPS
         if (PhotonNetwork.IsMasterClient) {
@@ -386,21 +341,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     // CONNECTION CALLBACKS
-    public void OnConnected() { }
     public void OnDisconnected(DisconnectCause cause) {
         GlobalController.Instance.disconnectCause = cause;
         SceneManager.LoadScene(0);
     }
-    public void OnRegionListReceived(RegionHandler handler) { }
-    public void OnCustomAuthenticationResponse(Dictionary<string, object> response) { }
-    public void OnCustomAuthenticationFailed(string failure) { }
-    public void OnConnectedToMaster() { }
 
 
     //Register callbacks & controls
     public void OnEnable() {
         Instance = this;
-        PhotonNetwork.AddCallbackTarget(this);
         InputSystem.controls.UI.Pause.performed += OnPause;
     }
     public void OnDisable() {
@@ -531,7 +480,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             yield return new WaitForSeconds(3.5f);
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
-            if (PhotonNetwork.IsMasterClient)
+            if (Runner.IsMasterClient)
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                     point.AttemptSpawning();
 
@@ -700,19 +649,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         List<PlayerController> winningPlayers = new();
         List<PlayerController> alivePlayers = new();
         foreach (var player in players) {
-            if (player == null || player.lives == 0)
+            if (player == null || player.Lives == 0)
                 continue;
 
             alivePlayers.Add(player);
 
-            if ((starGame && player.stars >= starRequirement) || timeUp) {
+            if ((starGame && player.Stars >= starRequirement) || timeUp) {
                 //we're in a state where this player would win.
                 //check if someone has more stars
-                if (player.stars > winningStars) {
+                if (player.Stars > winningStars) {
                     winningPlayers.Clear();
-                    winningStars = player.stars;
+                    winningStars = player.Stars;
                     winningPlayers.Add(player);
-                } else if (player.stars == winningStars) {
+                } else if (player.Stars == winningStars) {
                     winningPlayers.Add(player);
                 }
             }
@@ -764,17 +713,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (!player)
                 continue;
 
-            if (player.state == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
+            if (player.State == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
                 mega = true;
             if (player.invincible > 0)
                 invincible = true;
-            if ((player.stars + 1f) / starRequirement >= 0.95f || hurryup != false)
+            if ((player.Stars + 1f) / starRequirement >= 0.95f || hurryup != false)
                 speedup = true;
-            if (player.lives == 1 && players.Count <= 2)
+            if (player.Lives == 1 && players.Count <= 2)
                 speedup = true;
         }
 
-        speedup |= players.All(pl => !pl || pl.lives == 1 || pl.lives == 0);
+        speedup |= players.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
 
         if (mega) {
             PlaySong(Enums.MusicState.MegaMushroom, megaMushroomMusic);

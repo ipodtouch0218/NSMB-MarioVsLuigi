@@ -4,7 +4,7 @@ using UnityEngine;
 public class Powerup : ScriptableObject {
 
     public Enums.PowerupState state;
-    public string prefab;
+    public GameObject prefab;
     public Enums.Sounds soundEffect = Enums.Sounds.Player_Sound_PowerupCollect;
     public float spawnChance = 0.1f, losingSpawnBonus = 0f;
     public bool big, vertical, custom, lives;

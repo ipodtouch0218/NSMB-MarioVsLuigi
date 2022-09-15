@@ -2592,12 +2592,13 @@
             <param name="dictionary">IDictionary to return as string.</param>
             <param name="includeTypes"> </param>
         </member>
-        <member name="M:ExitGames.Client.Photon.SupportClass.ByteArrayToString(System.Byte[])">
+        <member name="M:ExitGames.Client.Photon.SupportClass.ByteArrayToString(System.Byte[],System.Int32)">
             <summary>
             Converts a byte-array to string (useful as debugging output).
             Uses BitConverter.ToString(list) internally after a null-check of list.
             </summary>
             <param name="list">Byte-array to convert to string.</param>
+            <param name="length">Length of bytes to convert to string. If negative, list.Length is converted. Optional. Default: -1. </param>
             <returns>
             List of bytes as string.
             </returns>

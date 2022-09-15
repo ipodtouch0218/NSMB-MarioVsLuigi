@@ -43,12 +43,12 @@ public class ScoreboardEntry : MonoBehaviour {
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
             return;
         }
-        if (target.lives == currentLives && target.stars == currentStars)
+        if (target.Lives == currentLives && target.Stars == currentStars)
             // No changes.
             return;
 
-        currentLives = target.lives;
-        currentStars = target.stars;
+        currentLives = target.Lives;
+        currentStars = target.Stars;
         UpdateText();
         ScoreboardUpdater.instance.Reposition();
     }

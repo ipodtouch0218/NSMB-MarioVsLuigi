@@ -3,19 +3,25 @@ using System.Text;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-
-using Photon.Pun;
 using Photon.Realtime;
+using Photon.Pun;
 
 namespace NSMB.Utils {
     public class Utils {
 
         public static int FirstPlaceStars {
-            get => GameManager.Instance.players.Where(pl => pl.lives != 0).Max(pc => pc.stars);
+            get => GameManager.Instance.players.Where(pl => pl.Lives != 0).Max(pc => pc.Stars);
         }
 
-        public static bool BitTest(long bit, int index) {
-            return (bit & (1 << index)) != 0;
+        public static bool BitTest(long v, int index) {
+            return (v & (1 << index)) != 0;
+        }
+
+        public static void BitSet(ref byte v, int index, bool value) {
+            if (value)
+                v |= (byte) (1 << index);
+            else
+                v &= (byte) ~(1 << index);
         }
 
         public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
@@ -77,8 +83,6 @@ namespace NSMB.Utils {
         public static int GetCharacterIndex(Player player = null) {
             if (player == null)
                 player = PhotonNetwork.LocalPlayer;
-
-            //Assert.IsNotNull(player, "player is null, are we not connected to Photon?");
 
             GetCustomProperty(Enums.NetPlayerProperties.Character, out int index, player.CustomProperties);
             return index;
@@ -396,7 +400,7 @@ namespace NSMB.Utils {
             GameManager gm = GameManager.Instance;
 
             // "losing" variable based on ln(x+1), x being the # of stars we're behind
-            int ourStars = player.stars;
+            int ourStars = player.Stars;
             int leaderStars = FirstPlaceStars;
 
             if (powerups == null)

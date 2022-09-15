@@ -52,8 +52,8 @@ public class BulletBillMover : KillableEntity {
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
         if (player.invincible > 0 || player.inShell || player.sliding
-            || ((player.groundpound || player.drill) && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
-            || player.state == Enums.PowerupState.MegaMushroom) {
+            || ((player.groundpound || player.drill) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
+            || player.State == Enums.PowerupState.MegaMushroom) {
 
             if (player.drill) {
                 player.bounce = true;
@@ -63,7 +63,7 @@ public class BulletBillMover : KillableEntity {
             return;
         }
         if (attackedFromAbove) {
-            if (!(player.state == Enums.PowerupState.MiniMushroom && !player.groundpound)) {
+            if (!(player.State == Enums.PowerupState.MiniMushroom && !player.groundpound)) {
                 photonView.RPC(nameof(Kill), RpcTarget.All);
             }
             player.photonView.RPC(nameof(PlayerController.PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);

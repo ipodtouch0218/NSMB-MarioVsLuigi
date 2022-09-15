@@ -10,9 +10,9 @@ public class SpinyWalk : KoopaWalk {
         if (holder)
             return;
 
-        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
-        } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom) {
+        } else if (player.sliding || player.inShell || player.invincible > 0 || player.State == Enums.PowerupState.MegaMushroom) {
             //Special kill
             bool originalFacing = player.facingRight;
             if (player.inShell && shell && !stationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
@@ -38,7 +38,7 @@ public class SpinyWalk : KoopaWalk {
                     //in shell, moving.
                     if (attackedFromAbove) {
                         //being stomped on
-                        if (player.state == Enums.PowerupState.MiniMushroom) {
+                        if (player.State == Enums.PowerupState.MiniMushroom) {
                             //mini mario interactions
                             if (player.groundpound) {
                                 //mini mario is groundpounding, cancel their groundpound & stop moving

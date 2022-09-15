@@ -3,8 +3,31 @@ Photon C# Client Library - Changelog
 Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
+Version 4.1.6.14 (26. April 2022 - rev6414)
+    Fixed: WSS PhotonClientWebSocket blocking the main thread when sending isn't possible. Without loss. This affects the RTT however.
+    Changed: PhotonClientWebSocket will return PhotonSocketError.Busy, if previous Task is not completed yet.
+    Changed: TPeer.SendData passes the inner result code (PhotonSocketError) to the calling method.
+    Changed: TPeer.SendOutgoingCommands() will skip sending, if SendData() returns PhotonSocketError.Busy.
+
+Version 4.1.6.13 (29. March 2022 - rev6399)
+    Fixed: Fragment length for Datagram Encryption gets recalculated when the encryption gets enabled.
+    Fixed: Resends will stop early, if the mtu-udpBufferIndex is less than 80.
+    Changed: Read for a specified GpType. If it is unknown, this will throw a InvalidDataException instead of reading data in undefined ways. The server is sending us the types, so in regular use, this should actually not happen. It is however cleaner to debug data this way.
+    Fixed: Several comments and log and exception messages.
+    Changed: Protocol18.WriteCustomTypeBody to use the size written by the serialize-method, instead of using the returned value.
+    Added: Short delay before closing a socket to give disconnect messages a better chance of being sent out.
+
+Version 4.1.6.12 (30. November 2021 - rev6299)
+    Changed: EnetPeer.Disconnect() sets state Disconnecting immediately.
+    Changed: EnetPeer.ReceiveIncomingCommands() will skip incoming datagrams when in state Disconnected.
+    Changed: EnetPeer.ReceiveIncomingCommands() checks the incoming challenge as early as possible to avoid using data from outdated connections.
+    Changed: How Datagram Encryption is enabled, when the first encrypted datagram arrives.
+    Changed: Some logged messages.
+    Added: Parameter "length" to SupportClass.ByteArrayToString to convert only a part of a byte[] to string.
+    Internal: Changed conversion from ParameterDictionary to Dictionary<byte, object> so that StructWrapper does not leak to resulting Dictionary.
+
 Version 4.1.6.11 (23. November 2021 - rev6288)
-	Fixed: Payload encryption initialization (without DiffieHellman) for TCP connection.
+    Fixed: Payload encryption initialization (without DiffieHellman) for TCP connection.
     Fixed: Protocol16.DeserializeCustom() to check if length of read bytes is available (else, a byte[] is returned).
     Changed: Custom Type arrays will return UnknownType[] if the array's item-type is unknown. If the custom type is known but items do not read properly, they will be null.
     Added: Checks if each generated Custom Type instance can be assigned to the Custom Type array (and skips those that are null or can't be assigned).
@@ -17,7 +40,7 @@ Version 4.1.6.10 (21. October 2021 - rev6243)
     Added: Exception handling to OnEvent and OnOperationResponse calls.
 
 Version 4.1.6.9 (12. October 2021 - rev6231)
-	Fixed: Reliable UDP protocol to send pings, if no reliable command was acknowledged or sent recently. This bug was preventing a client timeout in some cases.
+    Fixed: Reliable UDP protocol to send pings, if no reliable command was acknowledged or sent recently. This bug was preventing a client timeout in some cases.
 
 Version 4.1.6.8 (30. September 2021 - rev6222)
     Fixed: ReadCustomType to not use custom deserialization methods, should the reported size be less than available bytes.

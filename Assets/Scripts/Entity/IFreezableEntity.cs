@@ -1,4 +1,4 @@
-using Photon.Pun;
+using Fusion;
 
 public interface IFreezableEntity {
 
@@ -6,12 +6,11 @@ public interface IFreezableEntity {
     public bool IsFlying { get; }
     public bool Frozen { get; set; }
 
-    [PunRPC]
-    public void Freeze(int cube);
+    [Rpc]
+    public void Freeze(FrozenCube cube);
 
-    [PunRPC]
+    [Rpc]
     public void Unfreeze(byte reasonByte);
-
 
     public enum UnfreezeReason : byte {
         Other,
@@ -20,5 +19,4 @@ public interface IFreezableEntity {
         BlockBump,
         HitWall,
     }
-
 }

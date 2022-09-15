@@ -7,6 +7,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
             Destroy(gameObject);
             return false;
         }
+
         DontDestroyOnLoad(gameObject);
         return true;
     }

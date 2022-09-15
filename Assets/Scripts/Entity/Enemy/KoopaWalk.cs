@@ -178,15 +178,15 @@ public class KoopaWalk : HoldableEntity {
             photonView.RPC(nameof(BlueBecomeItem), RpcTarget.All);
             return;
         }
-        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             player.body.velocity = new(0, player.body.velocity.y);
             photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x > 0);
-        } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom) {
+        } else if (player.sliding || player.inShell || player.invincible > 0 || player.State == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC(nameof(PlayerController.Knockback), RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
             photonView.RPC(nameof(SpecialKill), RpcTarget.All, !originalFacing, false, player.StarCombo++);
-        } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
+        } else if (player.groundpound && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC(nameof(EnterShell), RpcTarget.All);
             if (!blue) {
                 photonView.RPC(nameof(Kick), RpcTarget.All, player.body.position.x < body.position.x, 1f, player.groundpound);
@@ -194,7 +194,7 @@ public class KoopaWalk : HoldableEntity {
                 previousHolder = player;
             }
         } else if (attackedFromAbove && (!shell || !IsStationary)) {
-            if (player.state == Enums.PowerupState.MiniMushroom) {
+            if (player.State == Enums.PowerupState.MiniMushroom) {
                 if (player.groundpound) {
                     player.groundpound = false;
                     photonView.RPC(nameof(EnterShell), RpcTarget.All);
