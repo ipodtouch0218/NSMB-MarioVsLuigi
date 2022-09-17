@@ -1,14 +1,13 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-public class WaterSplash : MonoBehaviour {
+public class WaterSplash : MonoBehaviour, IPlayerInteractable {
 
-    [Delayed]
-    public int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
-    [Delayed]
-    public float heightTiles = 1;
-    public float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f, animationSpeed = 1f;
-    public string splashParticle;
+    [Delayed] [SerializeField] private int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
+    [Delayed] [SerializeField] private float heightTiles = 1;
+    [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f, animationSpeed = 1f;
+    [SerializeField] private string splashParticle;
+    [SerializeField] private bool fireDeath;
 
     private Texture2D heightTex;
     private SpriteRenderer spriteRenderer;
@@ -114,5 +113,13 @@ public class WaterSplash : MonoBehaviour {
             return;
 
         collision.attachedRigidbody.velocity *= 1-Mathf.Clamp01(resistance);
+    }
+
+    public void InteractWithPlayer(PlayerController player) {
+        if (player.Dead)
+            return;
+
+        //TODO:
+        //player.Death(false, fireDeath);
     }
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "PlayerData", menuName = "ScriptableObjects/PlayerData", order = 0)]
-public class PlayerData : ScriptableObject {
+[CreateAssetMenu(fileName = "CharacterData", menuName = "ScriptableObjects/CharacterData", order = 0)]
+public class CharacterData : ScriptableObject {
     public string soundFolder, prefab, uistring;
     public Sprite loadingSmallSprite, loadingBigSprite, readySprite;
     public RuntimeAnimatorController smallOverrides, largeOverrides;

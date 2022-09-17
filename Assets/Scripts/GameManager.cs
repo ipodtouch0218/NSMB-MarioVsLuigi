@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using UnityEngine.Audio;
-using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 using TMPro;
 
 using NSMB.Utils;
@@ -230,17 +230,6 @@ public class GameManager : NetworkBehaviour {
             tilemap.SetTile(loc, null);
             break;
         }
-        case (byte) Enums.NetEventIds.SetCoinState: {
-            if (!(sender?.IsMasterClient ?? false))
-                return;
-
-            int view = (int) data[0];
-            bool visible = (bool) data[1];
-            GameObject coin = PhotonView.Find(view).gameObject;
-            coin.GetComponent<SpriteRenderer>().enabled = visible;
-            coin.GetComponent<BoxCollider2D>().enabled = visible;
-            break;
-        }
         case (byte) Enums.NetEventIds.SpawnParticle: {
             int x = (int) data[0];
             int y = (int) data[1];
@@ -284,10 +273,6 @@ public class GameManager : NetworkBehaviour {
     }
 
     // MATCHMAKING CALLBACKS
-    public void OnLeftRoom() {
-        OnDisconnected(DisconnectCause.DisconnectByServerLogic);
-    }
-
     // ROOM CALLBACKS
 
     public void OnMasterClientSwitched(Player newMaster) {
@@ -715,7 +700,7 @@ public class GameManager : NetworkBehaviour {
 
             if (player.State == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
                 mega = true;
-            if (player.invincible > 0)
+            if (player.StarmanTimer > 0)
                 invincible = true;
             if ((player.Stars + 1f) / starRequirement >= 0.95f || hurryup != false)
                 speedup = true;

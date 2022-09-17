@@ -2,39 +2,33 @@
 
 using Fusion;
 
-public class FireballMover : NetworkBehaviour {
+public class FireballMover : BasicEntity, IPlayerInteractable {
 
     //---Networked Variables
-    [Networked] public NetworkBool FacingRight { get; set; }
     [Networked] public NetworkBool IsIceball { get; set; }
 
     //---Public Variables
+    public PlayerController owner;
     public GameObject wallHitPrefab;
-    public PlayerRef owner;
 
     //---Serialized Variables
     [SerializeField] private float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
 
     //---Private Variables
-    private Rigidbody2D body;
     private PhysicsEntity physics;
     private bool breakOnImpact;
 
-    public void Awake() {
-        body = GetComponent<Rigidbody2D>();
-        physics = GetComponent<PhysicsEntity>();
-    }
-
-    public void OnBeforeSpawned(PlayerRef owner, bool right, float shooterSpeed) {
+    public void OnBeforeSpawned(PlayerController owner, bool right) {
         this.owner = owner;
         FacingRight = right;
 
         if (IsIceball)
-            speed += Mathf.Abs(shooterSpeed / 3f);
+            speed += Mathf.Abs(owner.body.velocity.x / 3f);
     }
 
-    public void Start() {
-        body.velocity = new Vector2(speed * (FacingRight ? 1 : -1), -speed);
+    public override void Awake() {
+        base.Awake();
+        physics = GetComponent<PhysicsEntity>();
     }
 
     public override void FixedUpdateNetwork() {
@@ -47,8 +41,7 @@ public class FireballMover : NetworkBehaviour {
 
         HandleCollision();
 
-        float gravityInOneFrame = body.gravityScale * Physics2D.gravity.y * Time.fixedDeltaTime;
-        body.velocity = new Vector2(speed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
+        body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
     private void HandleCollision() {
@@ -65,12 +58,15 @@ public class FireballMover : NetworkBehaviour {
         }
         bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact);
         if (breaking) {
-            Runner.Despawn(Object, true);
+            Runner.Despawn(Object);
 
         }
     }
 
-    public void OnDestroy() {
+    public override void Spawned() {
+        base.Spawned();
+    }
+    public override void Despawned(NetworkRunner runner, bool hasState) {
         if (!GameManager.Instance.gameover)
             Instantiate(wallHitPrefab, transform.position, Quaternion.identity);
     }
@@ -81,7 +77,7 @@ public class FireballMover : NetworkBehaviour {
         case "koopa":
         case "goomba": {
             KillableEntity en = collider.gameObject.GetComponentInParent<KillableEntity>();
-            if (en.dead || en.Frozen)
+            if (en.Dead || en.IsFrozen)
                 return;
 
             if (IsIceball) {
@@ -90,45 +86,45 @@ public class FireballMover : NetworkBehaviour {
             } else {
                 en.SpecialKill(FacingRight, false, 0);
             }
-            Runner.Despawn(Object, true);
+            Runner.Despawn(Object);
             break;
         }
         case "frozencube": {
             FrozenCube fc = collider.gameObject.GetComponent<FrozenCube>();
-            if (fc.dead)
+            if (fc.Dead)
                 return;
 
             if (!IsIceball) {
                 fc.Kill();
             }
 
-            Runner.Despawn(Object, true);
+            Runner.Despawn(Object);
             break;
         }
         case "Fireball": {
             FireballMover otherball = collider.gameObject.GetComponentInParent<FireballMover>();
             if (IsIceball ^ otherball.IsIceball) {
-                Runner.Despawn(Object, true);
-                Runner.Despawn(otherball.Object, true);
+                Runner.Despawn(Object);
+                Runner.Despawn(otherball.Object);
             }
             break;
         }
         case "bulletbill": {
             KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
-            if (IsIceball && !bb.Frozen) {
+            if (IsIceball && !bb.IsFrozen) {
                 //TODO:
                 //PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bb.photonView.ViewID });
             }
-            Runner.Despawn(Object, true);
+            Runner.Despawn(Object);
             break;
         }
         case "bobomb": {
             BobombWalk bobomb = collider.gameObject.GetComponentInParent<BobombWalk>();
-            if (bobomb.dead || bobomb.Frozen)
+            if (bobomb.Dead || bobomb.IsFrozen)
                 return;
 
             if (!IsIceball) {
-                if (!bobomb.lit) {
+                if (!bobomb.Lit) {
                     bobomb.Light();
                 } else {
                     bobomb.Kick(body.position.x < bobomb.body.position.x, 0f, false);
@@ -138,12 +134,12 @@ public class FireballMover : NetworkBehaviour {
                 //PhotonNetwork.Instantiate("Prefabs/FrozenCube", bobomb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bobomb.photonView.ViewID });
             }
 
-            Runner.Despawn(Object, true);
+            Runner.Despawn(Object);
             break;
         }
         case "piranhaplant": {
             KillableEntity killa = collider.gameObject.GetComponentInParent<KillableEntity>();
-            if (killa.dead)
+            if (killa.Dead)
                 return;
             AnimatorStateInfo asi = killa.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
             if (asi.IsName("end") && asi.normalizedTime > 0.5f)
@@ -155,9 +151,53 @@ public class FireballMover : NetworkBehaviour {
                 //TODO:
                 //PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { killa.photonView.ViewID });
             }
-            Runner.Despawn(Object, true);
+            Runner.Despawn(Object);
             break;
         }
+        }
+    }
+
+    public void InteractWithPlayer(PlayerController player) {
+        //Check if they own us. If so, don't collide.
+        if (owner == player.Object.InputAuthority)
+            return;
+
+        //If they have knockback invincibility, don't collide.
+        if (!player.DamageInvincibilityTimer.ExpiredOrNotRunning(Runner))
+            return;
+
+        //Destroy ourselves.
+        Runner.Despawn(Object);
+
+        //Starman Check
+        if (player.IsStarmanInvincible)
+            return;
+
+        //Player state checks
+        switch (player.State) {
+        case Enums.PowerupState.MegaMushroom: {
+            return;
+        }
+        case Enums.PowerupState.MiniMushroom: {
+            player.Death(false, false);
+            return;
+        }
+        case Enums.PowerupState.BlueShell: {
+            if (IsIceball && (player.inShell || player.crouching || player.groundpound))
+                player.ShellSlowdownTimer = TickTimer.CreateFromSeconds(Runner, 0.65f);
+            return;
+        }
+        }
+
+        //Collision is a GO
+        if (IsIceball) {
+            //iceball
+            //TODO:
+            player.Freeze(null);
+        } else {
+            //fireball
+            //TODO: damage source?
+            player.Knockback(FacingRight, 1, true, 0);
         }
     }
 }

@@ -264,7 +264,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 currentRooms.Remove(key);
             }
 
-            AuthenticationHandler.Authenticate(PlayerPrefs.GetString("id", null), PlayerPrefs.GetString("token", null), lastRegion);
+            //AuthenticationHandler.Authenticate(PlayerPrefs.GetString("id", null), PlayerPrefs.GetString("token", null));
 
             for (int i = 0; i < pingSortedRegions.Length; i++) {
                 Region r = pingSortedRegions[i];
@@ -902,14 +902,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         for (int i = 0; i < 7; i++)
             roomName += roomNameChars[Random.Range(0, roomNameChars.Length)];
 
-        Hashtable properties = NetworkUtils.DefaultRoomProperties;
-        properties[Enums.NetRoomProperties.HostName] = PhotonNetwork.NickName;
+        //Hashtable properties = NetworkUtils.DefaultRoomProperties;
+        //properties[Enums.NetRoomProperties.HostName] = PhotonNetwork.NickName;
 
         RoomOptions options = new() {
             MaxPlayers = players,
             IsVisible = !privateToggle.isOn,
             PublishUserId = true,
-            CustomRoomProperties = properties,
+            //CustomRoomProperties = properties,
             CustomRoomPropertiesForLobby = NetworkUtils.LobbyVisibleRoomProperties,
         };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
@@ -1076,15 +1076,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         LocalChatMessage($"Successfully banned {target.GetUniqueNickname()}", Color.red);
     }
 
-    private void Unban(NameIdPair targetPair) {
-        Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
-        List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
+    private void Unban() {
+        //TODO:
+        //Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
+        //List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
 
-        pairs.Remove(targetPair);
+        //pairs.Remove(targetPair);
 
-        Hashtable table = new() {
-            [Enums.NetRoomProperties.Bans] = pairs.ToArray(),
-        };
+        //Hashtable table = new() {
+            //[Enums.NetRoomProperties.Bans] = pairs.ToArray(),
+        //};
         PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
         LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
     }
@@ -1197,7 +1198,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Settings.Instance.character = dropdown.value;
         Settings.Instance.SaveSettingsToPreferences();
 
-        PlayerData data = GlobalController.Instance.characters[dropdown.value];
+        CharacterData data = GlobalController.Instance.characters[dropdown.value];
         sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
         colorManager.ChangeCharacter(data);
 

@@ -36,12 +36,12 @@ public class TrackIcon : MonoBehaviour {
         if (playerTarget || target.CompareTag("Player")) {
             if (!playerTarget) {
                 playerTarget = target.GetComponent<PlayerController>();
-                image.color = playerTarget.AnimationController.GlowColor;
-                mat.SetColor("OverlayColor", playerTarget.AnimationController.GlowColor);
+                image.color = playerTarget.animationController.GlowColor;
+                mat.SetColor("OverlayColor", playerTarget.animationController.GlowColor);
             }
 
             // OPTIMIZE:
-            if (playerTarget.dead) {
+            if (playerTarget.Dead) {
                 flashTimer += Time.deltaTime;
                 image.enabled = (flashTimer % 0.2f) <= 0.1f;
             } else {

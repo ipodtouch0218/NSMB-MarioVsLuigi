@@ -25,7 +25,7 @@ public class UserNametag : MonoBehaviour {
             return;
         }
 
-        arrow.color = parent.AnimationController.GlowColor;
+        arrow.color = parent.animationController.GlowColor;
         nametag.SetActive(parent.spawned);
 
         Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.WorldHitboxSize.y * 1.2f) + 0.5f);
@@ -59,13 +59,13 @@ public class UserNametag : MonoBehaviour {
         }
         transform.position = screenPoint;
 
-        text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.GetUniqueNickname();
+        text.text = (parent.Object.StateAuthority == parent.Object.InputAuthority ? "<sprite=5>" : "") + parent.photonView.Owner.GetUniqueNickname();
 
         text.text += "\n";
         if (parent.Lives >= 0)
-            text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString($"x{parent.Lives} ");
+            text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
 
-        text.text += Utils.GetSymbolString($"Sx{parent.Stars}");
+        text.text += Utils.GetSymbolString("Sx" + parent.Stars);
 
         if (rainbowName)
             text.color = Utils.GetRainbowColor();

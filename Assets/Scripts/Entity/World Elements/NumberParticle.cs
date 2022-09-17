@@ -1,5 +1,3 @@
-using System.Collections;
-
 using UnityEngine;
 using TMPro;
 
@@ -7,8 +5,11 @@ public class NumberParticle : MonoBehaviour {
 
     public TMP_Text text;
 
-    public void ApplyColor(Color color) {
+    public void ApplyColorAndText(string newText, Color color) {
+        if (!text)
+            text = GetComponentInChildren<TMP_Text>();
 
+        text.text = newText;
         text.ForceMeshUpdate();
         MeshRenderer mr = GetComponentsInChildren<MeshRenderer>()[1];
         MaterialPropertyBlock mpb = new();
@@ -17,6 +18,6 @@ public class NumberParticle : MonoBehaviour {
     }
 
     public void Kill() {
-        Destroy(transform.parent.gameObject);
+        Destroy(gameObject);
     }
 }

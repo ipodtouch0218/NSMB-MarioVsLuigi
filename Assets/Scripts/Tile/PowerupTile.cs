@@ -13,8 +13,8 @@ public class PowerupTile : BreakableBrickTile {
 
         string spawnResult = "Mushroom";
 
-        if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.previousHolder != null)) {
-            PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk)interacter).previousHolder;
+        if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.PreviousHolder != null)) {
+            PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk)interacter).PreviousHolder;
             if (player.State == Enums.PowerupState.MegaMushroom) {
                 //Break
 

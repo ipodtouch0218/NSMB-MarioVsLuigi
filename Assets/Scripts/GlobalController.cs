@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-using Photon.Pun;
-using Photon.Realtime;
-using ExitGames.Client.Photon;
-using NSMB.Utils;
+using Fusion;
 
-public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, ILobbyCallbacks {
+public class GlobalController : Singleton<GlobalController> {
 
     public PlayerColorSet[] skins;
     public Gradient rainbowGradient;
@@ -18,13 +14,13 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
 
     public RenderTexture ndsTexture;
-    public PlayerData[] characters;
+    public CharacterData[] characters;
     public Settings settings;
     public DiscordController DiscordController { get; private set; }
     public string controlsJson = null;
 
     public bool joinedAsSpectator = false, checkedForVersion;
-    public DisconnectCause? disconnectCause = null;
+    public ShutdownReason? disconnectCause = null;
 
     private int windowWidth, windowHeight;
 
@@ -40,19 +36,11 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         Instance = this;
         settings = GetComponent<Settings>();
         DiscordController = GetComponent<DiscordController>();
-
-        PhotonNetwork.AddCallbackTarget(this);
     }
 
 
     [Obsolete]
     public void Start() {
-        //Photon settings.
-        PhotonPeer.RegisterType(typeof(NameIdPair), 69, NameIdPair.Serialize, NameIdPair.Deserialize);
-        PhotonNetwork.SerializationRate = 30;
-        PhotonNetwork.SendRate = 30;
-        PhotonNetwork.MaxResendsBeforeDisconnect = 15;
-
         InputSystem.controls.UI.DebugInfo.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
@@ -145,30 +133,4 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         windowHeight = currentHeight;
 #endif
     }
-
-    public void OnPlayerEnteredRoom(Player newPlayer) {
-        NetworkUtils.nicknameCache.Remove(newPlayer.UserId);
-    }
-
-    public void OnPlayerLeftRoom(Player otherPlayer) {
-        NetworkUtils.nicknameCache.Remove(otherPlayer.UserId);
-    }
-
-    public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) { }
-
-    public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) { }
-
-    public void OnMasterClientSwitched(Player newMasterClient) { }
-
-    public void OnJoinedLobby() {
-        NetworkUtils.nicknameCache.Clear();
-    }
-
-    public void OnLeftLobby() {
-        NetworkUtils.nicknameCache.Clear();
-    }
-
-    public void OnRoomListUpdate(List<RoomInfo> roomList) { }
-
-    public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics) { }
 }

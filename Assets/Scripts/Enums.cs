@@ -205,7 +205,6 @@ public static class Enums {
         SetTileBatch = 23,
         ResetTiles = 24,
         SyncTilemap = 25,
-        SetCoinState = 26,
         // 30-39 = graphical-only events
         SpawnParticle = 30,
         SpawnResizableParticle = 31,
@@ -222,7 +221,7 @@ public class SoundData : Attribute {
     }
 }
 public static class SoundDataExtensions {
-    public static AudioClip GetClip(this Enums.Sounds sound, PlayerData player = null, int variant = 0) {
+    public static AudioClip GetClip(this Enums.Sounds sound, CharacterData player = null, int variant = 0) {
         SoundData data = GetSoundDataFromSound(sound);
         string name = "Sound/" + data.Sound + (variant > 0 ? "_" + variant : "");
         if (player != null)

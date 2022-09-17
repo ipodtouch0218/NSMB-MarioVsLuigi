@@ -4,7 +4,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Utils;
 
-public class StarBouncer : NetworkBehaviour {
+public class StarBouncer : BasicEntity, IPlayerInteractable {
 
     private static int ANY_GROUND_MASK = -1;
 
@@ -23,12 +23,11 @@ public class StarBouncer : NetworkBehaviour {
 
     public bool Collected { get; set; }
 
-    [Networked] public TickTimer DespawnTimer { get; set; }
-    [Networked] public NetworkBool FacingRight { get; set; }
     [Networked] public NetworkBool IsStationary { get; set; }
     [Networked] public NetworkBool DroppedByPit { get; set; }
     [Networked] public NetworkBool Collectable { get; set; }
     [Networked] public NetworkBool Fast { get; set; }
+    [Networked] public TickTimer DespawnTimer { get; set; }
 
     public void Awake() {
         body = GetComponent<Rigidbody2D>();
@@ -108,7 +107,7 @@ public class StarBouncer : NetworkBehaviour {
         }
 
         if (DespawnTimer.Expired(Runner)) {
-            Runner.Despawn(Object, true);
+            Despawn();
             return;
         } else {
             float timeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0;
@@ -135,8 +134,34 @@ public class StarBouncer : NetworkBehaviour {
             }
         }
 
-        if (lifespan <= 0 || (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY()))
-            Crushed();
+        if (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY())
+            Despawn();
+    }
+
+    public void InteractWithPlayer(PlayerController player) {
+        if (player.Dead || !player.spawned)
+            return;
+
+        if (!Collectable || Collected)
+            return;
+
+        Collected = true;
+
+        //we can collect
+        player.Stars = (byte) Mathf.Min(player.Stars + 1, GameManager.Instance.starRequirement);
+        Runner.Despawn(Object, true);
+
+        //game mechanics
+        if (IsStationary) {
+            //TODO:
+            //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+        }
+
+        GameManager.Instance.CheckForWinner();
+
+        //graphics / fx
+        player.PlaySoundEverywhere(Object.HasInputAuthority ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
+        Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), transform.position, Quaternion.identity);
     }
 
     private IEnumerator PulseEffect() {
@@ -158,15 +183,15 @@ public class StarBouncer : NetworkBehaviour {
         if (physics.onGround && canBounce) {
             body.velocity = new(body.velocity.x, bounceAmount);
             if (physics.hitRoof)
-                Crushed();
+                Despawn();
         }
     }
 
     public void DisableAnimator() {
-        GetComponent<Animator>().enabled = false;
+        animator.enabled = false;
     }
 
-    public void Crushed() {
+    public void Despawn() {
         Runner.Despawn(Object, true);
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
     }
@@ -175,4 +200,5 @@ public class StarBouncer : NetworkBehaviour {
         FacingRight = hitLeft;
         body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
     }
+
 }

@@ -87,7 +87,7 @@ namespace NSMB.Utils {
             GetCustomProperty(Enums.NetPlayerProperties.Character, out int index, player.CustomProperties);
             return index;
         }
-        public static PlayerData GetCharacterData(Player player = null) {
+        public static CharacterData GetCharacterData(Player player = null) {
             return GlobalController.Instance.characters[GetCharacterIndex(player)];
         }
 

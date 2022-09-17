@@ -65,7 +65,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
         ChangeCharacter(Utils.GetCharacterData());
     }
 
-    public void ChangeCharacter(PlayerData data) {
+    public void ChangeCharacter(CharacterData data) {
         foreach (ColorButton b in colorButtons)
             b.Instantiate(data);
     }

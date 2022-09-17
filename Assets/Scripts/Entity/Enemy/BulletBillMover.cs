@@ -1,33 +1,39 @@
 using UnityEngine;
 
-using Photon.Pun;
 using NSMB.Utils;
+using Fusion;
 
 public class BulletBillMover : KillableEntity {
 
-    public float speed, playerSearchRadius = 4, despawnDistance = 8;
+    //---Serialized Variables
+    [SerializeField] private float speed, playerSearchRadius = 4, despawnDistance = 8;
+
+    //---Misc Variables
     private Vector2 searchVector;
 
-    public new void Start() {
-        base.Start();
-        searchVector = new Vector2(playerSearchRadius * 2, 100);
-        left = photonView && photonView.InstantiationData != null && (bool) photonView.InstantiationData[0];
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+    public void OnPreSpawned(bool shootRight) {
+        FacingRight = shootRight;
+    }
+
+    public override void Spawned() {
+
+        searchVector = new(playerSearchRadius * 2, 100);
+        body.velocity = new Vector2(speed * (FacingRight ? 1 : -1), body.velocity.y);
 
         Transform t = transform.GetChild(1);
         ParticleSystem ps = t.GetComponent<ParticleSystem>();
         ParticleSystem.ShapeModule shape = ps.shape;
-        if (!left) {
+        if (FacingRight) {
             Transform tf = transform.GetChild(0);
             tf.localPosition *= new Vector2(-1, 1);
             shape.rotation = new Vector3(0, 0, -33);
         }
 
         ps.Play();
-        sRenderer.flipX = !left;
+        sRenderer.flipX = FacingRight;
     }
 
-    public new void FixedUpdate() {
+    public override void FixedUpdateNetwork() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -35,23 +41,21 @@ public class BulletBillMover : KillableEntity {
             body.isKinematic = true;
             return;
         }
-        if (Frozen) {
-            body.velocity = Vector2.zero;
-        } else {
-            body.velocity = new(speed * (left ? -1 : 1), body.velocity.y);
-        }
 
-        if (!Frozen && photonView.IsMine )
-            DespawnCheck();
+        if (IsFrozen)
+            return;
+
+        body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
+        DespawnCheck();
     }
     public override void InteractWithPlayer(PlayerController player) {
-        if (Frozen || player.Frozen)
+        if (IsFrozen || player.IsFrozen)
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (player.invincible > 0 || player.inShell || player.sliding
+        if (player.IsStarmanInvincible || player.inShell || player.sliding
             || ((player.groundpound || player.drill) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.State == Enums.PowerupState.MegaMushroom) {
 
@@ -59,22 +63,21 @@ public class BulletBillMover : KillableEntity {
                 player.bounce = true;
                 player.drill = false;
             }
-            photonView.RPC(nameof(Kill), RpcTarget.All);
+            Kill();
             return;
         }
         if (attackedFromAbove) {
             if (!(player.State == Enums.PowerupState.MiniMushroom && !player.groundpound)) {
-                photonView.RPC(nameof(Kill), RpcTarget.All);
+                Kill();
             }
-            player.photonView.RPC(nameof(PlayerController.PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+            PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;
             player.groundpound = false;
             player.bounce = true;
             return;
         }
 
-        player.photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
-        // left = damageDirection.x < 0;
+        player.Powerdown(false);
     }
 
     private void DespawnCheck() {
@@ -86,28 +89,27 @@ public class BulletBillMover : KillableEntity {
                 return;
         }
 
-        PhotonNetwork.Destroy(photonView);
+        Runner.Despawn(Object);
     }
 
-    [PunRPC]
     public override void Kill() {
-        SpecialKill(!left, false, 0);
+        SpecialKill(FacingRight, false, 0);
     }
 
-    [PunRPC]
     public override void SpecialKill(bool right, bool groundpound, int combo) {
-        body.velocity = new Vector2(0, 2.5f);
+        Dead = true;
+        body.velocity = Vector2.right * 2.5f;
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (right ? 1 : -1);
         body.gravityScale = 1.5f;
         body.isKinematic = false;
         hitbox.enabled = false;
         animator.speed = 0;
-        gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-        if (groundpound)
-            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + new Vector2(0, 0.5f), Quaternion.identity);
+        gameObject.layer = Layers.LayerHitsNothing;
 
-        dead = true;
+        if (groundpound)
+            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.right * 0.5f, Quaternion.identity);
+
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 

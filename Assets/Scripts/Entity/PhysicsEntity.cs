@@ -1,16 +1,19 @@
 using UnityEngine;
 
-public class PhysicsEntity : MonoBehaviour {
+using Fusion;
+
+public class PhysicsEntity : NetworkBehaviour {
 
     private static LayerMask GROUND_LAYERMASK;
-    
+
     public bool goUpSlopes;
 
     public bool onGround, hitRoof, hitRight, hitLeft, crushableGround;
     public float floorAngle = 0;
     public Collider2D currentCollider;
     public float floorAndRoofCutoff = 0.3f;
-    private readonly ContactPoint2D[] contacts = new ContactPoint2D[32];
+
+    private readonly ContactPoint2D[] contacts = new ContactPoint2D[64];
 
     private void Start() {
         if (GROUND_LAYERMASK == default)
@@ -26,7 +29,8 @@ public class PhysicsEntity : MonoBehaviour {
         floorAngle = 0;
         if (!currentCollider)
             return;
-        
+
+        //TODO:
         int c = currentCollider.GetContacts(contacts);
         for (int i = 0; i < c; i++) {
             ContactPoint2D point = contacts[i];

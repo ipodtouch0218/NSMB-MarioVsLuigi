@@ -16,5 +16,12 @@ public static class PrefabList {
         ((GameObject) Resources.Load("Prefabs/Powerups/Star")).GetComponent<MovingPowerup>();
     public static MovingPowerup Powerup_1Up { get; } =
         ((GameObject) Resources.Load("Prefabs/Powerups/1-Up")).GetComponent<MovingPowerup>();
+    public static MovingPowerup Powerup_BlueShell { get; } =
+        ((GameObject) Resources.Load("Prefabs/Powerups/BlueShell")).GetComponent<MovingPowerup>();
 
+
+    public static GameObject Particle_1Up { get; } =
+        (GameObject) Resources.Load("Prefabs/Particle/1Up");
+    public static NumberParticle Particle_CoinCollect { get; } =
+        ((GameObject) Resources.Load("Prefabs/Particle/Number")).GetComponent<NumberParticle>();
 }

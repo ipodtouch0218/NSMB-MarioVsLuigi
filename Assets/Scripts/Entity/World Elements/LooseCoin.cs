@@ -5,20 +5,24 @@ using NSMB.Utils;
 
 public class LooseCoin : Coin {
 
+    //---Networked Variables
+    [Networked] private TickTimer DespawnTimer { get; set; }
+
+    //---Serialized Variables
     [SerializeField] private float despawn = 10;
 
-    [Networked] public TickTimer DespawnTimer { get; set; }
-
-    private Rigidbody2D body;
+    //---Components
     private SpriteRenderer spriteRenderer;
     private PhysicsEntity physics;
     private Animator animator;
     private BoxCollider2D hitbox;
     private AudioSource sfx;
+
+    //---Misc Variables
     private Vector2 prevFrameVelocity;
 
-    public void Awake() {
-        body = GetComponent<Rigidbody2D>();
+    public override void Awake() {
+        base.Awake();
         spriteRenderer = GetComponent<SpriteRenderer>();
         hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
@@ -31,7 +35,7 @@ public class LooseCoin : Coin {
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
     }
 
-    public void FixedUpdate() {
+    public override void FixedUpdateNetwork() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             animator.enabled = false;
@@ -39,23 +43,22 @@ public class LooseCoin : Coin {
             return;
         }
 
-        bool inWall = Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.5f);
+        if (DespawnTimer.Expired(Runner)) {
+            Runner.Despawn(Object);
+            return;
+        }
+
+        bool inWall = Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f);
         gameObject.layer = inWall ? Layers.LayerHitsNothing : Layers.LayerLooseCoin;
 
         physics.UpdateCollisions();
         if (physics.onGround) {
             body.velocity -= body.velocity * Time.fixedDeltaTime;
             if (physics.hitRoof)
-                Runner.Despawn(Object, true);
+                Runner.Despawn(Object);
 
             if (prevFrameVelocity.y < -1f)
                 sfx.PlayOneShot(Enums.Sounds.World_Coin_Drop.GetClip());
-        }
-
-
-        if (DespawnTimer.Expired(Runner)) {
-            Runner.Despawn(Object, true);
-            return;
         }
 
         float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
@@ -63,9 +66,12 @@ public class LooseCoin : Coin {
 
         prevFrameVelocity = body.velocity;
     }
-    public override void OnCoinCollected() {
-        if (IsCollected)
-            Runner.Despawn(Object);
+
+    public static void OnCollectedChanged(Changed<FloatingCoin> changed) {
+        FloatingCoin coin = changed.Behaviour;
+        //TODO: is this safe?
+        if (coin.IsCollected)
+            coin.Runner.Despawn(coin.Object);
     }
 
     // DEBUG & GIZMOS

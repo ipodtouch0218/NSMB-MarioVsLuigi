@@ -1,22 +1,30 @@
 ﻿using UnityEngine;
 
-using Photon.Pun;
 using NSMB.Utils;
+using Fusion;
 
 public class PiranhaPlantController : KillableEntity {
 
+    //---Networked Variables
+    [Networked] public TickTimer PopupTimer { get; set; }
+
+    //---Serialized Variables
     [SerializeField] private float playerDetectSize = 1;
     [SerializeField] private float popupTimerRequirement = 6f;
 
-    private float popupTimer;
+    //---Misc Variables
     private bool upsideDown;
 
-    public new void Start() {
-        base.Start();
+
+    public void Start() {
         upsideDown = transform.eulerAngles.z != 0;
     }
 
-    public void Update() {
+    public override void Spawned() {
+        PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
+    }
+
+    public override void FixedUpdateNetwork() {
         GameManager gm = GameManager.Instance;
         if (gm) {
             if (gm.gameover) {
@@ -28,68 +36,55 @@ public class PiranhaPlantController : KillableEntity {
                 return;
         }
 
-        left = false;
+        animator.SetBool("dead", Dead);
+        if (Dead)
+            return;
 
-        if (!dead && photonView && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
-            photonView.RPC("Kill", RpcTarget.All);
+        if (Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
+            Kill();
             return;
         }
 
-        animator.SetBool("dead", dead);
-        if (dead || (photonView && !photonView.IsMine))
-            return;
-
-        if ((popupTimer += Time.deltaTime) >= popupTimerRequirement) {
-            if (gm) {
-                foreach (PlayerController pl in gm.players) {
-                    if (!pl)
-                        continue;
-
-                    if (Utils.WrappedDistance(transform.position, pl.transform.position) < playerDetectSize)
-                        return;
-                }
+        if (PopupTimer.Expired(Runner)) {
+            Collider2D closePlayer = Runner.GetPhysicsScene2D().OverlapCircle(transform.position, playerDetectSize, Layers.MaskOnlyPlayers);
+            if (!closePlayer) {
+                //no players nearby. pop up.
+                animator.SetTrigger("popup");
             }
-
-            animator.SetTrigger("popup");
-            popupTimer = 0;
+            PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
         }
     }
 
     public override void InteractWithPlayer(PlayerController player) {
-        if (player.invincible > 0 || player.inShell || player.State == Enums.PowerupState.MegaMushroom) {
-            photonView.RPC("Kill", RpcTarget.All);
+        if (player.StarmanTimer > 0 || player.inShell || player.State == Enums.PowerupState.MegaMushroom) {
+            Kill();
         } else {
-            player.photonView.RPC("Powerdown", RpcTarget.All, false);
+            player.Powerdown(false);
         }
     }
 
-    [PunRPC]
     public void Respawn() {
-        if (Frozen || !dead)
+        if (IsFrozen || !Dead)
             return;
 
-        Frozen = false;
-        dead = false;
-        popupTimer = 3;
+        IsFrozen = false;
+        Dead = false;
+        PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
         animator.Play("end", 0, 1);
-
         hitbox.enabled = true;
     }
 
-    [PunRPC]
     public override void Kill() {
 
         PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
-        PlaySound(Frozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
+        PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
 
-        dead = true;
+        Dead = true;
         hitbox.enabled = false;
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, upsideDown ? -0.5f : 0.5f, 0), Quaternion.identity);
-        if (photonView.IsMine)
-            PhotonNetwork.Instantiate("Prefabs/LooseCoin", transform.position + new Vector3(0, upsideDown ? -1f : 1f, 0), Quaternion.identity);
+        Runner.Spawn(PrefabList.LooseCoin, transform.position + Vector3.up * (upsideDown ? -1f : 1f));
     }
 
-    [PunRPC]
     public override void SpecialKill(bool right, bool groundpound, int combo) {
         Kill();
     }

@@ -7,22 +7,22 @@ public class SpinyWalk : KoopaWalk {
     public override void InteractWithPlayer(PlayerController player) {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
-        if (holder)
+        if (Holder)
             return;
 
         if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
-        } else if (player.sliding || player.inShell || player.invincible > 0 || player.State == Enums.PowerupState.MegaMushroom) {
+        } else if (player.sliding || player.inShell || player.StarmanTimer > 0 || player.State == Enums.PowerupState.MegaMushroom) {
             //Special kill
-            bool originalFacing = player.facingRight;
-            if (player.inShell && shell && !stationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
+            bool originalFacing = player.FacingRight;
+            if (player.inShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 //Do knockback to player, colliding with us in shell going opposite ways
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
 
             photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
-        } else if (!holder) {
-            if (shell) {
-                if (IsStationary) {
+        } else if (!Holder) {
+            if (IsInShell) {
+                if (IsActuallyStationary) {
                     //we aren't moving. check for kicks & pickups
                     if (player.CanPickup()) {
                         //pickup-able
@@ -32,7 +32,7 @@ public class SpinyWalk : KoopaWalk {
                         //non-pickup able, kick.
                         photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
                         player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
-                        previousHolder = player;
+                        PreviousHolder = player;
                     }
                 } else {
                     //in shell, moving.
@@ -63,12 +63,12 @@ public class SpinyWalk : KoopaWalk {
                                 photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
                             }
                         }
-                    } else if (player.hitInvincibilityCounter <= 0) {
+                    } else if (player.DamageInvincibilityTimer <= 0) {
                         //not being stomped on. just do damage.
                         player.photonView.RPC("Powerdown", RpcTarget.All, false);
                     }
                 }
-            } else if (player.hitInvincibilityCounter <= 0) {
+            } else if (player.DamageInvincibilityTimer <= 0) {
                 //Not in shell, we can't be stomped on.
                 player.photonView.RPC("Powerdown", RpcTarget.All, false);
                 photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);

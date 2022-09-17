@@ -5,7 +5,7 @@ public class PlayerColorSet : ScriptableObject {
 
     public PlayerColors[] colors = { new() };
 
-    public PlayerColors GetPlayerColors(PlayerData player) {
+    public PlayerColors GetPlayerColors(CharacterData player) {
 
         PlayerColors nullPlayer = null;
         foreach (PlayerColors color in colors) {
@@ -23,7 +23,7 @@ public class PlayerColorSet : ScriptableObject {
 [System.Serializable]
 public class PlayerColors {
 
-    public PlayerData player;
+    public CharacterData player;
     public Color hatColor = Color.black, overallsColor = Color.black;
 
 }

@@ -1,66 +1,91 @@
 ﻿using UnityEngine;
-using Photon.Pun;
+
+using Fusion;
+using NSMB.Utils;
 
 public abstract class HoldableEntity : KillableEntity {
 
-    public PlayerController holder, previousHolder;
+    //---Networked Variables
+    [Networked] public PlayerController Holder { get; set; }
+    [Networked] public PlayerController PreviousHolder { get; set; }
+    [Networked] protected TickTimer ThrowInvincibility { get; set; }
+
+    //---Serailized Variables
+    [SerializeField] protected float throwSpeed = 4.5f;
+
+    //--Misc Variables
     public Vector3 holderOffset;
-    public bool canPlace = true;
+    public bool canPlace = true, canKick = true;
 
     #region Unity Methods
-    public void LateUpdate() {
-        if (!holder)
-            return;
-
-        body.velocity = Vector2.zero;
-        body.position = transform.position = holder.transform.position + holderOffset;
-        return;
-    }
-
-    public override void FixedUpdate() {
-        if (!holder)
-            base.FixedUpdate();
+    public override void FixedUpdateNetwork() {
+        if (!Holder) {
+            base.FixedUpdateNetwork();
+        } else {
+            body.velocity = Vector2.zero;
+            body.position = Holder.body.position + (Vector2) holderOffset;
+            sRenderer.flipX = !FacingRight;
+        }
     }
     #endregion
 
-    #region PunRPCs
-    [PunRPC]
+    #region Implemented Methods
     public abstract void Kick(bool fromLeft, float kickFactor, bool groundpound);
 
-    [PunRPC]
-    public abstract void Throw(bool facingLeft, bool crouching, Vector2 pos);
-
-    [PunRPC]
-    public virtual void Pickup(int view) {
-        if (holder)
+    public virtual void Throw(bool toRight, bool crouching) {
+        if (!Holder)
             return;
 
-        PhotonView holderView = PhotonView.Find(view);
-        holder = holderView.gameObject.GetComponent<PlayerController>();
-        previousHolder = holder;
-        photonView.TransferOwnership(holderView.Owner);
+        if (Utils.IsTileSolidAtWorldLocation(body.position))
+            transform.position = body.position = new(Holder.transform.position.x, transform.position.y);
+
+        ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
+        if (Holder)
+            Holder.SetHolding(null);
+
+        FacingRight = toRight;
+
+        body.velocity = new Vector2((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
     }
 
-    [PunRPC]
-    public override void Kill() {
-        if (dead)
+    public virtual void Pickup(PlayerController player) {
+        if (Holder)
             return;
 
-        if (holder)
-            holder.SetHolding(-1);
+        player.SetHolding(this);
+    }
+
+    public override void InteractWithPlayer(PlayerController player) {
+        //don't interact with our lovely holder
+        if (Holder == player)
+            return;
+
+        //temporary invincibility
+        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+            return;
+
+        base.InteractWithPlayer(player);
+    }
+
+    public override void Kill() {
+        if (Dead)
+            return;
+
+        if (Holder)
+            Holder.SetHolding(null);
 
         base.Kill();
     }
 
-    [PunRPC]
     public override void SpecialKill(bool right, bool groundpound, int combo) {
-        if (dead)
+        if (Dead)
             return;
 
-        if (holder)
-            holder.SetHolding(-1);
+        if (Holder)
+            Holder.SetHolding(null);
 
         base.SpecialKill(right, groundpound, combo);
     }
+
     #endregion
 }

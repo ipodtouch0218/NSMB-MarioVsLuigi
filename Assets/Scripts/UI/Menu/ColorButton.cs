@@ -9,7 +9,7 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
     public PlayerColorSet palette;
 
-    public void Instantiate(PlayerData player) {
+    public void Instantiate(CharacterData player) {
         if (palette == null) {
             shirt.enabled = false;
             overalls.enabled = false;

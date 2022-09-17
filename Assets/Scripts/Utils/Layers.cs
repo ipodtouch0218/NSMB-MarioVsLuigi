@@ -3,17 +3,19 @@ using UnityEngine;
 namespace NSMB.Utils {
     public static class Layers {
 
-        private static int? _maskAnyGround, _maskOnlyGround;
+        private static int? _maskAnyGround, _maskOnlyGround, _maskOnlyPlayer;
         public static int MaskAnyGround { get => LazyLoadMask(ref _maskAnyGround, "Ground", "Semisolids", "IceBlock"); }
         public static int MaskOnlyGround { get => LazyLoadMask(ref _maskOnlyGround, "Ground"); }
+        public static int MaskOnlyPlayers { get => LazyLoadMask(ref _maskOnlyPlayer, "Player"); }
 
-        private static int? _layerGround, _layerHitsNothing, _layerDefault, _layerPassthrough, _layerLooseCoin, _layerEntity;
+        private static int? _layerGround, _layerHitsNothing, _layerDefault, _layerPassthrough, _layerLooseCoin, _layerEntity, _layerPlayer;
         public static int LayerGround { get => LazyLoadLayer(ref _layerGround, "Ground"); }
         public static int LayerHitsNothing { get => LazyLoadLayer(ref _layerHitsNothing, "HitsNothing"); }
         public static int LayerDefault { get => LazyLoadLayer(ref _layerDefault, "Default"); }
         public static int LayerPassthrough { get => LazyLoadLayer(ref _layerPassthrough, "PlayerPassthrough"); }
         public static int LayerLooseCoin { get => LazyLoadLayer(ref _layerLooseCoin, "LooseCoin"); }
         public static int LayerEntity { get => LazyLoadLayer(ref _layerEntity, "Entity"); }
+        public static int LayerPlayer { get => LazyLoadLayer(ref _layerPlayer, "Player"); }
 
         private static int LazyLoadMask(ref int? variable, params string[] layers) {
             if (variable != null)

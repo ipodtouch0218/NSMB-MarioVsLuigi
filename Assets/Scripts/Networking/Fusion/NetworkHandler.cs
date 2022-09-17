@@ -19,31 +19,61 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     private AuthenticationValues authValues;
 
     #region NetworkRunner Callbacks
-    public void OnConnectedToServer(NetworkRunner runner) { }
+    public void OnConnectedToServer(NetworkRunner runner) {
+        Debug.Log($"[Network] Successfully connected to the Lobby");
+    }
 
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) {
+        Debug.LogError($"[Network] Failed to connect to the Lobby ({remoteAddress}): {reason}");
+    }
 
-    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
+    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
+        Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress} ({token})");
+        request.Accept();
+    }
+    public void OnDisconnectedFromServer(NetworkRunner runner) {
+        Debug.Log("[Network] Disconnected from Lobby");
+    }
 
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {
+        Debug.Log("[Network] Authentication Successful");
 
-    public void OnDisconnectedFromServer(NetworkRunner runner) { }
+        PlayerPrefs.SetString("id", runner.AuthenticationValues.UserId);
+        if (data.ContainsKey("Token"))
+            PlayerPrefs.SetString("token", (string) data["Token"]);
+
+        PlayerPrefs.Save();
+    }
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) {
         PlayerNetworkInput newInput = new();
 
+        Vector2 joystick = InputSystem.controls.Player.Movement.ReadValue<Vector2>();
+        bool jump = InputSystem.controls.Player.Jump.ReadValue<bool>();
+        bool sprint = InputSystem.controls.Player.Sprint.ReadValue<bool>();
 
+        //TODO: deadzone?
+        newInput.buttons.Set(PlayerControls.Right, joystick.x > 0.25f);
+        newInput.buttons.Set(PlayerControls.Left, joystick.x < -0.25f);
+        newInput.buttons.Set(PlayerControls.Up, joystick.y > 0.25f);
+        newInput.buttons.Set(PlayerControls.Down, joystick.y < -0.25f);
+        newInput.buttons.Set(PlayerControls.Jump, jump);
+        newInput.buttons.Set(PlayerControls.Sprint, sprint);
 
         input.Set(newInput);
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
 
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+        Debug.Log($"[Network] Player joined room: {player.PlayerId}");
+    }
 
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        Debug.Log($"[Network] Player left room: {player.PlayerId}");
+    }
 
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
 
@@ -53,7 +83,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
 
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
+        Debug.Log($"[Network] Network Shutdown: {shutdownReason}");
+    }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
     #endregion
@@ -97,7 +129,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     public async Task<StartGameResult> CreateRoom() {
-
         //create a random room id.
         //TODO: first char should correspond to region.
 
@@ -112,6 +143,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             SessionName = idBuilder.ToString(),
             SceneManager = this,
             AuthValues = authValues,
+
         });
     }
 

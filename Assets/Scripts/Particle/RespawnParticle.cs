@@ -12,7 +12,7 @@ public class RespawnParticle : MonoBehaviour {
     public void Start() {
         foreach (ParticleSystem system in GetComponentsInChildren<ParticleSystem>()) {
             ParticleSystem.MainModule main = system.main;
-            main.startColor = player.AnimationController.GlowColor;
+            main.startColor = player.animationController.GlowColor;
 
             system.Play();
         }
