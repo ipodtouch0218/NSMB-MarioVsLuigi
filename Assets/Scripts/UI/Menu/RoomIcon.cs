@@ -2,18 +2,20 @@
 using UnityEngine.UI;
 using TMPro;
 
-using Photon.Realtime;
 using NSMB.Utils;
-using ExitGames.Client.Photon;
+using Fusion;
 
 public class RoomIcon : MonoBehaviour {
 
+    //---Serialized Variables
     [SerializeField] private Color defaultColor, highlightColor, selectedColor;
     [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText;
 
-    public RoomInfo room;
+    //---Public Variables
+    public SessionInfo session;
     public bool joinPrivate;
 
+    //---Components
     private Image icon;
 
     public void Start() {
@@ -21,23 +23,26 @@ public class RoomIcon : MonoBehaviour {
         Unselect();
     }
 
-    public void UpdateUI(RoomInfo newRoom) {
+    public void UpdateUI(SessionInfo newSession) {
         if (joinPrivate)
             return;
 
-        room = newRoom;
-        Hashtable prop = room.CustomProperties;
+        session = newSession;
 
-        nameText.text = $"{((string) prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}'s Lobby";
-        playersText.text = $"Players: {room.PlayerCount}/{room.MaxPlayers}";
-        inProgressText.text = (bool) prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string hostname);
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.Lives, out int lives);
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.Time, out int timer);
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.CustomPowerups, out bool powerups);
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool gameStarted);
+
+        nameText.text = hostname.ToValidUsername() + "'s Lobby";
+        playersText.text = $"Players: {session.PlayerCount}/{session.MaxPlayers}";
+        inProgressText.text = gameStarted ? "In Progress" : "Not Started";
 
         string symbols = "";
-        Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int stars, newRoom.CustomProperties);
-        Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out int coins, newRoom.CustomProperties);
-        Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out int lives, newRoom.CustomProperties);
-        bool powerups = (bool) prop[Enums.NetRoomProperties.NewPowerups];
-        bool time = ((int) prop[Enums.NetRoomProperties.Time]) >= 1;
+        bool time = timer >= 1;
         //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
         if (powerups)

@@ -172,7 +172,7 @@ public class MovingPowerup : CollectableEntity {
         //TODO: refactor
         if (powerup.state == Enums.PowerupState.MegaMushroom && player.State != Enums.PowerupState.MegaMushroom) {
 
-            player.GiantStartTimer = player.giantStartTime;
+            player.GiantStartTimer = TickTimer.CreateFromSeconds(Runner, player.giantStartTime);
             player.knockback = false;
             player.groundpound = false;
             player.crouching = false;
@@ -220,13 +220,13 @@ public class MovingPowerup : CollectableEntity {
         }
 
         if (reserve) {
-            if (player.StoredPowerup == null || (player.StoredPowerup != null && Enums.PowerupStatePriority[player.StoredPowerup.state].statePriority <= pp.statePriority && !(State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))) {
+            if (player.StoredPowerup == null || (player.StoredPowerup != null && Enums.PowerupStatePriority[player.StoredPowerup.state].statePriority <= pp.statePriority && !(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))) {
                 //dont reserve mushrooms
                 player.StoredPowerup = powerup;
             }
             player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         } else {
-            if (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == null || Enums.PowerupStatePriority[StoredPowerup.state].statePriority <= cp.statePriority)) {
+            if (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == null || Enums.PowerupStatePriority[player.StoredPowerup.state].statePriority <= cp.statePriority)) {
                 player.StoredPowerup = (Powerup) Resources.Load("Scriptables/Powerups/" + player.State);
             }
 

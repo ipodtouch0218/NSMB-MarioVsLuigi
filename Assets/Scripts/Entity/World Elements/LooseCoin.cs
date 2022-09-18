@@ -28,7 +28,7 @@ public class LooseCoin : Coin {
         physics = GetComponent<PhysicsEntity>();
         animator = GetComponent<Animator>();
         sfx = GetComponent<AudioSource>();
-        body.velocity = Vector2.up * Random.Range(2f, 3f);
+        body.velocity = Vector2.up * GameManager.Instance.Random.RangeInclusive(2f, 3f);
     }
 
     public override void Spawned() {

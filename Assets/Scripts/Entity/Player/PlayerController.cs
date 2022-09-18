@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
@@ -351,6 +351,7 @@ public class PlayerController : FreezableEntity {
 
     private static readonly Vector2 hitboxOffset = Vector2.up * 0.5f;
     private readonly Collider2D[] results = new Collider2D[64];
+    private readonly Collider2D[] tempResults = new Collider2D[64];
     private void CheckForEntityCollision() {
         //Don't check for collisions if we're dead, frozen, in a pipe, etc.
         if (Dead || IsFrozen || pipeEntering)
@@ -358,11 +359,13 @@ public class PlayerController : FreezableEntity {
 
         int collisions = 0;
         foreach (BoxCollider2D hitbox in hitboxes) {
-            collisions += Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, new ContactFilter2D().NoFilter(), results);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, default, tempResults);
+            Array.Copy(tempResults, 0, results, collisions, count);
+            collisions += count;
         }
 
-        foreach (Collider2D collider in results.Distinct()) {
-            GameObject collidedObject = collider.gameObject;
+        for (int i = 0; i < collisions; i++) {
+            GameObject collidedObject = results[i].gameObject;
 
             //don't interact with objects we're holding.
             if (HeldEntity.gameObject == collidedObject)
@@ -775,7 +778,7 @@ public class PlayerController : FreezableEntity {
     }
 
     public void SpawnRandomItem() {
-        Powerup randomItem = Utils.GetRandomItem(this);
+        Powerup randomItem = Utils.GetRandomItem(Runner, this);
         Runner.Spawn(randomItem.prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0);
 
         PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
@@ -1461,7 +1464,7 @@ public class PlayerController : FreezableEntity {
                 onGround = false;
                 bounce = false;
                 PlaySound(Enums.Sounds.Player_Sound_WallJump);
-                PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) Random.Range(1, 3));
+                PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
 
                 Vector2 offset = new(MainHitbox.size.x / 2f * (wallSlideLeft ? -1 : 1), MainHitbox.size.y / 2f);
                 SpawnParticle("Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Vector3.zero : Vector3.up * 180);
@@ -1579,7 +1582,7 @@ public class PlayerController : FreezableEntity {
                 singlejump = false;
                 doublejump = true;
                 triplejump = false;
-                PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) Random.Range(1, 3));
+                PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
             } else if (canSpecialJump && doublejump) {
                 //Triple Jump
                 singlejump = false;

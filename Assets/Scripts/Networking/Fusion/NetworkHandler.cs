@@ -8,14 +8,15 @@ using NSMB.Utils;
 using Fusion;
 using Fusion.Sockets;
 using Fusion.Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 #pragma warning disable UNT0006 // "Incorrect message signature" for OnConnectedToServer
-public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks, INetworkSceneManager {
+public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
     private static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
 
-    private NetworkRunner runner;
+    public NetworkRunner runner;
     private AuthenticationValues authValues;
 
     #region NetworkRunner Callbacks
@@ -69,10 +70,20 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
         Debug.Log($"[Network] Player joined room: {player.PlayerId}");
+
+        if (runner.IsServer) {
+            //create player data
+            runner.Spawn(PrefabList.Net_PlayerData, inputAuthority: player);
+        }
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.OnPlayerJoined(runner, player);
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         Debug.Log($"[Network] Player left room: {player.PlayerId}");
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.OnPlayerLeft(runner, player);
     }
 
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
@@ -81,21 +92,20 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public void OnSceneLoadStart(NetworkRunner runner) { }
 
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.OnRoomListUpdate(sessionList);
+    }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
         Debug.Log($"[Network] Network Shutdown: {shutdownReason}");
+
+        //back to the main menu
+        GlobalController.Instance.disconnectCause = shutdownReason;
+        SceneManager.LoadScene(0);
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-    #endregion
-
-    #region NetworkSceneManager Callbacks
-    public void Initialize(NetworkRunner runner) { }
-
-    public void Shutdown(NetworkRunner runner) { }
-
-    public bool IsReady(NetworkRunner runner) { return true; }
     #endregion
 
     #region Unity Callbacks
@@ -118,7 +128,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #endregion
 
     #region Room-Related Methods
-    public void JoinLobby() {
+    public void Authenticate() {
         string id = PlayerPrefs.GetString("id", null);
         string token = PlayerPrefs.GetString("token", null);
 
@@ -128,7 +138,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         });
     }
 
-    public async Task<StartGameResult> CreateRoom() {
+    public async Task<StartGameResult> CreateRoom(StartGameArgs args) {
         //create a random room id.
         //TODO: first char should correspond to region.
 
@@ -137,14 +147,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         for (int i = 0; i < RoomIdLength; i++)
             idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
 
-        //attempt to create the room
-        return await runner.StartGame(new() {
-            GameMode = GameMode.Host,
-            SessionName = idBuilder.ToString(),
-            SceneManager = this,
-            AuthValues = authValues,
+        args.GameMode = GameMode.Host;
+        args.SessionName = idBuilder.ToString();
+        args.AuthValues = authValues;
+        args.SessionProperties = NetworkUtils.DefaultRoomProperties;
+        args.Scene = 0;
 
-        });
+        //attempt to create the room
+        return await runner.StartGame(args);
     }
 
     public async Task<StartGameResult> JoinRoom(string roomId) {
@@ -155,9 +165,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return await runner.StartGame(new() {
             GameMode = GameMode.Client,
             SessionName = roomId,
-            SceneManager = this,
             AuthValues = authValues,
-            SessionProperties = NetworkUtils.DefaultRoomProperties,
         });
     }
     #endregion

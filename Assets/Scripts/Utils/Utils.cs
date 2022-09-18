@@ -3,8 +3,9 @@ using System.Text;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Photon.Realtime;
-using Photon.Pun;
+
+using NSMB.Extensions;
+using Fusion;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -80,15 +81,8 @@ namespace NSMB.Utils {
             return TilemapToWorldPosition(new Vector3Int(tileX, tileY));
         }
 
-        public static int GetCharacterIndex(Player player = null) {
-            if (player == null)
-                player = PhotonNetwork.LocalPlayer;
-
-            GetCustomProperty(Enums.NetPlayerProperties.Character, out int index, player.CustomProperties);
-            return index;
-        }
-        public static CharacterData GetCharacterData(Player player = null) {
-            return GlobalController.Instance.characters[GetCharacterIndex(player)];
+        public static CharacterData GetCharacterData(NetworkRunner runner, PlayerRef player) {
+            return GlobalController.Instance.characters[player.GetPlayerData(runner).CharacterIndex];
         }
 
         public static TileBase GetTileAtTileLocation(Vector3Int tileLocation) {
@@ -348,7 +342,7 @@ namespace NSMB.Utils {
             } while (i != 0);
 
             // Return true if count is odd, false otherwise
-            return (count % 2 == 1); // Same as (count%2 == 1)
+            return count % 2 == 1; // Same as (count%2 == 1)
         }
 
         public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize, bool boxcast = true) {
@@ -376,27 +370,34 @@ namespace NSMB.Utils {
             return Vector2.Distance(a, b);
         }
 
-        public static bool GetCustomProperty<T>(string key, out T value, ExitGames.Client.Photon.Hashtable properties = null) {
-            if (properties == null)
-                properties = PhotonNetwork.CurrentRoom.CustomProperties;
-            if (properties == null) {
-                value = default;
-                return false;
-            }
-
-            properties.TryGetValue(key, out object temp);
-            if (temp != null) {
-                value = (T) temp;
+        public static bool GetSessionProperty(SessionInfo session, string key, out int value) {
+            if (session.Properties.TryGetValue(key, out SessionProperty property)) {
+                value = property;
                 return true;
-            } else {
-                value = default;
-                return false;
             }
+            value = default;
+            return false;
+        }
+        public static bool GetSessionProperty(SessionInfo session, string key, out string value) {
+            if (session.Properties.TryGetValue(key, out SessionProperty property)) {
+                value = property;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+        public static bool GetSessionProperty(SessionInfo session, string key, out bool value) {
+            if (session.Properties.TryGetValue(key, out SessionProperty property)) {
+                value = property == 1;
+                return true;
+            }
+            value = default;
+            return false;
         }
 
         public static Powerup[] powerups = null;
         // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
-        public static Powerup GetRandomItem(PlayerController player) {
+        public static Powerup GetRandomItem(NetworkRunner runner, PlayerController player) {
             GameManager gm = GameManager.Instance;
 
             // "losing" variable based on ln(x+1), x being the # of stars we're behind
@@ -406,9 +407,10 @@ namespace NSMB.Utils {
             if (powerups == null)
                 powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
 
-            GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int starsToWin);
-            GetCustomProperty(Enums.NetRoomProperties.NewPowerups, out bool custom);
-            GetCustomProperty(Enums.NetRoomProperties.Lives, out int livesOn);
+            GetSessionProperty(runner.SessionInfo, Enums.NetRoomProperties.StarRequirement, out int starsToWin);
+            GetSessionProperty(runner.SessionInfo, Enums.NetRoomProperties.CustomPowerups, out bool custom);
+            GetSessionProperty(runner.SessionInfo, Enums.NetRoomProperties.Lives, out int livesOn);
+
             bool lives = false;
             if (livesOn > 0)
                 lives = true;
@@ -426,7 +428,7 @@ namespace NSMB.Utils {
                 totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
             }
 
-            float rand = Random.value * totalChance;
+            float rand = GameManager.Instance.Random.NextSingleExclusive() * totalChance;
             foreach (Powerup powerup in powerups) {
                 if (powerup.name == "MegaMushroom" && gm.musicState == Enums.MusicState.MegaMushroom)
                     continue;
@@ -560,13 +562,13 @@ namespace NSMB.Utils {
             return ret.ToString();
         }
 
-        public static Color GetPlayerColor(Player player, float s = 1, float v = 1) {
+        public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
 
             int result = -1;
             int count = 0;
-            foreach (var pl in PhotonNetwork.PlayerList) {
-                GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, pl.CustomProperties);
-                if (spectating)
+            foreach (PlayerRef pl in runner.ActivePlayers.OrderBy(pr => pr.RawEncoded)) {
+                //skip spectators in color calculations
+                if (pl.GetPlayerData(runner).IsManualSpectator)
                     continue;
 
                 if (pl == player)
@@ -585,8 +587,9 @@ namespace NSMB.Utils {
             counter = Mathf.Clamp(counter - delta, min, max);
         }
 
-        public static Color GetRainbowColor() {
-            double time = PhotonNetwork.Time * 0.1;
+        public static Color GetRainbowColor(NetworkRunner runner) {
+            //four seconds per revolution
+            double time = runner.Simulation.Tick.Raw * 0.01667f * 0.25f;
             time %= 1;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
         }

@@ -160,7 +160,7 @@ public class KoopaWalk : HoldableEntity {
 
         if (IsInShell && blue && player.groundpound && !player.onGround) {
             BlueBecomeItem();
-            return true;
+            return;
         }
         if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             player.body.velocity = new(0, player.body.velocity.y);
@@ -209,7 +209,6 @@ public class KoopaWalk : HoldableEntity {
                     FacingRight = damageDirection.x > 0;
             }
         }
-        return true;
     }
     #endregion
 

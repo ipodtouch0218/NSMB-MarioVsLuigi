@@ -180,10 +180,9 @@ public static class Enums {
         public static string Lives { get; } = "Li";
         public static string Time { get; } = "T";
         public static string DrawTime { get; } = "Dt";
-        public static string NewPowerups { get; } = "C";
+        public static string CustomPowerups { get; } = "C";
         public static string GameStarted { get; } = "G";
         public static string HostName { get; } = "H";
-        public static string Debug { get; } = "D";
         public static string Mutes { get; } = "M";
         public static string Bans { get; } = "B";
     }

@@ -10,6 +10,7 @@ using UnityEngine.Tilemaps;
 using TMPro;
 
 using NSMB.Utils;
+using NSMB.Extensions;
 using Fusion;
 
 public class GameManager : NetworkBehaviour {
@@ -27,6 +28,14 @@ public class GameManager : NetworkBehaviour {
         }
         private set => _instance = value;
     }
+
+    //---Networked Variables
+    [Networked] private TickTimer BigStarRespawnTimer { get; set; }
+    [Networked] public TickTimer GameStartTimer { get; set; }
+    [Networked] public TickTimer GameEndTimer { get; set; }
+    [Networked] public NetworkRNG Random { get; set; }
+
+
 
     public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
 
@@ -275,23 +284,12 @@ public class GameManager : NetworkBehaviour {
     // MATCHMAKING CALLBACKS
     // ROOM CALLBACKS
 
-    public void OnMasterClientSwitched(Player newMaster) {
-        //TODO: chat message
-
-        if (newMaster.IsLocal) {
-            //i am de captain now
-            PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
-                [Enums.NetRoomProperties.HostName] = newMaster.NickName
-            });
-        }
-    }
-
     public void OnPlayerEnteredRoom(Player newPlayer) {
         //Spectator joined. Sync the room state.
         //TODO: chat message?
 
         if (PhotonNetwork.IsMasterClient) {
-            Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
+            Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
             List<NameIdPair> banList = bans.Cast<NameIdPair>().ToList();
             if (banList.Any(nip => nip.userId == newPlayer.UserId)) {
 
@@ -327,8 +325,6 @@ public class GameManager : NetworkBehaviour {
 
     // CONNECTION CALLBACKS
     public void OnDisconnected(DisconnectCause cause) {
-        GlobalController.Instance.disconnectCause = cause;
-        SceneManager.LoadScene(0);
     }
 
 
@@ -376,8 +372,8 @@ public class GameManager : NetworkBehaviour {
 
         //Star spawning
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-        Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out starRequirement);
-        Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
+        Utils.GetSessionProperty(Enums.NetRoomProperties.StarRequirement, out starRequirement);
+        Utils.GetSessionProperty(Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
 
         SceneManager.SetActiveScene(gameObject.scene);
 
@@ -405,12 +401,10 @@ public class GameManager : NetworkBehaviour {
         loaded = true;
     }
 
-    private PlayerController GetController(Player player) {
-        foreach (PlayerController pl in players) {
-            if (pl.photonView.Owner == player)
-                return pl;
-        }
-        return null;
+    //TODO: invokeresim?
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void Rpc_EndGame(PlayerRef winner) {
+        StartCoroutine(EndGame(winner));
     }
 
     IEnumerator LoadingComplete(int startTimestamp) {
@@ -421,14 +415,6 @@ public class GameManager : NetworkBehaviour {
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
         bool spectating = GlobalController.Instance.joinedAsSpectator;
         bool gameStarting = startTimestamp - PhotonNetwork.ServerTimestamp > 0;
-
-        StartCoroutine(BigStarRespawn(false));
-
-        if (PhotonNetwork.IsMasterClient && !PhotonNetwork.OfflineMode) {
-            //clear buffered loading complete events.
-            RaiseEventOptions options = new() { Receivers = ReceiverGroup.All, CachingOption = EventCaching.RemoveFromRoomCache };
-            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerFinishedLoading, null, options, SendOptions.SendReliable);
-        }
 
         yield return new WaitForSeconds(Mathf.Max(1f, (startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f));
 
@@ -480,7 +466,7 @@ public class GameManager : NetworkBehaviour {
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
-        Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
+        Utils.GetSessionProperty(Runner, Enums.NetRoomProperties.Time, out int timedGameDuration);
 
         startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
         if (timedGameDuration > 0) {
@@ -511,12 +497,13 @@ public class GameManager : NetworkBehaviour {
         }
     }
 
-    private IEnumerator EndGame(Player winner) {
-        PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
+    private IEnumerator EndGame(PlayerRef winner) {
+        //TODO:
+        //PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.GetUniqueNickname() } Wins!" : "It's a draw...";
+        text.GetComponent<TMP_Text>().text = winner != null ? winner.GetPlayerData(Runner).Nickname + " Wins!" : "It's a draw...";
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
@@ -525,7 +512,7 @@ public class GameManager : NetworkBehaviour {
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
 
-        bool win = winner != null && winner.IsLocal;
+        bool win = winner != null && winner == Runner.LocalPlayer;
         bool draw = winner == null;
         int secondsUntilMenu;
         secondsUntilMenu = draw ? 5 : 4;
@@ -540,40 +527,51 @@ public class GameManager : NetworkBehaviour {
         //TOOD: make a results screen?
 
         yield return new WaitForSecondsRealtime(secondsUntilMenu);
-        if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.DestroyAll();
-        SceneManager.LoadScene("MainMenu");
+
+        if (Runner.IsServer)
+            Runner.SetActiveScene(SceneRef.None)
     }
 
-    private IEnumerator BigStarRespawn(bool wait = true) {
-        if (wait)
-            yield return new WaitForSeconds(10.4f - playerCount / 5f);
+    private void SpawnBigStar() {
 
-        if (!PhotonNetwork.IsMasterClient || gameover)
-            yield break;
-
-        bigwhile:
-        while (true) {
+        for (int i = 0; i < starSpawns.Length; i++) {
             if (remainingSpawns.Count <= 0)
                 remainingSpawns.AddRange(starSpawns);
 
-            int index = Random.Range(0, remainingSpawns.Count);
+            int index = Random.RangeExclusive(0, remainingSpawns.Count);
             Vector3 spawnPos = remainingSpawns[index].transform.position;
-            //Check for people camping spawn
-            foreach (var hit in Physics2D.OverlapCircleAll(spawnPos, 4)) {
-                if (hit.gameObject.CompareTag("Player")) {
-                    //cant spawn here
-                    remainingSpawns.RemoveAt(index);
-                    yield return new WaitForSeconds(0.2f);
-                    goto bigwhile;
-                }
+
+            if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 4, Layers.MaskOnlyPlayers)) {
+                //a player is too close to the spawn
+                remainingSpawns.RemoveAt(index);
+                continue;
             }
 
-            PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", spawnPos, Quaternion.identity);
+            Runner.Spawn(PrefabList.BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
+                obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
+            });
             remainingSpawns.RemoveAt(index);
             break;
         }
     }
+
+    public override void Spawned() {
+
+        if (Runner.IsServer)
+            Random = new(UnityEngine.Random.Range(int.MinValue, int.MaxValue));
+
+    }
+    public override void FixedUpdateNetwork() {
+
+        if (BigStarRespawnTimer.ExpiredOrNotRunning(Runner)) {
+            SpawnBigStar();
+            BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - playerCount / 5f);
+        }
+    }
+
+
+
+
 
     public void Update() {
         if (gameover)
@@ -663,7 +661,7 @@ public class GameManager : NetworkBehaviour {
         }
         //TIMED CHECKS
         if (timeUp) {
-            Utils.GetCustomProperty(Enums.NetRoomProperties.DrawTime, out bool draw);
+            Utils.GetSessionProperty(Enums.NetRoomProperties.DrawTime, out bool draw);
             //time up! check who has most stars, if a tie keep playing, if draw is on end game in a draw
             if (draw)
                 // it's a draw! Thanks for playing the demo!
@@ -680,6 +678,10 @@ public class GameManager : NetworkBehaviour {
             return;
         }
     }
+
+
+
+
 
     private void PlaySong(Enums.MusicState state, MusicData musicToPlay) {
         if (musicState == state)
@@ -700,7 +702,7 @@ public class GameManager : NetworkBehaviour {
 
             if (player.State == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
                 mega = true;
-            if (player.StarmanTimer > 0)
+            if (player.IsStarmanInvincible)
                 invincible = true;
             if ((player.Stars + 1f) / starRequirement >= 0.95f || hurryup != false)
                 speedup = true;
@@ -739,7 +741,7 @@ public class GameManager : NetworkBehaviour {
 
     public void AttemptQuit() {
 
-        if (PhotonNetwork.IsMasterClient) {
+        if (Runner.IsServer) {
             sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
             pausePanel.SetActive(false);
             hostExitUI.SetActive(true);
@@ -758,7 +760,7 @@ public class GameManager : NetworkBehaviour {
 
     public void Quit() {
         sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
-        PhotonNetwork.LeaveRoom();
+        Runner.Shutdown();
         SceneManager.LoadScene("MainMenu");
     }
 

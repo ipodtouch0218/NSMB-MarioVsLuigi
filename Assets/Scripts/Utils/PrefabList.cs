@@ -2,6 +2,12 @@ using UnityEngine;
 
 public static class PrefabList {
 
+
+    public static GameObject Net_PlayerData { get; } =
+        (GameObject) Resources.Load("Prefab/Network/PlayerDataHolder");
+
+
+
     public static FireballMover Fireball { get; } =
         ((GameObject) Resources.Load("Prefab/Fireball")).GetComponent<FireballMover>();
     public static FireballMover Iceball { get; } =

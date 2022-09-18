@@ -24,6 +24,9 @@ public class GlobalController : Singleton<GlobalController> {
 
     private int windowWidth, windowHeight;
 
+
+    public string nickname;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
         Instantiate(Resources.Load("Prefabs/Static/GlobalController"));
