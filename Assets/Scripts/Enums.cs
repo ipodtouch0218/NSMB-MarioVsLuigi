@@ -158,22 +158,8 @@ public static class Enums {
     #endregion
     #region NETWORKING
     // Networking Enums
-    public static class NetPlayerProperties {
-        public static string Character { get; } = "C";
-        public static string Ping { get; } = "P";
-        public static string PlayerColor { get; } = "C1";
-        public static string GameState { get; } = "S";
-        public static string Status { get; } = "St";
-        public static string Spectator { get; } = "Sp";
-    }
-    public static class NetPlayerGameState {
-        public static string Stars { get; } = "S";
-        public static string Coins { get; } = "C";
-        public static string Lives { get; } = "L";
-        public static string PowerupState { get; } = "P";
-        public static string ReserveItem { get; } = "R";
-    }
     public static class NetRoomProperties {
+        public static string MaxPlayers { get; } = "P";
         public static string Level { get; } = "L";
         public static string StarRequirement { get; } = "S";
         public static string CoinRequirement { get; } = "Co";
@@ -183,8 +169,6 @@ public static class Enums {
         public static string CustomPowerups { get; } = "C";
         public static string GameStarted { get; } = "G";
         public static string HostName { get; } = "H";
-        public static string Mutes { get; } = "M";
-        public static string Bans { get; } = "B";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events

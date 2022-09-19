@@ -207,12 +207,11 @@ public class PlayerController : FreezableEntity {
 
         cameraController.Recenter();
 
-        if (Object.HasInputAuthority)
+        if (Object.HasInputAuthority) {
             networkRigidbody.InterpolationDataSource = InterpolationDataSources.Predicted;
-    }
-
-    public void OnGameStart() {
-        PreRespawn();
+            GameManager.Instance.localPlayer = this;
+            GameManager.Instance.spectationManager.Spectating = false;
+        }
     }
 
     private void UpdateInputs() {
@@ -868,7 +867,7 @@ public class PlayerController : FreezableEntity {
             GameManager.Instance.CheckForWinner();
 
             if (Object.HasInputAuthority)
-                GameManager.Instance.SpectationManager.Spectating = true;
+                GameManager.Instance.spectationManager.Spectating = true;
 
             Runner.Despawn(Object);
             Destroy(trackIcon);
@@ -1095,7 +1094,7 @@ public class PlayerController : FreezableEntity {
         if (knockback && !fireballKnockback)
             return;
 
-        if (!GameManager.Instance.started || !DamageInvincibilityTimer.ExpiredOrNotRunning(Runner) || pipeEntering || IsFrozen || Dead || !GiantStartTimer.ExpiredOrNotRunning(Runner) || !GiantEndTimer.ExpiredOrNotRunning(Runner))
+        if (!GameManager.Instance.GameStarted || !DamageInvincibilityTimer.ExpiredOrNotRunning(Runner) || pipeEntering || IsFrozen || Dead || !GiantStartTimer.ExpiredOrNotRunning(Runner) || !GiantEndTimer.ExpiredOrNotRunning(Runner))
             return;
 
         if (State == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {

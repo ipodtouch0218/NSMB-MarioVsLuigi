@@ -29,6 +29,8 @@ public class RoomIcon : MonoBehaviour {
 
         session = newSession;
 
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxPlayers);
+        maxPlayers++;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string hostname);
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
@@ -38,12 +40,11 @@ public class RoomIcon : MonoBehaviour {
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool gameStarted);
 
         nameText.text = hostname.ToValidUsername() + "'s Lobby";
-        playersText.text = $"Players: {session.PlayerCount}/{session.MaxPlayers}";
+        playersText.text = $"Players: {session.PlayerCount}/{maxPlayers}";
         inProgressText.text = gameStarted ? "In Progress" : "Not Started";
 
         string symbols = "";
         bool time = timer >= 1;
-        //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
         if (powerups)
             symbols += "<sprite=8>";
@@ -74,7 +75,7 @@ public class RoomIcon : MonoBehaviour {
     }
 
     public void Unhover() {
-        if (MainMenuManager.Instance.selectedRoomIcon == this) {
+        if (MainMenuManager.Instance.selectedRoom == this) {
             Select();
         } else {
             Unselect();

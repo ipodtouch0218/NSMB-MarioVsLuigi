@@ -2,9 +2,9 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-using Photon.Pun;
-using Photon.Realtime;
 using Discord;
+using Fusion;
+using NSMB.Utils;
 
 public class DiscordController : MonoBehaviour {
 
@@ -39,13 +39,9 @@ public class DiscordController : MonoBehaviour {
             return;
 
         Debug.Log($"[DISCORD] Attempting to join game with secret \"{secret}\"");
-        string[] split = secret.Split("-");
-        string region = split[0];
-        string room = split[1];
 
-        MainMenuManager.lastRegion = region;
-        MainMenuManager.Instance.connectThroughSecret = room;
-        PhotonNetwork.Disconnect();
+        //TODO: add "disconnect" prompt
+        _ = NetworkHandler.Instance.JoinRoom(secret);
     }
 
     //TODO this doesn't work???
@@ -76,49 +72,45 @@ public class DiscordController : MonoBehaviour {
             return;
 
         Activity activity = new();
+        NetworkRunner runner = NetworkHandler.Instance.runner;
+        SessionInfo session;
 
-        if (GameManager.Instance) {
-            //in a level
-            GameManager gm = GameManager.Instance;
-            Room room = PhotonNetwork.CurrentRoom;
+        if ((session = runner.SessionInfo).IsValid) {
 
-            activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = room.IsVisible ? "In a Public Game" : "In a Private Game";
-            activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
+            activity.Details = runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
+            Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxPlayers);
+            maxPlayers++;
+            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = maxPlayers }, Id = session.Name };
+            activity.State = session.IsVisible ? "In a Public Game" : "In a Private Game";
+            activity.Secrets = new() { Join = session.Name };
 
-            ActivityAssets assets = new();
-            if (gm.richPresenceId != "")
-                assets.LargeImage = $"level-{gm.richPresenceId}";
-            else
-                assets.LargeImage = "mainmenu";
-            assets.LargeText = gm.levelName;
+            if (GameManager.Instance) {
+                //in a level
+                GameManager gm = GameManager.Instance;
 
-            activity.Assets = assets;
+                ActivityAssets assets = new();
+                if (gm.richPresenceId != "")
+                    assets.LargeImage = $"level-{gm.richPresenceId}";
+                else
+                    assets.LargeImage = "mainmenu";
+                assets.LargeText = gm.levelName;
 
-            if (gm.timedGameDuration == -1) {
-                activity.Timestamps = new() { Start = gm.startRealTime / 1000 };
+                activity.Assets = assets;
+
+                if (gm.timedGameDuration == -1) {
+                    activity.Timestamps = new() { Start = gm.startRealTime / 1000 };
+                } else {
+                    activity.Timestamps = new() { End = gm.endRealTime / 1000 };
+                }
             } else {
-                activity.Timestamps = new() { End = gm.endRealTime / 1000 };
+                //in a room, but on the main menu.
+                activity.Assets = new() { LargeImage = "mainmenu" };
             }
-
-        } else if (PhotonNetwork.InRoom) {
-            //in a room
-            Room room = PhotonNetwork.CurrentRoom;
-
-            activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
-            activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
-
-            activity.Assets = new() { LargeImage = "mainmenu" };
 
         } else {
             //in the main menu, not in a room
-
             activity.Details = "Browsing the Main Menu...";
             activity.Assets = new() { LargeImage = "mainmenu" };
-
         }
 
 

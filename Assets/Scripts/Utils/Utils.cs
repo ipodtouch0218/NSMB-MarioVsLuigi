@@ -593,5 +593,28 @@ namespace NSMB.Utils {
             time %= 1;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
         }
+
+        public static int ParseTimeToSeconds(string time) {
+            int minutes;
+            int seconds;
+
+            if (time.Contains(":")) {
+                string[] split = time.Split(":");
+                int.TryParse(split[0], out minutes);
+                int.TryParse(split[1], out seconds);
+            } else {
+                minutes = 0;
+                int.TryParse(time, out seconds);
+            }
+
+            if (seconds >= 60) {
+                minutes += seconds / 60;
+                seconds %= 60;
+            }
+
+            seconds = minutes * 60 + seconds;
+
+            return seconds;
+        }
     }
 }

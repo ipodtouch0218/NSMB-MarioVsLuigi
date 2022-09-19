@@ -1,35 +1,47 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using NSMB.Utils;
+using NSMB.Extensions;
 using Fusion;
 using Fusion.Sockets;
 using Fusion.Photon.Realtime;
-using UnityEngine.SceneManagement;
 
 #pragma warning disable UNT0006 // "Incorrect message signature" for OnConnectedToServer
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
+    public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us" };
     private static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
 
     public NetworkRunner runner;
-    private AuthenticationValues authValues;
+    private string currentRegion;
 
     #region NetworkRunner Callbacks
     public void OnConnectedToServer(NetworkRunner runner) {
-        Debug.Log($"[Network] Successfully connected to the Lobby");
+
+        if (runner.LobbyInfo.IsValid) {
+            //connected to a lobby
+            Debug.Log($"[Network] Successfully connected to a Lobby");
+        } else if (runner.SessionInfo.IsValid) {
+            //connected to a session
+            Debug.Log($"[Network] Successfully connected to a Room");
+        }
+
     }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) {
-        Debug.LogError($"[Network] Failed to connect to the Lobby ({remoteAddress}): {reason}");
+        Debug.LogError($"[Network] Failed to connect to the server ({remoteAddress}): {reason}");
     }
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
         Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress} ({token})");
+        //TODO: check for bans?
         request.Accept();
     }
     public void OnDisconnectedFromServer(NetworkRunner runner) {
@@ -69,7 +81,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        Debug.Log($"[Network] Player joined room: {player.PlayerId}");
+        Debug.Log($"[Network] Player joined room (UserId = {runner.GetPlayerUserId(player)})");
 
         if (runner.IsServer) {
             //create player data
@@ -78,12 +90,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.OnPlayerJoined(runner, player);
+
+        GlobalController.Instance.DiscordController.UpdateActivity();
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        Debug.Log($"[Network] Player left room: {player.PlayerId}");
+        PlayerData data = player.GetPlayerData(runner);
+        Debug.Log($"[Network] {data.GetNickname()} ({player.GetPlayerData(runner).GetUserId()}) left the room");
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.OnPlayerLeft(runner, player);
+
+        GlobalController.Instance.DiscordController.UpdateActivity();
     }
 
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
@@ -123,35 +140,46 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public void Start() {
         runner = GetComponent<NetworkRunner>();
-        runner.ProvideInput = true;
+        runner.ProvideInput = true; //TODO: move to
     }
     #endregion
 
     #region Room-Related Methods
-    public void Authenticate() {
+    private async Task<AuthenticationValues> Authenticate() {
         string id = PlayerPrefs.GetString("id", null);
         string token = PlayerPrefs.GetString("token", null);
 
-        AuthenticationHandler.Authenticate(id, token, (auth) => {
-            runner.JoinSessionLobby(SessionLobby.ClientServer, null, auth);
-            authValues = auth;
-        });
+        return await AuthenticationHandler.Authenticate(id, token);
+    }
+
+    public async Task<StartGameResult> ConnectToRegion(string region) {
+
+        //version separation
+        PhotonAppSettings.Instance.AppSettings.AppVersion = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value;
+        PhotonAppSettings.Instance.AppSettings.EnableLobbyStatistics = true;
+        PhotonAppSettings.Instance.AppSettings.FixedRegion = region;
+
+        //Authenticate
+        AuthenticationValues authValues = await Authenticate();
+        //And join lobby
+        return await runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues);
     }
 
     public async Task<StartGameResult> CreateRoom(StartGameArgs args) {
         //create a random room id.
-        //TODO: first char should correspond to region.
+        StringBuilder idBuilder = new();
+
+        //first char should correspond to region.
+        int index = Array.IndexOf(Regions, currentRegion);
+        idBuilder.Append(RoomIdValidChars[index]);
 
         //fill rest of the string with random chars
-        StringBuilder idBuilder = new();
-        for (int i = 0; i < RoomIdLength; i++)
+        for (int i = 1; i < RoomIdLength; i++)
             idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
 
         args.GameMode = GameMode.Host;
         args.SessionName = idBuilder.ToString();
-        args.AuthValues = authValues;
         args.SessionProperties = NetworkUtils.DefaultRoomProperties;
-        args.Scene = 0;
 
         //attempt to create the room
         return await runner.StartGame(args);
@@ -159,13 +187,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public async Task<StartGameResult> JoinRoom(string roomId) {
         //make sure that we're on the right region...
-        //TODO: change region based on first character
+        string targetRegion = Regions[RoomIdValidChars.IndexOf(roomId[0])];
+
+        if (currentRegion != targetRegion) {
+            //change regions
+            await ConnectToRegion(targetRegion);
+        }
 
         //attempt to join the room
         return await runner.StartGame(new() {
             GameMode = GameMode.Client,
             SessionName = roomId,
-            AuthValues = authValues,
         });
     }
     #endregion

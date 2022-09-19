@@ -10,5 +10,17 @@ namespace NSMB.Extensions {
 
             return obj.GetComponent<PlayerData>();
         }
+
+        public static PlayerData GetLocalPlayerData(this NetworkRunner runner) {
+            return runner.LocalPlayer.GetPlayerData(runner);
+        }
+
+        public static CharacterData GetCharacterData(this PlayerRef player, NetworkRunner runner) {
+            return runner.GetLocalPlayerData().GetCharacterData();
+        }
+
+        public static CharacterData GetCharacterData(this PlayerData data) {
+            return GlobalController.Instance.characters[data.CharacterIndex];
+        }
     }
 }

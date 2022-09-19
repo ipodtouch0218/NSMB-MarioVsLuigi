@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -11,6 +10,7 @@ using TMPro;
 using NSMB.Extensions;
 using NSMB.Utils;
 using Fusion;
+using Fusion.Photon.Realtime;
 
 public class MainMenuManager : MonoBehaviour {
 
@@ -25,7 +25,7 @@ public class MainMenuManager : MonoBehaviour {
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
     public TMP_Dropdown levelDropdown, characterDropdown;
-    public RoomIcon selectedRoomIcon, privateJoinRoom;
+    public RoomIcon selectedRoom, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
@@ -38,7 +38,6 @@ public class MainMenuManager : MonoBehaviour {
     public RebindManager rebindManager;
     public static string lastRegion;
     public string connectThroughSecret = "";
-    public string selectedRoom;
     public bool askedToJoin;
 
     public Image overallColor, shirtColor;
@@ -48,32 +47,23 @@ public class MainMenuManager : MonoBehaviour {
 
     public Selectable[] roomSettings;
 
-    public List<string> maps, debugMaps;
+    public List<string> maps;
 
-    private bool pingsReceived, joinedLate;
-    private List<string> formattedRegions;
-    private Region[] pingSortedRegions;
+    private bool joinedLate;
 
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
 
     private readonly List<string> allRegions = new();
     private static readonly string roomNameChars = "BCDFGHJKLMNPRQSTVWXYZ";
 
-    Coroutine updatePingCoroutine;
-
     public ColorChooser colorManager;
 
+    //---Properties
+    private NetworkRunner Runner => NetworkHandler.Instance.runner;
+    private PlayerData LocalData => Runner.GetLocalPlayerData();
+
+
     // LOBBY CALLBACKS
-    public void OnJoinedLobby() {
-
-        if (connectThroughSecret != "") {
-            PhotonNetwork.JoinRoom(connectThroughSecret);
-            connectThroughSecret = "";
-        }
-
-        if (updatePingCoroutine == null)
-            updatePingCoroutine = StartCoroutine(UpdatePing());
-    }
     public void OnRoomListUpdate(List<SessionInfo> sessionList) {
         List<string> invalidRooms = new();
 
@@ -85,7 +75,7 @@ public class MainMenuManager : MonoBehaviour {
 
             bool valid = true;
             valid &= session.IsVisible && session.IsOpen;
-            valid &= session.MaxPlayers >= 2 && session.MaxPlayers <= 10;
+            valid &= session.MaxPlayers > 0 && session.MaxPlayers < 10;
             valid &= lives <= 99;
             valid &= stars >= 1 && stars <= 99;
             valid &= coins >= 1 && coins <= 99;
@@ -108,9 +98,6 @@ public class MainMenuManager : MonoBehaviour {
                 currentRooms[session.Name] = roomIcon = newLobby.GetComponent<RoomIcon>();
                 roomIcon.session = session;
             }
-            if (session.Name == selectedRoom) {
-                selectedRoomIcon = roomIcon;
-            }
 
             roomIcon.UpdateUI(session);
         }
@@ -123,11 +110,10 @@ public class MainMenuManager : MonoBehaviour {
             currentRooms.Remove(key);
         }
 
-        if (askedToJoin && selectedRoomIcon != null) {
+        if (askedToJoin && selectedRoom != null) {
             JoinSelectedRoom();
             askedToJoin = false;
             selectedRoom = null;
-            selectedRoomIcon = null;
         }
 
         privateJoinRoom.transform.SetAsLastSibling();
@@ -151,11 +137,10 @@ public class MainMenuManager : MonoBehaviour {
     }
     */
 
-    public void OnJoinedRoom() {
-        Debug.Log($"[PHOTON] Joined Room ({PhotonNetwork.CurrentRoom.Name})");
-        LocalChatMessage(PhotonNetwork.LocalPlayer.GetUniqueNickname() + " joined the room", Color.red);
-        EnterRoom();
-    }
+    //public void OnJoinedRoom((NetworkRunner runner) {
+    //    LocalChatMessage(PhotonNetwork.LocalPlayer.GetUniqueNickname() + " joined the room", Color.red);
+
+    //}
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
         //TODO: check for bans?
         //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
@@ -177,13 +162,13 @@ public class MainMenuManager : MonoBehaviour {
         if (updatedProperties == null)
             return;
 
-        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
-        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
-        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
-        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.CustomPowerups, ChangeNewPowerups);
-        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.DrawTime, ChangeDrawTime);
+        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
+        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
+        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
+        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
+        //AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.CustomPowerups, ChangeNewPowerups);
+        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
+        //AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.DrawTime, ChangeDrawTime);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
     }
 
@@ -194,127 +179,71 @@ public class MainMenuManager : MonoBehaviour {
         updateAction((T) updatedProperties[key]);
     }
     // CONNECTION CALLBACKS
-    public void OnDisconnected(DisconnectCause cause) {
-        Debug.Log("[PHOTON] Disconnected: " + cause.ToString());
-        if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic || cause == DisconnectCause.CustomAuthenticationFailed))
-            OpenErrorBox(cause);
+    //public void OnDisconnected(ShutdownReason cause) {
+    //    Debug.Log("[PHOTON] Disconnected: " + cause.ToString());
+    //    if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic || cause == DisconnectCause.CustomAuthenticationFailed))
+    //        OpenErrorBox(cause);
+    //
+    //    selectedRoom = null;
+    //    if (!PhotonNetwork.IsConnectedAndReady) {
+    //
+    //        foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
+    //            Destroy(value);
+    //            currentRooms.Remove(key);
+    //        }
+    //
+    //        //AuthenticationHandler.Authenticate(PlayerPrefs.GetString("id", null), PlayerPrefs.GetString("token", null));
+    //
+    //    }
+    //}
+    //public void OnRegionListReceived(RegionHandler handler) {
+    //    handler.PingMinimumOfRegions((handler) => {
 
-        selectedRoom = null;
-        selectedRoomIcon = null;
-        if (!PhotonNetwork.IsConnectedAndReady) {
+    //        formattedRegions = new();
+    //        pingSortedRegions = handler.EnabledRegions.ToArray();
+    //        System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
 
-            foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
-                Destroy(value);
-                currentRooms.Remove(key);
-            }
+    //        foreach (Region r in pingSortedRegions)
+    //            formattedRegions.Add($"{r.Code} <color=#bbbbbb>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
 
-            //AuthenticationHandler.Authenticate(PlayerPrefs.GetString("id", null), PlayerPrefs.GetString("token", null));
-
-            for (int i = 0; i < pingSortedRegions.Length; i++) {
-                Region r = pingSortedRegions[i];
-                if (r.Code == lastRegion) {
-                    region.value = i;
-                    break;
-                }
-            }
-        }
-    }
-    public void OnRegionListReceived(RegionHandler handler) {
-        handler.PingMinimumOfRegions((handler) => {
-
-            formattedRegions = new();
-            pingSortedRegions = handler.EnabledRegions.ToArray();
-            System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
-
-            foreach (Region r in pingSortedRegions)
-                formattedRegions.Add($"{r.Code} <color=#bbbbbb>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
-
-            lastRegion = pingSortedRegions[0].Code;
-            pingsReceived = true;
-        }, "");
-    }
+    //        lastRegion = pingSortedRegions[0].Code;
+    //        pingsReceived = true;
+    //    }, "");
+    //}
     // MATCHMAKING CALLBACKS
     public void OnLeftRoom() {
         OpenLobbyMenu();
         ClearChat();
         GlobalController.Instance.DiscordController.UpdateActivity();
     }
-    // CUSTOM EVENT CALLBACKS
-    public void OnEvent(EventData e) {
-        Player sender = null;
+        //case (byte) Enums.NetEventIds.PlayerChatMessage: {
+        //    string message = e.CustomData as string;
 
-        if (PhotonNetwork.CurrentRoom != null)
-            sender = PhotonNetwork.CurrentRoom.GetPlayer(e.Sender);
+        //    if (string.IsNullOrWhiteSpace(message))
+        //        return;
 
-        switch (e.Code) {
-        case (byte) Enums.NetEventIds.StartGame: {
+        //    if (sender == null)
+        //        return;
 
-            if (!(sender?.IsMasterClient ?? false) && e.SenderKey != 255)
-                return;
+        //    double time = lastMessage.GetValueOrDefault(sender);
+        //    if (PhotonNetwork.Time - time < 0.75f)
+        //        return;
 
-            PlayerPrefs.SetString("in-room", PhotonNetwork.CurrentRoom.Name);
-            PlayerPrefs.Save();
-            Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectate, PhotonNetwork.LocalPlayer.CustomProperties);
-            GlobalController.Instance.joinedAsSpectator = spectate || joinedLate;
-            Utils.GetSessionProperty(Enums.NetRoomProperties.Level, out int level);
-            PhotonNetwork.IsMessageQueueRunning = false;
-            SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
-            SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Additive);
-            break;
-        }
-        case (byte) Enums.NetEventIds.PlayerChatMessage: {
-            string message = e.CustomData as string;
+        //    lastMessage[sender] = PhotonNetwork.Time;
 
-            if (string.IsNullOrWhiteSpace(message))
-                return;
+        //    if (!sender.IsMasterClient) {
+        //        Utils.GetSessionProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
+        //        if (mutes.Contains(sender.UserId))
+        //            return;
+        //    }
 
-            if (sender == null)
-                return;
+        //    message = message.Substring(0, Mathf.Min(128, message.Length));
+        //    message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
+        //    message = sender.GetUniqueNickname() + ": " + message.Filter();
 
-            double time = lastMessage.GetValueOrDefault(sender);
-            if (PhotonNetwork.Time - time < 0.75f)
-                return;
-
-            lastMessage[sender] = PhotonNetwork.Time;
-
-            if (!sender.IsMasterClient) {
-                Utils.GetSessionProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
-                if (mutes.Contains(sender.UserId))
-                    return;
-            }
-
-            message = message.Substring(0, Mathf.Min(128, message.Length));
-            message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
-            message = sender.GetUniqueNickname() + ": " + message.Filter();
-
-            LocalChatMessage(message, Color.black, false);
-            break;
-        }
-        case (byte) Enums.NetEventIds.ChangeMaxPlayers: {
-            ChangeMaxPlayers((byte) e.CustomData);
-            break;
-        }
-        case (byte) Enums.NetEventIds.ChangePrivate: {
-            ChangePrivate();
-            break;
-        }
-        }
-    }
-
-    private void JoinMainLobby() {
-        //Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
-        //PhotonNetwork.JoinLobby(new TypedLobby(match.Groups[0].Value, LobbyType.Default));
-
-        PhotonNetwork.JoinLobby();
-    }
-
-    // CALLBACK REGISTERING
-    void OnEnable() {
-        PhotonNetwork.AddCallbackTarget(this);
-    }
-    void OnDisable() {
-        PhotonNetwork.RemoveCallbackTarget(this);
-    }
+        //    LocalChatMessage(message, Color.black, false);
+        //    break;
+        //}
 
     // Unity Stuff
     public void Start() {
@@ -323,8 +252,7 @@ public class MainMenuManager : MonoBehaviour {
          * dear god this needs a refactor. does every UI element seriously have to have
          * their callbacks into this one fuckin script?
          */
-
-    Instance = this;
+        Instance = this;
 
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
@@ -339,57 +267,22 @@ public class MainMenuManager : MonoBehaviour {
 
         Camera.main.transform.position = levelCameraPositions[Random.Range(0, maps.Count)].transform.position;
         levelDropdown.AddOptions(maps);
-        LoadSettings(!PhotonNetwork.InRoom);
 
         //Photon stuff.
-        if (!PhotonNetwork.IsConnected) {
+        if (!Runner.IsCloudReady) {
+            //initial connection to the game
             OpenTitleScreen();
-            //PhotonNetwork.NetworkingClient.AppId = "ce540834-2db9-40b5-a311-e58be39e726a";
-            PhotonNetwork.NetworkingClient.AppId = "40c2f241-79f7-4721-bdac-3c0366d00f58";
+            LoadSettings(true);
 
-            //version separation
-            Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
-            PhotonNetwork.NetworkingClient.AppVersion = match.Groups[0].Value;
-
-            string id = PlayerPrefs.GetString("id", null);
-            string token = PlayerPrefs.GetString("token", null);
-
-            PhotonNetwork.NetworkingClient.ConnectToNameServer();
-
-        } else {
-            if (PhotonNetwork.InRoom) {
-                EnterRoom();
-                nicknameField.SetTextWithoutNotify(Settings.Instance.nickname);
-                UpdateNickname();
-
-            } else {
-                PhotonNetwork.Disconnect();
-                nicknameField.text = Settings.Instance.nickname;
-            }
+        } else if (Runner.SessionInfo.IsValid) {
+            //call enterroom callback
+            EnterRoom();
         }
 
-        if (PhotonNetwork.NetworkingClient.RegionHandler != null) {
+        region.ClearOptions();
+        region.AddOptions(NetworkHandler.Regions.ToList());
+        //TODO: change to current region
 
-            allRegions.AddRange(PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.Select(r => r.Code));
-            allRegions.Sort();
-
-            List<string> newRegions = new();
-            pingSortedRegions = PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.ToArray();
-            System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
-
-            int index = 0;
-            for (int i = 0; i < pingSortedRegions.Length; i++) {
-                Region r = pingSortedRegions[i];
-                newRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
-                if (r.Code == lastRegion)
-                    index = i;
-            }
-
-            region.ClearOptions();
-            region.AddOptions(newRegions);
-
-            region.value = index;
-        }
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
         nicknameField.characterLimit = NICKNAME_MAX;
@@ -436,90 +329,57 @@ public class MainMenuManager : MonoBehaviour {
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
     }
 
-    void Update() {
-        bool connected = PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
+    public void Update() {
+        bool connected = Runner.IsCloudReady;
         connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
         privateJoinRoom.gameObject.SetActive(connected);
 
-        joinRoomBtn.interactable = connected && selectedRoomIcon != null && validName;
+        joinRoomBtn.interactable = connected && selectedRoom != null && validName;
         createRoomBtn.interactable = connected && validName;
         region.interactable = connected;
-
-        if (pingsReceived) {
-
-            allRegions.Clear();
-            allRegions.AddRange(PhotonNetwork.NetworkingClient.RegionHandler.EnabledRegions.Select(r => r.Code));
-            allRegions.Sort();
-
-            pingsReceived = false;
-
-            region.ClearOptions();
-            region.AddOptions(formattedRegions);
-            region.value = 0;
-
-            PhotonNetwork.Disconnect();
-        }
-    }
-
-    IEnumerator UpdatePing() {
-        // push our ping into our player properties every N seconds. 2 seems good.
-        while (true) {
-            yield return new WaitForSecondsRealtime(2);
-            if (PhotonNetwork.InRoom) {
-                PhotonNetwork.LocalPlayer.SetCustomProperties(new() {
-                    { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() }
-                });
-            }
-        }
     }
 
     public void EnterRoom() {
-        Room room = PhotonNetwork.CurrentRoom;
-        PlayerPrefs.SetString("in-room", null);
-        PlayerPrefs.Save();
 
-        Utils.GetSessionProperty(Enums.NetRoomProperties.GameStarted, out bool started);
+        SessionInfo session = Runner.SessionInfo;
+
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool started);
         if (started) {
             //start as spectator
             joinedLate = true;
-            OnEvent(new() { Code = (byte) Enums.NetEventIds.StartGame, SenderKey = 255 });
+            StartGame();
             return;
         }
 
-        OpenInLobbyMenu();
-        characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
+        PlayerData data = Runner.GetLocalPlayerData();
 
-        if (PhotonNetwork.IsMasterClient)
+        OpenInLobbyMenu();
+        characterDropdown.SetValueWithoutNotify(data.CharacterIndex);
+
+        if (!Runner.IsClient)
             LocalChatMessage("You are the room's host! You can click on player names to control your room, or use chat commands. Do /help for more help.", Color.red);
 
-        Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value, PhotonNetwork.LocalPlayer.CustomProperties);
-        SetPlayerColor(value);
+        SetPlayerSkin(data.SkinIndex);
 
-        OnRoomPropertiesUpdate(room.CustomProperties);
-        ChangeMaxPlayers(room.MaxPlayers);
-        ChangePrivate();
+        //OnRoomPropertiesUpdate(room.CustomProperties);
+        //ChangeMaxPlayers(room.MaxPlayers);
+        //ChangePrivate();
 
         StartCoroutine(SetScroll());
 
-        PhotonNetwork.LocalPlayer.SetCustomProperties(new() {
-            [Enums.NetPlayerProperties.GameState] = null,
-            [Enums.NetPlayerProperties.Status] = Debug.isDebugBuild || Application.isEditor,
-        });
-        if (updatePingCoroutine == null)
-            updatePingCoroutine = StartCoroutine(UpdatePing());
         GlobalController.Instance.DiscordController.UpdateActivity();
 
-        Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, PhotonNetwork.LocalPlayer.CustomProperties);
-        spectateToggle.isOn = spectating;
+        spectateToggle.isOn = data.IsManualSpectator;
+
+        //clear text field
         chatTextField.SetTextWithoutNotify("");
     }
 
-    IEnumerator SetScroll() {
+    private IEnumerator SetScroll() {
         settingsScroll.verticalNormalizedPosition = 1;
         yield return null;
         settingsScroll.verticalNormalizedPosition = 1;
     }
-
 
     public void OpenTitleScreen() {
         title.SetActive(true);
@@ -564,7 +424,7 @@ public class MainMenuManager : MonoBehaviour {
         privatePrompt.SetActive(false);
 
         foreach (RoomIcon room in currentRooms.Values)
-            room.UpdateUI(room.room);
+            room.UpdateUI(room.session);
 
         EventSystem.current.SetSelectedGameObject(lobbySelected);
     }
@@ -646,7 +506,7 @@ public class MainMenuManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(privateSelected);
     }
 
-    public void OpenErrorBox(DisconnectCause cause) {
+    public void OpenErrorBox(ShutdownReason cause) {
         if (!errorBox.activeSelf)
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
 
@@ -673,8 +533,8 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void ConnectToDropdownRegion() {
-        Region targetRegion = pingSortedRegions[region.value];
-        if (lastRegion == targetRegion.Code)
+        string targetRegion = NetworkHandler.Regions[region.value];
+        if (lastRegion == targetRegion)
             return;
 
         for (int i = 0; i < lobbiesContent.transform.childCount; i++) {
@@ -684,108 +544,50 @@ public class MainMenuManager : MonoBehaviour {
 
             Destroy(roomObj);
         }
-        selectedRoomIcon = null;
         selectedRoom = null;
-        lastRegion = targetRegion.Code;
+        lastRegion = targetRegion;
 
-        PhotonNetwork.Disconnect();
+        _ = NetworkHandler.Instance.ConnectToRegion(targetRegion);
     }
 
     public void QuitRoom() {
-        PhotonNetwork.LeaveRoom();
+        NetworkHandler.Instance.runner.Shutdown();
     }
     public void StartGame() {
+        //do host related stuff
+        if (!Runner.IsClient) {
+            //set starting
+            Runner.SessionInfo.UpdateCustomProperties(new() {
+                [Enums.NetRoomProperties.GameStarted] = 1
+            });
 
-        //set started game
-        PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = true });
+            //load the correct scene
+            Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Level, out int level);
+            Runner.SetActiveScene(level + 2);
+        }
 
-        //start game with all players
-        RaiseEventOptions options = new() { Receivers = ReceiverGroup.All };
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.StartGame, null, options, SendOptions.SendReliable);
-    }
-    public void ChangeNewPowerups(bool value) {
-        powerupsEnabled.SetIsOnWithoutNotify(value);
-    }
-
-    public void ChangeLives(int lives) {
-        livesEnabled.SetIsOnWithoutNotify(lives != -1);
-        UpdateSettingEnableStates();
-        if (lives == -1)
-            return;
-
-        livesField.SetTextWithoutNotify(lives.ToString());
-    }
-    public void SetLives(TMP_InputField input) {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-
-        int.TryParse(input.text, out int newValue);
-        if (newValue == -1)
-            return;
-
-        if (newValue < 1)
-            newValue = 5;
-        ChangeLives(newValue);
-        if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Lives])
-            return;
-
-        Hashtable table = new() {
-            [Enums.NetRoomProperties.Lives] = newValue
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
-    public void SetNewPowerups(Toggle toggle) {
-        Hashtable properties = new() {
-            [Enums.NetRoomProperties.CustomPowerups] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-    public void EnableLives(Toggle toggle) {
-        Hashtable properties = new() {
-            [Enums.NetRoomProperties.Lives] = toggle.isOn ? int.Parse(livesField.text) : -1
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+        //go to loading screen
+        SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
     }
 
-    public void ChangeLevel(int index) {
-        levelDropdown.SetValueWithoutNotify(index);
-        LocalChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
-        Camera.main.transform.position = levelCameraPositions[index].transform.position;
-    }
-    public void SetLevelIndex() {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-
-        int newLevelIndex = levelDropdown.value;
-        if (newLevelIndex == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Level])
-            return;
-
-        //ChangeLevel(newLevelIndex);
-
-        Hashtable table = new() {
-            [Enums.NetRoomProperties.Level] = levelDropdown.value
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
     public void SelectRoom(GameObject room) {
-        if (selectedRoomIcon)
-            selectedRoomIcon.Unselect();
+        if (selectedRoom)
+            selectedRoom.Unselect();
 
-        selectedRoomIcon = room.GetComponent<RoomIcon>();
-        selectedRoomIcon.Select();
-        selectedRoom = selectedRoomIcon.room?.Name ?? null;
+        selectedRoom = room.GetComponent<RoomIcon>();
+        selectedRoom.Select();
 
         joinRoomBtn.interactable = room != null && nicknameField.text.Length >= NICKNAME_MIN;
     }
     public void JoinSelectedRoom() {
-        if (selectedRoomIcon?.joinPrivate ?? false) {
-            OpenPrivatePrompt();
-            return;
-        }
-        if (selectedRoom == null)
+        if (!selectedRoom)
             return;
 
-        PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
+        if (selectedRoom.joinPrivate) {
+            OpenPrivatePrompt();
+        } else {
+            _ = NetworkHandler.Instance.JoinRoom(selectedRoom.session.Name);
+        }
     }
     public void JoinSpecificRoom() {
         string id = lobbyJoinField.text.ToUpper();
@@ -794,15 +596,9 @@ public class MainMenuManager : MonoBehaviour {
             OpenErrorBox("Invalid Room ID");
             return;
         }
-        string region = allRegions[index];
-        if (PhotonNetwork.NetworkingClient.CloudRegion.Split("/")[0] != region) {
-            lastRegion = region;
-            connectThroughSecret = id;
-            PhotonNetwork.Disconnect();
-        } else {
-            PhotonNetwork.JoinRoom(id);
-        }
+
         privatePrompt.SetActive(false);
+        _ = NetworkHandler.Instance.JoinRoom(id);
     }
     public void CreateRoom() {
         Settings.Instance.nickname = nicknameField.text;
@@ -816,7 +612,7 @@ public class MainMenuManager : MonoBehaviour {
         });
 
         createLobbyPrompt.SetActive(false);
-        ChangeMaxPlayers(players);
+        //ChangeMaxPlayers(players);
     }
     public void ClearChat() {
         for (int i = 0; i < chatContent.transform.childCount; i++) {
@@ -843,10 +639,6 @@ public class MainMenuManager : MonoBehaviour {
 
         int realPlayers = NetworkHandler.Instance.runner.ActivePlayers.Where(pl => !pl.GetPlayerData(runner).IsManualSpectator).Count();
         startGameBtn.interactable = host && realPlayers >= 1;
-    }
-
-    public void PlayerChatMessage(string message) {
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerChatMessage, message, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
     public void LocalChatMessage(string message, Color? color = null, bool filter = true) {
@@ -876,20 +668,25 @@ public class MainMenuManager : MonoBehaviour {
         //tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
     }
     public void SendChat() {
-        double time = lastMessage.GetValueOrDefault(PhotonNetwork.LocalPlayer);
-        if (PhotonNetwork.Time - time < 0.75f)
+
+
+        PlayerData data = Runner.LocalPlayer.GetPlayerData(Runner);
+        if (!data.MessageCooldownTimer.ExpiredOrNotRunning(Runner)) {
+            //can't send a message yet.
             return;
+        }
 
         string text = chatTextField.text.Replace("<", "«").Replace(">", "»").Trim();
         if (text == null || text == "")
             return;
 
         if (text.StartsWith("/")) {
-            RunCommand(text[1..].Split(" "));
+            LocalChatMessage("Slash commands are no longer necessary. Click on a player's name instead!");
             return;
         }
 
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerChatMessage, text, NetworkUtils.EventAll, SendOptions.SendReliable);
+        //TODO:
+        //PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerChatMessage, text, NetworkUtils.EventAll, SendOptions.SendReliable);
         StartCoroutine(SelectNextFrame(chatTextField));
     }
 
@@ -933,50 +730,51 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void BanOrUnban(string playername) {
-        Player onlineTarget = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == playername);
-        if (onlineTarget != null) {
-            //player is in room, ban them
-            Ban(onlineTarget);
-            return;
-        }
+        //Player onlineTarget = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == playername);
+        //if (onlineTarget != null) {
+        //    //player is in room, ban them
+        //    Ban(onlineTarget);
+        //    return;
+        //}
 
-        Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
-        List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
+        //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
+        //List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
 
-        playername = playername.ToLower();
+        //playername = playername.ToLower();
 
-        NameIdPair targetPair = pairs.FirstOrDefault(nip => nip.name.ToLower() == playername);
-        if (targetPair != null) {
-            //player is banned, unban them
-            Unban(targetPair);
-            return;
-        }
+        //NameIdPair targetPair = pairs.FirstOrDefault(nip => nip.name.ToLower() == playername);
+        //if (targetPair != null) {
+        //    //player is banned, unban them
+        //    Unban(targetPair);
+        //    return;
+        //}
 
-        LocalChatMessage($"Error: Unknown player {playername}", Color.red);
+        //LocalChatMessage($"Error: Unknown player {playername}", Color.red);
     }
 
-    public void Ban(Player target) {
-        if (target.IsLocal) {
+    public void Ban(PlayerRef target) {
+        if (target == Runner.LocalPlayer) {
             LocalChatMessage("While you can ban yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
 
-        Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
-        List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
+        //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
+        //List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
 
-        NameIdPair newPair = new() {
-            name = target.NickName,
-            userId = target.UserId
-        };
+        //NameIdPair newPair = new() {
+        //    name = target.NickName,
+        //    userId = target.UserId
+        //};
 
-        pairs.Add(newPair);
+        //pairs.Add(newPair);
 
-        Hashtable table = new() {
-            [Enums.NetRoomProperties.Bans] = pairs.ToArray(),
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
-        PhotonNetwork.CloseConnection(target);
-        LocalChatMessage($"Successfully banned {target.GetUniqueNickname()}", Color.red);
+        //Hashtable table = new() {
+        //    [Enums.NetRoomProperties.Bans] = pairs.ToArray(),
+        //};
+        //PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
+
+        //Runner.Disconnect(target);
+        //LocalChatMessage($"Successfully banned {target.GetUniqueNickname()}", Color.red);
     }
 
     private void Unban() {
@@ -989,161 +787,142 @@ public class MainMenuManager : MonoBehaviour {
         //Hashtable table = new() {
             //[Enums.NetRoomProperties.Bans] = pairs.ToArray(),
         //};
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
-        LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
+        //PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
+        //LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
     }
 
     private void RunCommand(string[] args) {
-        if (!PhotonNetwork.IsMasterClient) {
+        if (Runner.IsClient) {
             LocalChatMessage("You cannot use room commands if you aren't the host!", Color.red);
             return;
         }
-        string command = args.Length > 0 ? args[0].ToLower() : "";
-        switch (command) {
-        case "kick": {
-            if (args.Length < 2) {
-                LocalChatMessage("Usage: /kick <player name>", Color.red);
-                return;
-            }
-            string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
-            if (target == null) {
-                LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
-                return;
-            }
-            Kick(target);
-            return;
-        }
-        case "host": {
-            if (args.Length < 2) {
-                LocalChatMessage("Usage: /host <player name>", Color.red);
-                return;
-            }
-            string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
-            if (target == null) {
-                LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
-                return;
-            }
-            Promote(target);
-            return;
-        }
-        case "help": {
-            string sub = args.Length > 1 ? args[1] : "";
-            string msg = sub switch {
-                "kick" => "/kick <player name> - Kick a player from the room",
-                "ban" => "/ban <player name> - Ban a player from rejoining the room",
-                "host" => "/host <player name> - Make a player the host for the room",
-                "mute" => "/mute <playername> - Prevents a player from talking in chat",
-                //"debug" => "/debug - Enables debug & in-development features",
-                _ => "Available commands: /kick, /host, /mute, /ban",
-            };
-            LocalChatMessage(msg, Color.red);
-            return;
-        }
-        /*
-        case "debug": {
-            Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debugEnabled);
-            if (PhotonNetwork.CurrentRoom.IsVisible) {
-                LocalChatMessage("Error: You can only enable debug / in development features in private lobbies.", Color.red);
-                return;
-            }
-
-            if (debugEnabled) {
-                LocalChatMessage("Debug features have been disabled.", Color.red);
-            } else {
-                LocalChatMessage("Debug features have been enabled.", Color.red);
-            }
-            PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
-                [Enums.NetRoomProperties.Debug] = !debugEnabled
-            });
-            return;
-        }
-        */
-        case "mute": {
-            if (args.Length < 2) {
-                LocalChatMessage("Usage: /mute <player name>", Color.red);
-                return;
-            }
-            string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
-            if (target == null) {
-                LocalChatMessage($"Unknown player {args[1]}", Color.red);
-                return;
-            }
-            Mute(target);
-            return;
-        }
-        case "ban": {
-            if (args.Length < 2) {
-                LocalChatMessage("Usage: /ban <player name>", Color.red);
-                return;
-            }
-            BanOrUnban(args[1]);
-            return;
-        }
-        }
-        LocalChatMessage($"Error: Unknown command. Try /help for help.", Color.red);
+        //string command = args.Length > 0 ? args[0].ToLower() : "";
+        //switch (command) {
+        //case "kick": {
+        //    if (args.Length < 2) {
+        //        LocalChatMessage("Usage: /kick <player name>", Color.red);
+        //        return;
+        //    }
+        //    string strTarget = args[1].ToLower();
+        //    Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
+        //    if (target == null) {
+        //        LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
+        //        return;
+        //    }
+        //    Kick(target);
+        //    return;
+        //}
+        //case "host": {
+        //    if (args.Length < 2) {
+        //        LocalChatMessage("Usage: /host <player name>", Color.red);
+        //        return;
+        //    }
+        //    string strTarget = args[1].ToLower();
+        //    Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
+        //    if (target == null) {
+        //        LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
+        //        return;
+        //    }
+        //    Promote(target);
+        //    return;
+        //}
+        //case "help": {
+        //    string sub = args.Length > 1 ? args[1] : "";
+        //    string msg = sub switch {
+        //        "kick" => "/kick <player name> - Kick a player from the room",
+        //        "ban" => "/ban <player name> - Ban a player from rejoining the room",
+        //        "host" => "/host <player name> - Make a player the host for the room",
+        //        "mute" => "/mute <playername> - Prevents a player from talking in chat",
+        //        //"debug" => "/debug - Enables debug & in-development features",
+        //        _ => "Available commands: /kick, /host, /mute, /ban",
+        //    };
+        //    LocalChatMessage(msg, Color.red);
+        //    return;
+        //}
+        //case "mute": {
+        //    if (args.Length < 2) {
+        //        LocalChatMessage("Usage: /mute <player name>", Color.red);
+        //        return;
+        //    }
+        //    string strTarget = args[1].ToLower();
+        //    Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
+        //    if (target == null) {
+        //        LocalChatMessage($"Unknown player {args[1]}", Color.red);
+        //        return;
+        //    }
+        //    Mute(target);
+        //    return;
+        //}
+        //case "ban": {
+        //    if (args.Length < 2) {
+        //        LocalChatMessage("Usage: /ban <player name>", Color.red);
+        //        return;
+        //    }
+        //    BanOrUnban(args[1]);
+        //    return;
+        //}
+        //}
+        //LocalChatMessage($"Error: Unknown command. Try /help for help.", Color.red);
         return;
     }
 
-    IEnumerator SelectNextFrame(TMP_InputField input) {
+    private IEnumerator SelectNextFrame(TMP_InputField input) {
         yield return new WaitForEndOfFrame();
         input.text = "";
         input.ActivateInputField();
     }
 
     public void SwapCharacter(TMP_Dropdown dropdown) {
-        Hashtable prop = new() {
-            { Enums.NetPlayerProperties.Character, dropdown.value }
-        };
-        PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
-        Settings.Instance.character = dropdown.value;
+        byte character = (byte) dropdown.value;
+
+        LocalData.Rpc_SetCharacterIndex(character);
+        Settings.Instance.character = character;
         Settings.Instance.SaveSettingsToPreferences();
 
         CharacterData data = GlobalController.Instance.characters[dropdown.value];
         sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
         colorManager.ChangeCharacter(data);
 
-        Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int index, PhotonNetwork.LocalPlayer.CustomProperties);
-        if (index == 0) {
+        byte skin = LocalData.SkinIndex;
+        if (skin == 0) {
             paletteDisabled.SetActive(true);
             palette.SetActive(false);
         } else {
             paletteDisabled.SetActive(false);
             palette.SetActive(true);
-            PlayerColors colors = GlobalController.Instance.skins[index].GetPlayerColors(data);
+            PlayerColors colors = GlobalController.Instance.skins[skin].GetPlayerColors(data);
             overallColor.color = colors.overallsColor;
             shirtColor.color = colors.hatColor;
         }
     }
 
-    public void SetPlayerColor(int index) {
-        Hashtable prop = new() {
-            { Enums.NetPlayerProperties.PlayerColor, index }
-        };
+    public void SetPlayerSkin(byte index) {
+
         if (index == 0) {
             paletteDisabled.SetActive(true);
             palette.SetActive(false);
         } else {
             paletteDisabled.SetActive(false);
             palette.SetActive(true);
-            PlayerColors colors = GlobalController.Instance.skins[index].GetPlayerColors(Utils.GetCharacterData());
+
+            CharacterData character = Runner.GetLocalPlayerData().GetCharacterData();
+            PlayerColors colors = GlobalController.Instance.skins[index].GetPlayerColors(character);
             overallColor.color = colors.overallsColor;
             shirtColor.color = colors.hatColor;
         }
-        PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
+
+        LocalData.Rpc_SetSkinIndex(index);
 
         Settings.Instance.skin = index;
         Settings.Instance.SaveSettingsToPreferences();
     }
 
     private void UpdateNickname() {
-        validName = PhotonNetwork.NickName.IsValidUsername();
+        validName = Settings.Instance.nickname.IsValidUsername();
         if (!validName) {
             ColorBlock colors = nicknameField.colors;
-            colors.normalColor = new Color(1, 0.7f, 0.7f, 1);
-            colors.highlightedColor = new Color(1, 0.55f, 0.55f, 1);
+            colors.normalColor = new(1, 0.7f, 0.7f, 1);
+            colors.highlightedColor = new(1, 0.55f, 0.55f, 1);
             nicknameField.colors = colors;
         } else {
             ColorBlock colors = nicknameField.colors;
@@ -1153,20 +932,14 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void SetUsername(TMP_InputField field) {
-        PhotonNetwork.NickName = field.text;
+        Settings.Instance.nickname = field.text;
         UpdateNickname();
 
-        Settings.Instance.nickname = field.text;
         Settings.Instance.SaveSettingsToPreferences();
     }
     private void SetText(GameObject obj, string txt, bool filter) {
         TextMeshProUGUI textComp = obj.GetComponent<TextMeshProUGUI>();
         textComp.text = filter ? txt.Filter() : txt;
-    }
-    private void SetText(GameObject obj, string txt, Color color) {
-        TextMeshProUGUI textComp = obj.GetComponent<TextMeshProUGUI>();
-        textComp.text = txt.Filter();
-        textComp.color = color;
     }
     public void OpenLinks() {
         Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/blob/master/LINKS.md");
@@ -1177,7 +950,7 @@ public class MainMenuManager : MonoBehaviour {
 
         StartCoroutine(FinishQuitting());
     }
-    IEnumerator FinishQuitting() {
+    private IEnumerator FinishQuitting() {
         AudioClip clip = Enums.Sounds.UI_Quit.GetClip();
         sfx.PlayOneShot(clip);
         quit = true;
@@ -1190,180 +963,29 @@ public class MainMenuManager : MonoBehaviour {
 #endif
     }
 
-    public void ChangeStarRequirement(int stars) {
-        starsText.text = stars.ToString();
-    }
-    public void SetStarRequirement(TMP_InputField input) {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
 
-        int.TryParse(input.text, out int newValue);
-        if (newValue < 1) {
-            newValue = 5;
-            input.text = newValue.ToString();
-        }
-        if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.StarRequirement])
-            return;
 
-        Hashtable table = new() {
-            [Enums.NetRoomProperties.StarRequirement] = newValue
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        //ChangeStarRequirement(newValue);
-    }
 
-    public void ChangeCoinRequirement(int coins) {
-        coinsText.text = coins.ToString();
-    }
-    public void SetCoinRequirement(TMP_InputField input) {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-
-        int.TryParse(input.text, out int newValue);
-        if (newValue < 1 || newValue > 99) {
-            newValue = 8;
-            input.text = newValue.ToString();
-        }
-        if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.CoinRequirement])
-            return;
-
-        Hashtable table = new() {
-            [Enums.NetRoomProperties.CoinRequirement] = newValue
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        //ChangeCoinRequirement(newValue);
-    }
-
-    public void CopyRoomCode() {
-        TextEditor te = new();
-        te.text = PhotonNetwork.CurrentRoom.Name;
-        te.SelectAll();
-        te.Copy();
-    }
 
     public void OpenDownloadsPage() {
         Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest");
         OpenMainMenu();
     }
 
-    public void ChangePrivate() {
-        privateToggleRoom.SetIsOnWithoutNotify(!PhotonNetwork.CurrentRoom.IsVisible);
-    }
-    public void SetPrivate(Toggle toggle) {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-
-        PhotonNetwork.CurrentRoom.IsVisible = !toggle.isOn;
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChangePrivate, null, NetworkUtils.EventAll, SendOptions.SendReliable);
-    }
-    public void ChangeMaxPlayers(byte value) {
-        changePlayersSlider.SetValueWithoutNotify(value);
-        currentMaxPlayers.GetComponent<TextMeshProUGUI>().text = "" + value;
-    }
-    public void SetMaxPlayers(Slider slider) {
-        if (!PhotonNetwork.InRoom) {
-            sliderText.GetComponent<TMP_Text>().text = slider.value.ToString();
-            return;
-        }
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-
-        byte players = PhotonNetwork.CurrentRoom.PlayerCount;
-        if (slider.value < players)
-            slider.SetValueWithoutNotify(players);
-
-        if (slider.value == PhotonNetwork.CurrentRoom.MaxPlayers)
-            return;
-
-        PhotonNetwork.CurrentRoom.MaxPlayers = (byte) slider.value;
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChangeMaxPlayers, (byte) slider.value, NetworkUtils.EventAll, SendOptions.SendReliable);
-    }
 
 
-    public void ChangeTime(int time) {
-        timeEnabled.SetIsOnWithoutNotify(time != -1);
-        UpdateSettingEnableStates();
-        if (time == -1)
-            return;
 
-        int minutes = time / 60;
-        int seconds = time % 60;
 
-        timeField.SetTextWithoutNotify($"{minutes}:{seconds:D2}");
-    }
 
-    public void SetTime(TMP_InputField input) {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-
-        int seconds = ParseTimeToSeconds(input.text);
-
-        if (seconds == -1)
-            return;
-
-        if (seconds < 1)
-            seconds = 300;
-
-        ChangeTime(seconds);
-
-        if (seconds == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Time])
-            return;
-
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.Time] = seconds
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
 
     public void EnableSpectator(Toggle toggle) {
-        Hashtable properties = new() {
-            [Enums.NetPlayerProperties.Spectator] = toggle.isOn,
-        };
-        PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+        PlayerData data = Runner.GetLocalPlayerData();
+
+        data.Rpc_SetPermanentSpectator(toggle.isOn);
     }
 
-    public void EnableTime(Toggle toggle) {
-        Hashtable properties = new() {
-            [Enums.NetRoomProperties.Time] = toggle.isOn ? ParseTimeToSeconds(timeField.text) : -1
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-    public void ChangeDrawTime(bool value) {
-        drawTimeupToggle.SetIsOnWithoutNotify(value);
-    }
-    public void SetDrawTime(Toggle toggle) {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
 
-        Hashtable properties = new() {
-            [Enums.NetRoomProperties.DrawTime] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-    public int ParseTimeToSeconds(string time) {
 
-        int minutes;
-        int seconds;
-
-        if (time.Contains(":")) {
-            string[] split = time.Split(":");
-            int.TryParse(split[0], out minutes);
-            int.TryParse(split[1], out seconds);
-        } else {
-            minutes = 0;
-            int.TryParse(time, out seconds);
-        }
-
-        if (seconds >= 60) {
-            minutes += seconds / 60;
-            seconds %= 60;
-        }
-
-        seconds = minutes * 60 + seconds;
-
-        return seconds;
-    }
     public void ChangeLobbyHeader(string name) {
         SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
     }

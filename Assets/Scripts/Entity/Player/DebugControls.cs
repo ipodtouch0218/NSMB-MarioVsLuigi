@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 
-using Photon.Pun;
 using NSMB.Utils;
 
 public class DebugControls : MonoBehaviour {
@@ -67,10 +66,10 @@ public class DebugControls : MonoBehaviour {
             feature.SetActive(!feature.isActive);
         }
         if (kb[Key.O].wasPressedThisFrame) {
-            GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.IsControllingCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.IsControllingCamera;
+            GameManager.Instance.localPlayer.cameraController.IsControllingCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.IsControllingCamera;
         }
         if (kb[Key.P].wasPressedThisFrame) {
-            GameManager.Instance.localPlayer.GetPhotonView().RPC("Death", RpcTarget.All, false, false);
+            GameManager.Instance.localPlayer.Death(false, false);
         }
     }
 
@@ -79,8 +78,8 @@ public class DebugControls : MonoBehaviour {
             return;
 
         PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        if (Keyboard.current[key].wasPressedThisFrame && !p.IsFrozen && !p.frozenObject && p.State != Enums.PowerupState.MegaMushroom && !p.pipeEntering && !p.knockback && p.DamageInvincibilityTimer <= 0) {
-            PhotonNetwork.Instantiate("Prefabs/FrozenCube", p.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { p.photonView.ViewID });
+        if (Keyboard.current[key].wasPressedThisFrame && !p.IsFrozen && !p.frozenObject && p.State != Enums.PowerupState.MegaMushroom && !p.pipeEntering && !p.knockback && !p.IsDamageable) {
+            //PhotonNetwork.Instantiate("Prefabs/FrozenCube", p.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { p.photonView.ViewID });
         }
     }
     private void DebugItem(Key key, string item) {
@@ -93,23 +92,27 @@ public class DebugControls : MonoBehaviour {
     }
 
     private void SpawnDebugItem(string prefab) {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
+        GameObject prefabObj;
 
-        PlayerController local = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
+        if (prefab == null) {
+            prefabObj = Utils.GetRandomItem(NetworkHandler.Instance.runner, GameManager.Instance.localPlayer).prefab;
+        } else {
+            prefabObj = (GameObject) Resources.Load("Prefabs/Powerup/" + prefab);
+        }
 
-        if (prefab == null)
-            prefab = Utils.GetRandomItem(local).prefab;
-
-        PhotonNetwork.Instantiate("Prefabs/Powerup/" + prefab, local.body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { local.photonView.ViewID });
+        NetworkHandler.Instance.runner.Spawn(prefabObj, onBeforeSpawned: (runner, obj) => {
+            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(GameManager.Instance.localPlayer, 0f);
+        });
     }
 
     private void DebugEntity(Key key, string entity) {
         if (!GameManager.Instance.localPlayer)
             return;
 
-        if (Keyboard.current[key].wasPressedThisFrame)
-            PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity, GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().FacingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
+        if (Keyboard.current[key].wasPressedThisFrame) {
+            Vector3 pos = GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().FacingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0);
+            NetworkHandler.Instance.runner.Spawn((GameObject) Resources.Load("Prefabs/Enemy/" + entity), pos);
+        }
     }
 
 #endif

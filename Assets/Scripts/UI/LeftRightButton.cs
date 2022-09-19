@@ -47,7 +47,7 @@ public class LeftRightButton : Selectable {
         if (Vector2.Dot(direction, Vector2.left) > cutoff) {
             //select left
             if (!leftSelected) {
-                GameManager.Instance.SpectationManager.SpectatePreviousPlayer();
+                GameManager.Instance.spectationManager.SpectatePreviousPlayer();
                 SetOffset(false, true);
             }
             leftSelected = true;
@@ -59,7 +59,7 @@ public class LeftRightButton : Selectable {
         if (Vector2.Dot(direction, Vector2.right) > cutoff) {
             //select left
             if (!rightSelected) {
-                GameManager.Instance.SpectationManager.SpectateNextPlayer();
+                GameManager.Instance.spectationManager.SpectateNextPlayer();
                 SetOffset(true, true);
             }
             rightSelected = true;

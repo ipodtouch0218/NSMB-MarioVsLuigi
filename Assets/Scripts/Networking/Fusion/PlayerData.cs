@@ -14,13 +14,18 @@ public class PlayerData : NetworkBehaviour {
 
     //---Networked Variables
     [Networked] private NetworkString<_32> Nickname { get; set; } = "noname";
+    [Networked] private NetworkString<_32> UserId { get; set; }
     [Networked] public NetworkBool IsNicknameSet { get; set; }
     [Networked] public NetworkBool IsMuted { get; set; }
     [Networked] public NetworkBool IsManualSpectator { get; set; }
     [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
+    [Networked(OnChanged = nameof(OnLoadStateChanged))] public NetworkBool IsLoaded { get; set; }
     [Networked] public TickTimer MessageCooldownTimer { get; set; }
     [Networked] public byte CharacterIndex { get; set; }
     [Networked] public byte SkinIndex { get; set; }
+
+    //---Misc Variables
+    private string cachedUserId = null;
 
 
     public void Awake() {
@@ -35,12 +40,28 @@ public class PlayerData : NetworkBehaviour {
             Rpc_SetSkinIndex(Settings.Instance.skin);
         }
 
+        if (Runner.IsServer) {
+            //expose their userid
+            UserId = Runner.GetPlayerUserId(Object.InputAuthority).Replace("-", "");
+        }
+
         //keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
     }
 
     public string GetNickname() {
         return Nickname.ToString().Filter();
+    }
+
+    public string GetUserId() {
+        if (cachedUserId == null)
+            cachedUserId = Regex.Replace(UserId.ToString(), "(.{8})(.{4})(.{4})(.{4})(.{12})", "$1-$2-$3-$4-$5");
+
+        return cachedUserId;
+    }
+
+    public static void OnLoadStateChanged(Changed<PlayerData> changed) {
+        GameManager.Instance.OnPlayerLoaded(changed.Behaviour);
     }
 
     #region RPCs
@@ -67,6 +88,11 @@ public class PlayerData : NetworkBehaviour {
 
         Nickname = name;
         IsNicknameSet = true;
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void Rpc_FinishedLoading() {
+        IsLoaded = true;
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]

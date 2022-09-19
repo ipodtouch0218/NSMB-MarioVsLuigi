@@ -3,13 +3,13 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-using Photon.Pun;
-using Photon.Realtime;
 using NSMB.Utils;
+using NSMB.Extensions;
+using Fusion;
 
 public class PlayerListEntry : MonoBehaviour {
 
-    public Player player;
+    public PlayerRef player;
 
     [SerializeField] private TMP_Text nameText, pingText;
     [SerializeField] private Image colorStrip;
@@ -30,24 +30,30 @@ public class PlayerListEntry : MonoBehaviour {
     }
 
     public void Update() {
-        nameText.color = Utils.GetRainbowColor();
+        nameText.color = Utils.GetRainbowColor(NetworkHandler.Instance.runner);
     }
 
     public void UpdateText() {
-        colorStrip.color = Utils.GetPlayerColor(player, 1f, 1f);
-        enabled = player.HasRainbowName();
+        NetworkRunner runner = NetworkHandler.Instance.runner;
+        PlayerData data = player.GetPlayerData(runner);
+
+
+        colorStrip.color = Utils.GetPlayerColor(runner, player);
+
+        //TODO: use a signed player id
+        //enabled = player.HasRainbowName();
 
         string permissionSymbol = "";
-        if (player.IsMasterClient)
+        if (runner.)
             permissionSymbol += "<sprite=5>";
 
-        Utils.GetSessionProperty(Enums.NetPlayerProperties.Status, out bool status, player.CustomProperties);
-        if (status)
-            permissionSymbol += "<sprite=26>";
+        //Utils.GetSessionProperty(Enums.NetPlayerProperties.Status, out bool status, player.CustomProperties);
+        //if (status)
+        //    permissionSymbol += "<sprite=26>";
 
-        string characterSymbol = Utils.GetCharacterData(player).uistring;
-        Utils.GetSessionProperty(Enums.NetPlayerProperties.Ping, out int ping, player.CustomProperties);
+        string characterSymbol = data.GetCharacterData().uistring;
 
+        int ping = (int) (runner.GetPlayerRtt(player) / 1000f);
         string pingColor;
         if (ping < 0) {
             pingColor = "black";
@@ -59,7 +65,7 @@ public class PlayerListEntry : MonoBehaviour {
             pingColor = "red";
         }
 
-        nameText.text = permissionSymbol + characterSymbol + player.GetUniqueNickname();
+        nameText.text = permissionSymbol + characterSymbol + data.GetNickname();
         pingText.text = $"<color={pingColor}>{ping}";
 
         Transform parent = transform.parent;
@@ -76,10 +82,11 @@ public class PlayerListEntry : MonoBehaviour {
     }
 
     public void ShowDropdown() {
+        NetworkRunner runner = NetworkHandler.Instance.runner;
         if (blockerInstance)
             Destroy(blockerInstance);
 
-        bool admin = PhotonNetwork.IsMasterClient && !player.IsMasterClient;
+        bool admin = runner.IsServer && runner.LocalPlayer != player;
         foreach (GameObject option in adminOnlyOptions) {
             option.SetActive(admin);
         }
@@ -129,7 +136,7 @@ public class PlayerListEntry : MonoBehaviour {
 
     public void CopyPlayerId() {
         TextEditor te = new();
-        te.text = player.UserId;
+        te.text = player.GetPlayerData(NetworkHandler.Instance.runner).GetUserId();
         te.SelectAll();
         te.Copy();
         HideDropdown(true);
