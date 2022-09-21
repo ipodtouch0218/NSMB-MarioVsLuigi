@@ -169,7 +169,7 @@ public class KoopaWalk : HoldableEntity {
         } else if (player.sliding || player.inShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.FacingRight;
             if (IsInShell && !IsStationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                player.Knockback(player.body.position.x < body.position.x, 0, true, 0);
+                player.DoKnockback(player.body.position.x < body.position.x, 0, true, 0);
 
             SpecialKill(!originalFacing, false, player.StarCombo++);
 
@@ -257,6 +257,13 @@ public class KoopaWalk : HoldableEntity {
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        EnterShell(false);
+
+        if (IsStationary)
+            body.velocity = new(bumper.body.position.x < body.position.x ? 3 : -3, body.velocity.y);
+    }
+
 
     public override void Throw(bool toRight, bool crouch) {
         base.Throw(toRight, crouch);
@@ -297,7 +304,7 @@ public class KoopaWalk : HoldableEntity {
 
     public void BlueBecomeItem() {
         Runner.Despawn(Object);
-        Runner.Spawn(PrefabList.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
+        Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
         });
     }
@@ -316,8 +323,8 @@ public class KoopaWalk : HoldableEntity {
             PlaySound(Enums.Sounds.World_Block_Bump);
     }
 
-    public void Bump() {
-        if (Dead)
+    public override void Bump(InteractableTile.InteractionDirection direction) {
+        if (Dead || direction == InteractableTile.InteractionDirection.Down)
             return;
 
         if (!IsInShell) {

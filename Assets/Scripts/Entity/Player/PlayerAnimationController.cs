@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using NSMB.Extensions;
 using NSMB.Utils;
-using Fusion;
 
-public class PlayerAnimationController : NetworkBehaviour {
+public class PlayerAnimationController : MonoBehaviour {
 
     //---Networked Variables
-    [Networked] private TickTimer DeathAnimTimer { get; set; }
-
 
     [SerializeField] private Avatar smallAvatar, largeAvatar;
     [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
@@ -28,7 +26,7 @@ public class PlayerAnimationController : NetworkBehaviour {
     public Color GlowColor {
         get {
             if (_glowColor == null)
-                _glowColor = Utils.GetPlayerColor(photonView.Owner);
+                _glowColor = Utils.GetPlayerColor(controller.Runner, controller.Object.InputAuthority);
 
             return _glowColor ?? Color.white;
         }
@@ -50,14 +48,15 @@ public class PlayerAnimationController : NetworkBehaviour {
         drillParticleAudio = drillParticle.GetComponent<AudioSource>();
     }
 
-    public void Start() {
+    public void Spawned() {
 
         DisableAllModels();
 
-        if (!Object.HasInputAuthority)
+        if (!controller.Object.HasInputAuthority)
             GameManager.Instance.CreateNametag(controller);
 
-        PlayerColorSet colorSet = GlobalController.Instance.skins[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.PlayerColor]];
+        PlayerData data = controller.Object.InputAuthority.GetPlayerData(controller.Runner);
+        PlayerColorSet colorSet = GlobalController.Instance.skins[data.SkinIndex];
         PlayerColors colors = colorSet.GetPlayerColors(controller.character);
         primaryColor = colors.overallsColor.linear;
         secondaryColor = colors.hatColor.linear;
@@ -78,14 +77,16 @@ public class PlayerAnimationController : NetworkBehaviour {
         if (gameover)
             models.SetActive(true);
 
+        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(controller.Runner) ?? 0f);
+
         Vector3 targetEuler = models.transform.eulerAngles;
         bool instant = false, changeFacing = false;
         if (!gameover && !controller.IsFrozen) {
-            if (controller.knockback) {
+            if (controller.IsInKnockback) {
                 targetEuler = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
                 instant = true;
-            } else if (controller.Dead) {
-                if (animator.GetBool("firedeath") && DeathAnimTimer > deathUpTime) {
+            } else if (controller.IsDead) {
+                if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
                     targetEuler = new Vector3(-15, controller.FacingRight ? 110 : 250, 0);
                 } else {
                     targetEuler = new Vector3(0, 180, 0);
@@ -110,7 +111,7 @@ public class PlayerAnimationController : NetworkBehaviour {
                     instant = true;
                     changeFacing = true;
                 } else if (controller.flying || controller.propeller) {
-                    targetEuler += new Vector3(0, -1200 - (controller.propellerTimer * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer <= 0 && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
+                    targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(controller.Runner) ?? 0f) * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer <= 0 && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
                     instant = true;
                 } else {
                     targetEuler = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
@@ -143,10 +144,10 @@ public class PlayerAnimationController : NetworkBehaviour {
             drillParticleAudio.clip = (controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
         SetParticleEmission(sparkles, !gameover && controller.IsStarmanInvincible);
         SetParticleEmission(giantParticle, !gameover && controller.State == Enums.PowerupState.MegaMushroom && !controller.GiantStartTimer.ExpiredOrNotRunning(controller.Runner));
-        SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.Dead && DeathAnimTimer > deathUpTime);
+        SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
 
         //Blinking
-        if (controller.Dead) {
+        if (controller.IsDead) {
             eyeState = Enums.PlayerEyeState.Death;
         } else {
             if ((blinkTimer -= Time.fixedDeltaTime) < 0)
@@ -196,7 +197,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("crouching", controller.crouching);
         animator.SetBool("groundpound", controller.groundpound);
         animator.SetBool("sliding", controller.sliding);
-        animator.SetBool("knockback", controller.knockback);
+        animator.SetBool("knockback", controller.IsInKnockback);
         animator.SetBool("facingRight", (left ^ right) ? right : controller.FacingRight);
         animator.SetBool("flying", controller.flying);
         animator.SetBool("drill", controller.drill);
@@ -208,7 +209,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             animatedVelocity = 0;
         } else if (controller.propeller) {
             animatedVelocity = 2.5f;
-        } else if (controller.State == Enums.PowerupState.MegaMushroom && Mathf.Abs(controller.joystick.x) > .2f) {
+        } else if (controller.State == Enums.PowerupState.MegaMushroom && (controller.currentInputs.buttons.IsSet(PlayerControls.Left) || controller.currentInputs.buttons.IsSet(PlayerControls.Right))) {
             animatedVelocity = 4.5f;
         } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
             animatedVelocity = Mathf.Max(3.5f, animatedVelocity);
@@ -229,11 +230,11 @@ public class PlayerAnimationController : NetworkBehaviour {
 
 
         if (!controller.GiantEndTimer.ExpiredOrNotRunning(controller.Runner)) {
-            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, controller.GiantEndTimer / (controller.giantStartTime / 2f)) * 2.6f));
+            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(controller.Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
         } else {
             transform.localScale = controller.State switch {
                 Enums.PowerupState.MiniMushroom => Vector3.one / 2,
-                Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (controller.GiantStartTimer / controller.giantStartTime)) * 2.6f)),
+                Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingTime(controller.Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
                 _ => Vector3.one,
             };
         }
@@ -260,8 +261,9 @@ public class PlayerAnimationController : NetworkBehaviour {
         materialBlock.SetVector("ShirtColor", secondaryColor);
 
         Vector3 giantMultiply = Vector3.one;
-        if (controller.giantTimer > 0 && controller.giantTimer < 4) {
-            float v = ((Mathf.Sin(controller.giantTimer * 20f) + 1f) / 2f * 0.9f) + 0.1f;
+        float giantTimeRemaining = controller.GiantTimer.RemainingTime(controller.Runner) ?? 0f;
+        if (controller.State == Enums.PowerupState.MegaMushroom && controller.GiantTimer.IsRunning && giantTimeRemaining < 4) {
+            float v = ((Mathf.Sin(giantTimeRemaining * 20f) + 1f) / 2f * 0.9f) + 0.1f;
             giantMultiply = new Vector3(v, 1, v);
         }
         materialBlock.SetVector("MultiplyColor", giantMultiply);
@@ -271,7 +273,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         //hit flash
         float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(controller.Runner) ?? 0f;
-        models.SetActive(GameManager.Instance.gameover || controller.Dead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
+        models.SetActive(GameManager.Instance.gameover || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
 
         //Model changing
         bool large = controller.State >= Enums.PowerupState.Mushroom;
@@ -291,13 +293,10 @@ public class PlayerAnimationController : NetworkBehaviour {
         transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
     }
     void HandleDeathAnimation() {
-        if (!controller.Dead) {
-            DeathAnimTimer = 0;
-            return;
-        }
 
-        DeathAnimTimer += Time.fixedDeltaTime;
-        if (DeathAnimTimer < deathUpTime) {
+        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(controller.Runner) ?? 0f);
+
+        if (deathTimer < deathUpTime) {
             deathUp = false;
             body.gravityScale = 0;
             body.velocity = Vector2.zero;
@@ -315,11 +314,8 @@ public class PlayerAnimationController : NetworkBehaviour {
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
         }
-        if (controller.Object.HasInputAuthority && DeathAnimTimer + controller.Runner.DeltaTime > (3 - 0.43f) && DeathAnimTimer < (3 - 0.43f))
+        if (controller.Object.HasInputAuthority && deathTimer + controller.Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f))
             controller.fadeOut.FadeOutAndIn(0.33f, .1f);
-
-        if (DeathAnimTimer >= 3f)
-            controller.PreRespawn();
 
         if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y) {
             models.SetActive(false);

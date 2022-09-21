@@ -18,7 +18,7 @@ public class PlayerData : NetworkBehaviour {
     [Networked] public NetworkBool IsNicknameSet { get; set; }
     [Networked] public NetworkBool IsMuted { get; set; }
     [Networked] public NetworkBool IsManualSpectator { get; set; }
-    [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
+    [Networked] public NetworkBool IsCurrentlySpectating { get; set; } = true;
     [Networked(OnChanged = nameof(OnLoadStateChanged))] public NetworkBool IsLoaded { get; set; }
     [Networked] public TickTimer MessageCooldownTimer { get; set; }
     [Networked] public byte CharacterIndex { get; set; }
@@ -42,6 +42,7 @@ public class PlayerData : NetworkBehaviour {
 
         if (Runner.IsServer) {
             //expose their userid
+            //TOOD: use an auth-server signed userid, to disallow userid spoofing.
             UserId = Runner.GetPlayerUserId(Object.InputAuthority).Replace("-", "");
         }
 
@@ -49,8 +50,8 @@ public class PlayerData : NetworkBehaviour {
         Runner.SetPlayerObject(Object.InputAuthority, Object);
     }
 
-    public string GetNickname() {
-        return Nickname.ToString().Filter();
+    public string GetNickname(bool filter = true) {
+        return filter ? Nickname.ToString().Filter() : Nickname.ToString();
     }
 
     public string GetUserId() {
@@ -61,7 +62,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnLoadStateChanged(Changed<PlayerData> changed) {
-        GameManager.Instance.OnPlayerLoaded(changed.Behaviour);
+        GameManager.Instance.OnPlayerLoaded();
     }
 
     #region RPCs
@@ -120,7 +121,6 @@ public class PlayerData : NetworkBehaviour {
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetSkinIndex(byte index) {
         //not accepting changes at this time
-        //TODO: change to "game started" somehow
         if (Locked)
             return;
 
@@ -129,6 +129,15 @@ public class PlayerData : NetworkBehaviour {
             return;
 
         SkinIndex = index;
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void Rpc_SceneLoaded() {
+        //no gamemanager, how can we be loaded???
+        if (!GameManager.Instance)
+            return;
+
+        IsLoaded = true;
     }
     #endregion
 }

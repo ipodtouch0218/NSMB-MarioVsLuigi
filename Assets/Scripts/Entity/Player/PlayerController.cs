@@ -20,9 +20,14 @@ public class PlayerController : FreezableEntity {
     [Networked] public sbyte Lives { get; set; } = -1;
     [Networked] public Powerup StoredPowerup { get; set; }
 
+    //Player Movement
+    [Networked] public TickTimer KnockbackTimer { get; set; }
+    [Networked] public NetworkBool IsInKnockback { get; set; }
+
     //Death & Respawning
-    [Networked] public NetworkBool Dead { get; set; }
+    [Networked] public NetworkBool IsDead { get; set; } = true;
     [Networked] public TickTimer RespawnTimer { get; set; }
+    [Networked] public TickTimer DeathTimer { get; set; }
 
     //Entity Interactions
     [Networked] public HoldableEntity HeldEntity { get; set; }
@@ -32,7 +37,9 @@ public class PlayerController : FreezableEntity {
     //Powerup Stuffs
     [Networked] public TickTimer FireballShootTimer { get; set; }
     [Networked] public TickTimer StarmanTimer { get; set; }
+    [Networked] public TickTimer PropellerLaunchTimer { get; set; }
     [Networked] public TickTimer GiantStartTimer { get; set; }
+    [Networked] public TickTimer GiantTimer { get; set; }
     [Networked] public TickTimer GiantEndTimer { get; set; }
 
     //---Properties
@@ -44,7 +51,7 @@ public class PlayerController : FreezableEntity {
 
     public Enums.PowerupState previousState;
     public FadeOutManager fadeOut;
-    public AudioSource sfx, sfxBrick;
+    public AudioSource sfxBrick;
     private Animator animator;
     private NetworkRigidbody2D networkRigidbody;
     public CameraController cameraController;
@@ -59,9 +66,9 @@ public class PlayerController : FreezableEntity {
 
 
 
-    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundLastFrame, sliding, knockback, hitBlock, functionallyRunning, flying, drill, inShell, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, canShootProjectile;
-    public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, powerupFlash, jumpBuffer, propellerTimer, propellerSpinTimer;
-    public float giantTimer, floorAngle, knockbackTimer, pipeTimer;
+    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundLastFrame, sliding, hitBlock, functionallyRunning, flying, drill, inShell, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, canShootProjectile;
+    public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, powerupFlash, jumpBuffer, propellerSpinTimer;
+    public float floorAngle, pipeTimer;
 
     //MOVEMENT STAGES
     private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
@@ -103,7 +110,7 @@ public class PlayerController : FreezableEntity {
     private int MovementStage {
         get {
             float xVel = Mathf.Abs(body.velocity.x);
-            float[] arr = flying ? SPEED_STAGE_SPINNER_MAX : SPEED_STAGE_MAX;
+            float[] arr = (flying || propeller) && State != Enums.PowerupState.MegaMushroom ? SPEED_STAGE_SPINNER_MAX : SPEED_STAGE_MAX;
             for (int i = 0; i < arr.Length; i++) {
                 if (xVel <= arr[i])
                     return i;
@@ -151,8 +158,6 @@ public class PlayerController : FreezableEntity {
     public BoxCollider2D MainHitbox => hitboxes[0];
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
 
-    private readonly Dictionary<GameObject, double> lastCollectTime = new();
-
     public PlayerNetworkInput currentInputs, previousInputs;
 
     #endregion
@@ -162,10 +167,8 @@ public class PlayerController : FreezableEntity {
         base.Awake();
 
         cameraController = GetComponent<CameraController>();
-        cameraController.IsControllingCamera = Object.HasInputAuthority;
 
         animator = GetComponentInChildren<Animator>();
-        sfx = GetComponent<AudioSource>();
         sfxBrick = GetComponents<AudioSource>()[1];
         //hitboxManager = GetComponent<WrappingHitbox>();
         animationController = GetComponent<PlayerAnimationController>();
@@ -205,6 +208,7 @@ public class PlayerController : FreezableEntity {
         trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
         transform.position = body.position = GameManager.Instance.spawnpoint;
 
+        cameraController.IsControllingCamera = Object.HasInputAuthority;
         cameraController.Recenter();
 
         if (Object.HasInputAuthority) {
@@ -235,7 +239,18 @@ public class PlayerController : FreezableEntity {
 
         UpdateInputs();
 
-        if (!Dead) {
+        if (IsDead) {
+
+            if (DeathTimer.Expired(Runner)) {
+                PreRespawn();
+                DeathTimer = TickTimer.None;
+            }
+
+            if (RespawnTimer.Expired(Runner)) {
+                Respawn();
+            }
+
+        } else {
 
             CheckForPowerupActions();
 
@@ -334,7 +349,7 @@ public class PlayerController : FreezableEntity {
         hitRight = right >= 1;
         hitRoof = !ignoreRoof && up > 1;
     }
-    void HandleTileProperties() {
+    private void HandleTileProperties() {
         onIce = false;
         footstepSound = Enums.Sounds.Player_Walk_Grass;
         foreach (Vector3Int pos in tilesStandingOn) {
@@ -348,12 +363,11 @@ public class PlayerController : FreezableEntity {
         }
     }
 
-    private static readonly Vector2 hitboxOffset = Vector2.up * 0.5f;
     private readonly Collider2D[] results = new Collider2D[64];
     private readonly Collider2D[] tempResults = new Collider2D[64];
     private void CheckForEntityCollision() {
         //Don't check for collisions if we're dead, frozen, in a pipe, etc.
-        if (Dead || IsFrozen || pipeEntering)
+        if (IsDead || IsFrozen || pipeEntering)
             return;
 
         int collisions = 0;
@@ -377,7 +391,7 @@ public class PlayerController : FreezableEntity {
 
     private ContactPoint2D[] contacts = new ContactPoint2D[0];
     public void OnCollisionStay2D(Collision2D collision) {
-        if ((knockback && !fireballKnockback) || IsFrozen)
+        if ((IsInKnockback && !fireballKnockback) || IsFrozen)
             return;
 
         GameObject obj = collision.gameObject;
@@ -404,8 +418,8 @@ public class PlayerController : FreezableEntity {
                     //They are invincible. let them decide if they've hit us.
                     if (IsStarmanInvincible) {
                         //oh, we both are. bonk.
-                        Knockback(otherObj.transform.position.x > body.position.x, 1, true, 0);
-                        Knockback(otherObj.transform.position.x < body.position.x, 1, true, 0);
+                        DoKnockback(otherObj.transform.position.x > body.position.x, 1, true, 0);
+                        DoKnockback(otherObj.transform.position.x < body.position.x, 1, true, 0);
                     }
                     return;
                 }
@@ -414,7 +428,7 @@ public class PlayerController : FreezableEntity {
                     //we are invincible. murder time :)
                     if (other.State == Enums.PowerupState.MegaMushroom) {
                         //wait fuck-
-                        Knockback(otherObj.transform.position.x > body.position.x, 1, true, 0);
+                        DoKnockback(otherObj.transform.position.x > body.position.x, 1, true, 0);
                         return;
                     }
 
@@ -437,8 +451,8 @@ public class PlayerController : FreezableEntity {
                             drill = false;
                             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                         } else if (!otherAbove) {
-                            Knockback(otherObj.transform.position.x < body.position.x, 0, true, 0);
-                            Knockback(otherObj.transform.position.x > body.position.x, 0, true, 0);
+                            DoKnockback(otherObj.transform.position.x < body.position.x, 0, true, 0);
+                            DoKnockback(otherObj.transform.position.x > body.position.x, 0, true, 0);
                         }
                     } else if (State == Enums.PowerupState.MegaMushroom) {
                         //only we are giant
@@ -455,8 +469,8 @@ public class PlayerController : FreezableEntity {
                         //hit them. powerdown them
                         if (other.inShell) {
                             //collide with both
-                            Knockback(otherObj.transform.position.x < body.position.x, 1, true, 0);
-                            Knockback(otherObj.transform.position.x > body.position.x, 1, true, 0);
+                            DoKnockback(otherObj.transform.position.x < body.position.x, 1, true, 0);
+                            DoKnockback(otherObj.transform.position.x > body.position.x, 1, true, 0);
                         } else {
                             Powerdown(false);
                         }
@@ -486,7 +500,7 @@ public class PlayerController : FreezableEntity {
                     if (State == Enums.PowerupState.MiniMushroom && other.State != Enums.PowerupState.MiniMushroom) {
                         //we are mini, they arent. special rules.
                         if (groundpounded) {
-                            Knockback(otherObj.transform.position.x < body.position.x, 1, false, 0);
+                            DoKnockback(otherObj.transform.position.x < body.position.x, 1, false, 0);
                             groundpound = false;
                             bounce = true;
                         } else {
@@ -494,23 +508,23 @@ public class PlayerController : FreezableEntity {
                         }
                     } else if (other.State == Enums.PowerupState.MiniMushroom && groundpounded) {
                         //we are big, groundpounding a mini opponent. squish.
-                        Knockback(otherObj.transform.position.x > body.position.x, 3, false, 0);
+                        DoKnockback(otherObj.transform.position.x > body.position.x, 3, false, 0);
                         bounce = false;
                     } else {
                         if (other.State == Enums.PowerupState.MiniMushroom && groundpounded) {
                             Powerdown(false);
                         } else {
-                            Knockback(otherObj.transform.position.x < body.position.x, groundpounded ? 3 : 1, false, 0);
+                            DoKnockback(otherObj.transform.position.x < body.position.x, groundpounded ? 3 : 1, false, 0);
                         }
                     }
                     body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);
 
                     return;
-                } else if (!knockback && !other.knockback && !otherAbove && onGround && other.onGround && (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed)) {
+                } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove && onGround && other.onGround && (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed)) {
                     //bump
 
-                    Knockback(otherObj.transform.position.x < body.position.x, 1, true, 0);
-                    Knockback(otherObj.transform.position.x > body.position.x, 1, true, 0);
+                    DoKnockback(otherObj.transform.position.x < body.position.x, 1, true, 0);
+                    DoKnockback(otherObj.transform.position.x > body.position.x, 1, true, 0);
                 }
             }
             break;
@@ -532,11 +546,11 @@ public class PlayerController : FreezableEntity {
             avg /= points.Count;
 
             MarioBrosPlatform platform = obj.GetComponent<MarioBrosPlatform>();
-            //TODO:
-            platform.Bump(0, avg);
+            platform.Bump(this, avg);
             break;
         }
         case "frozencube": {
+            //TODO:
             //if (HeldEntity == obj || (holdingOld == obj && throwInvincibility > 0))
             //    return;
 
@@ -547,7 +561,7 @@ public class PlayerController : FreezableEntity {
     }
 
     public void OnTriggerEnter2D(Collider2D collider) {
-        if (Dead || IsFrozen || pipeEntering || !MainHitbox.IsTouching(collider))
+        if (IsDead || IsFrozen || pipeEntering || !MainHitbox.IsTouching(collider))
             return;
 
 
@@ -570,7 +584,7 @@ public class PlayerController : FreezableEntity {
 
     #region -- CONTROLLER FUNCTIONS --
     private void ActivatePowerupAction() {
-        if (Dead || IsFrozen || knockback || pipeEntering || GameManager.Instance.gameover || HeldEntity)
+        if (IsDead || IsFrozen || IsInKnockback || pipeEntering || GameManager.Instance.gameover || HeldEntity)
             return;
 
         switch (State) {
@@ -598,12 +612,13 @@ public class PlayerController : FreezableEntity {
             }
 
             bool ice = State == Enums.PowerupState.IceFlower;
-            FireballMover prefab = ice ? PrefabList.Iceball : PrefabList.Fireball;
+            NetworkPrefabRef prefab = ice ? PrefabList.Instance.Obj_Iceball : PrefabList.Instance.Obj_Fireball;
             Enums.Sounds sound = ice ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot;
 
             Vector2 pos = body.position + new Vector2(FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.3f);
             if (Utils.IsTileSolidAtWorldLocation(pos)) {
-                Instantiate(prefab.wallHitPrefab, pos, Quaternion.identity);
+                GameObject wallPrefab = ice ? PrefabList.Instance.Particle_IceballWall : PrefabList.Instance.Particle_FireballWall;
+                Instantiate(wallPrefab, pos, Quaternion.identity);
             } else {
                 Runner.Spawn(prefab, pos, onBeforeSpawned: (runner, obj) => {
                     FireballMover mover = obj.GetComponent<FireballMover>();
@@ -631,7 +646,7 @@ public class PlayerController : FreezableEntity {
             return;
 
         body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity);
-        propellerTimer = 1f;
+        PropellerLaunchTimer = TickTimer.CreateFromSeconds(Runner, 1f);
         PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
 
         animator.SetTrigger("propeller_start");
@@ -658,7 +673,7 @@ public class PlayerController : FreezableEntity {
         if (!Object.HasInputAuthority || GameManager.Instance.paused || GameManager.Instance.gameover)
             return;
 
-        if (StoredPowerup == null || Dead) {
+        if (StoredPowerup == null || IsDead) {
             PlaySound(Enums.Sounds.UI_Error);
             return;
         }
@@ -700,7 +715,7 @@ public class PlayerController : FreezableEntity {
         }
         }
         propeller = false;
-        propellerTimer = 0;
+        PropellerLaunchTimer = TickTimer.None;
         propellerSpinTimer = 0;
         usedPropellerThisJump = false;
 
@@ -714,7 +729,7 @@ public class PlayerController : FreezableEntity {
     #region -- FREEZING --
 
     public override void Freeze(FrozenCube cube) {
-        if (knockback || !IsDamageable || IsFrozen || State == Enums.PowerupState.MegaMushroom)
+        if (IsInKnockback || !IsDamageable || IsFrozen || State == Enums.PowerupState.MegaMushroom)
             return;
 
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
@@ -724,18 +739,18 @@ public class PlayerController : FreezableEntity {
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
-        knockback = false;
+        IsInKnockback = false;
         skidding = false;
         drill = false;
         wallSlideLeft = false;
         wallSlideRight = false;
         propeller = false;
 
-        propellerTimer = 0;
+        PropellerLaunchTimer = TickTimer.None;
         skidding = false;
     }
 
-    public override void Unfreeze(byte reasonByte) {
+    public override void Unfreeze(UnfreezeReason reason) {
         if (!IsFrozen)
             return;
 
@@ -744,23 +759,30 @@ public class PlayerController : FreezableEntity {
         body.simulated = true;
         body.isKinematic = false;
 
-        int knockbackStars = reasonByte switch {
-            (byte) UnfreezeReason.Timer => 0,
-            (byte) UnfreezeReason.Groundpounded => 2,
+        int knockbackStars = reason switch {
+            UnfreezeReason.Timer => 0,
+            UnfreezeReason.Groundpounded => 2,
             _ => 1
         };
 
         if (frozenObject && frozenObject.Object.HasStateAuthority) {
-            frozenObject.Holder?.Knockback(frozenObject.Holder.FacingRight, 1, true, 0);
+            frozenObject.Holder?.DoKnockback(frozenObject.Holder.FacingRight, 1, true, 0);
             frozenObject.Kill();
         }
 
         if (knockbackStars > 0)
-            Knockback(FacingRight, knockbackStars, true, -1);
+            DoKnockback(FacingRight, knockbackStars, true, -1);
         else
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1.5f);
     }
     #endregion
+
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        if (IsInKnockback)
+            return;
+
+        DoKnockback(bumper.body.position.x < body.position.x, 1, false, 0);
+    }
 
     #region -- COIN / STAR COLLECTION --
 
@@ -799,7 +821,7 @@ public class PlayerController : FreezableEntity {
                     starDirection = 1;
             }
 
-            Runner.Spawn(PrefabList.BigStar, body.position + Vector2.up * WorldHitboxSize.y, onBeforeSpawned: (runner, obj) => {
+            Runner.Spawn(PrefabList.Instance.Obj_BigStar, body.position + Vector2.up * WorldHitboxSize.y, onBeforeSpawned: (runner, obj) => {
                 StarBouncer bouncer = obj.GetComponent<StarBouncer>();
                 bouncer.OnBeforeSpawned((byte) starDirection, false, deathplane);
             });
@@ -814,20 +836,17 @@ public class PlayerController : FreezableEntity {
 
     #region -- DEATH / RESPAWNING --
     public void Death(bool deathplane, bool fire) {
-        if (Dead)
+        if (IsDead)
             return;
-
-        //TODO: idk?
-
-        //if (info.Sender != photonView.Owner)
-        //    return;
 
         animator.Play("deadstart");
         if (--Lives == 0) {
             GameManager.Instance.CheckForWinner();
         }
 
-        Dead = true;
+        IsDead = true;
+        DeathTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+
         onSpinner = null;
         pipeEntering = null;
         inShell = false;
@@ -840,7 +859,7 @@ public class PlayerController : FreezableEntity {
         skidding = false;
         turnaround = false;
         groundpound = false;
-        knockback = false;
+        IsInKnockback = false;
         wallSlideLeft = false;
         wallSlideRight = false;
         animator.SetBool("knockback", false);
@@ -862,6 +881,8 @@ public class PlayerController : FreezableEntity {
 
     public void PreRespawn() {
 
+        RespawnTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
+
         sfx.enabled = true;
         if (Lives == 0) {
             GameManager.Instance.CheckForWinner();
@@ -875,28 +896,26 @@ public class PlayerController : FreezableEntity {
         }
         transform.localScale = Vector2.one;
         transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
-        Dead = false;
+        IsDead = false;
         previousState = State = Enums.PowerupState.Small;
         animationController.DisableAllModels();
         animator.SetTrigger("respawn");
         StarmanTimer = TickTimer.None;
-        giantTimer = 0;
+        GiantTimer = TickTimer.None;
         GiantEndTimer = TickTimer.None;
         GiantStartTimer = TickTimer.None;
         groundpound = false;
         body.isKinematic = false;
 
-        GameObject particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/Respawn"), body.position, Quaternion.identity);
-        particle.GetComponent<RespawnParticle>().player = this;
+        Instantiate(PrefabList.Instance.Particle_Respawn, body.position, Quaternion.identity);
 
-        //gameObject.SetActive(false);
         cameraController.Recenter();
     }
 
     public void Respawn() {
 
         //gameObject.SetActive(true);
-        Dead = false;
+        IsDead = false;
         State = Enums.PowerupState.Small;
         previousState = Enums.PowerupState.Small;
         body.velocity = Vector2.zero;
@@ -909,7 +928,7 @@ public class PlayerController : FreezableEntity {
         propeller = false;
         propellerSpinTimer = 0;
         usedPropellerThisJump = false;
-        propellerTimer = 0;
+        PropellerLaunchTimer = TickTimer.None;
 
         crouching = false;
         onGround = false;
@@ -919,12 +938,12 @@ public class PlayerController : FreezableEntity {
         StarmanTimer = TickTimer.None;
         GiantStartTimer = TickTimer.None;
         GiantEndTimer = TickTimer.None;
-        giantTimer = 0;
+        GiantTimer = TickTimer.None;
         singlejump = false;
         doublejump = false;
         turnaround = false;
         triplejump = false;
-        knockback = false;
+        IsInKnockback = false;
         bounce = false;
         skidding = false;
         groundpound = false;
@@ -944,23 +963,17 @@ public class PlayerController : FreezableEntity {
     public void PlaySoundEverywhere(Enums.Sounds sound) {
         GameManager.Instance.sfx.PlayOneShot(sound.GetClip(character));
     }
-    public void PlaySound(Enums.Sounds sound, byte variant, float volume) {
+    public void PlaySound(Enums.Sounds sound, byte variant = 0, float volume = 1) {
         if (sound == Enums.Sounds.Powerup_MegaMushroom_Break_Block) {
             sfxBrick.Stop();
             sfxBrick.clip = sound.GetClip(character, variant);
             sfxBrick.Play();
         } else {
-            sfx.PlayOneShot(sound.GetClip(character, variant), volume);
+            PlaySound(sound, character, variant, volume);
         }
     }
-    public void PlaySound(Enums.Sounds sound, byte variant) {
-        PlaySound(sound, variant, 1);
-    }
-    public void PlaySound(Enums.Sounds sound) {
-        PlaySound(sound, 0, 1);
-    }
-    protected void SpawnParticle(string particle, Vector2 worldPos) {
-        Instantiate(Resources.Load(particle), worldPos, Quaternion.identity);
+    protected void SpawnParticle(string particle, Vector2 worldPos, Quaternion? rot = null) {
+        Instantiate(Resources.Load(particle), worldPos, rot ?? Quaternion.identity);
     }
     protected void SpawnParticle(string particle, Vector2 worldPos, Vector3 rot) {
         Instantiate(Resources.Load(particle), worldPos, Quaternion.Euler(rot));
@@ -1088,13 +1101,13 @@ public class PlayerController : FreezableEntity {
 
     #region -- KNOCKBACK --
 
-    public void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
-        if (fireball && fireballKnockback && knockback)
+    public void DoKnockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
+        if (fireball && fireballKnockback && IsInKnockback)
             return;
-        if (knockback && !fireballKnockback)
+        if (IsInKnockback && !fireballKnockback)
             return;
 
-        if (!GameManager.Instance.GameStarted || !DamageInvincibilityTimer.ExpiredOrNotRunning(Runner) || pipeEntering || IsFrozen || Dead || !GiantStartTimer.ExpiredOrNotRunning(Runner) || !GiantEndTimer.ExpiredOrNotRunning(Runner))
+        if (!GameManager.Instance.GameStarted || !DamageInvincibilityTimer.ExpiredOrNotRunning(Runner) || pipeEntering || IsFrozen || IsDead || !GiantStartTimer.ExpiredOrNotRunning(Runner) || !GiantEndTimer.ExpiredOrNotRunning(Runner))
             return;
 
         if (State == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -1103,11 +1116,11 @@ public class PlayerController : FreezableEntity {
             return;
         }
 
-        if (knockback || fireballKnockback)
+        if (IsInKnockback || fireballKnockback)
             starsToDrop = Mathf.Min(1, starsToDrop);
 
-        knockback = true;
-        knockbackTimer = 0.5f;
+        IsInKnockback = true;
+        KnockbackTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
         fireballKnockback = fireball;
         initialKnockbackFacingRight = FacingRight;
 
@@ -1145,7 +1158,7 @@ public class PlayerController : FreezableEntity {
         groundpound = false;
         flying = false;
         propeller = false;
-        propellerTimer = 0;
+        PropellerLaunchTimer = TickTimer.None;
         propellerSpinTimer = 0;
         sliding = false;
         drill = false;
@@ -1162,8 +1175,9 @@ public class PlayerController : FreezableEntity {
 
     protected void ResetKnockback() {
         DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
+        KnockbackTimer = TickTimer.None;
         bounce = false;
-        knockback = false;
+        IsInKnockback = false;
         body.velocity = new(0, body.velocity.y);
         FacingRight = initialKnockbackFacingRight;
     }
@@ -1300,7 +1314,7 @@ public class PlayerController : FreezableEntity {
     }
 
     void HandleLayerState() {
-        bool hitsNothing = animator.GetBool("pipe") || Dead || stuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
+        bool hitsNothing = animator.GetBool("pipe") || IsDead || stuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
         //bool shouldntCollide = (DamageInvincibilityTimer > 0 && !IsStarmanInvincible) || (knockback && !fireballKnockback);
 
         int layer = Layers.LayerPlayer;
@@ -1315,7 +1329,7 @@ public class PlayerController : FreezableEntity {
     }
 
     private bool GroundSnapCheck() {
-        if (Dead || (body.velocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering || gameObject.layer == Layers.LayerHitsNothing)
+        if (IsDead || (body.velocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering || gameObject.layer == Layers.LayerHitsNothing)
             return false;
 
         bool prev = Physics2D.queriesStartInColliders;
@@ -1332,7 +1346,7 @@ public class PlayerController : FreezableEntity {
     #region -- PIPES --
 
     private void DownwardsPipeCheck(bool down) {
-        if (!down || State == Enums.PowerupState.MegaMushroom || !onGround || knockback || inShell)
+        if (!down || State == Enums.PowerupState.MegaMushroom || !onGround || IsInKnockback || inShell)
             return;
 
         foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.position, Vector2.down, 0.1f)) {
@@ -1399,7 +1413,7 @@ public class PlayerController : FreezableEntity {
     #endregion
 
     private void HandleCrouching(bool crouchInput) {
-        if (sliding || propeller || knockback)
+        if (sliding || propeller || IsInKnockback)
             return;
 
         if (State == Enums.PowerupState.MegaMushroom) {
@@ -1466,7 +1480,7 @@ public class PlayerController : FreezableEntity {
                 PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
 
                 Vector2 offset = new(MainHitbox.size.x / 2f * (wallSlideLeft ? -1 : 1), MainHitbox.size.y / 2f);
-                SpawnParticle("Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Vector3.zero : Vector3.up * 180);
+                SpawnParticle("Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
 
                 wallJumpTimer = 16 / 60f;
                 animator.SetTrigger("walljump");
@@ -1474,7 +1488,7 @@ public class PlayerController : FreezableEntity {
             }
         } else {
             //walljump starting check
-            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !flying && !drill && !crouching && !sliding && !knockback;
+            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !flying && !drill && !crouching && !sliding && !IsInKnockback;
             if (!canWallslide)
                 return;
 
@@ -1533,7 +1547,7 @@ public class PlayerController : FreezableEntity {
     }
 
     private void HandleJumping(bool jumpPressed, bool forceJump) {
-        if (knockback || drill || (State == Enums.PowerupState.MegaMushroom && singlejump))
+        if (IsInKnockback || drill || (State == Enums.PowerupState.MegaMushroom && singlejump))
             return;
 
         bool topSpeed = Mathf.Abs(body.velocity.x) >= RunningMaxSpeed;
@@ -1651,7 +1665,7 @@ public class PlayerController : FreezableEntity {
             }
         }
 
-        if (groundpound || groundpoundCounter > 0 || knockback || pipeEntering || jumpLandingTimer > 0 || !(wallJumpTimer <= 0 || onGround || body.velocity.y < 0))
+        if (groundpound || groundpoundCounter > 0 || IsInKnockback || pipeEntering || jumpLandingTimer > 0 || !(wallJumpTimer <= 0 || onGround || body.velocity.y < 0))
             return;
 
         if (!onGround)
@@ -1676,7 +1690,7 @@ public class PlayerController : FreezableEntity {
         float acc = State == Enums.PowerupState.MegaMushroom ? SPEED_STAGE_MEGA_ACC[stage] : SPEED_STAGE_ACC[stage];
         float sign = Mathf.Sign(body.velocity.x);
 
-        if ((left ^ right) && (!crouching || (crouching && !onGround && State != Enums.PowerupState.BlueShell)) && !knockback && !sliding) {
+        if ((left ^ right) && (!crouching || (crouching && !onGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !sliding) {
             //we can walk here
 
             float speed = Mathf.Abs(body.velocity.x);
@@ -1776,7 +1790,7 @@ public class PlayerController : FreezableEntity {
                 }
             } else if (onIce)
                 acc = -BUTTON_RELEASE_ICE_DEC[stage];
-            else if (knockback)
+            else if (IsInKnockback)
                 acc = -KNOCKBACK_DEC;
             else
                 acc = -BUTTON_RELEASE_DEC;
@@ -1883,12 +1897,9 @@ public class PlayerController : FreezableEntity {
         //    Utils.TickTimer(ref invincible, 0, delta);
 
         Utils.TickTimer(ref jumpBuffer, 0, delta);
-        Utils.TickTimer(ref giantTimer, 0, delta);
         Utils.TickTimer(ref groundpoundCounter, 0, delta);
         Utils.TickTimer(ref groundpoundDelay, 0, delta);
         Utils.TickTimer(ref propellerSpinTimer, 0, delta);
-        Utils.TickTimer(ref propellerTimer, 0, delta);
-        Utils.TickTimer(ref knockbackTimer, 0, delta);
         Utils.TickTimer(ref pipeTimer, 0, delta);
         Utils.TickTimer(ref wallSlideTimer, 0, delta);
         Utils.TickTimer(ref wallJumpTimer, 0, delta);
@@ -1912,7 +1923,7 @@ public class PlayerController : FreezableEntity {
             GiantStartTimer = TickTimer.None;
             stationaryGiantEnd = true;
             StoredPowerup = (Powerup) Resources.Load("Scriptables/Powerups/MegaMushroom");
-            giantTimer = 0;
+            GiantTimer = TickTimer.None;
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         }
         body.isKinematic = false;
@@ -1928,11 +1939,11 @@ public class PlayerController : FreezableEntity {
 
         if (wallJumpTimer > 0) {
             FacingRight = body.velocity.x > 0;
-        } else if (!inShell && !sliding && !skidding && !knockback && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
+        } else if (!inShell && !sliding && !skidding && !IsInKnockback && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
             if (right ^ left)
                 FacingRight = right;
         } else if (GiantStartTimer.ExpiredOrNotRunning(Runner) && GiantEndTimer.ExpiredOrNotRunning(Runner) && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
-            if (knockback || (onGround && State != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f)) {
+            if (IsInKnockback || (onGround && State != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f)) {
                 FacingRight = body.velocity.x > 0;
             } else if (((wallJumpTimer <= 0 && !inShell) || !GiantStartTimer.ExpiredOrNotRunning(Runner)) && (right || left)) {
                 FacingRight = right;
@@ -1943,8 +1954,11 @@ public class PlayerController : FreezableEntity {
     }
 
     public void EndMega() {
-        GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime / 2f);
+        if (State != Enums.PowerupState.MegaMushroom)
+            return;
+
         State = Enums.PowerupState.Mushroom;
+        GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime / 2f);
         stationaryGiantEnd = false;
         DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
         PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
@@ -1998,7 +2012,7 @@ public class PlayerController : FreezableEntity {
     private void HandleMovement(float delta) {
         functionallyRunning = currentInputs.buttons.IsSet(PlayerControls.Sprint) || State == Enums.PowerupState.MegaMushroom || propeller;
 
-        if (Dead)
+        if (IsDead)
             return;
 
         if (body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
@@ -2117,7 +2131,7 @@ public class PlayerController : FreezableEntity {
             UpwardsPipeCheck(up);
         }
 
-        if (knockback) {
+        if (IsInKnockback) {
             if (bounce)
                 ResetKnockback();
 
@@ -2126,7 +2140,7 @@ public class PlayerController : FreezableEntity {
             crouching = false;
             inShell = false;
             body.velocity -= body.velocity * (delta * 2f);
-            if (onGround && (Mathf.Abs(body.velocity.x) < 0.35f && knockbackTimer <= 0))
+            if (onGround && Mathf.Abs(body.velocity.x) < 0.35f && KnockbackTimer.Expired(Runner))
                 ResetKnockback();
 
             if (HeldEntity) {
@@ -2166,8 +2180,14 @@ public class PlayerController : FreezableEntity {
             }
         }
 
-        if (propellerTimer > 0)
-            body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity - (propellerTimer < .4f ? (1 - (propellerTimer / .4f)) * propellerLaunchVelocity : 0));
+        if (PropellerLaunchTimer.IsRunning) {
+            if (PropellerLaunchTimer.Expired(Runner)) {
+                PropellerLaunchTimer = TickTimer.None;
+            } else {
+                float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
+                body.velocity = new(body.velocity.x, propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime / .4f)) * propellerLaunchVelocity : 0));
+            }
+        }
 
         if (currentInputs.buttons.IsSet(PlayerControls.PowerupAction) && wallJumpTimer <= 0 && (propeller || !usedPropellerThisJump)) {
             if (body.velocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
@@ -2247,9 +2267,12 @@ public class PlayerController : FreezableEntity {
         HandleSliding(up, down, left, right);
 
         if (onGround) {
-            if (propellerTimer < 0.5f) {
-                propeller = false;
-                propellerTimer = 0;
+            if (PropellerLaunchTimer.IsRunning) {
+                float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
+                if (remainingTime < 0.5f) {
+                    propeller = false;
+                    PropellerLaunchTimer = TickTimer.None;
+                }
             }
             flying = false;
             drill = false;
@@ -2290,9 +2313,10 @@ public class PlayerController : FreezableEntity {
             HandleJumping(jump, doJump);
         }
 
-
-        if (State == Enums.PowerupState.MegaMushroom && giantTimer <= 0)
+        if (GiantTimer.Expired(Runner)) {
             EndMega();
+            GiantTimer = TickTimer.None;
+        }
 
         HandleSlopes();
         HandleFacingDirection();
@@ -2341,7 +2365,8 @@ public class PlayerController : FreezableEntity {
             if (drill) {
                 body.velocity = new(Mathf.Clamp(body.velocity.x, -WalkingMaxSpeed, WalkingMaxSpeed), -drillVelocity);
             } else {
-                float htv = WalkingMaxSpeed * 1.18f + (propellerTimer * 2f);
+                float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
+                float htv = WalkingMaxSpeed * 1.18f + (remainingTime * 2f);
                 body.velocity = new(Mathf.Clamp(body.velocity.x, -htv, htv), Mathf.Max(body.velocity.y, propellerSpinTimer > 0 ? -propellerSpinFallSpeed : -propellerFallSpeed));
             }
         } else if (wallSlideLeft || wallSlideRight) {
@@ -2386,7 +2411,7 @@ public class PlayerController : FreezableEntity {
         HeldEntity.Throw(throwRight, crouch);
         //holding.photonView.RPC(nameof(HoldableEntity.Throw), RpcTarget.All, throwLeft, crouch, body.position);
 
-        if (!crouch && !knockback) {
+        if (!crouch && !IsInKnockback) {
             PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);
             //throwInvincibility = 0.5f;
             animator.SetTrigger("throw");
@@ -2405,7 +2430,7 @@ public class PlayerController : FreezableEntity {
         if (groundpoundStartTimer != 0)
             return;
 
-        if (onGround || knockback || groundpound || drill
+        if (onGround || IsInKnockback || groundpound || drill
             || HeldEntity || crouching || sliding || inShell
             || wallSlideLeft || wallSlideRight || groundpoundDelay > 0)
             return;
@@ -2422,9 +2447,10 @@ public class PlayerController : FreezableEntity {
             }
         } else if (propeller) {
             //start propeller drill
-            if (propellerTimer < 0.6f && body.velocity.y < 7) {
+            float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
+            if (remainingTime < 0.6f && body.velocity.y < 4) {
                 drill = true;
-                propellerTimer = 0;
+                PropellerLaunchTimer = TickTimer.None;
                 hitBlock = true;
             }
         } else {
@@ -2500,7 +2526,7 @@ public class PlayerController : FreezableEntity {
     }
 
     public bool CanPickup() {
-        return State != Enums.PowerupState.MiniMushroom && !skidding && !turnaround && !HeldEntity && currentInputs.buttons.IsSet(PlayerControls.Sprint) && !propeller && !flying && !crouching && !Dead && !wallSlideLeft && !wallSlideRight && !doublejump && !triplejump && !groundpound;
+        return State != Enums.PowerupState.MiniMushroom && !skidding && !turnaround && !HeldEntity && currentInputs.buttons.IsSet(PlayerControls.Sprint) && !propeller && !flying && !crouching && !IsDead && !wallSlideLeft && !wallSlideRight && !doublejump && !triplejump && !groundpound;
     }
 
     public void OnDrawGizmos() {

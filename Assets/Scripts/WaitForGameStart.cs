@@ -1,29 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Photon.Pun;
+using Fusion;
 
-public abstract class WaitForGameStart : MonoBehaviourPun {
+public abstract class WaitForGameStart : NetworkBehaviour {
 
-    public FunctionTarget target = FunctionTarget.ALL;
+    public FunctionTarget target = FunctionTarget.All;
     public void AttemptExecute() {
-        if (!photonView) {
-            Execute();
-            return;
-        }
 
         switch (target) {
-        case FunctionTarget.ALL: {
+        case FunctionTarget.All: {
             Execute();
             break;
         }
-        case FunctionTarget.MASTER_ONLY: {
-            if (PhotonNetwork.IsMasterClient)
+        case FunctionTarget.ServerHostOnly: {
+            if (Runner.IsServer)
                 Execute();
             break;
         }
-        case FunctionTarget.OWNER_ONLY: {
-            if (photonView.IsMine)
+        case FunctionTarget.ObjectOwnerOnly: {
+            if (Object.HasInputAuthority)
                 Execute();
             break;
         }
@@ -31,6 +24,6 @@ public abstract class WaitForGameStart : MonoBehaviourPun {
     }
     public abstract void Execute();
     public enum FunctionTarget {
-        ALL, MASTER_ONLY, OWNER_ONLY
+        All, ServerHostOnly, ObjectOwnerOnly
     }
 }

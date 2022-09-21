@@ -10,7 +10,6 @@ using TMPro;
 using NSMB.Extensions;
 using NSMB.Utils;
 using Fusion;
-using Fusion.Photon.Realtime;
 
 public class MainMenuManager : MonoBehaviour {
 
@@ -49,8 +48,6 @@ public class MainMenuManager : MonoBehaviour {
 
     public List<string> maps;
 
-    private bool joinedLate;
-
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
 
     private readonly List<string> allRegions = new();
@@ -64,7 +61,7 @@ public class MainMenuManager : MonoBehaviour {
 
 
     // LOBBY CALLBACKS
-    public void OnRoomListUpdate(List<SessionInfo> sessionList) {
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
         List<string> invalidRooms = new();
 
         foreach (SessionInfo session in sessionList) {
@@ -151,6 +148,12 @@ public class MainMenuManager : MonoBehaviour {
 
         //    return;
         //}
+
+
+        //mark player as not a spectator, as we are in the lobby
+        if (Runner.IsServer)
+            player.GetPlayerData(runner).IsCurrentlySpectating = false;
+
         LocalChatMessage(player.GetPlayerData(runner).GetNickname() + " joined the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
     }
@@ -257,7 +260,6 @@ public class MainMenuManager : MonoBehaviour {
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
         HorizontalCamera.OFFSET = 0;
-        GlobalController.Instance.joinedAsSpectator = false;
         Time.timeScale = 1;
 
         if (GlobalController.Instance.disconnectCause != null) {
@@ -329,6 +331,18 @@ public class MainMenuManager : MonoBehaviour {
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
     }
 
+    public void OnEnable() {
+        NetworkHandler.Instance.OnPlayerJoined += OnPlayerJoined;
+        NetworkHandler.Instance.OnPlayerLeft += OnPlayerLeft;
+        NetworkHandler.Instance.OnSessionListUpdated += OnSessionListUpdated;
+    }
+
+    public void OnDisable() {
+        NetworkHandler.Instance.OnPlayerJoined -= OnPlayerJoined;
+        NetworkHandler.Instance.OnPlayerLeft -= OnPlayerLeft;
+        NetworkHandler.Instance.OnSessionListUpdated -= OnSessionListUpdated;
+    }
+
     public void Update() {
         bool connected = Runner.IsCloudReady;
         connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
@@ -345,8 +359,7 @@ public class MainMenuManager : MonoBehaviour {
 
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool started);
         if (started) {
-            //start as spectator
-            joinedLate = true;
+            //start early, we're joining late.
             StartGame();
             return;
         }

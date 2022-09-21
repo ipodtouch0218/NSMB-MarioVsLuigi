@@ -1,11 +1,11 @@
+using NSMB.Utils;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-using Photon.Pun;
-using NSMB.Utils;
-
+using NSMB.Extensions;
+using Fusion;
 
 public class UIUpdater : MonoBehaviour {
 
@@ -17,16 +17,25 @@ public class UIUpdater : MonoBehaviour {
     public Image itemReserve, itemColor;
     public float pingSample = 0;
 
+    private NetworkRunner Runner => NetworkHandler.Instance.runner;
+    private int CurrentPing => (int) (Runner.GetPlayerRtt(localPlayer) / 1000f);
+
+
     private Material timerMaterial;
     private GameObject starsParent, coinsParent, livesParent, timerParent;
     private readonly List<Image> backgrounds = new();
     private bool uiHidden;
 
+    private PlayerRef localPlayer;
+    private CharacterData character;
     private int coins = -1, stars = -1, lives = -1, timer = -1;
 
     public void Start() {
         Instance = this;
-        pingSample = PhotonNetwork.GetPing();
+
+        localPlayer = Runner.LocalPlayer;
+        character = localPlayer.GetCharacterData(Runner);
+        pingSample = CurrentPing;
 
         starsParent = uiStars.transform.parent.gameObject;
         coinsParent = uiCoins.transform.parent.gameObject;
@@ -44,15 +53,14 @@ public class UIUpdater : MonoBehaviour {
     }
 
     public void Update() {
-        pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Mathf.Clamp01(Time.unscaledDeltaTime * 0.5f));
+        pingSample = Mathf.Lerp(pingSample, CurrentPing, Mathf.Clamp01(Time.unscaledDeltaTime));
         if (pingSample == float.NaN)
             pingSample = 0;
 
         uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: " + (int) pingSample + "ms</font>";
 
         //Player stuff update.
-        if (!player && GameManager.Instance.localPlayer)
-            player = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
+        player = GameManager.Instance.localPlayer;
 
         if (!player) {
             if (!uiHidden)
@@ -100,30 +108,28 @@ public class UIUpdater : MonoBehaviour {
         if (player.Lives >= 0) {
             if (player.Lives != lives) {
                 lives = player.Lives;
-                uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + Utils.GetSymbolString("x" + lives);
+                uiLives.text = character.uistring + Utils.GetSymbolString("x" + lives);
             }
         } else {
             livesParent.SetActive(false);
         }
 
         if (GameManager.Instance.timedGameDuration > 0) {
-            int seconds = Mathf.CeilToInt((GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f);
+            float timeRemaining = GameManager.Instance.GameEndTimer.RemainingTime(Runner) ?? 0f;
+
+            int seconds = Mathf.CeilToInt(timeRemaining);
             seconds = Mathf.Clamp(seconds, 0, GameManager.Instance.timedGameDuration);
+
             if (seconds != timer) {
                 timer = seconds;
                 uiCountdown.text = Utils.GetSymbolString("cx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
+                timerParent.SetActive(true);
             }
-            timerParent.SetActive(true);
 
-            if (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp < 0) {
-                if (timerMaterial == null) {
-                    CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
-                    cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
-                }
-
-                float partialSeconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f % 2f;
-                byte gb = (byte) (Mathf.PingPong(partialSeconds, 1f) * 255);
-                timerMaterial.SetColor("_Color", new Color32(255, gb, gb, 255));
+            if (timeRemaining <= 0 && !timerMaterial) {
+                CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
+                cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
+                timerMaterial.SetColor("_Color", new Color32(255, 1, 1, 255));
             }
         } else {
             timerParent.SetActive(false);

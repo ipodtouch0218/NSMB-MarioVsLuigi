@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Photon.Pun;
 
 //This is pretty much just the koopawalk script but it causes damage when you stand on it.
 public class SpinyWalk : KoopaWalk {
@@ -11,27 +10,25 @@ public class SpinyWalk : KoopaWalk {
             return;
 
         if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
-            photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
-        } else if (player.sliding || player.inShell || player.StarmanTimer > 0 || player.State == Enums.PowerupState.MegaMushroom) {
+            FacingRight = damageDirection.x < 0;
+        } else if (player.sliding || player.inShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
             //Special kill
             bool originalFacing = player.FacingRight;
             if (player.inShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 //Do knockback to player, colliding with us in shell going opposite ways
-                player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
+                player.DoKnockback(player.body.position.x < body.position.x, 0, false, 0);
 
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
+            SpecialKill(!originalFacing, false, player.StarCombo++);
         } else if (!Holder) {
             if (IsInShell) {
                 if (IsActuallyStationary) {
                     //we aren't moving. check for kicks & pickups
                     if (player.CanPickup()) {
                         //pickup-able
-                        photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
-                        player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
+                        Pickup(player);
                     } else {
                         //non-pickup able, kick.
-                        photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
-                        player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
                         PreviousHolder = player;
                     }
                 } else {
@@ -42,36 +39,36 @@ public class SpinyWalk : KoopaWalk {
                             //mini mario interactions
                             if (player.groundpound) {
                                 //mini mario is groundpounding, cancel their groundpound & stop moving
-                                photonView.RPC("EnterShell", RpcTarget.All);
+                                EnterShell(true);
                                 player.groundpound = false;
                             } else {
                                 //mini mario not groundpounding, just bounce.
-                                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+                                PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                             }
                             player.bounce = true;
                         } else {
                             //normal mario interactions
                             if (player.groundpound) {
                                 //normal mario is groundpounding, we get kick'd
-                                photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, true);
-                                player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
+                                Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
+                                PreviousHolder = player;
                             } else {
                                 //normal mario isnt groundpounding, we get stopped
-                                photonView.RPC("EnterShell", RpcTarget.All);
-                                photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
+                                EnterShell(true);
+                                PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                                 player.bounce = true;
-                                photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
+                                FacingRight = damageDirection.x > 0;
                             }
                         }
-                    } else if (player.DamageInvincibilityTimer <= 0) {
+                    } else if (player.IsDamageable) {
                         //not being stomped on. just do damage.
-                        player.photonView.RPC("Powerdown", RpcTarget.All, false);
+                        player.Powerdown(false);
                     }
                 }
-            } else if (player.DamageInvincibilityTimer <= 0) {
+            } else if (player.IsDamageable) {
                 //Not in shell, we can't be stomped on.
-                player.photonView.RPC("Powerdown", RpcTarget.All, false);
-                photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x < 0);
+                player.Powerdown(false);
+                FacingRight = damageDirection.x > 0;
             }
         }
     }

@@ -8,8 +8,7 @@ public class FloatingCoin : Coin {
     private BoxCollider2D hitbox;
 
     public override void Awake() {
-        //we dont use body so...
-        //base.Awake();
+        base.Awake();
         spriteRenderer = GetComponent<SpriteRenderer>();
         hitbox = GetComponent<BoxCollider2D>();
     }

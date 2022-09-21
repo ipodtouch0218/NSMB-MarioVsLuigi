@@ -1,5 +1,5 @@
 using UnityEngine;
-using Photon.Pun;
+
 using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile", order = 5)]
@@ -35,22 +35,24 @@ public class RouletteTile : BreakableBrickTile {
                     }
                 }
 
-                if (interacter is MonoBehaviourPun pun)
-                    pun.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Break);
+                player.PlaySound(Enums.Sounds.World_Block_Break);
                 return true;
             }
 
-            spawnResult = Utils.GetRandomItem(player).prefab;
+            spawnResult = Utils.GetRandomItem(NetworkHandler.Instance.runner, player).prefab;
         }
 
         Bump(interacter, direction, worldLocation);
 
-        Vector2 offset = direction == InteractionDirection.Down ? bottomSpawnOffset + ( spawnResult == "MegaMushroom" ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
-        object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, offset };
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
+        //Vector2 offset = direction == InteractionDirection.Down ? bottomSpawnOffset + ( spawnResult == "MegaMushroom" ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
+        //object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, offset };
+        //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
 
-        if (interacter is MonoBehaviourPun pun2)
-            pun2.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Powerup);
+        if (interacter is PlayerController pl)
+            pl.PlaySound(Enums.Sounds.World_Block_Powerup);
+        else if (interacter is KoopaWalk k)
+            k.PlaySound(Enums.Sounds.World_Block_Powerup);
+
         return false;
     }
 }

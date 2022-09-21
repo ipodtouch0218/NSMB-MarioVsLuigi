@@ -112,13 +112,20 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable {
         }
     }
 
-    public override void Unfreeze(byte reasonByte) {
+    public override void Unfreeze(UnfreezeReason reasonByte) {
         IsFrozen = false;
         animator.enabled = true;
         if (body)
             body.isKinematic = false;
         hitbox.enabled = true;
         audioSource.enabled = true;
+
+        SpecialKill(false, false, 0);
+    }
+
+    public override void Bump(InteractableTile.InteractionDirection direction) {
+        if (direction == InteractableTile.InteractionDirection.Down)
+            return;
 
         SpecialKill(false, false, 0);
     }
@@ -146,7 +153,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable {
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.up * 0.5f, Quaternion.identity);
 
-        Runner.Spawn(PrefabList.LooseCoin, body.position + hitbox.size.y * 0.5f * Vector2.up);
+        Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.position + hitbox.offset);
     }
 
     public void PlaySound(Enums.Sounds sound) {

@@ -4,7 +4,7 @@ using UnityEngine;
 using NSMB.Utils;
 using Fusion;
 
-public class MovingPowerup : CollectableEntity {
+public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     private static int groundMask = -1;
 
@@ -127,8 +127,11 @@ public class MovingPowerup : CollectableEntity {
         body.velocity = new(body.velocity.x, Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
-    public void Bump() {
+    public override void Bump(InteractableTile.InteractionDirection direction) {
         if (FollowPlayer)
+            return;
+
+        if (direction == InteractableTile.InteractionDirection.Down)
             return;
 
         body.velocity = new(body.velocity.x, 5f);
@@ -173,7 +176,7 @@ public class MovingPowerup : CollectableEntity {
         if (powerup.state == Enums.PowerupState.MegaMushroom && player.State != Enums.PowerupState.MegaMushroom) {
 
             player.GiantStartTimer = TickTimer.CreateFromSeconds(Runner, player.giantStartTime);
-            player.knockback = false;
+            player.IsInKnockback = false;
             player.groundpound = false;
             player.crouching = false;
             player.propeller = false;
@@ -181,14 +184,14 @@ public class MovingPowerup : CollectableEntity {
             player.flying = false;
             player.drill = false;
             player.inShell = false;
-            player.giantTimer = 15f;
+            player.GiantTimer = TickTimer.CreateFromSeconds(Runner, 15f);
             transform.localScale = Vector3.one;
-            Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
+            Instantiate(PrefabList.Instance.Particle_Giant, transform.position, Quaternion.identity);
 
             player.PlaySoundEverywhere(powerup.soundEffect);
             soundPlayed = true;
 
-        } else if (powerup.prefab == PrefabList.Powerup_Star) {
+        } else if (powerup.prefab == PrefabList.Instance.Powerup_Starman) {
             //starman
             if (!player.IsStarmanInvincible)
                 player.StarCombo = 0;
@@ -204,10 +207,10 @@ public class MovingPowerup : CollectableEntity {
             Runner.Despawn(Object);
             return;
 
-        } else if (powerup.prefab == PrefabList.Powerup_1Up) {
+        } else if (powerup.prefab == PrefabList.Instance.Powerup_1Up) {
             player.Lives++;
 
-            Instantiate(PrefabList.Particle_1Up, transform.position, Quaternion.identity);
+            Instantiate(PrefabList.Instance.Particle_1Up, transform.position, Quaternion.identity);
             player.PlaySound(powerup.soundEffect);
             Runner.Despawn(Object);
             return;
@@ -237,7 +240,7 @@ public class MovingPowerup : CollectableEntity {
             player.propeller = false;
             player.usedPropellerThisJump = false;
             player.drill &= player.flying;
-            player.propellerTimer = 0;
+            player.PropellerLaunchTimer = TickTimer.None;
 
             if (!soundPlayed)
                 player.PlaySound(powerup.soundEffect);

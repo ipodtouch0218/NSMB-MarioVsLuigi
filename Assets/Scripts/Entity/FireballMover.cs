@@ -197,7 +197,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
         } else {
             //fireball
             //TODO: damage source?
-            player.Knockback(FacingRight, 1, true, 0);
+            player.DoKnockback(FacingRight, 1, true, 0);
         }
     }
 }

@@ -82,7 +82,7 @@ public class PiranhaPlantController : KillableEntity {
         Dead = true;
         hitbox.enabled = false;
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, upsideDown ? -0.5f : 0.5f, 0), Quaternion.identity);
-        Runner.Spawn(PrefabList.LooseCoin, transform.position + Vector3.up * (upsideDown ? -1f : 1f));
+        Runner.Spawn(PrefabList.Obj_LooseCoin, transform.position + Vector3.up * (upsideDown ? -1f : 1f));
     }
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {

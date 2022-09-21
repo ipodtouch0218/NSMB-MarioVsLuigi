@@ -1,7 +1,6 @@
 using UnityEngine;
 
 using NSMB.Utils;
-using Fusion;
 
 public class BulletBillMover : KillableEntity {
 
@@ -11,14 +10,18 @@ public class BulletBillMover : KillableEntity {
     //---Misc Variables
     private Vector2 searchVector;
 
-    public void OnPreSpawned(bool shootRight) {
+    public override void Awake() {
+        base.Awake();
+        searchVector = new(playerSearchRadius * 2, 100);
+    }
+
+    public void OnBeforeSpawned(bool shootRight) {
         FacingRight = shootRight;
     }
 
     public override void Spawned() {
 
-        searchVector = new(playerSearchRadius * 2, 100);
-        body.velocity = new Vector2(speed * (FacingRight ? 1 : -1), body.velocity.y);
+        body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
 
         Transform t = transform.GetChild(1);
         ParticleSystem ps = t.GetComponent<ParticleSystem>();

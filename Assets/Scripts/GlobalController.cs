@@ -8,6 +8,8 @@ using Fusion;
 
 public class GlobalController : Singleton<GlobalController> {
 
+    public PrefabList prefabs;
+
     public PlayerColorSet[] skins;
     public Gradient rainbowGradient;
 

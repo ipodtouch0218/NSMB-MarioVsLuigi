@@ -116,7 +116,7 @@ public class WaterSplash : MonoBehaviour, IPlayerInteractable {
     }
 
     public void InteractWithPlayer(PlayerController player) {
-        if (player.Dead)
+        if (player.IsDead)
             return;
 
         //TODO:

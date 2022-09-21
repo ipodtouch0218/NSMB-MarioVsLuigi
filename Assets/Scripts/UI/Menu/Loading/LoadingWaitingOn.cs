@@ -3,8 +3,7 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 
-using Photon.Realtime;
-using NSMB.Utils;
+using NSMB.Extensions;
 
 public class LoadingWaitingOn : MonoBehaviour {
 
@@ -21,26 +20,29 @@ public class LoadingWaitingOn : MonoBehaviour {
         if (!GameManager.Instance)
             return;
 
-        if (GlobalController.Instance.joinedAsSpectator) {
+        PlayerData ourData = NetworkHandler.Instance.runner.LocalPlayer.GetPlayerData(NetworkHandler.Instance.runner);
+
+        if (ourData.IsCurrentlySpectating) {
             text.text = spectatorText;
             return;
         }
 
         if (GameManager.Instance.loaded) {
             text.text = readyToStartText;
-            playerList.text = "";
-            return;
-        }
-
-        if (GameManager.Instance.loadedPlayers.Count == 0) {
             text.text = emptyText;
+            playerList.text = "";
             return;
         }
 
         text.text = iveLoadedText;
 
-        HashSet<Player> waitingFor = new(GameManager.Instance.nonSpectatingPlayers);
-        waitingFor.ExceptWith(GameManager.Instance.loadedPlayers);
-        playerList.text = (waitingFor.Count) == 0 ? "" : "Waiting for:\n\n- " + string.Join("\n- ", waitingFor.Select(pl => pl.GetUniqueNickname()));
+        HashSet<string> waitingFor = new();
+        foreach (PlayerController pc in GameManager.Instance.players) {
+            PlayerData data = pc.Object.InputAuthority.GetPlayerData(pc.Runner);
+
+            if (!data.IsCurrentlySpectating && !data.IsLoaded)
+                waitingFor.Add(data.GetNickname());
+        }
+        playerList.text = waitingFor.Count == 0 ? "" : "Waiting for:\n\n- " + string.Join("\n- ", waitingFor);
     }
 }

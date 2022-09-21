@@ -31,7 +31,7 @@ public class GameManager : NetworkBehaviour {
 
     //---Networked Variables
     [Networked] private TickTimer BigStarRespawnTimer { get; set; }
-    [Networked] public TickTimer GameStartTimer { get; set; }
+    [Networked(OnChanged = nameof(OnStartTimerChanged))] public TickTimer GameStartTimer { get; set; }
     [Networked] public TickTimer GameEndTimer { get; set; }
     [Networked] public NetworkRNG Random { get; set; }
     [Networked, Capacity(10)] private NetworkLinkedList<PlayerController> Players => default;
@@ -40,200 +40,205 @@ public class GameManager : NetworkBehaviour {
 
     //---Serialized Variables
     [SerializeField] private MusicData mainMusic, invincibleMusic, megaMushroomMusic;
+    [SerializeField] public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
+    [SerializeField] public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
+    [SerializeField] public bool loopingLevel = true;
+    [SerializeField] public Vector3 spawnpoint;
+    [SerializeField] private GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
+    [SerializeField, ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
+    [SerializeField] public Tilemap tilemap;
+    [SerializeField] public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
+    [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
 
-    public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
-    public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
-    public bool loopingLevel = true;
-    public Vector3 spawnpoint;
-    public Tilemap tilemap;
-    [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
-    public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
-    public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
-    private TileBase[] originalTiles;
-    private BoundsInt origin;
-    private GameObject[] starSpawns;
-    private readonly List<GameObject> remainingSpawns = new();
-    public int startServerTime, endServerTime = -1;
-    public long startRealTime = -1, endRealTime = -1;
+
+
 
     public Canvas nametagCanvas;
     public GameObject nametagPrefab;
 
     //Audio
-    public AudioSource music, sfx;
     public Enums.MusicState? musicState = null;
 
     public PlayerController localPlayer;
 
-    public bool paused, loaded;
-    public GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
-    public bool gameover = false, musicEnabled = false;
-    public int starRequirement, timedGameDuration = -1, coinRequirement;
-    public bool hurryUp = false;
+    public bool paused, loaded, gameover;
+    public bool musicEnabled, hurryUp;
 
-    public int playerCount = 1;
+    //---Public Variables
     public List<PlayerController> players = new();
+    public long gameStartTimestamp, gameEndTimestamp;
+    public int playerCount = 1;
+    public int starRequirement, timedGameDuration = -1, coinRequirement;
 
     //---Private Variables
+    private List<GameObject> activeStarSpawns = new();
     private EnemySpawnpoint[] enemySpawns;
     private FloatingCoin[] coins;
+    private GameObject[] starSpawns;
+    private TileBase[] originalTiles;
+    private BoundsInt originalTilesOrigin;
 
     //---Components
     public SpectationManager spectationManager;
     private LoopingMusic loopMusic;
+    public AudioSource music, sfx;
+
+
 
 
     private ParticleSystem brickBreak;
 
     // EVENT CALLBACK
-    public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, SendOptions sendOption, RaiseEventOptions eventOptions = null) {
-        if (eventOptions == null)
-            eventOptions = NetworkUtils.EventOthers;
-
-        HandleEvent((byte) eventId, parameters, PhotonNetwork.LocalPlayer, null);
-        PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
+    public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, object sendOption, object eventOptions = null) {
+        //if (eventOptions == null)
+        //    eventOptions = NetworkUtils.EventOthers;
+        //
+        //HandleEvent((byte) eventId, parameters, PhotonNetwork.LocalPlayer, null);
+        //PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
     }
-    public void OnEvent(EventData e) {
-        var players = PhotonNetwork.CurrentRoom.Players;
-        HandleEvent(e.Code, e.CustomData, players.ContainsKey(e.Sender) ? players[e.Sender] : null, e.Parameters);
+    /*
+        public void HandleEvent(byte eventId, object customData, Player sender, ParameterDictionary parameters) {
+            object[] data = customData as object[];
+
+            //Debug.Log($"id:{eventId} sender:{sender} master:{sender?.IsMasterClient ?? false}");
+            switch (eventId) {
+            case (byte) Enums.NetEventIds.SetTile: {
+
+                int x = (int) data[0];
+                int y = (int) data[1];
+                string tilename = (string) data[2];
+                Vector3Int loc = new(x, y, 0);
+
+                TileBase tile = Utils.GetTileFromCache(tilename);
+                tilemap.SetTile(loc, tile);
+                //Debug.Log($"SetTile by {sender?.NickName} ({sender?.UserId}): {tilename}");
+                break;
+            }
+            case (byte) Enums.NetEventIds.SetTileBatch: {
+                int x = (int) data[0];
+                int y = (int) data[1];
+                int width = (int) data[2];
+                int height = (int) data[3];
+                string[] tiles = (string[]) data[4];
+                TileBase[] tileObjects = new TileBase[tiles.Length];
+                for (int i = 0; i < tiles.Length; i++) {
+                    string tile = tiles[i];
+                    if (tile == "")
+                        continue;
+
+                    tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
+                }
+                tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
+                //Debug.Log($"SetTileBatch by {sender?.NickName} ({sender?.UserId}): {tileObjects[0]}");
+                break;
+            }
+            case (byte) Enums.NetEventIds.SyncTilemap: {
+                if (!(sender?.IsMasterClient ?? false))
+                    return;
+
+                Hashtable changes = (Hashtable) customData;
+                //Debug.Log($"SyncTilemap by {sender?.NickName} ({sender?.UserId}): {changes}");
+                Utils.ApplyTilemapChanges(originalTiles, originalTilesOrigin, tilemap, changes);
+                break;
+            }
+            case (byte) Enums.NetEventIds.BumpTile: {
+
+            }
+            case (byte) Enums.NetEventIds.SetThenBumpTile: {
+
+                int x = (int) data[0];
+                int y = (int) data[1];
+
+                bool downwards = (bool) data[2];
+                string newTile = (string) data[3];
+                string spawnResult = (string) data[4];
+
+                Vector3Int loc = new(x, y, 0);
+
+                tilemap.SetTile(loc, Utils.GetTileFromCache(newTile));
+                //Debug.Log($"SetThenBumpTile by {sender?.NickName} ({sender?.UserId}): {newTile}");
+                tilemap.RefreshTile(loc);
+
+                GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f, Quaternion.identity);
+                BlockBump bb = bump.GetComponentInChildren<BlockBump>();
+
+                bb.fromAbove = downwards;
+                bb.resultTile = newTile;
+                bb.sprite = tilemap.GetSprite(loc);
+                bb.resultPrefab = spawnResult;
+
+                tilemap.SetTile(loc, null);
+                break;
+            }
+            case (byte) Enums.NetEventIds.SpawnParticle: {
+                int x = (int) data[0];
+                int y = (int) data[1];
+                string particleName = (string) data[2];
+                Vector3 color = data.Length > 3 ? (Vector3) data[3] : new Vector3(1, 1, 1);
+                Vector3 worldPos = Utils.TilemapToWorldPosition(new(x, y)) + new Vector3(0.25f, 0.25f);
+
+                GameObject particle;
+                if (particleName == "BrickBreak") {
+                    brickBreak.transform.position = worldPos;
+                    brickBreak.Emit(new() { startColor = new Color(color.x, color.y, color.z, 1) }, 4);
+                } else {
+                    particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), worldPos, Quaternion.identity);
+
+                    ParticleSystem system = particle.GetComponent<ParticleSystem>();
+                    ParticleSystem.MainModule main = system.main;
+                    main.startColor = new Color(color.x, color.y, color.z, 1);
+                }
+
+                break;
+            }
+            case (byte) Enums.NetEventIds.SpawnResizableParticle: {
+
+            }
+            }
+        }
+    */
+
+
+    public void CreateBlockBump(int tileX, int tileY, bool downwards, string newTile, NetworkPrefabRef? spawnPrefab, bool spawnCoin, Vector2 spawnOffset = default) {
+
+        Vector3Int loc = new(tileX, tileY, 0);
+
+        if (tilemap.GetTile(loc) == null)
+            return;
+
+        Sprite sprite = tilemap.GetSprite(loc);
+        Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f;
+
+        Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
+            obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, newTile, spawnPrefab, downwards, spawnCoin, spawnOffset);
+        });
+
+        tilemap.SetTile(loc, null);
     }
-    public void HandleEvent(byte eventId, object customData, Player sender, ParameterDictionary parameters) {
-        object[] data = customData as object[];
+    public void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
+        TileBase[] tileObjects = new TileBase[tiles.Length];
+        for (int i = 0; i < tiles.Length; i++) {
+            string tile = tiles[i];
+            if (tile == "")
+                continue;
 
-        //Debug.Log($"id:{eventId} sender:{sender} master:{sender?.IsMasterClient ?? false}");
-        switch (eventId) {
-        case (byte) Enums.NetEventIds.SetTile: {
-
-            int x = (int) data[0];
-            int y = (int) data[1];
-            string tilename = (string) data[2];
-            Vector3Int loc = new(x, y, 0);
-
-            TileBase tile = Utils.GetTileFromCache(tilename);
-            tilemap.SetTile(loc, tile);
-            //Debug.Log($"SetTile by {sender?.NickName} ({sender?.UserId}): {tilename}");
-            break;
+            tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
         }
-        case (byte) Enums.NetEventIds.SetTileBatch: {
-            int x = (int) data[0];
-            int y = (int) data[1];
-            int width = (int) data[2];
-            int height = (int) data[3];
-            string[] tiles = (string[]) data[4];
-            TileBase[] tileObjects = new TileBase[tiles.Length];
-            for (int i = 0; i < tiles.Length; i++) {
-                string tile = tiles[i];
-                if (tile == "")
-                    continue;
 
-                tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
-            }
-            tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
-            //Debug.Log($"SetTileBatch by {sender?.NickName} ({sender?.UserId}): {tileObjects[0]}");
-            break;
-        }
-        case (byte) Enums.NetEventIds.SyncTilemap: {
-            if (!(sender?.IsMasterClient ?? false))
-                return;
+        GameManager.Instance.tilemap.SetTilesBlock(new BoundsInt(tileOrigin.x, tileOrigin.y, 0, tileDimensions.x, tileDimensions.y, 1), tileObjects);
+    }
 
-            Hashtable changes = (Hashtable) customData;
-            //Debug.Log($"SyncTilemap by {sender?.NickName} ({sender?.UserId}): {changes}");
-            Utils.ApplyTilemapChanges(originalTiles, origin, tilemap, changes);
-            break;
-        }
-        case (byte) Enums.NetEventIds.BumpTile: {
+    public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, GameObject prefab) {
+        GameObject particle = Instantiate(prefab, pos, Quaternion.Euler(0, 0, flip ? 180 : 0));
 
-            int x = (int) data[0];
-            int y = (int) data[1];
+        SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
+        sr.size = size;
 
-            bool downwards = (bool) data[2];
-            string newTile = (string) data[3];
-            string spawnResult = (string) data[4];
-            Vector2 spawnOffset = data.Length > 5 ? (Vector2) data[5] : Vector2.zero;
+        Rigidbody2D body = particle.GetComponent<Rigidbody2D>();
+        body.velocity = new Vector2(right ? 7 : -7, 6);
+        body.angularVelocity = right ^ flip ? -300 : 300;
 
-            Vector3Int loc = new(x, y, 0);
-
-            if (tilemap.GetTile(loc) == null)
-                return;
-
-            GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f, Quaternion.identity);
-            BlockBump bb = bump.GetComponentInChildren<BlockBump>();
-
-            bb.fromAbove = downwards;
-            bb.resultTile = newTile;
-            bb.sprite = tilemap.GetSprite(loc);
-            bb.resultPrefab = spawnResult;
-            bb.spawnOffset = spawnOffset;
-
-            tilemap.SetTile(loc, null);
-            break;
-        }
-        case (byte) Enums.NetEventIds.SetThenBumpTile: {
-
-            int x = (int) data[0];
-            int y = (int) data[1];
-
-            bool downwards = (bool) data[2];
-            string newTile = (string) data[3];
-            string spawnResult = (string) data[4];
-
-            Vector3Int loc = new(x, y, 0);
-
-            tilemap.SetTile(loc, Utils.GetTileFromCache(newTile));
-            //Debug.Log($"SetThenBumpTile by {sender?.NickName} ({sender?.UserId}): {newTile}");
-            tilemap.RefreshTile(loc);
-
-            GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f, Quaternion.identity);
-            BlockBump bb = bump.GetComponentInChildren<BlockBump>();
-
-            bb.fromAbove = downwards;
-            bb.resultTile = newTile;
-            bb.sprite = tilemap.GetSprite(loc);
-            bb.resultPrefab = spawnResult;
-
-            tilemap.SetTile(loc, null);
-            break;
-        }
-        case (byte) Enums.NetEventIds.SpawnParticle: {
-            int x = (int) data[0];
-            int y = (int) data[1];
-            string particleName = (string) data[2];
-            Vector3 color = data.Length > 3 ? (Vector3) data[3] : new Vector3(1, 1, 1);
-            Vector3 worldPos = Utils.TilemapToWorldPosition(new(x, y)) + new Vector3(0.25f, 0.25f);
-
-            GameObject particle;
-            if (particleName == "BrickBreak") {
-                brickBreak.transform.position = worldPos;
-                brickBreak.Emit(new() { startColor = new Color(color.x, color.y, color.z, 1) }, 4);
-            } else {
-                particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), worldPos, Quaternion.identity);
-
-                ParticleSystem system = particle.GetComponent<ParticleSystem>();
-                ParticleSystem.MainModule main = system.main;
-                main.startColor = new Color(color.x, color.y, color.z, 1);
-            }
-
-            break;
-        }
-        case (byte) Enums.NetEventIds.SpawnResizableParticle: {
-            Vector2 pos = (Vector2) data[0];
-            bool right = (bool) data[1];
-            bool upsideDown = (bool) data[2];
-            Vector2 size = (Vector2) data[3];
-            string prefab = (string) data[4];
-            GameObject particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + prefab), pos, Quaternion.Euler(0, 0, upsideDown ? 180 : 0));
-
-            SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
-            sr.size = size;
-
-            Rigidbody2D body = particle.GetComponent<Rigidbody2D>();
-            body.velocity = new Vector2(right ? 7 : -7, 6);
-            body.angularVelocity = right ^ upsideDown ? -300 : 300;
-
-            particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (upsideDown ? -1 : 1));
-            break;
-        }
-        }
+        particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (flip ? -1 : 1));
     }
 
     // MATCHMAKING CALLBACKS
@@ -268,9 +273,13 @@ public class GameManager : NetworkBehaviour {
     //Register pause event
     public void OnEnable() {
         InputSystem.controls.UI.Pause.performed += OnPause;
+        NetworkHandler.Instance.OnShutdown += OnShutdown;
+        NetworkHandler.Instance.OnInput += OnInput;
     }
     public void OnDisable() {
         InputSystem.controls.UI.Pause.performed -= OnPause;
+        NetworkHandler.Instance.OnShutdown -= OnShutdown;
+        NetworkHandler.Instance.OnInput -= OnInput;
     }
 
     public void Awake() {
@@ -312,8 +321,8 @@ public class GameManager : NetworkBehaviour {
         Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
 
         //Setup respawning tilemap
-        origin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
-        originalTiles = tilemap.GetTilesBlock(origin);
+        originalTilesOrigin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
+        originalTiles = tilemap.GetTilesBlock(originalTilesOrigin);
 
         //Find objects in the scene
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
@@ -336,7 +345,7 @@ public class GameManager : NetworkBehaviour {
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeResim = true)]
     public void Rpc_ResetTilemap() {
-        tilemap.SetTilesBlock(origin, originalTiles);
+        tilemap.SetTilesBlock(originalTilesOrigin, originalTiles);
 
         foreach (FloatingCoin coin in coins)
             coin.IsCollected = false;
@@ -349,6 +358,37 @@ public class GameManager : NetworkBehaviour {
 
     public void OnPlayerLoaded() {
         CheckIfAllPlayersLoaded();
+    }
+
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
+        GlobalController.Instance.disconnectCause = shutdownReason;
+        SceneManager.LoadScene(0);
+    }
+
+    public void OnInput(NetworkRunner runner, NetworkInput input) {
+        PlayerNetworkInput newInput = new();
+
+        Vector2 joystick = InputSystem.controls.Player.Movement.ReadValue<Vector2>();
+        bool jump = InputSystem.controls.Player.Jump.ReadValue<bool>();
+        bool sprint = InputSystem.controls.Player.Sprint.ReadValue<bool>();
+
+        //TODO: deadzone?
+        newInput.buttons.Set(PlayerControls.Right, joystick.x > 0.25f);
+        newInput.buttons.Set(PlayerControls.Left, joystick.x < -0.25f);
+        newInput.buttons.Set(PlayerControls.Up, joystick.y > 0.25f);
+        newInput.buttons.Set(PlayerControls.Down, joystick.y < -0.25f);
+        newInput.buttons.Set(PlayerControls.Jump, jump);
+        newInput.buttons.Set(PlayerControls.Sprint, sprint);
+
+        input.Set(newInput);
+    }
+
+    public static void OnStartTimerChanged(Changed<GameManager> changed) {
+        GameManager gm = changed.Behaviour;
+        if (gm.GameStartTimer.IsRunning && !gm.GameStarted) {
+            if (gm.Runner.IsServer)
+                gm.Rpc_FinishLoading();
+        }
     }
 
 
@@ -378,7 +418,8 @@ public class GameManager : NetworkBehaviour {
         StartCoroutine(EndGame(winner));
     }
 
-    private void FinishLoading() {
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void Rpc_FinishLoading() {
 
         //Populate scoreboard
         ScoreboardUpdater.instance.Populate(players);
@@ -388,7 +429,7 @@ public class GameManager : NetworkBehaviour {
         //Finalize loading screen
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
         if (canvas) {
-            canvas.GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
+            canvas.GetComponent<Animator>().SetTrigger(Runner.GetLocalPlayerData().IsCurrentlySpectating ? "spectating" : "loaded");
             //please just dont beep at me :(
             AudioSource source = canvas.GetComponent<AudioSource>();
             source.Stop();
@@ -396,12 +437,9 @@ public class GameManager : NetworkBehaviour {
             source.enabled = false;
             Destroy(source);
         }
-
-        GameStarted = true;
     }
 
     private void StartGame() {
-        started = true;
 
         //Respawn players
         foreach (PlayerController player in players) {
@@ -422,36 +460,19 @@ public class GameManager : NetworkBehaviour {
         //Play start sfx
         sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
-
-
-        foreach (PlayerController controllers in players)
-            if (controllers) {
-                if (spectating && controllers.sfx) {
-                    controllers.sfxBrick.enabled = true;
-                    controllers.sfx.enabled = true;
-                }
-                controllers.gameObject.SetActive(spectating);
-            }
-
-
-        startServerTime = startTimestamp + 3500;
+        //Start some things that should be booted
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
             wfgs.AttemptExecute();
 
-        yield return new WaitForSeconds(1f);
 
+        GameStarted = true;
         musicEnabled = true;
 
-        startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
-        if (timedGameDuration > 0) {
-            endServerTime = startTimestamp + 4500 + timedGameDuration * 1000;
-            endRealTime = startRealTime + 4500 + timedGameDuration * 1000;
-        }
+        gameStartTimestamp = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        gameEndTimestamp = (timedGameDuration > 0) ? gameStartTimestamp + timedGameDuration * 1000 : 0;
 
         GlobalController.Instance.DiscordController.UpdateActivity();
 
-        if (canvas)
-            SceneManager.UnloadSceneAsync("Loading");
     }
 
     private IEnumerator FinalizeGameStart() {
@@ -491,43 +512,59 @@ public class GameManager : NetworkBehaviour {
 
         yield return new WaitForSecondsRealtime(secondsUntilMenu);
 
-        if (Runner.IsServer)
-            Runner.SetActiveScene(0);
+        if (Runner.IsServer) {
+            //handle player states
+            foreach (PlayerRef player in Runner.ActivePlayers) {
+                PlayerData data = player.GetPlayerData(Runner);
+
+                //set loading state = false
+                data.IsLoaded = false;
+
+                //disable spectating
+                data.IsCurrentlySpectating = false;
+            }
+        }
+
+        Runner.SetActiveScene(0);
     }
 
     private void SpawnBigStar() {
 
         for (int i = 0; i < starSpawns.Length; i++) {
-            if (remainingSpawns.Count <= 0)
-                remainingSpawns.AddRange(starSpawns);
+            if (activeStarSpawns.Count <= 0)
+                activeStarSpawns.AddRange(starSpawns);
 
-            int index = Random.RangeExclusive(0, remainingSpawns.Count);
-            Vector3 spawnPos = remainingSpawns[index].transform.position;
+            int index = Random.RangeExclusive(0, activeStarSpawns.Count);
+            Vector3 spawnPos = activeStarSpawns[index].transform.position;
 
             if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 4, Layers.MaskOnlyPlayers)) {
                 //a player is too close to the spawn
-                remainingSpawns.RemoveAt(index);
+                activeStarSpawns.RemoveAt(index);
                 continue;
             }
 
-            Runner.Spawn(PrefabList.BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
+            //Valid spawn
+            Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
                 obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
             });
-            remainingSpawns.RemoveAt(index);
-            break;
+            activeStarSpawns.RemoveAt(index);
+            return;
         }
+
+        //no star could spawn. wait a second...
+        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
     }
 
     public override void FixedUpdateNetwork() {
 
         if (BigStarRespawnTimer.Expired(Runner)) {
-            SpawnBigStar();
             BigStarRespawnTimer = TickTimer.None;
+            SpawnBigStar();
         }
 
         if (GameStartTimer.Expired(Runner)) {
-            LoadingComplete();
             GameStartTimer = TickTimer.None;
+            StartGame();
         }
 
         if (GameEndTimer.IsRunning) {
@@ -665,7 +702,7 @@ public class GameManager : NetworkBehaviour {
             if (!player)
                 continue;
 
-            if (player.State == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
+            if (player.State == Enums.PowerupState.MegaMushroom && player.GiantStartTimer.ExpiredOrNotRunning(Runner))
                 mega = true;
             if (player.IsStarmanInvincible)
                 invincible = true;

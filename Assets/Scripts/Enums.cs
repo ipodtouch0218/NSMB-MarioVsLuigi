@@ -170,30 +170,6 @@ public static class Enums {
         public static string GameStarted { get; } = "G";
         public static string HostName { get; } = "H";
     }
-    public enum NetEventIds : byte {
-        // 1-9 = in-lobby events
-        StartGame = 1,
-        SystemMessage = 2,
-        PlayerChatMessage = 3,
-        ChangeMaxPlayers = 4,
-        ChangePrivate = 5,
-        // 10-19 = game state events
-        PlayerFinishedLoading = 10,
-        AllFinishedLoading = 11,
-        EndGame = 19,
-        // 20-29 = world-based game events
-        SetTile = 20,
-        BumpTile = 21,
-        SetThenBumpTile = 22,
-        SetTileBatch = 23,
-        ResetTiles = 24,
-        SyncTilemap = 25,
-        // 30-39 = graphical-only events
-        SpawnParticle = 30,
-        SpawnResizableParticle = 31,
-        // 40-49 = player-related events
-        PlayerDamagePlayer = 40,
-    }
     #endregion
 }
 

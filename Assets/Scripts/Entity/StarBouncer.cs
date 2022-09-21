@@ -139,7 +139,7 @@ public class StarBouncer : BasicEntity, IPlayerInteractable {
     }
 
     public void InteractWithPlayer(PlayerController player) {
-        if (player.Dead || !player.spawned)
+        if (player.IsDead)
             return;
 
         if (!Collectable || Collected)

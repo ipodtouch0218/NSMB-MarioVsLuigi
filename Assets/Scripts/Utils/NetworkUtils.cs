@@ -23,22 +23,10 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.CustomPowerups] = 1,
             [Enums.NetRoomProperties.GameStarted] = 0,
             [Enums.NetRoomProperties.HostName] = "",
-            [Enums.NetRoomProperties.Mutes] = "",
-            [Enums.NetRoomProperties.Bans] = "",
         };
 
         public static Dictionary<string, SessionProperty> DefaultRoomProperties {
             get => new(_defaultRoomProperties);
         }
-
-        public static readonly string[] LobbyVisibleRoomProperties = new string[] {
-            Enums.NetRoomProperties.Lives,
-            Enums.NetRoomProperties.StarRequirement,
-            Enums.NetRoomProperties.CoinRequirement,
-            Enums.NetRoomProperties.Time,
-            Enums.NetRoomProperties.CustomPowerups,
-            Enums.NetRoomProperties.GameStarted,
-            Enums.NetRoomProperties.HostName,
-        };
     }
 }

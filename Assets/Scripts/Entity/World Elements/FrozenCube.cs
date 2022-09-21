@@ -13,14 +13,12 @@ public class FrozenCube : HoldableEntity {
     //---Serialized Variables
     [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f;
 
-    public FreezableEntity.UnfreezeReason unfreezeReason = FreezableEntity.UnfreezeReason.Other;
-
-    //---Components
-
+    //---Private Variables
+    public UnfreezeReason unfreezeReason = UnfreezeReason.Other;
     private Vector2 entityPositionOffset;
-    private bool fastSlide, fallen;
-    private int combo;
     private float throwTimer;
+    private int combo;
+    private bool fastSlide, fallen;
 
     #region Unity Methods
     public void OnBeforeSpawned(FreezableEntity entityToFreeze) {
@@ -80,11 +78,13 @@ public class FrozenCube : HoldableEntity {
             return;
         }
         if (Holder && Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f)) {
-            KillWithReason((byte) FreezableEntity.UnfreezeReason.HitWall);
+            KillWithReason(UnfreezeReason.HitWall);
             return;
         }
 
-        if (!fastSlide) {
+        if (fastSlide) {
+            CheckForEntityCollisions();
+        } else {
             float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
             if (remainingTime < 1f) {
                 body.position = new(body.position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
@@ -106,11 +106,11 @@ public class FrozenCube : HoldableEntity {
         }
 
         if (fastSlide && physics.onGround && physics.floorAngle != 0) {
-            RaycastHit2D ray = Physics2D.BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskOnlyGround);
+            RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskOnlyGround);
             if (ray) {
-                body.position = new Vector2(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
+                body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
                 if (ray.distance < 0.1f)
-                    body.velocity = new Vector2(body.velocity.x, Mathf.Min(0, body.velocity.y));
+                    body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
             }
         }
 
@@ -120,12 +120,12 @@ public class FrozenCube : HoldableEntity {
 
             if (AutoBreakTimer.Expired(Runner)) {
                 if (!fastSlide)
-                    unfreezeReason = FreezableEntity.UnfreezeReason.Timer;
+                    unfreezeReason = UnfreezeReason.Timer;
 
                 if (flying)
                     fallen = true;
                 else {
-                    KillWithReason((byte) FreezableEntity.UnfreezeReason.Timer);
+                    KillWithReason(UnfreezeReason.Timer);
                 }
             }
         }
@@ -139,11 +139,8 @@ public class FrozenCube : HoldableEntity {
     }
     #endregion
 
-    private Collider2D[] collisions = new Collider2D[32];
+    private readonly Collider2D[] collisions = new Collider2D[32];
     private void CheckForEntityCollisions() {
-
-        if (!fastSlide)
-            return;
 
         int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisions);
 
@@ -208,13 +205,13 @@ public class FrozenCube : HoldableEntity {
             return;
 
         if ((player.groundpound || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
-            KillWithReason((byte) FreezableEntity.UnfreezeReason.Groundpounded);
+            KillWithReason(UnfreezeReason.Groundpounded);
 
         } else if (!attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
-            KillWithReason((byte) FreezableEntity.UnfreezeReason.BlockBump);
+            KillWithReason(UnfreezeReason.BlockBump);
 
         } else if (fastSlide) {
-            player.Knockback(body.position.x > player.body.position.x, 1, false, 0);
+            player.DoKnockback(body.position.x > player.body.position.x, 1, false, 0);
             Kill();
         }
         if (FrozenEntity.IsCarryable && !Holder && !Dead) {
@@ -239,8 +236,8 @@ public class FrozenCube : HoldableEntity {
         }
     }
 
-    public void KillWithReason(byte reasonByte) {
-        unfreezeReason = (FreezableEntity.UnfreezeReason) reasonByte;
+    public void KillWithReason(UnfreezeReason reason) {
+        unfreezeReason = reason;
         Kill();
     }
 
@@ -276,7 +273,7 @@ public class FrozenCube : HoldableEntity {
     }
 
     public override void Kill() {
-        FrozenEntity?.Unfreeze((byte) unfreezeReason);
+        FrozenEntity?.Unfreeze(unfreezeReason);
 
         if (Holder)
             Holder.SetHolding(null);

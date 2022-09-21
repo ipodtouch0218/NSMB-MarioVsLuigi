@@ -1,10 +1,12 @@
 using UnityEngine;
 
+using Fusion;
+
 [CreateAssetMenu(fileName = "Powerup", menuName = "ScriptableObjects/Powerup", order = 0)]
 public class Powerup : ScriptableObject {
 
     public Enums.PowerupState state;
-    public GameObject prefab;
+    public NetworkPrefabRef prefab;
     public Enums.Sounds soundEffect = Enums.Sounds.Player_Sound_PowerupCollect;
     public float spawnChance = 0.1f, losingSpawnBonus = 0f;
     public bool big, vertical, custom, lives;

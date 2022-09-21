@@ -44,7 +44,7 @@ public class PlayerListEntry : MonoBehaviour {
         //enabled = player.HasRainbowName();
 
         string permissionSymbol = "";
-        if (runner.)
+        if (player == 1)
             permissionSymbol += "<sprite=5>";
 
         //Utils.GetSessionProperty(Enums.NetPlayerProperties.Status, out bool status, player.CustomProperties);

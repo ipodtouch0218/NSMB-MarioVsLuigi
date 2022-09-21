@@ -1,14 +1,17 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using Photon.Pun;
 using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "BreakablePipeTile", menuName = "ScriptableObjects/Tiles/BreakablePipeTile", order = 4)]
 public class BreakablePipeTile : InteractableTile {
-    public string leftDestroy, rightDestroy, pipeParticle;
-    public bool upsideDownPipe, leftOfPipe;
-    public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
+
+    [SerializeField] private string leftDestroy, rightDestroy;
+    [SerializeField] private bool upsideDownPipe, leftOfPipe;
+
+    [SerializeField] GameObject pipeParticle, destroyedPipeParticle;
+
+    public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (!(interacter is PlayerController))
             return false;
 
@@ -87,8 +90,7 @@ public class BreakablePipeTile : InteractableTile {
             }
 
 
-            object[] parametersParticle = new object[]{world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), pipeParticle + (alreadyDestroyed ? "-D" : "")};
-            GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnResizableParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+            GameManager.Instance.SpawnResizableParticle(world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), alreadyDestroyed ? destroyedPipeParticle : pipeParticle);
         }
         string[] tiles = new string[tileHeight*2];
 
@@ -121,9 +123,9 @@ public class BreakablePipeTile : InteractableTile {
                 tiles[i] = "";
 
         Vector3Int offset = upsideDownPipe ? Vector3Int.zero : pipeDirection * (tileHeight-1);
-        BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector3Int.zero : Vector3Int.left), new Vector2Int(2, tileHeight), tiles);
+        GameManager.Instance.BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector3Int.zero : Vector3Int.left), new Vector2Int(2, tileHeight), tiles);
 
-        player.photonView.RPC(nameof(PlayerController.PlaySound), RpcTarget.All, Enums.Sounds.Powerup_MegaMushroom_Break_Pipe);
+        player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Break_Pipe);
         return true;
     }
 
@@ -150,10 +152,5 @@ public class BreakablePipeTile : InteractableTile {
             searchVector += Vector3Int.down;
         }
         return height;
-    }
-
-    private void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tilenames) {
-        object[] parametersTile = new object[]{tileOrigin.x, tileOrigin.y, tileDimensions.x, tileDimensions.y, tilenames};
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetTileBatch, parametersTile, ExitGames.Client.Photon.SendOptions.SendReliable);
     }
 }

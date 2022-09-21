@@ -41,7 +41,7 @@ public class TrackIcon : MonoBehaviour {
             }
 
             // OPTIMIZE:
-            if (playerTarget.Dead) {
+            if (playerTarget.IsDead) {
                 flashTimer += Time.deltaTime;
                 image.enabled = (flashTimer % 0.2f) <= 0.1f;
             } else {

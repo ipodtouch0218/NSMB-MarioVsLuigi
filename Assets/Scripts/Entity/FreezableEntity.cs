@@ -11,7 +11,7 @@ public abstract class FreezableEntity : BasicEntity {
 
     public abstract void Freeze(FrozenCube cube);
 
-    public abstract void Unfreeze(byte reasonByte);
+    public abstract void Unfreeze(UnfreezeReason reasonByte);
 
     public enum UnfreezeReason : byte {
         Other,

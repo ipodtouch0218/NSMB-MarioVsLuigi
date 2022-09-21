@@ -1,9 +1,8 @@
 using UnityEngine;
-using Photon.Pun;
 
 using NSMB.Utils;
 
-public class RespawningInvisibleBlock : MonoBehaviour {
+public class RespawningInvisibleBlock : MonoBehaviour, IPlayerInteractable {
 
     private double bumpTime;
 
@@ -35,6 +34,10 @@ public class RespawningInvisibleBlock : MonoBehaviour {
         DoBump(tileLocation, collision.gameObject.GetPhotonView());
         bumpTime = PhotonNetwork.Time + 0.25d;
         collision.attachedRigidbody.velocity = new(body.velocity.x, 0);
+    }
+
+    public void InteractWithPlayer(PlayerController player) {
+            
     }
 
     public void DoBump(Vector3Int tileLocation, PhotonView player) {

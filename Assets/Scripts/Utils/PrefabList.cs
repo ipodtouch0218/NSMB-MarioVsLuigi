@@ -1,33 +1,33 @@
 using UnityEngine;
 
-public static class PrefabList {
+using Fusion;
 
+[CreateAssetMenu(fileName = "New Prefab List", menuName = "ScriptableObjects/PrefabList")]
+public class PrefabList : ScriptableObject {
 
-    public static GameObject Net_PlayerData { get; } =
-        (GameObject) Resources.Load("Prefab/Network/PlayerDataHolder");
+    public static PrefabList Instance => GlobalController.Instance.prefabs;
 
+    //---Network Helpers
+    public NetworkPrefabRef PlayerDataHolder;
 
+    //---World Elements
+    public NetworkPrefabRef Obj_Fireball, Obj_Iceball;
+    public NetworkPrefabRef Obj_LooseCoin;
+    public NetworkPrefabRef Obj_BigStar;
+    public NetworkPrefabRef Obj_BlockBump;
 
-    public static FireballMover Fireball { get; } =
-        ((GameObject) Resources.Load("Prefab/Fireball")).GetComponent<FireballMover>();
-    public static FireballMover Iceball { get; } =
-        ((GameObject) Resources.Load("Prefab/Iceball")).GetComponent<FireballMover>();
-    public static LooseCoin LooseCoin { get; } =
-        ((GameObject) Resources.Load("Prefabs/LooseCoin")).GetComponent<LooseCoin>();
-    public static StarBouncer BigStar { get; } =
-        ((GameObject) Resources.Load("Prefabs/BigStar")).GetComponent<StarBouncer>();
+    //---Enemies
+    public NetworkPrefabRef BulletBill;
 
+    //---Powerups
+    public NetworkPrefabRef Powerup_1Up;
+    public NetworkPrefabRef Powerup_Starman, Powerup_MegaMushroom;
+    public NetworkPrefabRef Powerup_Mushroom, Powerup_FireFlower, Powerup_BlueShell, Powerup_PropellerMushroom, Powerup_IceFlower;
+    public NetworkPrefabRef Powerup_MiniMushroom;
 
-    public static MovingPowerup Powerup_Star { get; } =
-        ((GameObject) Resources.Load("Prefabs/Powerups/Star")).GetComponent<MovingPowerup>();
-    public static MovingPowerup Powerup_1Up { get; } =
-        ((GameObject) Resources.Load("Prefabs/Powerups/1-Up")).GetComponent<MovingPowerup>();
-    public static MovingPowerup Powerup_BlueShell { get; } =
-        ((GameObject) Resources.Load("Prefabs/Powerups/BlueShell")).GetComponent<MovingPowerup>();
-
-
-    public static GameObject Particle_1Up { get; } =
-        (GameObject) Resources.Load("Prefabs/Particle/1Up");
-    public static NumberParticle Particle_CoinCollect { get; } =
-        ((GameObject) Resources.Load("Prefabs/Particle/Number")).GetComponent<NumberParticle>();
+    //---Particles
+    public GameObject Particle_1Up, Particle_Giant;
+    public GameObject Particle_CoinCollect, Particle_CoinFromBlock;
+    public GameObject Particle_Respawn;
+    public GameObject Particle_FireballWall, Particle_IceballWall;
 }

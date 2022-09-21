@@ -98,9 +98,9 @@ public class DiscordController : MonoBehaviour {
                 activity.Assets = assets;
 
                 if (gm.timedGameDuration == -1) {
-                    activity.Timestamps = new() { Start = gm.startRealTime / 1000 };
+                    activity.Timestamps = new() { Start = gm.gameStartTimestamp / 1000 };
                 } else {
-                    activity.Timestamps = new() { End = gm.endRealTime / 1000 };
+                    activity.Timestamps = new() { End = gm.gameEndTimestamp / 1000 };
                 }
             } else {
                 //in a room, but on the main menu.

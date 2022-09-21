@@ -1,12 +1,11 @@
 using UnityEngine;
-using Photon.Pun;
 
-public class GenericMover : MonoBehaviour {
+using Fusion;
 
-    public AnimationCurve x;
-    public AnimationCurve y;
+public class GenericMover : NetworkBehaviour {
 
-    public float animationTimeSeconds = 1;
+    [SerializeField] private AnimationCurve x, y;
+    [SerializeField] private float animationTimeSeconds = 1;
 
     private Vector3? origin = null;
     private double timestamp = 0;

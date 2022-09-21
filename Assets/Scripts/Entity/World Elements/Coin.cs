@@ -9,21 +9,35 @@ public abstract class Coin : CollectableEntity {
             return;
 
         IsCollected = true;
-        GivePlayerCoin(player);
+        GivePlayerCoin(player, transform.position);
     }
 
-    public void GivePlayerCoin(PlayerController player) {
+    public static void GivePlayerCoin(PlayerController player, Vector3 position) {
         byte newCoins = (byte) (player.Coins + 1);
         if (newCoins >= GameManager.Instance.coinRequirement) {
             player.SpawnRandomItem();
             newCoins = 0;
         }
         player.Coins = newCoins;
-
-        Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), transform.position, Quaternion.identity);
         player.PlaySound(Enums.Sounds.World_Coin_Collect);
 
-        NumberParticle num = Instantiate(PrefabList.Particle_CoinCollect, transform.position, Quaternion.identity);
+        NumberParticle num = (Instantiate(PrefabList.Instance.Particle_CoinCollect, position, Quaternion.identity)).GetComponent<NumberParticle>();
         num.ApplyColorAndText(Utils.GetSymbolString(player.Coins.ToString(), Utils.numberSymbols), player.animationController.GlowColor);
+    }
+
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        if (direction == InteractableTile.InteractionDirection.Down)
+            return;
+
+        PlayerController target = null;
+        if (bumper is PlayerController player)
+            target = player;
+        else if (bumper is KoopaWalk koopa)
+            target = koopa.PreviousHolder;
+
+        if (!target)
+            return;
+
+        GivePlayerCoin(null, Vector3.zero);
     }
 }
