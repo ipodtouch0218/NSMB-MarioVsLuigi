@@ -10313,8 +10313,8 @@ GameObject:
   - component: {fileID: 5377451828833222271}
   - component: {fileID: 3452636116809643534}
   - component: {fileID: 453221688236677073}
-  - component: {fileID: 2433599474194652050}
   - component: {fileID: 4366200115852982522}
+  - component: {fileID: 2433599474194652050}
   m_Layer: 10
   m_Name: PlayerMario
   m_TagString: Player
@@ -10356,11 +10356,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 984b6c8bdb2dc4a419d0cd6be4254d4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerId: -1
-  dead: 0
-  spawned: 0
-  state: 0
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  _IsFrozen: 0
+  _State: 2
+  _Stars: 0
+  _Coins: 0
+  _Lives: -1
+  _StoredPowerup: 0
+  _IsInKnockback:
+    _value: 0
+  _IsDead:
+    _value: 1
+  _HeldEntity: {fileID: 0}
   previousState: 0
+  fadeOut: {fileID: 0}
+  sfxBrick: {fileID: 0}
+  cameraController: {fileID: 0}
+  animationController: {fileID: 0}
+  playerId: -1
   slowriseGravity: 1.05
   normalGravity: 3.25
   flyingGravity: 0.8
@@ -10385,11 +10400,6 @@ MonoBehaviour:
   propellerDrillBuffer: 0
   heightSmallModel: 0.42
   heightLargeModel: 0.82
-  cameraController: {fileID: 0}
-  fadeOut: {fileID: 0}
-  sfx: {fileID: 0}
-  sfxBrick: {fileID: 0}
-  body: {fileID: 0}
   onGround: 0
   previousOnGround: 0
   crushGround: 0
@@ -10399,7 +10409,6 @@ MonoBehaviour:
   hitRoof: 0
   skidding: 0
   turnaround: 0
-  facingRight: 0
   singlejump: 0
   doublejump: 0
   triplejump: 0
@@ -10408,11 +10417,8 @@ MonoBehaviour:
   groundpound: 0
   groundpoundLastFrame: 0
   sliding: 0
-  knockback: 0
   hitBlock: 0
-  running: 0
   functionallyRunning: 0
-  jumpHeld: 0
   flying: 0
   drill: 0
   inShell: 0
@@ -10433,32 +10439,15 @@ MonoBehaviour:
   groundpoundStartTimer: 0
   pickupTimer: 0
   groundpoundDelay: 0
-  hitInvincibilityCounter: 0
   powerupFlash: 0
-  throwInvincibility: 0
   jumpBuffer: 0
-  giantStartTimer: 0
-  giantEndTimer: 0
-  propellerTimer: 0
   propellerSpinTimer: 0
-  fireballTimer: 0
-  invincible: 0
-  giantTimer: 0
   floorAngle: 0
-  knockbackTimer: 0
   pipeTimer: 0
-  slowdownTimer: 0
   wallSlideLeft: 0
   wallSlideRight: 0
   pipeDirection: {x: 0, y: 0}
-  stars: 0
-  coins: 0
-  lives: -1
-  storedPowerup: {fileID: 0}
-  holding: {fileID: 0}
-  holdingOld: {fileID: 0}
   frozenObject: {fileID: 0}
-  joystick: {x: 0, y: 0}
   giantSavedVelocity: {x: 0, y: 0}
   previousFrameVelocity: {x: 0, y: 0}
   previousFramePosition: {x: 0, y: 0}
@@ -10863,35 +10852,10 @@ MonoBehaviour:
     RawGuidValue: 7624e7a260085f5409f044e3d21ae8d5
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 2433599474194652050}
+  - {fileID: 4824223341387914485}
   - {fileID: 4366200115852982522}
+  - {fileID: 2433599474194652050}
   SimulationBehaviours: []
---- !u!114 &2433599474194652050
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824223341387914446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  InterpolationSpace: 0
-  InterpolationTarget: {fileID: 8422425992379838804}
-  InterpolateErrorCorrection: 1
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 2
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
 --- !u!114 &4366200115852982522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10921,6 +10885,32 @@ MonoBehaviour:
     _hash: -814817977
   StateHashes: 0000000015b524dc47ef5bf556c27298bd01fa6551d1ef2fba1267d20e639a1f5c39e536d3bcc62fc92dfcc5c37a344a80d40749f0b7eca172f8a02449008d495391b7a3c672fc77e5c2ffd1cbc98d3ed158b7d4174540a8d68173646f89212fae4d12e333fcef56d13d40ba8dab84536a24afd318f37680aca7c5bffadd549f3b196753b8c8dcefaa659078bb7b4b94a9d60703f80769beeaaa25291f66c7e7fa5be914755d75eb3630d40976eee290358343723592c0ba76ff615801f2d1f7e4cfff041606b3a724bba6bdd4ea3ef42eef67ef9f8e7064165652646a23a24962c8319e79e798cbbf9ed1a9142de756e8038224d68c754bd1ce061658ea67e9b90c5e7784d7b6ba5dccbab430432d8b6c5a491f25427ed24e247f2d2bd053a28e636a95d6e2578d73516eba62d704e001088e180b1cadf536a6ee2121416a76e4c6fbc0ce825eb636c59099dc736e5919f4ffefaaf3a69a0e95236ca94031e10d26b417b399d2bd17ff574bea3c13cb4e5a963d679382eec3f50718df09deb748eb9366cbc9e4d81ef1023922d5f4aa279e4ec4
   TriggerHashes: 000000006fb88ee83741934fd3bcc62f40262abed68c754b65fb37c0
+--- !u!114 &2433599474194652050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824223341387914446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 8422425992379838804}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
 --- !u!1 &4824223342336871188
 GameObject:
   m_ObjectHideFlags: 0

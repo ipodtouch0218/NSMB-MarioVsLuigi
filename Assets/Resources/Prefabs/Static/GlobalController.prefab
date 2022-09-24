@@ -229,6 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2db399dc5ed094c8b01e459636e673, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabs: {fileID: 11400000, guid: 27efcbfe12709014985c8bfbd553ec02, type: 2}
   skins:
   - {fileID: 0}
   - {fileID: 11400000, guid: f63a082ed1de1ac46a4d175774638d5a, type: 2}
@@ -291,8 +292,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
   settings: {fileID: 0}
   controlsJson: 
-  joinedAsSpectator: 0
   checkedForVersion: 0
+  nickname: 
 --- !u!114 &1776850482587567144
 MonoBehaviour:
   m_ObjectHideFlags: 0

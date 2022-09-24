@@ -4,30 +4,25 @@ using Fusion;
 
 public class GenericMover : NetworkBehaviour {
 
+    //---Serialized Variables
     [SerializeField] private AnimationCurve x, y;
     [SerializeField] private float animationTimeSeconds = 1;
 
+    //---Private Variables
     private Vector3? origin = null;
-    private double timestamp = 0;
 
     public void Awake() {
         if (origin == null)
             origin = transform.position;
     }
 
-    public void Update() {
-        int start = GameManager.Instance.startServerTime;
+    public void FixedNetworkUpdate() {
+        int start = GameManager.Instance.GameStartTick;
+        int ticksSinceStart = start - Runner.Simulation.Tick.Raw;
+        float secondsSinceStart = ticksSinceStart / Runner.Config.Simulation.TickRate;
 
-        if (PhotonNetwork.Time <= timestamp) {
-            timestamp += Time.deltaTime;
-        } else {
-            timestamp = (float) PhotonNetwork.Time;
-        }
+        float percentage = secondsSinceStart / animationTimeSeconds % animationTimeSeconds;
 
-        double time = timestamp - (start / (double) 1000);
-        time /= animationTimeSeconds;
-        time %= animationTimeSeconds;
-
-        transform.position = (origin ?? default) + new Vector3(x.Evaluate((float) time), y.Evaluate((float) time), 0);
+        transform.position = (origin ?? default) + new Vector3(x.Evaluate(percentage), y.Evaluate(percentage), 0);
     }
 }

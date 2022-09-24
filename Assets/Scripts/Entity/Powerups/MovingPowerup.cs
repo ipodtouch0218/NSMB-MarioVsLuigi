@@ -22,7 +22,6 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     [SerializeField] private bool avoidPlayers;
 
     //---Component Variables
-    private Rigidbody2D body;
     private SpriteRenderer sRenderer;
     private PhysicsEntity physics;
     private Animator childAnimator;
@@ -31,8 +30,8 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     //---Misc Variables
     private int originalLayer;
 
-    public void Awake() {
-        body = GetComponent<Rigidbody2D>();
+    public override void Awake() {
+        base.Awake();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
         childAnimator = GetComponentInChildren<Animator>();
@@ -127,7 +126,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         body.velocity = new(body.velocity.x, Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
-    public override void Bump(InteractableTile.InteractionDirection direction) {
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         if (FollowPlayer)
             return;
 
@@ -223,14 +222,14 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         }
 
         if (reserve) {
-            if (player.StoredPowerup == null || (player.StoredPowerup != null && Enums.PowerupStatePriority[player.StoredPowerup.state].statePriority <= pp.statePriority && !(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))) {
+            if (player.StoredPowerup == Enums.PowerupState.None || (player.StoredPowerup != Enums.PowerupState.None && Enums.PowerupStatePriority[player.StoredPowerup].statePriority <= pp.statePriority && !(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))) {
                 //dont reserve mushrooms
-                player.StoredPowerup = powerup;
+                player.StoredPowerup = newState;
             }
             player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         } else {
-            if (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == null || Enums.PowerupStatePriority[player.StoredPowerup.state].statePriority <= cp.statePriority)) {
-                player.StoredPowerup = (Powerup) Resources.Load("Scriptables/Powerups/" + player.State);
+            if (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == Enums.PowerupState.None || Enums.PowerupStatePriority[player.StoredPowerup].statePriority <= cp.statePriority)) {
+                player.StoredPowerup = player.State;
             }
 
             player.previousState = player.State;

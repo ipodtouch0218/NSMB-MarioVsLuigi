@@ -4,72 +4,71 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-using NSMB.Utils;
-using NSMB.Extensions;
 using Fusion;
 using Fusion.Sockets;
 using Fusion.Photon.Realtime;
+using NSMB.Utils;
+using NSMB.Extensions;
 
-#pragma warning disable UNT0006 // "Incorrect message signature" for OnConnectedToServer
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
+    private static GameObject prefab;
     public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us" };
     private static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
 
     //---Exposed callbacks for Events
     public delegate void OnConnectedToServerDelegate(NetworkRunner runner);
-    public event OnConnectedToServerDelegate OnConnectedToServer;
+    public static event OnConnectedToServerDelegate OnConnectedToServer;
 
     public delegate void OnConnectFailedDelegate(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason);
-    public event OnConnectFailedDelegate OnConnectFailed;
+    public static event OnConnectFailedDelegate OnConnectFailed;
 
     public delegate bool OnConnectRequestDelegate(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token);
-    public event OnConnectRequestDelegate OnConnectRequest;
+    public static event OnConnectRequestDelegate OnConnectRequest;
 
     public delegate void OnDisconnectedFromServerDelegate(NetworkRunner runner);
-    public event OnDisconnectedFromServerDelegate OnDisconnectedFromServer;
+    public static event OnDisconnectedFromServerDelegate OnDisconnectedFromServer;
 
     public delegate void OnCustomAuthenticationResponseDelegate(NetworkRunner runner, Dictionary<string, object> data);
-    public event OnCustomAuthenticationResponseDelegate OnCustomAuthenticationResponse;
+    public static event OnCustomAuthenticationResponseDelegate OnCustomAuthenticationResponse;
 
     public delegate void OnHostMigrationDelegate(NetworkRunner runner, HostMigrationToken hostMigrationToken);
-    public event OnHostMigrationDelegate OnHostMigration;
+    public static event OnHostMigrationDelegate OnHostMigration;
 
     public delegate void OnInputDelegate(NetworkRunner runner, NetworkInput input);
-    public event OnInputDelegate OnInput;
+    public static event OnInputDelegate OnInput;
 
     public delegate void OnInputMissingDelegate(NetworkRunner runner, PlayerRef player, NetworkInput input);
-    public event OnInputMissingDelegate OnInputMissing;
+    public static event OnInputMissingDelegate OnInputMissing;
 
     public delegate void OnPlayerJoinedDelegate(NetworkRunner runner, PlayerRef player);
-    public event OnPlayerJoinedDelegate OnPlayerJoined;
+    public static event OnPlayerJoinedDelegate OnPlayerJoined;
 
     public delegate void OnPlayerLeftDelegate(NetworkRunner runner, PlayerRef player);
-    public event OnPlayerLeftDelegate OnPlayerLeft;
+    public static event OnPlayerLeftDelegate OnPlayerLeft;
 
     public delegate void OnReliableDataReceivedDelegate(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data);
-    public event OnReliableDataReceivedDelegate OnReliableDataReceived;
+    public static event OnReliableDataReceivedDelegate OnReliableDataReceived;
 
     public delegate void OnSceneLoadDoneDelegate(NetworkRunner runner);
-    public event OnSceneLoadDoneDelegate OnSceneLoadDone;
+    public static event OnSceneLoadDoneDelegate OnSceneLoadDone;
 
     public delegate void OnSceneLoadStartDelegate(NetworkRunner runner);
-    public event OnSceneLoadStartDelegate OnSceneLoadStart;
+    public static event OnSceneLoadStartDelegate OnSceneLoadStart;
 
     public delegate void OnSessionListUpdatedDelegate(NetworkRunner runner, List<SessionInfo> sessionList);
-    public event OnSessionListUpdatedDelegate OnSessionListUpdated;
+    public static event OnSessionListUpdatedDelegate OnSessionListUpdated;
 
     public delegate void OnShutdownDelegate(NetworkRunner runner, ShutdownReason shutdownReason);
-    public event OnShutdownDelegate OnShutdown;
+    public static event OnShutdownDelegate OnShutdown;
 
     public delegate void OnUserSimulationMessageDelegate(NetworkRunner runner, SimulationMessagePtr message);
-    public event OnUserSimulationMessageDelegate OnUserSimulationMessage;
+    public static event OnUserSimulationMessageDelegate OnUserSimulationMessage;
 
     public NetworkRunner runner;
-    private string currentRegion;
+    private string currentRegion = "us";
 
     #region NetworkRunner Callbacks
     void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {
@@ -81,13 +80,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             Debug.Log($"[Network] Successfully connected to a Room");
         }
 
-        OnConnectedToServer(runner);
+        OnConnectedToServer?.Invoke(runner);
     }
 
     void INetworkRunnerCallbacks.OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) {
         Debug.LogError($"[Network] Failed to connect to the server ({remoteAddress}): {reason}");
 
-        OnConnectFailed(runner, remoteAddress, reason);
+        OnConnectFailed?.Invoke(runner, remoteAddress, reason);
     }
 
     void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
@@ -95,7 +94,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         //TODO: check for bans?
         request.Accept();
 
-        bool accept = OnConnectRequest(runner, request, token);
+        bool accept = OnConnectRequest?.Invoke(runner, request, token) ?? true;
         if (accept)
             request.Accept();
         else
@@ -104,31 +103,31 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner) {
         Debug.Log("[Network] Disconnected from Lobby");
 
-        OnDisconnectedFromServer(runner);
+        OnDisconnectedFromServer?.Invoke(runner);
     }
 
     void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {
         Debug.Log("[Network] Authentication Successful");
 
-        PlayerPrefs.SetString("id", runner.AuthenticationValues.UserId);
-        if (data.ContainsKey("Token"))
-            PlayerPrefs.SetString("token", (string) data["Token"]);
+        //PlayerPrefs.SetString("id", runner.AuthenticationValues.UserId);
+        //if (data.ContainsKey("Token"))
+        //    PlayerPrefs.SetString("token", (string) data["Token"]);
+        //
+        //PlayerPrefs.Save();
 
-        PlayerPrefs.Save();
-
-        OnCustomAuthenticationResponse(runner, data);
+        OnCustomAuthenticationResponse?.Invoke(runner, data);
     }
 
     void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {
-        OnHostMigration(runner, hostMigrationToken);
+        OnHostMigration?.Invoke(runner, hostMigrationToken);
     }
 
     void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input) {
-        OnInput(runner, input);
+        OnInput?.Invoke(runner, input);
     }
 
     void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {
-        OnInputMissing(runner, player, input);
+        OnInputMissing?.Invoke(runner, player, input);
     }
 
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
@@ -136,12 +135,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         if (runner.IsServer) {
             //create player data
-            runner.Spawn(PrefabList.PlayerDataHolder, inputAuthority: player);
+            runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
         }
 
         GlobalController.Instance.DiscordController.UpdateActivity();
 
-        OnPlayerJoined(runner, player);
+        OnPlayerJoined?.Invoke(runner, player);
     }
 
     void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
@@ -154,36 +153,41 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) {
-        OnReliableDataReceived(runner, player, data);
+        OnReliableDataReceived?.Invoke(runner, player, data);
     }
 
     void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner) {
-        OnSceneLoadDone(runner);
+        OnSceneLoadDone?.Invoke(runner);
     }
 
     void INetworkRunnerCallbacks.OnSceneLoadStart(NetworkRunner runner) {
-        OnSceneLoadStart(runner);
+        OnSceneLoadStart?.Invoke(runner);
     }
 
     void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
-        OnSessionListUpdated(runner, sessionList);
+        OnSessionListUpdated?.Invoke(runner, sessionList);
     }
 
     void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
         Debug.Log($"[Network] Network Shutdown: {shutdownReason}");
 
-        OnShutdown(runner, shutdownReason);
+        Instance = null;
+        CreateInstance();
+        OnShutdown?.Invoke(runner, shutdownReason);
     }
 
     void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) {
-        OnUserSimulationMessage(runner, message);
+        OnUserSimulationMessage?.Invoke(runner, message);
     }
     #endregion
 
     #region Unity Callbacks
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
-        Instantiate(Resources.Load("Prefabs/Static/NetworkingHandler"));
+        if (!prefab)
+            prefab = (GameObject) Resources.Load("Prefabs/Static/NetworkingHandler");
+
+        Instantiate(prefab);
     }
 
     public void Awake() {
@@ -195,8 +199,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public void Start() {
         runner = GetComponent<NetworkRunner>();
-        runner.ProvideInput = true; //TODO: move to
+        runner.ProvideInput = true;
         runner.AddCallbacks(this);
+
+        //_ = ConnectToRegion();
     }
     #endregion
 
@@ -208,20 +214,25 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return await AuthenticationHandler.Authenticate(id, token);
     }
 
-    public async Task<StartGameResult> ConnectToRegion(string region) {
+    public async Task<StartGameResult> ConnectToRegion(string region = "") {
+        //exit if we're already in a room
+        if ((runner.SessionInfo.IsValid || runner.LobbyInfo.IsValid) && !runner.IsShutdown)
+            await runner.Shutdown();
 
         //version separation
         PhotonAppSettings.Instance.AppSettings.AppVersion = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value;
         PhotonAppSettings.Instance.AppSettings.EnableLobbyStatistics = true;
+        PhotonAppSettings.Instance.AppSettings.UseNameServer = true;
         PhotonAppSettings.Instance.AppSettings.FixedRegion = region;
 
         //Authenticate
         AuthenticationValues authValues = await Authenticate();
+
         //And join lobby
-        return await runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues);
+        return await Instance.runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues);
     }
 
-    public async Task<StartGameResult> CreateRoom(StartGameArgs args) {
+    public async Task<StartGameResult> CreateRoom(StartGameArgs args, string hostname) {
         //create a random room id.
         StringBuilder idBuilder = new();
 
@@ -237,11 +248,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         args.SessionName = idBuilder.ToString();
         args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
+        args.SessionProperties[Enums.NetRoomProperties.HostName] = hostname;
+
         //attempt to create the room
         return await runner.StartGame(args);
     }
 
     public async Task<StartGameResult> JoinRoom(string roomId) {
+        //exit if we're already in a room
+        if (!runner.IsShutdown)
+            await runner.Shutdown();
+
         //make sure that we're on the right region...
         string targetRegion = Regions[RoomIdValidChars.IndexOf(roomId[0])];
 

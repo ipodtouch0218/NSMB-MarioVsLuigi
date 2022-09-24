@@ -16,7 +16,6 @@ public class LooseCoin : Coin {
     private PhysicsEntity physics;
     private Animator animator;
     private BoxCollider2D hitbox;
-    private AudioSource sfx;
 
     //---Misc Variables
     private Vector2 prevFrameVelocity;
@@ -27,7 +26,6 @@ public class LooseCoin : Coin {
         hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
         animator = GetComponent<Animator>();
-        sfx = GetComponent<AudioSource>();
         body.velocity = Vector2.up * GameManager.Instance.Random.RangeInclusive(2f, 3f);
     }
 
@@ -58,7 +56,7 @@ public class LooseCoin : Coin {
                 Runner.Despawn(Object);
 
             if (prevFrameVelocity.y < -1f)
-                sfx.PlayOneShot(Enums.Sounds.World_Coin_Drop.GetClip());
+                PlaySound(Enums.Sounds.World_Coin_Drop);
         }
 
         float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;

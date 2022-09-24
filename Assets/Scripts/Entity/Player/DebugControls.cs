@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 
+using Fusion;
 using NSMB.Utils;
 
 public class DebugControls : MonoBehaviour {
@@ -28,16 +29,16 @@ public class DebugControls : MonoBehaviour {
             Time.timeScale *= 2;
             Debug.Log($"[DEBUG] Timescale set to {Time.timeScale}x");
         }
-        DebugItem(Key.Numpad0, null);
-        DebugItem(Key.Numpad1, "Mushroom");
-        DebugItem(Key.Numpad2, "FireFlower");
-        DebugItem(Key.Numpad3, "BlueShell");
-        DebugItem(Key.Numpad4, "MiniMushroom");
-        DebugItem(Key.Numpad5, "MegaMushroom");
-        DebugItem(Key.Numpad6, "Star");
-        DebugItem(Key.Numpad7, "PropellerMushroom");
-        DebugItem(Key.Numpad8, "IceFlower");
-        DebugItem(Key.Numpad9, "1-Up");
+        DebugItem(Key.Numpad0, NetworkPrefabRef.Empty);
+        DebugItem(Key.Numpad1, PrefabList.Instance.Powerup_Mushroom);
+        DebugItem(Key.Numpad2, PrefabList.Instance.Powerup_FireFlower);
+        DebugItem(Key.Numpad3, PrefabList.Instance.Powerup_BlueShell);
+        DebugItem(Key.Numpad4, PrefabList.Instance.Powerup_MiniMushroom);
+        DebugItem(Key.Numpad5, PrefabList.Instance.Powerup_MegaMushroom);
+        DebugItem(Key.Numpad6, PrefabList.Instance.Powerup_Starman);
+        DebugItem(Key.Numpad7, PrefabList.Instance.Powerup_PropellerMushroom);
+        DebugItem(Key.Numpad8, PrefabList.Instance.Powerup_IceFlower);
+        DebugItem(Key.Numpad9, PrefabList.Instance.Powerup_1Up);
         DebugEntity(Key.F1, "Koopa");
         DebugEntity(Key.F2, "RedKoopa");
         DebugEntity(Key.F3, "BlueKoopa");
@@ -82,7 +83,7 @@ public class DebugControls : MonoBehaviour {
             //PhotonNetwork.Instantiate("Prefabs/FrozenCube", p.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { p.photonView.ViewID });
         }
     }
-    private void DebugItem(Key key, string item) {
+    private void DebugItem(Key key, NetworkPrefabRef item) {
         if (!GameManager.Instance.localPlayer)
             return;
 
@@ -91,16 +92,11 @@ public class DebugControls : MonoBehaviour {
         }
     }
 
-    private void SpawnDebugItem(string prefab) {
-        GameObject prefabObj;
+    private void SpawnDebugItem(NetworkPrefabRef prefab) {
+        if (prefab == NetworkPrefabRef.Empty)
+            prefab = Utils.GetRandomItem(NetworkHandler.Instance.runner, GameManager.Instance.localPlayer).prefab;
 
-        if (prefab == null) {
-            prefabObj = Utils.GetRandomItem(NetworkHandler.Instance.runner, GameManager.Instance.localPlayer).prefab;
-        } else {
-            prefabObj = (GameObject) Resources.Load("Prefabs/Powerup/" + prefab);
-        }
-
-        NetworkHandler.Instance.runner.Spawn(prefabObj, onBeforeSpawned: (runner, obj) => {
+        NetworkHandler.Instance.runner.Spawn(prefab, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(GameManager.Instance.localPlayer, 0f);
         });
     }

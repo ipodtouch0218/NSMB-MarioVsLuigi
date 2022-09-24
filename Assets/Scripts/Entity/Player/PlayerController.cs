@@ -5,8 +5,8 @@ using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class PlayerController : FreezableEntity {
 
@@ -18,7 +18,7 @@ public class PlayerController : FreezableEntity {
     [Networked] public byte Stars { get; set; }
     [Networked] public byte Coins { get; set; }
     [Networked] public sbyte Lives { get; set; } = -1;
-    [Networked] public Powerup StoredPowerup { get; set; }
+    [Networked] public Enums.PowerupState StoredPowerup { get; set; }
 
     //Player Movement
     [Networked] public TickTimer KnockbackTimer { get; set; }
@@ -673,7 +673,7 @@ public class PlayerController : FreezableEntity {
         if (!Object.HasInputAuthority || GameManager.Instance.paused || GameManager.Instance.gameover)
             return;
 
-        if (StoredPowerup == null || IsDead) {
+        if (StoredPowerup == Enums.PowerupState.None || IsDead) {
             PlaySound(Enums.Sounds.UI_Error);
             return;
         }
@@ -790,12 +790,12 @@ public class PlayerController : FreezableEntity {
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_SpawnReserveItem() {
-        if (StoredPowerup == null)
+        if (StoredPowerup == Enums.PowerupState.None)
             return;
 
-        Runner.Spawn(StoredPowerup.prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0);
+        Runner.Spawn(Enums.PowerupFromState[StoredPowerup].prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0);
         PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
-        StoredPowerup = null;
+        StoredPowerup = Enums.PowerupState.None;
     }
 
     public void SpawnRandomItem() {
@@ -1107,7 +1107,7 @@ public class PlayerController : FreezableEntity {
         if (IsInKnockback && !fireballKnockback)
             return;
 
-        if (!GameManager.Instance.GameStarted || !DamageInvincibilityTimer.ExpiredOrNotRunning(Runner) || pipeEntering || IsFrozen || IsDead || !GiantStartTimer.ExpiredOrNotRunning(Runner) || !GiantEndTimer.ExpiredOrNotRunning(Runner))
+        if (GameManager.Instance.GameStartTick == -1 || !DamageInvincibilityTimer.ExpiredOrNotRunning(Runner) || pipeEntering || IsFrozen || IsDead || !GiantStartTimer.ExpiredOrNotRunning(Runner) || !GiantEndTimer.ExpiredOrNotRunning(Runner))
             return;
 
         if (State == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -1922,7 +1922,7 @@ public class PlayerController : FreezableEntity {
             animator.Play("mega-cancel", 0, 1f - (GiantEndTimer.RemainingTime(Runner) ?? 0f / giantStartTime));
             GiantStartTimer = TickTimer.None;
             stationaryGiantEnd = true;
-            StoredPowerup = (Powerup) Resources.Load("Scriptables/Powerups/MegaMushroom");
+            StoredPowerup = Enums.PowerupState.MegaMushroom;
             GiantTimer = TickTimer.None;
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         }

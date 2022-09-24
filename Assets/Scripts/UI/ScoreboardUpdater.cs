@@ -1,7 +1,8 @@
-using NSMB.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
+using NSMB.Extensions;
 
 public class ScoreboardUpdater : MonoBehaviour {
 
@@ -78,9 +79,11 @@ public class ScoreboardUpdater : MonoBehaviour {
             if (!player)
                 continue;
 
+            PlayerData data = player.Object.InputAuthority.GetPlayerData(player.Runner);
+
             GameObject entryObj = Instantiate(entryTemplate, transform);
             entryObj.SetActive(true);
-            entryObj.name = player.photonView.Owner.NickName;
+            entryObj.name = data.GetNickname();
             ScoreboardEntry entry = entryObj.GetComponent<ScoreboardEntry>();
             entry.target = player;
 

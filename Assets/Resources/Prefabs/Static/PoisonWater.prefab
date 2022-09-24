@@ -135,3 +135,4 @@ MonoBehaviour:
   resistance: 0
   animationSpeed: 9
   splashParticle: Prefabs/Particle/PoisonWaterSplash
+  fireDeath: 0

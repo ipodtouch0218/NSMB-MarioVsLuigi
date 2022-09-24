@@ -4,33 +4,35 @@ using UnityEngine;
 using Fusion;
 using NSMB.Utils;
 
-public class StarBouncer : BasicEntity, IPlayerInteractable {
+public class StarBouncer : CollectableEntity {
 
     private static int ANY_GROUND_MASK = -1;
 
-    [SerializeField] private float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f;
-
-    public Rigidbody2D body;
-    public bool passthrough = true, fast = false;
-
-    private SpriteRenderer sRenderer;
-    private Transform graphicTransform;
-    private PhysicsEntity physics;
-    private BoxCollider2D worldCollider;
-    private Animator animator;
-    private float pulseEffectCounter;
-    private bool canBounce;
-
-    public bool Collected { get; set; }
-
+    //---Networked Variables
     [Networked] public NetworkBool IsStationary { get; set; }
     [Networked] public NetworkBool DroppedByPit { get; set; }
     [Networked] public NetworkBool Collectable { get; set; }
     [Networked] public NetworkBool Fast { get; set; }
     [Networked] public TickTimer DespawnTimer { get; set; }
 
-    public void Awake() {
-        body = GetComponent<Rigidbody2D>();
+    //---Serialized Variables
+    [SerializeField] private float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f;
+
+    public bool passthrough = true, fast = false;
+
+    //---Components
+    private SpriteRenderer sRenderer;
+    private Transform graphicTransform;
+    private PhysicsEntity physics;
+    private BoxCollider2D worldCollider;
+    private Animator animator;
+
+    //--Private Variables
+    private float pulseEffectCounter;
+    private bool canBounce;
+
+    public override void Awake() {
+        base.Awake();
         physics = GetComponent<PhysicsEntity>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
         worldCollider = GetComponent<BoxCollider2D>();
@@ -138,14 +140,14 @@ public class StarBouncer : BasicEntity, IPlayerInteractable {
             Despawn();
     }
 
-    public void InteractWithPlayer(PlayerController player) {
+    public override void InteractWithPlayer(PlayerController player) {
         if (player.IsDead)
             return;
 
-        if (!Collectable || Collected)
+        if (!Collectable || IsCollected)
             return;
 
-        Collected = true;
+        IsCollected = true;
 
         //we can collect
         player.Stars = (byte) Mathf.Min(player.Stars + 1, GameManager.Instance.starRequirement);
@@ -153,8 +155,7 @@ public class StarBouncer : BasicEntity, IPlayerInteractable {
 
         //game mechanics
         if (IsStationary) {
-            //TODO:
-            //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+            GameManager.Instance.Rpc_ResetTilemap();
         }
 
         GameManager.Instance.CheckForWinner();
@@ -201,4 +202,7 @@ public class StarBouncer : BasicEntity, IPlayerInteractable {
         body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
     }
 
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        //do nothing when bumped
+    }
 }

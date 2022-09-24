@@ -9,9 +9,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using TMPro;
 
-using NSMB.Utils;
-using NSMB.Extensions;
 using Fusion;
+using NSMB.Extensions;
+using NSMB.Utils;
 
 public class GameManager : NetworkBehaviour {
 
@@ -36,7 +36,7 @@ public class GameManager : NetworkBehaviour {
     [Networked] public NetworkRNG Random { get; set; }
     [Networked, Capacity(10)] private NetworkLinkedList<PlayerController> Players => default;
     [Networked, Capacity(10)] private NetworkLinkedList<PlayerRef> LoadedPlayers => default;
-    [Networked] public NetworkBool GameStarted { get; set; }
+    [Networked] public int GameStartTick { get; set; } = -1;
 
     //---Serialized Variables
     [SerializeField] private MusicData mainMusic, invincibleMusic, megaMushroomMusic;
@@ -84,12 +84,10 @@ public class GameManager : NetworkBehaviour {
     public AudioSource music, sfx;
 
 
-
-
     private ParticleSystem brickBreak;
 
     // EVENT CALLBACK
-    public void SendAndExecuteEvent(Enums.NetEventIds eventId, object parameters, object sendOption, object eventOptions = null) {
+    public void SendAndExecuteEvent(object eventId, object parameters, object sendOption, object eventOptions = null) {
         //if (eventOptions == null)
         //    eventOptions = NetworkUtils.EventOthers;
         //
@@ -273,13 +271,13 @@ public class GameManager : NetworkBehaviour {
     //Register pause event
     public void OnEnable() {
         InputSystem.controls.UI.Pause.performed += OnPause;
-        NetworkHandler.Instance.OnShutdown += OnShutdown;
-        NetworkHandler.Instance.OnInput += OnInput;
+        NetworkHandler.OnShutdown += OnShutdown;
+        NetworkHandler.OnInput += OnInput;
     }
     public void OnDisable() {
         InputSystem.controls.UI.Pause.performed -= OnPause;
-        NetworkHandler.Instance.OnShutdown -= OnShutdown;
-        NetworkHandler.Instance.OnInput -= OnInput;
+        NetworkHandler.OnShutdown -= OnShutdown;
+        NetworkHandler.OnInput -= OnInput;
     }
 
     public void Awake() {
@@ -305,6 +303,8 @@ public class GameManager : NetworkBehaviour {
     }
 
     public override void Spawned() {
+
+        Debug.Log("A");
         //by default, spectate. when we get assigned a player object, we disable it there.
         spectationManager.Spectating = true;
 
@@ -385,7 +385,7 @@ public class GameManager : NetworkBehaviour {
 
     public static void OnStartTimerChanged(Changed<GameManager> changed) {
         GameManager gm = changed.Behaviour;
-        if (gm.GameStartTimer.IsRunning && !gm.GameStarted) {
+        if (gm.GameStartTimer.IsRunning && gm.GameStartTick == -1) {
             if (gm.Runner.IsServer)
                 gm.Rpc_FinishLoading();
         }
@@ -447,10 +447,8 @@ public class GameManager : NetworkBehaviour {
         }
 
         //Respawn enemies
-        if (Runner.IsServer) {
-            foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
-                point.AttemptSpawning();
-        }
+        foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
+            point.AttemptSpawning();
 
         //Start timer
         Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Time, out int timedGameDuration);
@@ -465,7 +463,7 @@ public class GameManager : NetworkBehaviour {
             wfgs.AttemptExecute();
 
 
-        GameStarted = true;
+        GameStartTick = Runner.Simulation.Tick.Raw;
         musicEnabled = true;
 
         gameStartTimestamp = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -601,7 +599,7 @@ public class GameManager : NetworkBehaviour {
         if (gameover)
             return;
 
-        if (GameStarted && musicEnabled) {
+        if (GameStartTick != -1 && musicEnabled) {
             bool allNull = true;
             foreach (PlayerController controller in players) {
                 if (controller) {

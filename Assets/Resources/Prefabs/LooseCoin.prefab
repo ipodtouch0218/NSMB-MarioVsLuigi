@@ -77,9 +77,8 @@ GameObject:
   - component: {fileID: 786289218142832794}
   - component: {fileID: 786289218142832795}
   - component: {fileID: 5943513950730874965}
-  - component: {fileID: 786289218142832799}
-  - component: {fileID: 4488621770218114167}
-  - component: {fileID: 3665151080293834493}
+  - component: {fileID: 826556521306155776}
+  - component: {fileID: 2965949114585547753}
   m_Layer: 15
   m_Name: LooseCoin
   m_TagString: loosecoin
@@ -115,6 +114,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 554259371d06ef74fb69f2282f4bdfff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  _IsCollected:
+    _value: 0
   despawn: 8
 --- !u!212 &786289218142832797
 SpriteRenderer:
@@ -373,6 +377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   killTime: 0
 --- !u!114 &5943513950730874965
 MonoBehaviour:
@@ -386,6 +391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   goUpSlopes: 0
   onGround: 0
   hitRoof: 0
@@ -395,7 +401,7 @@ MonoBehaviour:
   floorAngle: 0
   currentCollider: {fileID: 786289218142832792}
   floorAndRoofCutoff: 0.3
---- !u!114 &786289218142832799
+--- !u!114 &826556521306155776
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -404,21 +410,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 786289218142832788}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 4488621770218114167}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &4488621770218114167
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 3653cb6036ba9aa43a6ca2e8de135243
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 786289218142832793}
+  - {fileID: 786289218142832795}
+  - {fileID: 5943513950730874965}
+  - {fileID: 2965949114585547753}
+  SimulationBehaviours: []
+--- !u!114 &2965949114585547753
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -427,22 +437,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 786289218142832788}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: 3665151080293834493}
---- !u!114 &3665151080293834493
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 786289218142832788}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interpolate: 1
-  body: {fileID: 1694848990786736830}
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5

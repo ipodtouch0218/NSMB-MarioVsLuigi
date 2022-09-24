@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
-using NSMB.Utils;
+using NSMB.Extensions;
 
 public class SpectationManager : MonoBehaviour {
 
@@ -58,10 +58,10 @@ public class SpectationManager : MonoBehaviour {
             return;
 
         UIUpdater.Instance.player = TargetPlayer;
-        if (!TargetPlayer || !TargetPlayer.photonView)
+        if (!TargetPlayer)
             return;
 
-        spectatingText.text = $"Spectating: { TargetPlayer.photonView.Owner.GetUniqueNickname() }";
+        spectatingText.text = "Spectating: " + TargetPlayer.Object.InputAuthority.GetPlayerData(TargetPlayer.Runner).GetNickname();
     }
 
     public void SpectateNextPlayer() {

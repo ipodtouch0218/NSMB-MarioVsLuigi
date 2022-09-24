@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 
 using NSMB.Utils;
+using NSMB.Extensions;
 
 public class ScoreboardEntry : MonoBehaviour {
 
@@ -11,6 +12,7 @@ public class ScoreboardEntry : MonoBehaviour {
     [SerializeField] private Image background;
 
     public PlayerController target;
+    private PlayerData data;
 
     private int playerId, currentLives, currentStars;
     private bool rainbowEnabled;
@@ -21,20 +23,22 @@ public class ScoreboardEntry : MonoBehaviour {
             return;
         }
 
+        data = target.Object.InputAuthority.GetPlayerData(target.Runner);
+
         playerId = target.playerId;
-        nameText.text = target.photonView.Owner.GetUniqueNickname();
+        nameText.text = data.GetNickname();
 
         Color c = target.animationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);
 
-        rainbowEnabled = target.photonView.Owner.HasRainbowName();
+        rainbowEnabled = target.Object.InputAuthority.HasRainbowName();
     }
 
     public void Update() {
         CheckForTextUpdate();
 
         if (rainbowEnabled)
-            nameText.color = Utils.GetRainbowColor();
+            nameText.color = Utils.GetRainbowColor(target.Runner);
     }
 
     public void CheckForTextUpdate() {
@@ -57,7 +61,7 @@ public class ScoreboardEntry : MonoBehaviour {
         string txt = "";
         if (currentLives >= 0)
             txt += target.character.uistring + Utils.GetSymbolString(currentLives.ToString());
-        txt += Utils.GetSymbolString($"S{currentStars}");
+        txt += Utils.GetSymbolString("S" + currentStars);
 
         valuesText.text = txt;
     }

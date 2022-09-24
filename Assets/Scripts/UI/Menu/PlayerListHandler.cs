@@ -34,17 +34,20 @@ public class PlayerListHandler : MonoBehaviour {
     //}
 
     public void OnEnable() {
+        if (!NetworkHandler.Instance.runner)
+            return;
+
         if (NetworkHandler.Instance.runner.SessionInfo.IsValid)
             PopulatePlayerEntries(true);
 
-        NetworkHandler.Instance.OnPlayerJoined += OnPlayerJoined;
-        NetworkHandler.Instance.OnPlayerLeft += OnPlayerLeft;
+        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
     }
     public void OnDisable() {
         RemoveAllPlayerEntries();
 
-        NetworkHandler.Instance.OnPlayerJoined -= OnPlayerJoined;
-        NetworkHandler.Instance.OnPlayerLeft -= OnPlayerLeft;
+        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
     }
 
     public void PopulatePlayerEntries(bool addSelf) {

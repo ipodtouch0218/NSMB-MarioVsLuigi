@@ -4879,6 +4879,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa60e0a51f0cba44fa8367033bc452f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  body: {fileID: 0}
+  sfx: {fileID: 0}
+  _IsCollected:
+    _value: 0
+  _IsStationary:
+    _value: 0
+  _DroppedByPit:
+    _value: 0
+  _Collectable:
+    _value: 0
+  _Fast:
+    _value: 0
   pulseAmount: 0.15
   pulseSpeed: 16
   moveSpeed: 1.5
@@ -4887,10 +4902,7 @@ MonoBehaviour:
   deathBoostAmount: 8.5
   blinkingSpeed: 0.25
   lifespan: 15
-  body: {fileID: 0}
-  stationary: 1
   passthrough: 0
-  left: 1
   fast: 0
 --- !u!50 &1973747262660636108
 Rigidbody2D:
@@ -4983,6 +4995,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   goUpSlopes: 0
   onGround: 0
   hitRoof: 0
@@ -5127,6 +5140,8 @@ MonoBehaviour:
     RawGuidValue: d6c38f51091fae64fa27d92f9415b3ab
   NestedObjects: []
   NetworkedBehaviours:
+  - {fileID: 1973747262660636110}
+  - {fileID: 4404708631857811697}
   - {fileID: -1107023245251777124}
   SimulationBehaviours: []
 --- !u!114 &-1107023245251777124

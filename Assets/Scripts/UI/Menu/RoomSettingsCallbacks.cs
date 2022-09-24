@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class RoomSettingsCallbacks : MonoBehaviour {
 
@@ -88,12 +88,12 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     #endregion
 
     #region Lives
-    public void SetLives(TMP_InputField input) {
+    public void SetLives() {
         if (Runner.IsClient)
             return;
 
         Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Lives, out int oldValue);
-        int.TryParse(input.text, out int newValue);
+        int.TryParse(livesInputField.text, out int newValue);
         if (newValue == -1 || newValue < 1 || newValue > 99) {
             ChangeLives(oldValue);
             return;
@@ -149,13 +149,15 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
 
         int newValue = Utils.ParseTimeToSeconds(timerInputField.text);
+        newValue = timerEnabledToggle.isOn ? newValue : -1;
         Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.Time] = timerEnabledToggle.isOn ? newValue : -1
+            [Enums.NetRoomProperties.Time] = newValue
         });
         ChangeTime(newValue);
     }
     private void ChangeTime(int time) {
         timerEnabledToggle.SetIsOnWithoutNotify(time != -1);
+        timerInputField.interactable = time != -1;
 
         if (time == -1)
             return;

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6065391363066521137}
   - component: {fileID: 6205263236572087232}
+  - component: {fileID: 7778410660804686588}
   m_Layer: 0
   m_Name: PlayerDataHolder
   m_TagString: Untagged
@@ -53,5 +54,31 @@ MonoBehaviour:
   NetworkGuid:
     RawGuidValue: cf98b2b907b9bc74ab8c14624e3c5575
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 7778410660804686588}
   SimulationBehaviours: []
+--- !u!114 &7778410660804686588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8231482486698236711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90281b85f699b3d4f9f2583f81cd26da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _IsNicknameSet:
+    _value: 0
+  _IsMuted:
+    _value: 0
+  _IsManualSpectator:
+    _value: 0
+  _IsCurrentlySpectating:
+    _value: 1
+  _IsLoaded:
+    _value: 0
+  _CharacterIndex: 0
+  _SkinIndex: 0

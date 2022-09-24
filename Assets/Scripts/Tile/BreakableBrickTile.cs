@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using NSMB.Utils;
+using Fusion;
 
 [CreateAssetMenu(fileName = "BreakableBrickTile", menuName = "ScriptableObjects/Tiles/BreakableBrickTile")]
 public class BreakableBrickTile : InteractableTile {
@@ -39,19 +40,19 @@ public class BreakableBrickTile : InteractableTile {
         if (doBump && !doBreak && bumpIfNotBroken)
             BumpWithAnimation(interacter, direction, worldLocation);
         if (doBreak)
-            Break(interacter as BasicEntity, worldLocation, giantBreak ? Enums.Sounds.Powerup_MegaMushroom_Break_Block : Enums.Sounds.World_Block_Break);
+            Break(interacter, worldLocation, giantBreak ? Enums.Sounds.Powerup_MegaMushroom_Break_Block : Enums.Sounds.World_Block_Break);
         return doBreak;
     }
     public void Break(BasicEntity interacter, Vector3 worldLocation, Enums.Sounds sound) {
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Tilemap
-        object[] parametersTile = new object[]{tileLocation.x, tileLocation.y, null};
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetTile, parametersTile, ExitGames.Client.Photon.SendOptions.SendReliable);
+        GameManager.Instance.tilemap.SetTile(tileLocation, null);
 
         //Particle
-        object[] parametersParticle = new object[]{ tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+        //TODO:
+        //object[] parametersParticle = new object[]{ tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
+        //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
 
         if (interacter)
             interacter.PlaySound(sound);
@@ -61,8 +62,7 @@ public class BreakableBrickTile : InteractableTile {
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Bump
-        object[] parametersBump = new object[]{tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, "SpecialTiles/" + name, ""};
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
+        GameManager.Instance.CreateBlockBump(tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, "SpecialTiles/" + name, NetworkPrefabRef.Empty, false);
     }
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         //Breaking block check.

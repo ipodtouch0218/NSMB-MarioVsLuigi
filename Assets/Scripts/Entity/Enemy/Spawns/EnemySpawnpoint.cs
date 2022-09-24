@@ -4,8 +4,10 @@ using NSMB.Utils;
 
 public class EnemySpawnpoint : MonoBehaviour {
 
+    //---Serialized Variables
     [SerializeField] private GameObject prefab;
 
+    //---Private Variables
     private GameObject currentEntity;
 
     public virtual bool AttemptSpawning() {
@@ -20,6 +22,9 @@ public class EnemySpawnpoint : MonoBehaviour {
     }
 
     public void OnDrawGizmos() {
+        if (!prefab)
+            return;
+
         string icon = prefab.name;
         float offset = icon switch {
             "BlueKoopa" => 0.15f,

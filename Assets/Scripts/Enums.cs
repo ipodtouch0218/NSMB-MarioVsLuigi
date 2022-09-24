@@ -16,6 +16,16 @@ public static class Enums {
             itemPriority = item;
         }
     }
+    public static readonly Dictionary<PowerupState, Powerup> PowerupFromState = new() {
+        [PowerupState.None] = null,
+        [PowerupState.MiniMushroom] = (Powerup) Resources.Load("Scriptables/Powerups/MiniMushroom"),
+        [PowerupState.Mushroom] = (Powerup) Resources.Load("Scriptables/Powerups/Mushroom"),
+        [PowerupState.FireFlower] = (Powerup) Resources.Load("Scriptables/Powerups/FireFlower"),
+        [PowerupState.IceFlower] = (Powerup) Resources.Load("Scriptables/Powerups/IceFlower"),
+        [PowerupState.PropellerMushroom] = (Powerup) Resources.Load("Scriptables/Powerups/PropellerMushroom"),
+        [PowerupState.BlueShell] = (Powerup) Resources.Load("Scriptables/Powerups/BlueShell"),
+        [PowerupState.MegaMushroom] = (Powerup) Resources.Load("Scriptables/Powerups/MegaMushroom")
+    };
     public static readonly Dictionary<PowerupState, PriorityPair> PowerupStatePriority = new() {
         [PowerupState.None] = new(-1),
         [PowerupState.MiniMushroom] = new(0, 3),

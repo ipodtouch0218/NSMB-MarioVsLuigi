@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LoadingPower : MonoBehaviour {
-    
+
     public int marioX = -296, peachX = 296, minX = -410;
     public Vector3 movementSpeed;
     public MarioLoader mario;
@@ -11,12 +9,13 @@ public class LoadingPower : MonoBehaviour {
     private RectTransform rect;
     private bool goomba, goombaHit;
     private float goombaTimer;
-    void Start() {
+
+    public void Start() {
         animator = GetComponent<Animator>();
         rect = GetComponent<RectTransform>();
     }
 
-    void Update() {
+    public void Update() {
         animator.SetBool("goomba", goomba);
         if ((goombaTimer -= Time.deltaTime) < 0)
             rect.localPosition += movementSpeed * Time.deltaTime;
@@ -30,16 +29,16 @@ public class LoadingPower : MonoBehaviour {
                     goombaTimer = 0.5f;
                 }
                 if (rect.localPosition.x <= minX)
-                    Reset();
+                    TeleportToBeginning();
             } else {
                 mario.scale++;
                 mario.scaleTimer = 0f;
-                Reset();
+                TeleportToBeginning();
             }
         }
     }
 
-    void Reset() {
+    private void TeleportToBeginning() {
         goombaHit = false;
         goomba = mario.scale > 0 && (mario.scale >= 2 || Random.value < 0.5f);
         rect.localPosition = new Vector2(peachX, rect.localPosition.y);

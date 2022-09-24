@@ -200,4 +200,8 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
             player.DoKnockback(FacingRight, 1, true, 0);
         }
     }
+
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        //do nothing when bumped
+    }
 }

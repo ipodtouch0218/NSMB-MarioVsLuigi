@@ -13,8 +13,9 @@ public class PlayerData : NetworkBehaviour {
     public static bool Locked { get => GameManager.Instance; }
 
     //---Networked Variables
-    [Networked] private NetworkString<_32> Nickname { get; set; } = "noname";
-    [Networked] private NetworkString<_32> UserId { get; set; }
+    [Networked, Capacity(20)] private string Nickname { get; set; } = "noname";
+    [Networked, Capacity(20)] private string DisplayNickname { get; set; } = "noname";
+    [Networked, Capacity(32)] private string UserId { get; set; }
     [Networked] public NetworkBool IsNicknameSet { get; set; }
     [Networked] public NetworkBool IsMuted { get; set; }
     [Networked] public NetworkBool IsManualSpectator { get; set; }
@@ -33,6 +34,9 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public override void Spawned() {
+        //keep track of our data, pls kthx
+        Runner.SetPlayerObject(Object.InputAuthority, Object);
+
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.
             Rpc_SetNickname(Settings.Instance.nickname);
@@ -43,15 +47,12 @@ public class PlayerData : NetworkBehaviour {
         if (Runner.IsServer) {
             //expose their userid
             //TOOD: use an auth-server signed userid, to disallow userid spoofing.
-            UserId = Runner.GetPlayerUserId(Object.InputAuthority).Replace("-", "");
+            UserId = Runner.GetPlayerUserId(Object.InputAuthority)?.Replace("-", "");
         }
-
-        //keep track of our data, pls kthx
-        Runner.SetPlayerObject(Object.InputAuthority, Object);
     }
 
     public string GetNickname(bool filter = true) {
-        return filter ? Nickname.ToString().Filter() : Nickname.ToString();
+        return filter ? DisplayNickname.ToString().Filter() : DisplayNickname.ToString();
     }
 
     public string GetUserId() {
@@ -76,18 +77,21 @@ public class PlayerData : NetworkBehaviour {
         name = Regex.Replace(name, @"[^\p{L}\d]", "");
 
         //enforce character limits
-        name = name.Substring(0, Mathf.Max(name.Length, MainMenuManager.NICKNAME_MAX));
+        name = name.Substring(0, Mathf.Min(name.Length, MainMenuManager.NICKNAME_MAX));
 
         //if this new nickname is invalid, default back to "noname"
         if (name.Length < MainMenuManager.NICKNAME_MIN)
             name = "noname";
 
+        Nickname = name;
+        gameObject.name = "PlayerData (" + name + ")";
+
         //check for players with duplicate names, and add (1), (2), etc
-        int count = Runner.ActivePlayers.Where(pr => pr.GetPlayerData(Runner).Nickname.ToString().Split(" ")[0] == name).Count();
-        if (count >= 0)
+        int count = Runner.ActivePlayers.Where(pr => pr.GetPlayerData(Runner).Nickname.ToString().Filter() == name).Count() - 1;
+        if (count > 0)
             name += " (" + count + ")";
 
-        Nickname = name;
+        DisplayNickname = name;
         IsNicknameSet = true;
     }
 

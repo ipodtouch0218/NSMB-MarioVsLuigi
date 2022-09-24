@@ -17,9 +17,8 @@ GameObject:
   - component: {fileID: -4753383432991643724}
   - component: {fileID: 472015331249174581}
   - component: {fileID: -4211955845073762521}
-  - component: {fileID: -1720675168950811037}
-  - component: {fileID: 8282067885221242581}
-  - component: {fileID: 5581605840375564576}
+  - component: {fileID: 3997958104174501866}
+  - component: {fileID: 224056960718892709}
   m_Layer: 14
   m_Name: FrozenCube
   m_TagString: frozencube
@@ -54,22 +53,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a780c42ddb964d64a8847d5108909390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dead: 0
-  left: 1
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  _IsFrozen: 0
+  _Dead:
+    _value: 0
   collide: 1
   iceCarryable: 0
   flying: 0
-  body: {fileID: -1029166702606754831}
   hitbox: {fileID: 0}
-  holder: {fileID: 0}
-  previousHolder: {fileID: 0}
+  _Holder: {fileID: 0}
+  _PreviousHolder: {fileID: 0}
+  throwSpeed: 7.25
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 0
-  throwSpeed: 7.25
+  canKick: 1
   shakeSpeed: 80
   shakeAmount: 2
   unfreezeReason: 0
-  autoBreakTimer: 3
 --- !u!212 &5302927234469735370
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -201,6 +203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   goUpSlopes: 0
   onGround: 0
   hitRoof: 0
@@ -328,7 +331,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &-1720675168950811037
+--- !u!114 &3997958104174501866
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -337,21 +340,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 4465303805189439310}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 8282067885221242581}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &8282067885221242581
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 177a6b73e1174384f81bc44d9594f7e7
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 5742616016131993260}
+  - {fileID: -4753383432991643724}
+  - {fileID: 224056960718892709}
+  SimulationBehaviours: []
+--- !u!114 &224056960718892709
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -360,22 +366,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 4465303805189439310}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: 5581605840375564576}
---- !u!114 &5581605840375564576
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4465303805189439310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interpolate: 1
-  body: {fileID: -1029166702606754831}
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5

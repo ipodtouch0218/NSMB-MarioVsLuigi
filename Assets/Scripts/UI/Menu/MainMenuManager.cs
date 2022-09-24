@@ -134,21 +134,9 @@ public class MainMenuManager : MonoBehaviour {
     }
     */
 
-    //public void OnJoinedRoom((NetworkRunner runner) {
-    //    LocalChatMessage(PhotonNetwork.LocalPlayer.GetUniqueNickname() + " joined the room", Color.red);
-
-    //}
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        //TODO: check for bans?
-        //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
-        //List<NameIdPair> banList = bans.Cast<NameIdPair>().ToList();
-        //if (newPlayer.NickName.Length < NICKNAME_MIN || newPlayer.NickName.Length > NICKNAME_MAX || banList.Any(nip => nip.userId == newPlayer.UserId)) {
-        //    if (PhotonNetwork.IsMasterClient)
-        //        StartCoroutine(KickPlayer(newPlayer));
-
-        //    return;
-        //}
-
+        if (runner.LocalPlayer == player)
+            EnterRoom();
 
         //mark player as not a spectator, as we are in the lobby
         if (Runner.IsServer)
@@ -161,19 +149,6 @@ public class MainMenuManager : MonoBehaviour {
         LocalChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
-    public void OnRoomPropertiesUpdate(Hashtable updatedProperties) {
-        if (updatedProperties == null)
-            return;
-
-        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
-        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
-        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
-        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
-        //AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.CustomPowerups, ChangeNewPowerups);
-        //AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
-        //AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.DrawTime, ChangeDrawTime);
-        AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
-    }
 
     private void AttemptToUpdateProperty<T>(Hashtable updatedProperties, string key, System.Action<T> updateAction) {
         if (updatedProperties[key] == null)
@@ -181,24 +156,23 @@ public class MainMenuManager : MonoBehaviour {
 
         updateAction((T) updatedProperties[key]);
     }
+
     // CONNECTION CALLBACKS
-    //public void OnDisconnected(ShutdownReason cause) {
-    //    Debug.Log("[PHOTON] Disconnected: " + cause.ToString());
-    //    if (!(cause == DisconnectCause.None || cause == DisconnectCause.DisconnectByClientLogic || cause == DisconnectCause.CustomAuthenticationFailed))
-    //        OpenErrorBox(cause);
-    //
-    //    selectedRoom = null;
-    //    if (!PhotonNetwork.IsConnectedAndReady) {
-    //
-    //        foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
-    //            Destroy(value);
-    //            currentRooms.Remove(key);
-    //        }
-    //
-    //        //AuthenticationHandler.Authenticate(PlayerPrefs.GetString("id", null), PlayerPrefs.GetString("token", null));
-    //
-    //    }
-    //}
+    public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
+
+        if (cause != ShutdownReason.Ok)
+            OpenErrorBox(cause);
+
+        selectedRoom = null;
+        if (!runner.IsCloudReady) {
+
+            foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
+                Destroy(value);
+                currentRooms.Remove(key);
+            }
+
+        }
+    }
     //public void OnRegionListReceived(RegionHandler handler) {
     //    handler.PingMinimumOfRegions((handler) => {
 
@@ -214,39 +188,34 @@ public class MainMenuManager : MonoBehaviour {
     //    }, "");
     //}
     // MATCHMAKING CALLBACKS
-    public void OnLeftRoom() {
-        OpenLobbyMenu();
-        ClearChat();
-        GlobalController.Instance.DiscordController.UpdateActivity();
-    }
-        //case (byte) Enums.NetEventIds.PlayerChatMessage: {
-        //    string message = e.CustomData as string;
+    //case (byte) Enums.NetEventIds.PlayerChatMessage: {
+    //    string message = e.CustomData as string;
 
-        //    if (string.IsNullOrWhiteSpace(message))
-        //        return;
+    //    if (string.IsNullOrWhiteSpace(message))
+    //        return;
 
-        //    if (sender == null)
-        //        return;
+    //    if (sender == null)
+    //        return;
 
-        //    double time = lastMessage.GetValueOrDefault(sender);
-        //    if (PhotonNetwork.Time - time < 0.75f)
-        //        return;
+    //    double time = lastMessage.GetValueOrDefault(sender);
+    //    if (PhotonNetwork.Time - time < 0.75f)
+    //        return;
 
-        //    lastMessage[sender] = PhotonNetwork.Time;
+    //    lastMessage[sender] = PhotonNetwork.Time;
 
-        //    if (!sender.IsMasterClient) {
-        //        Utils.GetSessionProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
-        //        if (mutes.Contains(sender.UserId))
-        //            return;
-        //    }
+    //    if (!sender.IsMasterClient) {
+    //        Utils.GetSessionProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
+    //        if (mutes.Contains(sender.UserId))
+    //            return;
+    //    }
 
-        //    message = message.Substring(0, Mathf.Min(128, message.Length));
-        //    message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
-        //    message = sender.GetUniqueNickname() + ": " + message.Filter();
+    //    message = message.Substring(0, Mathf.Min(128, message.Length));
+    //    message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
+    //    message = sender.GetUniqueNickname() + ": " + message.Filter();
 
-        //    LocalChatMessage(message, Color.black, false);
-        //    break;
-        //}
+    //    LocalChatMessage(message, Color.black, false);
+    //    break;
+    //}
 
     // Unity Stuff
     public void Start() {
@@ -275,6 +244,7 @@ public class MainMenuManager : MonoBehaviour {
             //initial connection to the game
             OpenTitleScreen();
             LoadSettings(true);
+            _ = NetworkHandler.Instance.ConnectToRegion();
 
         } else if (Runner.SessionInfo.IsValid) {
             //call enterroom callback
@@ -332,19 +302,21 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void OnEnable() {
-        NetworkHandler.Instance.OnPlayerJoined += OnPlayerJoined;
-        NetworkHandler.Instance.OnPlayerLeft += OnPlayerLeft;
-        NetworkHandler.Instance.OnSessionListUpdated += OnSessionListUpdated;
+        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+        NetworkHandler.OnSessionListUpdated += OnSessionListUpdated;
+        NetworkHandler.OnShutdown += OnShutdown;
     }
 
     public void OnDisable() {
-        NetworkHandler.Instance.OnPlayerJoined -= OnPlayerJoined;
-        NetworkHandler.Instance.OnPlayerLeft -= OnPlayerLeft;
-        NetworkHandler.Instance.OnSessionListUpdated -= OnSessionListUpdated;
+        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+        NetworkHandler.OnSessionListUpdated -= OnSessionListUpdated;
+        NetworkHandler.OnShutdown -= OnShutdown;
     }
 
     public void Update() {
-        bool connected = Runner.IsCloudReady;
+        bool connected = Runner && Runner.State == NetworkRunner.States.Starting && Runner.IsCloudReady;
         connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
         privateJoinRoom.gameObject.SetActive(connected);
 
@@ -377,6 +349,9 @@ public class MainMenuManager : MonoBehaviour {
         //OnRoomPropertiesUpdate(room.CustomProperties);
         //ChangeMaxPlayers(room.MaxPlayers);
         //ChangePrivate();
+
+        Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
+        SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
 
         StartCoroutine(SetScroll());
 
@@ -563,8 +538,12 @@ public class MainMenuManager : MonoBehaviour {
         _ = NetworkHandler.Instance.ConnectToRegion(targetRegion);
     }
 
-    public void QuitRoom() {
-        NetworkHandler.Instance.runner.Shutdown();
+    public async void QuitRoom() {
+        OpenLobbyMenu();
+        ClearChat();
+
+        await NetworkHandler.Instance.ConnectToRegion();
+        GlobalController.Instance.DiscordController.UpdateActivity();
     }
     public void StartGame() {
         //do host related stuff
@@ -614,15 +593,15 @@ public class MainMenuManager : MonoBehaviour {
         _ = NetworkHandler.Instance.JoinRoom(id);
     }
     public void CreateRoom() {
+
         Settings.Instance.nickname = nicknameField.text;
         byte players = (byte) lobbyPlayersSlider.value;
 
         _ = NetworkHandler.Instance.CreateRoom(new() {
-            PlayerCount = players,
             Initialized = (runner) => {
                 runner.SessionInfo.IsVisible = !privateToggle.isOn;
             },
-        });
+        }, Settings.Instance.nickname);
 
         createLobbyPrompt.SetActive(false);
         //ChangeMaxPlayers(players);
@@ -995,11 +974,5 @@ public class MainMenuManager : MonoBehaviour {
         PlayerData data = Runner.GetLocalPlayerData();
 
         data.Rpc_SetPermanentSpectator(toggle.isOn);
-    }
-
-
-
-    public void ChangeLobbyHeader(string name) {
-        SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
     }
 }

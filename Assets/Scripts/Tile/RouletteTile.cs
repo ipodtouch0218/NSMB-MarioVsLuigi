@@ -1,20 +1,21 @@
 using UnityEngine;
 
 using NSMB.Utils;
+using Fusion;
 
-[CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile", order = 5)]
+[CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile")]
 public class RouletteTile : BreakableBrickTile {
 
     public string resultTile;
     public Vector2 topSpawnOffset, bottomSpawnOffset;
 
-    public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
+    public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (base.Interact(interacter, direction, worldLocation))
             return true;
 
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
-        string spawnResult = "Mushroom";
+        NetworkPrefabRef spawnResult = PrefabList.Instance.Powerup_Mushroom;
 
         if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.PreviousHolder != null)) {
             PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk) interacter).PreviousHolder;
@@ -22,15 +23,15 @@ public class RouletteTile : BreakableBrickTile {
                 //Break
 
                 //Tilemap
-                object[] parametersTile = new object[] { tileLocation.x, tileLocation.y, null };
-                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetTile, parametersTile, ExitGames.Client.Photon.SendOptions.SendReliable);
+                GameManager.Instance.tilemap.SetTile(tileLocation, null);
 
                 //Particles
                 for (int x = 0; x < 2; x++) {
                     for (int y = 0; y < 2; y++) {
 
-                        object[] parametersParticle = new object[] { tileLocation.x + x, tileLocation.y - y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
-                        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+                        //TODO:
+                        //object[] parametersParticle = new object[] { tileLocation.x + x, tileLocation.y - y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
+                        //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
 
                     }
                 }
@@ -44,14 +45,10 @@ public class RouletteTile : BreakableBrickTile {
 
         Bump(interacter, direction, worldLocation);
 
-        //Vector2 offset = direction == InteractionDirection.Down ? bottomSpawnOffset + ( spawnResult == "MegaMushroom" ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
-        //object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, offset };
-        //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
+        Vector2 offset = direction == InteractionDirection.Down ? bottomSpawnOffset + ( spawnResult == PrefabList.Instance.Powerup_MegaMushroom ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
+        GameManager.Instance.CreateBlockBump(tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, false, offset);
 
-        if (interacter is PlayerController pl)
-            pl.PlaySound(Enums.Sounds.World_Block_Powerup);
-        else if (interacter is KoopaWalk k)
-            k.PlaySound(Enums.Sounds.World_Block_Powerup);
+        interacter.PlaySound(Enums.Sounds.World_Block_Powerup);
 
         return false;
     }

@@ -75,7 +75,7 @@ public class DiscordController : MonoBehaviour {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         SessionInfo session;
 
-        if ((session = runner.SessionInfo).IsValid) {
+        if (runner && (session = runner.SessionInfo).IsValid) {
 
             activity.Details = runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
             Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxPlayers);

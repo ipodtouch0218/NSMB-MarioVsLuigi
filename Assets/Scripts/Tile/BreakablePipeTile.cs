@@ -7,7 +7,7 @@ using NSMB.Utils;
 public class BreakablePipeTile : InteractableTile {
 
     [SerializeField] private string leftDestroy, rightDestroy;
-    [SerializeField] private bool upsideDownPipe, leftOfPipe;
+    [SerializeField] public bool upsideDownPipe, leftOfPipe;
 
     [SerializeField] GameObject pipeParticle, destroyedPipeParticle;
 

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 using Fusion;
@@ -8,8 +9,8 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     [Networked] public NetworkBool FacingRight { get; set; } = true;
 
     //---Components
-    public Rigidbody2D body;
-    public AudioSource sfx;
+    [NonSerialized] public Rigidbody2D body;
+    [NonSerialized] public AudioSource sfx;
 
     public virtual void Awake() {
         body = GetComponent<Rigidbody2D>();

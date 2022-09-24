@@ -14,6 +14,9 @@ namespace NSMB.Extensions {
             ["7e9c6f2eaf0ce11098c8a90fcd9d48b13017667e33d09d0cc5dfe924f3ead6c1"] = "Fawndue",
         };
 
+        public static bool IsServer(this PlayerRef player) {
+            return NetworkHandler.Instance.runner.GetPlayerRtt(player) == 0;
+        }
         public static bool HasRainbowName(this PlayerRef player) {
             PlayerData data = player.GetPlayerData(NetworkHandler.Instance.runner);
             string userId = data?.GetUserId();

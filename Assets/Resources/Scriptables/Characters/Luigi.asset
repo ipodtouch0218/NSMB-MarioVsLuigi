@@ -9,12 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d06d6d68827b8e4ea85daa354fc2aef, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f957badddc28a34eace3672c1f18122, type: 3}
   m_Name: Luigi
   m_EditorClassIdentifier: 
+  prefab:
+    RawGuidValue: 92862b2047f6921418a44a88d54c9a3f
   soundFolder: luigi
-  prefab: PlayerLuigi
-  uistring: <sprite=4>
+  uistring: <sprite=1>
   loadingSmallSprite: {fileID: -3599161207798135845, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
   loadingBigSprite: {fileID: -309644342959843524, guid: a7245cae141f3ee449147539ebd2a2c9,

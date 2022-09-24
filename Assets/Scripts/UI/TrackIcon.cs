@@ -18,7 +18,7 @@ public class TrackIcon : MonoBehaviour {
         image = GetComponent<Image>();
 
         StarBouncer star;
-        if ((star = target.GetComponent<StarBouncer>()) && star.stationary) {
+        if ((star = target.GetComponent<StarBouncer>()) && star.IsStationary) {
             GetComponent<Animator>().enabled = true;
             transform.localScale = Vector2.zero;
         }

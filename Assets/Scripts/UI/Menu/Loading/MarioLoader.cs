@@ -1,16 +1,26 @@
-using NSMB.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
+using NSMB.Extensions;
+
 public class MarioLoader : MonoBehaviour {
 
+    //---Serailzied Variables
+    [SerializeField] private float blinkSpeed = 0.5f;
+
+    //---Public Variables
+    public float scaleTimer;
     public int scale = 0, previousScale;
-    public float scaleTimer, blinkSpeed = 0.5f;
+
+    //---Components
     private Image image;
-    public CharacterData data;
+
+    //---Private Variables
+    private CharacterData data;
+
     public void Start() {
         image = GetComponent<Image>();
-        data = Utils.GetCharacterData();
+        data = NetworkHandler.Instance.runner.GetLocalPlayerData().GetCharacterData();
     }
 
     public void Update() {

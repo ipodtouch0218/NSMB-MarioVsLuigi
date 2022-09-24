@@ -257,14 +257,6 @@ public class KoopaWalk : HoldableEntity {
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
-        EnterShell(false);
-
-        if (IsStationary)
-            body.velocity = new(bumper.body.position.x < body.position.x ? 3 : -3, body.velocity.y);
-    }
-
-
     public override void Throw(bool toRight, bool crouch) {
         base.Throw(toRight, crouch);
         if (Holder == null)
@@ -323,7 +315,7 @@ public class KoopaWalk : HoldableEntity {
             PlaySound(Enums.Sounds.World_Block_Bump);
     }
 
-    public override void Bump(InteractableTile.InteractionDirection direction) {
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         if (Dead || direction == InteractableTile.InteractionDirection.Down)
             return;
 
@@ -335,6 +327,9 @@ public class KoopaWalk : HoldableEntity {
         IsUpsideDown = canBeFlipped;
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
         body.velocity = new(body.velocity.x, 5.5f);
+
+        if (IsStationary)
+            body.velocity = new(bumper.body.position.x < body.position.x ? 3 : -3, body.velocity.y);
     }
 
     public override void Kill() {

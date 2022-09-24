@@ -2,16 +2,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using NSMB.Utils;
+
+using NSMB.Extensions;
 
 public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
+    //---Serialized Variables
     [SerializeField] private Canvas baseCanvas;
     [SerializeField] private GameObject template, blockerTemplate, content;
     [SerializeField] private Sprite clearSprite;
     [SerializeField] private string property;
 
-    private List<ColorButton> colorButtons = new();
+    //---Private Variables
+    private readonly List<ColorButton> colorButtons = new();
     private List<Button> buttons;
     private List<Navigation> navigations;
     private GameObject blocker;
@@ -62,7 +65,8 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
             buttons[i].navigation = navigations[i];
         }
 
-        ChangeCharacter(Utils.GetCharacterData());
+        CharacterData character = NetworkHandler.Instance.runner.LocalPlayer.GetCharacterData(NetworkHandler.Instance.runner);
+        ChangeCharacter(character);
     }
 
     public void ChangeCharacter(CharacterData data) {
@@ -72,7 +76,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
     public void SelectColor(Button button) {
         selected = buttons.IndexOf(button);
-        MainMenuManager.Instance.SetPlayerColor(buttons.IndexOf(button));
+        //MainMenuManager.Instance.SetPlayerColor(buttons.IndexOf(button));
         Close();
     }
     public void Open() {

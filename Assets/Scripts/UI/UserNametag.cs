@@ -3,11 +3,15 @@ using UnityEngine.UI;
 using TMPro;
 
 using NSMB.Utils;
+using NSMB.Extensions;
 
 public class UserNametag : MonoBehaviour {
 
     public PlayerController parent;
+    private PlayerData data;
+    private CharacterData character;
 
+    //---Serailzied Variables
     [SerializeField] private Camera cam;
     [SerializeField] private GameObject nametag;
     [SerializeField] private TMP_Text text;
@@ -16,7 +20,9 @@ public class UserNametag : MonoBehaviour {
     private bool rainbowName;
 
     public void Start() {
-        rainbowName = parent.photonView.Owner.HasRainbowName();
+        rainbowName = parent.Object.InputAuthority.HasRainbowName();
+        data = parent.Object.InputAuthority.GetPlayerData(parent.Runner);
+        character = data.GetCharacterData();
     }
 
     public void LateUpdate() {
@@ -26,7 +32,7 @@ public class UserNametag : MonoBehaviour {
         }
 
         arrow.color = parent.animationController.GlowColor;
-        nametag.SetActive(parent.spawned);
+        nametag.SetActive(parent.RespawnTimer.ExpiredOrNotRunning(parent.Runner));
 
         Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.WorldHitboxSize.y * 1.2f) + 0.5f);
         if (GameManager.Instance.loopingLevel && Mathf.Abs(cam.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * (1 / 4f))
@@ -59,15 +65,15 @@ public class UserNametag : MonoBehaviour {
         }
         transform.position = screenPoint;
 
-        text.text = (parent.Object.StateAuthority == parent.Object.InputAuthority ? "<sprite=5>" : "") + parent.photonView.Owner.GetUniqueNickname();
+        text.text = (parent.Object.StateAuthority == parent.Object.InputAuthority ? "<sprite=5>" : "") + data.GetNickname();
 
         text.text += "\n";
         if (parent.Lives >= 0)
-            text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
+            text.text += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
 
         text.text += Utils.GetSymbolString("Sx" + parent.Stars);
 
         if (rainbowName)
-            text.color = Utils.GetRainbowColor();
+            text.color = Utils.GetRainbowColor(parent.Runner);
     }
 }

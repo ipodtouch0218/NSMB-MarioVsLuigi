@@ -73,9 +73,10 @@ public class BulletBillLauncher : NetworkBehaviour {
     }
 
     private void SpawnBill(Vector2 spawnpoint, bool facingRight) {
-        BulletBillMover bbm = Runner.Spawn(PrefabList.BulletBill, spawnpoint, onBeforeSpawned: (runner, obj) => {
+        NetworkObject obj = Runner.Spawn(PrefabList.Instance.BulletBill, spawnpoint, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<BulletBillMover>().OnBeforeSpawned(facingRight);
         });
+        BulletBillMover bbm = obj.GetComponent<BulletBillMover>();
 
         for (int i = 0; i < BulletBills.Length; i++) {
             if (!BulletBills[i]) {

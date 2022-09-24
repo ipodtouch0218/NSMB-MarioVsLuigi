@@ -123,7 +123,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable {
         SpecialKill(false, false, 0);
     }
 
-    public override void Bump(InteractableTile.InteractionDirection direction) {
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         if (direction == InteractableTile.InteractionDirection.Down)
             return;
 

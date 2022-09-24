@@ -44,29 +44,26 @@ public class PlayerListEntry : MonoBehaviour {
         //enabled = player.HasRainbowName();
 
         string permissionSymbol = "";
-        if (player == 1)
+        if (player.IsServer()) {
             permissionSymbol += "<sprite=5>";
-
-        //Utils.GetSessionProperty(Enums.NetPlayerProperties.Status, out bool status, player.CustomProperties);
-        //if (status)
-        //    permissionSymbol += "<sprite=26>";
-
-        string characterSymbol = data.GetCharacterData().uistring;
-
-        int ping = (int) (runner.GetPlayerRtt(player) / 1000f);
-        string pingColor;
-        if (ping < 0) {
-            pingColor = "black";
-        } else if (ping < 80) {
-            pingColor = "#00b900";
-        } else if (ping < 120) {
-            pingColor = "orange";
+            pingText.text = "";
         } else {
-            pingColor = "red";
+            int ping = (int) runner.GetPlayerRtt(player);
+            string pingColor;
+            if (ping < 0) {
+                pingColor = "black";
+            } else if (ping < 80) {
+                pingColor = "#00b900";
+            } else if (ping < 120) {
+                pingColor = "orange";
+            } else {
+                pingColor = "red";
+            }
+            pingText.text = $"<color={pingColor}>{ping}";
         }
 
+        string characterSymbol = data.GetCharacterData().uistring;
         nameText.text = permissionSymbol + characterSymbol + data.GetNickname();
-        pingText.text = $"<color={pingColor}>{ping}";
 
         Transform parent = transform.parent;
         int childIndex = 0;
