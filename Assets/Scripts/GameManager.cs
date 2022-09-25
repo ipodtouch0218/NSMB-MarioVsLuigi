@@ -31,8 +31,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         private set => _instance = value;
     }
 
-    public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
-
+    [Header("= Level Data =")]
+    public string levelName = "Unknown";
+    public string levelDesigner = "", richPresenceId = "";
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     public bool loopingLevel = true;
@@ -40,22 +41,29 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public Tilemap tilemap;
     [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
     public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
-    public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
-    private TileBase[] originalTiles;
     private BoundsInt origin;
     private GameObject[] starSpawns;
-    private readonly List<GameObject> remainingSpawns = new();
-    public int startServerTime, endServerTime = -1;
-    public long startRealTime = -1, endRealTime = -1;
 
-    public Canvas nametagCanvas;
-    public GameObject nametagPrefab;
 
-    //Audio
+    [Header("= Audio =")]
+    public MusicData mainMusic;
+    public MusicData invincibleMusic, megaMushroomMusic;
     public AudioSource music, sfx;
     private LoopingMusic loopMusic;
     public Enums.MusicState? musicState = null;
 
+
+    private TileBase[] originalTiles;
+    private readonly List<GameObject> remainingSpawns = new();
+
+    [Header("= Server =")]
+    public int startServerTime;
+    public int endServerTime = -1;
+    public long startRealTime = -1, endRealTime = -1;
+
+    [Header("= Ingame Variables =")]
+    public Canvas nametagCanvas;
+    public GameObject nametagPrefab;
     public GameObject localPlayer;
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
@@ -880,7 +888,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             spawn -= new Vector3(levelWidthTile/2f, 0);
         return spawn;
     }
-    [Range(1,10)]
+    [Header("= DEBUG ="), Range(1,10)]
     public int playersToVisualize = 10;
     public void OnDrawGizmos() {
 
