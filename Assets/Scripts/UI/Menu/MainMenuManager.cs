@@ -17,42 +17,100 @@ using NSMB.Utils;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
 
-    public const int NICKNAME_MIN = 2, NICKNAME_MAX = 20;
+    /// <summary>
+    /// The minimum length of a player's nickname;
+    /// </summary>
+    public const int NICKNAME_MIN = 2;
+    /// <summary>
+    /// The maximum length of a player's nickname;
+    /// </summary>
+    public const int NICKNAME_MAX = 20;
 
     public static MainMenuManager Instance;
-    public AudioSource sfx, music;
-    public GameObject lobbiesContent, lobbyPrefab;
-    bool quit, validName;
-    public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox;
-    public GameObject[] levelCameraPositions;
-    public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
-    public TMP_Dropdown levelDropdown, characterDropdown;
-    public RoomIcon selectedRoomIcon, privateJoinRoom;
-    public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
-    public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
-    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected;
-    public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, rebindCountdown, rebindText, reconnectText, updateText;
-    public TMP_Dropdown region;
-    public RebindManager rebindManager;
     public static string lastRegion;
+
+    //Moved to the top for ease of access (since you're more likely to change these more often than the Object References that come after it)
+    [Header("= Level Data =")]
+    public int SceneOffset = 2; //!!NEW!! This was added in case the number of "non-level" scenes changes in the future
+    public GameObject[] levelCameraPositions;
+    public List<string> maps, debugMaps;
+
+    [Header("= Audio Sources =")]
+    public AudioSource music;
+    public AudioSource sfx;
+
+    [Header("= Menu References =")]
+    public GameObject title;
+    public GameObject bg;
+
+    [Header("= Main Menu =")]
+    public GameObject mainMenu;
+    public GameObject mainMenuSelected;
+    [Header("= Update Prompt =")]
+    public GameObject updateBox;
+    public GameObject updateBoxSelected;
+    public TMP_Text updateText;
+    [Header("= Options Menu =")]
+    public GameObject optionsMenu;
+    public GameObject controlsMenu;
+    public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, vsyncToggle, aspectToggle, scoreboardToggle, filterToggle;
+    public Slider musicSlider, sfxSlider, masterSlider;
+    public GameObject optionsSelected, controlsSelected, rebindPrompt;
+    public TMP_Text rebindCountdown, rebindText;
+    public RebindManager rebindManager;
+
+    [Header("= Lobbies Menu =")]
+    public GameObject lobbyMenu;
+    public GameObject connecting;
+    public GameObject lobbiesContent, lobbyPrefab;
+    public RoomIcon selectedRoomIcon, privateJoinRoom;
+    public TMP_InputField nicknameField;
+    public Button joinRoomBtn, createRoomBtn;
+    public GameObject lobbySelected;
+    public TMP_Dropdown region;
     public string connectThroughSecret = "";
     public string selectedRoom;
     public bool askedToJoin;
-
+    [Header("= Create Lobby Prompt =")]
+    public GameObject createLobbyPrompt;
+    public GameObject sliderText;
+    public Slider lobbyPlayersSlider;
+    public Toggle privateToggle;
+    public GameObject createLobbySelected;
+    [Header("= Join Private Prompt =")]
+    public GameObject privatePrompt;
+    public TMP_InputField lobbyJoinField;
+    public GameObject privateSelected;
+    [Header("= In Lobby Menu =")]
+    public GameObject inLobbyMenu;
+    public GameObject lobbyText, currentMaxPlayers, settingsPanel;
+    public TMP_Dropdown levelDropdown, characterDropdown;
+    public Button startGameBtn;
+    public GameObject playersContent;
+    public GameObject playersPrefab, chatContent, chatPrefab;
+    public TMP_InputField starsText, coinsText, livesField, timeField, chatTextField;
+    public Toggle livesEnabled, powerupsEnabled, timeEnabled, drawTimeupToggle, privateToggleRoom, spectateToggle;
+    public Slider changePlayersSlider;
+    public GameObject currentLobbySelected, reconnectBox, reconnectSelected;
+    public TMP_Text reconnectText;
     public Image overallColor, shirtColor;
     public GameObject palette, paletteDisabled;
-
     public ScrollRect settingsScroll;
-
     public Selectable[] roomSettings;
+    public ColorChooser colorManager;
 
-    public List<string> maps, debugMaps;
+    [Header("= About Menu =")]
+    public GameObject creditsMenu;
+    public GameObject creditsSelected;
 
+    [Header("= Error Popup =")]
+    public GameObject errorBox;
+    public GameObject errorButton;
+    public TMP_Text errorText;
+
+    //=====================================
+
+    private bool quit, validName;
     private bool pingsReceived, joinedLate;
     private List<string> formattedRegions;
     private Region[] pingSortedRegions;
@@ -65,8 +123,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     private readonly Dictionary<Player, double> lastMessage = new();
 
     Coroutine updatePingCoroutine;
-
-    public ColorChooser colorManager;
 
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
@@ -348,7 +404,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
             PhotonNetwork.IsMessageQueueRunning = false;
             SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
-            SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Additive);
+            SceneManager.LoadSceneAsync(level + SceneOffset, LoadSceneMode.Additive);
             break;
         }
         case (byte) Enums.NetEventIds.PlayerChatMessage: {
