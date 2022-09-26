@@ -19,8 +19,7 @@ public class PlayerAnimationController : MonoBehaviour {
     private PlayerController controller;
     private Animator animator;
     private Rigidbody2D body;
-    private BoxCollider2D mainHitbox;
-    private List<Renderer> renderers = new();
+    private readonly List<Renderer> renderers = new();
     private MaterialPropertyBlock materialBlock;
 
     public Color GlowColor {
@@ -44,7 +43,6 @@ public class PlayerAnimationController : MonoBehaviour {
         controller = GetComponent<PlayerController>();
         animator = GetComponent<Animator>();
         body = GetComponent<Rigidbody2D>();
-        mainHitbox = GetComponent<BoxCollider2D>();
         drillParticleAudio = drillParticle.GetComponent<AudioSource>();
     }
 
@@ -169,7 +167,7 @@ public class PlayerAnimationController : MonoBehaviour {
         if (controller.crouching || controller.sliding || controller.skidding) {
             dust.transform.localPosition = Vector2.zero;
         } else if (controller.wallSlideLeft || controller.wallSlideRight) {
-            dust.transform.localPosition = new Vector2(mainHitbox.size.x * (3f / 4f) * (controller.wallSlideLeft ? -1 : 1), mainHitbox.size.y * (3f / 4f));
+            dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * (3f / 4f) * (controller.wallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * (3f / 4f));
         }
     }
     private void SetParticleEmission(ParticleSystem particle, bool value) {
@@ -272,8 +270,9 @@ public class PlayerAnimationController : MonoBehaviour {
             r.SetPropertyBlock(materialBlock);
 
         //hit flash
-        float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(controller.Runner) ?? 0f;
-        models.SetActive(GameManager.Instance.gameover || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
+        //float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(controller.Runner) ?? 0f;
+        //models.SetActive(GameManager.Instance.gameover || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
+        models.SetActive(true);
 
         //Model changing
         bool large = controller.State >= Enums.PowerupState.Mushroom;
@@ -287,13 +286,12 @@ public class PlayerAnimationController : MonoBehaviour {
         animator.avatar = large ? largeAvatar : smallAvatar;
         animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
 
-        HandleDeathAnimation();
+        //HandleDeathAnimation();
         HandlePipeAnimation();
 
         transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
     }
     void HandleDeathAnimation() {
-
         float deathTimer = 3f - (controller.DeathTimer.RemainingTime(controller.Runner) ?? 0f);
 
         if (deathTimer < deathUpTime) {
@@ -318,7 +316,7 @@ public class PlayerAnimationController : MonoBehaviour {
             controller.fadeOut.FadeOutAndIn(0.33f, .1f);
 
         if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y) {
-            models.SetActive(false);
+            //models.SetActive(false);
             body.velocity = Vector2.zero;
             body.gravityScale = 0;
         }

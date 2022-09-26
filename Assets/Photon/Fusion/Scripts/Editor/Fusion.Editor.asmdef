@@ -35,6 +35,11 @@
             "name": "nuget.mono-cecil",
             "expression": "0.1",
             "define": "FUSION_HAS_MONO_CECIL"
+        },
+        {
+            "name": "com.unity.nuget.mono-cecil",
+            "expression": "1.11",
+            "define": "FUSION_CECIL_1_11_OR_NEWER"
         }
     ],
     "noEngineReferences": false

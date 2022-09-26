@@ -15,42 +15,44 @@ MonoBehaviour:
   PlayerDataHolder:
     RawGuidValue: cf98b2b907b9bc74ab8c14624e3c5575
   Obj_Fireball:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 00a2ef66a322a694c837b29404f2af49
   Obj_Iceball:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: c57433d2daa34524c9b41fbf944b0ba3
   Obj_LooseCoin:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 3653cb6036ba9aa43a6ca2e8de135243
   Obj_BigStar:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: d6c38f51091fae64fa27d92f9415b3ab
   Obj_BlockBump:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 184ade792aff4504bb1e613fe8952520
   BulletBill:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 42350f427b980ac45b4ce789698052ce
   Powerup_1Up:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: e9dfb7c4606191e418a7f2b88c805e3e
   Powerup_Starman:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 6503ae3cebbf4d94ba7bb95537697cae
   Powerup_MegaMushroom:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 2fa56f937ef51464da5f954b19b67637
   Powerup_Mushroom:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 6dbe32ab0e6d5bc4c8fe9722f4c86d19
   Powerup_FireFlower:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: d456b58d55e1ccc4eab91b85f3e4d08f
   Powerup_BlueShell:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: fc9311d45068b0b4babce8b3733e590b
   Powerup_PropellerMushroom:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 467d8d6c11c84374a9f38f758becc536
   Powerup_IceFlower:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 7fcd129d47a9505458544e2045bb0b57
   Powerup_MiniMushroom:
-    RawGuidValue: 00000000000000000000000000000000
+    RawGuidValue: 01e65939dc0c28345bd9b2d4fbf025ab
   Particle_1Up: {fileID: 4677531960176377302, guid: 4f0231ceed2b44e4ca1cf31e4d33437e,
     type: 3}
   Particle_Giant: {fileID: 1027938211771126356, guid: 70a76e37af3bdf04a822468bf5a629f2,
     type: 3}
-  Particle_CoinCollect: {fileID: 3454878197365995850, guid: 34b8762c3868b5d43b40a69badde238a,
+  Particle_CoinNumber: {fileID: 4677531960176377302, guid: 818e60315a414df48a229c8d1186ce98,
     type: 3}
   Particle_CoinFromBlock: {fileID: 4355208377719065490, guid: e55364fb26d178a4fbb31ba42edc3c9a,
+    type: 3}
+  Particle_StarCollect: {fileID: 817659606265668166, guid: 0d07cd0662b5f394fa4d95667c1d1814,
     type: 3}
   Particle_Respawn: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
     type: 3}

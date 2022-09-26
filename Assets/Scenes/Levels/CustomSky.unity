@@ -288,6 +288,21 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6411750294929853123, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 6411750294929853123, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 5210131537802704082
+      objectReference: {fileID: 0}
+    - target: {fileID: 6411750294929853123, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 5863731500628868508
+      objectReference: {fileID: 0}
     - target: {fileID: 6795175009404718072, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -650,6 +665,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: -2645044700054658478
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -3223630291425629296
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -1113,6 +1143,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: -3077628802301586630
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -1929206457916674378
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 946c21a210ac3094bba96c7e4190a452, type: 3}
@@ -1225,6 +1270,7 @@ GameObject:
   m_Component:
   - component: {fileID: 810399418}
   - component: {fileID: 810399419}
+  - component: {fileID: 810399420}
   m_Layer: 0
   m_Name: RedKoopaSpawn (1)
   m_TagString: Untagged
@@ -1259,8 +1305,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: Prefabs/Enemy/RedKoopa
-  currentEntity: {fileID: 0}
+  _interpolationDataSource: 0
+  prefab:
+    RawGuidValue: 8cf8f49ac0882ed44953ea53ff901f11
+--- !u!114 &810399420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810399417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: e6dfd0b2fef94337b948c68947cf3e43
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 810399419}
+  SimulationBehaviours: []
 --- !u!1 &859204836
 GameObject:
   m_ObjectHideFlags: 0
@@ -1519,6 +1590,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 2108198989912094409
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 6562127509441073078
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 946c21a210ac3094bba96c7e4190a452, type: 3}
@@ -1532,6 +1618,7 @@ GameObject:
   m_Component:
   - component: {fileID: 965364238}
   - component: {fileID: 965364239}
+  - component: {fileID: 965364240}
   m_Layer: 0
   m_Name: RedKoopaSpawn
   m_TagString: Untagged
@@ -1566,8 +1653,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: Prefabs/Enemy/RedKoopa
-  currentEntity: {fileID: 0}
+  _interpolationDataSource: 0
+  prefab:
+    RawGuidValue: 8cf8f49ac0882ed44953ea53ff901f11
+--- !u!114 &965364240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965364237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: 2059d65380ae4658894bb818c836a75f
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 965364239}
+  SimulationBehaviours: []
 --- !u!1 &1146816019
 GameObject:
   m_ObjectHideFlags: 0
@@ -4256,6 +4368,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: -1638913610241015189
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 6527493313968464275
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 946c21a210ac3094bba96c7e4190a452, type: 3}
@@ -4393,6 +4520,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 6863877958331668079
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 1895674721861928608
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -7463,6 +7605,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 3336746955562986496
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 777750637718226617
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 946c21a210ac3094bba96c7e4190a452, type: 3}
@@ -7538,6 +7695,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 7874028924100431263
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -3111280116572509292
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

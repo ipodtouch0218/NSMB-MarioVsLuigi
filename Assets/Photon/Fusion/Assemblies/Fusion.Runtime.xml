@@ -157,28 +157,18 @@
             Supplying a method name rather than a type allows a property with the type Type to be used to dynamically get the enum type.
             </summary>
         </member>
-        <member name="T:Fusion.DrawIfHideType">
-            <summary>
-            Options for hiding a field.
-            </summary>
-        </member>
-        <member name="F:Fusion.DrawIfHideType.ReadOnly">
-            <summary>
-            Field will be disabled, but still visible.
-            </summary>
-        </member>
-        <member name="F:Fusion.DrawIfHideType.Hide">
-            <summary>
-            Field will be hidden.
-            </summary>
-        </member>
         <member name="T:Fusion.DrawIfAttribute">
             <summary>
             Fusion editor attribute for selectively drawing/hiding fields. Condition member can be a property, field or method (with a return value).
             <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para>
             </summary>
         </member>
-        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,System.Int64,Fusion.DrawIfHideType,Fusion.DoIfCompareOperator)">
+        <member name="F:Fusion.DrawIfAttribute.Hide">
+            <summary>
+            Instructs the attribute completely hide the field if not draw, rather than the default of just disabling it.
+            </summary>
+        </member>
+        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,System.Double)">
             <summary>
             Constructor.
             </summary>
@@ -188,17 +178,7 @@
             <param name="hide">How the field should be hidden (disabled or removed)</param>
             <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
         </member>
-        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,System.Boolean,Fusion.DrawIfHideType,Fusion.DoIfCompareOperator)">
-            <summary>
-            Constructor.
-            </summary>
-            <param name="conditionMemberName">Condition member can be a property, field or method (with a return value).
-            <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para></param>
-            <param name="compareToValue">The value to compare the member value against.</param>
-            <param name="hide">How the field should be hidden (disabled or removed)</param>
-            <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
-        </member>
-        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,System.Int64,Fusion.DoIfCompareOperator)">
+        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,System.Boolean)">
             <summary>
             Constructor.
             </summary>
@@ -207,16 +187,7 @@
             <param name="compareToValue">The value to compare the member value against.</param>
             <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
         </member>
-        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,System.Boolean,Fusion.DoIfCompareOperator)">
-            <summary>
-            Constructor.
-            </summary>
-            <param name="conditionMemberName">Condition member can be a property, field or method (with a return value).
-            <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para></param>
-            <param name="compareToValue">The value to compare the member value against.</param>
-            <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
-        </member>
-        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,Fusion.DrawIfHideType,Fusion.DoIfCompareOperator)">
+        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String)">
             <summary>
             Constructor.
             </summary>
@@ -235,6 +206,11 @@
             Constructor.
             </summary>
             <param name="hideInRelease">If using the release version of the fusion.runtime.dll, field will be hidden, rather than just disabled.</param>
+        </member>
+        <member name="T:Fusion.EditorDisabledGroupAttribute">
+            <summary>
+            Fusion editor attribute for disabling groups of fields.
+            </summary>
         </member>
         <member name="T:Fusion.EnumMaskAttribute">
             <summary>
@@ -442,6 +418,9 @@
         <member name="F:Fusion.Units.Bytes">
             <summary></summary>
         </member>
+        <member name="F:Fusion.Units.Count">
+            <summary></summary>
+        </member>
         <member name="T:Fusion.UnitAttribute">
             <summary>
             Unit Attribute class.
@@ -453,9 +432,40 @@
             The rounding used by the value slider.
             </summary>
         </member>
+        <member name="F:Fusion.UnitAttribute.ClampMin">
+            <summary>
+            If entered values below this Min should be clamped.
+            </summary>
+        </member>
+        <member name="F:Fusion.UnitAttribute.ClampMax">
+            <summary>
+            If entered values above this Max should be clamped.
+            </summary>
+        </member>
+        <member name="F:Fusion.UnitAttribute.UseInverse">
+            <summary>
+            Displays 1/value as a second field.
+            </summary>
+        </member>
+        <member name="F:Fusion.UnitAttribute.InverseName">
+            <summary>
+            The label used for the inverse field (if used).
+            </summary>
+        </member>
+        <member name="F:Fusion.UnitAttribute.InverseUnit">
+            <summary>
+            The Units used for the inverse, as they will be different than the primary field.
+            </summary>
+        </member>
         <member name="F:Fusion.UnitAttribute.InverseDecimalPlaces">
             <summary>
             The rounding used by the inverse slider (if <see cref="F:Fusion.UnitAttribute.UseInverse"/> is enabled).
+            </summary>
+        </member>
+        <member name="F:Fusion.UnitAttribute.UseSlider">
+            <summary>
+            Set to false to override the effect of setting the min or max range values, and prevent the slider from being used.
+            Useful for cases where a min/max is desired for clamping, but a slider range is not appropriate.
             </summary>
         </member>
         <member name="M:Fusion.UnitAttribute.#ctor(Fusion.Units)">
@@ -464,16 +474,7 @@
             </summary>
             <param name="unit">Unit type</param>
         </member>
-        <member name="M:Fusion.UnitAttribute.#ctor(Fusion.Units,System.Single,System.Single,System.Boolean)">
-            <summary>
-            Specify the field <see cref="T:Fusion.Units"/> type, and its Min and Max values.
-            </summary>
-            <param name="unit">Unit type</param>
-            <param name="min">Min value for this field</param>
-            <param name="max">Max value for this field</param>
-            <param name="clamp">If values outside of the min/max range will get clamped, or be allowed.</param>
-        </member>
-        <member name="M:Fusion.UnitAttribute.#ctor(Fusion.Units,System.Double,System.Double,System.Boolean)">
+        <member name="M:Fusion.UnitAttribute.#ctor(Fusion.Units,System.Double,System.Double)">
             <summary>
             Specify the field <see cref="T:Fusion.Units"/> type, and its Min and Max values.
             </summary>
@@ -517,73 +518,121 @@
             True if condition member value is greater than compareToValue.
             </summary>
         </member>
+        <member name="F:Fusion.DoIfCompareOperator.NotZero">
+            <summary>
+            Returns true if the condition member evaluates to anything other than zero.
+            In the case of object references, this means true for any non-null value.
+            </summary>
+        </member>
+        <member name="F:Fusion.DoIfCompareOperator.IsZero">
+            <summary>
+            Returns true if the condition member evaluates to zero.
+            In the case of object references, this means true for any null value.
+            </summary>
+        </member>
         <member name="T:Fusion.DoIfAttribute">
             <summary>
             Fusion editor attribute for selective editor rendering. Condition member can be a property, field or method (with a return value).
             <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para>
             </summary>
         </member>
-        <member name="M:Fusion.DoIfAttribute.#ctor(System.String,System.Double,Fusion.DoIfCompareOperator)">
+        <member name="M:Fusion.DoIfAttribute.#ctor(System.String,System.Double)">
             <summary>
             Base Constructor.
             </summary>
             <param name="conditionMemberName"></param>
             <param name="compareToValue"></param>
-            <param name="compare"></param>
         </member>
-        <member name="M:Fusion.DoIfAttribute.#ctor(System.String,System.Boolean,Fusion.DoIfCompareOperator)">
+        <member name="M:Fusion.DoIfAttribute.#ctor(System.String,System.Boolean)">
             <summary>
             Base Constructor.
             </summary>
             <param name="conditionMemberName"></param>
             <param name="compareToValue"></param>
-            <param name="compare"></param>
         </member>
-        <member name="M:Fusion.DoIfAttribute.#ctor(System.String,Fusion.DoIfCompareOperator)">
+        <member name="M:Fusion.DoIfAttribute.#ctor(System.String)">
             <summary>
             Base Constructor.
             </summary>
             <param name="conditionMemberName"></param>
-            <param name="compare"></param>
         </member>
         <member name="T:Fusion.WarnIfAttribute">
             <summary>
-            Fusion editor attribute for selective editor rendering of warnings/info boxes in the inspector. 
+            Fusion editor attribute for adding notices to fields if the condition member evaluates as true. 
             Condition member can be a property, field or method (with a return value).
             <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para>
             </summary>
         </member>
-        <member name="M:Fusion.WarnIfAttribute.#ctor(System.String,System.Int64,System.String,System.Int32,Fusion.DoIfCompareOperator)">
+        <member name="F:Fusion.WarnIfAttribute.Message">
             <summary>
-            Constructor.
+            The default warning text, when a warning is shown.
             </summary>
-            <param name="conditionMemberName">Condition member can be a property, field or method (with a return value).
-            <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para></param>
-            <param name="compareToValue">The value to compare the member value against.</param>
-            <param name="message">The text of the info box.</param>
-            <param name="messageType">The icon of the message box. Use <code>(int)UnityEditor.MessageType</code></param>
-            <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
         </member>
-        <member name="M:Fusion.WarnIfAttribute.#ctor(System.String,System.Boolean,System.String,System.Int32,Fusion.DoIfCompareOperator)">
+        <member name="F:Fusion.WarnIfAttribute.MsgType">
             <summary>
-            Constructor.
+            The default message type for this warning.
+            0 = None, 1 = Info, 2 = Warning, 3 = Error
             </summary>
-            <param name="conditionMemberName">Condition member can be a property, field or method (with a return value).
-            <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para></param>
-            <param name="compareToValue">The value to compare the member value against.</param>
-            <param name="message">The text of the info box.</param>
-            <param name="messageType">The icon of the message box. Use <code>(int)UnityEditor.MessageType</code></param>
-            <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
         </member>
-        <member name="M:Fusion.WarnIfAttribute.#ctor(System.String,System.String,System.Int32,Fusion.DoIfCompareOperator)">
+        <member name="F:Fusion.WarnIfAttribute.MsgProvider">
+            <summary>
+            The name of any member which can be evaluated to a string value, which will be used as the source for the warning message text.
+            If null (default), then <see cref="F:Fusion.WarnIfAttribute.Message"/> will be used instead.
+            </summary>
+        </member>
+        <member name="F:Fusion.WarnIfAttribute.MsgTypeProvider">
+            <summary>
+            The name of any member which can be evaluated to an int value, which will be used as the source for the MsgType value.
+            If null (default), then <see cref="F:Fusion.WarnIfAttribute.MsgType"/> will be used instead.
+            0 = None, 1 = Info, 2 = Warning, 3 = Error
+            </summary>
+        </member>
+        <member name="F:Fusion.WarnIfAttribute.ActionMethod">
+            <summary>
+            The name of a method with no arguments and returns void, which will execute when the warning icon is clicked.
+            </summary>
+        </member>
+        <member name="F:Fusion.WarnIfAttribute.UseMsgIconOnly">
+            <summary>
+            Limits the warning box to only the icon next to the value field, rather than using the inline message box which is added below the field.
+            </summary>
+        </member>
+        <member name="M:Fusion.WarnIfAttribute.#ctor">
             <summary>
             Constructor.
             </summary>
-            <param name="conditionMemberName">Condition member can be a property, field or method (with a return value).
-            <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para></param>
+        </member>
+        <member name="M:Fusion.WarnIfAttribute.#ctor(System.String)">
+            <summary>
+            Constructor.
+            </summary>
             <param name="message">The text of the info box.</param>
-            <param name="messageType">The icon of the message box. Use <code>(int)UnityEditor.MessageType</code></param>
-            <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
+        </member>
+        <member name="M:Fusion.WarnIfAttribute.#ctor(System.String,System.String)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="conditionMember">Name of a property, field or method (with a return value) member.
+            <para>Value of condition method is converted to a double. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para></param>
+            <param name="message">The text of the info/warn/error box.</param>
+        </member>
+        <member name="M:Fusion.WarnIfAttribute.#ctor(System.String,System.Double,System.String)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="conditionMember">Name of a property, field or method (with a return value) member.
+            <para>Value of condition method is converted to a double. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para></param>
+            <param name="compareToValue">The value the conditionMember value is compred to.</param>
+            <param name="message">The text of the info/warn/error box.</param>
+        </member>
+        <member name="M:Fusion.WarnIfAttribute.#ctor(System.String,System.Boolean,System.String)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="conditionMember">Name of a property, field or method (with a return value) member.
+            <para>Value of condition method is converted to a double. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para></param>
+            <param name="compareToValue">The value the conditionMember value is compred to.</param>
+            <param name="message">The text of the info/warn/error box.</param>
         </member>
         <member name="T:Fusion.CloudCommunicator">
             <summary>
@@ -744,6 +793,14 @@
             <param name="actorID">ActorID of a Player inside the Room</param>
             <returns>Player UserID</returns>
         </member>
+        <member name="M:Fusion.CloudServices.TryGetActorIdByUniqueId(System.Int64,System.Int32@)">
+            <summary>
+            Try to get the ActorId associated with a specific Client Unique Id
+            </summary>
+            <param name="uniqueId">Client Unique Id to check</param>
+            <param name="actorId">ActorId associated with that Client Unique Id</param>
+            <returns>True if the ActorId can be found</returns>
+        </member>
         <member name="M:Fusion.CloudServices.OnInternalConnectionAttempt(System.Int32,System.Int32,System.Boolean@,Fusion.Sockets.NetAddress@)">
             <summary>
             Callback fire on every connection attempt with a remote Server.
@@ -766,11 +823,6 @@
         <member name="M:Fusion.CloudServices.Dispose">
             <summary>
             Disposes the current <see cref="T:Fusion.CloudServices"/>
-            </summary>
-        </member>
-        <member name="M:Fusion.CloudServices.Service_UpdateSessionInfo">
-            <summary>
-            Update the <see cref="T:Fusion.SessionInfo"/> data based on the current LBC Information after the peer enters a Room
             </summary>
         </member>
         <member name="M:Fusion.CloudServices.OnRoomChanged">
@@ -801,7 +853,7 @@
             </summary>
             <param name="stunResult">Reference to StunResult used to build the Protocol Message</param>
         </member>
-        <member name="M:Fusion.CloudServices.SendStateSnapshot">
+        <member name="M:Fusion.CloudServices.SendStateSnapshot(System.Int32,System.Int32,System.UInt32,System.Byte[])">
             <summary>
             Build and send the latest Server Snapshot to the Fusion Plugin
             </summary>
@@ -852,6 +904,28 @@
             </summary>
             <returns>True if the Join Confirmation was received, false otherwise</returns>
         </member>
+        <member name="M:Fusion.CloudServices.Service_UpdateSessionInfo">
+            <summary>
+            Update the <see cref="T:Fusion.SessionInfo"/> data based on the current LBC Information after the peer enters a Room
+            </summary>
+        </member>
+        <member name="M:Fusion.CloudServices.Service_SendHostMigrationSnapshots">
+            <summary>
+            Host Snapshot Update Service
+            </summary>
+        </member>
+        <member name="M:Fusion.CloudServices.SendHostMigrationSnapshot">
+            <summary>
+            Try to send Server Snapshot to Plugin 
+            </summary>
+        </member>
+        <member name="M:Fusion.CloudServices.Run_ReversePing(Fusion.Sockets.NetAddress)">
+            <summary>
+            Reverse ping will send Empty UDP Packets to the RemoteAddr in order to setup the Routing Table
+            on the current NAT of the Server, forcing it to allow packages from the remote client to be received
+            </summary>
+            <param name="remoteAddr">Remove EndPoint to ping</param>
+        </member>
         <member name="M:Fusion.CloudServices.QueryReflexiveInfo">
             <summary>
             Run the STUN Service to retrieve the current Reflexive Addresses of the local peer
@@ -863,26 +937,6 @@
             Update the internal <see cref="T:Fusion.NetworkRunnerInitializeArgs"/> used to start the Fusion Runner
             </summary>
             <param name="newArgs">New arguments</param>
-        </member>
-        <member name="M:Fusion.CloudServices.StartReversePing(Fusion.Sockets.NetAddress,System.Threading.CancellationToken)">
-            <summary>
-            Reverse ping will send Empty UDP Packets to the RemoteAddr in order to setup the Routing Table
-            on the current NAT of the Server, forcing it to allow packages from the remote client to be received
-            </summary>
-            <param name="remoteAddr">Remove EndPoint to ping</param>
-            <param name="cancellationToken">CancellationToken</param>
-        </member>
-        <member name="M:Fusion.CloudServices.SendPing(Fusion.Sockets.NetAddress)">
-            <summary>
-            Send a "ping" to an EndPoint
-            </summary>
-            <param name="netAddress">EndPoint to send the ping</param>
-            <returns>True if the Ping was sent, false otherwise</returns>
-        </member>
-        <member name="M:Fusion.CloudServices.Service_SendHostMigrationSnapshots">
-            <summary>
-            Try to send Server Snapshot to Plugin 
-            </summary>
         </member>
         <member name="M:Fusion.CloudServices.CheckSubnet(Fusion.Sockets.NetAddress)">
             <summary>
@@ -955,6 +1009,11 @@
             Local Reflexive Info. Stores private and public EndPoint of the local peer.
             </summary>
         </member>
+        <member name="P:Fusion.CloudServicesMetadata.UniqueId">
+            <summary>
+            Stores the local peer Unique Id
+            </summary>
+        </member>
         <member name="F:Fusion.CloudServicesMetadata.ScheduledRequests">
             <summary>
             Stores requests sent by the plugin
@@ -963,6 +1022,11 @@
         <member name="F:Fusion.CloudServicesMetadata.LastDisconnectMsg">
             <summary>
             Last Disconnect Msg Received from the Plugin
+            </summary>
+        </member>
+        <member name="F:Fusion.CloudServicesMetadata.UniqueIdToReflexiveInfoTable">
+            <summary>
+            Mapping between Actor UniqueId and its ReflexiveInfo
             </summary>
         </member>
         <member name="T:Fusion.ScheduledRequests">
@@ -1097,6 +1161,16 @@
             immediately after state is set to the latest server snapshot.
             </summary>
         </member>
+        <member name="T:Fusion.IAfterHostMigration">
+            <summary>
+            Used to mark NetworkBehaviors that need to be react after a Host Migration process
+            </summary>
+        </member>
+        <member name="M:Fusion.IAfterHostMigration.AfterHostMigration">
+            <summary>
+            Invoked after the Host Migration happens in order to setup non-networked data on NetworkBehaviors
+            </summary>
+        </member>
         <member name="T:Fusion.IAfterPhysicsStep">
             <summary>
             Interface for <see cref="M:Fusion.IAfterPhysicsStep.AfterPhysicsStep"/> callback. Called immediately after Physics.Simulate().
@@ -1158,6 +1232,17 @@
             <summary>
             Called at the very start of the resimulation loop (on clients with prediction enabled), 
             before state is set to the latest server snapshot.
+            </summary>
+        </member>
+        <member name="T:Fusion.IBeforeHitboxRegistration">
+            <summary>
+            Interface for <see cref="M:Fusion.IBeforeHitboxRegistration.BeforeHitboxRegistration"/> callback.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IBeforeHitboxRegistration.BeforeHitboxRegistration">
+            <summary>
+            Called immediately before the <see cref="T:Fusion.HitboxManager"/> registers hitboxes in a snapshot.
             </summary>
         </member>
         <member name="T:Fusion.IBeforePhysicsStep">
@@ -1420,6 +1505,11 @@
             The unique identifier for this network behaviour. 
             </summary>
         </member>
+        <member name="M:Fusion.NetworkBehaviour.GetLocalAuthorityMask">
+            <summary>
+            Gets a bitmask of <see cref="T:Fusion.AuthorityMasks"/> flags, representing the current local authority over this <see cref="T:Fusion.NetworkObject"/>.
+            </summary>
+        </member>
         <member name="P:Fusion.NetworkBehaviour.DynamicWordCount">
             <summary>
             Override this value for custom memory allocations. 
@@ -1633,6 +1723,11 @@
         <member name="F:Fusion.NetworkMecanimAnimator.Animator">
             <summary>
             The Animator being synced.
+            </summary>
+        </member>
+        <member name="F:Fusion.NetworkMecanimAnimator.TotalWords">
+            <summary>
+            The number of words allocated per snapshot for serialization of the Animator. (One Word is 32 bits, or 4 bytes).
             </summary>
         </member>
         <member name="F:Fusion.NetworkMecanimAnimator.SyncSettings">
@@ -1931,6 +2026,23 @@
             The <see cref="T:Fusion.NetworkObject"/> this component is associated with. May be null if this GameObject does not have a <see cref="T:Fusion.NetworkObject"/>.
             </summary>
         </member>
+        <member name="P:Fusion.SimulationBehaviour.HasInputAuthority">
+            <summary>
+            Returns true if the <see cref="P:Fusion.Simulation.LocalPlayer"/> of the associated <see cref="T:Fusion.NetworkRunner"/> is the designated as Input Authority for this network entity.
+            </summary>
+        </member>
+        <member name="P:Fusion.SimulationBehaviour.HasStateAuthority">
+            <summary>
+            Returns true if the associated <see cref="T:Fusion.NetworkRunner"/> is the State Authority for this network entity.
+            </summary>
+        </member>
+        <member name="P:Fusion.SimulationBehaviour.IsProxy">
+            <summary>
+            Returns true if the associated <see cref="T:Fusion.NetworkRunner"/> is neither the Input nor State Authority for this network entity.
+            It is recommended to use !<see cref="P:Fusion.SimulationBehaviour.HasStateAuthority"/> or !<see cref="P:Fusion.SimulationBehaviour.HasInputAuthority"/> when possible instead,
+            as this check requires evaluating both authorities - and is therefore less performant than the individual checks.
+            </summary>
+        </member>
         <member name="M:Fusion.SimulationBehaviour.FixedUpdateNetwork">
             <summary>
             Fusion FixedUpdate timing callback.
@@ -2070,6 +2182,9 @@
             <summary>
             Sets a rotation value to the engine. By default, the value is set to the transform's world rotation field.
             </summary>
+        </member>
+        <member name="M:Fusion.NetworkPositionRotation.AfterHostMigration">
+            <inheritdoc cref="M:Fusion.IAfterHostMigration.AfterHostMigration"/>
         </member>
         <member name="F:Fusion.NetworkPositionRotation.WORD_COUNT_NPR">
             <summary>
@@ -4273,6 +4388,11 @@
             If a hitbox or its HitboxRoot are not active, it will not be hit by lag-compensated queries.
             </summary>
         </member>
+        <member name="P:Fusion.Hitbox.ColliderIndex">
+            <summary>
+            Index assigned to the collider of this hitbox on the lag-compensated snapshots.
+            </summary>
+        </member>
         <member name="P:Fusion.Hitbox.Position">
             <summary>
             World-space position (includes Offset) of this <see cref="T:Fusion.Hitbox"/>.
@@ -4311,6 +4431,12 @@
         <member name="F:Fusion.HitOptions.DetailedHit">
             <summary>
             Compute surface normal and distance of raycast hit.
+            </summary>
+        </member>
+        <member name="F:Fusion.HitOptions.IgnoreInputAuthority">
+            <summary>
+            If the <see cref="T:Fusion.HitboxRoot"/> objects which the player performing the query
+            (if specified) has input authority over should be ignored by the query.
             </summary>
         </member>
         <member name="T:Fusion.LagCompensationSettings">
@@ -4391,7 +4517,23 @@
             Debug data from lag compensation history (registered <see cref="T:Fusion.Hitbox"/> count).
             </summary>
         </member>
-        <member name="M:Fusion.HitboxManager.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,Fusion.PlayerRef,Fusion.LagCompensatedHit@,System.Int32,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction)">
+        <member name="M:Fusion.HitboxManager.ResolveQuery(Fusion.LagCompensation.Query@,System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Boolean)">
+            <summary>
+            Performs a raycast, raycast-all, sphere- or box-overlap query.
+            Use the <see cref="M:Fusion.LagCompensation.RaycastQuery.CreateQuery(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Boolean,Fusion.PlayerRef,System.Int32,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
+            CreateQuery</see> method of <see cref="T:Fusion.LagCompensation.RaycastQuery"/>, <see cref="T:Fusion.LagCompensation.SphereOverlapQuery"/> or <see cref="T:Fusion.LagCompensation.BoxOverlapQuery"/>, respectively, to create a query.
+            </summary>
+            <param name="query">The lag-compensated query to be performed.</param>
+            <param name="hits">List to be filled with hits (both hitboxes and/or PhysX colliders, if included).</param>
+            <param name="clearHits">Clear list of hits before filling with new ones (defaults to true).</param>
+            <returns>The number of hits found by the query.</returns>
+            <exception cref="T:System.ArgumentException">If the query type is not supported by this method.</exception>
+            <code>
+            var query = Fusion.LagCompensation.SphereOverlapQuery.CreateQuery(center, radius, Object.InputAuthority);
+            var hitCount = Runner.LagCompensation.Query(ref query, hits);
+            </code>
+        </member>
+        <member name="M:Fusion.HitboxManager.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,Fusion.PlayerRef,Fusion.LagCompensatedHit@,System.Int32,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
             <summary>
             Performs a lag-compensated raycast query against all registered hitboxes.
             If the <see cref="F:Fusion.HitOptions.IncludePhysX"/> flag is indicated, query will also include PhysX colliders, 
@@ -4405,9 +4547,17 @@
             <param name="layerMask">Only objects with matching layers will be checked against.</param>
             <param name="options">Opt-in flags to compute with sub-tick accuracy (<see cref="F:Fusion.HitOptions.SubtickAccuracy"/>) and/or to include PhysX (<see cref="F:Fusion.HitOptions.IncludePhysX"/>).</param>
             <param name="queryTriggerInteraction">Trigger interaction behavior when also querying PhysX.</param>
-            <returns>true is something is hit</returns>
+            <param name="preProcessRoots">
+            Delegate to pre-process <see cref="T:Fusion.HitboxRoot">HitboxRoots</see> found in the broad-phase resolution of the query.
+            Roots removed from the list will not be processed any further.
+            Roots that remain on the candidates collection will be normally processed and fitting colliders will be evaluated in
+            the query narrow-phase resolution.
+            Hitbox collider indices added to the processed set will be evaluated in the narrow-phase regardless of further root
+            processing steps (e.g. layer mask match).
+            </param>
+            <returns>True if something is hit</returns>
         </member>
-        <member name="M:Fusion.HitboxManager.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Single},Fusion.LagCompensatedHit@,System.Int32,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction)">
+        <member name="M:Fusion.HitboxManager.Raycast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Single},Fusion.LagCompensatedHit@,System.Int32,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
             <summary>
             Performs a lag-compensated raycast query against all registered hitboxes.
             If the <see cref="F:Fusion.HitOptions.IncludePhysX"/> flag is indicated, query will also include PhysX colliders, 
@@ -4432,9 +4582,17 @@
             <param name="layerMask">Only objects with matching layers will be checked against.</param>
             <param name="options">Opt-in flags to compute with sub-tick accuracy (<see cref="F:Fusion.HitOptions.SubtickAccuracy"/>) and/or to include PhysX (<see cref="F:Fusion.HitOptions.IncludePhysX"/>).</param>
             <param name="queryTriggerInteraction">Trigger interaction behavior when also querying PhysX.</param>
-            <returns>true is something is hit</returns>
+            <param name="preProcessRoots">
+            Delegate to pre-process <see cref="T:Fusion.HitboxRoot">HitboxRoots</see> found in the broad-phase resolution of the query.
+            Roots removed from the list will not be processed any further.
+            Roots that remain on the candidates collection will be normally processed and fitting colliders will be evaluated in
+            the query narrow-phase resolution.
+            Hitbox collider indices added to the processed set will be evaluated in the narrow-phase regardless of further root
+            processing steps (e.g. layer mask match).
+            </param>
+            <returns>True if something is hit</returns>
         </member>
-        <member name="M:Fusion.HitboxManager.RaycastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,Fusion.PlayerRef,System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,System.Boolean,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction)">
+        <member name="M:Fusion.HitboxManager.RaycastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,Fusion.PlayerRef,System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,System.Boolean,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
             <summary>
             Performs a lag-compensated raycast query against all registered hitboxes.
             If the <see cref="F:Fusion.HitOptions.IncludePhysX"/> flag is indicated, query will also include PhysX colliders, 
@@ -4450,9 +4608,17 @@
             <param name="options">Opt-in flags to compute with sub-tick accuracy (<see cref="F:Fusion.HitOptions.SubtickAccuracy"/>) and/or to include PhysX (<see cref="F:Fusion.HitOptions.IncludePhysX"/>).</param>
             <param name="clearHits">Clear list of hits before filling with new ones (defaults to true).</param>
             <param name="queryTriggerInteraction">Trigger interaction behavior when also querying PhysX.</param>
+            <param name="preProcessRoots">
+            Delegate to pre-process <see cref="T:Fusion.HitboxRoot">HitboxRoots</see> found in the broad-phase resolution of the query.
+            Roots removed from the list will not be processed any further.
+            Roots that remain on the candidates collection will be normally processed and fitting colliders will be evaluated in
+            the query narrow-phase resolution.
+            Hitbox collider indices added to the processed set will be evaluated in the narrow-phase regardless of further root
+            processing steps (e.g. layer mask match).
+            </param>
             <returns>total number of hits</returns>
         </member>
-        <member name="M:Fusion.HitboxManager.RaycastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Single},System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,System.Boolean,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction)">
+        <member name="M:Fusion.HitboxManager.RaycastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Single},System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,System.Boolean,Fusion.HitOptions,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
             <summary>
             Performs a lag-compensated raycast query against all registered hitboxes.
             If the <see cref="F:Fusion.HitOptions.IncludePhysX"/> flag is indicated, query will also include PhysX colliders, 
@@ -4479,9 +4645,17 @@
             <param name="options">Opt-in flags to compute with sub-tick accuracy (<see cref="F:Fusion.HitOptions.SubtickAccuracy"/>) and/or to include PhysX (<see cref="F:Fusion.HitOptions.IncludePhysX"/>).</param>
             <param name="clearHits">Clear list of hits before filling with new ones (defaults to true).</param>
             <param name="queryTriggerInteraction">Trigger interaction behavior when also querying PhysX.</param>
+            <param name="preProcessRoots">
+            Delegate to pre-process <see cref="T:Fusion.HitboxRoot">HitboxRoots</see> found in the broad-phase resolution of the query.
+            Roots removed from the list will not be processed any further.
+            Roots that remain on the candidates collection will be normally processed and fitting colliders will be evaluated in
+            the query narrow-phase resolution.
+            Hitbox collider indices added to the processed set will be evaluated in the narrow-phase regardless of further root
+            processing steps (e.g. layer mask match).
+            </param>
             <returns>total number of hits</returns>
         </member>
-        <member name="M:Fusion.HitboxManager.OverlapSphere(UnityEngine.Vector3,System.Single,Fusion.PlayerRef,System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,Fusion.HitOptions,System.Boolean,UnityEngine.QueryTriggerInteraction)">
+        <member name="M:Fusion.HitboxManager.OverlapSphere(UnityEngine.Vector3,System.Single,Fusion.PlayerRef,System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,Fusion.HitOptions,System.Boolean,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
             <summary>
             Performs a lag-compensated overlap sphere query against all registered hitboxes.
             If the <see cref="F:Fusion.HitOptions.IncludePhysX"/> flag is indicated, query will also include PhysX colliders, 
@@ -4495,9 +4669,17 @@
             <param name="options">Opt-in flags to compute with sub-tick accuracy (<see cref="F:Fusion.HitOptions.SubtickAccuracy"/>) and/or to include PhysX (<see cref="F:Fusion.HitOptions.IncludePhysX"/>).</param>
             <param name="clearHits">Clear list of hits before filling with new ones (defaults to true).</param>
             <param name="queryTriggerInteraction">Trigger interaction behavior when also querying PhysX.</param>
+            <param name="preProcessRoots">
+            Delegate to pre-process <see cref="T:Fusion.HitboxRoot">HitboxRoots</see> found in the broad-phase resolution of the query.
+            Roots removed from the list will not be processed any further.
+            Roots that remain on the candidates collection will be normally processed and fitting colliders will be evaluated in
+            the query narrow-phase resolution.
+            Hitbox collider indices added to the processed set will be evaluated in the narrow-phase regardless of further root
+            processing steps (e.g. layer mask match).
+            </param>
             <returns>total number of hits</returns>
         </member>
-        <member name="M:Fusion.HitboxManager.OverlapSphere(UnityEngine.Vector3,System.Single,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Single},System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,Fusion.HitOptions,System.Boolean,UnityEngine.QueryTriggerInteraction)">
+        <member name="M:Fusion.HitboxManager.OverlapSphere(UnityEngine.Vector3,System.Single,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Single},System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,Fusion.HitOptions,System.Boolean,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
             <summary>
             Performs a lag-compensated overlap sphere query against all registered hitboxes.
             If the <see cref="F:Fusion.HitOptions.IncludePhysX"/> flag is indicated, query will also include PhysX colliders, 
@@ -4522,9 +4704,17 @@
             <param name="options">Opt-in flags to compute with sub-tick accuracy (<see cref="F:Fusion.HitOptions.SubtickAccuracy"/>) and/or to include PhysX (<see cref="F:Fusion.HitOptions.IncludePhysX"/>).</param>
             <param name="clearHits">Clear list of hits before filling with new ones (defaults to true).</param>
             <param name="queryTriggerInteraction">Trigger interaction behavior when also querying PhysX.</param>
+            <param name="preProcessRoots">
+            Delegate to pre-process <see cref="T:Fusion.HitboxRoot">HitboxRoots</see> found in the broad-phase resolution of the query.
+            Roots removed from the list will not be processed any further.
+            Roots that remain on the candidates collection will be normally processed and fitting colliders will be evaluated in
+            the query narrow-phase resolution.
+            Hitbox collider indices added to the processed set will be evaluated in the narrow-phase regardless of further root
+            processing steps (e.g. layer mask match).
+            </param>
             <returns>total number of hits</returns>
         </member>
-        <member name="M:Fusion.HitboxManager.OverlapBox(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,Fusion.PlayerRef,System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,Fusion.HitOptions,System.Boolean,UnityEngine.QueryTriggerInteraction)">
+        <member name="M:Fusion.HitboxManager.OverlapBox(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,Fusion.PlayerRef,System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,Fusion.HitOptions,System.Boolean,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
             <summary>
             Performs a lag-compensated box overlap query against all registered hitboxes.
             If the <see cref="F:Fusion.HitOptions.IncludePhysX"/> flag is indicated, query will also include PhysX colliders, 
@@ -4539,9 +4729,17 @@
             <param name="options">Opt-in flags to compute with sub-tick accuracy (<see cref="F:Fusion.HitOptions.SubtickAccuracy"/>) and/or to include PhysX (<see cref="F:Fusion.HitOptions.IncludePhysX"/>).</param>
             <param name="clearHits">Clear list of hits before filling with new ones (defaults to true).</param>
             <param name="queryTriggerInteraction">Trigger interaction behavior when also querying PhysX.</param>
+            <param name="preProcessRoots">
+            Delegate to pre-process <see cref="T:Fusion.HitboxRoot">HitboxRoots</see> found in the broad-phase resolution of the query.
+            Roots removed from the list will not be processed any further.
+            Roots that remain on the candidates collection will be normally processed and fitting colliders will be evaluated in
+            the query narrow-phase resolution.
+            Hitbox collider indices added to the processed set will be evaluated in the narrow-phase regardless of further root
+            processing steps (e.g. layer mask match).
+            </param>
             <returns>The total number of hits found.</returns>
         </member>
-        <member name="M:Fusion.HitboxManager.OverlapBox(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Single},System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,Fusion.HitOptions,System.Boolean,UnityEngine.QueryTriggerInteraction)">
+        <member name="M:Fusion.HitboxManager.OverlapBox(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Single},System.Collections.Generic.List{Fusion.LagCompensatedHit},System.Int32,Fusion.HitOptions,System.Boolean,UnityEngine.QueryTriggerInteraction,Fusion.LagCompensation.PreProcessingDelegate)">
             <summary>
             Performs a lag-compensated box overlap query against all registered hitboxes.
             If the <see cref="F:Fusion.HitOptions.IncludePhysX"/> flag is indicated, query will also include PhysX colliders, 
@@ -4567,6 +4765,14 @@
             <param name="options">Opt-in flags to compute with sub-tick accuracy (<see cref="F:Fusion.HitOptions.SubtickAccuracy"/>) and/or to include PhysX (<see cref="F:Fusion.HitOptions.IncludePhysX"/>).</param>
             <param name="clearHits">Clear list of hits before filling with new ones (defaults to true).</param>
             <param name="queryTriggerInteraction">Trigger interaction behavior when also querying PhysX.</param>
+            <param name="preProcessRoots">
+            Delegate to pre-process <see cref="T:Fusion.HitboxRoot">HitboxRoots</see> found in the broad-phase resolution of the query.
+            Roots removed from the list will not be processed any further.
+            Roots that remain on the candidates collection will be normally processed and fitting colliders will be evaluated in
+            the query narrow-phase resolution.
+            Hitbox collider indices added to the processed set will be evaluated in the narrow-phase regardless of further root
+            processing steps (e.g. layer mask match).
+            </param>
             <returns>The total number of hits found.</returns>
         </member>
         <member name="M:Fusion.HitboxManager.PositionRotation(Fusion.Hitbox,System.Int32,UnityEngine.Vector3@,UnityEngine.Quaternion@,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Single})">
@@ -4598,7 +4804,7 @@
             <param name="player">Player who "owns" this overlap. Used by the server to find the exact hitbox snapshots to check against.</param>
             <param name="position">Will be filled with the hitbox position at the time of the tick</param>
             <param name="rotation">Will be filled with the hitbox rotation at the time of the tick</param>
-            <param name="subtickAccuracy">If the query should interpolate between ticks to reflect exactly what was seen on the client.</param>
+            <param name="subTickAccuracy">If the query should interpolate between ticks to reflect exactly what was seen on the client.</param>
         </member>
         <member name="M:Fusion.HitboxManager.FixedUpdateNetwork">
             <summary>
@@ -4778,6 +4984,13 @@
             <summary>
             Auxiliary field used when sorting hits in a collection.
             </summary>
+        </member>
+        <member name="M:Fusion.LagCompensatedHit.op_Explicit(UnityEngine.RaycastHit)~Fusion.LagCompensatedHit">
+            <summary>
+            Creates a <see cref="T:Fusion.LagCompensatedHit"/> structure from the information on a Unity <see cref="T:UnityEngine.RaycastHit"/>.
+            </summary>
+            <param name="raycastHit">The <see cref="T:UnityEngine.RaycastHit"/> used as source.</param>
+            <returns>The built LagCompensatedHit structure.</returns>
         </member>
         <member name="M:Fusion.LagCompensatedExt.SortReference(System.Collections.Generic.List{Fusion.LagCompensatedHit},UnityEngine.Vector3)">
             <summary>
@@ -5675,7 +5888,7 @@
         </member>
         <member name="F:Fusion.NetworkObject.AoiPositionSource">
             <summary>
-            Specifies the <see cref="T:Fusion.NetworkAreaOfInterestBehaviour"/> component to used to determine this players position for Area Of Interest checks.
+            Specifies the <see cref="T:Fusion.NetworkAreaOfInterestBehaviour"/> component used to determine this players position for Area Of Interest checks.
             If left null, will use the first found root/child instance of <see cref="T:Fusion.NetworkAreaOfInterestBehaviour"/> on the Object.
             </summary>
         </member>
@@ -5820,6 +6033,12 @@
             Copies the entire State from another <see cref="T:Fusion.NetworkObject"/>
             </summary>
             <param name="networkObject">NetworkObject to copy the State from</param>
+        </member>
+        <member name="M:Fusion.NetworkObject.CopyStateFromSceneObject(Fusion.NetworkObjectHeaderPtr)">
+            <summary>
+            Copies the entire State from another Scene Object.
+            They must have the same Scene Guid
+            </summary>
         </member>
         <member name="M:Fusion.NetworkObject.SetInterestGroup(Fusion.PlayerRef,System.String,System.Boolean)">
             <summary>
@@ -6217,12 +6436,12 @@
         </member>
         <member name="F:Fusion.NetworkProjectConfig.PhysicsEngines.Physics2D">
             <summary>
-            The Unity PhysX2D simulation is used, but auto-simulation is disabled and simulations are controlled by Fusion.
+            The Unity Box2D simulation is used, but auto-simulation is disabled and simulations are controlled by Fusion.
             </summary>
         </member>
         <member name="F:Fusion.NetworkProjectConfig.PhysicsEngines.None">
             <summary>
-            Fusion preforms no simulation calls.
+            Fusion preforms no Physics Simulate() calls.
             </summary>
         </member>
         <member name="T:Fusion.NetworkProjectConfig.PhysicsModes">
@@ -6469,6 +6688,11 @@
             all types to be scanned and can increase weaving duration.
             </summary>
         </member>
+        <member name="F:Fusion.NetworkProjectConfig.CheckNetworkedPropertiesBeingEmpty">
+            <summary>
+            If set, the weaver will check if <see cref="T:Fusion.NetworkedAttribute"/> properties getters and setters are empty.
+            </summary>
+        </member>
         <member name="M:Fusion.NetworkProjectConfig.Copy">
             <summary>
             Make a copy of the <see cref="T:Fusion.NetworkProjectConfig"/>.
@@ -6477,6 +6701,11 @@
         <member name="M:Fusion.NetworkProjectConfig.ToString">
             <summary>
             ToString() implementation.
+            </summary>
+        </member>
+        <member name="P:Fusion.NetworkProjectConfig.FusionVersionInfo">
+            <summary>
+            Get the version information for the Fusion.Runntime.dll.
             </summary>
         </member>
         <member name="M:Fusion.NetworkProjectConfig.Serialize(Fusion.NetworkProjectConfig)">
@@ -6496,11 +6725,6 @@
         <member name="M:Fusion.NetworkProjectConfig.SerializeMinimal(Fusion.NetworkProjectConfig)">
             <summary>
             Remove unnecessary data from serialized version of <see cref="T:Fusion.NetworkProjectConfig"/>.
-            </summary>
-        </member>
-        <member name="P:Fusion.NetworkProjectConfig.FusionVersionInfo">
-            <summary>
-            Get the version information for the Fusion.Runntime.dll.
             </summary>
         </member>
         <member name="M:Fusion.NetworkProjectConfig.ConvertPhysicsMode(Fusion.NetworkProjectConfig.PhysicsEngines)">
@@ -6605,6 +6829,11 @@
         <member name="F:Fusion.NetworkRunner._initializeOperation">
             <summary>
             Completion Source for the startup Photon Cloud Operations
+            </summary>
+        </member>
+        <member name="P:Fusion.NetworkRunner.IsInitialized">
+            <summary>
+            Check if the Runner was properly Initialized
             </summary>
         </member>
         <member name="P:Fusion.NetworkRunner.IsVisible">
@@ -6740,6 +6969,11 @@
             The only caveat is that the server player (if one exists), always gets the last index no matter how many clients are connected.
             </summary>
         </member>
+        <member name="P:Fusion.NetworkRunner.Tick">
+            <summary>
+            The tick associated with the current state of networked objects, or the current simulation tick being processed (when evaluated during FixedUpdateNetwork).
+            </summary>
+        </member>
         <member name="P:Fusion.NetworkRunner.Config">
             <summary>
             Returns the <see cref="T:Fusion.NetworkProjectConfig"/> reference.
@@ -6765,6 +6999,18 @@
             Returns the <see cref="T:Fusion.INetworkObjectPool"/> instance.
             </summary>
         </member>
+        <member name="F:Fusion.NetworkRunner.OperationsCancellationTokenSource">
+            <summary>
+            Global CancellationTokenSource for this NetworkRunner Instance
+            Used to control all async operations along the life cycle of the Runner
+            Should be used in conjunction with <see cref="T:Fusion.Async.TaskManager"/>
+            </summary>
+        </member>
+        <member name="P:Fusion.NetworkRunner.OperationsCancellationToken">
+            <summary>
+            Global copy of the Cancellation Token for this NetworkRunner Instance
+            </summary>
+        </member>
         <member name="P:Fusion.NetworkRunner.LagCompensation">
             <summary>
             Returns the global instance of a lag compensation buffer <see cref="T:Fusion.HitboxManager"/>.
@@ -6776,7 +7022,13 @@
             </summary>
             <param name="player">Player to disconnect</param>
         </member>
-        <member name="M:Fusion.NetworkRunner.Connect(Fusion.Sockets.NetAddress,System.Byte[])">
+        <member name="M:Fusion.NetworkRunner.Disconnect(Fusion.Sockets.NetAddress)">
+            <summary>
+            Disconnect a client based on its NetAddress
+            </summary>
+            <param name="address">NetAddress of the client</param>
+        </member>
+        <member name="M:Fusion.NetworkRunner.Connect(Fusion.Sockets.NetAddress,System.Byte[],System.Byte[])">
             <summary>
             Connect this <see cref="T:Fusion.NetworkRunner"/> as a client to a Server.
             </summary>
@@ -6814,16 +7066,22 @@
         </member>
         <member name="M:Fusion.NetworkRunner.GetPlayerActorId(Fusion.PlayerRef)">
             <summary>
-            Gets Player's Actor Number (ID). Only usable in shared mode. 
+            Gets Player's Actor Number (ID).
+            
+            If used in Shared Mode, every client can get this information.
+            If used in Client Server Mode, only the Server is able to get this information.
             </summary>
             <param name="player">PlayerRef to get the Actor Number (ID)</param>
             <returns>Actor Number associated with the PlayerRef, otherwise null.</returns>
         </member>
         <member name="M:Fusion.NetworkRunner.GetPlayerUserId(Fusion.PlayerRef)">
             <summary>
-            Gets Player's UserID. Only usable in shared mode.
+            Gets Player's UserID.
+            
+            If used in Shared Mode, every client can get this information.
+            If used in Client Server Mode, only the Server is able to get this information.
             </summary>
-            <param name="player">PlayerRef to get the UserID</param>
+            <param name="player">PlayerRef to get the UserID. If no PlayerRef is passed, the UserID of the local client is returned instead.</param>
             <returns>UserID if valid player found, otherwise null.</returns>
         </member>
         <member name="M:Fusion.NetworkRunner.SetPlayerObject(Fusion.PlayerRef,Fusion.NetworkObject)">
@@ -6931,11 +7189,12 @@
         </member>
         <member name="M:Fusion.NetworkRunner.AddPlayerAreaOfInterest(Fusion.PlayerRef,UnityEngine.Vector3,System.Single,System.Int32)">
             <summary>
-            Adds a area of interest radius for a specific player at a position. A player can have several areas of interests added. Needs to be called every frame.
+            Adds an area of interest region for a specific player. A player can have multiple areas of interest regions added. 
+            These are cleared every tick, so this needs to be called every <see cref="M:Fusion.NetworkBehaviour.FixedUpdateNetwork"/>.
             </summary>
             <param name="player">The player</param>
             <param name="position">Center position of the area of interest</param>
-            <param name="radius">Radius of the area of interest</param>
+            <param name="extent">The extents of the area of interest.</param>
         </member>
         <member name="M:Fusion.NetworkRunner.GetInputForPlayer``1(Fusion.PlayerRef)">
             <summary>
@@ -6991,6 +7250,14 @@
             <typeparam name="T"></typeparam>
             <param name="id"></param>
             <returns>Returns the found component. Null if the <see cref="T:Fusion.NetworkObject"/> cannot be found, or if T cannot be found on the GameObject.</returns>
+        </member>
+        <member name="M:Fusion.NetworkRunner.SetSimulationState(Fusion.NetworkObject,System.Boolean)">
+            <summary>
+            Sets the simulation state for this object, if it takes part in the NetworkFixedUpdate, etc.
+            </summary>
+            <param name="obj">the object to change state for</param>
+            <param name="simulate">true if it should be simulated, false if otherwise</param>
+            <returns>true if the state of the object changed, false otherwise</returns>
         </member>
         <member name="M:Fusion.NetworkRunner.Exists(Fusion.NetworkObject)">
             <summary>
@@ -7141,11 +7408,13 @@
         <member name="M:Fusion.NetworkRunner.AddSimulationBehaviour(Fusion.SimulationBehaviour,Fusion.NetworkObject)">
             <summary>
             Register a <see cref="T:Fusion.SimulationBehaviour"/> instance with the <see cref="T:Fusion.SimulationBehaviourUpdater"/>. 
+            Invalid if NetworkRunner has not been started and initialized.
             </summary>
         </member>
         <member name="M:Fusion.NetworkRunner.RemoveSimulationBehavior(Fusion.SimulationBehaviour)">
             <summary>
-            Unregister a <see cref="T:Fusion.SimulationBehaviour"/> instance from the <see cref="T:Fusion.SimulationBehaviourUpdater"/> callbacks.
+            Unregister a <see cref="T:Fusion.SimulationBehaviour"/> instance from the <see cref="T:Fusion.SimulationBehaviourUpdater"/> callbacks. 
+            Invalid if NetworkRunner has not been started and initialized.
             </summary>
         </member>
         <member name="M:Fusion.NetworkRunner.Attach(Fusion.NetworkObject,System.Nullable{Fusion.PlayerRef})">
@@ -7183,11 +7452,24 @@
             if this instance is a resume (host migration)
             </summary>
         </member>
+        <member name="M:Fusion.NetworkRunner.PushHostMigrationSnapshot">
+            <summary>
+            Compute and send a Host Migration Snapshot to the Photon Cloud
+            </summary>
+            <returns>Task with the result of the operation. True if it was successful, false otherwise.</returns>
+        </member>
         <member name="M:Fusion.NetworkRunner.GetResumeSnapshotNetworkObjects">
             <summary>
             Iterate over the old NetworkObjects from the Resume Snapshot
             </summary>
             <returns>Iterable list of <see cref="T:Fusion.NetworkObject"/></returns>
+        </member>
+        <member name="M:Fusion.NetworkRunner.GetResumeSnapshotNetworkSceneObjects">
+            <summary>
+            Iterate over the Scene NetworkObjects from the Resume Snapshot while giving the reference of the old 
+            Snapshot data associated with that particular Scene Object
+            </summary>
+            <returns>Iterable list of Scene <see cref="T:Fusion.NetworkObject"/> and Scene Object Header</returns>
         </member>
         <member name="M:Fusion.NetworkRunner.CleanHostMigrationSnapshots">
             <summary>
@@ -7203,6 +7485,11 @@
         <member name="M:Fusion.NetworkRunner.GetNetworkObjectFromResumeSnapshot(Fusion.NetworkObjectHeaderPtr)">
             <summary>
             Gets a temporary representation of a <see cref="T:Fusion.NetworkObject"/> from the old Server Snapshot
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkRunner.GetSceneNetworkObjectFromResumeSnapshot(Fusion.NetworkObjectHeaderPtr)">
+            <summary>
+            Get the reference of a specific Scene Object associated with a NO Header from the old Server Snapshot
             </summary>
         </member>
         <member name="M:Fusion.NetworkRunner.SetupHostMigration(Fusion.Protocol.HostMigration)">
@@ -7529,6 +7816,11 @@
             Binding Address
             </summary>
         </member>
+        <member name="F:Fusion.StartGameArgs.CustomPublicAddress">
+            <summary>
+            Custom Public Reflexive Address
+            </summary>
+        </member>
         <member name="F:Fusion.StartGameArgs.ObjectPool">
             <summary>
             Object pool to use
@@ -7614,6 +7906,11 @@
         <member name="F:Fusion.StartGameArgs.HostMigrationResume">
             <summary>
             Callback invoked when the new Host is migrating from the old Host state
+            </summary>
+        </member>
+        <member name="M:Fusion.StartGameArgs.ToString">
+            <summary>
+            StartGameArgs ToString
             </summary>
         </member>
         <member name="T:Fusion.GameMode">
@@ -7704,15 +8001,20 @@
             Holds information about a Lobby
             </summary>
         </member>
-        <member name="F:Fusion.LobbyInfo.IsValid">
+        <member name="P:Fusion.LobbyInfo.IsValid">
             <summary>
             Flag to signal if the <see cref="T:Fusion.LobbyInfo"/> is ready for use.
             This is only true if the peer is currently connected to a Lobby.
             </summary>
         </member>
-        <member name="F:Fusion.LobbyInfo.Name">
+        <member name="P:Fusion.LobbyInfo.Name">
             <summary>
             Lobby Name
+            </summary>
+        </member>
+        <member name="P:Fusion.LobbyInfo.Region">
+            <summary>
+            Stores the current connected Region
             </summary>
         </member>
         <member name="T:Fusion.SessionInfo">
@@ -8177,7 +8479,7 @@
         </member>
         <member name="P:Fusion.Simulation.Tick">
             <summary>
-            The tick associated with the current state of networked objects.
+            The tick associated with the current state of networked objects, or the current simulation tick being processed (when evaluated during FixedUpdateNetwork).
             </summary>
         </member>
         <member name="P:Fusion.Simulation.Topology">
@@ -8267,12 +8569,25 @@
             <param name="player">Player to check for the NetAddress</param>
             <returns>NetAddress of a specific player</returns>
         </member>
+        <member name="M:Fusion.Simulation.GetPlayerUniqueId(Fusion.PlayerRef)">
+            <summary>
+            Return the UniqueId as a long from a specific Player
+            </summary>
+            <param name="player">Player to check for the UniqueId</param>
+            <returns>UniqueId of a specific Player</returns>
+        </member>
         <member name="M:Fusion.Simulation.Update(System.Double)">
             <summary>
             Forwards the Simulation based on the Delta Time
             </summary>
             <param name="dt">Delta Time used to forward the simulation</param>
             <returns>How many Ticks executed on this Update</returns>
+        </member>
+        <member name="M:Fusion.Simulation.Server.Disconnect(Fusion.Sockets.NetAddress)">
+            <summary>
+            Disconnect a client based on it's NetAddress
+            </summary>
+            <param name="address">Client Adress to Disconnect</param>
         </member>
         <member name="T:Fusion.Simulation.Statistics.StatSourceTypes">
             <summary>
@@ -8441,11 +8756,6 @@
             Selects if Object Interest should be used when running in <see cref="F:Fusion.SimulationConfig.StateReplicationModes.EventualConsistency"/> mode.
             When enabled, clients will only receive updates for objects which they have interest in. 
             How interest is determined for each <see cref="T:Fusion.NetworkObject"/> is based on its <see cref="F:Fusion.NetworkObject.ObjectInterest"/> mode setting.
-            </summary>
-        </member>
-        <member name="F:Fusion.SimulationConfig.SimulationCulling">
-            <summary>
-            Uses area of interest queries to cull execution of Fixed Update Network for objects outside of any players area of interest.
             </summary>
         </member>
         <member name="P:Fusion.SimulationConfig.InputTotalWordCount">
@@ -8679,7 +8989,7 @@
         </member>
         <member name="F:Fusion.NetworkSimulationConfiguration.DelayPeriod">
             <summary>
-            The period of the <see cref="F:Fusion.NetworkSimulationConfiguration.DelayShape"/> oscillator (the rate at which delay oscillates between <see cref="F:Fusion.NetworkSimulationConfiguration.DelayMin"/> and <see cref="F:Fusion.NetworkSimulationConfiguration.DelayMax"/>).
+            The period of the <see cref="F:Fusion.NetworkSimulationConfiguration.DelayShape"/> oscillator (the rate at which delay oscillates in seconds).
             </summary>
         </member>
         <member name="F:Fusion.NetworkSimulationConfiguration.DelayThreshold">
@@ -8719,7 +9029,7 @@
         </member>
         <member name="F:Fusion.NetworkSimulationConfiguration.AdditionalLoss">
             <summary>
-            After the <see cref="F:Fusion.NetworkSimulationConfiguration.LossChanceShape"/> oscillation loss calculated, an additional 0 to this (normalized) percentage of loss chance is added.
+            After the <see cref="F:Fusion.NetworkSimulationConfiguration.LossChanceShape"/> oscillation loss chance is calculated, an additional random value of 0 to this (normalized) percentage of loss chance is added.
             </summary>
         </member>
         <member name="T:Fusion.SimulationGlobalState">

@@ -109,7 +109,7 @@ public class PlayerController : FreezableEntity {
 
     private int MovementStage {
         get {
-            float xVel = Mathf.Abs(body.velocity.x);
+            float xVel = Mathf.Abs(currentVelocity.x);
             float[] arr = (flying || propeller) && State != Enums.PowerupState.MegaMushroom ? SPEED_STAGE_SPINNER_MAX : SPEED_STAGE_MAX;
             for (int i = 0; i < arr.Length; i++) {
                 if (xVel <= arr[i])
@@ -133,7 +133,7 @@ public class PlayerController : FreezableEntity {
 
     public FrozenCube frozenObject;
 
-    public Vector2 giantSavedVelocity, previousFrameVelocity, previousFramePosition;
+    public Vector2 giantSavedVelocity, currentVelocity, previousFrameVelocity, previousFramePosition;
 
     public GameObject onSpinner;
     public PipeManager pipeEntering;
@@ -203,16 +203,25 @@ public class PlayerController : FreezableEntity {
         GameManager.Instance.players.Remove(this);
     }
 
+    public void OnEnable() {
+        InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
+    }
+
+    public void OnDisable() {
+        InputSystem.controls.Player.ReserveItem.performed -= OnReserveItem;
+    }
+
     public override void Spawned() {
-        hitboxes = GetComponents<BoxCollider2D>();
+        hitboxes = GetComponentsInChildren<BoxCollider2D>();
         trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
         transform.position = body.position = GameManager.Instance.spawnpoint;
 
         cameraController.IsControllingCamera = Object.HasInputAuthority;
         cameraController.Recenter();
 
+        body = networkRigidbody.Rigidbody;
+
         if (Object.HasInputAuthority) {
-            networkRigidbody.InterpolationDataSource = InterpolationDataSources.Predicted;
             GameManager.Instance.localPlayer = this;
             GameManager.Instance.spectationManager.Spectating = false;
         }
@@ -251,6 +260,7 @@ public class PlayerController : FreezableEntity {
             }
 
         } else {
+            currentVelocity = body.velocity;
 
             CheckForPowerupActions();
 
@@ -269,6 +279,8 @@ public class PlayerController : FreezableEntity {
             HandleMovement(Runner.DeltaTime);
             HandleGiantTiles(true);
             UpdateHitbox();
+
+            body.velocity = currentVelocity;
         }
 
         animationController.UpdateAnimatorStates();
@@ -293,7 +305,7 @@ public class PlayerController : FreezableEntity {
     }
 
     #region -- COLLISIONS --
-    void HandleGroundCollision() {
+    private void HandleGroundCollision() {
         tilesJumpedInto.Clear();
         tilesStandingOn.Clear();
         tilesHitSide.Clear();
@@ -319,8 +331,8 @@ public class PlayerController : FreezableEntity {
                     continue;
 
                 if (Vector2.Dot(n, Vector2.up) > .05f) {
-                    if (Vector2.Dot(body.velocity.normalized, n) > 0.1f && !onGround) {
-                        if (!contact.rigidbody || contact.rigidbody.velocity.y < body.velocity.y)
+                    if (Vector2.Dot(currentVelocity.normalized, n) > 0.1f && !onGround) {
+                        if (!contact.rigidbody || contact.rigidbody.velocity.y < currentVelocity.y)
                             //invalid flooring
                             continue;
                     }
@@ -381,7 +393,7 @@ public class PlayerController : FreezableEntity {
             GameObject collidedObject = results[i].gameObject;
 
             //don't interact with objects we're holding.
-            if (HeldEntity.gameObject == collidedObject)
+            if (HeldEntity && HeldEntity.gameObject == collidedObject)
                 continue;
 
             if (collidedObject.TryGetComponent(out IPlayerInteractable interactable))
@@ -622,7 +634,7 @@ public class PlayerController : FreezableEntity {
             } else {
                 Runner.Spawn(prefab, pos, onBeforeSpawned: (runner, obj) => {
                     FireballMover mover = obj.GetComponent<FireballMover>();
-                    mover.OnBeforeSpawned(this, !FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround"));
+                    mover.OnBeforeSpawned(this, FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround"));
                 });
             }
             PlaySound(sound);
@@ -645,7 +657,7 @@ public class PlayerController : FreezableEntity {
         if (usedPropellerThisJump)
             return;
 
-        body.velocity = new Vector2(body.velocity.x, propellerLaunchVelocity);
+        currentVelocity.y = propellerLaunchVelocity;
         PropellerLaunchTimer = TickTimer.CreateFromSeconds(Runner, 1f);
         PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
 
@@ -788,20 +800,23 @@ public class PlayerController : FreezableEntity {
 
 
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, InvokeResim = true)]
     public void RPC_SpawnReserveItem() {
         if (StoredPowerup == Enums.PowerupState.None)
             return;
 
-        Runner.Spawn(Enums.PowerupFromState[StoredPowerup].prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0);
-        PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
+        SpawnItem(Enums.PowerupFromState[StoredPowerup].prefab);
         StoredPowerup = Enums.PowerupState.None;
     }
 
-    public void SpawnRandomItem() {
-        Powerup randomItem = Utils.GetRandomItem(Runner, this);
-        Runner.Spawn(randomItem.prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0);
+    public void SpawnItem(NetworkPrefabRef prefab) {
 
+        if (prefab == NetworkPrefabRef.Empty)
+            prefab = Utils.GetRandomItem(Runner, this).prefab;
+
+        Runner.Spawn(prefab, body.position + Vector2.up * 5f, onBeforeSpawned: (runner, obj) => {
+            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(this, 0f);
+        });
         PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
     }
 
@@ -918,7 +933,7 @@ public class PlayerController : FreezableEntity {
         IsDead = false;
         State = Enums.PowerupState.Small;
         previousState = Enums.PowerupState.Small;
-        body.velocity = Vector2.zero;
+        currentVelocity = Vector2.zero;
         wallSlideLeft = false;
         wallSlideRight = false;
         wallSlideTimer = 0;
@@ -993,7 +1008,7 @@ public class PlayerController : FreezableEntity {
         bool left = currentInputs.buttons.IsSet(PlayerControls.Left);
         bool right = currentInputs.buttons.IsSet(PlayerControls.Right);
 
-        bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == Mathf.Sign(body.velocity.x));
+        bool reverse = currentVelocity.x != 0 && ((left ? 1 : -1) == Mathf.Sign(currentVelocity.x));
         if (onIce && (left ^ right) && reverse) {
             PlaySound(Enums.Sounds.World_Ice_Skidding);
             return;
@@ -1002,10 +1017,10 @@ public class PlayerController : FreezableEntity {
             PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Kick);
             return;
         }
-        if (Mathf.Abs(body.velocity.x) < WalkingMaxSpeed)
+        if (Mathf.Abs(currentVelocity.x) < WalkingMaxSpeed)
             return;
 
-        PlaySound(footstepSound, (byte) (step ? 1 : 2), Mathf.Abs(body.velocity.x) / (RunningMaxSpeed + 4));
+        PlaySound(footstepSound, (byte) (step ? 1 : 2), Mathf.Abs(currentVelocity.x) / (RunningMaxSpeed + 4));
         step = !step;
     }
     #endregion
@@ -1023,7 +1038,7 @@ public class PlayerController : FreezableEntity {
         if (grounded)
             offset = Vector2.down / 2f;
 
-        Vector2 checkPosition = body.position + (Vector2.up * checkSize * 0.5f) + (2 * Time.fixedDeltaTime * body.velocity) + offset;
+        Vector2 checkPosition = body.position + (Vector2.up * checkSize * 0.5f) + (2 * Time.fixedDeltaTime * currentVelocity) + offset;
 
         Vector3Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
         Vector3Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
@@ -1139,7 +1154,7 @@ public class PlayerController : FreezableEntity {
         animator.SetBool("knockforwards", FacingRight != fromRight);
 
         float megaVelo = State == Enums.PowerupState.MegaMushroom ? 3 : 1;
-        body.velocity = new Vector2(
+        currentVelocity = new Vector2(
             (fromRight ? -1 : 1) *
             ((starsToDrop + 1) / 2f) *
             4f *
@@ -1178,7 +1193,7 @@ public class PlayerController : FreezableEntity {
         KnockbackTimer = TickTimer.None;
         bounce = false;
         IsInKnockback = false;
-        body.velocity = new(0, body.velocity.y);
+        currentVelocity.x = 0;
         FacingRight = initialKnockbackFacingRight;
     }
     #endregion
@@ -1231,10 +1246,10 @@ public class PlayerController : FreezableEntity {
                     groundpound = false;
                     sliding = true;
                     alreadyGroundpounded = true;
-                    body.velocity = new Vector2(-Mathf.Sign(floorAngle) * SPEED_SLIDE_MAX, 0);
+                    currentVelocity = new Vector2(-Mathf.Sign(floorAngle) * SPEED_SLIDE_MAX, 0);
                     startedSliding = true;
                 } else {
-                    body.velocity = Vector2.zero;
+                    currentVelocity = Vector2.zero;
                     if (!down || State == Enums.PowerupState.MegaMushroom) {
                         groundpound = false;
                         groundpoundCounter = State == Enums.PowerupState.MegaMushroom ? 0.4f : 0.25f;
@@ -1243,7 +1258,7 @@ public class PlayerController : FreezableEntity {
             }
             if (up && groundpoundCounter <= 0.05f) {
                 groundpound = false;
-                body.velocity = Vector2.down * groundpoundVelocity;
+                currentVelocity = Vector2.down * groundpoundVelocity;
             }
         }
         if (!((FacingRight && hitRight) || (!FacingRight && hitLeft)) && crouching && Mathf.Abs(floorAngle) >= slopeSlidingAngle && !inShell && State != Enums.PowerupState.MegaMushroom) {
@@ -1254,18 +1269,18 @@ public class PlayerController : FreezableEntity {
         if (sliding && onGround && Mathf.Abs(floorAngle) > slopeSlidingAngle) {
             float angleDeg = floorAngle * Mathf.Deg2Rad;
 
-            bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(body.velocity.x);
-            float speed = Time.fixedDeltaTime * 5f * (uphill ? Mathf.Clamp01(1f - (Mathf.Abs(body.velocity.x) / RunningMaxSpeed)) : 4f);
+            bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(currentVelocity.x);
+            float speed = Time.fixedDeltaTime * 5f * (uphill ? Mathf.Clamp01(1f - (Mathf.Abs(currentVelocity.x) / RunningMaxSpeed)) : 4f);
 
-            float newX = Mathf.Clamp(body.velocity.x - (Mathf.Sin(angleDeg) * speed), -(RunningMaxSpeed * 1.3f), RunningMaxSpeed * 1.3f);
+            float newX = Mathf.Clamp(currentVelocity.x - (Mathf.Sin(angleDeg) * speed), -(RunningMaxSpeed * 1.3f), RunningMaxSpeed * 1.3f);
             float newY = Mathf.Sin(angleDeg) * newX + 0.4f;
-            body.velocity = new Vector2(newX, newY);
+            currentVelocity = new Vector2(newX, newY);
 
         }
 
-        if (sliding && (up || ((left ^ right) && !down) || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && body.velocity.x == 0 && !down) || (FacingRight && hitRight) || (!FacingRight && hitLeft))) {
+        if (sliding && (up || ((left ^ right) && !down) || (Mathf.Abs(floorAngle) < slopeSlidingAngle && onGround && currentVelocity.x == 0 && !down) || (FacingRight && hitRight) || (!FacingRight && hitLeft))) {
             sliding = false;
-            if (body.velocity.x == 0 && onGround)
+            if (currentVelocity.x == 0 && onGround)
                 PlaySound(Enums.Sounds.Player_Sound_SlideEnd);
 
             //alreadyGroundpounded = false;
@@ -1285,12 +1300,12 @@ public class PlayerController : FreezableEntity {
             if (Mathf.Abs(angle) > 89)
                 return;
 
-            float x = floorAngle != angle ? previousFrameVelocity.x : body.velocity.x;
+            float x = floorAngle != angle ? previousFrameVelocity.x : currentVelocity.x;
 
             floorAngle = angle;
 
             float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.25f;
-            body.velocity = new Vector2(x, change);
+            currentVelocity = new Vector2(x, change);
             onGround = true;
             doGroundSnap = true;
         } else if (onGround) {
@@ -1300,11 +1315,11 @@ public class PlayerController : FreezableEntity {
                 if (Mathf.Abs(angle) > 89)
                     return;
 
-                float x = floorAngle != angle ? previousFrameVelocity.x : body.velocity.x;
+                float x = floorAngle != angle ? previousFrameVelocity.x : currentVelocity.x;
                 floorAngle = angle;
 
                 float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.25f;
-                body.velocity = new Vector2(x, change);
+                currentVelocity = new Vector2(x, change);
                 onGround = true;
                 doGroundSnap = true;
             } else {
@@ -1329,7 +1344,7 @@ public class PlayerController : FreezableEntity {
     }
 
     private bool GroundSnapCheck() {
-        if (IsDead || (body.velocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering || gameObject.layer == Layers.LayerHitsNothing)
+        if (IsDead || (currentVelocity.y > 0 && !onGround) || !doGroundSnap || pipeEntering || gameObject.layer == Layers.LayerHitsNothing)
             return false;
 
         bool prev = Physics2D.queriesStartInColliders;
@@ -1363,7 +1378,7 @@ public class PlayerController : FreezableEntity {
             pipeEntering = pipe;
             pipeDirection = Vector2.down;
 
-            body.velocity = Vector2.down;
+            currentVelocity = Vector2.down;
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
             PlaySound(Enums.Sounds.Player_Sound_Powerdown);
@@ -1397,7 +1412,7 @@ public class PlayerController : FreezableEntity {
             pipeEntering = pipe;
             pipeDirection = Vector2.up;
 
-            body.velocity = Vector2.up;
+            currentVelocity = Vector2.up;
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
             PlaySound(Enums.Sounds.Player_Sound_Powerdown);
@@ -1470,7 +1485,7 @@ public class PlayerController : FreezableEntity {
 
                 hitRight = false;
                 hitLeft = false;
-                body.velocity = new Vector2(WALLJUMP_HSPEED * (wallSlideLeft ? 1 : -1), WALLJUMP_VSPEED);
+                currentVelocity = new Vector2(WALLJUMP_HSPEED * (wallSlideLeft ? 1 : -1), WALLJUMP_VSPEED);
                 singlejump = false;
                 doublejump = false;
                 triplejump = false;
@@ -1480,7 +1495,8 @@ public class PlayerController : FreezableEntity {
                 PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
 
                 Vector2 offset = new(MainHitbox.size.x / 2f * (wallSlideLeft ? -1 : 1), MainHitbox.size.y / 2f);
-                SpawnParticle("Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
+                if (Runner.IsForward)
+                    SpawnParticle("Prefabs/Particle/WalljumpParticle", body.position + offset, wallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
 
                 wallJumpTimer = 16 / 60f;
                 animator.SetTrigger("walljump");
@@ -1488,7 +1504,7 @@ public class PlayerController : FreezableEntity {
             }
         } else {
             //walljump starting check
-            bool canWallslide = !inShell && body.velocity.y < -0.1 && !groundpound && !onGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !flying && !drill && !crouching && !sliding && !IsInKnockback;
+            bool canWallslide = !inShell && currentVelocity.y < -0.1 && !groundpound && !onGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !flying && !drill && !crouching && !sliding && !IsInKnockback;
             if (!canWallslide)
                 return;
 
@@ -1528,7 +1544,7 @@ public class PlayerController : FreezableEntity {
             return;
         }
 
-        bool moveDownCheck = body.velocity.y < 0;
+        bool moveDownCheck = currentVelocity.y < 0;
         if (!moveDownCheck)
             return;
 
@@ -1550,10 +1566,10 @@ public class PlayerController : FreezableEntity {
         if (IsInKnockback || drill || (State == Enums.PowerupState.MegaMushroom && singlejump))
             return;
 
-        bool topSpeed = Mathf.Abs(body.velocity.x) >= RunningMaxSpeed;
+        bool topSpeed = Mathf.Abs(currentVelocity.x) >= RunningMaxSpeed;
         if (bounce || (jumpPressed && (onGround || (koyoteTime < 0.07f && !propeller)) && !startedSliding)) {
 
-            bool canSpecialJump = (jumpPressed || (bounce && forceJump)) && properJump && !flying && !propeller && topSpeed && landing < 0.45f && !HeldEntity && !triplejump && !crouching && !inShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
+            bool canSpecialJump = (jumpPressed || (bounce && forceJump)) && properJump && !flying && !propeller && topSpeed && landing < 0.45f && !HeldEntity && !triplejump && !crouching && !inShell && ((currentVelocity.x < 0 && !FacingRight) || (currentVelocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
             float jumpBoost = 0;
 
             koyoteTime = 1;
@@ -1573,7 +1589,7 @@ public class PlayerController : FreezableEntity {
             if (!bounce && onSpinner && !HeldEntity) {
                 PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
                 PlaySound(Enums.Sounds.World_Spinner_Launch);
-                body.velocity = new Vector2(body.velocity.x, launchVelocity);
+                currentVelocity.y = launchVelocity;
                 flying = true;
                 onGround = false;
                 body.position += Vector2.up * 0.075f;
@@ -1586,7 +1602,7 @@ public class PlayerController : FreezableEntity {
 
             float vel = State switch {
                 Enums.PowerupState.MegaMushroom => megaJumpVelocity,
-                _ => jumpVelocity + Mathf.Abs(body.velocity.x) / RunningMaxSpeed * 1.05f,
+                _ => jumpVelocity + Mathf.Abs(currentVelocity.x) / RunningMaxSpeed * 1.05f,
             };
 
 
@@ -1609,7 +1625,7 @@ public class PlayerController : FreezableEntity {
                 doublejump = false;
                 triplejump = false;
             }
-            body.velocity = new Vector2(body.velocity.x, vel + jumpBoost);
+            currentVelocity.y = vel + jumpBoost;
             onGround = false;
             doGroundSnap = false;
             body.position += Vector2.up * 0.075f;
@@ -1654,25 +1670,25 @@ public class PlayerController : FreezableEntity {
         return new(MainHitbox.size.x, height);
     }
 
-    void HandleWalkingRunning(bool left, bool right) {
+    private void HandleWalkingRunning(bool left, bool right) {
 
         if (wallJumpTimer > 0) {
             if (wallJumpTimer < (14 / 60f) && (hitLeft || hitRight)) {
                 wallJumpTimer = 0;
             } else {
-                body.velocity = new(WALLJUMP_HSPEED * (FacingRight ? 1 : -1), body.velocity.y);
+                currentVelocity.x = WALLJUMP_HSPEED * (FacingRight ? 1 : -1);
                 return;
             }
         }
 
-        if (groundpound || groundpoundCounter > 0 || IsInKnockback || pipeEntering || jumpLandingTimer > 0 || !(wallJumpTimer <= 0 || onGround || body.velocity.y < 0))
+        if (groundpound || groundpoundCounter > 0 || IsInKnockback || pipeEntering || jumpLandingTimer > 0 || !(wallJumpTimer <= 0 || onGround || currentVelocity.y < 0))
             return;
 
         if (!onGround)
             skidding = false;
 
         if (inShell) {
-            body.velocity = new(SPEED_STAGE_MAX[RUN_STAGE] * 0.9f * (FacingRight ? 1 : -1) * (1f - ShellSlowdownTimer.RemainingTime(Runner) ?? 0f), body.velocity.y);
+            currentVelocity.x = SPEED_STAGE_MAX[RUN_STAGE] * 0.9f * (FacingRight ? 1 : -1) * (1f - ShellSlowdownTimer.RemainingTime(Runner) ?? 0f);
             return;
         }
 
@@ -1688,13 +1704,13 @@ public class PlayerController : FreezableEntity {
 
         int stage = MovementStage;
         float acc = State == Enums.PowerupState.MegaMushroom ? SPEED_STAGE_MEGA_ACC[stage] : SPEED_STAGE_ACC[stage];
-        float sign = Mathf.Sign(body.velocity.x);
+        float sign = Mathf.Sign(currentVelocity.x);
 
         if ((left ^ right) && (!crouching || (crouching && !onGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !sliding) {
             //we can walk here
 
-            float speed = Mathf.Abs(body.velocity.x);
-            bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == sign);
+            float speed = Mathf.Abs(currentVelocity.x);
+            bool reverse = currentVelocity.x != 0 && ((left ? 1 : -1) == sign);
 
             //check that we're not going above our limit
             float max = SPEED_STAGE_MAX[maxStage];
@@ -1754,7 +1770,7 @@ public class PlayerController : FreezableEntity {
             }
 
             int direction = left ? -1 : 1;
-            float newX = body.velocity.x + acc * direction;
+            float newX = currentVelocity.x + acc * direction;
 
             if (Mathf.Abs(newX) - speed > 0) {
                 //clamp only if accelerating
@@ -1768,7 +1784,7 @@ public class PlayerController : FreezableEntity {
                 newX = 0;
             }
 
-            body.velocity = new(newX, body.velocity.y);
+            currentVelocity.x = newX;
 
         } else if (onGround) {
             //not holding anything, sliding, or holding both directions. decelerate
@@ -1776,7 +1792,7 @@ public class PlayerController : FreezableEntity {
             skidding = false;
             turnaround = false;
 
-            if (body.velocity.x == 0)
+            if (currentVelocity.x == 0)
                 return;
 
             if (sliding) {
@@ -1795,8 +1811,8 @@ public class PlayerController : FreezableEntity {
             else
                 acc = -BUTTON_RELEASE_DEC;
 
-            int direction = (int) Mathf.Sign(body.velocity.x);
-            float newX = body.velocity.x + acc * direction;
+            int direction = (int) Mathf.Sign(currentVelocity.x);
+            float newX = currentVelocity.x + acc * direction;
 
             if ((direction == -1) ^ (newX <= 0))
                 newX = 0;
@@ -1805,15 +1821,16 @@ public class PlayerController : FreezableEntity {
                 newX = Mathf.Clamp(newX, -SPEED_SLIDE_MAX, SPEED_SLIDE_MAX);
             }
 
-            body.velocity = new(newX, body.velocity.y);
+            currentVelocity.x = newX;
 
             if (newX != 0)
                 FacingRight = newX > 0;
         }
 
-        inShell |= State == Enums.PowerupState.BlueShell && !sliding && onGround && functionallyRunning && !HeldEntity && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
+        inShell |= State == Enums.PowerupState.BlueShell && !sliding && onGround && functionallyRunning && !HeldEntity && Mathf.Abs(currentVelocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
         if (onGround || previousOnGround)
-            body.velocity = new(body.velocity.x, 0);
+            currentVelocity.y = 0;
+
     }
 
     bool HandleStuckInBlock() {
@@ -1829,7 +1846,7 @@ public class PlayerController : FreezableEntity {
         }
         stuckInBlock = true;
         body.gravityScale = 0;
-        body.velocity = Vector2.zero;
+        currentVelocity = Vector2.zero;
         groundpound = false;
         propeller = false;
         drill = false;
@@ -1888,7 +1905,7 @@ public class PlayerController : FreezableEntity {
         }
 
         alreadyStuckInBlock = true;
-        body.velocity = Vector2.right * 2f;
+        currentVelocity = Vector2.right * 2f;
         return true;
     }
 
@@ -1938,17 +1955,17 @@ public class PlayerController : FreezableEntity {
         bool left = currentInputs.buttons.IsSet(PlayerControls.Left);
 
         if (wallJumpTimer > 0) {
-            FacingRight = body.velocity.x > 0;
+            FacingRight = currentVelocity.x > 0;
         } else if (!inShell && !sliding && !skidding && !IsInKnockback && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
             if (right ^ left)
                 FacingRight = right;
         } else if (GiantStartTimer.ExpiredOrNotRunning(Runner) && GiantEndTimer.ExpiredOrNotRunning(Runner) && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
-            if (IsInKnockback || (onGround && State != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f)) {
-                FacingRight = body.velocity.x > 0;
+            if (IsInKnockback || (onGround && State != Enums.PowerupState.MegaMushroom && Mathf.Abs(currentVelocity.x) > 0.05f)) {
+                FacingRight = currentVelocity.x > 0;
             } else if (((wallJumpTimer <= 0 && !inShell) || !GiantStartTimer.ExpiredOrNotRunning(Runner)) && (right || left)) {
                 FacingRight = right;
             }
-            if (!inShell && ((Mathf.Abs(body.velocity.x) < 0.5f && crouching) || onIce) && (right || left))
+            if (!inShell && ((Mathf.Abs(currentVelocity.x) < 0.5f && crouching) || onIce) && (right || left))
                 FacingRight = right;
         }
     }
@@ -1962,7 +1979,9 @@ public class PlayerController : FreezableEntity {
         stationaryGiantEnd = false;
         DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
         PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
-        body.velocity = new(body.velocity.x, body.velocity.y > 0 ? (body.velocity.y / 3f) : body.velocity.y);
+
+        if (currentVelocity.y > 0)
+            currentVelocity.y *= 0.33f;
     }
 
     public void HandleBlockSnapping() {
@@ -1971,10 +1990,10 @@ public class PlayerController : FreezableEntity {
 
         //if we're about to be in the top 2 pixels of a block, snap up to it, (if we can fit)
 
-        if (body.velocity.y > 0)
+        if (currentVelocity.y > 0)
             return;
 
-        Vector2 nextPos = body.position + Time.fixedDeltaTime * 2f * body.velocity;
+        Vector2 nextPos = body.position + Time.fixedDeltaTime * 2f * currentVelocity;
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(nextPos + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize))
             //we are not going to be inside a block next fixed update
@@ -2023,9 +2042,9 @@ public class PlayerController : FreezableEntity {
 
         if (IsFrozen) {
             if (!frozenObject) {
-                Unfreeze((byte) FreezableEntity.UnfreezeReason.Other);
+                Unfreeze(UnfreezeReason.Other);
             } else {
-                body.velocity = Vector2.zero;
+                currentVelocity = Vector2.zero;
                 return;
             }
         }
@@ -2041,7 +2060,7 @@ public class PlayerController : FreezableEntity {
         //}
 
         if (GiantStartTimer.IsRunning) {
-            body.velocity = Vector2.zero;
+            currentVelocity = Vector2.zero;
             transform.position = body.position = previousFramePosition;
             if (GiantStartTimer.Expired(Runner)) {
                 FinishMegaMario(true);
@@ -2053,9 +2072,9 @@ public class PlayerController : FreezableEntity {
 
 
                 Vector2 checkSize = WorldHitboxSize * new Vector2(0.75f, 1.1f);
-                Vector2 normalizedVelocity = body.velocity;
+                Vector2 normalizedVelocity = currentVelocity;
                 if (!groundpound)
-                    normalizedVelocity.y = Mathf.Max(0, body.velocity.y);
+                    normalizedVelocity.y = Mathf.Max(0, currentVelocity.y);
 
                 Vector2 offset = Vector2.zero;
                 if (singlejump && onGround)
@@ -2086,13 +2105,13 @@ public class PlayerController : FreezableEntity {
             return;
         }
         if (GiantEndTimer.IsRunning && stationaryGiantEnd) {
-            body.velocity = Vector2.zero;
+            currentVelocity = Vector2.zero;
             body.isKinematic = true;
             transform.position = body.position = previousFramePosition;
 
             if (GiantEndTimer.Expired(Runner)) {
                 DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
-                body.velocity = giantSavedVelocity;
+                currentVelocity = giantSavedVelocity;
                 animator.enabled = true;
                 body.isKinematic = false;
                 State = previousState;
@@ -2123,7 +2142,11 @@ public class PlayerController : FreezableEntity {
         bool up = currentInputs.buttons.IsSet(PlayerControls.Up);
         bool jump = currentInputs.buttons.IsSet(PlayerControls.Jump);
 
-        bool doJump = jump || jumpBuffer > 0 && (onGround || koyoteTime < 0.07f || wallSlideLeft || wallSlideRight);
+        if (currentInputs.buttons.WasPressed(previousInputs.buttons, PlayerControls.Jump)) {
+            jumpBuffer = 0.15f;
+        }
+
+        bool doJump = (jumpBuffer > 0) && (onGround || koyoteTime < 0.07f || wallSlideLeft || wallSlideRight);
 
         //Pipes
         if (pipeTimer <= 0) {
@@ -2139,8 +2162,8 @@ public class PlayerController : FreezableEntity {
             wallSlideRight = false;
             crouching = false;
             inShell = false;
-            body.velocity -= body.velocity * (delta * 2f);
-            if (onGround && Mathf.Abs(body.velocity.x) < 0.35f && KnockbackTimer.Expired(Runner))
+            currentVelocity -= currentVelocity * (delta * 2f);
+            if (onGround && Mathf.Abs(currentVelocity.x) < 0.35f && KnockbackTimer.Expired(Runner))
                 ResetKnockback();
 
             if (HeldEntity) {
@@ -2151,7 +2174,7 @@ public class PlayerController : FreezableEntity {
 
         //activate blocks jumped into
         if (hitRoof) {
-            body.velocity = new Vector2(body.velocity.x, Mathf.Min(body.velocity.y, -0.1f));
+            currentVelocity.y = Mathf.Min(currentVelocity.y, -0.1f);
             bool tempHitBlock = false;
             foreach (Vector3Int tile in tilesJumpedInto) {
                 int temp = InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
@@ -2185,12 +2208,12 @@ public class PlayerController : FreezableEntity {
                 PropellerLaunchTimer = TickTimer.None;
             } else {
                 float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
-                body.velocity = new(body.velocity.x, propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime / .4f)) * propellerLaunchVelocity : 0));
+                currentVelocity.y = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime / .4f)) * propellerLaunchVelocity : 0);
             }
         }
 
         if (currentInputs.buttons.IsSet(PlayerControls.PowerupAction) && wallJumpTimer <= 0 && (propeller || !usedPropellerThisJump)) {
-            if (body.velocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
+            if (currentVelocity.y < -0.1f && propeller && !drill && !wallSlideLeft && !wallSlideRight && propellerSpinTimer < propellerSpinTime / 4f) {
                 propellerSpinTimer = propellerSpinTime;
                 propeller = true;
                 PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
@@ -2222,7 +2245,7 @@ public class PlayerController : FreezableEntity {
 
         //Ground
         if (onGround) {
-            if (hitRoof && crushGround && body.velocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
+            if (hitRoof && crushGround && currentVelocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
                 //Crushed.
                 Powerdown(true);
             }
@@ -2235,7 +2258,7 @@ public class PlayerController : FreezableEntity {
             if (drill)
                 SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
 
-            if (onSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !HeldEntity) {
+            if (onSpinner && Mathf.Abs(currentVelocity.x) < 0.3f && !HeldEntity) {
                 Transform spnr = onSpinner.transform;
                 float diff = body.position.x - spnr.transform.position.x;
                 if (Mathf.Abs(diff) >= 0.02f)
@@ -2287,10 +2310,10 @@ public class PlayerController : FreezableEntity {
 
                 if ((triplejump && !(left ^ right))
                     || edgeLanding
-                    || (Mathf.Abs(body.velocity.x) < 0.1f)) {
+                    || (Mathf.Abs(currentVelocity.x) < 0.1f)) {
 
                     if (!onIce)
-                        body.velocity = Vector2.zero;
+                        currentVelocity = Vector2.zero;
 
                     animator.Play("jumplanding" + (edgeLanding ? "-edge" : ""));
                     if (edgeLanding)
@@ -2336,8 +2359,8 @@ public class PlayerController : FreezableEntity {
             if (groundpound)
                 gravityModifier *= 1.5f;
 
-            if (body.velocity.y > 2.5) {
-                if (doJump || State == Enums.PowerupState.MegaMushroom) {
+            if (currentVelocity.y > 2.5) {
+                if (jump || State == Enums.PowerupState.MegaMushroom) {
                     body.gravityScale = slowriseGravity * slowriseModifier;
                 } else {
                     body.gravityScale = normalGravity * 1.5f * gravityModifier;
@@ -2357,24 +2380,24 @@ public class PlayerController : FreezableEntity {
         };
         if (flying) {
             if (drill) {
-                body.velocity = new(body.velocity.x, -drillVelocity);
+                currentVelocity.y = -drillVelocity;
             } else {
-                body.velocity = new(body.velocity.x, Mathf.Max(body.velocity.y, -flyingTerminalVelocity));
+                currentVelocity.y = Mathf.Max(currentVelocity.y, -flyingTerminalVelocity);
             }
         } else if (propeller) {
             if (drill) {
-                body.velocity = new(Mathf.Clamp(body.velocity.x, -WalkingMaxSpeed, WalkingMaxSpeed), -drillVelocity);
+                currentVelocity = new(Mathf.Clamp(currentVelocity.x, -WalkingMaxSpeed, WalkingMaxSpeed), -drillVelocity);
             } else {
                 float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
                 float htv = WalkingMaxSpeed * 1.18f + (remainingTime * 2f);
-                body.velocity = new(Mathf.Clamp(body.velocity.x, -htv, htv), Mathf.Max(body.velocity.y, propellerSpinTimer > 0 ? -propellerSpinFallSpeed : -propellerFallSpeed));
+                currentVelocity = new(Mathf.Clamp(currentVelocity.x, -htv, htv), Mathf.Max(currentVelocity.y, propellerSpinTimer > 0 ? -propellerSpinFallSpeed : -propellerFallSpeed));
             }
         } else if (wallSlideLeft || wallSlideRight) {
-            body.velocity = new(body.velocity.x, Mathf.Max(body.velocity.y, wallslideSpeed));
+            currentVelocity.y = Mathf.Max(currentVelocity.y, wallslideSpeed);
         } else if (groundpound) {
-            body.velocity = new(body.velocity.x, Mathf.Max(body.velocity.y, -groundpoundVelocity));
+            currentVelocity = new(currentVelocity.x, Mathf.Max(currentVelocity.y, -groundpoundVelocity));
         } else {
-            body.velocity = new(body.velocity.x, Mathf.Max(body.velocity.y, terminalVelocity * terminalVelocityModifier));
+            currentVelocity.y = Mathf.Max(currentVelocity.y, terminalVelocity * terminalVelocityModifier);
         }
 
         if (crouching || sliding || skidding) {
@@ -2383,7 +2406,7 @@ public class PlayerController : FreezableEntity {
         }
 
         if (previousOnGround && !onGround && !properJump && crouching && !inShell && !groundpound)
-            body.velocity = new(body.velocity.x, -3.75f);
+            currentVelocity.y = -3.75f;
     }
 
     public void SetHoldingOffset() {
@@ -2440,15 +2463,15 @@ public class PlayerController : FreezableEntity {
 
         if (flying) {
             //start drill
-            if (body.velocity.y < 0) {
+            if (currentVelocity.y < 0) {
                 drill = true;
                 hitBlock = true;
-                body.velocity = new(0, body.velocity.y);
+                currentVelocity.x = 0;
             }
         } else if (propeller) {
             //start propeller drill
             float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
-            if (remainingTime < 0.6f && body.velocity.y < 4) {
+            if (remainingTime < 0.6f && currentVelocity.y < 4) {
                 drill = true;
                 PropellerLaunchTimer = TickTimer.None;
                 hitBlock = true;
@@ -2467,7 +2490,7 @@ public class PlayerController : FreezableEntity {
             triplejump = false;
             hitBlock = true;
             sliding = false;
-            body.velocity = Vector2.up * 1.5f;
+            currentVelocity = Vector2.up * 1.5f;
             groundpoundCounter = groundpoundTime * (State == Enums.PowerupState.MegaMushroom ? 1.5f : 1);
             PlaySound(Enums.Sounds.Player_Sound_GroundpoundStart);
             alreadyGroundpounded = true;
@@ -2477,10 +2500,10 @@ public class PlayerController : FreezableEntity {
 
     void HandleGroundpound() {
         if (groundpound && groundpoundCounter > 0 && groundpoundCounter <= .1f)
-            body.velocity = Vector2.zero;
+            currentVelocity = Vector2.zero;
 
         if (groundpound && groundpoundCounter > 0 && groundpoundCounter - Time.fixedDeltaTime <= 0)
-            body.velocity = Vector2.down * groundpoundVelocity;
+            currentVelocity = Vector2.down * groundpoundVelocity;
 
         if (!(onGround && (groundpound || drill) && hitBlock))
             return;

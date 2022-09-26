@@ -5205,6 +5205,7 @@ GameObject:
   - component: {fileID: 3063105634746227037}
   - component: {fileID: 8814515203468784576}
   - component: {fileID: 6161724238288570319}
+  - component: {fileID: 6411750294929853123}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5243,6 +5244,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faa509be0aa8ac641ad4ddf6c01d26db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _GameStartTick: -1
   mainMusic: {fileID: 11400000, guid: 488f1c737d498714c951d86c1a790bcc, type: 2}
   invincibleMusic: {fileID: 11400000, guid: fb397722d9ffbb145a088ac9ce60908c, type: 2}
   megaMushroomMusic: {fileID: 11400000, guid: 3fb519076901a294493ae6e0c10c979b, type: 2}
@@ -5256,40 +5259,36 @@ MonoBehaviour:
   cameraMaxX: 1000
   loopingLevel: 1
   spawnpoint: {x: 0, y: 0, z: 0}
-  tilemap: {fileID: 0}
-  levelUIColor: {r: 0.09411766, g: 0.69803923, b: 0.6666667, a: 1}
-  spawnBigPowerups: 1
-  spawnVerticalPowerups: 1
-  levelDesigner: 
-  richPresenceId: 
-  levelName: Unknown
-  startServerTime: 0
-  endServerTime: -1
-  startRealTime: -1
-  endRealTime: -1
-  nametagCanvas: {fileID: 5453462452561088483}
-  nametagPrefab: {fileID: 7542548910130765567}
-  music: {fileID: 3063105634746227037}
-  sfx: {fileID: 8814515203468784576}
-  localPlayer: {fileID: 0}
-  paused: 0
-  loaded: 0
-  started: 0
   pauseUI: {fileID: 2934122842234400586}
   pausePanel: {fileID: 2534023630337648780}
   pauseButton: {fileID: 2224320915739540639}
   hostExitUI: {fileID: 6204975543479415834}
   hostExitButton: {fileID: 5369760449356936416}
+  levelUIColor: {r: 0.09411766, g: 0.69803923, b: 0.6666667, a: 1}
+  tilemap: {fileID: 0}
+  spawnBigPowerups: 1
+  spawnVerticalPowerups: 1
+  levelDesigner: 
+  richPresenceId: 
+  levelName: Unknown
+  nametagCanvas: {fileID: 5453462452561088483}
+  nametagPrefab: {fileID: 7542548910130765567}
+  localPlayer: {fileID: 0}
+  paused: 0
+  loaded: 0
   gameover: 0
   musicEnabled: 0
+  hurryUp: 0
+  players: []
+  gameStartTimestamp: 0
+  gameEndTimestamp: 0
+  playerCount: 0
   starRequirement: 0
   timedGameDuration: 0
   coinRequirement: 0
-  hurryup: 0
-  tenSecondCountdown: 0
-  playerCount: 0
-  players: []
-  enemySpawnpoints: []
+  spectationManager: {fileID: 0}
+  music: {fileID: 3063105634746227037}
+  sfx: {fileID: 8814515203468784576}
   size: 1.39
   ySize: 0.8
   playersToVisualize: 10
@@ -5529,6 +5528,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   editMode: 0
   feature: {fileID: 8738572190042607270, guid: 5f58d6b1c480f4b4f9c77b6264ddfa5b, type: 2}
+--- !u!114 &6411750294929853123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5500062339093502118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 67841
+  NetworkGuid:
+    RawGuidValue: 43d56bd18d06e9b4abe323618a20a228
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 5500062339093502114}
+  SimulationBehaviours: []
 --- !u!1 &6204975543479415834
 GameObject:
   m_ObjectHideFlags: 0

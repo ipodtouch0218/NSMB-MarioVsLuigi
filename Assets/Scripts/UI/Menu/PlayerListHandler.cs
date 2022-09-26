@@ -8,22 +8,18 @@ using NSMB.Extensions;
 public class PlayerListHandler : MonoBehaviour {
 
     [SerializeField] private GameObject contentPane, template;
-    private readonly Dictionary<string, PlayerListEntry> playerListEntries = new();
+    private readonly Dictionary<PlayerRef, PlayerListEntry> playerListEntries = new();
 
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        if (Runner.LocalPlayer != player) {
-            AddPlayerEntry(player);
-            UpdateAllPlayerEntries();
-        }
+        AddPlayerEntry(player);
+        UpdateAllPlayerEntries();
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        if (Runner.LocalPlayer != player) {
-            RemovePlayerEntry(player);
-            UpdateAllPlayerEntries();
-        }
+        RemovePlayerEntry(player);
+        UpdateAllPlayerEntries();
     }
 
     //public void OnPlayerPropertiesUpdate(PlayerRef targetPlayer, Hashtable changedProps) {
@@ -61,13 +57,12 @@ public class PlayerListHandler : MonoBehaviour {
     public void AddPlayerEntry(PlayerRef player) {
         PlayerData data = player.GetPlayerData(Runner);
 
-        string id = data.GetUserId();
-        if (!playerListEntries.ContainsKey(id)) {
+        if (!playerListEntries.ContainsKey(player)) {
             GameObject go = Instantiate(template, contentPane.transform);
-            go.name = $"{data.GetNickname()} ({id})";
+            go.name = $"{data.GetNickname()} ({data.GetUserId()})";
             go.SetActive(true);
-            playerListEntries[id] = go.GetComponent<PlayerListEntry>();
-            playerListEntries[id].player = player;
+            playerListEntries[player] = go.GetComponent<PlayerListEntry>();
+            playerListEntries[player].player = player;
         }
 
         UpdatePlayerEntry(player);
@@ -79,14 +74,11 @@ public class PlayerListHandler : MonoBehaviour {
     }
 
     public void RemovePlayerEntry(PlayerRef player) {
-        PlayerData data = player.GetPlayerData(Runner);
-        string userId = data.GetUserId();
-
-        if (!playerListEntries.ContainsKey(userId))
+        if (!playerListEntries.ContainsKey(player))
             return;
 
-        Destroy(playerListEntries[userId].gameObject);
-        playerListEntries.Remove(userId);
+        Destroy(playerListEntries[player].gameObject);
+        playerListEntries.Remove(player);
     }
 
     public void UpdateAllPlayerEntries() {
@@ -95,25 +87,22 @@ public class PlayerListHandler : MonoBehaviour {
     }
 
     public void UpdatePlayerEntry(PlayerRef player) {
-        PlayerData data = player.GetPlayerData(Runner);
-        string id = data.GetUserId();
-        if (!playerListEntries.ContainsKey(id)) {
+        if (!playerListEntries.ContainsKey(player)) {
             AddPlayerEntry(player);
             return;
         }
 
-        playerListEntries[id].UpdateText();
+        playerListEntries[player].UpdateText();
         ReorderEntries();
     }
 
     public void ReorderEntries() {
         foreach (PlayerRef player in Runner.ActivePlayers.OrderByDescending(pr => (int) pr)) {
-            PlayerData data = player.GetPlayerData(Runner);
-            string id = data.GetUserId();
-            if (!playerListEntries.ContainsKey(id))
+
+            if (!playerListEntries.ContainsKey(player))
                 continue;
 
-            playerListEntries[id].transform.SetAsFirstSibling();
+            playerListEntries[player].transform.SetAsFirstSibling();
         }
     }
 }

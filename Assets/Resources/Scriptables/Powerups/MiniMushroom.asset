@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: MiniMushroom
   m_EditorClassIdentifier: 
   state: 1
-  prefab: MiniMushroom
+  prefab:
+    RawGuidValue: 01e65939dc0c28345bd9b2d4fbf025ab
   soundEffect: 45
   spawnChance: 2
   losingSpawnBonus: -1

@@ -1,7 +1,5 @@
 using UnityEngine;
 
-using Fusion;
-
 public class FloatingCoin : Coin {
 
     private SpriteRenderer spriteRenderer;
@@ -13,9 +11,8 @@ public class FloatingCoin : Coin {
         hitbox = GetComponent<BoxCollider2D>();
     }
 
-    public static void OnCollect(Changed<FloatingCoin> changed) {
-        FloatingCoin coin = changed.Behaviour;
-        coin.spriteRenderer.enabled = !coin.IsCollected;
-        coin.hitbox.enabled = !coin.IsCollected;
+    public override void OnCollectedChanged() {
+        spriteRenderer.enabled = !IsCollected;
+        hitbox.enabled = !IsCollected;
     }
 }

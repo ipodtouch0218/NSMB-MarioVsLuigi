@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1068660991916741857}
   - component: {fileID: 6797847914880496266}
+  - component: {fileID: 8924763367514817877}
   m_Layer: 0
   m_Name: BulletBillLauncher
   m_TagString: Untagged
@@ -44,6 +45,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1a6a82b51b138f47931fde891270f59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   playerSearchRadius: 7
   playerCloseCutoff: 1
   initialShootTimer: 4
+--- !u!114 &8924763367514817877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135764822071322507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 67841
+  NetworkGuid:
+    RawGuidValue: 48dd05d6e5db3a84e9abb9f5710a952f
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 6797847914880496266}
+  SimulationBehaviours: []

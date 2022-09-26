@@ -53,6 +53,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             //spawned following a player
             FollowEndTimer = TickTimer.CreateFromSeconds(Runner, 1f);
 
+            body.position = new(FollowPlayer.transform.position.x, FollowPlayer.cameraController.currentPosition.y + 1.68f);
             body.isKinematic = true;
             gameObject.layer = Layers.LayerHitsNothing;
             sRenderer.sortingOrder = 15;
@@ -67,6 +68,8 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
                 return;
             }
         }
+
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 15f);
     }
 
     public override void FixedUpdateNetwork() {
@@ -85,6 +88,8 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
                 sRenderer.sortingOrder = originalLayer;
                 body.isKinematic = false;
             } else {
+                float timeRemaining = FollowEndTimer.RemainingTime(Runner) ?? 0f;
+                sRenderer.enabled = !(timeRemaining * blinkingRate % 1 < 0.5f);
                 return;
             }
         }
@@ -228,7 +233,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             }
             player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         } else {
-            if (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == Enums.PowerupState.None || Enums.PowerupStatePriority[player.StoredPowerup].statePriority <= cp.statePriority)) {
+            if (player.State != Enums.PowerupState.Small && (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == Enums.PowerupState.None || Enums.PowerupStatePriority[player.StoredPowerup].statePriority <= cp.statePriority))) {
                 player.StoredPowerup = player.State;
             }
 

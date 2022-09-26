@@ -137,7 +137,7 @@
             Used to keep the client communication
             </summary>
         </member>
-        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.BuildEnterRoomParams(Fusion.Photon.Realtime.TypedLobby,System.String,System.Int32,System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty})">
+        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.BuildEnterRoomParams(Fusion.Photon.Realtime.TypedLobby,System.String,System.Byte,System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty})">
             <summary>
             Build a new EnterRoomParams ref using the default configs and optional Room Name
             </summary>
@@ -294,7 +294,7 @@
             <param name="createServiceTask">Runs client.Service() during the operation</param>
             <returns>Photon Connection Handler object</returns>
         </member>
-        <member name="M:Fusion.Photon.Realtime.Async.LoadBalancingClientAsyncExtensions.CreateServiceTask(Fusion.Photon.Realtime.LoadBalancingClient,System.Threading.CancellationToken,System.Threading.Tasks.TaskCompletionSource{System.Int16})">
+        <member name="M:Fusion.Photon.Realtime.Async.LoadBalancingClientAsyncExtensions.Service_ClientUpdate(Fusion.Photon.Realtime.LoadBalancingClient,System.Threading.CancellationToken,System.Threading.Tasks.TaskCompletionSource{System.Int16})">
             <summary>
             Starts a task that calls <see cref="M:Fusion.Photon.Realtime.LoadBalancingClient.Service"/> every updateIntervalMs milliseconds.
             The task is stopped by the cancellation token from <see cref="P:Fusion.Photon.Realtime.Async.OperationHandler.Token"/>.
@@ -4453,21 +4453,6 @@
         <member name="P:Fusion.Photon.Realtime.PhotonAppSettings.Instance">
             <summary>Serialized server settings, written by the Setup Wizard for use in ConnectUsingSettings.</summary>
         </member>
-        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsBuildFlags">
-            <summary>
-            Flags for BuildFlags
-            </summary>
-        </member>
-        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsBuildTypes">
-            <summary>
-            Flags for BuildTypes
-            </summary>
-        </member>
-        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsDotNetVersion">
-            <summary>
-            Flags for DotNetVersion
-            </summary>
-        </member>
         <member name="T:Fusion.SessionProperty">
             <summary>
             Holds a Custom Session Property value
@@ -4523,10 +4508,12 @@
         <member name="M:Fusion.SessionProperty.Convert(System.Object)">
             <summary>
             Convert a particular object into a <see cref="T:Fusion.SessionProperty"/>.
-            If the object type is not supported, null will be returned.
+            Check the object type support using <see cref="M:Fusion.SessionProperty.Support(System.Object)"/>.
+            If the object type is not supported, <see cref="T:System.ArgumentException"/> will be thrown.
             </summary>
             <param name="obj">Object reference to be converted</param>
             <returns>Instance of a <see cref="T:Fusion.SessionProperty"/> if type is supported, null otherwise</returns>
+            <exception cref="T:System.ArgumentException">If the object type passed as argument is not supported</exception>
         </member>
     </members>
 </doc>

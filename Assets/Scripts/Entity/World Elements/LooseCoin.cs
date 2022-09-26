@@ -65,11 +65,9 @@ public class LooseCoin : Coin {
         prevFrameVelocity = body.velocity;
     }
 
-    public static void OnCollectedChanged(Changed<FloatingCoin> changed) {
-        FloatingCoin coin = changed.Behaviour;
-        //TODO: is this safe?
-        if (coin.IsCollected)
-            coin.Runner.Despawn(coin.Object);
+    public override void InteractWithPlayer(PlayerController player) {
+        base.InteractWithPlayer(player);
+        Runner.Despawn(Object);
     }
 
     // DEBUG & GIZMOS

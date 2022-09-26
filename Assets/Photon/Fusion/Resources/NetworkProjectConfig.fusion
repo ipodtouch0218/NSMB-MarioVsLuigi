@@ -46,7 +46,6 @@
         "DefaultPlayers": 10,
         "ReplicationMode": 0,
         "ObjectInterest": false,
-        "SimulationCulling": false,
         "ServerPacketInterval": 1,
         "ClientPacketInterval": 1
     },
@@ -160,5 +159,6 @@
     ],
     "UseSerializableDictionary": true,
     "NullChecksForNetworkedProperties": true,
-    "CheckRpcAttributeUsage": false
+    "CheckRpcAttributeUsage": false,
+    "CheckNetworkedPropertiesBeingEmpty": false
 }

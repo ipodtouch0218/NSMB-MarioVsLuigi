@@ -1,3 +1,443 @@
+# 1.1.2
+
+## F
+
+### Build 579 (Sep 19, 2022)
+
+- Marking 1.1.2 final
+
+## Nightly
+
+### Build 578 (Sep 17, 2022)
+
+**Removed**
+
+- Relay Connection Protocol Override
+
+### Build 577 (Sep 14, 2022)
+
+**What's New**
+
+- NanoSockets for Android x86_64
+- `IBeforeHitboxRegistration` callback, called before the Lag-compensation `HitboxManager` registers a snapshot of the hitboxes
+
+**Changes**
+
+- Lag-compensation's `HitboxManager` behaviour execution is now ordered after the 2D and 3D `NetworkPhysics` behaviours by default (not mandatory). Doing so ensures that NRBs with hitboxes will be moved by physics before the hitboxes are registered
+
+### Build 575 (Sep 10, 2022)
+
+**Bug Fixes**
+
+- Fixed: Missing NetworkMecanAnimator null check added for no AnimationController on Animator
+
+### Build 574 (Sep 09, 2022)
+
+**What's New**
+
+- StartGameArgs.CustomPublicAddress
+
+**Changes**
+
+- Log StartGameArgs at StartGame
+
+**Bug Fixes**
+
+- Fixed: NetworkRunner.GetPlayerConnectionToken to get Local Token
+- Fixed: Limite Max Ticks per Update
+
+### Build 573 (Sep 08, 2022)
+
+**What's New**
+
+- `IAfterSpawned`: implement to get a call when a block of `NetworkObjects` (scene objects, remote spawns, object hierarchy) is done calling `Spawned`. Allows to recreate a pattern similar to Unity's `Awake`-`Start` (`Spawned`-`AfterSpawned`)
+
+**Bug Fixes**
+
+- Fixed: Null check added to NetworkMecanAnimator for missing Animator component
+
+### Build 572 (Sep 06, 2022)
+
+**Bug Fixes**
+
+- Fixed: Client never catch up Simulation on low FPS
+- Fixed: GetPlayerConnectionToken now returns the  connection token for the local player on a client also
+- Fixed: FusionStats GraphMaxWidth field was disabled when it should have been enabled. Changed default Graphs
+
+### Build 571 (Sep 05, 2022)
+
+**Changes**
+
+- Re-work STUN Addr Check
+
+**Bug Fixes**
+
+- Fixed: IndexOutOfRangeException if using Max Allowed Players
+
+### Build 569 (Sep 02, 2022)
+
+**What's New**
+
+- `NetworkPrefabTable.Unload` and `NetworkPrefabTable.UnloadAll` - a way to unload prefab instances loaded by Fusion
+
+**Bug Fixes**
+
+- Fixed: Occasional "Collection was modified" exception with Multi-Peer
+- Fixed: Lag-compensation hitbox snapshot history picking the newest snapshot instead of the oldest when the desired tick is older than the oldest snapshot available
+- Fixed: New MasterClient not receiving StateAuth from old MasterClient
+
+### Build 568 (Sep 01, 2022)
+
+**Bug Fixes**
+
+- Fixed: Code-generated methods lacking `PreserveAttribute` and being possibly stripped out
+
+### Build 567 (Aug 31, 2022)
+
+**What's New**
+
+- NetworkRunner.LobbyInfo.Region field
+
+**Bug Fixes**
+
+- Fixed: NetworkMecanAnimator now caches WordCount for Animator at development time. Scene objects had an issue scanning the Animator for properties at runtime
+- Fixed: Assertion error in the `HitboxSnapshot` structure (lag-compensation) when performing multiple queries with sub-tick accuracy on the same tick (introduced on build 564)
+
+### Build 566 (Aug 29, 2022)
+
+**Bug Fixes**
+
+- Fixed: Use of Delays causing a stall
+
+### Build 565 (Aug 26, 2022)
+
+**Bug Fixes**
+
+- Fixed: WebGL Invalid Memory Access
+- Fixed: Linux Build Delay issues
+
+### Build 564 (Aug 23, 2022)
+
+**Bug Fixes**
+
+- Fixed: Lag-compensated snapshots not immediately releasing temp colliders used when sub-tick accuracy was requested, increasing the usage of the hitbox capacity proportionally to the number of queries performed
+
+### Build 562 (Aug 22, 2022)
+
+**Bug Fixes**
+
+- Fixed: Potential memory free bug in area of interest
+- Fixed: Texture GUID conflict between DebugStart skin and FusionHub skin
+- Fixed: Missing null check in RunnerVisibilityNode.cs added
+
+### Build 560 (Aug 20, 2022)
+
+**What's New**
+
+- Holding Shift, Alt, Ctr/Cmd key while clicking Visibility or Input Provider icons in the Runner Visibility Controls window will solo that Runner
+
+**Changes**
+
+- NetworkDebugStartUI background made opaque for consistency across Mac/PC and general easier readability of UI
+
+### Build 559 (Aug 18, 2022)
+
+**Bug Fixes**
+
+- Fixed: WebGL Builds not updating Sessions
+
+### Build 558 (Aug 17, 2022)
+
+**Bug Fixes**
+
+- Fixed: Rpcs not being sent to other peers for some objects in Shared mode
+
+### Build 557 (Aug 17, 2022)
+
+**Changes**
+
+- Removed the automatic SimulationCulling setting. If you need to/want to cull objects dynamically from having FixedUpdateNetwork/etc called, use the new NetworkRunner.SetSimulationState method
+
+**Bug Fixes**
+
+- Fixed: Scene Objects not being attached to in some scenarios
+- Fixed: Per-object interest groups not working
+
+### Build 556 (Aug 15, 2022)
+
+**Breaking Changes**
+
+- `ILWeaverSettings` is no longer static class. Partial user class definitions may need to be updated
+
+**Changes**
+
+- Moving config in the project no longer requires `ILWeaverSettings.OverrideNetworkProjectConfigPath` being implemented
+
+### Build 555 (Aug 12, 2022)
+
+**What's New**
+
+- Added distance based priority send scheduling when using area of interest
+- Added round-robin priority scheduler for object sends when not using area of interest
+- NetworkRunner.PushHostMigrationSnapshot
+
+**Changes**
+
+- NetworkObjectConnectionDataStatus enum is no longer public
+
+**Bug Fixes**
+
+- Fixed: Issue with client input redundancy consuming too much bandwidth (especially in VR games with big input structs)
+- Fixed: Issue with SetPlayerObject mapping not being replicated when area of interest was being used
+- Fixed: Issue with 'All Players' interested mode not working in shared mode properly
+- Fixed: NetCommandConnect Size Check
+- Fixed: SharedMode: StateAuthority being potentially lost when running under poor network conditions
+
+### Build 554 (Aug 11, 2022)
+
+**Bug Fixes**
+
+- Fixed: Dispose order on NetBitBufferBlock causing rare crash on ARM
+- Fixed: WarnIfAttribute render order changed to work in Unity 2020 and 2021 both
+
+### Build 552 (Aug 09, 2022)
+
+**What's New**
+
+- Client UniqueId Support
+
+### Build 549 (Aug 04, 2022)
+
+**Changes**
+
+- SessionProperty.Convert throw exception if type not supported
+
+**Bug Fixes**
+
+- Fixed: Missing NullCheck when building Session Custom Properties
+- Fixed: Missing NetAddress.CreateFromIpPort args validation
+
+### Build 548 (Aug 03, 2022)
+
+**Changes**
+
+- Removed NanoSockets VCRuntime Dependency
+
+### Build 546 (Jul 28, 2022)
+
+**Bug Fixes**
+
+- Fixed: Potential `NullReferenceException` when performing a lag-compensated query against a `HitboxRoot` that is alive but has a network `Object` that is not alive
+
+### Build 545 (Jul 27, 2022)
+
+**What's New**
+
+- Support to Session Creation Control
+- SimulationBehaviour and NetworkBehaviour property shortcuts for HasStateAuthority, HasInputAuthority and IsProxy added. Runner.Tick shortcut added
+
+### Build 543 (Jul 25, 2022)
+
+**Removed**
+
+- Old NanoSockets libs for macOS
+
+**Bug Fixes**
+
+- Fixed: NanoSockets signature for macOS
+- Fixed: TickRate increasing with each Play Mode enter when Domain Reloading is off
+- Fixed: Mixing `OnChanged` callbacks for statically and dynamically defined properties
+
+### Build 542 (Jul 24, 2022)
+
+**Bug Fixes**
+
+- Fixed: Fixxed isssues with NetBitBuffer and burst delta compressor
+
+### Build 540 (Jul 22, 2022)
+
+**Bug Fixes**
+
+- Fixed: `NetworkRunner.Shutdown` invoked in `DisconnectedFromServer` callback not preventing simulation from updating
+
+### Build 539 (Jul 21, 2022)
+
+**Bug Fixes**
+
+- Fixed: Removed all pre-allocation of packet buffers
+
+### Build 538 (Jul 20, 2022)
+
+**What's New**
+
+- Experimental support for disabled `Domain Reloading` for faster Enter Play Mode
+
+**Bug Fixes**
+
+- Fixed: `NetworkProjectConfig` inspector's `Apply` and `Revert` buttons being permanently disabled
+
+### Build 537 (Jul 19, 2022)
+
+**Changes**
+
+- NetworkRunner.AddPlayerAreaOfInterest() argument renamed from radius to extent, to better reflect the rectangular nature of the query
+
+**Bug Fixes**
+
+- Fixed: Local prefab being occasionally respawned when the spawn is followed by a despawn in next update (shared mode)
+
+### Build 535 (Jul 14, 2022)
+
+**Changes**
+
+- Renamed `Fusion/Rebuild Object Table` to `Fusion/Rebuild Prefab Table`
+- Renamed `Rebuild Object Table (slow)` button label in config inspector to `Rebuild Prefab Table`.  
+Rename: `NetworkProjectConfigUtilities.RebuildObjectTable` to `NetworkProjectConfigUtilities.RebuildPrefabTable`
+- `Prefabs` list in the config inspector is read-only
+
+### Build 534 (Jul 13, 2022)
+
+**What's New**
+
+- Lag-compensated API now has a `ResolveQuery` method. Respective query settings can be created through `RaycastQuery.`, `SphereOverlapQuery.` and `BoxOverlapQuery.CreateQuery` methods
+- Lag-compensated queries now support an optional delegate to pre-process hitbox roots candidates resultant from the query's broad-phase resolution
+- `HitOptions.IgnoreInputAuthority`, a lag-compensated query option that can be used to automatically ignore hitbox roots which the player performing the query (if specified) has input authority over
+
+**Changes**
+
+- UnitAttribute unit overlay adapts to width of field in inspector, and will use abbreviated unit names at smaller sizes
+
+### Build 533 (Jul 12, 2022)
+
+**Bug Fixes**
+
+- Fixed: NetworkObjectPredictionKey.AsFloat field changed to type float (was unintentionally byte)
+- Fixed: SinglePlayer Startup
+
+### Build 532 (Jul 11, 2022)
+
+**What's New**
+
+- Fusion Unity scipt xml documentation located under Assets/Photon/Fusion/Editor/Resources/Assembly-CSharp.xml
+
+**Bug Fixes**
+
+- Fixed: NDS SessionName when starting multiple clients
+
+### Build 531 (Jul 08, 2022)
+
+**Bug Fixes**
+
+- Fixed: Access modifiers of LobbyInfo fields
+
+### Build 529 (Jul 06, 2022)
+
+**Changes**
+
+- FusionGraph added StatsPerDefault value, allowing an initial 'per' setting for the graph, rather than the required clicking on the value at runtime to cycle to the desired setting
+
+### Build 528 (Jul 05, 2022)
+
+**What's New**
+
+- Universal macOS NanoSockets lib
+
+**Changes**
+
+- Remove from build old macOS NanoSockets libs
+
+**Bug Fixes**
+
+- Fixed: Eventual warnings messages when performing lag-compensated queries with sub-tick accuracy on a Server or Host and querying a tick that is not yet on the hitbox snapshot history
+- Fixed: ILWeaver: error when subclassing types from different assemblies
+
+### Build 527 (Jul 04, 2022)
+
+**Bug Fixes**
+
+- Fixed: Network Conditions settings with DelayMin and LossChanceMin values == zero allowed now
+
+### Build 526 (Jul 01, 2022)
+
+**Bug Fixes**
+
+- Fixed: Targeted RPCs being broadcast to all the clients in shared mode
+
+### Build 525 (Jun 30, 2022)
+
+**What's New**
+
+- NetworkRunner.GetResumeSnapshotNetworkSceneObjects()
+- NetworkObject.CopyStateFromSceneObject()
+- IAfterHostMigration to be used on NetworkBehaviours
+
+**Changes**
+
+- Host Migration now waits for the Scene to be fully ready before proceeding
+
+**Bug Fixes**
+
+- Fixed: Support for SceneObject on Host Migration
+- Fixed: `NetworkPhysics2D` and 3D behaviours now restore the respective physics engine auto-simulation mode back to its value prior to the Runner startup when it is shutdown
+
+### Build 524 (Jun 29, 2022)
+
+**Bug Fixes**
+
+- Fixed: Visual teleports when interpolation starts on `NetworkTransform` objects by initializing the `InterpolationTarget` position and rotation during `Spawned`
+
+### Build 521 (Jun 24, 2022)
+
+**Bug Fixes**
+
+- Fixed: `NetworkString` inspector setting the length to maximum
+
+### Build 520 (Jun 23, 2022)
+
+**Bug Fixes**
+
+- Fixed: Errors in Unity 2021+ when inspecting `AssembliesToWeave` and `Prefabs` in `NetworkPrefabConfig`
+- Fixed: Issue on the lag-compensated structure that could eventually cause an `InvalidOperationException` when adding a `HitboxRoot` to the BVH
+
+### Build 519 (Jun 22, 2022)
+
+**Improvements**
+
+- `FixedBufferPropertyAttributeDrawer` error handling
+
+**Bug Fixes**
+
+- Fixed: `NetworkCharacterControllerPrototype` initialization during `Spawned` causing objects to glitch when spawned on clients
+- Fixed: `NetworkArrays` not being properly initialized when inspecting a struct in the inspector
+- Fixed: Some drawers not being used when using Odin inspector
+- Fixed: Assertion raised for some properties when using Odin inspector
+
+### Build 518 (Jun 20, 2022)
+
+**Bug Fixes**
+
+- Fixed: Warning about `hasStateAuthorityForAllTargets` variable being unused
+
+### Build 516 (Jun 16, 2022)
+
+**What's New**
+
+- `NetworkProjectConfig.CheckNetworkedPropertiesBeingEmpty`: if enable, ILWeaver will emit a warning for each `[Networked]` property that is not either compiler-generated or empty
+
+### Build 515 (Jun 15, 2022)
+
+**Bug Fixes**
+
+- Fixed: Rotation interpolation of proxy objects with `NetworkTransform` in Shared Mode
+
+### Build 514 (Jun 14, 2022)
+
+**Bug Fixes**
+
+- Fixed: Protected `[Networked]` properties being serialized by Unity by default. Use `[field: SerializeField]` or `[UnitySerializeField]` attribute to make them serializable again
+- Fixed: Compile error when using Mono Cecil 1.11+
+- Fixed: Some custom property drawers missing in Unity 2021+ with Odin
+
 # 1.1.1
 
 ## F

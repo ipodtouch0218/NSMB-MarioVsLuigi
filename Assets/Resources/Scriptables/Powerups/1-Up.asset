@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: 1-Up
   m_EditorClassIdentifier: 
   state: 0
-  prefab: 1-Up
+  prefab:
+    RawGuidValue: e9dfb7c4606191e418a7f2b88c805e3e
   soundEffect: 78
   spawnChance: 0
   losingSpawnBonus: 0

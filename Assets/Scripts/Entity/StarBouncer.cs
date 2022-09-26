@@ -39,6 +39,12 @@ public class StarBouncer : CollectableEntity {
         animator = GetComponent<Animator>();
     }
 
+    public static void OnCollectedChanged(Changed<StarBouncer> changed) {
+        StarBouncer star = changed.Behaviour;
+        if (star.IsCollected)
+            star.Runner.Despawn(star.Object);
+    }
+
     public void OnBeforeSpawned(byte direction, bool stationary, bool pit) {
         FacingRight = direction >= 2;
         Fast = direction == 0 || direction == 3;
@@ -91,7 +97,7 @@ public class StarBouncer : CollectableEntity {
             ANY_GROUND_MASK = LayerMask.GetMask("Ground", "PassthroughInvalid");
     }
 
-    public void Update() {
+    public override void Render() {
         if (IsStationary || (GameManager.Instance?.gameover ?? false))
             return;
 
@@ -151,18 +157,19 @@ public class StarBouncer : CollectableEntity {
 
         //we can collect
         player.Stars = (byte) Mathf.Min(player.Stars + 1, GameManager.Instance.starRequirement);
-        Runner.Despawn(Object, true);
 
         //game mechanics
-        if (IsStationary) {
+        if (IsStationary)
             GameManager.Instance.Rpc_ResetTilemap();
-        }
 
         GameManager.Instance.CheckForWinner();
 
         //graphics / fx
         player.PlaySoundEverywhere(Object.HasInputAuthority ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
-        Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), transform.position, Quaternion.identity);
+        Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+
+        //despawn
+        Runner.Despawn(Object, true);
     }
 
     private IEnumerator PulseEffect() {

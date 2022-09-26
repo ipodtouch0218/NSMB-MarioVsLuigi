@@ -60,14 +60,7 @@
             <param name="port">Port used to build the NetAddress</param>
             <returns>New NetAddress reference</returns>
         </member>
-        <member name="M:Fusion.Sockets.NetAddress.CreateFromIpPort(System.String,System.UInt16)">
-            <summary>
-            Create a new NetAddress based on the IP and Port passed as argument
-            </summary>
-            <param name="ip">String representation of an IP, either IPv4 or IPv6</param>
-            <param name="port">Port used to build the NetAddress</param>
-            <returns>New NetAddress reference</returns>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:Fusion.Sockets.NetAddress.CreateFromIpPort(System.String,System.UInt16)" -->
         <member name="T:Fusion.Sockets.NetAddress.SubnetMask">
             <summary>
             IPv4 Subnet Mask Utilities
@@ -95,41 +88,6 @@
             <param name="netAddress">EndPoint</param>
             <param name="subnetMask">Subnet Mask</param>
             <returns>Network Address based on the Subnet Mask</returns>
-        </member>
-        <member name="M:Fusion.Sockets.NetBitBufferBlock.Create(System.Int32,System.Int32)">
-            <summary>
-            Build and alloc a <see cref="T:Fusion.Sockets.NetBitBufferBlock"/> based on the number of packets 
-            it need to keep track and the size of each packets.
-            </summary>
-            <param name="packetCount">Number of blocks to allocate</param>
-            <param name="packetSize">Size of each block</param>
-            <returns>Reference to a <see cref="T:Fusion.Sockets.NetBitBufferBlock"/></returns>
-        </member>
-        <member name="M:Fusion.Sockets.NetBitBufferBlock.Release(Fusion.Sockets.NetBitBuffer*)">
-            <summary>
-            Release the <see cref="T:Fusion.Sockets.NetBitBuffer"/> that is part of this Block and
-            mark it as available again by including it on the list of buffers
-            </summary>
-            <param name="ptr"></param>
-        </member>
-        <member name="M:Fusion.Sockets.NetBitBufferBlock.TryAcquire">
-            <summary>
-            Tries to get a valid <see cref="T:Fusion.Sockets.NetBitBuffer"/> reference from the Buffer block
-            </summary>
-            <returns>A valid NetBitBuffer reference if it can be retrieved from this block, null otherwise</returns>
-        </member>
-        <member name="M:Fusion.Sockets.NetBitBufferBlock.Empty">
-            <summary>
-            Creates a new empty <see cref="T:Fusion.Sockets.NetBitBuffer"/>
-            </summary>
-            <returns>NetBitBuffer reference</returns>
-        </member>
-        <member name="M:Fusion.Sockets.NetBitBufferBlock.TryAcquire(Fusion.Sockets.NetBitBuffer*@)">
-            <summary>
-            Tries to get a valid <see cref="T:Fusion.Sockets.NetBitBuffer"/> reference from the Buffer block
-            </summary>
-            <param name="ptr">Reference to a NetBitBuffer</param>
-            <returns>True if a valid NetBitBuffer reference can be retrieved from this block, false otherwise</returns>
         </member>
         <member name="T:Fusion.Sockets.NetBitBufferList">
             <summary>
@@ -315,6 +273,31 @@
         <member name="P:Fusion.Sockets.NetConfig.Defaults">
             <summary>
             Builds a <see cref="T:Fusion.Sockets.NetConfig"/> with the default values
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetConnectFailedReason">
+            <summary>
+            The reason a connection with a remote server has failed
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConnectFailedReason.Timeout">
+            <summary>
+            Server is not responding.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConnectFailedReason.ServerFull">
+            <summary>
+            Server has accepted the max allowed Players
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConnectFailedReason.ServerRefused">
+            <summary>
+            Server refused the connection
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConnection.UNIQUE_ID_SIZE">
+            <summary>
+            Client Unique ID size in bytes
             </summary>
         </member>
         <member name="T:Fusion.Sockets.NetDisconnectReason">
@@ -698,11 +681,6 @@
             Stores the Current Fusion Serialization Version
             </summary>
         </member>
-        <member name="F:Fusion.Protocol.Message.InvalidVersion">
-            <summary>
-            Represents an Invalid Version
-            </summary>
-        </member>
         <member name="P:Fusion.Protocol.Message.CustomData">
             <summary>
             Custom data send along side any Protocol Message
@@ -800,6 +778,11 @@
             When there is already a Server running on the current Room
             </summary>
         </member>
+        <member name="F:Fusion.Protocol.DisconnectReason.Error">
+            <summary>
+            An error occured on the Plugin
+            </summary>
+        </member>
         <member name="F:Fusion.Protocol.HostMigration.PeerMode">
             <summary>
             Local Peer Mode
@@ -893,6 +876,11 @@
             Requests sent from Plugin
             </summary>
         </member>
+        <member name="F:Fusion.Protocol.Join.UniqueId">
+            <summary>
+            Peer Unique ID
+            </summary>
+        </member>
         <member name="T:Fusion.Protocol.SyncType">
             <summary>
             Network Config Msg Type
@@ -959,6 +947,11 @@
         <member name="P:Fusion.Protocol.ReflexiveInfo.IsValid">
             <summary>
             Signal if this Reflexive Info is Valid or not
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ReflexiveInfo.UniqueId">
+            <summary>
+            Peer Unique ID
             </summary>
         </member>
         <member name="T:Fusion.Protocol.SnapshotType">
@@ -1191,6 +1184,11 @@
         <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_2_2">
             <summary>
             Added Host Migration Support
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_2_3">
+            <summary>
+            Added Peer Unique Key
             </summary>
         </member>
         <member name="F:Fusion.Protocol.ProtocolMessageVersion.LATEST">

@@ -15,10 +15,13 @@ public class MainMenuManager : MonoBehaviour {
 
     public const int NICKNAME_MIN = 2, NICKNAME_MAX = 20;
 
-    public static MainMenuManager Instance;    public AudioSource sfx, music;
+    public static MainMenuManager Instance;
+    public AudioSource sfx, music;
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
+
+    private GameObject loadingCanvas;
 
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox;
     public GameObject[] levelCameraPositions;
@@ -26,10 +29,10 @@ public class MainMenuManager : MonoBehaviour {
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoom, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, vsyncToggle, privateToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
-    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
+    public TMP_InputField nicknameField, lobbyJoinField, chatTextField;
+    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, rebindCountdown, rebindText, reconnectText, updateText;
@@ -51,7 +54,6 @@ public class MainMenuManager : MonoBehaviour {
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
 
     private readonly List<string> allRegions = new();
-    private static readonly string roomNameChars = "BCDFGHJKLMNPRQSTVWXYZ";
 
     public ColorChooser colorManager;
 
@@ -150,13 +152,6 @@ public class MainMenuManager : MonoBehaviour {
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
 
-    private void AttemptToUpdateProperty<T>(Hashtable updatedProperties, string key, System.Action<T> updateAction) {
-        if (updatedProperties[key] == null)
-            return;
-
-        updateAction((T) updatedProperties[key]);
-    }
-
     // CONNECTION CALLBACKS
     public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
 
@@ -173,6 +168,8 @@ public class MainMenuManager : MonoBehaviour {
 
         }
     }
+
+
     //public void OnRegionListReceived(RegionHandler handler) {
     //    handler.PingMinimumOfRegions((handler) => {
 
@@ -244,7 +241,7 @@ public class MainMenuManager : MonoBehaviour {
             //initial connection to the game
             OpenTitleScreen();
             LoadSettings(true);
-            _ = NetworkHandler.Instance.ConnectToRegion();
+            _ = NetworkHandler.ConnectToRegion();
 
         } else if (Runner.SessionInfo.IsValid) {
             //call enterroom callback
@@ -279,6 +276,9 @@ public class MainMenuManager : MonoBehaviour {
             GlobalController.Instance.checkedForVersion = true;
         }
 #endif
+
+        //add loading screen
+        SceneManager.LoadScene(1, LoadSceneMode.Additive);
     }
 
     private void LoadSettings(bool nickname) {
@@ -328,6 +328,8 @@ public class MainMenuManager : MonoBehaviour {
     public void EnterRoom() {
 
         SessionInfo session = Runner.SessionInfo;
+
+        Debug.Log(session + " - " + session.IsValid + " - " + session.Properties);
 
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool started);
         if (started) {
@@ -535,14 +537,14 @@ public class MainMenuManager : MonoBehaviour {
         selectedRoom = null;
         lastRegion = targetRegion;
 
-        _ = NetworkHandler.Instance.ConnectToRegion(targetRegion);
+        _ = NetworkHandler.ConnectToRegion(targetRegion);
     }
 
     public async void QuitRoom() {
         OpenLobbyMenu();
         ClearChat();
 
-        await NetworkHandler.Instance.ConnectToRegion();
+        await NetworkHandler.ConnectToRegion();
         GlobalController.Instance.DiscordController.UpdateActivity();
     }
     public void StartGame() {
@@ -557,9 +559,6 @@ public class MainMenuManager : MonoBehaviour {
             Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Level, out int level);
             Runner.SetActiveScene(level + 2);
         }
-
-        //go to loading screen
-        SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
     }
 
     public void SelectRoom(GameObject room) {
@@ -578,30 +577,32 @@ public class MainMenuManager : MonoBehaviour {
         if (selectedRoom.joinPrivate) {
             OpenPrivatePrompt();
         } else {
-            _ = NetworkHandler.Instance.JoinRoom(selectedRoom.session.Name);
+            _ = NetworkHandler.JoinRoom(selectedRoom.session.Name);
         }
     }
+
     public void JoinSpecificRoom() {
         string id = lobbyJoinField.text.ToUpper();
-        int index = id.Length > 0 ? roomNameChars.IndexOf(id[0]) : -1;
-        if (id.Length < 8 || index < 0 || index >= allRegions.Count) {
+        int index = id.Length > 0 ? NetworkHandler.RoomIdValidChars.IndexOf(id[0]) : -1;
+        if (id.Length < 8 || index < 0 || index >= NetworkHandler.Regions.Length) {
             OpenErrorBox("Invalid Room ID");
             return;
         }
 
         privatePrompt.SetActive(false);
-        _ = NetworkHandler.Instance.JoinRoom(id);
+        _ = NetworkHandler.JoinRoom(id);
     }
+
     public void CreateRoom() {
 
         Settings.Instance.nickname = nicknameField.text;
         byte players = (byte) lobbyPlayersSlider.value;
 
-        _ = NetworkHandler.Instance.CreateRoom(new() {
+        _ = NetworkHandler.CreateRoom(new() {
             Initialized = (runner) => {
                 runner.SessionInfo.IsVisible = !privateToggle.isOn;
             },
-        }, Settings.Instance.nickname);
+        });
 
         createLobbyPrompt.SetActive(false);
         //ChangeMaxPlayers(players);
@@ -615,23 +616,23 @@ public class MainMenuManager : MonoBehaviour {
         }
     }
 
-    public void UpdateSettingEnableStates() {
-        NetworkRunner runner = NetworkHandler.Instance.runner;
-        bool host = runner.IsServer;
+    //public void UpdateSettingEnableStates() {
+    //    NetworkRunner runner = NetworkHandler.Instance.runner;
+    //    bool host = runner.IsServer;
 
-        foreach (Selectable s in roomSettings)
-            s.interactable = host;
+    //    foreach (Selectable s in roomSettings)
+    //        s.interactable = host;
 
-        livesField.interactable = host && livesEnabled.isOn;
-        timeField.interactable = host && timeEnabled.isOn;
-        drawTimeupToggle.interactable = host && timeEnabled.isOn;
+    //    livesField.interactable = host && livesEnabled.isOn;
+    //    timeField.interactable = host && timeEnabled.isOn;
+    //    drawTimeupToggle.interactable = host && timeEnabled.isOn;
 
-        //TODO: add to array
-        privateToggleRoom.interactable = host;
+    //    //TODO: add to array
+    //    privateToggleRoom.interactable = host;
 
-        int realPlayers = NetworkHandler.Instance.runner.ActivePlayers.Where(pl => !pl.GetPlayerData(runner).IsManualSpectator).Count();
-        startGameBtn.interactable = host && realPlayers >= 1;
-    }
+    //    int realPlayers = NetworkHandler.Instance.runner.ActivePlayers.Where(pl => !pl.GetPlayerData(runner).IsManualSpectator).Count();
+    //    startGameBtn.interactable = host && realPlayers >= 1;
+    //}
 
     public void LocalChatMessage(string message, Color? color = null, bool filter = true) {
         float y = 0;

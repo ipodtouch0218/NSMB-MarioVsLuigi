@@ -112,6 +112,13 @@ public class FusionStats : Fusion.Behaviour {
     return stats;
   }
 
+  [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+  static void ResetStatics() {
+    _statsForRunnerLookup.Clear();
+    _activeGuids.Clear();
+    _newInputSystemFound = null;
+  }
+
   public static Stats.NetStatFlags DefaultNetStatsMask => Stats.NetStatFlags.RoundTripTime | Stats.NetStatFlags.ReceivedPacketSizes | Stats.NetStatFlags.SentPacketSizes;
 
   /// <summary>
@@ -121,14 +128,9 @@ public class FusionStats : Fusion.Behaviour {
   public const Stats.SimStatFlags DefaultSimStatsMask = (Stats.SimStatFlags)(-1);
 #else
   public const Stats.SimStatFlags DefaultSimStatsMask =
-      ~(
-      Stats.SimStatFlags.InterpDiff |
-      Stats.SimStatFlags.InterpUncertainty |
-      Stats.SimStatFlags.InterpMultiplier |
-      Stats.SimStatFlags.InputOffsetTarget |
-      Stats.SimStatFlags.InputOffsetDeviation |
-      Stats.SimStatFlags.InputReceiveDeltaDeviation
-      );
+    Stats.SimStatFlags.ForwardSimCount |
+    Stats.SimStatFlags.ResimCount      |
+    Stats.SimStatFlags.PacketSize;
 #endif
 
 
@@ -157,7 +159,7 @@ public class FusionStats : Fusion.Behaviour {
 
   // Used by DrawIfAttribute to determine inspector visibility of fields are runtime.
   bool ShowColorControls => !Application.isPlaying && _modifyColors;
-  bool IsPlaying => Application.isPlaying;
+  bool IsNotPlaying      => !Application.isPlaying;
 
 
   /// <summary>
@@ -214,7 +216,7 @@ public class FusionStats : Fusion.Behaviour {
   [SerializeField]
   [Range(0, 200)]
   [MultiPropertyDrawersFix]
-  int _maxHeaderHeight = 80;
+  int _maxHeaderHeight = 70;
   /// <summary>
   /// Height of button region at top of the stats panel. Values less than or equal to 0 hide the buttons, and reduce the header size.
   /// </summary>
@@ -230,7 +232,7 @@ public class FusionStats : Fusion.Behaviour {
   ///  The size of the canvas when <see cref="CanvasType"/> is set to <see cref="StatCanvasTypes.GameObject"/>.
   /// </summary>
   [InlineHelp]
-  [DrawIf(nameof(_canvasType), (long)StatCanvasTypes.GameObject, DrawIfHideType.Hide)]
+  [DrawIf(nameof(_canvasType), (long)StatCanvasTypes.GameObject, Hide = true)]
   [Range(0, 20f)]
   [MultiPropertyDrawersFix]
   public float CanvasScale = 5f;
@@ -239,7 +241,7 @@ public class FusionStats : Fusion.Behaviour {
   /// The distance on the Z axis the canvas will be positioned. Allows moving the canvas in front of or behind the parent GameObject.
   /// </summary>
   [InlineHelp]
-  [DrawIf(nameof(_canvasType), (long)StatCanvasTypes.GameObject, DrawIfHideType.Hide)]
+  [DrawIf(nameof(_canvasType), (long)StatCanvasTypes.GameObject, Hide = true)]
   [Range(-10, 10f)]
   [MultiPropertyDrawersFix]
   public float CanvasDistance = 0f;
@@ -249,7 +251,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(CanvasType), (long)StatCanvasTypes.GameObject, DrawIfHideType.Hide)]
+  [DrawIf(nameof(CanvasType), (long)StatCanvasTypes.GameObject, Hide = true)]
   [NormalizedRect(aspectRatio: 1)]
   [MultiPropertyDrawersFix]
   Rect _gameObjectRect = new Rect(0.0f, 0.0f, 0.3f, 1.0f);
@@ -268,7 +270,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(CanvasType), (long)StatCanvasTypes.Overlay, DrawIfHideType.Hide)]
+  [DrawIf(nameof(CanvasType), (long)StatCanvasTypes.Overlay, Hide = true)]
   [NormalizedRect]
   [MultiPropertyDrawersFix]
   Rect _overlayRect = new Rect(0.0f, 0.0f, 0.3f, 1.0f);
@@ -341,7 +343,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(GraphColumnCount), compareToValue: (long)0, DrawIfHideType.ReadOnly)]
+  [DrawIf(nameof(GraphColumnCount), 0)]
   [Range(30, SCREEN_SCALE_W)]
   [MultiPropertyDrawersFix]
   int _graphMaxWidth = SCREEN_SCALE_W / 4;
@@ -363,7 +365,7 @@ public class FusionStats : Fusion.Behaviour {
   [Header("Network Object Stats")]
   [InlineHelp]
   [SerializeField]
-  [WarnIf(nameof(ShowMissingNetObjWarning), true, "No NetworkObject found on this GameObject, nor parent. Object stats will be unavailable.")]
+  [WarnIf(nameof(ShowMissingNetObjWarning), "No NetworkObject found on this GameObject, nor parent. Object stats will be unavailable.")]
   bool _enableObjectStats;
   public bool EnableObjectStats {
     get => _enableObjectStats;
@@ -382,7 +384,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(EnableObjectStats), true)]
+  [DrawIf(nameof(EnableObjectStats))]
   NetworkObject _object;
   public NetworkObject Object {
     get {
@@ -398,7 +400,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(EnableObjectStats), true)]
+  [DrawIf(nameof(EnableObjectStats))]
   [Range(0, 200)]
   [MultiPropertyDrawersFix]
   int _objectTitleHeight = 48;
@@ -415,7 +417,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(EnableObjectStats), true)]
+  [DrawIf(nameof(EnableObjectStats))]
   [Range(0, 200)]
   [MultiPropertyDrawersFix]
   int _objectIdsHeight = 60;
@@ -432,7 +434,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(EnableObjectStats), true)]
+  [DrawIf(nameof(EnableObjectStats))]
   [Range(0, 200)]
   [MultiPropertyDrawersFix]
   int _objectMetersHeight = 90;
@@ -517,7 +519,7 @@ public class FusionStats : Fusion.Behaviour {
   [InlineHelp]
   [SerializeField]
   [VersaMask]
-  [DrawIf(nameof(EnableObjectStats), true)]
+  [DrawIf(nameof(EnableObjectStats))]
   [MultiPropertyDrawersFix]
   Stats.ObjStatFlags _includedObjStats;
   public Stats.ObjStatFlags IncludedObjectStats {
@@ -582,7 +584,7 @@ public class FusionStats : Fusion.Behaviour {
   /// regardless of the total number of peers running.
   /// </summary>
   [InlineHelp]
-  [DrawIf(nameof(EnforceSingle), true)]
+  [DrawIf(nameof(EnforceSingle))]
   [SerializeField]
   public string Guid;
 
@@ -592,7 +594,7 @@ public class FusionStats : Fusion.Behaviour {
   [Header("Customization")]
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(IsPlaying), false, DrawIfHideType.Hide)]
+  [DrawIf(nameof(IsNotPlaying), Hide = true)]
   [MultiPropertyDrawersFix]
   private bool _modifyColors;
   public bool ModifyColors => _modifyColors;
@@ -602,7 +604,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
   Color _graphColorGood = new Color(0.1f, 0.5f, 0.1f, 0.9f);
 
   /// <summary>
@@ -610,7 +612,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
   Color _graphColorWarn = new Color(0.75f, 0.75f, 0.2f, 0.9f);
 
   /// <summary>
@@ -618,7 +620,7 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
   Color _graphColorBad = new Color(0.9f, 0.2f, 0.2f, 0.9f);
 
   /// <summary>
@@ -626,32 +628,32 @@ public class FusionStats : Fusion.Behaviour {
   /// </summary>
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
   Color _graphColorFlag = new Color(0.8f, 0.75f, 0.0f, 1.0f);
 
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
   Color _fontColor = new Color(1.0f, 1.0f, 1.0f, 1f);
 
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
-  Color PanelColor = new Color(0.3f, 0.3f, 0.3f, 0.9f);
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
+  Color PanelColor = new Color(0.3f, 0.3f, 0.3f, 1.0f);
 
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
   Color _simDataBackColor = new Color(0.1f, 0.08f, 0.08f, 1.0f);
 
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
   Color _netDataBackColor = new Color(0.15f, 0.14f, 0.09f, 1.0f);
 
   [InlineHelp]
   [SerializeField]
-  [DrawIf(nameof(ShowColorControls), true, DrawIfHideType.Hide)]
+  [DrawIf(nameof(ShowColorControls), Hide = true)]
   Color _objDataBackColor = new Color(0.0f, 0.2f, 0.4f, 1.0f);
 
   // IFusionStats interface requirements
@@ -974,7 +976,6 @@ public class FusionStats : Fusion.Behaviour {
       }
 
       _layoutDirty = 1;
-      return;
     }
   }
 

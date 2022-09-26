@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: IceFlower
   m_EditorClassIdentifier: 
   state: 5
-  prefab: IceFlower
+  prefab:
+    RawGuidValue: 7fcd129d47a9505458544e2045bb0b57
   soundEffect: 16
   spawnChance: 0.5
   losingSpawnBonus: 1.5

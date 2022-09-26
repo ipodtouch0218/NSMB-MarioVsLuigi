@@ -18,6 +18,16 @@ PrefabInstance:
       propertyPath: floorAndRoofCutoff
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 4462257224907729137, guid: 4f50cb5e806289d43bf820de1f1347bb,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: -3157435927925294964
+      objectReference: {fileID: 0}
+    - target: {fileID: 4462257224907729137, guid: 4f50cb5e806289d43bf820de1f1347bb,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 1233864249221731145
+      objectReference: {fileID: 0}
     - target: {fileID: 8786985841086654504, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: interpolate
@@ -26,6 +36,16 @@ PrefabInstance:
     - target: {fileID: 8836298984178612580, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: red
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8836298984178612580, guid: 4f50cb5e806289d43bf820de1f1347bb,
+        type: 3}
+      propertyPath: blue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8836298984178612580, guid: 4f50cb5e806289d43bf820de1f1347bb,
+        type: 3}
+      propertyPath: dontFallOffEdges
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8836298984178612585, guid: 4f50cb5e806289d43bf820de1f1347bb,

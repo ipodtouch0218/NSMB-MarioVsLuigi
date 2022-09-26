@@ -33,8 +33,8 @@ namespace Fusion.Editor {
           VersionInfoGUI(); 
 
           using (new EditorGUI.DisabledScope(HasModified())) {
-            if (GUILayout.Button("Rebuild Object Table (Slow)")) {
-              NetworkProjectConfigUtilities.RebuildObjectTable();
+            if (GUILayout.Button("Rebuild Prefab Table")) {
+              NetworkProjectConfigUtilities.RebuildPrefabTable();
             }
           }
 

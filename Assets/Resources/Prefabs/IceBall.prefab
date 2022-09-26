@@ -60,8 +60,11 @@ MonoBehaviour:
     _value: 1
   _IsIceball:
     _value: 0
+  _BreakOnImpact:
+    _value: 0
   owner: {fileID: 0}
-  wallHitPrefab: {fileID: 0}
+  wallHitPrefab: {fileID: 3894548935506966732, guid: 0b92073613fc93f4698e7d4d7b8940dc,
+    type: 3}
   speed: 4.25
   bounceHeight: 6
   terminalVelocity: 6.25
@@ -197,6 +200,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!114 &-3035145909365686512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,6 +260,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1164692562165207756}
+  - {fileID: 1011982274984717417}
   - {fileID: -3035145909365686512}
   - {fileID: 376300006025663058}
   - {fileID: 842876408920944160}

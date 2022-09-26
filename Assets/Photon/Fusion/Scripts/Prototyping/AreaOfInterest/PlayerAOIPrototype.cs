@@ -29,12 +29,12 @@ public class PlayerAOIPrototype : NetworkBehaviour {
     if (Runner.Topology == SimulationConfig.Topologies.ClientServer) {
       // Assign this object as an AOI region for the player with input authority.
       if (Object.InputAuthority.IsNone == false && Runner.IsServer) {
-        Runner.AddPlayerAreaOfInterest(Object.InputAuthority, position: transform.position, radius: Radius);
+        Runner.AddPlayerAreaOfInterest(Object.InputAuthority, position: transform.position, Radius);
       }
     } else {
       // Assign this object as an AOI region for its State Authority player
       if (Object.StateAuthority.IsNone == false && Object.StateAuthority == Runner.LocalPlayer) {
-        Runner.AddPlayerAreaOfInterest(Object.StateAuthority, position: transform.position, radius: Radius);
+        Runner.AddPlayerAreaOfInterest(Object.StateAuthority, position: transform.position, Radius);
       }
     }
   }

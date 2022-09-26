@@ -45,9 +45,6 @@ public class NetworkCharacterControllerPrototype : NetworkTransform {
   public override void Spawned() {
     base.Spawned();
     CacheController();
-
-    // Caveat: this is needed to initialize the Controller's state and avoid unwanted spikes in its perceived velocity
-    Controller.Move(transform.position);
   }
 
   private void CacheController() {

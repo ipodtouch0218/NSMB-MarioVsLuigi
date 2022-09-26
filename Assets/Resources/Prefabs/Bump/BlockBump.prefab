@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5347700891599547490}
   - component: {fileID: 16106175369852631}
   - component: {fileID: 1392538299819834460}
+  - component: {fileID: -1844209149669900815}
   m_Layer: 8
   m_Name: BlockBump
   m_TagString: Untagged
@@ -46,12 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc22b60a21898684990112e398fb492f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resultTile: 
-  prefab: 
-  sprite: {fileID: 0}
-  fromAbove: 0
-  hitter: {fileID: 0}
-  spawnOffset: {x: 0, y: 0}
+  _interpolationDataSource: 0
 --- !u!95 &1392538299819834460
 Animator:
   serializedVersion: 4
@@ -72,6 +68,31 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &-1844209149669900815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6769544900703878166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 184ade792aff4504bb1e613fe8952520
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 16106175369852631}
+  - {fileID: 1846040291063038415}
+  SimulationBehaviours: []
 --- !u!1 &7449169019672523127
 GameObject:
   m_ObjectHideFlags: 0
@@ -85,6 +106,7 @@ GameObject:
   - component: {fileID: 3265167111181755697}
   - component: {fileID: 8649210667712108321}
   - component: {fileID: 8722656727595672907}
+  - component: {fileID: 1846040291063038415}
   m_Layer: 8
   m_Name: Graphics
   m_TagString: Untagged
@@ -295,7 +317,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 8461069782552266576}
   audioSources:
   - {fileID: 8649210667712108321}
+  soundOrigin: {fileID: 8461069782552266576}
+  soundRange: 12
+--- !u!114 &1846040291063038415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7449169019672523127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5

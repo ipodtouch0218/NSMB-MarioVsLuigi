@@ -41,7 +41,7 @@ public class DiscordController : MonoBehaviour {
         Debug.Log($"[DISCORD] Attempting to join game with secret \"{secret}\"");
 
         //TODO: add "disconnect" prompt
-        _ = NetworkHandler.Instance.JoinRoom(secret);
+        _ = NetworkHandler.JoinRoom(secret);
     }
 
     //TODO this doesn't work???

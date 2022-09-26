@@ -89,7 +89,7 @@ public class UIUpdater : MonoBehaviour {
         if (!player)
             return;
 
-        itemReserve.sprite = player.StoredPowerup == Enums.PowerupState.None ? Enums.PowerupFromState[player.StoredPowerup].reserveSprite : storedItemNull;
+        itemReserve.sprite = player.StoredPowerup != Enums.PowerupState.None ? Enums.PowerupFromState[player.StoredPowerup].reserveSprite : storedItemNull;
     }
 
     private void UpdateTextUI() {

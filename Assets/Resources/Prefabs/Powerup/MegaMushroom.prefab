@@ -75,9 +75,8 @@ GameObject:
   - component: {fileID: 6861960935492748004}
   - component: {fileID: 45429016534149503}
   - component: {fileID: -4909557973909771995}
-  - component: {fileID: -3959699289907803836}
-  - component: {fileID: 7613750627592452174}
-  - component: {fileID: -4375549080584697295}
+  - component: {fileID: 6268579416414490446}
+  - component: {fileID: 8514878024175363680}
   m_Layer: 9
   m_Name: MegaMushroom
   m_TagString: Powerup
@@ -113,16 +112,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92a2c7e0961057346829575aceae0464, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  _IsCollected:
+    _value: 0
+  powerupScriptable: {fileID: 11400000, guid: fb2d384f538256445be350e60f8473a4, type: 2}
   speed: 1.5
   bouncePower: 3.5
-  terminalVelocity: 6
-  blinkingRate: 6
+  terminalVelocity: 8
+  blinkingRate: 4
   avoidPlayers: 1
-  followMe: {fileID: 0}
-  followMeCounter: 0
-  despawnCounter: 15
-  ignoreCounter: 0
-  powerupScriptable: {fileID: 11400000, guid: fb2d384f538256445be350e60f8473a4, type: 2}
 --- !u!212 &6853285212139825911
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -234,6 +234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!114 &6861960935492748004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,6 +247,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   goUpSlopes: 0
   onGround: 0
   hitRoof: 0
@@ -267,6 +269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   killTime: 0
 --- !u!114 &-4909557973909771995
 MonoBehaviour:
@@ -280,7 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88eb6ee564c020f48a3b1cf851277386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-3959699289907803836
+--- !u!114 &6268579416414490446
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -289,21 +292,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 6853285212139825912}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 7613750627592452174}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &7613750627592452174
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 2fa56f937ef51464da5f954b19b67637
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 6853285212139825913}
+  - {fileID: 420957214971105809}
+  - {fileID: 6861960935492748004}
+  - {fileID: 45429016534149503}
+  - {fileID: 8514878024175363680}
+  SimulationBehaviours: []
+--- !u!114 &8514878024175363680
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -312,22 +320,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 6853285212139825912}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: -4375549080584697295}
---- !u!114 &-4375549080584697295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6853285212139825912}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interpolate: 1
-  body: {fileID: 6853285212139825909}
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5

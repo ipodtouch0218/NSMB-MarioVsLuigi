@@ -6,6 +6,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
 
     //---Networked Variables
     [Networked] public NetworkBool IsIceball { get; set; }
+    [Networked] public NetworkBool BreakOnImpact { get; set; }
 
     //---Public Variables
     public PlayerController owner;
@@ -16,7 +17,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
 
     //---Private Variables
     private PhysicsEntity physics;
-    private bool breakOnImpact;
 
     public void OnBeforeSpawned(PlayerController owner, bool right) {
         this.owner = owner;
@@ -29,6 +29,12 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
     public override void Awake() {
         base.Awake();
         physics = GetComponent<PhysicsEntity>();
+    }
+
+    public override void Spawned() {
+        base.Spawned();
+
+        body.velocity = new(speed * (FacingRight ? 1 : -1), -speed);
     }
 
     public override void FixedUpdateNetwork() {
@@ -47,25 +53,21 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
     private void HandleCollision() {
         physics.UpdateCollisions();
 
-        if (physics.onGround && !breakOnImpact) {
+        if (physics.onGround && !BreakOnImpact) {
             float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)) * 1.25f;
             if (Mathf.Sign(physics.floorAngle) != Mathf.Sign(body.velocity.x))
                 boost = 0;
 
             body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
         } else if (IsIceball && body.velocity.y > 1.5f)  {
-            breakOnImpact = true;
+            BreakOnImpact = true;
         }
-        bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact);
+        bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && BreakOnImpact);
         if (breaking) {
             Runner.Despawn(Object);
-
         }
     }
 
-    public override void Spawned() {
-        base.Spawned();
-    }
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (!GameManager.Instance.gameover)
             Instantiate(wallHitPrefab, transform.position, Quaternion.identity);

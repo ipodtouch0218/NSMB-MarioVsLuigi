@@ -4832,9 +4832,8 @@ GameObject:
   - component: {fileID: 3529903825791625940}
   - component: {fileID: 6793168269546059589}
   - component: {fileID: 5407584048357268515}
-  - component: {fileID: -7394845021063202232}
-  - component: {fileID: -2267053819997243671}
-  - component: {fileID: -2593818233479442467}
+  - component: {fileID: 6213839771229971201}
+  - component: {fileID: 8651934288568289201}
   m_Layer: 10
   m_Name: BulletBill
   m_TagString: bulletbill
@@ -4871,12 +4870,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09e12c8b01c503f41b9cb1e0ee79547b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dead: 0
-  left: 1
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  _IsFrozen: 0
+  _Dead:
+    _value: 0
   collide: 0
   iceCarryable: 1
   flying: 1
-  body: {fileID: 0}
   hitbox: {fileID: 0}
   speed: 1.5
   playerSearchRadius: 12
@@ -5013,6 +5015,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!114 &3529903825791625940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5025,6 +5028,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   killTime: 0
 --- !u!114 &6793168269546059589
 MonoBehaviour:
@@ -5139,7 +5143,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &-7394845021063202232
+--- !u!114 &6213839771229971201
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5148,36 +5152,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 2627485830306083579}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: -2267053819997243671}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &-2267053819997243671
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2627485830306083579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: -2593818233479442467}
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 42350f427b980ac45b4ce789698052ce
+  NestedObjects: []
+  NetworkedBehaviours:
   - {fileID: 2721581803245764244}
---- !u!114 &-2593818233479442467
+  - {fileID: 473391894580253470}
+  - {fileID: 3529903825791625940}
+  - {fileID: 8651934288568289201}
+  SimulationBehaviours: []
+--- !u!114 &8651934288568289201
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5186,11 +5179,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 2627485830306083579}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interpolate: 1
-  body: {fileID: 3091356493132500068}
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
 --- !u!1 &2855663874240651994
 GameObject:
   m_ObjectHideFlags: 0

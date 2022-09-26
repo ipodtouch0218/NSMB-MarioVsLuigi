@@ -19,10 +19,8 @@ GameObject:
   - component: {fileID: 2884479414836889194}
   - component: {fileID: 7415037304459295726}
   - component: {fileID: 5674404523704379184}
-  - component: {fileID: 8698039766182409506}
-  - component: {fileID: 5494058199843806299}
-  - component: {fileID: 902954096586121819}
-  - component: {fileID: -3964062451811810513}
+  - component: {fileID: 8059900885248764230}
+  - component: {fileID: 217785053388766539}
   m_Layer: 9
   m_Name: Goomba
   m_TagString: goomba
@@ -58,15 +56,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f5b530d04bdafb4b866d48e39e4d5e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dead: 0
-  left: 1
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  _IsFrozen: 0
+  _Dead:
+    _value: 0
   collide: 1
   iceCarryable: 1
   flying: 0
-  body: {fileID: 0}
   hitbox: {fileID: 0}
   speed: 0.875
-  deathTimer: -1
   terminalVelocity: -8
 --- !u!212 &7523289063499453457
 SpriteRenderer:
@@ -200,6 +200,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   goUpSlopes: 0
   onGround: 0
   hitRoof: 0
@@ -221,6 +222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!114 &2884479414836889194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,6 +235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   killTime: 0
 --- !u!114 &7415037304459295726
 MonoBehaviour:
@@ -356,7 +359,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &8698039766182409506
+--- !u!114 &8059900885248764230
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -365,37 +368,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 7523289063499453450}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 5494058199843806299}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &5494058199843806299
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7523289063499453450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: 902954096586121819}
-  - {fileID: -3964062451811810513}
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 1ce5864bde999014a92015b065520add
+  NestedObjects: []
+  NetworkedBehaviours:
   - {fileID: 7523289063499453453}
---- !u!114 &902954096586121819
+  - {fileID: 7551600738196628425}
+  - {fileID: 4710538364186427609}
+  - {fileID: 2884479414836889194}
+  - {fileID: 217785053388766539}
+  SimulationBehaviours: []
+--- !u!114 &217785053388766539
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -404,25 +396,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 7523289063499453450}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interpolate: 1
-  body: {fileID: 7523289063499453455}
---- !u!114 &-3964062451811810513
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7523289063499453450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1ec092acf651e542acfcdd4d0d2045a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ignoredParameters: []
-  animator: {fileID: 7523289063499453454}
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
 --- !u!1 &7523289063554791230
 GameObject:
   m_ObjectHideFlags: 0

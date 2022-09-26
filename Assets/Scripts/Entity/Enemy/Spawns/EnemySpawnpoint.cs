@@ -1,40 +1,43 @@
 using UnityEngine;
 
+using Fusion;
 using NSMB.Utils;
 
-public class EnemySpawnpoint : MonoBehaviour {
+public class EnemySpawnpoint : NetworkBehaviour {
+
+    //---Networked Variables
+    [Networked] private NetworkObject CurrentEntity { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private GameObject prefab;
+    [SerializeField] private NetworkPrefabRef prefab;
 
     //---Private Variables
-    private GameObject currentEntity;
 
     public virtual bool AttemptSpawning() {
-        if (currentEntity)
+        if (CurrentEntity)
             return false;
 
-        if (NetworkHandler.Instance.runner.GetPhysicsScene2D().OverlapCircle(transform.position, 1.5f, Layers.MaskOnlyPlayers))
+        if (Runner.GetPhysicsScene2D().OverlapCircle(transform.position, 1.5f, Layers.MaskOnlyPlayers))
             return false;
 
-        currentEntity = NetworkHandler.Instance.runner.Spawn(prefab, transform.position, transform.rotation).gameObject;
+        CurrentEntity = Runner.Spawn(prefab, transform.position, transform.rotation);
         return true;
     }
 
     public void OnDrawGizmos() {
-        if (!prefab)
+        if (prefab == NetworkPrefabRef.Empty)
             return;
 
-        string icon = prefab.name;
-        float offset = icon switch {
-            "BlueKoopa" => 0.15f,
-            "RedKoopa" => 0.15f,
-            "Koopa" => 0.15f,
-            "Bobomb" => 0.22f,
-            "Goomba" => 0.22f,
-            "Spiny" => -0.03125f,
-            _ => 0,
-        };
-        Gizmos.DrawIcon(transform.position + offset * Vector3.up, icon, true, new Color(1, 1, 1, 0.5f));
+        //string icon = prefab.;
+        //float offset = icon switch {
+        //    "BlueKoopa" => 0.15f,
+        //    "RedKoopa" => 0.15f,
+        //    "Koopa" => 0.15f,
+        //    "Bobomb" => 0.22f,
+        //    "Goomba" => 0.22f,
+        //    "Spiny" => -0.03125f,
+        //    _ => 0,
+        //};
+        //Gizmos.DrawIcon(transform.position + offset * Vector3.up, icon, true, new Color(1, 1, 1, 0.5f));
     }
 }

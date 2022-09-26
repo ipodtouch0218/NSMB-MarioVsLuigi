@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Star
   m_EditorClassIdentifier: 
   state: 0
-  prefab: Star
+  prefab:
+    RawGuidValue: 6503ae3cebbf4d94ba7bb95537697cae
   soundEffect: 16
   spawnChance: -0.2
   losingSpawnBonus: 3.5

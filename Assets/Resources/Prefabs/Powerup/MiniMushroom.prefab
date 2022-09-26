@@ -17,9 +17,8 @@ GameObject:
   - component: {fileID: 3203905593021969376}
   - component: {fileID: 3370984598777677660}
   - component: {fileID: 8142288132489407299}
-  - component: {fileID: 5111157548884678091}
-  - component: {fileID: 1327096901491533370}
-  - component: {fileID: 3348339991063947105}
+  - component: {fileID: 4048595090993098061}
+  - component: {fileID: 7510143724844531101}
   m_Layer: 9
   m_Name: MiniMushroom
   m_TagString: Powerup
@@ -55,16 +54,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92a2c7e0961057346829575aceae0464, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  _IsCollected:
+    _value: 0
+  powerupScriptable: {fileID: 11400000, guid: b3cbb6a3699975d4fb0a2e641a09684c, type: 2}
   speed: 2
   bouncePower: 0
   terminalVelocity: 8
-  blinkingRate: 6
+  blinkingRate: 4
   avoidPlayers: 0
-  followMe: {fileID: 0}
-  followMeCounter: 0
-  despawnCounter: 15
-  ignoreCounter: 0
-  powerupScriptable: {fileID: 11400000, guid: b3cbb6a3699975d4fb0a2e641a09684c, type: 2}
 --- !u!212 &3379984366894124871
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -176,6 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!114 &3203905593021969376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,6 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   goUpSlopes: 0
   onGround: 0
   hitRoof: 0
@@ -209,6 +211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   killTime: 0
 --- !u!114 &8142288132489407299
 MonoBehaviour:
@@ -222,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88eb6ee564c020f48a3b1cf851277386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5111157548884678091
+--- !u!114 &4048595090993098061
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -231,21 +234,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 3379984366894124873}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 1327096901491533370}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &1327096901491533370
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 01e65939dc0c28345bd9b2d4fbf025ab
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 3379984366894124870}
+  - {fileID: 2949046552459704907}
+  - {fileID: 3203905593021969376}
+  - {fileID: 3370984598777677660}
+  - {fileID: 7510143724844531101}
+  SimulationBehaviours: []
+--- !u!114 &7510143724844531101
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -254,25 +262,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 3379984366894124873}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: 3348339991063947105}
---- !u!114 &3348339991063947105
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3379984366894124873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interpolate: 1
-  body: {fileID: 3379984366894124869}
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
 --- !u!1 &6433809598137731468
 GameObject:
   m_ObjectHideFlags: 0

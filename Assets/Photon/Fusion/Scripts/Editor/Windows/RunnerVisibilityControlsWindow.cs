@@ -116,7 +116,6 @@ namespace Fusion.Editor {
       Instance = (RunnerVisibilityControlsWindow)window;
     }
 
-
     private void Awake() {
       Instance = this;
     }
@@ -205,7 +204,20 @@ namespace Fusion.Editor {
               var togglerect = EditorGUILayout.GetControlRect(GUILayout.Width(18));
 
               if (GUI.Button(togglerect, runner.IsVisible ? s_visibleIcon.Value : s_hiddenIcon.Value, s_invisibleButtonStyle.Value)) {
-                runner.IsVisible = !runner.IsVisible;
+                if ((Event.current.modifiers & (EventModifiers.Shift | EventModifiers.Control | EventModifiers.Command | EventModifiers.Alt)) == 0)
+                {
+                  runner.IsVisible = !runner.IsVisible;
+                } else {
+                  var others = NetworkRunner.GetInstancesEnumerator();
+                  while (others.MoveNext()) {
+                    var other = others.Current;
+                    // Only consider active runners.
+                    if (!other || !other.IsRunning) {
+                      continue;
+                    }
+                    other.IsVisible = other == runner;
+                  }
+                }
               }
             };
 
@@ -218,7 +230,21 @@ namespace Fusion.Editor {
                 (runner.ProvideInput ? s_inputIconShort.Value : s_noInputIconShort.Value);
 
               if (GUI.Button(inputToggleRect,inputContent, runner.ProvideInput ? s_invisibleButtonStyle.Value : s_invisibleButtonGrayStyle.Value)) {
-                runner.ProvideInput = !runner.ProvideInput;
+                
+                if ((Event.current.modifiers & (EventModifiers.Shift | EventModifiers.Control | EventModifiers.Command | EventModifiers.Alt)) == 0)
+                {
+                  runner.ProvideInput = !runner.ProvideInput;
+                } else {
+                  var others = NetworkRunner.GetInstancesEnumerator();
+                  while (others.MoveNext()) {
+                    var other = others.Current;
+                    // Only consider active runners.
+                    if (!other || !other.IsRunning) {
+                      continue;
+                    }
+                    other.ProvideInput = other == runner;
+                  }
+                }
               }
             };
 
@@ -248,7 +274,12 @@ namespace Fusion.Editor {
               }
             }
           }
+
           EditorGUILayout.EndHorizontal();
+
+        }
+        if (NetworkProjectConfig.Global.PeerMode == NetworkProjectConfig.PeerModes.Multiple) {
+          EditorGUILayout.LabelField("Hold Shift while clicking to solo Visibility/Input Provider.", EditorStyles.miniLabel);
         }
       }
       EditorGUILayout.EndScrollView();

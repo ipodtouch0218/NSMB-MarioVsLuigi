@@ -225,6 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!82 &-4211955845073762521
 AudioSource:
   m_ObjectHideFlags: 0
@@ -355,6 +356,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 5742616016131993260}
   - {fileID: -4753383432991643724}
+  - {fileID: 472015331249174581}
   - {fileID: 224056960718892709}
   SimulationBehaviours: []
 --- !u!114 &224056960718892709

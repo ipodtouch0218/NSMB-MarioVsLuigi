@@ -371,7 +371,7 @@ namespace NSMB.Utils {
         }
 
         public static bool GetSessionProperty(SessionInfo session, string key, out int value) {
-            if (session.Properties.TryGetValue(key, out SessionProperty property)) {
+            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
                 value = property;
                 return true;
             }
@@ -379,7 +379,7 @@ namespace NSMB.Utils {
             return false;
         }
         public static bool GetSessionProperty(SessionInfo session, string key, out string value) {
-            if (session.Properties.TryGetValue(key, out SessionProperty property)) {
+            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
                 value = property;
                 return true;
             }
@@ -387,7 +387,7 @@ namespace NSMB.Utils {
             return false;
         }
         public static bool GetSessionProperty(SessionInfo session, string key, out bool value) {
-            if (session.Properties.TryGetValue(key, out SessionProperty property)) {
+            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
                 value = property == 1;
                 return true;
             }
@@ -429,6 +429,7 @@ namespace NSMB.Utils {
             }
 
             float rand = GameManager.Instance.Random.NextSingleExclusive() * totalChance;
+            Debug.Log(rand);
             foreach (Powerup powerup in powerups) {
                 if (powerup.name == "MegaMushroom" && gm.musicState == Enums.MusicState.MegaMushroom)
                     continue;

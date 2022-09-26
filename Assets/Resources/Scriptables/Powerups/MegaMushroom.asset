@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: MegaMushroom
   m_EditorClassIdentifier: 
   state: 8
-  prefab: MegaMushroom
+  prefab:
+    RawGuidValue: 2fa56f937ef51464da5f954b19b67637
   soundEffect: 40
   spawnChance: -1
   losingSpawnBonus: 3

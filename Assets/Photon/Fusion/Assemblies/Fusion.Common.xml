@@ -4,31 +4,56 @@
         <name>Fusion.Common</name>
     </assembly>
     <members>
-        <member name="T:Fusion.Async.TaskFactoryManager">
+        <member name="T:Fusion.Async.TaskManager">
             <summary>
             Task Factory is used to create new Tasks and Schedule long running Tasks
             </summary>
         </member>
-        <member name="P:Fusion.Async.TaskFactoryManager.TaskFactory">
+        <member name="P:Fusion.Async.TaskManager.TaskFactory">
             <summary>
             Stores a Task Factory ready made to be used with Unity
             </summary>
         </member>
-        <member name="P:Fusion.Async.TaskFactoryManager.TaskScheduler">
-            <summary>
-            Task Scheduler based on the TaskFactory currently set
-            </summary>
-        </member>
-        <member name="M:Fusion.Async.TaskFactoryManager.SetupForUnity">
+        <member name="M:Fusion.Async.TaskManager.Setup">
             <summary>
             Setup a new TaskFactory tailored to work with Unity
             </summary>
         </member>
-        <member name="M:Fusion.Async.TaskFactoryManager.CreateUnityTaskFactory">
+        <member name="M:Fusion.Async.TaskManager.Service(System.Func{System.Threading.Tasks.Task{System.Boolean}},System.Threading.CancellationToken,System.Int32,System.String)">
             <summary>
-            Create a new TaskFactory reference with settings to work wiht Unity
+            Start a Service Task that will invoke a Recurring Action every each interval in millis
             </summary>
-            <returns>TaskFactory ref with the right arguments set</returns>
+            <param name="recurringAction">Action invoked every interval. It can return false to stop the service</param>
+            <param name="cancellationToken">CancellationToken used to stop the service</param>
+            <param name="interval">Interval between action invoke</param>
+            <param name="serviceName">Custom id name for the Service</param>
+            <returns>Service Task</returns>
+        </member>
+        <member name="M:Fusion.Async.TaskManager.Run(System.Func{System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken,System.Threading.Tasks.TaskCreationOptions)">
+            <summary>
+            Run an Action asynchronously
+            </summary>
+            <param name="action">Action to be invoked</param>
+            <param name="cancellationToken">CancellationToken used to stop the Action</param>
+            <param name="options">Extra Task Creation options</param>
+            <returns>Async Task based on the Action</returns>
+        </member>
+        <member name="M:Fusion.Async.TaskManager.ContinueWhenAll(System.Threading.Tasks.Task[],System.Func{System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+            <summary>
+            Run a continuation Task after all other Tasks have completed
+            </summary>
+            <param name="precedingTasks">List of pending tasks to wait</param>
+            <param name="action">Action to run after the Tasks</param>
+            <param name="cancellationToken">ellationToken used to stop the Action</param>
+            <returns>Async Task based on the Action</returns>
+        </member>
+        <member name="M:Fusion.Async.TaskManager.Delay(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Custom Task Delay method as Task.Delay is not supported by WebGL Builds
+            </summary>
+            <param name="delay">Delay in milliseconds to wait</param>
+            <param name="token">Cancelation Token used to stop the Delay</param>
+            <returns>Awaitable Task</returns>
         </member>
         <member name="T:Fusion.Collections.SynchronizedQueue`1">
             <summary>
@@ -151,6 +176,21 @@
             <param name="aLength">length of array</param>
             <param name="p">integer array with size (1 &lt;&lt; RADIX)</param>
             <param name="c">integer array with size (1 &lt;&lt; RADIX) * 4</param>
+        </member>
+        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsBuildFlags">
+            <summary>
+            Flags for BuildFlags
+            </summary>
+        </member>
+        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsBuildTypes">
+            <summary>
+            Flags for BuildTypes
+            </summary>
+        </member>
+        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsDotNetVersion">
+            <summary>
+            Flags for DotNetVersion
+            </summary>
         </member>
     </members>
 </doc>

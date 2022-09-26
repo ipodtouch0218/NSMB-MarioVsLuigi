@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: FireFlower
   m_EditorClassIdentifier: 
   state: 4
-  prefab: FireFlower
+  prefab:
+    RawGuidValue: d456b58d55e1ccc4eab91b85f3e4d08f
   soundEffect: 16
   spawnChance: 2
   losingSpawnBonus: 0.75

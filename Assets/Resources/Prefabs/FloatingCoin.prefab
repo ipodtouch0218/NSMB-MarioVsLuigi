@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5780648777663731098}
   - component: {fileID: 8712797713821691440}
   - component: {fileID: 8516101862555970818}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: FloatingCoin
   m_TagString: coin
   m_Icon: {fileID: 0}

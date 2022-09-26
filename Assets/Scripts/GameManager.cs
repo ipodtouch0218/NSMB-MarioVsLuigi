@@ -273,11 +273,13 @@ public class GameManager : NetworkBehaviour {
         InputSystem.controls.UI.Pause.performed += OnPause;
         NetworkHandler.OnShutdown += OnShutdown;
         NetworkHandler.OnInput += OnInput;
+        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
     }
     public void OnDisable() {
         InputSystem.controls.UI.Pause.performed -= OnPause;
         NetworkHandler.OnShutdown -= OnShutdown;
         NetworkHandler.OnInput -= OnInput;
+        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
     }
 
     public void Awake() {
@@ -288,23 +290,19 @@ public class GameManager : NetworkBehaviour {
         //Make UI color translucent
         levelUIColor.a = .7f;
 
-        //Check if we spawned inside the editor?
-        if (!NetworkHandler.Instance.runner.IsConnectedToServer) {
+        //spawning in editor
+        if (!NetworkHandler.Runner) {
             //uhhh
-            NetworkRunner runner = NetworkHandler.Instance.runner;
-            runner.StartGame(new() {
+
+            _ = NetworkHandler.CreateRoom(new() {
+                Scene = SceneManager.GetActiveScene().buildIndex,
                 GameMode = GameMode.Single,
-                SessionName = "debug",
-                SessionProperties = NetworkUtils.DefaultRoomProperties,
             });
         }
-
-        SceneManager.SetActiveScene(gameObject.scene);
     }
 
     public override void Spawned() {
 
-        Debug.Log("A");
         //by default, spectate. when we get assigned a player object, we disable it there.
         spectationManager.Spectating = true;
 
@@ -333,7 +331,7 @@ public class GameManager : NetworkBehaviour {
         if (Runner.IsServer) {
             foreach (PlayerRef player in Runner.ActivePlayers) {
                 CharacterData character = player.GetCharacterData(Runner);
-                NetworkObject obj = Runner.Spawn((GameObject) Resources.Load("Prefabs/" + character.prefab), spawnpoint, inputAuthority: player);
+                NetworkObject obj = Runner.Spawn(character.prefab, spawnpoint, inputAuthority: player);
                 Players.Add(obj.GetComponent<PlayerController>());
 
                 playerCount++;
@@ -341,6 +339,9 @@ public class GameManager : NetworkBehaviour {
         }
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
+
+        //finished loading
+        NetworkHandler.Runner.GetLocalPlayerData().Rpc_FinishedLoading();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeResim = true)]
@@ -369,8 +370,9 @@ public class GameManager : NetworkBehaviour {
         PlayerNetworkInput newInput = new();
 
         Vector2 joystick = InputSystem.controls.Player.Movement.ReadValue<Vector2>();
-        bool jump = InputSystem.controls.Player.Jump.ReadValue<bool>();
-        bool sprint = InputSystem.controls.Player.Sprint.ReadValue<bool>();
+        bool jump = InputSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
+        bool sprint = InputSystem.controls.Player.Sprint.ReadValue<float>() >= 0.5f;
+        bool powerup = InputSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
 
         //TODO: deadzone?
         newInput.buttons.Set(PlayerControls.Right, joystick.x > 0.25f);
@@ -379,8 +381,13 @@ public class GameManager : NetworkBehaviour {
         newInput.buttons.Set(PlayerControls.Down, joystick.y < -0.25f);
         newInput.buttons.Set(PlayerControls.Jump, jump);
         newInput.buttons.Set(PlayerControls.Sprint, sprint);
+        newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
 
         input.Set(newInput);
+    }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        CheckForWinner();
     }
 
     public static void OnStartTimerChanged(Changed<GameManager> changed) {
@@ -393,11 +400,11 @@ public class GameManager : NetworkBehaviour {
 
 
     private void CheckIfAllPlayersLoaded() {
-        if (loaded)
+        if (!NetworkHandler.Runner.IsServer || loaded)
             return;
 
-        foreach (PlayerRef player in Runner.ActivePlayers) {
-            PlayerData data = player.GetPlayerData(Runner);
+        foreach (PlayerRef player in NetworkHandler.Runner.ActivePlayers) {
+            PlayerData data = player.GetPlayerData(NetworkHandler.Runner);
 
             if (data == null || data.IsCurrentlySpectating)
                 continue;
@@ -407,7 +414,11 @@ public class GameManager : NetworkBehaviour {
         }
 
         loaded = true;
-        GameStartTimer = TickTimer.CreateFromSeconds(Runner, 1.5f);
+        SceneManager.SetActiveScene(gameObject.scene);
+        GameStartTimer = TickTimer.CreateFromSeconds(NetworkHandler.Runner, 1.5f);
+
+        foreach (PlayerRef player in NetworkHandler.Runner.ActivePlayers)
+            player.GetPlayerData(NetworkHandler.Runner).IsLoaded = false;
     }
 
     //TODO: invokeresim?
@@ -462,6 +473,9 @@ public class GameManager : NetworkBehaviour {
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
             wfgs.AttemptExecute();
 
+        //Big star
+        SpawnBigStar();
+
 
         GameStartTick = Runner.Simulation.Tick.Raw;
         musicEnabled = true;
@@ -476,7 +490,7 @@ public class GameManager : NetworkBehaviour {
     private IEnumerator FinalizeGameStart() {
         yield return new WaitForSeconds(3f);
         musicEnabled = true;
-        SceneManager.UnloadSceneAsync("Loading");
+        Destroy(FindObjectOfType<LoadingParent>().gameObject);
     }
 
     private IEnumerator EndGame(PlayerRef winner) {
@@ -549,11 +563,26 @@ public class GameManager : NetworkBehaviour {
             return;
         }
 
-        //no star could spawn. wait a second...
-        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
+        //no star could spawn. wait a second and try again...
+        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
     }
 
     public override void FixedUpdateNetwork() {
+
+        //check if all players left.
+        //if (GameStartTick != -1 && musicEnabled) {
+        //    bool allNull = true;
+        //    foreach (PlayerController controller in players) {
+        //        if (controller) {
+        //            allNull = false;
+        //            break;
+        //        }
+        //    }
+        //    if (spectationManager.Spectating && allNull) {
+        //        StartCoroutine(EndGame(PlayerRef.None));
+        //        return;
+        //    }
+        //}
 
         if (BigStarRespawnTimer.Expired(Runner)) {
             BigStarRespawnTimer = TickTimer.None;
@@ -598,20 +627,6 @@ public class GameManager : NetworkBehaviour {
     public void Update() {
         if (gameover)
             return;
-
-        if (GameStartTick != -1 && musicEnabled) {
-            bool allNull = true;
-            foreach (PlayerController controller in players) {
-                if (controller) {
-                    allNull = false;
-                    break;
-                }
-            }
-            if (spectationManager.Spectating && allNull) {
-                StartCoroutine(EndGame(PlayerRef.None));
-                return;
-            }
-        }
 
         if (musicEnabled)
             HandleMusic();

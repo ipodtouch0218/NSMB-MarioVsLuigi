@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: PropellerMushroom
   m_EditorClassIdentifier: 
   state: 6
-  prefab: PropellerMushroom
+  prefab:
+    RawGuidValue: 467d8d6c11c84374a9f38f758becc536
   soundEffect: 16
   spawnChance: 1.5
   losingSpawnBonus: 1

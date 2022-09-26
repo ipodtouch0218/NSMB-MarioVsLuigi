@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 
-public class WrappingObject : MonoBehaviour {
+using Fusion;
+
+public class WrappingObject : NetworkBehaviour {
 
     private Rigidbody2D body;
     private Vector2 width;
     private float min, max;
 
-    public void Start() {
+    public void Awake() {
         body = GetComponent<Rigidbody2D>();
         if (!body)
             body = GetComponentInParent<Rigidbody2D>();
@@ -22,7 +24,7 @@ public class WrappingObject : MonoBehaviour {
         width = new(GameManager.Instance.levelWidthTile / 2f, 0);
     }
 
-    public void FixedUpdate() {
+    public override void FixedUpdateNetwork() {
         if (body.position.x < min) {
             transform.position = body.position += width;
         } else if (body.position.x > max) {

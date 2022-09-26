@@ -63,12 +63,15 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnLoadStateChanged(Changed<PlayerData> changed) {
-        GameManager.Instance.OnPlayerLoaded();
+        Debug.Log("Change state loaded");
+        if (GameManager.Instance)
+            GameManager.Instance.OnPlayerLoaded();
     }
 
     #region RPCs
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetNickname(string name) {
+        Debug.Log("RPC: " + name);
         //don't allow changing nicknames after we've already set it.
         if (IsNicknameSet)
             return;

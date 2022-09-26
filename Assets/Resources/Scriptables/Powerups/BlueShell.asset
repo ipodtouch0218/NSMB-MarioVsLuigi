@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: BlueShell
   m_EditorClassIdentifier: 
   state: 7
-  prefab: BlueShell
+  prefab:
+    RawGuidValue: fc9311d45068b0b4babce8b3733e590b
   soundEffect: 16
   spawnChance: 1.5
   losingSpawnBonus: -0.25
