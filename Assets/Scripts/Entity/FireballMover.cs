@@ -84,7 +84,7 @@ public class FireballMover : MonoBehaviourPun {
                 PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { en.photonView.ViewID });
                 PhotonNetwork.Destroy(gameObject);
             } else {
-                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false, 0);
+                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false, true, 0);
                 PhotonNetwork.Destroy(gameObject);
             }
             break;
@@ -145,7 +145,7 @@ public class FireballMover : MonoBehaviourPun {
             if (asi.IsName("end") && asi.normalizedTime > 0.5f)
                 return;
             if (!isIceball) {
-                killa.photonView.RPC("Kill", RpcTarget.All);
+                killa.photonView.RPC("SpecialKill", RpcTarget.All, !left, false, true, 0);
                 PhotonNetwork.Destroy(gameObject);
             } else {
                 PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { killa.photonView.ViewID });

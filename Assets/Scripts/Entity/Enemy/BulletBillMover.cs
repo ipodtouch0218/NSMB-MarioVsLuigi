@@ -91,11 +91,11 @@ public class BulletBillMover : KillableEntity {
 
     [PunRPC]
     public override void Kill() {
-        SpecialKill(!left, false, 0);
+        SpecialKill(!left, false, false, 0);
     }
 
     [PunRPC]
-    public override void SpecialKill(bool right, bool groundpound, int combo) {
+    public override void SpecialKill(bool right, bool groundpound, bool fireball, int combo) {
         body.velocity = new Vector2(0, 2.5f);
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (right ? 1 : -1);
