@@ -172,7 +172,7 @@ public class FrozenCube : HoldableEntity {
             if (killa.dead || killa.photonView.ViewID == entityView.ViewID)
                 return;
 
-            killa.photonView.RPC(nameof(KillableEntity.SpecialKill), RpcTarget.All, killa.transform.position.x > transform.position.x, false, combo++);
+            killa.photonView.RPC(nameof(KillableEntity.SpecialKill), RpcTarget.All, killa.transform.position.x > transform.position.x, false, false, combo++);
         }
 
         switch (obj.tag) {
@@ -319,7 +319,7 @@ public class FrozenCube : HoldableEntity {
     }
 
 	[PunRPC]
-    public override void SpecialKill(bool right, bool groundpound, int combo) {
+    public override void SpecialKill(bool right, bool groundpound, bool fireball, int combo) {
         Kill();
     }
     #endregion

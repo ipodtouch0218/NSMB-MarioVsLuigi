@@ -73,7 +73,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
 
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
         if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc))
-            photonView.RPC(nameof(SpecialKill), RpcTarget.All, left, false, 0);
+            photonView.RPC(nameof(SpecialKill), RpcTarget.All, left, false, false, 0);
     }
     #endregion
 
@@ -105,7 +105,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
             || (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.state == Enums.PowerupState.MegaMushroom) {
 
-            photonView.RPC(nameof(SpecialKill), RpcTarget.All, player.body.velocity.x > 0, player.groundpound, player.StarCombo++);
+            photonView.RPC(nameof(SpecialKill), RpcTarget.All, player.body.velocity.x > 0, player.groundpound, false, player.StarCombo++);
         } else if (attackedFromAbove) {
             if (player.state == Enums.PowerupState.MiniMushroom) {
                 if (player.groundpound) {
@@ -159,16 +159,16 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         hitbox.enabled = true;
         audioSource.enabled = true;
 
-        SpecialKill(false, false, 0);
+        SpecialKill(false, false, false, 0);
     }
 
     [PunRPC]
     public virtual void Kill() {
-        SpecialKill(false, false, 0);
+        SpecialKill(false, false, false, 0);
     }
 
     [PunRPC]
-    public virtual void SpecialKill(bool right, bool groundpound, int combo) {
+    public virtual void SpecialKill(bool right, bool groundpound, bool fireball, int combo) {
         if (dead)
             return;
 
@@ -187,7 +187,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         if (groundpound)
             Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.up * 0.5f, Quaternion.identity);
 
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient && fireball)
             PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + Vector2.up * 0.5f, Quaternion.identity);
 
         body.velocity = new(2f * (right ? 1 : -1), 2.5f);

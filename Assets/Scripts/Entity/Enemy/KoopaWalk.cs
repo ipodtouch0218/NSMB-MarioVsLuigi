@@ -139,9 +139,9 @@ public class KoopaWalk : HoldableEntity {
         case "goomba":
             if (killa.dead)
                 break;
-            killa.photonView.RPC(nameof(SpecialKill), RpcTarget.All, killa.body.position.x > body.position.x, false, combo++);
+            killa.photonView.RPC(nameof(SpecialKill), RpcTarget.All, killa.body.position.x > body.position.x, false, false, combo++);
             if (holder)
-                photonView.RPC(nameof(SpecialKill), RpcTarget.All, killa.body.position.x < body.position.x, false, combo++);
+                photonView.RPC(nameof(SpecialKill), RpcTarget.All, killa.body.position.x < body.position.x, false, false, combo++);
             break;
         case "piranhaplant":
             if (killa.dead)
@@ -185,7 +185,7 @@ public class KoopaWalk : HoldableEntity {
             bool originalFacing = player.facingRight;
             if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.photonView.RPC(nameof(PlayerController.Knockback), RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
-            photonView.RPC(nameof(SpecialKill), RpcTarget.All, !originalFacing, false, player.StarCombo++);
+            photonView.RPC(nameof(SpecialKill), RpcTarget.All, !originalFacing, false, false, player.StarCombo++);
         } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC(nameof(EnterShell), RpcTarget.All);
             if (!blue) {
@@ -368,8 +368,8 @@ public class KoopaWalk : HoldableEntity {
     }
 
     [PunRPC]
-    public override void SpecialKill(bool right, bool groundpound, int combo) {
-        base.SpecialKill(right, groundpound, combo);
+    public override void SpecialKill(bool right, bool groundpound, bool fireball, int combo) {
+        base.SpecialKill(right, groundpound, fireball, combo);
         shell = true;
         if (holder)
             holder.photonView.RPC("SetHolding", RpcTarget.All, -1);

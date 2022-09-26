@@ -69,7 +69,7 @@ public class BobombWalk : HoldableEntity {
         if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
             photonView.RPC("SetLeft", RpcTarget.All, damageDirection.x > 0);
         } else if (player.sliding || player.inShell || player.invincible > 0) {
-            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false, player.StarCombo++);
+            photonView.RPC("SpecialKill", RpcTarget.All, player.body.velocity.x > 0, false, false, player.StarCombo++);
             return;
         } else if (attackedFromAbove && !lit) {
             if (player.state != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
@@ -154,7 +154,7 @@ public class BobombWalk : HoldableEntity {
                 continue;
 
             if (obj.GetComponent<KillableEntity>() is KillableEntity en) {
-                en.photonView.RPC("SpecialKill", RpcTarget.All, transform.position.x < obj.transform.position.x, false, 0);
+                en.photonView.RPC("SpecialKill", RpcTarget.All, transform.position.x < obj.transform.position.x, false, false, 0);
                 continue;
             }
 

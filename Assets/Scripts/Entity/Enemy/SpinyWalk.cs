@@ -19,7 +19,7 @@ public class SpinyWalk : KoopaWalk {
                 //Do knockback to player, colliding with us in shell going opposite ways
                 player.photonView.RPC("Knockback", RpcTarget.All, player.body.position.x < body.position.x, 0, photonView.ViewID);
 
-            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, player.StarCombo++);
+            photonView.RPC("SpecialKill", RpcTarget.All, !originalFacing, false, false, player.StarCombo++);
         } else if (!holder) {
             if (shell) {
                 if (IsStationary) {

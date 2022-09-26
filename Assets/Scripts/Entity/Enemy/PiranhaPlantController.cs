@@ -85,13 +85,13 @@ public class PiranhaPlantController : KillableEntity {
         dead = true;
         hitbox.enabled = false;
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, upsideDown ? -0.5f : 0.5f, 0), Quaternion.identity);
-        if (photonView.IsMine)
-            PhotonNetwork.Instantiate("Prefabs/LooseCoin", transform.position + new Vector3(0, upsideDown ? -1f : 1f, 0), Quaternion.identity);
     }
 
     [PunRPC]
-    public override void SpecialKill(bool right, bool groundpound, int combo) {
+    public override void SpecialKill(bool right, bool groundpound, bool fireball, int combo) {
         Kill();
+        if (photonView.IsMine && fireball)
+            PhotonNetwork.Instantiate("Prefabs/LooseCoin", transform.position + new Vector3(0, upsideDown ? -1f : 1f, 0), Quaternion.identity);
     }
 
     private void OnDrawGizmosSelected() {

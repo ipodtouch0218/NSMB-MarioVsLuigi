@@ -44,7 +44,7 @@ public abstract class InteractableTile : AnimatedTile {
             case "goomba": {
                 if (!obj.GetPhotonView())
                     continue;
-                obj.GetPhotonView().RPC(nameof(KillableEntity.SpecialKill), RpcTarget.All, obj.transform.position.x < worldLocation.x, false, 0);
+                obj.GetPhotonView().RPC(nameof(KillableEntity.SpecialKill), RpcTarget.All, obj.transform.position.x < worldLocation.x, false, false, 0);
                 continue;
             }
             case "loosecoin":

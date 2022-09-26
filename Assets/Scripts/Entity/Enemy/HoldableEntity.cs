@@ -53,14 +53,14 @@ public abstract class HoldableEntity : KillableEntity {
     }
 
     [PunRPC]
-    public override void SpecialKill(bool right, bool groundpound, int combo) {
+    public override void SpecialKill(bool right, bool groundpound, bool fireball, int combo) {
         if (dead)
             return;
 
         if (holder)
             holder.SetHolding(-1);
 
-        base.SpecialKill(right, groundpound, combo);
+        base.SpecialKill(right, groundpound, fireball, combo);
     }
     #endregion
 }
