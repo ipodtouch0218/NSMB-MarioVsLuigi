@@ -6,7 +6,7 @@ using Fusion;
 public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
     //---Networked Variables
-    [Networked] public NetworkBool FacingRight { get; set; } = true;
+    [Networked] public NetworkBool FacingRight { get; set; } = false;
 
     //---Components
     [NonSerialized] public Rigidbody2D body;

@@ -166,6 +166,9 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     public override void InteractWithPlayer(PlayerController player) {
 
+        if (!FollowEndTimer.ExpiredOrNotRunning(Runner))
+            return;
+
         if (!IgnorePlayerTimer.ExpiredOrNotRunning(Runner))
             return;
 

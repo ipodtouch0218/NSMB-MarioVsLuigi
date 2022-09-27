@@ -53,6 +53,7 @@ public class UIUpdater : MonoBehaviour {
     }
 
     public void Update() {
+
         pingSample = Mathf.Lerp(pingSample, CurrentPing, Mathf.Clamp01(Time.unscaledDeltaTime));
         if (pingSample == float.NaN)
             pingSample = 0;
@@ -72,8 +73,10 @@ public class UIUpdater : MonoBehaviour {
         if (uiHidden)
             ToggleUI(false);
 
-        UpdateStoredItemUI();
-        UpdateTextUI();
+        if (Runner.IsForward) {
+            UpdateStoredItemUI();
+            UpdateTextUI();
+        }
     }
 
     private void ToggleUI(bool hidden) {

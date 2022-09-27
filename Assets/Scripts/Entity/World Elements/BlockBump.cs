@@ -55,7 +55,6 @@ public class BlockBump : NetworkBehaviour {
     }
 
     public void Kill() {
-        Runner.Despawn(Object);
 
         Tilemap tm = GameManager.Instance.tilemap;
         Vector3Int loc = Utils.WorldToTilemapPosition(transform.position);
@@ -63,10 +62,13 @@ public class BlockBump : NetworkBehaviour {
         TileBase tile = Resources.Load("Tilemaps/Tiles/" + ResultTile) as TileBase;
         tm.SetTile(loc, tile);
 
-        if (SpawnPrefab == NetworkPrefabRef.Empty)
+        if (SpawnPrefab == NetworkPrefabRef.Empty) {
+            Runner.Despawn(Object);
             return;
+        }
 
         Vector3 pos = transform.position + Vector3.up * (IsDownwards ? -0.7f : 0.25f);
         Runner.Spawn(SpawnPrefab, pos + (Vector3) SpawnOffset);
+        Runner.Despawn(Object);
     }
 }

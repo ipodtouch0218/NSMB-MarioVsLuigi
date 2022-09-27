@@ -15,6 +15,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     private static GameObject prefab;
     public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us" };
+    private static string CurrentRegion;
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
 
@@ -69,8 +70,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public delegate void OnUserSimulationMessageDelegate(NetworkRunner runner, SimulationMessagePtr message);
     public static event OnUserSimulationMessageDelegate OnUserSimulationMessage;
 
+    public delegate void OnLobbyConnectDelegate(NetworkRunner runner, LobbyInfo lobby);
+    public static event OnLobbyConnectDelegate OnLobbyConnect;
+
+    public delegate void OnJoinSessionFailedDelegate(NetworkRunner runner, ShutdownReason reason);
+    public static event OnJoinSessionFailedDelegate OnJoinSessionFailed;
+
     public NetworkRunner runner;
-    private static string currentRegion = "us";
 
     #region NetworkRunner Callbacks
     void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {
@@ -103,7 +109,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             request.Refuse();
     }
     void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner) {
-        Debug.Log("[Network] Disconnected from Lobby");
+        Debug.Log("[Network] Disconnected from Server");
 
         OnDisconnectedFromServer?.Invoke(runner);
     }
@@ -223,6 +229,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if ((Runner.SessionInfo.IsValid || Runner.LobbyInfo.IsValid) && !Runner.IsShutdown)
             await Runner.Shutdown();
 
+        if (string.IsNullOrEmpty(region)) {
+            Debug.Log("[Network] Connecting to lobby with best ping.");
+        } else {
+            Debug.Log($"[Network] Connecting to lobby {region}");
+        }
+
         //version separation
         PhotonAppSettings.Instance.AppSettings.AppVersion = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value;
         PhotonAppSettings.Instance.AppSettings.EnableLobbyStatistics = true;
@@ -233,7 +245,15 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         AuthenticationValues authValues = await Authenticate();
 
         //And join lobby
-        return await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues);
+        StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues);
+        if (result.Ok) {
+            CurrentRegion = Runner.LobbyInfo.Region;
+
+            Debug.Log($"[Network] Connected to lobby in {CurrentRegion} region");
+            OnLobbyConnect?.Invoke(Runner, Runner.LobbyInfo);
+        }
+
+        return result;
     }
 
     public static async Task<StartGameResult> CreateRoom(StartGameArgs args) {
@@ -241,7 +261,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         StringBuilder idBuilder = new();
 
         //first char should correspond to region.
-        int index = Array.IndexOf(Regions, currentRegion);
+        int index = Array.IndexOf(Regions, CurrentRegion);
         idBuilder.Append(RoomIdValidChars[index]);
 
         //fill rest of the string with random chars
@@ -262,16 +282,24 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         //make sure that we're on the right region...
         string targetRegion = Regions[RoomIdValidChars.IndexOf(roomId[0])];
 
-        if (currentRegion != targetRegion) {
+        if (CurrentRegion != targetRegion) {
             //change regions
             await ConnectToRegion(targetRegion);
         }
 
+        Debug.Log($"[Network] Attempting to join game with ID: {roomId}");
         //attempt to join the room
-        return await Runner.StartGame(new() {
+        StartGameResult result = await Runner.StartGame(new() {
             GameMode = GameMode.Client,
             SessionName = roomId,
         });
+        Debug.Log(result.ShutdownReason);
+        if (!result.Ok) {
+            OnJoinSessionFailed?.Invoke(Runner, result.ShutdownReason);
+            //automatically go back to the lobby.
+        }
+
+        return result;
     }
     #endregion
 }

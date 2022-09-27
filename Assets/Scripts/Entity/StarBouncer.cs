@@ -98,10 +98,6 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Render() {
-        if (IsStationary || (GameManager.Instance?.gameover ?? false))
-            return;
-
-        graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
     }
 
     public override void FixedUpdateNetwork() {
@@ -113,6 +109,9 @@ public class StarBouncer : CollectableEntity {
             body.isKinematic = true;
             return;
         }
+
+        Debug.Log(graphicTransform);
+        graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Runner.DeltaTime), Space.Self);
 
         if (DespawnTimer.Expired(Runner)) {
             Despawn();
@@ -165,11 +164,17 @@ public class StarBouncer : CollectableEntity {
         GameManager.Instance.CheckForWinner();
 
         //graphics / fx
-        player.PlaySoundEverywhere(Object.HasInputAuthority ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
-        Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+        Rpc_PlayCollectEffects(player);
 
         //despawn
         Runner.Despawn(Object, true);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void Rpc_PlayCollectEffects(PlayerController collector) {
+
+        collector.PlaySoundEverywhere(collector.Object.HasInputAuthority ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
+        Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
     }
 
     private IEnumerator PulseEffect() {

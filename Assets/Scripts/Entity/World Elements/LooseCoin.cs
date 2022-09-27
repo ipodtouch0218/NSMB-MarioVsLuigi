@@ -65,9 +65,9 @@ public class LooseCoin : Coin {
         prevFrameVelocity = body.velocity;
     }
 
-    public override void InteractWithPlayer(PlayerController player) {
-        base.InteractWithPlayer(player);
-        Runner.Despawn(Object);
+    public override void OnCollectedChanged() {
+        if (IsCollected)
+            Runner.Despawn(Object);
     }
 
     // DEBUG & GIZMOS

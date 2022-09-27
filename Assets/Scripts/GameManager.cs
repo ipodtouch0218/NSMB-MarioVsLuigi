@@ -306,10 +306,6 @@ public class GameManager : NetworkBehaviour {
         //by default, spectate. when we get assigned a player object, we disable it there.
         spectationManager.Spectating = true;
 
-        //start RNG
-        if (Runner.IsServer)
-            Random = new(UnityEngine.Random.Range(int.MinValue, int.MaxValue));
-
         //Load + enable player controls
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
         Runner.ProvideInput = true;
@@ -583,6 +579,8 @@ public class GameManager : NetworkBehaviour {
         //        return;
         //    }
         //}
+
+        Random = new(Runner.Simulation.Tick);
 
         if (BigStarRespawnTimer.Expired(Runner)) {
             BigStarRespawnTimer = TickTimer.None;

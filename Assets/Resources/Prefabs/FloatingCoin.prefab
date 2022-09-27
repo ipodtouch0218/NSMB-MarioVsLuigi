@@ -9,12 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5780648777663731100}
+  - component: {fileID: 8516101862555970818}
   - component: {fileID: 5780648777663731099}
   - component: {fileID: -4656064841297145525}
   - component: {fileID: 5780648777663731098}
   - component: {fileID: 8712797713821691440}
-  - component: {fileID: 8516101862555970818}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: FloatingCoin
   m_TagString: coin
   m_Icon: {fileID: 0}
@@ -36,6 +36,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8516101862555970818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780648777663731097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95f73930430b17c46a5dbc64cde167be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _FacingRight:
+    _value: 1
+  _IsCollected:
+    _value: 0
 --- !u!212 &5780648777663731099
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -99,7 +116,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -159,20 +176,3 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 8516101862555970818}
   SimulationBehaviours: []
---- !u!114 &8516101862555970818
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5780648777663731097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95f73930430b17c46a5dbc64cde167be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  _FacingRight:
-    _value: 1
-  _IsCollected:
-    _value: 0

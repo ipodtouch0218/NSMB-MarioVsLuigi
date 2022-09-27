@@ -10,7 +10,5 @@ public abstract class CollectableEntity : BasicEntity, IPlayerInteractable {
         changed.Behaviour.OnCollectedChanged();
     }
 
-    public virtual void OnCollectedChanged() {
-
-    }
+    public virtual void OnCollectedChanged() {}
 }

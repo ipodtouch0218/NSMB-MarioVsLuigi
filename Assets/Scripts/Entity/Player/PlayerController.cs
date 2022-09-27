@@ -377,14 +377,20 @@ public class PlayerController : FreezableEntity {
 
     private readonly Collider2D[] results = new Collider2D[64];
     private readonly Collider2D[] tempResults = new Collider2D[64];
+    private static ContactFilter2D filter;
+
     private void CheckForEntityCollision() {
         //Don't check for collisions if we're dead, frozen, in a pipe, etc.
         if (IsDead || IsFrozen || pipeEntering)
             return;
 
+        if (!filter.useLayerMask) {
+            filter.SetLayerMask((int) (((uint) ((1 << Layers.LayerPlayer) | (1 << Layers.LayerGround))) ^ 0xFFFFFFFF));
+        }
+
         int collisions = 0;
         foreach (BoxCollider2D hitbox in hitboxes) {
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, default, tempResults);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, filter, tempResults);
             Array.Copy(tempResults, 0, results, collisions, count);
             collisions += count;
         }
@@ -395,6 +401,8 @@ public class PlayerController : FreezableEntity {
             //don't interact with objects we're holding.
             if (HeldEntity && HeldEntity.gameObject == collidedObject)
                 continue;
+
+            Debug.Log(collidedObject);
 
             if (collidedObject.TryGetComponent(out IPlayerInteractable interactable))
                 interactable.InteractWithPlayer(this);
@@ -800,6 +808,13 @@ public class PlayerController : FreezableEntity {
 
 
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void Rpc_SpawnCoinEffects(Vector3 position, byte coins) {
+        PlaySound(Enums.Sounds.World_Coin_Collect);
+        NumberParticle num = Instantiate(PrefabList.Instance.Particle_CoinNumber, position, Quaternion.identity).GetComponentInChildren<NumberParticle>();
+        num.ApplyColorAndText(Utils.GetSymbolString(coins.ToString(), Utils.numberSymbols), animationController.GlowColor);
+    }
+
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, InvokeResim = true)]
     public void RPC_SpawnReserveItem() {
         if (StoredPowerup == Enums.PowerupState.None)
@@ -814,7 +829,7 @@ public class PlayerController : FreezableEntity {
         if (prefab == NetworkPrefabRef.Empty)
             prefab = Utils.GetRandomItem(Runner, this).prefab;
 
-        Runner.Spawn(prefab, body.position + Vector2.up * 5f, onBeforeSpawned: (runner, obj) => {
+        Runner.Spawn(prefab, new(body.position.x, cameraController.currentPosition.y + 1.68f, 0), onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(this, 0f);
         });
         PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
@@ -1213,10 +1228,11 @@ public class PlayerController : FreezableEntity {
         }
 
         HeldEntity = entity;
-        HeldEntity.Holder = this;
-        HeldEntity.PreviousHolder = null;
 
         if (HeldEntity != null) {
+            HeldEntity.Holder = this;
+            HeldEntity.PreviousHolder = null;
+
             if (HeldEntity is FrozenCube) {
                 animator.Play("head-pickup");
                 animator.ResetTrigger("fireball");

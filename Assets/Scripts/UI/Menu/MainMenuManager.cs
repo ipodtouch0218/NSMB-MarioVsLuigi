@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,9 +8,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
+using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
-using Fusion;
 
 public class MainMenuManager : MonoBehaviour {
 
@@ -64,24 +65,27 @@ public class MainMenuManager : MonoBehaviour {
 
     // LOBBY CALLBACKS
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
-        List<string> invalidRooms = new();
+
+        List<string> invalidRooms = sessionList.Select(si => si.Name).ToList();
 
         foreach (SessionInfo session in sessionList) {
 
             Utils.GetSessionProperty(session, Enums.NetRoomProperties.Lives, out int lives);
             Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
             Utils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
+            Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string host);
 
             bool valid = true;
             valid &= session.IsVisible && session.IsOpen;
-            valid &= session.MaxPlayers > 0 && session.MaxPlayers < 10;
+            valid &= session.MaxPlayers > 0 && session.MaxPlayers <= 10;
             valid &= lives <= 99;
             valid &= stars >= 1 && stars <= 99;
             valid &= coins >= 1 && coins <= 99;
-            //valid &= host.IsValidUsername();
+            valid &= host.IsValidUsername();
 
-            if (!valid) {
-                invalidRooms.Add(session.Name);
+            if (valid) {
+                invalidRooms.Remove(session.Name);
+            } else {
                 continue;
             }
 
@@ -115,7 +119,14 @@ public class MainMenuManager : MonoBehaviour {
             selectedRoom = null;
         }
 
-        privateJoinRoom.transform.SetAsLastSibling();
+        privateJoinRoom.transform.SetAsFirstSibling();
+    }
+
+    public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
+        int index = Array.IndexOf(NetworkHandler.Regions, info.Region);
+
+        if (index != -1)
+            region.SetValueWithoutNotify(index);
     }
 
     // ROOM CALLBACKS
@@ -233,7 +244,7 @@ public class MainMenuManager : MonoBehaviour {
             GlobalController.Instance.disconnectCause = null;
         }
 
-        Camera.main.transform.position = levelCameraPositions[Random.Range(0, maps.Count)].transform.position;
+        Camera.main.transform.position = levelCameraPositions[UnityEngine.Random.Range(0, maps.Count)].transform.position;
         levelDropdown.AddOptions(maps);
 
         //Photon stuff.
@@ -304,15 +315,19 @@ public class MainMenuManager : MonoBehaviour {
     public void OnEnable() {
         NetworkHandler.OnPlayerJoined += OnPlayerJoined;
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect += OnLobbyConnect;
         NetworkHandler.OnSessionListUpdated += OnSessionListUpdated;
         NetworkHandler.OnShutdown += OnShutdown;
+        NetworkHandler.OnJoinSessionFailed += OnShutdown;
     }
 
     public void OnDisable() {
         NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
         NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
         NetworkHandler.OnSessionListUpdated -= OnSessionListUpdated;
         NetworkHandler.OnShutdown -= OnShutdown;
+        NetworkHandler.OnJoinSessionFailed -= OnShutdown;
     }
 
     public void Update() {
@@ -326,10 +341,7 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void EnterRoom() {
-
         SessionInfo session = Runner.SessionInfo;
-
-        Debug.Log(session + " - " + session.IsValid + " - " + session.Properties);
 
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool started);
         if (started) {

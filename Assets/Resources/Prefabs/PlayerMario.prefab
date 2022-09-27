@@ -141,7 +141,7 @@ GameObject:
   - component: {fileID: 5963926363534668188}
   - component: {fileID: 4685273836918269365}
   - component: {fileID: 1541702763616586234}
-  m_Layer: 9
+  m_Layer: 6
   m_Name: GroundHitboxes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10932,13 +10932,13 @@ MonoBehaviour:
   m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  _interpolationDataSource: 2
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 0}
   InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
-    MaxRate: 10
+    MaxRate: 45
     PosBlendStart: 0.25
     PosBlendEnd: 1
     PosMinCorrection: 0.025
