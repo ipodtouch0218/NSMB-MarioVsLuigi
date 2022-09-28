@@ -55,7 +55,7 @@ public class PlayerAnimationController : MonoBehaviour {
 
         PlayerData data = controller.Object.InputAuthority.GetPlayerData(controller.Runner);
         PlayerColorSet colorSet = GlobalController.Instance.skins[data.SkinIndex];
-        PlayerColors colors = colorSet.GetPlayerColors(controller.character);
+        PlayerColors colors = colorSet.GetPlayerColors(controller.data.GetCharacterData());
         primaryColor = colors.overallsColor.linear;
         secondaryColor = colors.hatColor.linear;
     }
@@ -109,7 +109,7 @@ public class PlayerAnimationController : MonoBehaviour {
                     instant = true;
                     changeFacing = true;
                 } else if (controller.flying || controller.propeller) {
-                    targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(controller.Runner) ?? 0f) * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer <= 0 && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
+                    targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(controller.Runner) ?? 0f) * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer.Expired(controller.Runner) && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
                     instant = true;
                 } else {
                     targetEuler = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
@@ -191,7 +191,7 @@ public class PlayerAnimationController : MonoBehaviour {
         animator.SetBool("invincible", controller.IsStarmanInvincible);
         animator.SetBool("skidding", controller.skidding);
         animator.SetBool("propeller", controller.propeller);
-        animator.SetBool("propellerSpin", controller.propellerSpinTimer > 0);
+        animator.SetBool("propellerSpin", !controller.propellerSpinTimer.ExpiredOrNotRunning(controller.Runner));
         animator.SetBool("crouching", controller.crouching);
         animator.SetBool("groundpound", controller.groundpound);
         animator.SetBool("sliding", controller.sliding);
@@ -224,7 +224,7 @@ public class PlayerAnimationController : MonoBehaviour {
         animator.SetBool("blueshell", controller.State == Enums.PowerupState.BlueShell);
         animator.SetBool("mini", controller.State == Enums.PowerupState.MiniMushroom);
         animator.SetBool("mega", controller.State == Enums.PowerupState.MegaMushroom);
-        animator.SetBool("inShell", controller.inShell || (controller.State == Enums.PowerupState.BlueShell && (controller.crouching || controller.groundpound) && controller.groundpoundCounter <= 0.15f));
+        animator.SetBool("inShell", controller.inShell || (controller.State == Enums.PowerupState.BlueShell && (controller.crouching || controller.groundpound) && (controller.GroundpoundStartTimer.RemainingTime(controller.Runner) ?? 0f) <= 0.15f));
 
 
         if (!controller.GiantEndTimer.ExpiredOrNotRunning(controller.Runner)) {
@@ -284,7 +284,7 @@ public class PlayerAnimationController : MonoBehaviour {
         largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(0).IsName("in-shell"));
         propellerHelmet.SetActive(controller.State == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
-        animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
+        animator.runtimeAnimatorController = large ? controller.data.GetCharacterData().largeOverrides : controller.data.GetCharacterData().smallOverrides;
 
         //HandleDeathAnimation();
         HandlePipeAnimation();

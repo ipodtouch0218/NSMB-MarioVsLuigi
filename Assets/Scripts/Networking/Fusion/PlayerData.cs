@@ -5,8 +5,9 @@ using UnityEngine;
 using NSMB.Extensions;
 using NSMB.Utils;
 using Fusion;
+using System.Text;
 
-public class PlayerData : NetworkBehaviour {
+public class PlayerData : NetworkBehaviour, IPredictedSpawnBehaviour {
 
     //---Static stuffs
     //TODO: change to "game started" somehow
@@ -37,14 +38,18 @@ public class PlayerData : NetworkBehaviour {
         //keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
+
+
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.
-            Rpc_SetNickname(Settings.Instance.nickname);
             Rpc_SetCharacterIndex(Settings.Instance.character);
             Rpc_SetSkinIndex(Settings.Instance.skin);
         }
 
         if (Runner.IsServer) {
+            string nickname = Encoding.Unicode.GetString(Runner.GetPlayerConnectionToken(Object.InputAuthority));
+            SetNickname(nickname);
+
             //expose their userid
             //TOOD: use an auth-server signed userid, to disallow userid spoofing.
             UserId = Runner.GetPlayerUserId(Object.InputAuthority)?.Replace("-", "");
@@ -63,19 +68,12 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnLoadStateChanged(Changed<PlayerData> changed) {
-        Debug.Log("Change state loaded");
         if (GameManager.Instance)
             GameManager.Instance.OnPlayerLoaded();
     }
 
     #region RPCs
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void Rpc_SetNickname(string name) {
-        Debug.Log("RPC: " + name);
-        //don't allow changing nicknames after we've already set it.
-        if (IsNicknameSet)
-            return;
-
+    public void SetNickname(string name) {
         //limit nickname to valid characters only.
         name = Regex.Replace(name, @"[^\p{L}\d]", "");
 
@@ -146,5 +144,15 @@ public class PlayerData : NetworkBehaviour {
 
         IsLoaded = true;
     }
+
+    public void PredictedSpawnSpawned() => Spawned();
+
+    public void PredictedSpawnUpdate() { }
+
+    public void PredictedSpawnRender() { }
+
+    public void PredictedSpawnFailed() { }
+
+    public void PredictedSpawnSuccess() { }
     #endregion
 }

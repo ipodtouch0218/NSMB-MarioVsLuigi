@@ -143,7 +143,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         if (runner.IsServer) {
             //create player data
-            runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
+            runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, predictionKey: new() { Byte0 = (byte) Runner.Simulation.Tick, Byte1 = (byte) player.RawEncoded });
         }
 
         GlobalController.Instance.DiscordController.UpdateActivity();
@@ -270,6 +270,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         args.GameMode = GameMode.Host;
         args.SessionName = idBuilder.ToString();
+        args.ConnectionToken = Encoding.Unicode.GetBytes(Settings.Instance.nickname);
         args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
         args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.nickname;
@@ -292,6 +293,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         StartGameResult result = await Runner.StartGame(new() {
             GameMode = GameMode.Client,
             SessionName = roomId,
+            ConnectionToken = Encoding.Unicode.GetBytes(Settings.Instance.nickname)
         });
         Debug.Log(result.ShutdownReason);
         if (!result.Ok) {

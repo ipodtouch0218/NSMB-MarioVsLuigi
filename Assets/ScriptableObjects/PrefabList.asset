@@ -17,7 +17,7 @@ MonoBehaviour:
   Obj_Fireball:
     RawGuidValue: 00a2ef66a322a694c837b29404f2af49
   Obj_Iceball:
-    RawGuidValue: c57433d2daa34524c9b41fbf944b0ba3
+    RawGuidValue: 19874e34cb6a977408f6f23de900aeb0
   Obj_LooseCoin:
     RawGuidValue: 3653cb6036ba9aa43a6ca2e8de135243
   Obj_BigStar:

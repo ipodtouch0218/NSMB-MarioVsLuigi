@@ -152,6 +152,21 @@
             <param name="baseJson">JSON output of "JsonUtility.ToJson" call</param>
             <returns>Same JSON but without the "referenes" object</returns>
         </member>
+        <member name="F:Fusion.Log.LogLevel">
+            <summary>
+            Set the Log Level based on the severity of the Log.
+            
+            Default: <see cref="F:Fusion.LogType.Debug"/>
+            </summary>
+        </member>
+        <member name="M:Fusion.Log.Init(Fusion.ILogger,Fusion.LogType)">
+            <summary>
+            Initialize the Log class with a Custom Logger implementation.
+            It will change the current <see cref="F:Fusion.Log.LogLevel"/> to <see cref="F:Fusion.LogType.Debug"/> by default when called.
+            </summary>
+            <param name="logger">Custom Logger Implementation</param>
+            <param name="LogLevel">New LogLevel</param>
+        </member>
         <member name="M:Fusion.Profiling.FusionSamplers.IncrementFrame">
             <summary>
             Instructs all sub-Samplers to register a frame change. The next Add will go to the next frame section.

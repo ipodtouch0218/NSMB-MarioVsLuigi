@@ -457,6 +457,11 @@
             Implements STUN message. Defined in RFC 3489.
             </summary>
         </member>
+        <member name="P:Fusion.Sockets.Stun.StunMessage.StunMessageTypeValues">
+            <summary>
+            Cache Stun Message Types
+            </summary>
+        </member>
         <member name="T:Fusion.Sockets.Stun.StunMessage.StunMessageType">
             <summary>
             STUN Message Type

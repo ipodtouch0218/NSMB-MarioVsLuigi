@@ -18,7 +18,7 @@ public class UIUpdater : MonoBehaviour {
     public float pingSample = 0;
 
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
-    private int CurrentPing => (int) (Runner.GetPlayerRtt(localPlayer) / 1000f);
+    private int CurrentPing => (int) (Runner.GetPlayerRtt(localPlayer) * 1000f);
 
 
     private Material timerMaterial;

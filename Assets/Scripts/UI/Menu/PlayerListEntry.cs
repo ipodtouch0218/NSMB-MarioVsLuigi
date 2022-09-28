@@ -48,7 +48,7 @@ public class PlayerListEntry : MonoBehaviour {
             permissionSymbol += "<sprite=5>";
             pingText.text = "";
         } else {
-            int ping = (int) runner.GetPlayerRtt(player);
+            int ping = (int) (runner.GetPlayerRtt(player) * 1000);
             string pingColor;
             if (ping < 0) {
                 pingColor = "black";

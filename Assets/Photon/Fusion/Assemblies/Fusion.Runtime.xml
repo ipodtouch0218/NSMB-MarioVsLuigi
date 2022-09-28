@@ -2078,6 +2078,157 @@
             The default behaviour interfaces
             </summary>
         </member>
+        <member name="T:Fusion.NetworkPosition">
+            <summary>
+            Replicates a Unity Transform's position state from the <see cref="P:Fusion.NetworkObject.StateAuthority"/> to all other peers.
+            Rotation is NOT networked. For that, see <see cref="T:Fusion.NetworkPositionRotation"/> or <see cref="T:Fusion.NetworkTransform"/>.
+            A <see cref="T:Fusion.NetworkObject"/> is required on this GameObject or a parent of this GameObject.
+            <remarks>
+            This component does not interpolate visuals. In order to do that, use a <see cref="T:Fusion.NetworkTransform"/>.
+            </remarks>
+            </summary>
+        </member>
+        <member name="P:Fusion.NetworkPosition.Transform">
+            <summary>
+            Cached GameObject.transform reference.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.Awake">
+            <summary>
+            Implements Unity's Awake event function.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.OnEnable">
+            <summary>
+            Implements Unity's OnEnable event function.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.Spawned">
+            <summary>
+            Overrides <see cref="M:Fusion.NetworkBehaviour.Spawned"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.BeforeUpdate">
+            <summary>
+            Implements <see cref="T:Fusion.IBeforeUpdate"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.BeforeAllTicks(System.Boolean,System.Int32)">
+            <summary>
+            Implements <see cref="T:Fusion.IBeforeAllTicks"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            To extend the functionality of copying data from the networked buffer to the engine,
+            override and extend <see cref="M:Fusion.NetworkPosition.CopyFromBufferToEngine"/> instead.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.AfterAllTicks(System.Boolean,System.Int32)">
+            <summary>
+            Implements <see cref="T:Fusion.IAfterAllTicks"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            To extend the functionality of copying data from the engine to the networked buffer,
+            override and extend <see cref="M:Fusion.NetworkPosition.CopyFromEngineToBuffer"/> instead.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.RemotePrefabCreated">
+            <summary>
+            Implements <see cref="T:Fusion.IRemotePrefabCreated"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.BeforeCopyPreviousState">
+            <summary>
+            Implements <see cref="T:Fusion.IBeforeCopyPreviousState"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.CopyBackingFieldsToState(System.Boolean)">
+            <summary>
+            Implements <see cref="M:Fusion.NetworkBehaviour.CopyBackingFieldsToState(System.Boolean)"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.CopyFromBufferToEngine">
+            <summary>
+            Sets the position value retrieved from the networked data to the engine's position field.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.CopyFromEngineToBuffer">
+            <summary>
+            Sets the position value retrieved from the engine (Unity) to the respective networked field.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.GetEnginePosition">
+            <summary>
+            Gets the position value from the engine. By default, the world position is set to be the output.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.SetEnginePosition(UnityEngine.Vector3)">
+            <summary>
+            Sets a position value to the engine. By default, the value is set to the transform's world position field.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.AfterHostMigration">
+            <inheritdoc cref="M:Fusion.IAfterHostMigration.AfterHostMigration"/>
+        </member>
+        <member name="F:Fusion.NetworkPosition.WORD_COUNT_NPOS">
+            <summary>
+            Number of words used by a <see cref="T:Fusion.NetworkPosition"/> instance on its networked data,
+            including all inherited fields.
+            </summary>
+        </member>
+        <member name="P:Fusion.NetworkPosition.BaseWordCount">
+            <summary>
+            Number of words used by this class on the networked data buffer, including all inherited fields,
+            to serve for reference to inheritors.
+            </summary>
+        </member>
+        <member name="P:Fusion.NetworkPosition.PositionWordOffset">
+            <summary>
+            Implements <see cref="T:Fusion.NetworkAreaOfInterestBehaviour"/> by defining the word offset from the base pointer to the field that carries the position data used for Area of Interest management.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.ReadPosition">
+            <summary>
+            Reads from the position field on this object's networked data
+            with the default Runner position read accuracy.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.ReadPosition(System.Int32*)">
+            <summary>
+            Reads from a position field on the networked data pointed by <paramref name="ptr"/>
+            with the default Runner position read accuracy.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.ReadPosition(System.Int32*,Fusion.ReadAccuracy)">
+            <summary>
+            Reads from a position field on the networked data pointed by <paramref name="ptr"/>
+            with the defined <paramref name="readAccuracy"/>.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.WritePosition(UnityEngine.Vector3)">
+            <summary>
+            Writes to a position field on this object's networked data
+            with the default Runner position write accuracy.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.WritePosition(UnityEngine.Vector3,System.Int32*)">
+            <summary>
+            Writes to a position field on the networked data pointed by <paramref name="ptr"/>
+            with the default Runner position write accuracy.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkPosition.WritePosition(UnityEngine.Vector3,System.Int32*,Fusion.WriteAccuracy)">
+            <summary>
+            Writes to a position field on the networked data pointed by <paramref name="ptr"/>
+            with the defined <paramref name="writeAccuracy"/>.
+            </summary>
+        </member>
         <member name="T:Fusion.NetworkPositionRotation">
             <summary>
             Replicates a Unity Transform's position and rotation states from the <see cref="P:Fusion.NetworkObject.StateAuthority"/> to all other peers.
@@ -2086,69 +2237,6 @@
             <remarks>
             This component does not interpolate visuals. In order to do that, use a <see cref="T:Fusion.NetworkTransform"/>.
             </remarks>
-            </summary>
-        </member>
-        <member name="P:Fusion.NetworkPositionRotation.Transform">
-            <summary>
-            Cached GameObject.transform reference.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.Awake">
-            <summary>
-            Implements Unity's Awake event function.
-            If overriding this method in an inheritor, the base method should be called.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.OnEnable">
-            <summary>
-            Implements Unity's OnEnable event function.
-            If overriding this method in an inheritor, the base method should be called.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.Spawned">
-            <summary>
-            Overrides <see cref="M:Fusion.NetworkBehaviour.Spawned"/>.
-            If overriding this method in an inheritor, the base method should be called.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.BeforeUpdate">
-            <summary>
-            Implements <see cref="T:Fusion.IBeforeUpdate"/>.
-            If overriding this method in an inheritor, the base method should be called.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.BeforeAllTicks(System.Boolean,System.Int32)">
-            <summary>
-            Implements <see cref="T:Fusion.IBeforeAllTicks"/>.
-            If overriding this method in an inheritor, the base method should be called.
-            To extend the functionality of copying data from the networked buffer to the engine,
-            override and extend <see cref="M:Fusion.NetworkPositionRotation.CopyFromBufferToEngine"/> instead.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.AfterAllTicks(System.Boolean,System.Int32)">
-            <summary>
-            Implements <see cref="T:Fusion.IAfterAllTicks"/>.
-            If overriding this method in an inheritor, the base method should be called.
-            To extend the functionality of copying data from the engine to the networked buffer,
-            override and extend <see cref="M:Fusion.NetworkPositionRotation.CopyFromEngineToBuffer"/> instead.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.RemotePrefabCreated">
-            <summary>
-            Implements <see cref="T:Fusion.IRemotePrefabCreated"/>.
-            If overriding this method in an inheritor, the base method should be called.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.BeforeCopyPreviousState">
-            <summary>
-            Implements <see cref="T:Fusion.IBeforeCopyPreviousState"/>.
-            If overriding this method in an inheritor, the base method should be called.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.CopyBackingFieldsToState(System.Boolean)">
-            <summary>
-            Implements <see cref="M:Fusion.NetworkBehaviour.CopyBackingFieldsToState(System.Boolean)"/>.
-            If overriding this method in an inheritor, the base method should be called.
             </summary>
         </member>
         <member name="M:Fusion.NetworkPositionRotation.CopyFromBufferToEngine">
@@ -2163,28 +2251,15 @@
             If overriding this method in an inheritor, the base method should be called.
             </summary>
         </member>
-        <member name="M:Fusion.NetworkPositionRotation.GetEnginePosition">
-            <summary>
-            Gets the position value from the engine. By default, the world position is set to be the output.
-            </summary>
-        </member>
         <member name="M:Fusion.NetworkPositionRotation.GetEngineRotation">
             <summary>
             Gets the rotation value from the engine. By default, the world rotation is set to be the output.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.SetEnginePosition(UnityEngine.Vector3)">
-            <summary>
-            Sets a position value to the engine. By default, the value is set to the transform's world position field.
             </summary>
         </member>
         <member name="M:Fusion.NetworkPositionRotation.SetEngineRotation(UnityEngine.Quaternion)">
             <summary>
             Sets a rotation value to the engine. By default, the value is set to the transform's world rotation field.
             </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.AfterHostMigration">
-            <inheritdoc cref="M:Fusion.IAfterHostMigration.AfterHostMigration"/>
         </member>
         <member name="F:Fusion.NetworkPositionRotation.WORD_COUNT_NPR">
             <summary>
@@ -2196,29 +2271,6 @@
             <summary>
             Number of words used by this class on the networked data buffer, including all inherited fields,
             to serve for reference to inheritors.
-            </summary>
-        </member>
-        <member name="P:Fusion.NetworkPositionRotation.PositionWordOffset">
-            <summary>
-            Implements <see cref="T:Fusion.NetworkAreaOfInterestBehaviour"/> by defining the word offset from the base pointer to the field that carries the position data used for Area of Interest management.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.ReadPosition">
-            <summary>
-            Reads from the position field on this object's networked data
-            with the default Runner position read accuracy.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.ReadPosition(System.Int32*)">
-            <summary>
-            Reads from a position field on the networked data pointed by <paramref name="ptr"/>
-            with the default Runner position read accuracy.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.ReadPosition(System.Int32*,Fusion.ReadAccuracy)">
-            <summary>
-            Reads from a position field on the networked data pointed by <paramref name="ptr"/>
-            with the defined <paramref name="readAccuracy"/>.
             </summary>
         </member>
         <member name="M:Fusion.NetworkPositionRotation.ReadRotation">
@@ -2237,24 +2289,6 @@
             <summary>
             Reads from a rotation field on the networked data pointed by <paramref name="ptr"/>
             with the defined <paramref name="readAccuracy"/>.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.WritePosition(UnityEngine.Vector3)">
-            <summary>
-            Writes to a position field on this object's networked data
-            with the default Runner position write accuracy.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.WritePosition(UnityEngine.Vector3,System.Int32*)">
-            <summary>
-            Writes to a position field on the networked data pointed by <paramref name="ptr"/>
-            with the default Runner position write accuracy.
-            </summary>
-        </member>
-        <member name="M:Fusion.NetworkPositionRotation.WritePosition(UnityEngine.Vector3,System.Int32*,Fusion.WriteAccuracy)">
-            <summary>
-            Writes to a position field on the networked data pointed by <paramref name="ptr"/>
-            with the defined <paramref name="writeAccuracy"/>.
             </summary>
         </member>
         <member name="M:Fusion.NetworkPositionRotation.WriteRotation(UnityEngine.Quaternion)">
@@ -2318,6 +2352,24 @@
         <member name="M:Fusion.NetworkRigidbody.Spawned">
             <summary>
             Implements <see cref="M:Fusion.NetworkBehaviour.Spawned"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkRigidbody.RemotePrefabCreated">
+            <summary>
+            Implements <see cref="T:Fusion.IRemotePrefabCreated"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkRigidbody.StateAuthorityChanged">
+            <summary>
+            Implements <see cref="T:Fusion.IStateAuthorityChanged"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkRigidbody.CopyBackingFieldsToState(System.Boolean)">
+            <summary>
+            Implements <see cref="M:Fusion.NetworkBehaviour.CopyBackingFieldsToState(System.Boolean)"/>.
             If overriding this method in an inheritor, the base method should be called.
             </summary>
         </member>
@@ -2546,6 +2598,24 @@
         <member name="M:Fusion.NetworkRigidbody2D.Spawned">
             <summary>
             Implements <see cref="M:Fusion.NetworkBehaviour.Spawned"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkRigidbody2D.RemotePrefabCreated">
+            <summary>
+            Implements <see cref="T:Fusion.IRemotePrefabCreated"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkRigidbody2D.StateAuthorityChanged">
+            <summary>
+            Implements <see cref="T:Fusion.IStateAuthorityChanged"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkRigidbody2D.CopyBackingFieldsToState(System.Boolean)">
+            <summary>
+            Implements <see cref="M:Fusion.NetworkBehaviour.CopyBackingFieldsToState(System.Boolean)"/>.
             If overriding this method in an inheritor, the base method should be called.
             </summary>
         </member>
@@ -2825,6 +2895,12 @@
         <member name="M:Fusion.NetworkRigidbodyBase.BeforeCopyPreviousState">
             <summary>
             Implements <see cref="T:Fusion.IBeforeCopyPreviousState"/>.
+            If overriding this method in an inheritor, the base method should be called.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkRigidbodyBase.StateAuthorityChanged">
+            <summary>
+            Implements <see cref="T:Fusion.IStateAuthorityChanged"/>.
             If overriding this method in an inheritor, the base method should be called.
             </summary>
         </member>
@@ -3200,7 +3276,7 @@
         </member>
         <member name="M:Fusion.NetworkTransform.BeforeUpdate">
             <summary>
-            Overrides <see cref="M:Fusion.NetworkPositionRotation.BeforeUpdate"/>.
+            Overrides <see cref="!:NetworkPositionRotation.BeforeUpdate"/>.
             If overriding this method in an inheritor, the base method should be called.
             </summary>
         </member>
@@ -4823,6 +4899,32 @@
             which are then used in the final <b><i>narrowphase</i></b> query.</para>
             </summary>
         </member>
+        <member name="T:Fusion.HitboxRoot.ConfigFlags">
+            <summary>
+            Set of configuration options for a Hitbox Root behaviour.
+            </summary>
+        </member>
+        <member name="F:Fusion.HitboxRoot.ConfigFlags.ReinitializeHitboxesBeforeRegistration">
+            <summary>
+            If the collection of hitboxes under a given root should be re-initialized before the Root is registered
+            in a hitbox snapshot. If disabled, the hitboxes will be used as configured in edit-time.
+            </summary>
+        </member>
+        <member name="F:Fusion.HitboxRoot.ConfigFlags.IncludeInactiveHitboxes">
+            <summary>
+            If Hitboxes on inactive Game Objects should be registered under this root upon initialization.
+            </summary>
+        </member>
+        <member name="F:Fusion.HitboxRoot.ConfigFlags.Legacy">
+            <summary>
+            Set of configuration flags that replicate the behaviour as it was before the flag options were added.
+            </summary>
+        </member>
+        <member name="F:Fusion.HitboxRoot.ConfigFlags.Default">
+            <summary>
+            Ser of configuration flags with the default behaviour, suitable for most use-cases.
+            </summary>
+        </member>
         <member name="P:Fusion.HitboxRoot.HitboxRootActive">
             <summary>
             Get or set the state of this HitboxRoot.
@@ -4832,6 +4934,12 @@
         <member name="F:Fusion.HitboxRoot.MAX_HITBOXES">
             <summary>
             The max number of hitboxes allowed under the same root.
+            </summary>
+        </member>
+        <member name="F:Fusion.HitboxRoot.Config">
+            <summary>
+            Set of configuration options for this Hitbox Root behaviour.
+            Check the API documentation for more details on what each flag represents.
             </summary>
         </member>
         <member name="F:Fusion.HitboxRoot.BroadRadius">
@@ -7603,7 +7711,10 @@
         </member>
         <member name="M:Fusion.NetworkRunner.JoinSessionLobby(Fusion.SessionLobby,System.String,Fusion.Photon.Realtime.AuthenticationValues,Fusion.Photon.Realtime.AppSettings)">
             <summary>
-            Join the Peer to a specific Lobby, either a prebuild or a custom one
+            Join the Peer to a specific Lobby, either a prebuild or a custom one.
+            
+            More about matchmaking:
+            https://doc.photonengine.com/en-us/fusion/current/manual/matchmaking
             </summary>
             <param name="sessionLobby">Lobby Type to Join</param>
             <param name="lobbyID">Lobby ID</param>
@@ -7614,6 +7725,9 @@
         <member name="M:Fusion.NetworkRunner.StartGame(Fusion.StartGameArgs)">
             <summary>
             Starts the local Fusion Runner and takes care of all major setup necessary
+            
+            More about matchmaking:
+            https://doc.photonengine.com/en-us/fusion/current/manual/matchmaking
             </summary>
             <param name="args">Custom arguments used to setup the Fusion Simulation</param>
             <returns>Task that can be awaited to chain actions</returns>
@@ -7797,73 +7911,105 @@
         </member>
         <member name="T:Fusion.StartGameArgs">
             <summary>
-            Fusion Start Arguments, used to configure the 
-            simulation mode and other settings
+            Fusion Start Arguments, used to configure the simulation mode and other settings
+            
+            More about matchmaking:
+            https://doc.photonengine.com/en-us/fusion/current/manual/matchmaking
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.GameMode">
             <summary>
-            Game Mode in which this peer will start
+            <see cref="T:Fusion.GameMode"/> in which this peer will start
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.SessionName">
             <summary>
-            Photon Cloud Session Name used either to Create or Join a Session
+            Photon Cloud Session Name used either to Create or Join a Session.
+            
+            Default: null (random session matching)
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.Address">
             <summary>
-            Binding Address
+            Peer Binding Address
+            
+            Default: <see cref="M:Fusion.Sockets.NetAddress.Any(System.UInt16)"/>
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.CustomPublicAddress">
             <summary>
             Custom Public Reflexive Address
+            
+            Default: null
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.ObjectPool">
             <summary>
             Object pool to use
+            
+            Default: null
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.SceneManager">
             <summary>
             See <see cref="T:Fusion.INetworkSceneManager"/>.
+            
+            Default: null
+            
+            More about Scene Loading:
+            https://doc.photonengine.com/en-us/fusion/current/manual/scene-loading
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.Config">
             <summary>
             Custom <see cref="T:Fusion.NetworkProjectConfig"/> used to start the simulation
+            
+            Default: Global NetworkProjectConfig
+            
+            More about NetworkProjectConfig:
+            https://doc.photonengine.com/en-us/fusion/current/manual/network-project-config
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.PlayerCount">
             <summary>
-            Number of players allowed to connect to this peer, when running in Server Mode
+            Number of players allowed to connect to this peer, when running in Server/Host Mode
+            
+            Default: DefaultPlayers from the Global NetworkProjectConfig
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.Scene">
             <summary>
-            Scene that will be set as the starting Scene when running in Server Mode
+            Scene that will be set as the starting Scene when running in Server/Host Mode
+            
+            Default: null (no scene set)
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.Initialized">
             <summary>
             Callback that is invoked when the Fusion has fully started
+            
+            Default: null
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.DisableNATPunchthrough">
             <summary>
             Flag to disable the NAT Punchthrough implementation and connect only via Relay
+            
+            Default: false
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.CustomCallbackInterfaces">
             <summary>
             User defined callback interfaces we will provide O(1) constant time lookup for
+            
+            Default: null
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.ConnectionToken">
             <summary>
             Connection token sent by client to server. Not used in shared mode.
+            
+            Default: null (empty connection token)
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.SessionProperties">
@@ -7871,46 +8017,76 @@
             Custom Session Properties.
             This dictionary can be used to either setup the initial Session Properties when creating a Session
             but also to set the matchmaking filters when joining a Random Session.
+            
+            Default: null (empty custom properties)
+            </summary>
+        </member>
+        <member name="F:Fusion.StartGameArgs.IsOpen">
+            <summary>
+            Session should be created Open or Closed to accept joins
+            
+            Default: true
+            </summary>
+        </member>
+        <member name="F:Fusion.StartGameArgs.IsVisible">
+            <summary>
+            Session should be Visible or not in the Session Lobby list
+            
+            Default: true
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.CustomLobbyName">
             <summary>
             Session Custom Lobby to be published in
+            
+            Default: null (default Lobby for each Session Type, LobbyClientServer or LobbyShared)
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.CustomSTUNServer">
             <summary>
             Specify a Custom STUN Server used to Resolve the peer Reflexive Addresses
+            
+            Default: null (no custom STUN Server)
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.AuthValues">
             <summary>
             Custom Authentication Data
+            
+            Default: null (default authentication values)
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.CustomPhotonAppSettings">
             <summary>
             Custom Photon Application Settings
+            
+            Default: null (Global PhotonAppSettings)
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.DisableClientSessionCreation">
             <summary>
             Disables the Session creation when starting a Client with an specific Session Name
+            
+            Default: false (clients *can* create new Sessions)
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.HostMigrationToken">
             <summary>
             Host Migration Token used when restarting the Fusion Simulation
+            
+            Default: null
             </summary>
         </member>
         <member name="F:Fusion.StartGameArgs.HostMigrationResume">
             <summary>
             Callback invoked when the new Host is migrating from the old Host state
+            
+            Default: null
             </summary>
         </member>
         <member name="M:Fusion.StartGameArgs.ToString">
             <summary>
-            StartGameArgs ToString
+            StartGameArgs ToString()
             </summary>
         </member>
         <member name="T:Fusion.GameMode">

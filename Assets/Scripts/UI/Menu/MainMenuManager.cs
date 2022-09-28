@@ -66,7 +66,7 @@ public class MainMenuManager : MonoBehaviour {
     // LOBBY CALLBACKS
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
 
-        List<string> invalidRooms = sessionList.Select(si => si.Name).ToList();
+        List<string> invalidRooms = currentRooms.Keys.ToList();
 
         foreach (SessionInfo session in sessionList) {
 
@@ -355,7 +355,7 @@ public class MainMenuManager : MonoBehaviour {
         OpenInLobbyMenu();
         characterDropdown.SetValueWithoutNotify(data.CharacterIndex);
 
-        if (!Runner.IsClient)
+        if (Runner.IsServer)
             LocalChatMessage("You are the room's host! You can click on player names to control your room, or use chat commands. Do /help for more help.", Color.red);
 
         SetPlayerSkin(data.SkinIndex);

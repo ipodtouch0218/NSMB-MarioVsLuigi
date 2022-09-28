@@ -567,7 +567,7 @@ namespace NSMB.Utils {
 
             int result = -1;
             int count = 0;
-            foreach (PlayerRef pl in runner.ActivePlayers.OrderBy(pr => pr.RawEncoded)) {
+            foreach (PlayerRef pl in runner.ActivePlayers.OrderByDescending(pr => pr.RawEncoded)) {
                 //skip spectators in color calculations
                 if (pl.GetPlayerData(runner).IsManualSpectator)
                     continue;

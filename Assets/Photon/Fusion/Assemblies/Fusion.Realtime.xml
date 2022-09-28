@@ -137,13 +137,16 @@
             Used to keep the client communication
             </summary>
         </member>
-        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.BuildEnterRoomParams(Fusion.Photon.Realtime.TypedLobby,System.String,System.Byte,System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty})">
+        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.BuildEnterRoomParams(Fusion.Photon.Realtime.TypedLobby,System.String,System.Byte,System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty},System.Boolean,System.Boolean)">
             <summary>
             Build a new EnterRoomParams ref using the default configs and optional Room Name
             </summary>
             <param name="typedLobby">Which lobby the Room should exits</param>
-            <param name="RoomName">Room Name, if not set, a Random Name will be used</param>
+            <param name="roomName">Room Name, if not set, a Random Name will be used</param>
+            <param name="maxPlayers">Set the max number of players per Session</param>
             <param name="customProperties">Optional Room Custom Properties</param>
+            <param name="isOpen">Signal if the Session should be Open/Closed</param>
+            <param name="isVisible">Signal if the Session should Visiable/Invisible</param>
             <returns>EnterRoomParams reference.</returns>
         </member>
         <member name="M:Fusion.Photon.Realtime.FusionRelayClient.BuildJoinParams(Fusion.Photon.Realtime.TypedLobby,System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty})">

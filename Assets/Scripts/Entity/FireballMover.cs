@@ -14,6 +14,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
 
     //---Serialized Variables
     [SerializeField] private float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
+    [SerializeField] private ParticleSystem particles;
 
     //---Private Variables
     private PhysicsEntity physics;
@@ -45,12 +46,13 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
             return;
         }
 
-        HandleCollision();
+        if (!HandleCollision())
+            return;
 
         body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
-    private void HandleCollision() {
+    private bool HandleCollision() {
         physics.UpdateCollisions();
 
         if (physics.onGround && !BreakOnImpact) {
@@ -65,12 +67,18 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
         bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && BreakOnImpact);
         if (breaking) {
             Runner.Despawn(Object);
+            return false;
         }
+
+        return true;
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (!GameManager.Instance.gameover)
             Instantiate(wallHitPrefab, transform.position, Quaternion.identity);
+
+        particles.transform.parent = null;
+        particles.Stop();
     }
 
 
@@ -168,9 +176,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
         if (!player.DamageInvincibilityTimer.ExpiredOrNotRunning(Runner))
             return;
 
-        //Destroy ourselves.
-        Runner.Despawn(Object);
-
         //Starman Check
         if (player.IsStarmanInvincible)
             return;
@@ -201,6 +206,9 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
             //TODO: damage source?
             player.DoKnockback(FacingRight, 1, true, 0);
         }
+
+        //Destroy ourselves.
+        Runner.Despawn(Object);
     }
 
     public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {

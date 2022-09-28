@@ -358,6 +358,38 @@ Transform:
   m_Father: {fileID: 4317513770746404403}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1194134760236617144
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8927504140826809228}
+  m_Layer: 10
+  m_Name: ModelParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8927504140826809228
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194134760236617144}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4741703498087908296}
+  m_Father: {fileID: 8636928217783201364}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1451829972066525507
 GameObject:
   m_ObjectHideFlags: 0
@@ -10926,8 +10958,8 @@ Transform:
   m_Children:
   - {fileID: 2061862550066614901}
   - {fileID: 4471174548985650791}
-  m_Father: {fileID: 8636928217783201364}
-  m_RootOrder: 0
+  m_Father: {fileID: 8927504140826809228}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 5, y: 90, z: 0}
 --- !u!1 &5057836210313044904
 GameObject:
@@ -15766,7 +15798,7 @@ GameObject:
   - component: {fileID: 4936659145743467833}
   - component: {fileID: 6432982313154493715}
   - component: {fileID: 5037661849438817163}
-  m_Layer: 9
+  m_Layer: 6
   m_Name: GroundHitboxes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21467,13 +21499,13 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4741703498087908296}
+  - {fileID: 8927504140826809228}
+  - {fileID: 4936659145743467833}
   - {fileID: 8636928219237579147}
   - {fileID: 2213290113926414133}
   - {fileID: 3465634119598827263}
   - {fileID: 617143010349426807}
   - {fileID: 1016023482582175583}
-  - {fileID: 4936659145743467833}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -21533,6 +21565,7 @@ MonoBehaviour:
   propellerDrillBuffer: 0
   heightSmallModel: 0.42
   heightLargeModel: 0.82
+  models: {fileID: 4741703498087908288}
   onGround: 0
   previousOnGround: 0
   crushGround: 0
@@ -21999,10 +22032,10 @@ MonoBehaviour:
   _interpolationDataSource: 2
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 0}
-  InterpolateErrorCorrection: 1
+  InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
-    MaxRate: 45
+    MaxRate: 10
     PosBlendStart: 0.25
     PosBlendEnd: 1
     PosMinCorrection: 0.025
