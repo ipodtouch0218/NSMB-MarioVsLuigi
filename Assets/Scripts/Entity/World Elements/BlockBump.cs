@@ -50,14 +50,15 @@ public class BlockBump : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        if (DespawnTimer.Expired(Runner))
-            Kill();
+        if (DespawnTimer.Expired(Runner)) {
+            Vector3Int loc = Utils.WorldToTilemapPosition(transform.position);
+            Kill(loc);
+        }
     }
 
-    public void Kill() {
+    public void Kill(Vector3Int loc) {
 
         Tilemap tm = GameManager.Instance.tilemap;
-        Vector3Int loc = Utils.WorldToTilemapPosition(transform.position);
 
         TileBase tile = Resources.Load("Tilemaps/Tiles/" + ResultTile) as TileBase;
         tm.SetTile(loc, tile);

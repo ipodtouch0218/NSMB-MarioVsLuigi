@@ -2,29 +2,28 @@
 
 using Fusion;
 
-public class FireballMover : BasicEntity, IPlayerInteractable {
+public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
     //---Networked Variables
-    [Networked] public NetworkBool IsIceball { get; set; }
     [Networked] public NetworkBool BreakOnImpact { get; set; }
+    [Networked(Default = nameof(speed))] private float MoveSpeed { get; set; }
 
     //---Public Variables
-    public PlayerController owner;
     public GameObject wallHitPrefab;
 
     //---Serialized Variables
-    [SerializeField] private float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
     [SerializeField] private ParticleSystem particles;
+    [SerializeField] private float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
+    [SerializeField] public bool isIceball;
 
     //---Private Variables
     private PhysicsEntity physics;
 
     public void OnBeforeSpawned(PlayerController owner, bool right) {
-        this.owner = owner;
         FacingRight = right;
 
-        if (IsIceball)
-            speed += Mathf.Abs(owner.body.velocity.x / 3f);
+        if (isIceball)
+            MoveSpeed += Mathf.Abs(owner.body.velocity.x / 3f);
     }
 
     public override void Awake() {
@@ -34,8 +33,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
 
     public override void Spawned() {
         base.Spawned();
-
-        body.velocity = new(speed * (FacingRight ? 1 : -1), -speed);
+        body.velocity = new(MoveSpeed * (FacingRight ? 1 : -1), -MoveSpeed);
     }
 
     public override void FixedUpdateNetwork() {
@@ -49,7 +47,10 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
         if (!HandleCollision())
             return;
 
-        body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
+        if (!CheckForEntityCollision())
+            return;
+
+        body.velocity = new(MoveSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
     private bool HandleCollision() {
@@ -60,14 +61,39 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
             if (Mathf.Sign(physics.floorAngle) != Mathf.Sign(body.velocity.x))
                 boost = 0;
 
-            body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
-        } else if (IsIceball && body.velocity.y > 1.5f)  {
+            body.velocity = new(body.velocity.x, bounceHeight + boost);
+        } else if (isIceball && body.velocity.y > 0.1f)  {
             BreakOnImpact = true;
         }
         bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && BreakOnImpact);
         if (breaking) {
             Runner.Despawn(Object);
             return false;
+        }
+
+        return true;
+    }
+
+    private readonly Collider2D[] collisions = new Collider2D[8];
+    public bool CheckForEntityCollision() {
+
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + physics.currentCollider.offset, ((BoxCollider2D) physics.currentCollider).size, 0, default, collisions);
+
+        for (int i = 0; i < count; i++) {
+            GameObject collidedObject = collisions[i].gameObject;
+
+            //don't interact with ourselves.
+            if (collisions[i].attachedRigidbody == body)
+                continue;
+
+            if (collidedObject.GetComponentInParent<IFireballInteractable>() is IFireballInteractable interactable) {
+                bool result = isIceball ? interactable.InteractWithIceball(this) : interactable.InteractWithFireball(this);
+                if (result) {
+                    //true = interacted & despawn.
+                    Runner.Despawn(Object);
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -81,95 +107,9 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
         particles.Stop();
     }
 
-
-    private void OnTriggerEnter2D(Collider2D collider) {
-        switch (collider.tag) {
-        case "koopa":
-        case "goomba": {
-            KillableEntity en = collider.gameObject.GetComponentInParent<KillableEntity>();
-            if (en.Dead || en.IsFrozen)
-                return;
-
-            if (IsIceball) {
-                //TODO:
-                //PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { en.photonView.ViewID });
-            } else {
-                en.SpecialKill(FacingRight, false, 0);
-            }
-            Runner.Despawn(Object);
-            break;
-        }
-        case "frozencube": {
-            FrozenCube fc = collider.gameObject.GetComponent<FrozenCube>();
-            if (fc.Dead)
-                return;
-
-            if (!IsIceball) {
-                fc.Kill();
-            }
-
-            Runner.Despawn(Object);
-            break;
-        }
-        case "Fireball": {
-            FireballMover otherball = collider.gameObject.GetComponentInParent<FireballMover>();
-            if (IsIceball ^ otherball.IsIceball) {
-                Runner.Despawn(Object);
-                Runner.Despawn(otherball.Object);
-            }
-            break;
-        }
-        case "bulletbill": {
-            KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
-            if (IsIceball && !bb.IsFrozen) {
-                //TODO:
-                //PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bb.photonView.ViewID });
-            }
-            Runner.Despawn(Object);
-            break;
-        }
-        case "bobomb": {
-            BobombWalk bobomb = collider.gameObject.GetComponentInParent<BobombWalk>();
-            if (bobomb.Dead || bobomb.IsFrozen)
-                return;
-
-            if (!IsIceball) {
-                if (!bobomb.Lit) {
-                    bobomb.Light();
-                } else {
-                    bobomb.Kick(body.position.x < bobomb.body.position.x, 0f, false);
-                }
-            } else {
-                //TODO:
-                //PhotonNetwork.Instantiate("Prefabs/FrozenCube", bobomb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bobomb.photonView.ViewID });
-            }
-
-            Runner.Despawn(Object);
-            break;
-        }
-        case "piranhaplant": {
-            KillableEntity killa = collider.gameObject.GetComponentInParent<KillableEntity>();
-            if (killa.Dead)
-                return;
-            AnimatorStateInfo asi = killa.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
-            if (asi.IsName("end") && asi.normalizedTime > 0.5f)
-                return;
-
-            if (!IsIceball) {
-                killa.Kill();
-            } else {
-                //TODO:
-                //PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { killa.photonView.ViewID });
-            }
-            Runner.Despawn(Object);
-            break;
-        }
-        }
-    }
-
     public void InteractWithPlayer(PlayerController player) {
         //Check if they own us. If so, don't collide.
-        if (owner == player.Object.InputAuthority)
+        if (Object.InputAuthority == player.Object.InputAuthority)
             return;
 
         //If they have knockback invincibility, don't collide.
@@ -190,14 +130,14 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
             return;
         }
         case Enums.PowerupState.BlueShell: {
-            if (IsIceball && (player.inShell || player.crouching || player.groundpound))
+            if (isIceball && (player.IsInShell || player.IsCrouching || player.IsGroundpounding))
                 player.ShellSlowdownTimer = TickTimer.CreateFromSeconds(Runner, 0.65f);
             return;
         }
         }
 
         //Collision is a GO
-        if (IsIceball) {
+        if (isIceball) {
             //iceball
             //TODO:
             player.Freeze(null);
@@ -209,6 +149,24 @@ public class FireballMover : BasicEntity, IPlayerInteractable {
 
         //Destroy ourselves.
         Runner.Despawn(Object);
+    }
+
+    public bool InteractWithFireball(FireballMover fireball) {
+        //fire + ice = both destroy
+        if (isIceball) {
+            Runner.Despawn(fireball.Object);
+            return true;
+        }
+        return false;
+    }
+
+    public bool InteractWithIceball(FireballMover iceball) {
+        //fire + ice = both destroy
+        if (!isIceball) {
+            Runner.Despawn(iceball.Object);
+            return true;
+        }
+        return false;
     }
 
     public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {

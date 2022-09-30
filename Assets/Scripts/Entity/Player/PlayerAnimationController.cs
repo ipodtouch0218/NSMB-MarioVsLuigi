@@ -55,7 +55,7 @@ public class PlayerAnimationController : MonoBehaviour {
 
         PlayerData data = controller.Object.InputAuthority.GetPlayerData(controller.Runner);
         PlayerColorSet colorSet = GlobalController.Instance.skins[data.SkinIndex];
-        PlayerColors colors = colorSet.GetPlayerColors(controller.data.GetCharacterData());
+        PlayerColors colors = colorSet.GetPlayerColors(controller.character);
         primaryColor = colors.overallsColor.linear;
         secondaryColor = colors.hatColor.linear;
     }
@@ -77,94 +77,98 @@ public class PlayerAnimationController : MonoBehaviour {
 
         float deathTimer = 3f - (controller.DeathTimer.RemainingTime(controller.Runner) ?? 0f);
 
-        Vector3 targetEuler = models.transform.eulerAngles;
-        bool instant = false, changeFacing = false;
-        if (!gameover && !controller.IsFrozen) {
-            if (controller.IsInKnockback) {
-                targetEuler = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
-                instant = true;
-            } else if (controller.IsDead) {
-                if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
-                    targetEuler = new Vector3(-15, controller.FacingRight ? 110 : 250, 0);
-                } else {
-                    targetEuler = new Vector3(0, 180, 0);
-                }
-                instant = true;
-            } else if (animator.GetBool("pipe")) {
-                targetEuler = new Vector3(0, 180, 0);
-                instant = true;
-            } else if (animator.GetBool("inShell") && (!controller.onSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
-                targetEuler += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * Time.deltaTime * new Vector3(0, 1800 * (controller.FacingRight ? -1 : 1));
-                instant = true;
-            } else if (wasTurnaround || controller.skidding || controller.turnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
-                if (controller.FacingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.skidding)) {
-                    targetEuler = new Vector3(0, 250, 0);
-                } else {
-                    targetEuler = new Vector3(0, 110, 0);
-                }
-                instant = true;
-            } else {
-                if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity) {
-                    targetEuler += new Vector3(0, -1800, 0) * Time.deltaTime;
-                    instant = true;
-                    changeFacing = true;
-                } else if (controller.flying || controller.propeller) {
-                    targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(controller.Runner) ?? 0f) * 2000) - (controller.drill ? 800 : 0) + (controller.propeller && controller.propellerSpinTimer.Expired(controller.Runner) && body.velocity.y < 0 ? 800 : 0), 0) * Time.deltaTime;
-                    instant = true;
-                } else {
+        if (controller.Runner.IsForward) {
+            float delta = controller.Runner.DeltaTime * 0.333f;
+
+            Vector3 targetEuler = models.transform.eulerAngles;
+            bool instant = false, changeFacing = false;
+            if (!gameover && !controller.IsFrozen) {
+                if (controller.IsInKnockback) {
                     targetEuler = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
+                    instant = true;
+                } else if (controller.IsDead) {
+                    if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
+                        targetEuler = new Vector3(-15, controller.FacingRight ? 110 : 250, 0);
+                    } else {
+                        targetEuler = new Vector3(0, 180, 0);
+                    }
+                    instant = true;
+                } else if (animator.GetBool("pipe")) {
+                    targetEuler = new Vector3(0, 180, 0);
+                    instant = true;
+                } else if (animator.GetBool("inShell") && (!controller.onSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
+                    targetEuler += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1800 * (controller.FacingRight ? -1 : 1));
+                    instant = true;
+                } else if (wasTurnaround || controller.skidding || controller.turnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
+                    if (controller.FacingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.skidding)) {
+                        targetEuler = new Vector3(0, 250, 0);
+                    } else {
+                        targetEuler = new Vector3(0, 110, 0);
+                    }
+                    instant = true;
+                } else {
+                    if (controller.onSpinner && controller.IsOnGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity) {
+                        targetEuler += new Vector3(0, -1800, 0) * delta;
+                        instant = true;
+                        changeFacing = true;
+                    } else if (controller.IsSpinnerFlying || controller.IsPropellerFlying) {
+                        targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(controller.Runner) ?? 0f) * 2000) - (controller.IsDrilling ? 800 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.Expired(controller.Runner) && body.velocity.y < 0 ? 800 : 0), 0) * delta;
+                        instant = true;
+                    } else {
+                        targetEuler = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
+                    }
                 }
+                propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.IsSpinnerFlying || controller.IsPropellerFlying || controller.usedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
+                propeller.transform.Rotate(Vector3.forward, propellerVelocity * delta);
+
+                if (instant || wasTurnaround) {
+                    models.transform.rotation = Quaternion.Euler(targetEuler);
+                } else {
+                    float maxRotation = 2000f * delta;
+                    float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
+                    x += Mathf.Clamp(targetEuler.x - x, -maxRotation, maxRotation);
+                    y += Mathf.Clamp(targetEuler.y - y, -maxRotation, maxRotation);
+                    z += Mathf.Clamp(targetEuler.z - z, -maxRotation, maxRotation);
+                    models.transform.rotation = Quaternion.Euler(x, y, z);
+                }
+
+                if (changeFacing)
+                    controller.FacingRight = models.transform.eulerAngles.y < 180;
+
+                wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
             }
-            propellerVelocity = Mathf.Clamp(propellerVelocity + (1800 * ((controller.flying || controller.propeller || controller.usedPropellerThisJump) ? -1 : 1) * Time.deltaTime), -2500, -300);
-            propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
 
-            if (instant || wasTurnaround) {
-                models.transform.rotation = Quaternion.Euler(targetEuler);
+            //Particles
+            SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.IsOnGround && (controller.skidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
+            SetParticleEmission(drillParticle, !gameover && controller.IsDrilling);
+            if (controller.IsDrilling)
+                drillParticleAudio.clip = (controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
+            SetParticleEmission(sparkles, !gameover && controller.IsStarmanInvincible);
+            SetParticleEmission(giantParticle, !gameover && controller.State == Enums.PowerupState.MegaMushroom && !controller.GiantStartTimer.ExpiredOrNotRunning(controller.Runner));
+            SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
+
+            //Blinking
+            if (controller.IsDead) {
+                eyeState = Enums.PlayerEyeState.Death;
             } else {
-                float maxRotation = 2000f * Time.deltaTime;
-                float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
-                x += Mathf.Clamp(targetEuler.x - x, -maxRotation, maxRotation);
-                y += Mathf.Clamp(targetEuler.y - y, -maxRotation, maxRotation);
-                z += Mathf.Clamp(targetEuler.z - z, -maxRotation, maxRotation);
-                models.transform.rotation = Quaternion.Euler(x, y, z);
-            }
-
-            if (changeFacing)
-                controller.FacingRight = models.transform.eulerAngles.y < 180;
-
-            wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
-        }
-
-        //Particles
-        SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.onGround && (controller.skidding || (controller.crouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.onGround)) && !controller.pipeEntering);
-        SetParticleEmission(drillParticle, !gameover && controller.drill);
-        if (controller.drill)
-            drillParticleAudio.clip = (controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
-        SetParticleEmission(sparkles, !gameover && controller.IsStarmanInvincible);
-        SetParticleEmission(giantParticle, !gameover && controller.State == Enums.PowerupState.MegaMushroom && !controller.GiantStartTimer.ExpiredOrNotRunning(controller.Runner));
-        SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
-
-        //Blinking
-        if (controller.IsDead) {
-            eyeState = Enums.PlayerEyeState.Death;
-        } else {
-            if ((blinkTimer -= Time.fixedDeltaTime) < 0)
-                blinkTimer = 3f + (Random.value * 6f);
-            if (blinkTimer < blinkDuration) {
-                eyeState = Enums.PlayerEyeState.HalfBlink;
-            } else if (blinkTimer < blinkDuration * 2f) {
-                eyeState = Enums.PlayerEyeState.FullBlink;
-            } else if (blinkTimer < blinkDuration * 3f) {
-                eyeState = Enums.PlayerEyeState.HalfBlink;
-            } else {
-                eyeState = Enums.PlayerEyeState.Normal;
+                if ((blinkTimer -= Time.fixedDeltaTime) < 0)
+                    blinkTimer = 3f + (Random.value * 6f);
+                if (blinkTimer < blinkDuration) {
+                    eyeState = Enums.PlayerEyeState.HalfBlink;
+                } else if (blinkTimer < blinkDuration * 2f) {
+                    eyeState = Enums.PlayerEyeState.FullBlink;
+                } else if (blinkTimer < blinkDuration * 3f) {
+                    eyeState = Enums.PlayerEyeState.HalfBlink;
+                } else {
+                    eyeState = Enums.PlayerEyeState.Normal;
+                }
             }
         }
 
         if (controller.cameraController.IsControllingCamera)
-            HorizontalCamera.OFFSET_TARGET = (controller.flying || controller.propeller) ? 0.5f : 0f;
+            HorizontalCamera.OFFSET_TARGET = (controller.IsSpinnerFlying || controller.IsPropellerFlying) ? 0.5f : 0f;
 
-        if (controller.crouching || controller.sliding || controller.skidding) {
+        if (controller.IsCrouching || controller.sliding || controller.skidding) {
             dust.transform.localPosition = Vector2.zero;
         } else if (controller.wallSlideLeft || controller.wallSlideRight) {
             dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * (3f / 4f) * (controller.wallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * (3f / 4f));
@@ -187,25 +191,25 @@ public class PlayerAnimationController : MonoBehaviour {
 
         animator.SetBool("onLeft", controller.wallSlideLeft);
         animator.SetBool("onRight", controller.wallSlideRight);
-        animator.SetBool("onGround", controller.onGround);
+        animator.SetBool("onGround", controller.IsOnGround);
         animator.SetBool("invincible", controller.IsStarmanInvincible);
         animator.SetBool("skidding", controller.skidding);
-        animator.SetBool("propeller", controller.propeller);
-        animator.SetBool("propellerSpin", !controller.propellerSpinTimer.ExpiredOrNotRunning(controller.Runner));
-        animator.SetBool("crouching", controller.crouching);
-        animator.SetBool("groundpound", controller.groundpound);
+        animator.SetBool("propeller", controller.IsPropellerFlying);
+        animator.SetBool("propellerSpin", !controller.PropellerSpinTimer.ExpiredOrNotRunning(controller.Runner));
+        animator.SetBool("crouching", controller.IsCrouching);
+        animator.SetBool("groundpound", controller.IsGroundpounding);
         animator.SetBool("sliding", controller.sliding);
         animator.SetBool("knockback", controller.IsInKnockback);
         animator.SetBool("facingRight", (left ^ right) ? right : controller.FacingRight);
-        animator.SetBool("flying", controller.flying);
-        animator.SetBool("drill", controller.drill);
+        animator.SetBool("flying", controller.IsSpinnerFlying);
+        animator.SetBool("drill", controller.IsDrilling);
 
         //Animation
         animator.SetBool("turnaround", controller.turnaround);
         float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.floorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.floorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);
         if (controller.stuckInBlock) {
             animatedVelocity = 0;
-        } else if (controller.propeller) {
+        } else if (controller.IsPropellerFlying) {
             animatedVelocity = 2.5f;
         } else if (controller.State == Enums.PowerupState.MegaMushroom && (controller.currentInputs.buttons.IsSet(PlayerControls.Left) || controller.currentInputs.buttons.IsSet(PlayerControls.Right))) {
             animatedVelocity = 4.5f;
@@ -224,9 +228,9 @@ public class PlayerAnimationController : MonoBehaviour {
         animator.SetBool("blueshell", controller.State == Enums.PowerupState.BlueShell);
         animator.SetBool("mini", controller.State == Enums.PowerupState.MiniMushroom);
         animator.SetBool("mega", controller.State == Enums.PowerupState.MegaMushroom);
-        animator.SetBool("inShell", controller.inShell || (controller.State == Enums.PowerupState.BlueShell && (controller.crouching || controller.groundpound) && (controller.GroundpoundStartTimer.RemainingTime(controller.Runner) ?? 0f) <= 0.15f));
-
-
+        animator.SetBool("inShell", controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(controller.Runner) ?? 0f) <= 0.15f));
+    }
+    public void HandleMiscStates() {
         if (!controller.GiantEndTimer.ExpiredOrNotRunning(controller.Runner)) {
             transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(controller.Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
         } else {
@@ -284,14 +288,17 @@ public class PlayerAnimationController : MonoBehaviour {
         largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(0).IsName("in-shell"));
         propellerHelmet.SetActive(controller.State == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
-        animator.runtimeAnimatorController = large ? controller.data.GetCharacterData().largeOverrides : controller.data.GetCharacterData().smallOverrides;
+        animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
 
-        //HandleDeathAnimation();
+        HandleDeathAnimation();
         HandlePipeAnimation();
 
         transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
     }
-    void HandleDeathAnimation() {
+    private void HandleDeathAnimation() {
+        if (!controller.IsDead)
+            return;
+
         float deathTimer = 3f - (controller.DeathTimer.RemainingTime(controller.Runner) ?? 0f);
 
         if (deathTimer < deathUpTime) {
@@ -303,7 +310,7 @@ public class PlayerAnimationController : MonoBehaviour {
             if (!deathUp && body.position.y > GameManager.Instance.GetLevelMinY()) {
                 body.velocity = new Vector2(0, deathForce);
                 deathUp = true;
-                if (animator.GetBool("firedeath")) {
+                if (animator.GetBool("firedeath") && controller.Runner.IsForward) {
                     controller.PlaySound(Enums.Sounds.Player_Voice_LavaDeath);
                     controller.PlaySound(Enums.Sounds.Player_Sound_LavaHiss);
                 }
@@ -352,10 +359,10 @@ public class PlayerAnimationController : MonoBehaviour {
         if (pipeTimer >= pipeDuration) {
             controller.pipeEntering = null;
             body.isKinematic = false;
-            controller.onGround = false;
+            controller.IsOnGround = false;
             controller.properJump = false;
             controller.koyoteTime = 1;
-            controller.crouching = false;
+            controller.IsCrouching = false;
             controller.alreadyGroundpounded = true;
             controller.pipeTimer = 0.25f;
             body.velocity = Vector2.zero;

@@ -31,7 +31,7 @@ public class CameraController : MonoBehaviour {
         if (IsControllingCamera) {
 
             Vector3 shakeOffset = Vector3.zero;
-            if ((ScreenShake -= Time.deltaTime) > 0 && controller.onGround)
+            if ((ScreenShake -= Time.deltaTime) > 0 && controller.IsOnGround)
                 shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
 
             targetCamera.transform.position = currentPosition + shakeOffset;
@@ -90,9 +90,9 @@ public class CameraController : MonoBehaviour {
 
         // lagging camera movements
         Vector3 targetPosition = currentPosition;
-        if (controller.onGround)
+        if (controller.IsOnGround)
             lastFloor = playerPos.y;
-        bool validFloor = controller.onGround || lastFloor < playerPos.y;
+        bool validFloor = controller.IsOnGround || lastFloor < playerPos.y;
 
         //top camera clip ON GROUND. slowly pan up, dont do it instantly.
         if (validFloor && lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0)
@@ -120,7 +120,7 @@ public class CameraController : MonoBehaviour {
             return;
 
         Gizmos.color = Color.blue;
-        Vector2 threshold = controller.onGround ? groundedThreshold : airThreshold;
+        Vector2 threshold = controller.IsOnGround ? groundedThreshold : airThreshold;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(new(playerPos.x, lastFloor), Vector3.right / 2);

@@ -9,16 +9,18 @@ public class FrozenCube : HoldableEntity {
     //---Networked Variables
     [Networked] public TickTimer AutoBreakTimer { get; set; }
     [Networked] private FreezableEntity FrozenEntity { get; set; }
+    [Networked] private NetworkBool FastSlide { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f;
+    [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, autoBreak = 3f;
+    [SerializeField] private GameObject shatterParticles;
 
     //---Private Variables
     public UnfreezeReason unfreezeReason = UnfreezeReason.Other;
     private Vector2 entityPositionOffset;
     private float throwTimer;
     private int combo;
-    private bool fastSlide, fallen;
+    private bool fallen;
 
     #region Unity Methods
     public void OnBeforeSpawned(FreezableEntity entityToFreeze) {
@@ -32,7 +34,6 @@ public class FrozenCube : HoldableEntity {
             Kill();
 
         FrozenEntity.Freeze(this);
-
 
         Bounds bounds = default;
         GameObject rendererObject = FrozenEntity.gameObject;
@@ -56,8 +57,20 @@ public class FrozenCube : HoldableEntity {
 
         transform.position -= (Vector3) entityPositionOffset - Vector3.down * 0.1f;
 
+        AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
         flying = FrozenEntity.IsFlying;
         ApplyConstraints();
+
+        //move entity inside us
+        if (FrozenEntity.IsCarryable) {
+            FrozenEntity.transform.SetParent(transform);
+            FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
+        }
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        if (FrozenEntity.IsCarryable)
+            FrozenEntity.transform.SetParent(null);
     }
 
     public override void FixedUpdateNetwork() {
@@ -82,9 +95,9 @@ public class FrozenCube : HoldableEntity {
             return;
         }
 
-        if (fastSlide) {
+        if (FastSlide) {
             CheckForEntityCollisions();
-        } else {
+        } else if (!Holder) {
             float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
             if (remainingTime < 1f) {
                 body.position = new(body.position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
@@ -105,7 +118,7 @@ public class FrozenCube : HoldableEntity {
             FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
         }
 
-        if (fastSlide && physics.onGround && physics.floorAngle != 0) {
+        if (FastSlide && physics.onGround && physics.floorAngle != 0) {
             RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskOnlyGround);
             if (ray) {
                 body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
@@ -116,10 +129,10 @@ public class FrozenCube : HoldableEntity {
 
         body.velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.velocity.y);
 
-        if (FrozenEntity is PlayerController || (!Holder && !fastSlide)) {
+        if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {
 
             if (AutoBreakTimer.Expired(Runner)) {
-                if (!fastSlide)
+                if (!FastSlide)
                     unfreezeReason = UnfreezeReason.Timer;
 
                 if (flying)
@@ -139,7 +152,7 @@ public class FrozenCube : HoldableEntity {
     }
     #endregion
 
-    private readonly Collider2D[] collisions = new Collider2D[32];
+    private readonly Collider2D[] collisions = new Collider2D[8];
     private void CheckForEntityCollisions() {
 
         int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisions);
@@ -147,7 +160,14 @@ public class FrozenCube : HoldableEntity {
         for (int i = 0; i < count; i++) {
             GameObject obj = collisions[i].gameObject;
 
-            //killable entities
+            if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj)
+                continue;
+
+            if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
+                coin.InteractWithPlayer(PreviousHolder);
+                continue;
+            }
+
             if (obj.TryGetComponent(out KillableEntity killable)) {
                 if (killable.Dead || killable == FrozenEntity)
                     continue;
@@ -161,12 +181,6 @@ public class FrozenCube : HoldableEntity {
 
                 continue;
             }
-
-            //coins
-            if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
-                coin.InteractWithPlayer(PreviousHolder);
-                continue;
-            }
         }
     }
 
@@ -174,7 +188,7 @@ public class FrozenCube : HoldableEntity {
     private void HandleTile() {
         physics.UpdateCollisions();
 
-        if ((fastSlide && (physics.hitLeft || physics.hitRight))
+        if ((FastSlide && (physics.hitLeft || physics.hitRight))
             || (flying && fallen && physics.onGround && !Holder)
             || ((Holder || physics.onGround) && physics.hitRoof)) {
 
@@ -197,29 +211,40 @@ public class FrozenCube : HoldableEntity {
         if (PreviousHolder == player && throwTimer > 0)
             return;
 
-        if (!Holder && (player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom || player.inShell)) {
+        if (!Holder && (player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom || player.IsInShell)) {
             Kill();
             return;
         }
         if (fallen || player.IsFrozen)
             return;
 
-        if ((player.groundpound || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
+        if ((player.IsGroundpounding || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
             KillWithReason(UnfreezeReason.Groundpounded);
 
         } else if (!attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
             KillWithReason(UnfreezeReason.BlockBump);
 
-        } else if (fastSlide) {
+        } else if (FastSlide) {
             player.DoKnockback(body.position.x > player.body.position.x, 1, false, 0);
             Kill();
         }
         if (FrozenEntity.IsCarryable && !Holder && !Dead) {
-            if (player.CanPickup() && player.onGround) {
+            if (player.CanPickup() && player.IsOnGround) {
                 fallen = true;
                 Pickup(player);
             }
         }
+    }
+
+    public override bool InteractWithFireball(FireballMover fireball) {
+        if (!fireball.isIceball)
+            Kill();
+
+        return true;
+    }
+
+    public override bool InteractWithIceball(FireballMover iceball) {
+        return true;
     }
 
     private void ApplyConstraints() {
@@ -228,7 +253,7 @@ public class FrozenCube : HoldableEntity {
         body.isKinematic = !FrozenEntity.IsCarryable;
 
         if (!Holder) {
-            if (!fastSlide)
+            if (!FastSlide)
                 body.constraints |= RigidbodyConstraints2D.FreezePositionX;
 
             if (flying && !fallen)
@@ -248,7 +273,7 @@ public class FrozenCube : HoldableEntity {
     public override void Pickup(PlayerController player) {
         base.Pickup(player);
         Physics2D.IgnoreCollision(hitbox, player.MainHitbox);
-        AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, AutoBreakTimer.RemainingTime(Runner) ?? 0f + 1f);
+        AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, (AutoBreakTimer.RemainingTime(Runner) ?? 0f) + 1f);
     }
 
     public override void Throw(bool toRight, bool crouch) {
@@ -257,7 +282,9 @@ public class FrozenCube : HoldableEntity {
 
         fallen = false;
         flying = false;
-        fastSlide = true;
+        FastSlide = true;
+        PreviousHolder = Holder;
+        Holder = null;
 
         throwTimer = 1f;
 
@@ -278,7 +305,7 @@ public class FrozenCube : HoldableEntity {
         if (Holder)
             Holder.SetHolding(null);
 
-        Instantiate(Resources.Load("Prefabs/Particle/IceBreak"), transform.position, Quaternion.identity);
+        Instantiate(shatterParticles, transform.position, Quaternion.identity);
         Runner.Despawn(Object);
     }
 

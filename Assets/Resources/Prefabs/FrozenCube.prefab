@@ -54,8 +54,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _FacingRight:
-    _value: 1
   _IsFrozen: 0
   _Dead:
     _value: 0
@@ -71,6 +69,9 @@ MonoBehaviour:
   canKick: 1
   shakeSpeed: 80
   shakeAmount: 2
+  autoBreak: 3
+  shatterParticles: {fileID: 6779589790155936114, guid: 18ec030fd34201b4c90cac2de9b22a2d,
+    type: 3}
   unfreezeReason: 0
 --- !u!212 &5302927234469735370
 SpriteRenderer:

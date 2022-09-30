@@ -37,7 +37,7 @@
     "MaxNetworkedObjectCount": 8192,
     "NetworkIdIsObjectName": false,
     "HideNetworkObjectInactivityGuard": false,
-    "EnableHostMigration": false,
+    "EnableHostMigration": true,
     "HostMigrationSnapshotInterval": 60,
     "Simulation": {
         "InputDataWordCount": 0,
@@ -50,8 +50,8 @@
         "ClientPacketInterval": 1
     },
     "Interpolation": {
-        "DeltaAdjustment": 1,
-        "AllowedJitter": 25,
+        "DeltaAdjustment": 2,
+        "AllowedJitter": 35,
         "SnapLimit": 200,
         "MultiplierMin": 1.25,
         "MultiplierMax": 3.0

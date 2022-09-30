@@ -345,7 +345,7 @@ public class GameManager : NetworkBehaviour {
         tilemap.SetTilesBlock(originalTilesOrigin, originalTiles);
 
         foreach (FloatingCoin coin in coins)
-            coin.IsCollected = false;
+            coin.Collector = null;
 
         foreach (EnemySpawnpoint point in enemySpawns)
             point.AttemptSpawning();
@@ -463,7 +463,8 @@ public class GameManager : NetworkBehaviour {
             GameEndTimer = TickTimer.CreateFromSeconds(Runner, timedGameDuration);
 
         //Play start sfx
-        sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
+        if (Runner.IsForward)
+            sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
         //Start some things that should be booted
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
@@ -472,6 +473,9 @@ public class GameManager : NetworkBehaviour {
         //Big star
         SpawnBigStar();
 
+        //Destroy canavas
+        GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
+        Destroy(canvas.transform.parent.gameObject);
 
         GameStartTick = Runner.Simulation.Tick.Raw;
         musicEnabled = true;

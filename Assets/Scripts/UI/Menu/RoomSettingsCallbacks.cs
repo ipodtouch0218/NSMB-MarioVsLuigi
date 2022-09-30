@@ -30,7 +30,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         }
 
         Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.Level] = levelDropdown.value
+            [Enums.NetRoomProperties.Level] = newValue
         });
         ChangeLevel(newValue);
     }

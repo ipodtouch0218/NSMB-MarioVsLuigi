@@ -15,6 +15,7 @@ public class PrefabList : ScriptableObject {
     public NetworkPrefabRef Obj_LooseCoin;
     public NetworkPrefabRef Obj_BigStar;
     public NetworkPrefabRef Obj_BlockBump;
+    public NetworkPrefabRef Obj_FrozenCube;
 
     //---Enemies
     public NetworkPrefabRef BulletBill;
@@ -31,4 +32,5 @@ public class PrefabList : ScriptableObject {
     public GameObject Particle_StarCollect;
     public GameObject Particle_Respawn;
     public GameObject Particle_FireballWall, Particle_IceballWall;
+    public GameObject Particle_Groundpound, Particle_Walljump;
 }

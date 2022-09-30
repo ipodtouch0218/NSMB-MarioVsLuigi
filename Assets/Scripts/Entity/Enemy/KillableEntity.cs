@@ -3,7 +3,7 @@
 using Fusion;
 using NSMB.Utils;
 
-public abstract class KillableEntity : FreezableEntity, IPlayerInteractable {
+public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFireballInteractable {
 
     private static readonly Enums.Sounds[] COMBOS = {
         Enums.Sounds.Enemy_Shell_Kick,
@@ -67,33 +67,48 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable {
     public virtual void InteractWithPlayer(PlayerController player) {
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.onGround;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.IsOnGround;
 
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             FacingRight = damageDirection.x < 0;
-        } else if (player.IsStarmanInvincible || player.inShell || player.sliding
-            || (player.groundpound && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
+        } else if (player.IsStarmanInvincible || player.IsInShell || player.sliding
+            || (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.State == Enums.PowerupState.MegaMushroom) {
 
-            SpecialKill(player.body.velocity.x > 0, player.groundpound, player.StarCombo++);
+            SpecialKill(player.body.velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
         } else if (attackedFromAbove) {
             if (player.State == Enums.PowerupState.MiniMushroom) {
-                if (player.groundpound) {
-                    player.groundpound = false;
+                if (player.IsGroundpounding) {
+                    player.IsGroundpounding = false;
                     Kill();
                 }
                 player.bounce = true;
             } else {
                 Kill();
-                player.bounce = !player.groundpound;
+                player.bounce = !player.IsGroundpounding;
             }
             player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
-            player.drill = false;
+            player.IsDrilling = false;
 
         } else if (player.IsDamageable) {
             player.Powerdown(false);
             FacingRight = damageDirection.x > 0;
         }
+    }
+
+    public virtual bool InteractWithFireball(FireballMover fireball) {
+        SpecialKill(fireball.FacingRight, false, 0);
+        return true;
+    }
+
+    public virtual bool InteractWithIceball(FireballMover iceball) {
+        if (!IsFrozen) {
+            Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
+                FrozenCube cube = obj.GetComponent<FrozenCube>();
+                cube.OnBeforeSpawned(this);
+            });
+        }
+        return true;
     }
     #endregion
 
@@ -159,4 +174,5 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable {
     public void PlaySound(Enums.Sounds sound) {
         audioSource.PlayOneShot(sound.GetClip());
     }
+
 }

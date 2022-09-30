@@ -2,8 +2,7 @@ using Fusion;
 
 public abstract class CollectableEntity : BasicEntity, IPlayerInteractable {
 
-    [Networked(OnChanged = "OnCollectedChanged")] public NetworkBool IsCollected { get; set; } = false;
-    [Networked] public PlayerController Collector { get; set; }
+    [Networked(OnChanged = "OnCollectedChanged")] public PlayerController Collector { get; set; }
 
     public abstract void InteractWithPlayer(PlayerController player);
 

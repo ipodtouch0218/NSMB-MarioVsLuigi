@@ -9,12 +9,12 @@ public class SpinyWalk : KoopaWalk {
         if (Holder)
             return;
 
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             FacingRight = damageDirection.x < 0;
-        } else if (player.sliding || player.inShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
+        } else if (player.sliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
             //Special kill
             bool originalFacing = player.FacingRight;
-            if (player.inShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
+            if (player.IsInShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 //Do knockback to player, colliding with us in shell going opposite ways
                 player.DoKnockback(player.body.position.x < body.position.x, 0, false, 0);
 
@@ -28,7 +28,7 @@ public class SpinyWalk : KoopaWalk {
                         Pickup(player);
                     } else {
                         //non-pickup able, kick.
-                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
+                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                         PreviousHolder = player;
                     }
                 } else {
@@ -37,10 +37,10 @@ public class SpinyWalk : KoopaWalk {
                         //being stomped on
                         if (player.State == Enums.PowerupState.MiniMushroom) {
                             //mini mario interactions
-                            if (player.groundpound) {
+                            if (player.IsGroundpounding) {
                                 //mini mario is groundpounding, cancel their groundpound & stop moving
                                 EnterShell(true);
-                                player.groundpound = false;
+                                player.IsGroundpounding = false;
                             } else {
                                 //mini mario not groundpounding, just bounce.
                                 PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
@@ -48,9 +48,9 @@ public class SpinyWalk : KoopaWalk {
                             player.bounce = true;
                         } else {
                             //normal mario interactions
-                            if (player.groundpound) {
+                            if (player.IsGroundpounding) {
                                 //normal mario is groundpounding, we get kick'd
-                                Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
+                                Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                                 PreviousHolder = player;
                             } else {
                                 //normal mario isnt groundpounding, we get stopped

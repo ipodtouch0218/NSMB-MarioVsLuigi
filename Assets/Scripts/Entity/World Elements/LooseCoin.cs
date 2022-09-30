@@ -66,13 +66,7 @@ public class LooseCoin : Coin {
     }
 
     public override void OnCollectedChanged() {
-        if (IsCollected)
+        if (Collector)
             Runner.Despawn(Object);
-    }
-
-    // DEBUG & GIZMOS
-    public void OnDrawGizmos() {
-        Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(body.position + hitbox.offset, hitbox.size * transform.lossyScale);
     }
 }

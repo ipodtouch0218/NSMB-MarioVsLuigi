@@ -60,15 +60,16 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         } else {
             //spawned as a normal item.
             gameObject.layer = Layers.LayerEntity;
-            Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
+            Vector2 size = hitbox.size * transform.lossyScale * 0.5f;
             Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
-            if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Physics2D.OverlapBox(origin, size, 0, groundMask)) {
+            if (Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, groundMask)) {
                 DespawnWithPoof();
                 return;
             }
         }
 
+        FacingRight = true;
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 15f);
     }
 
@@ -159,18 +160,23 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public void DespawnWithPoof() {
+        Instantiate(Resources.Load("Prefabs/Particle/Puff"), body.position, Quaternion.identity);
         Runner.Despawn(Object, true);
-        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.GetChild(0).position, Quaternion.identity);
     }
 
 
     public override void InteractWithPlayer(PlayerController player) {
+
+        if (Collector)
+            return;
 
         if (!FollowEndTimer.ExpiredOrNotRunning(Runner))
             return;
 
         if (!IgnorePlayerTimer.ExpiredOrNotRunning(Runner))
             return;
+
+        Collector = player;
 
         Powerup powerup = powerupScriptable;
         Enums.PowerupState newState = powerup.state;
@@ -184,13 +190,13 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
             player.GiantStartTimer = TickTimer.CreateFromSeconds(Runner, player.giantStartTime);
             player.IsInKnockback = false;
-            player.groundpound = false;
-            player.crouching = false;
-            player.propeller = false;
+            player.IsGroundpounding = false;
+            player.IsCrouching = false;
+            player.IsPropellerFlying = false;
             player.usedPropellerThisJump = false;
-            player.flying = false;
-            player.drill = false;
-            player.inShell = false;
+            player.IsSpinnerFlying = false;
+            player.IsDrilling = false;
+            player.IsInShell = false;
             player.GiantTimer = TickTimer.CreateFromSeconds(Runner, 15f);
             transform.localScale = Vector3.one;
             Instantiate(PrefabList.Instance.Particle_Giant, transform.position, Quaternion.identity);
@@ -224,7 +230,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
         } else if (player.State == Enums.PowerupState.MiniMushroom) {
             //check if we're in a mini area to avoid crushing ourselves
-            if (player.onGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.up, 0.3f, Layers.MaskOnlyGround)) {
+            if (player.IsOnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.up, 0.3f, Layers.MaskOnlyGround)) {
                 reserve = true;
             }
         }
@@ -243,10 +249,10 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             player.previousState = player.State;
             player.State = newState;
             player.powerupFlash = 2;
-            player.crouching |= player.ForceCrouchCheck();
-            player.propeller = false;
+            player.IsCrouching |= player.ForceCrouchCheck();
+            player.IsPropellerFlying = false;
             player.usedPropellerThisJump = false;
-            player.drill &= player.flying;
+            player.IsDrilling &= player.IsSpinnerFlying;
             player.PropellerLaunchTimer = TickTimer.None;
 
             if (!soundPlayed)

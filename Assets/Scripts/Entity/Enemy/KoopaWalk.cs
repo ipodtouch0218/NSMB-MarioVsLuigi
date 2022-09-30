@@ -158,48 +158,48 @@ public class KoopaWalk : HoldableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = damageDirection.y > 0;
 
-        if (IsInShell && blue && player.groundpound && !player.onGround) {
+        if (IsInShell && blue && player.IsGroundpounding && !player.IsOnGround) {
             BlueBecomeItem();
             return;
         }
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             player.body.velocity = new(0, player.body.velocity.y);
             FacingRight = damageDirection.x < 0;
 
-        } else if (player.sliding || player.inShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
+        } else if (player.sliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.FacingRight;
-            if (IsInShell && !IsStationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
+            if (IsInShell && !IsStationary && player.IsInShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.DoKnockback(player.body.position.x < body.position.x, 0, true, 0);
 
             SpecialKill(!originalFacing, false, player.StarCombo++);
 
-        } else if (player.groundpound && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
+        } else if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             EnterShell(true);
             if (!blue) {
-                Kick(player.body.position.x < body.position.x, 1f, player.groundpound);
+                Kick(player.body.position.x < body.position.x, 1f, player.IsGroundpounding);
                 PreviousHolder = player;
             }
 
         } else if (attackedFromAbove && (!IsInShell || !IsActuallyStationary)) {
             if (player.State == Enums.PowerupState.MiniMushroom) {
-                if (player.groundpound) {
-                    player.groundpound = false;
+                if (player.IsGroundpounding) {
+                    player.IsGroundpounding = false;
                     EnterShell(true);
                 }
                 player.bounce = true;
             } else {
                 EnterShell(true);
-                player.bounce = !player.groundpound;
+                player.bounce = !player.IsGroundpounding;
             }
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
-            player.drill = false;
+            player.IsDrilling = false;
         } else {
             if (IsInShell && IsActuallyStationary) {
                 if (!Holder) {
                     if (player.CanPickup()) {
                         Pickup(player);
                     } else {
-                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
+                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                         PreviousHolder = player;
                     }
                 }
@@ -295,10 +295,10 @@ public class KoopaWalk : HoldableEntity {
     }
 
     public void BlueBecomeItem() {
-        Runner.Despawn(Object);
         Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
         });
+        Runner.Despawn(Object);
     }
 
 
@@ -338,7 +338,7 @@ public class KoopaWalk : HoldableEntity {
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {
         base.SpecialKill(right, groundpound, combo);
-        IsInShell = true;
+        animator.SetBool("shell", true);
     }
 
     #endregion

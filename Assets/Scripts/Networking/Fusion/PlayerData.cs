@@ -38,8 +38,6 @@ public class PlayerData : NetworkBehaviour, IPredictedSpawnBehaviour {
         //keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
-
-
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.
             Rpc_SetCharacterIndex(Settings.Instance.character);

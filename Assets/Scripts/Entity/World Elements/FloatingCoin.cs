@@ -12,7 +12,7 @@ public class FloatingCoin : Coin {
     }
 
     public override void OnCollectedChanged() {
-        spriteRenderer.enabled = !IsCollected;
-        hitbox.enabled = !IsCollected;
+        spriteRenderer.enabled = !Collector;
+        hitbox.enabled = !Collector;
     }
 }

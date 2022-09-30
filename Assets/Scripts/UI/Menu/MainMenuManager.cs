@@ -561,7 +561,7 @@ public class MainMenuManager : MonoBehaviour {
     }
     public void StartGame() {
         //do host related stuff
-        if (!Runner.IsClient) {
+        if (Runner.IsServer) {
             //set starting
             Runner.SessionInfo.UpdateCustomProperties(new() {
                 [Enums.NetRoomProperties.GameStarted] = 1
@@ -569,6 +569,8 @@ public class MainMenuManager : MonoBehaviour {
 
             //load the correct scene
             Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Level, out int level);
+            Debug.Log(Runner.SessionInfo);
+            Debug.Log(level);
             Runner.SetActiveScene(level + 2);
         }
     }

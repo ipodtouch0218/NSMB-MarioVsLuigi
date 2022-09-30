@@ -56,7 +56,7 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public override void InteractWithPlayer(PlayerController player) {
-        if (player.IsStarmanInvincible || player.inShell || player.State == Enums.PowerupState.MegaMushroom) {
+        if (player.IsStarmanInvincible || player.IsInShell || player.State == Enums.PowerupState.MegaMushroom) {
             Kill();
         } else {
             player.Powerdown(false);

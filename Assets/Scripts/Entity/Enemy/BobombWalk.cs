@@ -3,8 +3,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class BobombWalk : HoldableEntity {
 
@@ -54,9 +54,12 @@ public class BobombWalk : HoldableEntity {
         if (Lit) {
             float timeUntilDetonation = DetonationTimer.RemainingTime(Runner) ?? 0f;
             float redOverlayPercent = 5.39f / (timeUntilDetonation + 2.695f) * 10f % 1f;
-            MaterialPropertyBlock block = new();
-            block.SetFloat("FlashAmount", redOverlayPercent);
-            sRenderer.SetPropertyBlock(block);
+
+            if (mpb == null)
+                sRenderer.GetPropertyBlock(mpb = new());
+
+            mpb.SetFloat("FlashAmount", redOverlayPercent);
+            sRenderer.SetPropertyBlock(mpb);
         }
 
         previousFrameVelocity = body.velocity;
@@ -68,32 +71,32 @@ public class BobombWalk : HoldableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             FacingRight = damageDirection.x < 0;
 
-        } else if (player.sliding || player.inShell || player.IsStarmanInvincible) {
+        } else if (player.sliding || player.IsInShell || player.IsStarmanInvincible) {
             SpecialKill(player.body.velocity.x > 0, false, player.StarCombo++);
             return;
 
         } else if (attackedFromAbove && !Lit) {
-            if (player.State != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
+            if (player.State != Enums.PowerupState.MiniMushroom || (player.IsGroundpounding && attackedFromAbove))
                 Light();
 
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
-            if (player.groundpound && player.State != Enums.PowerupState.MiniMushroom) {
-                Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
+            if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom) {
+                Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
             } else {
                 player.bounce = true;
-                player.groundpound = false;
+                player.IsGroundpounding = false;
             }
-            player.drill = false;
+            player.IsDrilling = false;
         } else {
             if (Lit) {
                 if (!Holder) {
                     if (player.CanPickup()) {
                         Pickup(player);
                     } else {
-                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
+                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                     }
                 }
             } else if (player.IsDamageable) {
@@ -101,6 +104,15 @@ public class BobombWalk : HoldableEntity {
                 FacingRight = damageDirection.x > 0;
             }
         }
+    }
+
+    public override bool InteractWithFireball(FireballMover fireball) {
+        if (!Lit) {
+            Light();
+        } else {
+            Kick(fireball.FacingRight, 0f, false);
+        }
+        return true;
     }
 
     private void HandleCollision() {

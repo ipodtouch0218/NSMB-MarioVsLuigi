@@ -40,8 +40,7 @@ public abstract class HoldableEntity : KillableEntity {
             transform.position = body.position = new(Holder.transform.position.x, transform.position.y);
 
         ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
-        if (Holder)
-            Holder.SetHolding(null);
+        Holder = null;
 
         FacingRight = toRight;
 

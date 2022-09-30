@@ -24,6 +24,8 @@ MonoBehaviour:
     RawGuidValue: d6c38f51091fae64fa27d92f9415b3ab
   Obj_BlockBump:
     RawGuidValue: 184ade792aff4504bb1e613fe8952520
+  Obj_FrozenCube:
+    RawGuidValue: 177a6b73e1174384f81bc44d9594f7e7
   BulletBill:
     RawGuidValue: 42350f427b980ac45b4ce789698052ce
   Powerup_1Up:
@@ -59,4 +61,8 @@ MonoBehaviour:
   Particle_FireballWall: {fileID: 3894548935506966732, guid: 1cd96fd39f9753b4fb9e589043267000,
     type: 3}
   Particle_IceballWall: {fileID: 3894548935506966732, guid: 0b92073613fc93f4698e7d4d7b8940dc,
+    type: 3}
+  Particle_Groundpound: {fileID: 6621544317595282144, guid: 51b09745b9ed23f49986be6555fd6caa,
+    type: 3}
+  Particle_Walljump: {fileID: 9100450100766208478, guid: bf2e43bc76bbacf4ea4e6f3558c1b256,
     type: 3}

@@ -41,7 +41,7 @@ public class StarBouncer : CollectableEntity {
 
     public static void OnCollectedChanged(Changed<StarBouncer> changed) {
         StarBouncer star = changed.Behaviour;
-        if (star.IsCollected)
+        if (star.Collector)
             star.Runner.Despawn(star.Object);
     }
 
@@ -150,10 +150,9 @@ public class StarBouncer : CollectableEntity {
         if (player.IsDead)
             return;
 
-        if (!Collectable || IsCollected)
+        if (!Collectable || Collector)
             return;
 
-        IsCollected = true;
         Collector = player;
 
         //we can collect

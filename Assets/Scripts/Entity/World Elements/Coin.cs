@@ -1,15 +1,14 @@
 using UnityEngine;
 
 using Fusion;
-using NSMB.Utils;
 
 public abstract class Coin : CollectableEntity {
 
     public override void InteractWithPlayer(PlayerController player) {
-        if (IsCollected)
+        if (Collector)
             return;
 
-        IsCollected = true;
+        Collector = player;
         GivePlayerCoin(player, transform.position);
     }
 
@@ -38,6 +37,6 @@ public abstract class Coin : CollectableEntity {
         if (!target)
             return;
 
-        GivePlayerCoin(null, Vector3.zero);
+        GivePlayerCoin(target, Vector3.zero);
     }
 }

@@ -58,29 +58,42 @@ public class BulletBillMover : KillableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (player.IsStarmanInvincible || player.inShell || player.sliding
-            || ((player.groundpound || player.drill) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
+        if (player.IsStarmanInvincible || player.IsInShell || player.sliding
+            || ((player.IsGroundpounding || player.IsDrilling) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.State == Enums.PowerupState.MegaMushroom) {
 
-            if (player.drill) {
+            if (player.IsDrilling) {
                 player.bounce = true;
-                player.drill = false;
+                player.IsDrilling = false;
             }
             Kill();
             return;
         }
         if (attackedFromAbove) {
-            if (!(player.State == Enums.PowerupState.MiniMushroom && !player.groundpound)) {
+            if (!(player.State == Enums.PowerupState.MiniMushroom && !player.IsGroundpounding)) {
                 Kill();
             }
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
-            player.drill = false;
-            player.groundpound = false;
+            player.IsDrilling = false;
+            player.IsGroundpounding = false;
             player.bounce = true;
             return;
         }
 
         player.Powerdown(false);
+    }
+
+    public override bool InteractWithFireball(FireballMover fireball) {
+        if (fireball.isIceball) {
+            Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
+                FrozenCube cube = obj.GetComponent<FrozenCube>();
+                cube.OnBeforeSpawned(this);
+            });
+            return true;
+        }
+
+        //don't die to fireballs, but still destroy them.
+        return true;
     }
 
     private void DespawnCheck() {
