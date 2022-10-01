@@ -22,8 +22,6 @@ public class MainMenuManager : MonoBehaviour {
     bool quit, validName;
     public GameObject connecting;
 
-    private GameObject loadingCanvas;
-
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
@@ -43,6 +41,10 @@ public class MainMenuManager : MonoBehaviour {
     public string connectThroughSecret = "";
     public bool askedToJoin;
 
+    //---Serialize Fields
+    [SerializeField] public PlayerListHandler playerList;
+    [SerializeField] private ColorChooser colorManager;
+
     public Image overallColor, shirtColor;
     public GameObject palette, paletteDisabled;
 
@@ -54,9 +56,6 @@ public class MainMenuManager : MonoBehaviour {
 
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
 
-    private readonly List<string> allRegions = new();
-
-    public ColorChooser colorManager;
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
@@ -130,33 +129,17 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     // ROOM CALLBACKS
-    //TODO: what
-    /*
-    public void OnMasterClientSwitched(Player newMaster) {
-
-        LocalChatMessage(newMaster.GetUniqueNickname() + " has become the Host", Color.red);
-
-        if (newMaster.IsLocal) {
-            //i am de captain now
-            PhotonNetwork.CurrentRoom.SetCustomProperties(new() {
-                [Enums.NetRoomProperties.HostName] = newMaster.GetUniqueNickname()
-            });
-            LocalChatMessage("You are the room's host! You can click on player names to control your room, or use chat commands. Do /help for more help.", Color.red);
-        }
-        UpdateSettingEnableStates();
-    }
-    */
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+        waitingForJoinMessage.Add(player);
+
         if (runner.LocalPlayer == player)
             EnterRoom();
 
-        //mark player as not a spectator, as we are in the lobby
-        if (Runner.IsServer)
-            player.GetPlayerData(runner).IsCurrentlySpectating = false;
-
-        LocalChatMessage(player.GetPlayerData(runner).GetNickname() + " joined the room", Color.red);
-        sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
+        ////mark player as not a spectator, as we are in the lobby
+        //if (Runner.IsServer)
+        //    player.GetPlayerData(runner).IsCurrentlySpectating = false;
+        //
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         LocalChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
@@ -340,6 +323,24 @@ public class MainMenuManager : MonoBehaviour {
         region.interactable = connected;
     }
 
+    private List<PlayerRef> waitingForJoinMessage = new();
+    public IEnumerator OnPlayerDataValidated(PlayerRef player) {
+        yield return null; //wait a frame because reasons
+        if (waitingForJoinMessage.Remove(player)) {
+            LocalChatMessage(player.GetPlayerData(Runner).GetNickname() + " joined the room", Color.red);
+            sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
+        }
+
+        playerList.AddPlayerEntry(player);
+    }
+
+    private IEnumerator UpdateUsernames() {
+        while (Runner.SessionInfo?.IsValid ?? false) {
+            playerList.UpdateAllPlayerEntries();
+            yield return new WaitForSecondsRealtime(2f);
+        }
+    }
+
     public void EnterRoom() {
         SessionInfo session = Runner.SessionInfo;
 
@@ -350,28 +351,23 @@ public class MainMenuManager : MonoBehaviour {
             return;
         }
 
+        StartCoroutine(UpdateUsernames());
+        StartCoroutine(SetScroll());
+
         PlayerData data = Runner.GetLocalPlayerData();
+        characterDropdown.SetValueWithoutNotify(data?.CharacterIndex ?? Settings.Instance.character);
+        SetPlayerSkin(data?.SkinIndex ?? Settings.Instance.skin);
+        spectateToggle.isOn = data?.IsManualSpectator ?? false;
 
         OpenInLobbyMenu();
-        characterDropdown.SetValueWithoutNotify(data.CharacterIndex);
 
         if (Runner.IsServer)
-            LocalChatMessage("You are the room's host! You can click on player names to control your room, or use chat commands. Do /help for more help.", Color.red);
-
-        SetPlayerSkin(data.SkinIndex);
-
-        //OnRoomPropertiesUpdate(room.CustomProperties);
-        //ChangeMaxPlayers(room.MaxPlayers);
-        //ChangePrivate();
+            LocalChatMessage("You are the room's host! Click on your player's names to control your room.", Color.red);
 
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
         SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
 
-        StartCoroutine(SetScroll());
-
         GlobalController.Instance.DiscordController.UpdateActivity();
-
-        spectateToggle.isOn = data.IsManualSpectator;
 
         //clear text field
         chatTextField.SetTextWithoutNotify("");
@@ -569,8 +565,6 @@ public class MainMenuManager : MonoBehaviour {
 
             //load the correct scene
             Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Level, out int level);
-            Debug.Log(Runner.SessionInfo);
-            Debug.Log(level);
             Runner.SetActiveScene(level + 2);
         }
     }
@@ -918,7 +912,7 @@ public class MainMenuManager : MonoBehaviour {
             shirtColor.color = colors.hatColor;
         }
 
-        LocalData.Rpc_SetSkinIndex(index);
+        LocalData?.Rpc_SetSkinIndex(index);
 
         Settings.Instance.skin = index;
         Settings.Instance.SaveSettingsToPreferences();

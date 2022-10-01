@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-using Fusion;
 using NSMB.Extensions;
+using Fusion;
 
 public class PlayerListHandler : MonoBehaviour {
 
@@ -21,13 +21,6 @@ public class PlayerListHandler : MonoBehaviour {
         RemovePlayerEntry(player);
         UpdateAllPlayerEntries();
     }
-
-    //public void OnPlayerPropertiesUpdate(PlayerRef targetPlayer, Hashtable changedProps) {
-    //    if (changedProps.ContainsKey(Enums.NetPlayerProperties.Spectator))
-    //        UpdateAllPlayerEntries();
-    //    else
-    //        UpdatePlayerEntry(targetPlayer);
-    //}
 
     public void OnEnable() {
         if (!NetworkHandler.Instance.runner)
@@ -56,6 +49,8 @@ public class PlayerListHandler : MonoBehaviour {
 
     public void AddPlayerEntry(PlayerRef player) {
         PlayerData data = player.GetPlayerData(Runner);
+        if (!data)
+            return;
 
         if (!playerListEntries.ContainsKey(player)) {
             GameObject go = Instantiate(template, contentPane.transform);

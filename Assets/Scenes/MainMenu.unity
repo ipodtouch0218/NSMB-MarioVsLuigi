@@ -39392,6 +39392,8 @@ MonoBehaviour:
   rebindManager: {fileID: 1657549225}
   connectThroughSecret: 
   askedToJoin: 0
+  playerList: {fileID: 1585506767}
+  colorManager: {fileID: 1983555074}
   overallColor: {fileID: 1385748054}
   shirtColor: {fileID: 584898080}
   palette: {fileID: 1087430716}
@@ -39417,7 +39419,6 @@ MonoBehaviour:
   - '[C] Volcano'
   - '[C] Bonus'
   - '[C] Desert'
-  colorManager: {fileID: 1983555074}
 --- !u!4 &887693662
 Transform:
   m_ObjectHideFlags: 0

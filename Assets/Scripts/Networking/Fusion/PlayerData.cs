@@ -1,13 +1,13 @@
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 using NSMB.Extensions;
 using NSMB.Utils;
 using Fusion;
-using System.Text;
 
-public class PlayerData : NetworkBehaviour, IPredictedSpawnBehaviour {
+public class PlayerData : NetworkBehaviour {
 
     //---Static stuffs
     //TODO: change to "game started" somehow
@@ -17,13 +17,12 @@ public class PlayerData : NetworkBehaviour, IPredictedSpawnBehaviour {
     [Networked, Capacity(20)] private string Nickname { get; set; } = "noname";
     [Networked, Capacity(20)] private string DisplayNickname { get; set; } = "noname";
     [Networked, Capacity(32)] private string UserId { get; set; }
-    [Networked] public NetworkBool IsNicknameSet { get; set; }
     [Networked] public NetworkBool IsMuted { get; set; }
-    [Networked] public NetworkBool IsManualSpectator { get; set; }
+    [Networked(OnChanged = nameof(OnSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
     [Networked] public NetworkBool IsCurrentlySpectating { get; set; } = true;
     [Networked(OnChanged = nameof(OnLoadStateChanged))] public NetworkBool IsLoaded { get; set; }
     [Networked] public TickTimer MessageCooldownTimer { get; set; }
-    [Networked] public byte CharacterIndex { get; set; }
+    [Networked(OnChanged = nameof(OnSettingChanged))] public byte CharacterIndex { get; set; }
     [Networked] public byte SkinIndex { get; set; }
 
     //---Misc Variables
@@ -52,6 +51,9 @@ public class PlayerData : NetworkBehaviour, IPredictedSpawnBehaviour {
             //TOOD: use an auth-server signed userid, to disallow userid spoofing.
             UserId = Runner.GetPlayerUserId(Object.InputAuthority)?.Replace("-", "");
         }
+
+        if (MainMenuManager.Instance)
+            StartCoroutine(MainMenuManager.Instance.OnPlayerDataValidated(Object.InputAuthority));
     }
 
     public string GetNickname(bool filter = true) {
@@ -68,6 +70,10 @@ public class PlayerData : NetworkBehaviour, IPredictedSpawnBehaviour {
     public static void OnLoadStateChanged(Changed<PlayerData> changed) {
         if (GameManager.Instance)
             GameManager.Instance.OnPlayerLoaded();
+    }
+
+    public static void OnSettingChanged(Changed<PlayerData> changed) {
+        MainMenuManager.Instance.playerList.UpdatePlayerEntry(changed.Behaviour.Object.InputAuthority);
     }
 
     #region RPCs
@@ -91,7 +97,6 @@ public class PlayerData : NetworkBehaviour, IPredictedSpawnBehaviour {
             name += " (" + count + ")";
 
         DisplayNickname = name;
-        IsNicknameSet = true;
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -142,15 +147,5 @@ public class PlayerData : NetworkBehaviour, IPredictedSpawnBehaviour {
 
         IsLoaded = true;
     }
-
-    public void PredictedSpawnSpawned() => Spawned();
-
-    public void PredictedSpawnUpdate() { }
-
-    public void PredictedSpawnRender() { }
-
-    public void PredictedSpawnFailed() { }
-
-    public void PredictedSpawnSuccess() { }
     #endregion
 }

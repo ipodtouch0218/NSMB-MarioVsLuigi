@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 using NSMB.Extensions;
 
@@ -76,7 +76,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
     public void SelectColor(Button button) {
         selected = buttons.IndexOf(button);
-        //MainMenuManager.Instance.SetPlayerColor(buttons.IndexOf(button));
+        MainMenuManager.Instance.SetPlayerSkin((byte) buttons.IndexOf(button));
         Close();
     }
     public void Open() {

@@ -429,7 +429,6 @@ namespace NSMB.Utils {
             }
 
             float rand = GameManager.Instance.Random.NextSingleExclusive() * totalChance;
-            Debug.Log(rand);
             foreach (Powerup powerup in powerups) {
                 if (powerup.name == "MegaMushroom" && gm.musicState == Enums.MusicState.MegaMushroom)
                     continue;

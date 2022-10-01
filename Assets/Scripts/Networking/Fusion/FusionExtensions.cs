@@ -45,11 +45,11 @@ namespace NSMB.Extensions {
         }
 
         public static CharacterData GetCharacterData(this PlayerRef player, NetworkRunner runner) {
-            return runner.GetLocalPlayerData().GetCharacterData();
+            return runner.GetLocalPlayerData()?.GetCharacterData() ?? GlobalController.Instance.characters[0];
         }
 
         public static CharacterData GetCharacterData(this PlayerData data) {
-            return GlobalController.Instance.characters[data.CharacterIndex];
+            return GlobalController.Instance.characters[data?.CharacterIndex ?? Settings.Instance.character];
         }
     }
 }

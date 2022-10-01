@@ -1,27 +1,27 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using TMPro;
 
+using Fusion;
 using NSMB.Utils;
 using NSMB.Extensions;
-using Fusion;
 
 public class PlayerListEntry : MonoBehaviour {
 
+    //---Public Variables
     public PlayerRef player;
 
+    //---Serialized Variables
     [SerializeField] private TMP_Text nameText, pingText;
     [SerializeField] private Image colorStrip;
-
     [SerializeField] private RectTransform background, options;
     [SerializeField] private GameObject blockerTemplate, firstButton;
-
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private LayoutElement layout;
-
     [SerializeField] private GameObject[] adminOnlyOptions;
 
+    //---Private Variables
     private GameObject blockerInstance;
 
     private void OnDestroy() {
@@ -36,7 +36,6 @@ public class PlayerListEntry : MonoBehaviour {
     public void UpdateText() {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         PlayerData data = player.GetPlayerData(runner);
-
 
         colorStrip.color = Utils.GetPlayerColor(runner, player);
 
