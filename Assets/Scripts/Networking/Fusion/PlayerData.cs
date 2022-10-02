@@ -44,7 +44,7 @@ public class PlayerData : NetworkBehaviour {
         }
 
         if (Runner.IsServer) {
-            string nickname = Encoding.Unicode.GetString(Runner.GetPlayerConnectionToken(Object.InputAuthority));
+            string nickname = Encoding.Unicode.GetString(Runner.GetPlayerConnectionToken(Object.InputAuthority) ?? Encoding.Unicode.GetBytes("noname"));
             SetNickname(nickname);
 
             //expose their userid

@@ -84,14 +84,6 @@ public class BulletBillMover : KillableEntity {
     }
 
     public override bool InteractWithFireball(FireballMover fireball) {
-        if (fireball.isIceball) {
-            Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
-                FrozenCube cube = obj.GetComponent<FrozenCube>();
-                cube.OnBeforeSpawned(this);
-            });
-            return true;
-        }
-
         //don't die to fireballs, but still destroy them.
         return true;
     }
@@ -106,6 +98,10 @@ public class BulletBillMover : KillableEntity {
         }
 
         Runner.Despawn(Object);
+    }
+
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        //do nothing
     }
 
     public override void Kill() {

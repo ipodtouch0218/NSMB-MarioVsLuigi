@@ -289,20 +289,20 @@ public class GameManager : NetworkBehaviour {
 
         //Make UI color translucent
         levelUIColor.a = .7f;
+    }
 
+    public async void Start() {
         //spawning in editor
-        if (!NetworkHandler.Runner) {
+        if (!NetworkHandler.Runner.SessionInfo.IsValid) {
             //uhhh
 
-            _ = NetworkHandler.CreateRoom(new() {
+            await NetworkHandler.CreateRoom(new() {
                 Scene = SceneManager.GetActiveScene().buildIndex,
-                GameMode = GameMode.Single,
-            });
+            }, GameMode.Single);
         }
     }
 
     public override void Spawned() {
-
         //by default, spectate. when we get assigned a player object, we disable it there.
         spectationManager.Spectating = true;
 
@@ -313,6 +313,12 @@ public class GameManager : NetworkBehaviour {
         //Cache game settings
         Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.StarRequirement, out starRequirement);
         Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
+
+        if (starRequirement == 0)
+            starRequirement = 10;
+
+        if (coinRequirement == 0)
+            coinRequirement = 8;
 
         //Setup respawning tilemap
         originalTilesOrigin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
@@ -337,7 +343,11 @@ public class GameManager : NetworkBehaviour {
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
 
         //finished loading
-        NetworkHandler.Runner.GetLocalPlayerData().Rpc_FinishedLoading();
+        if (Runner.IsSinglePlayer) {
+            CheckIfAllPlayersLoaded();
+        } else {
+            NetworkHandler.Runner.GetLocalPlayerData()?.Rpc_FinishedLoading();
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeResim = true)]
@@ -475,7 +485,8 @@ public class GameManager : NetworkBehaviour {
 
         //Destroy canavas
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
-        Destroy(canvas.transform.parent.gameObject);
+        if (canvas)
+            Destroy(canvas.transform.parent.gameObject);
 
         GameStartTick = Runner.Simulation.Tick.Raw;
         musicEnabled = true;

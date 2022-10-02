@@ -256,19 +256,19 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return result;
     }
 
-    public static async Task<StartGameResult> CreateRoom(StartGameArgs args) {
+    public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host) {
         //create a random room id.
         StringBuilder idBuilder = new();
 
         //first char should correspond to region.
         int index = Array.IndexOf(Regions, CurrentRegion);
-        idBuilder.Append(RoomIdValidChars[index]);
+        idBuilder.Append(RoomIdValidChars[index >= 0 ? index : 0]);
 
         //fill rest of the string with random chars
         for (int i = 1; i < RoomIdLength; i++)
             idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
 
-        args.GameMode = GameMode.Host;
+        args.GameMode = gamemode;
         args.SessionName = idBuilder.ToString();
         args.ConnectionToken = Encoding.Unicode.GetBytes(Settings.Instance.nickname);
         args.SessionProperties = NetworkUtils.DefaultRoomProperties;

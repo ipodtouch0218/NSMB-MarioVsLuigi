@@ -44,8 +44,10 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             return;
 
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-        if (body && !Dead && !IsFrozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc))
+        if (body && !Dead && !IsFrozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc)) {
+            Debug.Log("A");
             SpecialKill(FacingRight, false, 0);
+        }
     }
     #endregion
 

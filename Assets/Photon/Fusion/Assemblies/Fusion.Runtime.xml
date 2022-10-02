@@ -8713,6 +8713,11 @@
             Only valid in Shared Mode. Indicates if this peer is flagged as the MasterClient, which means it is default StateAuthority
             </summary>
         </member>
+        <member name="P:Fusion.Simulation.ActivePlayers">
+            <summary>
+            List of Active players in the Simulation
+            </summary>
+        </member>
         <member name="P:Fusion.Simulation.IsRunning">
             <summary>
             Signal if the Simulation is currently running

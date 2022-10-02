@@ -18,8 +18,15 @@ public class UIUpdater : MonoBehaviour {
     public float pingSample = 0;
 
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
-    private int CurrentPing => (int) (Runner.GetPlayerRtt(localPlayer) * 1000f);
-
+    private int CurrentPing {
+        get {
+            try {
+                return (int) (Runner.GetPlayerRtt(localPlayer) * 1000f);
+            } catch {
+                return 0;
+            }
+        }
+    }
 
     private Material timerMaterial;
     private GameObject starsParent, coinsParent, livesParent, timerParent;

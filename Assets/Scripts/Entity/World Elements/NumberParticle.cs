@@ -18,6 +18,6 @@ public class NumberParticle : MonoBehaviour {
     }
 
     public void Kill() {
-        Destroy(gameObject);
+        Destroy(gameObject.transform.parent.gameObject);
     }
 }

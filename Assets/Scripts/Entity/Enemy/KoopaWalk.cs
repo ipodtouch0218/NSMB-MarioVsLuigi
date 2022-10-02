@@ -22,18 +22,11 @@ public class KoopaWalk : HoldableEntity {
 
     public bool dontFallOffEdges, blue, canBeFlipped = true, flipXFlip, putdown;
 
-    private BoxCollider2D worldHitbox;
     private Vector2 blockOffset = new(0, 0.05f), velocityLastFrame;
     private float dampVelocity, currentSpeed;
     protected int combo;
 
     #region Unity Methods
-    public override void Awake() {
-        base.Awake();
-        hitbox = transform.GetChild(0).GetComponent<BoxCollider2D>();
-        worldHitbox = GetComponent<BoxCollider2D>();
-    }
-
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.gameover) {
@@ -65,8 +58,8 @@ public class KoopaWalk : HoldableEntity {
         }
 
         if (IsInShell) {
-            worldHitbox.size = hitbox.size = inShellHitboxSize;
-            worldHitbox.offset = hitbox.offset = inShellHitboxOffset;
+            hitbox.size = inShellHitboxSize;
+            hitbox.offset = inShellHitboxOffset;
 
             if (IsStationary) {
                 if (physics.onGround)
@@ -78,8 +71,8 @@ public class KoopaWalk : HoldableEntity {
                 }
             }
         } else {
-            worldHitbox.size = hitbox.size = outShellHitboxSize;
-            worldHitbox.offset = hitbox.offset = outShellHitboxOffset;
+            hitbox.size = outShellHitboxSize;
+            hitbox.offset = outShellHitboxOffset;
         }
 
         if (physics.hitRight && FacingRight) {
@@ -108,7 +101,7 @@ public class KoopaWalk : HoldableEntity {
         velocityLastFrame = body.velocity;
     }
 
-    private Collider2D[] collisions = new Collider2D[32];
+    private Collider2D[] collisions = new Collider2D[16];
     private void CheckForEntityCollisions() {
 
         if (!IsInShell || IsActuallyStationary || putdown || Dead)
@@ -118,6 +111,9 @@ public class KoopaWalk : HoldableEntity {
 
         for (int i = 0; i < count; i++) {
             GameObject obj = collisions[i].gameObject;
+
+            if (obj == gameObject)
+                continue;
 
             //killable entities
             if (obj.TryGetComponent(out KillableEntity killable)) {
@@ -219,7 +215,7 @@ public class KoopaWalk : HoldableEntity {
         physics.UpdateCollisions();
 
         ContactPoint2D[] collisions = new ContactPoint2D[20];
-        int collisionAmount = worldHitbox.GetContacts(collisions);
+        int collisionAmount = hitbox.GetContacts(collisions);
         for (int i = 0; i < collisionAmount; i++) {
             var point = collisions[i];
             Vector2 p = point.point + (point.normal * -0.15f);

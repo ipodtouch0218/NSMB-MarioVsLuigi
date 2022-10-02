@@ -78,7 +78,7 @@ public class PlayerAnimationController : MonoBehaviour {
         float deathTimer = 3f - (controller.DeathTimer.RemainingTime(controller.Runner) ?? 0f);
 
         if (controller.Runner.IsForward) {
-            float delta = controller.Runner.DeltaTime * 0.333f;
+            float delta = controller.Runner.DeltaTime;
 
             Vector3 targetEuler = models.transform.eulerAngles;
             bool instant = false, changeFacing = false;
@@ -114,6 +114,8 @@ public class PlayerAnimationController : MonoBehaviour {
                     } else if (controller.IsSpinnerFlying || controller.IsPropellerFlying) {
                         targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(controller.Runner) ?? 0f) * 2000) - (controller.IsDrilling ? 800 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.Expired(controller.Runner) && body.velocity.y < 0 ? 800 : 0), 0) * delta;
                         instant = true;
+                    } else if (controller.wallSlideLeft || controller.wallSlideRight) {
+                        targetEuler = new Vector3(0, controller.wallSlideRight ? 110 : 250, 0);
                     } else {
                         targetEuler = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
                     }

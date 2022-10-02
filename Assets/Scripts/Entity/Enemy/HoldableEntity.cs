@@ -40,8 +40,8 @@ public abstract class HoldableEntity : KillableEntity {
             transform.position = body.position = new(Holder.transform.position.x, transform.position.y);
 
         ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
+        PreviousHolder = Holder;
         Holder = null;
-
         FacingRight = toRight;
 
         body.velocity = new Vector2((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), body.velocity.y);

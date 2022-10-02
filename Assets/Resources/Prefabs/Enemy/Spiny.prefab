@@ -115,8 +115,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _FacingRight:
-    _value: 1
   _IsFrozen: 0
   _Dead:
     _value: 0
@@ -143,9 +141,9 @@ MonoBehaviour:
   walkSpeed: 0.875
   kickSpeed: 5
   wakeup: 15
-  dontFallOffEdges: 0
+  dontFallOffEdges: 1
   blue: 0
-  canBeFlipped: 0
+  canBeFlipped: 1
   flipXFlip: 1
   putdown: 0
 --- !u!212 &1435431862184428455

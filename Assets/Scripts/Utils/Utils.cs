@@ -407,7 +407,7 @@ namespace NSMB.Utils {
             if (powerups == null)
                 powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
 
-            GetSessionProperty(runner.SessionInfo, Enums.NetRoomProperties.StarRequirement, out int starsToWin);
+            int starsToWin = GameManager.Instance.starRequirement;
             GetSessionProperty(runner.SessionInfo, Enums.NetRoomProperties.CustomPowerups, out bool custom);
             GetSessionProperty(runner.SessionInfo, Enums.NetRoomProperties.Lives, out int livesOn);
 

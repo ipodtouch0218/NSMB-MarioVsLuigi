@@ -140,7 +140,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
     }
 
-    //Walljumping variables
+    //Walljumping variables+
     public bool wallSlideLeft, wallSlideRight;
 
     private int _starCombo;

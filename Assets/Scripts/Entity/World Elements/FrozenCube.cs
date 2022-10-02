@@ -112,7 +112,8 @@ public class FrozenCube : HoldableEntity {
 
         //handle interactions with tiles
         if (FrozenEntity.IsCarryable) {
-            HandleTile();
+            if (!HandleTile())
+                return;
 
             //be inside us, entity. cmaaahn~
             FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
@@ -139,6 +140,7 @@ public class FrozenCube : HoldableEntity {
                     fallen = true;
                 else {
                     KillWithReason(UnfreezeReason.Timer);
+                    return;
                 }
             }
         }
@@ -185,7 +187,7 @@ public class FrozenCube : HoldableEntity {
     }
 
     #region Helper Methods
-    private void HandleTile() {
+    private bool HandleTile() {
         physics.UpdateCollisions();
 
         if ((FastSlide && (physics.hitLeft || physics.hitRight))
@@ -193,7 +195,10 @@ public class FrozenCube : HoldableEntity {
             || ((Holder || physics.onGround) && physics.hitRoof)) {
 
             Kill();
+            return false;
         }
+
+        return true;
     }
 
     public override void InteractWithPlayer(PlayerController player) {
@@ -285,6 +290,7 @@ public class FrozenCube : HoldableEntity {
         FastSlide = true;
         PreviousHolder = Holder;
         Holder = null;
+        FacingRight = toRight;
 
         throwTimer = 1f;
 

@@ -41,7 +41,11 @@ namespace NSMB.Extensions {
         }
 
         public static PlayerData GetLocalPlayerData(this NetworkRunner runner) {
-            return runner.LocalPlayer.GetPlayerData(runner);
+            try {
+                return runner.LocalPlayer.GetPlayerData(runner);
+            } catch {
+                return null;
+            }
         }
 
         public static CharacterData GetCharacterData(this PlayerRef player, NetworkRunner runner) {

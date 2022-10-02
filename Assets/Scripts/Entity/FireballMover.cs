@@ -74,7 +74,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         return true;
     }
 
-    private readonly Collider2D[] collisions = new Collider2D[8];
+    private readonly Collider2D[] collisions = new Collider2D[16];
     public bool CheckForEntityCollision() {
 
         int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + physics.currentCollider.offset, ((BoxCollider2D) physics.currentCollider).size, 0, default, collisions);

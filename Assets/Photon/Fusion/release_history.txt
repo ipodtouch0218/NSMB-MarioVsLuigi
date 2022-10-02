@@ -2,6 +2,14 @@
 
 ## Nightly
 
+### Build 586 (Sep 29, 2022)
+
+**Bug Fixes**
+
+- Fixed: SetPlayerObject after Host Migration
+- Fixed: Nested `NetworkObjects` in prefabs not being attached to in Shared mode
+- Fixed: Nested `NetworkObjects` not being detached when `NetworkRunner.Despawn` and custom `INetworkObjectPool` are used
+
 ### Build 585 (Sep 28, 2022)
 
 **What's New**
