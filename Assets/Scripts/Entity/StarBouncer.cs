@@ -98,7 +98,7 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Render() {
-        if (IsStationary)
+        if (IsStationary || (GameManager.Instance?.gameover ?? false))
             return;
 
         graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
@@ -112,7 +112,7 @@ public class StarBouncer : CollectableEntity {
         }
 
         if (DespawnTimer.Expired(Runner)) {
-            Despawn();
+            Runner.Despawn(Object, true);
             return;
         }
 
@@ -127,7 +127,8 @@ public class StarBouncer : CollectableEntity {
         canBounce |= body.velocity.y < 0;
         Collectable |= body.velocity.y < 0;
 
-        HandleCollision();
+        if (HandleCollision())
+            return;
 
         if (passthrough && Collectable && body.velocity.y <= 0 && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, ANY_GROUND_MASK)) {
             passthrough = false;
@@ -143,7 +144,12 @@ public class StarBouncer : CollectableEntity {
         }
 
         if (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY())
-            Despawn();
+            Runner.Despawn(Object, true);
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        if (!Collector)
+            Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
     }
 
     public override void InteractWithPlayer(PlayerController player) {
@@ -185,7 +191,7 @@ public class StarBouncer : CollectableEntity {
         }
     }
 
-    private void HandleCollision() {
+    private bool HandleCollision() {
         physics.UpdateCollisions();
 
         if (physics.hitLeft || physics.hitRight)
@@ -193,20 +199,17 @@ public class StarBouncer : CollectableEntity {
 
         if (physics.onGround && canBounce) {
             body.velocity = new(body.velocity.x, bounceAmount);
-            if (physics.hitRoof)
-                Despawn();
+            if (physics.hitRoof) {
+                Runner.Despawn(Object, true);
+                return true;
+            }
         }
+
+        return false;
     }
 
     public void DisableAnimator() {
         animator.enabled = false;
-    }
-
-    public void Despawn() {
-        if (!IsStationary)
-            Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
-
-        Runner.Despawn(Object, true);
     }
 
     public void Turnaround(bool hitLeft) {

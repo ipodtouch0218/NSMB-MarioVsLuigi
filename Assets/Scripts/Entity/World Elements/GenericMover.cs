@@ -11,17 +11,16 @@ public class GenericMover : NetworkBehaviour {
     //---Private Variables
     private Vector3? origin = null;
 
-    public void Awake() {
-        if (origin == null)
-            origin = transform.position;
+    public override void Spawned() {
+        origin = transform.position;
     }
 
-    public void FixedNetworkUpdate() {
+    public override void FixedUpdateNetwork() {
         int start = GameManager.Instance.GameStartTick;
         int ticksSinceStart = start - Runner.Simulation.Tick.Raw;
-        float secondsSinceStart = ticksSinceStart / Runner.Config.Simulation.TickRate;
+        double secondsSinceStart = (double) ticksSinceStart / Runner.Config.Simulation.TickRate;
 
-        float percentage = secondsSinceStart / animationTimeSeconds % animationTimeSeconds;
+        float percentage = (float) (secondsSinceStart / animationTimeSeconds) % animationTimeSeconds;
 
         transform.position = (origin ?? default) + new Vector3(x.Evaluate(percentage), y.Evaluate(percentage), 0);
     }

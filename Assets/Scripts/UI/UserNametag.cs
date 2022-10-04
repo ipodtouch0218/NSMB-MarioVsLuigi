@@ -17,6 +17,7 @@ public class UserNametag : MonoBehaviour {
     [SerializeField] private TMP_Text text;
     [SerializeField] private Image arrow;
 
+    private string cachedNickname;
     private bool rainbowName;
 
     public void Start() {
@@ -65,9 +66,11 @@ public class UserNametag : MonoBehaviour {
         }
         transform.position = screenPoint;
 
-        text.text = (parent.Object.StateAuthority == parent.Object.InputAuthority ? "<sprite=5>" : "") + data.GetNickname();
+        if (cachedNickname == null)
+            cachedNickname = data.GetNickname();
 
-        text.text += "\n";
+        text.text = (data.IsRoomOwner ? "<sprite=5>" : "") + cachedNickname + "\n";
+
         if (parent.Lives >= 0)
             text.text += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
 

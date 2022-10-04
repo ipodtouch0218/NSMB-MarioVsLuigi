@@ -21,9 +21,11 @@ public abstract class HoldableEntity : KillableEntity {
     public override void FixedUpdateNetwork() {
         if (!Holder) {
             base.FixedUpdateNetwork();
+            hitbox.enabled = true;
         } else {
             body.velocity = Vector2.zero;
             body.position = Holder.body.position + (Vector2) holderOffset;
+            hitbox.enabled = false;
             sRenderer.flipX = !FacingRight;
         }
     }

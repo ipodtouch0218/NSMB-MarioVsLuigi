@@ -21639,6 +21639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf9d71929a202541b352e506ca0197e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
   largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
   dust: {fileID: 8636928219237579149}
@@ -21986,6 +21987,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8636928217783201385}
+  - {fileID: 4962373736136367448}
   - {fileID: 8636928217783201366}
   - {fileID: 5594443215964999487}
   SimulationBehaviours: []

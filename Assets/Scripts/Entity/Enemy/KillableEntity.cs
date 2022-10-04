@@ -45,7 +45,6 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
         if (body && !Dead && !IsFrozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc)) {
-            Debug.Log("A");
             SpecialKill(FacingRight, false, 0);
         }
     }
@@ -73,7 +72,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
         if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             FacingRight = damageDirection.x < 0;
-        } else if (player.IsStarmanInvincible || player.IsInShell || player.sliding
+        } else if (player.IsStarmanInvincible || player.IsInShell || player.IsSliding
             || (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.State == Enums.PowerupState.MegaMushroom) {
 

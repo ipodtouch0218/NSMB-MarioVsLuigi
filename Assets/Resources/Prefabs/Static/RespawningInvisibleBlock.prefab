@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4425110965538168566}
   - component: {fileID: 4425110965538168456}
   - component: {fileID: 3681017443671302445}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: RespawningInvisibleBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ EdgeCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.25, y: -0.25}
@@ -86,7 +86,7 @@ MonoBehaviour:
   DestroyWhenStateAuthorityLeaves: 0
   AllowStateAuthorityOverride: 0
   AoiPositionSource: {fileID: 0}
-  Flags: 2305
+  Flags: 67841
   NetworkGuid:
     RawGuidValue: 52fa37521c30ebb40ab4cac4ef31be57
   NestedObjects: []

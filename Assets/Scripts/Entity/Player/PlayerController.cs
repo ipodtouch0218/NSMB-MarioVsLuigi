@@ -25,6 +25,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     //Generic
     [Networked] public NetworkBool IsOnGround { get; set; }
     [Networked] public NetworkBool IsCrouching { get; set; }
+    [Networked] public NetworkBool IsSliding { get; set; }
+    //Jumping Animations
+    [Networked] private NetworkBool IsSingleJump { get; set; }
+    [Networked] public NetworkBool IsDoubleJump { get; set; }
+    [Networked] public NetworkBool IsTripleJump { get; set; }
     //Knockback
     [Networked] public NetworkBool IsInKnockback { get; set; }
     [Networked] public TickTimer KnockbackTimer { get; set; }
@@ -61,8 +66,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool IsInShell { get; set; }
 
     //---Properties
-    public bool IsStarmanInvincible { get => !StarmanTimer.ExpiredOrNotRunning(Runner); }
-    public bool IsDamageable { get => !(IsStarmanInvincible || DamageInvincibilityTimer.ExpiredOrNotRunning(Runner)); }
+    public bool IsStarmanInvincible => !StarmanTimer.ExpiredOrNotRunning(Runner);
+    public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
     public override bool IsCarryable => true;
     public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
 
@@ -87,7 +92,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
 
 
-    public bool previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, singlejump, doublejump, triplejump, bounce, groundpoundLastFrame, sliding, hitBlock, functionallyRunning, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding;
+    public bool previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, bounce, groundpoundLastFrame, hitBlock, functionallyRunning, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundStartTimer, pickupTimer, powerupFlash, jumpBuffer;
     public float floorAngle, pipeTimer;
 
@@ -609,7 +614,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         switch (State) {
         case Enums.PowerupState.IceFlower:
         case Enums.PowerupState.FireFlower: {
-            if (wallSlideLeft || wallSlideRight || IsGroundpounding || triplejump || IsSpinnerFlying || IsDrilling || IsCrouching || sliding)
+            if (wallSlideLeft || wallSlideRight || IsGroundpounding || IsTripleJump || IsSpinnerFlying || IsDrilling || IsCrouching || IsSliding)
                 return;
 
             int count = 0;
@@ -656,7 +661,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             break;
         }
         case Enums.PowerupState.PropellerMushroom: {
-            if (IsGroundpounding || (IsSpinnerFlying && IsDrilling) || IsPropellerFlying || IsCrouching || sliding || !WallJumpTimer.ExpiredOrNotRunning(Runner))
+            if (IsGroundpounding || (IsSpinnerFlying && IsDrilling) || IsPropellerFlying || IsCrouching || IsSliding || !WallJumpTimer.ExpiredOrNotRunning(Runner))
                 return;
 
             StartPropeller();
@@ -678,9 +683,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsSpinnerFlying = false;
         IsCrouching = false;
 
-        singlejump = false;
-        doublejump = false;
-        triplejump = false;
+        IsSingleJump = false;
+        IsDoubleJump = false;
+        IsTripleJump = false;
 
         wallSlideLeft = false;
         wallSlideRight = false;
@@ -889,7 +894,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         PropellerSpinTimer = TickTimer.None;
         IsSpinnerFlying = false;
         IsDrilling = false;
-        sliding = false;
+        IsSliding = false;
         IsCrouching = false;
         skidding = false;
         turnaround = false;
@@ -975,17 +980,17 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         IsCrouching = false;
         IsOnGround = false;
-        sliding = false;
+        IsSliding = false;
         koyoteTime = 1f;
         jumpBuffer = 0;
         StarmanTimer = TickTimer.None;
         GiantStartTimer = TickTimer.None;
         GiantEndTimer = TickTimer.None;
         GiantTimer = TickTimer.None;
-        singlejump = false;
-        doublejump = false;
+        IsSingleJump = false;
+        IsDoubleJump = false;
         turnaround = false;
-        triplejump = false;
+        IsTripleJump = false;
         IsInKnockback = false;
         bounce = false;
         skidding = false;
@@ -1199,7 +1204,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsPropellerFlying = false;
         PropellerLaunchTimer = TickTimer.None;
         PropellerSpinTimer = TickTimer.None;
-        sliding = false;
+        IsSliding = false;
         IsDrilling = false;
         body.gravityScale = normalGravity;
         wallSlideLeft = wallSlideRight = false;
@@ -1269,7 +1274,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 }
                 if (!IsInShell && Mathf.Abs(floorAngle) >= slopeSlidingAngle) {
                     IsGroundpounding = false;
-                    sliding = true;
+                    IsSliding = true;
                     alreadyGroundpounded = true;
                     currentVelocity = new Vector2(-Mathf.Sign(floorAngle) * SPEED_SLIDE_MAX, 0);
                     startedSliding = true;
@@ -1287,11 +1292,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
         if (!((FacingRight && hitRight) || (!FacingRight && hitLeft)) && IsCrouching && Mathf.Abs(floorAngle) >= slopeSlidingAngle && !IsInShell && State != Enums.PowerupState.MegaMushroom) {
-            sliding = true;
+            IsSliding = true;
             IsCrouching = false;
             alreadyGroundpounded = true;
         }
-        if (sliding && IsOnGround && Mathf.Abs(floorAngle) > slopeSlidingAngle) {
+        if (IsSliding && IsOnGround && Mathf.Abs(floorAngle) > slopeSlidingAngle) {
             float angleDeg = floorAngle * Mathf.Deg2Rad;
 
             bool uphill = Mathf.Sign(floorAngle) == Mathf.Sign(currentVelocity.x);
@@ -1303,8 +1308,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         }
 
-        if (sliding && (up || ((left ^ right) && !down) || (Mathf.Abs(floorAngle) < slopeSlidingAngle && IsOnGround && currentVelocity.x == 0 && !down) || (FacingRight && hitRight) || (!FacingRight && hitLeft))) {
-            sliding = false;
+        if (IsSliding && (up || ((left ^ right) && !down) || (Mathf.Abs(floorAngle) < slopeSlidingAngle && IsOnGround && currentVelocity.x == 0 && !down) || (FacingRight && hitRight) || (!FacingRight && hitLeft))) {
+            IsSliding = false;
             if (currentVelocity.x == 0 && IsOnGround)
                 PlaySound(Enums.Sounds.Player_Sound_SlideEnd);
 
@@ -1408,7 +1413,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
             PlaySound(Enums.Sounds.Player_Sound_Powerdown);
             IsCrouching = false;
-            sliding = false;
+            IsSliding = false;
             IsPropellerFlying = false;
             IsDrilling = false;
             usedPropellerThisJump = false;
@@ -1442,7 +1447,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
             PlaySound(Enums.Sounds.Player_Sound_Powerdown);
             IsCrouching = false;
-            sliding = false;
+            IsSliding = false;
             IsPropellerFlying = false;
             usedPropellerThisJump = false;
             IsSpinnerFlying = false;
@@ -1453,7 +1458,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     #endregion
 
     private void HandleCrouching(bool crouchInput) {
-        if (sliding || IsPropellerFlying || IsInKnockback)
+        if (IsSliding || IsPropellerFlying || IsInKnockback)
             return;
 
         if (State == Enums.PowerupState.MegaMushroom) {
@@ -1511,20 +1516,21 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 hitRight = false;
                 hitLeft = false;
                 currentVelocity = new Vector2(WALLJUMP_HSPEED * (wallSlideLeft ? 1 : -1), WALLJUMP_VSPEED);
-                singlejump = false;
-                doublejump = false;
-                triplejump = false;
+                IsSingleJump = false;
+                IsDoubleJump = false;
+                IsTripleJump = false;
                 IsOnGround = false;
                 jumpBuffer = 0f;
                 bounce = false;
-                PlaySound(Enums.Sounds.Player_Sound_WallJump);
-                PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
 
                 Vector2 offset = MainHitbox.size * 0.5f;
                 offset.x *= wallSlideLeft ? -1 : 1;
 
-                if (Runner.IsForward)
+                if (Runner.IsForward) {
+                    PlaySound(Enums.Sounds.Player_Sound_WallJump);
+                    PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
                     SpawnParticle(PrefabList.Instance.Particle_Walljump, body.position + offset, wallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
+                }
 
                 WallJumpTimer = TickTimer.CreateFromSeconds(Runner, 16f / 60f);
                 animator.SetTrigger("walljump");
@@ -1532,7 +1538,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         } else {
             //walljump starting check
-            bool canWallslide = !IsInShell && currentVelocity.y < -0.1f && !IsGroundpounding && !IsOnGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !IsSpinnerFlying && !IsDrilling && !IsCrouching && !sliding && !IsInKnockback;
+            bool canWallslide = !IsInShell && currentVelocity.y < -0.1f && !IsGroundpounding && !IsOnGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !IsSpinnerFlying && !IsDrilling && !IsCrouching && !IsSliding && !IsInKnockback;
             if (!canWallslide)
                 return;
 
@@ -1593,20 +1599,20 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void HandleJumping(bool jumpPressed, bool forceJump) {
-        if (IsInKnockback || IsDrilling || (State == Enums.PowerupState.MegaMushroom && singlejump))
+        if (IsInKnockback || IsDrilling || (State == Enums.PowerupState.MegaMushroom && IsSingleJump))
             return;
 
         bool topSpeed = Mathf.Abs(currentVelocity.x) >= RunningMaxSpeed;
         if (bounce || (forceJump && (IsOnGround || (koyoteTime < 0.07f && !IsPropellerFlying)) && !startedSliding)) {
 
-            bool canSpecialJump = (forceJump || (bounce && jumpPressed)) && properJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && landing < 0.45f && !HeldEntity && !triplejump && !IsCrouching && !IsInShell && ((currentVelocity.x < 0 && !FacingRight) || (currentVelocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
+            bool canSpecialJump = (forceJump || (bounce && jumpPressed)) && properJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && landing < 0.45f && !HeldEntity && !IsTripleJump && !IsCrouching && !IsInShell && ((currentVelocity.x < 0 && !FacingRight) || (currentVelocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
             float jumpBoost = 0;
 
             koyoteTime = 1;
             jumpBuffer = 0;
             skidding = false;
             turnaround = false;
-            sliding = false;
+            IsSliding = false;
             wallSlideLeft = false;
             wallSlideRight = false;
             WallSlideTimer = TickTimer.None;
@@ -1617,9 +1623,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsSpinnerFlying &= bounce;
             IsPropellerFlying &= bounce;
 
-            if (!bounce && onSpinner && !HeldEntity) {
-                PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
-                PlaySound(Enums.Sounds.World_Spinner_Launch);
+            if (!bounce && onSpinner && IsOnGround && !HeldEntity) {
+                if (Runner.IsForward) {
+                    PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
+                    PlaySound(Enums.Sounds.World_Spinner_Launch);
+                }
                 currentVelocity.y = launchVelocity;
                 IsSpinnerFlying = true;
                 IsOnGround = false;
@@ -1636,49 +1644,53 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 _ => jumpVelocity + Mathf.Abs(currentVelocity.x) / RunningMaxSpeed * 1.05f,
             };
 
-
-            if (canSpecialJump && singlejump) {
+            if (canSpecialJump && IsSingleJump) {
                 //Double jump
-                singlejump = false;
-                doublejump = true;
-                triplejump = false;
-                PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
-            } else if (canSpecialJump && doublejump) {
+                IsSingleJump = false;
+                IsDoubleJump = true;
+                IsTripleJump = false;
+                if (Runner.IsForward)
+                    PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
+
+            } else if (canSpecialJump && IsDoubleJump) {
                 //Triple Jump
-                singlejump = false;
-                doublejump = false;
-                triplejump = true;
+                IsSingleJump = false;
+                IsDoubleJump = false;
+                IsTripleJump = true;
                 jumpBoost = 0.5f;
-                PlaySound(Enums.Sounds.Player_Voice_TripleJump);
+                if (Runner.IsForward)
+                    PlaySound(Enums.Sounds.Player_Voice_TripleJump);
+
             } else {
                 //Normal jump
-                singlejump = true;
-                doublejump = false;
-                triplejump = false;
+                IsSingleJump = true;
+                IsDoubleJump = false;
+                IsTripleJump = false;
             }
             currentVelocity.y = vel + jumpBoost;
             IsOnGround = false;
             doGroundSnap = false;
-            body.position += Vector2.up * 0.075f;
+            //body.position += Vector2.up * 0.075f;
             properJump = true;
             jumping = true;
 
             if (!bounce) {
                 //play jump sound
-                Enums.Sounds sound = State switch {
-                    Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Jump,
-                    Enums.PowerupState.MegaMushroom => Enums.Sounds.Powerup_MegaMushroom_Jump,
-                    _ => Enums.Sounds.Player_Sound_Jump,
-                };
-                PlaySound(sound);
+                if (Runner.IsForward) {
+                    Enums.Sounds sound = State switch {
+                        Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Jump,
+                        Enums.PowerupState.MegaMushroom => Enums.Sounds.Powerup_MegaMushroom_Jump,
+                        _ => Enums.Sounds.Player_Sound_Jump,
+                    };
+                    PlaySound(sound);
+                }
             }
             bounce = false;
         }
     }
 
-
     public void UpdateHitbox() {
-        bool crouchHitbox = State != Enums.PowerupState.MiniMushroom && pipeEntering == null && ((IsCrouching && !IsGroundpounding) || IsInShell || sliding);
+        bool crouchHitbox = State != Enums.PowerupState.MiniMushroom && pipeEntering == null && ((IsCrouching && !IsGroundpounding) || IsInShell || IsSliding);
         Vector2 hitbox = GetHitboxSize(crouchHitbox);
 
         MainHitbox.size = hitbox;
@@ -1688,7 +1700,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public Vector2 GetHitboxSize(bool crouching) {
         float height;
 
-        if (State <= Enums.PowerupState.Small || (IsStarmanInvincible && !IsOnGround && !crouching && !sliding && !IsSpinnerFlying && !IsPropellerFlying) || IsGroundpounding) {
+        if (State <= Enums.PowerupState.Small || (IsStarmanInvincible && !IsOnGround && !crouching && !IsSliding && !IsSpinnerFlying && !IsPropellerFlying) || IsGroundpounding) {
             height = heightSmallModel;
         } else {
             height = heightLargeModel;
@@ -1736,7 +1748,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         float acc = State == Enums.PowerupState.MegaMushroom ? SPEED_STAGE_MEGA_ACC[stage] : SPEED_STAGE_ACC[stage];
         float sign = Mathf.Sign(currentVelocity.x);
 
-        if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !sliding) {
+        if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !IsSliding) {
             //we can walk here
 
             float speed = Mathf.Abs(currentVelocity.x);
@@ -1825,7 +1837,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (currentVelocity.x == 0)
                 return;
 
-            if (sliding) {
+            if (IsSliding) {
                 float angle = Mathf.Abs(floorAngle);
                 if (angle > slopeSlidingAngle) {
                     //uphill / downhill
@@ -1847,7 +1859,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if ((direction == -1) ^ (newX <= 0))
                 newX = 0;
 
-            if (sliding) {
+            if (IsSliding) {
                 newX = Mathf.Clamp(newX, -SPEED_SLIDE_MAX, SPEED_SLIDE_MAX);
             }
 
@@ -1857,7 +1869,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 FacingRight = newX > 0;
         }
 
-        IsInShell |= State == Enums.PowerupState.BlueShell && !sliding && IsOnGround && functionallyRunning && !HeldEntity && Mathf.Abs(currentVelocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
+        IsInShell |= State == Enums.PowerupState.BlueShell && !IsSliding && IsOnGround && functionallyRunning && !HeldEntity && Mathf.Abs(currentVelocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
         if (IsOnGround || previousOnGround)
             currentVelocity.y = 0;
 
@@ -1981,7 +1993,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (!WallJumpTimer.ExpiredOrNotRunning(Runner)) {
             FacingRight = currentVelocity.x > 0;
-        } else if (!IsInShell && !sliding && !skidding && !IsInKnockback && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
+        } else if (!IsInShell && !IsSliding && !skidding && !IsInKnockback && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
             if (right ^ left)
                 FacingRight = right;
         } else if (GiantStartTimer.ExpiredOrNotRunning(Runner) && GiantEndTimer.ExpiredOrNotRunning(Runner) && !skidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || turnaround)) {
@@ -2102,7 +2114,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     normalizedVelocity.y = Mathf.Max(0, currentVelocity.y);
 
                 Vector2 offset = Vector2.zero;
-                if (singlejump && IsOnGround)
+                if (IsSingleJump && IsOnGround)
                     offset = Vector2.down / 2f;
 
                 Vector2 checkPosition = body.position + Vector2.up * checkSize / 2f + offset;
@@ -2147,10 +2159,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (State == Enums.PowerupState.MegaMushroom) {
             HandleGiantTiles(true);
-            if (IsOnGround && singlejump) {
+            if (IsOnGround && IsSingleJump) {
                 SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
                 CameraController.ScreenShake = 0.15f;
-                singlejump = false;
+                IsSingleJump = false;
             }
             StarmanTimer = TickTimer.None;
         }
@@ -2327,7 +2339,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     edgeLanding = (leftEdge || rightEdge) && properJump && edge && (FacingRight == rightEdge);
                 }
 
-                if ((triplejump && !(left ^ right))
+                if ((IsTripleJump && !(left ^ right))
                     || edgeLanding
                     || (Mathf.Abs(currentVelocity.x) < 0.1f)) {
 
@@ -2340,9 +2352,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 }
             }
             if (landing > 0.2f) {
-                singlejump = false;
-                doublejump = false;
-                triplejump = false;
+                IsSingleJump = false;
+                IsDoubleJump = false;
+                IsTripleJump = false;
             }
         }
 
@@ -2419,7 +2431,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             currentVelocity.y = Mathf.Max(currentVelocity.y, terminalVelocity * terminalVelocityModifier);
         }
 
-        if (IsCrouching || sliding || skidding) {
+        if (IsCrouching || IsSliding || skidding) {
             wallSlideLeft = false;
             wallSlideRight = false;
         }
@@ -2470,7 +2482,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         if (IsOnGround || IsInKnockback || IsGroundpounding || IsDrilling
-            || HeldEntity || IsCrouching || sliding || IsInShell
+            || HeldEntity || IsCrouching || IsSliding || IsInShell
             || wallSlideLeft || wallSlideRight)
             return;
 
@@ -2501,11 +2513,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             wallSlideLeft = false;
             wallSlideRight = false;
             IsGroundpounding = true;
-            singlejump = false;
-            doublejump = false;
-            triplejump = false;
+            IsSingleJump = false;
+            IsDoubleJump = false;
+            IsTripleJump = false;
             hitBlock = true;
-            sliding = false;
+            IsSliding = false;
             currentVelocity = Vector2.up * 1.5f;
             GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, groundpoundTime * (State == Enums.PowerupState.MegaMushroom ? 1.5f : 1));
             PlaySound(Enums.Sounds.Player_Sound_GroundpoundStart);
@@ -2567,7 +2579,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     public bool CanPickup() {
-        return State != Enums.PowerupState.MiniMushroom && !skidding && !turnaround && !HeldEntity && currentInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !wallSlideLeft && !wallSlideRight && !doublejump && !triplejump && !IsGroundpounding;
+        return State != Enums.PowerupState.MiniMushroom && !skidding && !turnaround && !HeldEntity && currentInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !wallSlideLeft && !wallSlideRight && !IsDoubleJump && !IsTripleJump && !IsGroundpounding;
     }
 
     public void OnDrawGizmos() {

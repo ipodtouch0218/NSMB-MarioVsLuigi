@@ -2,6 +2,17 @@
 
 ## Nightly
 
+### Build 588 (Oct 04, 2022)
+
+**Changes**
+
+- Added `Serializable` attribute to `NetworkId`
+- PhotonCloud PlayerTTL set to 15sec
+
+**Bug Fixes**
+
+- Fixed: Unable to Update Session Properties
+
 ### Build 586 (Sep 29, 2022)
 
 **Bug Fixes**

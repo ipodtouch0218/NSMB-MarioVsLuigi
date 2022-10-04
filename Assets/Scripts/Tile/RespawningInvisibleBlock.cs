@@ -1,7 +1,7 @@
 using UnityEngine;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
 
@@ -11,7 +11,6 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
     [Networked] private TickTimer BumpTimer { get; set; }
 
     public void InteractWithPlayer(PlayerController player) {
-
         if (!BumpTimer.ExpiredOrNotRunning(Runner))
             return;
 
@@ -27,7 +26,6 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
         //player has to bump us from below
         if (player.body.position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.previousFrameVelocity.y * Runner.DeltaTime) > transform.position.y)
             return;
-
 
         BumpTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
         DoBump(tileLocation, player);

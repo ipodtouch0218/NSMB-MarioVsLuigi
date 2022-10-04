@@ -58,7 +58,7 @@ public class BulletBillMover : KillableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
-        if (player.IsStarmanInvincible || player.IsInShell || player.sliding
+        if (player.IsStarmanInvincible || player.IsInShell || player.IsSliding
             || ((player.IsGroundpounding || player.IsDrilling) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
             || player.State == Enums.PowerupState.MegaMushroom) {
 

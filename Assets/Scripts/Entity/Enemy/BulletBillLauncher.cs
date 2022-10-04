@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class BulletBillLauncher : NetworkBehaviour {
 
@@ -67,7 +66,7 @@ public class BulletBillLauncher : NetworkBehaviour {
 
         //Shoot right
         if (!IntersectsPlayer(rightSearchPosition, searchBox)) {
-            SpawnBill(leftSpawnPosition, true);
+            SpawnBill(rightSpawnPosition, true);
             return;
         }
     }

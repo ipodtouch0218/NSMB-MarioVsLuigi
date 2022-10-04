@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
 
-public class PlayerAnimationController : MonoBehaviour {
+public class PlayerAnimationController : NetworkBehaviour {
 
     //---Networked Variables
 
+    //---Serialized Variables
     [SerializeField] private Avatar smallAvatar, largeAvatar;
     [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
     [SerializeField] private GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
@@ -25,7 +27,7 @@ public class PlayerAnimationController : MonoBehaviour {
     public Color GlowColor {
         get {
             if (_glowColor == null)
-                _glowColor = Utils.GetPlayerColor(controller.Runner, controller.Object.InputAuthority);
+                _glowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
 
             return _glowColor ?? Color.white;
         }
@@ -46,21 +48,21 @@ public class PlayerAnimationController : MonoBehaviour {
         drillParticleAudio = drillParticle.GetComponent<AudioSource>();
     }
 
-    public void Spawned() {
+    public override void Spawned() {
 
         DisableAllModels();
 
         if (!controller.Object.HasInputAuthority)
             GameManager.Instance.CreateNametag(controller);
 
-        PlayerData data = controller.Object.InputAuthority.GetPlayerData(controller.Runner);
-        PlayerColorSet colorSet = GlobalController.Instance.skins[data.SkinIndex];
+        PlayerData data = Object.InputAuthority.GetPlayerData(Runner);
+        PlayerColorSet colorSet = GlobalController.Instance.skins[data?.SkinIndex ?? 0];
         PlayerColors colors = colorSet.GetPlayerColors(controller.character);
         primaryColor = colors.overallsColor.linear;
         secondaryColor = colors.hatColor.linear;
     }
 
-    public void Update() {
+    public override void FixedUpdateNetwork() {
         HandleAnimations();
 
         if (renderers.Count == 0) {
@@ -75,10 +77,10 @@ public class PlayerAnimationController : MonoBehaviour {
         if (gameover)
             models.SetActive(true);
 
-        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(controller.Runner) ?? 0f);
+        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(Runner) ?? 0f);
 
-        if (controller.Runner.IsForward) {
-            float delta = controller.Runner.DeltaTime;
+        if (Runner.IsForward) {
+            float delta = Runner.DeltaTime;
 
             Vector3 targetEuler = models.transform.eulerAngles;
             bool instant = false, changeFacing = false;
@@ -112,7 +114,7 @@ public class PlayerAnimationController : MonoBehaviour {
                         instant = true;
                         changeFacing = true;
                     } else if (controller.IsSpinnerFlying || controller.IsPropellerFlying) {
-                        targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(controller.Runner) ?? 0f) * 2000) - (controller.IsDrilling ? 800 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.Expired(controller.Runner) && body.velocity.y < 0 ? 800 : 0), 0) * delta;
+                        targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(Runner) ?? 0f) * 2000) - (controller.IsDrilling ? 800 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.Expired(Runner) && body.velocity.y < 0 ? 800 : 0), 0) * delta;
                         instant = true;
                     } else if (controller.wallSlideLeft || controller.wallSlideRight) {
                         targetEuler = new Vector3(0, controller.wallSlideRight ? 110 : 250, 0);
@@ -141,12 +143,12 @@ public class PlayerAnimationController : MonoBehaviour {
             }
 
             //Particles
-            SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.IsOnGround && (controller.skidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.sliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
+            SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.IsOnGround && (controller.skidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
             SetParticleEmission(drillParticle, !gameover && controller.IsDrilling);
             if (controller.IsDrilling)
                 drillParticleAudio.clip = (controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
             SetParticleEmission(sparkles, !gameover && controller.IsStarmanInvincible);
-            SetParticleEmission(giantParticle, !gameover && controller.State == Enums.PowerupState.MegaMushroom && !controller.GiantStartTimer.ExpiredOrNotRunning(controller.Runner));
+            SetParticleEmission(giantParticle, !gameover && controller.State == Enums.PowerupState.MegaMushroom && !controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
             SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
 
             //Blinking
@@ -170,7 +172,7 @@ public class PlayerAnimationController : MonoBehaviour {
         if (controller.cameraController.IsControllingCamera)
             HorizontalCamera.OFFSET_TARGET = (controller.IsSpinnerFlying || controller.IsPropellerFlying) ? 0.5f : 0f;
 
-        if (controller.IsCrouching || controller.sliding || controller.skidding) {
+        if (controller.IsCrouching || controller.IsSliding || controller.skidding) {
             dust.transform.localPosition = Vector2.zero;
         } else if (controller.wallSlideLeft || controller.wallSlideRight) {
             dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * (3f / 4f) * (controller.wallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * (3f / 4f));
@@ -197,10 +199,10 @@ public class PlayerAnimationController : MonoBehaviour {
         animator.SetBool("invincible", controller.IsStarmanInvincible);
         animator.SetBool("skidding", controller.skidding);
         animator.SetBool("propeller", controller.IsPropellerFlying);
-        animator.SetBool("propellerSpin", !controller.PropellerSpinTimer.ExpiredOrNotRunning(controller.Runner));
+        animator.SetBool("propellerSpin", !controller.PropellerSpinTimer.ExpiredOrNotRunning(Runner));
         animator.SetBool("crouching", controller.IsCrouching);
         animator.SetBool("groundpound", controller.IsGroundpounding);
-        animator.SetBool("sliding", controller.sliding);
+        animator.SetBool("sliding", controller.IsSliding);
         animator.SetBool("knockback", controller.IsInKnockback);
         animator.SetBool("facingRight", (left ^ right) ? right : controller.FacingRight);
         animator.SetBool("flying", controller.IsSpinnerFlying);
@@ -222,23 +224,23 @@ public class PlayerAnimationController : MonoBehaviour {
         }
         animator.SetFloat("velocityX", animatedVelocity);
         animator.SetFloat("velocityY", body.velocity.y);
-        animator.SetBool("doublejump", controller.doublejump);
-        animator.SetBool("triplejump", controller.triplejump);
+        animator.SetBool("doublejump", controller.IsDoubleJump);
+        animator.SetBool("triplejump", controller.IsTripleJump);
         animator.SetBool("holding", controller.HeldEntity != null);
         animator.SetBool("head carry", controller.HeldEntity != null && controller.HeldEntity is FrozenCube);
         animator.SetBool("pipe", controller.pipeEntering != null);
         animator.SetBool("blueshell", controller.State == Enums.PowerupState.BlueShell);
         animator.SetBool("mini", controller.State == Enums.PowerupState.MiniMushroom);
         animator.SetBool("mega", controller.State == Enums.PowerupState.MegaMushroom);
-        animator.SetBool("inShell", controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(controller.Runner) ?? 0f) <= 0.15f));
+        animator.SetBool("inShell", controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
     }
     public void HandleMiscStates() {
-        if (!controller.GiantEndTimer.ExpiredOrNotRunning(controller.Runner)) {
-            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(controller.Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
+        if (!controller.GiantEndTimer.ExpiredOrNotRunning(Runner)) {
+            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
         } else {
             transform.localScale = controller.State switch {
                 Enums.PowerupState.MiniMushroom => Vector3.one / 2,
-                Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingTime(controller.Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
+                Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingTime(Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
                 _ => Vector3.one,
             };
         }
@@ -265,7 +267,7 @@ public class PlayerAnimationController : MonoBehaviour {
         materialBlock.SetVector("ShirtColor", secondaryColor);
 
         Vector3 giantMultiply = Vector3.one;
-        float giantTimeRemaining = controller.GiantTimer.RemainingTime(controller.Runner) ?? 0f;
+        float giantTimeRemaining = controller.GiantTimer.RemainingTime(Runner) ?? 0f;
         if (controller.State == Enums.PowerupState.MegaMushroom && controller.GiantTimer.IsRunning && giantTimeRemaining < 4) {
             float v = ((Mathf.Sin(giantTimeRemaining * 20f) + 1f) / 2f * 0.9f) + 0.1f;
             giantMultiply = new Vector3(v, 1, v);
@@ -276,7 +278,7 @@ public class PlayerAnimationController : MonoBehaviour {
             r.SetPropertyBlock(materialBlock);
 
         //hit flash
-        //float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(controller.Runner) ?? 0f;
+        //float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(Runner) ?? 0f;
         //models.SetActive(GameManager.Instance.gameover || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
         models.SetActive(true);
 
@@ -301,7 +303,7 @@ public class PlayerAnimationController : MonoBehaviour {
         if (!controller.IsDead)
             return;
 
-        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(controller.Runner) ?? 0f);
+        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(Runner) ?? 0f);
 
         if (deathTimer < deathUpTime) {
             deathUp = false;
@@ -312,7 +314,7 @@ public class PlayerAnimationController : MonoBehaviour {
             if (!deathUp && body.position.y > GameManager.Instance.GetLevelMinY()) {
                 body.velocity = new Vector2(0, deathForce);
                 deathUp = true;
-                if (animator.GetBool("firedeath") && controller.Runner.IsForward) {
+                if (animator.GetBool("firedeath") && Runner.IsForward) {
                     controller.PlaySound(Enums.Sounds.Player_Voice_LavaDeath);
                     controller.PlaySound(Enums.Sounds.Player_Sound_LavaHiss);
                 }
@@ -321,7 +323,7 @@ public class PlayerAnimationController : MonoBehaviour {
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
         }
-        if (controller.Object.HasInputAuthority && deathTimer + controller.Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f))
+        if (controller.Object.HasInputAuthority && deathTimer + Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f))
             controller.fadeOut.FadeOutAndIn(0.33f, .1f);
 
         if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y) {

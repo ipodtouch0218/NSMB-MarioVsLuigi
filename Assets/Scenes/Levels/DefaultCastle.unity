@@ -3970,6 +3970,7 @@ GameObject:
   - component: {fileID: 361225200}
   - component: {fileID: 361225208}
   - component: {fileID: 361225205}
+  - component: {fileID: 361225209}
   m_Layer: 8
   m_Name: Tilemap_Squishy
   m_TagString: Squishy
@@ -11562,6 +11563,31 @@ MonoBehaviour:
     m_PostInfinity: 1
     m_RotationOrder: 4
   animationTimeSeconds: 17
+--- !u!114 &361225209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361225195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: 5cfed3c32b214f8a971d484c0758c464
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 361225208}
+  - {fileID: 361225205}
+  SimulationBehaviours: []
 --- !u!1001 &379146488
 PrefabInstance:
   m_ObjectHideFlags: 0

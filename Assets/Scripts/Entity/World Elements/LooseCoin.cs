@@ -52,8 +52,10 @@ public class LooseCoin : Coin {
         physics.UpdateCollisions();
         if (physics.onGround) {
             body.velocity -= body.velocity * Time.fixedDeltaTime;
-            if (physics.hitRoof)
+            if (physics.hitRoof) {
                 Runner.Despawn(Object);
+                return;
+            }
 
             if (prevFrameVelocity.y < -1f)
                 PlaySound(Enums.Sounds.World_Coin_Drop);

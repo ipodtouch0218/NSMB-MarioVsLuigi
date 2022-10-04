@@ -11,6 +11,7 @@ public class KoopaWalk : HoldableEntity {
     [Networked] public NetworkBool IsInShell { get; set; }
     [Networked] public NetworkBool IsStationary { get; set; }
     [Networked] public NetworkBool IsUpsideDown { get; set; }
+    [Networked] private float CurrentSpeed { get; set; }
 
     //---Serialized Variables
     [SerializeField] private Vector2 outShellHitboxSize, inShellHitboxSize;
@@ -22,8 +23,8 @@ public class KoopaWalk : HoldableEntity {
 
     public bool dontFallOffEdges, blue, canBeFlipped = true, flipXFlip, putdown;
 
+    private float dampVelocity;
     private Vector2 blockOffset = new(0, 0.05f), velocityLastFrame;
-    private float dampVelocity, currentSpeed;
     protected int combo;
 
     #region Unity Methods
@@ -91,8 +92,8 @@ public class KoopaWalk : HoldableEntity {
                 Turnaround(!FacingRight, velocityLastFrame.x);
         }
 
-        if (physics.onGround && !IsStationary)
-            body.velocity = new((IsInShell ? currentSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+        if (!IsStationary)
+            body.velocity = new((IsInShell ? CurrentSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
         CheckForEntityCollisions();
         HandleTile();
@@ -162,7 +163,7 @@ public class KoopaWalk : HoldableEntity {
             player.body.velocity = new(0, player.body.velocity.y);
             FacingRight = damageDirection.x < 0;
 
-        } else if (player.sliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
+        } else if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.FacingRight;
             if (IsInShell && !IsStationary && player.IsInShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.DoKnockback(player.body.position.x < body.position.x, 0, true, 0);
@@ -246,21 +247,20 @@ public class KoopaWalk : HoldableEntity {
     }
 
     public override void Kick(bool fromLeft, float kickFactor, bool groundpound) {
-        FacingRight = !fromLeft;
+        FacingRight = fromLeft;
         IsStationary = false;
-        currentSpeed = kickSpeed + 1.5f * kickFactor;
-        body.velocity = new(currentSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
+        CurrentSpeed = kickSpeed + 1.5f * kickFactor;
+        body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
     public override void Throw(bool toRight, bool crouch) {
+        throwSpeed = CurrentSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.velocity.x) / Holder.RunningMaxSpeed);
         base.Throw(toRight, crouch);
-        if (Holder == null)
-            return;
 
         IsStationary = crouch;
         IsInShell = true;
-        throwSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.velocity.x) / Holder.RunningMaxSpeed);
+        WakeupTimer = TickTimer.None;
         putdown = crouch;
     }
 
@@ -306,7 +306,7 @@ public class KoopaWalk : HoldableEntity {
             PlaySound(Enums.Sounds.World_Block_Bump);
 
         FacingRight = hitWallOnLeft;
-        body.velocity = new((x > 0.5f ? Mathf.Abs(x) : currentSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+        body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
         if (IsInShell)
             PlaySound(Enums.Sounds.World_Block_Bump);
     }

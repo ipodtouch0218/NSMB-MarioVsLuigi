@@ -21,7 +21,7 @@ namespace NSMB.Utils {
 
         public static string ToValidUsername(this string input, bool discrim = true) {
 
-            string discriminator = input.Length >= 3 ? input[^3..] : "";
+            string discriminator = input?.Length >= 3 ? input[^3..] : "";
 
             //valid characters
             input = Regex.Replace(input, @"(\([0-9]\))|[^A-Za-z0-9]", "");

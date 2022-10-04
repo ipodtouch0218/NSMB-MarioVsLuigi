@@ -21,7 +21,7 @@ public class BobombWalk : HoldableEntity {
     private Vector3 previousFrameVelocity;
 
     //---Properties
-    public bool Lit { get => !DetonationTimer.ExpiredOrNotRunning(Runner); }
+    public bool Lit => !DetonationTimer.ExpiredOrNotRunning(Runner);
 
 
     #region Unity Methods
@@ -30,6 +30,7 @@ public class BobombWalk : HoldableEntity {
     }
 
     public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -38,7 +39,6 @@ public class BobombWalk : HoldableEntity {
             return;
         }
 
-        base.FixedUpdateNetwork();
         if (IsFrozen || Dead)
             return;
 
@@ -74,7 +74,7 @@ public class BobombWalk : HoldableEntity {
         if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             FacingRight = damageDirection.x < 0;
 
-        } else if (player.sliding || player.IsInShell || player.IsStarmanInvincible) {
+        } else if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible) {
             SpecialKill(player.body.velocity.x > 0, false, player.StarCombo++);
             return;
 
@@ -136,6 +136,11 @@ public class BobombWalk : HoldableEntity {
         if (physics.onGround && physics.hitRoof)
             SpecialKill(false, false, 0);
     }
+
+    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        base.Bump(bumper, tile, direction);
+        Light();
+    }
     #endregion
 
     #region PunRPCs
@@ -155,8 +160,8 @@ public class BobombWalk : HoldableEntity {
             if (obj == gameObject)
                 continue;
 
-            if (hit.CompareTag("Player")) {
-                obj.GetComponent<PlayerController>().Powerdown(false);
+            if (obj.TryGetComponent(out PlayerController player)) {
+                player.Powerdown(false);
                 continue;
             }
 

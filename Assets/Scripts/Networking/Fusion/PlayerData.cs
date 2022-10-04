@@ -3,9 +3,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
+using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
-using Fusion;
 
 public class PlayerData : NetworkBehaviour {
 
@@ -17,10 +17,11 @@ public class PlayerData : NetworkBehaviour {
     [Networked, Capacity(20)] private string Nickname { get; set; } = "noname";
     [Networked, Capacity(20)] private string DisplayNickname { get; set; } = "noname";
     [Networked, Capacity(32)] private string UserId { get; set; }
-    [Networked] public NetworkBool IsMuted { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
     [Networked] public NetworkBool IsCurrentlySpectating { get; set; } = true;
+    [Networked] public NetworkBool IsRoomOwner { get; set; }
     [Networked(OnChanged = nameof(OnLoadStateChanged))] public NetworkBool IsLoaded { get; set; }
+    [Networked] public NetworkBool IsMuted { get; set; }
     [Networked] public TickTimer MessageCooldownTimer { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))] public byte CharacterIndex { get; set; }
     [Networked] public byte SkinIndex { get; set; }
@@ -41,6 +42,9 @@ public class PlayerData : NetworkBehaviour {
             //we're the client. update with our data.
             Rpc_SetCharacterIndex(Settings.Instance.character);
             Rpc_SetSkinIndex(Settings.Instance.skin);
+
+            if (Runner.IsServer)
+                IsRoomOwner = true;
         }
 
         if (Runner.IsServer) {

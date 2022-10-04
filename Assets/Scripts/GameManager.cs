@@ -31,7 +31,7 @@ public class GameManager : NetworkBehaviour {
 
     //---Networked Variables
     [Networked] private TickTimer BigStarRespawnTimer { get; set; }
-    [Networked(OnChanged = nameof(OnStartTimerChanged))] public TickTimer GameStartTimer { get; set; }
+    [Networked] public TickTimer GameStartTimer { get; set; }
     [Networked] public TickTimer GameEndTimer { get; set; }
     [Networked] public NetworkRNG Random { get; set; }
     [Networked, Capacity(10)] private NetworkLinkedList<PlayerController> Players => default;
@@ -197,12 +197,16 @@ public class GameManager : NetworkBehaviour {
     */
 
 
-    public void CreateBlockBump(int tileX, int tileY, bool downwards, string newTile, NetworkPrefabRef? spawnPrefab, bool spawnCoin, Vector2 spawnOffset = default) {
+    public void CreateBlockBump(int tileX, int tileY, bool downwards, string newTile, NetworkPrefabRef? spawnPrefab, bool spawnCoin, Vector2 spawnOffset = default, bool setAndBump = false) {
 
         Vector3Int loc = new(tileX, tileY, 0);
 
-        if (tilemap.GetTile(loc) == null)
-            return;
+        if (tilemap.GetTile(loc) == null) {
+            if (setAndBump)
+                return;
+
+            tilemap.SetTile(loc, (TileBase) Resources.Load("Tilemaps/Tiles/" + newTile));
+        }
 
         Sprite sprite = tilemap.GetSprite(loc);
         Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f;
@@ -396,15 +400,6 @@ public class GameManager : NetworkBehaviour {
         CheckForWinner();
     }
 
-    public static void OnStartTimerChanged(Changed<GameManager> changed) {
-        GameManager gm = changed.Behaviour;
-        if (gm.GameStartTimer.IsRunning && gm.GameStartTick == -1) {
-            if (gm.Runner.IsServer)
-                gm.Rpc_FinishLoading();
-        }
-    }
-
-
     private void CheckIfAllPlayersLoaded() {
         if (!NetworkHandler.Runner.IsServer || loaded)
             return;
@@ -422,6 +417,9 @@ public class GameManager : NetworkBehaviour {
         loaded = true;
         SceneManager.SetActiveScene(gameObject.scene);
         GameStartTimer = TickTimer.CreateFromSeconds(NetworkHandler.Runner, 1.5f);
+
+        if (Runner.IsServer)
+            Rpc_FinishLoading();
 
         foreach (PlayerRef player in NetworkHandler.Runner.ActivePlayers)
             player.GetPlayerData(NetworkHandler.Runner).IsLoaded = false;
@@ -633,10 +631,6 @@ public class GameManager : NetworkBehaviour {
         }
     }
 
-
-
-
-
     public void Update() {
         if (gameover)
             return;
@@ -844,6 +838,7 @@ public class GameManager : NetworkBehaviour {
             spawn -= new Vector3(levelWidthTile/2f, 0);
         return spawn;
     }
+
     [Range(1,10)]
     public int playersToVisualize = 10;
     public void OnDrawGizmos() {
@@ -886,5 +881,4 @@ public class GameManager : NetworkBehaviour {
             Gizmos.DrawIcon(starSpawn.transform.position, "star", true, new Color(1, 1, 1, 0.5f));
         }
     }
-
 }

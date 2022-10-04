@@ -563,6 +563,16 @@ public class MainMenuManager : MonoBehaviour {
                 [Enums.NetRoomProperties.GameStarted] = 1
             });
 
+            //set spectating values for players
+            foreach (PlayerRef player in Runner.ActivePlayers) {
+                PlayerData data = player.GetPlayerData(Runner);
+
+                if (!data)
+                    continue;
+
+                data.IsCurrentlySpectating = data.IsManualSpectator;
+            }
+
             //load the correct scene
             Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Level, out int level);
             Runner.SetActiveScene(level + 2);

@@ -197,7 +197,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             player.IsSpinnerFlying = false;
             player.IsDrilling = false;
             player.IsInShell = false;
-            player.GiantTimer = TickTimer.CreateFromSeconds(Runner, 15f);
+            player.GiantTimer = TickTimer.CreateFromSeconds(Runner, 15f + player.giantStartTime);
             transform.localScale = Vector3.one;
             Instantiate(PrefabList.Instance.Particle_Giant, transform.position, Quaternion.identity);
 
