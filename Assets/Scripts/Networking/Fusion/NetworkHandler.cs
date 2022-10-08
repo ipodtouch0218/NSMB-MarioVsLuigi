@@ -99,6 +99,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
         Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress} ({token})");
+
+        SessionInfo info = runner.SessionInfo;
+        if (info.PlayerCount >= LobbyData.Instance.MaxPlayers) {
+            request.Refuse();
+            return;
+        }
+
         //TODO: check for bans?
         request.Accept();
 
@@ -144,6 +151,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (runner.IsServer) {
             //create player data
             runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, predictionKey: new() { Byte0 = (byte) Runner.Simulation.Tick, Byte1 = (byte) player.RawEncoded });
+
+            if (player == Runner.LocalPlayer) {
+                //create lobby data
+                NetworkObject lobby = runner.Spawn(PrefabList.Instance.LobbyDataHolder);
+                LobbyData.Instance = lobby.GetComponent<LobbyData>();
+            }
         }
 
         GlobalController.Instance.DiscordController.UpdateActivity();
@@ -256,7 +269,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return result;
     }
 
-    public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host) {
+    public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host, int players = 10) {
         //create a random room id.
         StringBuilder idBuilder = new();
 
@@ -274,6 +287,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
         args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.nickname;
+        args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;
 
         //attempt to create the room
         return await Runner.StartGame(args);

@@ -46,6 +46,9 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     public void OnBeforeSpawned(PlayerController playerToFollow, float pickupDelay) {
         FollowPlayer = playerToFollow;
         FollowEndTimer = TickTimer.CreateFromSeconds(Runner, pickupDelay);
+
+        if (playerToFollow)
+            transform.position = body.position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.currentPosition.y + 1.68f);
     }
 
     public override void Spawned() {
@@ -53,7 +56,6 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             //spawned following a player
             FollowEndTimer = TickTimer.CreateFromSeconds(Runner, 1f);
 
-            body.position = new(FollowPlayer.transform.position.x, FollowPlayer.cameraController.currentPosition.y + 1.68f);
             body.isKinematic = true;
             gameObject.layer = Layers.LayerHitsNothing;
             sRenderer.sortingOrder = 15;

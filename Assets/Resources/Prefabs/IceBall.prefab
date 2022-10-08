@@ -96,6 +96,12 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 1164692562165207756, guid: 00a2ef66a322a694c837b29404f2af49,
         type: 3}
+      propertyPath: wallHitParticle
+      value: 
+      objectReference: {fileID: 3894548935506966732, guid: 0b92073613fc93f4698e7d4d7b8940dc,
+        type: 3}
+    - target: {fileID: 1164692562165207756, guid: 00a2ef66a322a694c837b29404f2af49,
+        type: 3}
       propertyPath: _IsIceball._value
       value: 1
       objectReference: {fileID: 0}
@@ -113,6 +119,11 @@ PrefabInstance:
         type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: -5715629875319867896
+      objectReference: {fileID: 0}
+    - target: {fileID: 2914323514277592658, guid: 00a2ef66a322a694c837b29404f2af49,
+        type: 3}
+      propertyPath: InterpolationTarget
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5044812112945403417, guid: 00a2ef66a322a694c837b29404f2af49,
         type: 3}

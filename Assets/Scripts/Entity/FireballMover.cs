@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Utils;
 
 public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
@@ -9,7 +10,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     [Networked(Default = nameof(speed))] private float MoveSpeed { get; set; }
 
     //---Public Variables
-    public GameObject wallHitPrefab;
+    public GameObject wallHitParticle;
 
     //---Serialized Variables
     [SerializeField] private ParticleSystem particles;
@@ -32,8 +33,10 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     }
 
     public override void Spawned() {
-        base.Spawned();
         body.velocity = new(MoveSpeed * (FacingRight ? 1 : -1), -MoveSpeed);
+
+        if (Utils.IsTileSolidAtWorldLocation(body.position))
+            Runner.Despawn(Object);
     }
 
     public override void FixedUpdateNetwork() {
@@ -101,7 +104,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (!GameManager.Instance.gameover)
-            Instantiate(wallHitPrefab, transform.position, Quaternion.identity);
+            Instantiate(wallHitParticle, transform.position, Quaternion.identity);
 
         particles.transform.parent = null;
         particles.Stop();

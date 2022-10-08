@@ -17,6 +17,7 @@ public class MainMenuManager : MonoBehaviour {
     public const int NICKNAME_MIN = 2, NICKNAME_MAX = 20;
 
     public static MainMenuManager Instance;
+
     public AudioSource sfx, music;
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
@@ -44,6 +45,8 @@ public class MainMenuManager : MonoBehaviour {
     //---Serialize Fields
     [SerializeField] public PlayerListHandler playerList;
     [SerializeField] private ColorChooser colorManager;
+    [SerializeField] public ChatManager chat;
+    [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
 
     public Image overallColor, shirtColor;
     public GameObject palette, paletteDisabled;
@@ -73,10 +76,12 @@ public class MainMenuManager : MonoBehaviour {
             Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
             Utils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
             Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string host);
+            Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int players);
 
             bool valid = true;
             valid &= session.IsVisible && session.IsOpen;
             valid &= session.MaxPlayers > 0 && session.MaxPlayers <= 10;
+            valid &= players > 0 && players <= 10;
             valid &= lives <= 99;
             valid &= stars >= 1 && stars <= 99;
             valid &= coins >= 1 && coins <= 99;
@@ -142,7 +147,7 @@ public class MainMenuManager : MonoBehaviour {
         //
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        LocalChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
+        chat.LocalChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
 
@@ -180,32 +185,6 @@ public class MainMenuManager : MonoBehaviour {
     //}
     // MATCHMAKING CALLBACKS
     //case (byte) Enums.NetEventIds.PlayerChatMessage: {
-    //    string message = e.CustomData as string;
-
-    //    if (string.IsNullOrWhiteSpace(message))
-    //        return;
-
-    //    if (sender == null)
-    //        return;
-
-    //    double time = lastMessage.GetValueOrDefault(sender);
-    //    if (PhotonNetwork.Time - time < 0.75f)
-    //        return;
-
-    //    lastMessage[sender] = PhotonNetwork.Time;
-
-    //    if (!sender.IsMasterClient) {
-    //        Utils.GetSessionProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
-    //        if (mutes.Contains(sender.UserId))
-    //            return;
-    //    }
-
-    //    message = message.Substring(0, Mathf.Min(128, message.Length));
-    //    message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
-    //    message = sender.GetUniqueNickname() + ": " + message.Filter();
-
-    //    LocalChatMessage(message, Color.black, false);
-    //    break;
     //}
 
     // Unity Stuff
@@ -327,7 +306,7 @@ public class MainMenuManager : MonoBehaviour {
     public IEnumerator OnPlayerDataValidated(PlayerRef player) {
         yield return null; //wait a frame because reasons
         if (waitingForJoinMessage.Remove(player)) {
-            LocalChatMessage(player.GetPlayerData(Runner).GetNickname() + " joined the room", Color.red);
+            chat.LocalChatMessage(player.GetPlayerData(Runner).GetNickname() + " joined the room", Color.red);
             sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
         }
 
@@ -342,10 +321,8 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void EnterRoom() {
-        SessionInfo session = Runner.SessionInfo;
 
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool started);
-        if (started) {
+        if (LobbyData.Instance.GameStarted) {
             //start early, we're joining late.
             StartGame();
             return;
@@ -362,8 +339,9 @@ public class MainMenuManager : MonoBehaviour {
         OpenInLobbyMenu();
 
         if (Runner.IsServer)
-            LocalChatMessage("You are the room's host! Click on your player's names to control your room.", Color.red);
+            chat.LocalChatMessage("You are the room's host! Click on your player's names to control your room.", Color.red);
 
+        SessionInfo session = Runner.SessionInfo;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
         SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
 
@@ -559,9 +537,7 @@ public class MainMenuManager : MonoBehaviour {
         //do host related stuff
         if (Runner.IsServer) {
             //set starting
-            Runner.SessionInfo.UpdateCustomProperties(new() {
-                [Enums.NetRoomProperties.GameStarted] = 1
-            });
+            LobbyData.Instance.SetGameStarted(true);
 
             //set spectating values for players
             foreach (PlayerRef player in Runner.ActivePlayers) {
@@ -574,8 +550,7 @@ public class MainMenuManager : MonoBehaviour {
             }
 
             //load the correct scene
-            Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Level, out int level);
-            Runner.SetActiveScene(level + 2);
+            Runner.SetActiveScene(LobbyData.Instance.Level + 2);
         }
     }
 
@@ -652,81 +627,33 @@ public class MainMenuManager : MonoBehaviour {
     //    startGameBtn.interactable = host && realPlayers >= 1;
     //}
 
-    public void LocalChatMessage(string message, Color? color = null, bool filter = true) {
-        float y = 0;
-        for (int i = 0; i < chatContent.transform.childCount; i++) {
-            GameObject child = chatContent.transform.GetChild(i).gameObject;
-            if (!child.activeSelf)
-                continue;
-
-            y -= child.GetComponent<RectTransform>().rect.height + 20;
-        }
-
-        GameObject chat = Instantiate(chatPrefab, Vector3.zero, Quaternion.identity, chatContent.transform);
-        chat.SetActive(true);
-
-        if (color != null) {
-            Color fColor = (Color) color;
-            message = $"<color=#{(byte) (fColor.r * 255):X2}{(byte) (fColor.g * 255):X2}{(byte) (fColor.b * 255):X2}>" + message;
-        }
-
-        GameObject txtObject = chat.transform.Find("Text").gameObject;
-        SetText(txtObject, message, filter);
-        Canvas.ForceUpdateCanvases();
-
-        //RectTransform tf = txtObject.GetComponent<RectTransform>();
-        //Bounds bounds = txtObject.GetComponent<TextMeshProUGUI>().textBounds;
-        //tf.sizeDelta = new Vector2(tf.sizeDelta.x, bounds.max.y - bounds.min.y - 15f);
-    }
-    public void SendChat() {
-
-
-        PlayerData data = Runner.LocalPlayer.GetPlayerData(Runner);
-        if (!data.MessageCooldownTimer.ExpiredOrNotRunning(Runner)) {
-            //can't send a message yet.
-            return;
-        }
-
-        string text = chatTextField.text.Replace("<", "«").Replace(">", "»").Trim();
-        if (text == null || text == "")
-            return;
-
-        if (text.StartsWith("/")) {
-            LocalChatMessage("Slash commands are no longer necessary. Click on a player's name instead!");
-            return;
-        }
-
-        //TODO:
-        //PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerChatMessage, text, NetworkUtils.EventAll, SendOptions.SendReliable);
-        StartCoroutine(SelectNextFrame(chatTextField));
-    }
 
     public void Kick(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         if (target == runner.LocalPlayer) {
-            LocalChatMessage("While you can kick yourself, it's probably not what you meant to do.", Color.red);
+            chat.LocalChatMessage("While you can kick yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
-        LocalChatMessage($"Successfully kicked {target.GetPlayerData(runner).GetNickname()}", Color.red);
+        chat.LocalChatMessage($"Successfully kicked {target.GetPlayerData(runner).GetNickname()}", Color.red);
         runner.Disconnect(target);
     }
 
     public void Promote(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         if (target == runner.LocalPlayer) {
-            LocalChatMessage("You are already the host..?", Color.red);
+            chat.LocalChatMessage("You are already the host..?", Color.red);
             return;
         }
 
         //PhotonNetwork.SetMasterClient(target);
         //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
-        LocalChatMessage("Changing hosts is not implemented yet!", Color.red);
+        chat.LocalChatMessage("Changing hosts is not implemented yet!", Color.red);
     }
 
     public void Mute(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         if (target == runner.LocalPlayer) {
-            LocalChatMessage("While you can mute yourself, it's probably not what you meant to do.", Color.red);
+            chat.LocalChatMessage("While you can mute yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
 
@@ -734,9 +661,9 @@ public class MainMenuManager : MonoBehaviour {
         data.IsMuted = !data.IsMuted;
 
         if (data.IsMuted) {
-            LocalChatMessage($"Successfully muted {data.GetNickname()}", Color.red);
+            chat.LocalChatMessage($"Successfully muted {data.GetNickname()}", Color.red);
         } else {
-            LocalChatMessage($"Successfully unmuted {data.GetNickname()}", Color.red);
+            chat.LocalChatMessage($"Successfully unmuted {data.GetNickname()}", Color.red);
         }
     }
 
@@ -765,7 +692,7 @@ public class MainMenuManager : MonoBehaviour {
 
     public void Ban(PlayerRef target) {
         if (target == Runner.LocalPlayer) {
-            LocalChatMessage("While you can ban yourself, it's probably not what you meant to do.", Color.red);
+            chat.LocalChatMessage("While you can ban yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
 
@@ -802,86 +729,82 @@ public class MainMenuManager : MonoBehaviour {
         //LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
     }
 
+    /*
     private void RunCommand(string[] args) {
         if (Runner.IsClient) {
-            LocalChatMessage("You cannot use room commands if you aren't the host!", Color.red);
+            chat.LocalChatMessage("You cannot use room commands if you aren't the host!", Color.red);
             return;
         }
-        //string command = args.Length > 0 ? args[0].ToLower() : "";
-        //switch (command) {
-        //case "kick": {
-        //    if (args.Length < 2) {
-        //        LocalChatMessage("Usage: /kick <player name>", Color.red);
-        //        return;
-        //    }
-        //    string strTarget = args[1].ToLower();
-        //    Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
-        //    if (target == null) {
-        //        LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
-        //        return;
-        //    }
-        //    Kick(target);
-        //    return;
-        //}
-        //case "host": {
-        //    if (args.Length < 2) {
-        //        LocalChatMessage("Usage: /host <player name>", Color.red);
-        //        return;
-        //    }
-        //    string strTarget = args[1].ToLower();
-        //    Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
-        //    if (target == null) {
-        //        LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
-        //        return;
-        //    }
-        //    Promote(target);
-        //    return;
-        //}
-        //case "help": {
-        //    string sub = args.Length > 1 ? args[1] : "";
-        //    string msg = sub switch {
-        //        "kick" => "/kick <player name> - Kick a player from the room",
-        //        "ban" => "/ban <player name> - Ban a player from rejoining the room",
-        //        "host" => "/host <player name> - Make a player the host for the room",
-        //        "mute" => "/mute <playername> - Prevents a player from talking in chat",
-        //        //"debug" => "/debug - Enables debug & in-development features",
-        //        _ => "Available commands: /kick, /host, /mute, /ban",
-        //    };
-        //    LocalChatMessage(msg, Color.red);
-        //    return;
-        //}
-        //case "mute": {
-        //    if (args.Length < 2) {
-        //        LocalChatMessage("Usage: /mute <player name>", Color.red);
-        //        return;
-        //    }
-        //    string strTarget = args[1].ToLower();
-        //    Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
-        //    if (target == null) {
-        //        LocalChatMessage($"Unknown player {args[1]}", Color.red);
-        //        return;
-        //    }
-        //    Mute(target);
-        //    return;
-        //}
-        //case "ban": {
-        //    if (args.Length < 2) {
-        //        LocalChatMessage("Usage: /ban <player name>", Color.red);
-        //        return;
-        //    }
-        //    BanOrUnban(args[1]);
-        //    return;
-        //}
-        //}
-        //LocalChatMessage($"Error: Unknown command. Try /help for help.", Color.red);
+        string command = args.Length > 0 ? args[0].ToLower() : "";
+        switch (command) {
+        case "kick": {
+            if (args.Length < 2) {
+                LocalChatMessage("Usage: /kick <player name>", Color.red);
+                return;
+            }
+            string strTarget = args[1].ToLower();
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
+            if (target == null) {
+                LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
+                return;
+            }
+            Kick(target);
+            return;
+        }
+        case "host": {
+            if (args.Length < 2) {
+                LocalChatMessage("Usage: /host <player name>", Color.red);
+                return;
+            }
+            string strTarget = args[1].ToLower();
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
+            if (target == null) {
+                LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
+                return;
+            }
+            Promote(target);
+            return;
+        }
+        case "help": {
+            string sub = args.Length > 1 ? args[1] : "";
+            string msg = sub switch {
+                "kick" => "/kick <player name> - Kick a player from the room",
+                "ban" => "/ban <player name> - Ban a player from rejoining the room",
+                "host" => "/host <player name> - Make a player the host for the room",
+                "mute" => "/mute <playername> - Prevents a player from talking in chat",
+                //"debug" => "/debug - Enables debug & in-development features",
+                _ => "Available commands: /kick, /host, /mute, /ban",
+            };
+            LocalChatMessage(msg, Color.red);
+            return;
+        }
+        case "mute": {
+            if (args.Length < 2) {
+                LocalChatMessage("Usage: /mute <player name>", Color.red);
+                return;
+            }
+            string strTarget = args[1].ToLower();
+            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
+            if (target == null) {
+                LocalChatMessage($"Unknown player {args[1]}", Color.red);
+                return;
+            }
+            Mute(target);
+            return;
+        }
+        case "ban": {
+            if (args.Length < 2) {
+                LocalChatMessage("Usage: /ban <player name>", Color.red);
+                return;
+            }
+            BanOrUnban(args[1]);
+            return;
+        }
+        }
+        LocalChatMessage($"Error: Unknown command. Try /help for help.", Color.red);
         return;
     }
-
-    private IEnumerator SelectNextFrame(TMP_InputField input) {
-        yield return new WaitForEndOfFrame();
-        input.text = "";
-        input.ActivateInputField();
-    }
+    */
 
     public void SwapCharacter(TMP_Dropdown dropdown) {
         byte character = (byte) dropdown.value;

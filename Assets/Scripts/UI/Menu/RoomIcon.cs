@@ -30,7 +30,6 @@ public class RoomIcon : MonoBehaviour {
         session = newSession;
 
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxPlayers);
-        maxPlayers++;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string hostname);
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);

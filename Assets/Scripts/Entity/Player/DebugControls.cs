@@ -94,7 +94,7 @@ public class DebugControls : MonoBehaviour {
 
     private void SpawnDebugItem(NetworkPrefabRef prefab) {
         if (prefab == NetworkPrefabRef.Empty)
-            prefab = Utils.GetRandomItem(NetworkHandler.Instance.runner, GameManager.Instance.localPlayer).prefab;
+            prefab = Utils.GetRandomItem(GameManager.Instance.localPlayer).prefab;
 
         NetworkHandler.Instance.runner.Spawn(prefab, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(GameManager.Instance.localPlayer, 0f);

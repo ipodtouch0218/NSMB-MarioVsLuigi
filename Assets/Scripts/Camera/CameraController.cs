@@ -43,8 +43,8 @@ public class CameraController : MonoBehaviour {
         }
     }
 
-    public void Recenter() {
-        currentPosition = (Vector2) transform.position + airOffset;
+    public void Recenter(Vector2 pos) {
+        currentPosition = pos + airOffset;
         smoothDampVel = Vector3.zero;
         LateUpdate();
     }
@@ -53,7 +53,7 @@ public class CameraController : MonoBehaviour {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
-        if (!controller.IsDead)
+        if (!controller.IsDead || controller.IsRespawning)
             playerPos = AntiJitter(transform.position);
 
         float vOrtho = targetCamera.orthographicSize;

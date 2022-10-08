@@ -7,5 +7,5 @@ public struct PlayerNetworkInput : INetworkInput {
 }
 
 public enum PlayerControls {
-    Up, Down, Left, Right, Jump, Sprint, PowerupAction
+    Up, Down, Left, Right, Jump, Sprint, PowerupAction, SprintPowerupAction
 }

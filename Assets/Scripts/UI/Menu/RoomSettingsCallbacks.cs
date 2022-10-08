@@ -15,38 +15,59 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, customPowerupsEnabledToggle;
 
     //---Properties
-    private NetworkRunner Runner => NetworkHandler.Instance.runner;
+    private NetworkRunner Runner => NetworkHandler.Runner;
+    private LobbyData Lobby => LobbyData.Instance;
+
+    public void UpdateAllSettings(Changed<LobbyData> changed) {
+
+        ChangePrivate(Lobby.PrivateRoom);
+        ChangeMaxPlayers(Lobby.MaxPlayers);
+        //no "started" setting to update
+        byte newLevel = changed.Behaviour.Level;
+        changed.LoadOld();
+        byte oldLevel = changed.Behaviour.Level;
+        changed.LoadNew();
+
+        ChangeLevelIndex(Lobby.Level, newLevel != oldLevel);
+        ChangeStarRequirement(Lobby.StarRequirement);
+        ChangeCoinRequirement(Lobby.CoinRequirement);
+        ChangeLives(Lobby.Lives);
+        ChangeTime(Lobby.Timer);
+        ChangeDrawOnTimeUp(Lobby.DrawOnTimeUp);
+        ChangeCustomPowerups(Lobby.CustomPowerups);
+    }
 
     #region Level Index
     public void SetLevelIndex() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Level, out int oldValue);
+        int oldValue = Lobby.Level;
         int newValue = levelDropdown.value;
         if (newValue == oldValue || newValue < 0) {
-            ChangeLevel(oldValue);
+            ChangeLevelIndex(oldValue, false);
             return;
         }
 
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.Level] = newValue
-        });
-        ChangeLevel(newValue);
+        Lobby.SetLevel((byte) newValue);
+        ChangeLevelIndex(newValue, true);
     }
-    private void ChangeLevel(int index) {
+
+    private void ChangeLevelIndex(int index, bool changed) {
         levelDropdown.SetValueWithoutNotify(index);
-        MainMenuManager.Instance.LocalChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
-        Camera.main.transform.position = MainMenuManager.Instance.levelCameraPositions[index].transform.position;
+        if (changed) {
+            MainMenuManager.Instance.chat.LocalChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
+            Camera.main.transform.position = MainMenuManager.Instance.levelCameraPositions[index].transform.position;
+        }
     }
     #endregion
 
     #region Stars
     public void SetStarRequirement() {
-        if (!Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.StarRequirement, out int oldValue);
+        int oldValue = Lobby.StarRequirement;
         int.TryParse(starsInputField.text, out int newValue);
 
         if (newValue == oldValue || newValue < 1 || newValue > 99) {
@@ -54,11 +75,10 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
         }
 
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.StarRequirement] = newValue
-        });
+        Lobby.SetStarRequirement((sbyte) newValue);
         ChangeStarRequirement(newValue);
     }
+
     private void ChangeStarRequirement(int stars) {
         starsInputField.text = stars.ToString();
     }
@@ -66,10 +86,10 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     #region Coins
     public void SetCoinRequirement() {
-        if (!Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.CoinRequirement, out int oldValue);
+        int oldValue = Lobby.CoinRequirement;
         int.TryParse(coinsInputField.text, out int newValue);
 
         if (newValue == oldValue || newValue < 1 || newValue > 99) {
@@ -77,11 +97,10 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
         }
 
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.CoinRequirement] = newValue
-        });
+        Lobby.SetCoinRequirement((byte) newValue);
         ChangeCoinRequirement(newValue);
     }
+
     private void ChangeCoinRequirement(int coins) {
         coinsInputField.text = coins.ToString();
     }
@@ -89,32 +108,29 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     #region Lives
     public void SetLives() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Lives, out int oldValue);
+        int oldValue = Lobby.Lives;
         int.TryParse(livesInputField.text, out int newValue);
         if (newValue == -1 || newValue < 1 || newValue > 99) {
             ChangeLives(oldValue);
             return;
         }
 
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.Lives] = newValue
-        });
+        Lobby.SetLives((sbyte) newValue);
         ChangeLives(newValue);
     }
     public void EnableLives() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
         int newValue = livesEnabledToggle.isOn ? int.Parse(livesInputField.text) : -1;
 
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.Lives] = newValue
-        });
+        Lobby.SetLives((sbyte) newValue);
         ChangeLives(newValue);
     }
+
     private void ChangeLives(int lives) {
         bool enabled = lives != -1;
         livesEnabledToggle.SetIsOnWithoutNotify(enabled);
@@ -128,10 +144,10 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     #region Timer
     public void SetTime() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Time, out int oldValue);
+        int oldValue = Lobby.Timer;
         int newValue = Utils.ParseTimeToSeconds(timerInputField.text);
 
         if (newValue == oldValue || newValue < 1 || newValue > 99) {
@@ -139,22 +155,20 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
         }
 
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.Time] = newValue
-        });
+        Lobby.SetTimer(newValue);
         ChangeTime(newValue);
     }
     public void EnableTime() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
         int newValue = Utils.ParseTimeToSeconds(timerInputField.text);
         newValue = timerEnabledToggle.isOn ? newValue : -1;
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.Time] = newValue
-        });
+
+        Lobby.SetTimer(newValue);
         ChangeTime(newValue);
     }
+
     private void ChangeTime(int time) {
         timerEnabledToggle.SetIsOnWithoutNotify(time != -1);
         timerInputField.interactable = time != -1;
@@ -170,15 +184,15 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     #region DrawOnTimeUp
     public void SetDrawOnTimeUp() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
         bool newValue = drawEnabledToggle.isOn;
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.DrawTime] = newValue ? 1 : 0
-        });
+
+        Lobby.SetDrawOnTimeUp(newValue);
         ChangeDrawOnTimeUp(newValue);
     }
+
     private void ChangeDrawOnTimeUp(bool value) {
         drawEnabledToggle.SetIsOnWithoutNotify(value);
     }
@@ -186,15 +200,15 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     #region Custom Powerups
     public void SetCustomPowerups() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
         bool newValue = customPowerupsEnabledToggle.isOn;
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.CustomPowerups] = newValue ? 1 : 0
-        });
+
+        Lobby.SetCustomPowerups(newValue);
         ChangeCustomPowerups(newValue);
     }
+
     private void ChangeCustomPowerups(bool value) {
         customPowerupsEnabledToggle.SetIsOnWithoutNotify(value);
     }
@@ -202,10 +216,10 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     #region Players
     public void SetMaxPlayers() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int oldValue);
+        int oldValue = Lobby.MaxPlayers;
         int newValue = (int) playersSlider.value;
         int currentPlayers = Runner.SessionInfo.PlayerCount;
 
@@ -219,11 +233,10 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
         }
 
-        Runner.SessionInfo.UpdateCustomProperties(new() {
-            [Enums.NetRoomProperties.MaxPlayers] = newValue
-        });
+        Lobby.SetMaxPlayers((byte) newValue);
         ChangeMaxPlayers(newValue);
     }
+
     private void ChangeMaxPlayers(int value) {
         playersSlider.SetValueWithoutNotify(value);
         playersCount.text = value.ToString();
@@ -232,14 +245,15 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     #region Private
     public void SetPrivate() {
-        if (Runner.IsClient)
+        if (!Runner.IsServer)
             return;
 
         bool newValue = privateEnabledToggle.isOn;
+
         Runner.SessionInfo.IsVisible = !newValue;
         ChangePrivate(newValue);
-        //PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChangePrivate, null, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
+
     private void ChangePrivate(bool value) {
         privateEnabledToggle.SetIsOnWithoutNotify(value);
     }

@@ -397,7 +397,7 @@ namespace NSMB.Utils {
 
         public static Powerup[] powerups = null;
         // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
-        public static Powerup GetRandomItem(NetworkRunner runner, PlayerController player) {
+        public static Powerup GetRandomItem(PlayerController player) {
             GameManager gm = GameManager.Instance;
 
             // "losing" variable based on ln(x+1), x being the # of stars we're behind
@@ -407,13 +407,10 @@ namespace NSMB.Utils {
             if (powerups == null)
                 powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
 
-            int starsToWin = GameManager.Instance.starRequirement;
-            GetSessionProperty(runner.SessionInfo, Enums.NetRoomProperties.CustomPowerups, out bool custom);
-            GetSessionProperty(runner.SessionInfo, Enums.NetRoomProperties.Lives, out int livesOn);
+            int starsToWin = LobbyData.Instance.StarRequirement;
+            bool custom = LobbyData.Instance.CustomPowerups;
+            bool lives = LobbyData.Instance.Lives > 0;
 
-            bool lives = false;
-            if (livesOn > 0)
-                lives = true;
 
             bool big = gm.spawnBigPowerups;
             bool vertical = gm.spawnVerticalPowerups;

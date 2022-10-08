@@ -28,11 +28,7 @@ public class RouletteTile : BreakableBrickTile {
                 //Particles
                 for (int x = 0; x < 2; x++) {
                     for (int y = 0; y < 2; y++) {
-
-                        //TODO:
-                        //object[] parametersParticle = new object[] { tileLocation.x + x, tileLocation.y - y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
-                        //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
-
+                        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.TilemapToWorldPosition(tileLocation + new Vector3Int(x, y, 0)), particleColor);
                     }
                 }
 
@@ -40,7 +36,7 @@ public class RouletteTile : BreakableBrickTile {
                 return true;
             }
 
-            spawnResult = Utils.GetRandomItem(NetworkHandler.Instance.runner, player).prefab;
+            spawnResult = Utils.GetRandomItem(player).prefab;
         }
 
         Bump(interacter, direction, worldLocation);

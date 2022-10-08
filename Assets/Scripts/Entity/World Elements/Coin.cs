@@ -17,7 +17,7 @@ public abstract class Coin : CollectableEntity {
 
         player.Rpc_SpawnCoinEffects(position, newCoins);
 
-        if (newCoins >= GameManager.Instance.coinRequirement) {
+        if (newCoins >= LobbyData.Instance.CoinRequirement) {
             player.SpawnItem(NetworkPrefabRef.Empty);
             newCoins = 0;
         }

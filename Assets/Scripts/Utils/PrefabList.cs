@@ -8,7 +8,7 @@ public class PrefabList : ScriptableObject {
     public static PrefabList Instance => GlobalController.Instance.prefabs;
 
     //---Network Helpers
-    public NetworkPrefabRef PlayerDataHolder;
+    public NetworkPrefabRef PlayerDataHolder, LobbyDataHolder;
 
     //---World Elements
     public NetworkPrefabRef Obj_Fireball, Obj_Iceball;

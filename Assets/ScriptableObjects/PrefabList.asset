@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerDataHolder:
     RawGuidValue: cf98b2b907b9bc74ab8c14624e3c5575
+  LobbyDataHolder:
+    RawGuidValue: 6fe1d2f7545d144468b4dbaf10fabd89
   Obj_Fireball:
     RawGuidValue: 00a2ef66a322a694c837b29404f2af49
   Obj_Iceball:

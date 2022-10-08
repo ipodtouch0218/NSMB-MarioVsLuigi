@@ -116,8 +116,8 @@ public class PlayerAnimationController : NetworkBehaviour {
                     } else if (controller.IsSpinnerFlying || controller.IsPropellerFlying) {
                         targetEuler += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(Runner) ?? 0f) * 2000) - (controller.IsDrilling ? 800 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.Expired(Runner) && body.velocity.y < 0 ? 800 : 0), 0) * delta;
                         instant = true;
-                    } else if (controller.wallSlideLeft || controller.wallSlideRight) {
-                        targetEuler = new Vector3(0, controller.wallSlideRight ? 110 : 250, 0);
+                    } else if (controller.WallSlideLeft || controller.WallSlideRight) {
+                        targetEuler = new Vector3(0, controller.WallSlideRight ? 110 : 250, 0);
                     } else {
                         targetEuler = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
                     }
@@ -143,12 +143,12 @@ public class PlayerAnimationController : NetworkBehaviour {
             }
 
             //Particles
-            SetParticleEmission(dust, !gameover && (controller.wallSlideLeft || controller.wallSlideRight || (controller.IsOnGround && (controller.skidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
+            SetParticleEmission(dust, !gameover && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.skidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
             SetParticleEmission(drillParticle, !gameover && controller.IsDrilling);
             if (controller.IsDrilling)
                 drillParticleAudio.clip = (controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
             SetParticleEmission(sparkles, !gameover && controller.IsStarmanInvincible);
-            SetParticleEmission(giantParticle, !gameover && controller.State == Enums.PowerupState.MegaMushroom && !controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
+            SetParticleEmission(giantParticle, !gameover && controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
             SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
 
             //Blinking
@@ -174,8 +174,8 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         if (controller.IsCrouching || controller.IsSliding || controller.skidding) {
             dust.transform.localPosition = Vector2.zero;
-        } else if (controller.wallSlideLeft || controller.wallSlideRight) {
-            dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * (3f / 4f) * (controller.wallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * (3f / 4f));
+        } else if (controller.WallSlideLeft || controller.WallSlideRight) {
+            dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * (3f / 4f) * (controller.WallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * (3f / 4f));
         }
     }
     private void SetParticleEmission(ParticleSystem particle, bool value) {
@@ -193,8 +193,8 @@ public class PlayerAnimationController : NetworkBehaviour {
         bool right = controller.currentInputs.buttons.IsSet(PlayerControls.Right);
         bool left = controller.currentInputs.buttons.IsSet(PlayerControls.Left);
 
-        animator.SetBool("onLeft", controller.wallSlideLeft);
-        animator.SetBool("onRight", controller.wallSlideRight);
+        animator.SetBool("onLeft", controller.WallSlideLeft);
+        animator.SetBool("onRight", controller.WallSlideRight);
         animator.SetBool("onGround", controller.IsOnGround);
         animator.SetBool("invincible", controller.IsStarmanInvincible);
         animator.SetBool("skidding", controller.skidding);
@@ -278,9 +278,8 @@ public class PlayerAnimationController : NetworkBehaviour {
             r.SetPropertyBlock(materialBlock);
 
         //hit flash
-        //float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(Runner) ?? 0f;
-        //models.SetActive(GameManager.Instance.gameover || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration));
-        models.SetActive(true);
+        float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(Runner) ?? 0f;
+        models.SetActive(!controller.IsRespawning && (GameManager.Instance.gameover || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration)));
 
         //Model changing
         bool large = controller.State >= Enums.PowerupState.Mushroom;
@@ -300,7 +299,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
     }
     private void HandleDeathAnimation() {
-        if (!controller.IsDead)
+        if (!controller.IsDead || controller.IsRespawning)
             return;
 
         float deathTimer = 3f - (controller.DeathTimer.RemainingTime(Runner) ?? 0f);
@@ -309,7 +308,10 @@ public class PlayerAnimationController : NetworkBehaviour {
             deathUp = false;
             body.gravityScale = 0;
             body.velocity = Vector2.zero;
-            animator.Play("deadstart");
+            if (deathTimer < (deathUpTime * 0.5f)) {
+                animator.Play("deadstart");
+                animator.ResetTrigger("respawn");
+            }
         } else {
             if (!deathUp && body.position.y > GameManager.Instance.GetLevelMinY()) {
                 body.velocity = new Vector2(0, deathForce);
@@ -356,9 +358,10 @@ public class PlayerAnimationController : NetworkBehaviour {
                 float size = controller.MainHitbox.size.y * transform.localScale.y;
                 offset.y += size;
             }
-            transform.position = body.position = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
+            Vector3 tpPos = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
+            transform.position = body.position = tpPos;
             controller.PlaySound(Enums.Sounds.Player_Sound_Powerdown);
-            controller.cameraController.Recenter();
+            controller.cameraController.Recenter(tpPos);
         }
         if (pipeTimer >= pipeDuration) {
             controller.pipeEntering = null;

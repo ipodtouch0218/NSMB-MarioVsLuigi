@@ -165,20 +165,26 @@ public static class Enums {
         [SoundData("world/water_splash")]                       World_Water_Splash = 77,
     }
 
+    public enum Particle : byte {
+        Entity_BrickBreak = 0,
+        Entity_Coin = 1,
+        Walk_Sand = 2,
+        Walk_Ice = 3,
+    }
+
     #endregion
     #region NETWORKING
     // Networking Enums
     public static class NetRoomProperties {
-        public static string MaxPlayers { get; } = "P";
-        public static string Level { get; } = "L";
-        public static string StarRequirement { get; } = "S";
-        public static string CoinRequirement { get; } = "Co";
-        public static string Lives { get; } = "Li";
-        public static string Time { get; } = "T";
-        public static string DrawTime { get; } = "Dt";
-        public static string CustomPowerups { get; } = "C";
-        public static string GameStarted { get; } = "G";
-        public static string HostName { get; } = "H";
+        public const string MaxPlayers = "P";
+        public const string Level = "L";
+        public const string StarRequirement = "S";
+        public const string CoinRequirement = "Co";
+        public const string Lives = "Li";
+        public const string Time = "T";
+        public const string CustomPowerups = "C";
+        public const string GameStarted = "G";
+        public const string HostName = "H";
     }
     #endregion
 }

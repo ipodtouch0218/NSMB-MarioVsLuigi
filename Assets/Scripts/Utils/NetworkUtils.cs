@@ -19,10 +19,10 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.CoinRequirement] = 8,
             [Enums.NetRoomProperties.Lives] = -1,
             [Enums.NetRoomProperties.Time] = -1,
-            [Enums.NetRoomProperties.DrawTime] = 0,
             [Enums.NetRoomProperties.CustomPowerups] = 1,
+            [Enums.NetRoomProperties.MaxPlayers] = 10,
             [Enums.NetRoomProperties.GameStarted] = 0,
-            [Enums.NetRoomProperties.HostName] = "",
+            [Enums.NetRoomProperties.HostName] = "noname",
         };
 
         public static Dictionary<string, SessionProperty> DefaultRoomProperties {

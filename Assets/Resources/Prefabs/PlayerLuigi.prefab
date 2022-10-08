@@ -21531,6 +21531,12 @@ MonoBehaviour:
     _value: 0
   _IsCrouching:
     _value: 0
+  _IsSliding:
+    _value: 0
+  _IsDoubleJump:
+    _value: 0
+  _IsTripleJump:
+    _value: 0
   _IsInKnockback:
     _value: 0
   _IsGroundpounding:
@@ -21563,7 +21569,7 @@ MonoBehaviour:
   groundpoundVelocity: 11.25
   blinkingSpeed: 0.25
   terminalVelocity: -7.5
-  jumpVelocity: 6.7382812
+  jumpVelocity: 6.938281
   megaJumpVelocity: 12.65625
   launchVelocity: 12
   wallslideSpeed: -4.6875
@@ -21588,12 +21594,8 @@ MonoBehaviour:
   hitRoof: 0
   skidding: 0
   turnaround: 0
-  singlejump: 0
-  doublejump: 0
-  triplejump: 0
   bounce: 0
   groundpoundLastFrame: 0
-  sliding: 0
   hitBlock: 0
   functionallyRunning: 0
   hitLeft: 0

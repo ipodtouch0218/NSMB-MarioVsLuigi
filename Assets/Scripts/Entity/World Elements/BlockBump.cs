@@ -46,7 +46,7 @@ public class BlockBump : NetworkBehaviour {
 
         BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
         hitbox.size = spriteRenderer.sprite.bounds.size;
-        hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(1/2f, -1/2f);
+        hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(0.5f, -0.5f);
     }
 
     public override void FixedUpdateNetwork() {
@@ -71,5 +71,9 @@ public class BlockBump : NetworkBehaviour {
         Vector3 pos = transform.position + Vector3.up * (IsDownwards ? -0.7f : 0.25f);
         Runner.Spawn(SpawnPrefab, pos + (Vector3) SpawnOffset);
         Runner.Despawn(Object);
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        base.Despawned(runner, hasState);
     }
 }

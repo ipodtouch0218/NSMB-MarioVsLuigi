@@ -33,9 +33,7 @@ public class GameManager : NetworkBehaviour {
     [Networked] private TickTimer BigStarRespawnTimer { get; set; }
     [Networked] public TickTimer GameStartTimer { get; set; }
     [Networked] public TickTimer GameEndTimer { get; set; }
-    [Networked] public NetworkRNG Random { get; set; }
     [Networked, Capacity(10)] private NetworkLinkedList<PlayerController> Players => default;
-    [Networked, Capacity(10)] private NetworkLinkedList<PlayerRef> LoadedPlayers => default;
     [Networked] public int GameStartTick { get; set; } = -1;
 
     //---Serialized Variables
@@ -51,6 +49,7 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
 
 
+    public NetworkRNG Random { get; set; }
 
 
     public Canvas nametagCanvas;
@@ -65,10 +64,10 @@ public class GameManager : NetworkBehaviour {
     public bool musicEnabled, hurryUp;
 
     //---Public Variables
+    public SingleParticleManager particleManager;
     public List<PlayerController> players = new();
     public long gameStartTimestamp, gameEndTimestamp;
     public int playerCount = 1;
-    public int starRequirement, timedGameDuration = -1, coinRequirement;
 
     //---Private Variables
     private List<GameObject> activeStarSpawns = new();
@@ -227,7 +226,7 @@ public class GameManager : NetworkBehaviour {
             tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
         }
 
-        GameManager.Instance.tilemap.SetTilesBlock(new BoundsInt(tileOrigin.x, tileOrigin.y, 0, tileDimensions.x, tileDimensions.y, 1), tileObjects);
+        tilemap.SetTilesBlock(new BoundsInt(tileOrigin.x, tileOrigin.y, 0, tileDimensions.x, tileDimensions.y, 1), tileObjects);
     }
 
     public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, GameObject prefab) {
@@ -276,13 +275,11 @@ public class GameManager : NetworkBehaviour {
     public void OnEnable() {
         InputSystem.controls.UI.Pause.performed += OnPause;
         NetworkHandler.OnShutdown += OnShutdown;
-        NetworkHandler.OnInput += OnInput;
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
     }
     public void OnDisable() {
         InputSystem.controls.UI.Pause.performed -= OnPause;
         NetworkHandler.OnShutdown -= OnShutdown;
-        NetworkHandler.OnInput -= OnInput;
         NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
     }
 
@@ -290,6 +287,7 @@ public class GameManager : NetworkBehaviour {
         Instance = this;
         spectationManager = GetComponent<SpectationManager>();
         loopMusic = GetComponent<LoopingMusic>();
+        particleManager = GetComponentInChildren<SingleParticleManager>();
 
         //Make UI color translucent
         levelUIColor.a = .7f;
@@ -313,16 +311,6 @@ public class GameManager : NetworkBehaviour {
         //Load + enable player controls
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
         Runner.ProvideInput = true;
-
-        //Cache game settings
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.StarRequirement, out starRequirement);
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
-
-        if (starRequirement == 0)
-            starRequirement = 10;
-
-        if (coinRequirement == 0)
-            coinRequirement = 8;
 
         //Setup respawning tilemap
         originalTilesOrigin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
@@ -354,7 +342,7 @@ public class GameManager : NetworkBehaviour {
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeResim = true)]
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_ResetTilemap() {
         tilemap.SetTilesBlock(originalTilesOrigin, originalTiles);
 
@@ -374,26 +362,6 @@ public class GameManager : NetworkBehaviour {
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
         GlobalController.Instance.disconnectCause = shutdownReason;
         SceneManager.LoadScene(0);
-    }
-
-    public void OnInput(NetworkRunner runner, NetworkInput input) {
-        PlayerNetworkInput newInput = new();
-
-        Vector2 joystick = InputSystem.controls.Player.Movement.ReadValue<Vector2>();
-        bool jump = InputSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
-        bool sprint = InputSystem.controls.Player.Sprint.ReadValue<float>() >= 0.5f;
-        bool powerup = InputSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
-
-        //TODO: deadzone?
-        newInput.buttons.Set(PlayerControls.Right, joystick.x > 0.25f);
-        newInput.buttons.Set(PlayerControls.Left, joystick.x < -0.25f);
-        newInput.buttons.Set(PlayerControls.Up, joystick.y > 0.25f);
-        newInput.buttons.Set(PlayerControls.Down, joystick.y < -0.25f);
-        newInput.buttons.Set(PlayerControls.Jump, jump);
-        newInput.buttons.Set(PlayerControls.Sprint, sprint);
-        newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
-
-        input.Set(newInput);
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
@@ -466,9 +434,9 @@ public class GameManager : NetworkBehaviour {
             point.AttemptSpawning();
 
         //Start timer
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.Time, out int timedGameDuration);
-        if (timedGameDuration > 0)
-            GameEndTimer = TickTimer.CreateFromSeconds(Runner, timedGameDuration);
+        int timer = LobbyData.Instance.Timer;
+        if (timer > 0)
+            GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer);
 
         //Play start sfx
         if (Runner.IsForward)
@@ -490,10 +458,9 @@ public class GameManager : NetworkBehaviour {
         musicEnabled = true;
 
         gameStartTimestamp = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
-        gameEndTimestamp = (timedGameDuration > 0) ? gameStartTimestamp + timedGameDuration * 1000 : 0;
+        gameEndTimestamp = (timer > 0) ? gameStartTimestamp + timer * 1000 : 0;
 
         GlobalController.Instance.DiscordController.UpdateActivity();
-
     }
 
     private IEnumerator FinalizeGameStart() {
@@ -508,7 +475,7 @@ public class GameManager : NetworkBehaviour {
         gameover = true;
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != null ? winner.GetPlayerData(Runner).GetNickname() + " Wins!" : "It's a draw...";
+        text.GetComponent<TMP_Text>().text = winner != PlayerRef.None ? winner.GetPlayerData(Runner).GetNickname() + " Wins!" : "It's a draw...";
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
@@ -544,6 +511,8 @@ public class GameManager : NetworkBehaviour {
                 //disable spectating
                 data.IsCurrentlySpectating = false;
             }
+
+            LobbyData.Instance.SetGameStarted(false);
         }
 
         Runner.SetActiveScene(0);
@@ -649,7 +618,7 @@ public class GameManager : NetworkBehaviour {
         if (gameover || !Runner.IsServer)
             return;
 
-        bool starGame = starRequirement != -1;
+        bool starGame = LobbyData.Instance.StarRequirement != -1;
         bool timeUp = GameEndTimer.Expired(Runner);
         int winningStars = -1;
         List<PlayerController> winningPlayers = new();
@@ -660,7 +629,7 @@ public class GameManager : NetworkBehaviour {
 
             alivePlayers.Add(player);
 
-            if ((starGame && player.Stars >= starRequirement) || timeUp) {
+            if ((starGame && player.Stars >= LobbyData.Instance.StarRequirement) || timeUp) {
                 //we're in a state where this player would win.
                 //check if someone has more stars
                 if (player.Stars > winningStars) {
@@ -685,10 +654,8 @@ public class GameManager : NetworkBehaviour {
 
         //TIMED CHECKS
         if (timeUp) {
-            Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.DrawTime, out bool draw);
-
             //time up! check who has most stars, if a tie keep playing, if draw is on end game in a draw
-            if (draw) {
+            if (LobbyData.Instance.DrawOnTimeUp) {
                 // it's a draw! Thanks for playing the demo!
                 Rpc_EndGame(PlayerRef.None);
             } else if (winningPlayers.Count == 1) {
@@ -698,7 +665,7 @@ public class GameManager : NetworkBehaviour {
             return;
         }
 
-        if (starGame && winningStars >= starRequirement) {
+        if (starGame && winningStars >= LobbyData.Instance.StarRequirement) {
             if (winningPlayers.Count == 1)
                 Rpc_EndGame(winningPlayers[0].Object.InputAuthority);
 
@@ -724,11 +691,11 @@ public class GameManager : NetworkBehaviour {
 
             if (player.State == Enums.PowerupState.MegaMushroom && player.GiantStartTimer.ExpiredOrNotRunning(Runner))
                 mega = true;
+
             if (player.IsStarmanInvincible)
                 invincible = true;
-            if ((player.Stars + 1f) / starRequirement >= 0.95f || hurryUp != false)
-                speedup = true;
-            if (player.Lives == 1 && players.Count <= 2)
+
+            if (hurryUp || (player.Stars + 1f) == LobbyData.Instance.StarRequirement || (player.Lives == 1 && players.Count <= 2))
                 speedup = true;
         }
 

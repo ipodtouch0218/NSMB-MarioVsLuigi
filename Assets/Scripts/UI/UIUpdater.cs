@@ -108,11 +108,11 @@ public class UIUpdater : MonoBehaviour {
 
         if (player.Stars != stars) {
             stars = player.Stars;
-            uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + GameManager.Instance.starRequirement);
+            uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + LobbyData.Instance.StarRequirement);
         }
         if (player.Coins != coins) {
             coins = player.Coins;
-            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + GameManager.Instance.coinRequirement);
+            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + LobbyData.Instance.CoinRequirement);
         }
 
         if (player.Lives >= 0) {
@@ -124,11 +124,11 @@ public class UIUpdater : MonoBehaviour {
             livesParent.SetActive(false);
         }
 
-        if (GameManager.Instance.timedGameDuration > 0) {
+        if (LobbyData.Instance.Timer > 0) {
             float timeRemaining = GameManager.Instance.GameEndTimer.RemainingTime(Runner) ?? 0f;
 
             int seconds = Mathf.CeilToInt(timeRemaining);
-            seconds = Mathf.Clamp(seconds, 0, GameManager.Instance.timedGameDuration);
+            seconds = Mathf.Clamp(seconds, 0, LobbyData.Instance.Timer);
 
             if (seconds != timer) {
                 timer = seconds;

@@ -6,6 +6,7 @@ using NSMB.Utils;
 public class LooseCoin : Coin {
 
     //---Networked Variables
+    [Networked] private TickTimer CollectableTimer { get; set; }
     [Networked] private TickTimer DespawnTimer { get; set; }
 
     //---Serialized Variables
@@ -26,11 +27,13 @@ public class LooseCoin : Coin {
         hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
         animator = GetComponent<Animator>();
-        body.velocity = Vector2.up * GameManager.Instance.Random.RangeInclusive(2f, 3f);
     }
 
     public override void Spawned() {
+        CollectableTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
+
+        body.velocity = Vector2.up * GameManager.Instance.Random.RangeInclusive(2f, 3f);
     }
 
     public override void FixedUpdateNetwork() {
@@ -65,6 +68,13 @@ public class LooseCoin : Coin {
         spriteRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
 
         prevFrameVelocity = body.velocity;
+    }
+
+    public override void InteractWithPlayer(PlayerController player) {
+        if (!CollectableTimer.ExpiredOrNotRunning(Runner))
+            return;
+
+        base.InteractWithPlayer(player);
     }
 
     public override void OnCollectedChanged() {

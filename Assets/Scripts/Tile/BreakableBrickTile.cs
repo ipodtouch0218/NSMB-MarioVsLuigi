@@ -24,10 +24,6 @@ public class BreakableBrickTile : InteractableTile {
                 doBreak = breakableByLargeMario;
                 doBump = true;
             }
-
-        } else if (interacter is SpinyWalk) {
-            doBump = true;
-            doBreak = breakableByShells;
         } else if (interacter is KoopaWalk) {
             doBump = true;
             doBreak = breakableByShells;
@@ -50,9 +46,7 @@ public class BreakableBrickTile : InteractableTile {
         GameManager.Instance.tilemap.SetTile(tileLocation, null);
 
         //Particle
-        //TODO:
-        //object[] parametersParticle = new object[]{ tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b) };
-        //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, tileLocation, particleColor);
 
         if (interacter)
             interacter.PlaySound(sound);

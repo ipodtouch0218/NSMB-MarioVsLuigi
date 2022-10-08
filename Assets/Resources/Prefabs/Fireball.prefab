@@ -55,17 +55,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _IsIceball:
-    _value: 0
   _BreakOnImpact:
     _value: 0
-  owner: {fileID: 0}
-  wallHitPrefab: {fileID: 3894548935506966732, guid: 1cd96fd39f9753b4fb9e589043267000,
+  wallHitParticle: {fileID: 3894548935506966732, guid: 1cd96fd39f9753b4fb9e589043267000,
     type: 3}
+  particles: {fileID: 5044812112945403417}
   speed: 6.25
   bounceHeight: 6.75
   terminalVelocity: 6.25
-  particles: {fileID: 5044812112945403417}
+  isIceball: 0
 --- !u!50 &1186833380152900418
 Rigidbody2D:
   serializedVersion: 4
