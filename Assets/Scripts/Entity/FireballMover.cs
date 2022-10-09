@@ -14,7 +14,10 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---Serialized Variables
     [SerializeField] private ParticleSystem particles;
-    [SerializeField] private float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
+#pragma warning disable CS0414
+    [SerializeField] private float speed = 3f;
+#pragma warning restore CS0414
+    [SerializeField] private float bounceHeight = 4.5f, terminalVelocity = 6.25f;
     [SerializeField] public bool isIceball;
 
     //---Private Variables

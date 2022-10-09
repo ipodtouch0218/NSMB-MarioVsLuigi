@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 
 using Discord;
 using Fusion;
-using NSMB.Utils;
 
 public class DiscordController : MonoBehaviour {
 
@@ -88,7 +87,7 @@ public class DiscordController : MonoBehaviour {
 
                 ActivityAssets assets = new();
                 if (gm.richPresenceId != "")
-                    assets.LargeImage = $"level-{gm.richPresenceId}";
+                    assets.LargeImage = "level-" + gm.richPresenceId;
                 else
                     assets.LargeImage = "mainmenu";
                 assets.LargeText = gm.levelName;

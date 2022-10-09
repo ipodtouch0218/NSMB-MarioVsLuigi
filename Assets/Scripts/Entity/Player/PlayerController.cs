@@ -864,8 +864,17 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     private void SpawnStars(int amount, bool deathplane) {
 
+        GameManager gm = GameManager.Instance;
         bool fastStars = amount > 2 && Stars > 2;
         int starDirection = FacingRight ? 1 : 2;
+
+        if (!gm.loopingLevel) {
+            if (body.position.x > gm.GetLevelMaxX() - 2.5f) {
+                starDirection = 1;
+            } else if (body.position.x < gm.GetLevelMinX() + 2.5f) {
+                starDirection = 2;
+            }
+        }
 
         while (amount > 0) {
             if (Stars <= 0)
@@ -887,7 +896,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             Stars--;
             amount--;
         }
-        GameManager.Instance.CheckForWinner();
+        gm.CheckForWinner();
     }
     #endregion
 

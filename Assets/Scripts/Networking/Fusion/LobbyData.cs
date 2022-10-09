@@ -4,6 +4,7 @@ public class LobbyData : NetworkBehaviour {
 
     public static LobbyData Instance;
 
+#pragma warning disable CS0414
     //--Default values
     private readonly byte defaultMaxPlayers = 10;
     private readonly sbyte defaultStarRequirement = 10;
@@ -11,6 +12,7 @@ public class LobbyData : NetworkBehaviour {
     private readonly sbyte defaultLives = -1;
     private readonly int defaultTimer = -1;
     private readonly NetworkBool defaultCustomPowerups = true;
+#pragma warning restore CS0414
 
     //---Networked Variables
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultMaxPlayers))]        public byte MaxPlayers { get; set; }
@@ -24,6 +26,9 @@ public class LobbyData : NetworkBehaviour {
     [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool DrawOnTimeUp { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCustomPowerups))]    public NetworkBool CustomPowerups { get; set; }
 
+    //---Private Variables
+    private Tick lastUpdatedTick;
+
     //---Properties
     private ChatManager Chat => MainMenuManager.Instance.chat;
 
@@ -31,8 +36,20 @@ public class LobbyData : NetworkBehaviour {
         DontDestroyOnLoad(gameObject);
     }
 
+    public override void Spawned() {
+        Instance = this;
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.EnterRoom();
+    }
+
     public static void SettingChanged(Changed<LobbyData> data) {
+        LobbyData lobby = data.Behaviour;
+        Tick currentTick = lobby.Object.Runner.Tick;
+        if (currentTick <= lobby.lastUpdatedTick)
+            return;
+
         MainMenuManager.Instance.roomSettingsCallbacks?.UpdateAllSettings(data);
+        lobby.lastUpdatedTick = currentTick;
     }
 
     public void SetMaxPlayers(byte value) {

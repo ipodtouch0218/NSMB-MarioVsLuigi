@@ -18,7 +18,7 @@ public class PlayerData : NetworkBehaviour {
     [Networked, Capacity(20)] private string DisplayNickname { get; set; } = "noname";
     [Networked, Capacity(32)] private string UserId { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
-    [Networked] public NetworkBool IsCurrentlySpectating { get; set; } = true;
+    [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
     [Networked] public NetworkBool IsRoomOwner { get; set; }
     [Networked(OnChanged = nameof(OnLoadStateChanged))] public NetworkBool IsLoaded { get; set; }
     [Networked] public NetworkBool IsMuted { get; set; }
@@ -28,7 +28,6 @@ public class PlayerData : NetworkBehaviour {
 
     //---Misc Variables
     private string cachedUserId = null;
-
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -42,9 +41,6 @@ public class PlayerData : NetworkBehaviour {
             //we're the client. update with our data.
             Rpc_SetCharacterIndex(Settings.Instance.character);
             Rpc_SetSkinIndex(Settings.Instance.skin);
-
-            if (Runner.IsServer)
-                IsRoomOwner = true;
         }
 
         if (Runner.IsServer) {
@@ -54,6 +50,10 @@ public class PlayerData : NetworkBehaviour {
             //expose their userid
             //TOOD: use an auth-server signed userid, to disallow userid spoofing.
             UserId = Runner.GetPlayerUserId(Object.InputAuthority)?.Replace("-", "");
+            if (Runner.IsServer)
+                IsRoomOwner = true;
+
+            IsCurrentlySpectating = LobbyData.Instance?.GameStarted ?? false;
         }
 
         if (MainMenuManager.Instance)

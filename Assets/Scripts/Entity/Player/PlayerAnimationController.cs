@@ -29,13 +29,13 @@ public class PlayerAnimationController : NetworkBehaviour {
             if (_glowColor == null)
                 _glowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
 
-            return _glowColor ?? Color.white;
+            return _glowColor.Value;
         }
         set => _glowColor = value;
     }
 
     AudioSource drillParticleAudio;
-    [SerializeField] AudioClip normalDrill, propellerDrill;
+    [SerializeField] private AudioClip normalDrill, propellerDrill;
 
     Enums.PlayerEyeState eyeState;
     float blinkTimer, pipeTimer, propellerVelocity;
@@ -218,7 +218,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         } else if (controller.State == Enums.PowerupState.MegaMushroom && (controller.currentInputs.buttons.IsSet(PlayerControls.Left) || controller.currentInputs.buttons.IsSet(PlayerControls.Right))) {
             animatedVelocity = 4.5f;
         } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
-            animatedVelocity = Mathf.Max(3.5f, animatedVelocity);
+            animatedVelocity = Mathf.Max(2f, animatedVelocity);
         } else if (controller.onIce) {
             animatedVelocity = 0;
         }

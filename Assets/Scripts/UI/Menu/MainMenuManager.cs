@@ -137,14 +137,6 @@ public class MainMenuManager : MonoBehaviour {
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
         waitingForJoinMessage.Add(player);
-
-        if (runner.LocalPlayer == player)
-            EnterRoom();
-
-        ////mark player as not a spectator, as we are in the lobby
-        //if (Runner.IsServer)
-        //    player.GetPlayerData(runner).IsCurrentlySpectating = false;
-        //
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         chat.LocalChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
@@ -345,10 +337,10 @@ public class MainMenuManager : MonoBehaviour {
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
         SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
 
-        GlobalController.Instance.DiscordController.UpdateActivity();
-
         //clear text field
         chatTextField.SetTextWithoutNotify("");
+
+        GlobalController.Instance.DiscordController.UpdateActivity();
     }
 
     private IEnumerator SetScroll() {
@@ -696,6 +688,7 @@ public class MainMenuManager : MonoBehaviour {
             return;
         }
 
+
         //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
         //List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
 
@@ -889,28 +882,19 @@ public class MainMenuManager : MonoBehaviour {
         sfx.PlayOneShot(clip);
         quit = true;
 
-        yield return new WaitForSeconds(clip.length);
-        Application.Quit();
+        yield return new WaitForSecondsRealtime(clip.length);
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
 #endif
     }
-
-
-
-
 
     public void OpenDownloadsPage() {
         Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest");
         OpenMainMenu();
     }
-
-
-
-
-
-
 
     public void EnableSpectator(Toggle toggle) {
         PlayerData data = Runner.GetLocalPlayerData();

@@ -19,22 +19,26 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private LobbyData Lobby => LobbyData.Instance;
 
     public void UpdateAllSettings(Changed<LobbyData> changed) {
+        LobbyData data = changed.Behaviour;
 
-        ChangePrivate(Lobby.PrivateRoom);
-        ChangeMaxPlayers(Lobby.MaxPlayers);
+        if (!data.Object.IsValid)
+            return;
+
+        ChangePrivate(data.PrivateRoom);
+        ChangeMaxPlayers(data.MaxPlayers);
         //no "started" setting to update
         byte newLevel = changed.Behaviour.Level;
         changed.LoadOld();
         byte oldLevel = changed.Behaviour.Level;
         changed.LoadNew();
 
-        ChangeLevelIndex(Lobby.Level, newLevel != oldLevel);
-        ChangeStarRequirement(Lobby.StarRequirement);
-        ChangeCoinRequirement(Lobby.CoinRequirement);
-        ChangeLives(Lobby.Lives);
-        ChangeTime(Lobby.Timer);
-        ChangeDrawOnTimeUp(Lobby.DrawOnTimeUp);
-        ChangeCustomPowerups(Lobby.CustomPowerups);
+        ChangeLevelIndex(data.Level, newLevel != oldLevel);
+        ChangeStarRequirement(data.StarRequirement);
+        ChangeCoinRequirement(data.CoinRequirement);
+        ChangeLives(data.Lives);
+        ChangeTime(data.Timer);
+        ChangeDrawOnTimeUp(data.DrawOnTimeUp);
+        ChangeCustomPowerups(data.CustomPowerups);
     }
 
     #region Level Index
@@ -50,9 +54,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         }
 
         Lobby.SetLevel((byte) newValue);
-        ChangeLevelIndex(newValue, true);
     }
-
     private void ChangeLevelIndex(int index, bool changed) {
         levelDropdown.SetValueWithoutNotify(index);
         if (changed) {
@@ -76,9 +78,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         }
 
         Lobby.SetStarRequirement((sbyte) newValue);
-        ChangeStarRequirement(newValue);
     }
-
     private void ChangeStarRequirement(int stars) {
         starsInputField.text = stars.ToString();
     }
@@ -98,9 +98,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         }
 
         Lobby.SetCoinRequirement((byte) newValue);
-        ChangeCoinRequirement(newValue);
     }
-
     private void ChangeCoinRequirement(int coins) {
         coinsInputField.text = coins.ToString();
     }
@@ -119,7 +117,6 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         }
 
         Lobby.SetLives((sbyte) newValue);
-        ChangeLives(newValue);
     }
     public void EnableLives() {
         if (!Runner.IsServer)
@@ -128,7 +125,6 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         int newValue = livesEnabledToggle.isOn ? int.Parse(livesInputField.text) : -1;
 
         Lobby.SetLives((sbyte) newValue);
-        ChangeLives(newValue);
     }
 
     private void ChangeLives(int lives) {
@@ -139,7 +135,6 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (enabled)
             livesInputField.SetTextWithoutNotify(lives.ToString());
     }
-
     #endregion
 
     #region Timer
@@ -156,7 +151,6 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         }
 
         Lobby.SetTimer(newValue);
-        ChangeTime(newValue);
     }
     public void EnableTime() {
         if (!Runner.IsServer)
@@ -166,9 +160,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         newValue = timerEnabledToggle.isOn ? newValue : -1;
 
         Lobby.SetTimer(newValue);
-        ChangeTime(newValue);
     }
-
     private void ChangeTime(int time) {
         timerEnabledToggle.SetIsOnWithoutNotify(time != -1);
         timerInputField.interactable = time != -1;
@@ -190,9 +182,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         bool newValue = drawEnabledToggle.isOn;
 
         Lobby.SetDrawOnTimeUp(newValue);
-        ChangeDrawOnTimeUp(newValue);
     }
-
     private void ChangeDrawOnTimeUp(bool value) {
         drawEnabledToggle.SetIsOnWithoutNotify(value);
     }
@@ -206,9 +196,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         bool newValue = customPowerupsEnabledToggle.isOn;
 
         Lobby.SetCustomPowerups(newValue);
-        ChangeCustomPowerups(newValue);
     }
-
     private void ChangeCustomPowerups(bool value) {
         customPowerupsEnabledToggle.SetIsOnWithoutNotify(value);
     }
@@ -226,7 +214,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (newValue < currentPlayers)
             newValue = currentPlayers;
 
-        newValue = Mathf.Clamp(newValue, 0, 9);
+        newValue = Mathf.Clamp(newValue, 2, 10);
 
         if (newValue == oldValue) {
             ChangeMaxPlayers(oldValue);
@@ -234,9 +222,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         }
 
         Lobby.SetMaxPlayers((byte) newValue);
-        ChangeMaxPlayers(newValue);
     }
-
     private void ChangeMaxPlayers(int value) {
         playersSlider.SetValueWithoutNotify(value);
         playersCount.text = value.ToString();
@@ -251,9 +237,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         bool newValue = privateEnabledToggle.isOn;
 
         Runner.SessionInfo.IsVisible = !newValue;
-        ChangePrivate(newValue);
     }
-
     private void ChangePrivate(bool value) {
         privateEnabledToggle.SetIsOnWithoutNotify(value);
     }

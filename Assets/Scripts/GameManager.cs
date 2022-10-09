@@ -49,6 +49,8 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
 
 
+    //---Private Variables
+    private TickTimer StartMusicTimer { get; set; }
     public NetworkRNG Random { get; set; }
 
 
@@ -461,12 +463,8 @@ public class GameManager : NetworkBehaviour {
         gameEndTimestamp = (timer > 0) ? gameStartTimestamp + timer * 1000 : 0;
 
         GlobalController.Instance.DiscordController.UpdateActivity();
-    }
 
-    private IEnumerator FinalizeGameStart() {
-        yield return new WaitForSeconds(3f);
-        musicEnabled = true;
-        Destroy(FindObjectOfType<LoadingParent>().gameObject);
+        StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 3f);
     }
 
     private IEnumerator EndGame(PlayerRef winner) {
@@ -564,6 +562,9 @@ public class GameManager : NetworkBehaviour {
 
         Random = new(Runner.Simulation.Tick);
 
+        if (musicEnabled)
+            HandleMusic();
+
         if (BigStarRespawnTimer.Expired(Runner)) {
             BigStarRespawnTimer = TickTimer.None;
             SpawnBigStar();
@@ -572,6 +573,12 @@ public class GameManager : NetworkBehaviour {
         if (GameStartTimer.Expired(Runner)) {
             GameStartTimer = TickTimer.None;
             StartGame();
+        }
+
+        if (StartMusicTimer.Expired(Runner)) {
+            StartMusicTimer = TickTimer.None;
+            musicEnabled = true;
+            Destroy(FindObjectOfType<LoadingParent>().gameObject);
         }
 
         if (GameEndTimer.IsRunning) {
@@ -598,14 +605,6 @@ public class GameManager : NetworkBehaviour {
                     sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
             }
         }
-    }
-
-    public void Update() {
-        if (gameover)
-            return;
-
-        if (musicEnabled)
-            HandleMusic();
     }
 
     public void CreateNametag(PlayerController controller) {

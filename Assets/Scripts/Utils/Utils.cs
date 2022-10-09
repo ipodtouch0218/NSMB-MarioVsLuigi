@@ -559,13 +559,15 @@ namespace NSMB.Utils {
             return ret.ToString();
         }
 
+        private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
 
             int result = -1;
             int count = 0;
             foreach (PlayerRef pl in runner.ActivePlayers.OrderByDescending(pr => pr.RawEncoded)) {
                 //skip spectators in color calculations
-                if (pl.GetPlayerData(runner).IsManualSpectator)
+                PlayerData data = pl.GetPlayerData(runner);
+                if (data.IsManualSpectator || data.IsCurrentlySpectating)
                     continue;
 
                 if (pl == player)
@@ -575,7 +577,7 @@ namespace NSMB.Utils {
             }
 
             if (result == -1)
-                return new Color(0.9f, 0.9f, 0.9f, 0.7f);
+                return spectatorColor;
 
             return Color.HSVToRGB(result / ((float) count + 1), s, v);
         }
