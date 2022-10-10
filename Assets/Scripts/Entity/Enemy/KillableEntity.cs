@@ -19,7 +19,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     public override bool IsCarryable => iceCarryable;
     public override bool IsFlying => flying;
 
-    [Networked] public NetworkBool Dead { get; set; }
+    [Networked] public NetworkBool IsDead { get; set; }
 
     public bool collide = true, iceCarryable = true, flying;
 
@@ -44,7 +44,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             return;
 
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-        if (body && !Dead && !IsFrozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc)) {
+        if (body && !IsDead && !IsFrozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc)) {
             SpecialKill(FacingRight, false, 0);
         }
     }
@@ -53,7 +53,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     #region Unity Callbacks
     public void OnTriggerEnter2D(Collider2D collider) {
         KillableEntity entity = collider.GetComponentInParent<KillableEntity>();
-        if (!collide || !Object.HasStateAuthority || !entity || entity.Dead)
+        if (!collide || !Object.HasStateAuthority || !entity || entity.IsDead)
             return;
 
         bool goRight = body.position.x > collider.attachedRigidbody.position.x;
@@ -151,10 +151,10 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     public virtual void SpecialKill(bool right, bool groundpound, int combo) {
-        if (Dead)
+        if (IsDead)
             return;
 
-        Dead = true;
+        IsDead = true;
 
         body.constraints = RigidbodyConstraints2D.None;
         body.velocity = new(2f * (right ? 1 : -1), 2.5f);

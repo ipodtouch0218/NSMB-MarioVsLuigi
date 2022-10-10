@@ -39,7 +39,7 @@ public class BobombWalk : HoldableEntity {
             return;
         }
 
-        if (IsFrozen || Dead)
+        if (IsFrozen || IsDead)
             return;
 
         HandleCollision();
@@ -143,10 +143,9 @@ public class BobombWalk : HoldableEntity {
     }
     #endregion
 
-    #region PunRPCs
     public void Detonate() {
 
-        Dead = true;
+        IsDead = true;
         sRenderer.enabled = false;
         hitbox.enabled = false;
 
@@ -160,12 +159,12 @@ public class BobombWalk : HoldableEntity {
             if (obj == gameObject)
                 continue;
 
-            if (obj.TryGetComponent(out PlayerController player)) {
+            if (obj.GetComponentInParent<PlayerController>() is PlayerController player) {
                 player.Powerdown(false);
                 continue;
             }
 
-            if (obj.TryGetComponent(out KillableEntity en)) {
+            if (obj.GetComponentInParent<KillableEntity>() is KillableEntity en) {
                 en.SpecialKill(transform.position.x < obj.transform.position.x, false, 0);
                 continue;
             }
@@ -210,5 +209,4 @@ public class BobombWalk : HoldableEntity {
         body.velocity = new((Lit ? -previousFrameVelocity.x : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
         animator.SetTrigger("turnaround");
     }
-    #endregion
 }

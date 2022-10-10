@@ -162,7 +162,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public void DespawnWithPoof() {
-        Instantiate(Resources.Load("Prefabs/Particle/Puff"), body.position, Quaternion.identity);
+        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, body.position);
         Runner.Despawn(Object, true);
     }
 

@@ -57,6 +57,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public TickTimer DamageInvincibilityTimer { get; set; }
 
     //-Powerup Stuffs
+    [Networked(OnChanged = nameof(OnFireballListChanged)), Capacity(6)] private NetworkLinkedList<FireballMover> FireballList => default;
     [Networked] public TickTimer FireballShootTimer { get; set; }
     [Networked] public NetworkBool CanShootAdditionalFireball { get; set; }
     [Networked] public TickTimer StarmanTimer { get; set; }
@@ -450,9 +451,17 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (HeldEntity && HeldEntity.gameObject == collidedObject)
                 continue;
 
+            //don't interact with our own frozen cube
+            if (frozenObject && frozenObject.gameObject == collidedObject)
+                continue;
+
             if (collidedObject.GetComponentInParent<IPlayerInteractable>() is IPlayerInteractable interactable) {
                 //don't interact with frozen entities.
                 if (interactable is FreezableEntity freezable && freezable.IsFrozen)
+                    continue;
+
+                //don't interact with dead entities.
+                if (interactable is KillableEntity killable && killable.IsDead)
                     continue;
 
                 interactable.InteractWithPlayer(this);
@@ -642,12 +651,17 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (WallSlideLeft || WallSlideRight || IsGroundpounding || IsTripleJump || IsSpinnerFlying || IsDrilling || IsCrouching || IsSliding)
                 return;
 
-            int count = 0;
-            foreach (FireballMover existingFire in FindObjectsOfType<FireballMover>()) {
-                if (existingFire.Object?.InputAuthority == Object.InputAuthority && ++count >= 6)
-                    return;
+            //remove fireballs that were destroyed
+            for (int i = 0; i < FireballList.Count; i++) {
+                FireballMover fireball = FireballList[i];
+                if (!fireball) {
+                    FireballList.Remove(fireball);
+                    i--;
+                    continue;
+                }
             }
 
+            int count = FireballList.Count;
             if (count <= 1) {
                 FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
                 CanShootAdditionalFireball = count == 0;
@@ -663,18 +677,21 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             bool ice = State == Enums.PowerupState.IceFlower;
             NetworkPrefabRef prefab = ice ? PrefabList.Instance.Obj_Iceball : PrefabList.Instance.Obj_Fireball;
 
-            Vector2 pos = body.position + new Vector2(FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ? 0.5f : -0.5f, 0.3f);
-            Runner.Spawn(prefab, pos, inputAuthority: Object.InputAuthority, onBeforeSpawned: (runner, obj) => {
+            bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
+            Vector2 pos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
+            NetworkObject obj = Runner.Spawn(prefab, pos, inputAuthority: Object.InputAuthority, onBeforeSpawned: (runner, obj) => {
                 FireballMover mover = obj.GetComponent<FireballMover>();
-                mover.OnBeforeSpawned(this, FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround"));
-            });
+                mover.OnBeforeSpawned(this, right);
+            }, predictionKey: new() { Byte0 = (byte) Runner.Simulation.Tick, Byte1 = (byte) 'F', Byte2 = (byte) Object.InputAuthority.RawEncoded });
 
-            if (Runner.IsForward) {
-                Enums.Sounds sound = ice ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot;
-                PlaySound(sound);
-                animator.SetTrigger("fireball");
-            }
+            FireballMover mover = obj.GetComponent<FireballMover>();
 
+            if (obj.IsPredictedSpawn)
+                mover.OnBeforeSpawned(this, right);
+
+            FireballList.Add(mover);
+
+            //weird interaction in the main game... replicate it i guess.
             WallJumpTimer = TickTimer.None;
             break;
         }
@@ -1021,7 +1038,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         landing = 0f;
         ResetKnockback();
         animator.SetTrigger("respawn");
-        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
+        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
         models.transform.rotation = Quaternion.Euler(0, 180, 0);
         body.isKinematic = false;
         body.velocity = Vector2.zero;
@@ -1580,7 +1597,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             //Start wallslide
             WallSlideRight = currentWallDirection == Vector2.right;
             WallSlideLeft = currentWallDirection == Vector2.left;
-            IsPropellerFlying = false;
+
+            if (WallSlideRight || WallSlideLeft)
+                IsPropellerFlying = false;
         }
 
         WallSlideRight &= !WallSlideTimer.Expired(Runner) && hitRight;
@@ -2103,7 +2122,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
 
-        if (HeldEntity && (HeldEntity.Dead || IsFrozen || HeldEntity.IsFrozen))
+        if (HeldEntity && (HeldEntity.IsDead || IsFrozen || HeldEntity.IsFrozen))
             SetHolding(null);
 
         //FrozenCube holdingCube;
@@ -2580,7 +2599,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     };
                     PlaySound(sound);
                     SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position);
-                    GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
+                    //GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
                 } else {
                     CameraController.ScreenShake = 0.15f;
                 }
@@ -2671,6 +2690,29 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         GameObject particle = Instantiate(PrefabList.Instance.Particle_Respawn, player.body.position, Quaternion.identity);
         particle.GetComponent<RespawnParticle>().player = player;
+    }
+
+    public static void OnFireballListChanged(Changed<PlayerController> changed) {
+        int curr = changed.Behaviour.FireballList.Count;
+        changed.LoadOld();
+        NetworkLinkedList<FireballMover> prevList = changed.Behaviour.FireballList;
+        changed.LoadNew();
+
+
+        //prev can have null references. remove them.
+        int prev = 0;
+        foreach (FireballMover mover in prevList) {
+            if (mover)
+                prev++;
+        }
+
+        //no change?
+        if (curr <= prev)
+            return;
+
+        PlayerController player = changed.Behaviour;
+        player.PlaySound(player.State == Enums.PowerupState.IceFlower ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot);
+        player.animator.SetTrigger("fireball");
     }
     #endregion
 }

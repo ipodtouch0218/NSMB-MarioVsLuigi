@@ -38,7 +38,7 @@ public class KoopaWalk : HoldableEntity {
             return;
         }
 
-        if (IsFrozen || Dead)
+        if (IsFrozen || IsDead)
             return;
 
         sRenderer.flipX = FacingRight ^ flipXFlip;
@@ -105,7 +105,7 @@ public class KoopaWalk : HoldableEntity {
     private Collider2D[] collisions = new Collider2D[16];
     private void CheckForEntityCollisions() {
 
-        if (!IsInShell || IsActuallyStationary || putdown || Dead)
+        if (!IsInShell || IsActuallyStationary || putdown || IsDead)
             return;
 
         int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisions);
@@ -118,7 +118,7 @@ public class KoopaWalk : HoldableEntity {
 
             //killable entities
             if (obj.TryGetComponent(out KillableEntity killable)) {
-                if (killable.Dead)
+                if (killable.IsDead)
                     continue;
 
                 //kill entity we ran into
@@ -312,7 +312,7 @@ public class KoopaWalk : HoldableEntity {
     }
 
     public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
-        if (Dead || direction == InteractableTile.InteractionDirection.Down)
+        if (IsDead || direction == InteractableTile.InteractionDirection.Down)
             return;
 
         if (!IsInShell) {

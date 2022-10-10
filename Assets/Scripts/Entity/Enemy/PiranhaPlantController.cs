@@ -36,8 +36,8 @@ public class PiranhaPlantController : KillableEntity {
                 return;
         }
 
-        animator.SetBool("dead", Dead);
-        if (Dead)
+        animator.SetBool("dead", IsDead);
+        if (IsDead)
             return;
 
         if (Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
@@ -64,11 +64,11 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public void Respawn() {
-        if (IsFrozen || !Dead)
+        if (IsFrozen || !IsDead)
             return;
 
         IsFrozen = false;
-        Dead = false;
+        IsDead = false;
         PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
         animator.Play("end", 0, 1);
         hitbox.enabled = true;
@@ -79,9 +79,10 @@ public class PiranhaPlantController : KillableEntity {
         PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
         PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
 
-        Dead = true;
+        IsDead = true;
         hitbox.enabled = false;
-        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position + new Vector3(0, upsideDown ? -0.5f : 0.5f, 0), Quaternion.identity);
+
+        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + new Vector3(0, upsideDown ? -0.5f : 0.5f, 0));
         Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up * (upsideDown ? -1f : 1f));
     }
 

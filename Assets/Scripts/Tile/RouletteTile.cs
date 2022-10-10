@@ -28,7 +28,7 @@ public class RouletteTile : BreakableBrickTile {
                 //Particles
                 for (int x = 0; x < 2; x++) {
                     for (int y = 0; y < 2; y++) {
-                        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.TilemapToWorldPosition(tileLocation + new Vector3Int(x, y, 0)), particleColor);
+                        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.TilemapToWorldPosition(tileLocation + new Vector3Int(x, y, 0)) + Vector3.one * 0.25f, particleColor);
                     }
                 }
 

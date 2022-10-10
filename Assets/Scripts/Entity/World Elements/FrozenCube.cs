@@ -76,7 +76,7 @@ public class FrozenCube : HoldableEntity {
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
 
-        if (Dead)
+        if (IsDead)
             return;
 
         if (GameManager.Instance && GameManager.Instance.gameover) {
@@ -171,7 +171,7 @@ public class FrozenCube : HoldableEntity {
             }
 
             if (obj.TryGetComponent(out KillableEntity killable)) {
-                if (killable.Dead || killable == FrozenEntity)
+                if (killable.IsDead || killable == FrozenEntity)
                     continue;
 
                 //kill entity we ran into
@@ -233,7 +233,7 @@ public class FrozenCube : HoldableEntity {
             player.DoKnockback(body.position.x > player.body.position.x, 1, false, 0);
             Kill();
         }
-        if (FrozenEntity.IsCarryable && !Holder && !Dead) {
+        if (FrozenEntity.IsCarryable && !Holder && !IsDead) {
             if (player.CanPickup() && player.IsOnGround) {
                 fallen = true;
                 Pickup(player);

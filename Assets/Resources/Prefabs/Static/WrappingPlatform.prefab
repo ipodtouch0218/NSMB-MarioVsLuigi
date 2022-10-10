@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 549419135642806217}
-  - component: {fileID: 549419135642806216}
+  - component: {fileID: 4512469588533065805}
   - component: {fileID: 549419135642806218}
   - component: {fileID: 549419135642806223}
   - component: {fileID: 549419135642806226}
@@ -40,21 +40,61 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &549419135642806216
+--- !u!114 &4512469588533065805
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 549419135642806219}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d8a7c9b2b5abfe469e44e69005186e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 8e08d8b87ed0623468df5e282f4df8ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxY: 5.5
-  minY: -2.5
-  ySpeed: 1.5
+  _interpolationDataSource: 0
+  x:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 1.0000055
+      value: 0.00004054513
+      inSlope: 0.005136476
+      outSlope: 0.005136476
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  y:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  animationTimeSeconds: 5.3333335
+  animationMultiplier: 8
+  animationOffset: 0
 --- !u!212 &549419135642806218
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -181,10 +221,10 @@ PlatformEffector2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 549419135642806219}
   m_Enabled: 1
-  m_UseColliderMask: 1
+  m_UseColliderMask: 0
   m_ColliderMask:
     serializedVersion: 2
-    m_Bits: 55223
+    m_Bits: 2147483647
   m_RotationalOffset: 0
   m_UseOneWay: 1
   m_UseOneWayGrouping: 0
@@ -207,7 +247,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   target: 0
   behaviours:
-  - {fileID: 549419135642806216}
+  - {fileID: 4512469588533065805}
 --- !u!114 &4423665312669468572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,11 +265,12 @@ MonoBehaviour:
   DestroyWhenStateAuthorityLeaves: 0
   AllowStateAuthorityOverride: 0
   AoiPositionSource: {fileID: 0}
-  Flags: 2305
+  Flags: 67841
   NetworkGuid:
     RawGuidValue: c47ca8bcff624cc48bd8ce919f74072c
   NestedObjects: []
   NetworkedBehaviours:
+  - {fileID: 4512469588533065805}
   - {fileID: 8658303608481168900}
   - {fileID: 2844461530477682196}
   SimulationBehaviours: []

@@ -3,7 +3,7 @@
 using Fusion;
 using NSMB.Utils;
 
-public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
+public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable, IPredictedSpawnBehaviour {
 
     //---Networked Variables
     [Networked] public NetworkBool BreakOnImpact { get; set; }
@@ -22,6 +22,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---Private Variables
     private PhysicsEntity physics;
+    private bool despawn;
 
     public void OnBeforeSpawned(PlayerController owner, bool right) {
         FacingRight = right;
@@ -38,8 +39,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     public override void Spawned() {
         body.velocity = new(MoveSpeed * (FacingRight ? 1 : -1), -MoveSpeed);
 
-        if (Utils.IsTileSolidAtWorldLocation(body.position))
-            Runner.Despawn(Object);
+        despawn = Utils.IsTileSolidAtWorldLocation(body.position);
     }
 
     public override void FixedUpdateNetwork() {
@@ -47,6 +47,11 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             body.velocity = Vector2.zero;
             GetComponent<Animator>().enabled = false;
             body.isKinematic = true;
+            return;
+        }
+
+        if (despawn) {
+            Runner.Despawn(Object);
             return;
         }
 
@@ -177,5 +182,28 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing when bumped
+    }
+
+    //uhhh
+    public void PredictedSpawnSpawned() {
+        Debug.Log("fireball predictive spawn");
+        Spawned();
+    }
+
+    public void PredictedSpawnUpdate() {
+        FixedUpdateNetwork();
+    }
+
+    public void PredictedSpawnRender() {
+        Render();
+    }
+
+    public void PredictedSpawnFailed() {
+        Debug.Log("predictive spawn failed");
+        Destroy(gameObject);
+    }
+
+    public void PredictedSpawnSuccess() {
+        Debug.Log("predictive spawn success");
     }
 }

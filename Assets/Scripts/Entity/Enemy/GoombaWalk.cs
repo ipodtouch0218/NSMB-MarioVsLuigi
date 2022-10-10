@@ -25,7 +25,7 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        if (Dead) {
+        if (IsDead) {
             if (DespawnTimer.Expired(Runner))
                 Runner.Despawn(Object);
             return;
@@ -44,7 +44,7 @@ public class GoombaWalk : KillableEntity {
     }
 
     public override void Kill() {
-        Dead = true;
+        IsDead = true;
 
         body.velocity = Vector2.zero;
         body.isKinematic = true;

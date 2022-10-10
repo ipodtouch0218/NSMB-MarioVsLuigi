@@ -148,8 +148,8 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (!Collector)
-            Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
+        if (!GameManager.Instance.gameover && !Collector)
+            GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
     }
 
     public override void InteractWithPlayer(PlayerController player) {
@@ -167,7 +167,6 @@ public class StarBouncer : CollectableEntity {
         //game mechanics
         if (IsStationary)
             GameManager.Instance.Rpc_ResetTilemap();
-
         GameManager.Instance.CheckForWinner();
 
         //despawn

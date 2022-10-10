@@ -69,7 +69,7 @@ public abstract class HoldableEntity : KillableEntity {
     }
 
     public override void Kill() {
-        if (Dead)
+        if (IsDead)
             return;
 
         if (Holder)
@@ -79,7 +79,7 @@ public abstract class HoldableEntity : KillableEntity {
     }
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {
-        if (Dead)
+        if (IsDead)
             return;
 
         if (Holder)

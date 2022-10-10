@@ -46,7 +46,7 @@ public class BreakableBrickTile : InteractableTile {
         GameManager.Instance.tilemap.SetTile(tileLocation, null);
 
         //Particle
-        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, tileLocation, particleColor);
+        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f, particleColor);
 
         if (interacter)
             interacter.PlaySound(sound);

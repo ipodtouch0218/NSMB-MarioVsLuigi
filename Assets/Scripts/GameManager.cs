@@ -342,6 +342,8 @@ public class GameManager : NetworkBehaviour {
         } else {
             NetworkHandler.Runner.GetLocalPlayerData()?.Rpc_FinishedLoading();
         }
+
+        Camera.main.transform.position = spawnpoint;
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -386,7 +388,7 @@ public class GameManager : NetworkBehaviour {
 
         loaded = true;
         SceneManager.SetActiveScene(gameObject.scene);
-        GameStartTimer = TickTimer.CreateFromSeconds(NetworkHandler.Runner, 1.5f);
+        GameStartTimer = TickTimer.CreateFromSeconds(NetworkHandler.Runner, 3.7f);
 
         if (Runner.IsServer)
             Rpc_FinishLoading();
@@ -426,10 +428,13 @@ public class GameManager : NetworkBehaviour {
 
     private void StartGame() {
 
-        //Respawn players
-        foreach (PlayerController player in players) {
+        //Spawn players
+        foreach (PlayerController player in players)
             player.PreRespawn();
-        }
+
+        //Play start sfx
+        if (Runner.IsForward)
+            sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
         //Respawn enemies
         foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
@@ -440,10 +445,6 @@ public class GameManager : NetworkBehaviour {
         if (timer > 0)
             GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer);
 
-        //Play start sfx
-        if (Runner.IsForward)
-            sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
-
         //Start some things that should be booted
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
             wfgs.AttemptExecute();
@@ -451,20 +452,14 @@ public class GameManager : NetworkBehaviour {
         //Big star
         SpawnBigStar();
 
-        //Destroy canavas
-        GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
-        if (canvas)
-            Destroy(canvas.transform.parent.gameObject);
-
         GameStartTick = Runner.Simulation.Tick.Raw;
-        musicEnabled = true;
 
         gameStartTimestamp = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
         gameEndTimestamp = (timer > 0) ? gameStartTimestamp + timer * 1000 : 0;
 
         GlobalController.Instance.DiscordController.UpdateActivity();
 
-        StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+        StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
     }
 
     private IEnumerator EndGame(PlayerRef winner) {

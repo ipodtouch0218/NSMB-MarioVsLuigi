@@ -5015,7 +5015,7 @@ PrefabInstance:
     - target: {fileID: 549419135642806217, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 549419135642806217, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
@@ -5081,6 +5081,16 @@ PrefabInstance:
         type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: -3040814077242440268
+      objectReference: {fileID: 0}
+    - target: {fileID: 4512469588533065805, guid: c47ca8bcff624cc48bd8ce919f74072c,
+        type: 3}
+      propertyPath: animationMultiplier
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 4512469588533065805, guid: c47ca8bcff624cc48bd8ce919f74072c,
+        type: 3}
+      propertyPath: animationTimeSeconds
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5683304359912364406, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
@@ -5377,7 +5387,7 @@ PrefabInstance:
     - target: {fileID: 549419135642806217, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.5
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 549419135642806217, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
@@ -5444,6 +5454,21 @@ PrefabInstance:
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: 7246732428076608181
       objectReference: {fileID: 0}
+    - target: {fileID: 4512469588533065805, guid: c47ca8bcff624cc48bd8ce919f74072c,
+        type: 3}
+      propertyPath: animationOffset
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 4512469588533065805, guid: c47ca8bcff624cc48bd8ce919f74072c,
+        type: 3}
+      propertyPath: animationMultiplier
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 4512469588533065805, guid: c47ca8bcff624cc48bd8ce919f74072c,
+        type: 3}
+      propertyPath: animationTimeSeconds
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5683304359912364406, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
       propertyPath: sceneViewId
@@ -5489,7 +5514,7 @@ PrefabInstance:
     - target: {fileID: 549419135642806217, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.5
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 549419135642806217, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
@@ -5556,12 +5581,28 @@ PrefabInstance:
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: -1873181656969383504
       objectReference: {fileID: 0}
+    - target: {fileID: 4512469588533065805, guid: c47ca8bcff624cc48bd8ce919f74072c,
+        type: 3}
+      propertyPath: animationOffset
+      value: 0.6666667
+      objectReference: {fileID: 0}
+    - target: {fileID: 4512469588533065805, guid: c47ca8bcff624cc48bd8ce919f74072c,
+        type: 3}
+      propertyPath: animationMultiplier
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 4512469588533065805, guid: c47ca8bcff624cc48bd8ce919f74072c,
+        type: 3}
+      propertyPath: animationTimeSeconds
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5683304359912364406, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
       propertyPath: sceneViewId
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 549419135642806216, guid: c47ca8bcff624cc48bd8ce919f74072c, type: 3}
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: c47ca8bcff624cc48bd8ce919f74072c, type: 3}
 --- !u!4 &1582590456 stripped

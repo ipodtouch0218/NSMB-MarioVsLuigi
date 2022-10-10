@@ -109,7 +109,7 @@ public class BulletBillMover : KillableEntity {
     }
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {
-        Dead = true;
+        IsDead = true;
         body.velocity = Vector2.right * 2.5f;
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (right ? 1 : -1);

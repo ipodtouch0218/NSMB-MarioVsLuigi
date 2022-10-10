@@ -37,6 +37,6 @@ public abstract class Coin : CollectableEntity {
         if (!target)
             return;
 
-        GivePlayerCoin(target, Vector3.zero);
+        InteractWithPlayer(target);
     }
 }

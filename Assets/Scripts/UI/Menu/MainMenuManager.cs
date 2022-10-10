@@ -526,6 +526,10 @@ public class MainMenuManager : MonoBehaviour {
         GlobalController.Instance.DiscordController.UpdateActivity();
     }
     public void StartGame() {
+
+        if (Runner.ActivePlayers.All(ap => ap.GetPlayerData(Runner).IsManualSpectator))
+            return;
+
         //do host related stuff
         if (Runner.IsServer) {
             //set starting

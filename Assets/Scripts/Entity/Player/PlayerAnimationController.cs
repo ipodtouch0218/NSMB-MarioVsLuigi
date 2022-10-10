@@ -56,10 +56,12 @@ public class PlayerAnimationController : NetworkBehaviour {
             GameManager.Instance.CreateNametag(controller);
 
         PlayerData data = Object.InputAuthority.GetPlayerData(Runner);
-        PlayerColorSet colorSet = GlobalController.Instance.skins[data?.SkinIndex ?? 0];
-        PlayerColors colors = colorSet.GetPlayerColors(controller.character);
-        primaryColor = colors.overallsColor.linear;
-        secondaryColor = colors.hatColor.linear;
+
+        if (GlobalController.Instance.skins[data?.SkinIndex ?? 0] is PlayerColorSet colorSet) {
+            PlayerColors colors = colorSet.GetPlayerColors(controller.character);
+            primaryColor = colors.overallsColor.linear;
+            secondaryColor = colors.hatColor.linear;
+        }
     }
 
     public override void FixedUpdateNetwork() {
