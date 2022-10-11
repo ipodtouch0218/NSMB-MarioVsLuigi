@@ -167,6 +167,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
+    private Enums.Particle footstepParticle = Enums.Particle.None;
     public bool onIce;
     private readonly List<Vector3Int> tilesStandingOn = new(), tilesJumpedInto = new(), tilesHitSide = new();
 
@@ -409,12 +410,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private void HandleTileProperties() {
         onIce = false;
         footstepSound = Enums.Sounds.Player_Walk_Grass;
+        footstepParticle = Enums.Particle.None;
         foreach (Vector3Int pos in tilesStandingOn) {
             TileBase tile = Utils.GetTileAtTileLocation(pos);
             if (tile == null)
                 continue;
             if (tile is TileWithProperties propTile) {
                 footstepSound = propTile.footstepSound;
+                footstepParticle = propTile.footstepParticle;
                 onIce = propTile.iceSkidding;
             }
         }
@@ -1092,6 +1095,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Kick);
             return;
         }
+        if (footstepParticle != Enums.Particle.None)
+            GameManager.Instance.particleManager.Play((Enums.Particle) ((int) footstepParticle + (FacingRight ? 1 : 0)), body.position);
+
         if (Mathf.Abs(currentVelocity.x) < WalkingMaxSpeed)
             return;
 

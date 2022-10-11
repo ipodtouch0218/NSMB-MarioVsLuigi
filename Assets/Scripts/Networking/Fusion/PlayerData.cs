@@ -41,6 +41,9 @@ public class PlayerData : NetworkBehaviour {
             //we're the client. update with our data.
             Rpc_SetCharacterIndex(Settings.Instance.character);
             Rpc_SetSkinIndex(Settings.Instance.skin);
+
+            if (Runner.IsServer)
+                IsRoomOwner = true;
         }
 
         if (Runner.IsServer) {
@@ -50,10 +53,8 @@ public class PlayerData : NetworkBehaviour {
             //expose their userid
             //TOOD: use an auth-server signed userid, to disallow userid spoofing.
             UserId = Runner.GetPlayerUserId(Object.InputAuthority)?.Replace("-", "");
-            if (Runner.IsServer)
-                IsRoomOwner = true;
 
-            IsCurrentlySpectating = LobbyData.Instance?.GameStarted ?? false;
+            IsCurrentlySpectating = LobbyData.Instance ? LobbyData.Instance.GameStarted : false;
         }
 
         if (MainMenuManager.Instance)

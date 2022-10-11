@@ -33,7 +33,7 @@ public class LooseCoin : Coin {
         CollectableTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
-        body.velocity = Vector2.up * GameManager.Instance.Random.RangeInclusive(2f, 3f);
+        body.velocity = Vector2.up * GameManager.Instance.Random.RangeInclusive(3f, 5f);
     }
 
     public override void FixedUpdateNetwork() {

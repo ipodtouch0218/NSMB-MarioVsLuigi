@@ -147,4 +147,4 @@ MonoBehaviour:
   isBackgroundTile: 0
   iceSkidding: 0
   footstepSound: 32
-  frictionFactor: 1
+  footstepParticle: 4

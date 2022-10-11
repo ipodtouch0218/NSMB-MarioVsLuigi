@@ -202,10 +202,11 @@ public class MainMenuManager : MonoBehaviour {
         levelDropdown.AddOptions(maps);
 
         //Photon stuff.
+        LoadSettings(!Runner.IsCloudReady);
+
         if (!Runner.IsCloudReady) {
             //initial connection to the game
             OpenTitleScreen();
-            LoadSettings(true);
             _ = NetworkHandler.ConnectToRegion();
 
         } else if (Runner.SessionInfo.IsValid) {
@@ -216,7 +217,6 @@ public class MainMenuManager : MonoBehaviour {
         region.ClearOptions();
         region.AddOptions(NetworkHandler.Regions.ToList());
         //TODO: change to current region
-
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
         nicknameField.characterLimit = NICKNAME_MAX;

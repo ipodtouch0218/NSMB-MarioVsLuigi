@@ -41,7 +41,7 @@ public class ChatManager : MonoBehaviour {
     public void SendChat() {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerData data = runner.GetLocalPlayerData();
-        if (!data?.MessageCooldownTimer.ExpiredOrNotRunning(runner) ?? true) {
+        if (!data.MessageCooldownTimer.ExpiredOrNotRunning(runner)) {
             //can't send a message yet.
             return;
         }
@@ -55,12 +55,14 @@ public class ChatManager : MonoBehaviour {
             return;
         }
 
-        IncomingPlayerMessage(text);
+        LobbyData.Instance.Rpc_ChatIncomingMessage(text);
         StartCoroutine(SelectTextboxNextFrame());
     }
 
     private IEnumerator SelectTextboxNextFrame() {
+        chatbox.text = "";
         yield return null;
+        chatbox.text = "";
         EventSystem.current.SetSelectedGameObject(chatbox.gameObject);
     }
 
@@ -71,6 +73,9 @@ public class ChatManager : MonoBehaviour {
 
         PlayerData data = source.GetPlayerData(NetworkHandler.Runner);
 
+        if (!data || !data.Object.IsValid)
+            return;
+
         //format message, in case we can't trust the host to do it for us.
         message = message.Substring(0, Mathf.Min(128, message.Length));
         message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
@@ -78,18 +83,20 @@ public class ChatManager : MonoBehaviour {
         //add username
         message = data.GetNickname() + ": " + message.Filter();
 
+        Debug.Log("A");
         LocalChatMessage(message);
     }
 
-    public void IncomingPlayerMessage(string message, RpcInfo info = default) {
+    public void IncomingPlayerMessage(string message, RpcInfo info) {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerRef player = info.Source;
-
-        //what?
+        Debug.Log(player);
         if (!player.IsValid)
             return;
 
         PlayerData data = player.GetPlayerData(runner);
+        if (!data || !data.Object.IsValid)
+            return;
 
         //spam prevention.
         if (!data.MessageCooldownTimer.ExpiredOrNotRunning(runner))
@@ -103,7 +110,9 @@ public class ChatManager : MonoBehaviour {
         if (string.IsNullOrWhiteSpace(message))
             return;
 
-        //message seems fine, send to rest of lobby.
+        data.MessageCooldownTimer = TickTimer.CreateFromSeconds(runner, 0.5f);
 
+        //message seems fine, send to rest of lobby.
+        LobbyData.Instance.Rpc_ChatDisplayMessage(message, player);
     }
 }

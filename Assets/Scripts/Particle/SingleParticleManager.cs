@@ -14,7 +14,7 @@ public class SingleParticleManager : MonoBehaviour {
         pairs = serializedSystems.ToDictionary(pp => pp.particle, pp => pp);
     }
 
-    public void Play(Enums.Particle particle, Vector3 position, Color? color = null) {
+    public void Play(Enums.Particle particle, Vector3 position, Color? color = null, float rot = 0) {
         if (!systems.ContainsKey(particle))
             return;
 
@@ -23,6 +23,7 @@ public class SingleParticleManager : MonoBehaviour {
 
         ParticleSystem.EmitParams emitParams = new() {
             position = position,
+            rotation3D = new(0, 0, rot),
             applyShapeToPosition = true,
         };
 

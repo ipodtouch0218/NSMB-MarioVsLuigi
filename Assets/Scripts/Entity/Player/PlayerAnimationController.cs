@@ -220,7 +220,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         } else if (controller.State == Enums.PowerupState.MegaMushroom && (controller.currentInputs.buttons.IsSet(PlayerControls.Left) || controller.currentInputs.buttons.IsSet(PlayerControls.Right))) {
             animatedVelocity = 4.5f;
         } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
-            animatedVelocity = Mathf.Max(2f, animatedVelocity);
+            animatedVelocity = Mathf.Max(controller.onIce ? 4.5f : 2f, animatedVelocity);
         } else if (controller.onIce) {
             animatedVelocity = 0;
         }

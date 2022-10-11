@@ -1,8 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpinnerAnimator : MonoBehaviour {
+using Fusion;
+
+public class SpinnerAnimator : SimulationBehaviour, IPlayerInteractable {
 
     [SerializeField] private Vector3 idleSpinSpeed = new(0, -100, 0), fastSpinSpeed = new(0, -1800, 0);
     [SerializeField] private Transform topArmBone;
@@ -33,6 +34,10 @@ public class SpinnerAnimator : MonoBehaviour {
         topArmBone.localPosition = new Vector3(0, Mathf.Max(-0.084f, percentage * -0.07f), 0);
     }
 
+    public override void FixedUpdateNetwork() {
+
+    }
+
     public void OnTriggerExit2D(Collider2D collider) {
         PlayerController cont = collider.gameObject.GetComponent<PlayerController>();
         if (cont)
@@ -43,5 +48,9 @@ public class SpinnerAnimator : MonoBehaviour {
         PlayerController cont = collider.gameObject.GetComponent<PlayerController>();
         if (cont)
             playersInside.Add(cont);
+    }
+
+    public void InteractWithPlayer(PlayerController player) {
+        Debug.Log("a");
     }
 }

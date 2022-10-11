@@ -110,8 +110,8 @@ public class LobbyData : NetworkBehaviour {
 
     #region RPCS
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void Rpc_ChatIncomingMessage(string message) => Chat.IncomingPlayerMessage(message);
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void Rpc_ChatIncomingMessage(string message, RpcInfo info = default) => Chat.IncomingPlayerMessage(message, info);
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_ChatDisplayMessage(string message, PlayerRef player) => Chat.DisplayPlayerMessage(message, player);

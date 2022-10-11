@@ -166,11 +166,15 @@ public static class Enums {
     }
 
     public enum Particle : byte {
+        None = 5,
+
         Entity_BrickBreak = 0,
         Entity_Coin = 1,
-        Generic_Puff = 4,
+        Generic_Puff = 6,
         Walk_Sand = 2,
-        Walk_Ice = 3,
+        Walk_Sand_Right = 3,
+        Walk_Snow = 4,
+        Walk_Snow_Right = 5,
     }
 
     #endregion
