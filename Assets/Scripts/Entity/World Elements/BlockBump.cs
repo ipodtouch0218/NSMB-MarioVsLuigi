@@ -57,11 +57,8 @@ public class BlockBump : NetworkBehaviour {
     }
 
     public void Kill(Vector3Int loc) {
-
-        Tilemap tm = GameManager.Instance.tilemap;
-
-        TileBase tile = Resources.Load("Tilemaps/Tiles/" + ResultTile) as TileBase;
-        tm.SetTile(loc, tile);
+        if (Object.HasStateAuthority)
+            GameManager.Instance.Rpc_SetTile(loc.x, loc.y, ResultTile.ToString());
 
         if (SpawnPrefab == NetworkPrefabRef.Empty) {
             Runner.Despawn(Object);

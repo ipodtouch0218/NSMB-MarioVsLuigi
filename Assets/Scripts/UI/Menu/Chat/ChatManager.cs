@@ -13,15 +13,7 @@ public class ChatManager : MonoBehaviour {
     [SerializeField] private TMP_InputField chatbox;
     [SerializeField] private GameObject chatWindow;
 
-    public void LocalChatMessage(string message, Color? color = null, bool filter = false) {
-        float y = 0;
-        for (int i = 0; i < chatWindow.transform.childCount; i++) {
-            GameObject child = chatWindow.transform.GetChild(i).gameObject;
-            if (!child.activeSelf)
-                continue;
-
-            y -= child.GetComponent<RectTransform>().rect.height + 20;
-        }
+    public void AddChatMessage(string message, Color? color = null, bool filter = false) {
 
         ChatMessage chat = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, chatWindow.transform);
         chat.gameObject.SetActive(true);
@@ -51,7 +43,7 @@ public class ChatManager : MonoBehaviour {
             return;
 
         if (text.StartsWith("/")) {
-            LocalChatMessage("Slash commands are no longer necessary. Click on a player's name to moderate your room instead!", Color.red);
+            AddChatMessage("Slash commands are no longer necessary. Click on a player's name to moderate your room instead!", Color.red);
             return;
         }
 
@@ -83,14 +75,13 @@ public class ChatManager : MonoBehaviour {
         //add username
         message = data.GetNickname() + ": " + message.Filter();
 
-        Debug.Log("A");
-        LocalChatMessage(message);
+        AddChatMessage(message);
     }
 
     public void IncomingPlayerMessage(string message, RpcInfo info) {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerRef player = info.Source;
-        Debug.Log(player);
+
         if (!player.IsValid)
             return;
 

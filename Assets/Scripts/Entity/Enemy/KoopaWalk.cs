@@ -11,7 +11,6 @@ public class KoopaWalk : HoldableEntity {
     [Networked] public NetworkBool IsInShell { get; set; }
     [Networked] public NetworkBool IsStationary { get; set; }
     [Networked] public NetworkBool IsUpsideDown { get; set; }
-    [Networked] private float CurrentSpeed { get; set; }
 
     //---Serialized Variables
     [SerializeField] private Vector2 outShellHitboxSize, inShellHitboxSize;
@@ -76,6 +75,8 @@ public class KoopaWalk : HoldableEntity {
             hitbox.offset = outShellHitboxOffset;
         }
 
+        physics.UpdateCollisions();
+
         if (physics.hitRight && FacingRight) {
             Turnaround(false, velocityLastFrame.x);
         } else if (physics.hitLeft && !FacingRight) {
@@ -93,7 +94,7 @@ public class KoopaWalk : HoldableEntity {
         }
 
         if (!IsStationary)
-            body.velocity = new((IsInShell ? CurrentSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+            body.velocity = new((IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
         CheckForEntityCollisions();
         HandleTile();
@@ -173,7 +174,7 @@ public class KoopaWalk : HoldableEntity {
         } else if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             EnterShell(true);
             if (!blue) {
-                Kick(player.body.position.x < body.position.x, 1f, player.IsGroundpounding);
+                Kick(player, player.body.position.x < body.position.x, 1f, player.IsGroundpounding);
                 PreviousHolder = player;
             }
 
@@ -196,7 +197,7 @@ public class KoopaWalk : HoldableEntity {
                     if (player.CanPickup()) {
                         Pickup(player);
                     } else {
-                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                        Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                         PreviousHolder = player;
                     }
                 }
@@ -213,7 +214,6 @@ public class KoopaWalk : HoldableEntity {
     private void HandleTile() {
         if (Holder)
             return;
-        physics.UpdateCollisions();
 
         ContactPoint2D[] collisions = new ContactPoint2D[20];
         int collisionAmount = hitbox.GetContacts(collisions);
@@ -246,16 +246,13 @@ public class KoopaWalk : HoldableEntity {
         IsStationary = true;
     }
 
-    public override void Kick(bool fromLeft, float kickFactor, bool groundpound) {
-        FacingRight = fromLeft;
+    public override void Kick(PlayerController thrower, bool toRight, float kickFactor, bool groundpound) {
+        base.Kick(thrower, toRight, kickFactor, groundpound);
         IsStationary = false;
-        CurrentSpeed = kickSpeed + 1.5f * kickFactor;
-        body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
-        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
     public override void Throw(bool toRight, bool crouch) {
-        throwSpeed = CurrentSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.velocity.x) / Holder.RunningMaxSpeed);
+        throwSpeed = CurrentKickSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.velocity.x) / Holder.RunningMaxSpeed);
         base.Throw(toRight, crouch);
 
         IsStationary = crouch;
@@ -306,13 +303,13 @@ public class KoopaWalk : HoldableEntity {
             PlaySound(Enums.Sounds.World_Block_Bump);
 
         FacingRight = hitWallOnLeft;
-        body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+        body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
         if (IsInShell)
             PlaySound(Enums.Sounds.World_Block_Bump);
     }
 
     public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
-        if (IsDead || direction == InteractableTile.InteractionDirection.Down)
+        if (IsDead)
             return;
 
         if (!IsInShell) {

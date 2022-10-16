@@ -33,7 +33,7 @@ public class SpinnerAnimator : SimulationBehaviour, IPlayerInteractable {
         topArmBone.eulerAngles += ((fastSpinSpeed * spinPercentage) + (idleSpinSpeed * (1-spinPercentage))) * Time.deltaTime;
         topArmBone.localPosition = new Vector3(0, Mathf.Max(-0.084f, percentage * -0.07f), 0);
     }
-
+    //TODO: everything
     public override void FixedUpdateNetwork() {
 
     }

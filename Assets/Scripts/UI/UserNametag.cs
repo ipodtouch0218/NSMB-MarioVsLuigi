@@ -33,7 +33,7 @@ public class UserNametag : MonoBehaviour {
         }
 
         arrow.color = parent.animationController.GlowColor;
-        nametag.SetActive(parent.RespawnTimer.ExpiredOrNotRunning(parent.Runner));
+        nametag.SetActive(!(parent.IsDead && parent.IsRespawning));
 
         Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.WorldHitboxSize.y * 1.2f) + 0.5f);
         if (GameManager.Instance.loopingLevel && Mathf.Abs(cam.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * (1 / 4f))

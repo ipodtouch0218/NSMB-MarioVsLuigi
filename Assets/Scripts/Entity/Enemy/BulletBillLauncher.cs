@@ -59,13 +59,13 @@ public class BulletBillLauncher : NetworkBehaviour {
             return;
 
         //Shoot left
-        if (!IntersectsPlayer(leftSearchPosition, searchBox)) {
+        if (IntersectsPlayer(leftSearchPosition, searchBox)) {
             SpawnBill(leftSpawnPosition, false);
             return;
         }
 
         //Shoot right
-        if (!IntersectsPlayer(rightSearchPosition, searchBox)) {
+        if (IntersectsPlayer(rightSearchPosition, searchBox)) {
             SpawnBill(rightSpawnPosition, true);
             return;
         }

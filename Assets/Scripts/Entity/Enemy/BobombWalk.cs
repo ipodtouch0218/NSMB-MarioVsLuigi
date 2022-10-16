@@ -14,7 +14,7 @@ public class BobombWalk : HoldableEntity {
     //---Serialized Variables
     [SerializeField] private GameObject explosionPrefab;
     [SerializeField] private float walkSpeed = 0.6f, kickSpeed = 4.5f, detonationTime = 4f;
-    [SerializeField] private int explosionTileSize = 2;
+    [SerializeField] private int explosionTileSize = 1;
 
     //---Misc Variables
     private MaterialPropertyBlock mpb;
@@ -22,7 +22,6 @@ public class BobombWalk : HoldableEntity {
 
     //---Properties
     public bool Lit => !DetonationTimer.ExpiredOrNotRunning(Runner);
-
 
     #region Unity Methods
     public override void Spawned() {
@@ -84,7 +83,7 @@ public class BobombWalk : HoldableEntity {
 
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom) {
-                Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
             } else {
                 player.bounce = true;
                 player.IsGroundpounding = false;
@@ -96,7 +95,7 @@ public class BobombWalk : HoldableEntity {
                     if (player.CanPickup()) {
                         Pickup(player);
                     } else {
-                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                        Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                     }
                 }
             } else if (player.IsDamageable) {
@@ -110,7 +109,7 @@ public class BobombWalk : HoldableEntity {
         if (!Lit) {
             Light();
         } else {
-            Kick(fireball.FacingRight, 0f, false);
+            Kick(null, fireball.FacingRight, 0f, false);
         }
         return true;
     }
@@ -198,10 +197,9 @@ public class BobombWalk : HoldableEntity {
         PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
     }
 
-    public override void Kick(bool fromLeft, float speed, bool groundpound) {
-        FacingRight = fromLeft;
-        body.velocity = new(kickSpeed * (FacingRight ? 1 : -1), 3f);
-        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+    public override void Kick(PlayerController kicker, bool toRight, float speed, bool groundpound) {
+        //always do a groundpound variant kick
+        base.Kick(kicker, toRight, speed, true);
     }
 
     public void Turnaround(bool hitWallOnLeft) {

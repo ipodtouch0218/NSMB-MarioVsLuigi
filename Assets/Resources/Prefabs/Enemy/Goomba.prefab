@@ -57,10 +57,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _FacingRight:
-    _value: 1
   _IsFrozen: 0
-  _Dead:
+  _IsDead:
     _value: 0
   collide: 1
   iceCarryable: 1
@@ -400,9 +398,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  InterpolationSpace: 0
+  InterpolationSpace: 1
   InterpolationTarget: {fileID: 0}
-  InterpolateErrorCorrection: 1
+  InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
     MaxRate: 10

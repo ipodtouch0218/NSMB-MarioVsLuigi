@@ -2995,7 +2995,6 @@ namespace Fusion.CodeGen {
 #if FUSION_WEAVER && FUSION_WEAVER_ILPOSTPROCESSOR && FUSION_HAS_MONO_CECIL
 
 namespace Fusion.CodeGen {
-
   using System.Collections.Generic;
   using System.IO;
   using System.Linq;
@@ -3010,7 +3009,7 @@ namespace Fusion.CodeGen {
 
     public AssemblyDefinition WeavedAssembly;
 
-    public ILWeaverAssemblyResolver(ILWeaverLog log, string compiledAssemblyName, string[] references) {
+    public ILWeaverAssemblyResolver(ILWeaverLog log, string compiledAssemblyName, string[] references, string[] weavedAssemblies) {
       _log                  = log;
       _compiledAssemblyName = compiledAssemblyName;
       _assemblyNameToPath   = new Dictionary<string, string>();
@@ -3020,6 +3019,31 @@ namespace Fusion.CodeGen {
         if (_assemblyNameToPath.TryGetValue(assemblyName, out var existingPath)) {
           _log.Warn($"Assembly {assemblyName} (full path: {referencePath}) already referenced by {compiledAssemblyName} at {existingPath}");
         } else {
+#if !FUSION_WEAVER_DISABLE_POST_PROCESSED_ASSEMBLIES_WORKAROUND
+          if (System.Array.IndexOf(weavedAssemblies, assemblyName) >= 0) {
+            // this assembly is expected to have been postprocessed, try to read it
+            var dir = Path.GetDirectoryName(referencePath);
+            dir = dir.Replace("\\", "/");
+
+            var fileName = Path.GetFileName(referencePath);
+            if (dir.Contains("Library/Bee/artifacts/")) {
+              var postProcessedPath = $"{dir}/post-processed/{fileName}";
+              if (File.Exists(postProcessedPath)) {
+                _log.Debug($"Adding {assemblyName}->{postProcessedPath} (PostProcessed)");
+                _assemblyNameToPath.Add(assemblyName, postProcessedPath);
+                continue;
+              }
+            } else if (dir.EndsWith("Library/ScriptAssemblies")) {
+              var postProcessedPath = $"Temp/{fileName}";
+              if (File.Exists(postProcessedPath)) {
+                _log.Debug($"Adding {assemblyName}->{postProcessedPath} (PostProcessed)");
+                _assemblyNameToPath.Add(assemblyName, postProcessedPath);
+                continue;
+              }
+            }
+          }
+#endif
+          _log.Debug($"Adding {assemblyName}->{referencePath}");
           _assemblyNameToPath.Add(assemblyName, referencePath);
         }
       }
@@ -3325,7 +3349,7 @@ namespace Fusion.CodeGen {
           ILWeaver weaver;
 
           using (log.Scope("Resolving")) {
-            asm = CreateWeaverAssembly(log, compiledAssembly);
+            asm = CreateWeaverAssembly(settings, log, compiledAssembly);
           }
 
           using (log.Scope("Init")) { 
@@ -3363,12 +3387,7 @@ namespace Fusion.CodeGen {
       string[] assembliesToWeave;
 
       try {
-        assembliesToWeave = 
-          _config.Value.Root.Element(nameof(NetworkProjectConfig.AssembliesToWeave))?
-          .Elements()
-          .Select(x => x.Value)
-          .ToArray() ?? Array.Empty<string>();
-
+        assembliesToWeave = ReadSettings(_config.Value, full: false).AssembliesToWeave;
       } catch {
         // need to go to the next stage for some assembly, main is good enough
         return compiledAssembly.Name == MainAssemblyName;
@@ -3386,8 +3405,8 @@ namespace Fusion.CodeGen {
     }
 
 
-    static ILWeaverAssembly CreateWeaverAssembly(ILWeaverLog log, ICompiledAssembly compiledAssembly) {
-      var resolver = new ILWeaverAssemblyResolver(log, compiledAssembly.Name, compiledAssembly.References);
+    static ILWeaverAssembly CreateWeaverAssembly(ILWeaverSettings settings, ILWeaverLog log, ICompiledAssembly compiledAssembly) {
+      var resolver = new ILWeaverAssemblyResolver(log, compiledAssembly.Name, compiledAssembly.References, settings.AssembliesToWeave);
 
       var readerParameters = new ReaderParameters {
         SymbolStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PdbData.ToArray()),
@@ -3409,7 +3428,7 @@ namespace Fusion.CodeGen {
       };
     }
 
-    static ILWeaverSettings ReadSettings(XDocument config) {
+    static ILWeaverSettings ReadSettings(XDocument config, bool full = true) {
 
       static XElement GetElementOrThrow(XElement element, string name) {
         var child = element.Element(name);
@@ -3448,31 +3467,37 @@ namespace Fusion.CodeGen {
       }
 
       var result = new ILWeaverSettings();
+      if (full) {
+        {
+          AccuracyDefaults defaults = new AccuracyDefaults();
+          var element = config.Root.Element(nameof(NetworkProjectConfig.AccuracyDefaults));
+          if (element != null) {
+            {
+              var t = ParseAccuracies(element, nameof(AccuracyDefaults.coreKeys), nameof(AccuracyDefaults.coreVals));
+              defaults.coreKeys = t.Item1;
+              defaults.coreVals = t.Item2;
+            }
 
-      {
-        AccuracyDefaults defaults = new AccuracyDefaults();
-        var element = config.Root.Element(nameof(NetworkProjectConfig.AccuracyDefaults));
-        if (element != null) {
-          {
-            var t = ParseAccuracies(element, nameof(AccuracyDefaults.coreKeys), nameof(AccuracyDefaults.coreVals));
-            defaults.coreKeys = t.Item1;
-            defaults.coreVals = t.Item2;
+            {
+              var t = ParseAccuracies(element, nameof(AccuracyDefaults.tags), nameof(AccuracyDefaults.values));
+              defaults.tags = t.Item1.ToList();
+              defaults.values = t.Item2.ToList();
+            }
+            defaults.RebuildLookup();
           }
-
-          {
-            var t = ParseAccuracies(element, nameof(AccuracyDefaults.tags), nameof(AccuracyDefaults.values));
-            defaults.tags = t.Item1.ToList();
-            defaults.values = t.Item2.ToList();
-          }
-          defaults.RebuildLookup();
+          result.AccuracyDefaults = defaults;
         }
-        result.AccuracyDefaults = defaults;
+
+        SetIfExists(ref result.NullChecksForNetworkedProperties, nameof(NetworkProjectConfig.NullChecksForNetworkedProperties));
+        SetIfExists(ref result.UseSerializableDictionary, nameof(NetworkProjectConfig.UseSerializableDictionary));
+        SetIfExists(ref result.CheckRpcAttributeUsage, nameof(NetworkProjectConfig.CheckRpcAttributeUsage));
+        SetIfExists(ref result.CheckNetworkedPropertiesBeingEmpty, nameof(NetworkProjectConfig.CheckNetworkedPropertiesBeingEmpty));
       }
 
-      SetIfExists(ref result.NullChecksForNetworkedProperties, nameof(NetworkProjectConfig.NullChecksForNetworkedProperties));
-      SetIfExists(ref result.UseSerializableDictionary, nameof(NetworkProjectConfig.UseSerializableDictionary));
-      SetIfExists(ref result.CheckRpcAttributeUsage, nameof(NetworkProjectConfig.CheckRpcAttributeUsage));
-      SetIfExists(ref result.CheckNetworkedPropertiesBeingEmpty, nameof(NetworkProjectConfig.CheckNetworkedPropertiesBeingEmpty));
+      result.AssembliesToWeave = config.Root.Element(nameof(NetworkProjectConfig.AssembliesToWeave))?
+          .Elements()
+          .Select(x => x.Value)
+          .ToArray() ?? Array.Empty<string>();
 
       return result;
     }
@@ -3649,7 +3674,8 @@ namespace Fusion.CodeGen {
           CheckNetworkedPropertiesBeingEmpty = projectConfig.CheckNetworkedPropertiesBeingEmpty,
           CheckRpcAttributeUsage             = projectConfig.CheckRpcAttributeUsage,
           NullChecksForNetworkedProperties   = projectConfig.NullChecksForNetworkedProperties,
-          UseSerializableDictionary          = projectConfig.UseSerializableDictionary
+          UseSerializableDictionary          = projectConfig.UseSerializableDictionary,
+          AssembliesToWeave                  = projectConfig.AssembliesToWeave,
         };
 
         _weaver = _weaver ?? new ILWeaver(settings, new ILWeaverLoggerUnityDebug());
@@ -5365,6 +5391,7 @@ namespace Fusion.CodeGen {
     public bool UseSerializableDictionary;
     public bool CheckRpcAttributeUsage;
     public bool CheckNetworkedPropertiesBeingEmpty;
+    public string[] AssembliesToWeave;
   }
 }
 #endif

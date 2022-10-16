@@ -125,6 +125,16 @@ PrefabInstance:
       propertyPath: InterpolationTarget
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2914323514277592658, guid: 00a2ef66a322a694c837b29404f2af49,
+        type: 3}
+      propertyPath: _interpolationDataSource
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2914323514277592658, guid: 00a2ef66a322a694c837b29404f2af49,
+        type: 3}
+      propertyPath: InterpolateErrorCorrection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5044812112945403417, guid: 00a2ef66a322a694c837b29404f2af49,
         type: 3}
       propertyPath: UVModule.sprites.Array.data[0].sprite

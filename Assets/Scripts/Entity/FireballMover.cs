@@ -3,7 +3,7 @@
 using Fusion;
 using NSMB.Utils;
 
-public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable, IPredictedSpawnBehaviour {
+public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable, IPredictedSpawnBehaviour, IPredictedDespawnBehaviour {
 
     //---Networked Variables
     [Networked] public NetworkBool BreakOnImpact { get; set; }
@@ -150,8 +150,12 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         //Collision is a GO
         if (isIceball) {
             //iceball
-            //TODO:
-            player.Freeze(null);
+            if (!player.IsFrozen) {
+                Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
+                    FrozenCube cube = obj.GetComponent<FrozenCube>();
+                    cube.OnBeforeSpawned(player);
+                });
+            }
         } else {
             //fireball
             //TODO: damage source?
@@ -200,10 +204,18 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     public void PredictedSpawnFailed() {
         Debug.Log("predictive spawn failed");
-        Destroy(gameObject);
+        Runner.Despawn(Object, true);
     }
 
     public void PredictedSpawnSuccess() {
         Debug.Log("predictive spawn success");
+    }
+
+    public void PredictedDespawn() {
+        throw new System.NotImplementedException();
+    }
+
+    public void PredictedDespawnFailed() {
+        throw new System.NotImplementedException();
     }
 }

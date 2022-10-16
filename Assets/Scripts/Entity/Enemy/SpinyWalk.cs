@@ -28,8 +28,7 @@ public class SpinyWalk : KoopaWalk {
                         Pickup(player);
                     } else {
                         //non-pickup able, kick.
-                        Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
-                        PreviousHolder = player;
+                        Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                     }
                 } else {
                     //in shell, moving.
@@ -50,8 +49,7 @@ public class SpinyWalk : KoopaWalk {
                             //normal mario interactions
                             if (player.IsGroundpounding) {
                                 //normal mario is groundpounding, we get kick'd
-                                Kick(player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
-                                PreviousHolder = player;
+                                Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                             } else {
                                 //normal mario isnt groundpounding, we get stopped
                                 EnterShell(true);

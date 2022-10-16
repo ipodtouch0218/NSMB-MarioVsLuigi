@@ -50,7 +50,7 @@ GameObject:
   - component: {fileID: 4891561017733555876}
   - component: {fileID: 5412312900953502766}
   - component: {fileID: 157777260401815061}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: animatorsarestupid
   m_TagString: piranhaplant
   m_Icon: {fileID: 0}
@@ -85,10 +85,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _FacingRight:
-    _value: 1
   _IsFrozen: 0
-  _Dead:
+  _IsDead:
     _value: 0
   collide: 0
   iceCarryable: 0
@@ -159,7 +157,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.11}
@@ -207,7 +205,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 212c7eab2afd3074eb45336ea3726447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 0}
+  _interpolationDataSource: 0
+  prefab:
+    RawGuidValue: 00000000000000000000000000000000
 --- !u!114 &3206924239527984068
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -103,8 +103,8 @@ public class PlayerAnimationController : NetworkBehaviour {
                 } else if (animator.GetBool("inShell") && (!controller.onSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
                     targetEuler += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1800 * (controller.FacingRight ? -1 : 1));
                     instant = true;
-                } else if (wasTurnaround || controller.skidding || controller.turnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
-                    if (controller.FacingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.skidding)) {
+                } else if (wasTurnaround || controller.IsSkidding || controller.IsTurnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
+                    if (controller.FacingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.IsSkidding)) {
                         targetEuler = new Vector3(0, 250, 0);
                     } else {
                         targetEuler = new Vector3(0, 110, 0);
@@ -145,7 +145,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             }
 
             //Particles
-            SetParticleEmission(dust, !gameover && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.skidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
+            SetParticleEmission(dust, !gameover && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
             SetParticleEmission(drillParticle, !gameover && controller.IsDrilling);
             if (controller.IsDrilling)
                 drillParticleAudio.clip = (controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
@@ -174,7 +174,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         if (controller.cameraController.IsControllingCamera)
             HorizontalCamera.OFFSET_TARGET = (controller.IsSpinnerFlying || controller.IsPropellerFlying) ? 0.5f : 0f;
 
-        if (controller.IsCrouching || controller.IsSliding || controller.skidding) {
+        if (controller.IsCrouching || controller.IsSliding || controller.IsSkidding) {
             dust.transform.localPosition = Vector2.zero;
         } else if (controller.WallSlideLeft || controller.WallSlideRight) {
             dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * (3f / 4f) * (controller.WallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * (3f / 4f));
@@ -199,7 +199,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("onRight", controller.WallSlideRight);
         animator.SetBool("onGround", controller.IsOnGround);
         animator.SetBool("invincible", controller.IsStarmanInvincible);
-        animator.SetBool("skidding", controller.skidding);
+        animator.SetBool("skidding", controller.IsSkidding);
         animator.SetBool("propeller", controller.IsPropellerFlying);
         animator.SetBool("propellerSpin", !controller.PropellerSpinTimer.ExpiredOrNotRunning(Runner));
         animator.SetBool("crouching", controller.IsCrouching);
@@ -211,7 +211,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("drill", controller.IsDrilling);
 
         //Animation
-        animator.SetBool("turnaround", controller.turnaround);
+        animator.SetBool("turnaround", controller.IsTurnaround);
         float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.floorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.floorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);
         if (controller.stuckInBlock) {
             animatedVelocity = 0;
@@ -220,7 +220,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         } else if (controller.State == Enums.PowerupState.MegaMushroom && (controller.currentInputs.buttons.IsSet(PlayerControls.Left) || controller.currentInputs.buttons.IsSet(PlayerControls.Right))) {
             animatedVelocity = 4.5f;
         } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
-            animatedVelocity = Mathf.Max(controller.onIce ? 4.5f : 2f, animatedVelocity);
+            animatedVelocity = Mathf.Max(controller.onIce ? 3.5f : 2f, animatedVelocity);
         } else if (controller.onIce) {
             animatedVelocity = 0;
         }

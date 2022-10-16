@@ -218,6 +218,15 @@ public class GameManager : NetworkBehaviour {
 
         tilemap.SetTile(loc, null);
     }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void Rpc_SetTile(int x, int y, string tilename) {
+        Vector3Int loc = new(x, y, 0);
+
+        TileBase tile = Utils.GetTileFromCache(tilename);
+        tilemap.SetTile(loc, tile);
+    }
+
     public void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
         TileBase[] tileObjects = new TileBase[tiles.Length];
         for (int i = 0; i < tiles.Length; i++) {
@@ -491,7 +500,7 @@ public class GameManager : NetworkBehaviour {
 
         //TOOD: make a results screen?
 
-        yield return new WaitForSecondsRealtime(secondsUntilMenu);
+        LobbyData.Instance.SetGameStarted(false);
 
         if (Runner.IsServer) {
             //handle player states
@@ -504,10 +513,9 @@ public class GameManager : NetworkBehaviour {
                 //disable spectating
                 data.IsCurrentlySpectating = false;
             }
-
-            LobbyData.Instance.SetGameStarted(false);
         }
 
+        yield return new WaitForSecondsRealtime(secondsUntilMenu);
         Runner.SetActiveScene(0);
     }
 

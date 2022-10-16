@@ -139,7 +139,7 @@ public class MainMenuManager : MonoBehaviour {
         waitingForJoinMessage.Add(player);
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        chat.LocalChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
+        chat.AddChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
 
@@ -298,7 +298,7 @@ public class MainMenuManager : MonoBehaviour {
     public IEnumerator OnPlayerDataValidated(PlayerRef player) {
         yield return null; //wait a frame because reasons
         if (waitingForJoinMessage.Remove(player)) {
-            chat.LocalChatMessage(player.GetPlayerData(Runner).GetNickname() + " joined the room", Color.red);
+            chat.AddChatMessage(player.GetPlayerData(Runner).GetNickname() + " joined the room", Color.red);
             sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
         }
 
@@ -307,8 +307,8 @@ public class MainMenuManager : MonoBehaviour {
 
     private IEnumerator UpdateUsernames() {
         while (Runner.SessionInfo?.IsValid ?? false) {
-            playerList.UpdateAllPlayerEntries();
             yield return new WaitForSecondsRealtime(2f);
+            playerList.UpdateAllPlayerEntries();
         }
     }
 
@@ -331,7 +331,7 @@ public class MainMenuManager : MonoBehaviour {
         OpenInLobbyMenu();
 
         if (Runner.IsServer)
-            chat.LocalChatMessage("You are the room's host! Click on your player's names to control your room.", Color.red);
+            chat.AddChatMessage("You are the room's host! Click on your player's names to control your room.", Color.red);
 
         SessionInfo session = Runner.SessionInfo;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
@@ -527,15 +527,16 @@ public class MainMenuManager : MonoBehaviour {
     }
     public void StartGame() {
 
+        //don't start if everyone's a spectator
         if (Runner.ActivePlayers.All(ap => ap.GetPlayerData(Runner).IsManualSpectator))
             return;
 
         //do host related stuff
         if (Runner.IsServer) {
             //set starting
-            LobbyData.Instance.SetGameStarted(true);
 
             //set spectating values for players
+            sbyte count = 0;
             foreach (PlayerRef player in Runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(Runner);
 
@@ -543,7 +544,10 @@ public class MainMenuManager : MonoBehaviour {
                     continue;
 
                 data.IsCurrentlySpectating = data.IsManualSpectator;
+                data.PlayerId = data.IsCurrentlySpectating ? (sbyte) -1 : count++;
             }
+
+            LobbyData.Instance.SetGameStarted(true);
 
             //load the correct scene
             Runner.SetActiveScene(LobbyData.Instance.Level + 2);
@@ -588,9 +592,7 @@ public class MainMenuManager : MonoBehaviour {
         byte players = (byte) lobbyPlayersSlider.value;
 
         _ = NetworkHandler.CreateRoom(new() {
-            Initialized = (runner) => {
-                runner.SessionInfo.IsVisible = !privateToggle.isOn;
-            },
+            IsVisible = !privateToggle.isOn,
         });
 
         createLobbyPrompt.SetActive(false);
@@ -627,29 +629,29 @@ public class MainMenuManager : MonoBehaviour {
     public void Kick(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         if (target == runner.LocalPlayer) {
-            chat.LocalChatMessage("While you can kick yourself, it's probably not what you meant to do.", Color.red);
+            chat.AddChatMessage("While you can kick yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
-        chat.LocalChatMessage($"Successfully kicked {target.GetPlayerData(runner).GetNickname()}", Color.red);
+        chat.AddChatMessage($"Successfully kicked {target.GetPlayerData(runner).GetNickname()}", Color.red);
         runner.Disconnect(target);
     }
 
     public void Promote(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         if (target == runner.LocalPlayer) {
-            chat.LocalChatMessage("You are already the host..?", Color.red);
+            chat.AddChatMessage("You are already the host..?", Color.red);
             return;
         }
 
         //PhotonNetwork.SetMasterClient(target);
         //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
-        chat.LocalChatMessage("Changing hosts is not implemented yet!", Color.red);
+        chat.AddChatMessage("Changing hosts is not implemented yet!", Color.red);
     }
 
     public void Mute(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         if (target == runner.LocalPlayer) {
-            chat.LocalChatMessage("While you can mute yourself, it's probably not what you meant to do.", Color.red);
+            chat.AddChatMessage("While you can mute yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
 
@@ -657,9 +659,9 @@ public class MainMenuManager : MonoBehaviour {
         data.IsMuted = !data.IsMuted;
 
         if (data.IsMuted) {
-            chat.LocalChatMessage($"Successfully muted {data.GetNickname()}", Color.red);
+            chat.AddChatMessage($"Successfully muted {data.GetNickname()}", Color.red);
         } else {
-            chat.LocalChatMessage($"Successfully unmuted {data.GetNickname()}", Color.red);
+            chat.AddChatMessage($"Successfully unmuted {data.GetNickname()}", Color.red);
         }
     }
 
@@ -688,7 +690,7 @@ public class MainMenuManager : MonoBehaviour {
 
     public void Ban(PlayerRef target) {
         if (target == Runner.LocalPlayer) {
-            chat.LocalChatMessage("While you can ban yourself, it's probably not what you meant to do.", Color.red);
+            chat.AddChatMessage("While you can ban yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
 

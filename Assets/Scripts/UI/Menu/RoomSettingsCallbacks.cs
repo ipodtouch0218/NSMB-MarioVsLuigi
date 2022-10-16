@@ -58,7 +58,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private void ChangeLevelIndex(int index, bool changed) {
         levelDropdown.SetValueWithoutNotify(index);
         if (changed) {
-            MainMenuManager.Instance.chat.LocalChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
+            MainMenuManager.Instance.chat.AddChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
             Camera.main.transform.position = MainMenuManager.Instance.levelCameraPositions[index].transform.position;
         }
     }

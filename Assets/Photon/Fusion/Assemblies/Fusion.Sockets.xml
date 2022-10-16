@@ -30,6 +30,21 @@
             Signal if this <see cref="T:Fusion.Sockets.NetAddress"/> is not default/empty
             </summary>
         </member>
+        <member name="M:Fusion.Sockets.NetAddress.FromActorId(System.Int32)">
+            <summary>
+            Build a new <see cref="T:Fusion.Sockets.NetAddress"/> based on an ActorId
+            </summary>
+            <param name="actorId">ActorId used to build the NetAddress</param>
+            <returns>Relay NetAddress that references the ActorId</returns>
+            <remarks>ActorId must be 0 or greated</remarks>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.Hash64(Fusion.Sockets.NetAddress)">
+            <summary>
+            Build <see cref="T:Fusion.Sockets.NetAddress"/> 64Bit Hash 
+            </summary>
+            <param name="address">Address to build the Hash</param>
+            <returns>64bit Hash</returns>
+        </member>
         <member name="M:Fusion.Sockets.NetAddress.LocalhostIPv4(System.UInt16)">
             <summary>
             Create a new NetAddress on the LocalHost address with the desired Port 

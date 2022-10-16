@@ -9,6 +9,7 @@ public abstract class HoldableEntity : KillableEntity {
     [Networked] public PlayerController Holder { get; set; }
     [Networked] public PlayerController PreviousHolder { get; set; }
     [Networked] protected TickTimer ThrowInvincibility { get; set; }
+    [Networked] protected float CurrentKickSpeed { get; set; }
 
     //---Serailized Variables
     [SerializeField] protected float throwSpeed = 4.5f;
@@ -32,7 +33,20 @@ public abstract class HoldableEntity : KillableEntity {
     #endregion
 
     #region Implemented Methods
-    public abstract void Kick(bool fromLeft, float kickFactor, bool groundpound);
+    public virtual void Kick(PlayerController kicker, bool toRight, float kickFactor, bool groundpound) {
+        if (Holder)
+            return;
+
+        if (kicker) {
+            ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
+            PreviousHolder = kicker;
+        }
+        FacingRight = toRight;
+
+        CurrentKickSpeed = throwSpeed + 1.5f * kickFactor;
+        body.velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
+        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+    }
 
     public virtual void Throw(bool toRight, bool crouching) {
         if (!Holder)
@@ -41,7 +55,7 @@ public abstract class HoldableEntity : KillableEntity {
         if (Utils.IsTileSolidAtWorldLocation(body.position))
             transform.position = body.position = new(Holder.transform.position.x, transform.position.y);
 
-        ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
+        ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, crouching ? 0.5f : 0.2f);
         PreviousHolder = Holder;
         Holder = null;
         FacingRight = toRight;

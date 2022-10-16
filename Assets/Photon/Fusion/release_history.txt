@@ -2,6 +2,55 @@
 
 ## Nightly
 
+### Build 596 (Oct 14, 2022)
+
+**Bug Fixes**
+
+- Fixed: "Failed to get user type word count" weaver error when referencing types from other weaved asmdefs
+
+### Build 594 (Oct 12, 2022)
+
+**Changes**
+
+- Cloud Resend and Disconnect Timeout Settings
+
+### Build 593 (Oct 11, 2022)
+
+**Bug Fixes**
+
+- Fixed: Invalid cached NetAddress
+
+### Build 591 (Oct 07, 2022)
+
+**Changes**
+
+- Reuse NetworkID from Resume NO on Host Migration
+- NetworkObject.CopyStateFrom now also copy State from nested NetworkObjects
+
+**Bug Fixes**
+
+- Fixed: Memory Access Violation when releasing Envelopes
+
+### Build 590 (Oct 06, 2022)
+
+**Changes**
+
+- Implicit cast of PlayerRef to bool is now marked as obsolete, will be removed in next stable release
+
+**Bug Fixes**
+
+- Fixed: An issue where mixing reliable and unreliable RPCs could prevent RPCs from being handled at all for a client with poor network conditions
+
+### Build 589 (Oct 05, 2022)
+
+**What's New**
+
+- NetworkId/NetworkBId documentation snippets
+
+**Bug Fixes**
+
+- Fixed: `OrderBefore` and `OrderAfter` attributes being removed when High Managed Stripping Level is selected
+
 ### Build 588 (Oct 04, 2022)
 
 **Changes**

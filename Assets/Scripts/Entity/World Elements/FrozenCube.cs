@@ -1,13 +1,14 @@
 using UnityEngine;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 // maybe a better name for the script
 public class FrozenCube : HoldableEntity {
 
     //---Networked Variables
     [Networked] public TickTimer AutoBreakTimer { get; set; }
+    [Networked] private TickTimer ThrowTimer { get; set; }
     [Networked] private FreezableEntity FrozenEntity { get; set; }
     [Networked] private NetworkBool FastSlide { get; set; }
 
@@ -18,7 +19,6 @@ public class FrozenCube : HoldableEntity {
     //---Private Variables
     public UnfreezeReason unfreezeReason = UnfreezeReason.Other;
     private Vector2 entityPositionOffset;
-    private float throwTimer;
     private int combo;
     private bool fallen;
 
@@ -30,10 +30,10 @@ public class FrozenCube : HoldableEntity {
     public override void Spawned() {
         holderOffset = Vector2.one;
 
-        if (FrozenEntity == null)
+        if (!FrozenEntity) {
             Kill();
-
-        FrozenEntity.Freeze(this);
+            return;
+        }
 
         Bounds bounds = default;
         GameObject rendererObject = FrozenEntity.gameObject;
@@ -61,6 +61,8 @@ public class FrozenCube : HoldableEntity {
         flying = FrozenEntity.IsFlying;
         ApplyConstraints();
 
+        FrozenEntity.Freeze(this);
+
         //move entity inside us
         if (FrozenEntity.IsCarryable) {
             FrozenEntity.transform.SetParent(transform);
@@ -86,10 +88,19 @@ public class FrozenCube : HoldableEntity {
             body.isKinematic = true;
             return;
         }
+
+        if (ThrowTimer.Expired(Runner)) {
+            ThrowTimer = TickTimer.None;
+
+            if (PreviousHolder)
+                Physics2D.IgnoreCollision(hitbox, PreviousHolder.MainHitbox, false);
+        }
+
         if (body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY()) {
             Kill();
             return;
         }
+
         if (Holder && Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f)) {
             KillWithReason(UnfreezeReason.HitWall);
             return;
@@ -145,11 +156,6 @@ public class FrozenCube : HoldableEntity {
             }
         }
 
-        if (throwTimer > 0 && throwTimer - Time.fixedDeltaTime <= 0) {
-            Physics2D.IgnoreCollision(hitbox, PreviousHolder.MainHitbox, false);
-        }
-        Utils.TickTimer(ref throwTimer, 0, Time.fixedDeltaTime);
-
         ApplyConstraints();
     }
     #endregion
@@ -162,7 +168,7 @@ public class FrozenCube : HoldableEntity {
         for (int i = 0; i < count; i++) {
             GameObject obj = collisions[i].gameObject;
 
-            if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj)
+            if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj || FrozenEntity?.gameObject == obj)
                 continue;
 
             if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
@@ -213,7 +219,8 @@ public class FrozenCube : HoldableEntity {
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = damageDirection.y > -0.4f;
-        if (PreviousHolder == player && throwTimer > 0)
+
+        if (PreviousHolder == player)
             return;
 
         if (!Holder && (player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom || player.IsInShell)) {
@@ -282,17 +289,15 @@ public class FrozenCube : HoldableEntity {
     }
 
     public override void Throw(bool toRight, bool crouch) {
-        if (Holder == null)
+        base.Throw(toRight, false);
+
+        if (!Holder)
             return;
 
         fallen = false;
         flying = false;
         FastSlide = true;
-        PreviousHolder = Holder;
-        Holder = null;
-        FacingRight = toRight;
-
-        throwTimer = 1f;
+        ThrowTimer = TickTimer.CreateFromSeconds(Runner, 1f);
 
         if (FrozenEntity.IsFlying) {
             fallen = true;
@@ -301,7 +306,7 @@ public class FrozenCube : HoldableEntity {
         ApplyConstraints();
     }
 
-    public override void Kick(bool fromLeft, float kickFactor, bool groundpound) {
+    public override void Kick(PlayerController kicker, bool fromLeft, float kickFactor, bool groundpound) {
         //kicking does nothing.
     }
 

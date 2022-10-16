@@ -11,12 +11,13 @@ public class PlayerData : NetworkBehaviour {
 
     //---Static stuffs
     //TODO: change to "game started" somehow
-    public static bool Locked { get => GameManager.Instance; }
+    public static bool Locked => GameManager.Instance;
 
     //---Networked Variables
     [Networked, Capacity(20)] private string Nickname { get; set; } = "noname";
-    [Networked, Capacity(20)] private string DisplayNickname { get; set; } = "noname";
+    [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
     [Networked, Capacity(32)] private string UserId { get; set; }
+    [Networked] public sbyte PlayerId { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
     [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
     [Networked] public NetworkBool IsRoomOwner { get; set; }
@@ -36,6 +37,8 @@ public class PlayerData : NetworkBehaviour {
     public override void Spawned() {
         //keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
+
+        PlayerId = -1;
 
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.

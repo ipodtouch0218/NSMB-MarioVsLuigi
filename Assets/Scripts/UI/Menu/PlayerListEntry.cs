@@ -43,7 +43,7 @@ public class PlayerListEntry : MonoBehaviour {
         //enabled = player.HasRainbowName();
 
         string permissionSymbol = "";
-        if (player.IsServer()) {
+        if (data.IsRoomOwner) {
             permissionSymbol += "<sprite=5>";
             pingText.text = "";
         } else {

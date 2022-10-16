@@ -6140,13 +6140,14 @@
             <summary>
             Copies the entire State from another <see cref="T:Fusion.NetworkObject"/>
             </summary>
-            <param name="networkObject">NetworkObject to copy the State from</param>
+            <param name="source"><see cref="T:Fusion.NetworkObject"/> to copy the State from</param>
         </member>
         <member name="M:Fusion.NetworkObject.CopyStateFromSceneObject(Fusion.NetworkObjectHeaderPtr)">
             <summary>
-            Copies the entire State from another Scene Object.
-            They must have the same Scene Guid
+            Copies the entire State from another Scene <see cref="T:Fusion.NetworkObject"/>.
+            They must have the same Scene Guid.
             </summary>
+            <param name="source">Scene <see cref="T:Fusion.NetworkObject"/> to copy the State from.</param>
         </member>
         <member name="M:Fusion.NetworkObject.SetInterestGroup(Fusion.PlayerRef,System.String,System.Boolean)">
             <summary>
@@ -7479,7 +7480,7 @@
             </param>
             <returns><see cref="T:Fusion.NetworkObject"/> reference, or null if it was not able to spawn the object</returns>
         </member>
-        <member name="M:Fusion.NetworkRunner.Spawn(Fusion.NetworkPrefabId,System.Nullable{UnityEngine.Vector3},System.Nullable{UnityEngine.Quaternion},System.Nullable{Fusion.PlayerRef},Fusion.NetworkRunner.OnBeforeSpawned,System.Nullable{Fusion.NetworkObjectPredictionKey},System.Boolean)">
+        <member name="M:Fusion.NetworkRunner.Spawn(Fusion.NetworkPrefabId,System.Nullable{UnityEngine.Vector3},System.Nullable{UnityEngine.Quaternion},System.Nullable{Fusion.PlayerRef},Fusion.NetworkRunner.OnBeforeSpawned,System.Nullable{Fusion.NetworkObjectPredictionKey},System.Boolean,Fusion.NetworkObject)">
             <summary>
             Attempts to network instantiate a <see cref="T:Fusion.NetworkObject"/> using a <see cref="T:Fusion.NetworkPrefabId"/>
             Note: position and rotation values are only used locally for the instantiation of the object, and are not inherently networked.
@@ -7495,6 +7496,7 @@
             If <see cref="M:UnityEngine.Physics.SyncTransforms"/> and <see cref="M:UnityEngine.Physics2D.SyncTransforms"/> should be called after
             setting the network object <paramref name="position"/> and/or <paramref name="rotation"/>, if provided.
             </param>
+            <param name="resumeNO">Used as reference when re-creating the NetworkObject from a old simulation. Accepted only when resuming from a Host Migration.</param>
             <returns><see cref="T:Fusion.NetworkObject"/> reference, or null if it was not able to spawn the object</returns>
         </member>
         <member name="M:Fusion.NetworkRunner.Despawn(Fusion.NetworkObject,System.Boolean)">
@@ -7532,7 +7534,7 @@
             <param name="networkObject">The object to attach</param>
             <param name="inputAuthority">If assigned who is the default input authority for this object</param>
         </member>
-        <member name="M:Fusion.NetworkRunner.SpawnInternal(Fusion.NetworkPrefabId,System.Nullable{UnityEngine.Vector3},System.Nullable{UnityEngine.Quaternion},System.Nullable{Fusion.PlayerRef},System.Object,System.Nullable{Fusion.NetworkObjectPredictionKey},System.Boolean)">
+        <member name="M:Fusion.NetworkRunner.SpawnInternal(Fusion.NetworkPrefabId,System.Nullable{UnityEngine.Vector3},System.Nullable{UnityEngine.Quaternion},System.Nullable{Fusion.PlayerRef},System.Object,System.Nullable{Fusion.NetworkObjectPredictionKey},System.Boolean,Fusion.NetworkObject)">
             <summary>
             Attempts to network instantiate a <see cref="T:Fusion.NetworkObject"/> using a <see cref="T:Fusion.NetworkPrefabId"/>
             Note: position and rotation values are only used locally for the instantiation of the object, and are not inherently networked.
@@ -7548,6 +7550,7 @@
             If <see cref="M:UnityEngine.Physics.SyncTransforms"/> and <see cref="M:UnityEngine.Physics2D.SyncTransforms"/> should be called after
             setting the network object <paramref name="position"/> and/or <paramref name="rotation"/>, if provided.
             </param>
+            <param name="resumeNO">Used as reference when re-creating the NetworkObject from a old simulation. Accepted only when resuming from a Host Migration.</param>
             <returns><see cref="T:Fusion.NetworkObject"/> reference, or null if it was not able to spawn the object</returns>
         </member>
         <member name="P:Fusion.NetworkRunner.IsHostMigrationEnabled">
@@ -7590,7 +7593,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Fusion.NetworkRunner.GetNetworkObjectFromResumeSnapshot(Fusion.NetworkObjectHeaderPtr)">
+        <member name="M:Fusion.NetworkRunner.GetNetworkObjectFromResumeSnapshot(Fusion.NetworkObjectHeaderPtr,System.Collections.Generic.Dictionary{Fusion.NetworkId,Fusion.NetworkObjectHeaderPtr},System.Collections.Generic.Dictionary{Fusion.NetworkId,System.Collections.Generic.List{Fusion.NetworkId}})">
             <summary>
             Gets a temporary representation of a <see cref="T:Fusion.NetworkObject"/> from the old Server Snapshot
             </summary>
@@ -9282,6 +9285,13 @@
             <summary>
             The time in seconds this <see cref="T:Fusion.SimulationSnapshot"/> represents.
             Time is relative to <see cref="P:Fusion.SimulationSnapshot.Tick"/> 0, with Tick 0 representing Time 0f.
+            </summary>
+        </member>
+        <member name="M:Fusion.SimulationSnapshot.GetObjectHeaderPtrs">
+            <summary>
+            Build a set of maps of NetworkObject headers. The maps are:
+            1. Simple mapping between the NetworkId and the NetworkObject Header
+            2. Map between NetworkObject root and a list of nested NetworkObjects based on the NetworkId
             </summary>
         </member>
         <member name="T:Fusion.SimulationStages">

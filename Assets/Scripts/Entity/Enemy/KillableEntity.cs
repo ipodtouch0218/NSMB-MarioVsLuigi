@@ -16,10 +16,11 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         Enums.Sounds.Enemy_Shell_Combo7,
     };
 
+    [Networked] public NetworkBool IsDead { get; set; }
+
     public override bool IsCarryable => iceCarryable;
     public override bool IsFlying => flying;
 
-    [Networked] public NetworkBool IsDead { get; set; }
 
     public bool collide = true, iceCarryable = true, flying;
 
@@ -35,7 +36,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         hitbox = GetComponent<BoxCollider2D>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        sRenderer = GetComponent<SpriteRenderer>();
+        sRenderer = GetComponentInChildren<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
     }
 
@@ -140,9 +141,6 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
-        if (direction == InteractableTile.InteractionDirection.Down)
-            return;
-
         SpecialKill(false, false, 0);
     }
 

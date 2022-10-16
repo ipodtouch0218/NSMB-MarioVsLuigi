@@ -18,7 +18,6 @@ public class WaterSplash : MonoBehaviour, IPlayerInteractable {
     private int totalPoints;
     private bool initialized;
 
-
     private void Awake() {
         Initialize();
     }
@@ -119,7 +118,6 @@ public class WaterSplash : MonoBehaviour, IPlayerInteractable {
         if (player.IsDead)
             return;
 
-        //TODO:
-        //player.Death(false, fireDeath);
+        player.Death(false, false);
     }
 }
