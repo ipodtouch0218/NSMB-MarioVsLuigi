@@ -28,6 +28,7 @@ public class GoombaWalk : KillableEntity {
         if (IsDead) {
             if (DespawnTimer.Expired(Runner))
                 Runner.Despawn(Object);
+
             return;
         }
 
@@ -43,6 +44,7 @@ public class GoombaWalk : KillableEntity {
             FacingRight = physics.hitLeft;
     }
 
+    //---KillableEntity overrides
     public override void Kill() {
         IsDead = true;
 

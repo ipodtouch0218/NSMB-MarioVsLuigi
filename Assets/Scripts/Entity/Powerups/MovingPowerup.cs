@@ -134,7 +134,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         body.velocity = new(body.velocity.x, Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         if (FollowPlayer)
             return;
 
@@ -169,17 +169,27 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     public override void InteractWithPlayer(PlayerController player) {
 
+        //fixes players hitting multiple colliders at once (propeller)
+        if (!Object.IsValid)
+            return;
+
+        //don't be collectable if someone already collected us
         if (Collector)
             return;
 
+        //don't be collectable if we're following a player
         if (!FollowEndTimer.ExpiredOrNotRunning(Runner))
             return;
 
+        //don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,
+        // so we dont collect it instantly)
         if (!IgnorePlayerTimer.ExpiredOrNotRunning(Runner))
             return;
 
         Collector = player;
 
+        //change the player's powerup state
+        //TODO: refactor to be powerup independent.
         Powerup powerup = powerupScriptable;
         Enums.PowerupState newState = powerup.state;
         Enums.PriorityPair pp = Enums.PowerupStatePriority[powerup.state];
@@ -187,7 +197,6 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         bool reserve = cp.statePriority > pp.itemPriority || player.State == newState;
         bool soundPlayed = false;
 
-        //TODO: refactor
         if (powerup.state == Enums.PowerupState.MegaMushroom && player.State != Enums.PowerupState.MegaMushroom) {
 
             player.GiantStartTimer = TickTimer.CreateFromSeconds(Runner, player.giantStartTime);

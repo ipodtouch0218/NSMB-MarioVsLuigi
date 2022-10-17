@@ -10,6 +10,7 @@ public class BulletBillMover : KillableEntity {
     //---Misc Variables
     private Vector2 searchVector;
 
+
     public override void Awake() {
         base.Awake();
         searchVector = new(playerSearchRadius * 2, 100);
@@ -51,6 +52,20 @@ public class BulletBillMover : KillableEntity {
         body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
         DespawnCheck();
     }
+
+    private void DespawnCheck() {
+        foreach (PlayerController player in GameManager.Instance.players) {
+            if (!player)
+                continue;
+
+            if (Utils.WrappedDistance(player.body.position, body.position) < despawnDistance)
+                return;
+        }
+
+        Runner.Despawn(Object);
+    }
+
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
         if (IsFrozen || player.IsFrozen)
             return;
@@ -83,27 +98,18 @@ public class BulletBillMover : KillableEntity {
         player.Powerdown(false);
     }
 
+    //---IFireballInteractable overrides
     public override bool InteractWithFireball(FireballMover fireball) {
         //don't die to fireballs, but still destroy them.
         return true;
     }
 
-    private void DespawnCheck() {
-        foreach (PlayerController player in GameManager.Instance.players) {
-            if (!player)
-                continue;
-
-            if (Utils.WrappedDistance(player.body.position, body.position) < despawnDistance)
-                return;
-        }
-
-        Runner.Despawn(Object);
-    }
-
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing
     }
 
+    //---KillableEntity overrides
     public override void Kill() {
         SpecialKill(FacingRight, false, 0);
     }
@@ -125,6 +131,7 @@ public class BulletBillMover : KillableEntity {
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
+    //---Debug
     public void OnDrawGizmosSelected() {
         if (!GameManager.Instance)
             return;

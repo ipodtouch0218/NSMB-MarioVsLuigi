@@ -60,7 +60,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public TickTimer DamageInvincibilityTimer { get; set; }
 
     //-Powerup Stuffs
-    [Networked(OnChanged = nameof(OnFireballListChanged)), Capacity(6)] private NetworkLinkedList<FireballMover> FireballList => default;
+    [Networked, Capacity(6)] private NetworkLinkedList<FireballMover> FireballList => default;
     [Networked] public TickTimer FireballShootTimer { get; set; }
     [Networked] public TickTimer FireballDelayTimer { get; set; }
     [Networked] public NetworkBool CanShootAdditionalFireball { get; set; }
@@ -675,18 +675,27 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
 
             bool ice = State == Enums.PowerupState.IceFlower;
-            NetworkPrefabRef prefab = ice ? PrefabList.Instance.Obj_Iceball : PrefabList.Instance.Obj_Fireball;
-
             bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
-            Vector2 pos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
-            NetworkObject obj = Runner.Spawn(prefab, pos, inputAuthority: Object.InputAuthority, onBeforeSpawned: (runner, obj) => {
-                FireballMover mover = obj.GetComponent<FireballMover>();
-                mover.OnBeforeSpawned(this, right);
-            });
+            Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
 
-            FireballMover mover = obj.GetComponent<FireballMover>();
+            if (!Utils.IsTileSolidAtWorldLocation(spawnPos)) {
+                //spawned inside the wall, spawn only the particle.
+                if (Object.HasStateAuthority)
+                    Rpc_FireballAnimation(ice, true, spawnPos);
+            } else {
+                //normal spawn
+                NetworkPrefabRef prefab = ice ? PrefabList.Instance.Obj_Iceball : PrefabList.Instance.Obj_Fireball;
+                NetworkObject obj = Runner.Spawn(prefab, spawnPos, inputAuthority: Object.InputAuthority, onBeforeSpawned: (runner, obj) => {
+                    FireballMover mover = obj.GetComponent<FireballMover>();
+                    mover.OnBeforeSpawned(this, right);
+                });
 
-            FireballList.Add(mover);
+                FireballList.Add(obj.GetComponent<FireballMover>());
+
+                if (Object.HasStateAuthority)
+                    Rpc_FireballAnimation(ice, false);
+            }
+
             FireballDelayTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
 
             //weird interaction in the main game... replicate it i guess.
@@ -700,6 +709,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             StartPropeller();
             break;
         }
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void Rpc_FireballAnimation(bool ice, bool invalid, Vector2 particleLocation = default) {
+        PlaySound(ice ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot);
+        animator.SetTrigger("fireball");
+
+        if (invalid) {
+            //spawn particles as the shot didn't actually shoot.
+            GameObject prefab = ice ? PrefabList.Instance.Particle_IceballWall : PrefabList.Instance.Particle_FireballWall;
+            Instantiate(prefab, particleLocation, Quaternion.identity);
         }
     }
 
@@ -838,7 +859,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
     #endregion
 
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         if (IsInKnockback)
             return;
 
@@ -2695,29 +2716,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         GameObject particle = Instantiate(PrefabList.Instance.Particle_Respawn, player.body.position, Quaternion.identity);
         particle.GetComponent<RespawnParticle>().player = player;
-    }
-
-    public static void OnFireballListChanged(Changed<PlayerController> changed) {
-        int curr = changed.Behaviour.FireballList.Count;
-        changed.LoadOld();
-        NetworkLinkedList<FireballMover> prevList = changed.Behaviour.FireballList;
-        changed.LoadNew();
-
-
-        //prev can have null references. remove them.
-        int prev = 0;
-        foreach (FireballMover mover in prevList) {
-            if (mover)
-                prev++;
-        }
-
-        //no change?
-        if (curr <= prev)
-            return;
-
-        PlayerController player = changed.Behaviour;
-        player.PlaySound(player.State == Enums.PowerupState.IceFlower ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot);
-        player.animator.SetTrigger("fireball");
     }
     #endregion
 }

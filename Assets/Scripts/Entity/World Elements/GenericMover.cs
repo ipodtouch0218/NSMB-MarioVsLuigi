@@ -6,7 +6,9 @@ public class GenericMover : NetworkBehaviour {
 
     //---Serialized Variables
     [SerializeField] private AnimationCurve x, y;
-    [SerializeField] private float animationTimeSeconds = 1, animationMultiplier = 1, animationOffset = 0;
+    [SerializeField] private float animationTimeSeconds = 1;
+    [SerializeField] private float animationMultiplier = 1;
+    [SerializeField] private float animationOffset = 0;
 
     //---Private Variables
     private Vector3? origin = null;

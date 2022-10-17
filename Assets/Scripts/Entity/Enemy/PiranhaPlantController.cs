@@ -16,7 +16,8 @@ public class PiranhaPlantController : KillableEntity {
     private bool upsideDown;
 
 
-    public void Start() {
+    public override void Awake() {
+        base.Awake();
         upsideDown = transform.eulerAngles.z != 0;
     }
 
@@ -55,14 +56,6 @@ public class PiranhaPlantController : KillableEntity {
         }
     }
 
-    public override void InteractWithPlayer(PlayerController player) {
-        if (player.IsStarmanInvincible || player.IsInShell || player.State == Enums.PowerupState.MegaMushroom) {
-            Kill();
-        } else {
-            player.Powerdown(false);
-        }
-    }
-
     public void Respawn() {
         if (IsFrozen || !IsDead)
             return;
@@ -74,8 +67,17 @@ public class PiranhaPlantController : KillableEntity {
         hitbox.enabled = true;
     }
 
-    public override void Kill() {
+    //---IPlayerInteractable overrides
+    public override void InteractWithPlayer(PlayerController player) {
+        if (player.IsStarmanInvincible || player.IsInShell || player.State == Enums.PowerupState.MegaMushroom) {
+            Kill();
+        } else {
+            player.Powerdown(false);
+        }
+    }
 
+    //---KillableEntity overrides
+    public override void Kill() {
         PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
         PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
 
@@ -90,6 +92,7 @@ public class PiranhaPlantController : KillableEntity {
         Kill();
     }
 
+    //---Debug
     private void OnDrawGizmosSelected() {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawSphere(transform.position + (Vector3) (playerDetectSize * new Vector2(0, transform.eulerAngles.z != 0 ? -0.5f : 0.5f)), playerDetectSize);

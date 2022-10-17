@@ -3,11 +3,20 @@
 //This is pretty much just the koopawalk script but it causes damage when you stand on it.
 public class SpinyWalk : KoopaWalk {
 
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
-        Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
+
+        //TODO: refactor
+
         if (Holder)
             return;
+
+        //temporary invincibility, we dont want to spam the kick sound
+        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+            return;
+
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
 
         if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             FacingRight = damageDirection.x < 0;

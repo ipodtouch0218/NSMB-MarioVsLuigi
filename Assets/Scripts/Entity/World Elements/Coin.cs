@@ -4,14 +4,6 @@ using Fusion;
 
 public abstract class Coin : CollectableEntity {
 
-    public override void InteractWithPlayer(PlayerController player) {
-        if (Collector)
-            return;
-
-        Collector = player;
-        GivePlayerCoin(player, transform.position);
-    }
-
     public static void GivePlayerCoin(PlayerController player, Vector3 position) {
         byte newCoins = (byte) (player.Coins + 1);
 
@@ -25,7 +17,17 @@ public abstract class Coin : CollectableEntity {
         player.Coins = newCoins;
     }
 
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    //---IPlayerInteractable overrides
+    public override void InteractWithPlayer(PlayerController player) {
+        if (Collector)
+            return;
+
+        Collector = player;
+        GivePlayerCoin(player, transform.position);
+    }
+
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         if (direction == InteractableTile.InteractionDirection.Down)
             return;
 

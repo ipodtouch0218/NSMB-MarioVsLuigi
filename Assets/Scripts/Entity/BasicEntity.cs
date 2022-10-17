@@ -36,5 +36,6 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
         sfx.PlayOneShot(sound.GetClip(character, variant), volume);
     }
 
-    public abstract void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction);
+    //---IBlockBumpable overrides
+    public abstract void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction);
 }

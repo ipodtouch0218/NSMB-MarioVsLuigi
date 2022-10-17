@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class FloatingCoin : Coin {
 
+    //---Components
     private SpriteRenderer spriteRenderer;
     private BoxCollider2D hitbox;
 
@@ -11,6 +12,7 @@ public class FloatingCoin : Coin {
         hitbox = GetComponent<BoxCollider2D>();
     }
 
+    //---Coin overrides
     public override void OnCollectedChanged() {
         spriteRenderer.enabled = !Collector;
         hitbox.enabled = !Collector;

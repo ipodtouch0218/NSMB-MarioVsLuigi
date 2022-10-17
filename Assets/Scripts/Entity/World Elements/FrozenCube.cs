@@ -22,7 +22,7 @@ public class FrozenCube : HoldableEntity {
     private int combo;
     private bool fallen;
 
-    #region Unity Methods
+
     public void OnBeforeSpawned(FreezableEntity entityToFreeze) {
         FrozenEntity = entityToFreeze;
     }
@@ -106,13 +106,10 @@ public class FrozenCube : HoldableEntity {
             return;
         }
 
-        if (FastSlide) {
-            CheckForEntityCollisions();
-        } else if (!Holder) {
+        if (!FastSlide && !Holder) {
             float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
-            if (remainingTime < 1f) {
+            if (remainingTime < 1f)
                 body.position = new(body.position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
-            }
         }
 
         //our entity despawned. remove.
@@ -158,41 +155,7 @@ public class FrozenCube : HoldableEntity {
 
         ApplyConstraints();
     }
-    #endregion
 
-    private readonly Collider2D[] collisions = new Collider2D[8];
-    private void CheckForEntityCollisions() {
-
-        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisions);
-
-        for (int i = 0; i < count; i++) {
-            GameObject obj = collisions[i].gameObject;
-
-            if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj || FrozenEntity?.gameObject == obj)
-                continue;
-
-            if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
-                coin.InteractWithPlayer(PreviousHolder);
-                continue;
-            }
-
-            if (obj.TryGetComponent(out KillableEntity killable)) {
-                if (killable.IsDead || killable == FrozenEntity)
-                    continue;
-
-                //kill entity we ran into
-                killable.SpecialKill(killable.body.position.x > body.position.x, false, combo++);
-
-                //kill ourselves if we're being held too
-                if (Holder)
-                    SpecialKill(killable.body.position.x < body.position.x, false, 0);
-
-                continue;
-            }
-        }
-    }
-
-    #region Helper Methods
     private bool HandleTile() {
         physics.UpdateCollisions();
 
@@ -207,6 +170,26 @@ public class FrozenCube : HoldableEntity {
         return true;
     }
 
+    private void ApplyConstraints() {
+        body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        body.mass = Holder ? 0 : 1;
+        body.isKinematic = !FrozenEntity.IsCarryable;
+
+        if (!Holder) {
+            if (!FastSlide)
+                body.constraints |= RigidbodyConstraints2D.FreezePositionX;
+
+            if (flying && !fallen)
+                body.constraints |= RigidbodyConstraints2D.FreezePositionY;
+        }
+    }
+
+    public void KillWithReason(UnfreezeReason reason) {
+        unfreezeReason = reason;
+        Kill();
+    }
+
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
 
         //don't interact with our lovely holder
@@ -248,6 +231,7 @@ public class FrozenCube : HoldableEntity {
         }
     }
 
+    //---IFireballInteractable overrides
     public override bool InteractWithFireball(FireballMover fireball) {
         if (!fireball.isIceball)
             Kill();
@@ -259,29 +243,7 @@ public class FrozenCube : HoldableEntity {
         return true;
     }
 
-    private void ApplyConstraints() {
-        body.constraints = RigidbodyConstraints2D.FreezeRotation;
-        body.mass = Holder ? 0 : 1;
-        body.isKinematic = !FrozenEntity.IsCarryable;
-
-        if (!Holder) {
-            if (!FastSlide)
-                body.constraints |= RigidbodyConstraints2D.FreezePositionX;
-
-            if (flying && !fallen)
-                body.constraints |= RigidbodyConstraints2D.FreezePositionY;
-        }
-    }
-
-    public void KillWithReason(UnfreezeReason reason) {
-        unfreezeReason = reason;
-        Kill();
-    }
-
-
-    #endregion
-
-    #region Interface Methods
+    //---IThrowableEntity overrides
     public override void Pickup(PlayerController player) {
         base.Pickup(player);
         Physics2D.IgnoreCollision(hitbox, player.MainHitbox);
@@ -310,6 +272,44 @@ public class FrozenCube : HoldableEntity {
         //kicking does nothing.
     }
 
+    //---IKillableEntity overrides
+    protected override void CheckForEntityCollisions() {
+        //don't call base, we dont wanna turn around.
+
+        if (!FastSlide)
+            return;
+
+        //only run when fastsliding...
+
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
+
+        for (int i = 0; i < count; i++) {
+            GameObject obj = collisionBuffer[i].gameObject;
+
+            if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj || FrozenEntity?.gameObject == obj)
+                continue;
+
+            if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
+                coin.InteractWithPlayer(PreviousHolder);
+                continue;
+            }
+
+            if (obj.TryGetComponent(out KillableEntity killable)) {
+                if (killable.IsDead || killable == FrozenEntity)
+                    continue;
+
+                //kill entity we ran into
+                killable.SpecialKill(killable.body.position.x > body.position.x, false, combo++);
+
+                //kill ourselves if we're being held too
+                if (Holder)
+                    SpecialKill(killable.body.position.x < body.position.x, false, 0);
+
+                continue;
+            }
+        }
+    }
+
     public override void Kill() {
         FrozenEntity?.Unfreeze(unfreezeReason);
 
@@ -323,5 +323,4 @@ public class FrozenCube : HoldableEntity {
     public override void SpecialKill(bool right, bool groundpound, int combo) {
         Kill();
     }
-    #endregion
 }

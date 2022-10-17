@@ -96,53 +96,93 @@ public class KoopaWalk : HoldableEntity {
         if (!IsStationary)
             body.velocity = new((IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
-        CheckForEntityCollisions();
         HandleTile();
         animator.SetBool("shell", IsInShell || Holder != null);
         animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
         velocityLastFrame = body.velocity;
     }
 
-    private Collider2D[] collisions = new Collider2D[16];
-    private void CheckForEntityCollisions() {
+    #endregion
 
-        if (!IsInShell || IsActuallyStationary || putdown || IsDead)
+
+    private void HandleTile() {
+        if (Holder)
             return;
 
-        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisions);
+        ContactPoint2D[] collisions = new ContactPoint2D[20];
+        int collisionAmount = hitbox.GetContacts(collisions);
+        for (int i = 0; i < collisionAmount; i++) {
+            var point = collisions[i];
+            Vector2 p = point.point + (point.normal * -0.15f);
+            if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
+                if (!putdown && IsInShell && !IsStationary) {
+                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
+                    TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
+                    if (tile == null)
+                        continue;
+                    if (!IsInShell)
+                        continue;
 
-        for (int i = 0; i < count; i++) {
-            GameObject obj = collisions[i].gameObject;
-
-            if (obj == gameObject)
-                continue;
-
-            //killable entities
-            if (obj.TryGetComponent(out KillableEntity killable)) {
-                if (killable.IsDead)
-                    continue;
-
-                //kill entity we ran into
-                killable.SpecialKill(killable.body.position.x > body.position.x, false, combo++);
-
-                //kill ourselves if we're being held too
-                if (Holder)
-                    SpecialKill(killable.body.position.x < body.position.x, false, 0);
-
-                continue;
-            }
-
-            //coins
-            if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
-                coin.InteractWithPlayer(PreviousHolder);
-                continue;
+                    if (tile is InteractableTile it)
+                        it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
+                }
+            } else if (point.normal.y > 0 && putdown) {
+                body.velocity = new Vector2(0, body.velocity.y);
+                putdown = false;
             }
         }
     }
 
-    #endregion
 
-    #region Public Methods
+    public void WakeUp() {
+        IsInShell = false;
+        body.velocity = new(-walkSpeed, 0);
+        FacingRight = false;
+        IsUpsideDown = false;
+        IsStationary = false;
+
+        if (Holder)
+            Holder.HoldingWakeup();
+
+        Holder = null;
+        PreviousHolder = null;
+    }
+
+    public void EnterShell(bool becomeItem) {
+        if (blue && !IsInShell && becomeItem) {
+            BlueBecomeItem();
+            return;
+        }
+        body.velocity = Vector2.zero;
+        WakeupTimer = TickTimer.CreateFromSeconds(Runner, wakeup);
+        combo = 0;
+        IsInShell = true;
+        IsStationary = true;
+    }
+
+    public void BlueBecomeItem() {
+        Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
+            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
+        });
+        Runner.Despawn(Object);
+    }
+
+
+    protected void Turnaround(bool hitWallOnLeft, float x) {
+        if (IsActuallyStationary)
+            return;
+
+        if (IsInShell && hitWallOnLeft == FacingRight)
+            PlaySound(Enums.Sounds.World_Block_Bump);
+
+        FacingRight = hitWallOnLeft;
+        body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+        if (IsInShell)
+            PlaySound(Enums.Sounds.World_Block_Bump);
+    }
+
+
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
 
         //don't interact with our lovely holder
@@ -155,6 +195,8 @@ public class KoopaWalk : HoldableEntity {
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = damageDirection.y > 0;
+
+        //TODO: refactor
 
         if (IsInShell && blue && player.IsGroundpounding && !player.IsOnGround) {
             BlueBecomeItem();
@@ -208,107 +250,10 @@ public class KoopaWalk : HoldableEntity {
             }
         }
     }
-    #endregion
-
-    #region Helper Methods
-    private void HandleTile() {
-        if (Holder)
-            return;
-
-        ContactPoint2D[] collisions = new ContactPoint2D[20];
-        int collisionAmount = hitbox.GetContacts(collisions);
-        for (int i = 0; i < collisionAmount; i++) {
-            var point = collisions[i];
-            Vector2 p = point.point + (point.normal * -0.15f);
-            if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
-                if (!putdown && IsInShell && !IsStationary) {
-                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
-                    TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
-                    if (tile == null)
-                        continue;
-                    if (!IsInShell)
-                        continue;
-
-                    if (tile is InteractableTile it)
-                        it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
-                }
-            } else if (point.normal.y > 0 && putdown) {
-                body.velocity = new Vector2(0, body.velocity.y);
-                putdown = false;
-            }
-        }
-    }
-    #endregion
-
-    #region PunRPCs
-    public override void Freeze(FrozenCube cube) {
-        base.Freeze(cube);
-        IsStationary = true;
-    }
-
-    public override void Kick(PlayerController thrower, bool toRight, float kickFactor, bool groundpound) {
-        base.Kick(thrower, toRight, kickFactor, groundpound);
-        IsStationary = false;
-    }
-
-    public override void Throw(bool toRight, bool crouch) {
-        throwSpeed = CurrentKickSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.velocity.x) / Holder.RunningMaxSpeed);
-        base.Throw(toRight, crouch);
-
-        IsStationary = crouch;
-        IsInShell = true;
-        WakeupTimer = TickTimer.None;
-        putdown = crouch;
-    }
-
-    public void WakeUp() {
-        IsInShell = false;
-        body.velocity = new(-walkSpeed, 0);
-        FacingRight = false;
-        IsUpsideDown = false;
-        IsStationary = false;
-
-        if (Holder)
-            Holder.HoldingWakeup();
-
-        Holder = null;
-        PreviousHolder = null;
-    }
-
-    public void EnterShell(bool becomeItem) {
-        if (blue && !IsInShell && becomeItem) {
-            BlueBecomeItem();
-            return;
-        }
-        body.velocity = Vector2.zero;
-        WakeupTimer = TickTimer.CreateFromSeconds(Runner, wakeup);
-        combo = 0;
-        IsInShell = true;
-        IsStationary = true;
-    }
-
-    public void BlueBecomeItem() {
-        Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
-        });
-        Runner.Despawn(Object);
-    }
 
 
-    protected void Turnaround(bool hitWallOnLeft, float x) {
-        if (IsActuallyStationary)
-            return;
-
-        if (IsInShell && hitWallOnLeft == FacingRight)
-            PlaySound(Enums.Sounds.World_Block_Bump);
-
-        FacingRight = hitWallOnLeft;
-        body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
-        if (IsInShell)
-            PlaySound(Enums.Sounds.World_Block_Bump);
-    }
-
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         if (IsDead)
             return;
 
@@ -325,6 +270,52 @@ public class KoopaWalk : HoldableEntity {
             body.velocity = new(bumper.body.position.x < body.position.x ? 3 : -3, body.velocity.y);
     }
 
+    //---FreezableEntity overrides
+    public override void Freeze(FrozenCube cube) {
+        base.Freeze(cube);
+        IsStationary = true;
+    }
+
+
+    //---KillableEntity overrides
+    protected override void CheckForEntityCollisions() {
+
+        base.CheckForEntityCollisions();
+
+        if (!IsInShell || IsActuallyStationary || putdown || IsDead)
+            return;
+
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
+
+        for (int i = 0; i < count; i++) {
+            GameObject obj = collisionBuffer[i].gameObject;
+
+            if (obj == gameObject)
+                continue;
+
+            //killable entities
+            if (obj.TryGetComponent(out KillableEntity killable)) {
+                if (killable.IsDead)
+                    continue;
+
+                //kill entity we ran into
+                killable.SpecialKill(killable.body.position.x > body.position.x, false, combo++);
+
+                //kill ourselves if we're being held too
+                if (Holder)
+                    SpecialKill(killable.body.position.x < body.position.x, false, 0);
+
+                continue;
+            }
+
+            //coins
+            if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
+                coin.InteractWithPlayer(PreviousHolder);
+                continue;
+            }
+        }
+    }
+
     public override void Kill() {
         EnterShell(false);
     }
@@ -334,5 +325,19 @@ public class KoopaWalk : HoldableEntity {
         animator.SetBool("shell", true);
     }
 
-    #endregion
+    //---ThrowableEntity overrides
+    public override void Kick(PlayerController thrower, bool toRight, float kickFactor, bool groundpound) {
+        base.Kick(thrower, toRight, kickFactor, groundpound);
+        IsStationary = false;
+    }
+
+    public override void Throw(bool toRight, bool crouch) {
+        throwSpeed = CurrentKickSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.velocity.x) / Holder.RunningMaxSpeed);
+        base.Throw(toRight, crouch);
+
+        IsStationary = crouch;
+        IsInShell = true;
+        WakeupTimer = TickTimer.None;
+        putdown = crouch;
+    }
 }

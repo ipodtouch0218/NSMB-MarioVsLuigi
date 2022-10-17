@@ -18,7 +18,6 @@ public abstract class HoldableEntity : KillableEntity {
     public Vector3 holderOffset;
     public bool canPlace = true, canKick = true;
 
-    #region Unity Methods
     public override void FixedUpdateNetwork() {
         if (!Holder) {
             base.FixedUpdateNetwork();
@@ -30,9 +29,7 @@ public abstract class HoldableEntity : KillableEntity {
             sRenderer.flipX = !FacingRight;
         }
     }
-    #endregion
 
-    #region Implemented Methods
     public virtual void Kick(PlayerController kicker, bool toRight, float kickFactor, bool groundpound) {
         if (Holder)
             return;
@@ -70,6 +67,7 @@ public abstract class HoldableEntity : KillableEntity {
         player.SetHolding(this);
     }
 
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
         //don't interact with our lovely holder
         if (Holder == player)
@@ -82,6 +80,7 @@ public abstract class HoldableEntity : KillableEntity {
         base.InteractWithPlayer(player);
     }
 
+    //---KillableEntity overrides
     public override void Kill() {
         if (IsDead)
             return;
@@ -101,6 +100,4 @@ public abstract class HoldableEntity : KillableEntity {
 
         base.SpecialKill(right, groundpound, combo);
     }
-
-    #endregion
 }

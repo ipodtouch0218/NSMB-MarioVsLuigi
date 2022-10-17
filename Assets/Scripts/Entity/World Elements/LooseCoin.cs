@@ -70,6 +70,7 @@ public class LooseCoin : Coin {
         prevFrameVelocity = body.velocity;
     }
 
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
         if (!CollectableTimer.ExpiredOrNotRunning(Runner))
             return;
@@ -77,6 +78,7 @@ public class LooseCoin : Coin {
         base.InteractWithPlayer(player);
     }
 
+    //---CollectableEntity overrides
     public override void OnCollectedChanged() {
         if (Collector)
             Runner.Despawn(Object);

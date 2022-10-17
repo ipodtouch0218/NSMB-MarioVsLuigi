@@ -3,7 +3,7 @@
 using Fusion;
 using NSMB.Utils;
 
-public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable, IPredictedSpawnBehaviour, IPredictedDespawnBehaviour {
+public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable /*, IPredictedSpawnBehaviour, IPredictedDespawnBehaviour */ {
 
     //---Networked Variables
     [Networked] public NetworkBool BreakOnImpact { get; set; }
@@ -22,7 +22,11 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---Private Variables
     private PhysicsEntity physics;
-    private bool despawn;
+
+    public override void Awake() {
+        base.Awake();
+        physics = GetComponent<PhysicsEntity>();
+    }
 
     public void OnBeforeSpawned(PlayerController owner, bool right) {
         FacingRight = right;
@@ -31,15 +35,8 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             MoveSpeed += Mathf.Abs(owner.body.velocity.x / 3f);
     }
 
-    public override void Awake() {
-        base.Awake();
-        physics = GetComponent<PhysicsEntity>();
-    }
-
     public override void Spawned() {
         body.velocity = new(MoveSpeed * (FacingRight ? 1 : -1), -MoveSpeed);
-
-        despawn = Utils.IsTileSolidAtWorldLocation(body.position);
     }
 
     public override void FixedUpdateNetwork() {
@@ -47,11 +44,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             body.velocity = Vector2.zero;
             GetComponent<Animator>().enabled = false;
             body.isKinematic = true;
-            return;
-        }
-
-        if (despawn) {
-            Runner.Despawn(Object);
             return;
         }
 
@@ -63,6 +55,15 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         body.velocity = new(MoveSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
+
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        if (!GameManager.Instance.gameover)
+            Instantiate(wallHitParticle, transform.position, Quaternion.identity);
+
+        particles.transform.parent = null;
+        particles.Stop();
+    }
+
 
     private bool HandleCollision() {
         physics.UpdateCollisions();
@@ -78,6 +79,11 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         }
         bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && BreakOnImpact);
         if (breaking) {
+            Runner.Despawn(Object);
+            return false;
+        }
+
+        if (Utils.IsTileSolidAtWorldLocation(body.position)) {
             Runner.Despawn(Object);
             return false;
         }
@@ -110,14 +116,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         return true;
     }
 
-    public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (!GameManager.Instance.gameover)
-            Instantiate(wallHitParticle, transform.position, Quaternion.identity);
-
-        particles.transform.parent = null;
-        particles.Stop();
-    }
-
+    //---IPlayerInteractable override
     public void InteractWithPlayer(PlayerController player) {
         //Check if they own us. If so, don't collide.
         if (Object.InputAuthority == player.Object.InputAuthority)
@@ -166,6 +165,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         Runner.Despawn(Object);
     }
 
+    //---IFireballInteractable overrides
     public bool InteractWithFireball(FireballMover fireball) {
         //fire + ice = both destroy
         if (isIceball) {
@@ -184,38 +184,8 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         return false;
     }
 
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing when bumped
-    }
-
-    //uhhh
-    public void PredictedSpawnSpawned() {
-        Debug.Log("fireball predictive spawn");
-        Spawned();
-    }
-
-    public void PredictedSpawnUpdate() {
-        FixedUpdateNetwork();
-    }
-
-    public void PredictedSpawnRender() {
-        Render();
-    }
-
-    public void PredictedSpawnFailed() {
-        Debug.Log("predictive spawn failed");
-        Runner.Despawn(Object, true);
-    }
-
-    public void PredictedSpawnSuccess() {
-        Debug.Log("predictive spawn success");
-    }
-
-    public void PredictedDespawn() {
-        throw new System.NotImplementedException();
-    }
-
-    public void PredictedDespawnFailed() {
-        throw new System.NotImplementedException();
     }
 }

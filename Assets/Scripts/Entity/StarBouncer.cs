@@ -97,13 +97,6 @@ public class StarBouncer : CollectableEntity {
             ANY_GROUND_MASK = LayerMask.GetMask("Ground", "PassthroughInvalid");
     }
 
-    public override void Render() {
-        if (IsStationary || (GameManager.Instance?.gameover ?? false))
-            return;
-
-        graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
-    }
-
     public override void FixedUpdateNetwork() {
         if (GameManager.Instance?.gameover ?? false) {
             body.velocity = Vector2.zero;
@@ -147,11 +140,52 @@ public class StarBouncer : CollectableEntity {
             Runner.Despawn(Object, true);
     }
 
+    public override void Render() {
+        if (IsStationary || (GameManager.Instance?.gameover ?? false))
+            return;
+
+        graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
+    }
+
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (!GameManager.Instance.gameover && !Collector)
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
     }
 
+    private IEnumerator PulseEffect() {
+        while (true) {
+            pulseEffectCounter += Time.deltaTime;
+            float sin = Mathf.Sin(pulseEffectCounter * pulseSpeed) * pulseAmount;
+            graphicTransform.localScale = Vector3.one * 3f + new Vector3(sin, sin, 0);
+
+            yield return null;
+        }
+    }
+
+    private bool HandleCollision() {
+        physics.UpdateCollisions();
+
+        if (physics.hitLeft || physics.hitRight) {
+            FacingRight = physics.hitLeft;
+            body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
+        }
+
+        if (physics.onGround && canBounce) {
+            body.velocity = new(body.velocity.x, bounceAmount);
+            if (physics.hitRoof) {
+                Runner.Despawn(Object, true);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void DisableAnimator() {
+        animator.enabled = false;
+    }
+
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
         if (player.IsDead)
             return;
@@ -173,6 +207,7 @@ public class StarBouncer : CollectableEntity {
         DespawnTimer = TickTimer.CreateFromTicks(Runner, 1);
     }
 
+    //---CollectableEntity overrides
     public override void OnCollectedChanged() {
         //play fx
         graphicTransform.gameObject.SetActive(false);
@@ -180,43 +215,8 @@ public class StarBouncer : CollectableEntity {
         Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
     }
 
-    private IEnumerator PulseEffect() {
-        while (true) {
-            pulseEffectCounter += Time.deltaTime;
-            float sin = Mathf.Sin(pulseEffectCounter * pulseSpeed) * pulseAmount;
-            graphicTransform.localScale = Vector3.one * 3f + new Vector3(sin, sin, 0);
-
-            yield return null;
-        }
-    }
-
-    private bool HandleCollision() {
-        physics.UpdateCollisions();
-
-        if (physics.hitLeft || physics.hitRight)
-            Turnaround(physics.hitLeft);
-
-        if (physics.onGround && canBounce) {
-            body.velocity = new(body.velocity.x, bounceAmount);
-            if (physics.hitRoof) {
-                Runner.Despawn(Object, true);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void DisableAnimator() {
-        animator.enabled = false;
-    }
-
-    public void Turnaround(bool hitLeft) {
-        FacingRight = hitLeft;
-        body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
-    }
-
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing when bumped
     }
 }

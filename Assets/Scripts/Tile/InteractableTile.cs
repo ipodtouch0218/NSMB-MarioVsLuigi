@@ -24,7 +24,7 @@ public abstract class InteractableTile : AnimatedTile {
                 continue;
 
             if (obj.TryGetComponent(out IBlockBumpable bumpable))
-                bumpable.Bump(interacter, Utils.WorldToTilemapPosition(worldLocation), direction);
+                bumpable.BlockBump(interacter, Utils.WorldToTilemapPosition(worldLocation), direction);
         }
     }
     public enum InteractionDirection {

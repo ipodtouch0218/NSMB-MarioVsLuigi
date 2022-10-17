@@ -23,7 +23,7 @@ public class BobombWalk : HoldableEntity {
     //---Properties
     public bool Lit => !DetonationTimer.ExpiredOrNotRunning(Runner);
 
-    #region Unity Methods
+
     public override void Spawned() {
         body.velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.velocity.y);
     }
@@ -63,10 +63,110 @@ public class BobombWalk : HoldableEntity {
 
         previousFrameVelocity = body.velocity;
     }
-    #endregion
 
-    #region Helper Methods
+    private void HandleCollision() {
+        if (Holder)
+            return;
+
+        physics.UpdateCollisions();
+        if (Lit && physics.onGround) {
+            //apply friction
+            body.velocity -= body.velocity * (Runner.DeltaTime * 3f);
+            if (Mathf.Abs(body.velocity.x) < 0.05) {
+                body.velocity = new(0, body.velocity.y);
+            }
+        }
+
+        if (physics.hitRight && FacingRight) {
+            Turnaround(false);
+        } else if (physics.hitLeft && !FacingRight) {
+            Turnaround(true);
+        }
+
+        if (physics.onGround && physics.hitRoof)
+            SpecialKill(false, false, 0);
+    }
+
+    public void Light() {
+        if (Lit)
+            return;
+
+        animator.SetTrigger("lit");
+        DetonationTimer = TickTimer.CreateFromSeconds(Runner, detonationTime);
+        body.velocity = Vector2.zero;
+        PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
+    }
+
+    public void Detonate() {
+
+        IsDead = true;
+
+        //disable hitbox and sprite
+        sRenderer.enabled = false;
+        hitbox.enabled = false;
+
+        //spawn explosion
+        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+
+        //damage entities in range. TODO: change to nonalloc?
+        List<Collider2D> hits = new();
+        Runner.GetPhysicsScene2D().OverlapCircle(body.position + hitbox.offset, 1f, default, hits);
+
+        //use distinct to only damage enemies once
+        foreach (GameObject hitObj in hits.Select(c => c.gameObject).Distinct()) {
+            //don't interact with ourselves
+            if (hitObj == gameObject)
+                continue;
+
+            //interact with players by powerdown-ing them
+            if (hitObj.GetComponentInParent<PlayerController>() is PlayerController player) {
+                player.Powerdown(false);
+                continue;
+            }
+
+            //interact with other entities by special killing htem
+            if (hitObj.GetComponentInParent<KillableEntity>() is KillableEntity en) {
+                en.SpecialKill(transform.position.x < hitObj.transform.position.x, false, 0);
+                continue;
+            }
+        }
+
+        //(sort or) 'splode tiles in range.
+        Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position);
+        Tilemap tm = GameManager.Instance.tilemap;
+        for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
+            for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
+                //use taxi-cab distance to make a somewhat circular explosion
+                if (Mathf.Abs(x) + Mathf.Abs(y) > explosionTileSize)
+                    continue;
+
+                Vector3Int ourLocation = tileLocation + new Vector3Int(x, y, 0);
+                Utils.WrapTileLocation(ref ourLocation);
+
+                TileBase tile = tm.GetTile(ourLocation);
+                if (tile is InteractableTile iTile)
+                    iTile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(ourLocation));
+            }
+        }
+
+        //suicide ourselves
+        Runner.Despawn(Object);
+    }
+
+    public void Turnaround(bool hitWallOnLeft) {
+        FacingRight = hitWallOnLeft;
+        body.velocity = new((Lit ? -previousFrameVelocity.x : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+        animator.SetTrigger("turnaround");
+    }
+
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
+
+        //temporary invincibility, we dont want to spam the kick sound
+        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+            return;
+
+        //TODO: rewrite?
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
@@ -105,6 +205,13 @@ public class BobombWalk : HoldableEntity {
         }
     }
 
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        //Light if we get bumped
+        Light();
+    }
+
+    //---IFireballInteractable overrides
     public override bool InteractWithFireball(FireballMover fireball) {
         if (!Lit) {
             Light();
@@ -114,97 +221,21 @@ public class BobombWalk : HoldableEntity {
         return true;
     }
 
-    private void HandleCollision() {
-        if (Holder)
-            return;
-
-        physics.UpdateCollisions();
-        if (Lit && physics.onGround) {
-            body.velocity -= body.velocity * (Runner.DeltaTime * 3f);
-            if (Mathf.Abs(body.velocity.x) < 0.05) {
-                body.velocity = new(0, body.velocity.y);
-            }
-        }
-
-        if (physics.hitRight && FacingRight) {
-            Turnaround(false);
-        } else if (physics.hitLeft && !FacingRight) {
-            Turnaround(true);
-        }
-
-        if (physics.onGround && physics.hitRoof)
-            SpecialKill(false, false, 0);
-    }
-
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
-        base.Bump(bumper, tile, direction);
-        Light();
-    }
-    #endregion
-
-    public void Detonate() {
-
-        IsDead = true;
-        sRenderer.enabled = false;
-        hitbox.enabled = false;
-
-        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
-
-        List<Collider2D> hits = new();
-        Runner.GetPhysicsScene2D().OverlapCircle(body.position + hitbox.offset, 1f, default, hits);
-
-        foreach (Collider2D hit in hits.Distinct()) {
-            GameObject obj = hit.gameObject;
-            if (obj == gameObject)
-                continue;
-
-            if (obj.GetComponentInParent<PlayerController>() is PlayerController player) {
-                player.Powerdown(false);
-                continue;
-            }
-
-            if (obj.GetComponentInParent<KillableEntity>() is KillableEntity en) {
-                en.SpecialKill(transform.position.x < obj.transform.position.x, false, 0);
-                continue;
-            }
-        }
-
-        Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position);
-        Tilemap tm = GameManager.Instance.tilemap;
-        for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
-            for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
-                if (Mathf.Abs(x) + Mathf.Abs(y) > explosionTileSize) continue;
-                Vector3Int ourLocation = tileLocation + new Vector3Int(x, y, 0);
-                Utils.WrapTileLocation(ref ourLocation);
-
-                TileBase tile = tm.GetTile(ourLocation);
-                if (tile is InteractableTile iTile) {
-                    iTile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(ourLocation));
-                }
-            }
-        }
-        Runner.Despawn(Object, true);
-    }
-
+    //---KillableEntity overrides
     public override void Kill() {
         Light();
     }
 
-    public void Light() {
-        animator.SetTrigger("lit");
-        DetonationTimer = TickTimer.CreateFromSeconds(Runner, detonationTime);
-        body.velocity = Vector2.zero;
-        PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
+    public override void SpecialKill(bool right, bool groundpound, int combo) {
+        base.SpecialKill(right, groundpound, combo);
+
+        //stop the fuse sound if we were killed early (by shell, for example).
+        sfx.Stop();
     }
 
+    //---ThrowableEntity overrides
     public override void Kick(PlayerController kicker, bool toRight, float speed, bool groundpound) {
         //always do a groundpound variant kick
         base.Kick(kicker, toRight, speed, true);
-    }
-
-    public void Turnaround(bool hitWallOnLeft) {
-        FacingRight = hitWallOnLeft;
-        body.velocity = new((Lit ? -previousFrameVelocity.x : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
-        animator.SetTrigger("turnaround");
     }
 }

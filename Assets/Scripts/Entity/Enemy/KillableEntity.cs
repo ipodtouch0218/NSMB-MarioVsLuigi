@@ -16,8 +16,11 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         Enums.Sounds.Enemy_Shell_Combo7,
     };
 
+    //---Networked Variables
     [Networked] public NetworkBool IsDead { get; set; }
 
+    //---Private Variables
+    protected readonly Collider2D[] collisionBuffer = new Collider2D[32];
     public override bool IsCarryable => iceCarryable;
     public override bool IsFlying => flying;
 
@@ -44,6 +47,9 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         if (!GameManager.Instance || !body)
             return;
 
+        if (!IsDead)
+            CheckForEntityCollisions();
+
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
         if (body && !IsDead && !IsFrozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc)) {
             SpecialKill(FacingRight, false, 0);
@@ -51,97 +57,25 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
     #endregion
 
-    #region Unity Callbacks
-    public void OnTriggerEnter2D(Collider2D collider) {
-        KillableEntity entity = collider.GetComponentInParent<KillableEntity>();
-        if (!collide || !Object.HasStateAuthority || !entity || entity.IsDead)
-            return;
+    protected virtual void CheckForEntityCollisions() {
 
-        bool goRight = body.position.x > collider.attachedRigidbody.position.x;
-        if (body.position.x == collider.attachedRigidbody.position.x) {
-            goRight = body.position.y < collider.attachedRigidbody.position.y;
-        }
-        FacingRight = goRight;
-    }
-    #endregion
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, collisionBuffer);
 
-    #region Helper Methods
-    public virtual void InteractWithPlayer(PlayerController player) {
+        for (int i = 0; i < count; i++) {
+            GameObject obj = collisionBuffer[i].gameObject;
 
-        Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.IsOnGround;
+            if (obj == gameObject)
+                continue;
 
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
-            FacingRight = damageDirection.x < 0;
-        } else if (player.IsStarmanInvincible || player.IsInShell || player.IsSliding
-            || (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
-            || player.State == Enums.PowerupState.MegaMushroom) {
+            if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
 
-            SpecialKill(player.body.velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
-        } else if (attackedFromAbove) {
-            if (player.State == Enums.PowerupState.MiniMushroom) {
-                if (player.IsGroundpounding) {
-                    player.IsGroundpounding = false;
-                    Kill();
-                }
-                player.bounce = true;
-            } else {
-                Kill();
-                player.bounce = !player.IsGroundpounding;
+                bool goRight = body.position.x > killable.body.position.x;
+                if (Mathf.Abs(body.position.x - killable.body.position.x) < 0.01f)
+                    goRight = body.position.y < killable.body.position.y;
+
+                FacingRight = goRight;
             }
-            player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
-            player.IsDrilling = false;
-
-        } else if (player.IsDamageable) {
-            player.Powerdown(false);
-            FacingRight = damageDirection.x > 0;
         }
-    }
-
-    public virtual bool InteractWithFireball(FireballMover fireball) {
-        SpecialKill(fireball.FacingRight, false, 0);
-        return true;
-    }
-
-    public virtual bool InteractWithIceball(FireballMover iceball) {
-        if (!IsFrozen) {
-            Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
-                FrozenCube cube = obj.GetComponent<FrozenCube>();
-                cube.OnBeforeSpawned(this);
-            });
-        }
-        return true;
-    }
-    #endregion
-
-    public override void Freeze(FrozenCube cube) {
-        audioSource.Stop();
-        PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
-        IsFrozen = true;
-        animator.enabled = false;
-        foreach (BoxCollider2D hitboxes in GetComponentsInChildren<BoxCollider2D>()) {
-            hitboxes.enabled = false;
-        }
-        if (body) {
-            body.velocity = Vector2.zero;
-            body.angularVelocity = 0;
-            body.isKinematic = true;
-        }
-    }
-
-    public override void Unfreeze(UnfreezeReason reasonByte) {
-        IsFrozen = false;
-        animator.enabled = true;
-        if (body)
-            body.isKinematic = false;
-        hitbox.enabled = true;
-        audioSource.enabled = true;
-
-        SpecialKill(false, false, 0);
-    }
-
-    public override void Bump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
-        SpecialKill(false, false, 0);
     }
 
     public virtual void Kill() {
@@ -174,4 +108,84 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         audioSource.PlayOneShot(sound.GetClip());
     }
 
+    //---IPlayerInteractable overrides
+    public virtual void InteractWithPlayer(PlayerController player) {
+
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.IsOnGround;
+
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
+            FacingRight = damageDirection.x < 0;
+        } else if (player.IsStarmanInvincible || player.IsInShell || player.IsSliding
+            || (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
+            || player.State == Enums.PowerupState.MegaMushroom) {
+
+            SpecialKill(player.body.velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
+        } else if (attackedFromAbove) {
+            if (player.State == Enums.PowerupState.MiniMushroom) {
+                if (player.IsGroundpounding) {
+                    player.IsGroundpounding = false;
+                    Kill();
+                }
+                player.bounce = true;
+            } else {
+                Kill();
+                player.bounce = !player.IsGroundpounding;
+            }
+            player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+            player.IsDrilling = false;
+
+        } else if (player.IsDamageable) {
+            player.Powerdown(false);
+            FacingRight = damageDirection.x > 0;
+        }
+    }
+
+    //---IFireballInteractable overrides
+    public virtual bool InteractWithFireball(FireballMover fireball) {
+        SpecialKill(fireball.FacingRight, false, 0);
+        return true;
+    }
+
+    public virtual bool InteractWithIceball(FireballMover iceball) {
+        if (!IsFrozen) {
+            Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
+                FrozenCube cube = obj.GetComponent<FrozenCube>();
+                cube.OnBeforeSpawned(this);
+            });
+        }
+        return true;
+    }
+
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        SpecialKill(false, false, 0);
+    }
+
+    //---FreezableEntity overrides
+    public override void Freeze(FrozenCube cube) {
+        audioSource.Stop();
+        PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
+        IsFrozen = true;
+        animator.enabled = false;
+        foreach (BoxCollider2D hitboxes in GetComponentsInChildren<BoxCollider2D>()) {
+            hitboxes.enabled = false;
+        }
+        if (body) {
+            body.velocity = Vector2.zero;
+            body.angularVelocity = 0;
+            body.isKinematic = true;
+        }
+    }
+
+    public override void Unfreeze(UnfreezeReason reasonByte) {
+        IsFrozen = false;
+        animator.enabled = true;
+        if (body)
+            body.isKinematic = false;
+        hitbox.enabled = true;
+        audioSource.enabled = true;
+
+        SpecialKill(false, false, 0);
+    }
 }

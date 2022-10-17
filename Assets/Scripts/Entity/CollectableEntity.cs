@@ -2,13 +2,15 @@ using Fusion;
 
 public abstract class CollectableEntity : BasicEntity, IPlayerInteractable {
 
-    [Networked(OnChanged = "OnCollectedChanged")] public PlayerController Collector { get; set; }
+    //---Networked Variables
+    [Networked(OnChanged = nameof(CollectableEntity.OnCollectedChanged))] public PlayerController Collector { get; set; }
 
-    public abstract void InteractWithPlayer(PlayerController player);
+    public virtual void OnCollectedChanged() {}
 
     public static void OnCollectedChanged(Changed<CollectableEntity> changed) {
         changed.Behaviour.OnCollectedChanged();
     }
 
-    public virtual void OnCollectedChanged() {}
+    //---IPlayerInteractable overrides
+    public abstract void InteractWithPlayer(PlayerController player);
 }

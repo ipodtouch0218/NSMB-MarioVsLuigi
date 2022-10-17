@@ -56,6 +56,10 @@ public class BlockBump : NetworkBehaviour {
         }
     }
 
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        base.Despawned(runner, hasState);
+    }
+
     public void Kill(Vector3Int loc) {
         if (Object.HasStateAuthority)
             GameManager.Instance.Rpc_SetTile(loc.x, loc.y, ResultTile.ToString());
@@ -68,9 +72,5 @@ public class BlockBump : NetworkBehaviour {
         Vector3 pos = transform.position + Vector3.up * (IsDownwards ? -0.7f : 0.25f);
         Runner.Spawn(SpawnPrefab, pos + (Vector3) SpawnOffset);
         Runner.Despawn(Object);
-    }
-
-    public override void Despawned(NetworkRunner runner, bool hasState) {
-        base.Despawned(runner, hasState);
     }
 }
