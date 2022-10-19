@@ -47,7 +47,7 @@ public class SpinyWalk : KoopaWalk {
                             //mini mario interactions
                             if (player.IsGroundpounding) {
                                 //mini mario is groundpounding, cancel their groundpound & stop moving
-                                EnterShell(true);
+                                EnterShell(true, player);
                                 player.IsGroundpounding = false;
                             } else {
                                 //mini mario not groundpounding, just bounce.
@@ -61,7 +61,7 @@ public class SpinyWalk : KoopaWalk {
                                 Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                             } else {
                                 //normal mario isnt groundpounding, we get stopped
-                                EnterShell(true);
+                                EnterShell(true, player);
                                 PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                                 player.bounce = true;
                                 FacingRight = damageDirection.x > 0;

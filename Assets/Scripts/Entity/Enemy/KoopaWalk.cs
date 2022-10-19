@@ -148,7 +148,7 @@ public class KoopaWalk : HoldableEntity {
         PreviousHolder = null;
     }
 
-    public void EnterShell(bool becomeItem) {
+    public void EnterShell(bool becomeItem, PlayerController player) {
         if (blue && !IsInShell && becomeItem) {
             BlueBecomeItem();
             return;
@@ -158,6 +158,12 @@ public class KoopaWalk : HoldableEntity {
         combo = 0;
         IsInShell = true;
         IsStationary = true;
+
+        if (player) {
+            Holder = null;
+            PreviousHolder = player;
+            ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
+        }
     }
 
     public void BlueBecomeItem() {
@@ -214,7 +220,7 @@ public class KoopaWalk : HoldableEntity {
             SpecialKill(!originalFacing, false, player.StarCombo++);
 
         } else if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
-            EnterShell(true);
+            EnterShell(true, player);
             if (!blue) {
                 Kick(player, player.body.position.x < body.position.x, 1f, player.IsGroundpounding);
                 PreviousHolder = player;
@@ -224,11 +230,11 @@ public class KoopaWalk : HoldableEntity {
             if (player.State == Enums.PowerupState.MiniMushroom) {
                 if (player.IsGroundpounding) {
                     player.IsGroundpounding = false;
-                    EnterShell(true);
+                    EnterShell(true, player);
                 }
                 player.bounce = true;
             } else {
-                EnterShell(true);
+                EnterShell(true, player);
                 player.bounce = !player.IsGroundpounding;
             }
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
@@ -261,7 +267,7 @@ public class KoopaWalk : HoldableEntity {
             IsStationary = true;
             putdown = true;
         }
-        EnterShell(false);
+        EnterShell(false, bumper as PlayerController);
         IsUpsideDown = canBeFlipped;
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
         body.velocity = new(body.velocity.x, 5.5f);
@@ -280,44 +286,44 @@ public class KoopaWalk : HoldableEntity {
     //---KillableEntity overrides
     protected override void CheckForEntityCollisions() {
 
-        base.CheckForEntityCollisions();
+        if (!(!IsInShell || IsActuallyStationary || putdown || IsDead)) {
 
-        if (!IsInShell || IsActuallyStationary || putdown || IsDead)
-            return;
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
 
-        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
+            for (int i = 0; i < count; i++) {
+                GameObject obj = collisionBuffer[i].gameObject;
 
-        for (int i = 0; i < count; i++) {
-            GameObject obj = collisionBuffer[i].gameObject;
-
-            if (obj == gameObject)
-                continue;
-
-            //killable entities
-            if (obj.TryGetComponent(out KillableEntity killable)) {
-                if (killable.IsDead)
+                if (obj == gameObject)
                     continue;
 
-                //kill entity we ran into
-                killable.SpecialKill(killable.body.position.x > body.position.x, false, combo++);
+                //killable entities
+                if (obj.TryGetComponent(out KillableEntity killable)) {
+                    if (killable.IsDead)
+                        continue;
 
-                //kill ourselves if we're being held too
-                if (Holder)
-                    SpecialKill(killable.body.position.x < body.position.x, false, 0);
+                    //kill entity we ran into
+                    killable.SpecialKill(killable.body.position.x > body.position.x, false, combo++);
 
-                continue;
-            }
+                    //kill ourselves if we're being held too
+                    if (Holder)
+                        SpecialKill(killable.body.position.x < body.position.x, false, 0);
 
-            //coins
-            if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
-                coin.InteractWithPlayer(PreviousHolder);
-                continue;
+                    continue;
+                }
+
+                //coins
+                if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
+                    coin.InteractWithPlayer(PreviousHolder);
+                    continue;
+                }
             }
         }
+
+        base.CheckForEntityCollisions();
     }
 
     public override void Kill() {
-        EnterShell(false);
+        EnterShell(false, null);
     }
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {

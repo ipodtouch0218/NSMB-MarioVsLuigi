@@ -19,14 +19,15 @@ public abstract class HoldableEntity : KillableEntity {
     public bool canPlace = true, canKick = true;
 
     public override void FixedUpdateNetwork() {
-        if (!Holder) {
-            base.FixedUpdateNetwork();
-            hitbox.enabled = true;
-        } else {
+        if (Holder) {
             body.velocity = Vector2.zero;
+            transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
             body.position = Holder.body.position + (Vector2) holderOffset;
             hitbox.enabled = false;
             sRenderer.flipX = !FacingRight;
+        } else {
+            base.FixedUpdateNetwork();
+            hitbox.enabled = true;
         }
     }
 

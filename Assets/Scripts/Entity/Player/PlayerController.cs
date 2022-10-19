@@ -678,7 +678,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
             Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
 
-            if (!Utils.IsTileSolidAtWorldLocation(spawnPos)) {
+            if (Utils.IsTileSolidAtWorldLocation(spawnPos)) {
                 //spawned inside the wall, spawn only the particle.
                 if (Object.HasStateAuthority)
                     Rpc_FireballAnimation(ice, true, spawnPos);
