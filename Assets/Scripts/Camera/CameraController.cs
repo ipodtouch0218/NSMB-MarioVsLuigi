@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour {
         //only control the camera if we're the local player.
         targetCamera = Camera.main;
         startingZ = targetCamera.transform.position.z;
-        controller = GetComponent<PlayerController>();
+        controller = GetComponentInParent<PlayerController>();
         targetCamera.GetComponentsInChildren(secondaryPositioners);
     }
 

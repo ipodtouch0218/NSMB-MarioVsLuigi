@@ -1,6 +1,18 @@
 # 1.1.3
 
+## F
+
+### Build 599 (Oct 18, 2022)
+
+- Releasing 1.1.3 Stable
+
 ## Nightly
+
+### Build 597 (Oct 18, 2022)
+
+**Bug Fixes**
+
+- Fixed: Change Session Flags to same value breaks updates
 
 ### Build 596 (Oct 14, 2022)
 

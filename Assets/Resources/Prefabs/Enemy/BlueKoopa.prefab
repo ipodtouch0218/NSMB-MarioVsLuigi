@@ -154,6 +154,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BlueKoopa
       objectReference: {fileID: 0}
+    - target: {fileID: 7426856683177255959, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: m_UseAutoMass
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255964, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: red

@@ -142,6 +142,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {
+        Debug.Log($"[Network] Missing input from player {player}");
         OnInputMissing?.Invoke(runner, player, input);
     }
 
