@@ -11,10 +11,6 @@ using Fusion;
 namespace NSMB.Utils {
     public class Utils {
 
-        public static int FirstPlaceStars {
-            get => GameManager.Instance.players.Where(pl => pl.Lives != 0).Max(pc => pc.Stars);
-        }
-
         public static bool BitTest(long v, int index) {
             return (v & (1 << index)) != 0;
         }
@@ -45,10 +41,10 @@ namespace NSMB.Utils {
                 return false;
 
             if (location.x < manager.GetLevelMinX()) {
-                location.x += manager.levelWidthTile / 2;
+                location.x += manager.levelWidthTile * 0.5f;
                 return true;
             } else if (location.x >= manager.GetLevelMaxX()) {
-                location.x -= manager.levelWidthTile / 2;
+                location.x -= manager.levelWidthTile * 0.5f;
                 return true;
             }
             return false;
@@ -68,22 +64,11 @@ namespace NSMB.Utils {
             }
         }
 
-        public static Vector3Int WorldToTilemapPosition(float worldX, float worldY) {
-            return WorldToTilemapPosition(new Vector3(worldX, worldY));
-        }
-
         public static Vector3 TilemapToWorldPosition(Vector3Int tileVec, GameManager manager = null) {
             if (!manager)
                 manager = GameManager.Instance;
+
             return manager.tilemap.CellToWorld(tileVec);
-        }
-
-        public static Vector3 TilemapToWorldPosition(int tileX, int tileY) {
-            return TilemapToWorldPosition(new Vector3Int(tileX, tileY));
-        }
-
-        public static CharacterData GetCharacterData(NetworkRunner runner, PlayerRef player) {
-            return GlobalController.Instance.characters[player.GetPlayerData(runner).CharacterIndex];
         }
 
         public static TileBase GetTileAtTileLocation(Vector3Int tileLocation) {
@@ -347,8 +332,8 @@ namespace NSMB.Utils {
         }
 
         public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize, bool boxcast = true) {
-            Vector3Int minPos = WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
-            Vector3Int size = WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
+            Vector3Int minPos = WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
+            Vector3Int size = WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
 
             for (int x = 0; x <= size.x; x++) {
                 for (int y = 0; y <= size.y; y++) {
@@ -365,8 +350,8 @@ namespace NSMB.Utils {
 
         public static float WrappedDistance(Vector2 a, Vector2 b) {
             GameManager gm = GameManager.Instance;
-            if ((gm?.loopingLevel ?? false) && Mathf.Abs(a.x - b.x) > gm.levelWidthTile / 4f)
-                a.x -= gm.levelWidthTile / 2f * Mathf.Sign(a.x - b.x);
+            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.levelWidthTile * 0.25f)
+                a.x -= gm.levelWidthTile * 0.5f * Mathf.Sign(a.x - b.x);
 
             return Vector2.Distance(a, b);
         }
@@ -396,17 +381,14 @@ namespace NSMB.Utils {
             return false;
         }
 
-        public static Powerup[] powerups = null;
         // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
         public static Powerup GetRandomItem(PlayerController player) {
+            Powerup[] powerups = GlobalController.Instance.powerups;
             GameManager gm = GameManager.Instance;
 
             // "losing" variable based on ln(x+1), x being the # of stars we're behind
             int ourStars = player.Stars;
-            int leaderStars = FirstPlaceStars;
-
-            if (powerups == null)
-                powerups = Resources.LoadAll<Powerup>("Scriptables/Powerups");
+            int leaderStars = gm.FirstPlaceStars;
 
             int starsToWin = LobbyData.Instance.StarRequirement;
             bool custom = LobbyData.Instance.CustomPowerups;
@@ -418,7 +400,7 @@ namespace NSMB.Utils {
 
             float totalChance = 0;
             foreach (Powerup powerup in powerups) {
-                if (powerup.name == "MegaMushroom" && gm.musicState == Enums.MusicState.MegaMushroom)
+                if (powerup.state == Enums.PowerupState.MegaMushroom && gm.musicState == Enums.MusicState.MegaMushroom)
                     continue;
                 if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
                     continue;
@@ -428,7 +410,7 @@ namespace NSMB.Utils {
 
             float rand = GameManager.Instance.Random.NextSingleExclusive() * totalChance;
             foreach (Powerup powerup in powerups) {
-                if (powerup.name == "MegaMushroom" && gm.musicState == Enums.MusicState.MegaMushroom)
+                if (powerup.state == Enums.PowerupState.MegaMushroom && gm.musicState == Enums.MusicState.MegaMushroom)
                     continue;
                 if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
                     continue;
@@ -589,7 +571,7 @@ namespace NSMB.Utils {
 
         public static Color GetRainbowColor(NetworkRunner runner) {
             //four seconds per revolution
-            double time = runner.Simulation.Tick.Raw * 0.01667f * 0.25f;
+            double time = runner.Simulation.Tick.Raw * 0.25d / runner.Simulation.Config.TickRate;
             time %= 1;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
         }

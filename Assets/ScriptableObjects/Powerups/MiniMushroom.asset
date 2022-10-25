@@ -10,17 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
-  m_Name: BlueShell
+  m_Name: MiniMushroom
   m_EditorClassIdentifier: 
-  state: 7
+  state: 1
   prefab:
-    RawGuidValue: fc9311d45068b0b4babce8b3733e590b
-  soundEffect: 16
-  spawnChance: 1.5
-  losingSpawnBonus: -0.25
+    RawGuidValue: 01e65939dc0c28345bd9b2d4fbf025ab
+  soundEffect: 45
+  spawnChance: 2
+  losingSpawnBonus: -1
   big: 0
   vertical: 0
   custom: 0
   lives: 0
-  reserveSprite: {fileID: 2664608197882872095, guid: a87d3b028baa82640b06b88398a8c4f0,
+  reserveSprite: {fileID: 5709720548119103520, guid: a87d3b028baa82640b06b88398a8c4f0,
     type: 3}
+  statePriority: 0
+  itemPriority: 3

@@ -65,6 +65,9 @@ public class GameManager : NetworkBehaviour {
     public bool paused, loaded, gameover;
     public bool musicEnabled, hurryUp;
 
+    //---Properties
+    public int FirstPlaceStars => players.Where(pl => pl.Lives != 0).Max(pc => pc.Stars);
+
     //---Public Variables
     public SingleParticleManager particleManager;
     public List<PlayerController> players = new();
@@ -84,8 +87,6 @@ public class GameManager : NetworkBehaviour {
     private LoopingMusic loopMusic;
     public AudioSource music, sfx;
 
-
-    private ParticleSystem brickBreak;
 
     // EVENT CALLBACK
     public void SendAndExecuteEvent(object eventId, object parameters, object sendOption, object eventOptions = null) {
@@ -288,6 +289,7 @@ public class GameManager : NetworkBehaviour {
         NetworkHandler.OnShutdown += OnShutdown;
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
     }
+
     public void OnDisable() {
         InputSystem.controls.UI.Pause.performed -= OnPause;
         NetworkHandler.OnShutdown -= OnShutdown;
@@ -304,12 +306,12 @@ public class GameManager : NetworkBehaviour {
         levelUIColor.a = .7f;
     }
 
-    public async void Start() {
+    public void Start() {
         //spawning in editor
         if (!NetworkHandler.Runner.SessionInfo.IsValid) {
             //uhhh
 
-            await NetworkHandler.CreateRoom(new() {
+            _ = NetworkHandler.CreateRoom(new() {
                 Scene = SceneManager.GetActiveScene().buildIndex,
             }, GameMode.Single);
         }
@@ -343,13 +345,14 @@ public class GameManager : NetworkBehaviour {
             }
         }
 
-        brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
-
         //finished loading
         if (Runner.IsSinglePlayer) {
             CheckIfAllPlayersLoaded();
         } else {
-            NetworkHandler.Runner.GetLocalPlayerData()?.Rpc_FinishedLoading();
+            //tell our host that we're done loading
+            PlayerData data;
+            if (data = NetworkHandler.Runner.GetLocalPlayerData())
+                data.Rpc_FinishedLoading();
         }
 
         Camera.main.transform.position = spawnpoint;
@@ -360,7 +363,7 @@ public class GameManager : NetworkBehaviour {
         tilemap.SetTilesBlock(originalTilesOrigin, originalTiles);
 
         foreach (FloatingCoin coin in coins)
-            coin.Collector = null;
+            coin.ResetCoin();
 
         foreach (EnemySpawnpoint point in enemySpawns)
             point.AttemptSpawning();
@@ -372,13 +375,13 @@ public class GameManager : NetworkBehaviour {
         CheckIfAllPlayersLoaded();
     }
 
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        CheckForWinner();
+    }
+
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
         GlobalController.Instance.disconnectCause = shutdownReason;
         SceneManager.LoadScene(0);
-    }
-
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        CheckForWinner();
     }
 
     private void CheckIfAllPlayersLoaded() {
@@ -400,7 +403,7 @@ public class GameManager : NetworkBehaviour {
         GameStartTimer = TickTimer.CreateFromSeconds(NetworkHandler.Runner, 3.7f);
 
         if (Runner.IsServer)
-            Rpc_FinishLoading();
+            Rpc_LoadingComplete();
 
         foreach (PlayerRef player in NetworkHandler.Runner.ActivePlayers)
             player.GetPlayerData(NetworkHandler.Runner).IsLoaded = false;
@@ -415,7 +418,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void Rpc_FinishLoading() {
+    private void Rpc_LoadingComplete() {
 
         //Populate scoreboard
         ScoreboardUpdater.instance.Populate(players);
@@ -423,15 +426,15 @@ public class GameManager : NetworkBehaviour {
             ScoreboardUpdater.instance.SetEnabled();
 
         //Finalize loading screen
-        GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
+        GameObject canvas = GlobalController.Instance.loadingCanvas;
         if (canvas) {
             canvas.GetComponent<Animator>().SetTrigger(Runner.GetLocalPlayerData().IsCurrentlySpectating ? "spectating" : "loaded");
             //please just dont beep at me :(
             AudioSource source = canvas.GetComponent<AudioSource>();
-            source.Stop();
             source.volume = 0;
-            source.enabled = false;
-            Destroy(source);
+            //source.enabled = false;
+            source.Stop();
+            //Destroy(source);
         }
     }
 
@@ -475,6 +478,8 @@ public class GameManager : NetworkBehaviour {
         //TODO:
         //PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
+        LobbyData.Instance.SetGameStarted(false);
+
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
         text.GetComponent<TMP_Text>().text = winner != PlayerRef.None ? winner.GetPlayerData(Runner).GetNickname() + " Wins!" : "It's a draw...";
@@ -500,7 +505,6 @@ public class GameManager : NetworkBehaviour {
 
         //TOOD: make a results screen?
 
-        LobbyData.Instance.SetGameStarted(false);
 
         if (Runner.IsServer) {
             //handle player states
@@ -563,6 +567,9 @@ public class GameManager : NetworkBehaviour {
         //    }
         //}
 
+        if (gameover)
+            return;
+
         Random = new(Runner.Simulation.Tick);
 
         if (musicEnabled)
@@ -581,7 +588,7 @@ public class GameManager : NetworkBehaviour {
         if (StartMusicTimer.Expired(Runner)) {
             StartMusicTimer = TickTimer.None;
             musicEnabled = true;
-            Destroy(FindObjectOfType<LoadingParent>().gameObject);
+            GlobalController.Instance.loadingCanvas.SetActive(false);
         }
 
         if (GameEndTimer.IsRunning) {
@@ -765,28 +772,23 @@ public class GameManager : NetworkBehaviour {
     //lazy mofo
     private float? middleX, minX, minY, maxX, maxY;
     public float GetLevelMiddleX() {
-        if (middleX == null)
-            middleX = (GetLevelMaxX() + GetLevelMinX()) / 2;
+        middleX ??= (GetLevelMaxX() + GetLevelMinX()) / 2;
         return (float) middleX;
     }
     public float GetLevelMinX() {
-        if (minX == null)
-            minX = (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+        minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
         return (float) minX;
     }
     public float GetLevelMinY() {
-        if (minY == null)
-            minY = (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+        minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
         return (float) minY;
     }
     public float GetLevelMaxX() {
-        if (maxX == null)
-            maxX = ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+        maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
         return (float) maxX;
     }
     public float GetLevelMaxY() {
-        if (maxY == null)
-            maxY =  ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+        maxY ??=  ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
         return (float) maxY;
     }
 
@@ -808,8 +810,7 @@ public class GameManager : NetworkBehaviour {
         return spawn;
     }
 
-    [Range(1,10)]
-    public int playersToVisualize = 10;
+    [SerializeField, Range(1,10)] private int playersToVisualize = 10;
     public void OnDrawGizmos() {
 
         if (!tilemap)

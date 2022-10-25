@@ -27,7 +27,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool IsSliding { get; set; }
     [Networked] public NetworkBool IsSkidding { get; set; }
     [Networked] public NetworkBool IsTurnaround { get; set; }
-    [Networked] public float JumpBuffer { get; set; }
     //Jumping Animations
     [Networked] private NetworkBool IsSingleJump { get; set; }
     [Networked] public NetworkBool IsDoubleJump { get; set; }
@@ -98,11 +97,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [SerializeField] private GameObject models;
     [SerializeField] public CharacterData character;
 
-
+    private float jumpBufferTime;
+    private float leftGroundTime;
 
 
     public bool previousOnGround, crushGround, jumping, properJump, hitRoof, bounce, groundpoundLastFrame, hitBlock, functionallyRunning, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding;
-    public float jumpLandingTimer, landing, koyoteTime, pickupTimer, powerupFlash;
+    public float jumpLandingTimer, landing, pickupTimer, powerupFlash;
     public float floorAngle, pipeTimer;
 
     //MOVEMENT STAGES
@@ -188,8 +188,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public BoxCollider2D MainHitbox => hitboxes[0];
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
 
-    public PlayerNetworkInput currentInputs, previousInputs;
-
+    [Networked]
+    private PlayerNetworkInput PreviousInputs { get; set; }
 
     public PlayerData data;
 
@@ -248,43 +248,33 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         Lives = LobbyData.Instance.Lives;
         playerId = Runner.GetLocalPlayerData().PlayerId;
-        Debug.Log(Runner.GetLocalPlayerData().GetNickname() + " - " + Runner.GetLocalPlayerData().PlayerId);
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) {
         PlayerNetworkInput newInput = new();
 
-        Vector2 joystick = InputSystem.controls.Player.Movement.ReadValue<Vector2>();
-        bool jump = InputSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
-        bool sprint = InputSystem.controls.Player.Sprint.ReadValue<float>() >= 0.5f;
-        bool powerup = InputSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
+        Vector2 joystick =   InputSystem.controls.Player.Movement.ReadValue<Vector2>();
+        bool jump =          InputSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
+        bool sprint =        InputSystem.controls.Player.Sprint.ReadValue<float>() >= 0.5f;
+        bool powerup =       InputSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
+        bool sprintPowerup = sprint && Settings.Instance.fireballFromSprint;
 
-        //TODO: deadzone?
-        newInput.buttons.Set(PlayerControls.Right, joystick.x > 0.25f);
-        newInput.buttons.Set(PlayerControls.Left, joystick.x < -0.25f);
-        newInput.buttons.Set(PlayerControls.Up, joystick.y > 0.25f);
-        newInput.buttons.Set(PlayerControls.Down, joystick.y < -0.25f);
-        newInput.buttons.Set(PlayerControls.Jump, jump);
-        newInput.buttons.Set(PlayerControls.Sprint, sprint);
-        newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
-        newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprint && Settings.Instance.fireballFromSprint);
+        //TODO: changeable deadzone?
+        newInput.buttons.Set(PlayerControls.Up,                  joystick.y > 0.25f);
+        newInput.buttons.Set(PlayerControls.Down,                joystick.y < -0.25f);
+        newInput.buttons.Set(PlayerControls.Left,                joystick.x < -0.25f);
+        newInput.buttons.Set(PlayerControls.Right,               joystick.x > 0.25f);
+        newInput.buttons.Set(PlayerControls.Jump,                jump);
+        newInput.buttons.Set(PlayerControls.Sprint,              sprint);
+        newInput.buttons.Set(PlayerControls.PowerupAction,       powerup);
+        newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprintPowerup);
 
         input.Set(newInput);
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {
         //when we drop inputs, continue predicting the previous set of inputs.
-        input.Set(previousInputs);
-    }
-
-    private bool UpdateInputs() {
-        var temp = currentInputs;
-        if (GetInput(out PlayerNetworkInput newInput)) {
-            currentInputs = newInput;
-            previousInputs = temp;
-            return true;
-        }
-        return false;
+        input.Set(PreviousInputs);
     }
 
     public override void FixedUpdateNetwork() {
@@ -313,27 +303,37 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 RespawnTimer = TickTimer.None;
             }
 
-        } else if (UpdateInputs()) {
+        } else if (GetInput(out PlayerNetworkInput input)) {
+
+            NetworkButtons heldButtons = input.buttons;
+            NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
+            PreviousInputs = input;
+
             groundpoundLastFrame = IsGroundpounding;
             previousOnGround = IsOnGround;
             HandleBlockSnapping();
             CheckForEntityCollision();
 
             HandleGroundCollision();
-            if (previousOnGround && !IsOnGround)
+            if (previousOnGround && !IsOnGround) {
                 IsOnGround = GroundSnapCheck();
+
+                if (!IsOnGround)
+                    leftGroundTime = Runner.SimulationTime;
+            }
 
             HandleTileProperties();
             TickCounters(Runner.DeltaTime);
 
-            CheckForPowerupActions();
-            HandleMovement(Runner.DeltaTime);
+            CheckForPowerupActions(pressedButtons);
+            HandleMovement(heldButtons, pressedButtons);
 
             HandleGiantTiles(true);
             UpdateHitbox();
+
+            animationController.UpdateAnimatorStates(heldButtons);
         }
 
-        animationController.UpdateAnimatorStates();
         animationController.HandleMiscStates();
         HandleLayerState();
         previousFrameVelocity = body.velocity;
@@ -341,29 +341,71 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
     #endregion
 
-    private void CheckForPowerupActions() {
+    private void CheckForPowerupActions(NetworkButtons pressedButtons) {
         //powerup action button check
-        if (currentInputs.buttons.WasPressed(previousInputs.buttons, PlayerControls.PowerupAction)
-            || (currentInputs.buttons.WasPressed(previousInputs.buttons, PlayerControls.SprintPowerupAction)
+        if (pressedButtons.IsSet(PlayerControls.PowerupAction)
+            || (pressedButtons.IsSet(PlayerControls.SprintPowerupAction)
                 && (State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower)))
 
             ActivatePowerupAction();
     }
 
     #region -- COLLISIONS --
-    private static readonly Vector2[] checkDirections = { Vector2.down, Vector2.left, Vector2.right, Vector2.up };
-    private readonly HashSet<RaycastHit2D> groundContacts = new(16);
+    //private static readonly Vector2[] checkDirections = { Vector2.down, Vector2.left, Vector2.right, Vector2.up };
+    //private readonly HashSet<RaycastHit2D> groundContacts = new(24);
+    private readonly ContactPoint2D[] contacts = new ContactPoint2D[16];
     private void HandleGroundCollision() {
         tilesJumpedInto.Clear();
         tilesStandingOn.Clear();
         tilesHitSide.Clear();
-        groundContacts.Clear();
 
         bool ignoreRoof = false;
         int down = 0, left = 0, right = 0, up = 0;
 
-        float dist = Physics2D.defaultContactOffset * 2f;
+        crushGround = false;
+        foreach (BoxCollider2D hitbox in hitboxes) {
+            int collisionCount = hitbox.GetContacts(contacts);
 
+            for (int i = 0; i < collisionCount; i++) {
+                ContactPoint2D contact = contacts[i];
+                GameObject go = contact.collider.gameObject;
+                Vector2 n = contact.normal;
+                Vector2 p = contact.point + (contact.normal * -0.15f);
+                if (n == Vector2.up && contact.point.y > body.position.y)
+                    continue;
+
+                Vector3Int vec = Utils.WorldToTilemapPosition(p);
+                if (!contact.collider || contact.collider.CompareTag("Player"))
+                    continue;
+
+                if (Vector2.Dot(n, Vector2.up) > .05f) {
+                    if (Vector2.Dot(body.velocity.normalized, n) > 0.1f && !IsOnGround) {
+                        if (!contact.rigidbody || contact.rigidbody.velocity.y < body.velocity.y)
+                            //invalid flooring
+                            continue;
+                    }
+
+                    crushGround |= !go.CompareTag("platform") && !go.CompareTag("frozencube");
+                    down++;
+                    tilesStandingOn.Add(vec);
+                } else if (contact.collider.gameObject.layer == Layers.LayerGround) {
+                    if (Vector2.Dot(n, Vector2.down) > .9f) {
+                        up++;
+                        tilesJumpedInto.Add(vec);
+                    } else {
+                        if (n.x < 0) {
+                            right++;
+                        } else {
+                            left++;
+                        }
+                        tilesHitSide.Add(vec);
+                    }
+                }
+            }
+        }
+
+        /*
+        float dist = Physics2D.defaultContactOffset * 2f;
         foreach (BoxCollider2D hitbox in hitboxes) {
 
             Vector2 size = hitbox.size * transform.localScale;
@@ -374,6 +416,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 Vector2 off = dir * size;
                 Vector2 off2 = new Vector2(Mathf.Abs(dir.y), Mathf.Abs(dir.x)) * size;
 
+                //center hit
+                groundContacts.Add(Runner.GetPhysicsScene2D().Raycast(center + off, dir, dist, Layers.MaskOnlyGround));
                 //left hit
                 groundContacts.Add(Runner.GetPhysicsScene2D().Raycast(center + off - off2, dir, dist, Layers.MaskOnlyGround));
                 //right hit
@@ -420,6 +464,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 }
             }
         }
+        */
 
         IsOnGround = down >= 1;
         hitLeft = left >= 1;
@@ -907,7 +952,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (StoredPowerup == Enums.PowerupState.None)
             return;
 
-        SpawnItem(Enums.PowerupFromState[StoredPowerup].prefab);
+        SpawnItem(StoredPowerup.GetPowerupScriptable().prefab);
         StoredPowerup = Enums.PowerupState.None;
     }
 
@@ -1066,8 +1111,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsCrouching = false;
         IsOnGround = false;
         IsSliding = false;
-        koyoteTime = 1f;
-        JumpBuffer = 0;
         StarmanTimer = TickTimer.None;
         GiantStartTimer = TickTimer.None;
         GiantEndTimer = TickTimer.None;
@@ -1126,8 +1169,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (State == Enums.PowerupState.MegaMushroom)
             return;
 
-        bool left = currentInputs.buttons.IsSet(PlayerControls.Left);
-        bool right = currentInputs.buttons.IsSet(PlayerControls.Right);
+        bool left = PreviousInputs.buttons.IsSet(PlayerControls.Left);
+        bool right = PreviousInputs.buttons.IsSet(PlayerControls.Right);
 
         bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == Mathf.Sign(body.velocity.x));
         if (onIce && (left ^ right) && reverse) {
@@ -1601,7 +1644,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 IsDoubleJump = false;
                 IsTripleJump = false;
                 IsOnGround = false;
-                JumpBuffer = 0f;
                 bounce = false;
 
                 WallJumpTimer = TickTimer.CreateFromSeconds(Runner, 16f / 60f);
@@ -1672,18 +1714,16 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
     }
 
-    private void HandleJumping(bool jumpPressed, bool forceJump) {
+    private void HandleJumping(bool jumpHeld, bool doJump) {
         if (IsInKnockback || IsDrilling || (State == Enums.PowerupState.MegaMushroom && IsSingleJump))
             return;
 
         bool topSpeed = Mathf.Abs(body.velocity.x) >= RunningMaxSpeed;
-        if (bounce || (forceJump && (IsOnGround || (koyoteTime < 0.07f && !IsPropellerFlying)) && !startedSliding)) {
+        if (bounce || (doJump && IsOnGround && !startedSliding)) {
 
-            bool canSpecialJump = (forceJump || (bounce && jumpPressed)) && properJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && landing < 0.45f && !HeldEntity && !IsTripleJump && !IsCrouching && !IsInShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
+            bool canSpecialJump = (doJump || (bounce && jumpHeld)) && properJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && landing < 0.45f && !HeldEntity && !IsTripleJump && !IsCrouching && !IsInShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
             float jumpBoost = 0;
 
-            koyoteTime = 1;
-            JumpBuffer = 0;
             IsSkidding = false;
             IsTurnaround = false;
             IsSliding = false;
@@ -2029,7 +2069,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         //if (!pipeEntering)
         //    Utils.TickTimer(ref invincible, 0, delta);
 
-        JumpBuffer = Math.Max(0, JumpBuffer - delta);
         Utils.TickTimer(ref pipeTimer, 0, delta);
         Utils.TickTimer(ref jumpLandingTimer, 0, delta);
         Utils.TickTimer(ref pickupTimer, 0, -delta, pickupTime);
@@ -2057,13 +2096,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         body.isKinematic = false;
     }
 
-    private void HandleFacingDirection() {
+    private void HandleFacingDirection(NetworkButtons heldButtons) {
         if (IsGroundpounding && !IsOnGround)
             return;
 
         //Facing direction
-        bool right = currentInputs.buttons.IsSet(PlayerControls.Right);
-        bool left = currentInputs.buttons.IsSet(PlayerControls.Left);
+        bool right = heldButtons.IsSet(PlayerControls.Right);
+        bool left = heldButtons.IsSet(PlayerControls.Left);
 
         if (!WallJumpTimer.ExpiredOrNotRunning(Runner)) {
             FacingRight = body.velocity.x > 0;
@@ -2136,8 +2175,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         body.position = newPosition;
     }
 
-    private void HandleMovement(float delta) {
-        functionallyRunning = currentInputs.buttons.IsSet(PlayerControls.Sprint) || State == Enums.PowerupState.MegaMushroom || IsPropellerFlying;
+    private void HandleMovement(NetworkButtons heldButtons, NetworkButtons pressedButtons) {
+        float delta = Runner.DeltaTime;
+        functionallyRunning = heldButtons.IsSet(PlayerControls.Sprint) || State == Enums.PowerupState.MegaMushroom || IsPropellerFlying;
 
         if (IsDead)
             return;
@@ -2244,16 +2284,19 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (HandleStuckInBlock())
             return;
 
-        bool right = currentInputs.buttons.IsSet(PlayerControls.Right);
-        bool left = currentInputs.buttons.IsSet(PlayerControls.Left);
-        bool down = currentInputs.buttons.IsSet(PlayerControls.Down);
-        bool up = currentInputs.buttons.IsSet(PlayerControls.Up);
-        bool jump = currentInputs.buttons.IsSet(PlayerControls.Jump);
+        bool right =    heldButtons.IsSet(PlayerControls.Right);
+        bool left =     heldButtons.IsSet(PlayerControls.Left);
+        bool down =     heldButtons.IsSet(PlayerControls.Down);
+        bool up =       heldButtons.IsSet(PlayerControls.Up);
+        bool jumpHeld = heldButtons.IsSet(PlayerControls.Jump);
+        bool powerup =  heldButtons.IsSet(PlayerControls.PowerupAction);
 
-        if (currentInputs.buttons.WasPressed(previousInputs.buttons, PlayerControls.Jump))
-            JumpBuffer = 0.15f;
+        if (pressedButtons.IsSet(PlayerControls.Jump)) {
+            jumpBufferTime = Runner.SimulationTime + 0.15f;
+            Debug.Log("pressed jump " + Runner.Tick);
+        }
 
-        bool doJump = (JumpBuffer > 0) && (IsOnGround || koyoteTime < 0.07f || WallSlideLeft || WallSlideRight);
+        bool doJump = (jumpBufferTime >= Runner.SimulationTime) && (IsOnGround || (leftGroundTime >= Runner.SimulationTime - 0.07f) || WallSlideLeft || WallSlideRight);
 
         //Pipes
         if (pipeTimer <= 0) {
@@ -2315,7 +2358,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
 
-        if (currentInputs.buttons.IsSet(PlayerControls.PowerupAction) && IsPropellerFlying && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime / 4f) {
+        if (powerup && IsPropellerFlying && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime / 4f) {
             PropellerSpinTimer = TickTimer.CreateFromSeconds(Runner, propellerSpinTime);
             PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
         }
@@ -2350,7 +2393,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 Powerdown(true);
             }
 
-            koyoteTime = 0;
             usedPropellerThisJump = false;
             WallSlideLeft = false;
             WallSlideRight = false;
@@ -2365,7 +2407,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     body.position += -0.6f * Mathf.Sign(diff) * Time.fixedDeltaTime * Vector2.right;
             }
         } else {
-            koyoteTime += delta;
             landing = 0;
             IsSkidding = false;
             IsTurnaround = false;
@@ -2432,7 +2473,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             HandleWalkingRunning(left, right);
 
             //Jumping
-            HandleJumping(jump, doJump);
+            HandleJumping(jumpHeld, doJump);
         }
 
         if (GiantTimer.Expired(Runner)) {
@@ -2441,7 +2482,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         HandleSlopes();
-        HandleFacingDirection();
+        HandleFacingDirection(heldButtons);
 
         //slow-rise check
         if (IsSpinnerFlying || IsPropellerFlying) {
@@ -2459,7 +2500,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 gravityModifier *= 1.5f;
 
             if (body.velocity.y > 2.5) {
-                if (jump || State == Enums.PowerupState.MegaMushroom) {
+                if (jumpHeld || State == Enums.PowerupState.MegaMushroom) {
                     body.gravityScale = slowriseGravity * slowriseModifier;
                 } else {
                     body.gravityScale = normalGravity * 1.5f * gravityModifier;
@@ -2641,9 +2682,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     CameraController.ScreenShake = 0.15f;
                 }
             }
-            if (hitBlock) {
-                koyoteTime = 1.5f;
-            } else if (State == Enums.PowerupState.MegaMushroom) {
+            if (!hitBlock && State == Enums.PowerupState.MegaMushroom) {
                 PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
                 SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position);
                 CameraController.ScreenShake = 0.35f;
@@ -2652,7 +2691,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     public bool CanPickup() {
-        return State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && currentInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && !IsDoubleJump && !IsTripleJump && !IsGroundpounding;
+        return State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && !IsDoubleJump && !IsTripleJump && !IsGroundpounding;
     }
 
     public void OnDrawGizmos() {

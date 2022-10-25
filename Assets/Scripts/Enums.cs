@@ -1,46 +1,18 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
 public static class Enums {
 
-    #region POWERUPS
-    public class PriorityPair {
-        public int itemPriority, statePriority;
-        public PriorityPair(int state) {
-            statePriority = itemPriority = state;
-        }
-        public PriorityPair(int state, int item) {
-            statePriority = state;
-            itemPriority = item;
-        }
-    }
-    public static readonly Dictionary<PowerupState, Powerup> PowerupFromState = new() {
-        [PowerupState.None] = null,
-        [PowerupState.MiniMushroom] = (Powerup) Resources.Load("Scriptables/Powerups/MiniMushroom"),
-        [PowerupState.Mushroom] = (Powerup) Resources.Load("Scriptables/Powerups/Mushroom"),
-        [PowerupState.FireFlower] = (Powerup) Resources.Load("Scriptables/Powerups/FireFlower"),
-        [PowerupState.IceFlower] = (Powerup) Resources.Load("Scriptables/Powerups/IceFlower"),
-        [PowerupState.PropellerMushroom] = (Powerup) Resources.Load("Scriptables/Powerups/PropellerMushroom"),
-        [PowerupState.BlueShell] = (Powerup) Resources.Load("Scriptables/Powerups/BlueShell"),
-        [PowerupState.MegaMushroom] = (Powerup) Resources.Load("Scriptables/Powerups/MegaMushroom")
-    };
-    public static readonly Dictionary<PowerupState, PriorityPair> PowerupStatePriority = new() {
-        [PowerupState.None] = new(-1),
-        [PowerupState.MiniMushroom] = new(0, 3),
-        [PowerupState.Small] = new(-1),
-        [PowerupState.Mushroom] = new(1),
-        [PowerupState.FireFlower] = new(2),
-        [PowerupState.IceFlower] = new(2),
-        [PowerupState.PropellerMushroom] = new(2),
-        [PowerupState.BlueShell] = new(2),
-        [PowerupState.MegaMushroom] = new(4),
-    };
     public enum PowerupState : byte {
         None, MiniMushroom, Small, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
-    #endregion
+    public static Powerup GetPowerupScriptable(this PowerupState state) {
+        return GlobalController.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
+    }
+
+
     #region ANIMATION & MUSIC
     // Animation enums
     public enum PlayerEyeState {
@@ -48,9 +20,7 @@ public static class Enums {
     }
     // Music Enums
     public enum MusicState {
-        Normal,
-        MegaMushroom,
-        Starman,
+        Normal, MegaMushroom, Starman
     }
     //Sound effects
     public enum Sounds : byte {
@@ -166,15 +136,15 @@ public static class Enums {
     }
 
     public enum Particle : byte {
-        None = 5,
+        None = 0,
 
-        Entity_BrickBreak = 0,
-        Entity_Coin = 1,
-        Generic_Puff = 6,
-        Walk_Sand = 2,
-        Walk_Sand_Right = 3,
-        Walk_Snow = 4,
-        Walk_Snow_Right = 5,
+        Entity_BrickBreak = 1,
+        Entity_Coin = 2,
+        Generic_Puff = 3,
+        Walk_Sand = 4,
+        Walk_Sand_Right = 5,
+        Walk_Snow = 6,
+        Walk_Snow_Right = 7,
     }
 
     #endregion

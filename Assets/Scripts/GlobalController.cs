@@ -7,11 +7,12 @@ using Fusion;
 public class GlobalController : Singleton<GlobalController> {
 
     public PrefabList prefabs;
+    public Powerup[] powerups;
 
     public PlayerColorSet[] skins;
     public Gradient rainbowGradient;
 
-    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
+    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, loadingCanvas;
 
     public RenderTexture ndsTexture;
     public CharacterData[] characters;

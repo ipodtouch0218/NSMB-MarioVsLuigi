@@ -99,7 +99,7 @@ public class UIUpdater : MonoBehaviour {
         if (!player)
             return;
 
-        itemReserve.sprite = player.StoredPowerup != Enums.PowerupState.None ? Enums.PowerupFromState[player.StoredPowerup].reserveSprite : storedItemNull;
+        itemReserve.sprite = player.StoredPowerup.GetPowerupScriptable()?.reserveSprite ?? storedItemNull;
     }
 
     private void UpdateTextUI() {
@@ -125,21 +125,23 @@ public class UIUpdater : MonoBehaviour {
         }
 
         if (LobbyData.Instance.Timer > 0) {
-            float timeRemaining = GameManager.Instance.GameEndTimer.RemainingTime(Runner) ?? 0f;
+            float? timeRemaining = GameManager.Instance.GameEndTimer.RemainingTime(Runner);
 
-            int seconds = Mathf.CeilToInt(timeRemaining);
-            seconds = Mathf.Clamp(seconds, 0, LobbyData.Instance.Timer);
+            if (timeRemaining != null) {
+                int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);
+                seconds = Mathf.Clamp(seconds, 0, LobbyData.Instance.Timer);
 
-            if (seconds != timer) {
-                timer = seconds;
-                uiCountdown.text = Utils.GetSymbolString("cx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
-                timerParent.SetActive(true);
-            }
+                if (seconds != timer) {
+                    timer = seconds;
+                    uiCountdown.text = Utils.GetSymbolString("cx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
+                    timerParent.SetActive(true);
+                }
 
-            if (timeRemaining <= 0 && !timerMaterial) {
-                CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
-                cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
-                timerMaterial.SetColor("_Color", new Color32(255, 1, 1, 255));
+                if (timeRemaining <= 0 && !timerMaterial) {
+                    CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
+                    cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
+                    timerMaterial.SetColor("_Color", new Color32(255, 0, 0, 255));
+                }
             }
         } else {
             timerParent.SetActive(false);

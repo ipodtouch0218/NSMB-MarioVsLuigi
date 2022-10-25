@@ -190,14 +190,20 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
         //change the player's powerup state
         //TODO: refactor to be powerup independent.
-        Powerup powerup = powerupScriptable;
-        Enums.PowerupState newState = powerup.state;
-        Enums.PriorityPair pp = Enums.PowerupStatePriority[powerup.state];
-        Enums.PriorityPair cp = Enums.PowerupStatePriority[player.State];
-        bool reserve = cp.statePriority > pp.itemPriority || player.State == newState;
+        Powerup newPowerup = powerupScriptable;
+        Powerup currentPowerup = player.State.GetPowerupScriptable();
+        Powerup reservePowerup = player.StoredPowerup.GetPowerupScriptable();
+
+        sbyte currentPowerupStatePriority = currentPowerup ? currentPowerup.statePriority : (sbyte) -1;
+        sbyte newPowerupItemPriority = newPowerup ? newPowerup.itemPriority : (sbyte) -1;
+        sbyte newPowerupStatePriority = newPowerup ? newPowerup.statePriority : (sbyte) -1;
+        sbyte reservePowerupStatePriority = reservePowerup ? reservePowerup.statePriority : (sbyte) -1;
+
+        Enums.PowerupState newState = newPowerup.state;
+        bool reserve = currentPowerupStatePriority > newPowerupItemPriority || player.State == newState;
         bool soundPlayed = false;
 
-        if (powerup.state == Enums.PowerupState.MegaMushroom && player.State != Enums.PowerupState.MegaMushroom) {
+        if (newState == Enums.PowerupState.MegaMushroom && player.State != Enums.PowerupState.MegaMushroom) {
 
             player.GiantStartTimer = TickTimer.CreateFromSeconds(Runner, player.giantStartTime);
             player.IsInKnockback = false;
@@ -212,16 +218,16 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             transform.localScale = Vector3.one;
             Instantiate(PrefabList.Instance.Particle_Giant, transform.position, Quaternion.identity);
 
-            player.PlaySoundEverywhere(powerup.soundEffect);
+            player.PlaySoundEverywhere(newPowerup.soundEffect);
             soundPlayed = true;
 
-        } else if (powerup.prefab == PrefabList.Instance.Powerup_Starman) {
+        } else if (newPowerup.prefab == PrefabList.Instance.Powerup_Starman) {
             //starman
             if (!player.IsStarmanInvincible)
                 player.StarCombo = 0;
 
             player.StarmanTimer = TickTimer.CreateFromSeconds(Runner, 10f);
-            player.PlaySound(powerup.soundEffect);
+            player.PlaySound(newPowerup.soundEffect);
 
             if (player.HeldEntity) {
                 player.HeldEntity.SpecialKill(FacingRight, false, 0);
@@ -231,11 +237,11 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             Runner.Despawn(Object);
             return;
 
-        } else if (powerup.prefab == PrefabList.Instance.Powerup_1Up) {
+        } else if (newPowerup.prefab == PrefabList.Instance.Powerup_1Up) {
             player.Lives++;
 
             Instantiate(PrefabList.Instance.Particle_1Up, transform.position, Quaternion.identity);
-            player.PlaySound(powerup.soundEffect);
+            player.PlaySound(newPowerup.soundEffect);
             Runner.Despawn(Object);
             return;
 
@@ -247,13 +253,13 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         }
 
         if (reserve) {
-            if (player.StoredPowerup == Enums.PowerupState.None || (player.StoredPowerup != Enums.PowerupState.None && Enums.PowerupStatePriority[player.StoredPowerup].statePriority <= pp.statePriority && !(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))) {
+            if (player.StoredPowerup == Enums.PowerupState.None || (player.StoredPowerup != Enums.PowerupState.None && reservePowerupStatePriority <= newPowerupStatePriority && !(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))) {
                 //dont reserve mushrooms
                 player.StoredPowerup = newState;
             }
             player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         } else {
-            if (player.State != Enums.PowerupState.Small && (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == Enums.PowerupState.None || Enums.PowerupStatePriority[player.StoredPowerup].statePriority <= cp.statePriority))) {
+            if (player.State != Enums.PowerupState.Small && (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == Enums.PowerupState.None || reservePowerupStatePriority <= currentPowerupStatePriority))) {
                 player.StoredPowerup = player.State;
             }
 
@@ -267,7 +273,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             player.PropellerLaunchTimer = TickTimer.None;
 
             if (!soundPlayed)
-                player.PlaySound(powerup.soundEffect);
+                player.PlaySound(newPowerup.soundEffect);
         }
 
         Runner.Despawn(Object);

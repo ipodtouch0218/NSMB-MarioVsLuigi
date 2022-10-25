@@ -17,4 +17,8 @@ public class FloatingCoin : Coin {
         spriteRenderer.enabled = !Collector;
         hitbox.enabled = !Collector;
     }
+
+    public void ResetCoin() {
+        Collector = null;
+    }
 }

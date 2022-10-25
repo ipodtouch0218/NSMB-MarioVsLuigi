@@ -241,9 +241,6 @@ public class MainMenuManager : MonoBehaviour {
             GlobalController.Instance.checkedForVersion = true;
         }
 #endif
-
-        //add loading screen
-        SceneManager.LoadScene(1, LoadSceneMode.Additive);
     }
 
     private void LoadSettings(bool nickname) {
@@ -341,6 +338,8 @@ public class MainMenuManager : MonoBehaviour {
         chatTextField.SetTextWithoutNotify("");
 
         GlobalController.Instance.DiscordController.UpdateActivity();
+
+        roomSettingsCallbacks.UpdateAllSettings(LobbyData.Instance, false);
     }
 
     private IEnumerator SetScroll() {
@@ -550,7 +549,7 @@ public class MainMenuManager : MonoBehaviour {
             LobbyData.Instance.SetGameStarted(true);
 
             //load the correct scene
-            Runner.SetActiveScene(LobbyData.Instance.Level + 2);
+            Runner.SetActiveScene(LobbyData.Instance.Level + 1);
         }
     }
 

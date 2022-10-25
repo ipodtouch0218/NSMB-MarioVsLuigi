@@ -48,7 +48,13 @@ public class LobbyData : NetworkBehaviour {
         if (currentTick <= lobby.lastUpdatedTick)
             return;
 
-        MainMenuManager.Instance.roomSettingsCallbacks?.UpdateAllSettings(data);
+        //no "started" setting to update
+        byte newLevel = lobby.Level;
+        data.LoadOld();
+        byte oldLevel = lobby.Level;
+        data.LoadNew();
+
+        MainMenuManager.Instance.roomSettingsCallbacks?.UpdateAllSettings(lobby, oldLevel != newLevel);
         lobby.lastUpdatedTick = currentTick;
     }
 

@@ -18,21 +18,13 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private NetworkRunner Runner => NetworkHandler.Runner;
     private LobbyData Lobby => LobbyData.Instance;
 
-    public void UpdateAllSettings(Changed<LobbyData> changed) {
-        LobbyData data = changed.Behaviour;
-
+    public void UpdateAllSettings(LobbyData data, bool level) {
         if (!data.Object.IsValid)
             return;
 
         ChangePrivate(data.PrivateRoom);
         ChangeMaxPlayers(data.MaxPlayers);
-        //no "started" setting to update
-        byte newLevel = changed.Behaviour.Level;
-        changed.LoadOld();
-        byte oldLevel = changed.Behaviour.Level;
-        changed.LoadNew();
-
-        ChangeLevelIndex(data.Level, newLevel != oldLevel);
+        ChangeLevelIndex(data.Level, level);
         ChangeStarRequirement(data.StarRequirement);
         ChangeCoinRequirement(data.CoinRequirement);
         ChangeLives(data.Lives);

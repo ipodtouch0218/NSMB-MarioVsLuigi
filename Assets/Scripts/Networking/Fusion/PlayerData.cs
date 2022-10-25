@@ -10,11 +10,10 @@ using NSMB.Utils;
 public class PlayerData : NetworkBehaviour {
 
     //---Static stuffs
-    //TODO: change to "game started" somehow
-    public static bool Locked => GameManager.Instance;
+    public static bool Locked => LobbyData.Instance && LobbyData.Instance.GameStarted;
 
     //---Networked Variables
-    [Networked, Capacity(20)] private string Nickname { get; set; } = "noname";
+    [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] private string Nickname { get; set; } = "noname";
     [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
     [Networked, Capacity(32)] private string UserId { get; set; }
     [Networked] public sbyte PlayerId { get; set; }
@@ -84,7 +83,10 @@ public class PlayerData : NetworkBehaviour {
         MainMenuManager.Instance.playerList.UpdatePlayerEntry(changed.Behaviour.Object.InputAuthority);
     }
 
-    #region RPCs
+    public static void OnNameChanged(Changed<PlayerData> changed) {
+        changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.Nickname + ")";
+    }
+
     public void SetNickname(string name) {
         //limit nickname to valid characters only.
         name = Regex.Replace(name, @"[^\p{L}\d]", "");
@@ -106,6 +108,8 @@ public class PlayerData : NetworkBehaviour {
 
         DisplayNickname = name;
     }
+
+    #region RPCs
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_FinishedLoading() {

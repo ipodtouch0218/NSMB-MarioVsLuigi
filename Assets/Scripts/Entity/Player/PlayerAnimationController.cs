@@ -15,7 +15,6 @@ public class PlayerAnimationController : NetworkBehaviour {
     [SerializeField] private GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
     [SerializeField] private Material glowMaterial;
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
-    [SerializeField] [ColorUsage(true, false)] private Color? _glowColor = null;
     [SerializeField] private float blinkDuration = 0.1f, pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] private AudioClip normalDrill, propellerDrill;
 
@@ -29,15 +28,7 @@ public class PlayerAnimationController : NetworkBehaviour {
     private readonly List<Renderer> renderers = new();
 
     //---Properties
-    public Color GlowColor {
-        get {
-            if (_glowColor == null)
-                _glowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
-
-            return _glowColor.Value;
-        }
-        set => _glowColor = value;
-    }
+    public Color GlowColor { get; set; }
 
     private Vector3 rotChangeTarget;
     private bool rotChangeInstant;
@@ -72,6 +63,9 @@ public class PlayerAnimationController : NetworkBehaviour {
         renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
 
         rotChangeTarget = models.transform.rotation.eulerAngles;
+
+        enableGlow = !Object.HasInputAuthority;
+        GlowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
     }
 
     public override void Render() {
@@ -99,7 +93,6 @@ public class PlayerAnimationController : NetworkBehaviour {
             SetParticleEmission(fireParticle,   false);
             return;
         }
-
 
         //Particles
         SetParticleEmission(drillParticle,      controller.IsDrilling);
@@ -139,6 +132,8 @@ public class PlayerAnimationController : NetworkBehaviour {
     }
 
     private void SetFacingDirection() {
+
+        //TODO: refactor
 
         if (GameManager.Instance.gameover || controller.IsFrozen)
             return;
@@ -224,10 +219,13 @@ public class PlayerAnimationController : NetworkBehaviour {
         }
     }
 
-    public void UpdateAnimatorStates() {
+    public void UpdateAnimatorStates(NetworkButtons heldButtons) {
 
-        bool right = controller.currentInputs.buttons.IsSet(PlayerControls.Right);
-        bool left = controller.currentInputs.buttons.IsSet(PlayerControls.Left);
+        if (!Runner.IsForward)
+            return;
+
+        bool right = heldButtons.IsSet(PlayerControls.Right);
+        bool left =  heldButtons.IsSet(PlayerControls.Left);
 
         animator.SetBool("onLeft", controller.WallSlideLeft);
         animator.SetBool("onRight", controller.WallSlideRight);
@@ -251,7 +249,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             animatedVelocity = 0;
         } else if (controller.IsPropellerFlying) {
             animatedVelocity = 2.5f;
-        } else if (controller.State == Enums.PowerupState.MegaMushroom && (controller.currentInputs.buttons.IsSet(PlayerControls.Left) || controller.currentInputs.buttons.IsSet(PlayerControls.Right))) {
+        } else if (controller.State == Enums.PowerupState.MegaMushroom && (left || right)) {
             animatedVelocity = 4.5f;
         } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
             animatedVelocity = Mathf.Max(controller.onIce ? 3.5f : 2f, animatedVelocity);
@@ -282,8 +280,16 @@ public class PlayerAnimationController : NetworkBehaviour {
         }
 
         //Shader effects
-        if (materialBlock == null)
+        if (materialBlock == null) {
             materialBlock = new();
+
+            //Customizeable player color
+            materialBlock.SetVector("OverallsColor", primaryColor);
+            materialBlock.SetVector("ShirtColor", secondaryColor);
+
+            if (enableGlow)
+                materialBlock.SetColor("GlowColor", GlowColor);
+        }
 
         materialBlock.SetFloat("RainbowEnabled", controller.IsStarmanInvincible ? 1.1f : 0f);
         int ps = controller.State switch {
@@ -295,12 +301,6 @@ public class PlayerAnimationController : NetworkBehaviour {
         materialBlock.SetFloat("PowerupState", ps);
         materialBlock.SetFloat("EyeState", (int) eyeState);
         materialBlock.SetFloat("ModelScale", transform.lossyScale.x);
-        if (enableGlow)
-            materialBlock.SetColor("GlowColor", GlowColor);
-
-        //Customizeable player color
-        materialBlock.SetVector("OverallsColor", primaryColor);
-        materialBlock.SetVector("ShirtColor", secondaryColor);
 
         Vector3 giantMultiply = Vector3.one;
         float giantTimeRemaining = controller.GiantTimer.RemainingTime(Runner) ?? 0f;
@@ -334,6 +334,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
     }
+
     private void HandleDeathAnimation() {
         if (!controller.IsDead || controller.IsRespawning)
             return;
@@ -371,7 +372,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         }
     }
 
-    void HandlePipeAnimation() {
+    private void HandlePipeAnimation() {
         if (!controller.pipeEntering) {
             pipeTimer = 0;
             return;
@@ -404,7 +405,6 @@ public class PlayerAnimationController : NetworkBehaviour {
             body.isKinematic = false;
             controller.IsOnGround = false;
             controller.properJump = false;
-            controller.koyoteTime = 1;
             controller.IsCrouching = false;
             controller.alreadyGroundpounded = true;
             controller.pipeTimer = 0.25f;

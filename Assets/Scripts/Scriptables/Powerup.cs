@@ -12,6 +12,8 @@ public class Powerup : ScriptableObject {
     public bool big, vertical, custom, lives;
     public Sprite reserveSprite;
 
+    public sbyte statePriority = -1, itemPriority = -1;
+
     public float GetModifiedChance(float starsToWin, float leaderStars, float ourStars) {
         float starDifference = leaderStars - ourStars;
         float bonus = losingSpawnBonus * Mathf.Log(starDifference + 1) * (1f - ((starsToWin - leaderStars) / starsToWin));

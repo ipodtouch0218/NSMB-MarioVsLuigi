@@ -10,17 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
-  m_Name: MiniMushroom
+  m_Name: Mushroom
   m_EditorClassIdentifier: 
-  state: 1
+  state: 3
   prefab:
-    RawGuidValue: 01e65939dc0c28345bd9b2d4fbf025ab
-  soundEffect: 45
-  spawnChance: 2
-  losingSpawnBonus: -1
+    RawGuidValue: 6dbe32ab0e6d5bc4c8fe9722f4c86d19
+  soundEffect: 16
+  spawnChance: 8
+  losingSpawnBonus: -8
   big: 0
   vertical: 0
   custom: 0
   lives: 0
-  reserveSprite: {fileID: 5709720548119103520, guid: a87d3b028baa82640b06b88398a8c4f0,
+  reserveSprite: {fileID: -6080119536613256813, guid: a87d3b028baa82640b06b88398a8c4f0,
     type: 3}
+  statePriority: 1
+  itemPriority: 1

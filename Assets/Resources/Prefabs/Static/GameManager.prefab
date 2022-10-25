@@ -438,7 +438,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 57269
+    m_Bits: 57333
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -3886,7 +3886,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 76.65
+  m_fontSize: 76.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6115,27 +6115,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serializedSystems:
-  - particle: 0
+  - particle: 1
     system: {fileID: 8044830579763793565}
     particleMin: 4
     particleMax: 4
-  - particle: 6
+  - particle: 3
     system: {fileID: 7824665616464299599}
     particleMin: 30
     particleMax: 40
-  - particle: 2
+  - particle: 4
     system: {fileID: 6854017217927754963}
     particleMin: 1
     particleMax: 2
-  - particle: 3
+  - particle: 5
     system: {fileID: 4824275121829990699}
     particleMin: 1
     particleMax: 2
-  - particle: 4
+  - particle: 6
     system: {fileID: 5413043901153218812}
     particleMin: 1
     particleMax: 2
-  - particle: 5
+  - particle: 7
     system: {fileID: 7672938424597859681}
     particleMin: 1
     particleMax: 2
