@@ -21492,6 +21492,7 @@ GameObject:
   - component: {fileID: 3270782425811840124}
   - component: {fileID: 3640785753887057674}
   - component: {fileID: 5594443215964999487}
+  - component: {fileID: 3742144845986238834}
   m_Layer: 10
   m_Name: PlayerLuigi
   m_TagString: Player
@@ -21993,6 +21994,7 @@ MonoBehaviour:
   - {fileID: 4962373736136367448}
   - {fileID: 8636928217783201366}
   - {fileID: 5594443215964999487}
+  - {fileID: 3742144845986238834}
   SimulationBehaviours: []
 --- !u!114 &5594443215964999487
 MonoBehaviour:
@@ -22020,6 +22022,36 @@ MonoBehaviour:
     RotBlendStart: 0
     RotBlendEnd: 0
     RotTeleportRadians: 0
+--- !u!114 &3742144845986238834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8636928217783201362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Animator: {fileID: 0}
+  TotalWords: -1
+  SyncSettings: 79
+  FloatAccuracy:
+    _value: 0
+    _inverse: 0
+    _hash: -814817977
+  TimeAccuracy:
+    _value: 0
+    _inverse: 0
+    _hash: 1061325578
+  WeightAccuracy:
+    _value: 0
+    _inverse: 0
+    _hash: -814817977
+  StateHashes: 
+  TriggerHashes: 
 --- !u!1 &8636928219237579144
 GameObject:
   m_ObjectHideFlags: 0

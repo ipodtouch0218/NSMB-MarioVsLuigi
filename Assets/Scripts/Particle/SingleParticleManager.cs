@@ -27,7 +27,7 @@ public class SingleParticleManager : MonoBehaviour {
             applyShapeToPosition = true,
         };
 
-        if (color != null)
+        if (color.HasValue)
             emitParams.startColor = color.Value;
 
         system.Emit(emitParams, UnityEngine.Random.Range(pair.particleMin, pair.particleMax + 1));

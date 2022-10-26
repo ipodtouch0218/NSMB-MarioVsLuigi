@@ -31,23 +31,23 @@ MonoBehaviour:
   BulletBill:
     RawGuidValue: 42350f427b980ac45b4ce789698052ce
   Powerup_1Up:
-    RawGuidValue: e9dfb7c4606191e418a7f2b88c805e3e
+    RawGuidValue: b7cdc1e59b36b7044ac57ab9187fc91f
   Powerup_Starman:
-    RawGuidValue: 6503ae3cebbf4d94ba7bb95537697cae
+    RawGuidValue: bc3583c54fac0eb47b3b0039be1ef4a3
   Powerup_MegaMushroom:
-    RawGuidValue: 2fa56f937ef51464da5f954b19b67637
+    RawGuidValue: f6c07caac997a364c832cfaa038eb9d2
   Powerup_Mushroom:
     RawGuidValue: 6dbe32ab0e6d5bc4c8fe9722f4c86d19
   Powerup_FireFlower:
-    RawGuidValue: d456b58d55e1ccc4eab91b85f3e4d08f
+    RawGuidValue: 9bcb5effadc837a45b61571768c543cf
   Powerup_BlueShell:
-    RawGuidValue: fc9311d45068b0b4babce8b3733e590b
+    RawGuidValue: 07755fea8aa3195458fdd5077870b4d0
   Powerup_PropellerMushroom:
     RawGuidValue: 467d8d6c11c84374a9f38f758becc536
   Powerup_IceFlower:
-    RawGuidValue: 7fcd129d47a9505458544e2045bb0b57
+    RawGuidValue: 1c0c7582045793f42b2983b08068485f
   Powerup_MiniMushroom:
-    RawGuidValue: 01e65939dc0c28345bd9b2d4fbf025ab
+    RawGuidValue: 135b1c15edc848541bc7302cdf55e322
   Particle_1Up: {fileID: 4677531960176377302, guid: 4f0231ceed2b44e4ca1cf31e4d33437e,
     type: 3}
   Particle_Giant: {fileID: 1027938211771126356, guid: 70a76e37af3bdf04a822468bf5a629f2,

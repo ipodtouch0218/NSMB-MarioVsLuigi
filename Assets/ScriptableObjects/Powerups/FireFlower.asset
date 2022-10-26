@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
   m_Name: FireFlower
   m_EditorClassIdentifier: 
-  state: 4
+  state: 3
   prefab:
-    RawGuidValue: d456b58d55e1ccc4eab91b85f3e4d08f
+    RawGuidValue: 9bcb5effadc837a45b61571768c543cf
   soundEffect: 16
   spawnChance: 2
   losingSpawnBonus: 0.75

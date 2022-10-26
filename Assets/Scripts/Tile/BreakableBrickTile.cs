@@ -6,14 +6,13 @@ using Fusion;
 [CreateAssetMenu(fileName = "BreakableBrickTile", menuName = "ScriptableObjects/Tiles/BreakableBrickTile")]
 public class BreakableBrickTile : InteractableTile {
 
-    [ColorUsage(false)]
-    public Color particleColor;
+    [ColorUsage(false), SerializeField] protected Color particleColor;
     public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
 
     protected bool BreakBlockCheck(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         bool doBump = false, doBreak = false, giantBreak = false;
         if (interacter is PlayerController pl) {
-            if (pl.State <= Enums.PowerupState.Small && !pl.IsDrilling) {
+            if (pl.State <= Enums.PowerupState.MiniMushroom && !pl.IsDrilling) {
                 doBreak = breakableBySmallMario;
                 doBump = true;
             } else if (pl.State == Enums.PowerupState.MegaMushroom) {

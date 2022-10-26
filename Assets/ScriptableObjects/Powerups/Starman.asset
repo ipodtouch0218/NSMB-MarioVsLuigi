@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
-  m_Name: Star
+  m_Name: Starman
   m_EditorClassIdentifier: 
   state: 0
   prefab:
-    RawGuidValue: 6503ae3cebbf4d94ba7bb95537697cae
+    RawGuidValue: bc3583c54fac0eb47b3b0039be1ef4a3
   soundEffect: 16
   spawnChance: -0.2
   losingSpawnBonus: 3.5
@@ -23,3 +23,5 @@ MonoBehaviour:
   custom: 0
   lives: 0
   reserveSprite: {fileID: 0}
+  statePriority: -1
+  itemPriority: -1

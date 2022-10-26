@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
   m_Name: BlueShell
   m_EditorClassIdentifier: 
-  state: 7
+  state: 6
   prefab:
-    RawGuidValue: fc9311d45068b0b4babce8b3733e590b
+    RawGuidValue: 07755fea8aa3195458fdd5077870b4d0
   soundEffect: 16
   spawnChance: 1.5
   losingSpawnBonus: -0.25

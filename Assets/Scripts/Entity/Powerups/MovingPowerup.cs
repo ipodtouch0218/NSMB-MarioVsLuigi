@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
@@ -26,6 +26,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     private PhysicsEntity physics;
     private Animator childAnimator;
     private BoxCollider2D hitbox;
+    private IPowerupCollect collectScript;
 
     //---Misc Variables
     private int originalLayer;
@@ -36,6 +37,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         physics = GetComponent<PhysicsEntity>();
         childAnimator = GetComponentInChildren<Animator>();
         hitbox = GetComponent<BoxCollider2D>();
+        collectScript = GetComponent<IPowerupCollect>();
 
         originalLayer = sRenderer.sortingOrder;
 
@@ -189,91 +191,33 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         Collector = player;
 
         //change the player's powerup state
-        //TODO: refactor to be powerup independent.
+        Enums.PowerupState oldState = player.State;
+
         Powerup newPowerup = powerupScriptable;
-        Powerup currentPowerup = player.State.GetPowerupScriptable();
-        Powerup reservePowerup = player.StoredPowerup.GetPowerupScriptable();
-
-        sbyte currentPowerupStatePriority = currentPowerup ? currentPowerup.statePriority : (sbyte) -1;
-        sbyte newPowerupItemPriority = newPowerup ? newPowerup.itemPriority : (sbyte) -1;
-        sbyte newPowerupStatePriority = newPowerup ? newPowerup.statePriority : (sbyte) -1;
-        sbyte reservePowerupStatePriority = reservePowerup ? reservePowerup.statePriority : (sbyte) -1;
-
         Enums.PowerupState newState = newPowerup.state;
-        bool reserve = currentPowerupStatePriority > newPowerupItemPriority || player.State == newState;
-        bool soundPlayed = false;
+        PowerupReserveResult reserve = collectScript.OnPowerupCollect(player, this);
 
-        if (newState == Enums.PowerupState.MegaMushroom && player.State != Enums.PowerupState.MegaMushroom) {
-
-            player.GiantStartTimer = TickTimer.CreateFromSeconds(Runner, player.giantStartTime);
-            player.IsInKnockback = false;
-            player.IsGroundpounding = false;
-            player.IsCrouching = false;
-            player.IsPropellerFlying = false;
-            player.usedPropellerThisJump = false;
-            player.IsSpinnerFlying = false;
-            player.IsDrilling = false;
-            player.IsInShell = false;
-            player.GiantTimer = TickTimer.CreateFromSeconds(Runner, 15f + player.giantStartTime);
-            transform.localScale = Vector3.one;
-            Instantiate(PrefabList.Instance.Particle_Giant, transform.position, Quaternion.identity);
-
-            player.PlaySoundEverywhere(newPowerup.soundEffect);
-            soundPlayed = true;
-
-        } else if (newPowerup.prefab == PrefabList.Instance.Powerup_Starman) {
-            //starman
-            if (!player.IsStarmanInvincible)
-                player.StarCombo = 0;
-
-            player.StarmanTimer = TickTimer.CreateFromSeconds(Runner, 10f);
+        switch (reserve) {
+        case PowerupReserveResult.NoneButPlaySound: {
+            //just play the collect sound
             player.PlaySound(newPowerup.soundEffect);
-
-            if (player.HeldEntity) {
-                player.HeldEntity.SpecialKill(FacingRight, false, 0);
-                player.SetHolding(null);
-            }
-
-            Runner.Despawn(Object);
-            return;
-
-        } else if (newPowerup.prefab == PrefabList.Instance.Powerup_1Up) {
-            player.Lives++;
-
-            Instantiate(PrefabList.Instance.Particle_1Up, transform.position, Quaternion.identity);
-            player.PlaySound(newPowerup.soundEffect);
-            Runner.Despawn(Object);
-            return;
-
-        } else if (player.State == Enums.PowerupState.MiniMushroom) {
-            //check if we're in a mini area to avoid crushing ourselves
-            if (player.IsOnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.up, 0.3f, Layers.MaskOnlyGround)) {
-                reserve = true;
-            }
+            break;
         }
+        case PowerupReserveResult.ReserveOldPowerup: {
+            //reserve the powerup we just had
+            player.SetReserveItem(oldState);
+            if (newState == Enums.PowerupState.MegaMushroom)
+                break;
 
-        if (reserve) {
-            if (player.StoredPowerup == Enums.PowerupState.None || (player.StoredPowerup != Enums.PowerupState.None && reservePowerupStatePriority <= newPowerupStatePriority && !(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))) {
-                //dont reserve mushrooms
-                player.StoredPowerup = newState;
-            }
+            player.PlaySound(newPowerup.soundEffect);
+            break;
+        }
+        case PowerupReserveResult.ReserveNewPowerup: {
+            //reserve the new powerup
+            player.SetReserveItem(newState);
             player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
-        } else {
-            if (player.State != Enums.PowerupState.Small && (!(player.State == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom) && (player.StoredPowerup == Enums.PowerupState.None || reservePowerupStatePriority <= currentPowerupStatePriority))) {
-                player.StoredPowerup = player.State;
-            }
-
-            player.previousState = player.State;
-            player.State = newState;
-            player.powerupFlash = 2;
-            player.IsCrouching |= player.ForceCrouchCheck();
-            player.IsPropellerFlying = false;
-            player.usedPropellerThisJump = false;
-            player.IsDrilling &= player.IsSpinnerFlying;
-            player.PropellerLaunchTimer = TickTimer.None;
-
-            if (!soundPlayed)
-                player.PlaySound(newPowerup.soundEffect);
+            break;
+        }
         }
 
         Runner.Despawn(Object);

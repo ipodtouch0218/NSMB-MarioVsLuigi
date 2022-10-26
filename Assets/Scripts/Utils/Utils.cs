@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using NSMB.Extensions;
 using Fusion;
+using NSMB.Extensions;
 
 namespace NSMB.Utils {
     public class Utils {

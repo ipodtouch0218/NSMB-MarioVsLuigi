@@ -6,9 +6,12 @@ using UnityEngine;
 public static class Enums {
 
     public enum PowerupState : byte {
-        None, MiniMushroom, Small, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
+        NoPowerup, MiniMushroom, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
     public static Powerup GetPowerupScriptable(this PowerupState state) {
+        if (state == PowerupState.NoPowerup)
+            return null;
+
         return GlobalController.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
     }
 

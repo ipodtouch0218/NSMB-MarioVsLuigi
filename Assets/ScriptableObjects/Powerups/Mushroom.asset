@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
   m_Name: Mushroom
   m_EditorClassIdentifier: 
-  state: 3
+  state: 2
   prefab:
     RawGuidValue: 6dbe32ab0e6d5bc4c8fe9722f4c86d19
   soundEffect: 16

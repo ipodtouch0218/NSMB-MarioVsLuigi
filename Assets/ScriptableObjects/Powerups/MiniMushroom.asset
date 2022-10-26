@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 1
   prefab:
-    RawGuidValue: 01e65939dc0c28345bd9b2d4fbf025ab
+    RawGuidValue: 135b1c15edc848541bc7302cdf55e322
   soundEffect: 45
   spawnChance: 2
   losingSpawnBonus: -1

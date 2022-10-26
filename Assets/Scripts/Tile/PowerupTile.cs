@@ -33,7 +33,7 @@ public class PowerupTile : BreakableBrickTile {
                 return true;
             }
 
-            if (player.State > Enums.PowerupState.Small)
+            if (player.State > Enums.PowerupState.MiniMushroom)
                 spawnResult = PrefabList.Instance.Powerup_FireFlower;
         }
 

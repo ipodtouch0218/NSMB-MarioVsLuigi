@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   prefab:
-    RawGuidValue: e9dfb7c4606191e418a7f2b88c805e3e
+    RawGuidValue: b7cdc1e59b36b7044ac57ab9187fc91f
   soundEffect: 78
   spawnChance: 0
   losingSpawnBonus: 0
@@ -23,3 +23,5 @@ MonoBehaviour:
   custom: 1
   lives: 1
   reserveSprite: {fileID: 0}
+  statePriority: -1
+  itemPriority: -1

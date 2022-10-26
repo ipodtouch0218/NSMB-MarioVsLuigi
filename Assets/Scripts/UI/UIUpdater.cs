@@ -9,7 +9,8 @@ using Fusion;
 
 public class UIUpdater : MonoBehaviour {
 
-    public static UIUpdater Instance;
+    public static UIUpdater Instance { get; set; }
+
     public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
     public Sprite storedItemNull;
@@ -18,15 +19,6 @@ public class UIUpdater : MonoBehaviour {
     public float pingSample = 0;
 
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
-    private int CurrentPing {
-        get {
-            try {
-                return (int) (Runner.GetPlayerRtt(localPlayer) * 1000f);
-            } catch {
-                return 0;
-            }
-        }
-    }
 
     private Material timerMaterial;
     private GameObject starsParent, coinsParent, livesParent, timerParent;
@@ -42,7 +34,7 @@ public class UIUpdater : MonoBehaviour {
 
         localPlayer = Runner.LocalPlayer;
         character = localPlayer.GetCharacterData(Runner);
-        pingSample = CurrentPing;
+        pingSample = GetCurrentPing();
 
         starsParent = uiStars.transform.parent.gameObject;
         coinsParent = uiCoins.transform.parent.gameObject;
@@ -56,12 +48,13 @@ public class UIUpdater : MonoBehaviour {
 
         foreach (Image bg in backgrounds)
             bg.color = GameManager.Instance.levelUIColor;
+
         itemColor.color = new(GameManager.Instance.levelUIColor.r - 0.2f, GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f, GameManager.Instance.levelUIColor.a);
     }
 
     public void Update() {
 
-        pingSample = Mathf.Lerp(pingSample, CurrentPing, Mathf.Clamp01(Time.unscaledDeltaTime));
+        pingSample = Mathf.Lerp(pingSample, GetCurrentPing(), Mathf.Clamp01(Time.unscaledDeltaTime));
         if (pingSample == float.NaN)
             pingSample = 0;
 
@@ -99,7 +92,13 @@ public class UIUpdater : MonoBehaviour {
         if (!player)
             return;
 
-        itemReserve.sprite = player.StoredPowerup.GetPowerupScriptable()?.reserveSprite ?? storedItemNull;
+        Powerup powerup = player.StoredPowerup.GetPowerupScriptable();
+        if (!powerup) {
+            itemReserve.sprite = storedItemNull;
+            return;
+        }
+
+        itemReserve.sprite = powerup.reserveSprite ? powerup.reserveSprite : storedItemNull;
     }
 
     private void UpdateTextUI() {
@@ -156,5 +155,13 @@ public class UIUpdater : MonoBehaviour {
         trackObject.SetActive(true);
 
         return trackObject;
+    }
+
+    private int GetCurrentPing() {
+        try {
+            return (int) (Runner.GetPlayerRtt(localPlayer) * 1000f);
+        } catch {
+            return 0;
+        }
     }
 }

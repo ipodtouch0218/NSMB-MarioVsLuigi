@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
   m_Name: IceFlower
   m_EditorClassIdentifier: 
-  state: 5
+  state: 4
   prefab:
-    RawGuidValue: 7fcd129d47a9505458544e2045bb0b57
+    RawGuidValue: 1c0c7582045793f42b2983b08068485f
   soundEffect: 16
   spawnChance: 0.5
   losingSpawnBonus: 1.5

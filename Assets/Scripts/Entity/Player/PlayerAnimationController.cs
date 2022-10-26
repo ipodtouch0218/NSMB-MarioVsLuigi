@@ -64,6 +64,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         rotChangeTarget = models.transform.rotation.eulerAngles;
 
+        Debug.Log(Object.InputAuthority + " = " + Runner.LocalPlayer + " ? " + Object.HasInputAuthority);
         enableGlow = !Object.HasInputAuthority;
         GlowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
     }

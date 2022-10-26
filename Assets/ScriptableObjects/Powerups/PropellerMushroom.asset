@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea796f302b1a91d478efc94e21899d8d, type: 3}
   m_Name: PropellerMushroom
   m_EditorClassIdentifier: 
-  state: 6
+  state: 5
   prefab:
     RawGuidValue: 467d8d6c11c84374a9f38f758becc536
   soundEffect: 16
