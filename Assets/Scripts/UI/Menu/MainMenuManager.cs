@@ -29,7 +29,7 @@ public class MainMenuManager : MonoBehaviour {
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoom, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, vsyncToggle, privateToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, privateToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
@@ -257,6 +257,7 @@ public class MainMenuManager : MonoBehaviour {
         aspectToggle.isOn = Settings.Instance.fourByThreeRatio;
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
         fireballToggle.isOn = Settings.Instance.fireballFromSprint;
+        autoSprintToggle.isOn = Settings.Instance.autoSprint;
         vsyncToggle.isOn = Settings.Instance.vsync;
         scoreboardToggle.isOn = Settings.Instance.scoreboardAlways;
         filterToggle.isOn = Settings.Instance.filter;

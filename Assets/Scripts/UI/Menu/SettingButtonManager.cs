@@ -35,6 +35,12 @@ public class SettingButtonManager : MonoBehaviour {
         Settings.SaveSettingsToPreferences();
     }
 
+    public void OnAutoSprintToggle(Toggle toggle)
+    {
+        Settings.autoSprint = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
+    }
+
     public void OnScoreboardToggle(Toggle toggle) {
         Settings.scoreboardAlways = toggle.isOn;
         Settings.SaveSettingsToPreferences();
