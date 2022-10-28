@@ -265,7 +265,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         newInput.buttons.Set(PlayerControls.Up, joystick.y > 0.25f);
         newInput.buttons.Set(PlayerControls.Down, joystick.y < -0.25f);
         newInput.buttons.Set(PlayerControls.Jump, jump);
-        newInput.buttons.Set(PlayerControls.Sprint, sprint);
+        newInput.buttons.Set(PlayerControls.Sprint, sprint || Settings.Instance.autoSprint);
         newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
         newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprint && Settings.Instance.fireballFromSprint);
 

@@ -30,7 +30,7 @@ public class Settings : Singleton<Settings> {
 
     public string nickname;
     public byte character, skin;
-    public bool ndsResolution = false, fireballFromSprint = true, vsync = false, fourByThreeRatio = false;
+    public bool ndsResolution = false, fireballFromSprint = true, autoSprint = false, vsync = false, fourByThreeRatio = false;
     public bool scoreboardAlways = false, filter = true;
 
     public void Awake() {
@@ -52,6 +52,7 @@ public class Settings : Singleton<Settings> {
         VolumeMaster = PlayerPrefs.GetFloat("volumeMaster", 1);
         ndsResolution = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
         fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
+        autoSprint = PlayerPrefs.GetInt("AutoSprint", 0) == 1;
         vsync = PlayerPrefs.GetInt("VSync", 0) == 1;
         fourByThreeRatio = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
         scoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
@@ -67,6 +68,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetFloat("volumeMaster", VolumeMaster);
         PlayerPrefs.SetInt("NDSResolution", ndsResolution ? 1 : 0);
         PlayerPrefs.SetInt("FireballFromSprint", fireballFromSprint ? 1 : 0);
+        PlayerPrefs.SetInt("AutoSprint", autoSprint ? 1 : 0);
         PlayerPrefs.SetInt("VSync", vsync ? 1 : 0);
         PlayerPrefs.SetInt("NDS4by3", fourByThreeRatio ? 1 : 0);
         PlayerPrefs.SetInt("ScoreboardAlwaysVisible", scoreboardAlways ? 1 : 0);
