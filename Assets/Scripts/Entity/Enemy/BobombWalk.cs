@@ -192,7 +192,7 @@ public class BobombWalk : HoldableEntity {
         } else {
             if (Lit) {
                 if (!Holder) {
-                    if (player.CanPickup()) {
+                    if (player.CanPickupItem) {
                         Pickup(player);
                     } else {
                         Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);

@@ -76,7 +76,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
     public override bool IsCarryable => true;
     public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
-    private Rigidbody2D Body => networkRigidbody.Rigidbody;
+    public bool CanPickupItem => State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && !IsDoubleJump && !IsTripleJump && !IsGroundpounding;
+
 
     //---Components
     private BoxCollider2D[] hitboxes;
@@ -99,7 +100,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private float jumpBufferTime;
     private float leftGroundTime;
 
-    private float? groundpoundBufferTime;
+    private bool groundpoundHeld;
+    private float groundpoundBufferTime;
 
 
     public bool previousOnGround, crushGround, jumping, properJump, hitRoof, bounce, groundpoundLastFrame, hitBlock, functionallyRunning, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding;
@@ -2317,17 +2319,22 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         bool jumpHeld = heldButtons.IsSet(PlayerControls.Jump);
         bool powerup =  heldButtons.IsSet(PlayerControls.PowerupAction);
 
-        if (pressedButtons.IsSet(PlayerControls.Jump))
+        if (pressedButtons.IsSet(PlayerControls.Jump)) {
             jumpBufferTime = Runner.SimulationTime + 0.15f;
+            Debug.Log("jump start " + Runner.Tick);
+        }
 
         if (pressedButtons.IsSet(PlayerControls.Down)) {
             groundpoundBufferTime = Runner.SimulationTime + 0.08f;
-        } else if (!heldButtons.IsSet(PlayerControls.Down)) {
-            groundpoundBufferTime = null;
+            groundpoundHeld = true;
+            Debug.Log("groundpound hold start " + Runner.Tick);
+        } else if (!heldButtons.IsSet(PlayerControls.Down) && groundpoundHeld) {
+            groundpoundHeld = false;
+            Debug.Log("groundpound release " + Runner.Tick);
         }
 
         bool doJump = (jumpBufferTime >= Runner.SimulationTime) && (IsOnGround || (leftGroundTime >= Runner.SimulationTime - 0.07f) || WallSlideLeft || WallSlideRight);
-        bool doGroundpound = groundpoundBufferTime.HasValue && groundpoundBufferTime < Runner.SimulationTime;
+        bool doGroundpound = groundpoundHeld && groundpoundBufferTime < Runner.SimulationTime;
 
         //Pipes
         if (pipeTimer <= 0) {
@@ -2452,8 +2459,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         HandleSlopes();
 
-        if (doGroundpound && !IsGroundpounding && !alreadyGroundpounded)
+        if (doGroundpound && !IsGroundpounding && !alreadyGroundpounded) {
+            Debug.Log("groundpound start " + Runner.Tick);
             HandleGroundpoundStart(left, right);
+        }
 
         HandleGroundpound();
 
@@ -2705,10 +2714,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 CameraController.ScreenShake = 0.35f;
             }
         }
-    }
-
-    public bool CanPickup() {
-        return State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && !IsDoubleJump && !IsTripleJump && !IsGroundpounding;
     }
 
     public void OnDrawGizmos() {

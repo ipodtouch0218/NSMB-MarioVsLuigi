@@ -223,11 +223,9 @@ public class FrozenCube : HoldableEntity {
             player.DoKnockback(body.position.x > player.body.position.x, 1, false, 0);
             Kill();
         }
-        if (FrozenEntity.IsCarryable && !Holder && !IsDead) {
-            if (player.CanPickup() && player.IsOnGround) {
-                fallen = true;
-                Pickup(player);
-            }
+        if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround) {
+            fallen = true;
+            Pickup(player);
         }
     }
 

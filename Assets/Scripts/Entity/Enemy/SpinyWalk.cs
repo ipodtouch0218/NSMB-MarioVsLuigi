@@ -32,7 +32,7 @@ public class SpinyWalk : KoopaWalk {
             if (IsInShell) {
                 if (IsActuallyStationary) {
                     //we aren't moving. check for kicks & pickups
-                    if (player.CanPickup()) {
+                    if (player.CanPickupItem) {
                         //pickup-able
                         Pickup(player);
                     } else {
