@@ -73,7 +73,7 @@ public class StarBouncer : CollectableEntity {
             StartCoroutine(PulseEffect());
 
             //play star spawn sfx, only IF
-            if (GameManager.Instance.musicEnabled)
+            if (GameManager.Instance.IsMusicEnabled)
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
 
         } else {

@@ -35,6 +35,7 @@ public class GameManager : NetworkBehaviour {
     [Networked] public TickTimer GameEndTimer { get; set; }
     [Networked, Capacity(10)] private NetworkLinkedList<PlayerController> Players => default;
     [Networked] public int GameStartTick { get; set; } = -1;
+    [Networked] public NetworkBool IsMusicEnabled { get; set; }
 
     //---Serialized Variables
     [SerializeField] private MusicData mainMusic, invincibleMusic, megaMushroomMusic;
@@ -51,7 +52,6 @@ public class GameManager : NetworkBehaviour {
 
     //---Private Variables
     private TickTimer StartMusicTimer { get; set; }
-    public NetworkRNG Random { get; set; }
 
 
     public Canvas nametagCanvas;
@@ -63,7 +63,7 @@ public class GameManager : NetworkBehaviour {
     public PlayerController localPlayer;
 
     public bool paused, loaded, gameover;
-    public bool musicEnabled, hurryUp;
+    private bool hurryUpSoundPlayed;
 
     //---Properties
     public int FirstPlaceStars => players.Where(pl => pl.Lives != 0).Max(pc => pc.Stars);
@@ -71,11 +71,12 @@ public class GameManager : NetworkBehaviour {
     //---Public Variables
     public SingleParticleManager particleManager;
     public List<PlayerController> players = new();
+    public NetworkRNG Random { get; set; }
     public long gameStartTimestamp, gameEndTimestamp;
     public int playerCount = 1;
 
     //---Private Variables
-    private List<GameObject> activeStarSpawns = new();
+    private readonly List<GameObject> activeStarSpawns = new();
     private EnemySpawnpoint[] enemySpawns;
     private FloatingCoin[] coins;
     private GameObject[] starSpawns;
@@ -572,7 +573,7 @@ public class GameManager : NetworkBehaviour {
 
         Random = new(Runner.Simulation.Tick);
 
-        if (musicEnabled)
+        if (IsMusicEnabled)
             HandleMusic();
 
         if (BigStarRespawnTimer.Expired(Runner)) {
@@ -587,7 +588,7 @@ public class GameManager : NetworkBehaviour {
 
         if (StartMusicTimer.Expired(Runner)) {
             StartMusicTimer = TickTimer.None;
-            musicEnabled = true;
+            IsMusicEnabled = true;
             GlobalController.Instance.loadingCanvas.SetActive(false);
         }
 
@@ -602,8 +603,8 @@ public class GameManager : NetworkBehaviour {
 
             int tickrate = Runner.Config.Simulation.TickRate;
             int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
-            if (!hurryUp && remainingTicks < 60 * tickrate) {
-                hurryUp = true;
+            if (!hurryUpSoundPlayed && remainingTicks < 60 * tickrate) {
+                hurryUpSoundPlayed = true;
                 sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
             } else if (remainingTicks < (10 * tickrate)) {
                 //10 second "dings"
@@ -704,7 +705,7 @@ public class GameManager : NetworkBehaviour {
             if (player.IsStarmanInvincible)
                 invincible = true;
 
-            if (hurryUp || (player.Stars + 1f) == LobbyData.Instance.StarRequirement || (player.Lives == 1 && players.Count <= 2))
+            if (hurryUpSoundPlayed || (player.Stars + 1f) == LobbyData.Instance.StarRequirement || (player.Lives == 1 && players.Count <= 2))
                 speedup = true;
         }
 
@@ -726,7 +727,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void Pause() {
-        if (gameover || !musicEnabled)
+        if (gameover || !IsMusicEnabled)
             return;
 
         paused = !paused;

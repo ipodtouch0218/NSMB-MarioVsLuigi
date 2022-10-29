@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-using NSMB.Extensions;
 using Fusion;
+using NSMB.Extensions;
 
 public class PlayerListHandler : MonoBehaviour {
 
@@ -49,7 +49,7 @@ public class PlayerListHandler : MonoBehaviour {
 
     public void AddPlayerEntry(PlayerRef player) {
         PlayerData data = player.GetPlayerData(Runner);
-        if (!data)
+        if (!data || !template)
             return;
 
         if (!playerListEntries.ContainsKey(player)) {

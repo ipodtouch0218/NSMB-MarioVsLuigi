@@ -475,6 +475,9 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void OpenErrorBox(ShutdownReason cause) {
+        if (cause == ShutdownReason.Ok)
+            return;
+
         if (!errorBox.activeSelf)
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
 

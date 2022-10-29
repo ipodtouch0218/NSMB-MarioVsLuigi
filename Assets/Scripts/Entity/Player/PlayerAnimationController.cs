@@ -64,7 +64,6 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         rotChangeTarget = models.transform.rotation.eulerAngles;
 
-        Debug.Log(Object.InputAuthority + " = " + Runner.LocalPlayer + " ? " + Object.HasInputAuthority);
         enableGlow = !Object.HasInputAuthority;
         GlowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
     }
@@ -269,8 +268,9 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("mega", controller.State == Enums.PowerupState.MegaMushroom);
         animator.SetBool("inShell", controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
     }
+
     public void HandleMiscStates() {
-        if (!controller.GiantEndTimer.ExpiredOrNotRunning(Runner)) {
+        if (controller.GiantEndTimer.IsActive(Runner)) {
             transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
         } else {
             transform.localScale = controller.State switch {

@@ -4725,9 +4725,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 125.00001, y: -10}
-  m_SizeDelta: {x: 250.00002, y: 20}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -10}
+  m_SizeDelta: {x: 250, y: 20}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &2998342450094080188
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4781,6 +4781,8 @@ MonoBehaviour:
   nameText: {fileID: 797520857410300177}
   valuesText: {fileID: 6338451756509380755}
   background: {fileID: 7949764034340995915}
+  normalWidth: 230
+  controllerWidth: 250
   target: {fileID: 0}
 --- !u!1 &4870953021787574524
 GameObject:
@@ -5747,7 +5749,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.75}
   m_AnchorMax: {x: 0.25, y: 0.75}
-  m_AnchoredPosition: {x: -250, y: 0}
+  m_AnchoredPosition: {x: -300, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &8406214132052344437
@@ -5784,7 +5786,7 @@ MonoBehaviour:
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 1
+  m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0

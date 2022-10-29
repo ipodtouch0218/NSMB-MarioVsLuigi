@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -9,6 +11,15 @@ using NSMB.Extensions;
 
 namespace NSMB.Utils {
     public class Utils {
+
+        public static async Task WaitWhile(Func<bool> condition, int frequency = 25, int timeout = -1) {
+            var waitTask = Task.Run(async () => {
+                while (condition()) await Task.Delay(frequency);
+            });
+
+            if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
+                throw new TimeoutException();
+        }
 
         public static bool BitTest(long v, int index) {
             return (v & (1 << index)) != 0;
@@ -544,6 +555,8 @@ namespace NSMB.Utils {
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
 
+
+
             int result = -1;
             int count = 0;
             foreach (PlayerRef pl in runner.ActivePlayers.OrderByDescending(pr => pr.RawEncoded)) {
@@ -570,7 +583,7 @@ namespace NSMB.Utils {
 
         public static Color GetRainbowColor(NetworkRunner runner) {
             //four seconds per revolution
-            double time = runner.Simulation.Tick.Raw * 0.25d / runner.Simulation.Config.TickRate;
+            double time = runner.SimulationTime * 0.25d;
             time %= 1;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
         }

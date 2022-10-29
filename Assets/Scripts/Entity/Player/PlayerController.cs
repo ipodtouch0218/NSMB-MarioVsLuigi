@@ -103,6 +103,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private bool groundpoundHeld;
     private float groundpoundBufferTime;
 
+    private bool hasInput;
 
     public bool previousOnGround, crushGround, jumping, properJump, hitRoof, bounce, groundpoundLastFrame, hitBlock, functionallyRunning, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float jumpLandingTimer, landing, pickupTimer, powerupFlash;
@@ -216,10 +217,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         GameManager.Instance.players.Add(this);
     }
 
-    public override void Despawned(NetworkRunner runner, bool hasState) {
-        GameManager.Instance.players.Remove(this);
-    }
-
     public void OnEnable() {
         InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
     }
@@ -235,7 +232,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
         transform.position = body.position = GameManager.Instance.spawnpoint;
 
-        cameraController.IsControllingCamera = Object.HasInputAuthority;
+        //use |= as the spectate manager sets it first
+        cameraController.IsControllingCamera |= Object.HasInputAuthority;
         cameraController.Recenter(body.position);
 
         body.isKinematic = true;
@@ -251,6 +249,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         Lives = LobbyData.Instance.Lives;
         playerId = Runner.GetLocalPlayerData().PlayerId;
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        GameManager.Instance.players.Remove(this);
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) {
@@ -283,7 +285,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public override void FixedUpdateNetwork() {
         //game ended, freeze.
 
-        if (!GameManager.Instance.musicEnabled) {
+        if (!GameManager.Instance.IsMusicEnabled) {
             models.SetActive(false);
             return;
         }
@@ -308,7 +310,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         } else {
 
-            GetInput(out PlayerNetworkInput input);
+            if (!GetInput(out PlayerNetworkInput input)) {
+                //input failed, use previous inputs.
+                input = PreviousInputs;
+            }
 
             NetworkButtons heldButtons = input.buttons;
             NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
@@ -348,11 +353,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     private void CheckForPowerupActions(NetworkButtons pressedButtons) {
         //powerup action button check
+        bool checkSprintButton = State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower;
         if (pressedButtons.IsSet(PlayerControls.PowerupAction)
-            || (pressedButtons.IsSet(PlayerControls.SprintPowerupAction)
-                && (State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower)))
+            || (pressedButtons.IsSet(PlayerControls.SprintPowerupAction) && checkSprintButton)) {
 
             ActivatePowerupAction();
+        }
     }
 
     #region -- COLLISIONS --
@@ -654,7 +660,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
         }
 
-        if (IsDamageable && above) {
+        if (other.IsDamageable && above) {
             //hit them from above
             bounce = !IsGroundpounding && !IsDrilling;
             bool groundpounded = IsGroundpounding || IsDrilling;
@@ -821,7 +827,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (IsOnGround) {
             IsOnGround = false;
-            //body.position += Vector2.up * 0.15f;
+            body.position += Vector2.up * 0.15f;
         }
         usedPropellerThisJump = true;
     }

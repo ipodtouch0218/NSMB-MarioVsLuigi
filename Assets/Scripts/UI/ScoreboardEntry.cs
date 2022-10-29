@@ -3,21 +3,26 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using NSMB.Utils;
 using NSMB.Extensions;
+using NSMB.Utils;
 
 public class ScoreboardEntry : MonoBehaviour {
 
     [SerializeField] private TMP_Text nameText, valuesText;
     [SerializeField] private Image background;
+    [SerializeField] private float normalWidth = 250, controllerWidth = 280;
 
     public PlayerController target;
     private PlayerData data;
 
+    private RectTransform rectTransform;
     private int playerId, currentLives, currentStars;
-    private bool rainbowEnabled;
+    private bool isCameraController, rainbowEnabled;
 
     public void Start() {
+
+        rectTransform = GetComponent<RectTransform>();
+
         if (!target) {
             enabled = false;
             return;
@@ -36,15 +41,25 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public void Update() {
         CheckForTextUpdate();
+        CheckForCameraControl();
 
         if (rainbowEnabled)
             nameText.color = Utils.GetRainbowColor(target.Runner);
     }
 
-    public void CheckForTextUpdate() {
+    private void CheckForCameraControl() {
+        if (!(isCameraController ^ target.cameraController.IsControllingCamera))
+            return;
+
+        isCameraController = target.cameraController.IsControllingCamera;
+        rectTransform.sizeDelta = new(isCameraController ? controllerWidth : normalWidth, rectTransform.sizeDelta.y);
+    }
+
+    private void CheckForTextUpdate() {
         if (!target) {
             // our target lost all lives (or dc'd)
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
+
             return;
         }
         if (target.Lives == currentLives && target.Stars == currentStars)
@@ -57,7 +72,7 @@ public class ScoreboardEntry : MonoBehaviour {
         ScoreboardUpdater.instance.Reposition();
     }
 
-    public void UpdateText() {
+    private void UpdateText() {
         string txt = "";
         if (currentLives >= 0)
             txt += target.data.GetCharacterData().uistring + Utils.GetSymbolString(currentLives.ToString());

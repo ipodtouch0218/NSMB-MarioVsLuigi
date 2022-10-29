@@ -17,6 +17,7 @@ public class PlayerData : NetworkBehaviour {
     [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
     [Networked, Capacity(32)] private string UserId { get; set; }
     [Networked] public sbyte PlayerId { get; set; }
+    [Networked] public sbyte TeamNumber { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
     [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
     [Networked] public NetworkBool IsRoomOwner { get; set; }
@@ -38,6 +39,7 @@ public class PlayerData : NetworkBehaviour {
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
         PlayerId = -1;
+        TeamNumber = -1;
 
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.
@@ -109,8 +111,6 @@ public class PlayerData : NetworkBehaviour {
         DisplayNickname = name;
     }
 
-    #region RPCs
-
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_FinishedLoading() {
         IsLoaded = true;
@@ -152,6 +152,11 @@ public class PlayerData : NetworkBehaviour {
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void Rpc_SetTeamNumber(sbyte team) {
+
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SceneLoaded() {
         //no gamemanager, how can we be loaded???
         if (!GameManager.Instance)
@@ -159,5 +164,4 @@ public class PlayerData : NetworkBehaviour {
 
         IsLoaded = true;
     }
-    #endregion
 }

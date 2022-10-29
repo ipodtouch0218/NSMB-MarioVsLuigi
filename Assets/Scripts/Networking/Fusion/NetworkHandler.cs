@@ -8,8 +8,8 @@ using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
 using Fusion.Photon.Realtime;
-using NSMB.Utils;
 using NSMB.Extensions;
+using NSMB.Utils;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
@@ -196,9 +196,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
         Debug.Log($"[Network] Network Shutdown: {shutdownReason}");
 
-        Instance = null;
-        CreateInstance();
         OnShutdown?.Invoke(runner, shutdownReason);
+        RecreateInstance();
     }
 
     void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) {
@@ -208,26 +207,23 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     #region Unity Callbacks
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    public static void CreateInstance() {
+    public static void RecreateInstance() {
         if (!prefab)
             prefab = (GameObject) Resources.Load("Prefabs/Static/NetworkingHandler");
 
-        Instantiate(prefab);
+        if (Instance)
+            Destroy(Instance.gameObject);
+
+        Instance = Instantiate(prefab).GetComponent<NetworkHandler>();
+        Instance.Initialize();
+        Debug.Log("[Network] NetworkHandler created");
     }
 
-    public void Awake() {
-        if (!InstanceCheck())
-            return;
-
-        Instance = this;
-    }
-
-    public void Start() {
+    public void Initialize() {
+        DontDestroyOnLoad(this);
         runner = GetComponent<NetworkRunner>();
         runner.ProvideInput = true;
         runner.AddCallbacks(this);
-
-        //_ = ConnectToRegion();
     }
     #endregion
 
@@ -297,6 +293,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public static async Task<StartGameResult> JoinRoom(string roomId) {
         //make sure that we're on the right region...
+        string originalRegion = CurrentRegion;
         string targetRegion = Regions[RoomIdValidChars.IndexOf(roomId[0])];
 
         if (CurrentRegion != targetRegion) {
@@ -309,12 +306,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         StartGameResult result = await Runner.StartGame(new() {
             GameMode = GameMode.Client,
             SessionName = roomId,
-            ConnectionToken = Encoding.Unicode.GetBytes(Settings.Instance.nickname)
+            ConnectionToken = Encoding.Unicode.GetBytes(Settings.Instance.nickname),
+            DisableClientSessionCreation = true,
         });
-        Debug.Log(result.ShutdownReason);
+        Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
         if (!result.Ok) {
             OnJoinSessionFailed?.Invoke(Runner, result.ShutdownReason);
             //automatically go back to the lobby.
+            await ConnectToRegion(originalRegion);
         }
 
         return result;

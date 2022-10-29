@@ -343,7 +343,8 @@ public class KoopaWalk : HoldableEntity {
 
         IsStationary = crouch;
         IsInShell = true;
-        WakeupTimer = TickTimer.None;
+        if (!crouch)
+            WakeupTimer = TickTimer.None;
         putdown = crouch;
     }
 }

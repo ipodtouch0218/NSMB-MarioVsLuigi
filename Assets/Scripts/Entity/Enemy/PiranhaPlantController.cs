@@ -33,7 +33,7 @@ public class PiranhaPlantController : KillableEntity {
                 return;
             }
 
-            if (!gm.musicEnabled)
+            if (!gm.IsMusicEnabled)
                 return;
         }
 
