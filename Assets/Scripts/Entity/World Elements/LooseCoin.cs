@@ -23,10 +23,10 @@ public class LooseCoin : Coin {
 
     public override void Awake() {
         base.Awake();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
-        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     public override void Spawned() {

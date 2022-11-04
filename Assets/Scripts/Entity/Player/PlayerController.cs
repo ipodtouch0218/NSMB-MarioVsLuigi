@@ -691,8 +691,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove && IsOnGround && other.IsOnGround && (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed)) {
             //bump
 
-            DoKnockback(other.body.transform.position.x < body.position.x, 1, true, 0);
-            other.DoKnockback(other.body.transform.position.x > body.position.x, 1, true, 0);
+            DoKnockback(other.body.transform.position.x > body.position.x, 1, true, 0);
+            other.DoKnockback(other.body.transform.position.x < body.position.x, 1, true, 0);
         }
     }
 
@@ -1755,6 +1755,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         bool topSpeed = Mathf.Abs(body.velocity.x) >= RunningMaxSpeed;
         if (bounce || (doJump && (IsOnGround || leftGroundTime + 0.07f >= Runner.SimulationTime) && !startedSliding)) {
 
+            //disable koyote time
+            leftGroundTime = 0;
+
             bool canSpecialJump = (doJump || (bounce && jumpHeld)) && properJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && landing < 0.45f && !HeldEntity && !IsTripleJump && !IsCrouching && !IsInShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
             float jumpBoost = 0;
 
@@ -2327,16 +2330,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (pressedButtons.IsSet(PlayerControls.Jump)) {
             jumpBufferTime = Runner.SimulationTime + 0.15f;
-            Debug.Log("jump start " + Runner.Tick);
         }
 
         if (pressedButtons.IsSet(PlayerControls.Down)) {
             groundpoundBufferTime = Runner.SimulationTime + 0.08f;
             groundpoundHeld = true;
-            Debug.Log("groundpound hold start " + Runner.Tick);
         } else if (!heldButtons.IsSet(PlayerControls.Down) && groundpoundHeld) {
             groundpoundHeld = false;
-            Debug.Log("groundpound release " + Runner.Tick);
+        }
+
+        if (groundpoundHeld && (left || right || up)) {
+            //dont groundpound if we're holding another direction
+            groundpoundHeld = false;
         }
 
         bool doJump = (jumpBufferTime >= Runner.SimulationTime) && (IsOnGround || (leftGroundTime >= Runner.SimulationTime - 0.07f) || WallSlideLeft || WallSlideRight);
@@ -2466,7 +2471,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         HandleSlopes();
 
         if (doGroundpound && !IsGroundpounding && !alreadyGroundpounded) {
-            Debug.Log("groundpound start " + Runner.Tick);
             HandleGroundpoundStart(left, right);
         }
 
@@ -2676,7 +2680,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
 
-        if (IsGroundpounding && GroundpoundStartTimer.ExpiredOrNotRunning(Runner)) {
+        if (IsGroundpounding && GroundpoundStartTimer.Expired(Runner)) {
             body.velocity = Vector2.down * groundpoundVelocity;
             GroundpoundStartTimer = TickTimer.None;
         }
@@ -2761,11 +2765,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         Vector2 offset = player.MainHitbox.size * 0.5f;
         changed.LoadOld();
         offset.x *= changed.Behaviour.WallSlideLeft ? -1 : 1;
-        changed.LoadNew();
 
         player.PlaySound(Enums.Sounds.Player_Sound_WallJump);
         player.PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
         player.SpawnParticle(PrefabList.Instance.Particle_Walljump, player.body.position + offset, player.WallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
+
+        changed.LoadNew();
     }
 
     public static void OnDeadChanged(Changed<PlayerController> changed) {

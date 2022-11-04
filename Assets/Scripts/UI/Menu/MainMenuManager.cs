@@ -534,6 +534,9 @@ public class MainMenuManager : MonoBehaviour {
         if (Runner.ActivePlayers.All(ap => ap.GetPlayerData(Runner).IsManualSpectator))
             return;
 
+        //start loading screen
+        GlobalController.Instance.loadingCanvas.SetActive(true);
+
         //do host related stuff
         if (Runner.IsServer) {
             //set starting

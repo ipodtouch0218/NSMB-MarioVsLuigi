@@ -12,6 +12,7 @@ public class TrackIcon : MonoBehaviour {
     private PlayerController playerTarget;
     private Material mat;
     private Image image;
+    private Coroutine flashRoutine;
     private bool changedSprite = false;
 
     public void Start() {
@@ -43,7 +44,7 @@ public class TrackIcon : MonoBehaviour {
                 mat.SetColor("OverlayColor", playerTarget.animationController.GlowColor);
             }
 
-            StartCoroutine(Flash());
+            flashRoutine ??= StartCoroutine(Flash());
             transform.localScale = playerTarget.cameraController.IsControllingCamera ? new(1, -1, 1) : Vector3.one * (2f / 3f);
         } else if (!changedSprite) {
             image.sprite = starSprite;
@@ -67,5 +68,6 @@ public class TrackIcon : MonoBehaviour {
         }
 
         image.enabled = true;
+        flashRoutine = null;
     }
 }

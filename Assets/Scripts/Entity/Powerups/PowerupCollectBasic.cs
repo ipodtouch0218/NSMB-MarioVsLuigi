@@ -39,7 +39,7 @@ public class PowerupCollectBasic : MonoBehaviour, IPowerupCollect {
         player.PropellerLaunchTimer = TickTimer.None;
 
         // dont give us an extra mushroom
-        if (player.previousState == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom)
+        if (player.previousState == Enums.PowerupState.NoPowerup || (player.previousState == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))
             return PowerupReserveResult.NoneButPlaySound;
 
         return PowerupReserveResult.ReserveOldPowerup;

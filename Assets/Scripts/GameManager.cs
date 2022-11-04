@@ -329,6 +329,7 @@ public class GameManager : NetworkBehaviour {
         //Setup respawning tilemap
         originalTilesOrigin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
         originalTiles = tilemap.GetTilesBlock(originalTilesOrigin);
+        tilemap.RefreshAllTiles();
 
         //Find objects in the scene
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
@@ -431,10 +432,11 @@ public class GameManager : NetworkBehaviour {
         if (canvas) {
             canvas.GetComponent<Animator>().SetTrigger(Runner.GetLocalPlayerData().IsCurrentlySpectating ? "spectating" : "loaded");
             //please just dont beep at me :(
-            AudioSource source = canvas.GetComponent<AudioSource>();
-            source.volume = 0;
+            //canvas.GetComponent<AudioListener>().enabled = false;
+            //AudioSource source = canvas.GetComponent<AudioSource>();
+            //source.Stop();
+            //source.volume = 0;
             //source.enabled = false;
-            source.Stop();
             //Destroy(source);
         }
     }
@@ -589,7 +591,7 @@ public class GameManager : NetworkBehaviour {
         if (StartMusicTimer.Expired(Runner)) {
             StartMusicTimer = TickTimer.None;
             IsMusicEnabled = true;
-            GlobalController.Instance.loadingCanvas.SetActive(false);
+            //GlobalController.Instance.loadingCanvas.SetActive(false);
         }
 
         if (GameEndTimer.IsRunning) {

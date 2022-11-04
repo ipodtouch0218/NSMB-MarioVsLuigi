@@ -30,7 +30,7 @@ public class PowerupCollectMegaMushroom : MonoBehaviour, IPowerupCollect {
         player.IsDrilling = false;
         player.IsInShell = false;
         transform.localScale = Vector3.one;
-        Instantiate(PrefabList.Instance.Particle_Giant, transform.position, Quaternion.identity);
+        Instantiate(PrefabList.Instance.Particle_Giant, player.transform.position, Quaternion.identity);
 
         player.PlaySoundEverywhere(powerup.powerupScriptable.soundEffect);
         return PowerupReserveResult.ReserveOldPowerup;

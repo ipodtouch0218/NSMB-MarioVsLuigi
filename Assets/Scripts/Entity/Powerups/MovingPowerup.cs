@@ -148,6 +148,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     public void HandleCollision() {
         physics.UpdateCollisions();
+
         if (physics.hitLeft || physics.hitRight) {
             FacingRight = physics.hitLeft;
             body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
