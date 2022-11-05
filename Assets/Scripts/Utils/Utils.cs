@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -11,15 +9,6 @@ using NSMB.Extensions;
 
 namespace NSMB.Utils {
     public class Utils {
-
-        public static async Task WaitWhile(Func<bool> condition, int frequency = 25, int timeout = -1) {
-            var waitTask = Task.Run(async () => {
-                while (condition()) await Task.Delay(frequency);
-            });
-
-            if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
-                throw new TimeoutException();
-        }
 
         public static bool BitTest(long v, int index) {
             return (v & (1 << index)) != 0;
@@ -44,7 +33,7 @@ namespace NSMB.Utils {
         }
 
         public static bool WrapWorldLocation(ref Vector3 location, GameManager manager = null) {
-            if (manager == null)
+            if (!manager)
                 manager = GameManager.Instance;
 
             if (!manager.loopingLevel)
@@ -61,7 +50,7 @@ namespace NSMB.Utils {
         }
 
         public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {
-            if (manager == null)
+            if (!manager)
                 manager = GameManager.Instance;
 
             if (!manager.loopingLevel)
@@ -126,11 +115,12 @@ namespace NSMB.Utils {
             Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix(tileLocation);
 
             Vector2 halfBox = worldBox * 0.5f;
-            List<Vector2> boxPoints = new();
-            boxPoints.Add(ogWorldLocation + Vector2.up * halfBox + Vector2.right * halfBox); // ++
-            boxPoints.Add(ogWorldLocation + Vector2.up * halfBox + Vector2.left * halfBox); // +-
-            boxPoints.Add(ogWorldLocation + Vector2.down * halfBox + Vector2.left * halfBox); // --
-            boxPoints.Add(ogWorldLocation + Vector2.down * halfBox + Vector2.right * halfBox); // -+
+            List<Vector2> boxPoints = new() {
+                ogWorldLocation + Vector2.up * halfBox + Vector2.right * halfBox,   // ++
+                ogWorldLocation + Vector2.up * halfBox + Vector2.left * halfBox,    // +-
+                ogWorldLocation + Vector2.down * halfBox + Vector2.left * halfBox,  // --
+                ogWorldLocation + Vector2.down * halfBox + Vector2.right * halfBox  // -+
+            };
 
             Sprite sprite = GameManager.Instance.tilemap.GetSprite(tileLocation);
             switch (GetColliderType(tileLocation)) {
@@ -153,14 +143,6 @@ namespace NSMB.Utils {
                         point += Vector2.one * 0.25f;
                         points[j] = point;
                     }
-
-                    for (int j = 0; j < points.Count; j++) {
-                        Debug.DrawLine(points[j], points[(j + 1) % points.Count], Color.white, 10);
-                    }
-                    for (int j = 0; j < boxPoints.Count; j++) {
-                        Debug.DrawLine(boxPoints[j], boxPoints[(j + 1) % boxPoints.Count], Color.blue, 3);
-                    }
-
 
                     if (PolygonsOverlap(points, boxPoints))
                         return true;
@@ -233,7 +215,7 @@ namespace NSMB.Utils {
         // Given three collinear points p, q, r,
         // the function checks if point q lies
         // on line segment 'pr'
-        static bool OnSegment(Vector2 p, Vector2 q, Vector2 r) {
+        private static bool OnSegment(Vector2 p, Vector2 q, Vector2 r) {
             if (q.x <= Mathf.Max(p.x, r.x) &&
                 q.x >= Mathf.Min(p.x, r.x) &&
                 q.y <= Mathf.Max(p.y, r.y) &&
@@ -248,7 +230,7 @@ namespace NSMB.Utils {
         // 0 --> p, q and r are collinear
         // 1 --> Clockwise
         // 2 --> Counterclockwise
-        static float Orientation(Vector2 p, Vector2 q, Vector2 r) {
+        private static float Orientation(Vector2 p, Vector2 q, Vector2 r) {
             float val = (q.y - p.y) * (r.x - q.x) -
                     (q.x - p.x) * (r.y - q.y);
 
@@ -260,7 +242,7 @@ namespace NSMB.Utils {
 
         // The function that returns true if
         // line segment 'p1q1' and 'p2q2' intersect.
-        static bool DoIntersect(Vector2 p1, Vector2 q1,
+        private static bool DoIntersect(Vector2 p1, Vector2 q1,
                                 Vector2 p2, Vector2 q2) {
             // Find the four orientations needed for
             // general and special cases
@@ -305,7 +287,7 @@ namespace NSMB.Utils {
 
         // Returns true if the point p lies
         // inside the polygon[] with n vertices
-        static bool IsInside(List<Vector2> polygon, Vector2 p) {
+        private static bool IsInside(List<Vector2> polygon, Vector2 p) {
             // There must be at least 3 vertices in polygon[]
             if (polygon.Count < 3) {
                 return false;
@@ -554,8 +536,6 @@ namespace NSMB.Utils {
 
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
-
-
 
             int result = -1;
             int count = 0;

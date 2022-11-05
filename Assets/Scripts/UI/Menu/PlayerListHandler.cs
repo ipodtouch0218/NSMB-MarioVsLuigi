@@ -32,6 +32,7 @@ public class PlayerListHandler : MonoBehaviour {
         NetworkHandler.OnPlayerJoined += OnPlayerJoined;
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
     }
+
     public void OnDisable() {
         RemoveAllPlayerEntries();
 

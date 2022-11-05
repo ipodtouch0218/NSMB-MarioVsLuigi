@@ -452,7 +452,7 @@ public class GameManager : NetworkBehaviour {
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
         //Respawn enemies
-        foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
+        foreach (EnemySpawnpoint point in enemySpawns)
             point.AttemptSpawning();
 
         //Start timer

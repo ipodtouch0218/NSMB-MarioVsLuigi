@@ -25,6 +25,7 @@ public class LobbyData : NetworkBehaviour {
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultTimer))]             public int Timer { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool DrawOnTimeUp { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCustomPowerups))]    public NetworkBool CustomPowerups { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool Teams { get; set; }
 
     //---Private Variables
     private Tick lastUpdatedTick;
@@ -54,7 +55,9 @@ public class LobbyData : NetworkBehaviour {
         byte oldLevel = lobby.Level;
         data.LoadNew();
 
-        MainMenuManager.Instance.roomSettingsCallbacks?.UpdateAllSettings(lobby, oldLevel != newLevel);
+        if (MainMenuManager.Instance && MainMenuManager.Instance.roomSettingsCallbacks)
+            MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(lobby, oldLevel != newLevel);
+
         lobby.lastUpdatedTick = currentTick;
     }
 
@@ -100,6 +103,11 @@ public class LobbyData : NetworkBehaviour {
     public void SetCustomPowerups(bool value) {
         CustomPowerups = value;
         UpdateProperty(Enums.NetRoomProperties.CustomPowerups, value ? 1 : 0);
+    }
+
+    public void SetTeams(bool value) {
+        Teams = value;
+        UpdateProperty(Enums.NetRoomProperties.Teams, value ? 1 : 0);
     }
 
     public void SetPrivateRoom(bool value) {

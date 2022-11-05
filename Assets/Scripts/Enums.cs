@@ -160,6 +160,7 @@ public static class Enums {
         public const string CoinRequirement = "Co";
         public const string Lives = "Li";
         public const string Time = "T";
+        public const string Teams = "Ts";
         public const string CustomPowerups = "C";
         public const string GameStarted = "G";
         public const string HostName = "H";

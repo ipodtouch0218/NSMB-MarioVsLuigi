@@ -4,6 +4,8 @@ Shader "TextMeshPro/Sprite"
 	{
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
 		_Color("Tint", Color) = (1,1,1,1)
+		_ColorOffset("Tint Offset", vector) = (0,0,0)
+		_Overlay("Overlay", Color) = (0,0,0,0)
 
 		_StencilComp ("Stencil Comparison", Float) = 8
 		_Stencil ("Stencil ID", Float) = 0
@@ -76,6 +78,8 @@ Shader "TextMeshPro/Sprite"
 
             sampler2D _MainTex;
 			fixed4 _Color;
+			fixed3 _ColorOffset;
+			fixed3 _Overlay;
 			fixed4 _TextureSampleAdd;
 			float4 _ClipRect;
             float4 _MainTex_ST;
@@ -89,13 +93,13 @@ Shader "TextMeshPro/Sprite"
 				OUT.worldPosition = v.vertex;
 				OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
                 OUT.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
-                OUT.color = v.color * _Color;
+                OUT.color = clamp(v.color * (_Color + half4(_ColorOffset.xyz, 0)), 0, 1);
 				return OUT;
 			}
 
 			fixed4 frag(v2f IN) : SV_Target
 			{
-				half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
+				half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color + half4(_Overlay, 0.0);
 
                 #ifdef UNITY_UI_CLIP_RECT
 					color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);

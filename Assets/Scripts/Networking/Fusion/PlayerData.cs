@@ -17,7 +17,7 @@ public class PlayerData : NetworkBehaviour {
     [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
     [Networked, Capacity(32)] private string UserId { get; set; }
     [Networked] public sbyte PlayerId { get; set; }
-    [Networked] public sbyte TeamNumber { get; set; }
+    [Networked] public sbyte Team { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
     [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
     [Networked] public NetworkBool IsRoomOwner { get; set; }
@@ -39,7 +39,7 @@ public class PlayerData : NetworkBehaviour {
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
         PlayerId = -1;
-        TeamNumber = -1;
+        Team = -1;
 
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.
@@ -70,8 +70,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public string GetUserId() {
-        if (cachedUserId == null)
-            cachedUserId = Regex.Replace(UserId.ToString(), "(.{8})(.{4})(.{4})(.{4})(.{12})", "$1-$2-$3-$4-$5");
+        cachedUserId ??= Regex.Replace(UserId.ToString(), "(.{8})(.{4})(.{4})(.{4})(.{12})", "$1-$2-$3-$4-$5");
 
         return cachedUserId;
     }
@@ -151,9 +150,13 @@ public class PlayerData : NetworkBehaviour {
         SkinIndex = index;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.InputAuthority | RpcSources.StateAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetTeamNumber(sbyte team) {
+        //not accepting changes at this time
+        if (Locked)
+            return;
 
+        Team = team;
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]

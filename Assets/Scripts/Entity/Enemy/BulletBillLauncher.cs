@@ -72,7 +72,7 @@ public class BulletBillLauncher : NetworkBehaviour {
     }
 
     private void SpawnBill(Vector2 spawnpoint, bool facingRight) {
-        NetworkObject obj = Runner.Spawn(PrefabList.Instance.BulletBill, spawnpoint, onBeforeSpawned: (runner, obj) => {
+        NetworkObject obj = Runner.Spawn(PrefabList.Instance.Enemy_BulletBill, spawnpoint, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<BulletBillMover>().OnBeforeSpawned(facingRight);
         });
         BulletBillMover bbm = obj.GetComponent<BulletBillMover>();

@@ -12,7 +12,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     [SerializeField] private TMP_InputField starsInputField, coinsInputField, livesInputField, timerInputField;
     [SerializeField] private TMP_Text playersCount;
     [SerializeField] private Slider playersSlider;
-    [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, customPowerupsEnabledToggle;
+    [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle;
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Runner;
@@ -27,6 +27,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         ChangeLevelIndex(data.Level, level);
         ChangeStarRequirement(data.StarRequirement);
         ChangeCoinRequirement(data.CoinRequirement);
+        ChangeTeams(data.Teams);
         ChangeLives(data.Lives);
         ChangeTime(data.Timer);
         ChangeDrawOnTimeUp(data.DrawOnTimeUp);
@@ -177,6 +178,20 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     }
     private void ChangeDrawOnTimeUp(bool value) {
         drawEnabledToggle.SetIsOnWithoutNotify(value);
+    }
+    #endregion
+
+    #region Teams
+    public void SetTeams() {
+        if (!Runner.IsServer)
+            return;
+
+        bool newValue = teamsEnabledToggle.isOn;
+
+        Lobby.SetTeams(newValue);
+    }
+    private void ChangeTeams(bool value) {
+        teamsEnabledToggle.SetIsOnWithoutNotify(value);
     }
     #endregion
 

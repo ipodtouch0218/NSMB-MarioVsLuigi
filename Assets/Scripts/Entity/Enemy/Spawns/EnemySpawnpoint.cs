@@ -11,8 +11,6 @@ public class EnemySpawnpoint : NetworkBehaviour {
     //---Serialized Variables
     [SerializeField] private NetworkPrefabRef prefab;
 
-    //---Private Variables
-
     public virtual bool AttemptSpawning() {
         if (CurrentEntity)
             return false;
@@ -27,6 +25,8 @@ public class EnemySpawnpoint : NetworkBehaviour {
     public void OnDrawGizmos() {
         if (prefab == NetworkPrefabRef.Empty)
             return;
+
+        //TODO: reimplement
 
         //string icon = prefab.;
         //float offset = icon switch {

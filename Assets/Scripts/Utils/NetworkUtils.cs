@@ -20,8 +20,9 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.Lives] = -1,
             [Enums.NetRoomProperties.Time] = -1,
             [Enums.NetRoomProperties.CustomPowerups] = 1,
-            [Enums.NetRoomProperties.MaxPlayers] = 10,
             [Enums.NetRoomProperties.GameStarted] = 0,
+            [Enums.NetRoomProperties.Teams] = 0,
+            [Enums.NetRoomProperties.MaxPlayers] = 10,
             [Enums.NetRoomProperties.HostName] = "noname",
         };
 

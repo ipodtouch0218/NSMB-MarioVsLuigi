@@ -6,14 +6,16 @@ public abstract class Coin : CollectableEntity {
 
     public static void GivePlayerCoin(PlayerController player, Vector3 position) {
         byte newCoins = (byte) (player.Coins + 1);
+        bool item = newCoins >= LobbyData.Instance.CoinRequirement;
 
         if (player.Object.HasStateAuthority)
-            player.Rpc_SpawnCoinEffects(position, newCoins);
+            player.Rpc_SpawnCoinEffects(position, newCoins, item);
 
-        if (newCoins >= LobbyData.Instance.CoinRequirement) {
+        if (item) {
             player.SpawnItem(NetworkPrefabRef.Empty);
             newCoins = 0;
         }
+
         player.Coins = newCoins;
     }
 

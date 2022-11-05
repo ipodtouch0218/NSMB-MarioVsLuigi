@@ -18,7 +18,9 @@ public class PrefabList : ScriptableObject {
     public NetworkPrefabRef Obj_FrozenCube;
 
     //---Enemies
-    public NetworkPrefabRef BulletBill;
+    public NetworkPrefabRef Enemy_GreenKoopa, Enemy_RedKoopa, Enemy_BlueKoopa, Enemy_Spiny;
+    public NetworkPrefabRef Enemy_Goomba, Enemy_Bobomb;
+    public NetworkPrefabRef Enemy_BulletBill;
 
     //---Powerups
     public NetworkPrefabRef Powerup_1Up;
@@ -33,4 +35,5 @@ public class PrefabList : ScriptableObject {
     public GameObject Particle_Respawn;
     public GameObject Particle_FireballWall, Particle_IceballWall;
     public GameObject Particle_Groundpound, Particle_Walljump;
+
 }

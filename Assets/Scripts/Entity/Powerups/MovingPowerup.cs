@@ -173,7 +173,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     public override void InteractWithPlayer(PlayerController player) {
 
         //fixes players hitting multiple colliders at once (propeller)
-        if (!Object.IsValid)
+        if (!Object || !Object.IsValid)
             return;
 
         //don't be collectable if someone already collected us
