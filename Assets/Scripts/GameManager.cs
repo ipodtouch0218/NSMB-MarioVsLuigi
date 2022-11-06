@@ -433,8 +433,8 @@ public class GameManager : NetworkBehaviour {
             canvas.GetComponent<Animator>().SetTrigger(Runner.GetLocalPlayerData().IsCurrentlySpectating ? "spectating" : "loaded");
             //please just dont beep at me :(
             //canvas.GetComponent<AudioListener>().enabled = false;
-            //AudioSource source = canvas.GetComponent<AudioSource>();
-            //source.Stop();
+            AudioSource source = canvas.GetComponent<AudioSource>();
+            source.Stop();
             //source.volume = 0;
             //source.enabled = false;
             //Destroy(source);

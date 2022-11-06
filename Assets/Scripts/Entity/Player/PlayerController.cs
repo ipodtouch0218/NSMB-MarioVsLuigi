@@ -950,7 +950,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_SpawnCoinEffects(Vector3 position, byte coins, bool final) {
         PlaySound(Enums.Sounds.World_Coin_Collect);
-        NumberParticle num = Instantiate(PrefabList.Instance.Particle_CoinNumber, position + Vector3.down * 0.25f, Quaternion.identity).GetComponentInChildren<NumberParticle>();
+        NumberParticle num = Instantiate(PrefabList.Instance.Particle_CoinNumber, position, Quaternion.identity).GetComponentInChildren<NumberParticle>();
         num.ApplyColorAndText(Utils.GetSymbolString(coins.ToString(), Utils.numberSymbols), animationController.GlowColor, final);
     }
 

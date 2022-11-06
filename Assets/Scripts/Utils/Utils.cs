@@ -534,15 +534,32 @@ namespace NSMB.Utils {
             return ret.ToString();
         }
 
+        private static readonly float[] teamHues = {
+            0/360f,     // red
+            120/360f,   // green
+            220/360f,   // blue
+            60/360f,    // yellow
+            300/360f,   // magenta
+        };
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
 
+            PlayerData data = player.GetPlayerData(runner);
+            //prioritize spectator status
+            if (data.IsManualSpectator || data.IsCurrentlySpectating)
+                return spectatorColor;
+
+            //then teams
+            if (LobbyData.Instance.Teams && data.Team >= 0 && data.Team < teamHues.Length)
+                return GetTeamColor(data.Team, s, v);
+
+            //then id based color
             int result = -1;
             int count = 0;
             foreach (PlayerRef pl in runner.ActivePlayers.OrderByDescending(pr => pr.RawEncoded)) {
                 //skip spectators in color calculations
-                PlayerData data = pl.GetPlayerData(runner);
-                if (data.IsManualSpectator || data.IsCurrentlySpectating)
+                PlayerData playerData = pl.GetPlayerData(runner);
+                if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating)
                     continue;
 
                 if (pl == player)
@@ -555,6 +572,13 @@ namespace NSMB.Utils {
                 return spectatorColor;
 
             return Color.HSVToRGB(result / ((float) count + 1), s, v);
+        }
+
+        public static Color GetTeamColor(int team, float s = 1, float v = 1) {
+            if (team < 0 || team >= teamHues.Length)
+                return spectatorColor;
+
+            return Color.HSVToRGB(teamHues[team], s, v);
         }
 
         public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {

@@ -79,6 +79,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
         MainMenuManager.Instance.SetPlayerSkin((byte) buttons.IndexOf(button));
         Close();
     }
+
     public void Open() {
         blocker = Instantiate(blockerTemplate, baseCanvas.transform);
         blocker.SetActive(true);
@@ -86,6 +87,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
         EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
     }
+
     public void Close() {
         Destroy(blocker);
         EventSystem.current.SetSelectedGameObject(gameObject);

@@ -13,6 +13,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     [SerializeField] private TMP_Text playersCount;
     [SerializeField] private Slider playersSlider;
     [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle;
+    [SerializeField] private TeamChooser teamSelectorButton;
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Runner;
@@ -192,6 +193,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     }
     private void ChangeTeams(bool value) {
         teamsEnabledToggle.SetIsOnWithoutNotify(value);
+        teamSelectorButton.SetEnabled(value);
     }
     #endregion
 
