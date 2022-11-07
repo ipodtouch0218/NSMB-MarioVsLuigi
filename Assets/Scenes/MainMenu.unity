@@ -31660,14 +31660,14 @@ MonoBehaviour:
         - m_Target: {fileID: 1983555074}
           m_TargetAssemblyTypeName: ColorChooser, Assembly-CSharp
           m_MethodName: Close
-          m_Mode: 1
+          m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
-            m_BoolArgument: 0
+            m_BoolArgument: 1
           m_CallState: 2
 --- !u!114 &778243030
 MonoBehaviour:
@@ -31716,14 +31716,14 @@ MonoBehaviour:
       - m_Target: {fileID: 1983555074}
         m_TargetAssemblyTypeName: ColorChooser, Assembly-CSharp
         m_MethodName: Close
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &778243031
 MonoBehaviour:
@@ -42849,14 +42849,14 @@ MonoBehaviour:
         - m_Target: {fileID: 1729887819}
           m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
           m_MethodName: Close
-          m_Mode: 1
+          m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
-            m_BoolArgument: 0
+            m_BoolArgument: 1
           m_CallState: 2
 --- !u!114 &957537615
 MonoBehaviour:
@@ -42905,14 +42905,14 @@ MonoBehaviour:
       - m_Target: {fileID: 1729887819}
         m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
         m_MethodName: Close
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &957537616
 MonoBehaviour:
@@ -87488,7 +87488,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.000015258789}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1603668786
@@ -96357,7 +96357,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1141870933}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.5025966
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

@@ -1,9 +1,9 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Utils;
 
-// maybe a better name for the script
 public class FrozenCube : HoldableEntity {
 
     //---Networked Variables
@@ -21,7 +21,6 @@ public class FrozenCube : HoldableEntity {
     private Vector2 entityPositionOffset;
     private int combo;
     private bool fallen;
-
 
     public void OnBeforeSpawned(FreezableEntity entityToFreeze) {
         FrozenEntity = entityToFreeze;

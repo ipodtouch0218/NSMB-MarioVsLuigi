@@ -190,6 +190,9 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         bool newValue = teamsEnabledToggle.isOn;
 
         Lobby.SetTeams(newValue);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
     }
     private void ChangeTeams(bool value) {
         teamsEnabledToggle.SetIsOnWithoutNotify(value);

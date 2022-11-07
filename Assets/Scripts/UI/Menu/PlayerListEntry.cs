@@ -98,7 +98,7 @@ public class PlayerListEntry : MonoBehaviour {
         options.anchoredPosition = new(options.anchoredPosition.x, -options.rect.height);
 
         EventSystem.current.SetSelectedGameObject(firstButton);
-        MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor.GetClip());
+        MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
     }
 
     public void HideDropdown(bool didAction) {
@@ -107,7 +107,7 @@ public class PlayerListEntry : MonoBehaviour {
         background.offsetMin = new(background.offsetMin.x, 0);
         options.anchoredPosition = new(options.anchoredPosition.x, 0);
 
-        MainMenuManager.Instance.sfx.PlayOneShot((didAction ? Enums.Sounds.UI_Decide : Enums.Sounds.UI_Back).GetClip());
+        MainMenuManager.Instance.sfx.PlayOneShot(didAction ? Enums.Sounds.UI_Decide : Enums.Sounds.UI_Back);
     }
 
     public void BanPlayer() {

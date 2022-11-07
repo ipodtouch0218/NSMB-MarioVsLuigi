@@ -3,7 +3,7 @@
 using Fusion;
 using NSMB.Utils;
 
-public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable /*, IPredictedSpawnBehaviour, IPredictedDespawnBehaviour */ {
+public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
     //---Networked Variables
     [Networked] public NetworkBool BreakOnImpact { get; set; }
@@ -11,6 +11,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---Public Variables
     public GameObject wallHitParticle;
+    public bool isIceball;
 
     //---Serialized Variables
     [SerializeField] private ParticleSystem particles;
@@ -18,10 +19,10 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     [SerializeField] private float speed = 3f;
 #pragma warning restore CS0414
     [SerializeField] private float bounceHeight = 4.5f, terminalVelocity = 6.25f;
-    [SerializeField] public bool isIceball;
 
     //---Private Variables
     private PhysicsEntity physics;
+    private readonly Collider2D[] collisions = new Collider2D[16];
 
     public override void Awake() {
         base.Awake();
@@ -91,7 +92,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         return true;
     }
 
-    private readonly Collider2D[] collisions = new Collider2D[16];
     public bool CheckForEntityCollision() {
 
         int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + physics.currentCollider.offset, ((BoxCollider2D) physics.currentCollider).size, 0, default, collisions);

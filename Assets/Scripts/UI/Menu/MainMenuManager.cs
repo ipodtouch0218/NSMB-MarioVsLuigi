@@ -59,6 +59,8 @@ public class MainMenuManager : MonoBehaviour {
 
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
 
+    private Coroutine playerUpdateRoutine;
+
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
@@ -140,7 +142,7 @@ public class MainMenuManager : MonoBehaviour {
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         chat.AddChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
-        sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
     }
 
     // CONNECTION CALLBACKS
@@ -297,14 +299,14 @@ public class MainMenuManager : MonoBehaviour {
         yield return null; //wait a frame because reasons
         if (waitingForJoinMessage.Remove(player)) {
             chat.AddChatMessage(player.GetPlayerData(Runner).GetNickname() + " joined the room", Color.red);
-            sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
         }
 
         playerList.AddPlayerEntry(player);
     }
 
     private IEnumerator UpdateUsernames() {
-        while (Runner.SessionInfo?.IsValid ?? false) {
+        while (true) {
             yield return new WaitForSecondsRealtime(2f);
             playerList.UpdateAllPlayerEntries();
         }
@@ -318,13 +320,16 @@ public class MainMenuManager : MonoBehaviour {
             return;
         }
 
-        StartCoroutine(UpdateUsernames());
+        if (playerUpdateRoutine != null)
+            StopCoroutine(playerUpdateRoutine);
+
+        playerUpdateRoutine = StartCoroutine(UpdateUsernames());
         StartCoroutine(SetScroll());
 
         PlayerData data = Runner.GetLocalPlayerData();
-        characterDropdown.SetValueWithoutNotify(data?.CharacterIndex ?? Settings.Instance.character);
-        SetPlayerSkin(data?.SkinIndex ?? Settings.Instance.skin);
-        spectateToggle.isOn = data?.IsManualSpectator ?? false;
+        characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.character);
+        SetPlayerSkin(data ? data.SkinIndex : Settings.Instance.skin);
+        spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
         OpenInLobbyMenu();
 
@@ -479,7 +484,7 @@ public class MainMenuManager : MonoBehaviour {
             return;
 
         if (!errorBox.activeSelf)
-            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_Error);
 
         errorBox.SetActive(true);
         errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
@@ -488,7 +493,7 @@ public class MainMenuManager : MonoBehaviour {
 
     public void OpenErrorBox(string text) {
         if (!errorBox.activeSelf)
-            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_Error);
 
         errorBox.SetActive(true);
         errorText.text = text;
@@ -496,11 +501,11 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void BackSound() {
-        sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_Back);
     }
 
     public void ConfirmSound() {
-        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide);
     }
 
     public void ConnectToDropdownRegion() {
@@ -524,6 +529,11 @@ public class MainMenuManager : MonoBehaviour {
     public async void QuitRoom() {
         OpenLobbyMenu();
         ClearChat();
+
+        if (playerUpdateRoutine != null) {
+            StopCoroutine(playerUpdateRoutine);
+            playerUpdateRoutine = null;
+        }
 
         await NetworkHandler.ConnectToRegion();
         GlobalController.Instance.DiscordController.UpdateActivity();
@@ -819,7 +829,7 @@ public class MainMenuManager : MonoBehaviour {
         Settings.Instance.SaveSettingsToPreferences();
 
         CharacterData data = GlobalController.Instance.characters[dropdown.value];
-        sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
+        sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected, data);
         colorManager.ChangeCharacter(data);
 
         byte skin = LocalData.SkinIndex;

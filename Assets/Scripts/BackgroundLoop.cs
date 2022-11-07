@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
+using NSMB.Extensions;
+
 public class BackgroundLoop : MonoBehaviour {
 
     public static BackgroundLoop Instance { get; private set; }

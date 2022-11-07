@@ -379,7 +379,7 @@ namespace NSMB.Utils {
             GameManager gm = GameManager.Instance;
 
             // "losing" variable based on ln(x+1), x being the # of stars we're behind
-            int ourStars = player.Stars;
+            int ourStars = gm.GetTeamStars(players);
             int leaderStars = gm.FirstPlaceStars;
 
             int starsToWin = LobbyData.Instance.StarRequirement;

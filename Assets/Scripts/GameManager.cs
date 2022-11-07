@@ -66,12 +66,12 @@ public class GameManager : NetworkBehaviour {
     private bool hurryUpSoundPlayed;
 
     //---Properties
-    public int FirstPlaceStars => players.Where(pl => pl.Lives != 0).Max(pc => pc.Stars);
+    public NetworkRNG Random { get; set; }
 
     //---Public Variables
     public SingleParticleManager particleManager;
+    public TeamManager teamManager = new();
     public List<PlayerController> players = new();
-    public NetworkRNG Random { get; set; }
     public long gameStartTimestamp, gameEndTimestamp;
     public int playerCount = 1;
 
@@ -432,12 +432,8 @@ public class GameManager : NetworkBehaviour {
         if (canvas) {
             canvas.GetComponent<Animator>().SetTrigger(Runner.GetLocalPlayerData().IsCurrentlySpectating ? "spectating" : "loaded");
             //please just dont beep at me :(
-            //canvas.GetComponent<AudioListener>().enabled = false;
             AudioSource source = canvas.GetComponent<AudioSource>();
             source.Stop();
-            //source.volume = 0;
-            //source.enabled = false;
-            //Destroy(source);
         }
     }
 
@@ -449,7 +445,7 @@ public class GameManager : NetworkBehaviour {
 
         //Play start sfx
         if (Runner.IsForward)
-            sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
 
         //Respawn enemies
         foreach (EnemySpawnpoint point in enemySpawns)
@@ -500,11 +496,11 @@ public class GameManager : NetworkBehaviour {
         secondsUntilMenu = draw ? 5 : 4;
 
         if (draw)
-            music.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
+            music.PlayOneShot(Enums.Sounds.UI_Match_Draw);
         else if (win)
-            music.PlayOneShot(Enums.Sounds.UI_Match_Win.GetClip());
+            music.PlayOneShot(Enums.Sounds.UI_Match_Win);
         else
-            music.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
+            music.PlayOneShot(Enums.Sounds.UI_Match_Lose);
 
         //TOOD: make a results screen?
 
@@ -591,31 +587,34 @@ public class GameManager : NetworkBehaviour {
         if (StartMusicTimer.Expired(Runner)) {
             StartMusicTimer = TickTimer.None;
             IsMusicEnabled = true;
-            //GlobalController.Instance.loadingCanvas.SetActive(false);
+            GlobalController.Instance.loadingCanvas.SetActive(false);
         }
 
         if (GameEndTimer.IsRunning) {
             if (GameEndTimer.Expired(Runner)) {
                 CheckForWinner();
 
-                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+                //time end sfx
+                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
                 GameEndTimer = TickTimer.None;
                 return;
             }
 
             int tickrate = Runner.Config.Simulation.TickRate;
             int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
+
             if (!hurryUpSoundPlayed && remainingTicks < 60 * tickrate) {
+                //60 second warning
                 hurryUpSoundPlayed = true;
-                sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
+                sfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
             } else if (remainingTicks < (10 * tickrate)) {
                 //10 second "dings"
                 if (remainingTicks % tickrate == 0)
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
 
                 //at 3 seconds, double speed
                 if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0.GetClip());
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
             }
         }
     }
@@ -733,7 +732,7 @@ public class GameManager : NetworkBehaviour {
             return;
 
         paused = !paused;
-        sfx.PlayOneShot(Enums.Sounds.UI_Pause.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_Pause);
         pauseUI.SetActive(paused);
         pausePanel.SetActive(true);
         hostExitUI.SetActive(false);
@@ -743,7 +742,7 @@ public class GameManager : NetworkBehaviour {
     public void AttemptQuit() {
 
         if (Runner.IsServer) {
-            sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_Decide);
             pausePanel.SetActive(false);
             hostExitUI.SetActive(true);
             EventSystem.current.SetSelectedGameObject(hostExitButton);
@@ -755,12 +754,12 @@ public class GameManager : NetworkBehaviour {
 
     public void HostEndMatch() {
         pauseUI.SetActive(false);
-        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         Rpc_EndGame(PlayerRef.None);
     }
 
     public void Quit() {
-        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         Runner.Shutdown();
         SceneManager.LoadScene("MainMenu");
     }
@@ -768,7 +767,7 @@ public class GameManager : NetworkBehaviour {
     public void HostQuitCancel() {
         pausePanel.SetActive(true);
         hostExitUI.SetActive(false);
-        sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_Back);
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 

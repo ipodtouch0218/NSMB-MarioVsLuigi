@@ -2,6 +2,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Utils;
 
 public class StarBouncer : CollectableEntity {
@@ -74,7 +75,7 @@ public class StarBouncer : CollectableEntity {
 
             //play star spawn sfx, only IF
             if (GameManager.Instance.IsMusicEnabled)
-                GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn.GetClip());
+                GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
 
         } else {
             //player dropped star

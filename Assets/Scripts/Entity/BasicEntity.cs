@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
 
 public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
@@ -33,7 +34,7 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
             brickBreakSound = true;
         }
 
-        sfx.PlayOneShot(sound.GetClip(character, variant), volume);
+        sfx.PlayOneShot(sound, character, variant, volume);
     }
 
     //---IBlockBumpable overrides

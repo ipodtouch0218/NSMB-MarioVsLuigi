@@ -31,7 +31,6 @@ public class SpectationManager : MonoBehaviour {
             if (value != null) {
                 UpdateSpectateUI();
                 value.cameraController.IsControllingCamera = true;
-                Debug.Log(value.cameraController.IsControllingCamera);
             }
         }
     }

@@ -77,7 +77,10 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
     public void SelectColor(Button button) {
         selected = buttons.IndexOf(button);
         MainMenuManager.Instance.SetPlayerSkin((byte) buttons.IndexOf(button));
-        Close();
+        Close(false);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);
     }
 
     public void Open() {
@@ -86,11 +89,17 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
         content.SetActive(true);
 
         EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
     }
 
-    public void Close() {
+    public void Close(bool playSound) {
         Destroy(blocker);
         EventSystem.current.SetSelectedGameObject(gameObject);
         content.SetActive(false);
+
+        if (playSound && MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Back);
     }
 }

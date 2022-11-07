@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -23,8 +22,13 @@ public class TeamChooser : MonoBehaviour {
         normalIcon.SetActive(value);
         disabledIcon.SetActive(!value);
 
-        if (!value)
-            Close();
+        if (value) {
+            PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
+            int selected = data.Team;
+            flagColor.color = Utils.GetTeamColor(selected);
+        } else {
+            Close(true);
+        }
     }
 
     public void SelectTeam(TeamButton team) {
@@ -32,8 +36,11 @@ public class TeamChooser : MonoBehaviour {
         int selected = team.index;
 
         data.Rpc_SetTeamNumber((sbyte) selected);
-        Close();
+        Close(false);
         flagColor.color = Utils.GetTeamColor(selected);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);
     }
 
     public void Open() {
@@ -47,14 +54,20 @@ public class TeamChooser : MonoBehaviour {
             button.OnDeselect(null);
 
         EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
     }
 
-    public void Close() {
+    public void Close(bool playSound) {
         if (!blocker)
             return;
 
         Destroy(blocker);
         EventSystem.current.SetSelectedGameObject(gameObject);
         content.SetActive(false);
+
+        if (playSound && MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Back);
     }
 }

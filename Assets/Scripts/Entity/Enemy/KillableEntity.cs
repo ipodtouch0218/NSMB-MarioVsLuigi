@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Utils;
 
 public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFireballInteractable {
@@ -113,7 +114,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     public void PlaySound(Enums.Sounds sound) {
-        audioSource.PlayOneShot(sound.GetClip());
+        audioSource.PlayOneShot(sound);
     }
 
     //---IPlayerInteractable overrides

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -8,6 +9,7 @@ public static class Enums {
     public enum PowerupState : byte {
         NoPowerup, MiniMushroom, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
+
     public static Powerup GetPowerupScriptable(this PowerupState state) {
         if (state == PowerupState.NoPowerup)
             return null;
@@ -15,21 +17,20 @@ public static class Enums {
         return GlobalController.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
     }
 
-
     #region ANIMATION & MUSIC
     // Animation enums
     public enum PlayerEyeState {
         Normal, HalfBlink, FullBlink, Death
     }
+
     // Music Enums
     public enum MusicState {
         Normal, MegaMushroom, Starman
     }
+
     //Sound effects
     public enum Sounds : byte {
-
-        //CURRENT MAX: 94
-
+        //CURRENT HIGHEST NUMBER: 94
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
         [SoundData("enemy/freeze_shatter")]                     Enemy_Generic_FreezeShatter = 1,
@@ -174,15 +175,27 @@ public class SoundData : Attribute {
         Sound = sound;
     }
 }
+
 public static class SoundDataExtensions {
+
+    private readonly static Dictionary<string, AudioClip> cachedClips = new();
+
     public static AudioClip GetClip(this Enums.Sounds sound, CharacterData player = null, int variant = 0) {
-        SoundData data = GetSoundDataFromSound(sound);
+        SoundData data = GetClipString(sound);
         string name = "Sound/" + data.Sound + (variant > 0 ? "_" + variant : "");
+
         if (player != null)
             name = name.Replace("{char}", player.soundFolder);
-        return Resources.Load(name) as AudioClip;
+
+        if (cachedClips.ContainsKey(name))
+            return cachedClips[name];
+
+        AudioClip clip = Resources.Load(name) as AudioClip;
+        cachedClips[name] = clip;
+        return clip;
     }
-    private static SoundData GetSoundDataFromSound(Enums.Sounds sound) {
+
+    private static SoundData GetClipString(Enums.Sounds sound) {
         return sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>();
     }
 }

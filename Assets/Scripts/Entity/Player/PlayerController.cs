@@ -1174,7 +1174,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     #region -- SOUNDS / PARTICLES --
     public void PlaySoundEverywhere(Enums.Sounds sound) {
-        GameManager.Instance.sfx.PlayOneShot(sound.GetClip(character));
+        GameManager.Instance.sfx.PlayOneShot(sound, character);
     }
     public void PlaySound(Enums.Sounds sound, byte variant = 0, float volume = 1) {
         if (sound == Enums.Sounds.Powerup_MegaMushroom_Break_Block) {
