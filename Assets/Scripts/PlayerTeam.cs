@@ -13,17 +13,29 @@ public class TeamManager {
         team.Add(player);
     }
 
+    public HashSet<PlayerController> GetTeamMembers(int team) {
+        if (teams.TryGetValue(team, out HashSet<PlayerController> teamMembers))
+            return teamMembers;
+
+        return null;
+    }
+
     public int GetTeamStars(int teamIndex) {
         if (!teams.TryGetValue(teamIndex, out HashSet<PlayerController> team))
             return 0;
 
         int stars = 0;
+        bool hasAtLeastOnePlayer = false;
         foreach (PlayerController player in team) {
             if (!player || player.Lives == 0)
                 continue;
 
             stars += player.Stars;
+            hasAtLeastOnePlayer = true;
         }
+
+        if (!hasAtLeastOnePlayer)
+            return -1;
 
         return stars;
     }
@@ -39,19 +51,33 @@ public class TeamManager {
         return max;
     }
 
-    public bool HasFirstPlaceTeam(out int teamIndex) {
-        int max = 0;
+    public bool HasFirstPlaceTeam(out int teamIndex, out int stars) {
+        stars = 0;
         teamIndex = -1;
         foreach ((int index, var team) in teams) {
             int count = GetTeamStars(index);
 
-            if (count > max) {
-                max = count;
+            if (count > stars) {
+                stars = count;
                 teamIndex = index;
-            } else if (count == max) {
+            } else if (count == stars) {
                 teamIndex = -1;
             }
         }
         return teamIndex != -1;
+    }
+
+    public int GetAliveTeamCount() {
+        int count = 0;
+        foreach ((int index, var team) in teams) {
+            foreach (PlayerController player in team) {
+                if (!player || player.Lives == 0)
+                    continue;
+
+                count++;
+                break;
+            }
+        }
+        return count;
     }
 }

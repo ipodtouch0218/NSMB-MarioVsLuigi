@@ -413,10 +413,10 @@ public class GameManager : NetworkBehaviour {
 
     //TODO: invokeresim?
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_EndGame(PlayerRef winner) {
+    public void Rpc_EndGame(int team) {
 
         //TODO: don't use a coroutine.
-        StartCoroutine(EndGame(winner));
+        StartCoroutine(EndGame(team));
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -473,7 +473,8 @@ public class GameManager : NetworkBehaviour {
         StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
     }
 
-    private IEnumerator EndGame(PlayerRef winner) {
+    private static readonly string[] teams = { "Red Team", "Green Team", "Blue Team", "Yellow Team", "Magenta Team" };
+    private IEnumerator EndGame(int winningTeam) {
         //TODO:
         //PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
@@ -481,7 +482,17 @@ public class GameManager : NetworkBehaviour {
 
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != PlayerRef.None ? winner.GetPlayerData(Runner).GetNickname() + " Wins!" : "It's a draw...";
+        TMP_Text tmpText = text.GetComponent<TMP_Text>();
+
+        if (winningTeam == -1) {
+            tmpText.text = "It's a draw...";
+        } else {
+            if (LobbyData.Instance.Teams) {
+                tmpText.text = teams[winningTeam] + " Wins!";
+            } else {
+                tmpText.text = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname() + " Wins!";
+            }
+        }
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
@@ -490,10 +501,9 @@ public class GameManager : NetworkBehaviour {
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
 
-        bool win = winner != null && winner == Runner.LocalPlayer;
-        bool draw = winner == PlayerRef.None;
-        int secondsUntilMenu;
-        secondsUntilMenu = draw ? 5 : 4;
+        bool draw = winningTeam == -1;
+        bool win = !draw && winningTeam == Runner.GetLocalPlayerData().Team;
+        int secondsUntilMenu = draw ? 5 : 4;
 
         if (draw)
             music.PlayOneShot(Enums.Sounds.UI_Match_Draw);
@@ -503,7 +513,6 @@ public class GameManager : NetworkBehaviour {
             music.PlayOneShot(Enums.Sounds.UI_Match_Lose);
 
         //TOOD: make a results screen?
-
 
         if (Runner.IsServer) {
             //handle player states
@@ -629,57 +638,43 @@ public class GameManager : NetworkBehaviour {
         if (gameover || !Runner.IsServer)
             return;
 
-        bool starGame = LobbyData.Instance.StarRequirement != -1;
+        int requiredStars = LobbyData.Instance.StarRequirement;
+        bool starGame = requiredStars != -1;
+
+        bool hasFirstPlace = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
+        int aliveTeams = teamManager.GetAliveTeamCount();
         bool timeUp = GameEndTimer.Expired(Runner);
-        int winningStars = -1;
-        List<PlayerController> winningPlayers = new();
-        List<PlayerController> alivePlayers = new();
-        foreach (var player in players) {
-            if (player == null || player.Lives == 0)
-                continue;
 
-            alivePlayers.Add(player);
-
-            if ((starGame && player.Stars >= LobbyData.Instance.StarRequirement) || timeUp) {
-                //we're in a state where this player would win.
-                //check if someone has more stars
-                if (player.Stars > winningStars) {
-                    winningPlayers.Clear();
-                    winningStars = player.Stars;
-                    winningPlayers.Add(player);
-                } else if (player.Stars == winningStars) {
-                    winningPlayers.Add(player);
-                }
-            }
-        }
-        //LIVES CHECKS
-        if (alivePlayers.Count == 0) {
-            //everyone's dead...? ok then, draw?
+        if (aliveTeams == 0) {
+            //all teams dead, draw?
             Rpc_EndGame(PlayerRef.None);
             return;
-        } else if (alivePlayers.Count == 1 && playerCount >= 2) {
-            //one player left alive (and not in a solo game). winner!
-            Rpc_EndGame(alivePlayers[0].Object.InputAuthority);
+        }
+
+        if (aliveTeams == 1 && playerCount > 1) {
+            //one team left alive (and it's not a solo game), they win.
+            Rpc_EndGame(firstPlaceTeam);
             return;
         }
 
-        //TIMED CHECKS
-        if (timeUp) {
-            //time up! check who has most stars, if a tie keep playing, if draw is on end game in a draw
-            if (LobbyData.Instance.DrawOnTimeUp) {
-                // it's a draw! Thanks for playing the demo!
-                Rpc_EndGame(PlayerRef.None);
-            } else if (winningPlayers.Count == 1) {
-                Rpc_EndGame(winningPlayers[0].Object.InputAuthority);
+        if (hasFirstPlace) {
+            //we have a team that's clearly in first...
+            if (starGame && firstPlaceStars >= requiredStars) {
+                //and they have enough stars.
+                Rpc_EndGame(firstPlaceTeam);
+                return;
             }
-            //keep plaing
-            return;
+            //they don't have enough stars. wait 'till later
         }
 
-        if (starGame && winningStars >= LobbyData.Instance.StarRequirement) {
-            if (winningPlayers.Count == 1)
-                Rpc_EndGame(winningPlayers[0].Object.InputAuthority);
-
+        if (timeUp) {
+            //ran out of time, instantly end if DrawOnTimeUp is set
+            if (LobbyData.Instance.DrawOnTimeUp) {
+                //no one wins
+                Rpc_EndGame(PlayerRef.None);
+                return;
+            }
+            //keep playing
         }
     }
 

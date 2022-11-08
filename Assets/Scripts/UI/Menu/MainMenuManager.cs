@@ -538,18 +538,20 @@ public class MainMenuManager : MonoBehaviour {
         await NetworkHandler.ConnectToRegion();
         GlobalController.Instance.DiscordController.UpdateActivity();
     }
+
     public void StartGame() {
 
         //don't start if everyone's a spectator
         if (Runner.ActivePlayers.All(ap => ap.GetPlayerData(Runner).IsManualSpectator))
             return;
 
-        //start loading screen
-        GlobalController.Instance.loadingCanvas.SetActive(true);
-
         //do host related stuff
         if (Runner.IsServer) {
             //set starting
+
+            bool teamMode = LobbyData.Instance.Teams;
+            bool hasTwoTeams = false;
+            int teamOne = -1;
 
             //set spectating values for players
             sbyte count = 0;
@@ -560,14 +562,40 @@ public class MainMenuManager : MonoBehaviour {
                     continue;
 
                 data.IsCurrentlySpectating = data.IsManualSpectator;
-                data.PlayerId = data.IsCurrentlySpectating ? (sbyte) -1 : count++;
+                if (data.IsCurrentlySpectating) {
+                    data.PlayerId = -1;
+                    data.Team = -1;
+                } else {
+                    data.PlayerId = count;
+                    if (!teamMode) {
+                        data.Team = count;
+                    } else if (data.Team == -1) {
+                        data.Team = 0;
+                    }
+
+                    if (!hasTwoTeams) {
+                        if (teamOne == -1)
+                            teamOne = data.Team;
+                        else if (teamOne != data.Team)
+                            hasTwoTeams = true;
+                    }
+
+                    count++;
+                }
             }
+
+            //don't start if there's only one team (if not singleplayer)
+            if (teamMode && !hasTwoTeams && count != 1)
+                return;
 
             LobbyData.Instance.SetGameStarted(true);
 
             //load the correct scene
             Runner.SetActiveScene(LobbyData.Instance.Level + 1);
         }
+
+        //start loading screen
+        GlobalController.Instance.loadingCanvas.SetActive(true);
     }
 
     public void SelectRoom(GameObject room) {

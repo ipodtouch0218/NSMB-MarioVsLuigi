@@ -249,6 +249,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         Lives = LobbyData.Instance.Lives;
         playerId = Runner.GetLocalPlayerData().PlayerId;
+
+        GameManager.Instance.teamManager.AddPlayer(this);
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
