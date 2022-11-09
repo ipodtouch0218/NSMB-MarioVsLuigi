@@ -15,7 +15,7 @@ public class TeamChooser : MonoBehaviour {
     [SerializeField] private Image flagColor;
 
     //---Private Variables
-    private GameObject blocker;
+    private GameObject blockerInstance;
 
     public void SetEnabled(bool value) {
         button.interactable = value;
@@ -23,8 +23,7 @@ public class TeamChooser : MonoBehaviour {
         disabledIcon.SetActive(!value);
 
         if (value) {
-            PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
-            int selected = data.Team;
+            int selected = NetworkHandler.Runner.GetLocalPlayerData().Team % 5;
             flagColor.color = Utils.GetTeamColor(selected);
         } else {
             Close(true);
@@ -32,9 +31,9 @@ public class TeamChooser : MonoBehaviour {
     }
 
     public void SelectTeam(TeamButton team) {
-        PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
         int selected = team.index;
 
+        PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
         data.Rpc_SetTeamNumber((sbyte) selected);
         Close(false);
         flagColor.color = Utils.GetTeamColor(selected);
@@ -46,8 +45,8 @@ public class TeamChooser : MonoBehaviour {
     public void Open() {
         PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
         int selected = Mathf.Clamp(data.Team, 0, 4);
-        blocker = Instantiate(blockerTemplate, baseCanvas.transform);
-        blocker.SetActive(true);
+        blockerInstance = Instantiate(blockerTemplate, baseCanvas.transform);
+        blockerInstance.SetActive(true);
         content.SetActive(true);
 
         foreach (TeamButton button in buttons)
@@ -60,10 +59,10 @@ public class TeamChooser : MonoBehaviour {
     }
 
     public void Close(bool playSound) {
-        if (!blocker)
+        if (!blockerInstance)
             return;
 
-        Destroy(blocker);
+        Destroy(blockerInstance);
         EventSystem.current.SetSelectedGameObject(gameObject);
         content.SetActive(false);
 

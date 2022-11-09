@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -520,8 +520,7 @@ namespace NSMB.Utils {
             ['9'] = 47,
         };
         public static string GetSymbolString(string str, Dictionary<char, byte> dict = null) {
-            if (dict == null)
-                dict = uiSymbols;
+            dict ??= uiSymbols;
 
             StringBuilder ret = new();
             foreach (char c in str) {

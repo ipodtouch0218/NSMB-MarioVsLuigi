@@ -17,8 +17,8 @@ public class PlayerData : NetworkBehaviour {
     [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
     [Networked, Capacity(32)] private string UserId { get; set; }
     [Networked] public sbyte PlayerId { get; set; }
-    [Networked(OnChanged = nameof(OnSettingChanged))] public sbyte Team { get; set; }
-    [Networked(OnChanged = nameof(OnSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
+    [Networked(OnChanged = nameof(OnStartSettingChanged))] public sbyte Team { get; set; }
+    [Networked(OnChanged = nameof(OnStartSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
     [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
     [Networked] public NetworkBool IsRoomOwner { get; set; }
     [Networked(OnChanged = nameof(OnLoadStateChanged))] public NetworkBool IsLoaded { get; set; }
@@ -26,6 +26,10 @@ public class PlayerData : NetworkBehaviour {
     [Networked] public TickTimer MessageCooldownTimer { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))] public byte CharacterIndex { get; set; }
     [Networked] public byte SkinIndex { get; set; }
+    [Networked(OnChanged = nameof(OnSettingChanged))] public int Ping { get; set; }
+
+
+    private Tick lastUpdatedTick;
 
     //---Misc Variables
     private string cachedUserId = null;
@@ -39,6 +43,7 @@ public class PlayerData : NetworkBehaviour {
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
         PlayerId = -1;
+        Team = (sbyte) ((Object.InputAuthority + 1) % 5);
 
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.
@@ -74,25 +79,12 @@ public class PlayerData : NetworkBehaviour {
         return cachedUserId;
     }
 
-    public static void OnLoadStateChanged(Changed<PlayerData> changed) {
-        if (GameManager.Instance)
-            GameManager.Instance.OnPlayerLoaded();
-    }
-
-    public static void OnSettingChanged(Changed<PlayerData> changed) {
-        MainMenuManager.Instance.playerList.UpdatePlayerEntry(changed.Behaviour.Object.InputAuthority);
-    }
-
-    public static void OnNameChanged(Changed<PlayerData> changed) {
-        changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.Nickname + ")";
-    }
-
     public void SetNickname(string name) {
         //limit nickname to valid characters only.
         name = Regex.Replace(name, @"[^\p{L}\d]", "");
 
         //enforce character limits
-        name = name.Substring(0, Mathf.Min(name.Length, MainMenuManager.NICKNAME_MAX));
+        name = name[..Mathf.Min(name.Length, MainMenuManager.NICKNAME_MAX)];
 
         //if this new nickname is invalid, default back to "noname"
         if (name.Length < MainMenuManager.NICKNAME_MIN)
@@ -149,10 +141,13 @@ public class PlayerData : NetworkBehaviour {
         SkinIndex = index;
     }
 
-    [Rpc(RpcSources.InputAuthority | RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetTeamNumber(sbyte team) {
         //not accepting changes at this time
         if (Locked)
+            return;
+
+        if (team < 0 || team > 4)
             return;
 
         Team = team;
@@ -165,5 +160,35 @@ public class PlayerData : NetworkBehaviour {
             return;
 
         IsLoaded = true;
+    }
+
+    public static void OnLoadStateChanged(Changed<PlayerData> changed) {
+        if (GameManager.Instance)
+            GameManager.Instance.OnPlayerLoaded();
+    }
+
+    public static void OnSettingChanged(Changed<PlayerData> changed) {
+        if (!MainMenuManager.Instance)
+            return;
+
+        if (changed.Behaviour.lastUpdatedTick >= changed.Behaviour.Runner.Tick) {
+            return;
+        } else {
+            changed.Behaviour.lastUpdatedTick = changed.Behaviour.Runner.Tick;
+        }
+
+        MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
+    }
+
+    public static void OnStartSettingChanged(Changed<PlayerData> changed) {
+        if (!MainMenuManager.Instance)
+            return;
+
+        MainMenuManager.Instance.UpdateStartGameButton();
+        OnSettingChanged(changed);
+    }
+
+    public static void OnNameChanged(Changed<PlayerData> changed) {
+        changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.Nickname + ")";
     }
 }

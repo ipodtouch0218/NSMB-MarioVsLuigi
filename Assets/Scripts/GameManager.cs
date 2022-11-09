@@ -524,6 +524,9 @@ public class GameManager : NetworkBehaviour {
 
                 //disable spectating
                 data.IsCurrentlySpectating = false;
+
+                //move non-teams into valid teams range
+                data.Team = (sbyte) ((data.Object.InputAuthority + 1) % 5);
             }
         }
 
@@ -695,16 +698,11 @@ public class GameManager : NetworkBehaviour {
             if (!player)
                 continue;
 
-            if (player.State == Enums.PowerupState.MegaMushroom && player.GiantStartTimer.ExpiredOrNotRunning(Runner))
-                mega = true;
-
-            if (player.IsStarmanInvincible)
-                invincible = true;
-
-            if (hurryUpSoundPlayed || (player.Stars + 1f) == LobbyData.Instance.StarRequirement || (player.Lives == 1 && players.Count <= 2))
-                speedup = true;
+            mega |= player.State == Enums.PowerupState.MegaMushroom && player.GiantStartTimer.ExpiredOrNotRunning(Runner);
+            invincible |= player.IsStarmanInvincible;
         }
 
+        speedup |= teamManager.GetFirstPlaceStars() + 1 >= LobbyData.Instance.StarRequirement;
         speedup |= players.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
 
         if (mega) {
@@ -797,13 +795,14 @@ public class GameManager : NetworkBehaviour {
         if (players == 0)
             players = 1;
 
+        Debug.Log($"getting spawn, playerindex: {playerIndex}, players: {players}");
+
         float comp = (float) playerIndex/players * 2 * Mathf.PI + (Mathf.PI/2f) + (Mathf.PI/(2*players));
         float scale = (2-(players+1f)/players) * size;
+
         Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2 ? scale * ySize : 0), 0);
-        if (spawn.x < GetLevelMinX())
-            spawn += new Vector3(levelWidthTile/2f, 0);
-        if (spawn.x > GetLevelMaxX())
-            spawn -= new Vector3(levelWidthTile/2f, 0);
+        Utils.WrapWorldLocation(ref spawn);
+
         return spawn;
     }
 
@@ -828,9 +827,9 @@ public class GameManager : NetworkBehaviour {
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(origin, size);
 
-
         if (!tilemap)
             return;
+
         for (int x = 0; x < levelWidthTile; x++) {
             for (int y = 0; y < levelHeightTile; y++) {
                 Vector3Int loc = new(x+levelMinTileX, y+levelMinTileY, 0);

@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using Fusion.Sockets;
 
 public class MainMenuManager : MonoBehaviour {
 
@@ -42,11 +42,12 @@ public class MainMenuManager : MonoBehaviour {
     public string connectThroughSecret = "";
     public bool askedToJoin;
 
-    //---Serialize Fields
+    //---Serialized Fields
     [SerializeField] public PlayerListHandler playerList;
     [SerializeField] private ColorChooser colorManager;
     [SerializeField] public ChatManager chat;
     [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
+    [SerializeField] private CanvasGroup hostControlsGroup;
 
     public Image overallColor, shirtColor;
     public GameObject palette, paletteDisabled;
@@ -139,10 +140,12 @@ public class MainMenuManager : MonoBehaviour {
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
         waitingForJoinMessage.Add(player);
+        UpdateStartGameButton();
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         chat.AddChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
+        UpdateStartGameButton();
     }
 
     // CONNECTION CALLBACKS
@@ -153,15 +156,25 @@ public class MainMenuManager : MonoBehaviour {
 
         selectedRoom = null;
         if (!runner.IsCloudReady) {
-
             foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
                 Destroy(value);
                 currentRooms.Remove(key);
             }
-
         }
     }
 
+    public void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
+
+        OpenErrorBox(cause);
+
+        selectedRoom = null;
+        if (!runner.IsCloudReady) {
+            foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
+                Destroy(value);
+                currentRooms.Remove(key);
+            }
+        }
+    }
 
     //public void OnRegionListReceived(RegionHandler handler) {
     //    handler.PingMinimumOfRegions((handler) => {
@@ -273,6 +286,7 @@ public class MainMenuManager : MonoBehaviour {
         NetworkHandler.OnSessionListUpdated += OnSessionListUpdated;
         NetworkHandler.OnShutdown += OnShutdown;
         NetworkHandler.OnJoinSessionFailed += OnShutdown;
+        NetworkHandler.OnConnectFailed += OnConnectFailed;
     }
 
     public void OnDisable() {
@@ -282,6 +296,7 @@ public class MainMenuManager : MonoBehaviour {
         NetworkHandler.OnSessionListUpdated -= OnSessionListUpdated;
         NetworkHandler.OnShutdown -= OnShutdown;
         NetworkHandler.OnJoinSessionFailed -= OnShutdown;
+        NetworkHandler.OnConnectFailed -= OnConnectFailed;
     }
 
     public void Update() {
@@ -305,10 +320,11 @@ public class MainMenuManager : MonoBehaviour {
         playerList.AddPlayerEntry(player);
     }
 
-    private IEnumerator UpdateUsernames() {
+    private IEnumerator UpdatePings() {
         while (true) {
             yield return new WaitForSecondsRealtime(2f);
-            playerList.UpdateAllPlayerEntries();
+            foreach (PlayerRef player in Runner.ActivePlayers)
+                player.GetPlayerData(Runner).Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
         }
     }
 
@@ -320,10 +336,9 @@ public class MainMenuManager : MonoBehaviour {
             return;
         }
 
-        if (playerUpdateRoutine != null)
-            StopCoroutine(playerUpdateRoutine);
-
-        playerUpdateRoutine = StartCoroutine(UpdateUsernames());
+        if (Runner.IsServer)
+            playerUpdateRoutine ??= StartCoroutine(UpdatePings());
+        
         StartCoroutine(SetScroll());
 
         PlayerData data = Runner.GetLocalPlayerData();
@@ -338,13 +353,14 @@ public class MainMenuManager : MonoBehaviour {
 
         SessionInfo session = Runner.SessionInfo;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
-        SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
+        SetText(lobbyText, name.ToValidUsername() + "'s Lobby", true);
 
         //clear text field
         chatTextField.SetTextWithoutNotify("");
 
         GlobalController.Instance.DiscordController.UpdateActivity();
 
+        hostControlsGroup.interactable = data.IsRoomOwner;
         roomSettingsCallbacks.UpdateAllSettings(LobbyData.Instance, false);
     }
 
@@ -479,10 +495,7 @@ public class MainMenuManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(privateSelected);
     }
 
-    public void OpenErrorBox(ShutdownReason cause) {
-        if (cause == ShutdownReason.Ok)
-            return;
-
+    public void OpenErrorBox(Enum cause) {
         if (!errorBox.activeSelf)
             sfx.PlayOneShot(Enums.Sounds.UI_Error);
 
@@ -630,45 +643,46 @@ public class MainMenuManager : MonoBehaviour {
         _ = NetworkHandler.JoinRoom(id);
     }
 
-    public void CreateRoom() {
 
+    public void CreateRoom() {
         Settings.Instance.nickname = nicknameField.text;
-        byte players = (byte) lobbyPlayersSlider.value;
+        byte maxPlayers = (byte) lobbyPlayersSlider.value;
 
         _ = NetworkHandler.CreateRoom(new() {
-            IsVisible = !privateToggle.isOn,
-        });
+            IsVisible = !privateToggle.isOn
+        }, players: maxPlayers);
 
         createLobbyPrompt.SetActive(false);
-        //ChangeMaxPlayers(players);
     }
+
     public void ClearChat() {
-        for (int i = 0; i < chatContent.transform.childCount; i++) {
-            GameObject chatMsg = chatContent.transform.GetChild(i).gameObject;
-            if (!chatMsg.activeSelf)
-                continue;
-            Destroy(chatMsg);
-        }
+        for (int i = 1; i < chatContent.transform.childCount; i++)
+            Destroy(chatContent.transform.GetChild(i).gameObject);
     }
 
-    //public void UpdateSettingEnableStates() {
-    //    NetworkRunner runner = NetworkHandler.Instance.runner;
-    //    bool host = runner.IsServer;
+    public void UpdateStartGameButton() {
+        if (!Runner.GetLocalPlayerData().IsRoomOwner) {
+            startGameBtn.interactable = false;
+            return;
+        }
 
-    //    foreach (Selectable s in roomSettings)
-    //        s.interactable = host;
+        IEnumerable<PlayerData> datas = Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner));
+        bool validRoomConfig = true;
 
-    //    livesField.interactable = host && livesEnabled.isOn;
-    //    timeField.interactable = host && timeEnabled.isOn;
-    //    drawTimeupToggle.interactable = host && timeEnabled.isOn;
+        //only do checks if there's more than one player
+        if (datas.Count() > 1 || !LobbyData.Instance.PrivateRoom) {
 
-    //    //TODO: add to array
-    //    privateToggleRoom.interactable = host;
+            int realPlayers = datas.Where(pd => !pd.IsManualSpectator).Count();
+            validRoomConfig &= realPlayers > 1;
 
-    //    int realPlayers = NetworkHandler.Instance.runner.ActivePlayers.Where(pl => !pl.GetPlayerData(runner).IsManualSpectator).Count();
-    //    startGameBtn.interactable = host && realPlayers >= 1;
-    //}
+            if (LobbyData.Instance.Teams) {
+                int teams = datas.Where(pd => !pd.IsManualSpectator).Select(pd => pd.Team).Distinct().Count();
+                validRoomConfig &= teams > 1;
+            }
+        }
 
+        startGameBtn.interactable = validRoomConfig;
+    }
 
     public void Kick(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;

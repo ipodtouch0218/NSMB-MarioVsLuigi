@@ -4,8 +4,8 @@ using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
-using NSMB.Utils;
 using NSMB.Extensions;
+using NSMB.Utils;
 
 public class PlayerListEntry : MonoBehaviour {
 
@@ -39,15 +39,14 @@ public class PlayerListEntry : MonoBehaviour {
 
         colorStrip.color = Utils.GetPlayerColor(runner, player);
 
-        //TODO: use a signed player id
-        //enabled = player.HasRainbowName();
+        enabled = player.HasRainbowName();
 
         string permissionSymbol = "";
         if (data.IsRoomOwner) {
             permissionSymbol += "<sprite=5>";
             pingText.text = "";
         } else {
-            int ping = (int) (runner.GetPlayerRtt(player) * 1000);
+            int ping = data.Ping;
             string pingColor;
             if (ping < 0) {
                 pingColor = "black";

@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Utils;
 
 public class RoomSettingsCallbacks : MonoBehaviour {
@@ -19,20 +22,23 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private NetworkRunner Runner => NetworkHandler.Runner;
     private LobbyData Lobby => LobbyData.Instance;
 
-    public void UpdateAllSettings(LobbyData data, bool level) {
-        if (!data.Object.IsValid)
+    public void UpdateAllSettings(LobbyData lobbyData, bool level) {
+        if (!lobbyData.Object.IsValid)
             return;
 
-        ChangePrivate(data.PrivateRoom);
-        ChangeMaxPlayers(data.MaxPlayers);
-        ChangeLevelIndex(data.Level, level);
-        ChangeStarRequirement(data.StarRequirement);
-        ChangeCoinRequirement(data.CoinRequirement);
-        ChangeTeams(data.Teams);
-        ChangeLives(data.Lives);
-        ChangeTime(data.Timer);
-        ChangeDrawOnTimeUp(data.DrawOnTimeUp);
-        ChangeCustomPowerups(data.CustomPowerups);
+        ChangePrivate(lobbyData.PrivateRoom);
+        ChangeMaxPlayers(lobbyData.MaxPlayers);
+        ChangeLevelIndex(lobbyData.Level, level);
+        ChangeStarRequirement(lobbyData.StarRequirement);
+        ChangeCoinRequirement(lobbyData.CoinRequirement);
+        ChangeTeams(lobbyData.Teams);
+        ChangeLives(lobbyData.Lives);
+        ChangeTime(lobbyData.Timer);
+        ChangeDrawOnTimeUp(lobbyData.DrawOnTimeUp);
+        ChangeCustomPowerups(lobbyData.CustomPowerups);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.UpdateStartGameButton();
     }
 
     #region Level Index
@@ -158,6 +164,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private void ChangeTime(int time) {
         timerEnabledToggle.SetIsOnWithoutNotify(time != -1);
         timerInputField.interactable = time != -1;
+        drawEnabledToggle.interactable = time != -1;
 
         if (time == -1)
             return;
