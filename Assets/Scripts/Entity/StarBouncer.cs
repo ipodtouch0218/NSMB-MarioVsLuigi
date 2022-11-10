@@ -212,7 +212,8 @@ public class StarBouncer : CollectableEntity {
     public override void OnCollectedChanged() {
         //play fx
         graphicTransform.gameObject.SetActive(false);
-        Collector.PlaySoundEverywhere(Collector.Object.HasInputAuthority ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
+        bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team;
+        Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
         Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
     }
 

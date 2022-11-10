@@ -44,17 +44,16 @@ namespace NSMB.Extensions {
         public static PlayerData GetLocalPlayerData(this NetworkRunner runner) {
             try {
                 return runner.LocalPlayer.GetPlayerData(runner);
-            } catch {
-                return null;
-            }
+            } catch {}
+            return null;
         }
 
         public static CharacterData GetCharacterData(this PlayerRef player, NetworkRunner runner) {
-            return player.GetPlayerData(runner)?.GetCharacterData() ?? GlobalController.Instance.characters[0];
+            return player.GetPlayerData(runner).GetCharacterData();
         }
 
         public static CharacterData GetCharacterData(this PlayerData data) {
-            return GlobalController.Instance.characters[data?.CharacterIndex ?? Settings.Instance.character];
+            return GlobalController.Instance.characters[data ? data.CharacterIndex : Settings.Instance.character];
         }
     }
 }

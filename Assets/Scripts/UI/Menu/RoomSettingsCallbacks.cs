@@ -255,7 +255,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
         bool newValue = privateEnabledToggle.isOn;
 
-        Runner.SessionInfo.IsVisible = !newValue;
+        Lobby.SetPrivateRoom(newValue);
     }
     private void ChangePrivate(bool value) {
         privateEnabledToggle.SetIsOnWithoutNotify(value);

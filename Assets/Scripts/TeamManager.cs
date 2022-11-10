@@ -2,7 +2,12 @@ using System.Collections.Generic;
 
 public class TeamManager {
 
+    public delegate void OnTeamsFinalizedDelegate(TeamManager manager);
+    public static event OnTeamsFinalizedDelegate OnTeamsFinalized;
+
+    //---Private Variables
     private readonly Dictionary<int, HashSet<PlayerController>> teams = new();
+
 
     public void AddPlayer(PlayerController player) {
         sbyte teamid = player.data.Team;
@@ -11,6 +16,17 @@ public class TeamManager {
             teams[teamid] = team = new();
 
         team.Add(player);
+
+        if (GetTotalPlayers() == GameManager.Instance.AlivePlayers.Count)
+            OnTeamsFinalized?.Invoke(this);
+    }
+
+    public int GetTotalPlayers() {
+        int count = 0;
+        foreach (HashSet<PlayerController> team in teams.Values)
+            count += team.Count;
+
+        return count;
     }
 
     public HashSet<PlayerController> GetTeamMembers(int team) {
@@ -18,6 +34,10 @@ public class TeamManager {
             return teamMembers;
 
         return null;
+    }
+
+    public IEnumerable<int> GetValidTeams() {
+        return teams.Keys;
     }
 
     public int GetTeamStars(int teamIndex) {

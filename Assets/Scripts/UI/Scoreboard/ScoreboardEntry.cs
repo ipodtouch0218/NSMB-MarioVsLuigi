@@ -8,13 +8,16 @@ using NSMB.Utils;
 
 public class ScoreboardEntry : MonoBehaviour {
 
+    //---Serialized Variables
     [SerializeField] private TMP_Text nameText, valuesText;
     [SerializeField] private Image background;
     [SerializeField] private float normalWidth = 250, controllerWidth = 280;
 
+    //---Public Variables
     public PlayerController target;
-    private PlayerData data;
 
+    //---Private Variables
+    private PlayerData data;
     private RectTransform rectTransform;
     private int playerId, currentLives, currentStars;
     private bool isCameraController, rainbowEnabled;
@@ -59,9 +62,9 @@ public class ScoreboardEntry : MonoBehaviour {
         if (!target) {
             // our target lost all lives (or dc'd)
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
-
             return;
         }
+
         if (target.Lives == currentLives && target.Stars == currentStars)
             // No changes.
             return;
@@ -69,7 +72,7 @@ public class ScoreboardEntry : MonoBehaviour {
         currentLives = target.Lives;
         currentStars = target.Stars;
         UpdateText();
-        ScoreboardUpdater.instance.Reposition();
+        ScoreboardUpdater.Instance.Reposition();
     }
 
     private void UpdateText() {

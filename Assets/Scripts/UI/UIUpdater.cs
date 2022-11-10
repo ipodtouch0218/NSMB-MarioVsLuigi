@@ -1,11 +1,11 @@
-using NSMB.Utils;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-using NSMB.Extensions;
 using Fusion;
+using NSMB.Extensions;
+using NSMB.Utils;
 
 public class UIUpdater : MonoBehaviour {
 
@@ -14,33 +14,40 @@ public class UIUpdater : MonoBehaviour {
     public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
     public Sprite storedItemNull;
-    public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
+    public TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     public Image itemReserve, itemColor;
     public float pingSample = 0;
 
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
 
     private Material timerMaterial;
-    private GameObject starsParent, coinsParent, livesParent, timerParent;
+    private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
     private readonly List<Image> backgrounds = new();
     private bool uiHidden;
 
     private PlayerRef localPlayer;
     private CharacterData character;
-    private int coins = -1, stars = -1, lives = -1, timer = -1;
+    private int coins = -1, teamStars = -1, stars = -1, lives = -1, timer = -1;
+
+    private TeamManager teamManager;
+    private bool teams;
 
     public void Start() {
         Instance = this;
+        teams = LobbyData.Instance.Teams;
+        teamManager = GameManager.Instance.teamManager;
 
         localPlayer = Runner.LocalPlayer;
         character = localPlayer.GetCharacterData(Runner);
         pingSample = GetCurrentPing();
 
+        teamsParent = uiTeamStars.transform.parent.gameObject;
         starsParent = uiStars.transform.parent.gameObject;
         coinsParent = uiCoins.transform.parent.gameObject;
         livesParent = uiLives.transform.parent.gameObject;
         timerParent = uiCountdown.transform.parent.gameObject;
 
+        backgrounds.Add(teamsParent.GetComponentInChildren<Image>());
         backgrounds.Add(starsParent.GetComponentInChildren<Image>());
         backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
@@ -50,6 +57,8 @@ public class UIUpdater : MonoBehaviour {
             bg.color = GameManager.Instance.levelUIColor;
 
         itemColor.color = new(GameManager.Instance.levelUIColor.r - 0.2f, GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f, GameManager.Instance.levelUIColor.a);
+
+        teamsParent.SetActive(teams);
     }
 
     public void Update() {
@@ -82,6 +91,7 @@ public class UIUpdater : MonoBehaviour {
     private void ToggleUI(bool hidden) {
         uiHidden = hidden;
 
+        teamsParent.SetActive(!hidden && teams);
         starsParent.SetActive(!hidden);
         livesParent.SetActive(!hidden);
         coinsParent.SetActive(!hidden);
@@ -105,9 +115,18 @@ public class UIUpdater : MonoBehaviour {
         if (!player || GameManager.Instance.gameover)
             return;
 
+        if (teams) {
+            int team = player.data.Team;
+            teamStars = teamManager.GetTeamStars(team);
+            uiTeamStars.text = Utils.teamSprites[team] + Utils.GetSymbolString("x" + stars + "/" + LobbyData.Instance.StarRequirement);
+        }
         if (player.Stars != stars) {
             stars = player.Stars;
-            uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + LobbyData.Instance.StarRequirement);
+            string starString = "Sx" + stars;
+            if (!teams)
+                starString += "/" + LobbyData.Instance.StarRequirement;
+
+            uiStars.text = Utils.GetSymbolString(starString);
         }
         if (player.Coins != coins) {
             coins = player.Coins;

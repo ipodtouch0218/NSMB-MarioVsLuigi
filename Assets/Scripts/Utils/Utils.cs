@@ -573,6 +573,14 @@ namespace NSMB.Utils {
             return Color.HSVToRGB(result / ((float) count + 1), s, v);
         }
 
+        public static readonly string[] teamSprites = {
+            "<sprite=50>",  //red
+            "<sprite=51>",  //green
+            "<sprite=52>",  //blue
+            "<sprite=53>",  //yellow
+            "<sprite=54>"   //magenta
+        };
+
         public static Color GetTeamColor(int team, float s = 1, float v = 1) {
             if (team < 0 || team >= teamHues.Length)
                 return spectatorColor;

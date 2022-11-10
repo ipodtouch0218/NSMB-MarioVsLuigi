@@ -33,8 +33,9 @@ public class GameManager : NetworkBehaviour {
     [Networked] private TickTimer BigStarRespawnTimer { get; set; }
     [Networked] public TickTimer GameStartTimer { get; set; }
     [Networked] public TickTimer GameEndTimer { get; set; }
-    [Networked, Capacity(10)] private NetworkLinkedList<PlayerController> Players => default;
+    [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
     [Networked] public int GameStartTick { get; set; } = -1;
+    [Networked] public int RealPlayerCount { get; set; }
     [Networked] public NetworkBool IsMusicEnabled { get; set; }
 
     //---Serialized Variables
@@ -48,7 +49,6 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] public Tilemap tilemap;
     [SerializeField] public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
-
 
     //---Private Variables
     private TickTimer StartMusicTimer { get; set; }
@@ -71,9 +71,7 @@ public class GameManager : NetworkBehaviour {
     //---Public Variables
     public SingleParticleManager particleManager;
     public TeamManager teamManager = new();
-    public List<PlayerController> players = new();
     public long gameStartTimestamp, gameEndTimestamp;
-    public int playerCount = 1;
 
     //---Private Variables
     private readonly List<GameObject> activeStarSpawns = new();
@@ -339,11 +337,12 @@ public class GameManager : NetworkBehaviour {
         //create player instances
         if (Runner.IsServer) {
             foreach (PlayerRef player in Runner.ActivePlayers) {
-                CharacterData character = player.GetCharacterData(Runner);
-                NetworkObject obj = Runner.Spawn(character.prefab, spawnpoint, inputAuthority: player);
-                Players.Add(obj.GetComponent<PlayerController>());
+                PlayerData data = player.GetPlayerData(Runner);
+                if (data.IsCurrentlySpectating)
+                    continue;
 
-                playerCount++;
+                Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player);
+                RealPlayerCount++;
             }
         }
 
@@ -370,7 +369,7 @@ public class GameManager : NetworkBehaviour {
         foreach (EnemySpawnpoint point in enemySpawns)
             point.AttemptSpawning();
 
-        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - playerCount / 5f);
+        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - RealPlayerCount / 5f);
     }
 
     public void OnPlayerLoaded() {
@@ -423,24 +422,17 @@ public class GameManager : NetworkBehaviour {
     private void Rpc_LoadingComplete() {
 
         //Populate scoreboard
-        ScoreboardUpdater.instance.Populate(players);
+        ScoreboardUpdater.Instance.Populate(AlivePlayers);
         if (Settings.Instance.scoreboardAlways)
-            ScoreboardUpdater.instance.SetEnabled();
+            ScoreboardUpdater.Instance.SetEnabled();
 
-        //Finalize loading screen
-        GameObject canvas = GlobalController.Instance.loadingCanvas;
-        if (canvas) {
-            canvas.GetComponent<Animator>().SetTrigger(Runner.GetLocalPlayerData().IsCurrentlySpectating ? "spectating" : "loaded");
-            //please just dont beep at me :(
-            AudioSource source = canvas.GetComponent<AudioSource>();
-            source.Stop();
-        }
+        GlobalController.Instance.loadingCanvas.EndLoading();
     }
 
     private void StartGame() {
 
         //Spawn players
-        foreach (PlayerController player in players)
+        foreach (PlayerController player in AlivePlayers)
             player.PreRespawn();
 
         //Play start sfx
@@ -599,7 +591,6 @@ public class GameManager : NetworkBehaviour {
         if (StartMusicTimer.Expired(Runner)) {
             StartMusicTimer = TickTimer.None;
             IsMusicEnabled = true;
-            GlobalController.Instance.loadingCanvas.SetActive(false);
         }
 
         if (GameEndTimer.IsRunning) {
@@ -654,7 +645,7 @@ public class GameManager : NetworkBehaviour {
             return;
         }
 
-        if (aliveTeams == 1 && playerCount > 1) {
+        if (aliveTeams == 1 && RealPlayerCount > 1) {
             //one team left alive (and it's not a solo game), they win.
             Rpc_EndGame(firstPlaceTeam);
             return;
@@ -694,7 +685,7 @@ public class GameManager : NetworkBehaviour {
         bool mega = false;
         bool speedup = false;
 
-        foreach (var player in players) {
+        foreach (var player in AlivePlayers) {
             if (!player)
                 continue;
 
@@ -703,7 +694,7 @@ public class GameManager : NetworkBehaviour {
         }
 
         speedup |= teamManager.GetFirstPlaceStars() + 1 >= LobbyData.Instance.StarRequirement;
-        speedup |= players.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
+        speedup |= AlivePlayers.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
 
         if (mega) {
             PlaySong(Enums.MusicState.MegaMushroom, megaMushroomMusic);
@@ -791,7 +782,7 @@ public class GameManager : NetworkBehaviour {
     public float size = 1.39f, ySize = 0.8f;
     public Vector3 GetSpawnpoint(int playerIndex, int players = -1) {
         if (players <= -1)
-            players = playerCount;
+            players = RealPlayerCount;
         if (players == 0)
             players = 1;
 

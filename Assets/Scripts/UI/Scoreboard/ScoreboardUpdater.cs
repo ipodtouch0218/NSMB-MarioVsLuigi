@@ -6,20 +6,32 @@ using NSMB.Extensions;
 
 public class ScoreboardUpdater : MonoBehaviour {
 
-    public static ScoreboardUpdater instance;
+    //---Static Variables
+    public static ScoreboardUpdater Instance { get; private set; }
     private static IComparer<ScoreboardEntry> entryComparer;
 
-    [SerializeField] GameObject entryTemplate;
+    //---Serialized Variables
+    [SerializeField] private GameObject entryTemplate, teamsHeader;
 
+    //---Private Variables
     private readonly List<ScoreboardEntry> entries = new();
-    private bool manuallyToggled = false, autoToggled = false;
     private Animator animator;
+    private bool manuallyToggled = false, autoToggled = false;
 
     public void OnEnable() {
         InputSystem.controls.UI.Scoreboard.performed += OnToggle;
     }
+
     public void OnDisable() {
         InputSystem.controls.UI.Scoreboard.performed -= OnToggle;
+    }
+
+    public void Awake() {
+        Instance = this;
+        animator = GetComponent<Animator>();
+        entryComparer ??= new ScoreboardEntry.EntryComparer();
+
+        teamsHeader.SetActive(LobbyData.Instance.Teams);
     }
 
     private void OnToggle(InputAction.CallbackContext context) {
@@ -62,13 +74,6 @@ public class ScoreboardUpdater : MonoBehaviour {
         }
     }
 
-    public void Awake() {
-        instance = this;
-        animator = GetComponent<Animator>();
-        if (entryComparer == null)
-            entryComparer = new ScoreboardEntry.EntryComparer();
-    }
-
     public void Reposition() {
         entries.Sort(entryComparer);
         entries.ForEach(se => se.transform.SetAsLastSibling());
@@ -81,7 +86,7 @@ public class ScoreboardUpdater : MonoBehaviour {
 
             PlayerData data = player.Object.InputAuthority.GetPlayerData(player.Runner);
 
-            GameObject entryObj = Instantiate(entryTemplate, transform);
+            GameObject entryObj = Instantiate(entryTemplate, entryTemplate.transform.parent);
             entryObj.SetActive(true);
             entryObj.name = data.GetNickname();
             ScoreboardEntry entry = entryObj.GetComponent<ScoreboardEntry>();

@@ -331,14 +331,13 @@ public class MainMenuManager : MonoBehaviour {
     public void EnterRoom() {
 
         if (LobbyData.Instance.GameStarted) {
-            //start early, we're joining late.
-            StartGame();
+            OnGameStartChanged();
             return;
         }
 
         if (Runner.IsServer)
             playerUpdateRoutine ??= StartCoroutine(UpdatePings());
-        
+
         StartCoroutine(SetScroll());
 
         PlayerData data = Runner.GetLocalPlayerData();
@@ -552,6 +551,11 @@ public class MainMenuManager : MonoBehaviour {
         GlobalController.Instance.DiscordController.UpdateActivity();
     }
 
+    public void OnGameStartChanged() {
+        if (LobbyData.Instance.GameStarted)
+            GlobalController.Instance.loadingCanvas.Initialize();
+    }
+
     public void StartGame() {
 
         //don't start if everyone's a spectator
@@ -606,9 +610,6 @@ public class MainMenuManager : MonoBehaviour {
             //load the correct scene
             Runner.SetActiveScene(LobbyData.Instance.Level + 1);
         }
-
-        //start loading screen
-        GlobalController.Instance.loadingCanvas.SetActive(true);
     }
 
     public void SelectRoom(GameObject room) {
@@ -620,6 +621,7 @@ public class MainMenuManager : MonoBehaviour {
 
         joinRoomBtn.interactable = room != null && nicknameField.text.Length >= NICKNAME_MIN;
     }
+
     public void JoinSelectedRoom() {
         if (!selectedRoom)
             return;
@@ -661,7 +663,7 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void UpdateStartGameButton() {
-        if (!Runner.GetLocalPlayerData().IsRoomOwner) {
+        if (!Runner.GetLocalPlayerData() || !Runner.GetLocalPlayerData().IsRoomOwner) {
             startGameBtn.interactable = false;
             return;
         }
@@ -669,16 +671,13 @@ public class MainMenuManager : MonoBehaviour {
         IEnumerable<PlayerData> datas = Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner));
         bool validRoomConfig = true;
 
-        //only do checks if there's more than one player
-        if (datas.Count() > 1 || !LobbyData.Instance.PrivateRoom) {
+        int realPlayers = datas.Where(pd => !pd.IsManualSpectator).Count();
+        validRoomConfig &= realPlayers > (LobbyData.Instance.PrivateRoom ? 0 : 1);
 
-            int realPlayers = datas.Where(pd => !pd.IsManualSpectator).Count();
-            validRoomConfig &= realPlayers > 1;
-
-            if (LobbyData.Instance.Teams) {
-                int teams = datas.Where(pd => !pd.IsManualSpectator).Select(pd => pd.Team).Distinct().Count();
-                validRoomConfig &= teams > 1;
-            }
+        //only do team checks if there's more than one player
+        if (LobbyData.Instance.Teams && (datas.Count() > 1 || !LobbyData.Instance.PrivateRoom)) {
+            int teams = datas.Where(pd => !pd.IsManualSpectator).Select(pd => pd.Team).Distinct().Count();
+            validRoomConfig &= teams > 1;
         }
 
         startGameBtn.interactable = validRoomConfig;
@@ -714,9 +713,10 @@ public class MainMenuManager : MonoBehaviour {
         }
 
         PlayerData data = target.GetPlayerData(runner);
-        data.IsMuted = !data.IsMuted;
+        bool newMuteState = !data.IsMuted;
+        data.IsMuted = newMuteState;
 
-        if (data.IsMuted) {
+        if (newMuteState) {
             chat.AddChatMessage($"Successfully muted {data.GetNickname()}", Color.red);
         } else {
             chat.AddChatMessage($"Successfully unmuted {data.GetNickname()}", Color.red);
@@ -935,12 +935,14 @@ public class MainMenuManager : MonoBehaviour {
     public void OpenLinks() {
         Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/blob/master/LINKS.md");
     }
+
     public void Quit() {
         if (quit)
             return;
 
         StartCoroutine(FinishQuitting());
     }
+
     private IEnumerator FinishQuitting() {
         AudioClip clip = Enums.Sounds.UI_Quit.GetClip();
         sfx.PlayOneShot(clip);

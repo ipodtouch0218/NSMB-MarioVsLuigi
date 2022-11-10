@@ -54,7 +54,7 @@ public class BulletBillMover : KillableEntity {
     }
 
     private void DespawnCheck() {
-        foreach (PlayerController player in GameManager.Instance.players) {
+        foreach (PlayerController player in GameManager.Instance.AlivePlayers) {
             if (!player)
                 continue;
 

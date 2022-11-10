@@ -17,7 +17,7 @@ public class LobbyData : NetworkBehaviour {
     //---Networked Variables
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultMaxPlayers))]        public byte MaxPlayers { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool PrivateRoom { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool GameStarted { get; set; }
+    [Networked(OnChanged = nameof(StartChanged))]                                               public NetworkBool GameStarted { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                             public byte Level { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultStarRequirement))]   public sbyte StarRequirement { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCoinRequirement))]   public byte CoinRequirement { get; set; }
@@ -41,6 +41,13 @@ public class LobbyData : NetworkBehaviour {
         Instance = this;
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.EnterRoom();
+    }
+
+    public static void StartChanged(Changed<LobbyData> data) {
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.OnGameStartChanged();
+
+        SettingChanged(data);
     }
 
     public static void SettingChanged(Changed<LobbyData> data) {

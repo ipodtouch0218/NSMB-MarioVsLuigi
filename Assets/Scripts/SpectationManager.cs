@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 
 using NSMB.Extensions;
+using Fusion;
 
 public class SpectationManager : MonoBehaviour {
 
@@ -65,7 +66,7 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectateNextPlayer() {
-        List<PlayerController> players = GameManager.Instance.players;
+        NetworkLinkedList<PlayerController> players = GameManager.Instance.AlivePlayers;
         int count = players.Count;
         if (count <= 0)
             return;
@@ -82,7 +83,7 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectatePreviousPlayer() {
-        List<PlayerController> players = GameManager.Instance.players;
+        NetworkLinkedList<PlayerController> players = GameManager.Instance.AlivePlayers;
         int count = players.Count;
         if (count <= 0)
             return;
@@ -106,7 +107,7 @@ public class SpectationManager : MonoBehaviour {
             index += 9;
             index %= 10;
 
-            List<PlayerController> sortedPlayers = new(GameManager.Instance.players);
+            List<PlayerController> sortedPlayers = new(GameManager.Instance.AlivePlayers);
             sortedPlayers.Sort(new PlayerComparer());
 
             if (index >= sortedPlayers.Count)

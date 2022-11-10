@@ -37,7 +37,7 @@ public class LoadingWaitingOn : MonoBehaviour {
         text.text = iveLoadedText;
 
         HashSet<string> waitingFor = new();
-        foreach (PlayerController pc in GameManager.Instance.players) {
+        foreach (PlayerController pc in GameManager.Instance.AlivePlayers) {
             PlayerData data = pc.Object.InputAuthority.GetPlayerData(pc.Runner);
 
             if (!data.IsCurrentlySpectating && !data.IsLoaded)

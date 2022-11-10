@@ -22,6 +22,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public Enums.PowerupState StoredPowerup { get; set; }
     //-Player Movement
     //Generic
+    [Networked] private PlayerNetworkInput PreviousInputs { get; set; }
     [Networked] public NetworkBool IsOnGround { get; set; }
     [Networked] public NetworkBool IsCrouching { get; set; }
     [Networked] public NetworkBool IsSliding { get; set; }
@@ -186,14 +187,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     public int playerId;
 
-    // == FREEZING VARIABLES ==
-
-
     public BoxCollider2D MainHitbox => hitboxes[0];
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
 
-    [Networked]
-    private PlayerNetworkInput PreviousInputs { get; set; }
 
     public PlayerData data;
 
@@ -213,8 +209,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         fadeOut = GameObject.FindGameObjectWithTag("FadeUI").GetComponent<FadeOutManager>();
 
         body.position = transform.position = GameManager.Instance.GetSpawnpoint(playerId);
-
-        GameManager.Instance.players.Add(this);
     }
 
     public void OnEnable() {
@@ -250,11 +244,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         Lives = LobbyData.Instance.Lives;
         playerId = Runner.GetLocalPlayerData().PlayerId;
 
+        if (Runner.IsServer)
+            GameManager.Instance.AlivePlayers.Add(this);
+
         GameManager.Instance.teamManager.AddPlayer(this);
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        GameManager.Instance.players.Remove(this);
+        GameManager.Instance.AlivePlayers.Remove(this);
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) {
@@ -945,6 +942,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsInKnockback)
             return;
 
+        Debug.Log("a");
         DoKnockback(bumper.body.position.x < body.position.x, 1, false, 0);
     }
 
@@ -1169,7 +1167,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         body.velocity = Vector2.zero;
 
         if (Object.HasInputAuthority)
-            ScoreboardUpdater.instance.OnRespawnToggle();
+            ScoreboardUpdater.Instance.OnRespawnToggle();
 
     }
     #endregion
@@ -2788,7 +2786,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         player.PlaySound(player.cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
 
         if (player.Object.HasInputAuthority)
-            ScoreboardUpdater.instance.OnDeathToggle();
+            ScoreboardUpdater.Instance.OnDeathToggle();
 
     }
 

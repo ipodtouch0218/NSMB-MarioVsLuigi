@@ -1257,6 +1257,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 471865848775443366}
+  - component: {fileID: 4559077638615233841}
   - component: {fileID: 1173027632323425885}
   - component: {fileID: 5586956838194776704}
   - component: {fileID: 2239720947781399540}
@@ -1277,7 +1278,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 440222930750488320}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
@@ -1289,9 +1290,27 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -50, y: -50}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &4559077638615233841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440222930750488320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6d58278364962a4aae36829243ad8de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioListener: {fileID: 5063321644330613871}
+  audioSource: {fileID: 7736130533744580698}
+  animator: {fileID: 4068457237609990628}
+  loadingGroup: {fileID: 5958951687455989865}
+  readyGroup: {fileID: 5739995423523077644}
+  readyBackground: {fileID: 7083138380686876693}
 --- !u!223 &1173027632323425885
 Canvas:
   m_ObjectHideFlags: 0
@@ -5030,7 +5049,7 @@ MonoBehaviour:
   fourByThreeImage: {fileID: 0}
   anyAspectImage: {fileID: 0}
   graphy: {fileID: 65175768685879623}
-  loadingCanvas: {fileID: 440222930750488320}
+  loadingCanvas: {fileID: 4559077638615233841}
   ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
   characters:
   - {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
@@ -5057,6 +5076,7 @@ MonoBehaviour:
   skin: 0
   ndsResolution: 0
   fireballFromSprint: 1
+  autoSprint: 0
   vsync: 0
   fourByThreeRatio: 0
   scoreboardAlways: 0
@@ -6398,6 +6418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blinkSpeed: 0.125
+  image: {fileID: 7698897800922453201}
   scaleTimer: 0
   scale: 0
   previousScale: 0
@@ -18147,7 +18168,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 2688860679172727607, guid: fb97c835167322d4c972e1b475455b7e,
+  m_Sprite: {fileID: 7263181891274304025, guid: 70672da71d9d71a4daaf5f3fc58531e6,
     type: 3}
   m_Type: 0
   m_PreserveAspect: 0
@@ -18170,6 +18191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbeccd0bed4d67e4f8ad1c997834fd47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  image: {fileID: 2934555977915435956}
 --- !u!1 &6960621104077129942
 GameObject:
   m_ObjectHideFlags: 0
@@ -18869,6 +18891,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67eb88faefd8974438646222c86e568d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  text: {fileID: 1530434073578936767}
+  templateString: 'Level designed by: {0}'
 --- !u!1 &7238789405595031768
 GameObject:
   m_ObjectHideFlags: 0

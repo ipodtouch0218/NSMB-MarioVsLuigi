@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 using Fusion;
+using NSMB.Loading;
 
 public class GlobalController : Singleton<GlobalController> {
 
@@ -12,7 +13,8 @@ public class GlobalController : Singleton<GlobalController> {
     public PlayerColorSet[] skins;
     public Gradient rainbowGradient;
 
-    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, loadingCanvas;
+    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
+    public LoadingCanvas loadingCanvas;
 
     public RenderTexture ndsTexture;
     public CharacterData[] characters;
