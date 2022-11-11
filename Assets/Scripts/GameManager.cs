@@ -401,13 +401,18 @@ public class GameManager : NetworkBehaviour {
 
         loaded = true;
         SceneManager.SetActiveScene(gameObject.scene);
-        GameStartTimer = TickTimer.CreateFromSeconds(NetworkHandler.Runner, 3.7f);
+        GameStartTimer = TickTimer.CreateFromSeconds(NetworkHandler.Runner, 5.7f);
 
         if (Runner.IsServer)
-            Rpc_LoadingComplete();
+            StartCoroutine(CallLoadingComplete(2));
 
         foreach (PlayerRef player in NetworkHandler.Runner.ActivePlayers)
             player.GetPlayerData(NetworkHandler.Runner).IsLoaded = false;
+    }
+
+    private IEnumerator CallLoadingComplete(float seconds) {
+        yield return new WaitForSeconds(seconds);
+        Rpc_LoadingComplete();
     }
 
     //TODO: invokeresim?

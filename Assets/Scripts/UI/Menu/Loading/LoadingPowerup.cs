@@ -33,16 +33,14 @@ namespace NSMB.Loading {
             if (rect.localPosition.x <= marioX) {
                 if (goomba) {
                     if (!goombaHit) {
-                        mario.scale--;
+                        mario.Scale--;
                         goombaHit = true;
-                        mario.scaleTimer = 0f;
                         goombaTimer = 0.5f;
                     }
                     if (rect.localPosition.x <= minX)
                         TeleportToBeginning();
                 } else {
-                    mario.scale++;
-                    mario.scaleTimer = 0f;
+                    mario.Scale++;
                     TeleportToBeginning();
                 }
             }
@@ -50,7 +48,7 @@ namespace NSMB.Loading {
 
         public void TeleportToBeginning() {
             goombaHit = false;
-            goomba = mario.scale > 0 && (mario.scale >= 2 || Random.value < 0.5f);
+            goomba = mario.Scale > 0 && (mario.Scale >= 2 || Random.value < 0.5f);
             animator.SetBool("goomba", goomba);
             rect.localPosition = new Vector2(peachX, rect.localPosition.y);
         }

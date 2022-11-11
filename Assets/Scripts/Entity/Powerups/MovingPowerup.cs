@@ -118,11 +118,14 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             HandleCollision();
         }
 
-        if (physics.onGround && childAnimator) {
-            childAnimator.SetTrigger("trigger");
-            hitbox.enabled = false;
-            body.isKinematic = true;
-            body.gravityScale = 0;
+        if (childAnimator) {
+            childAnimator.SetBool("onGround", physics.onGround);
+
+            if (physics.onGround && powerupScriptable.state == Enums.PowerupState.PropellerMushroom) {
+                hitbox.enabled = false;
+                body.isKinematic = true;
+                body.gravityScale = 0;
+            }
         }
 
         if (avoidPlayers && physics.onGround) {

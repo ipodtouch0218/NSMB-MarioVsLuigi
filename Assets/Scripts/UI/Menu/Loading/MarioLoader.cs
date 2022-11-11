@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,41 +13,66 @@ namespace NSMB.Loading {
         [SerializeField] private float blinkSpeed = 0.5f;
         [SerializeField] private Image image;
 
+        //---Public Properties
+        private int _scale;
+        public int Scale {
+            get => _scale;
+            set {
+                previousScale = _scale;
+                _scale = value;
+                if (flashRoutine != null)
+                    StopCoroutine(flashRoutine);
+
+                StartCoroutine(DoGrowShrinkFlash());
+            }
+        }
+
         //---Public Variables
-        public float scaleTimer;
-        public int scale = 0, previousScale;
+        public int previousScale;
 
         //---Private Variables
+        private Coroutine flashRoutine;
         private CharacterData data;
 
-        public void Update() {
-            int scaleDisplay = scale;
+        private IEnumerator DoGrowShrinkFlash() {
+            float halfBlink = blinkSpeed * 0.5f;
+            float scaleTimer = 0.5f;
 
-            if ((scaleTimer += Time.deltaTime) < 0.5f) {
-                if (scaleTimer % blinkSpeed < blinkSpeed / 2f)
-                    scaleDisplay = previousScale;
-            } else {
-                previousScale = scale;
-            }
+            while (scaleTimer > 0) {
+                scaleTimer -= Time.deltaTime;
+                int scaleToDisplay = (scaleTimer % blinkSpeed) < halfBlink ? Scale : previousScale;
 
-            if (scaleDisplay == 0) {
-                transform.localScale = Vector3.one;
-                image.sprite = data.loadingSmallSprite;
-            } else if (scaleDisplay == 1) {
-                transform.localScale = Vector3.one;
-                image.sprite = data.loadingBigSprite;
-            } else {
-                transform.localScale = two;
-                image.sprite = data.loadingBigSprite;
+                switch (scaleToDisplay) {
+                case 0: {
+                    transform.localScale = Vector3.one;
+                    image.sprite = data.loadingSmallSprite;
+                    break;
+                }
+                case 1: {
+                    transform.localScale = Vector3.one;
+                    image.sprite = data.loadingBigSprite;
+                    break;
+                }
+                case 2: {
+                    transform.localScale = two;
+                    image.sprite = data.loadingBigSprite;
+                    break;
+                }
+                }
+
+                yield return null;
             }
+            flashRoutine = null;
         }
 
         public void Initialize() {
             data = NetworkHandler.Instance.runner.GetLocalPlayerData().GetCharacterData();
-            scaleTimer = 0;
-            scale = 0;
+            Scale = 0;
             previousScale = 0;
             image.sprite = data.loadingSmallSprite;
+
+            if (flashRoutine != null)
+                StopCoroutine(flashRoutine);
         }
     }
 }
