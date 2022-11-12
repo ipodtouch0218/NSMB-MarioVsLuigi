@@ -242,7 +242,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         Lives = LobbyData.Instance.Lives;
-        playerId = Runner.GetLocalPlayerData().PlayerId;
+        playerId = data.PlayerId;
 
         if (Runner.IsServer)
             GameManager.Instance.AlivePlayers.Add(this);

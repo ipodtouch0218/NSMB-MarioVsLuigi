@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using NSMB.Extensions;
+using System.Collections;
 
 namespace NSMB.Loading {
     public class LoadingCanvas : MonoBehaviour {
@@ -15,20 +16,22 @@ namespace NSMB.Loading {
         [SerializeField] private Image readyBackground;
 
         //---Private Variables
-        private bool loading;
+        private bool initialized;
 
         public void Initialize() {
-            if (loading)
+            if (initialized)
                 return;
 
-            loading = true;
+            initialized = true;
 
             readyGroup.gameObject.SetActive(false);
             gameObject.SetActive(true);
+
             loadingGroup.alpha = 1;
             readyGroup.alpha = 0;
             readyBackground.color = Color.clear;
 
+            animator.Play("waiting");
             audioSource.Play();
             audioListener.enabled = true;
         }
@@ -38,14 +41,15 @@ namespace NSMB.Loading {
             readyGroup.gameObject.SetActive(true);
             animator.SetTrigger(spectator ? "spectating" : "loaded");
 
+            initialized = false;
+
             audioSource.Stop();
             audioListener.enabled = false;
         }
 
         public void EndAnimation() {
-            animator.Play("waiting");
             gameObject.SetActive(false);
-            loading = false;
+            initialized = false;
         }
     }
 }

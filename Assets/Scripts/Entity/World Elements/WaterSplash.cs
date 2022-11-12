@@ -3,12 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 public class WaterSplash : MonoBehaviour, IPlayerInteractable {
 
+    //---Serialized Variables
     [Delayed] [SerializeField] private int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
     [Delayed] [SerializeField] private float heightTiles = 1;
     [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f, animationSpeed = 1f;
     [SerializeField] private string splashParticle;
     [SerializeField] private bool fireDeath;
 
+    //---Private Variables
     private Texture2D heightTex;
     private SpriteRenderer spriteRenderer;
     private MaterialPropertyBlock properties;
@@ -21,6 +23,7 @@ public class WaterSplash : MonoBehaviour, IPlayerInteractable {
     private void Awake() {
         Initialize();
     }
+
     private void OnValidate() {
         ValidationUtility.SafeOnValidate(Initialize);
     }
@@ -95,6 +98,7 @@ public class WaterSplash : MonoBehaviour, IPlayerInteractable {
         properties.SetFloat("TextureIndex", animTimer);
         spriteRenderer.SetPropertyBlock(properties);
     }
+
     public void OnTriggerEnter2D(Collider2D collider) {
         Instantiate(Resources.Load(splashParticle), collider.transform.position, Quaternion.identity);
 
@@ -107,6 +111,7 @@ public class WaterSplash : MonoBehaviour, IPlayerInteractable {
             pointVelocities[pointsX] = -splashVelocity * power;
         }
     }
+
     public void OnTriggerStay2D(Collider2D collision) {
         if (collision.attachedRigidbody == null)
             return;

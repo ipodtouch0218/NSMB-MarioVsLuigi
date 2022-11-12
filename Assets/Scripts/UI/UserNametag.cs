@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using NSMB.Utils;
 using NSMB.Extensions;
+using NSMB.Utils;
+using System.Collections;
 
 public class UserNametag : MonoBehaviour {
 
@@ -24,6 +25,7 @@ public class UserNametag : MonoBehaviour {
         rainbowName = parent.Object.InputAuthority.HasRainbowName();
         data = parent.Object.InputAuthority.GetPlayerData(parent.Runner);
         character = data.GetCharacterData();
+        arrow.color = parent.animationController.GlowColor;
     }
 
     public void LateUpdate() {
@@ -32,7 +34,6 @@ public class UserNametag : MonoBehaviour {
             return;
         }
 
-        arrow.color = parent.animationController.GlowColor;
         nametag.SetActive(!(parent.IsDead && parent.IsRespawning));
 
         Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.WorldHitboxSize.y * 1.2f) + 0.5f);
@@ -66,8 +67,7 @@ public class UserNametag : MonoBehaviour {
         }
         transform.position = screenPoint;
 
-        if (cachedNickname == null)
-            cachedNickname = data.GetNickname();
+        cachedNickname ??= data.GetNickname();
 
         text.text = (data.IsRoomOwner ? "<sprite=5>" : "") + cachedNickname + "\n";
 
