@@ -4080,7 +4080,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 76.75
+  m_fontSize: 76.65
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5434,6 +5434,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5500062339093502141}
   - component: {fileID: 5500062339093502114}
+  - component: {fileID: 6418608900138254647}
   - component: {fileID: 9060135030118423222}
   - component: {fileID: 3058852347368318539}
   - component: {fileID: 3063105634746227037}
@@ -5510,21 +5511,34 @@ MonoBehaviour:
   levelDesigner: 
   richPresenceId: 
   levelName: Unknown
+  particleManager: {fileID: 0}
+  gameStartTimestamp: 0
+  gameEndTimestamp: 0
   nametagCanvas: {fileID: 5453462452561088483}
   nametagPrefab: {fileID: 7542548910130765567}
   localPlayer: {fileID: 0}
   paused: 0
   loaded: 0
   gameover: 0
-  particleManager: {fileID: 0}
-  gameStartTimestamp: 0
-  gameEndTimestamp: 0
   spectationManager: {fileID: 0}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
   size: 1.39
   ySize: 0.8
   playersToVisualize: 10
+--- !u!114 &6418608900138254647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5500062339093502118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e634c13992bdf394596c9973645ad96b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!114 &9060135030118423222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5784,6 +5798,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5500062339093502114}
+  - {fileID: 6418608900138254647}
   SimulationBehaviours: []
 --- !u!1 &5549907166122049973
 GameObject:

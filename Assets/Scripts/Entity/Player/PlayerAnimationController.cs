@@ -53,7 +53,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         PlayerData data = Object.InputAuthority.GetPlayerData(Runner);
 
-        if (GlobalController.Instance.skins[data?.SkinIndex ?? 0] is PlayerColorSet colorSet) {
+        if (ScriptableManager.Instance.skins[data?.SkinIndex ?? 0] is PlayerColorSet colorSet) {
             PlayerColors colors = colorSet.GetPlayerColors(controller.character);
             primaryColor = colors.overallsColor.linear;
             secondaryColor = colors.hatColor.linear;
@@ -64,7 +64,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         rotChangeTarget = models.transform.rotation.eulerAngles;
 
-        enableGlow = !Object.HasInputAuthority;
+        enableGlow = LobbyData.Instance.Teams || !Object.HasInputAuthority;
         GlowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
     }
 

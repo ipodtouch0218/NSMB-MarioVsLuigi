@@ -1,18 +1,20 @@
 ﻿using UnityEngine;
-using UnityEngine.Tilemaps;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
+using UnityEngine.Tilemaps;
 
 public class BlockBump : NetworkBehaviour {
 
     //---Networked Variables
-    [Networked] private TickTimer DespawnTimer { get; set; }
+    [Networked] private TickTimer           DespawnTimer { get; set; }
     [Networked] private NetworkString<_128> ResultTile { get; set; }
-    [Networked] private NetworkBool IsDownwards { get; set; }
-    [Networked] private NetworkBool SpawnCoin { get; set; }
-    [Networked] private NetworkPrefabRef SpawnPrefab { get; set; }
-    [Networked] private Vector2 SpawnOffset { get; set; }
+    [Networked] private NetworkString<_128> OldTile { get; set; }
+    [Networked] private NetworkBool         IsDownwards { get; set; }
+    [Networked] private NetworkBool         SpawnCoin { get; set; }
+    [Networked] private NetworkPrefabRef    SpawnPrefab { get; set; }
+    [Networked] private Vector2             SpawnOffset { get; set; }
+    [Networked] private Vector3Int          TileLocation { get; set; }
 
     //---Components
     private SpriteRenderer spriteRenderer;
@@ -23,8 +25,9 @@ public class BlockBump : NetworkBehaviour {
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
-    public void OnBeforeSpawned(Vector3Int spriteLocation, string resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
-        spriteRenderer.sprite = GameManager.Instance.tilemap.GetSprite(spriteLocation);
+    public void OnBeforeSpawned(Vector3Int tileLocation, string oldTile, string resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
+        TileLocation = tileLocation;
+        OldTile = oldTile;
         ResultTile = resultTile;
         SpawnPrefab = spawnPrefab ?? NetworkPrefabRef.Empty;
         IsDownwards = downwards;
@@ -47,6 +50,14 @@ public class BlockBump : NetworkBehaviour {
         BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
         hitbox.size = spriteRenderer.sprite.bounds.size;
         hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(0.5f, -0.5f);
+
+        //graphics bs
+        Tilemap tm = GameManager.Instance.tilemap;
+        if (tm.GetTile(TileLocation) == null)
+            tm.SetTile(TileLocation, Utils.GetCacheTile("Tilemaps/Tiles/" + OldTile));
+
+        spriteRenderer.sprite = GameManager.Instance.tilemap.GetSprite(TileLocation);
+        GameManager.Instance.tilemap.SetTile(TileLocation, null);
     }
 
     public override void FixedUpdateNetwork() {
@@ -62,7 +73,7 @@ public class BlockBump : NetworkBehaviour {
 
     public void Kill(Vector3Int loc) {
         if (Object.HasStateAuthority)
-            GameManager.Instance.Rpc_SetTile(loc.x, loc.y, ResultTile.ToString());
+            GameManager.Instance.rpcs.Rpc_SetTile((short) loc.x, (short) loc.y, ResultTile.ToString());
 
         if (SpawnPrefab == NetworkPrefabRef.Empty) {
             Runner.Despawn(Object);

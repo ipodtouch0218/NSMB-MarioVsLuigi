@@ -39,7 +39,10 @@ public class PowerupTile : BreakableBrickTile {
 
         Bump(interacter, direction, worldLocation);
 
-        GameManager.Instance.CreateBlockBump(tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, false);
+        if (GameManager.Instance.Object.HasStateAuthority) {
+            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
+                resultTile, direction == InteractionDirection.Down, Vector2.zero, false, spawnResult);
+        }
 
         interacter.PlaySound(Enums.Sounds.World_Block_Powerup);
         return false;

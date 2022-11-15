@@ -257,6 +257,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public void OnInput(NetworkRunner runner, NetworkInput input) {
         PlayerNetworkInput newInput = new();
 
+        if (GameManager.Instance.paused) {
+            input.Set(newInput);
+            return;
+        }
+
         Vector2 joystick =   InputSystem.controls.Player.Movement.ReadValue<Vector2>();
         bool jump =          InputSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
         bool powerup =       InputSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
@@ -269,8 +274,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         newInput.buttons.Set(PlayerControls.Left,                joystick.x < -0.25f);
         newInput.buttons.Set(PlayerControls.Right,               joystick.x > 0.25f);
         newInput.buttons.Set(PlayerControls.Jump,                jump);
-        newInput.buttons.Set(PlayerControls.Sprint,              sprint || Settings.Instance.autoSprint);
         newInput.buttons.Set(PlayerControls.PowerupAction,       powerup);
+        newInput.buttons.Set(PlayerControls.Sprint,              sprint || Settings.Instance.autoSprint);
         newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprintPowerup);
 
         input.Set(newInput);
@@ -278,7 +283,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {
         //when we drop inputs, continue predicting the previous set of inputs.
-        input.Set(PreviousInputs);
+        //input.Set(PreviousInputs);
     }
 
     public override void FixedUpdateNetwork() {
@@ -288,6 +293,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             models.SetActive(false);
             return;
         }
+
         if (GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             animator.enabled = false;
@@ -307,13 +313,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 RespawnTimer = TickTimer.None;
             }
 
-        } else {
-
-            if (!GetInput(out PlayerNetworkInput input)) {
-                //input failed, use previous inputs.
-                input = PreviousInputs;
-            }
-
+        } else if (!IsFrozen && GetInput(out PlayerNetworkInput input)) {
             NetworkButtons heldButtons = input.buttons;
             NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
             PreviousInputs = input;

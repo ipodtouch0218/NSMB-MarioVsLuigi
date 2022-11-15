@@ -7,19 +7,16 @@ using NSMB.Loading;
 
 public class GlobalController : Singleton<GlobalController> {
 
-    public PrefabList prefabs;
-    public Powerup[] powerups;
+    //---Public Properties
+    public DiscordController DiscordController { get; private set; }
 
-    public PlayerColorSet[] skins;
+    //---Public Variables
     public Gradient rainbowGradient;
 
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
     public LoadingCanvas loadingCanvas;
 
     public RenderTexture ndsTexture;
-    public CharacterData[] characters;
-    public Settings settings;
-    public DiscordController DiscordController { get; private set; }
     public string controlsJson = null;
 
     public bool checkedForVersion;
@@ -40,7 +37,6 @@ public class GlobalController : Singleton<GlobalController> {
             return;
 
         Instance = this;
-        settings = GetComponent<Settings>();
         DiscordController = GetComponent<DiscordController>();
     }
 
@@ -54,10 +50,10 @@ public class GlobalController : Singleton<GlobalController> {
         int currentWidth = Screen.width;
         int currentHeight = Screen.height;
 
-        if (settings.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0) {
+        if (Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0) {
             float aspect = (float) currentWidth / currentHeight;
             int targetHeight = 224;
-            int targetWidth = (int) (targetHeight * (settings.fourByThreeRatio ? (4/3f) : aspect));
+            int targetWidth = (int) (targetHeight * (Settings.Instance.fourByThreeRatio ? (4/3f) : aspect));
             if (ndsTexture == null || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
                 if (ndsTexture != null)
                     ndsTexture.Release();

@@ -200,8 +200,9 @@ public class StarBouncer : CollectableEntity {
         player.Stars = (byte) Mathf.Min(player.Stars + 1, LobbyData.Instance.StarRequirement);
 
         //game mechanics
-        if (IsStationary)
-            GameManager.Instance.Rpc_ResetTilemap();
+        if (IsStationary && GameManager.Instance.Object.HasStateAuthority)
+            GameManager.Instance.rpcs.Rpc_ResetTilemap();
+
         GameManager.Instance.CheckForWinner();
 
         //despawn

@@ -14,7 +14,7 @@ public static class Enums {
         if (state == PowerupState.NoPowerup)
             return null;
 
-        return GlobalController.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
+        return ScriptableManager.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
     }
 
     #region ANIMATION & MUSIC
@@ -178,11 +178,11 @@ public class SoundData : Attribute {
 
 public static class SoundDataExtensions {
 
+    private readonly static Dictionary<Enums.Sounds, string> cachedStrings = new();
     private readonly static Dictionary<string, AudioClip> cachedClips = new();
 
     public static AudioClip GetClip(this Enums.Sounds sound, CharacterData player = null, int variant = 0) {
-        SoundData data = GetClipString(sound);
-        string name = "Sound/" + data.Sound + (variant > 0 ? "_" + variant : "");
+        string name = "Sound/" + GetClipString(sound) + (variant > 0 ? "_" + variant : "");
 
         if (player != null)
             name = name.Replace("{char}", player.soundFolder);
@@ -195,7 +195,12 @@ public static class SoundDataExtensions {
         return clip;
     }
 
-    private static SoundData GetClipString(Enums.Sounds sound) {
-        return sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>();
+    private static string GetClipString(Enums.Sounds sound) {
+        if (cachedStrings.ContainsKey(sound))
+            return cachedStrings[sound];
+
+        string str = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound;
+        cachedStrings[sound] = str;
+        return str;
     }
 }

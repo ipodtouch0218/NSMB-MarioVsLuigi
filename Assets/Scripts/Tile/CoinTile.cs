@@ -1,10 +1,13 @@
 using UnityEngine;
 
+using Fusion;
 using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "CoinTile", menuName = "ScriptableObjects/Tiles/CoinTile", order = 1)]
 public class CoinTile : BreakableBrickTile {
-    public string resultTile;
+
+    [SerializeField] private string resultTile;
+
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (base.Interact(interacter, direction, worldLocation))
             return true;
@@ -14,7 +17,7 @@ public class CoinTile : BreakableBrickTile {
         PlayerController player = null;
         if (interacter is PlayerController controller)
             player = controller;
-        if (interacter is KoopaWalk koopa)
+        else if (interacter is KoopaWalk koopa)
             player = koopa.PreviousHolder;
 
         if (player) {
@@ -41,7 +44,11 @@ public class CoinTile : BreakableBrickTile {
 
         Bump(interacter, direction, worldLocation);
 
-        GameManager.Instance.CreateBlockBump(tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, null, true);
+        if (GameManager.Instance.Object.HasStateAuthority) {
+            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
+                resultTile, direction == InteractionDirection.Down, Vector2.zero, true, NetworkPrefabRef.Empty);
+        }
+
         return false;
     }
 }

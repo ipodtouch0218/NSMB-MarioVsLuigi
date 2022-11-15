@@ -5,10 +5,15 @@ using NSMB.Utils;
 
 public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
 
-    private static readonly Vector3 blockOffset = new(0.25f, 0.25f);
+    private static readonly Vector3 BlockOffset = new(0.25f, 0.25f);
+    private static readonly Color GizmoColor = new(1, 1, 1, 0.5f);
 
     //---Networked Variables
     [Networked] private TickTimer BumpTimer { get; set; }
+
+    //---Serialized Variables
+    [SerializeField] private string bumpTile = "SpecialTiles/YellowQuestion";
+    [SerializeField] private string resultTile = "SpecialTiles/EmptyYellowQuestion";
 
     public void InteractWithPlayer(PlayerController player) {
         if (!BumpTimer.ExpiredOrNotRunning(Runner))
@@ -35,13 +40,16 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
     }
 
     public void DoBump(Vector3Int tileLocation, PlayerController player) {
-        Vector3 location = Utils.TilemapToWorldPosition(tileLocation) + blockOffset;
-
+        Vector3 location = Utils.TilemapToWorldPosition(tileLocation) + BlockOffset;
         Coin.GivePlayerCoin(player, location);
-        GameManager.Instance.CreateBlockBump(tileLocation.x, tileLocation.y, false, "SpecialTiles/EmptyYellowQuestion", NetworkPrefabRef.Empty, true);
+
+        if (GameManager.Instance.Object.HasStateAuthority) {
+            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
+                resultTile, false, Vector2.zero, true, NetworkPrefabRef.Empty);
+        }
     }
 
     public void OnDrawGizmos() {
-        Gizmos.DrawIcon(transform.position, "HiddenBlock", true, new Color(1, 1, 1, 0.5f));
+        Gizmos.DrawIcon(transform.position, "HiddenBlock", true, GizmoColor);
     }
 }

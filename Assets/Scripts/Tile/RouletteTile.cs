@@ -1,13 +1,14 @@
 using UnityEngine;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile")]
 public class RouletteTile : BreakableBrickTile {
 
-    public string resultTile;
-    public Vector2 topSpawnOffset, bottomSpawnOffset;
+    //---Serialized Variables
+    [SerializeField] private string resultTile;
+    [SerializeField] private Vector2 topSpawnOffset, bottomSpawnOffset;
 
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (base.Interact(interacter, direction, worldLocation))
@@ -41,8 +42,13 @@ public class RouletteTile : BreakableBrickTile {
 
         Bump(interacter, direction, worldLocation);
 
-        Vector2 offset = direction == InteractionDirection.Down ? bottomSpawnOffset + ( spawnResult == PrefabList.Instance.Powerup_MegaMushroom ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
-        GameManager.Instance.CreateBlockBump(tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, false, offset);
+        if (GameManager.Instance.Object.HasStateAuthority) {
+            bool downwards = direction == InteractionDirection.Down;
+            Vector2 offset = downwards ? bottomSpawnOffset + (spawnResult == PrefabList.Instance.Powerup_MegaMushroom ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
+
+            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
+                resultTile, downwards, offset, false, spawnResult);
+        }
 
         interacter.PlaySound(Enums.Sounds.World_Block_Powerup);
 

@@ -4,7 +4,6 @@ using TMPro;
 
 using NSMB.Extensions;
 using NSMB.Utils;
-using System.Collections;
 
 public class UserNametag : MonoBehaviour {
 
@@ -44,7 +43,7 @@ public class UserNametag : MonoBehaviour {
         Vector3 screenPoint = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;
         screenPoint.z = 0;
 
-        if (GlobalController.Instance.settings.ndsResolution && GlobalController.Instance.settings.fourByThreeRatio) {
+        if (Settings.Instance.ndsResolution && Settings.Instance.fourByThreeRatio) {
             // handle black borders
             float screenW = Screen.width;
             float screenH = Screen.height;

@@ -118,7 +118,7 @@ public class UIUpdater : MonoBehaviour {
         if (teams) {
             int team = player.data.Team;
             teamStars = teamManager.GetTeamStars(team);
-            uiTeamStars.text = Utils.teamSprites[team] + Utils.GetSymbolString("x" + stars + "/" + LobbyData.Instance.StarRequirement);
+            uiTeamStars.text = ScriptableManager.Instance.teams[team].textSprite + Utils.GetSymbolString("x" + teamStars + "/" + LobbyData.Instance.StarRequirement);
         }
         if (player.Stars != stars) {
             stars = player.Stars;

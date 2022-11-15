@@ -8,7 +8,6 @@ public class TeamManager {
     //---Private Variables
     private readonly Dictionary<int, HashSet<PlayerController>> teams = new();
 
-
     public void AddPlayer(PlayerController player) {
         sbyte teamid = player.data.Team;
 
@@ -55,7 +54,7 @@ public class TeamManager {
         }
 
         if (!hasAtLeastOnePlayer)
-            return -1;
+            return 0;
 
         return stars;
     }

@@ -122,7 +122,7 @@ public class PlayerData : NetworkBehaviour {
             return;
 
         //invalid character...
-        if (index >= GlobalController.Instance.characters.Length)
+        if (index >= ScriptableManager.Instance.characters.Length)
             return;
 
         CharacterIndex = index;
@@ -135,7 +135,7 @@ public class PlayerData : NetworkBehaviour {
             return;
 
         //invalid skin...
-        if (index >= GlobalController.Instance.skins.Length)
+        if (index >= ScriptableManager.Instance.skins.Length)
             return;
 
         SkinIndex = index;

@@ -4940,6 +4940,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1776850482587567143}
   - component: {fileID: 1776850482587567140}
+  - component: {fileID: -428314071820370687}
   - component: {fileID: 1776850482587567144}
   - component: {fileID: 1776850482587567145}
   - component: {fileID: 4164633649054386327}
@@ -4982,6 +4983,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2db399dc5ed094c8b01e459636e673, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rainbowGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 0.13913044, b: 0.11304349, a: 1}
+    key1: {r: 1, g: 0.40000004, b: 0, a: 1}
+    key2: {r: 1, g: 0.6509804, b: 0, a: 0}
+    key3: {r: 0.8313726, g: 1, b: 0, a: 0}
+    key4: {r: 0, g: 1, b: 0.6313726, a: 0}
+    key5: {r: 0.17647058, g: 0.4509805, b: 1, a: 0}
+    key6: {r: 0.8060319, g: 0.32599998, b: 1, a: 0}
+    key7: {r: 1, g: 0.13725491, b: 0.1137255, a: 0}
+    ctime0: 0
+    ctime1: 7710
+    ctime2: 14456
+    ctime3: 22552
+    ctime4: 33539
+    ctime5: 45104
+    ctime6: 57247
+    ctime7: 65535
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 8
+    m_NumAlphaKeys: 2
+  ndsCanvas: {fileID: 1955773772637164072}
+  fourByThreeImage: {fileID: 0}
+  anyAspectImage: {fileID: 0}
+  graphy: {fileID: 65175768685879623}
+  loadingCanvas: {fileID: 4559077638615233841}
+  ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
+  settings: {fileID: 0}
+  controlsJson: 
+  checkedForVersion: 0
+  nickname: 
+--- !u!114 &-428314071820370687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776850482587567141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3edd7125116ee9545a0159eb376163fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   prefabs: {fileID: 11400000, guid: 27efcbfe12709014985c8bfbd553ec02, type: 2}
   powerups:
   - {fileID: 11400000, guid: c46080c934b689f41943aef6ecaf61b4, type: 2}
@@ -5016,48 +5068,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3211edc9ee1951f4780bd104a9fbd597, type: 2}
   - {fileID: 11400000, guid: 245cea6ccab8e0d47a215ef6df104e09, type: 2}
   - {fileID: 11400000, guid: 2ea8c39849fd3704cb659e2d4ef905c3, type: 2}
-  rainbowGradient:
-    serializedVersion: 2
-    key0: {r: 1, g: 0.13913044, b: 0.11304349, a: 1}
-    key1: {r: 1, g: 0.40000004, b: 0, a: 1}
-    key2: {r: 1, g: 0.6509804, b: 0, a: 0}
-    key3: {r: 0.8313726, g: 1, b: 0, a: 0}
-    key4: {r: 0, g: 1, b: 0.6313726, a: 0}
-    key5: {r: 0.17511517, g: 0.31336403, b: 1, a: 0}
-    key6: {r: 0.8060319, g: 0.32599998, b: 1, a: 0}
-    key7: {r: 1, g: 0.13725491, b: 0.1137255, a: 0}
-    ctime0: 0
-    ctime1: 7710
-    ctime2: 14456
-    ctime3: 22552
-    ctime4: 33539
-    ctime5: 45104
-    ctime6: 57247
-    ctime7: 65535
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 8
-    m_NumAlphaKeys: 2
-  ndsCanvas: {fileID: 1955773772637164072}
-  fourByThreeImage: {fileID: 0}
-  anyAspectImage: {fileID: 0}
-  graphy: {fileID: 65175768685879623}
-  loadingCanvas: {fileID: 4559077638615233841}
-  ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
   characters:
   - {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
   - {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
-  settings: {fileID: 0}
-  controlsJson: 
-  checkedForVersion: 0
-  nickname: 
+  teams:
+  - {fileID: 11400000, guid: a8b2a85ce7190164ca6dc02934fad796, type: 2}
+  - {fileID: 11400000, guid: 8b4850b40bd67b942a59fe821a95b76d, type: 2}
+  - {fileID: 11400000, guid: c3ef426263aebe244b5bcf2b9955797c, type: 2}
+  - {fileID: 11400000, guid: c09017c0500866d42846620d77edad3a, type: 2}
+  - {fileID: 11400000, guid: 3215e8cb10c74044b9c4b199865ddfea, type: 2}
 --- !u!114 &1776850482587567144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6419,8 +6438,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blinkSpeed: 0.125
   image: {fileID: 7698897800922453201}
-  scaleTimer: 0
-  scale: 0
   previousScale: 0
 --- !u!1 &2609706312738980476
 GameObject:

@@ -3,7 +3,6 @@ using UnityEngine.Audio;
 
 public class Settings : Singleton<Settings> {
 
-    [SerializeField] private AudioMixer mixer;
 
     private float _volumeMaster, _volumeMusic, _volumeSFX;
     public float VolumeMaster {
@@ -28,10 +27,14 @@ public class Settings : Singleton<Settings> {
         }
     }
 
-    public string nickname;
+    //---Public Variables
+    public string nickname, controlsJsonString;
     public byte character, skin;
     public bool ndsResolution = false, fireballFromSprint = true, autoSprint = false, vsync = false, fourByThreeRatio = false;
     public bool scoreboardAlways = false, filter = true;
+
+    //---Private Variables
+    [SerializeField] private AudioMixer mixer;
 
     public void Awake() {
         if (!InstanceCheck())

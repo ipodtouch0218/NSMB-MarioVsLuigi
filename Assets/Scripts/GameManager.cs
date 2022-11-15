@@ -30,7 +30,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     //---Networked Variables
-    [Networked] private TickTimer BigStarRespawnTimer { get; set; }
+    [Networked] public TickTimer BigStarRespawnTimer { get; set; }
     [Networked] public TickTimer GameStartTimer { get; set; }
     [Networked] public TickTimer GameEndTimer { get; set; }
     [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
@@ -50,36 +50,28 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
 
-    //---Private Variables
-    private TickTimer StartMusicTimer { get; set; }
-
-
-    public Canvas nametagCanvas;
-    public GameObject nametagPrefab;
-
-    //Audio
-    public Enums.MusicState? musicState = null;
-
-    public PlayerController localPlayer;
-
-    public bool paused, loaded, gameover;
-    private bool hurryUpSoundPlayed;
-
     //---Properties
     public NetworkRNG Random { get; set; }
 
     //---Public Variables
+    public EnemySpawnpoint[] enemySpawns;
     public SingleParticleManager particleManager;
     public TeamManager teamManager = new();
+    public GameEventRpcs rpcs;
+    public Canvas nametagCanvas;
+    public GameObject nametagPrefab;
+    public PlayerController localPlayer;
     public long gameStartTimestamp, gameEndTimestamp;
+    public bool paused, loaded, gameover;
 
     //---Private Variables
+    private TickTimer StartMusicTimer { get; set; }
     private readonly List<GameObject> activeStarSpawns = new();
-    private EnemySpawnpoint[] enemySpawns;
-    private FloatingCoin[] coins;
     private GameObject[] starSpawns;
-    private TileBase[] originalTiles;
-    private BoundsInt originalTilesOrigin;
+
+    //Audio
+    public Enums.MusicState? musicState = null;
+    private bool hurryUpSoundPlayed;
 
     //---Components
     public SpectationManager spectationManager;
@@ -198,35 +190,6 @@ public class GameManager : NetworkBehaviour {
     */
 
 
-    public void CreateBlockBump(int tileX, int tileY, bool downwards, string newTile, NetworkPrefabRef? spawnPrefab, bool spawnCoin, Vector2 spawnOffset = default, bool setAndBump = false) {
-
-        Vector3Int loc = new(tileX, tileY, 0);
-
-        if (tilemap.GetTile(loc) == null) {
-            if (setAndBump)
-                return;
-
-            tilemap.SetTile(loc, (TileBase) Resources.Load("Tilemaps/Tiles/" + newTile));
-        }
-
-        Sprite sprite = tilemap.GetSprite(loc);
-        Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f;
-
-        Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, newTile, spawnPrefab, downwards, spawnCoin, spawnOffset);
-        });
-
-        tilemap.SetTile(loc, null);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_SetTile(int x, int y, string tilename) {
-        Vector3Int loc = new(x, y, 0);
-
-        TileBase tile = Utils.GetTileFromCache(tilename);
-        tilemap.SetTile(loc, tile);
-    }
-
     public void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
         TileBase[] tileObjects = new TileBase[tiles.Length];
         for (int i = 0; i < tiles.Length; i++) {
@@ -300,6 +263,7 @@ public class GameManager : NetworkBehaviour {
         spectationManager = GetComponent<SpectationManager>();
         loopMusic = GetComponent<LoopingMusic>();
         particleManager = GetComponentInChildren<SingleParticleManager>();
+        rpcs = GetComponent<GameEventRpcs>();
 
         //Make UI color translucent
         levelUIColor.a = .7f;
@@ -325,13 +289,10 @@ public class GameManager : NetworkBehaviour {
         Runner.ProvideInput = true;
 
         //Setup respawning tilemap
-        originalTilesOrigin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
-        originalTiles = tilemap.GetTilesBlock(originalTilesOrigin);
         tilemap.RefreshAllTiles();
 
         //Find objects in the scene
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-        coins = FindObjectsOfType<FloatingCoin>();
         enemySpawns = FindObjectsOfType<EnemySpawnpoint>();
 
         //create player instances
@@ -357,19 +318,6 @@ public class GameManager : NetworkBehaviour {
         }
 
         Camera.main.transform.position = spawnpoint;
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_ResetTilemap() {
-        tilemap.SetTilesBlock(originalTilesOrigin, originalTiles);
-
-        foreach (FloatingCoin coin in coins)
-            coin.ResetCoin();
-
-        foreach (EnemySpawnpoint point in enemySpawns)
-            point.AttemptSpawning();
-
-        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - RealPlayerCount / 5f);
     }
 
     public void OnPlayerLoaded() {
@@ -470,7 +418,6 @@ public class GameManager : NetworkBehaviour {
         StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
     }
 
-    private static readonly string[] teams = { "Red Team", "Green Team", "Blue Team", "Yellow Team", "Magenta Team" };
     private IEnumerator EndGame(int winningTeam) {
         //TODO:
         //PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
@@ -485,7 +432,8 @@ public class GameManager : NetworkBehaviour {
             tmpText.text = "It's a draw...";
         } else {
             if (LobbyData.Instance.Teams) {
-                tmpText.text = teams[winningTeam] + " Wins!";
+                Team team = ScriptableManager.Instance.teams[winningTeam];
+                tmpText.text = team.displayName + " Wins!";
             } else {
                 tmpText.text = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname() + " Wins!";
             }
@@ -523,7 +471,8 @@ public class GameManager : NetworkBehaviour {
                 data.IsCurrentlySpectating = false;
 
                 //move non-teams into valid teams range
-                data.Team = (sbyte) ((data.Object.InputAuthority + 1) % 5);
+                if (LobbyData.Instance.Teams)
+                    data.Team = (sbyte) Mathf.Clamp(data.Team, 0, ScriptableManager.Instance.teams.Length);
             }
         }
 
@@ -634,7 +583,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void CheckForWinner() {
-        if (gameover || !Runner.IsServer)
+        if (gameover || !Object.HasStateAuthority)
             return;
 
         int requiredStars = LobbyData.Instance.StarRequirement;

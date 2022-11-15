@@ -53,7 +53,7 @@ namespace NSMB.Extensions {
         }
 
         public static CharacterData GetCharacterData(this PlayerData data) {
-            return GlobalController.Instance.characters[data ? data.CharacterIndex : Settings.Instance.character];
+            return ScriptableManager.Instance.characters[data ? data.CharacterIndex : Settings.Instance.character];
         }
     }
 }

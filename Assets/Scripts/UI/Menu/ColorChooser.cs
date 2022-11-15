@@ -25,7 +25,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
         buttons = new();
         navigations = new();
 
-        PlayerColorSet[] colors = GlobalController.Instance.skins;
+        PlayerColorSet[] colors = ScriptableManager.Instance.skins;
 
         for (int i = 0; i < colors.Length; i++) {
             PlayerColorSet color = colors[i];

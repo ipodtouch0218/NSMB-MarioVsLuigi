@@ -870,7 +870,7 @@ public class MainMenuManager : MonoBehaviour {
         Settings.Instance.character = character;
         Settings.Instance.SaveSettingsToPreferences();
 
-        CharacterData data = GlobalController.Instance.characters[dropdown.value];
+        CharacterData data = ScriptableManager.Instance.characters[dropdown.value];
         sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected, data);
         colorManager.ChangeCharacter(data);
 
@@ -881,7 +881,7 @@ public class MainMenuManager : MonoBehaviour {
         } else {
             paletteDisabled.SetActive(false);
             palette.SetActive(true);
-            PlayerColors colors = GlobalController.Instance.skins[skin].GetPlayerColors(data);
+            PlayerColors colors = ScriptableManager.Instance.skins[skin].GetPlayerColors(data);
             overallColor.color = colors.overallsColor;
             shirtColor.color = colors.hatColor;
         }
@@ -897,7 +897,7 @@ public class MainMenuManager : MonoBehaviour {
             palette.SetActive(true);
 
             CharacterData character = Runner.GetLocalPlayerData().GetCharacterData();
-            PlayerColors colors = GlobalController.Instance.skins[index].GetPlayerColors(character);
+            PlayerColors colors = ScriptableManager.Instance.skins[index].GetPlayerColors(character);
             overallColor.color = colors.overallsColor;
             shirtColor.color = colors.hatColor;
         }

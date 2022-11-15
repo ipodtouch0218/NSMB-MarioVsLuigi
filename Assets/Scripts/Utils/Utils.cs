@@ -375,7 +375,7 @@ namespace NSMB.Utils {
 
         // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
         public static Powerup GetRandomItem(PlayerController player) {
-            Powerup[] powerups = GlobalController.Instance.powerups;
+            Powerup[] powerups = ScriptableManager.Instance.powerups;
             GameManager gm = GameManager.Instance;
 
             // "losing" variable based on ln(x+1), x being the # of stars we're behind
@@ -458,14 +458,14 @@ namespace NSMB.Utils {
             string[] tiles = (string[]) changesTable["T"];
 
             foreach (KeyValuePair<int, int> pairs in changes) {
-                copy[pairs.Key] = GetTileFromCache(tiles[pairs.Value]);
+                copy[pairs.Key] = GetCacheTile(tiles[pairs.Value]);
             }
 
             tilemap.SetTilesBlock(bounds, copy);
         }
 
         private static readonly Dictionary<string, TileBase> tileCache = new();
-        public static TileBase GetTileFromCache(string tilename) {
+        public static TileBase GetCacheTile(string tilename) {
             if (tilename == null || tilename == "")
                 return null;
 
@@ -533,13 +533,6 @@ namespace NSMB.Utils {
             return ret.ToString();
         }
 
-        private static readonly float[] teamHues = {
-            0/360f,     // red
-            120/360f,   // green
-            220/360f,   // blue
-            60/360f,    // yellow
-            300/360f,   // magenta
-        };
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
 
@@ -549,7 +542,7 @@ namespace NSMB.Utils {
                 return spectatorColor;
 
             //then teams
-            if (LobbyData.Instance.Teams && data.Team >= 0 && data.Team < teamHues.Length)
+            if (LobbyData.Instance.Teams && data.Team >= 0 && data.Team < ScriptableManager.Instance.teams.Length)
                 return GetTeamColor(data.Team, s, v);
 
             //then id based color
@@ -573,19 +566,13 @@ namespace NSMB.Utils {
             return Color.HSVToRGB(result / ((float) count + 1), s, v);
         }
 
-        public static readonly string[] teamSprites = {
-            "<sprite=50>",  //red
-            "<sprite=51>",  //green
-            "<sprite=52>",  //blue
-            "<sprite=53>",  //yellow
-            "<sprite=54>"   //magenta
-        };
-
         public static Color GetTeamColor(int team, float s = 1, float v = 1) {
-            if (team < 0 || team >= teamHues.Length)
+            if (team < 0 || team >= ScriptableManager.Instance.teams.Length)
                 return spectatorColor;
 
-            return Color.HSVToRGB(teamHues[team], s, v);
+            Color color = ScriptableManager.Instance.teams[team].color;
+            Color.RGBToHSV(color, out float hue, out float saturation, out float value);
+            return Color.HSVToRGB(hue, saturation * s, value * v);
         }
 
         public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {

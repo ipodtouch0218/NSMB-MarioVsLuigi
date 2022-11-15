@@ -5,7 +5,7 @@ using Fusion;
 [CreateAssetMenu(fileName = "New Prefab List", menuName = "ScriptableObjects/PrefabList")]
 public class PrefabList : ScriptableObject {
 
-    public static PrefabList Instance => GlobalController.Instance.prefabs;
+    public static PrefabList Instance => ScriptableManager.Instance.prefabs;
 
     //---Network Helpers
     public NetworkPrefabRef PlayerDataHolder, LobbyDataHolder;
