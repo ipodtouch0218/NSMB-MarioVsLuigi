@@ -59,11 +59,11 @@ MonoBehaviour:
     _value: 0
   wallHitParticle: {fileID: 3894548935506966732, guid: 1cd96fd39f9753b4fb9e589043267000,
     type: 3}
+  isIceball: 0
   particles: {fileID: 5044812112945403417}
   speed: 6.25
   bounceHeight: 6.75
   terminalVelocity: 6.25
-  isIceball: 0
 --- !u!50 &1186833380152900418
 Rigidbody2D:
   serializedVersion: 4
@@ -75,7 +75,7 @@ Rigidbody2D:
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 1
+  m_UseAutoMass: 0
   m_Mass: 0.075625
   m_LinearDrag: 0
   m_AngularDrag: 0.05

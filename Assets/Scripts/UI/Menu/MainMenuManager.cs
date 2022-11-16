@@ -8,13 +8,13 @@ using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
+using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
-using Fusion.Sockets;
 
 public class MainMenuManager : MonoBehaviour {
 
-    public const int NICKNAME_MIN = 2, NICKNAME_MAX = 20;
+    public static readonly int NicknameMin = 2, NicknameMax = 20;
 
     public static MainMenuManager Instance;
 
@@ -234,7 +234,7 @@ public class MainMenuManager : MonoBehaviour {
         //TODO: change to current region
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
-        nicknameField.characterLimit = NICKNAME_MAX;
+        nicknameField.characterLimit = NicknameMax;
 
         rebindManager.Init();
 
@@ -619,7 +619,7 @@ public class MainMenuManager : MonoBehaviour {
         selectedRoom = room.GetComponent<RoomIcon>();
         selectedRoom.Select();
 
-        joinRoomBtn.interactable = room != null && nicknameField.text.Length >= NICKNAME_MIN;
+        joinRoomBtn.interactable = room != null && nicknameField.text.Length >= NicknameMin;
     }
 
     public void JoinSelectedRoom() {

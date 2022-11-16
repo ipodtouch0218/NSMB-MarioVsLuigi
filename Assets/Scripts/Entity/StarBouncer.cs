@@ -72,11 +72,6 @@ public class StarBouncer : CollectableEntity {
             body.isKinematic = true;
             body.velocity = Vector2.zero;
             StartCoroutine(PulseEffect());
-
-            //play star spawn sfx, only IF
-            if (GameManager.Instance.IsMusicEnabled)
-                GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
-
         } else {
             //player dropped star
 
@@ -93,6 +88,9 @@ public class StarBouncer : CollectableEntity {
             body.isKinematic = false;
             worldCollider.enabled = true;
         }
+
+        if (GameManager.Instance.IsMusicEnabled)
+            GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
 
         if (ANY_GROUND_MASK == -1)
             ANY_GROUND_MASK = LayerMask.GetMask("Ground", "PassthroughInvalid");

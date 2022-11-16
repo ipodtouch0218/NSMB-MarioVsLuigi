@@ -71,7 +71,7 @@ PrefabInstance:
     - target: {fileID: 1011982274984717421, guid: 00a2ef66a322a694c837b29404f2af49,
         type: 3}
       propertyPath: m_Name
-      value: Iceball
+      value: IceBall
       objectReference: {fileID: 0}
     - target: {fileID: 1164692562165207756, guid: 00a2ef66a322a694c837b29404f2af49,
         type: 3}
@@ -104,6 +104,11 @@ PrefabInstance:
         type: 3}
       propertyPath: _IsIceball._value
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1186833380152900418, guid: 00a2ef66a322a694c837b29404f2af49,
+        type: 3}
+      propertyPath: m_UseAutoMass
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1186833380152900418, guid: 00a2ef66a322a694c837b29404f2af49,
         type: 3}

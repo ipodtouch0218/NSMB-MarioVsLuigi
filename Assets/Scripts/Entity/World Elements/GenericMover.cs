@@ -18,7 +18,7 @@ public class GenericMover : NetworkBehaviour {
     public override void FixedUpdateNetwork() {
         int start = GameManager.Instance.GameStartTick;
         int ticksSinceStart = Runner.Simulation.Tick.Raw - start;
-        double secondsSinceStart = (double) ticksSinceStart / Runner.Config.Simulation.TickRate;
+        double secondsSinceStart = (double) ticksSinceStart * Runner.DeltaTime;
 
         float xValue = 0, yValue = 0;
 

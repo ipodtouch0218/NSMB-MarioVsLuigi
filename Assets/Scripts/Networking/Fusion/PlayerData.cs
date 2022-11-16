@@ -84,10 +84,10 @@ public class PlayerData : NetworkBehaviour {
         name = Regex.Replace(name, @"[^\p{L}\d]", "");
 
         //enforce character limits
-        name = name[..Mathf.Min(name.Length, MainMenuManager.NICKNAME_MAX)];
+        name = name[..Mathf.Min(name.Length, MainMenuManager.NicknameMax)];
 
         //if this new nickname is invalid, default back to "noname"
-        if (name.Length < MainMenuManager.NICKNAME_MIN)
+        if (name.Length < MainMenuManager.NicknameMin)
             name = "noname";
 
         Nickname = name;

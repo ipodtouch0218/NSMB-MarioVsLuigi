@@ -15,7 +15,7 @@ namespace NSMB.Utils {
             if (input == null)
                 return false;
 
-            string count = MainMenuManager.NICKNAME_MIN + "," + MainMenuManager.NICKNAME_MAX;
+            string count = MainMenuManager.NicknameMin + "," + MainMenuManager.NicknameMax;
             return Regex.IsMatch(input, "^[0-9A-Za-z]{" + count + "}(\\([0-9]\\))?$");
         }
 
@@ -27,10 +27,10 @@ namespace NSMB.Utils {
             input = Regex.Replace(input, @"(\([0-9]\))|[^A-Za-z0-9]", "");
 
             //name character maximum
-            input = input.Substring(0, Mathf.Min(input.Length, MainMenuManager.NICKNAME_MAX));
+            input = input.Substring(0, Mathf.Min(input.Length, MainMenuManager.NicknameMax));
 
             //name character minimum
-            if (input.Length < MainMenuManager.NICKNAME_MIN)
+            if (input.Length < MainMenuManager.NicknameMin)
                 input = "noname";
 
             //name filtering

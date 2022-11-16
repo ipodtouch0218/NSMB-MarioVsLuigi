@@ -699,7 +699,6 @@ public class GameManager : NetworkBehaviour {
     public void Quit() {
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         Runner.Shutdown();
-        SceneManager.LoadScene("MainMenu");
     }
 
     public void HostQuitCancel() {
@@ -739,8 +738,6 @@ public class GameManager : NetworkBehaviour {
             players = RealPlayerCount;
         if (players == 0)
             players = 1;
-
-        Debug.Log($"getting spawn, playerindex: {playerIndex}, players: {players}");
 
         float comp = (float) playerIndex/players * 2 * Mathf.PI + (Mathf.PI/2f) + (Mathf.PI/(2*players));
         float scale = (2-(players+1f)/players) * size;
