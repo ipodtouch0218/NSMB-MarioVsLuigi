@@ -20,4 +20,4 @@ MonoBehaviour:
   isBackgroundTile: 0
   iceSkidding: 0
   footstepSound: 93
-  footstepParticle: 2
+  footstepParticle: 4

@@ -708,24 +708,28 @@ public class GameManager : NetworkBehaviour {
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
-    //lazy mofo
+    //lazy loading
     private float? middleX, minX, minY, maxX, maxY;
     public float GetLevelMiddleX() {
         middleX ??= (GetLevelMaxX() + GetLevelMinX()) / 2;
         return (float) middleX;
     }
+
     public float GetLevelMinX() {
         minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
         return (float) minX;
     }
+
     public float GetLevelMinY() {
         minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
         return (float) minY;
     }
+
     public float GetLevelMaxX() {
         maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
         return (float) maxX;
     }
+
     public float GetLevelMaxY() {
         maxY ??=  ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
         return (float) maxY;

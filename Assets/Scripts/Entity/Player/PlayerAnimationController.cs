@@ -407,7 +407,6 @@ public class PlayerAnimationController : NetworkBehaviour {
             controller.IsOnGround = false;
             controller.properJump = false;
             controller.IsCrouching = false;
-            controller.alreadyGroundpounded = true;
             controller.pipeTimer = 0.25f;
             body.velocity = Vector2.zero;
         }

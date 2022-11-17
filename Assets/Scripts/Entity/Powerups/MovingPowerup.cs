@@ -35,9 +35,9 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         base.Awake();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
-        childAnimator = GetComponentInChildren<Animator>();
         hitbox = GetComponent<BoxCollider2D>();
         collectScript = GetComponent<IPowerupCollect>();
+        childAnimator = GetComponentInChildren<Animator>();
 
         originalLayer = sRenderer.sortingOrder;
 

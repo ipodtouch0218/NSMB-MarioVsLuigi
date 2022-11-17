@@ -5,13 +5,15 @@ using NSMB.Utils;
 
 public class CameraController : MonoBehaviour {
 
-    private static readonly Vector2 airOffset = new(0, .65f);
+    private static readonly Vector2 AirOffset = new(0, .65f);
+    private static readonly Vector2 AirThreshold = new(0.5f, 1.3f), GroundedThreshold = new(0.5f, 0f);
 
+    //---Public Variables
     public static float ScreenShake = 0;
     public Vector3 currentPosition;
     public bool IsControllingCamera { get; set; } = false;
 
-    private Vector2 airThreshold = new(0.5f, 1.3f), groundedThreshold = new(0.5f, 0f);
+    //---Private Variables
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
     private PlayerController controller;
     private Vector3 smoothDampVel, playerPos;
@@ -34,19 +36,26 @@ public class CameraController : MonoBehaviour {
             if ((ScreenShake -= Time.deltaTime) > 0 && controller.IsOnGround)
                 shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
 
-            targetCamera.transform.position = currentPosition + shakeOffset;
-            if (BackgroundLoop.Instance)
-                BackgroundLoop.Instance.Reposition();
-
-            secondaryPositioners.RemoveAll(scp => scp == null);
-            secondaryPositioners.ForEach(scp => scp.UpdatePosition());
+            SetPosition(currentPosition + shakeOffset);
         }
     }
 
     public void Recenter(Vector2 pos) {
-        currentPosition = pos + airOffset;
+        currentPosition = pos + AirOffset;
         smoothDampVel = Vector3.zero;
-        LateUpdate();
+        SetPosition(pos);
+    }
+
+    private void SetPosition(Vector3 position) {
+        if (!IsControllingCamera)
+            return;
+
+        targetCamera.transform.position = position;
+        if (BackgroundLoop.Instance)
+            BackgroundLoop.Instance.Reposition();
+
+        secondaryPositioners.RemoveAll(scp => !scp);
+        secondaryPositioners.ForEach(scp => scp.UpdatePosition());
     }
 
     private Vector3 CalculateNewPosition() {
@@ -115,12 +124,13 @@ public class CameraController : MonoBehaviour {
 
         return targetPosition;
     }
-    private void OnDrawGizmos() {
+
+    public void OnDrawGizmos() {
         if (!controller)
             return;
 
         Gizmos.color = Color.blue;
-        Vector2 threshold = controller.IsOnGround ? groundedThreshold : airThreshold;
+        Vector2 threshold = controller.IsOnGround ? GroundedThreshold : AirThreshold;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(new(playerPos.x, lastFloor), Vector3.right / 2);
