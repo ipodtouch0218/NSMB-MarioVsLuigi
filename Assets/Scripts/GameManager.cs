@@ -12,6 +12,7 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using System.Drawing.Text;
 
 public class GameManager : NetworkBehaviour {
 
@@ -203,6 +204,7 @@ public class GameManager : NetworkBehaviour {
         tilemap.SetTilesBlock(new BoundsInt(tileOrigin.x, tileOrigin.y, 0, tileDimensions.x, tileDimensions.y, 1), tileObjects);
     }
 
+    //TODO: convert to RPC...?
     public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, GameObject prefab) {
         GameObject particle = Instantiate(prefab, pos, Quaternion.Euler(0, 0, flip ? 180 : 0));
 
@@ -230,18 +232,6 @@ public class GameManager : NetworkBehaviour {
         //    RaiseEventOptions options = new() { CachingOption = EventCaching.DoNotCache, TargetActors = new int[] { player.ActorNumber } };
         //    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SyncTilemap, changes, options, SendOptions.SendReliable);
 
-        //}
-    }
-    public void OnPlayerLeftRoom(PlayerRef player) {
-        //TODO: player disconnect message
-
-        //nonSpectatingPlayers = PhotonNetwork.CurrentRoom.Players.Values.Where(pl => !pl.IsSpectator()).ToHashSet();
-        //CheckIfAllLoaded();
-
-        //if (musicEnabled && FindObjectsOfType<PlayerController>().Length <= 0) {
-        //    //all players left.
-        //    if (PhotonNetwork.IsMasterClient)
-        //        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
         //}
     }
 
@@ -325,6 +315,14 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        //Kill player if they are still alive
+        if (Object.HasStateAuthority) {
+            foreach (PlayerController pl in AlivePlayers) {
+                if (pl.Object.InputAuthority == player)
+                    pl.Rpc_DisconnectDeath();
+            }
+        }
+
         CheckForWinner();
     }
 
@@ -366,8 +364,10 @@ public class GameManager : NetworkBehaviour {
     //TODO: invokeresim?
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_EndGame(int team) {
+        if (gameover)
+            return;
 
-        //TODO: don't use a coroutine.
+        //TODO: don't use a coroutine?
         StartCoroutine(EndGame(team));
     }
 
@@ -406,7 +406,7 @@ public class GameManager : NetworkBehaviour {
             wfgs.AttemptExecute();
 
         //Big star
-        SpawnBigStar();
+        AttemptSpawnBigStar();
 
         GameStartTick = Runner.Simulation.Tick.Raw;
 
@@ -480,49 +480,7 @@ public class GameManager : NetworkBehaviour {
         Runner.SetActiveScene(0);
     }
 
-    private void SpawnBigStar() {
-
-        for (int i = 0; i < starSpawns.Length; i++) {
-            if (activeStarSpawns.Count <= 0)
-                activeStarSpawns.AddRange(starSpawns);
-
-            int index = Random.RangeExclusive(0, activeStarSpawns.Count);
-            Vector3 spawnPos = activeStarSpawns[index].transform.position;
-
-            if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 4, Layers.MaskOnlyPlayers)) {
-                //a player is too close to the spawn
-                activeStarSpawns.RemoveAt(index);
-                continue;
-            }
-
-            //Valid spawn
-            Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
-                obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
-            });
-            activeStarSpawns.RemoveAt(index);
-            return;
-        }
-
-        //no star could spawn. wait a second and try again...
-        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
-    }
-
     public override void FixedUpdateNetwork() {
-
-        //check if all players left.
-        //if (GameStartTick != -1 && musicEnabled) {
-        //    bool allNull = true;
-        //    foreach (PlayerController controller in players) {
-        //        if (controller) {
-        //            allNull = false;
-        //            break;
-        //        }
-        //    }
-        //    if (spectationManager.Spectating && allNull) {
-        //        StartCoroutine(EndGame(PlayerRef.None));
-        //        return;
-        //    }
-        //}
 
         if (gameover)
             return;
@@ -534,7 +492,7 @@ public class GameManager : NetworkBehaviour {
 
         if (BigStarRespawnTimer.Expired(Runner)) {
             BigStarRespawnTimer = TickTimer.None;
-            SpawnBigStar();
+            AttemptSpawnBigStar();
         }
 
         if (GameStartTimer.Expired(Runner)) {
@@ -574,6 +532,33 @@ public class GameManager : NetworkBehaviour {
                     sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
             }
         }
+    }
+
+    private void AttemptSpawnBigStar() {
+
+        for (int i = 0; i < starSpawns.Length; i++) {
+            if (activeStarSpawns.Count <= 0)
+                activeStarSpawns.AddRange(starSpawns);
+
+            int index = Random.RangeExclusive(0, activeStarSpawns.Count);
+            Vector3 spawnPos = activeStarSpawns[index].transform.position;
+
+            if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 4, Layers.MaskOnlyPlayers)) {
+                //a player is too close to the spawn
+                activeStarSpawns.RemoveAt(index);
+                continue;
+            }
+
+            //Valid spawn
+            Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
+                obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
+            });
+            activeStarSpawns.RemoveAt(index);
+            return;
+        }
+
+        //no star could spawn. wait a few and try again...
+        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
     }
 
     public void CreateNametag(PlayerController controller) {
@@ -626,7 +611,7 @@ public class GameManager : NetworkBehaviour {
         }
     }
 
-    private void PlaySong(Enums.MusicState state, MusicData musicToPlay) {
+    private void TryChangeSong(Enums.MusicState state, MusicData musicToPlay) {
         if (musicState == state)
             return;
 
@@ -648,14 +633,14 @@ public class GameManager : NetworkBehaviour {
         }
 
         speedup |= teamManager.GetFirstPlaceStars() + 1 >= LobbyData.Instance.StarRequirement;
-        speedup |= AlivePlayers.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
+        speedup |= AlivePlayers.Count <= 2 && AlivePlayers.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
 
         if (mega) {
-            PlaySong(Enums.MusicState.MegaMushroom, megaMushroomMusic);
+            TryChangeSong(Enums.MusicState.MegaMushroom, megaMushroomMusic);
         } else if (invincible) {
-            PlaySong(Enums.MusicState.Starman, invincibleMusic);
+            TryChangeSong(Enums.MusicState.Starman, invincibleMusic);
         } else {
-            PlaySong(Enums.MusicState.Normal, mainMusic);
+            TryChangeSong(Enums.MusicState.Normal, mainMusic);
         }
 
         loopMusic.FastMusic = speedup;
@@ -678,8 +663,8 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void AttemptQuit() {
-
-        if (Runner.IsServer) {
+        if (Runner.GetLocalPlayerData().IsRoomOwner) {
+            //prompt for ending game or leaving
             sfx.PlayOneShot(Enums.Sounds.UI_Decide);
             pausePanel.SetActive(false);
             hostExitUI.SetActive(true);
@@ -690,6 +675,7 @@ public class GameManager : NetworkBehaviour {
         Quit();
     }
 
+    //---UI Callbacks
     public void HostEndMatch() {
         pauseUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
@@ -708,32 +694,16 @@ public class GameManager : NetworkBehaviour {
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
+    //---Helpers
     //lazy loading
-    private float? middleX, minX, minY, maxX, maxY;
-    public float GetLevelMiddleX() {
-        middleX ??= (GetLevelMaxX() + GetLevelMinX()) / 2;
-        return (float) middleX;
-    }
-
-    public float GetLevelMinX() {
-        minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-        return (float) minX;
-    }
-
-    public float GetLevelMinY() {
-        minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
-        return (float) minY;
-    }
-
-    public float GetLevelMaxX() {
-        maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-        return (float) maxX;
-    }
-
-    public float GetLevelMaxY() {
-        maxY ??=  ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
-        return (float) maxY;
-    }
+    private float? middleX, minX, minY, maxX, maxY, levelWidth, levelHeight;
+    public float GetLevelMiddleX() => middleX ??= (GetLevelMaxX() + GetLevelMinX()) * 0.5f;
+    public float GetLevelMinX() => minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float GetLevelMinY() => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    public float GetLevelMaxX() => maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float GetLevelMaxY() => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    public float GetLevelWidth() => levelWidth ??= levelWidthTile * 0.5f;
+    public float GetLevelHeight() => levelHeight ??= levelHeightTile * 0.5f;
 
 
     public float size = 1.39f, ySize = 0.8f;
@@ -743,8 +713,8 @@ public class GameManager : NetworkBehaviour {
         if (players == 0)
             players = 1;
 
-        float comp = (float) playerIndex/players * 2 * Mathf.PI + (Mathf.PI/2f) + (Mathf.PI/(2*players));
-        float scale = (2-(players+1f)/players) * size;
+        float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI/(2*players));
+        float scale = (2 - (players + 1f) / players) * size;
 
         Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2 ? scale * ySize : 0), 0);
         Utils.WrapWorldLocation(ref spawn);
@@ -752,45 +722,45 @@ public class GameManager : NetworkBehaviour {
         return spawn;
     }
 
-    [SerializeField, Range(1,10)] private int playersToVisualize = 10;
+    //---Debug
+    private static readonly int DebugSpawns = 10;
     public void OnDrawGizmos() {
 
         if (!tilemap)
             return;
 
-        for (int i = 0; i < playersToVisualize; i++) {
-            Gizmos.color = new Color((float) i / playersToVisualize, 0, 0, 0.75f);
-            Gizmos.DrawCube(GetSpawnpoint(i, playersToVisualize) + Vector3.down/4f, Vector2.one/2f);
+        for (int i = 0; i < DebugSpawns; i++) {
+            Gizmos.color = new Color((float) i / DebugSpawns, 0, 0, 0.75f);
+            Gizmos.DrawCube(GetSpawnpoint(i, DebugSpawns) + Vector3.down * 0.25f, Vector2.one * 0.5f);
         }
 
-        Vector3 size = new(levelWidthTile/2f, levelHeightTile/2f);
-        Vector3 origin = new(GetLevelMinX() + (levelWidthTile/4f), GetLevelMinY() + (levelHeightTile/4f), 1);
+        Vector3 size = new(GetLevelWidth(), GetLevelHeight());
+        Vector3 origin = new(GetLevelMinX() + (GetLevelWidth() * 0.5f), GetLevelMinY() + (GetLevelHeight() * 0.5f), 1);
         Gizmos.color = Color.gray;
         Gizmos.DrawWireCube(origin, size);
 
-        size = new Vector3(levelWidthTile/2f, cameraHeightY);
-        origin = new Vector3(GetLevelMinX() + (levelWidthTile/4f), cameraMinY + (cameraHeightY/2f), 1);
+        size = new Vector3(GetLevelWidth(), cameraHeightY);
+        origin.y = cameraMinY + (cameraHeightY * 0.5f);
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(origin, size);
 
-        if (!tilemap)
-            return;
-
+        Vector3 oneFourth = Vector3.one * 0.25f;
         for (int x = 0; x < levelWidthTile; x++) {
             for (int y = 0; y < levelHeightTile; y++) {
                 Vector3Int loc = new(x+levelMinTileX, y+levelMinTileY, 0);
                 TileBase tile = tilemap.GetTile(loc);
                 if (tile is CoinTile)
-                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + Vector3.one * 0.25f, "coin");
+                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + oneFourth, "coin");
                 if (tile is PowerupTile)
-                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + Vector3.one * 0.25f, "powerup");
+                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + oneFourth, "powerup");
             }
         }
 
-        Gizmos.color = new Color(1, 0.9f, 0.2f, 0.2f);
+        Gizmos.color = new(1, 0.9f, 0.2f, 0.2f);
+        Color starBoxColor = new(1, 1, 1, 0.5f);
         foreach (GameObject starSpawn in GameObject.FindGameObjectsWithTag("StarSpawn")) {
             Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
-            Gizmos.DrawIcon(starSpawn.transform.position, "star", true, new Color(1, 1, 1, 0.5f));
+            Gizmos.DrawIcon(starSpawn.transform.position, "star", true, starBoxColor);
         }
     }
 }

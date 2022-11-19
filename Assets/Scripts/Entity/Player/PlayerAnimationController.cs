@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,9 @@ using NSMB.Utils;
 
 public class PlayerAnimationController : NetworkBehaviour {
 
+    //---Static Variables
+    private static readonly WaitForSeconds BlinkDelay = new(0.1f);
+
     //---Networked Variables
 
     //---Serialized Variables
@@ -15,7 +19,7 @@ public class PlayerAnimationController : NetworkBehaviour {
     [SerializeField] private GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
     [SerializeField] private Material glowMaterial;
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
-    [SerializeField] private float blinkDuration = 0.1f, pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
+    [SerializeField] private float pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] private AudioClip normalDrill, propellerDrill;
 
     //---Components
@@ -36,6 +40,8 @@ public class PlayerAnimationController : NetworkBehaviour {
     private Enums.PlayerEyeState eyeState;
     private float blinkTimer, pipeTimer, propellerVelocity;
     public bool deathUp, wasTurnaround, enableGlow;
+
+    private Coroutine blinkRoutine;
 
     public void Awake() {
         controller = GetComponent<PlayerController>();
@@ -66,40 +72,41 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         enableGlow = LobbyData.Instance.Teams || !Object.HasInputAuthority;
         GlowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
+
+        blinkRoutine ??= StartCoroutine(BlinkRoutine());
     }
 
     public override void Render() {
+        UpdateAnimatorStates();
         HandleAnimations();
-        SetFacingDirection();
-    }
-
-    public void Update() {
         InterpolateFacingDirection();
     }
 
+    public override void FixedUpdateNetwork() {
+        SetFacingDirection();
+    }
+
     public void HandleAnimations() {
-
-        bool gameover = GameManager.Instance.gameover;
-        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(Runner) ?? 0f);
-
-        if (gameover) {
+        if (GameManager.Instance.gameover) {
             models.SetActive(true);
 
             // Disable Particles
-            SetParticleEmission(drillParticle,  false);
-            SetParticleEmission(sparkles,       false);
-            SetParticleEmission(dust,           false);
-            SetParticleEmission(giantParticle,  false);
-            SetParticleEmission(fireParticle,   false);
+            SetParticleEmission(drillParticle, false);
+            SetParticleEmission(sparkles,      false);
+            SetParticleEmission(dust,          false);
+            SetParticleEmission(giantParticle, false);
+            SetParticleEmission(fireParticle,  false);
             return;
         }
 
+        float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
+
         //Particles
-        SetParticleEmission(drillParticle,      controller.IsDrilling);
-        SetParticleEmission(sparkles,           controller.IsStarmanInvincible);
-        SetParticleEmission(dust,               (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
-        SetParticleEmission(giantParticle,      controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
-        SetParticleEmission(fireParticle,       animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
+        SetParticleEmission(drillParticle, controller.IsDrilling);
+        SetParticleEmission(sparkles,      controller.IsStarmanInvincible);
+        SetParticleEmission(dust,          (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.pipeEntering);
+        SetParticleEmission(giantParticle, controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
+        SetParticleEmission(fireParticle,  animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
 
         if (controller.IsDrilling)
             drillParticleAudio.clip = controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill;
@@ -107,28 +114,24 @@ public class PlayerAnimationController : NetworkBehaviour {
         if (controller.IsCrouching || controller.IsSliding || controller.IsSkidding) {
             dust.transform.localPosition = Vector2.zero;
         } else if (controller.WallSlideLeft || controller.WallSlideRight) {
-            dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * (3f / 4f) * (controller.WallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * (3f / 4f));
-        }
-
-        //Blinking
-        if (controller.IsDead) {
-            eyeState = Enums.PlayerEyeState.Death;
-        } else {
-            if ((blinkTimer -= Time.fixedDeltaTime) < 0)
-                blinkTimer = 3f + (Random.value * 6f);
-            if (blinkTimer < blinkDuration) {
-                eyeState = Enums.PlayerEyeState.HalfBlink;
-            } else if (blinkTimer < blinkDuration * 2f) {
-                eyeState = Enums.PlayerEyeState.FullBlink;
-            } else if (blinkTimer < blinkDuration * 3f) {
-                eyeState = Enums.PlayerEyeState.HalfBlink;
-            } else {
-                eyeState = Enums.PlayerEyeState.Normal;
-            }
+            dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * 0.75f * (controller.WallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * 0.75f);
         }
 
         if (controller.cameraController.IsControllingCamera)
             HorizontalCamera.OFFSET_TARGET = (controller.IsSpinnerFlying || controller.IsPropellerFlying) ? 0.5f : 0f;
+    }
+
+    private IEnumerator BlinkRoutine() {
+        while (true) {
+            yield return new WaitForSeconds(3f + (Random.value * 6f));
+            eyeState = Enums.PlayerEyeState.HalfBlink;
+            yield return BlinkDelay;
+            eyeState = Enums.PlayerEyeState.FullBlink;
+            yield return BlinkDelay;
+            eyeState = Enums.PlayerEyeState.HalfBlink;
+            yield return BlinkDelay;
+            eyeState = Enums.PlayerEyeState.Normal;
+        }
     }
 
     private void SetFacingDirection() {
@@ -139,8 +142,8 @@ public class PlayerAnimationController : NetworkBehaviour {
             return;
 
         //rotChangeTarget = models.transform.rotation.eulerAngles;
-        float delta = Runner.DeltaTime * 0.333f;
-        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(Runner) ?? 0f);
+        float delta = Runner.DeltaTime;
+        float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
 
         bool rotChangeFacingDirection = false;
         rotChangeInstant = false;
@@ -191,7 +194,6 @@ public class PlayerAnimationController : NetworkBehaviour {
     }
 
     private void InterpolateFacingDirection() {
-
         if (GameManager.Instance.gameover || controller.IsFrozen)
             return;
 
@@ -219,13 +221,10 @@ public class PlayerAnimationController : NetworkBehaviour {
         }
     }
 
-    public void UpdateAnimatorStates(NetworkButtons heldButtons) {
+    public void UpdateAnimatorStates() {
 
-        if (!Runner.IsForward)
-            return;
-
-        bool right = heldButtons.IsSet(PlayerControls.Right);
-        bool left =  heldButtons.IsSet(PlayerControls.Left);
+        bool right = controller.PreviousInputs.buttons.IsSet(PlayerControls.Right);
+        bool left =  controller.PreviousInputs.buttons.IsSet(PlayerControls.Left);
 
         animator.SetBool("onLeft", controller.WallSlideLeft);
         animator.SetBool("onRight", controller.WallSlideRight);
@@ -300,7 +299,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             _ => 0
         };
         materialBlock.SetFloat("PowerupState", ps);
-        materialBlock.SetFloat("EyeState", (int) eyeState);
+        materialBlock.SetFloat("EyeState", (int) (controller.IsDead ? Enums.PlayerEyeState.Death : eyeState));
         materialBlock.SetFloat("ModelScale", transform.lossyScale.x);
 
         Vector3 giantMultiply = Vector3.one;
@@ -316,7 +315,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         //hit flash
         float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(Runner) ?? 0f;
-        models.SetActive(!controller.IsRespawning && (GameManager.Instance.gameover || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % (blinkDuration * 2f) < blinkDuration)));
+        models.SetActive(!controller.IsRespawning && (GameManager.Instance.gameover || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
 
         //Model changing
         bool large = controller.State >= Enums.PowerupState.Mushroom;
@@ -340,7 +339,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         if (!controller.IsDead || controller.IsRespawning)
             return;
 
-        float deathTimer = 3f - (controller.DeathTimer.RemainingTime(Runner) ?? 0f);
+        float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
 
         if (deathTimer < deathUpTime) {
             deathUp = false;
@@ -363,7 +362,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
         }
-        if (controller.Object.HasInputAuthority && deathTimer + Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f))
+        if (controller.Object.HasInputAuthority && deathTimer + Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f) && Runner.IsForward)
             controller.fadeOut.FadeOutAndIn(0.33f, .1f);
 
         if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y) {
@@ -405,7 +404,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             controller.pipeEntering = null;
             body.isKinematic = false;
             controller.IsOnGround = false;
-            controller.properJump = false;
+            controller.ProperJump = false;
             controller.IsCrouching = false;
             controller.pipeTimer = 0.25f;
             body.velocity = Vector2.zero;

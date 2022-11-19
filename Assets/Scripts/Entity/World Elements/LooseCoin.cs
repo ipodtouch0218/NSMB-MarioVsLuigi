@@ -60,7 +60,8 @@ public class LooseCoin : Coin {
                 return;
             }
 
-            if (prevFrameVelocity.y < -1f)
+            //isforward is ok, the sound isnt top priority
+            if (prevFrameVelocity.y < -1f && Runner.IsForward)
                 PlaySound(Enums.Sounds.World_Coin_Drop);
         }
 
