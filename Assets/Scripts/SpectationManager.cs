@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
-using NSMB.Extensions;
 using Fusion;
+using NSMB.Extensions;
 
 public class SpectationManager : MonoBehaviour {
 

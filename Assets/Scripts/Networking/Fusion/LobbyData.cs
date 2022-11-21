@@ -1,4 +1,9 @@
+using Collections.Unsafe;
 using Fusion;
+using Fusion.Sockets;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.InputSystem.Controls;
 
 public class LobbyData : NetworkBehaviour {
 
@@ -28,7 +33,10 @@ public class LobbyData : NetworkBehaviour {
     [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool Teams { get; set; }
 
     //---Private Variables
+    private readonly Dictionary<int, NetAddress> playerAddresses = new();
     private Tick lastUpdatedTick;
+    private HashSet<NetAddress> bannedIps;
+    private HashSet<string> bannedIds;
 
     //---Properties
     private ChatManager Chat => MainMenuManager.Instance.chat;
@@ -41,31 +49,31 @@ public class LobbyData : NetworkBehaviour {
         Instance = this;
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.EnterRoom();
+
+        if (HasStateAuthority) {
+            bannedIds = new();
+            bannedIps = new();
+            NetworkHandler.OnConnectRequest += OnConnectRequest;
+        }
     }
 
-    public static void StartChanged(Changed<LobbyData> data) {
-        if (MainMenuManager.Instance)
-            MainMenuManager.Instance.OnGameStartChanged();
-
-        SettingChanged(data);
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        NetworkHandler.OnConnectRequest -= OnConnectRequest;
     }
 
-    public static void SettingChanged(Changed<LobbyData> data) {
-        LobbyData lobby = data.Behaviour;
-        Tick currentTick = lobby.Object.Runner.Tick;
-        if (currentTick <= lobby.lastUpdatedTick)
-            return;
+    private bool OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
+        if (bannedIps.Contains(request.RemoteAddress))
+            return false;
 
-        //no "started" setting to update
-        byte newLevel = lobby.Level;
-        data.LoadOld();
-        byte oldLevel = lobby.Level;
-        data.LoadNew();
+        playerAddresses[request.RemoteAddress.ActorId] = request.RemoteAddress;
+        return true;
+    }
 
-        if (MainMenuManager.Instance && MainMenuManager.Instance.roomSettingsCallbacks)
-            MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(lobby, oldLevel != newLevel);
-
-        lobby.lastUpdatedTick = currentTick;
+    public void AddBan(PlayerRef player) {
+        if (playerAddresses.TryGetValue(player, out NetAddress address)) {
+            bannedIps.Add(address);
+            playerAddresses.Remove(player);
+        }
     }
 
     public void SetMaxPlayers(byte value) {
@@ -138,4 +146,31 @@ public class LobbyData : NetworkBehaviour {
     public void Rpc_ChatDisplayMessage(string message, PlayerRef player) => Chat.DisplayPlayerMessage(message, player);
 
     #endregion
+
+    //---OnChangeds
+
+    public static void StartChanged(Changed<LobbyData> data) {
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.OnGameStartChanged();
+
+        SettingChanged(data);
+    }
+
+    public static void SettingChanged(Changed<LobbyData> data) {
+        LobbyData lobby = data.Behaviour;
+        Tick currentTick = lobby.Object.Runner.Tick;
+        if (currentTick <= lobby.lastUpdatedTick)
+            return;
+
+        //no "started" setting to update
+        byte newLevel = lobby.Level;
+        data.LoadOld();
+        byte oldLevel = lobby.Level;
+        data.LoadNew();
+
+        if (MainMenuManager.Instance && MainMenuManager.Instance.roomSettingsCallbacks)
+            MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(lobby, oldLevel != newLevel);
+
+        lobby.lastUpdatedTick = currentTick;
+    }
 }

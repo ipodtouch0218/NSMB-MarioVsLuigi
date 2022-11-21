@@ -106,9 +106,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             return;
         }
 
-        //TODO: check for bans?
-        request.Accept();
-
         bool accept = OnConnectRequest?.Invoke(runner, request, token) ?? true;
         if (accept)
             request.Accept();
@@ -119,16 +116,18 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         Debug.Log("[Network] Disconnected from Server");
 
         OnDisconnectedFromServer?.Invoke(runner);
+        Debug.Log(runner.State);
+        //Runner.Shutdown();
+        RecreateInstance();
     }
 
     void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {
         Debug.Log("[Network] Authentication Successful");
 
-        //PlayerPrefs.SetString("id", runner.AuthenticationValues.UserId);
-        //if (data.ContainsKey("Token"))
-        //    PlayerPrefs.SetString("token", (string) data["Token"]);
-        //
-        //PlayerPrefs.Save();
+        if (data.ContainsKey("Token")) {
+            PlayerPrefs.SetString("token", (string) data["Token"]);
+            PlayerPrefs.Save();
+        }
 
         OnCustomAuthenticationResponse?.Invoke(runner, data);
     }
@@ -150,7 +149,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         if (runner.IsServer) {
             //create player data
-            runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, predictionKey: new() { Byte0 = (byte) Runner.Simulation.Tick, Byte1 = (byte) player.RawEncoded });
+            runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
 
             if (player == Runner.LocalPlayer) {
                 //create lobby data
@@ -246,20 +245,28 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         }
 
         //version separation
-        PhotonAppSettings.Instance.AppSettings.AppVersion = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value;
-        PhotonAppSettings.Instance.AppSettings.EnableLobbyStatistics = true;
-        PhotonAppSettings.Instance.AppSettings.UseNameServer = true;
-        PhotonAppSettings.Instance.AppSettings.FixedRegion = region;
+        AppSettings appSettings = new() {
+            AppIdFusion = PhotonAppSettings.Instance.AppSettings.AppIdFusion,
+            AppVersion = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value,
+            EnableLobbyStatistics = true,
+            UseNameServer = true,
+            FixedRegion = region,
+        };
 
         //Authenticate
         AuthenticationValues authValues = await Authenticate();
 
         //And join lobby
-        StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues);
+        StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues, customAppSettings: appSettings);
         if (result.Ok) {
             CurrentRegion = Runner.LobbyInfo.Region;
 
             Debug.Log($"[Network] Connected to lobby in {CurrentRegion} region");
+
+            Debug.Log(Runner.AuthenticationValues.UserId);
+            PlayerPrefs.SetString("id", Runner.AuthenticationValues.UserId);
+            PlayerPrefs.Save();
+
             OnLobbyConnect?.Invoke(Runner, Runner.LobbyInfo);
         }
 
@@ -280,7 +287,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         args.GameMode = gamemode;
         args.SessionName = idBuilder.ToString();
-        args.ConnectionToken = Encoding.Unicode.GetBytes(Settings.Instance.nickname);
+        args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname);
         args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
         args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.nickname;
@@ -305,8 +312,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         StartGameResult result = await Runner.StartGame(new() {
             GameMode = GameMode.Client,
             SessionName = roomId,
-            ConnectionToken = Encoding.Unicode.GetBytes(Settings.Instance.nickname),
+            ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname),
             DisableClientSessionCreation = true,
+            DisableNATPunchthrough = true,
         });
         Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
         if (!result.Ok) {

@@ -68,6 +68,9 @@ public class ChatManager : MonoBehaviour {
         if (!data || !data.Object.IsValid)
             return;
 
+        if (data.IsMuted)
+            return;
+
         //format message, in case we can't trust the host to do it for us.
         message = message.Substring(0, Mathf.Min(128, message.Length));
         message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
@@ -90,7 +93,7 @@ public class ChatManager : MonoBehaviour {
             return;
 
         //spam prevention.
-        if (!data.MessageCooldownTimer.ExpiredOrNotRunning(runner))
+        if (data.IsMuted || !data.MessageCooldownTimer.ExpiredOrNotRunning(runner))
             return;
 
         //validate message format

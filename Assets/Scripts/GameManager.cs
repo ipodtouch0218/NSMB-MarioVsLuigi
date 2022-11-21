@@ -12,7 +12,6 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
-using System.Drawing.Text;
 
 public class GameManager : NetworkBehaviour {
 
@@ -35,7 +34,7 @@ public class GameManager : NetworkBehaviour {
     [Networked] public TickTimer GameStartTimer { get; set; }
     [Networked] public TickTimer GameEndTimer { get; set; }
     [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
-    [Networked] public int GameStartTick { get; set; } = -1;
+    [Networked] public float GameStartTime { get; set; } = -1;
     [Networked] public int RealPlayerCount { get; set; }
     [Networked] public NetworkBool IsMusicEnabled { get; set; }
 
@@ -64,6 +63,8 @@ public class GameManager : NetworkBehaviour {
     public PlayerController localPlayer;
     public long gameStartTimestamp, gameEndTimestamp;
     public bool paused, loaded, gameover;
+    public BoundsInt originalTilesOrigin;
+    public TileBase[] originalTiles;
 
     //---Private Variables
     private TickTimer StartMusicTimer { get; set; }
@@ -218,34 +219,19 @@ public class GameManager : NetworkBehaviour {
         particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (flip ? -1 : 1));
     }
 
-    // MATCHMAKING CALLBACKS
-    // ROOM CALLBACKS
-
-    public void OnPlayerEnteredRoom(PlayerRef player) {
-        //Spectator joined. Sync the room state.
-
-        //TODO:
-
-        ////SYNCHRONIZE TILEMAPS
-        //if (PhotonNetwork.IsMasterClient) {
-        //    Hashtable changes = Utils.GetTilemapChanges(originalTiles, origin, tilemap);
-        //    RaiseEventOptions options = new() { CachingOption = EventCaching.DoNotCache, TargetActors = new int[] { player.ActorNumber } };
-        //    PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.SyncTilemap, changes, options, SendOptions.SendReliable);
-
-        //}
-    }
-
     //Register pause event
     public void OnEnable() {
         InputSystem.controls.UI.Pause.performed += OnPause;
-        NetworkHandler.OnShutdown += OnShutdown;
-        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+        NetworkHandler.OnShutdown +=               OnShutdown;
+        NetworkHandler.OnPlayerJoined +=           OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft +=             OnPlayerLeft;
     }
 
     public void OnDisable() {
         InputSystem.controls.UI.Pause.performed -= OnPause;
-        NetworkHandler.OnShutdown -= OnShutdown;
-        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+        NetworkHandler.OnShutdown -=               OnShutdown;
+        NetworkHandler.OnPlayerJoined -=           OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -=             OnPlayerLeft;
     }
 
     public void Awake() {
@@ -254,6 +240,10 @@ public class GameManager : NetworkBehaviour {
         loopMusic = GetComponent<LoopingMusic>();
         particleManager = GetComponentInChildren<SingleParticleManager>();
         rpcs = GetComponent<GameEventRpcs>();
+
+        //tiles
+        originalTilesOrigin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
+        originalTiles = tilemap.GetTilesBlock(originalTilesOrigin);
 
         //Make UI color translucent
         levelUIColor.a = .7f;
@@ -302,8 +292,8 @@ public class GameManager : NetworkBehaviour {
             CheckIfAllPlayersLoaded();
         } else {
             //tell our host that we're done loading
-            PlayerData data;
-            if (data = NetworkHandler.Runner.GetLocalPlayerData())
+            PlayerData data = NetworkHandler.Runner.GetLocalPlayerData();
+            if (data)
                 data.Rpc_FinishedLoading();
         }
 
@@ -312,6 +302,18 @@ public class GameManager : NetworkBehaviour {
 
     public void OnPlayerLoaded() {
         CheckIfAllPlayersLoaded();
+    }
+
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+        if (!Runner.IsServer)
+            return;
+
+        //send spectating player the current level
+        if (Utils.GetTilemapChanges(originalTiles, originalTilesOrigin, tilemap, out TileChangeInfo[] tilePositions, out string[] tileNames)) {
+            rpcs.Rpc_UpdateSpectatorTilemap(player, tilePositions, tileNames);
+
+            Debug.Log(string.Join(',', tileNames));
+        }
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
@@ -408,7 +410,7 @@ public class GameManager : NetworkBehaviour {
         //Big star
         AttemptSpawnBigStar();
 
-        GameStartTick = Runner.Simulation.Tick.Raw;
+        GameStartTime = Runner.SimulationTime;
 
         gameStartTimestamp = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
         gameEndTimestamp = (timer > 0) ? gameStartTimestamp + timer * 1000 : 0;
@@ -457,7 +459,7 @@ public class GameManager : NetworkBehaviour {
         else
             music.PlayOneShot(Enums.Sounds.UI_Match_Lose);
 
-        //TOOD: make a results screen?
+        //TODO: make a results screen?
 
         if (Runner.IsServer) {
             //handle player states

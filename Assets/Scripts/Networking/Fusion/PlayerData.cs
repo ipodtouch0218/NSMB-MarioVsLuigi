@@ -6,6 +6,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using Fusion.Sockets;
 
 public class PlayerData : NetworkBehaviour {
 
@@ -28,11 +29,10 @@ public class PlayerData : NetworkBehaviour {
     [Networked] public byte SkinIndex { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))] public int Ping { get; set; }
 
-
+    //---Private Variables
     private Tick lastUpdatedTick;
-
-    //---Misc Variables
-    private string cachedUserId = null;
+    private NetAddress address;
+    private string cachedUserId;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -55,11 +55,11 @@ public class PlayerData : NetworkBehaviour {
         }
 
         if (Runner.IsServer) {
-            string nickname = Encoding.Unicode.GetString(Runner.GetPlayerConnectionToken(Object.InputAuthority) ?? Encoding.Unicode.GetBytes("noname"));
+            string nickname = Encoding.UTF8.GetString(Runner.GetPlayerConnectionToken(Object.InputAuthority) ?? Encoding.UTF8.GetBytes("noname"));
             SetNickname(nickname);
 
             //expose their userid
-            //TOOD: use an auth-server signed userid, to disallow userid spoofing.
+            //TODO: use an auth-server signed userid, to disallow userid spoofing.
             UserId = Runner.GetPlayerUserId(Object.InputAuthority)?.Replace("-", "");
 
             IsCurrentlySpectating = LobbyData.Instance ? LobbyData.Instance.GameStarted : false;
@@ -69,13 +69,16 @@ public class PlayerData : NetworkBehaviour {
             StartCoroutine(MainMenuManager.Instance.OnPlayerDataValidated(Object.InputAuthority));
     }
 
+    public string GetRawNickname() {
+        return Nickname.ToString();
+    }
+
     public string GetNickname(bool filter = true) {
         return filter ? DisplayNickname.ToString().Filter() : DisplayNickname.ToString();
     }
 
     public string GetUserId() {
         cachedUserId ??= Regex.Replace(UserId.ToString(), "(.{8})(.{4})(.{4})(.{4})(.{12})", "$1-$2-$3-$4-$5");
-
         return cachedUserId;
     }
 

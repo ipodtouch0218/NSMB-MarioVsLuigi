@@ -437,7 +437,6 @@ MonoBehaviour:
   WordOffset: 0
   WordCount: 0
   _interpolationDataSource: 0
-  TargetPlayerBy: 1
   DrawAreaOfInterestRadius: 0
   Radius: 32
 --- !u!143 &7291690687864886413
@@ -470,8 +469,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 378411a89480da345945c2f888327a2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WordOffset: 0
-  WordCount: 0
+  WordOffset: 23
+  WordCount: 22
   _interpolationDataSource: 0
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 602043736063956190}
@@ -486,6 +485,8 @@ MonoBehaviour:
     RotBlendStart: 0.1
     RotBlendEnd: 0.5
     RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
   gravity: -20
   jumpImpulse: 8
   acceleration: 10

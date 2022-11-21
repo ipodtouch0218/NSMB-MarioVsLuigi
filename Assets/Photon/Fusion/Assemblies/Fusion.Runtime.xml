@@ -3268,6 +3268,32 @@
             If current interpolation target is considered invalid.
             </summary>
         </member>
+        <member name="F:Fusion.NetworkTransform.InterpolateErrorCorrection">
+            <summary>
+            If the computed prediction error should be smoothly corrected on
+            the <see cref="F:Fusion.NetworkTransform.InterpolationTarget">InterpolationTarget</see> according to
+            the <see cref="F:Fusion.NetworkTransform.InterpolatedErrorCorrectionSettings">InterpolatedErrorCorrectionSettings</see>.
+            </summary>
+        </member>
+        <member name="F:Fusion.NetworkTransform.InterpolatedErrorCorrectionSettings">
+            <summary>
+            A set of parameters to tune the interpolated correction of prediction
+            error to be applied on the <see cref="F:Fusion.NetworkTransform.InterpolationTarget">InterpolationTarget</see>.
+            </summary>
+        </member>
+        <member name="F:Fusion.NetworkTransform.UseLegacySharedModeInterpolation">
+            <summary>
+            If the legacy interpolation algorithm should be used in Shared Mode for this object.
+            </summary>
+        </member>
+        <member name="F:Fusion.NetworkTransform.TargetInterpolationDelay">
+            <summary>
+            In shared mode, how much behind (in seconds) the remote client's interpolated
+            view will try to stay from the latest snapshot available.
+            The smaller the value, the snappier the interpolation will be and the higher
+            the changes of extrapolations and eventual error corrections (interpolated). 
+            </summary>
+        </member>
         <member name="M:Fusion.NetworkTransform.Spawned">
             <summary>
             Overrides <see cref="M:Fusion.NetworkBehaviour.Spawned"/>.
@@ -3338,18 +3364,32 @@
             </summary>
             <param name="nt"></param>
         </member>
-        <member name="F:Fusion.NetworkTransform.InterpolateErrorCorrection">
+        <member name="F:Fusion.NetworkTransform._legacyIntermittentInterp">
             <summary>
-            If the computed prediction error should be smoothly corrected on
-            the <see cref="F:Fusion.NetworkTransform.InterpolationTarget">InterpolationTarget</see> according to
-            the <see cref="F:Fusion.NetworkTransform.InterpolatedErrorCorrectionSettings">InterpolatedErrorCorrectionSettings</see>.
+            Cached <see cref="T:Fusion.NetworkTransform.LegacyIntermittentStateInterp"/>.
+            <see cref="F:Fusion.NetworkTransform._currInterpImpl"/> will point to this object if/when it
+            is the interpolation implementation being used.
             </summary>
         </member>
-        <member name="F:Fusion.NetworkTransform.InterpolatedErrorCorrectionSettings">
+        <member name="T:Fusion.NetworkTransform.LegacyIntermittentStateInterp">
             <summary>
-            A set of parameters to tune the interpolated correction of prediction
-            error to be applied on the <see cref="F:Fusion.NetworkTransform.InterpolationTarget">InterpolationTarget</see>.
+            Implements interpolation logic between two snapshots that are not
+            consecutive and/or are not consumed with a steady frequency.
+            This is a legacy implementation, check the latest and recommended
+            intermittent interpolation logic on <see cref="T:Fusion.NetworkTransform.IntermittentStateInterp"/>/
             </summary>
+        </member>
+        <member name="F:Fusion.NetworkTransform.LegacyIntermittentStateInterp._nt">
+            <summary>
+            <see cref="T:Fusion.NetworkTransform"/> tracked by the implementation logic.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.LegacyIntermittentStateInterp.Reset(Fusion.NetworkTransform)">
+            <summary>
+            Reset must be called to set or reset the tracked <see cref="T:Fusion.NetworkTransform"/>
+            and/or to reset any cached state in the interpolation implementation, like when switching implementation.
+            </summary>
+            <param name="nt"></param>
         </member>
         <member name="F:Fusion.NetworkTransform._smoothErrorCorrectedInterp">
             <summary>
@@ -3380,8 +3420,11 @@
             this property to provide better default values, like the latest known angular velocity of the rigid body. 
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.CopyFromEngineToBuffer">
-            <inheritdoc cref="M:Fusion.NetworkPositionRotation.CopyFromEngineToBuffer"/>
+        <member name="M:Fusion.NetworkTransform.AfterAllTicks(System.Boolean,System.Int32)">
+            <inheritdoc cref="M:Fusion.NetworkRigidbodyBase.AfterAllTicks(System.Boolean,System.Int32)"/>
+        </member>
+        <member name="M:Fusion.NetworkTransform.CopyBackingFieldsToState(System.Boolean)">
+            <inheritdoc cref="M:Fusion.NetworkRigidbodyBase.CopyBackingFieldsToState(System.Boolean)"/>
         </member>
         <member name="M:Fusion.NetworkTransform.TeleportToPosition(UnityEngine.Vector3,System.Nullable{UnityEngine.Vector3},System.Boolean)">
             <summary>
@@ -3591,30 +3634,48 @@
             or backwards (Emulated From based on To state - interpolation).
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.ReadPositionRotationChanged">
+        <member name="M:Fusion.NetworkTransform.ReadPositionChangedTick">
             <summary>
-            Reads from this object's field holding information about whether the position and/or
-            rotation values changed when written to the buffer.
+            Reads from this object's field holding the tick number when the written position value changed.
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.ReadPositionRotationChanged(System.Int32*)">
+        <member name="M:Fusion.NetworkTransform.ReadPositionChangedTick(System.Int32*)">
             <summary>
             Reads from the networked data pointer by <paramref name="ptr"/>
-            a field holding information about whether the position and/or
-            rotation values changed when written to the buffer.
+            a field holding the tick number when the written position value changed.
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.ReadPositionRotationChangedTick">
+        <member name="M:Fusion.NetworkTransform.ReadRotationChangedTick">
             <summary>
-            Reads from this object's field holding the tick number when
-            the written position and/or rotation values changed.
+            Reads from this object's field holding the tick number when the written rotation value changed.
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.ReadPositionRotationChangedTick(System.Int32*)">
+        <member name="M:Fusion.NetworkTransform.ReadRotationChangedTick(System.Int32*)">
             <summary>
             Reads from the networked data pointer by <paramref name="ptr"/>
-            a field holding the tick number when the written position and/or
-            rotation values changed.
+            a field holding the tick number when the written rotation value changed.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.ReadPositionStoppedChangingTick">
+            <summary>
+            Reads from this object's field holding the tick number when the written position value stopped changing.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.ReadPositionStoppedChangingTick(System.Int32*)">
+            <summary>
+            Reads from the networked data pointer by <paramref name="ptr"/>
+            a field holding the tick number when the written position value stopped changing.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.ReadRotationStoppedChangingTick">
+            <summary>
+            Reads from this object's field holding the tick number when the written rotation value stopped changing.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.ReadRotationStoppedChangingTick(System.Int32*)">
+            <summary>
+            Reads from the networked data pointer by <paramref name="ptr"/>
+            a field holding the tick number when the written rotation value stopped changing.
             </summary>
         </member>
         <member name="M:Fusion.NetworkTransform.WriteTeleportInterpolationVelocity(UnityEngine.Vector3)">
@@ -3709,30 +3770,48 @@
             (Emulated From based on To state - interpolation).
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.WritePositionRotationChanged(System.Boolean,System.Boolean)">
+        <member name="M:Fusion.NetworkTransform.WritePositionChangedTick(System.Int32)">
             <summary>
-            Writes to this object's field holding information about whether the position and/or
-            rotation values changed when written to the buffer.
+            Writes to this object's field holding the tick number when the written position value changed.
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.WritePositionRotationChanged(System.Int32*,System.Boolean,System.Boolean)">
+        <member name="M:Fusion.NetworkTransform.WritePositionChangedTick(System.Int32,System.Int32*)">
             <summary>
             Writes to the networked data pointer by <paramref name="ptr"/>, on
-            a field holding information about whether the position and/or
-            rotation values changed when written to the buffer.
+            a field holding the tick number when the written position value changed.
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.WritePositionRotationChangedTick(System.Int32)">
+        <member name="M:Fusion.NetworkTransform.WriteRotationChangedTick(System.Int32)">
             <summary>
-            Writes to this object's field holding the tick number when
-            the written position and/or rotation values changed.
+            Writes to this object's field holding the tick number when the written rotation value changed.
             </summary>
         </member>
-        <member name="M:Fusion.NetworkTransform.WritePositionRotationChangedTick(System.Int32,System.Int32*)">
+        <member name="M:Fusion.NetworkTransform.WriteRotationChangedTick(System.Int32,System.Int32*)">
             <summary>
             Writes to the networked data pointer by <paramref name="ptr"/>, on
-            a field holding the tick number when the written position and/or
-            rotation values changed.
+            a field holding the tick number when the written rotation value changed.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.WritePositionStoppedChangingTick(System.Int32)">
+            <summary>
+            Writes to this object's field holding the tick number when the written position value stopped changing.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.WritePositionStoppedChangingTick(System.Int32,System.Int32*)">
+            <summary>
+            Writes to the networked data pointer by <paramref name="ptr"/>, on
+            a field holding the tick number when the written position value stopped changing.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.WriteRotationStoppedChangingTick(System.Int32)">
+            <summary>
+            Writes to this object's field holding the tick number when the written rotation value stopped changing.
+            </summary>
+        </member>
+        <member name="M:Fusion.NetworkTransform.WriteRotationStoppedChangingTick(System.Int32,System.Int32*)">
+            <summary>
+            Writes to the networked data pointer by <paramref name="ptr"/>, on
+            a field holding the tick number when the written rotation value stopped changing.
             </summary>
         </member>
         <member name="T:Fusion.NetworkCharacterController">
@@ -6044,7 +6123,17 @@
         </member>
         <member name="P:Fusion.NetworkObject.IsSceneObject">
             <summary>
-            Returns if this network entity existed as part of a scene, rather than having been dynamically spawned.
+            Returns true if this network entity existed as part of a scene, rather than having been dynamically spawned.
+            </summary>
+        </member>
+        <member name="P:Fusion.NetworkObject.IsSpawnedPrefabRoot">
+            <summary>
+            Returns true if this network entity is a spawned prefab's root, rather than being a scene object or a nested prefab object.
+            </summary>
+        </member>
+        <member name="P:Fusion.NetworkObject.IsSpawnedPrefabNestedObject">
+            <summary>
+            Returns true if this network entity is a spawned prefab's nested object, rather than being a scene object or a root prefab object.
             </summary>
         </member>
         <member name="P:Fusion.NetworkObject.IsValid">

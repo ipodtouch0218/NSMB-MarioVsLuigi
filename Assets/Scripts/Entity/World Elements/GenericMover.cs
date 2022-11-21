@@ -4,33 +4,30 @@ using Fusion;
 
 public class GenericMover : NetworkBehaviour {
 
+    //---Networked Variables
+    [Networked] private Vector3 Origin { get; set; }
+
     //---Serialized Variables
     [SerializeField] private AnimationCurve x, y;
     [SerializeField] private float animationOffset = 0;
 
-    //---Private Variables
-    private Vector3? origin = null;
-
     public override void Spawned() {
-        origin = transform.position;
+        Origin = transform.position;
     }
 
     public override void FixedUpdateNetwork() {
-        int start = GameManager.Instance.GameStartTick;
-        int ticksSinceStart = Runner.Simulation.Tick.Raw - start;
-        double secondsSinceStart = (double) ticksSinceStart * Runner.DeltaTime;
+        float secondsElapsed = GameManager.Instance.GameStartTime - Runner.SimulationTime;
+        float xOffset = EvaluateCurve(x, animationOffset, secondsElapsed);
+        float yOffset = EvaluateCurve(y, animationOffset, secondsElapsed);
 
-        float xValue = 0, yValue = 0;
+        transform.position = Origin + new Vector3(xOffset, yOffset,0);
+    }
 
-        if (x.length > 0) {
-            float xEnd = x.keys[^1].time;
-            xValue = x.Evaluate((float) ((secondsSinceStart + (animationOffset * xEnd)) % xEnd));
-        }
-        if (y.length > 0) {
-            float yEnd = y.keys[^1].time;
-            yValue = y.Evaluate((float) ((secondsSinceStart + (animationOffset * yEnd)) % yEnd));
-        }
+    private static float EvaluateCurve(AnimationCurve curve, double offset, double time) {
+        if (curve.length <= 0)
+            return 0;
 
-        transform.position = (origin ?? default) + new Vector3(xValue, yValue, 0);
+        float end = curve.keys[^1].time;
+        return curve.Evaluate((float) ((time + (offset * end)) % end));
     }
 }

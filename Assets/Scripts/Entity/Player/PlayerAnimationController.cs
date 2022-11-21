@@ -73,6 +73,9 @@ public class PlayerAnimationController : NetworkBehaviour {
         enableGlow = LobbyData.Instance.Teams || !Object.HasInputAuthority;
         GlowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
 
+        if (LobbyData.Instance.Teams)
+            GameManager.Instance.levelUIColor = GlowColor;
+
         blinkRoutine ??= StartCoroutine(BlinkRoutine());
     }
 
@@ -385,12 +388,12 @@ public class PlayerAnimationController : NetworkBehaviour {
         body.isKinematic = true;
         body.velocity = controller.pipeDirection;
 
-        if (pipeTimer < pipeDuration / 2f && pipeTimer + Time.fixedDeltaTime >= pipeDuration / 2f) {
+        if (pipeTimer < pipeDuration * 0.5f && pipeTimer + Time.fixedDeltaTime >= pipeDuration * 0.5f) {
             //tp to other pipe
             if (pe.otherPipe.bottom == pe.bottom)
                 controller.pipeDirection *= -1;
 
-            Vector2 offset = controller.pipeDirection * (pipeDuration / 2f);
+            Vector2 offset = controller.pipeDirection * (pipeDuration * 0.5f);
             if (pe.otherPipe.bottom) {
                 float size = controller.MainHitbox.size.y * transform.localScale.y;
                 offset.y += size;

@@ -52,7 +52,7 @@ public class FrozenCube : HoldableEntity {
         hitbox.size = sRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size;
         hitbox.offset = Vector2.up * hitbox.size / 2;
 
-        entityPositionOffset = -(bounds.center - Vector3.up.Multiply(bounds.size / 2) - rendererObject.transform.position);
+        entityPositionOffset = -(bounds.center - Vector3.up.Multiply(bounds.size * 0.5f) - rendererObject.transform.position);
 
         transform.position -= (Vector3) entityPositionOffset - Vector3.down * 0.1f;
 

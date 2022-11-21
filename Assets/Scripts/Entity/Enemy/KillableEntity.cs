@@ -152,11 +152,17 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
     //---IFireballInteractable overrides
     public virtual bool InteractWithFireball(FireballMover fireball) {
+        if (IsDead)
+            return false;
+
         SpecialKill(fireball.FacingRight, false, 0);
         return true;
     }
 
     public virtual bool InteractWithIceball(FireballMover iceball) {
+        if (IsDead)
+            return false;
+
         if (!IsFrozen) {
             Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
                 FrozenCube cube = obj.GetComponent<FrozenCube>();

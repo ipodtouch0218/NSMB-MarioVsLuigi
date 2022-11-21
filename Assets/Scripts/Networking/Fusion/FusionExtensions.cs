@@ -20,8 +20,11 @@ namespace NSMB.Extensions {
 
         public static bool HasRainbowName(this PlayerRef player) {
             PlayerData data = player.GetPlayerData(NetworkHandler.Instance.runner);
-            string userId = data?.GetUserId();
-            if (!data || userId == null)
+            if (!data)
+                return false;
+
+            string userId = data.GetUserId();
+            if (userId == null)
                 return false;
 
             byte[] bytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(userId));
@@ -30,7 +33,7 @@ namespace NSMB.Extensions {
                 sb.Append(b.ToString("X2"));
 
             string hash = sb.ToString().ToLower();
-            return SPECIAL_PLAYERS.ContainsKey(hash) && data.GetNickname(false) == SPECIAL_PLAYERS[hash];
+            return SPECIAL_PLAYERS.ContainsKey(hash) && data.GetRawNickname() == SPECIAL_PLAYERS[hash];
         }
 
         public static PlayerData GetPlayerData(this PlayerRef player, NetworkRunner runner) {

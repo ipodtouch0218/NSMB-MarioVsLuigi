@@ -421,17 +421,18 @@ namespace NSMB.Utils {
             return -1 * v * (v - 2);
         }
 
-        public static ExitGames.Client.Photon.Hashtable GetTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap) {
-            Dictionary<int, int> changes = new();
+        public static bool GetTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap, out TileChangeInfo[] outTilePositions, out string[] outTileNames) {
+
+            List<TileChangeInfo> changes = new();
             List<string> tiles = new();
 
-            TileBase[] current = tilemap.GetTilesBlock(bounds);
+            TileBase[] currentTiles = tilemap.GetTilesBlock(bounds);
 
             for (int i = 0; i < original.Length; i++) {
-                if (current[i] == original[i])
+                if (currentTiles[i] == original[i])
                     continue;
 
-                TileBase cTile = current[i];
+                TileBase cTile = currentTiles[i];
                 string path;
                 if (cTile == null) {
                     path = "";
@@ -442,13 +443,17 @@ namespace NSMB.Utils {
                 if (!tiles.Contains(path))
                     tiles.Add(path);
 
-                changes[i] = tiles.IndexOf(path);
+                changes.Add(new() {
+                    x = (short) (bounds.x + i % bounds.size.x),
+                    y = (short) (bounds.y + i / bounds.size.x),
+                    tileIndex = tiles.IndexOf(path),
+                });
             }
 
-            return new() {
-                ["T"] = tiles.ToArray(),
-                ["C"] = changes,
-            };
+            outTilePositions = changes.ToArray();
+            outTileNames = tiles.ToArray();
+
+            return changes.Count > 0;
         }
 
         public static void ApplyTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap, ExitGames.Client.Photon.Hashtable changesTable) {

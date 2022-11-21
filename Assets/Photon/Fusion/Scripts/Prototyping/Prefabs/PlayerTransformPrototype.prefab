@@ -375,11 +375,11 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AoiMode: 0
-  DefaultPropertyGroups: []
+  ObjectInterest: 0
+  DefaultInterestGroups: []
   DestroyWhenStateAuthorityLeaves: 0
   AllowStateAuthorityOverride: 0
-  AoiPosition: {fileID: 0}
+  AoiPositionSource: {fileID: 0}
   Flags: 2305
   NetworkGuid:
     RawGuidValue: 3251faa3ac8a66642bf6f9e8433499da
@@ -436,6 +436,7 @@ MonoBehaviour:
   WordOffset: 0
   WordCount: 0
   _interpolationDataSource: 0
+  InterpolationSpace: 0
   InterpolationTarget: {fileID: 602043736063956190}
   InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
@@ -448,6 +449,8 @@ MonoBehaviour:
     RotBlendStart: 0.1
     RotBlendEnd: 0.5
     RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
 --- !u!114 &4065374778257232135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -463,6 +466,5 @@ MonoBehaviour:
   WordOffset: 0
   WordCount: 0
   _interpolationDataSource: 0
-  TargetPlayerBy: 1
   DrawAreaOfInterestRadius: 0
   Radius: 32

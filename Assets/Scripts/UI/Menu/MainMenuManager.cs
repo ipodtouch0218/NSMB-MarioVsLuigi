@@ -747,11 +747,15 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void Ban(PlayerRef target) {
-        if (target == Runner.LocalPlayer) {
+        NetworkRunner runner = NetworkHandler.Instance.runner;
+        if (target == runner.LocalPlayer) {
             chat.AddChatMessage("While you can ban yourself, it's probably not what you meant to do.", Color.red);
             return;
         }
 
+        LobbyData.Instance.AddBan(target);
+        chat.AddChatMessage($"Successfully kicked {target.GetPlayerData(runner).GetNickname()}", Color.red);
+        Runner.Disconnect(target);
 
         //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
         //List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();

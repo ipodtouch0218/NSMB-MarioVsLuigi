@@ -12,8 +12,6 @@ public class GameEventRpcs : NetworkBehaviour {
     //---Private Variables
     private GameManager gm;
     private Tilemap tilemap;
-    private BoundsInt originalTilesOrigin;
-    private TileBase[] originalTiles;
     private FloatingCoin[] coins;
 
     public void Awake() {
@@ -21,14 +19,12 @@ public class GameEventRpcs : NetworkBehaviour {
         tilemap = gm.tilemap;
 
         coins = FindObjectsOfType<FloatingCoin>();
-
-        originalTilesOrigin = new(gm.levelMinTileX, gm.levelMinTileY, 0, gm.levelWidthTile, gm.levelHeightTile, 1);
-        originalTiles = tilemap.GetTilesBlock(originalTilesOrigin);
     }
 
+    //---TILES
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_ResetTilemap() {
-        tilemap.SetTilesBlock(originalTilesOrigin, originalTiles);
+        tilemap.SetTilesBlock(gm.originalTilesOrigin, gm.originalTiles);
 
         foreach (FloatingCoin coin in coins)
             coin.ResetCoin();
@@ -54,5 +50,13 @@ public class GameEventRpcs : NetworkBehaviour {
     public void Rpc_SetTile(short x, short y, string tilename) {
         TileBase tile = Utils.GetCacheTile(tilename);
         tilemap.SetTile(new(x, y, 0), tile);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void Rpc_UpdateSpectatorTilemap([RpcTarget] PlayerRef targetPlayer, TileChangeInfo[] changes, string[] tileNames) {
+        foreach (TileChangeInfo change in changes) {
+            TileBase tile = Utils.GetCacheTile(tileNames[change.tileIndex]);
+            tilemap.SetTile(new(change.x, change.y, 0), tile);
+        }
     }
 }
