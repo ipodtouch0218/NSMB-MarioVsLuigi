@@ -29,7 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CustomJungle.unity
     guid: de8e2edb54b6b5e489c97578fa670804
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Levels/CustomSky.unity
     guid: addb28d9cb6d8a6498a3b328a6e57f33
   - enabled: 1
@@ -42,24 +42,24 @@ EditorBuildSettings:
     path: Assets/Scenes/Levels/CustomDesert.unity
     guid: 0a445e83695e8424e9e56da3e5b773e4
   - enabled: 1
-    path: Assets/Scenes/Levels/CadoMountain.unity
+    path: Assets/Scenes/Levels/CadoMountains.unity
     guid: a2428cbc96a029748bcb0c6d37569232
   - enabled: 1
-    path: Assets/Scenes/Levels/CadoSpooky.unity
+    path: Assets/Scenes/Levels/CadoDarkness.unity
     guid: 57e70d2991dd2624caf06eec136b989c
   - enabled: 1
-    path: Assets/Scenes/Levels/CadoBeach.unity
+    path: Assets/Scenes/Levels/CadoBeachSide.unity
     guid: 600d3df3bb8263f40ab993c3cb740a83
   - enabled: 1
     path: Assets/Scenes/Levels/CadoFinalCastle.unity
     guid: 99b3124c5814a544d8dc129396bc28ac
   - enabled: 1
-    path: Assets/Scenes/Levels/CadoSnowy.unity
+    path: Assets/Scenes/Levels/CadoSnowfall.unity
     guid: 52d6910408d2f294aa3a01155ca53d2c
   - enabled: 1
-    path: Assets/Scenes/Levels/CadoHills.unity
+    path: Assets/Scenes/Levels/CadoHIghHills.unity
     guid: 8633be09f6d0fcb43a88adaeec3ddf6a
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomColdSky.unity
-    guid: a04f2b9a59bb942409e7ebe1c6689f8c
+    path: Assets/Scenes/Levels/CadoSandRuins.unity
+    guid: 0ae5eae3d2214134da470c94eeb0b8cb
   m_configObjects: {}
