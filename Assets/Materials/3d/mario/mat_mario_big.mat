@@ -95,6 +95,7 @@ Material:
     - IsEyeTexture: 0
     - OutlineSize: 0.01
     - PowerupState: 0
+    - RainbowEnabled: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1

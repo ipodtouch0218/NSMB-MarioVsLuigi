@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3060121057263043570}
   - component: {fileID: 8371659256944361981}
   m_Layer: 9
-  m_Name: Particle System
+  m_Name: Sparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -662,7 +662,7 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 10
+    type: 18
     angle: 25
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
@@ -4840,9 +4840,8 @@ GameObject:
   - component: {fileID: 4404708631857811697}
   - component: {fileID: 858852620204674597}
   - component: {fileID: 7844204986304545686}
-  - component: {fileID: 1973747262660636098}
-  - component: {fileID: 4766034588940193156}
-  - component: {fileID: 4891126300868574464}
+  - component: {fileID: -4356651289696895989}
+  - component: {fileID: -1107023245251777124}
   m_Layer: 9
   m_Name: BigStar
   m_TagString: bigstar
@@ -4862,7 +4861,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1973747262981084695}
   - {fileID: 7308630834410186342}
   - {fileID: 2942793993665947634}
   m_Father: {fileID: 0}
@@ -4880,6 +4878,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa60e0a51f0cba44fa8367033bc452f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _Collector: {fileID: 0}
+  _IsStationary:
+    _value: 0
+  _DroppedByPit:
+    _value: 0
+  _Collectable:
+    _value: 0
+  _Fast:
+    _value: 0
   pulseAmount: 0.15
   pulseSpeed: 16
   moveSpeed: 1.5
@@ -4888,10 +4896,7 @@ MonoBehaviour:
   deathBoostAmount: 8.5
   blinkingSpeed: 0.25
   lifespan: 15
-  body: {fileID: 0}
-  stationary: 1
   passthrough: 0
-  left: 1
   fast: 0
 --- !u!50 &1973747262660636108
 Rigidbody2D:
@@ -4921,7 +4926,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1973747262660636106}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -4972,6 +4977,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!114 &4404708631857811697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4984,6 +4990,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   goUpSlopes: 0
   onGround: 0
   hitRoof: 0
@@ -5106,7 +5113,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1973747262660636098
+--- !u!114 &-4356651289696895989
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5115,21 +5122,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 1973747262660636106}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 4766034588940193156}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &4766034588940193156
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: d6c38f51091fae64fa27d92f9415b3ab
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1973747262660636110}
+  - {fileID: 1973747262660636107}
+  - {fileID: 4404708631857811697}
+  - {fileID: -1107023245251777124}
+  SimulationBehaviours: []
+--- !u!114 &-1107023245251777124
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5138,83 +5149,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1973747262660636106}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: 4891126300868574464}
---- !u!114 &4891126300868574464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973747262660636106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 583250cb77de772478ef115ec0f870ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interpolate: 1
-  body: {fileID: 1973747262660636108}
---- !u!1 &1973747262981084694
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1973747262981084695}
-  - component: {fileID: 1973747262981084692}
-  m_Layer: 10
-  m_Name: Hitbox
-  m_TagString: bigstar
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1973747262981084695
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973747262981084694}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1973747262660636105}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &1973747262981084692
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973747262981084694}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.9, y: 0.9}
-  m_EdgeRadius: 0
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
 --- !u!1 &9209823662088345179
 GameObject:
   m_ObjectHideFlags: 0

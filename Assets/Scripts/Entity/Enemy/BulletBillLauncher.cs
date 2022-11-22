@@ -1,73 +1,99 @@
-using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+
+using Fusion;
 using NSMB.Utils;
 
-public class BulletBillLauncher : MonoBehaviourPun {
+public class BulletBillLauncher : NetworkBehaviour {
 
-    public float playerSearchRadius = 7, playerCloseCutoff = 1;
-    public float initialShootTimer = 5;
-    private float shootTimer;
-    private readonly List<GameObject> bills = new();
+    //---Networked Variables
+    [Networked] TickTimer ShootTimer { get; set; }
+    [Networked, Capacity(3)] NetworkArray<BulletBillMover> BulletBills => default;
 
-    private Vector2 searchBox, closeSearchBox = new(1.5f, 1f), searchOffset, spawnOffset = new(0.25f, -0.2f);
+    //---Serialized Variables
+    [SerializeField] private float playerSearchRadius = 7, playerCloseCutoff = 1, initialShootTimer = 5;
 
-    void Start() {
+    //---Private Variables
+    private Vector2 searchBox, closeSearchPosition, closeSearchBox = new(1.5f, 1f);
+
+    private Vector2 leftSearchPosition, rightSearchPosition;
+    private Vector2 leftSpawnPosition, rightSpawnPosition;
+
+    public void Awake() {
         searchBox = new(playerSearchRadius, playerSearchRadius);
-        searchOffset = new(playerSearchRadius/2 + playerCloseCutoff, 0);
-    }
-    void Update() {
-        if (!PhotonNetwork.IsMasterClient || GameManager.Instance.gameover)
-            return;
+        closeSearchPosition = transform.position + new Vector3(0, 0.25f);
 
-        if ((shootTimer -= Time.deltaTime) <= 0) {
-            shootTimer = initialShootTimer;
+        Vector2 searchOffset = new(playerSearchRadius / 2 + playerCloseCutoff, 0);
+        leftSearchPosition = (Vector2) transform.position - searchOffset;
+        rightSearchPosition = (Vector2) transform.position + searchOffset;
+
+        leftSpawnPosition = (Vector2) transform.position + new Vector2(-0.25f, -0.2f);
+        rightSpawnPosition = (Vector2) transform.position + new Vector2(0.25f, -0.2f);
+    }
+
+    public override void Spawned() {
+        ShootTimer = TickTimer.CreateFromSeconds(Runner, initialShootTimer);
+    }
+
+    public override void FixedUpdateNetwork() {
+
+        if (ShootTimer.Expired(Runner)) {
             TryToShoot();
+            ShootTimer = TickTimer.CreateFromSeconds(Runner, initialShootTimer);
         }
     }
 
-    void TryToShoot() {
+    private void TryToShoot() {
         if (!Utils.IsTileSolidAtWorldLocation(transform.position))
             return;
-        for (int i = 0; i < bills.Count; i++) {
-            if (bills[i] == null)
-                bills.RemoveAt(i--);
+
+        byte activeBills = 0;
+        foreach (BulletBillMover bill in BulletBills) {
+            if (bill)
+                activeBills++;
         }
-        if (bills.Count >= 3)
+        if (activeBills >= 3)
             return;
 
-        //Check for players close by
-        if (IntersectsPlayer(transform.position + Vector3.down * 0.25f, closeSearchBox))
+        //Check for close players
+        if (IntersectsPlayer(closeSearchPosition, closeSearchBox))
             return;
 
         //Shoot left
-        if (IntersectsPlayer((Vector2) transform.position - searchOffset, searchBox)) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(-spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ true });
-            bills.Add(newBill);
+        if (IntersectsPlayer(leftSearchPosition, searchBox)) {
+            SpawnBill(leftSpawnPosition, false);
             return;
         }
 
         //Shoot right
-        if (IntersectsPlayer((Vector2) transform.position + searchOffset, searchBox)) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ false });
-            bills.Add(newBill);
+        if (IntersectsPlayer(rightSearchPosition, searchBox)) {
+            SpawnBill(rightSpawnPosition, true);
             return;
         }
     }
 
-    bool IntersectsPlayer(Vector2 origin, Vector2 searchBox) {
-        foreach (var hit in Physics2D.OverlapBoxAll(origin, searchBox, 0)) {
-            if (hit.gameObject.CompareTag("Player"))
-                return true;
+    private void SpawnBill(Vector2 spawnpoint, bool facingRight) {
+        NetworkObject obj = Runner.Spawn(PrefabList.Instance.Enemy_BulletBill, spawnpoint, onBeforeSpawned: (runner, obj) => {
+            obj.GetComponent<BulletBillMover>().OnBeforeSpawned(facingRight);
+        });
+        BulletBillMover bbm = obj.GetComponent<BulletBillMover>();
+
+        for (int i = 0; i < BulletBills.Length; i++) {
+            if (!BulletBills[i]) {
+                BulletBills.Set(i, bbm);
+                break;
+            }
         }
-        return false;
     }
 
-    void OnDrawGizmosSelected() {
-        Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(transform.position + Vector3.down * 0.5f, closeSearchBox);
-        Gizmos.color = new Color(0, 0, 1, 0.5f);
-        Gizmos.DrawCube((Vector2) transform.position - searchOffset, searchBox);
-        Gizmos.DrawCube((Vector2) transform.position + searchOffset, searchBox);
+    private bool IntersectsPlayer(Vector2 origin, Vector2 searchBox) {
+        return Runner.GetPhysicsScene2D().OverlapBox(origin, searchBox, 0, Layers.MaskOnlyPlayers);
+    }
+
+    public void OnDrawGizmosSelected() {
+        Gizmos.color = new(1, 0, 0, 0.5f);
+        Gizmos.DrawCube(closeSearchPosition, closeSearchBox);
+        Gizmos.color = new(0, 0, 1, 0.5f);
+        Gizmos.DrawCube(leftSearchPosition, searchBox);
+        Gizmos.DrawCube(rightSearchPosition, searchBox);
     }
 }

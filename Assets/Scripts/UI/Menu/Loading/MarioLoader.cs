@@ -1,37 +1,78 @@
-using NSMB.Utils;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MarioLoader : MonoBehaviour {
+using NSMB.Extensions;
 
-    public int scale = 0, previousScale;
-    public float scaleTimer, blinkSpeed = 0.5f;
-    private Image image;
-    public PlayerData data;
-    public void Start() {
-        image = GetComponent<Image>();
-        data = Utils.GetCharacterData();
-    }
+namespace NSMB.Loading {
+    public class MarioLoader : MonoBehaviour {
 
-    public void Update() {
-        int scaleDisplay = scale;
+        private static readonly Vector3 two = Vector3.one * 2;
 
-        if ((scaleTimer += Time.deltaTime) < 0.5f) {
-            if (scaleTimer % blinkSpeed < blinkSpeed / 2f)
-                scaleDisplay = previousScale;
-        } else {
-            previousScale = scale;
+        //---Serailzied Variables
+        [SerializeField] private float blinkSpeed = 0.5f;
+        [SerializeField] private Image image;
+
+        //---Public Properties
+        private int _scale;
+        public int Scale {
+            get => _scale;
+            set {
+                previousScale = _scale;
+                _scale = value;
+                if (flashRoutine != null)
+                    StopCoroutine(flashRoutine);
+
+                StartCoroutine(DoGrowShrinkFlash());
+            }
         }
 
-        if (scaleDisplay == 0) {
-            transform.localScale = Vector3.one;
+        //---Public Variables
+        public int previousScale;
+
+        //---Private Variables
+        private Coroutine flashRoutine;
+        private CharacterData data;
+
+        private IEnumerator DoGrowShrinkFlash() {
+            float halfBlink = blinkSpeed * 0.5f;
+            float scaleTimer = 0.5f;
+
+            while (scaleTimer > 0) {
+                scaleTimer -= Time.deltaTime;
+                int scaleToDisplay = (scaleTimer % blinkSpeed) < halfBlink ? Scale : previousScale;
+
+                switch (scaleToDisplay) {
+                case 0: {
+                    transform.localScale = Vector3.one;
+                    image.sprite = data.loadingSmallSprite;
+                    break;
+                }
+                case 1: {
+                    transform.localScale = Vector3.one;
+                    image.sprite = data.loadingBigSprite;
+                    break;
+                }
+                case 2: {
+                    transform.localScale = two;
+                    image.sprite = data.loadingBigSprite;
+                    break;
+                }
+                }
+
+                yield return null;
+            }
+            flashRoutine = null;
+        }
+
+        public void Initialize() {
+            data = NetworkHandler.Instance.runner.GetLocalPlayerData().GetCharacterData();
+            Scale = 0;
+            previousScale = 0;
             image.sprite = data.loadingSmallSprite;
-        } else if (scaleDisplay == 1) {
-            transform.localScale = Vector3.one;
-            image.sprite = data.loadingBigSprite;
-        } else {
-            transform.localScale = Vector3.one * 2;
-            image.sprite = data.loadingBigSprite;
+
+            if (flashRoutine != null)
+                StopCoroutine(flashRoutine);
         }
     }
 }

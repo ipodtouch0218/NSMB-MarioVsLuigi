@@ -1,95 +1,85 @@
 using UnityEngine;
 
-using Photon.Pun;
+using Fusion;
+using NSMB.Extensions;
 using NSMB.Utils;
 
-// maybe a better name for the script
 public class FrozenCube : HoldableEntity {
 
-    [SerializeField] private float throwSpeed = 10f, shakeSpeed = 1f, shakeAmount = 0.1f;
+    //---Networked Variables
+    [Networked] public TickTimer AutoBreakTimer { get; set; }
+    [Networked] private TickTimer ThrowTimer { get; set; }
+    [Networked] private FreezableEntity FrozenEntity { get; set; }
+    [Networked] private NetworkBool FastSlide { get; set; }
 
-    public IFreezableEntity.UnfreezeReason unfreezeReason = IFreezableEntity.UnfreezeReason.Other;
-    public float autoBreakTimer = 10;
+    //---Serialized Variables
+    [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, autoBreak = 3f;
+    [SerializeField] private GameObject shatterParticles;
 
-    private SpriteRenderer spriteRenderer;
-    private IFreezableEntity entity;
-    private PhotonView entityView;
-    private Rigidbody2D entityBody;
-
+    //---Private Variables
+    public UnfreezeReason unfreezeReason = UnfreezeReason.Other;
     private Vector2 entityPositionOffset;
-    private bool fastSlide, fallen;
     private int combo;
-    private float throwTimer;
+    private bool fallen;
 
-    #region Unity Methods
-    public new void Start() {
-        base.Start();
-        dead = false;
-        holderOffset = Vector2.one;
-        body.velocity = Vector2.zero;
-
-        if (photonView && photonView.InstantiationData != null) {
-            int id = (int) photonView.InstantiationData[0];
-            entityView = PhotonView.Find(id);
-
-            entity = entityView.GetComponent<IFreezableEntity>();
-            if (entity == null || (photonView.IsMine && entity.Frozen)) {
-                Destroy(gameObject);
-                return;
-            }
-
-            entityBody = entityView.GetComponentInParent<Rigidbody2D>();
-
-            if (photonView.IsMine)
-                entityView.RPC("Freeze", RpcTarget.All, photonView.ViewID);
-
-            spriteRenderer = GetComponent<SpriteRenderer>();
-
-            Bounds bounds = default;
-            GameObject rendererObject = entityView.gameObject;
-            Renderer[] renderers = entityView.GetComponentsInChildren<Renderer>();
-            foreach (Renderer renderer in renderers) {
-                if (!renderer.enabled || renderer is ParticleSystemRenderer)
-                    continue;
-
-                renderer.ResetBounds();
-
-                if (bounds == default)
-                    bounds = new(renderer.bounds.center, renderer.bounds.size);
-                else
-                    bounds.Encapsulate(renderer.bounds);
-            }
-
-            hitbox.size = spriteRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size;
-            hitbox.offset = Vector2.up * hitbox.size / 2;
-
-            entityPositionOffset = -(bounds.center - Vector3.up.Multiply(bounds.size / 2) - rendererObject.transform.position);
-
-            transform.position -= (Vector3) entityPositionOffset - Vector3.down * 0.1f;
-
-            flying = entity.IsFlying;
-            ApplyConstraints();
-        }
+    public void OnBeforeSpawned(FreezableEntity entityToFreeze) {
+        FrozenEntity = entityToFreeze;
     }
 
-    public new void LateUpdate() {
-        base.LateUpdate();
+    public override void Spawned() {
+        holderOffset = Vector2.one;
 
-        if (entity == null || !entityView) {
-            if (photonView.IsMine) {
-                PhotonNetwork.Destroy(gameObject);
-            } else {
-                Destroy(gameObject);
-            }
+        if (!FrozenEntity) {
+            Kill();
             return;
         }
 
-        //move the entity to be inside of us
-        if (entity.IsCarryable)
-            entityBody.transform.position = entityBody.position = (Vector2) transform.position + entityPositionOffset;
+        Bounds bounds = default;
+        GameObject rendererObject = FrozenEntity.gameObject;
+        Renderer[] renderers = FrozenEntity.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers) {
+            if (!renderer.enabled || renderer is ParticleSystemRenderer)
+                continue;
+
+            renderer.ResetBounds();
+
+            if (bounds == default)
+                bounds = new(renderer.bounds.center, renderer.bounds.size);
+            else
+                bounds.Encapsulate(renderer.bounds);
+        }
+
+        hitbox.size = sRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size;
+        hitbox.offset = Vector2.up * hitbox.size / 2;
+
+        entityPositionOffset = -(bounds.center - Vector3.up.Multiply(bounds.size * 0.5f) - rendererObject.transform.position);
+
+        transform.position -= (Vector3) entityPositionOffset - Vector3.down * 0.1f;
+
+        AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
+        flying = FrozenEntity.IsFlying;
+        ApplyConstraints();
+
+        FrozenEntity.Freeze(this);
+
+        //move entity inside us
+        if (FrozenEntity.IsCarryable) {
+            FrozenEntity.transform.SetParent(transform);
+            FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
+        }
     }
 
-    public override void FixedUpdate() {
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        if (FrozenEntity.IsCarryable)
+            FrozenEntity.transform.SetParent(null);
+    }
+
+    public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
+
+        if (IsDead)
+            return;
+
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -97,163 +87,95 @@ public class FrozenCube : HoldableEntity {
             body.isKinematic = true;
             return;
         }
-        if (photonView.IsMine && body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY()) {
-            entityView.RPC("Unfreeze", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Other);
-            PhotonNetwork.Destroy(photonView);
-            return;
+
+        if (ThrowTimer.Expired(Runner)) {
+            ThrowTimer = TickTimer.None;
+
+            if (PreviousHolder)
+                Physics2D.IgnoreCollision(hitbox, PreviousHolder.MainHitbox, false);
         }
-        if (photonView.IsMine && holder && Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f)) {
-            photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.HitWall);
+
+        if (body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY()) {
+            Kill();
             return;
         }
 
-        if (!fastSlide && autoBreakTimer < 1f)
-            body.position = new(body.position.x + Mathf.Sin(autoBreakTimer * shakeSpeed) * shakeAmount * Time.fixedDeltaTime, transform.position.y);
-
-        if (dead)
+        if (Holder && Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f)) {
+            KillWithReason(UnfreezeReason.HitWall);
             return;
+        }
+
+        if (!FastSlide && !Holder) {
+            float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
+            if (remainingTime < 1f)
+                body.position = new(body.position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
+        }
 
         //our entity despawned. remove.
-        if (entity == null) {
-            if (photonView.IsMine) {
-                PhotonNetwork.Destroy(photonView);
-            }
-            Destroy(gameObject);
+        if (FrozenEntity == null) {
+            Runner.Despawn(Object);
             return;
         }
 
         //handle interactions with tiles
-        if (entity.IsCarryable && photonView.IsMineOrLocal())
-            HandleTile();
+        if (FrozenEntity.IsCarryable) {
+            if (!HandleTile())
+                return;
 
-        if (fastSlide && physics.onGround && physics.floorAngle != 0) {
-            RaycastHit2D ray = Physics2D.BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskOnlyGround);
+            //be inside us, entity. cmaaahn~
+            FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
+        }
+
+        if (FastSlide && physics.onGround && physics.floorAngle != 0) {
+            RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskOnlyGround);
             if (ray) {
-                body.position = new Vector2(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
+                body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
                 if (ray.distance < 0.1f)
-                    body.velocity = new Vector2(body.velocity.x, Mathf.Min(0, body.velocity.y));
+                    body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
             }
         }
 
-        body.velocity = new Vector2(throwSpeed * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.velocity.y);
 
-        if (autoBreakTimer > 0 && (entity is PlayerController || (!holder && !fastSlide))) {
-            Utils.TickTimer(ref autoBreakTimer, 0, Time.fixedDeltaTime);
-            if (autoBreakTimer <= 0) {
-                if (!fastSlide)
-                    unfreezeReason = IFreezableEntity.UnfreezeReason.Timer;
+        if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {
+
+            if (AutoBreakTimer.Expired(Runner)) {
+                if (!FastSlide)
+                    unfreezeReason = UnfreezeReason.Timer;
 
                 if (flying)
                     fallen = true;
-                else if (photonView.IsMine) {
-                    photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Timer);
+                else {
+                    KillWithReason(UnfreezeReason.Timer);
+                    return;
                 }
             }
         }
 
-        if (throwTimer > 0 && throwTimer - Time.fixedDeltaTime <= 0) {
-            Physics2D.IgnoreCollision(hitbox, previousHolder.MainHitbox, false);
-        }
-        Utils.TickTimer(ref throwTimer, 0, Time.fixedDeltaTime);
-
         ApplyConstraints();
     }
-    #endregion
 
-    #region Unity Callbacks
-    public new void OnTriggerEnter2D(Collider2D collider) {
-        if (!photonView.IsMineOrLocal() || dead || !fastSlide)
-            return;
-
-        GameObject obj = collider.gameObject;
-        KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
-
-        if (killa && (killa.dead ||killa.photonView.ViewID == entityView.ViewID))
-            return;
-
-        switch (obj.tag) {
-        case "koopa":
-        case "bobomb":
-        case "bulletbill":
-        case "goomba":
-        case "piranhaplant":
-        case "frozencube": {
-            killa.photonView.RPC("SpecialKill", RpcTarget.All, killa.transform.position.x > transform.position.x, false, combo++);
-            break;
-        }
-        case "coin": {
-            (holder != null ? holder : previousHolder).photonView.RPC("CollectCoin", RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector3(obj.transform.position.x, collider.transform.position.y, 0));
-            break;
-        }
-        case "loosecoin": {
-            Transform parent = obj.transform.parent;
-            (holder != null ? holder : previousHolder).photonView.RPC("CollectCoin", RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, parent.position);
-            break;
-        }
-        }
-    }
-    #endregion
-
-    #region Helper Methods
-    private void HandleTile() {
-        if (!photonView.IsMineOrLocal())
-            return;
-
+    private bool HandleTile() {
         physics.UpdateCollisions();
 
-        if ((fastSlide && (physics.hitLeft || physics.hitRight))
-            || (flying && fallen && physics.onGround && !holder)
-            || ((holder || physics.onGround) && physics.hitRoof)) {
+        if ((FastSlide && (physics.hitLeft || physics.hitRight))
+            || (flying && fallen && physics.onGround && !Holder)
+            || ((Holder || physics.onGround) && physics.hitRoof)) {
 
-            photonView.RPC("Kill", RpcTarget.All);
+            Kill();
+            return false;
         }
-    }
 
-    public override void InteractWithPlayer(PlayerController player) {
-        Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = damageDirection.y > -0.4f;
-        if (previousHolder == player && throwTimer > 0)
-            return;
-
-        if (!holder && (player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom || player.inShell)) {
-            photonView.RPC("Kill", RpcTarget.All);
-            return;
-        }
-        if (holder || fallen || player.Frozen || (player.throwInvincibility > 0 && player.holdingOld == gameObject))
-            return;
-
-        if (player.groundpound && attackedFromAbove && player.state != Enums.PowerupState.MiniMushroom) {
-            photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.Groundpounded);
-            if (entity is PlayerController pc)
-                pc.photonView.RPC("Knockback", RpcTarget.All, pc.facingRight, 1, false, player.photonView.ViewID);
-
-        } else if (!attackedFromAbove && player.state != Enums.PowerupState.MiniMushroom) {
-
-            photonView.RPC("KillWithReason", RpcTarget.All, (byte) IFreezableEntity.UnfreezeReason.BlockBump);
-
-        } else if (fastSlide) {
-            player.photonView.RPC("Knockback", RpcTarget.All, body.position.x > player.body.position.x, 1, false, photonView.ViewID);
-            photonView.RPC("Kill", RpcTarget.All);
-        }
-        if (entity.IsCarryable && !holder && !dead) {
-            if (player.CanPickup() && player.onGround) {
-                fallen = true;
-                photonView.RPC("Pickup", RpcTarget.All, player.photonView.ViewID);
-                player.photonView.RPC("SetHolding", RpcTarget.All, photonView.ViewID);
-            } else {
-                player.photonView.RPC("SetHoldingOld", RpcTarget.All, photonView.ViewID);
-                previousHolder = player;
-            }
-        }
+        return true;
     }
 
     private void ApplyConstraints() {
         body.constraints = RigidbodyConstraints2D.FreezeRotation;
-        body.mass = holder ? 0 : 1;
-        body.isKinematic = !entity.IsCarryable;
+        body.mass = Holder ? 0 : 1;
+        body.isKinematic = !FrozenEntity.IsCarryable;
 
-        if (!holder) {
-            if (!fastSlide)
+        if (!Holder) {
+            if (!FastSlide)
                 body.constraints |= RigidbodyConstraints2D.FreezePositionX;
 
             if (flying && !fallen)
@@ -261,73 +183,141 @@ public class FrozenCube : HoldableEntity {
         }
     }
 
-    #endregion
-
-    #region PunRPCs
-    [PunRPC]
-    public override void Pickup(int view) {
-        base.Pickup(view);
-        Physics2D.IgnoreCollision(hitbox, holder.MainHitbox);
-        autoBreakTimer += 1f;
+    public void KillWithReason(UnfreezeReason reason) {
+        unfreezeReason = reason;
+        Kill();
     }
 
-    [PunRPC]
-    public override void Throw(bool facingLeft, bool crouch, Vector2 pos) {
-        if (holder == null)
+    //---IPlayerInteractable overrides
+    public override void InteractWithPlayer(PlayerController player) {
+
+        //don't interact with our lovely holder
+        if (Holder == player)
+            return;
+
+        //temporary invincibility
+        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+            return;
+
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = damageDirection.y > -0.4f;
+
+        if (PreviousHolder == player)
+            return;
+
+        if (!Holder && (player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom || player.IsInShell)) {
+            Kill();
+            return;
+        }
+        if (fallen || player.IsFrozen)
+            return;
+
+        if ((player.IsGroundpounding || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
+            KillWithReason(UnfreezeReason.Groundpounded);
+
+        } else if (!attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
+            KillWithReason(UnfreezeReason.BlockBump);
+
+        } else if (FastSlide) {
+            player.DoKnockback(body.position.x > player.body.position.x, 1, false, 0);
+            Kill();
+        }
+        if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround) {
+            fallen = true;
+            Pickup(player);
+        }
+    }
+
+    //---IFireballInteractable overrides
+    public override bool InteractWithFireball(FireballMover fireball) {
+        if (!fireball.isIceball)
+            Kill();
+
+        return true;
+    }
+
+    public override bool InteractWithIceball(FireballMover iceball) {
+        return true;
+    }
+
+    //---IThrowableEntity overrides
+    public override void Pickup(PlayerController player) {
+        base.Pickup(player);
+        Physics2D.IgnoreCollision(hitbox, player.MainHitbox);
+        AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, (AutoBreakTimer.RemainingTime(Runner) ?? 0f) + 1f);
+    }
+
+    public override void Throw(bool toRight, bool crouch) {
+        base.Throw(toRight, false);
+
+        if (!Holder)
             return;
 
         fallen = false;
         flying = false;
-        left = facingLeft;
-        fastSlide = true;
-        body.position = new(pos.x + (holder.facingRight ? 0.1f : -0.1f), pos.y);
+        FastSlide = true;
+        ThrowTimer = TickTimer.CreateFromSeconds(Runner, 1f);
 
-        previousHolder = holder;
-        holder.SetHoldingOld(photonView.ViewID);
-        holder = null;
-        throwTimer = 1f;
-
-        photonView.TransferOwnership(PhotonNetwork.MasterClient);
-
-        if (entity.IsFlying) {
+        if (FrozenEntity.IsFlying) {
             fallen = true;
             body.isKinematic = false;
         }
         ApplyConstraints();
-
-        body.velocity = new(throwSpeed * (left ? -1 : 1), Mathf.Min(0, body.velocity.y));
     }
 
-    [PunRPC]
-    public override void Kick(bool fromLeft, float kickFactor, bool groundpound) {
+    public override void Kick(PlayerController kicker, bool fromLeft, float kickFactor, bool groundpound) {
         //kicking does nothing.
     }
 
-    [PunRPC]
-    public void KillWithReason(byte reasonByte) {
-        unfreezeReason = (IFreezableEntity.UnfreezeReason) reasonByte;
-        Kill();
-    }
+    //---IKillableEntity overrides
+    protected override void CheckForEntityCollisions() {
+        //don't call base, we dont wanna turn around.
 
-    [PunRPC]
-    public override void Kill() {
-        entity?.Unfreeze((byte) unfreezeReason);
+        if (!FastSlide)
+            return;
 
-        if (holder)
-            holder.holding = null;
-        holder = null;
+        //only run when fastsliding...
 
-        Instantiate(Resources.Load("Prefabs/Particle/IceBreak"), transform.position, Quaternion.identity);
-        if (photonView.IsMine) {
-            PhotonNetwork.Destroy(photonView);
-        } else {
-            Destroy(gameObject);
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
+
+        for (int i = 0; i < count; i++) {
+            GameObject obj = collisionBuffer[i].gameObject;
+
+            if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj || FrozenEntity?.gameObject == obj)
+                continue;
+
+            if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
+                coin.InteractWithPlayer(PreviousHolder);
+                continue;
+            }
+
+            if (obj.TryGetComponent(out KillableEntity killable)) {
+                if (killable.IsDead || killable == FrozenEntity)
+                    continue;
+
+                //kill entity we ran into
+                killable.SpecialKill(killable.body.position.x > body.position.x, false, combo++);
+
+                //kill ourselves if we're being held too
+                if (Holder)
+                    SpecialKill(killable.body.position.x < body.position.x, false, 0);
+
+                continue;
+            }
         }
     }
 
-	[PunRPC]
+    public override void Kill() {
+        FrozenEntity?.Unfreeze(unfreezeReason);
+
+        if (Holder)
+            Holder.SetHolding(null);
+
+        Instantiate(shatterParticles, transform.position, Quaternion.identity);
+        Runner.Despawn(Object);
+    }
+
     public override void SpecialKill(bool right, bool groundpound, int combo) {
         Kill();
     }
-    #endregion
 }

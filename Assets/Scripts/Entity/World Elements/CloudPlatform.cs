@@ -5,20 +5,16 @@ using UnityEngine;
 
 public class CloudPlatform : MonoBehaviour {
 
-    [Delayed]
-    public int platformWidth = 8, samplesPerTile = 8;
-    public float time = 0.25f;
-    public bool changeCollider = true;
-
-    public EdgeCollider2D ground;
-    public BoxCollider2D trigger;
-    
-    [SerializeField]
-    public List<CloudContact> positions = new();
+    [SerializeField] private EdgeCollider2D ground;
+    [SerializeField] private BoxCollider2D trigger;
+    [Delayed] [SerializeField] private int platformWidth = 8, samplesPerTile = 8;
+    [SerializeField] private float time = 0.25f;
+    [SerializeField] private bool changeCollider = true;
 
     private MaterialPropertyBlock mpb;
     private Texture2D displacementMap;
     private SpriteRenderer spriteRenderer;
+    private List<CloudContact> positions = new();
     private Color32[] pixels;
 
     public void Start() {
@@ -26,13 +22,11 @@ public class CloudPlatform : MonoBehaviour {
     }
 
     public void OnValidate() {
-        ValidationUtility.SafeOnValidate(() => {
-            Initialize();
-        });
+        ValidationUtility.SafeOnValidate(Initialize);
     }
 
     private void Initialize() {
-        if (this == null)
+        if (this == null || !this)
             //what
             return;
 
@@ -156,7 +150,6 @@ public class CloudPlatform : MonoBehaviour {
         return null;
     }
 
-    [System.Serializable]
     public class CloudContact {
         public Rigidbody2D obj;
         public CloudPlatform platform;
@@ -182,7 +175,7 @@ public class CloudPlatform : MonoBehaviour {
             this.platform = platform;
             this.obj = obj;
             this.collider = collider;
-            timer = platform.time;
+            timer = 0.05f;
         }
     }
 }

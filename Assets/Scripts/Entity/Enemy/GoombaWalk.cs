@@ -1,17 +1,22 @@
 using UnityEngine;
-using Photon.Pun;
-using NSMB.Utils;
+
+using Fusion;
 
 public class GoombaWalk : KillableEntity {
-    [SerializeField] float speed, deathTimer = -1, terminalVelocity = -8;
 
-    public new void Start() {
-        base.Start();
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+    //---Networked Variables
+    [Networked] private TickTimer DespawnTimer { get; set; }
+
+    //---Serialized Variables
+    [SerializeField] private float speed, terminalVelocity = -8;
+
+    public override void Spawned() {
+        body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
         animator.SetBool("dead", false);
     }
 
-    public new void FixedUpdate() {
+    public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -20,33 +25,34 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        base.FixedUpdate();
-        if (dead) {
-            if (deathTimer >= 0 && (photonView?.IsMine ?? true)) {
-                Utils.TickTimer(ref deathTimer, 0, Time.fixedDeltaTime);
-                if (deathTimer == 0)
-                    PhotonNetwork.Destroy(gameObject);
-            }
+        if (IsDead) {
+            if (DespawnTimer.Expired(Runner))
+                Runner.Despawn(Object);
+
             return;
         }
 
+        HandleWallCollisions();
 
-        physics.UpdateCollisions();
-        if (physics.hitLeft || physics.hitRight) {
-            left = physics.hitRight;
-        }
-        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
-        sRenderer.flipX = !left;
+        body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(terminalVelocity, body.velocity.y));
+        sRenderer.flipX = FacingRight;
     }
 
-    [PunRPC]
+    private void HandleWallCollisions() {
+        physics.UpdateCollisions();
+        if (physics.hitLeft || physics.hitRight)
+            FacingRight = physics.hitLeft;
+    }
+
+    //---KillableEntity overrides
     public override void Kill() {
+        IsDead = true;
+
         body.velocity = Vector2.zero;
         body.isKinematic = true;
-        speed = 0;
-        dead = true;
-        deathTimer = 0.5f;
         hitbox.enabled = false;
+
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
         animator.SetBool("dead", true);
     }
 }

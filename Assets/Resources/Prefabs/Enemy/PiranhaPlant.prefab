@@ -48,10 +48,9 @@ GameObject:
   - component: {fileID: 9130149352575295893}
   - component: {fileID: 3206924239527984068}
   - component: {fileID: 4891561017733555876}
-  - component: {fileID: 3416259037201337410}
-  - component: {fileID: 144300025093644703}
-  - component: {fileID: 7244889019862401011}
-  m_Layer: 0
+  - component: {fileID: 5412312900953502766}
+  - component: {fileID: 157777260401815061}
+  m_Layer: 10
   m_Name: animatorsarestupid
   m_TagString: piranhaplant
   m_Icon: {fileID: 0}
@@ -85,12 +84,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 678c29978dd34f647a21f2a2c3db5a9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dead: 0
-  left: 1
+  _interpolationDataSource: 0
+  _IsFrozen: 0
+  _IsDead:
+    _value: 0
   collide: 0
   iceCarryable: 0
   flying: 0
-  body: {fileID: 0}
   hitbox: {fileID: 0}
   playerDetectSize: 1
   popupTimerRequirement: 3.6
@@ -157,7 +157,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.11}
@@ -205,8 +205,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 212c7eab2afd3074eb45336ea3726447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: 
-  currentEntity: {fileID: 0}
+  _interpolationDataSource: 0
+  prefab:
+    RawGuidValue: 00000000000000000000000000000000
 --- !u!114 &3206924239527984068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,10 +220,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 1900118008454034840}
   audioSources:
   - {fileID: 4891561017733555876}
+  soundOrigin: {fileID: 1900118008454034840}
+  soundRange: 12
 --- !u!82 &4891561017733555876
 AudioSource:
   m_ObjectHideFlags: 0
@@ -320,7 +321,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &3416259037201337410
+--- !u!114 &5412312900953502766
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -329,21 +330,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1900118008454034841}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 144300025093644703}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &144300025093644703
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 0
+  NetworkGuid:
+    RawGuidValue: 00000000000000000000000000000000
+  NestedObjects: []
+  NetworkedBehaviours: []
+  SimulationBehaviours: []
+--- !u!114 &157777260401815061
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -352,23 +353,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1900118008454034841}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21c3e9f85d5b489468bea041192f50b2, type: 3}
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializableViews:
-  - {fileID: 7244889019862401011}
-  - {fileID: 5617925178328362155}
---- !u!114 &7244889019862401011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1900118008454034841}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1ec092acf651e542acfcdd4d0d2045a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ignoredParameters: []
-  animator: {fileID: 1900118008454034843}
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5

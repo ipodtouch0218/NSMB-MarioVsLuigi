@@ -1,63 +1,68 @@
-﻿using NSMB.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+
+using NSMB.Utils;
 
 public class CameraController : MonoBehaviour {
 
+    private static readonly Vector2 AirOffset = new(0, .65f);
+    private static readonly Vector2 AirThreshold = new(0.5f, 1.3f), GroundedThreshold = new(0.5f, 0f);
+
+    //---Public Variables
     public static float ScreenShake = 0;
-    public bool controlCamera = false;
     public Vector3 currentPosition;
+    public bool IsControllingCamera { get; set; } = false;
 
-    private Vector2 airThreshold = new(0.5f, 1.3f), groundedThreshold = new(0.5f, 0f);
-    private Vector2 airOffset = new(0, .65f), groundedOffset = new(0, 1.3f);
-
-    private Vector3 smoothDampVel;
+    //---Private Variables
+    private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
+    private PlayerController controller;
+    private Vector3 smoothDampVel, playerPos;
     private Camera targetCamera;
-    private List<SecondaryCameraPositioner> secondaryPositioners = new();
     private float startingZ, lastFloor;
 
-    private PlayerController controller;
-    private Vector3 playerPos;
-
-    void Awake() {
+    public void Awake() {
         //only control the camera if we're the local player.
         targetCamera = Camera.main;
         startingZ = targetCamera.transform.position.z;
-        controller = GetComponent<PlayerController>();
+        controller = GetComponentInParent<PlayerController>();
         targetCamera.GetComponentsInChildren(secondaryPositioners);
     }
 
     public void LateUpdate() {
         currentPosition = CalculateNewPosition();
-        if (controlCamera) {
+        if (IsControllingCamera) {
 
             Vector3 shakeOffset = Vector3.zero;
-            if ((ScreenShake -= Time.deltaTime) > 0)
+            if ((ScreenShake -= Time.deltaTime) > 0 && controller.IsOnGround)
                 shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
 
-            if (!controller.onGround)
-                shakeOffset = Vector3.zero;
-
-            targetCamera.transform.position = currentPosition + shakeOffset;
-            if (BackgroundLoop.Instance)
-                BackgroundLoop.Instance.Reposition();
-
-            secondaryPositioners.RemoveAll(scp => scp == null);
-            secondaryPositioners.ForEach(scp => scp.UpdatePosition());
+            SetPosition(currentPosition + shakeOffset);
         }
     }
 
-    public void Recenter() {
-        currentPosition = (Vector2) transform.position + airOffset;
+    public void Recenter(Vector2 pos) {
+        currentPosition = pos + AirOffset;
         smoothDampVel = Vector3.zero;
-        LateUpdate();
+        SetPosition(pos);
+    }
+
+    private void SetPosition(Vector3 position) {
+        if (!IsControllingCamera)
+            return;
+
+        targetCamera.transform.position = position;
+        if (BackgroundLoop.Instance)
+            BackgroundLoop.Instance.Reposition();
+
+        secondaryPositioners.RemoveAll(scp => !scp);
+        secondaryPositioners.ForEach(scp => scp.UpdatePosition());
     }
 
     private Vector3 CalculateNewPosition() {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
-        if (!controller.dead)
+        if (!controller.IsDead || controller.IsRespawning)
             playerPos = AntiJitter(transform.position);
 
         float vOrtho = targetCamera.orthographicSize;
@@ -85,7 +90,7 @@ public class CameraController : MonoBehaviour {
             currentPosition.x += (right ? -1 : 1) * GameManager.Instance.levelWidthTile / 2f;
             xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
             right = currentPosition.x > playerPos.x;
-            if (controlCamera)
+            if (IsControllingCamera)
                 BackgroundLoop.Instance.wrap = true;
         }
 
@@ -94,9 +99,9 @@ public class CameraController : MonoBehaviour {
 
         // lagging camera movements
         Vector3 targetPosition = currentPosition;
-        if (controller.onGround)
+        if (controller.IsOnGround)
             lastFloor = playerPos.y;
-        bool validFloor = controller.onGround || lastFloor < playerPos.y;
+        bool validFloor = controller.IsOnGround || lastFloor < playerPos.y;
 
         //top camera clip ON GROUND. slowly pan up, dont do it instantly.
         if (validFloor && lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0)
@@ -119,12 +124,13 @@ public class CameraController : MonoBehaviour {
 
         return targetPosition;
     }
-    private void OnDrawGizmos() {
+
+    public void OnDrawGizmos() {
         if (!controller)
             return;
 
         Gizmos.color = Color.blue;
-        Vector2 threshold = controller.onGround ? groundedThreshold : airThreshold;
+        Vector2 threshold = controller.IsOnGround ? GroundedThreshold : AirThreshold;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(new(playerPos.x, lastFloor), Vector3.right / 2);

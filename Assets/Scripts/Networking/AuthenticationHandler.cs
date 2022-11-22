@@ -1,45 +1,75 @@
-using System.Net.Http;
+using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Networking;
 
-using Photon.Pun;
-using Photon.Realtime;
+using Fusion.Photon.Realtime;
 
 public class AuthenticationHandler {
 
     private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
 
-    public async static void Authenticate(string userid, string token) {
-        try {
-            HttpClient client = new();
-            string request = URL + "?";
-            if (userid != null)
-                request += "&userid=" + userid;
-            if (token != null)
-                request += "&token=" + token;
+    public async static Task<AuthenticationValues> Authenticate(string userid, string token) {
 
-            HttpResponseMessage resp = await client.GetAsync(request);
-            string responseString = await resp.Content.ReadAsStringAsync();
+        string request = URL + "?";
+        if (userid != null)
+            request += "&userid=" + userid;
+        if (token != null)
+            request += "&token=" + token;
 
-            if (!resp.IsSuccessStatusCode) {
+        UnityWebRequest client = UnityWebRequest.Get(request);
 
-                if (MainMenuManager.Instance)
-                    MainMenuManager.Instance.OpenErrorBox(responseString);
-                return;
+        client.certificateHandler = new MvLCertificateHandler();
+        client.disposeCertificateHandlerOnDispose = true;
+        client.disposeDownloadHandlerOnDispose = true;
+        client.disposeUploadHandlerOnDispose = true;
+
+        await client.SendWebRequest();
+
+        if (client.result != UnityWebRequest.Result.Success) {
+            if (MainMenuManager.Instance) {
+                MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode);
+                //MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
             }
-
-
-            AuthenticationValues values = new();
-            values.AuthType = CustomAuthenticationType.Custom;
-            values.UserId = userid;
-            values.AddAuthParameter("data", responseString.Trim());
-            PhotonNetwork.AuthValues = values;
-
-            PhotonNetwork.NetworkingClient.ConnectToNameServer();
-
-        } catch (HttpRequestException e) {
-
-            if (MainMenuManager.Instance)
-                MainMenuManager.Instance.OpenErrorBox(e.Message);
-            return;
+            return null;
         }
+
+        AuthenticationValues values = new();
+        values.AuthType = CustomAuthenticationType.Custom;
+        values.UserId = userid;
+        values.AddAuthParameter("data", client.downloadHandler.text.Trim());
+
+        client.Dispose();
+
+        return values;
+    }
+}
+
+public class UnityWebRequestAwaiter : INotifyCompletion {
+    private UnityWebRequestAsyncOperation asyncOp;
+    private Action continuation;
+
+    public UnityWebRequestAwaiter(UnityWebRequestAsyncOperation asyncOp) {
+        this.asyncOp = asyncOp;
+        asyncOp.completed += OnRequestCompleted;
+    }
+
+    public bool IsCompleted { get { return asyncOp.isDone; } }
+
+    public void GetResult() { }
+
+    public void OnCompleted(Action continuation) {
+        this.continuation = continuation;
+    }
+
+    private void OnRequestCompleted(AsyncOperation obj) {
+        continuation();
+    }
+}
+
+public static class ExtensionMethods {
+    public static UnityWebRequestAwaiter GetAwaiter(this UnityWebRequestAsyncOperation asyncOp) {
+        return new UnityWebRequestAwaiter(asyncOp);
     }
 }

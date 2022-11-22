@@ -1,65 +1,67 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using TMPro;
 
-using Photon.Pun;
-using Photon.Realtime;
+using Fusion;
+using NSMB.Extensions;
 using NSMB.Utils;
 
 public class PlayerListEntry : MonoBehaviour {
 
-    public Player player;
+    //---Public Variables
+    public PlayerRef player;
 
+    //---Serialized Variables
     [SerializeField] private TMP_Text nameText, pingText;
     [SerializeField] private Image colorStrip;
-
     [SerializeField] private RectTransform background, options;
     [SerializeField] private GameObject blockerTemplate, firstButton;
-
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private LayoutElement layout;
-
     [SerializeField] private GameObject[] adminOnlyOptions;
 
+    //---Private Variables
     private GameObject blockerInstance;
 
+    private void OnDestroy() {
+        if (blockerInstance)
+            Destroy(blockerInstance);
+    }
+
     public void Update() {
-        nameText.color = Utils.GetRainbowColor();
+        nameText.color = Utils.GetRainbowColor(NetworkHandler.Instance.runner);
     }
 
     public void UpdateText() {
-        colorStrip.color = Utils.GetPlayerColor(player, 1f, 1f);
+        NetworkRunner runner = NetworkHandler.Instance.runner;
+        PlayerData data = player.GetPlayerData(runner);
+
+        colorStrip.color = Utils.GetPlayerColor(runner, player);
+
         enabled = player.HasRainbowName();
 
         string permissionSymbol = "";
-        if (player.IsMasterClient)
+        if (data.IsRoomOwner) {
             permissionSymbol += "<sprite=5>";
-
-        Utils.GetCustomProperty(Enums.NetPlayerProperties.Status, out bool status, player.CustomProperties);
-        if (status)
-            permissionSymbol += "<sprite=26>";
-
-        string characterSymbol = Utils.GetCharacterData(player).uistring;
-        Utils.GetCustomProperty(Enums.NetPlayerProperties.Ping, out int ping, player.CustomProperties);
-
-        string pingColor;
-        if (ping < 0) {
-            pingColor = "black";
-        } else if (ping < 80) {
-            pingColor = "#00b900";
-        } else if (ping < 120) {
-            pingColor = "orange";
+            pingText.text = "";
         } else {
-            pingColor = "red";
+            int ping = data.Ping;
+            string pingColor;
+            if (ping < 0) {
+                pingColor = "black";
+            } else if (ping < 80) {
+                pingColor = "#00b900";
+            } else if (ping < 120) {
+                pingColor = "orange";
+            } else {
+                pingColor = "red";
+            }
+            pingText.text = $"<color={pingColor}>{ping}";
         }
 
-        nameText.text = permissionSymbol + characterSymbol + player.GetUniqueNickname();
-        pingText.text = $"<color={pingColor}>{ping}";
+        string characterSymbol = data.GetCharacterData().uistring;
+        nameText.text = permissionSymbol + characterSymbol + data.GetNickname();
 
         Transform parent = transform.parent;
         int childIndex = 0;
@@ -75,10 +77,11 @@ public class PlayerListEntry : MonoBehaviour {
     }
 
     public void ShowDropdown() {
+        NetworkRunner runner = NetworkHandler.Instance.runner;
         if (blockerInstance)
             Destroy(blockerInstance);
 
-        bool admin = PhotonNetwork.IsMasterClient && !player.IsMasterClient;
+        bool admin = runner.IsServer && runner.LocalPlayer != player;
         foreach (GameObject option in adminOnlyOptions) {
             option.SetActive(admin);
         }
@@ -94,7 +97,7 @@ public class PlayerListEntry : MonoBehaviour {
         options.anchoredPosition = new(options.anchoredPosition.x, -options.rect.height);
 
         EventSystem.current.SetSelectedGameObject(firstButton);
-        MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor.GetClip());
+        MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
     }
 
     public void HideDropdown(bool didAction) {
@@ -103,7 +106,7 @@ public class PlayerListEntry : MonoBehaviour {
         background.offsetMin = new(background.offsetMin.x, 0);
         options.anchoredPosition = new(options.anchoredPosition.x, 0);
 
-        MainMenuManager.Instance.sfx.PlayOneShot((didAction ? Enums.Sounds.UI_Decide : Enums.Sounds.UI_Back).GetClip());
+        MainMenuManager.Instance.sfx.PlayOneShot(didAction ? Enums.Sounds.UI_Decide : Enums.Sounds.UI_Back);
     }
 
     public void BanPlayer() {
@@ -128,7 +131,7 @@ public class PlayerListEntry : MonoBehaviour {
 
     public void CopyPlayerId() {
         TextEditor te = new();
-        te.text = player.UserId;
+        te.text = player.GetPlayerData(NetworkHandler.Instance.runner).GetUserId();
         te.SelectAll();
         te.Copy();
         HideDropdown(true);

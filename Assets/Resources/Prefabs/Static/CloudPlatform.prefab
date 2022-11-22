@@ -99,13 +99,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e1866da6ee0d3e4b865eab90c997fee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ground: {fileID: 5317415744946271560}
+  trigger: {fileID: 1599724149089002305}
   platformWidth: 6
   samplesPerTile: 16
   time: 0.25
   changeCollider: 1
-  ground: {fileID: 5317415744946271560}
-  trigger: {fileID: 1599724149089002305}
-  positions: []
 --- !u!61 &1599724149089002305
 BoxCollider2D:
   m_ObjectHideFlags: 0

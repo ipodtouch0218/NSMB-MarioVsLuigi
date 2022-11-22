@@ -104,10 +104,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1062070206634343210}
-  - component: {fileID: 9006241837872920554}
   - component: {fileID: 5419776802840818205}
   - component: {fileID: 5736572734822788709}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: spin_obj
   m_TagString: spinner
   m_Icon: {fileID: 0}
@@ -129,22 +128,6 @@ Transform:
   m_Father: {fileID: 7020551328166419880}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9006241837872920554
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7253224997873802793}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa5979d0e1adc55409bf911b004d25ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleSpinSpeed: {x: 0, y: -100, z: 0}
-  fastSpinSpeed: {x: 0, y: -1800, z: 0}
-  topArmBone: {fileID: 5801919727347960438}
-  playerCollider: {fileID: 0}
 --- !u!137 &5419776802840818205
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
@@ -214,7 +197,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.30719656}
@@ -239,7 +222,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7020551328166419880}
+  - component: {fileID: 2562862165479420778}
   - component: {fileID: 3233889381157595090}
+  - component: {fileID: 7405962687031427707}
   m_Layer: 8
   m_Name: Spinner
   m_TagString: spinner
@@ -264,6 +249,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2562862165479420778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7648751058351671058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa5979d0e1adc55409bf911b004d25ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idleSpinSpeed: {x: 0, y: -100, z: 0}
+  fastSpinSpeed: {x: 0, y: -1800, z: 0}
+  topArmBone: {fileID: 5801919727347960438}
 --- !u!61 &3233889381157595090
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -290,6 +290,30 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 0.5041587}
   m_EdgeRadius: 0
+--- !u!114 &7405962687031427707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7648751058351671058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: df38f39e18bbdcf4b9b2ee15b49f1bb2
+  NestedObjects: []
+  NetworkedBehaviours: []
+  SimulationBehaviours:
+  - {fileID: 2562862165479420778}
 --- !u!1 &8515403405127119728
 GameObject:
   m_ObjectHideFlags: 0

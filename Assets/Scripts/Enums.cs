@@ -1,50 +1,36 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
 public static class Enums {
 
-    #region POWERUPS
-    public class PriorityPair {
-        public int itemPriority, statePriority;
-        public PriorityPair(int state) {
-            statePriority = itemPriority = state;
-        }
-        public PriorityPair(int state, int item) {
-            statePriority = state;
-            itemPriority = item;
-        }
-    }
-    public static readonly Dictionary<PowerupState, PriorityPair> PowerupStatePriority = new() {
-        [PowerupState.None] = new(-1),
-        [PowerupState.MiniMushroom] = new(0, 3),
-        [PowerupState.Small] = new(-1),
-        [PowerupState.Mushroom] = new(1),
-        [PowerupState.FireFlower] = new(2),
-        [PowerupState.IceFlower] = new(2),
-        [PowerupState.PropellerMushroom] = new(2),
-        [PowerupState.BlueShell] = new(2),
-        [PowerupState.MegaMushroom] = new(4),
-    };
     public enum PowerupState : byte {
-        None, MiniMushroom, Small, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
+        NoPowerup, MiniMushroom, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
-    #endregion
+
+    public static Powerup GetPowerupScriptable(this PowerupState state) {
+        if (state == PowerupState.NoPowerup)
+            return null;
+
+        return ScriptableManager.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
+    }
+
     #region ANIMATION & MUSIC
     // Animation enums
     public enum PlayerEyeState {
         Normal, HalfBlink, FullBlink, Death
     }
+
     // Music Enums
     public enum MusicState {
-        Normal,
-        MegaMushroom,
-        Starman,
+        Normal, MegaMushroom, Starman
     }
+
     //Sound effects
     public enum Sounds : byte {
-
+        //CURRENT HIGHEST NUMBER: 94
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
         [SoundData("enemy/freeze_shatter")]                     Enemy_Generic_FreezeShatter = 1,
@@ -68,21 +54,24 @@ public static class Enums {
         [SoundData("player/collision_fireball")]                Player_Sound_Collision_Fireball = 18,
         [SoundData("player/crouch")]                            Player_Sound_Crouch = 19,
         [SoundData("player/death")]                             Player_Sound_Death = 20,
+        [SoundData("player/death_others")]                      Player_Sound_DeathOthers = 94,
         [SoundData("player/drill")]                             Player_Sound_Drill = 21,
         [SoundData("player/groundpound_start")]                 Player_Sound_GroundpoundStart = 22,
         [SoundData("player/groundpound_landing")]               Player_Sound_GroundpoundLanding = 23,
         [SoundData("player/jump")]                              Player_Sound_Jump = 24,
+        [SoundData("player/lava_hiss")]                         Player_Sound_LavaHiss = 90,
         [SoundData("player/powerup")]                           Player_Sound_PowerupCollect = 16, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
         [SoundData("player/powerup_reserve_store")]             Player_Sound_PowerupReserveStore = 25,
         [SoundData("player/powerup_reserve_use")]               Player_Sound_PowerupReserveUse = 26,
         [SoundData("player/powerdown")]                         Player_Sound_Powerdown = 27,
         [SoundData("player/respawn")]                           Player_Sound_Respawn = 28,
+        [SoundData("player/slide_end")]                         Player_Sound_SlideEnd = 92,
         [SoundData("player/walljump")]                          Player_Sound_WallJump = 29,
         [SoundData("player/wallslide")]                         Player_Sound_WallSlide = 30,
 
         [SoundData("player/walk/grass")]                        Player_Walk_Grass = 31,
         [SoundData("player/walk/snow")]                         Player_Walk_Snow = 32,
-        [SoundData("player/walk/sand")]                         Player_Walk_Sand = 78,
+        [SoundData("player/walk/sand")]                         Player_Walk_Sand = 93,
 
         [SoundData("character/{char}/doublejump")]              Player_Voice_DoubleJump = 33,
         [SoundData("character/{char}/lava_death")]              Player_Voice_LavaDeath = 34,
@@ -132,14 +121,15 @@ public static class Enums {
         [SoundData("ui/windowclosed")]                          UI_WindowClose = 85,
         [SoundData("ui/windowopen")]                            UI_WindowOpen = 86,
         [SoundData("ui/match_draw")]                            UI_Match_Draw = 87,
-        [SoundData("ui/countdown1")]                            UI_Countdown_0 = 88,
-        [SoundData("ui/countdown0")]                            UI_Countdown_1 = 89,
+        [SoundData("ui/countdown0")]                            UI_Countdown_0 = 88,
+        [SoundData("ui/countdown1")]                            UI_Countdown_1 = 89,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,
         [SoundData("world/block_bump")]                         World_Block_Bump = 68,
         [SoundData("world/block_powerup")]                      World_Block_Powerup = 69, //nice
         [SoundData("world/coin_collect")]                       World_Coin_Collect = 70,
+        [SoundData("world/coin_drop")]                          World_Coin_Drop = 91,
         [SoundData("world/ice_skidding")]                       World_Ice_Skidding = 71,
         [SoundData("world/spinner_launch")]                     World_Spinner_Launch = 72,
         [SoundData("world/star_collect")]                       World_Star_Collect_Self = 73,
@@ -149,62 +139,32 @@ public static class Enums {
         [SoundData("world/water_splash")]                       World_Water_Splash = 77,
     }
 
+    public enum Particle : byte {
+        None = 0,
+
+        Entity_BrickBreak = 1,
+        Entity_Coin = 2,
+        Generic_Puff = 3,
+        Walk_Sand = 4,
+        Walk_Sand_Right = 5,
+        Walk_Snow = 6,
+        Walk_Snow_Right = 7,
+    }
+
     #endregion
     #region NETWORKING
     // Networking Enums
-    public static class NetPlayerProperties {
-        public static string Character { get; } = "C";
-        public static string Ping { get; } = "P";
-        public static string PlayerColor { get; } = "C1";
-        public static string GameState { get; } = "S";
-        public static string Status { get; } = "St";
-        public static string Spectator { get; } = "Sp";
-    }
-    public static class NetPlayerGameState {
-        public static string Stars { get; } = "S";
-        public static string Coins { get; } = "C";
-        public static string Lives { get; } = "L";
-        public static string PowerupState { get; } = "P";
-        public static string ReserveItem { get; } = "R";
-    }
     public static class NetRoomProperties {
-        public static string Level { get; } = "L";
-        public static string StarRequirement { get; } = "S";
-        public static string CoinRequirement { get; } = "Co";
-        public static string Lives { get; } = "Li";
-        public static string Time { get; } = "T";
-        public static string DrawTime { get; } = "Dt";
-        public static string NewPowerups { get; } = "C";
-        public static string GameStarted { get; } = "G";
-        public static string HostName { get; } = "H";
-        public static string Debug { get; } = "D";
-        public static string Mutes { get; } = "M";
-        public static string Bans { get; } = "B";
-    }
-    public enum NetEventIds : byte {
-        // 1-9 = in-lobby events
-        StartGame = 1,
-        SystemMessage = 2,
-        PlayerChatMessage = 3,
-        ChangeMaxPlayers = 4,
-        ChangePrivate = 5,
-        // 10-19 = game state events
-        PlayerFinishedLoading = 10,
-        AllFinishedLoading = 11,
-        EndGame = 19,
-        // 20-29 = world-based game events
-        SetTile = 20,
-        BumpTile = 21,
-        SetThenBumpTile = 22,
-        SetTileBatch = 23,
-        ResetTiles = 24,
-        SyncTilemap = 25,
-        SetCoinState = 26,
-        // 30-39 = graphical-only events
-        SpawnParticle = 30,
-        SpawnResizableParticle = 31,
-        // 40-49 = player-related events
-        PlayerDamagePlayer = 40,
+        public const string MaxPlayers = "P";
+        public const string Level = "L";
+        public const string StarRequirement = "S";
+        public const string CoinRequirement = "Co";
+        public const string Lives = "Li";
+        public const string Time = "T";
+        public const string Teams = "Ts";
+        public const string CustomPowerups = "C";
+        public const string GameStarted = "G";
+        public const string HostName = "H";
     }
     #endregion
 }
@@ -215,15 +175,32 @@ public class SoundData : Attribute {
         Sound = sound;
     }
 }
+
 public static class SoundDataExtensions {
-    public static AudioClip GetClip(this Enums.Sounds sound, PlayerData player = null, int variant = 0) {
-        SoundData data = GetSoundDataFromSound(sound);
-        string name = "Sound/" + data.Sound + (variant > 0 ? "_" + variant : "");
+
+    private readonly static Dictionary<Enums.Sounds, string> cachedStrings = new();
+    private readonly static Dictionary<string, AudioClip> cachedClips = new();
+
+    public static AudioClip GetClip(this Enums.Sounds sound, CharacterData player = null, int variant = 0) {
+        string name = "Sound/" + GetClipString(sound) + (variant > 0 ? "_" + variant : "");
+
         if (player != null)
             name = name.Replace("{char}", player.soundFolder);
-        return Resources.Load(name) as AudioClip;
+
+        if (cachedClips.ContainsKey(name))
+            return cachedClips[name];
+
+        AudioClip clip = Resources.Load(name) as AudioClip;
+        cachedClips[name] = clip;
+        return clip;
     }
-    private static SoundData GetSoundDataFromSound(Enums.Sounds sound) {
-        return sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>();
+
+    private static string GetClipString(Enums.Sounds sound) {
+        if (cachedStrings.ContainsKey(sound))
+            return cachedStrings[sound];
+
+        string str = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound;
+        cachedStrings[sound] = str;
+        return str;
     }
 }

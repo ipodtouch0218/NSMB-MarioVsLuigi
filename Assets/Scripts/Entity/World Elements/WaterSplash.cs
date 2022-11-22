@@ -1,15 +1,16 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-public class WaterSplash : MonoBehaviour {
+public class WaterSplash : MonoBehaviour, IPlayerInteractable {
 
-    [Delayed]
-    public int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
-    [Delayed]
-    public float heightTiles = 1;
-    public float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f, animationSpeed = 1f;
-    public string splashParticle;
+    //---Serialized Variables
+    [Delayed] [SerializeField] private int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
+    [Delayed] [SerializeField] private float heightTiles = 1;
+    [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, resistance = 0f, animationSpeed = 1f;
+    [SerializeField] private string splashParticle;
+    [SerializeField] private bool fireDeath;
 
+    //---Private Variables
     private Texture2D heightTex;
     private SpriteRenderer spriteRenderer;
     private MaterialPropertyBlock properties;
@@ -19,14 +20,12 @@ public class WaterSplash : MonoBehaviour {
     private int totalPoints;
     private bool initialized;
 
-
     private void Awake() {
         Initialize();
     }
+
     private void OnValidate() {
-        ValidationUtility.SafeOnValidate(() => {
-            Initialize();
-        });
+        ValidationUtility.SafeOnValidate(Initialize);
     }
 
     private void Initialize() {
@@ -84,7 +83,7 @@ public class WaterSplash : MonoBehaviour {
             pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); //right
         }
         for (int i = 0; i < totalPoints; i++) {
-            byte newR = (byte) (((pointHeights[i] / 20f) + 0.5f) * 255f);
+            byte newR = (byte) (Mathf.Clamp01((pointHeights[i] / 20f) + 0.5f) * 255f);
             valuesChanged |= colors[i].r != newR;
             colors[i].r = newR;
         }
@@ -99,6 +98,7 @@ public class WaterSplash : MonoBehaviour {
         properties.SetFloat("TextureIndex", animTimer);
         spriteRenderer.SetPropertyBlock(properties);
     }
+
     public void OnTriggerEnter2D(Collider2D collider) {
         Instantiate(Resources.Load(splashParticle), collider.transform.position, Quaternion.identity);
 
@@ -111,10 +111,18 @@ public class WaterSplash : MonoBehaviour {
             pointVelocities[pointsX] = -splashVelocity * power;
         }
     }
+
     public void OnTriggerStay2D(Collider2D collision) {
         if (collision.attachedRigidbody == null)
             return;
 
         collision.attachedRigidbody.velocity *= 1-Mathf.Clamp01(resistance);
+    }
+
+    public void InteractWithPlayer(PlayerController player) {
+        if (player.IsDead)
+            return;
+
+        player.Death(false, false);
     }
 }

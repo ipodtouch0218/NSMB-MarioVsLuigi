@@ -1,0 +1,46 @@
+{
+    "name": "Fusion.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:142cc54f3f73e4dabac1c30b19afb51d",
+        "GUID:19e39f4cea842594788e0c7be4c044c8"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Mono.Cecil.dll",
+        "Mono.Cecil.Pdb.dll",
+        "Mono.Cecil.Mdb.dll",
+        "Mono.Cecil.Rocks.dll",
+        "Fusion.Common.dll",
+        "Fusion.Runtime.dll",
+        "Fusion.Realtime.dll",
+        "Sirenix.OdinInspector.Editor.dll",
+        "Sirenix.Utilities.Editor.dll",
+        "Sirenix.Utilities.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.nuget.mono-cecil",
+            "expression": "1",
+            "define": "FUSION_HAS_MONO_CECIL"
+        },
+        {
+            "name": "nuget.mono-cecil",
+            "expression": "0.1",
+            "define": "FUSION_HAS_MONO_CECIL"
+        },
+        {
+            "name": "com.unity.nuget.mono-cecil",
+            "expression": "1.11",
+            "define": "FUSION_CECIL_1_11_OR_NEWER"
+        }
+    ],
+    "noEngineReferences": false
+}

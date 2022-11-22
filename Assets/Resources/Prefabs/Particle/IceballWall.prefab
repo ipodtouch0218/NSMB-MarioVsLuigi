@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6846844490911380731}
   - component: {fileID: 8731761913041386346}
   - component: {fileID: 4430510369696643318}
-  - component: {fileID: 6811752418340689560}
+  - component: {fileID: 8689746274265496876}
   - component: {fileID: 5560788942230574499}
   m_Layer: 9
   m_Name: IceballWall
@@ -604,6 +604,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
+    gravitySource: 0
     maxNumParticles: 1000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
@@ -4046,6 +4047,7 @@ ParticleSystem:
         m_RotationOrder: 4
     minVertexDistance: 0.2
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     ribbonCount: 1
     shadowBias: 0.5
     worldSpace: 0
@@ -4970,7 +4972,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &6811752418340689560
+--- !u!114 &8689746274265496876
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4995,7 +4997,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 4489564120651488598}
   audioSources:
   - {fileID: 4430510369696643318}
+  soundOrigin: {fileID: 4489564120651488598}
+  soundRange: 12

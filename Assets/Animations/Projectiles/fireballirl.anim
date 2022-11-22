@@ -7,7 +7,7 @@ AnimationClip:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: fireballirl
-  serializedVersion: 6
+  serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
   m_UseHighQualityCurve: 1
@@ -32,7 +32,7 @@ AnimationClip:
       value: {fileID: -3915765450054648673, guid: 8b4c76bfff99dba4b90ef29e19c39f48,
         type: 3}
     attribute: m_Sprite
-    path: 
+    path: Graphic
     classID: 212
     script: {fileID: 0}
   m_SampleRate: 60
@@ -43,12 +43,13 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 0
+      path: 3003628726
       attribute: 0
       script: {fileID: 0}
       typeID: 212
       customType: 23
       isPPtrCurve: 1
+      isIntCurve: 0
     pptrCurveMapping:
     - {fileID: 5353841184698615464, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
     - {fileID: 750297706712597742, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}

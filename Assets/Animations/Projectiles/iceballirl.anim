@@ -7,7 +7,7 @@ AnimationClip:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: iceballirl
-  serializedVersion: 6
+  serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
   m_UseHighQualityCurve: 1
@@ -32,7 +32,7 @@ AnimationClip:
       value: {fileID: -3915765450054648673, guid: eddf8ec042b3e614e925d846a27642df,
         type: 3}
     attribute: m_Sprite
-    path: 
+    path: Graphic
     classID: 212
     script: {fileID: 0}
   m_SampleRate: 12
@@ -43,12 +43,13 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 0
+      path: 3003628726
       attribute: 0
       script: {fileID: 0}
       typeID: 212
       customType: 23
       isPPtrCurve: 1
+      isIntCurve: 0
     pptrCurveMapping:
     - {fileID: 5353841184698615464, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
     - {fileID: 750297706712597742, guid: eddf8ec042b3e614e925d846a27642df, type: 3}

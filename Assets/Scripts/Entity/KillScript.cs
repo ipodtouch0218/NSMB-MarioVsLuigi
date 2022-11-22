@@ -1,15 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class KillScript : MonoBehaviour {
-    public string spawnAfter;
+
+    [SerializeField] private GameObject spawnAfter;
+
     public void Kill() {
         Destroy(gameObject);
         if (transform.parent != null)
             Destroy(transform.parent.gameObject);
 
-        if (spawnAfter.Length > 0)
-            Instantiate(Resources.Load("Prefabs/" + spawnAfter), transform.position, Quaternion.identity);
+        if (spawnAfter)
+            Instantiate(spawnAfter, transform.position, Quaternion.identity);
     }
 }

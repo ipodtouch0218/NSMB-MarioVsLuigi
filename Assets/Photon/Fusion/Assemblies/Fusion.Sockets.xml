@@ -1,0 +1,1220 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Fusion.Sockets</name>
+    </assembly>
+    <members>
+        <member name="T:Fusion.Sockets.NetAddress">
+            <summary>
+            Represents a Network Address, which includes a IP and Port
+            This can contains either a IPv4 or a IPv6 address
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetAddress.ActorId">
+            <summary>
+            Retrieves the Remote Actor ID which this <see cref="T:Fusion.Sockets.NetAddress"/> Represents
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetAddress.IsRelayAddr">
+            <summary>
+            Signal if the <see cref="T:Fusion.Sockets.NetAddress"/> is a Relayed connection
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetAddress.IsIPv6">
+            <summary>
+            Signal if the <see cref="T:Fusion.Sockets.NetAddress"/> represents an IPv6 Address
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetAddress.IsValid">
+            <summary>
+            Signal if this <see cref="T:Fusion.Sockets.NetAddress"/> is not default/empty
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.FromActorId(System.Int32)">
+            <summary>
+            Build a new <see cref="T:Fusion.Sockets.NetAddress"/> based on an ActorId
+            </summary>
+            <param name="actorId">ActorId used to build the NetAddress</param>
+            <returns>Relay NetAddress that references the ActorId</returns>
+            <remarks>ActorId must be 0 or greated</remarks>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.Hash64(Fusion.Sockets.NetAddress)">
+            <summary>
+            Build <see cref="T:Fusion.Sockets.NetAddress"/> 64Bit Hash 
+            </summary>
+            <param name="address">Address to build the Hash</param>
+            <returns>64bit Hash</returns>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.LocalhostIPv4(System.UInt16)">
+            <summary>
+            Create a new NetAddress on the LocalHost address with the desired Port 
+            </summary>
+            <param name="port">Port used to build the NetAddress</param>
+            <returns>New NetAddress reference</returns>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.LocalhostIPv6(System.UInt16)">
+            <summary>
+            Create a new <see cref="T:Fusion.Sockets.NetAddress"/> on the LocalHost IPv6 Address with the desired Port
+            </summary>
+            <param name="port">Port used to build the NetAddress</param>
+            <returns>New NetAddress reference</returns>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.Any(System.UInt16)">
+            <summary>
+            Create a new NetAddress using the "Any" IPv4 Address representation (0.0.0.0)
+            with the Port passed as argument
+            </summary>
+            <param name="port">Port used to build the NetAddress</param>
+            <returns>New NetAddress reference</returns>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.AnyIPv6(System.UInt16)">
+            <summary>
+            Create a new NetAddress using the "Any" IPv6 Address representation (::)
+            with the Port passed as argument
+            </summary>
+            <param name="port">Port used to build the NetAddress</param>
+            <returns>New NetAddress reference</returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Fusion.Sockets.NetAddress.CreateFromIpPort(System.String,System.UInt16)" -->
+        <member name="T:Fusion.Sockets.NetAddress.SubnetMask">
+            <summary>
+            IPv4 Subnet Mask Utilities
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetAddress.SubnetMask.SubnetMasks">
+            <summary>
+            List of IPv4 Subnet Masks
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.SubnetMask.IsSameSubNet(Fusion.Sockets.NetAddress,Fusion.Sockets.NetAddress)">
+            <summary>
+            Check if two IPv4 <see cref="T:Fusion.Sockets.NetAddress"/> seems to be in the same Subnet.
+            
+            The addresses are checked against all subnet masks in <see cref="P:Fusion.Sockets.NetAddress.SubnetMask.SubnetMasks"/>.
+            </summary>
+            <param name="addressA">EndPoint A</param>
+            <param name="addressB">EndPoint B</param>
+            <returns>True if both addresses seems to be in the same subnet</returns>
+        </member>
+        <member name="M:Fusion.Sockets.NetAddress.SubnetMask.GetNetworkAddress(Fusion.Sockets.NetAddress,Fusion.Sockets.NetAddress)">
+            <summary>
+            Extracts the Network Address of an IPv4 EndPoint based on a particular Subnet Mask
+            </summary>
+            <param name="netAddress">EndPoint</param>
+            <param name="subnetMask">Subnet Mask</param>
+            <returns>Network Address based on the Subnet Mask</returns>
+        </member>
+        <member name="T:Fusion.Sockets.NetBitBufferList">
+            <summary>
+            Represents a linked list of <see cref="T:Fusion.Sockets.NetBitBuffer"/>
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.NetBitBufferList.AddFirst(Fusion.Sockets.NetBitBuffer*)">
+            <summary>
+            Add a <see cref="T:Fusion.Sockets.NetBitBuffer"/> at the beginning of the List
+            </summary>
+            <param name="item">NetBitBuffer to add to the list</param>
+        </member>
+        <member name="M:Fusion.Sockets.NetBitBufferList.AddLast(Fusion.Sockets.NetBitBuffer*)">
+            <summary>
+            Add a <see cref="T:Fusion.Sockets.NetBitBuffer"/> at the end of the list.
+            </summary>
+            <param name="item">NetBitBuffer to add to the list</param>
+        </member>
+        <member name="M:Fusion.Sockets.NetBitBufferList.RemoveHead">
+            <summary>
+            Removes the first element of the list
+            </summary>
+            <returns>NetBitBuffer reference</returns>
+        </member>
+        <member name="M:Fusion.Sockets.NetBitBufferList.Remove(Fusion.Sockets.NetBitBuffer*)">
+            <summary>
+            Remove a specific <see cref="T:Fusion.Sockets.NetBitBuffer"/> from the list
+            </summary>
+            <param name="item">NetBitBuffer to remove</param>
+        </member>
+        <member name="M:Fusion.Sockets.NetBitBufferList.IsInList(Fusion.Sockets.NetBitBuffer*)">
+            <summary>
+            Check if a specific <see cref="T:Fusion.Sockets.NetBitBuffer"/> is in the list
+            </summary>
+            <param name="item">NetBitBuffer to check</param>
+            <returns>True if the list contains the item, false otherwise</returns>
+        </member>
+        <member name="T:Fusion.Sockets.NetCommands">
+            <summary>
+            Describe the Type of a Command Packet
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetCommandHeader">
+            <summary>
+            Network Command Header
+            Describe its type and usual settings for all commands
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.NetCommandHeader.Create(Fusion.Sockets.NetCommands)">
+            <summary>
+            Create a new NetCommandHeader based on a <see cref="T:Fusion.Sockets.NetCommands"/> type
+            </summary>
+            <param name="command">Type of Command that should be created</param>
+            <returns>New NetCommandHeader reference based on the Command Type</returns>
+        </member>
+        <member name="T:Fusion.Sockets.NetCommandConnect">
+            <summary>
+            Connect Command used to signal a remote server that a client is trying to connect to it
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetCommandAccepted">
+            <summary>
+            Accepted Command, sent by the server when a remote client connection is accepted
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetCommandRefused">
+            <summary>
+            Refuse Command, sent by the server when the connection was refused.
+            This happens when the server has reached its max connection capacity.
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetCommandDisconnect">
+            <summary>
+            Disconnect Command, it can be used by either side of the connection
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetConfig">
+            <summary>
+            General configuration used to drive the behavior of the Socket library
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.ConnectionSendBuffers">
+            <summary>
+            Pre-allocated number of data buffers used to send data 
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.ConnectionGroups">
+            <summary>
+            Number of Connection Groups supported by the local instance
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.MaxConnections">
+            <summary>
+            Max Number of Connections supported by the local instance
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetConfig.ConnectionsPerGroup">
+            <summary>
+            Max number of Connection per Group based on the <see cref="F:Fusion.Sockets.NetConfig.ConnectionGroups"/> and <see cref="F:Fusion.Sockets.NetConfig.MaxConnections"/>
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.SocketSendBuffer">
+            <summary>
+            Size of the internal Socket send buffer
+            <seealso href="https://github.com/nxrighthere/NanoSockets/blob/master/Source/Native/nanosockets.h#L210"/>
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.SocketRecvBuffer">
+            <summary>
+            Size of the internal Socket receive buffer
+            <seealso href="https://github.com/nxrighthere/NanoSockets/blob/master/Source/Native/nanosockets.h#L213"/>
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.DefaultMtu">
+            <summary>
+            default Maximum Transmission Unit
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.PacketSize">
+            <summary>
+            UDP Packet Size in Bytes
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetConfig.PacketSizeInBits">
+            <summary>
+            UDP Packet Size in Bits based on <see cref="F:Fusion.Sockets.NetConfig.PacketSize"/>
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.ConnectAttempts">
+            <summary>
+            Number of Connection Attempts tried by the peer before cancel the connection 
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.ConnectInterval">
+            <summary>
+            Interval in Seconds between attempts to connect to a remote server
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.OperationExpireTime">
+            <summary>
+            Max Allowed time for the Send and Receive operations, in milliseconds
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.ConnectionDefaultRtt">
+            <summary>
+            Initial RTT
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.ConnectionTimeout">
+            <summary>
+            Connection Timeout in seconds
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.ConnectionPingInterval">
+            <summary>
+            Interval in Seconds between ping being sent to a remote end
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.ConnectionShutdownTime">
+             <summary>
+             Timeout in Seconds to allow a disconnected Connection to be released from the Group Mapping
+            
+             <remarks>
+             <see cref="M:Fusion.Sockets.NetPeerGroup.UpdateShutdown(Fusion.Sockets.NetPeerGroup*,Fusion.Sockets.INetPeerGroupCallbacks,Fusion.Sockets.NetConnection*)"/>
+             </remarks>
+             </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.Address">
+            <summary>
+            Network Address used to bind the internal Socket
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.Notify">
+            <summary>
+            Package acknowledgment system configuration
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConfig.Simulation">
+            <summary>
+            Network simulation system configuration
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetConfig.Defaults">
+            <summary>
+            Builds a <see cref="T:Fusion.Sockets.NetConfig"/> with the default values
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetConnectFailedReason">
+            <summary>
+            The reason a connection with a remote server has failed
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConnectFailedReason.Timeout">
+            <summary>
+            Server is not responding.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConnectFailedReason.ServerFull">
+            <summary>
+            Server has accepted the max allowed Players
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConnectFailedReason.ServerRefused">
+            <summary>
+            Server refused the connection
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetConnection.UNIQUE_ID_SIZE">
+            <summary>
+            Client Unique ID size in bytes
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetDisconnectReason">
+            <summary>
+            Disconnect Reason Flag
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.NetPacketType">
+            <summary>
+            Describe the type of a Networked Packet
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetPeer.DEFAULT_HEADERS">
+            <summary>
+            IPv6 header: 40 bytes, UDP header: 8 bytes, Realtime Header: 96 bytes
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetPeer.MIN_MTU_BYTES">
+            <summary>
+            MinimumTransferUnit bytes. 
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetPeer.MIN_MTU_BITS">
+            <summary>
+            MinimumTransferUnit bits.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetPeer.MAX_MTU_BYTES">
+            <summary>
+            MaximumTransferUnit bytes.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetPeer.MAX_MTU_BITS">
+            <summary>
+            MaximumTransferUnit bits. (ipv6 header: 40 bytes, udp header: 8 bytes)
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.NetSequencer.Distance(System.UInt64,System.UInt64)">
+            <summary>
+            if from is LARGER than to, result is positive
+            if from is LESSER than to, result is negative
+            if they are the same, result is zero
+            </summary>
+            <param name="from"></param>
+            <param name="to"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Fusion.Sockets.NetSocketRelay._handle">
+            <summary>
+            Random ID of this socket
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.NetSocketRelay._communicator">
+            <summary>
+            Reference to Current Communicator
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.NetSocketRelay.LocalAddress">
+            <summary>
+            Local Peer Address is based on the current Player Actor Number inside the Room
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.NATType">
+            <summary>
+            Specifies UDP network type.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.Stun.NATType.Invalid">
+            <summary>
+            Invalid NAT Type
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.Stun.NATType.UdpBlocked">
+            <summary>
+            UDP is always blocked.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.Stun.NATType.OpenInternet">
+            <summary>
+            No NAT, public IP, no firewall.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.Stun.NATType.FullCone">
+            <summary>
+            A full cone NAT is one where all requests from the same internal IP address and port are 
+            mapped to the same external IP address and port. Furthermore, any external host can send 
+            a packet to the internal host, by sending a packet to the mapped external address.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.Stun.NATType.Symmetric">
+            <summary>
+            A symmetric NAT is one where all requests from the same internal IP address and port, 
+            to a specific destination IP address and port, are mapped to the same external IP address and
+            port.  If the same host sends a packet with the same source address and port, but to 
+            a different destination, a different mapping is used. Furthermore, only the external host that
+            receives a packet can send a UDP packet back to the internal host.
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunClient">
+            <summary>
+            This class implements STUN Client. Defined in RFC 8489
+            
+            <see cref="!:https://datatracker.ietf.org/doc/html/rfc8489"/> Session Traversal Utilities for NAT (STUN)
+            <see cref="!:https://datatracker.ietf.org/doc/html/rfc8656"/> Traversal Using Relays around NAT (TURN): Relay Extensions to Session Traversal Utilities for NAT(STUN)
+            <see cref="!:https://datatracker.ietf.org/doc/html/rfc8305"/> Happy Eyeballs Version 2: Better Connectivity Using Concurrency
+            <see cref="!:https://datatracker.ietf.org/doc/html/rfc5128"/> State of Peer-to-Peer (P2P) Communication across Network Address Translators(NATs)
+            <see cref="!:https://www.netmanias.com/en/post/techdocs/6067/nat-network-protocol/nat-behavior-discovery-using-stun-rfc-5780"/>
+            <see cref="!:https://www.voip-info.org/stun/"/>
+            <see cref="!:https://tailscale.com/blog/how-nat-traversal-works/"/>
+            <see cref="!:https://serverfault.com/questions/782627/udp-hole-punching-still-required-in-ipv6-even-without-nat"/>
+            <see cref="!:https://serverfault.com/questions/184524/switching-to-ipv6-implies-dropping-nat-is-that-a-good-thing"/>
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunClient.TestIPs">
+            <summary>
+            List of public DNS Servers
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunClient.QueryPublicAddress(Fusion.Sockets.NetPeer*,Fusion.Sockets.INetSocket,System.Net.Sockets.AddressFamily,System.Guid@)">
+            <summary>
+            Run a STUN Binding Request against the Public STUN Server in order to discover peer reflexive addresses
+            </summary>
+            <param name="peer">Network Peer reference</param>
+            <param name="socket">Network Socket reference</param>
+            <returns>Running Task of the STUN Query Procedure</returns>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunClient.GetLocalAddress(System.Net.Sockets.AddressFamily@,System.Net.IPAddress@)">
+            <summary>
+            Retrieve the Local IP Endpoint currently active
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunErrorAttribute">
+            <summary>
+            This class implements STUN ERROR-CODE. Defined in RFC RFC 5389 15.6
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunErrorAttribute.Code">
+            <summary>
+            Gets or sets error code.
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunErrorAttribute.ReasonText">
+            <summary>
+            Gets reason text.
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunErrorAttribute.#ctor(System.Int32,System.String)">
+            <summary>
+            Default constructor.
+            </summary>
+            <param name="code">Error code.</param>
+            <param name="reasonText">Reason text.</param>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunMessage">
+            <summary>
+            Implements STUN message. Defined in RFC 3489.
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunMessage.StunMessageTypeValues">
+            <summary>
+            Cache Stun Message Types
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunMessage.StunMessageType">
+            <summary>
+            STUN Message Type
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunMessage.AttributeType">
+            <summary>
+            STUN Attribute Type
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunMessage.StunDefines">
+            <summary>
+            Global Stun Related defined values
+            </summary>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunMessage.IPFamily">
+            <summary>
+            IP Address Family
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunMessage.Type">
+            <summary>
+            STUN Message Type
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunMessage.ID">
+            <summary>
+            STUN Transaction ID
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunMessage.TransactionID">
+            <summary>
+            Gets transaction ID.
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunMessage.MappedAddress">
+            <summary>
+            Gets or sets IP end point what was actually connected to STUN server. Returns null if not specified.
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunMessage.UserName">
+            <summary>
+            Gets or sets user name. Value null means not specified.
+            </summary>          
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunMessage.ErrorCode">
+            <summary>
+            Gets or sets error info. Returns null if not specified.
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunMessage.#ctor(System.Guid,Fusion.Sockets.Stun.StunMessage.StunMessageType)">
+            <summary>
+            Default constructor.
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunMessage.TryParse(System.Byte*,System.Int32)">
+            <summary>
+            Parses STUN message from raw data packet.
+            </summary>
+            <param name="data">Raw STUN message.</param>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunMessage.Serialize">
+            <summary>
+            Converts this to raw STUN packet.
+            </summary>
+            <returns>Returns raw STUN packet.</returns>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunMessage.ReadAttribute(System.Byte*,System.Int32@)">
+            <summary>
+            Parses attribute from data.
+            </summary>
+            <param name="data">SIP message data.</param>
+            <param name="offset">Offset in data.</param>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunMessage.ParseEndPoint(System.Byte[],System.Int32@)">
+            <summary>
+            Pasrses IP endpoint attribute.
+            </summary>
+            <param name="data">STUN message data.</param>
+            <param name="offset">Offset in data.</param>
+            <returns>Returns parsed IP end point.</returns>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunMessage.StoreEndPoint(Fusion.Sockets.Stun.StunMessage.AttributeType,System.Net.IPEndPoint,System.Byte[],System.Int32@)">
+            <summary>
+            Stores ip end point attribute to buffer.
+            </summary>
+            <param name="type">Attribute type.</param>
+            <param name="endPoint">IP end point.</param>
+            <param name="message">Buffer where to store.</param>
+            <param name="offset">Offset in buffer.</param>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunResult">
+            <summary>
+            This class holds the result of a STUN Query
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.Stun.StunResult.NatType">
+            <summary>
+            Current NAT Type of the peer
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunResult.IsValid">
+            <summary>
+            Signal if Result is valid
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunResult.PublicEndPoint">
+            <summary>
+            Gets public IP end point.
+            </summary>
+        </member>
+        <member name="P:Fusion.Sockets.Stun.StunResult.PrivateEndPoint">
+            <summary>
+            Gets private IP end point.
+            </summary>
+        </member>
+        <member name="F:Fusion.Sockets.Stun.StunResult.Invalid">
+            <summary>
+            Invalid StunResult Reference
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunResult.#ctor(Fusion.Sockets.NetAddress,Fusion.Sockets.NetAddress)">
+            <summary>
+            Default constructor.
+            </summary>
+            <param name="netType">Specifies UDP network type.</param>
+            <param name="publicEndPoint">Public IP end point.</param>
+        </member>
+        <member name="T:Fusion.Sockets.Stun.StunServers">
+            <summary>
+            List of public STUN Servers
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.Stun.StunServers.BuildIP(System.String)">
+            <summary>
+            
+            <see cref="!:https://datatracker.ietf.org/doc/html/rfc5952#section-6"/>
+            </summary>
+            <param name="stunServer"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.Size">
+            <summary>
+            Total size in BITS of the buffer
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.Position">
+            <summary>
+            Current read/write position in BITS inside the Buffer
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.BytesRequired">
+            <summary>
+            Size of written buffer in BYTES
+            Ammount of bytes required considering the total of written bytes
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.Capacity">
+            <summary>
+            Total Size in BYTES of the Buffer
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.Done">
+            <summary>
+            Signal if the buffer was completely written
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.Overflowing">
+            <summary>
+            Signal if the buffer is overflowing
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.Writing">
+            <summary>
+            Signal if the Buffer is in Write Mode
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.Reading">
+            <summary>
+            Signal if the Buffer is in Read Mode
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.BitStream.Data">
+            <summary>
+            Internal Byte Array
+            </summary>
+        </member>
+        <member name="M:Fusion.Protocol.CommunicatorBase.HandleProtocolPackage(System.Int32,System.Object)">
+            <summary>
+            Handles Protocol Msgs sent by the Fusion Plugin
+            
+            It converts the byte buffer into usable Protocol Msgs
+            </summary>
+            <param name="actorNr">Sender Actor of the Protocol Msg, generally the Plugin</param>
+            <param name="data">Object that stores the buffer to be converted</param>
+        </member>
+        <member name="M:Fusion.Protocol.CommunicatorBase.ConvertData(System.Object,System.Byte[]@,System.Int32@)">
+            <summary>
+            Convert the Data object into a usable Byte Buffer.
+            How the conversion happens depends on the the Type of Communicator
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.Message">
+            <summary>
+            Base Protocol Message.
+            
+            This concentrates the basics for serialization and cloning
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Message.CUSTOM_DATA_LENGHT">
+            <summary>
+            Max Lenght of the Custom Data
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Message.ProtocolVersion">
+            <summary>
+            Stores the Current Protocol Message version
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Message.FusionSerializationVersion">
+            <summary>
+            Stores the Current Fusion Serialization Version
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.Message.CustomData">
+            <summary>
+            Custom data send along side any Protocol Message
+            </summary>
+        </member>
+        <member name="M:Fusion.Protocol.Message.Clone">
+            <summary>
+            Creates a copy of this Message
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusion.Protocol.Message.#ctor(Fusion.Protocol.ProtocolMessageVersion,System.Version)">
+            <summary>
+            Created a new Message with a certain version
+            </summary>
+            <param name="protocolMessage">Protocol Message Version</param>
+        </member>
+        <member name="M:Fusion.Protocol.Message.Serialize(Fusion.Protocol.BitStream)">
+            <summary>
+            Serialize this Message into or from a <see cref="T:Fusion.Protocol.BitStream"/>.
+            </summary>
+            <param name="stream">Buffer to read from or write into the data of the Message</param>
+        </member>
+        <member name="M:Fusion.Protocol.Message.SerializeProtected(Fusion.Protocol.BitStream)">
+            <summary>
+            Used by the specialized versions of Message to serialize its data
+            </summary>
+            <param name="serializer">Buffer to read from or write into the data of the Message</param>
+        </member>
+        <member name="M:Fusion.Protocol.Message.CheckCompability(Fusion.Protocol.ProtocolMessageVersion,System.Version,System.Boolean)">
+            <summary>
+            Check if this Message is compatible with target versions
+            </summary>
+            <param name="targetProtocolMessage">Target Protocol Message Version</param>
+            <param name="targetSerializationVersion">Target Fusion Serialization Version</param>
+            <param name="enableSerializationVersionCheck">Enable the Serialization Version Check</param>
+            <returns>True if message is compatible with versions</returns>
+        </member>
+        <member name="T:Fusion.Protocol.Disconnect">
+            <summary>
+            Disconnect Protocol Message.
+            
+            Used to signal a peer that it will be disconnected from Photon Cloud
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Disconnect.DisconnectReason">
+            <summary>
+            Disconnect Reason
+            </summary>
+        </member>
+        <member name="M:Fusion.Protocol.Disconnect.#ctor">
+            <summary>
+            Disconnect Protocol Message
+            </summary>
+        </member>
+        <member name="M:Fusion.Protocol.Disconnect.#ctor(Fusion.Protocol.DisconnectReason,Fusion.Protocol.ProtocolMessageVersion,System.Version)">
+            <summary>
+            Disconnect Protocol Message
+            </summary>
+            <param name="reason">Disconnect Reason</param>
+        </member>
+        <member name="T:Fusion.Protocol.DisconnectReason">
+            <summary>
+            List all Disconnect reason used by the Plugin to remove an Actor from the Room
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.DisconnectReason.ServerLogic">
+            <summary>
+            Abstract disconnect reason
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.DisconnectReason.InvalidEventCode">
+            <summary>
+            Used when an event with other code other then the treated ones is received by the plugin
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.DisconnectReason.InvalidJoinMsgType">
+            <summary>
+            When the Join Message is not of the Request Type
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.DisconnectReason.InvalidJoinGameMode">
+            <summary>
+            When the Join Message does not contain a valid Game Mode
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.DisconnectReason.IncompatibleConfiguration">
+            <summary>
+            When any of the major settings of a message does not align with the current settings, 
+            like GameMode, Protocol Version, Serialization Version and Peer Mode
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.DisconnectReason.ServerAlreadyInRoom">
+            <summary>
+            When there is already a Server running on the current Room
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.DisconnectReason.Error">
+            <summary>
+            An error occured on the Plugin
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.HostMigration.PeerMode">
+            <summary>
+            Local Peer Mode
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.JoinMessageType">
+            <summary>
+            <see cref="T:Fusion.Protocol.Join"/> message Type
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.JoinMessageType.Request">
+            <summary>
+            Sent by Peer to Request to Join on the Plugin
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.JoinMessageType.Confirmation">
+            <summary>
+            Sent by the Plugin to confirm the Join of a Peer
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.PeerMode">
+            <summary>
+            Type of Peer which the Peer is starting as
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.PeerMode.None">
+            <summary>
+            No Mode Selected, means Invalid
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.PeerMode.Server">
+            <summary>
+            Server Mode
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.PeerMode.Client">
+            <summary>
+            Client Mode
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.JoinRequests">
+            <summary>
+            Join Requests sent by the Plugin to request data from the Peer
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.JoinRequests.None">
+            <summary>
+            No request in the Join Message
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.JoinRequests.NetworkConfig">
+            <summary>
+            Request the Network Config
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.JoinRequests.ReflexiveInfo">
+            <summary>
+            Request for Reflexive Information
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.JoinRequests.DisableNATPunch">
+            <summary>
+            Request to Disable NAT Punch
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.Join">
+            <summary>
+            Join Message
+            
+            It is used to join a Fusion Room Session with extra information about the Peer.
+            This is unrelated to the Join Operation into a Photon Room.
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Join.Type">
+            <summary>
+            Join Message Type
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Join.GameMode">
+            <summary>
+            Requested Plugin Game Mode
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Join.PeerMode">
+            <summary>
+            Local Peer Mode
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Join.JoinRequests">
+            <summary>
+            Requests sent from Plugin
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Join.UniqueId">
+            <summary>
+            Peer Unique ID
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.SyncType">
+            <summary>
+            Network Config Msg Type
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.SyncType.Request">
+            <summary>
+            Request Network Config
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.SyncType.Response">
+            <summary>
+            Response to a Request
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.SyncType.Override">
+            <summary>
+            Override Signal for the Network Config
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.NetworkConfigSync">
+            <summary>
+            NetworkConfig Protocol Msgs
+            It is used to serialize the Fusion NetworkConfig and send to Photon Cloud Plugin
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.NetworkConfigSync.Type">
+            <summary>
+            Network Config Type
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.NetworkConfigSync.NetworkConfig">
+            <summary>
+            JSON Serialized NetworkConfig
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.ReflexiveInfo">
+            <summary>
+            Reflexive Info Msgs
+            
+            Used to transport information about the Reflexive Addresses of a Peer
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ReflexiveInfo.ActorNr">
+            <summary>
+            Actor ID to which this info is related
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ReflexiveInfo.PublicAddr">
+            <summary>
+            Peer Public Address
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ReflexiveInfo.PrivateAddr">
+            <summary>
+            Peer Private Address
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ReflexiveInfo.NatType">
+            <summary>
+            Peer NAT Type
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.ReflexiveInfo.IsValid">
+            <summary>
+            Signal if this Reflexive Info is Valid or not
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ReflexiveInfo.UniqueId">
+            <summary>
+            Peer Unique ID
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.SnapshotType">
+            <summary>
+            Snapshot Message Type
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.SnapshotType.Invalid">
+            <summary>
+            Invalid/Empty Type
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.SnapshotType.Data">
+            <summary>
+            Base Snapshot
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.SnapshotType.Confirmation">
+            <summary>
+            Confirmation sent by the Plugin
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.Snapshot">
+            <summary>
+            State Snapshot Protocol Msgs
+            
+            Used to sync the current Server Game State with the Photon Cloud Plugin 
+            in order to perform an eventual Host Migration
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.Tick">
+            <summary>
+            Tick to which this Snapshot represents
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.NetworkID">
+            <summary>
+            Last NetworkID from the Server
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.SnapshotType">
+            <summary>
+            Snapshot Type
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.TotalSize">
+            <summary>
+            Snapshot Total number of bytes stored or expected to be stored on the Snapshot
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.IsValid">
+            <summary>
+            Check if the Snapshot has a valid Data based on the expected CRC
+            </summary>
+            <returns>True if the Snapshot has a valid data</returns>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.Data">
+            <summary>
+            Get Snapshot internal Data Buffer
+            </summary>
+            <returns>Internal Data Buffer</returns>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.CRC">
+            <summary>
+            CRC Hash based on the content of the internal data or the expected CRC after all fragments are computed
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.SnapshotBuffer">
+            <summary>
+            Actual Snapshot data
+            </summary>
+        </member>
+        <member name="P:Fusion.Protocol.Snapshot.SnapshotSize">
+            <summary>
+            Snapshot Total Size
+            </summary>
+        </member>
+        <member name="M:Fusion.Protocol.Snapshot.ComputeCRC(System.Byte[])">
+            <summary>
+            Computes the CRC64 of the current Buffer Data stored on the Snapshot
+            </summary>
+        </member>
+        <member name="M:Fusion.Protocol.Snapshot.Merge(Fusion.Protocol.Snapshot)">
+            <summary>
+            Merge the received Snapshot data on this own data
+            </summary>
+            <param name="snapshot">Snapshot to be merged</param>
+        </member>
+        <member name="M:Fusion.Protocol.Snapshot.Clone">
+            <summary>
+            Create a clone with this Snapshot and reset reference
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Fusion.Protocol.StartRequests">
+            <summary>
+            Start Message Requests
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.StartRequests.None">
+            <summary>
+            No Requests
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.StartRequests.ConnectToShared">
+            <summary>
+            Peer should connect to Shared Server
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.StartRequests.WaitForReflexiveInfo">
+            <summary>
+            Peer should wait for the Server Reflexive Info
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.Start">
+            <summary>
+            Start Protocol Msgs
+            Used to signal that Fusion Simulation should start
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Start.RemoteServerID">
+            <summary>
+            Actor ID of the Remote Server
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Start.StartRequests">
+            <summary>
+            Start Requests
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.PluginGameMode">
+            <summary>
+            Defines the Mode the Plugin should run
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.PluginGameMode.Invalid">
+            <summary>
+            No Game Mode set
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.PluginGameMode.ClientServer">
+            <summary>
+            Client Server Game Mode
+            
+            The Plugin will act just as a relay, exchanging data between the peers.
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.PluginGameMode.Shared">
+            <summary>
+            Shared Game Mode
+            
+            The Plugin will act as a Fusion Server and will accept remote connections
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.EventCodes">
+            <summary>
+            Photon Event Codes used by the Fusion to communicate with the Photon Cloud
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.EventCodes.PROTOCOL">
+            <summary>
+            Protocol Event Code
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.EventCodes.DATA">
+            <summary>
+            Data Event Code
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.PhotonConstants.SERVER_ACTOR_ID">
+            <summary>
+            Zero (0) means: if it should be the room itself (authorative event).
+            
+            <see cref="!:https://doc-api.photonengine.com/en/plugins/v4/interface_photon_1_1_hive_1_1_plugin_1_1_i_plugin_host.html#a756dbd7b16fac7b43cb153506a442a99"/>
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.PhotonConstants.FUSION_DATA_EVENT_PARAMETER_CODE">
+            <summary>
+            Default CustomData Key of Realtime Events
+            
+            <see cref="!:https://doc-api.photonengine.com/en/dotnet/current/class_exit_games_1_1_client_1_1_photon_1_1_event_data.html#a85c3ee46f89cc41d459ababb1d55d150"/>
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.ProtocolSerializer">
+            <summary>
+            Protocol Messages Serializer
+            </summary>
+        </member>
+        <member name="M:Fusion.Protocol.ProtocolSerializer.PackNext(Fusion.Protocol.Message,Fusion.Protocol.BitStream)">
+            <summary>
+            Serialize a Protocol Message into a BitStream
+            </summary>
+            <param name="msg">Protocol Message to be serialized</param>
+            <param name="stream">BitStream containing the Protocol Message</param>
+            <returns>True if the Protocol Message was serialized</returns>
+        </member>
+        <member name="M:Fusion.Protocol.ProtocolSerializer.ReadNext(Fusion.Protocol.BitStream,Fusion.Protocol.Message@)">
+            <summary>
+            Deserialize a Protocol Message from a BitStream
+            </summary>
+            <param name="stream">Stream containing a Protocol Message</param>
+            <param name="msg">Deserialized Protocol Message</param>
+            <returns>True if a Protocol Message was deserialized</returns>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.Invalid">
+            <summary>
+            Invalid Version
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_0_0">
+            <summary>
+            Initial Version
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_1_0">
+            <summary>
+            Added Support to Fusion Serialization Version
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_2_0">
+            <summary>
+            Added Custom Data to all Protocol Messages
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_2_1">
+            <summary>
+            Added NAT Type to Reflexive Info
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_2_2">
+            <summary>
+            Added Host Migration Support
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_2_3">
+            <summary>
+            Added Peer Unique Key
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.LATEST">
+            <summary>
+            Always points to the Latest version
+            </summary>
+        </member>
+    </members>
+</doc>

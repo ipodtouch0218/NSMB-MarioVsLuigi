@@ -3,7 +3,9 @@ Shader "TextMeshPro/Sprite"
 	Properties
 	{
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
-		_Color ("Tint", Color) = (1,1,1,1)
+		_Color("Tint", Color) = (1,1,1,1)
+		_ColorOffset("Tint Offset", vector) = (0,0,0)
+		_Overlay("Overlay", Color) = (0,0,0,0)
 
 		_StencilComp ("Stencil Comparison", Float) = 8
 		_Stencil ("Stencil ID", Float) = 0
@@ -14,10 +16,6 @@ Shader "TextMeshPro/Sprite"
 		_CullMode ("Cull Mode", Float) = 0
 		_ColorMask ("Color Mask", Float) = 15
 		_ClipRect ("Clip Rect", vector) = (-32767, -32767, 32767, 32767)
-
-		[PerRendererData] _VerticalOffsetX("Vertical Offset based on X pos", Float) = 0
-		[PerRendererData] _FirstCharOffset("First char offset", Float) = 0
-		[PerRendererData] _SecondCharOffset("Second char offset", Float) = 0
 
 		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
 	}
@@ -56,7 +54,6 @@ Shader "TextMeshPro/Sprite"
 		CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-            #pragma target 3.5
 
 			#include "UnityCG.cginc"
 			#include "UnityUI.cginc"
@@ -69,7 +66,6 @@ Shader "TextMeshPro/Sprite"
 				float4 vertex   : POSITION;
 				float4 color    : COLOR;
 				float2 texcoord : TEXCOORD0;
-				uint id         : SV_VertexId;
 			};
 
 			struct v2f
@@ -82,6 +78,8 @@ Shader "TextMeshPro/Sprite"
 
             sampler2D _MainTex;
 			fixed4 _Color;
+			fixed3 _ColorOffset;
+			fixed3 _Overlay;
 			fixed4 _TextureSampleAdd;
 			float4 _ClipRect;
             float4 _MainTex_ST;
@@ -93,24 +91,15 @@ Shader "TextMeshPro/Sprite"
 			{
 				v2f OUT;
 				OUT.worldPosition = v.vertex;
-				if ((uint) (v.id / 4) == 0) {
-					OUT.worldPosition.y += _FirstCharOffset;
-				}
-				else if ((uint) (v.id / 4) == 1) {
-					OUT.worldPosition.y += _SecondCharOffset;
-				}
-				OUT.worldPosition.y += ((v.id / 4) * _VerticalOffsetX);
 				OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
-
                 OUT.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
-
-                OUT.color = v.color * _Color;
+                OUT.color = clamp(v.color * (_Color + half4(_ColorOffset.xyz, 0)), 0, 1);
 				return OUT;
 			}
 
 			fixed4 frag(v2f IN) : SV_Target
 			{
-				half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
+				half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color + half4(_Overlay, 0.0);
 
                 #ifdef UNITY_UI_CLIP_RECT
 					color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);

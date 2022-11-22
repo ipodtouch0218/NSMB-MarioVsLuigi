@@ -1,25 +1,23 @@
 ﻿using UnityEngine;
-using Photon.Pun;
 
-public class KillplaneKill : MonoBehaviourPun {
+using Fusion;
 
+public class KillplaneKill : NetworkBehaviour {
+
+    //---Networked Variables
+    [Networked] private TickTimer KillTimer { get; set; }
+
+    //---Serialized Variables
     [SerializeField] private float killTime = 0f;
-    private float timer = 0;
 
-    public void Update() {
+    public override void FixedUpdateNetwork() {
         if (transform.position.y >= GameManager.Instance.GetLevelMinY())
             return;
 
-        if ((timer += Time.deltaTime) < killTime)
-            return;
+        if (!KillTimer.IsRunning)
+            KillTimer = TickTimer.CreateFromSeconds(Runner, killTime);
 
-        if (!photonView) {
-            Destroy(gameObject);
-            return;
-        }
-        if (photonView.IsMine) {
-            PhotonNetwork.Destroy(photonView);
-            return;
-        }
+        if (KillTimer.Expired(Runner))
+            Runner.Despawn(Object);
     }
 }

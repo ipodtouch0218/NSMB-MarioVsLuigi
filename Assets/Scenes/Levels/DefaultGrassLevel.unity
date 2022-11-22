@@ -211,6 +211,7 @@ GameObject:
   m_Component:
   - component: {fileID: 215765621}
   - component: {fileID: 215765622}
+  - component: {fileID: 215765623}
   m_Layer: 0
   m_Name: GoombaSpawn
   m_TagString: Untagged
@@ -245,8 +246,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: Prefabs/Enemy/Goomba
-  currentEntity: {fileID: 0}
+  _interpolationDataSource: 0
+  prefab:
+    RawGuidValue: 1ce5864bde999014a92015b065520add
+--- !u!114 &215765623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215765620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: f9d1977dbe764afea0720ee9054a5867
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 215765622}
+  SimulationBehaviours: []
 --- !u!1001 &237660768
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -324,6 +350,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 236445229015055643
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -8576421904594454857
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -991,7 +1032,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 32
-      m_TileSpriteIndex: 19
+      m_TileSpriteIndex: 4
       m_TileMatrixIndex: 1
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1001,7 +1042,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 32
-      m_TileSpriteIndex: 19
+      m_TileSpriteIndex: 4
       m_TileMatrixIndex: 2
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1191,7 +1232,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 32
-      m_TileSpriteIndex: 19
+      m_TileSpriteIndex: 4
       m_TileMatrixIndex: 1
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1201,7 +1242,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 32
-      m_TileSpriteIndex: 19
+      m_TileSpriteIndex: 4
       m_TileMatrixIndex: 2
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -3275,8 +3316,9 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 4
+    m_Data: {fileID: 3313547660045521459, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
+      type: 3}
   - m_RefCount: 13
     m_Data: {fileID: 3684821612489964542, guid: f4b7221be8b79c94c9c8919163014cb0,
       type: 3}
@@ -3318,9 +3360,8 @@ Tilemap:
   - m_RefCount: 56
     m_Data: {fileID: -4988122654707678320, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
-  - m_RefCount: 4
-    m_Data: {fileID: -4118142165262079471, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
-      type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 14
     m_Data:
@@ -3461,14 +3502,6 @@ CompositeCollider2D:
   m_ColliderPaths:
   - m_Collider: {fileID: 643464988}
     m_ColliderPaths:
-    - - X: -170000000
-        Y: -5000000
-      - X: -175000000
-        Y: -5000000
-      - X: -175000000
-        Y: -10000000
-      - X: -170000000
-        Y: -10000000
     - - X: 0
         Y: -5000000
       - X: -40000000
@@ -3477,14 +3510,34 @@ CompositeCollider2D:
         Y: -10000000
       - X: 0
         Y: -10000000
+    - - X: -170000000
+        Y: -5000000
+      - X: -175000000
+        Y: -5000000
+      - X: -175000000
+        Y: -10000000
+      - X: -170000000
+        Y: -10000000
     - - X: 30000000
         Y: -24995000
       - X: 20000000
         Y: -24995000
       - X: 20000000
         Y: -29995000
-      - X: 30000000
+      - X: 15000000
         Y: -29995000
+      - X: 15000000
+        Y: -34995000
+      - X: 10000000
+        Y: -34995000
+      - X: 10000000
+        Y: -39994996
+      - X: 5000000
+        Y: -39994996
+      - X: 5000000
+        Y: -44994996
+      - X: 30000000
+        Y: -44994996
     - - X: -200000000
         Y: -25000000
       - X: -205000000
@@ -3492,14 +3545,6 @@ CompositeCollider2D:
       - X: -205000000
         Y: -30000000
       - X: -200000000
-        Y: -30000000
-    - - X: -160000000
-        Y: -25000000
-      - X: -185000000
-        Y: -25000000
-      - X: -185000000
-        Y: -30000000
-      - X: -160000000
         Y: -30000000
     - - X: -40000000
         Y: -25000000
@@ -3537,6 +3582,14 @@ CompositeCollider2D:
         Y: -70000000
       - X: -80000000
         Y: -70000000
+    - - X: -160000000
+        Y: -25000000
+      - X: -185000000
+        Y: -25000000
+      - X: -185000000
+        Y: -30000000
+      - X: -160000000
+        Y: -30000000
     - - X: 45000000
         Y: -55000000
       - X: 80000000
@@ -3565,42 +3618,6 @@ CompositeCollider2D:
         Y: -70000000
       - X: 45000000
         Y: -70000000
-    - - X: 30000000
-        Y: -30000000
-      - X: 20000000
-        Y: -30000000
-      - X: 20000000
-        Y: -29995000
-      - X: 15000000
-        Y: -29995000
-      - X: 15000000
-        Y: -34995000
-      - X: 30000000
-        Y: -34995000
-    - - X: 30000000
-        Y: -35000000
-      - X: 15000000
-        Y: -35000000
-      - X: 15000000
-        Y: -34995000
-      - X: 10000000
-        Y: -34995000
-      - X: 10000000
-        Y: -39994996
-      - X: 30000000
-        Y: -39994996
-    - - X: 30000000
-        Y: -40000000
-      - X: 10000000
-        Y: -40000000
-      - X: 10000000
-        Y: -39994996
-      - X: 5000000
-        Y: -39994996
-      - X: 5000000
-        Y: -44994996
-      - X: 30000000
-        Y: -44994996
     - - X: -65000000
         Y: -55000000
       - X: 25000000
@@ -3619,26 +3636,28 @@ CompositeCollider2D:
         Y: -70000000
   m_CompositePaths:
     m_Paths:
-    - - {x: -17, y: -0.5}
-      - {x: -17.5, y: -0.5}
-      - {x: -17.5, y: -1}
-      - {x: -17, y: -1}
     - - {x: 0, y: -0.5}
       - {x: -4, y: -0.5}
       - {x: -4, y: -1}
       - {x: 0, y: -1}
+    - - {x: -17, y: -0.5}
+      - {x: -17.5, y: -0.5}
+      - {x: -17.5, y: -1}
+      - {x: -17, y: -1}
     - - {x: 3, y: -2.4995}
       - {x: 2, y: -2.4995}
       - {x: 2, y: -2.9995}
-      - {x: 3, y: -2.9995}
+      - {x: 1.5, y: -2.9995}
+      - {x: 1.5, y: -3.4995}
+      - {x: 1, y: -3.4995}
+      - {x: 1, y: -3.9994996}
+      - {x: 0.5, y: -3.9994996}
+      - {x: 0.5, y: -4.4995}
+      - {x: 3, y: -4.4995}
     - - {x: -20, y: -2.5}
       - {x: -20.5, y: -2.5}
       - {x: -20.5, y: -3}
       - {x: -20, y: -3}
-    - - {x: -16, y: -2.5}
-      - {x: -18.5, y: -2.5}
-      - {x: -18.5, y: -3}
-      - {x: -16, y: -3}
     - - {x: -4, y: -2.5}
       - {x: -5.5, y: -2.5}
       - {x: -5.5, y: -3}
@@ -3657,6 +3676,10 @@ CompositeCollider2D:
       - {x: -8.5, y: -5.5}
       - {x: -8.5, y: -7}
       - {x: -8, y: -7}
+    - - {x: -16, y: -2.5}
+      - {x: -18.5, y: -2.5}
+      - {x: -18.5, y: -3}
+      - {x: -16, y: -3}
     - - {x: 4.5, y: -5.5}
       - {x: 8, y: -5.5}
       - {x: 8, y: -4.5}
@@ -3671,24 +3694,6 @@ CompositeCollider2D:
       - {x: 4, y: -2.5}
       - {x: 4, y: -7}
       - {x: 4.5, y: -7}
-    - - {x: 3, y: -3}
-      - {x: 2, y: -3}
-      - {x: 2, y: -2.9995}
-      - {x: 1.5, y: -2.9995}
-      - {x: 1.5, y: -3.4995}
-      - {x: 3, y: -3.4995}
-    - - {x: 3, y: -3.5}
-      - {x: 1.5, y: -3.5}
-      - {x: 1.5, y: -3.4995}
-      - {x: 1, y: -3.4995}
-      - {x: 1, y: -3.9994996}
-      - {x: 3, y: -3.9994996}
-    - - {x: 3, y: -4}
-      - {x: 1, y: -4}
-      - {x: 1, y: -3.9994996}
-      - {x: 0.5, y: -3.9994996}
-      - {x: 0.5, y: -4.4995}
-      - {x: 3, y: -4.4995}
     - - {x: -6.5, y: -5.5}
       - {x: 2.5, y: -5.5}
       - {x: 2.5, y: -7}
@@ -3788,6 +3793,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 1171435289168917179
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 6586461071777637002
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 946c21a210ac3094bba96c7e4190a452, type: 3}
@@ -3874,6 +3894,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: -6754500670648525968
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -7597979736491092563
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -4093,6 +4128,21 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6411750294929853123, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 6411750294929853123, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 8737667776853946510
+      objectReference: {fileID: 0}
+    - target: {fileID: 6411750294929853123, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -5363779721744100954
+      objectReference: {fileID: 0}
     - target: {fileID: 7298383080133919252, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -4270,6 +4320,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 6864568247821973180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 7216050893436305571
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -4598,6 +4663,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1758303614}
   - component: {fileID: 1758303615}
+  - component: {fileID: 1758303616}
   m_Layer: 0
   m_Name: GoombaSpawn (1)
   m_TagString: Untagged
@@ -4632,8 +4698,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: Prefabs/Enemy/Goomba
-  currentEntity: {fileID: 0}
+  _interpolationDataSource: 0
+  prefab:
+    RawGuidValue: 1ce5864bde999014a92015b065520add
+--- !u!114 &1758303616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1758303613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: 826073c96fa3425da17f70933ee22b8e
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1758303615}
+  SimulationBehaviours: []
 --- !u!1 &1831778352
 GameObject:
   m_ObjectHideFlags: 0
@@ -4942,6 +5033,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 2327644400981508699
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 3950188664743859645
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 946c21a210ac3094bba96c7e4190a452, type: 3}
@@ -4961,6 +5067,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1976703580}
   - component: {fileID: 1976703581}
+  - component: {fileID: 1976703582}
   m_Layer: 0
   m_Name: GoombaSpawn (2)
   m_TagString: Untagged
@@ -4995,8 +5102,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: Prefabs/Enemy/Goomba
-  currentEntity: {fileID: 0}
+  _interpolationDataSource: 0
+  prefab:
+    RawGuidValue: 1ce5864bde999014a92015b065520add
+--- !u!114 &1976703582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1976703579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: dd1bdb7a04d3444ea5f232c126d015df
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1976703581}
+  SimulationBehaviours: []
 --- !u!1 &2067183185
 GameObject:
   m_ObjectHideFlags: 0
@@ -5007,6 +5139,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2067183186}
   - component: {fileID: 2067183187}
+  - component: {fileID: 2067183188}
   m_Layer: 0
   m_Name: KoopaSpawn
   m_TagString: Untagged
@@ -5041,8 +5174,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd6e70ad40a93f419db4c4118455d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: Prefabs/Enemy/Koopa
-  currentEntity: {fileID: 0}
+  _interpolationDataSource: 0
+  prefab:
+    RawGuidValue: 4f50cb5e806289d43bf820de1f1347bb
+--- !u!114 &2067183188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067183185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 0
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: da3a2b2ca5df41a3b2c2a2c2bb09e0a6
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 2067183187}
+  SimulationBehaviours: []
 --- !u!1001 &4425110964215584584
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5051,6 +5209,21 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3681017443671302445, guid: 52fa37521c30ebb40ab4cac4ef31be57,
+        type: 3}
+      propertyPath: Flags
+      value: 2561
+      objectReference: {fileID: 0}
+    - target: {fileID: 3681017443671302445, guid: 52fa37521c30ebb40ab4cac4ef31be57,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 2255910864038565215
+      objectReference: {fileID: 0}
+    - target: {fileID: 3681017443671302445, guid: 52fa37521c30ebb40ab4cac4ef31be57,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -8555423563151123571
+      objectReference: {fileID: 0}
     - target: {fileID: 4425110965538168565, guid: 52fa37521c30ebb40ab4cac4ef31be57,
         type: 3}
       propertyPath: m_Name
@@ -5064,7 +5237,7 @@ PrefabInstance:
     - target: {fileID: 4425110965538168567, guid: 52fa37521c30ebb40ab4cac4ef31be57,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2
+      value: 2.25
       objectReference: {fileID: 0}
     - target: {fileID: 4425110965538168567, guid: 52fa37521c30ebb40ab4cac4ef31be57,
         type: 3}
@@ -5211,6 +5384,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: Flags
+      value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: -1924918553836189620
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -1997442417670561106
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

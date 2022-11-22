@@ -1,0 +1,1 @@
+This file exists to maintain a .meta file that is used to locate this config folder.

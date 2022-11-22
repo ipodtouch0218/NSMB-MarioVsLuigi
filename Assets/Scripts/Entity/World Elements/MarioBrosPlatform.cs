@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-public class MarioBrosPlatform : MonoBehaviourPun {
+public class MarioBrosPlatform : MonoBehaviour {
 
     private static readonly Vector2 BUMP_OFFSET = new(-0.25f, -0.1f);
 
@@ -48,6 +47,7 @@ public class MarioBrosPlatform : MonoBehaviourPun {
         mpb.SetFloat("PlatformWidth", platformWidth);
         mpb.SetFloat("PointsPerTile", samplesPerTile);
     }
+
     public void Update() {
         for (int i = 0; i < platformWidth * samplesPerTile; i++)
             pixels[i] = new Color32(0, 0, 0, 255);
@@ -85,10 +85,8 @@ public class MarioBrosPlatform : MonoBehaviourPun {
         spriteRenderer.SetPropertyBlock(mpb);
     }
 
-    [PunRPC]
-    public void Bump(int id, Vector2 worldPos) {
 
-        PlayerController player = PhotonView.Find(id).GetComponent<PlayerController>();
+    public void Bump(PlayerController player, Vector2 worldPos) {
 
         float localPos = transform.InverseTransformPoint(worldPos).x;
 
@@ -105,8 +103,8 @@ public class MarioBrosPlatform : MonoBehaviourPun {
             return;
 
         player.PlaySound(Enums.Sounds.World_Block_Bump);
-        if (player.photonView.IsMine)
-            InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BUMP_OFFSET);
+        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BUMP_OFFSET);
+
         bumps.Add(new BumpInfo(bumpDuration, (int) localPos));
     }
 

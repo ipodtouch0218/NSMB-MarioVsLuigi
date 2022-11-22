@@ -7,7 +7,6 @@ TagManager:
   - goomba
   - koopa
   - Bullet
-  - Powerup
   - coin
   - bigstar
   - StarSpawn
@@ -32,6 +31,7 @@ TagManager:
   - lava
   - MarioBrosPlatform
   - frozencube
+  - Squishy
   layers:
   - Default
   - TransparentFX
@@ -39,7 +39,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Player
   - PlayerPassthrough
   - Ground
   - Entity
