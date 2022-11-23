@@ -21,7 +21,7 @@ public class BulletBillMover : KillableEntity {
     }
 
     public override void Spawned() {
-
+        base.Spawned();
         body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
 
         Transform t = transform.GetChild(1);

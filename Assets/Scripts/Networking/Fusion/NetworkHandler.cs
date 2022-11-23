@@ -263,7 +263,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             Debug.Log($"[Network] Connected to lobby in {CurrentRegion} region");
 
-            Debug.Log(Runner.AuthenticationValues.UserId);
+            //save id for later authentication
             PlayerPrefs.SetString("id", Runner.AuthenticationValues.UserId);
             PlayerPrefs.Save();
 
@@ -314,7 +314,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             SessionName = roomId,
             ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname),
             DisableClientSessionCreation = true,
-            DisableNATPunchthrough = true,
         });
         Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
         if (!result.Ok) {

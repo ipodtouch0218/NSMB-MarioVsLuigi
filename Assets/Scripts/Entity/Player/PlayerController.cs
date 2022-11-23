@@ -8,10 +8,16 @@ using UnityEngine.Tilemaps;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using System.Linq;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     #region Variables
+
+    //---Static Variables
+    private static readonly Collider2D[] CollisionBuffer = new Collider2D[64];
+    private static readonly Collider2D[] TempCollisionBuffer = new Collider2D[64];
+    private static ContactFilter2D CollisionFilter;
 
     //---Networked Variables
     //-Player State
@@ -69,7 +75,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public TickTimer DamageInvincibilityTimer { get; set; }
 
     //-Powerup Stuffs
-    [Networked, Capacity(6)] private NetworkLinkedList<FireballMover> FireballList => default;
+    [Networked(OnChanged = nameof(OnFireballCounterChanged))] public byte FireballCounter { get; set; }
     [Networked] public TickTimer FireballShootTimer { get; set; }
     [Networked] public TickTimer FireballDelayTimer { get; set; }
     [Networked] public NetworkBool CanShootAdditionalFireball { get; set; }
@@ -222,6 +228,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     public override void Spawned() {
+        base.Spawned();
+
         hitboxes = GetComponentsInChildren<BoxCollider2D>();
         trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
         transform.position = body.position = GameManager.Instance.spawnpoint;
@@ -448,31 +456,26 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
     }
 
-    private static readonly Collider2D[] results = new Collider2D[64];
-    private static readonly Collider2D[] tempResults = new Collider2D[64];
-    private static ContactFilter2D filter;
-
     private void CheckForEntityCollision() {
         //Don't check for collisions if we're dead, frozen, in a pipe, etc.
         if (IsDead || IsFrozen || pipeEntering)
             return;
 
-        if (!filter.useLayerMask) {
-            filter.SetLayerMask((int) (((uint) (/*(1 << Layers.LayerPlayer) | */(1 << Layers.LayerGround))) ^ 0xFFFFFFFF));
-        }
+        if (!CollisionFilter.useLayerMask)
+            CollisionFilter.SetLayerMask((int) (((uint) (1 << Layers.LayerGround)) ^ 0xFFFFFFFF));
 
         int collisions = 0;
         foreach (BoxCollider2D hitbox in hitboxes) {
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, filter, tempResults);
-            Array.Copy(tempResults, 0, results, collisions, count);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, CollisionFilter, TempCollisionBuffer);
+            Array.Copy(TempCollisionBuffer, 0, CollisionBuffer, collisions, count);
             collisions += count;
         }
 
         for (int i = 0; i < collisions; i++) {
-            GameObject collidedObject = results[i].gameObject;
+            GameObject collidedObject = CollisionBuffer[i].gameObject;
 
             //don't interact with ourselves.
-            if (results[i].attachedRigidbody == body)
+            if (CollisionBuffer[i].attachedRigidbody == body)
                 continue;
 
             //don't interact with objects we're holding.
@@ -526,7 +529,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
         }
     }
-
 
     public void InteractWithPlayer(PlayerController other) {
 
@@ -661,20 +663,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (!FireballDelayTimer.ExpiredOrNotRunning(Runner))
                 return;
 
-            //remove fireballs that were destroyed
-            for (int i = 0; i < FireballList.Count; i++) {
-                FireballMover fireball = FireballList[i];
-                if (!fireball) {
-                    FireballList.Remove(fireball);
-                    i--;
-                    continue;
-                }
-            }
-
-            int count = FireballList.Count;
-            if (count <= 1) {
+            if (FireballCounter <= 1) {
                 FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
-                CanShootAdditionalFireball = count == 0;
+                CanShootAdditionalFireball = FireballCounter == 0;
             } else if (FireballShootTimer.ExpiredOrNotRunning(Runner)) {
                 FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
                 CanShootAdditionalFireball = true;
@@ -688,27 +679,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
             Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
 
-            if (Utils.IsTileSolidAtWorldLocation(spawnPos)) {
-                //spawned inside the wall, spawn only the particle.
-                if (Object.HasStateAuthority)
-                    Rpc_FireballAnimation(ice, true, spawnPos);
-            } else {
-                //normal spawn
-                NetworkPrefabRef prefab = ice ? PrefabList.Instance.Obj_Iceball : PrefabList.Instance.Obj_Fireball;
-                NetworkObject obj = Runner.Spawn(prefab, spawnPos, inputAuthority: Object.InputAuthority, onBeforeSpawned: (runner, obj) => {
-                    FireballMover mover = obj.GetComponent<FireballMover>();
-                    mover.OnBeforeSpawned(this, right);
-                });
-
-                FireballList.Add(obj.GetComponent<FireballMover>());
-
-                if (Object.HasStateAuthority)
-                    Rpc_FireballAnimation(ice, false);
-            }
+            FireballMover inactiveFireball = GameManager.Instance.PooledFireballs.First(fm => !fm.IsActive);
+            inactiveFireball.Initialize(this, spawnPos, ice, right);
 
             FireballDelayTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
 
-            //weird interaction in the main game... replicate it i guess.
+            //weird interaction in the main game...
             WallJumpTimer = TickTimer.None;
             break;
         }
@@ -719,18 +695,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             StartPropeller();
             break;
         }
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void Rpc_FireballAnimation(bool ice, bool invalid, Vector2 particleLocation = default) {
-        PlaySound(ice ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot);
-        animator.SetTrigger("fireball");
-
-        if (invalid) {
-            //spawn particles as the shot didn't actually shoot.
-            GameObject prefab = ice ? PrefabList.Instance.Particle_IceballWall : PrefabList.Instance.Particle_FireballWall;
-            Instantiate(prefab, particleLocation, Quaternion.identity);
         }
     }
 
@@ -1328,7 +1292,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         ResetKnockback();
     }
 
-    protected void ResetKnockback() {
+    private void ResetKnockback() {
         DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
         KnockbackTimer = TickTimer.None;
         bounce = false;
@@ -1338,15 +1302,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
     #endregion
 
-    #region -- ENTITY HOLDING --
-    public void HoldingWakeup() {
-        HeldEntity = null;
-        //holdingOld = null;
-        //throwInvincibility = 0;
-        Powerdown(false);
-    }
-
-    public void SetHolding(HoldableEntity entity) {
+    public void SetHeldEntity(HoldableEntity entity) {
         if (HeldEntity) {
             HeldEntity.Holder = null;
             HeldEntity.PreviousHolder = this;
@@ -1372,7 +1328,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             SetHoldingOffset();
         }
     }
-    #endregion
 
     private void HandleSliding(bool up, bool down, bool left, bool right) {
         startedSliding = false;
@@ -2170,7 +2125,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         if (HeldEntity && (HeldEntity.IsDead || IsFrozen || HeldEntity.IsFrozen)) {
-            SetHolding(null);
+            SetHeldEntity(null);
         }
 
         if (GiantStartTimer.IsRunning) {
@@ -2723,6 +2678,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     }
 
+    private GameObject respawnParticle;
     public static void OnRespawningChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
         //if (!player.Runner.IsFirstTick)
@@ -2731,7 +2687,22 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (!player.IsRespawning)
             return;
 
-        GameObject particle = Instantiate(PrefabList.Instance.Particle_Respawn, player.body.position, Quaternion.identity);
-        particle.GetComponent<RespawnParticle>().player = player;
+        if (player.respawnParticle)
+            return;
+
+        player.respawnParticle = Instantiate(PrefabList.Instance.Particle_Respawn, player.body.position, Quaternion.identity);
+        player.respawnParticle.GetComponent<RespawnParticle>().player = player;
+    }
+
+    public static void OnFireballCounterChanged(Changed<PlayerController> changed) {
+        PlayerController player = changed.Behaviour;
+        changed.LoadOld();
+        int previous = player.FireballCounter;
+        changed.LoadNew();
+
+        if (player.FireballCounter <= previous)
+            return;
+
+        player.animator.SetTrigger("fireball");
     }
 }

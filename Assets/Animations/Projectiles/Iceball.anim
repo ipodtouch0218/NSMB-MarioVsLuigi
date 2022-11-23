@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: iceballirl
+  m_Name: Iceball
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -22,20 +22,20 @@ AnimationClip:
     - time: 0
       value: {fileID: 5353841184698615464, guid: eddf8ec042b3e614e925d846a27642df,
         type: 3}
-    - time: 0.083333336
+    - time: 0.1
       value: {fileID: 750297706712597742, guid: eddf8ec042b3e614e925d846a27642df,
         type: 3}
-    - time: 0.16666667
+    - time: 0.2
       value: {fileID: -8127487528002223245, guid: eddf8ec042b3e614e925d846a27642df,
         type: 3}
-    - time: 0.25
+    - time: 0.3
       value: {fileID: -3915765450054648673, guid: eddf8ec042b3e614e925d846a27642df,
         type: 3}
     attribute: m_Sprite
-    path: Graphic
+    path: 
     classID: 212
     script: {fileID: 0}
-  m_SampleRate: 12
+  m_SampleRate: 60
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -43,7 +43,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 3003628726
+      path: 0
       attribute: 0
       script: {fileID: 0}
       typeID: 212
@@ -60,12 +60,12 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.33333334
+    m_StopTime: 0.3166667
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
     m_HasAdditiveReferencePose: 0
-    m_LoopTime: 1
+    m_LoopTime: 0
     m_LoopBlend: 0
     m_LoopBlendOrientation: 0
     m_LoopBlendPositionY: 0

@@ -34,6 +34,7 @@ public class GameManager : NetworkBehaviour {
     [Networked] public TickTimer GameStartTimer { get; set; }
     [Networked] public TickTimer GameEndTimer { get; set; }
     [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
+    [Networked, Capacity(60)] public NetworkLinkedList<FireballMover> PooledFireballs => default;
     [Networked] public float GameStartTime { get; set; } = -1;
     [Networked] public int RealPlayerCount { get; set; }
     [Networked] public NetworkBool IsMusicEnabled { get; set; }
@@ -49,11 +50,13 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] public Tilemap tilemap;
     [SerializeField] public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
+    [SerializeField] public GameObject objectPoolParent;
 
     //---Properties
     public NetworkRNG Random { get; set; }
 
     //---Public Variables
+    public readonly HashSet<NetworkObject> networkObjects = new();
     public EnemySpawnpoint[] enemySpawns;
     public SingleParticleManager particleManager;
     public TeamManager teamManager = new();
@@ -275,8 +278,8 @@ public class GameManager : NetworkBehaviour {
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
         enemySpawns = FindObjectsOfType<EnemySpawnpoint>();
 
-        //create player instances
         if (Runner.IsServer) {
+            //create player instances
             foreach (PlayerRef player in Runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(Runner);
                 if (data.IsCurrentlySpectating)
@@ -285,6 +288,10 @@ public class GameManager : NetworkBehaviour {
                 Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player);
                 RealPlayerCount++;
             }
+
+            //create pooled fireball instances (6 per player)
+            for (int i = 0; i < RealPlayerCount * 6; i++)
+                Runner.Spawn(PrefabList.Instance.Obj_Fireball);
         }
 
         //finished loading
@@ -298,6 +305,15 @@ public class GameManager : NetworkBehaviour {
         }
 
         Camera.main.transform.position = spawnpoint;
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        if (runner.IsServer || !hasState)
+            return;
+
+        //remove all network objects.
+        foreach (var obj in networkObjects)
+            runner.Despawn(obj);
     }
 
     public void OnPlayerLoaded() {
@@ -431,7 +447,7 @@ public class GameManager : NetworkBehaviour {
         TMP_Text tmpText = text.GetComponent<TMP_Text>();
 
         if (winningTeam == -1) {
-            tmpText.text = "It's a draw...";
+            tmpText.text = "It's a draw";
         } else {
             if (LobbyData.Instance.Teams) {
                 Team team = ScriptableManager.Instance.teams[winningTeam];

@@ -30,6 +30,7 @@ public class LooseCoin : Coin {
     }
 
     public override void Spawned() {
+        base.Spawned();
         CollectableTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
@@ -53,9 +54,9 @@ public class LooseCoin : Coin {
         gameObject.layer = inWall ? Layers.LayerHitsNothing : Layers.LayerLooseCoin;
 
         physics.UpdateCollisions();
-        if (physics.onGround) {
+        if (physics.OnGround) {
             body.velocity -= body.velocity * Time.fixedDeltaTime;
-            if (physics.hitRoof) {
+            if (physics.HitRoof) {
                 Runner.Despawn(Object);
                 return;
             }

@@ -25,6 +25,7 @@ public class BobombWalk : HoldableEntity {
 
 
     public override void Spawned() {
+        base.Spawned();
         body.velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.velocity.y);
     }
 
@@ -69,7 +70,7 @@ public class BobombWalk : HoldableEntity {
             return;
 
         physics.UpdateCollisions();
-        if (Lit && physics.onGround) {
+        if (Lit && physics.OnGround) {
             //apply friction
             body.velocity -= body.velocity * (Runner.DeltaTime * 3f);
             if (Mathf.Abs(body.velocity.x) < 0.05) {
@@ -77,13 +78,13 @@ public class BobombWalk : HoldableEntity {
             }
         }
 
-        if (physics.hitRight && FacingRight) {
+        if (physics.HitRight && FacingRight) {
             Turnaround(false);
-        } else if (physics.hitLeft && !FacingRight) {
+        } else if (physics.HitLeft && !FacingRight) {
             Turnaround(true);
         }
 
-        if (physics.onGround && physics.hitRoof)
+        if (physics.OnGround && physics.HitRoof)
             SpecialKill(false, false, 0);
     }
 

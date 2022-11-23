@@ -22,6 +22,11 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
         sfx = GetComponent<AudioSource>();
     }
 
+    public override void Spawned() {
+        if (GameManager.Instance)
+            GameManager.Instance.networkObjects.Add(Object);
+    }
+
     public void Update() {
         brickBreakSound = false;
     }

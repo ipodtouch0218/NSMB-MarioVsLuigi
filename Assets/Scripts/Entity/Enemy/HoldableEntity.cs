@@ -3,6 +3,7 @@
 using Fusion;
 using NSMB.Utils;
 
+[OrderAfter(typeof(PlayerController))]
 public abstract class HoldableEntity : KillableEntity {
 
     //---Networked Variables
@@ -65,7 +66,7 @@ public abstract class HoldableEntity : KillableEntity {
         if (Holder)
             return;
 
-        player.SetHolding(this);
+        player.SetHeldEntity(this);
     }
 
     //---IPlayerInteractable overrides
@@ -87,7 +88,7 @@ public abstract class HoldableEntity : KillableEntity {
             return;
 
         if (Holder)
-            Holder.SetHolding(null);
+            Holder.SetHeldEntity(null);
 
         base.Kill();
     }
@@ -97,7 +98,7 @@ public abstract class HoldableEntity : KillableEntity {
             return;
 
         if (Holder)
-            Holder.SetHolding(null);
+            Holder.SetHeldEntity(null);
 
         base.SpecialKill(right, groundpound, combo);
     }

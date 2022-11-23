@@ -5,6 +5,7 @@ using TMPro;
 using NSMB.Extensions;
 
 namespace NSMB.Loading {
+
     [RequireComponent(typeof(TMP_Text))]
     public class LoadingWaitingOn : MonoBehaviour {
 
@@ -20,7 +21,7 @@ namespace NSMB.Loading {
         }
 
         public void Update() {
-            if (!GameManager.Instance)
+            if (!GameManager.Instance || !GameManager.Instance.Object.IsValid)
                 return;
 
             PlayerData ourData = NetworkHandler.Instance.runner.LocalPlayer.GetPlayerData(NetworkHandler.Instance.runner);

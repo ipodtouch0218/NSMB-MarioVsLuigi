@@ -11,7 +11,7 @@ public class PrefabList : ScriptableObject {
     public NetworkPrefabRef PlayerDataHolder, LobbyDataHolder;
 
     //---World Elements
-    public NetworkPrefabRef Obj_Fireball, Obj_Iceball;
+    public NetworkPrefabRef Obj_Fireball;
     public NetworkPrefabRef Obj_LooseCoin;
     public NetworkPrefabRef Obj_BigStar;
     public NetworkPrefabRef Obj_BlockBump;
@@ -33,7 +33,6 @@ public class PrefabList : ScriptableObject {
     public GameObject Particle_CoinNumber, Particle_CoinFromBlock;
     public GameObject Particle_StarCollect;
     public GameObject Particle_Respawn;
-    public GameObject Particle_FireballWall, Particle_IceballWall;
     public GameObject Particle_Groundpound, Particle_Walljump;
 
 }

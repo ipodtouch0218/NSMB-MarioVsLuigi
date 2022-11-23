@@ -3,7 +3,7 @@ using Fusion;
 public abstract class FreezableEntity : BasicEntity {
 
     //---Networked Variables
-    [Networked] public bool IsFrozen { get; set; }
+    [Networked] public NetworkBool IsFrozen { get; set; }
 
     //---Properties
     public abstract bool IsCarryable { get; }

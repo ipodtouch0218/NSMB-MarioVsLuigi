@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class PiranhaPlantController : KillableEntity {
 
@@ -22,6 +22,7 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public override void Spawned() {
+        base.Spawned();
         PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
     }
 

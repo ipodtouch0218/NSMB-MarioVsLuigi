@@ -58,6 +58,7 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Spawned() {
+        base.Spawned();
 
         graphicTransform = transform.Find("Graphic");
 
@@ -164,14 +165,14 @@ public class StarBouncer : CollectableEntity {
     private bool HandleCollision() {
         physics.UpdateCollisions();
 
-        if (physics.hitLeft || physics.hitRight) {
-            FacingRight = physics.hitLeft;
+        if (physics.HitLeft || physics.HitRight) {
+            FacingRight = physics.HitLeft;
             body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
         }
 
-        if (physics.onGround && canBounce) {
+        if (physics.OnGround && canBounce) {
             body.velocity = new(body.velocity.x, bounceAmount);
-            if (physics.hitRoof) {
+            if (physics.HitRoof) {
                 Runner.Despawn(Object, true);
                 return true;
             }
