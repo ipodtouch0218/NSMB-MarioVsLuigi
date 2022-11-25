@@ -38,7 +38,7 @@ public class PhysicsEntity : NetworkBehaviour {
         if (!currentCollider)
             return;
 
-        Runner.GetPhysicsScene2D().Simulate(0f);
+        //Runner.GetPhysicsScene2D().Simulate(0f);
         int c = currentCollider.GetContacts(ContactBuffer);
         for (int i = 0; i < c; i++) {
             ContactPoint2D point = ContactBuffer[i];

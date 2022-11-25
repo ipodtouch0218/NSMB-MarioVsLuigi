@@ -23,8 +23,7 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     }
 
     public override void Spawned() {
-        if (GameManager.Instance)
-            GameManager.Instance.networkObjects.Add(Object);
+        GameManager.Instance.networkObjects.Add(Object);
     }
 
     public void Update() {

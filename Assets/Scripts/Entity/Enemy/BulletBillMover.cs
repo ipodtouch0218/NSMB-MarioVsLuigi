@@ -78,7 +78,7 @@ public class BulletBillMover : KillableEntity {
             || player.State == Enums.PowerupState.MegaMushroom) {
 
             if (player.IsDrilling) {
-                player.bounce = true;
+                player.DoEntityBounce = true;
                 player.IsDrilling = false;
             }
             Kill();
@@ -91,7 +91,7 @@ public class BulletBillMover : KillableEntity {
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.IsDrilling = false;
             player.IsGroundpounding = false;
-            player.bounce = true;
+            player.DoEntityBounce = true;
             return;
         }
 

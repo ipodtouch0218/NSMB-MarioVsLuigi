@@ -308,12 +308,15 @@ public class GameManager : NetworkBehaviour {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (runner.IsServer || !hasState)
+        if (!runner.IsServer || !hasState)
             return;
 
         //remove all network objects.
-        foreach (var obj in networkObjects)
+        foreach (var obj in networkObjects) {
+            Debug.Log($"Despwaning {obj.Name}");
             runner.Despawn(obj);
+
+        }
     }
 
     public void OnPlayerLoaded() {
@@ -415,7 +418,7 @@ public class GameManager : NetworkBehaviour {
             point.AttemptSpawning();
 
         //Start timer
-        int timer = LobbyData.Instance.Timer;
+        int timer = SessionData.Instance.Timer;
         if (timer > 0)
             GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer);
 
@@ -440,7 +443,7 @@ public class GameManager : NetworkBehaviour {
         //TODO:
         //PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
-        LobbyData.Instance.SetGameStarted(false);
+        SessionData.Instance.SetGameStarted(false);
 
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
@@ -449,7 +452,7 @@ public class GameManager : NetworkBehaviour {
         if (winningTeam == -1) {
             tmpText.text = "It's a draw";
         } else {
-            if (LobbyData.Instance.Teams) {
+            if (SessionData.Instance.Teams) {
                 Team team = ScriptableManager.Instance.teams[winningTeam];
                 tmpText.text = team.displayName + " Wins!";
             } else {
@@ -489,7 +492,7 @@ public class GameManager : NetworkBehaviour {
                 data.IsCurrentlySpectating = false;
 
                 //move non-teams into valid teams range
-                if (LobbyData.Instance.Teams)
+                if (SessionData.Instance.Teams)
                     data.Team = (sbyte) Mathf.Clamp(data.Team, 0, ScriptableManager.Instance.teams.Length);
             }
         }
@@ -589,7 +592,7 @@ public class GameManager : NetworkBehaviour {
         if (gameover || !Object.HasStateAuthority)
             return;
 
-        int requiredStars = LobbyData.Instance.StarRequirement;
+        int requiredStars = SessionData.Instance.StarRequirement;
         bool starGame = requiredStars != -1;
 
         bool hasFirstPlace = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
@@ -620,7 +623,7 @@ public class GameManager : NetworkBehaviour {
 
         if (timeUp) {
             //ran out of time, instantly end if DrawOnTimeUp is set
-            if (LobbyData.Instance.DrawOnTimeUp) {
+            if (SessionData.Instance.DrawOnTimeUp) {
                 //no one wins
                 Rpc_EndGame(PlayerRef.None);
                 return;
@@ -650,7 +653,7 @@ public class GameManager : NetworkBehaviour {
             invincible |= player.IsStarmanInvincible;
         }
 
-        speedup |= teamManager.GetFirstPlaceStars() + 1 >= LobbyData.Instance.StarRequirement;
+        speedup |= teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
         speedup |= AlivePlayers.Count <= 2 && AlivePlayers.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
 
         if (mega) {

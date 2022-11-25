@@ -230,10 +230,10 @@ public class KoopaWalk : HoldableEntity {
                     player.IsGroundpounding = false;
                     EnterShell(true, player);
                 }
-                player.bounce = true;
+                player.DoEntityBounce = true;
             } else {
                 EnterShell(true, player);
-                player.bounce = !player.IsGroundpounding;
+                player.DoEntityBounce = !player.IsGroundpounding;
             }
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.IsDrilling = false;
@@ -287,10 +287,10 @@ public class KoopaWalk : HoldableEntity {
 
         if (!(!IsInShell || IsActuallyStationary || putdown || IsDead)) {
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
             for (int i = 0; i < count; i++) {
-                GameObject obj = collisionBuffer[i].gameObject;
+                GameObject obj = CollisionBuffer[i].gameObject;
 
                 if (obj == gameObject)
                     continue;

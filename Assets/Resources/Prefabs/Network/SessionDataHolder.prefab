@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2600866393204277216}
   - component: {fileID: 2600866393204277219}
   m_Layer: 0
-  m_Name: LobbyDataHolder
+  m_Name: SessionDataHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

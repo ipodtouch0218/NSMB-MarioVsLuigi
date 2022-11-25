@@ -42,13 +42,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         Owner = owner;
         Object.AssignInputAuthority(owner.Object.InputAuthority);
 
-        Owner.FireballCounter++;
-
-        //insta-break check
-        if (Utils.IsTileSolidAtWorldLocation(spawnpoint)) {
-            Destroy();
-            return;
-        }
+        Owner.ActiveFireballs++;
 
         //speed
         if (IsIceball) {
@@ -99,7 +93,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         //TDO: this mispredicts. is body.simulated not allowed?
         IsActive = false;
         body.simulated = false;
-        Owner.FireballCounter--;
+        Owner.ActiveFireballs--;
     }
 
     //---Helper Methods

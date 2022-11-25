@@ -34,7 +34,7 @@ public class UIUpdater : MonoBehaviour {
 
     public void Start() {
         Instance = this;
-        teams = LobbyData.Instance.Teams;
+        teams = SessionData.Instance.Teams;
         teamManager = GameManager.Instance.teamManager;
 
         localPlayer = Runner.LocalPlayer;
@@ -118,19 +118,19 @@ public class UIUpdater : MonoBehaviour {
         if (teams) {
             int team = player.data.Team;
             teamStars = teamManager.GetTeamStars(team);
-            uiTeamStars.text = ScriptableManager.Instance.teams[team].textSprite + Utils.GetSymbolString("x" + teamStars + "/" + LobbyData.Instance.StarRequirement);
+            uiTeamStars.text = ScriptableManager.Instance.teams[team].textSprite + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
         }
         if (player.Stars != stars) {
             stars = player.Stars;
             string starString = "Sx" + stars;
             if (!teams)
-                starString += "/" + LobbyData.Instance.StarRequirement;
+                starString += "/" + SessionData.Instance.StarRequirement;
 
             uiStars.text = Utils.GetSymbolString(starString);
         }
         if (player.Coins != coins) {
             coins = player.Coins;
-            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + LobbyData.Instance.CoinRequirement);
+            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + SessionData.Instance.CoinRequirement);
         }
 
         if (player.Lives >= 0) {
@@ -142,12 +142,12 @@ public class UIUpdater : MonoBehaviour {
             livesParent.SetActive(false);
         }
 
-        if (LobbyData.Instance.Timer > 0) {
+        if (SessionData.Instance.Timer > 0) {
             float? timeRemaining = GameManager.Instance.GameEndTimer.RemainingTime(Runner);
 
             if (timeRemaining != null) {
                 int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);
-                seconds = Mathf.Clamp(seconds, 0, LobbyData.Instance.Timer);
+                seconds = Mathf.Clamp(seconds, 0, SessionData.Instance.Timer);
 
                 if (seconds != timer) {
                     timer = seconds;

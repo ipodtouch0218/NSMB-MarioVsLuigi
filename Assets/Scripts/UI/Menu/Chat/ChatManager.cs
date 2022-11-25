@@ -47,7 +47,7 @@ public class ChatManager : MonoBehaviour {
             return;
         }
 
-        LobbyData.Instance.Rpc_ChatIncomingMessage(text);
+        SessionData.Instance.Rpc_ChatIncomingMessage(text);
         StartCoroutine(SelectTextboxNextFrame());
     }
 
@@ -107,6 +107,6 @@ public class ChatManager : MonoBehaviour {
         data.MessageCooldownTimer = TickTimer.CreateFromSeconds(runner, 0.5f);
 
         //message seems fine, send to rest of lobby.
-        LobbyData.Instance.Rpc_ChatDisplayMessage(message, player);
+        SessionData.Instance.Rpc_ChatDisplayMessage(message, player);
     }
 }

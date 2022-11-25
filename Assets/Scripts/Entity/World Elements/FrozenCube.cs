@@ -14,7 +14,6 @@ public class FrozenCube : HoldableEntity {
 
     //---Serialized Variables
     [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, autoBreak = 3f;
-    [SerializeField] private GameObject shatterParticles;
 
     //---Private Variables
     public UnfreezeReason unfreezeReason = UnfreezeReason.Other;
@@ -71,7 +70,9 @@ public class FrozenCube : HoldableEntity {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (FrozenEntity.IsCarryable)
+        Instantiate(PrefabList.Instance.Particle_IceBreak, transform.position, Quaternion.identity);
+
+        if (FrozenEntity && FrozenEntity.IsCarryable)
             FrozenEntity.transform.SetParent(null);
     }
 
@@ -279,10 +280,10 @@ public class FrozenCube : HoldableEntity {
 
         //only run when fastsliding...
 
-        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
         for (int i = 0; i < count; i++) {
-            GameObject obj = collisionBuffer[i].gameObject;
+            GameObject obj = CollisionBuffer[i].gameObject;
 
             if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj || FrozenEntity?.gameObject == obj)
                 continue;
@@ -314,7 +315,6 @@ public class FrozenCube : HoldableEntity {
         if (Holder)
             Holder.SetHeldEntity(null);
 
-        Instantiate(shatterParticles, transform.position, Quaternion.identity);
         Runner.Despawn(Object);
     }
 

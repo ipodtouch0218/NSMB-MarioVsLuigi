@@ -101,7 +101,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress} ({token})");
 
         SessionInfo info = runner.SessionInfo;
-        if (info.PlayerCount >= LobbyData.Instance.MaxPlayers) {
+        if (info.PlayerCount >= SessionData.Instance.MaxPlayers) {
             request.Refuse();
             return;
         }
@@ -153,8 +153,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             if (player == Runner.LocalPlayer) {
                 //create lobby data
-                NetworkObject lobby = runner.Spawn(PrefabList.Instance.LobbyDataHolder);
-                LobbyData.Instance = lobby.GetComponent<LobbyData>();
+                NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
+                SessionData.Instance = session.GetComponent<SessionData>();
             }
         }
 

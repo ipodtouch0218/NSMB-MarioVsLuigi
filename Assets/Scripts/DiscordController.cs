@@ -77,7 +77,7 @@ public class DiscordController : MonoBehaviour {
         if (runner && (session = runner.SessionInfo).IsValid) {
 
             activity.Details = runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = LobbyData.Instance.MaxPlayers }, Id = session.Name };
+            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = SessionData.Instance.MaxPlayers }, Id = session.Name };
             activity.State = session.IsVisible ? "In a Public Game" : "In a Private Game";
             activity.Secrets = new() { Join = session.Name };
 
@@ -94,7 +94,7 @@ public class DiscordController : MonoBehaviour {
 
                 activity.Assets = assets;
 
-                if (LobbyData.Instance.Timer == -1) {
+                if (SessionData.Instance.Timer == -1) {
                     activity.Timestamps = new() { Start = gm.gameStartTimestamp / 1000 };
                 } else {
                     activity.Timestamps = new() { End = gm.gameEndTimestamp / 1000 };

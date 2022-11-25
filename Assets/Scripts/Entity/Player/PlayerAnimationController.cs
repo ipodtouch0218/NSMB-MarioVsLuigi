@@ -6,6 +6,7 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
 
+[OrderAfter(typeof(PlayerController))]
 public class PlayerAnimationController : NetworkBehaviour {
 
     //---Static Variables
@@ -70,10 +71,10 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         rotChangeTarget = models.transform.rotation.eulerAngles;
 
-        enableGlow = LobbyData.Instance.Teams || !Object.HasInputAuthority;
+        enableGlow = SessionData.Instance.Teams || !Object.HasInputAuthority;
         GlowColor = Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
 
-        if (LobbyData.Instance.Teams)
+        if (SessionData.Instance.Teams)
             GameManager.Instance.levelUIColor = GlowColor;
 
         blinkRoutine ??= StartCoroutine(BlinkRoutine());
@@ -246,7 +247,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         //Animation
         animator.SetBool("turnaround", controller.IsTurnaround);
-        float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.floorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.floorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);
+        float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.FloorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.FloorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);
         if (controller.stuckInBlock) {
             animatedVelocity = 0;
         } else if (controller.IsPropellerFlying) {

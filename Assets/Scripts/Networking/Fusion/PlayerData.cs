@@ -11,7 +11,7 @@ using Fusion.Sockets;
 public class PlayerData : NetworkBehaviour {
 
     //---Static stuffs
-    public static bool Locked => LobbyData.Instance && LobbyData.Instance.GameStarted;
+    public static bool Locked => SessionData.Instance && SessionData.Instance.GameStarted;
 
     //---Networked Variables
     [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] private string Nickname { get; set; } = "noname";
@@ -62,7 +62,7 @@ public class PlayerData : NetworkBehaviour {
             //TODO: use an auth-server signed userid, to disallow userid spoofing.
             UserId = Runner.GetPlayerUserId(Object.InputAuthority)?.Replace("-", "");
 
-            IsCurrentlySpectating = LobbyData.Instance ? LobbyData.Instance.GameStarted : false;
+            IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
         }
 
         if (MainMenuManager.Instance)

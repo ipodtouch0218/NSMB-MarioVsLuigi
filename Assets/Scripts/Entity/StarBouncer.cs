@@ -196,7 +196,7 @@ public class StarBouncer : CollectableEntity {
         Collector = player;
 
         //we can collect
-        player.Stars = (byte) Mathf.Min(player.Stars + 1, LobbyData.Instance.StarRequirement);
+        player.Stars = (byte) Mathf.Min(player.Stars + 1, SessionData.Instance.StarRequirement);
 
         //game mechanics
         if (IsStationary && GameManager.Instance.Object.HasStateAuthority)

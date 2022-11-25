@@ -330,7 +330,7 @@ public class MainMenuManager : MonoBehaviour {
 
     public void EnterRoom() {
 
-        if (LobbyData.Instance.GameStarted) {
+        if (SessionData.Instance.GameStarted) {
             OnGameStartChanged();
             return;
         }
@@ -344,6 +344,7 @@ public class MainMenuManager : MonoBehaviour {
         characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.character);
         SetPlayerSkin(data ? data.SkinIndex : Settings.Instance.skin);
         spectateToggle.isOn = data ? data.IsManualSpectator : false;
+
 
         OpenInLobbyMenu();
 
@@ -360,7 +361,9 @@ public class MainMenuManager : MonoBehaviour {
         GlobalController.Instance.DiscordController.UpdateActivity();
 
         hostControlsGroup.interactable = data.IsRoomOwner;
-        roomSettingsCallbacks.UpdateAllSettings(LobbyData.Instance, false);
+        roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
+
+        Camera.main.transform.position = levelCameraPositions[SessionData.Instance.Level].transform.position;
     }
 
     private IEnumerator SetScroll() {
@@ -552,7 +555,7 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void OnGameStartChanged() {
-        if (LobbyData.Instance.GameStarted)
+        if (SessionData.Instance.GameStarted)
             GlobalController.Instance.loadingCanvas.Initialize();
     }
 
@@ -566,7 +569,7 @@ public class MainMenuManager : MonoBehaviour {
         if (Runner.IsServer) {
             //set starting
 
-            bool teamMode = LobbyData.Instance.Teams;
+            bool teamMode = SessionData.Instance.Teams;
             bool hasTwoTeams = false;
             int teamOne = -1;
 
@@ -605,10 +608,10 @@ public class MainMenuManager : MonoBehaviour {
             if (teamMode && !hasTwoTeams && count != 1)
                 return;
 
-            LobbyData.Instance.SetGameStarted(true);
+            SessionData.Instance.SetGameStarted(true);
 
             //load the correct scene
-            Runner.SetActiveScene(LobbyData.Instance.Level + 1);
+            Runner.SetActiveScene(SessionData.Instance.Level + 1);
         }
     }
 
@@ -672,10 +675,10 @@ public class MainMenuManager : MonoBehaviour {
         bool validRoomConfig = true;
 
         int realPlayers = datas.Where(pd => !pd.IsManualSpectator).Count();
-        validRoomConfig &= realPlayers > (LobbyData.Instance.PrivateRoom ? 0 : 1);
+        validRoomConfig &= realPlayers > (SessionData.Instance.PrivateRoom ? 0 : 1);
 
         //only do team checks if there's more than one player
-        if (LobbyData.Instance.Teams && (datas.Count() > 1 || !LobbyData.Instance.PrivateRoom)) {
+        if (SessionData.Instance.Teams && (datas.Count() > 1 || !SessionData.Instance.PrivateRoom)) {
             int teams = datas.Where(pd => !pd.IsManualSpectator).Select(pd => pd.Team).Distinct().Count();
             validRoomConfig &= teams > 1;
         }
@@ -753,7 +756,7 @@ public class MainMenuManager : MonoBehaviour {
             return;
         }
 
-        LobbyData.Instance.AddBan(target);
+        SessionData.Instance.AddBan(target);
         chat.AddChatMessage($"Successfully kicked {target.GetPlayerData(runner).GetNickname()}", Color.red);
         Runner.Disconnect(target);
 

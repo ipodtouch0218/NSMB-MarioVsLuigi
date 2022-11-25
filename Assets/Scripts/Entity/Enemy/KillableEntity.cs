@@ -6,6 +6,7 @@ using NSMB.Utils;
 
 public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFireballInteractable {
 
+    //---Static Variables
     private static readonly Enums.Sounds[] COMBOS = {
         Enums.Sounds.Enemy_Shell_Kick,
         Enums.Sounds.Enemy_Shell_Combo1,
@@ -16,18 +17,20 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         Enums.Sounds.Enemy_Shell_Combo6,
         Enums.Sounds.Enemy_Shell_Combo7,
     };
+    protected readonly Collider2D[] CollisionBuffer = new Collider2D[32];
 
     //---Networked Variables
     [Networked] public NetworkBool IsDead { get; set; }
 
-    //---Private Variables
-    protected readonly Collider2D[] collisionBuffer = new Collider2D[32];
+    //---Properties
     public override bool IsCarryable => iceCarryable;
     public override bool IsFlying => flying;
 
+    //---Serialized Variables
+    [SerializeField] protected bool iceCarryable = true;
+    [SerializeField] protected bool flying = false;
 
-    public bool collide = true, iceCarryable = true, flying;
-
+    //---Components
     public BoxCollider2D hitbox;
     protected Animator animator;
     protected SpriteRenderer sRenderer;
@@ -60,10 +63,10 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
     protected virtual void CheckForEntityCollisions() {
 
-        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, collisionBuffer);
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
 
         for (int i = 0; i < count; i++) {
-            GameObject obj = collisionBuffer[i].gameObject;
+            GameObject obj = CollisionBuffer[i].gameObject;
 
             if (obj == gameObject)
                 continue;
@@ -106,9 +109,12 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         hitbox.enabled = false;
         animator.speed = 0;
         gameObject.layer = Layers.LayerHitsNothing;
-        PlaySound(!IsFrozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, combo)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
+
+        if (Runner.IsForward)
+            PlaySound(!IsFrozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, combo)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
+
         if (groundpound)
-            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.up * 0.5f, Quaternion.identity);
+            Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.position + Vector2.up * 0.5f, Quaternion.identity);
 
         Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.position + hitbox.offset);
     }
@@ -136,12 +142,13 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
                     player.IsGroundpounding = false;
                     Kill();
                 }
-                player.bounce = true;
+                player.DoEntityBounce = true;
             } else {
                 Kill();
-                player.bounce = !player.IsGroundpounding;
+                player.DoEntityBounce = !player.IsGroundpounding;
             }
-            player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+            if (Runner.IsForward)
+                player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.IsDrilling = false;
 
         } else if (player.IsDamageable) {
@@ -180,7 +187,6 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     //---FreezableEntity overrides
     public override void Freeze(FrozenCube cube) {
         audioSource.Stop();
-        PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         IsFrozen = true;
         animator.enabled = false;
         foreach (BoxCollider2D hitboxes in GetComponentsInChildren<BoxCollider2D>()) {
@@ -203,4 +209,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
         SpecialKill(false, false, 0);
     }
+
+    //---OnChangeds
+
 }

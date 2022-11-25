@@ -382,9 +382,9 @@ namespace NSMB.Utils {
             int ourStars = gm.teamManager.GetTeamStars(player.data.Team);
             int leaderStars = gm.teamManager.GetFirstPlaceStars();
 
-            int starsToWin = LobbyData.Instance.StarRequirement;
-            bool custom = LobbyData.Instance.CustomPowerups;
-            bool lives = LobbyData.Instance.Lives > 0;
+            int starsToWin = SessionData.Instance.StarRequirement;
+            bool custom = SessionData.Instance.CustomPowerups;
+            bool lives = SessionData.Instance.Lives > 0;
 
 
             bool big = gm.spawnBigPowerups;
@@ -547,7 +547,7 @@ namespace NSMB.Utils {
                 return spectatorColor;
 
             //then teams
-            if (LobbyData.Instance.Teams && data.Team >= 0 && data.Team < ScriptableManager.Instance.teams.Length)
+            if (SessionData.Instance.Teams && data.Team >= 0 && data.Team < ScriptableManager.Instance.teams.Length)
                 return GetTeamColor(data.Team, s, v);
 
             //then id based color

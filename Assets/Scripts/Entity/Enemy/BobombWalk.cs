@@ -186,7 +186,7 @@ public class BobombWalk : HoldableEntity {
             if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom) {
                 Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
             } else {
-                player.bounce = true;
+                player.DoEntityBounce = true;
                 player.IsGroundpounding = false;
             }
             player.IsDrilling = false;

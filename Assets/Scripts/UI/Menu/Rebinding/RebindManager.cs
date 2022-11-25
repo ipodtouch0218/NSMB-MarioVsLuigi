@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -7,12 +8,15 @@ using TMPro;
 
 public class RebindManager : MonoBehaviour {
 
+    //---Static Variables
     public static RebindManager Instance;
 
-    public InputActionAsset controls;
-    public GameObject headerTemplate, buttonTemplate, axisTemplate, playerSettings, resetAll;
-    public Toggle fireballToggle;
+    //---Serialized Variables
+    [SerializeField] private InputActionAsset controls;
+    [SerializeField] private GameObject headerTemplate, buttonTemplate, axisTemplate, playerSettings, resetAll;
+    [SerializeField] private Toggle fireballToggle;
 
+    //---Private Variablse
     private readonly List<RebindButton> buttons = new();
 
     public void Init() {
@@ -30,18 +34,16 @@ public class RebindManager : MonoBehaviour {
     public void LoadBindings() {
         string json = GlobalController.Instance.controlsJson;
 
-        if (json != null && json != "") {
+        if (!string.IsNullOrEmpty(json)) {
             // we have old bindings...
             controls.LoadBindingOverridesFromJson(json);
-            Debug.Log("load from globalcontroller: " + json);
 
         } else if (InputSystem.file.Exists) {
             //load bindings...
             try {
-                Debug.Log("load from file: " + File.ReadAllText(InputSystem.file.FullName));
                 controls.LoadBindingOverridesFromJson(File.ReadAllText(InputSystem.file.FullName));
                 GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
-            } catch (System.Exception e) {
+            } catch (Exception e) {
                 Debug.LogError(e.Message);
             }
         }
@@ -61,7 +63,7 @@ public class RebindManager : MonoBehaviour {
         SaveRebindings();
     }
 
-    void CreateActions() {
+    private void CreateActions() {
 
         foreach (InputActionMap map in controls.actionMaps) {
 
@@ -126,9 +128,10 @@ public class RebindManager : MonoBehaviour {
                 playerSettings.transform.SetAsLastSibling();
         }
     }
+
     public void SaveRebindings() {
         string json = controls.SaveBindingOverridesAsJson();
-        
+
         if (!InputSystem.file.Exists)
             InputSystem.file.Directory.Create();
 
