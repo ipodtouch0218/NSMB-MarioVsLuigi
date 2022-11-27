@@ -252,9 +252,6 @@ public class FrozenCube : HoldableEntity {
     public override void Throw(bool toRight, bool crouch) {
         base.Throw(toRight, false);
 
-        if (!Holder)
-            return;
-
         fallen = false;
         flying = false;
         FastSlide = true;

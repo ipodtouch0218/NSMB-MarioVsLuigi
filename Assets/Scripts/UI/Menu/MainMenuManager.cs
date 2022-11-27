@@ -139,6 +139,9 @@ public class MainMenuManager : MonoBehaviour {
     // ROOM CALLBACKS
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+        if (runner.LocalPlayer == player)
+            EnterRoom();
+
         waitingForJoinMessage.Add(player);
         UpdateStartGameButton();
     }
@@ -358,7 +361,7 @@ public class MainMenuManager : MonoBehaviour {
         //clear text field
         chatTextField.SetTextWithoutNotify("");
 
-        GlobalController.Instance.DiscordController.UpdateActivity();
+        GlobalController.Instance.DiscordController.UpdateActivity(session);
 
         hostControlsGroup.interactable = data.IsRoomOwner;
         roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);

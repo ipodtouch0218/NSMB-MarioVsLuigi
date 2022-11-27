@@ -4,6 +4,9 @@ using Fusion;
 
 public abstract class Coin : CollectableEntity {
 
+    //---Serialized Variables
+    [SerializeField] private SpriteRenderer sRenderer;
+
     public static void GivePlayerCoin(PlayerController player, Vector3 position) {
         byte newCoins = (byte) (player.Coins + 1);
         bool item = newCoins >= SessionData.Instance.CoinRequirement;
@@ -43,5 +46,10 @@ public abstract class Coin : CollectableEntity {
             return;
 
         InteractWithPlayer(target);
+    }
+
+    //CollectableEntity overrides
+    public override void OnCollectedChanged() {
+        sRenderer.enabled = !Collector;
     }
 }

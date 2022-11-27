@@ -11,7 +11,7 @@ namespace NSMB.Loading {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text playerList;
-        [SerializeField] private string emptyText = "Loading...", iveLoadedText = "Waiting for others...", readyToStartText = "Starting...", spectatorText = "Joining as Spectator...";
+        [SerializeField] private string emptyText = "Loading...", waitingForOthersText = "Waiting for others...", readyToStartText = "Starting...", spectatorText = "Joining as Spectator...";
 
         //---Private Variables
         private TMP_Text text;
@@ -26,21 +26,28 @@ namespace NSMB.Loading {
 
             PlayerData ourData = NetworkHandler.Instance.runner.LocalPlayer.GetPlayerData(NetworkHandler.Instance.runner);
 
+            //loading as spectator
             if (ourData.IsCurrentlySpectating) {
                 text.text = spectatorText;
                 return;
             }
 
+            //we're still loading
+            if (!GameManager.Instance.Object.IsValid) {
+                text.text = emptyText;
+                return;
+            }
+
+            //game starting
             if (GameManager.Instance.GameStartTimer.IsRunning) {
                 text.text = readyToStartText;
-                text.text = emptyText;
                 playerList.text = "";
                 return;
             }
 
-            text.text = iveLoadedText;
+            //waiting for otherrs
+            text.text = waitingForOthersText;
 
-            //TODO: fix
             HashSet<string> waitingFor = new();
             foreach (PlayerController pc in GameManager.Instance.AlivePlayers) {
                 PlayerData data = pc.Object.InputAuthority.GetPlayerData(pc.Runner);

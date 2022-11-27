@@ -9,7 +9,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     private static LayerMask GroundMask;
 
     //---Networked Variables
-    [Networked] private PlayerController FollowPlayer { get; set; }
+    [Networked] protected PlayerController FollowPlayer { get; set; }
     [Networked] private TickTimer FollowEndTimer { get; set; }
     [Networked] private TickTimer DespawnTimer { get; set; }
     [Networked] private TickTimer IgnorePlayerTimer { get; set; }
@@ -23,7 +23,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     //---Component Variables
     private SpriteRenderer sRenderer;
-    private PhysicsEntity physics;
+    protected PhysicsEntity physics;
     private Animator childAnimator;
     private BoxCollider2D hitbox;
     private IPowerupCollect collectScript;
@@ -79,8 +79,12 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 15f);
     }
 
+    public override void Render() {
+        if (childAnimator)
+            childAnimator.SetBool("onGround", physics.OnGround);
+    }
+
     public override void FixedUpdateNetwork() {
-        base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
@@ -118,16 +122,6 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         } else {
             gameObject.layer = Layers.LayerEntity;
             HandleCollision();
-        }
-
-        if (childAnimator) {
-            childAnimator.SetBool("onGround", physics.OnGround);
-
-            if (physics.OnGround && powerupScriptable.state == Enums.PowerupState.PropellerMushroom) {
-                hitbox.enabled = false;
-                body.isKinematic = true;
-                body.gravityScale = 0;
-            }
         }
 
         if (avoidPlayers && physics.OnGround) {

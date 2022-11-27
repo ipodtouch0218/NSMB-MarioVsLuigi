@@ -9,10 +9,12 @@ public class BulletBillMover : KillableEntity {
 
     //---Misc Variables
     private Vector2 searchVector;
-
+    private new Animation animation;
 
     public override void Awake() {
         base.Awake();
+        animation = GetComponent<Animation>();
+
         searchVector = new(playerSearchRadius * 2, 100);
     }
 
@@ -41,7 +43,7 @@ public class BulletBillMover : KillableEntity {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
-            animator.enabled = false;
+            animation.enabled = false;
             body.isKinematic = true;
             return;
         }
@@ -121,8 +123,8 @@ public class BulletBillMover : KillableEntity {
         body.angularVelocity = 400f * (right ? 1 : -1);
         body.gravityScale = 1.5f;
         body.isKinematic = false;
+        animation.enabled = false;
         hitbox.enabled = false;
-        animator.speed = 0;
         gameObject.layer = Layers.LayerHitsNothing;
 
         if (groundpound)

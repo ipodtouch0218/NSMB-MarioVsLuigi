@@ -11,11 +11,11 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     private static readonly Collider2D[] CollisionBuffer = new Collider2D[16];
 
     //---Networked Variables
-    [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
+    [Networked] private PlayerController Owner { get; set; }
+    [Networked] private float CurrentSpeed { get; set; }
     [Networked] public NetworkBool AlreadyBounced { get; set; }
     [Networked] public NetworkBool IsIceball { get; set; }
-    [Networked] private float CurrentSpeed { get; set; }
-    [Networked] private PlayerController Owner { get; set; }
+    [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
 
     //---Serialized Variables
     [SerializeField] private ParticleSystem iceBreak, fireBreak, iceTrail, fireTrail;
@@ -26,11 +26,13 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     //---Components
     private PhysicsEntity physics;
     private NetworkRigidbody2D nrb;
+    private SpriteRenderer[] renderers;
 
     public override void Awake() {
         base.Awake();
         physics = GetComponent<PhysicsEntity>();
         nrb = GetComponent<NetworkRigidbody2D>();
+        renderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
     public void Initialize(PlayerController owner, Vector2 spawnpoint, bool ice, bool right) {
@@ -42,9 +44,13 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         Owner = owner;
         Object.AssignInputAuthority(owner.Object.InputAuthority);
 
+        foreach (SpriteRenderer r in renderers)
+            r.flipX = FacingRight;
+
         Owner.ActiveFireballs++;
 
         //speed
+        body.gravityScale = IsIceball ? 2.2f : 4.4f;
         if (IsIceball) {
             CurrentSpeed = iceSpeed + Mathf.Abs(owner.body.velocity.x / 3f);
         } else {
@@ -109,7 +115,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         } else if (IsIceball && body.velocity.y > 0.1f)  {
             AlreadyBounced = true;
         }
-        bool breaking = physics.HitLeft || physics.HitRight || physics.HitRoof || (physics.OnGround && AlreadyBounced);
+        bool breaking = physics.HitLeft || physics.HitRight || physics.HitRoof || (physics.OnGround && AlreadyBounced && body.velocity.y < 1f);
         if (breaking) {
             Destroy();
             return false;

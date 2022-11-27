@@ -3,7 +3,7 @@ using Fusion;
 public abstract class CollectableEntity : BasicEntity, IPlayerInteractable {
 
     //---Networked Variables
-    [Networked(OnChanged = nameof(CollectableEntity.OnCollectedChanged))] public PlayerController Collector { get; set; }
+    [Networked(OnChanged = nameof(OnCollectedChanged))] public PlayerController Collector { get; set; }
 
     public virtual void OnCollectedChanged() {}
 
