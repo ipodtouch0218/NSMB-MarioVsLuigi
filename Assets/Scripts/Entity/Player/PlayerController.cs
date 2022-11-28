@@ -58,6 +58,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] private NetworkBool GroundpoundHeld { get; set; }
     [Networked] private float GroundpoundStartTime { get; set; }
     //Spinner
+    [Networked] public SpinnerAnimator OnSpinner { get; set; }
     [Networked] public NetworkBool IsSpinnerFlying { get; set; }
     [Networked] public NetworkBool IsDrilling { get; set; }
     //Walljump
@@ -183,7 +184,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     public Vector2 giantSavedVelocity, previousFrameVelocity, previousFramePosition;
 
-    public GameObject onSpinner;
     public PipeManager pipeEntering;
     public bool step;
 
@@ -392,6 +392,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         int down = 0, left = 0, right = 0, up = 0;
 
         crushGround = false;
+        OnSpinner = null;
         foreach (BoxCollider2D hitbox in hitboxes) {
             //Runner.GetPhysicsScene2D().Simulate(0f);
             //int collisionCount = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale, 0, contacts);
@@ -418,6 +419,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
                     crushGround |= !go.CompareTag("platform") && !go.CompareTag("frozencube");
                     down++;
+                    if (go.CompareTag("spinner"))
+                        OnSpinner = go.GetComponentInParent<SpinnerAnimator>();
+
                     tilesStandingOn.Add(vec);
                 } else if (contact.collider.gameObject.layer == Layers.LayerGround) {
                     if (Vector2.Dot(n, Vector2.down) > .9f) {
@@ -961,7 +965,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             SpawnStars(1, deathplane);
         }
 
-        onSpinner = null;
+        OnSpinner = null;
         pipeEntering = null;
         IsInShell = false;
         IsPropellerFlying = false;
@@ -1426,7 +1430,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     private void HandleLayerState() {
         bool hitsNothing = animator.GetBool("pipe") || IsDead || stuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
-        //bool shouldntCollide = (DamageInvincibilityTimer > 0 && !IsStarmanInvincible) || (knockback && !fireballKnockback);
 
         int layer = Layers.LayerPlayer;
         if (hitsNothing)
@@ -1436,6 +1439,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private bool GroundSnapCheck() {
+
         if (IsDead || body.velocity.y > 0.1f || pipeEntering)
             return false;
 
@@ -1675,7 +1679,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsSpinnerFlying &= DoEntityBounce;
         IsPropellerFlying &= DoEntityBounce;
 
-        if (!DoEntityBounce && onSpinner && IsOnGround && !HeldEntity) {
+        if (!DoEntityBounce && OnSpinner && IsOnGround && !HeldEntity) {
             if (Runner.IsForward) {
                 PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
                 PlaySound(Enums.Sounds.World_Spinner_Launch);
@@ -2341,8 +2345,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (IsDrilling)
                 SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
 
-            if (onSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !HeldEntity) {
-                Transform spnr = onSpinner.transform;
+            if (OnSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !HeldEntity) {
+                Transform spnr = OnSpinner.transform;
                 float diff = body.position.x - spnr.transform.position.x;
                 if (Mathf.Abs(diff) >= 0.02f)
                     body.position += -0.6f * Mathf.Sign(diff) * delta * Vector2.right;
@@ -2697,7 +2701,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (player.IsSliding)
             return;
 
-        if (!player.IsOnGround && Mathf.Abs(player.body.velocity.x) > 0.01f)
+        if (!player.IsOnGround || Mathf.Abs(player.body.velocity.x) > 0.01f)
             return;
 
         player.PlaySound(Enums.Sounds.Player_Sound_SlideEnd);

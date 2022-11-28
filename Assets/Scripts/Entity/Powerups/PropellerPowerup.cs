@@ -1,9 +1,7 @@
 using UnityEngine;
 
 using Fusion;
-using UnityEngine.EventSystems;
 using NSMB.Utils;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PropellerPowerup : MovingPowerup {
 

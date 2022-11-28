@@ -39,10 +39,12 @@ public class PlayerAnimationController : NetworkBehaviour {
     private bool rotChangeInstant;
 
     private Enums.PlayerEyeState eyeState;
-    private float blinkTimer, pipeTimer, propellerVelocity;
+    private float pipeTimer, propellerVelocity;
     public bool deathUp, wasTurnaround, enableGlow;
 
+#pragma warning disable IDE0052 // Remove unused private members
     private Coroutine blinkRoutine;
+#pragma warning restore IDE0052 // Remove unused private members
 
     public void Awake() {
         controller = GetComponent<PlayerController>();
@@ -165,7 +167,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         } else if (controller.pipeEntering) {
             rotChangeTarget = new Vector3(0, 180, 0);
             rotChangeInstant = true;
-        } else if (animator.GetBool("inShell") && (!controller.onSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
+        } else if (animator.GetBool("inShell") && (!controller.OnSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
             rotChangeTarget += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1800 * (controller.FacingRight ? -1 : 1));
             rotChangeInstant = true;
         } else if (wasTurnaround || controller.IsSkidding || controller.IsTurnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
@@ -176,8 +178,8 @@ public class PlayerAnimationController : NetworkBehaviour {
             }
             rotChangeInstant = true;
         } else {
-            if (controller.onSpinner && controller.IsOnGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity) {
-                rotChangeTarget += new Vector3(0, -1800, 0) * delta;
+            if (controller.OnSpinner && controller.IsOnGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity) {
+                rotChangeTarget += controller.OnSpinner.spinSpeed * delta * Vector3.up;
                 rotChangeInstant = true;
                 rotChangeFacingDirection = true;
             } else if (controller.IsSpinnerFlying || controller.IsPropellerFlying) {

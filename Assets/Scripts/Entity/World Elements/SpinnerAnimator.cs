@@ -1,56 +1,49 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 using Fusion;
 
-public class SpinnerAnimator : SimulationBehaviour, IPlayerInteractable {
+[OrderAfter(typeof(PlayerController))]
+public class SpinnerAnimator : NetworkBehaviour {
 
-    [SerializeField] private Vector3 idleSpinSpeed = new(0, -100, 0), fastSpinSpeed = new(0, -1800, 0);
+    //---Static Variables
+    private static readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
+
+    //---Networked Variables
+    [Networked] private float ArmPosition { get; set; }
+    [Networked] private NetworkBool HasPlayer { get; set; }
+
+    //---Serialized Variables
     [SerializeField] private Transform topArmBone;
+    [SerializeField] private BoxCollider2D hitbox;
+    [SerializeField] private float idleSpinSpeed = -100, fastSpinSpeed = -1800, pressSpeed = 0.5f;
 
-    private float spinPercentage = 0;
-    private readonly List<PlayerController> playersInside = new();
+    //---Public Variables
+    public float spinSpeed;
 
-    public void Update() {
-        bool players = playersInside.Count >= 1;
-        float percentage = 0;
-        if (players) {
-            float playerWorldY = float.PositiveInfinity;
-            foreach (PlayerController player in playersInside) {
-                if (player.body.velocity.y > 0.2f)
-                    continue;
+    public override void Render() {
+        spinSpeed = Mathf.MoveTowards(spinSpeed, HasPlayer ? fastSpinSpeed : idleSpinSpeed, Time.deltaTime * 1350f);
 
-                playerWorldY = Mathf.Min(playerWorldY, player.transform.position.y);
-            }
-            float spinnerWorldY = transform.position.y;
-
-            if (playerWorldY != float.PositiveInfinity)
-                percentage = 1 - ((playerWorldY - spinnerWorldY - 0.1f) / 0.25f);
-        }
-
-        spinPercentage = Mathf.Clamp01(spinPercentage + (players ? 0.75f * Time.deltaTime : -1f * Time.deltaTime));
-
-        topArmBone.eulerAngles += ((fastSpinSpeed * spinPercentage) + (idleSpinSpeed * (1-spinPercentage))) * Time.deltaTime;
-        topArmBone.localPosition = new Vector3(0, Mathf.Max(-0.084f, percentage * -0.07f), 0);
+        topArmBone.eulerAngles += spinSpeed * Time.deltaTime * Vector3.up;
     }
-    //TODO: everything
+
     public override void FixedUpdateNetwork() {
 
-    }
+        HasPlayer = false;
 
-    public void OnTriggerExit2D(Collider2D collider) {
-        PlayerController cont = collider.gameObject.GetComponent<PlayerController>();
-        if (cont)
-            playersInside.Remove(cont);
-    }
+        Runner.GetPhysicsScene2D().Simulate(0);
+        int count = hitbox.GetContacts(ContactBuffer);
+        for (int i = 0; i < count; i++) {
+            ContactPoint2D contact = ContactBuffer[i];
+            if (contact.normal != Vector2.down)
+                continue;
 
-    public void OnTriggerEnter2D(Collider2D collider) {
-        PlayerController cont = collider.gameObject.GetComponent<PlayerController>();
-        if (cont)
-            playersInside.Add(cont);
-    }
+            if (contact.rigidbody.gameObject.CompareTag("Player")) {
+                HasPlayer = true;
+                break;
+            }
+        }
 
-    public void InteractWithPlayer(PlayerController player) {
-        Debug.Log("a");
+        ArmPosition = Mathf.MoveTowards(ArmPosition, HasPlayer ? -0.084f : 0, pressSpeed * Runner.DeltaTime);
+        hitbox.transform.localPosition = topArmBone.localPosition = new Vector3(0, ArmPosition, 0);
     }
 }

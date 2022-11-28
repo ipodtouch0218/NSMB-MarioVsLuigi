@@ -13,7 +13,7 @@ public class BulletBillMover : KillableEntity {
 
     public override void Awake() {
         base.Awake();
-        animation = GetComponent<Animation>();
+        animation = GetComponentInChildren<Animation>();
 
         searchVector = new(playerSearchRadius * 2, 100);
     }

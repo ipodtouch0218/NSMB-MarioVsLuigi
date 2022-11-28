@@ -47,6 +47,8 @@ public class SessionData : NetworkBehaviour {
 
     public override void Spawned() {
         Instance = this;
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.EnterRoom();
 
         if (HasStateAuthority) {
             bannedIds = new();

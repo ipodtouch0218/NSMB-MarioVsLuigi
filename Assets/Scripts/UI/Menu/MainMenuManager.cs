@@ -139,9 +139,6 @@ public class MainMenuManager : MonoBehaviour {
     // ROOM CALLBACKS
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        if (runner.LocalPlayer == player)
-            EnterRoom();
-
         waitingForJoinMessage.Add(player);
         UpdateStartGameButton();
     }
