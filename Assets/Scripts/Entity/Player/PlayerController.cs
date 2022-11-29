@@ -1660,9 +1660,32 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (!DoEntityBounce && !doJump)
             return;
 
-        //disable koyote time
-        IgnoreCoyoteTime = true;
+        if (!DoEntityBounce && OnSpinner && IsOnGround && !HeldEntity) {
+            //wait for spinner to depress
+            if (OnSpinner.ArmPosition < 0.95f)
+                return;
 
+            if (Runner.IsForward) {
+                PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
+                PlaySound(Enums.Sounds.World_Spinner_Launch);
+            }
+            body.velocity = new(body.velocity.x, launchVelocity);
+            IsSpinnerFlying = true;
+            IsOnGround = false;
+            WasGroundedLastFrame = false;
+            IsCrouching = false;
+            IsInShell = false;
+            IsSkidding = false;
+            IsTurnaround = false;
+            IsSliding = false;
+            WallSlideTimer = TickTimer.None;
+            IsGroundpounding = false;
+            GroundpoundStartTimer = TickTimer.None;
+            IsDrilling = false;
+            IsPropellerFlying = false;
+            OnSpinner.ArmPosition = 0;
+            return;
+        }
 
         bool topSpeed = Mathf.Abs(body.velocity.x) >= RunningMaxSpeed;
         bool canSpecialJump = (doJump || (DoEntityBounce && jumpHeld)) && ProperJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && (Runner.SimulationTime - TimeGrounded < 0.2f) && !HeldEntity && !IsTripleJump && !IsCrouching && !IsInShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
@@ -1673,25 +1696,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsSliding = false;
         WallSlideTimer = TickTimer.None;
         IsGroundpounding = false;
-        IsOnGround = false;
         GroundpoundStartTimer = TickTimer.None;
         IsDrilling = false;
         IsSpinnerFlying &= DoEntityBounce;
         IsPropellerFlying &= DoEntityBounce;
 
-        if (!DoEntityBounce && OnSpinner && IsOnGround && !HeldEntity) {
-            if (Runner.IsForward) {
-                PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
-                PlaySound(Enums.Sounds.World_Spinner_Launch);
-            }
-            body.velocity = new(body.velocity.x, launchVelocity);
-            IsSpinnerFlying = true;
-            //body.position += Vector2.up * 0.075f;
-            WasGroundedLastFrame = false;
-            IsCrouching = false;
-            IsInShell = false;
-            return;
-        }
+        //disable koyote time
+        IgnoreCoyoteTime = true;
+        IsOnGround = false;
 
         float vel = State switch {
             Enums.PowerupState.MegaMushroom => megaJumpVelocity,

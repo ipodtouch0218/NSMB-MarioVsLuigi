@@ -223,7 +223,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7020551328166419880}
   - component: {fileID: 2562862165479420778}
-  - component: {fileID: 3233889381157595090}
+  - component: {fileID: 494105199198006985}
   - component: {fileID: 7405962687031427707}
   m_Layer: 8
   m_Name: Spinner
@@ -262,13 +262,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _ArmPosition: 0
   topArmBone: {fileID: 5801919727347960438}
   hitbox: {fileID: 650858211456639898}
   idleSpinSpeed: -100
   fastSpinSpeed: -1800
-  pressSpeed: 0.5
---- !u!61 &3233889381157595090
-BoxCollider2D:
+  pressSpeed: 8.5
+  spinSpeed: 0
+--- !u!68 &494105199198006985
+EdgeCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -280,19 +282,17 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.115}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 0.4}
+  m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0
+  m_Points:
+  - {x: -0.5, y: 0.134}
+  - {x: -0.5, y: -0.31}
+  - {x: 0.5, y: -0.31}
+  - {x: 0.5, y: 0.134}
+  m_AdjacentStartPoint: {x: 0, y: 0}
+  m_AdjacentEndPoint: {x: 0, y: 0}
+  m_UseAdjacentStartPoint: 0
+  m_UseAdjacentEndPoint: 0
 --- !u!114 &7405962687031427707
 MonoBehaviour:
   m_ObjectHideFlags: 0

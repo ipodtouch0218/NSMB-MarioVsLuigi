@@ -9,7 +9,7 @@ public class SpinnerAnimator : NetworkBehaviour {
     private static readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
     //---Networked Variables
-    [Networked] private float ArmPosition { get; set; }
+    [Networked] public float ArmPosition { get; set; }
     [Networked] private NetworkBool HasPlayer { get; set; }
 
     //---Serialized Variables
@@ -43,7 +43,7 @@ public class SpinnerAnimator : NetworkBehaviour {
             }
         }
 
-        ArmPosition = Mathf.MoveTowards(ArmPosition, HasPlayer ? -0.084f : 0, pressSpeed * Runner.DeltaTime);
-        hitbox.transform.localPosition = topArmBone.localPosition = new Vector3(0, ArmPosition, 0);
+        ArmPosition = Mathf.MoveTowards(ArmPosition, HasPlayer ? 1 : 0, pressSpeed * Runner.DeltaTime);
+        hitbox.transform.localPosition = topArmBone.localPosition = new Vector3(0, ArmPosition * -0.084f, 0);
     }
 }

@@ -6,6 +6,19 @@ using UnityEngine;
 namespace NSMB.Utils {
     public static class SerializationUtils {
 
+        #region VECTOR2
+        public static void WriteVector2(List<byte> buffer, Vector2 input) {
+            WriteFloat(buffer, input.x);
+            WriteFloat(buffer, input.y);
+        }
+
+        public static void ReadVector2(List<byte> buffer, ref int index, out Vector2 value) {
+            ReadFloat(buffer, ref index, out float x);
+            ReadFloat(buffer, ref index, out float y);
+            value = new(x, y);
+        }
+        #endregion
+
         #region INT PRECISION
         public static void PackToInt(List<byte> buffer, Vector2 input, float xMin, float xMax, float? yMin = null, float? yMax = null) {
             SetIfNull(ref yMin, xMin);
@@ -115,6 +128,10 @@ namespace NSMB.Utils {
         #endregion
 
         #region Helper Methods
+        public static void WriteFloat(List<byte> buffer, float input) {
+            WriteInt(buffer, System.BitConverter.SingleToInt32Bits(input));
+        }
+
         public static void WriteInt(List<byte> buffer, int input) {
             WriteShort(buffer, (short) (input >> 16));
             WriteShort(buffer, (short) (input >> 0));
@@ -130,6 +147,11 @@ namespace NSMB.Utils {
         /// </summary>
         public static void WriteByte(List<byte> buffer, byte input) {
             buffer.Add(input);
+        }
+
+        public static void ReadFloat(List<byte> buffer, ref int index, out float value) {
+            ReadInt(buffer, ref index, out int intValue);
+            value = System.BitConverter.Int32BitsToSingle(intValue);
         }
 
         public static void ReadInt(List<byte> buffer, ref int index, out uint value) {
