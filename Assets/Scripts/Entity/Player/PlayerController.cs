@@ -23,10 +23,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     //---Networked Variables
     //-Player State
     [Networked] public Enums.PowerupState State { get; set; }
+    [Networked] public Enums.PowerupState PreviousState { get; set; }
+    [Networked] public Enums.PowerupState StoredPowerup { get; set; }
     [Networked] public byte Stars { get; set; }
     [Networked] public byte Coins { get; set; }
     [Networked] public sbyte Lives { get; set; }
-    [Networked] public Enums.PowerupState StoredPowerup { get; set; }
     //-Player Movement
     //Generic
     [Networked] public PlayerNetworkInput PreviousInputs { get; set; }
@@ -88,22 +89,41 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool IsPropellerFlying { get; set; }
     [Networked] public TickTimer PropellerLaunchTimer { get; set; }
     [Networked] public TickTimer PropellerSpinTimer { get; set; }
+    [Networked] public NetworkBool UsedPropellerThisJump { get; set; }
     [Networked] public TickTimer GiantStartTimer { get; set; }
     [Networked] public TickTimer GiantTimer { get; set; }
     [Networked] public TickTimer GiantEndTimer { get; set; }
     [Networked] public NetworkBool IsInShell { get; set; }
 
     //---Properties
+    public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
+    public override bool IsCarryable => true;
     public bool IsStarmanInvincible => !StarmanTimer.ExpiredOrNotRunning(Runner);
     public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
-    public override bool IsCarryable => true;
-    public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
+    public int PlayerId => data.PlayerId;
     public bool CanPickupItem => State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && !IsDoubleJump && !IsTripleJump && !IsGroundpounding;
     public bool HasGroundpoundHitbox => IsGroundpounding && !IsOnGround && GroundpoundStartTimer.ExpiredOrNotRunning(Runner);
     public float RunningMaxSpeed => SPEED_STAGE_MAX[RUN_STAGE];
     public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
     public BoxCollider2D MainHitbox => hitboxes[0];
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
+    private int MovementStage {
+        get {
+            float xVel = Mathf.Abs(body.velocity.x);
+            float[] arr = (IsSpinnerFlying || IsPropellerFlying) && State != Enums.PowerupState.MegaMushroom ? SPEED_STAGE_SPINNER_MAX : SPEED_STAGE_MAX;
+            for (int i = 0; i < arr.Length; i++) {
+                if (xVel <= arr[i])
+                    return i;
+            }
+            return arr.Length - 1;
+        }
+    }
+
+    private int _starCombo;
+    public int StarCombo {
+        get => IsStarmanInvincible ? _starCombo : 0;
+        set => _starCombo = IsStarmanInvincible ? value : 0;
+    }
 
     //---Components
     private BoxCollider2D[] hitboxes;
@@ -121,7 +141,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [SerializeField] private GameObject models;
     [SerializeField] public CharacterData character;
 
-    public bool crushGround, hitRoof, groundpoundLastFrame, hitBlock, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding;
+    public bool crushGround, hitRoof, groundpoundLastFrame, hitBlock, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float jumpLandingTimer, pickupTimer, powerupFlash;
     public float pipeTimer;
 
@@ -160,23 +180,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float SLIDING_22_ACC = 5.2734375f;
 
 
-    private int MovementStage {
-        get {
-            float xVel = Mathf.Abs(body.velocity.x);
-            float[] arr = (IsSpinnerFlying || IsPropellerFlying) && State != Enums.PowerupState.MegaMushroom ? SPEED_STAGE_SPINNER_MAX : SPEED_STAGE_MAX;
-            for (int i = 0; i < arr.Length; i++) {
-                if (xVel <= arr[i])
-                    return i;
-            }
-            return arr.Length - 1;
-        }
-    }
-
-    private int _starCombo;
-    public int StarCombo {
-        get => IsStarmanInvincible ? _starCombo : 0;
-        set => _starCombo = IsStarmanInvincible ? value : 0;
-    }
 
     public Vector2 pipeDirection;
 
@@ -185,7 +188,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public Vector2 giantSavedVelocity, previousFrameVelocity, previousFramePosition;
 
     public PipeManager pipeEntering;
-    public bool step;
 
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
@@ -193,17 +195,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public bool onIce;
     private readonly List<Vector3Int> tilesStandingOn = new(), tilesJumpedInto = new(), tilesHitSide = new();
 
-    private GameObject trackIcon;
-
     private bool initialKnockbackFacingRight = false;
+    private bool footstepVariant;
 
-    public int playerId;
-
-
-    public Enums.PowerupState previousState;
-
+    private TrackIcon icon;
 
     public PlayerData data;
+
+
 
     #endregion
 
@@ -236,7 +235,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         base.Spawned();
 
         hitboxes = GetComponentsInChildren<BoxCollider2D>();
-        trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
+        icon = UIUpdater.Instance.CreateTrackIcon(this);
         transform.position = body.position = GameManager.Instance.spawnpoint;
 
         body.isKinematic = true;
@@ -249,13 +248,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             NetworkHandler.OnInput += OnInput;
         }
 
+
         Lives = SessionData.Instance.Lives;
-        playerId = data.PlayerId;
 
         //use |= as the spectate manager sets it first
         cameraController.IsControllingCamera |= Object.HasInputAuthority;
 
-        Vector3 spawnpoint = GameManager.Instance.GetSpawnpoint(playerId, 1);
+        Vector3 spawnpoint = GameManager.Instance.GetSpawnpoint(PlayerId, 1);
         body.position = spawnpoint;
         cameraController.Recenter(spawnpoint);
 
@@ -706,7 +705,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void StartPropeller() {
-        if (usedPropellerThisJump)
+        if (UsedPropellerThisJump)
             return;
 
         body.velocity = new(body.velocity.x, propellerLaunchVelocity);
@@ -732,7 +731,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsOnGround = false;
             body.position += Vector2.up * 0.15f;
         }
-        usedPropellerThisJump = true;
+        UsedPropellerThisJump = true;
     }
 
     private void OnReserveItem(InputAction.CallbackContext context) {
@@ -754,7 +753,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (ignoreInvincible || !IsDamageable)
             return;
 
-        previousState = State;
+        PreviousState = State;
         bool nowDead = false;
 
         switch (State) {
@@ -783,7 +782,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsPropellerFlying = false;
         PropellerLaunchTimer = TickTimer.None;
         PropellerSpinTimer = TickTimer.None;
-        usedPropellerThisJump = false;
+        UsedPropellerThisJump = false;
 
         if (!nowDead) {
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
@@ -1020,14 +1019,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 GameManager.Instance.spectationManager.Spectating = true;
 
             Runner.Despawn(Object);
-            Destroy(trackIcon);
+            Destroy(icon.gameObject);
             return;
         }
 
         IsRespawning = true;
         FacingRight = true;
         transform.localScale = Vector2.one;
-        previousState = State = Enums.PowerupState.NoPowerup;
+        PreviousState = State = Enums.PowerupState.NoPowerup;
         animationController.DisableAllModels();
         animator.SetTrigger("respawn");
         StarmanTimer = TickTimer.None;
@@ -1037,7 +1036,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsGroundpounding = false;
         body.isKinematic = true;
 
-        Vector2 spawnpoint = GameManager.Instance.GetSpawnpoint(playerId);
+        Vector2 spawnpoint = GameManager.Instance.GetSpawnpoint(PlayerId);
         transform.position = body.position = spawnpoint;
         cameraController.Recenter(spawnpoint);
     }
@@ -1048,7 +1047,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsDead = false;
         IsRespawning = false;
         State = Enums.PowerupState.NoPowerup;
-        previousState = Enums.PowerupState.NoPowerup;
+        PreviousState = Enums.PowerupState.NoPowerup;
         body.velocity = Vector2.zero;
         WallSlideLeft = false;
         WallSlideRight = false;
@@ -1058,7 +1057,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         FacingRight = true;
 
         IsPropellerFlying = false;
-        usedPropellerThisJump = false;
+        UsedPropellerThisJump = false;
         PropellerLaunchTimer = TickTimer.None;
         PropellerSpinTimer = TickTimer.None;
 
@@ -1113,8 +1112,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     protected void GiantFootstep() {
         CameraController.ScreenShake = 0.15f;
         SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position + new Vector2(FacingRight ? 0.5f : -0.5f, 0));
-        PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte) (step ? 1 : 2));
-        step = !step;
+        PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte) (footstepVariant ? 1 : 2));
+        footstepVariant = !footstepVariant;
     }
 
     protected void Footstep() {
@@ -1139,8 +1138,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (Mathf.Abs(body.velocity.x) < WalkingMaxSpeed)
             return;
 
-        PlaySound(footstepSound, (byte) (step ? 1 : 2), Mathf.Abs(body.velocity.x) / (RunningMaxSpeed + 4));
-        step = !step;
+        PlaySound(footstepSound, (byte) (footstepVariant ? 1 : 2), Mathf.Abs(body.velocity.x) / (RunningMaxSpeed + 4));
+        footstepVariant = !footstepVariant;
     }
     #endregion
 
@@ -1479,7 +1478,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsSliding = false;
             IsPropellerFlying = false;
             IsDrilling = false;
-            usedPropellerThisJump = false;
+            UsedPropellerThisJump = false;
             IsGroundpounding = false;
             IsInShell = false;
             break;
@@ -1512,7 +1511,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsCrouching = false;
             IsSliding = false;
             IsPropellerFlying = false;
-            usedPropellerThisJump = false;
+            UsedPropellerThisJump = false;
             IsSpinnerFlying = false;
             IsInShell = false;
             break;
@@ -2203,7 +2202,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 body.velocity = giantSavedVelocity;
                 animator.enabled = true;
                 body.isKinematic = false;
-                State = previousState;
+                State = PreviousState;
                 GiantEndTimer = TickTimer.None;
             }
             return;
@@ -2350,7 +2349,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 Powerdown(true);
             }
 
-            usedPropellerThisJump = false;
+            UsedPropellerThisJump = false;
             WallSlideLeft = false;
             WallSlideRight = false;
             Jumping = false;
@@ -2629,12 +2628,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     //---Debug
+#if UNITY_EDITOR
     public void OnDrawGizmos() {
         if (!body)
             return;
 
         Gizmos.DrawRay(body.position, body.velocity);
-        Gizmos.DrawCube(body.position + new Vector2(0, WorldHitboxSize.y * 0.5f) + (body.velocity * Time.fixedDeltaTime), WorldHitboxSize);
+        Gizmos.DrawCube(body.position + new Vector2(0, WorldHitboxSize.y * 0.5f) + (body.velocity * Runner.DeltaTime), WorldHitboxSize);
 
         Gizmos.color = Color.white;
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
@@ -2644,6 +2644,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
         }
     }
+#endif
 
     //---OnChangeds
     public static void OnGroundpoundingChanged(Changed<PlayerController> changed) {

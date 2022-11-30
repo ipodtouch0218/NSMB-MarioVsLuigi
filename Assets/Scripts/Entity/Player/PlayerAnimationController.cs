@@ -168,7 +168,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             rotChangeTarget = new Vector3(0, 180, 0);
             rotChangeInstant = true;
         } else if (animator.GetBool("inShell") && (!controller.OnSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
-            rotChangeTarget += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1000 * (controller.FacingRight ? -1 : 1));
+            rotChangeTarget += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1400 * (controller.FacingRight ? -1 : 1));
             rotChangeInstant = true;
         } else if (wasTurnaround || controller.IsSkidding || controller.IsTurnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
             if (controller.FacingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.IsSkidding)) {
@@ -192,7 +192,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             }
         }
 
-        propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((controller.IsSpinnerFlying || controller.IsPropellerFlying || controller.usedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
+        propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((controller.IsSpinnerFlying || controller.IsPropellerFlying || controller.UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
 
         if (rotChangeFacingDirection)
             controller.FacingRight = models.transform.eulerAngles.y < 180;
@@ -209,7 +209,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         if (rotChangeInstant || wasTurnaround) {
             models.transform.rotation = Quaternion.Euler(rotChangeTarget);
         } else {
-            float maxRotation = 1000f * Time.deltaTime;
+            float maxRotation = 2000f * Time.deltaTime;
             float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
             x += Mathf.Clamp(rotChangeTarget.x - x, -maxRotation, maxRotation);
             y += Mathf.Clamp(rotChangeTarget.y - y, -maxRotation, maxRotation);

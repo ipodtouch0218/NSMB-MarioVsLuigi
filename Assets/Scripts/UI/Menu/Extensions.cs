@@ -68,6 +68,19 @@ namespace NSMB.Extensions {
             return new(a.x / b.x, a.y / b.y, a.z / b.z);
         }
 
+        /// <summary>
+        /// Sets the x, y, and z values for an existing Vector3 if the given x, y, and z values are not null.
+        /// </summary>
+        /// <param name="vec">An existing Vector3 to modify</param>
+        /// <param name="x">The new X value. If null, the existing X value is kept.</param>
+        /// <param name="y">The new Y value. If null, the existing Y value is kept.</param>
+        /// <param name="z">The new Z value. If null, the existing Z value is kept.</param>
+        public static void SetNonNulls(this Vector3 vec, float? x, float? y, float? z) {
+            vec.x = x ?? vec.x;
+            vec.y = y ?? vec.y;
+            vec.z = z ?? vec.z;
+        }
+
         //easy sound clips
         public static void PlayOneShot(this AudioSource source, Enums.Sounds clip, CharacterData character = null, byte variant = 0, float volume = 1f) {
             source.PlayOneShot(clip.GetClip(character, variant), volume);

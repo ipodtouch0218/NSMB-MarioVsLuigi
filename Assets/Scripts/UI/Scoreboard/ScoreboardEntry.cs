@@ -33,7 +33,7 @@ public class ScoreboardEntry : MonoBehaviour {
 
         data = target.Object.InputAuthority.GetPlayerData(target.Runner);
 
-        playerId = target.playerId;
+        playerId = target.PlayerId;
         nameText.text = data.GetNickname();
 
         Color c = target.animationController.GlowColor;

@@ -29,18 +29,18 @@ public class PowerupCollectBasic : MonoBehaviour, IPowerupCollect {
         if (currentPowerupStatePriority > newPowerupItemPriority)
             return PowerupReserveResult.ReserveNewPowerup;
 
-        player.previousState = player.State;
+        player.PreviousState = player.State;
         player.State = newState;
         player.powerupFlash = 2;
         player.IsCrouching |= player.ForceCrouchCheck();
         player.IsPropellerFlying = false;
-        player.usedPropellerThisJump = false;
+        player.UsedPropellerThisJump = false;
         player.IsDrilling &= player.IsSpinnerFlying;
         player.PropellerLaunchTimer = TickTimer.None;
         player.IsInShell = false;
 
         // dont give us an extra mushroom
-        if (player.previousState == Enums.PowerupState.NoPowerup || (player.previousState == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))
+        if (player.PreviousState == Enums.PowerupState.NoPowerup || (player.PreviousState == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))
             return PowerupReserveResult.NoneButPlaySound;
 
         return PowerupReserveResult.ReserveOldPowerup;

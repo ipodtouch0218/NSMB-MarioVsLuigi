@@ -31,6 +31,7 @@ public class StarBouncer : CollectableEntity {
     //--Private Variables
     private float pulseEffectCounter;
     private bool canBounce;
+    private TrackIcon icon;
 
     public override void Awake() {
         base.Awake();
@@ -61,11 +62,7 @@ public class StarBouncer : CollectableEntity {
         base.Spawned();
 
         graphicTransform = transform.Find("Graphic");
-
-        GameObject trackObject = Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.parent);
-        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
-        icon.target = gameObject;
-        trackObject.SetActive(true);
+        icon = UIUpdater.Instance.CreateTrackIcon(this);
 
         if (IsStationary) {
             //main star
@@ -76,7 +73,6 @@ public class StarBouncer : CollectableEntity {
         } else {
             //player dropped star
 
-            trackObject.transform.localScale = new(3f / 4f, 3f / 4f, 1f);
             passthrough = true;
             sRenderer.color = new(1, 1, 1, 0.55f);
             gameObject.layer = Layers.LayerHitsNothing;
@@ -150,6 +146,8 @@ public class StarBouncer : CollectableEntity {
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (!GameManager.Instance.gameover && !Collector)
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
+
+        Destroy(icon.gameObject);
     }
 
     private IEnumerator PulseEffect() {

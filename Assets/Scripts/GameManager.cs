@@ -279,15 +279,22 @@ public class GameManager : NetworkBehaviour {
         enemySpawns = FindObjectsOfType<EnemySpawnpoint>();
 
         if (Runner.IsServer) {
+            //handle spawning in editor
+            if (Runner.IsSinglePlayer) {
+                Runner.Spawn(PrefabList.Instance.SessionDataHolder);
+                Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
+            }
+
             //create player instances
             foreach (PlayerRef player in Runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(Runner);
-                if (data.IsCurrentlySpectating)
+                if (!data || data.IsCurrentlySpectating)
                     continue;
 
                 Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player);
                 RealPlayerCount++;
             }
+
 
             //create pooled fireball instances (6 per player)
             for (int i = 0; i < RealPlayerCount * 6; i++)

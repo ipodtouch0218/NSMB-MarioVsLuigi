@@ -31,7 +31,7 @@ public class ScoreboardUpdater : MonoBehaviour {
         animator = GetComponent<Animator>();
         entryComparer ??= new ScoreboardEntry.EntryComparer();
 
-        teamsHeader.SetActive(SessionData.Instance.Teams);
+        teamsHeader.SetActive(SessionData.Instance?.Teams ?? false);
     }
 
     private void OnToggle(InputAction.CallbackContext context) {

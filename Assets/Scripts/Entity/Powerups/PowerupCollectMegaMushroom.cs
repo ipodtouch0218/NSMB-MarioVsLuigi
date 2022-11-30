@@ -10,12 +10,12 @@ public class PowerupCollectMegaMushroom : MonoBehaviour, IPowerupCollect {
 
         NetworkRunner runner = player.Runner;
 
-        player.previousState = player.State;
+        player.PreviousState = player.State;
         player.State = Enums.PowerupState.MegaMushroom;
         player.powerupFlash = 2;
         player.IsCrouching |= player.ForceCrouchCheck();
         player.IsPropellerFlying = false;
-        player.usedPropellerThisJump = false;
+        player.UsedPropellerThisJump = false;
         player.IsDrilling &= player.IsSpinnerFlying;
         player.PropellerLaunchTimer = TickTimer.None;
 
@@ -25,7 +25,7 @@ public class PowerupCollectMegaMushroom : MonoBehaviour, IPowerupCollect {
         player.IsGroundpounding = false;
         player.IsCrouching = false;
         player.IsPropellerFlying = false;
-        player.usedPropellerThisJump = false;
+        player.UsedPropellerThisJump = false;
         player.IsSpinnerFlying = false;
         player.IsDrilling = false;
         player.IsInShell = false;
