@@ -5018,7 +5018,6 @@ MonoBehaviour:
   graphy: {fileID: 65175768685879623}
   loadingCanvas: {fileID: 4559077638615233841}
   ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
-  settings: {fileID: 0}
   controlsJson: 
   checkedForVersion: 0
   nickname: 
@@ -5089,8 +5088,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cda16b7402b2d7499a959740bd07318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
   nickname: 
+  controlsJsonString: 
   character: 0
   skin: 0
   ndsResolution: 0
@@ -5100,6 +5099,7 @@ MonoBehaviour:
   fourByThreeRatio: 0
   scoreboardAlways: 0
   filter: 1
+  mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
 --- !u!82 &1776850482587567145
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10657,7 +10657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerList: {fileID: 2628469307357434847}
   emptyText: Loading...
-  iveLoadedText: Waiting for others...
+  waitingForOthersText: Waiting for others...
   readyToStartText: Starting...
   spectatorText: Joining as Spectator...
 --- !u!1 &4095823768780909971
