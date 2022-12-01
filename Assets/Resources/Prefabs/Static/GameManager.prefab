@@ -1773,9 +1773,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2526eca467488c446912383ef1a83c09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTrackTemplate: {fileID: 4050413685647265443}
-  starTrackTemplate: {fileID: 4524465249670580737}
+  _interpolationDataSource: 0
   player: {fileID: 0}
+  playerTrackTemplate: {fileID: 8594917175965942357}
+  starTrackTemplate: {fileID: 7091870336971138168}
   storedItemNull: {fileID: 7194109699264141795, guid: a87d3b028baa82640b06b88398a8c4f0,
     type: 3}
   uiTeamStars: {fileID: 2754102469701690834}
@@ -1786,7 +1787,6 @@ MonoBehaviour:
   uiCountdown: {fileID: 8006312052843805487}
   itemReserve: {fileID: 2321423708915906539}
   itemColor: {fileID: 2568638592884976754}
-  pingSample: 20
 --- !u!225 &77425761379163978
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2294,7 +2294,7 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: -319978117, guid: b1010e6c03fc02d4599c4840ed8413c8,
+    m_HighlightedSprite: {fileID: -634966080, guid: 919785a51397c1a44816e9462ed989f9,
       type: 3}
     m_PressedSprite: {fileID: 1292347602, guid: 919785a51397c1a44816e9462ed989f9,
       type: 3}
@@ -4080,7 +4080,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 76.65
+  m_fontSize: 76.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4153,7 +4153,7 @@ GameObject:
   - component: {fileID: 1595409777389826989}
   - component: {fileID: 5444111194937001549}
   - component: {fileID: 1559674212391454316}
-  - component: {fileID: 7147343924389434795}
+  - component: {fileID: 8594917175965942357}
   m_Layer: 5
   m_Name: PlayerTrackTemplate
   m_TagString: Untagged
@@ -4178,7 +4178,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -147, y: -17.480103}
+  m_AnchoredPosition: {x: -269, y: -17.5}
   m_SizeDelta: {x: 16, y: 16}
   m_Pivot: {x: 0.5, y: -0.33}
 --- !u!222 &5444111194937001549
@@ -4220,7 +4220,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7147343924389434795
+--- !u!114 &8594917175965942357
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4229,15 +4229,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4050413685647265443}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7089d00f57f1e3545897921e32eb46b8, type: 3}
+  m_Script: {fileID: 11500000, guid: 3192810780ff04b468e3f4615b58c028, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: {fileID: 0}
   trackMinX: -269
   trackMaxX: 269
-  target: {fileID: 0}
-  doAnimation: 0
-  starSprite: {fileID: 6326231466481203021, guid: 6afc8664f51abf545987f0a04b8a1125,
-    type: 3}
 --- !u!1 &4290463620930338631
 GameObject:
   m_ObjectHideFlags: 0
@@ -4575,7 +4572,7 @@ GameObject:
   - component: {fileID: 3417450193404260057}
   - component: {fileID: 4674711513998181762}
   - component: {fileID: 8441716901655522576}
-  - component: {fileID: 9132201914035545409}
+  - component: {fileID: 7091870336971138168}
   - component: {fileID: 5933298125935314498}
   m_Layer: 5
   m_Name: StarTrackTemplate
@@ -4642,7 +4639,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &9132201914035545409
+--- !u!114 &7091870336971138168
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4651,13 +4648,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4524465249670580737}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7089d00f57f1e3545897921e32eb46b8, type: 3}
+  m_Script: {fileID: 11500000, guid: dd91ee0956342a3468df101fb40d2e89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: {fileID: 0}
   trackMinX: -269
   trackMaxX: 269
-  target: {fileID: 0}
-  doAnimation: 1
   starSprite: {fileID: 1346584908, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
 --- !u!95 &5933298125935314498
 Animator:
@@ -5465,6 +5461,7 @@ Transform:
   - {fileID: 7256241718061403626}
   - {fileID: 5556271360954478095}
   - {fileID: 6190145402886522113}
+  - {fileID: 4435157000410621849}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5482,7 +5479,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _AlivePlayers: []
-  _GameStartTick: -1
+  _PooledFireballs: []
+  _GameStartTime: -1
   _RealPlayerCount: 0
   _IsMusicEnabled:
     _value: 0
@@ -5511,21 +5509,27 @@ MonoBehaviour:
   levelDesigner: 
   richPresenceId: 
   levelName: Unknown
+  objectPoolParent: {fileID: 7998357169434227364}
   particleManager: {fileID: 0}
-  gameStartTimestamp: 0
-  gameEndTimestamp: 0
+  rpcs: {fileID: 0}
   nametagCanvas: {fileID: 5453462452561088483}
   nametagPrefab: {fileID: 7542548910130765567}
   localPlayer: {fileID: 0}
+  gameStartTimestamp: 0
+  gameEndTimestamp: 0
   paused: 0
   loaded: 0
   gameover: 0
+  enemySpawns: []
+  originalTiles: []
+  originalTilesOrigin:
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Size: {x: 0, y: 0, z: 0}
   spectationManager: {fileID: 0}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
   size: 1.39
   ySize: 0.8
-  playersToVisualize: 10
 --- !u!114 &6418608900138254647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5799,6 +5803,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 5500062339093502114}
   - {fileID: 6418608900138254647}
+  - {fileID: 7156616037079317633}
   SimulationBehaviours: []
 --- !u!1 &5549907166122049973
 GameObject:
@@ -6709,6 +6714,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &7998357169434227364
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4435157000410621849}
+  m_Layer: 0
+  m_Name: Object Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4435157000410621849
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7998357169434227364}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5500062339093502141}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8288302013964884986
 GameObject:
   m_ObjectHideFlags: 0
@@ -7227,7 +7263,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 13.15
+  m_fontSize: 14.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

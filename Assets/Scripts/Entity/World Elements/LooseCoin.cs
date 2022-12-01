@@ -10,12 +10,12 @@ public class LooseCoin : Coin {
     [Networked] private TickTimer DespawnTimer { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private float despawn = 10;
+    [SerializeField] private float despawn = 8;
 
     //---Components
     private SpriteRenderer spriteRenderer;
     private PhysicsEntity physics;
-    private Animator animator;
+    private new Animation animation;
     private BoxCollider2D hitbox;
 
     //---Misc Variables
@@ -26,10 +26,11 @@ public class LooseCoin : Coin {
         hitbox = GetComponent<BoxCollider2D>();
         physics = GetComponent<PhysicsEntity>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        animator = GetComponentInChildren<Animator>();
+        animation = GetComponentInChildren<Animation>();
     }
 
     public override void Spawned() {
+        base.Spawned();
         CollectableTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
@@ -39,7 +40,7 @@ public class LooseCoin : Coin {
     public override void FixedUpdateNetwork() {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
-            animator.enabled = false;
+            animation.enabled = false;
             body.isKinematic = true;
             return;
         }
@@ -53,9 +54,9 @@ public class LooseCoin : Coin {
         gameObject.layer = inWall ? Layers.LayerHitsNothing : Layers.LayerLooseCoin;
 
         physics.UpdateCollisions();
-        if (physics.onGround) {
+        if (physics.OnGround) {
             body.velocity -= body.velocity * Time.fixedDeltaTime;
-            if (physics.hitRoof) {
+            if (physics.HitRoof) {
                 Runner.Despawn(Object);
                 return;
             }
@@ -77,11 +78,6 @@ public class LooseCoin : Coin {
             return;
 
         base.InteractWithPlayer(player);
-    }
-
-    //---CollectableEntity overrides
-    public override void OnCollectedChanged() {
-        if (Collector)
-            Runner.Despawn(Object);
+        Runner.Despawn(Object);
     }
 }

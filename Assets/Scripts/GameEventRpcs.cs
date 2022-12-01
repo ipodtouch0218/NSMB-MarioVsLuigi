@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -58,5 +59,27 @@ public class GameEventRpcs : NetworkBehaviour {
             TileBase tile = Utils.GetCacheTile(tileNames[change.tileIndex]);
             tilemap.SetTile(new(change.x, change.y, 0), tile);
         }
+    }
+
+    //---LOADING
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void Rpc_EndGame(int team) {
+        if (gm.gameover)
+            return;
+
+        //TODO: don't use a coroutine?
+        StartCoroutine(gm.EndGame(team));
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void Rpc_LoadingComplete() {
+
+        //Populate scoreboard
+        ScoreboardUpdater.Instance.Populate(gm.AlivePlayers);
+        if (Settings.Instance.scoreboardAlways)
+            ScoreboardUpdater.Instance.SetEnabled();
+
+        GlobalController.Instance.loadingCanvas.EndLoading();
     }
 }

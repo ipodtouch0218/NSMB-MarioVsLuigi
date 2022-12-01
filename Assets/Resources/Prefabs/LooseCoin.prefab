@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7313813804966619559}
   - component: {fileID: 7440053010099547169}
-  - component: {fileID: 6211140620328400207}
+  - component: {fileID: 7174137950827053746}
+  - component: {fileID: 1917642254078187410}
   m_Layer: 9
   m_Name: Graphics
   m_TagString: Untagged
@@ -80,32 +81,46 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.875, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &6211140620328400207
-Animator:
-  serializedVersion: 4
+--- !u!111 &7174137950827053746
+Animation:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 510247005471066579}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5f651736638a16b43845baff42308fca, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 16495a0606a4a694a93933375bf4f212, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 16495a0606a4a694a93933375bf4f212, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
+--- !u!114 &1917642254078187410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510247005471066579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frame: 0
+  frames:
+  - {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -2074995507315294404, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
 --- !u!1 &786289218142832788
 GameObject:
   m_ObjectHideFlags: 0
@@ -162,6 +177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _Collector: {fileID: 0}
+  sRenderer: {fileID: 7440053010099547169}
   despawn: 8
 --- !u!50 &1694848990786736830
 Rigidbody2D:
@@ -363,14 +379,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  goUpSlopes: 0
-  onGround: 0
-  hitRoof: 0
-  hitRight: 0
-  hitLeft: 0
-  crushableGround: 0
-  floorAngle: 0
+  _OnGround:
+    _value: 0
+  _HitRoof:
+    _value: 0
+  _HitLeft:
+    _value: 0
+  _HitRight:
+    _value: 0
+  _CrushableGround:
+    _value: 0
+  _FloorAngle: 0
   currentCollider: {fileID: 786289218142832792}
+  goUpSlopes: 0
   floorAndRoofCutoff: 0.3
 --- !u!114 &826556521306155776
 MonoBehaviour:

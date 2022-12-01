@@ -11,6 +11,7 @@ public class GoombaWalk : KillableEntity {
     [SerializeField] private float speed, terminalVelocity = -8;
 
     public override void Spawned() {
+        base.Spawned();
         body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
         animator.SetBool("dead", false);
     }
@@ -40,8 +41,8 @@ public class GoombaWalk : KillableEntity {
 
     private void HandleWallCollisions() {
         physics.UpdateCollisions();
-        if (physics.hitLeft || physics.hitRight)
-            FacingRight = physics.hitLeft;
+        if (physics.HitLeft || physics.HitRight)
+            FacingRight = physics.HitLeft;
     }
 
     //---KillableEntity overrides

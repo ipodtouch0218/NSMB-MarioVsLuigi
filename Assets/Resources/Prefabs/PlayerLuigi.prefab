@@ -21535,12 +21535,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _IsFrozen: 0
+  _IsFrozen:
+    _value: 0
   _State: 2
   _Stars: 0
   _Coins: 0
   _Lives: -1
   _StoredPowerup: 0
+  _IsFunctionallyRunning:
+    _value: 0
   _IsOnGround:
     _value: 0
   _IsCrouching:
@@ -21551,14 +21554,26 @@ MonoBehaviour:
     _value: 0
   _IsTurnaround:
     _value: 0
+  _IgnoreCoyoteTime:
+    _value: 0
+  _FloorAngle: 0
+  _Jumping:
+    _value: 0
+  _ProperJump:
+    _value: 0
   _IsDoubleJump:
     _value: 0
   _IsTripleJump:
+    _value: 0
+  _DoEntityBounce:
     _value: 0
   _IsInKnockback:
     _value: 0
   _IsGroundpounding:
     _value: 0
+  _WasGroundedLastFrame:
+    _value: 0
+  _OnSpinner: {fileID: 0}
   _IsSpinnerFlying:
     _value: 0
   _IsDrilling:
@@ -21572,13 +21587,13 @@ MonoBehaviour:
   _IsRespawning:
     _value: 0
   _HeldEntity: {fileID: 0}
+  _ActiveFireballs: 0
   _CanShootAdditionalFireball:
     _value: 0
   _IsPropellerFlying:
     _value: 0
   _IsInShell:
     _value: 0
-  previousState: 0
   fadeOut: {fileID: 0}
   sfxBrick: {fileID: 0}
   cameraController: {fileID: 0}
@@ -21609,15 +21624,10 @@ MonoBehaviour:
   heightLargeModel: 0.82
   models: {fileID: 4741703498087908288}
   character: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
-  previousOnGround: 0
   crushGround: 0
-  jumping: 0
-  properJump: 0
   hitRoof: 0
-  bounce: 0
   groundpoundLastFrame: 0
   hitBlock: 0
-  functionallyRunning: 0
   hitLeft: 0
   hitRight: 0
   stuckInBlock: 0
@@ -21627,22 +21637,19 @@ MonoBehaviour:
   fireballKnockback: 0
   startedSliding: 0
   jumpLandingTimer: 0
-  landing: 0
   pickupTimer: 0
   powerupFlash: 0
-  floorAngle: 0
   pipeTimer: 0
   pipeDirection: {x: 0, y: 0}
   frozenObject: {fileID: 0}
   giantSavedVelocity: {x: 0, y: 0}
   previousFrameVelocity: {x: 0, y: 0}
   previousFramePosition: {x: 0, y: 0}
-  onSpinner: {fileID: 0}
   pipeEntering: {fileID: 0}
   step: 0
-  alreadyGroundpounded: 0
   onIce: 0
   playerId: -1
+  previousState: 0
   data: {fileID: 0}
 --- !u!114 &4962373736136367448
 MonoBehaviour:
@@ -21674,7 +21681,6 @@ MonoBehaviour:
   glowMaterial: {fileID: 0}
   primaryColor: {r: 0, g: 0, b: 0, a: 0}
   secondaryColor: {r: 0, g: 0, b: 0, a: 0}
-  blinkDuration: 0.1
   pipeDuration: 2
   deathUpTime: 0.6
   deathForce: 7
@@ -22022,6 +22028,8 @@ MonoBehaviour:
     RotBlendStart: 0
     RotBlendEnd: 0
     RotTeleportRadians: 0
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
 --- !u!114 &3742144845986238834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22036,7 +22044,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   Animator: {fileID: 0}
-  TotalWords: -1
+  TotalWords: 4
   SyncSettings: 79
   FloatAccuracy:
     _value: 0
@@ -22050,8 +22058,8 @@ MonoBehaviour:
     _value: 0
     _inverse: 0
     _hash: -814817977
-  StateHashes: 
-  TriggerHashes: 
+  StateHashes: 0000000015b524dc47ef5bf556c27298bd01fa6551d1ef2fba1267d20e639a1f5c39e536d3bcc62fc92dfcc5c37a344a80d40749f0b7eca172f8a02449008d495391b7a3c672fc77e5c2ffd1cbc98d3ed158b7d4174540a8d68173646f89212fae4d12e333fcef56d13d40ba8dab84536a24afd318f37680aca7c5bffadd549f3b196753b8c8dcefaa659078bb7b4b94a9d60703f80769beeaaa25291f66c7e7fa5be914755d75eb3630d40976eee290358343723592c0ba76ff615801f2d1f7e4cfff041606b3a724bba6bdd4ea3ef42eef67ef9f8e7064165652646a23a24962c8319e79e798cbbf9ed1a9142de756e8038224d68c754bd1ce061658ea67e9b90c5e7784d7b6ba5dccbab430432d8b6c5a491f25427ed24e247f2d2bd053a28e636a95d6e2578d73516eba62d704e001088e180b1cadf536a6ee2121416a76e4c6fbc0ce825eb636c59099dc736e5919f4ffefaaf3a69a0e95236ca94031e10d26b417b399d2bd17ff574bea3c13cb4e5a963d679382eec3f50718df09deb748eb9366cbc9e4d81ef1023922d5f4aa279e4ec4
+  TriggerHashes: 000000006fb88ee83741934fd3bcc62f40262abed68c754b65fb37c0
 --- !u!1 &8636928219237579144
 GameObject:
   m_ObjectHideFlags: 0

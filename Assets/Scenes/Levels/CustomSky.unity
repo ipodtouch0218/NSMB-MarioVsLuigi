@@ -142,6 +142,51 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1731295336454021316, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1731295336454021316, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1731295336454021316, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1820768802018231823, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1820768802018231823, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3357010861536891764, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3357010861536891764, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3357010861536891764, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3357010861536891764, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: tilemap
@@ -278,6 +323,31 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6097373057582557604, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6097373057582557604, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6097373057582557604, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6132771086129286972, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6132771086129286972, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6355964096291475732, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -286,6 +356,11 @@ PrefabInstance:
     - target: {fileID: 6355964096291475732, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6355964096291475732, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6411750294929853123, guid: 43d56bd18d06e9b4abe323618a20a228,
@@ -609,7 +684,7 @@ PrefabInstance:
     - target: {fileID: 5780648777663731097, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: m_Name
-      value: FloatingCoin (6)
+      value: Coin (5)
       objectReference: {fileID: 0}
     - target: {fileID: 5780648777663731100, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -1086,7 +1161,7 @@ PrefabInstance:
     - target: {fileID: 5780648777663731097, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: m_Name
-      value: FloatingCoin (5)
+      value: Coin (4)
       objectReference: {fileID: 0}
     - target: {fileID: 5780648777663731100, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -1533,7 +1608,7 @@ PrefabInstance:
     - target: {fileID: 5780648777663731097, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: m_Name
-      value: FloatingCoin (3)
+      value: Coin (2)
       objectReference: {fileID: 0}
     - target: {fileID: 5780648777663731100, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -4311,7 +4386,7 @@ PrefabInstance:
     - target: {fileID: 5780648777663731097, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: m_Name
-      value: FloatingCoin (1)
+      value: Coin
       objectReference: {fileID: 0}
     - target: {fileID: 5780648777663731100, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -4464,7 +4539,7 @@ PrefabInstance:
     - target: {fileID: 5780648777663731097, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: m_Name
-      value: FloatingCoin (2)
+      value: Coin (1)
       objectReference: {fileID: 0}
     - target: {fileID: 5780648777663731100, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -7548,7 +7623,7 @@ PrefabInstance:
     - target: {fileID: 5780648777663731097, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: m_Name
-      value: FloatingCoin (4)
+      value: Coin (3)
       objectReference: {fileID: 0}
     - target: {fileID: 5780648777663731100, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -7639,7 +7714,7 @@ PrefabInstance:
     - target: {fileID: 5780648777663731097, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: m_Name
-      value: FloatingCoin (7)
+      value: Coin (6)
       objectReference: {fileID: 0}
     - target: {fileID: 5780648777663731100, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}

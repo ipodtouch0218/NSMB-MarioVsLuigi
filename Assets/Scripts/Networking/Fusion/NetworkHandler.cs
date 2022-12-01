@@ -101,7 +101,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress} ({token})");
 
         SessionInfo info = runner.SessionInfo;
-        if (info.PlayerCount >= LobbyData.Instance.MaxPlayers) {
+        if (info.PlayerCount >= SessionData.Instance.MaxPlayers) {
             request.Refuse();
             return;
         }
@@ -153,8 +153,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             if (player == Runner.LocalPlayer) {
                 //create lobby data
-                NetworkObject lobby = runner.Spawn(PrefabList.Instance.LobbyDataHolder);
-                LobbyData.Instance = lobby.GetComponent<LobbyData>();
+                NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
+                SessionData.Instance = session.GetComponent<SessionData>();
             }
         }
 
@@ -263,7 +263,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             Debug.Log($"[Network] Connected to lobby in {CurrentRegion} region");
 
-            Debug.Log(Runner.AuthenticationValues.UserId);
+            //save id for later authentication
             PlayerPrefs.SetString("id", Runner.AuthenticationValues.UserId);
             PlayerPrefs.Save();
 
@@ -314,7 +314,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             SessionName = roomId,
             ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname),
             DisableClientSessionCreation = true,
-            DisableNATPunchthrough = true,
         });
         Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
         if (!result.Ok) {

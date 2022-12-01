@@ -41,7 +41,7 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void Start() {
-        InputSystem.controls.UI.DebugInfo.performed += (context) => {
+        ControlSystem.controls.UI.DebugInfo.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
     }

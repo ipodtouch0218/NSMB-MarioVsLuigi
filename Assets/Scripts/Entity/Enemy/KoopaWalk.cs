@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class KoopaWalk : HoldableEntity {
 
@@ -16,17 +16,21 @@ public class KoopaWalk : HoldableEntity {
     [SerializeField] private Vector2 outShellHitboxSize, inShellHitboxSize;
     [SerializeField] private Vector2 outShellHitboxOffset, inShellHitboxOffset;
     [SerializeField] protected float walkSpeed, kickSpeed, wakeup = 15;
+    [SerializeField] public bool dontFallOffEdges, blue, canBeFlipped = true, flipXFlip, putdown;
 
     //---Properties
     public bool IsActuallyStationary => !Holder && IsStationary;
 
-    public bool dontFallOffEdges, blue, canBeFlipped = true, flipXFlip, putdown;
-
+    //---Private Variables
     private float dampVelocity;
     private Vector2 blockOffset = new(0, 0.05f), velocityLastFrame;
     protected int combo;
 
-    #region Unity Methods
+    public override void Render() {
+        animator.SetBool("shell", IsInShell || Holder != null);
+        animator.SetFloat("xVel", IsStationary ? 0 : Mathf.Abs(body.velocity.x));
+    }
+
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.gameover) {
@@ -62,7 +66,7 @@ public class KoopaWalk : HoldableEntity {
             hitbox.offset = inShellHitboxOffset;
 
             if (IsStationary) {
-                if (physics.onGround)
+                if (physics.OnGround)
                     body.velocity = new(0, body.velocity.y);
 
                 if (WakeupTimer.Expired(Runner)) {
@@ -77,13 +81,13 @@ public class KoopaWalk : HoldableEntity {
 
         physics.UpdateCollisions();
 
-        if (physics.hitRight && FacingRight) {
+        if (physics.HitRight && FacingRight) {
             Turnaround(false, velocityLastFrame.x);
-        } else if (physics.hitLeft && !FacingRight) {
+        } else if (physics.HitLeft && !FacingRight) {
             Turnaround(true, velocityLastFrame.x);
         }
 
-        if (physics.onGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
+        if (physics.OnGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
             Vector3 redCheckPos = body.position + new Vector2(0.1f * (FacingRight ? 1 : -1), 0);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref redCheckPos);
@@ -97,30 +101,22 @@ public class KoopaWalk : HoldableEntity {
             body.velocity = new((IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
         HandleTile();
-        animator.SetBool("shell", IsInShell || Holder != null);
-        animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
         velocityLastFrame = body.velocity;
     }
-
-    #endregion
-
 
     private void HandleTile() {
         if (Holder)
             return;
 
-        ContactPoint2D[] collisions = new ContactPoint2D[20];
-        int collisionAmount = hitbox.GetContacts(collisions);
+        int collisionAmount = hitbox.GetContacts(ContactBuffer);
         for (int i = 0; i < collisionAmount; i++) {
-            var point = collisions[i];
+            ContactPoint2D point = ContactBuffer[i];
             Vector2 p = point.point + (point.normal * -0.15f);
             if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
                 if (!putdown && IsInShell && !IsStationary) {
                     Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
                     TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
-                    if (tile == null)
-                        continue;
-                    if (!IsInShell)
+                    if (!tile || !IsInShell)
                         continue;
 
                     if (tile is InteractableTile it)
@@ -133,7 +129,6 @@ public class KoopaWalk : HoldableEntity {
         }
     }
 
-
     public void WakeUp() {
         IsInShell = false;
         body.velocity = new(-walkSpeed, 0);
@@ -142,7 +137,7 @@ public class KoopaWalk : HoldableEntity {
         IsStationary = false;
 
         if (Holder)
-            Holder.HoldingWakeup();
+            Holder.SetHeldEntity(null);
 
         Holder = null;
         PreviousHolder = null;
@@ -232,10 +227,10 @@ public class KoopaWalk : HoldableEntity {
                     player.IsGroundpounding = false;
                     EnterShell(true, player);
                 }
-                player.bounce = true;
+                player.DoEntityBounce = true;
             } else {
                 EnterShell(true, player);
-                player.bounce = !player.IsGroundpounding;
+                player.DoEntityBounce = !player.IsGroundpounding;
             }
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.IsDrilling = false;
@@ -257,7 +252,6 @@ public class KoopaWalk : HoldableEntity {
         }
     }
 
-
     //---IBlockBumpable overrides
     public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         if (IsDead)
@@ -272,8 +266,11 @@ public class KoopaWalk : HoldableEntity {
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
         body.velocity = new(body.velocity.x, 5.5f);
 
-        if (IsStationary)
-            body.velocity = new(bumper.body.position.x < body.position.x ? 3 : -3, body.velocity.y);
+        if (IsStationary) {
+            body.velocity = new(bumper.body.position.x < body.position.x ? 1f : -1f, body.velocity.y);
+            //body.position += Vector2.up * 0.1f;
+            physics.OnGround = false;
+        }
     }
 
     //---FreezableEntity overrides
@@ -282,16 +279,15 @@ public class KoopaWalk : HoldableEntity {
         IsStationary = true;
     }
 
-
     //---KillableEntity overrides
     protected override void CheckForEntityCollisions() {
 
         if (!(!IsInShell || IsActuallyStationary || putdown || IsDead)) {
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
             for (int i = 0; i < count; i++) {
-                GameObject obj = collisionBuffer[i].gameObject;
+                GameObject obj = CollisionBuffer[i].gameObject;
 
                 if (obj == gameObject)
                     continue;
@@ -335,6 +331,7 @@ public class KoopaWalk : HoldableEntity {
     public override void Kick(PlayerController thrower, bool toRight, float kickFactor, bool groundpound) {
         base.Kick(thrower, toRight, kickFactor, groundpound);
         IsStationary = false;
+        WakeupTimer = TickTimer.None;
     }
 
     public override void Throw(bool toRight, bool crouch) {

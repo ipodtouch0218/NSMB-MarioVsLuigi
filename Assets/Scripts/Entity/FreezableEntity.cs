@@ -3,7 +3,7 @@ using Fusion;
 public abstract class FreezableEntity : BasicEntity {
 
     //---Networked Variables
-    [Networked] public bool IsFrozen { get; set; }
+    [Networked(OnChanged = nameof(OnIsFrozenChanged))] public NetworkBool IsFrozen { get; set; }
 
     //---Properties
     public abstract bool IsCarryable { get; }
@@ -19,5 +19,15 @@ public abstract class FreezableEntity : BasicEntity {
         Groundpounded,
         BlockBump,
         HitWall,
+    }
+
+    //---OnChangeds
+    public static void OnIsFrozenChanged(Changed<FreezableEntity> changed) {
+        FreezableEntity entity = changed.Behaviour;
+
+        if (!entity.IsFrozen)
+            return;
+
+        entity.PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
     }
 }

@@ -19,11 +19,11 @@ public class ScoreboardUpdater : MonoBehaviour {
     private bool manuallyToggled = false, autoToggled = false;
 
     public void OnEnable() {
-        InputSystem.controls.UI.Scoreboard.performed += OnToggle;
+        ControlSystem.controls.UI.Scoreboard.performed += OnToggle;
     }
 
     public void OnDisable() {
-        InputSystem.controls.UI.Scoreboard.performed -= OnToggle;
+        ControlSystem.controls.UI.Scoreboard.performed -= OnToggle;
     }
 
     public void Awake() {
@@ -31,7 +31,7 @@ public class ScoreboardUpdater : MonoBehaviour {
         animator = GetComponent<Animator>();
         entryComparer ??= new ScoreboardEntry.EntryComparer();
 
-        teamsHeader.SetActive(LobbyData.Instance.Teams);
+        teamsHeader.SetActive(SessionData.Instance?.Teams ?? false);
     }
 
     private void OnToggle(InputAction.CallbackContext context) {

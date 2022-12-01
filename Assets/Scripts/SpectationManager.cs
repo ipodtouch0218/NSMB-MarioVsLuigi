@@ -38,11 +38,11 @@ public class SpectationManager : MonoBehaviour {
     private int targetIndex;
 
     public void OnEnable() {
-        InputSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
+        ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
     }
 
     public void OnDisable() {
-        InputSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
+        ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
     }
 
     public void Update() {
@@ -129,7 +129,7 @@ public class SpectationManager : MonoBehaviour {
 
             if (x.Stars == y.Stars || x.Lives == 0 || y.Lives == 0) {
                 if (Mathf.Max(0, x.Lives) == Mathf.Max(0, y.Lives))
-                    return x.playerId - y.playerId;
+                    return x.PlayerId - y.PlayerId;
 
                 return y.Lives - x.Lives;
             }

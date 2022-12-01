@@ -14,12 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerDataHolder:
     RawGuidValue: cf98b2b907b9bc74ab8c14624e3c5575
-  LobbyDataHolder:
+  SessionDataHolder:
     RawGuidValue: 6fe1d2f7545d144468b4dbaf10fabd89
   Obj_Fireball:
     RawGuidValue: 00a2ef66a322a694c837b29404f2af49
-  Obj_Iceball:
-    RawGuidValue: 19874e34cb6a977408f6f23de900aeb0
   Obj_LooseCoin:
     RawGuidValue: 3653cb6036ba9aa43a6ca2e8de135243
   Obj_BigStar:
@@ -72,11 +70,11 @@ MonoBehaviour:
     type: 3}
   Particle_Respawn: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
     type: 3}
-  Particle_FireballWall: {fileID: 3894548935506966732, guid: 1cd96fd39f9753b4fb9e589043267000,
-    type: 3}
-  Particle_IceballWall: {fileID: 3894548935506966732, guid: 0b92073613fc93f4698e7d4d7b8940dc,
-    type: 3}
   Particle_Groundpound: {fileID: 6621544317595282144, guid: 51b09745b9ed23f49986be6555fd6caa,
     type: 3}
   Particle_Walljump: {fileID: 9100450100766208478, guid: bf2e43bc76bbacf4ea4e6f3558c1b256,
+    type: 3}
+  Particle_EnemySpecialKill: {fileID: 8258044260612326560, guid: d0dec86b8ad08184d9da50d1f76fc7bd,
+    type: 3}
+  Particle_IceBreak: {fileID: 6779589790155936114, guid: 18ec030fd34201b4c90cac2de9b22a2d,
     type: 3}

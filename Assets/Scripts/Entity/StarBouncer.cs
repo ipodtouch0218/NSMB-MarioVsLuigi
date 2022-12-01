@@ -31,6 +31,7 @@ public class StarBouncer : CollectableEntity {
     //--Private Variables
     private float pulseEffectCounter;
     private bool canBounce;
+    private TrackIcon icon;
 
     public override void Awake() {
         base.Awake();
@@ -58,13 +59,10 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Spawned() {
+        base.Spawned();
 
         graphicTransform = transform.Find("Graphic");
-
-        GameObject trackObject = Instantiate(UIUpdater.Instance.starTrackTemplate, UIUpdater.Instance.starTrackTemplate.transform.parent);
-        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
-        icon.target = gameObject;
-        trackObject.SetActive(true);
+        icon = UIUpdater.Instance.CreateTrackIcon(this);
 
         if (IsStationary) {
             //main star
@@ -75,7 +73,6 @@ public class StarBouncer : CollectableEntity {
         } else {
             //player dropped star
 
-            trackObject.transform.localScale = new(3f / 4f, 3f / 4f, 1f);
             passthrough = true;
             sRenderer.color = new(1, 1, 1, 0.55f);
             gameObject.layer = Layers.LayerHitsNothing;
@@ -149,6 +146,8 @@ public class StarBouncer : CollectableEntity {
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (!GameManager.Instance.gameover && !Collector)
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
+
+        Destroy(icon.gameObject);
     }
 
     private IEnumerator PulseEffect() {
@@ -164,14 +163,14 @@ public class StarBouncer : CollectableEntity {
     private bool HandleCollision() {
         physics.UpdateCollisions();
 
-        if (physics.hitLeft || physics.hitRight) {
-            FacingRight = physics.hitLeft;
+        if (physics.HitLeft || physics.HitRight) {
+            FacingRight = physics.HitLeft;
             body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
         }
 
-        if (physics.onGround && canBounce) {
+        if (physics.OnGround && canBounce) {
             body.velocity = new(body.velocity.x, bounceAmount);
-            if (physics.hitRoof) {
+            if (physics.HitRoof) {
                 Runner.Despawn(Object, true);
                 return true;
             }
@@ -195,7 +194,7 @@ public class StarBouncer : CollectableEntity {
         Collector = player;
 
         //we can collect
-        player.Stars = (byte) Mathf.Min(player.Stars + 1, LobbyData.Instance.StarRequirement);
+        player.Stars = (byte) Mathf.Min(player.Stars + 1, SessionData.Instance.StarRequirement);
 
         //game mechanics
         if (IsStationary && GameManager.Instance.Object.HasStateAuthority)
@@ -209,11 +208,16 @@ public class StarBouncer : CollectableEntity {
 
     //---CollectableEntity overrides
     public override void OnCollectedChanged() {
-        //play fx
-        graphicTransform.gameObject.SetActive(false);
-        bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team;
-        Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
-        Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+        if (Collector) {
+            //play fx
+            graphicTransform.gameObject.SetActive(false);
+            bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team;
+            Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
+            Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+        } else {
+            //oops...
+            graphicTransform.gameObject.SetActive(true);
+        }
     }
 
     //---IBlockBumpable overrides

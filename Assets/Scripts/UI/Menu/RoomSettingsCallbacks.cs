@@ -20,9 +20,9 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Runner;
-    private LobbyData Lobby => LobbyData.Instance;
+    private SessionData Lobby => SessionData.Instance;
 
-    public void UpdateAllSettings(LobbyData lobbyData, bool level) {
+    public void UpdateAllSettings(SessionData lobbyData, bool level) {
         if (!lobbyData.Object.IsValid)
             return;
 

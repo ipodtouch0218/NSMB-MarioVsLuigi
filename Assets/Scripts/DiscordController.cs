@@ -63,7 +63,7 @@ public class DiscordController : MonoBehaviour {
         discord?.Dispose();
     }
 
-    public void UpdateActivity() {
+    public void UpdateActivity(SessionInfo session = null) {
 #if UNITY_WEBGL
         return;
 #endif
@@ -71,13 +71,12 @@ public class DiscordController : MonoBehaviour {
             return;
 
         Activity activity = new();
-        NetworkRunner runner = NetworkHandler.Instance.runner;
-        SessionInfo session;
+        session ??= NetworkHandler.Runner?.SessionInfo;
 
-        if (runner && (session = runner.SessionInfo).IsValid) {
+        if (SessionData.Instance) {
 
-            activity.Details = runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = LobbyData.Instance.MaxPlayers }, Id = session.Name };
+            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
+            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount + 1, MaxSize = SessionData.Instance.MaxPlayers }, Id = session.Name + "1" };
             activity.State = session.IsVisible ? "In a Public Game" : "In a Private Game";
             activity.Secrets = new() { Join = session.Name };
 
@@ -94,11 +93,12 @@ public class DiscordController : MonoBehaviour {
 
                 activity.Assets = assets;
 
-                if (LobbyData.Instance.Timer == -1) {
+                if (SessionData.Instance.Timer <= 0) {
                     activity.Timestamps = new() { Start = gm.gameStartTimestamp / 1000 };
                 } else {
                     activity.Timestamps = new() { End = gm.gameEndTimestamp / 1000 };
                 }
+
             } else {
                 //in a room, but on the main menu.
                 activity.Assets = new() { LargeImage = "mainmenu" };

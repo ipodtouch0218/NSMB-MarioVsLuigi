@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.InputSystem.Controls;
 
-public class LobbyData : NetworkBehaviour {
+public class SessionData : NetworkBehaviour {
 
-    public static LobbyData Instance;
+    public static SessionData Instance;
 
 #pragma warning disable CS0414
     //--Default values
@@ -49,6 +49,8 @@ public class LobbyData : NetworkBehaviour {
         Instance = this;
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.EnterRoom();
+
+        PrivateRoom = !Runner.SessionInfo.IsVisible;
 
         if (HasStateAuthority) {
             bannedIds = new();
@@ -149,15 +151,15 @@ public class LobbyData : NetworkBehaviour {
 
     //---OnChangeds
 
-    public static void StartChanged(Changed<LobbyData> data) {
+    public static void StartChanged(Changed<SessionData> data) {
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.OnGameStartChanged();
 
         SettingChanged(data);
     }
 
-    public static void SettingChanged(Changed<LobbyData> data) {
-        LobbyData lobby = data.Behaviour;
+    public static void SettingChanged(Changed<SessionData> data) {
+        SessionData lobby = data.Behaviour;
         Tick currentTick = lobby.Object.Runner.Tick;
         if (currentTick <= lobby.lastUpdatedTick)
             return;

@@ -6,10 +6,10 @@ using NSMB.Utils;
 
 public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
-    private static int groundMask = -1;
+    private static LayerMask GroundMask;
 
     //---Networked Variables
-    [Networked] private PlayerController FollowPlayer { get; set; }
+    [Networked] protected PlayerController FollowPlayer { get; set; }
     [Networked] private TickTimer FollowEndTimer { get; set; }
     [Networked] private TickTimer DespawnTimer { get; set; }
     [Networked] private TickTimer IgnorePlayerTimer { get; set; }
@@ -23,7 +23,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     //---Component Variables
     private SpriteRenderer sRenderer;
-    private PhysicsEntity physics;
+    protected PhysicsEntity physics;
     private Animator childAnimator;
     private BoxCollider2D hitbox;
     private IPowerupCollect collectScript;
@@ -41,8 +41,8 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
         originalLayer = sRenderer.sortingOrder;
 
-        if (groundMask == -1)
-            groundMask = LayerMask.GetMask("Ground", "PassthroughInvalid");
+        if (GroundMask == 0)
+            GroundMask = (1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough);
     }
 
     public void OnBeforeSpawned(PlayerController playerToFollow, float pickupDelay) {
@@ -54,6 +54,8 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public override void Spawned() {
+        base.Spawned();
+
         if (FollowPlayer) {
             //spawned following a player
             FollowEndTimer = TickTimer.CreateFromSeconds(Runner, 1f);
@@ -67,7 +69,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             Vector2 size = hitbox.size * transform.lossyScale * 0.5f;
             Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
-            if (Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, groundMask)) {
+            if (Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
                 DespawnWithPoof();
                 return;
             }
@@ -77,8 +79,12 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 15f);
     }
 
+    public override void Render() {
+        if (childAnimator)
+            childAnimator.SetBool("onGround", physics.OnGround);
+    }
+
     public override void FixedUpdateNetwork() {
-        base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
@@ -110,7 +116,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
         Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
-        if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, groundMask)) {
+        if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
             gameObject.layer = Layers.LayerHitsNothing;
             return;
         } else {
@@ -118,17 +124,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             HandleCollision();
         }
 
-        if (childAnimator) {
-            childAnimator.SetBool("onGround", physics.onGround);
-
-            if (physics.onGround && powerupScriptable.state == Enums.PowerupState.PropellerMushroom) {
-                hitbox.enabled = false;
-                body.isKinematic = true;
-                body.gravityScale = 0;
-            }
-        }
-
-        if (avoidPlayers && physics.onGround) {
+        if (avoidPlayers && physics.OnGround) {
             PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
             if (closest) {
                 float dist = closest.body.position.x - body.position.x;
@@ -139,28 +135,18 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         body.velocity = new(body.velocity.x, Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
-    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
-        if (FollowPlayer)
-            return;
-
-        if (direction == InteractableTile.InteractionDirection.Down)
-            return;
-
-        body.velocity = new(body.velocity.x, 5f);
-    }
-
     public void HandleCollision() {
         physics.UpdateCollisions();
 
-        if (physics.hitLeft || physics.hitRight) {
-            FacingRight = physics.hitLeft;
+        if (physics.HitLeft || physics.HitRight) {
+            FacingRight = physics.HitLeft;
             body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
         }
 
-        if (physics.onGround) {
+        if (physics.OnGround) {
             body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(body.velocity.y, bouncePower));
 
-            if (physics.hitRoof || (physics.hitLeft && physics.hitRight)) {
+            if (physics.HitRoof || (physics.HitLeft && physics.HitRight)) {
                 DespawnWithPoof();
                 return;
             }
@@ -168,11 +154,19 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public void DespawnWithPoof() {
-        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, body.position);
+        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, body.position + hitbox.offset);
         Runner.Despawn(Object, true);
     }
 
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        if (direction == InteractableTile.InteractionDirection.Down || FollowPlayer)
+            return;
 
+        body.velocity = new(body.velocity.x, 5f);
+    }
+
+    //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
 
         //fixes players hitting multiple colliders at once (propeller)

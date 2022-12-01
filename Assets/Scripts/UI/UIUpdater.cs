@@ -7,19 +7,17 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
 
-public class UIUpdater : MonoBehaviour {
+public class UIUpdater : NetworkBehaviour {
 
     public static UIUpdater Instance { get; set; }
 
-    public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
-    public Sprite storedItemNull;
-    public TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
-    public Image itemReserve, itemColor;
-    public float pingSample = 0;
+    [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
+    [SerializeField] private Sprite storedItemNull;
+    [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
+    [SerializeField] private Image itemReserve, itemColor;
 
-    private NetworkRunner Runner => NetworkHandler.Instance.runner;
-
+    private float pingSample = 0;
     private Material timerMaterial;
     private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
     private readonly List<Image> backgrounds = new();
@@ -32,9 +30,12 @@ public class UIUpdater : MonoBehaviour {
     private TeamManager teamManager;
     private bool teams;
 
-    public void Start() {
+    public void Awake() {
         Instance = this;
-        teams = LobbyData.Instance.Teams;
+    }
+
+    public override void Spawned() {
+        teams = SessionData.Instance.Teams;
         teamManager = GameManager.Instance.teamManager;
 
         localPlayer = Runner.LocalPlayer;
@@ -61,7 +62,7 @@ public class UIUpdater : MonoBehaviour {
         teamsParent.SetActive(teams);
     }
 
-    public void Update() {
+    public override void Render() {
 
         pingSample = Mathf.Lerp(pingSample, GetCurrentPing(), Mathf.Clamp01(Time.unscaledDeltaTime));
         if (pingSample == float.NaN)
@@ -82,10 +83,8 @@ public class UIUpdater : MonoBehaviour {
         if (uiHidden)
             ToggleUI(false);
 
-        if (Runner.IsForward) {
-            UpdateStoredItemUI();
-            UpdateTextUI();
-        }
+        UpdateStoredItemUI();
+        UpdateTextUI();
     }
 
     private void ToggleUI(bool hidden) {
@@ -118,19 +117,19 @@ public class UIUpdater : MonoBehaviour {
         if (teams) {
             int team = player.data.Team;
             teamStars = teamManager.GetTeamStars(team);
-            uiTeamStars.text = ScriptableManager.Instance.teams[team].textSprite + Utils.GetSymbolString("x" + teamStars + "/" + LobbyData.Instance.StarRequirement);
+            uiTeamStars.text = ScriptableManager.Instance.teams[team].textSprite + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
         }
         if (player.Stars != stars) {
             stars = player.Stars;
             string starString = "Sx" + stars;
             if (!teams)
-                starString += "/" + LobbyData.Instance.StarRequirement;
+                starString += "/" + SessionData.Instance.StarRequirement;
 
             uiStars.text = Utils.GetSymbolString(starString);
         }
         if (player.Coins != coins) {
             coins = player.Coins;
-            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + LobbyData.Instance.CoinRequirement);
+            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + SessionData.Instance.CoinRequirement);
         }
 
         if (player.Lives >= 0) {
@@ -142,12 +141,12 @@ public class UIUpdater : MonoBehaviour {
             livesParent.SetActive(false);
         }
 
-        if (LobbyData.Instance.Timer > 0) {
+        if (SessionData.Instance.Timer > 0) {
             float? timeRemaining = GameManager.Instance.GameEndTimer.RemainingTime(Runner);
 
             if (timeRemaining != null) {
                 int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);
-                seconds = Mathf.Clamp(seconds, 0, LobbyData.Instance.Timer);
+                seconds = Mathf.Clamp(seconds, 0, SessionData.Instance.Timer);
 
                 if (seconds != timer) {
                     timer = seconds;
@@ -166,14 +165,18 @@ public class UIUpdater : MonoBehaviour {
         }
     }
 
-    public GameObject CreatePlayerIcon(PlayerController player) {
-        GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
-        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
-        icon.target = player.gameObject;
+    public TrackIcon CreateTrackIcon(Component comp) {
+        TrackIcon icon;
+        if (comp is PlayerController)
+            icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
+        else if (comp is StarBouncer)
+            icon = Instantiate(starTrackTemplate, starTrackTemplate.transform.parent);
+        else
+            return null;
 
-        trackObject.SetActive(true);
-
-        return trackObject;
+        icon.target = comp.gameObject;
+        icon.gameObject.SetActive(true);
+        return icon;
     }
 
     private int GetCurrentPing() {

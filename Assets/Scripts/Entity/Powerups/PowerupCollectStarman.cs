@@ -16,7 +16,7 @@ public class PowerupCollectStarman : MonoBehaviour, IPowerupCollect {
 
         if (player.HeldEntity) {
             player.HeldEntity.SpecialKill(player.FacingRight, false, 0);
-            player.SetHolding(null);
+            player.SetHeldEntity(null);
         }
 
         return PowerupReserveResult.None;

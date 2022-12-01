@@ -6,13 +6,16 @@ public class BulletBillMover : KillableEntity {
 
     //---Serialized Variables
     [SerializeField] private float speed, playerSearchRadius = 4, despawnDistance = 8;
+    [SerializeField] private ParticleSystem shootParticles, trailParticles;
 
     //---Misc Variables
     private Vector2 searchVector;
-
+    private new Animation animation;
 
     public override void Awake() {
         base.Awake();
+        animation = GetComponentInChildren<Animation>();
+
         searchVector = new(playerSearchRadius * 2, 100);
     }
 
@@ -21,19 +24,16 @@ public class BulletBillMover : KillableEntity {
     }
 
     public override void Spawned() {
-
+        base.Spawned();
         body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
 
-        Transform t = transform.GetChild(1);
-        ParticleSystem ps = t.GetComponent<ParticleSystem>();
-        ParticleSystem.ShapeModule shape = ps.shape;
         if (FacingRight) {
-            Transform tf = transform.GetChild(0);
-            tf.localPosition *= new Vector2(-1, 1);
+            trailParticles.transform.localPosition *= new Vector2(-1, 1);
+            ParticleSystem.ShapeModule shape = shootParticles.shape;
             shape.rotation = new Vector3(0, 0, -33);
         }
 
-        ps.Play();
+        shootParticles.Play();
         sRenderer.flipX = FacingRight;
     }
 
@@ -41,7 +41,7 @@ public class BulletBillMover : KillableEntity {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
-            animator.enabled = false;
+            animation.enabled = false;
             body.isKinematic = true;
             return;
         }
@@ -78,7 +78,7 @@ public class BulletBillMover : KillableEntity {
             || player.State == Enums.PowerupState.MegaMushroom) {
 
             if (player.IsDrilling) {
-                player.bounce = true;
+                player.DoEntityBounce = true;
                 player.IsDrilling = false;
             }
             Kill();
@@ -91,7 +91,7 @@ public class BulletBillMover : KillableEntity {
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.IsDrilling = false;
             player.IsGroundpounding = false;
-            player.bounce = true;
+            player.DoEntityBounce = true;
             return;
         }
 
@@ -121,8 +121,8 @@ public class BulletBillMover : KillableEntity {
         body.angularVelocity = 400f * (right ? 1 : -1);
         body.gravityScale = 1.5f;
         body.isKinematic = false;
+        animation.enabled = false;
         hitbox.enabled = false;
-        animator.speed = 0;
         gameObject.layer = Layers.LayerHitsNothing;
 
         if (groundpound)
@@ -131,6 +131,7 @@ public class BulletBillMover : KillableEntity {
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
+#if UNITY_EDITOR
     //---Debug
     public void OnDrawGizmosSelected() {
         if (!GameManager.Instance)
@@ -145,4 +146,5 @@ public class BulletBillMover : KillableEntity {
         if (body.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX())
             Gizmos.DrawCube(body.position - new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
     }
+#endif
 }

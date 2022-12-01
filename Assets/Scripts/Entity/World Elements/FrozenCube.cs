@@ -14,7 +14,6 @@ public class FrozenCube : HoldableEntity {
 
     //---Serialized Variables
     [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, autoBreak = 3f;
-    [SerializeField] private GameObject shatterParticles;
 
     //---Private Variables
     public UnfreezeReason unfreezeReason = UnfreezeReason.Other;
@@ -27,6 +26,7 @@ public class FrozenCube : HoldableEntity {
     }
 
     public override void Spawned() {
+        base.Spawned();
         holderOffset = Vector2.one;
 
         if (!FrozenEntity) {
@@ -70,7 +70,9 @@ public class FrozenCube : HoldableEntity {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (FrozenEntity.IsCarryable)
+        Instantiate(PrefabList.Instance.Particle_IceBreak, transform.position, Quaternion.identity);
+
+        if (FrozenEntity && FrozenEntity.IsCarryable)
             FrozenEntity.transform.SetParent(null);
     }
 
@@ -126,7 +128,7 @@ public class FrozenCube : HoldableEntity {
             FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
         }
 
-        if (FastSlide && physics.onGround && physics.floorAngle != 0) {
+        if (FastSlide && physics.OnGround && physics.FloorAngle != 0) {
             RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskOnlyGround);
             if (ray) {
                 body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
@@ -158,9 +160,9 @@ public class FrozenCube : HoldableEntity {
     private bool HandleTile() {
         physics.UpdateCollisions();
 
-        if ((FastSlide && (physics.hitLeft || physics.hitRight))
-            || (flying && fallen && physics.onGround && !Holder)
-            || ((Holder || physics.onGround) && physics.hitRoof)) {
+        if ((FastSlide && (physics.HitLeft || physics.HitRight))
+            || (flying && fallen && physics.OnGround && !Holder)
+            || ((Holder || physics.OnGround) && physics.HitRoof)) {
 
             Kill();
             return false;
@@ -230,7 +232,7 @@ public class FrozenCube : HoldableEntity {
 
     //---IFireballInteractable overrides
     public override bool InteractWithFireball(FireballMover fireball) {
-        if (!fireball.isIceball)
+        if (!fireball.IsIceball)
             Kill();
 
         return true;
@@ -249,9 +251,6 @@ public class FrozenCube : HoldableEntity {
 
     public override void Throw(bool toRight, bool crouch) {
         base.Throw(toRight, false);
-
-        if (!Holder)
-            return;
 
         fallen = false;
         flying = false;
@@ -278,10 +277,10 @@ public class FrozenCube : HoldableEntity {
 
         //only run when fastsliding...
 
-        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, collisionBuffer);
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
         for (int i = 0; i < count; i++) {
-            GameObject obj = collisionBuffer[i].gameObject;
+            GameObject obj = CollisionBuffer[i].gameObject;
 
             if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj || FrozenEntity?.gameObject == obj)
                 continue;
@@ -311,9 +310,8 @@ public class FrozenCube : HoldableEntity {
         FrozenEntity?.Unfreeze(unfreezeReason);
 
         if (Holder)
-            Holder.SetHolding(null);
+            Holder.SetHeldEntity(null);
 
-        Instantiate(shatterParticles, transform.position, Quaternion.identity);
         Runner.Despawn(Object);
     }
 

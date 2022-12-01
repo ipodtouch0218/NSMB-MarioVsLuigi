@@ -16,7 +16,7 @@ public class GenericMover : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        float secondsElapsed = GameManager.Instance.GameStartTime - Runner.SimulationTime;
+        float secondsElapsed = Runner.SimulationTime - GameManager.Instance.GameStartTime;
         float xOffset = EvaluateCurve(x, animationOffset, secondsElapsed);
         float yOffset = EvaluateCurve(y, animationOffset, secondsElapsed);
 

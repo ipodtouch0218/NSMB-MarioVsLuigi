@@ -55,7 +55,7 @@ public class UnityWebRequestAwaiter : INotifyCompletion {
         asyncOp.completed += OnRequestCompleted;
     }
 
-    public bool IsCompleted { get { return asyncOp.isDone; } }
+    public bool IsCompleted => asyncOp.isDone;
 
     public void GetResult() { }
 

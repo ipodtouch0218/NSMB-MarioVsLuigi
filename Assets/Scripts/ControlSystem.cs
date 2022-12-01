@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEngine;
 
-public class InputSystem : MonoBehaviour {
+public class ControlSystem : MonoBehaviour {
 
     public static Controls controls;
     public static FileInfo file;
