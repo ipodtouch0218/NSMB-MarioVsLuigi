@@ -50,6 +50,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -93,6 +94,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -194,7 +196,7 @@ TextureImporter:
       name: goomba_1
       rect:
         serializedVersion: 2
-        x: 20
+        x: 19
         y: 20
         width: 17
         height: 18
@@ -299,7 +301,7 @@ TextureImporter:
       name: goomba_6
       rect:
         serializedVersion: 2
-        x: 119
+        x: 120
         y: 20
         width: 16
         height: 19
@@ -381,7 +383,6 @@ TextureImporter:
       goomba_5: 7518829234646223683
   spritePackingTag: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
