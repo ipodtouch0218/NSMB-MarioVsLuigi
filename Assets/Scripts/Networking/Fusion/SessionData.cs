@@ -50,6 +50,8 @@ public class SessionData : NetworkBehaviour {
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.EnterRoom();
 
+        PrivateRoom = !Runner.SessionInfo.IsVisible;
+
         if (HasStateAuthority) {
             bannedIds = new();
             bannedIps = new();

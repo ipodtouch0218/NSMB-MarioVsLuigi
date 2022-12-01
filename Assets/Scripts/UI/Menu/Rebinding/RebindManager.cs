@@ -38,10 +38,10 @@ public class RebindManager : MonoBehaviour {
             // we have old bindings...
             controls.LoadBindingOverridesFromJson(json);
 
-        } else if (InputSystem.file.Exists) {
+        } else if (ControlSystem.file.Exists) {
             //load bindings...
             try {
-                controls.LoadBindingOverridesFromJson(File.ReadAllText(InputSystem.file.FullName));
+                controls.LoadBindingOverridesFromJson(File.ReadAllText(ControlSystem.file.FullName));
                 GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
             } catch (Exception e) {
                 Debug.LogError(e.Message);
@@ -132,10 +132,10 @@ public class RebindManager : MonoBehaviour {
     public void SaveRebindings() {
         string json = controls.SaveBindingOverridesAsJson();
 
-        if (!InputSystem.file.Exists)
-            InputSystem.file.Directory.Create();
+        if (!ControlSystem.file.Exists)
+            ControlSystem.file.Directory.Create();
 
-        File.WriteAllText(InputSystem.file.FullName, json);
+        File.WriteAllText(ControlSystem.file.FullName, json);
         GlobalController.Instance.controlsJson = json;
     }
 }

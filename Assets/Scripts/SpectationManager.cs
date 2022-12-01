@@ -38,11 +38,11 @@ public class SpectationManager : MonoBehaviour {
     private int targetIndex;
 
     public void OnEnable() {
-        InputSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
+        ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
     }
 
     public void OnDisable() {
-        InputSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
+        ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
     }
 
     public void Update() {

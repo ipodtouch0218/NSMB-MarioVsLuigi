@@ -2294,7 +2294,7 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: -319978117, guid: b1010e6c03fc02d4599c4840ed8413c8,
+    m_HighlightedSprite: {fileID: -634966080, guid: 919785a51397c1a44816e9462ed989f9,
       type: 3}
     m_PressedSprite: {fileID: 1292347602, guid: 919785a51397c1a44816e9462ed989f9,
       type: 3}
@@ -5510,7 +5510,6 @@ MonoBehaviour:
   richPresenceId: 
   levelName: Unknown
   objectPoolParent: {fileID: 7998357169434227364}
-  enemySpawns: []
   particleManager: {fileID: 0}
   rpcs: {fileID: 0}
   nametagCanvas: {fileID: 5453462452561088483}
@@ -5521,10 +5520,11 @@ MonoBehaviour:
   paused: 0
   loaded: 0
   gameover: 0
+  enemySpawns: []
+  originalTiles: []
   originalTilesOrigin:
     m_Position: {x: 0, y: 0, z: 0}
     m_Size: {x: 0, y: 0, z: 0}
-  originalTiles: []
   spectationManager: {fileID: 0}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}

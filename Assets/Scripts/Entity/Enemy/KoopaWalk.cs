@@ -108,18 +108,15 @@ public class KoopaWalk : HoldableEntity {
         if (Holder)
             return;
 
-        ContactPoint2D[] collisions = new ContactPoint2D[20];
-        int collisionAmount = hitbox.GetContacts(collisions);
+        int collisionAmount = hitbox.GetContacts(ContactBuffer);
         for (int i = 0; i < collisionAmount; i++) {
-            var point = collisions[i];
+            ContactPoint2D point = ContactBuffer[i];
             Vector2 p = point.point + (point.normal * -0.15f);
             if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
                 if (!putdown && IsInShell && !IsStationary) {
                     Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
                     TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
-                    if (tile == null)
-                        continue;
-                    if (!IsInShell)
+                    if (!tile || !IsInShell)
                         continue;
 
                     if (tile is InteractableTile it)
@@ -334,6 +331,7 @@ public class KoopaWalk : HoldableEntity {
     public override void Kick(PlayerController thrower, bool toRight, float kickFactor, bool groundpound) {
         base.Kick(thrower, toRight, kickFactor, groundpound);
         IsStationary = false;
+        WakeupTimer = TickTimer.None;
     }
 
     public override void Throw(bool toRight, bool crouch) {

@@ -6,6 +6,7 @@ public class BulletBillMover : KillableEntity {
 
     //---Serialized Variables
     [SerializeField] private float speed, playerSearchRadius = 4, despawnDistance = 8;
+    [SerializeField] private ParticleSystem shootParticles, trailParticles;
 
     //---Misc Variables
     private Vector2 searchVector;
@@ -26,16 +27,13 @@ public class BulletBillMover : KillableEntity {
         base.Spawned();
         body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
 
-        Transform t = transform.GetChild(1);
-        ParticleSystem ps = t.GetComponent<ParticleSystem>();
-        ParticleSystem.ShapeModule shape = ps.shape;
         if (FacingRight) {
-            Transform tf = transform.GetChild(0);
-            tf.localPosition *= new Vector2(-1, 1);
+            trailParticles.transform.localPosition *= new Vector2(-1, 1);
+            ParticleSystem.ShapeModule shape = shootParticles.shape;
             shape.rotation = new Vector3(0, 0, -33);
         }
 
-        ps.Play();
+        shootParticles.Play();
         sRenderer.flipX = FacingRight;
     }
 
@@ -133,6 +131,7 @@ public class BulletBillMover : KillableEntity {
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
+#if UNITY_EDITOR
     //---Debug
     public void OnDrawGizmosSelected() {
         if (!GameManager.Instance)
@@ -147,4 +146,5 @@ public class BulletBillMover : KillableEntity {
         if (body.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX())
             Gizmos.DrawCube(body.position - new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
     }
+#endif
 }

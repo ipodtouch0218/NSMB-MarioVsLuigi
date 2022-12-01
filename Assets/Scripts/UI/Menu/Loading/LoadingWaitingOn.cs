@@ -21,7 +21,7 @@ namespace NSMB.Loading {
         }
 
         public void Update() {
-            if (!GameManager.Instance || !GameManager.Instance.Object.IsValid)
+            if (!GameManager.Instance || !(GameManager.Instance.Object?.IsValid ?? false))
                 return;
 
             PlayerData ourData = NetworkHandler.Instance.runner.LocalPlayer.GetPlayerData(NetworkHandler.Instance.runner);

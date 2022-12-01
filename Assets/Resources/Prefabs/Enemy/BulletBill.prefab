@@ -5037,6 +5037,8 @@ MonoBehaviour:
   speed: 1.5
   playerSearchRadius: 12
   despawnDistance: 10
+  shootParticles: {fileID: 7693979224894144423}
+  trailParticles: {fileID: 1566471443926189886}
 --- !u!50 &3091356493132500068
 Rigidbody2D:
   serializedVersion: 4

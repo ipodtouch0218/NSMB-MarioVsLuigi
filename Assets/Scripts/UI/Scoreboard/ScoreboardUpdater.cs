@@ -19,11 +19,11 @@ public class ScoreboardUpdater : MonoBehaviour {
     private bool manuallyToggled = false, autoToggled = false;
 
     public void OnEnable() {
-        InputSystem.controls.UI.Scoreboard.performed += OnToggle;
+        ControlSystem.controls.UI.Scoreboard.performed += OnToggle;
     }
 
     public void OnDisable() {
-        InputSystem.controls.UI.Scoreboard.performed -= OnToggle;
+        ControlSystem.controls.UI.Scoreboard.performed -= OnToggle;
     }
 
     public void Awake() {

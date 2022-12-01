@@ -18,6 +18,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         Enums.Sounds.Enemy_Shell_Combo7,
     };
     protected readonly Collider2D[] CollisionBuffer = new Collider2D[32];
+    protected readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
     //---Networked Variables
     [Networked] public NetworkBool IsDead { get; set; }

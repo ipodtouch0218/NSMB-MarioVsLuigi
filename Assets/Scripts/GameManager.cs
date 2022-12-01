@@ -57,7 +57,6 @@ public class GameManager : NetworkBehaviour {
 
     //---Public Variables
     public readonly HashSet<NetworkObject> networkObjects = new();
-    public EnemySpawnpoint[] enemySpawns;
     public SingleParticleManager particleManager;
     public TeamManager teamManager = new();
     public GameEventRpcs rpcs;
@@ -66,8 +65,10 @@ public class GameManager : NetworkBehaviour {
     public PlayerController localPlayer;
     public long gameStartTimestamp, gameEndTimestamp;
     public bool paused, loaded, gameover;
-    public BoundsInt originalTilesOrigin;
+
+    public EnemySpawnpoint[] enemySpawns;
     public TileBase[] originalTiles;
+    public BoundsInt originalTilesOrigin;
 
     //---Private Variables
     private TickTimer StartMusicTimer { get; set; }
@@ -224,17 +225,17 @@ public class GameManager : NetworkBehaviour {
 
     //Register pause event
     public void OnEnable() {
-        InputSystem.controls.UI.Pause.performed += OnPause;
-        NetworkHandler.OnShutdown +=               OnShutdown;
-        NetworkHandler.OnPlayerJoined +=           OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft +=             OnPlayerLeft;
+        ControlSystem.controls.UI.Pause.performed += OnPause;
+        NetworkHandler.OnShutdown +=     OnShutdown;
+        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft +=   OnPlayerLeft;
     }
 
     public void OnDisable() {
-        InputSystem.controls.UI.Pause.performed -= OnPause;
-        NetworkHandler.OnShutdown -=               OnShutdown;
-        NetworkHandler.OnPlayerJoined -=           OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft -=             OnPlayerLeft;
+        ControlSystem.controls.UI.Pause.performed -= OnPause;
+        NetworkHandler.OnShutdown -=     OnShutdown;
+        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -=   OnPlayerLeft;
     }
 
     public void Awake() {
@@ -268,7 +269,7 @@ public class GameManager : NetworkBehaviour {
         spectationManager.Spectating = true;
 
         //Load + enable player controls
-        InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
+        ControlSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
         Runner.ProvideInput = true;
 
         //Setup respawning tilemap
@@ -319,11 +320,8 @@ public class GameManager : NetworkBehaviour {
             return;
 
         //remove all network objects.
-        foreach (var obj in networkObjects) {
-            Debug.Log($"Despwaning {obj.Name}");
+        foreach (var obj in networkObjects)
             runner.Despawn(obj);
-
-        }
     }
 
     public void OnPlayerLoaded() {
@@ -337,8 +335,6 @@ public class GameManager : NetworkBehaviour {
         //send spectating player the current level
         if (Utils.GetTilemapChanges(originalTiles, originalTilesOrigin, tilemap, out TileChangeInfo[] tilePositions, out string[] tileNames)) {
             rpcs.Rpc_UpdateSpectatorTilemap(player, tilePositions, tileNames);
-
-            Debug.Log(string.Join(',', tileNames));
         }
     }
 
@@ -386,32 +382,10 @@ public class GameManager : NetworkBehaviour {
 
     private IEnumerator CallLoadingComplete(float seconds) {
         yield return new WaitForSeconds(seconds);
-        Rpc_LoadingComplete();
-    }
-
-    //TODO: invokeresim?
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_EndGame(int team) {
-        if (gameover)
-            return;
-
-        //TODO: don't use a coroutine?
-        StartCoroutine(EndGame(team));
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void Rpc_LoadingComplete() {
-
-        //Populate scoreboard
-        ScoreboardUpdater.Instance.Populate(AlivePlayers);
-        if (Settings.Instance.scoreboardAlways)
-            ScoreboardUpdater.Instance.SetEnabled();
-
-        GlobalController.Instance.loadingCanvas.EndLoading();
+        rpcs.Rpc_LoadingComplete();
     }
 
     private void StartGame() {
-
         //Spawn players
         foreach (PlayerController player in AlivePlayers)
             player.PreRespawn();
@@ -446,9 +420,7 @@ public class GameManager : NetworkBehaviour {
         StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
     }
 
-    private IEnumerator EndGame(int winningTeam) {
-        //TODO:
-        //PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
+    internal IEnumerator EndGame(int winningTeam) {
         gameover = true;
         SessionData.Instance.SetGameStarted(false);
 
@@ -608,13 +580,13 @@ public class GameManager : NetworkBehaviour {
 
         if (aliveTeams == 0) {
             //all teams dead, draw?
-            Rpc_EndGame(PlayerRef.None);
+            rpcs.Rpc_EndGame(PlayerRef.None);
             return;
         }
 
         if (aliveTeams == 1 && RealPlayerCount > 1) {
             //one team left alive (and it's not a solo game), they win.
-            Rpc_EndGame(firstPlaceTeam);
+            rpcs.Rpc_EndGame(firstPlaceTeam);
             return;
         }
 
@@ -622,7 +594,7 @@ public class GameManager : NetworkBehaviour {
             //we have a team that's clearly in first...
             if (starGame && firstPlaceStars >= requiredStars) {
                 //and they have enough stars.
-                Rpc_EndGame(firstPlaceTeam);
+                rpcs.Rpc_EndGame(firstPlaceTeam);
                 return;
             }
             //they don't have enough stars. wait 'till later
@@ -632,7 +604,7 @@ public class GameManager : NetworkBehaviour {
             //ran out of time, instantly end if DrawOnTimeUp is set
             if (SessionData.Instance.DrawOnTimeUp) {
                 //no one wins
-                Rpc_EndGame(PlayerRef.None);
+                rpcs.Rpc_EndGame(PlayerRef.None);
                 return;
             }
             //keep playing
@@ -707,7 +679,7 @@ public class GameManager : NetworkBehaviour {
     public void HostEndMatch() {
         pauseUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-        Rpc_EndGame(PlayerRef.None);
+        rpcs.Rpc_EndGame(PlayerRef.None);
     }
 
     public void Quit() {
@@ -751,7 +723,9 @@ public class GameManager : NetworkBehaviour {
     }
 
     //---Debug
+#if UNITY_EDITOR
     private static readonly int DebugSpawns = 10;
+    private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f);
     public void OnDrawGizmos() {
 
         if (!tilemap)
@@ -785,10 +759,10 @@ public class GameManager : NetworkBehaviour {
         }
 
         Gizmos.color = new(1, 0.9f, 0.2f, 0.2f);
-        Color starBoxColor = new(1, 1, 1, 0.5f);
         foreach (GameObject starSpawn in GameObject.FindGameObjectsWithTag("StarSpawn")) {
             Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
-            Gizmos.DrawIcon(starSpawn.transform.position, "star", true, starBoxColor);
+            Gizmos.DrawIcon(starSpawn.transform.position, "star", true, StarSpawnTint);
         }
     }
+#endif
 }

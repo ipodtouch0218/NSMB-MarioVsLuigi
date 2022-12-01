@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Fusion;
+using UnityEngine;
 
-public class PipeManager : MonoBehaviour {
+public class PipeManager : NetworkBehaviour {
 
     public bool entryAllowed = true, bottom = false, miniOnly = false;
     public PipeManager otherPipe;
