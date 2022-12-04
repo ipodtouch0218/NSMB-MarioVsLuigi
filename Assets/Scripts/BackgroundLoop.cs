@@ -37,8 +37,8 @@ public class BackgroundLoop : MonoBehaviour {
             positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
         }
 
-        mainCamera = gameObject.GetComponent<Camera>();
-        screenBounds = new Vector2(mainCamera.orthographicSize * mainCamera.aspect, mainCamera.orthographicSize) * 3f; // mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
+        mainCamera = GetComponent<Camera>();
+        screenBounds = new Vector2(6.5f, 4f);
         foreach (GameObject obj in children)
             LoadChildObjects(obj);
 

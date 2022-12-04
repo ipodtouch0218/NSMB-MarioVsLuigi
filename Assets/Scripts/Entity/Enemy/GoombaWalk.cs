@@ -8,12 +8,12 @@ public class GoombaWalk : KillableEntity {
     [Networked] private TickTimer DespawnTimer { get; set; }
 
     //---Serialized Variables
+    [SerializeField] private Sprite deadSprite;
     [SerializeField] private float speed, terminalVelocity = -8;
 
     public override void Spawned() {
         base.Spawned();
         body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
-        animator.SetBool("dead", false);
     }
 
     public override void FixedUpdateNetwork() {
@@ -21,15 +21,16 @@ public class GoombaWalk : KillableEntity {
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
-            animator.enabled = false;
+            legacyAnimation.enabled = false;
             body.isKinematic = true;
             return;
         }
 
         if (IsDead) {
-            if (DespawnTimer.Expired(Runner))
+            if (DespawnTimer.Expired(Runner)) {
+                DespawnTimer = TickTimer.None;
                 Runner.Despawn(Object);
-
+            }
             return;
         }
 
@@ -51,9 +52,20 @@ public class GoombaWalk : KillableEntity {
 
         body.velocity = Vector2.zero;
         body.isKinematic = true;
-        hitbox.enabled = false;
 
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
-        animator.SetBool("dead", true);
+    }
+
+    public override void OnIsDeadChanged() {
+        base.OnIsDeadChanged();
+
+        if (IsDead) {
+            if (!WasSpecialKilled) {
+                legacyAnimation.enabled = false;
+                sRenderer.sprite = deadSprite;
+            }
+        } else {
+            legacyAnimation.enabled = true;
+        }
     }
 }

@@ -10,6 +10,7 @@ public class BobombWalk : HoldableEntity {
 
     //---Networked Variables
     [Networked] public TickTimer DetonationTimer { get; set; }
+    [Networked] private Vector3 PreviousFrameVelocity { get; set; }
 
     //---Serialized Variables
     [SerializeField] private GameObject explosionPrefab;
@@ -18,15 +19,30 @@ public class BobombWalk : HoldableEntity {
 
     //---Misc Variables
     private MaterialPropertyBlock mpb;
-    private Vector3 previousFrameVelocity;
+    private GameObject explosion;
 
     //---Properties
     public bool Lit => !DetonationTimer.ExpiredOrNotRunning(Runner);
 
-
     public override void Spawned() {
         base.Spawned();
         body.velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.velocity.y);
+    }
+
+    public override void Render() {
+        base.Render();
+
+        if (!Lit)
+            return;
+
+        float timeUntilDetonation = DetonationTimer.RemainingTime(Runner) ?? 0f;
+        float redOverlayPercent = 5.39f / (timeUntilDetonation + 2.695f) * 10f % 1f;
+
+        if (mpb == null)
+            sRenderer.GetPropertyBlock(mpb = new());
+
+        mpb.SetFloat("FlashAmount", redOverlayPercent);
+        sRenderer.SetPropertyBlock(mpb);
     }
 
     public override void FixedUpdateNetwork() {
@@ -51,18 +67,10 @@ public class BobombWalk : HoldableEntity {
             return;
         }
 
-        if (Lit) {
-            float timeUntilDetonation = DetonationTimer.RemainingTime(Runner) ?? 0f;
-            float redOverlayPercent = 5.39f / (timeUntilDetonation + 2.695f) * 10f % 1f;
+        if (!Lit)
+            body.velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.velocity.y);
 
-            if (mpb == null)
-                sRenderer.GetPropertyBlock(mpb = new());
-
-            mpb.SetFloat("FlashAmount", redOverlayPercent);
-            sRenderer.SetPropertyBlock(mpb);
-        }
-
-        previousFrameVelocity = body.velocity;
+        PreviousFrameVelocity = body.velocity;
     }
 
     private void HandleCollision() {
@@ -72,7 +80,7 @@ public class BobombWalk : HoldableEntity {
         physics.UpdateCollisions();
         if (Lit && physics.OnGround) {
             //apply friction
-            body.velocity -= body.velocity * (Runner.DeltaTime * 3f);
+            body.velocity -= body.velocity * (Runner.DeltaTime * 3.5f);
             if (Mathf.Abs(body.velocity.x) < 0.05) {
                 body.velocity = new(0, body.velocity.y);
             }
@@ -99,7 +107,6 @@ public class BobombWalk : HoldableEntity {
     }
 
     public void Detonate() {
-
         IsDead = true;
 
         //disable hitbox and sprite
@@ -107,7 +114,8 @@ public class BobombWalk : HoldableEntity {
         hitbox.enabled = false;
 
         //spawn explosion
-        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        if (!explosion)
+            explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
 
         //damage entities in range. TODO: change to nonalloc?
         List<Collider2D> hits = new();
@@ -156,8 +164,10 @@ public class BobombWalk : HoldableEntity {
 
     public void Turnaround(bool hitWallOnLeft) {
         FacingRight = hitWallOnLeft;
-        body.velocity = new((Lit ? -previousFrameVelocity.x : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
-        animator.SetTrigger("turnaround");
+        body.velocity = new((Lit ? Mathf.Abs(PreviousFrameVelocity.x) : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+
+        if (Runner.IsForward)
+            animator.SetTrigger("turnaround");
     }
 
     //---IPlayerInteractable overrides
@@ -232,6 +242,36 @@ public class BobombWalk : HoldableEntity {
 
         //stop the fuse sound if we were killed early (by shell, for example).
         sfx.Stop();
+    }
+
+    protected override void CheckForEntityCollisions() {
+        base.CheckForEntityCollisions();
+        if (IsDead || !Lit || Mathf.Abs(body.velocity.x) < 1f)
+            return;
+
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
+
+        for (int i = 0; i < count; i++) {
+            GameObject obj = CollisionBuffer[i].gameObject;
+
+            if (obj == gameObject)
+                continue;
+
+            //killable entities
+            if (obj.TryGetComponent(out KillableEntity killable)) {
+                if (killable.IsDead)
+                    continue;
+
+                //kill entity we ran into
+                killable.SpecialKill(killable.body.position.x > body.position.x, false, ComboCounter++);
+
+                //kill ourselves if we're being held too
+                if (Holder)
+                    SpecialKill(killable.body.position.x < body.position.x, false, 0);
+
+                continue;
+            }
+        }
     }
 
     //---ThrowableEntity overrides

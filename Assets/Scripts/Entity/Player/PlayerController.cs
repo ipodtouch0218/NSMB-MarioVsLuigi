@@ -2474,7 +2474,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (HeldEntity is FrozenCube) {
             HeldEntity.holderOffset = new(HeldEntity.hitbox.size.x * 0.25f, MainHitbox.size.y * (1f - Utils.QuadraticEaseOut(1f - (pickupTimer / pickupTime))), -2);
         } else {
-            HeldEntity.holderOffset = new((FacingRight ? 1 : -1) * 0.25f, State >= Enums.PowerupState.Mushroom ? 0.5f : 0.25f, !FacingRight ? -0.09f : 0f);
+            HeldEntity.holderOffset = new((FacingRight ? 1 : -1) * 0.25f, (State >= Enums.PowerupState.Mushroom ? 0.3f : 0.075f) - HeldEntity.sRenderer.localBounds.min.y, !FacingRight ? -0.09f : 0f);
         }
     }
 

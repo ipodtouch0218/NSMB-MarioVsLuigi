@@ -5,11 +5,8 @@ using NSMB.Utils;
 
 public class PropellerPowerup : MovingPowerup {
 
-    //---Default Variables
-    private float defaultTimeFlyingStarted = -1;
-
     //---Networked Variables
-    [Networked(Default = nameof(defaultTimeFlyingStarted))] private float TimeFlyingStarted { get; set; }
+    [Networked] private float TimeFlyingStarted { get; set; }
     [Networked] private Vector2 FlightOrigin { get; set; }
 
     //---Serialized Variables
@@ -27,7 +24,7 @@ public class PropellerPowerup : MovingPowerup {
             return;
         }
 
-        if (TimeFlyingStarted < 0) {
+        if (TimeFlyingStarted <= 0) {
             gameObject.layer = Layers.LayerEntity;
             base.FixedUpdateNetwork();
 

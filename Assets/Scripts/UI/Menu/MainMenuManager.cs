@@ -137,11 +137,11 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     // ROOM CALLBACKS
-
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
         waitingForJoinMessage.Add(player);
         UpdateStartGameButton();
     }
+
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         chat.AddChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
@@ -176,33 +176,12 @@ public class MainMenuManager : MonoBehaviour {
         }
     }
 
-    //public void OnRegionListReceived(RegionHandler handler) {
-    //    handler.PingMinimumOfRegions((handler) => {
-
-    //        formattedRegions = new();
-    //        pingSortedRegions = handler.EnabledRegions.ToArray();
-    //        System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
-
-    //        foreach (Region r in pingSortedRegions)
-    //            formattedRegions.Add($"{r.Code} <color=#bbbbbb>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
-
-    //        lastRegion = pingSortedRegions[0].Code;
-    //        pingsReceived = true;
-    //    }, "");
-    //}
-    // MATCHMAKING CALLBACKS
-    //case (byte) Enums.NetEventIds.PlayerChatMessage: {
-    //}
-
     // Unity Stuff
-    public void Start() {
-
-        /*
-         * dear god this needs a refactor. does every UI element seriously have to have
-         * their callbacks into this one fuckin script?
-         */
+    public void Awake() {
         Instance = this;
+    }
 
+    public void Start() {
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
         HorizontalCamera.OFFSET = 0;
@@ -258,45 +237,24 @@ public class MainMenuManager : MonoBehaviour {
 #endif
     }
 
-    private void LoadSettings(bool nickname) {
-        if (nickname)
-            nicknameField.text = Settings.Instance.nickname;
-        else
-            nicknameField.SetTextWithoutNotify(Settings.Instance.nickname);
-
-        musicSlider.value = Settings.Instance.VolumeMusic;
-        sfxSlider.value = Settings.Instance.VolumeSFX;
-        masterSlider.value = Settings.Instance.VolumeMaster;
-
-        aspectToggle.interactable = ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
-        aspectToggle.isOn = Settings.Instance.fourByThreeRatio;
-        fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
-        fireballToggle.isOn = Settings.Instance.fireballFromSprint;
-        autoSprintToggle.isOn = Settings.Instance.autoSprint;
-        vsyncToggle.isOn = Settings.Instance.vsync;
-        scoreboardToggle.isOn = Settings.Instance.scoreboardAlways;
-        filterToggle.isOn = Settings.Instance.filter;
-        QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
-    }
-
     public void OnEnable() {
-        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect += OnLobbyConnect;
+        NetworkHandler.OnPlayerJoined +=       OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft +=         OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect +=       OnLobbyConnect;
         NetworkHandler.OnSessionListUpdated += OnSessionListUpdated;
-        NetworkHandler.OnShutdown += OnShutdown;
-        NetworkHandler.OnJoinSessionFailed += OnShutdown;
-        NetworkHandler.OnConnectFailed += OnConnectFailed;
+        NetworkHandler.OnShutdown +=           OnShutdown;
+        NetworkHandler.OnJoinSessionFailed +=  OnShutdown;
+        NetworkHandler.OnConnectFailed +=      OnConnectFailed;
     }
 
     public void OnDisable() {
-        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
+        NetworkHandler.OnPlayerJoined -=       OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -=         OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect -=       OnLobbyConnect;
         NetworkHandler.OnSessionListUpdated -= OnSessionListUpdated;
-        NetworkHandler.OnShutdown -= OnShutdown;
-        NetworkHandler.OnJoinSessionFailed -= OnShutdown;
-        NetworkHandler.OnConnectFailed -= OnConnectFailed;
+        NetworkHandler.OnShutdown -=           OnShutdown;
+        NetworkHandler.OnJoinSessionFailed -=  OnShutdown;
+        NetworkHandler.OnConnectFailed -=      OnConnectFailed;
     }
 
     public void Update() {
@@ -515,6 +473,28 @@ public class MainMenuManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(errorButton);
     }
 
+    private void LoadSettings(bool nickname) {
+        if (nickname)
+            nicknameField.text = Settings.Instance.nickname;
+        else
+            nicknameField.SetTextWithoutNotify(Settings.Instance.nickname);
+
+        musicSlider.value =          Settings.Instance.VolumeMusic;
+        sfxSlider.value =            Settings.Instance.VolumeSFX;
+        masterSlider.value =         Settings.Instance.VolumeMaster;
+
+        ndsResolutionToggle.isOn =   Settings.Instance.ndsResolution;
+        aspectToggle.interactable =  Settings.Instance.ndsResolution;
+        aspectToggle.isOn =          Settings.Instance.fourByThreeRatio;
+        fireballToggle.isOn =        Settings.Instance.fireballFromSprint;
+        autoSprintToggle.isOn =      Settings.Instance.autoSprint;
+        vsyncToggle.isOn =           Settings.Instance.vsync;
+        scoreboardToggle.isOn =      Settings.Instance.scoreboardAlways;
+        filterToggle.isOn =          Settings.Instance.filter;
+        QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
+        fullscreenToggle.isOn =      Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
+    }
+
     public void BackSound() {
         sfx.PlayOneShot(Enums.Sounds.UI_Back);
     }
@@ -648,7 +628,6 @@ public class MainMenuManager : MonoBehaviour {
         _ = NetworkHandler.JoinRoom(id);
     }
 
-
     public void CreateRoom() {
         Settings.Instance.nickname = nicknameField.text;
         byte maxPlayers = (byte) lobbyPlayersSlider.value;
@@ -666,7 +645,8 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void UpdateStartGameButton() {
-        if (!Runner.GetLocalPlayerData() || !Runner.GetLocalPlayerData().IsRoomOwner) {
+        PlayerData data = Runner.GetLocalPlayerData();
+        if (!data || !data.IsRoomOwner) {
             startGameBtn.interactable = false;
             return;
         }
@@ -675,10 +655,10 @@ public class MainMenuManager : MonoBehaviour {
         bool validRoomConfig = true;
 
         int realPlayers = datas.Where(pd => !pd.IsManualSpectator).Count();
-        validRoomConfig &= realPlayers > (SessionData.Instance.PrivateRoom ? 0 : 1);
+        validRoomConfig &= realPlayers >= 1;
 
         //only do team checks if there's more than one player
-        if (SessionData.Instance.Teams && (datas.Count() > 1 || !SessionData.Instance.PrivateRoom)) {
+        if (SessionData.Instance.Teams && datas.Count() > 1) {
             int teams = datas.Where(pd => !pd.IsManualSpectator).Select(pd => pd.Team).Distinct().Count();
             validRoomConfig &= teams > 1;
         }

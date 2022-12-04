@@ -21,7 +21,10 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     protected readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
     //---Networked Variables
-    [Networked] public NetworkBool IsDead { get; set; }
+    [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
+    [Networked] protected NetworkBool WasSpecialKilled { get; set; }
+    [Networked] protected NetworkBool WasGroundpounded { get; set; }
+    [Networked] protected byte ComboCounter { get; set; }
 
     //---Properties
     public override bool IsCarryable => iceCarryable;
@@ -34,33 +37,46 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     //---Components
     public BoxCollider2D hitbox;
     protected Animator animator;
-    protected SpriteRenderer sRenderer;
+    protected LegacyAnimateSpriteRenderer legacyAnimation;
+    public SpriteRenderer sRenderer;
     protected AudioSource audioSource;
     protected PhysicsEntity physics;
 
-    #region Unity Methods
     public override void Awake() {
         base.Awake();
         hitbox = GetComponent<BoxCollider2D>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         audioSource = GetComponent<AudioSource>();
         sRenderer = GetComponentInChildren<SpriteRenderer>();
+        legacyAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
     }
 
     public override void FixedUpdateNetwork() {
-        if (!GameManager.Instance || !body)
+        if (!GameManager.Instance || !body || IsFrozen)
             return;
 
-        if (!IsDead)
-            CheckForEntityCollisions();
+        if (IsDead) {
+            hitbox.enabled = false;
+            gameObject.layer = Layers.LayerHitsNothing;
+
+            if (WasSpecialKilled) {
+                body.angularVelocity = 400f * (FacingRight ? 1 : -1);
+                body.constraints = RigidbodyConstraints2D.None;
+            }
+        } else {
+            hitbox.enabled = true;
+            gameObject.layer = Layers.LayerEntity;
+            body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+
+        CheckForEntityCollisions();
 
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-        if (body && !IsDead && !IsFrozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc)) {
+        if (!body.isKinematic && /*Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) &&*/ Utils.IsTileSolidAtWorldLocation(loc)) {
             SpecialKill(FacingRight, false, 0);
         }
     }
-    #endregion
 
     protected virtual void CheckForEntityCollisions() {
 
@@ -73,7 +89,6 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
                 continue;
 
             if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
-
                 if (killable.IsDead)
                     continue;
 
@@ -92,6 +107,9 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     public virtual void Kill() {
+        if (IsDead)
+            return;
+
         SpecialKill(false, false, 0);
     }
 
@@ -100,24 +118,37 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             return;
 
         IsDead = true;
+        WasSpecialKilled = true;
+        WasGroundpounded = groundpound;
+        ComboCounter = (byte) combo;
+        FacingRight = right;
 
         body.constraints = RigidbodyConstraints2D.None;
-        body.velocity = new(2f * (right ? 1 : -1), 2.5f);
-        body.angularVelocity = 400f * (right ? 1 : -1);
+        body.velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
+        body.angularVelocity = 400f * (FacingRight ? 1 : -1);
         body.gravityScale = 1.5f;
-        audioSource.enabled = true;
-        animator.enabled = true;
-        hitbox.enabled = false;
-        animator.speed = 0;
-        gameObject.layer = Layers.LayerHitsNothing;
-
-        if (Runner.IsForward)
-            PlaySound(!IsFrozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, combo)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
-
-        if (groundpound)
-            Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.position + Vector2.up * 0.5f, Quaternion.identity);
 
         Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.position + hitbox.offset);
+    }
+
+    public virtual void OnIsDeadChanged() {
+        if (IsDead) {
+            //death effects
+            if (animator)
+                animator.enabled = false;
+            audioSource.enabled = true;
+
+            if (WasSpecialKilled)
+                PlaySound(!IsFrozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
+
+            if (WasGroundpounded)
+                Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.position + hitbox.offset, Quaternion.identity);
+
+        } else {
+            //undo death effects
+            if (animator)
+                animator.enabled = true;
+        }
     }
 
     public void PlaySound(Enums.Sounds sound) {
@@ -212,5 +243,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     //---OnChangeds
-
+    public static void OnIsDeadChanged(Changed<KillableEntity> changed) {
+        changed.Behaviour.OnIsDeadChanged();
+    }
 }
