@@ -10,14 +10,17 @@ public class KillplaneKill : NetworkBehaviour {
     //---Serialized Variables
     [SerializeField] private float killTime = 0f;
 
+    public override void Spawned() {
+        KillTimer = TickTimer.CreateFromSeconds(Runner, killTime);
+    }
+
     public override void FixedUpdateNetwork() {
-        if (transform.position.y >= GameManager.Instance.GetLevelMinY())
+        if (transform.position.y >= GameManager.Instance.LevelMinY)
             return;
 
-        if (!KillTimer.IsRunning)
-            KillTimer = TickTimer.CreateFromSeconds(Runner, killTime);
-
-        if (KillTimer.Expired(Runner))
+        if (KillTimer.Expired(Runner)) {
+            KillTimer = TickTimer.None;
             Runner.Despawn(Object);
+        }
     }
 }

@@ -351,7 +351,7 @@ public class PlayerAnimationController : NetworkBehaviour {
                 animator.ResetTrigger("respawn");
             }
         } else {
-            if (!deathUp && body.position.y > GameManager.Instance.GetLevelMinY()) {
+            if (!deathUp && body.position.y > GameManager.Instance.LevelMinY) {
                 body.velocity = new Vector2(0, deathForce);
                 deathUp = true;
                 if (animator.GetBool("firedeath") && Runner.IsForward) {
@@ -366,7 +366,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         if (controller.Object.HasInputAuthority && deathTimer + Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f) && Runner.IsForward)
             controller.fadeOut.FadeOutAndIn(0.33f, .1f);
 
-        if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y) {
+        if (body.position.y < GameManager.Instance.LevelMinY - transform.lossyScale.y) {
             //models.SetActive(false);
             body.velocity = Vector2.zero;
             body.gravityScale = 0;

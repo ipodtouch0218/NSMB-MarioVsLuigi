@@ -39,10 +39,10 @@ namespace NSMB.Utils {
             if (!manager.loopingLevel)
                 return false;
 
-            if (location.x < manager.GetLevelMinX()) {
+            if (location.x < manager.LevelMinX) {
                 location.x += manager.levelWidthTile * 0.5f;
                 return true;
-            } else if (location.x >= manager.GetLevelMaxX()) {
+            } else if (location.x >= manager.LevelMaxX) {
                 location.x -= manager.levelWidthTile * 0.5f;
                 return true;
             }
@@ -547,7 +547,7 @@ namespace NSMB.Utils {
                 return spectatorColor;
 
             //then teams
-            if (SessionData.Instance.Teams && data.Team >= 0 && data.Team < ScriptableManager.Instance.teams.Length)
+            if (SessionData.Instance && SessionData.Instance.Teams && data.Team >= 0 && data.Team < ScriptableManager.Instance.teams.Length)
                 return GetTeamColor(data.Team, s, v);
 
             //then id based color

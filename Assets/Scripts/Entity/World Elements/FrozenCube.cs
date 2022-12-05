@@ -97,7 +97,7 @@ public class FrozenCube : HoldableEntity {
                 Physics2D.IgnoreCollision(hitbox, PreviousHolder.MainHitbox, false);
         }
 
-        if (body.position.y + hitbox.size.y < GameManager.Instance.GetLevelMinY()) {
+        if (body.position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
             Kill();
             return;
         }

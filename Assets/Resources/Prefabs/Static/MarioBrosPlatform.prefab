@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fd2c7ea9582077468a278787dbccfea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   platformWidth: 12
   samplesPerTile: 16
   bumpWidthPoints: 1

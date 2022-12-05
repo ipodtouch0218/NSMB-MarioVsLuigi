@@ -21,7 +21,7 @@ public class TrackIcon : MonoBehaviour {
         image = GetComponent<Image>();
 
         GameManager gm = GameManager.Instance;
-        levelMinX = gm.GetLevelMinX();
+        levelMinX = gm.LevelMinX;
         trackWidth = trackMaxX - trackMinX;
         levelWidthReciprocal = 2f / gm.levelWidthTile;
     }

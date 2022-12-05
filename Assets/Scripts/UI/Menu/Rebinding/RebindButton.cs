@@ -7,12 +7,17 @@ using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 
 public class RebindButton : MonoBehaviour {
 
-    public int timeoutTime = 6;
+    //---Public Variables
     public InputAction targetAction;
     public InputBinding targetBinding;
     public int index;
-    private TMP_Text ourText;
+
+    //---Serialized Variables
+    [SerializeField] private int timeoutTime = 6;
+
+    //---Private Variables
     private RebindingOperation rebinding;
+    private TMP_Text ourText;
     private Coroutine countdown;
 
     public void Start() {

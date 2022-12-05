@@ -87,7 +87,7 @@ public class CameraController : MonoBehaviour {
         bool right = currentPosition.x > playerPos.x;
 
         if (xDifference >= 8) {
-            currentPosition.x += (right ? -1 : 1) * GameManager.Instance.levelWidthTile / 2f;
+            currentPosition.x += (right ? -1 : 1) * GameManager.Instance.LevelWidth;
             xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
             right = currentPosition.x > playerPos.x;
             if (IsControllingCamera)

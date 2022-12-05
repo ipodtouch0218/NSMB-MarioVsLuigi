@@ -905,9 +905,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         // if the level doesn't loop, don't have stars go to the edges of the map
         if (!gm.loopingLevel) {
-            if (body.position.x > gm.GetLevelMaxX() - 2.5f) {
+            if (body.position.x > gm.LevelMaxX - 2.5f) {
                 starDirection = 1;
-            } else if (body.position.x < gm.GetLevelMinX() + 2.5f) {
+            } else if (body.position.x < gm.LevelMinX + 2.5f) {
                 starDirection = 2;
             }
         }
@@ -2096,7 +2096,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsFunctionallyRunning = heldButtons.IsSet(PlayerControls.Sprint) || State == Enums.PowerupState.MegaMushroom || IsPropellerFlying;
 
         //death via pit
-        if (body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
+        if (body.position.y + transform.lossyScale.y < GameManager.Instance.LevelMinY) {
             Death(true, false);
             return;
         }
@@ -2595,29 +2595,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
     }
 
-    //---Debug
-#if UNITY_EDITOR
-    public void OnDrawGizmos() {
-        if (!body)
-            return;
-
-        Gizmos.DrawRay(body.position, body.velocity);
-        Gizmos.DrawCube(body.position + new Vector2(0, WorldHitboxSize.y * 0.5f) + (body.velocity * Runner.DeltaTime), WorldHitboxSize);
-
-        Gizmos.color = Color.white;
-        foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
-            if (r is ParticleSystemRenderer)
-                continue;
-
-            Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
-        }
-    }
-#endif
-
     //---OnChangeds
     public static void OnGroundpoundingChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
-
         if (!player.IsGroundpounding)
             return;
 
@@ -2643,7 +2623,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     public static void OnDeadChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
-
         if (!player.IsDead) {
             //respawn poof particle
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, player.body.position);
@@ -2661,10 +2640,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private GameObject respawnParticle;
     public static void OnRespawningChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
-        if (!player.IsRespawning)
-            return;
-
-        if (player.respawnParticle)
+        if (!player.IsRespawning || player.respawnParticle)
             return;
 
         player.respawnParticle = Instantiate(PrefabList.Instance.Particle_Respawn, player.body.position, Quaternion.identity);
@@ -2721,6 +2697,25 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         player.PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
         player.PlaySound(Enums.Sounds.World_Spinner_Launch);
     }
+
+    //---Debug
+#if UNITY_EDITOR
+    public void OnDrawGizmos() {
+        if (!body)
+            return;
+
+        Gizmos.DrawRay(body.position, body.velocity);
+        Gizmos.DrawCube(body.position + new Vector2(0, WorldHitboxSize.y * 0.5f) + (body.velocity * Runner.DeltaTime), WorldHitboxSize);
+
+        Gizmos.color = Color.white;
+        foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
+            if (r is ParticleSystemRenderer)
+                continue;
+
+            Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
+        }
+    }
+#endif
 
     public enum PlayerJumpState : byte {
         None,

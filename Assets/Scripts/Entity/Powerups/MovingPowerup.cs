@@ -128,7 +128,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
             if (closest) {
                 float dist = closest.body.position.x - body.position.x;
-                FacingRight = dist < 0 || dist > GameManager.Instance.levelWidthTile * 0.5f;
+                FacingRight = dist < 0 || dist > GameManager.Instance.LevelWidth;
             }
         }
 

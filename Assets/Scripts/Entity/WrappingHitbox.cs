@@ -5,7 +5,6 @@ public class WrappingHitbox : MonoBehaviour {
     private Rigidbody2D body;
     private BoxCollider2D[] ourColliders, childColliders;
     private Vector2 offset;
-    private float levelMiddle, levelWidth;
 
     public void Awake() {
         body = GetComponent<Rigidbody2D>();
@@ -22,9 +21,7 @@ public class WrappingHitbox : MonoBehaviour {
         childColliders = new BoxCollider2D[ourColliders.Length];
         for (int i = 0; i < ourColliders.Length; i++)
             childColliders[i] = gameObject.AddComponent<BoxCollider2D>();
-        levelWidth = GameManager.Instance.levelWidthTile / 2f;
-        levelMiddle = GameManager.Instance.GetLevelMinX() + levelWidth / 2f;
-        offset = new(levelWidth, 0);
+        offset = new(GameManager.Instance.LevelWidth, 0);
 
         LateUpdate();
     }
@@ -42,7 +39,7 @@ public class WrappingHitbox : MonoBehaviour {
         childCollider.edgeRadius = ourCollider.edgeRadius;
         childCollider.enabled = ourCollider.enabled;
         childCollider.isTrigger = ourCollider.isTrigger;
-        childCollider.offset = ourCollider.offset + (((body.position.x < levelMiddle) ? offset : -offset) / body.transform.lossyScale);
+        childCollider.offset = ourCollider.offset + (((body.position.x < GameManager.Instance.LevelMiddleX) ? offset : -offset) / body.transform.lossyScale);
         childCollider.sharedMaterial = ourCollider.sharedMaterial;
         childCollider.size = ourCollider.size;
         childCollider.usedByComposite = ourCollider.usedByComposite;

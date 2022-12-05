@@ -7,7 +7,6 @@ public class WrappingObject : NetworkBehaviour {
 
     private NetworkRigidbody2D nrb;
     private Vector2 width;
-    private float min, max;
 
     public void Awake() {
         nrb = GetComponent<NetworkRigidbody2D>();
@@ -19,19 +18,16 @@ public class WrappingObject : NetworkBehaviour {
             return;
         }
 
-        min = GameManager.Instance.GetLevelMinX();
-        max = GameManager.Instance.GetLevelMaxX();
-        width = new(GameManager.Instance.levelWidthTile * 0.5f, 0);
+        width = new(GameManager.Instance.LevelWidth, 0);
     }
 
     public override void FixedUpdateNetwork() {
-        if (nrb.Rigidbody.position.x < min) {
+        if (nrb.Rigidbody.position.x < GameManager.Instance.LevelMinX) {
             Vector3 newPos = nrb.Rigidbody.position + width;
             nrb.TeleportToPosition(newPos);
-        } else if (nrb.Rigidbody.position.x > max) {
+        } else if (nrb.Rigidbody.position.x > GameManager.Instance.LevelMaxX) {
             Vector3 newPos = nrb.Rigidbody.position - width;
             nrb.TeleportToPosition(newPos);
         }
-        //nrb.centerOfMass = Vector2.zero;
     }
 }

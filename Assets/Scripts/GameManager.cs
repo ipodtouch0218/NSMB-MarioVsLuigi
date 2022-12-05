@@ -21,7 +21,7 @@ public class GameManager : NetworkBehaviour {
             if (_instance)
                 return _instance;
 
-            if (SceneManager.GetActiveScene().buildIndex >= 2)
+            if (SceneManager.GetActiveScene().buildIndex >= 2 || SceneManager.GetActiveScene().buildIndex < 0)
                 _instance = FindObjectOfType<GameManager>();
 
             return _instance;
@@ -54,7 +54,16 @@ public class GameManager : NetworkBehaviour {
 
     //---Properties
     public NetworkRNG Random { get; set; }
+    private float? levelWidth, levelHeight, middleX, minX, minY, maxX, maxY;
+    public float LevelWidth => levelWidth ??= levelWidthTile * tilemap.transform.localScale.x;
+    public float LevelHeight => levelHeight ??= levelHeightTile * tilemap.transform.localScale.x;
+    public float LevelMinX => minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float LevelMaxX => maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float LevelMiddleX => middleX ??= (LevelMaxX + LevelMinX) * 0.5f;
+    public float LevelMinY => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    public float LevelMaxY => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
 
+    public float GetLevelMinY() => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
     //---Public Variables
     public readonly HashSet<NetworkObject> networkObjects = new();
     public SingleParticleManager particleManager;
@@ -695,17 +704,6 @@ public class GameManager : NetworkBehaviour {
     }
 
     //---Helpers
-    //lazy loading
-    private float? middleX, minX, minY, maxX, maxY, levelWidth, levelHeight;
-    public float GetLevelMiddleX() => middleX ??= (GetLevelMaxX() + GetLevelMinX()) * 0.5f;
-    public float GetLevelMinX() => minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-    public float GetLevelMinY() => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
-    public float GetLevelMaxX() => maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-    public float GetLevelMaxY() => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
-    public float GetLevelWidth() => levelWidth ??= levelWidthTile * 0.5f;
-    public float GetLevelHeight() => levelHeight ??= levelHeightTile * 0.5f;
-
-
     public float size = 1.39f, ySize = 0.8f;
     public Vector3 GetSpawnpoint(int playerIndex, int players = -1) {
         if (players <= -1)
@@ -727,7 +725,6 @@ public class GameManager : NetworkBehaviour {
     private static readonly int DebugSpawns = 10;
     private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f);
     public void OnDrawGizmos() {
-
         if (!tilemap)
             return;
 
@@ -736,12 +733,12 @@ public class GameManager : NetworkBehaviour {
             Gizmos.DrawCube(GetSpawnpoint(i, DebugSpawns) + Vector3.down * 0.25f, Vector2.one * 0.5f);
         }
 
-        Vector3 size = new(GetLevelWidth(), GetLevelHeight());
-        Vector3 origin = new(GetLevelMinX() + (GetLevelWidth() * 0.5f), GetLevelMinY() + (GetLevelHeight() * 0.5f), 1);
+        Vector3 size = new(LevelWidth, LevelHeight);
+        Vector3 origin = new(LevelMinX + (LevelWidth * 0.5f), LevelMinY + (LevelHeight * 0.5f), 1);
         Gizmos.color = Color.gray;
         Gizmos.DrawWireCube(origin, size);
 
-        size = new Vector3(GetLevelWidth(), cameraHeightY);
+        size = new Vector3(LevelWidth, cameraHeightY);
         origin.y = cameraMinY + (cameraHeightY * 0.5f);
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(origin, size);

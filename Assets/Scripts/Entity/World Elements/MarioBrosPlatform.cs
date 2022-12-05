@@ -1,17 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Fusion;
+
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-public class MarioBrosPlatform : MonoBehaviour {
+public class MarioBrosPlatform : NetworkBehaviour {
 
-    private static readonly Vector2 BUMP_OFFSET = new(-0.25f, -0.1f);
+    //---Static Variables
+    private static readonly Vector2 BumpOffset = new(-0.25f, -0.1f);
+    private static readonly Color BlankColor = new(0, 0, 0, 255);
 
-    [Delayed]
-    public int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
-    public float bumpDuration = 0.4f;
-    public bool changeCollider = true;
+    //---Networked Variables
+    [Networked, Capacity(8)] private NetworkLinkedList<BumpInfo> Bumps => default;
 
-    private readonly List<BumpInfo> bumps = new();
+    //---Serialized Variables
+    [Delayed] [SerializeField] private int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
+    [SerializeField] private float bumpDuration = 0.4f;
+    [SerializeField] private bool changeCollider = true;
+
+    //---Misc Variables
     private SpriteRenderer spriteRenderer;
     private MaterialPropertyBlock mpb;
     private Color32[] pixels;
@@ -50,20 +57,13 @@ public class MarioBrosPlatform : MonoBehaviour {
 
     public void Update() {
         for (int i = 0; i < platformWidth * samplesPerTile; i++)
-            pixels[i] = new Color32(0, 0, 0, 255);
+            pixels[i] = BlankColor;
 
-        for (int i = bumps.Count - 1; i >= 0; i--) {
-            BumpInfo bump = bumps[i];
-            bump.timer -= Time.deltaTime;
-            if (bump.timer <= 0) {
-                bumps.RemoveAt(i);
-                continue;
-            }
-
-            float percentageCompleted = bump.timer / bumpDuration;
+        foreach (BumpInfo bump in Bumps) {
+            float percentageCompleted = bump.SpawnTime / bumpDuration;
             float v = Mathf.Sin(Mathf.PI * percentageCompleted);
             for (int x = -bumpWidthPoints - bumpBlurPoints; x <= bumpWidthPoints + bumpBlurPoints; x++) {
-                int index = bump.pointX + x;
+                int index = bump.Point + x;
                 if (index < 0 || index >= platformWidth * samplesPerTile)
                     continue;
 
@@ -85,13 +85,18 @@ public class MarioBrosPlatform : MonoBehaviour {
         spriteRenderer.SetPropertyBlock(mpb);
     }
 
+    public override void FixedUpdateNetwork() {
+        for (int i = 0; i < Bumps.Count - 1; i++) {
+
+        }
+    }
 
     public void Bump(PlayerController player, Vector2 worldPos) {
 
         float localPos = transform.InverseTransformPoint(worldPos).x;
 
         if (Mathf.Abs(localPos) > platformWidth) {
-            worldPos.x += GameManager.Instance.levelWidthTile / 2f;
+            worldPos.x += GameManager.Instance.LevelWidth;
             localPos = transform.InverseTransformPoint(worldPos).x;
         }
 
@@ -103,17 +108,13 @@ public class MarioBrosPlatform : MonoBehaviour {
             return;
 
         player.PlaySound(Enums.Sounds.World_Block_Bump);
-        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BUMP_OFFSET);
+        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BumpOffset);
 
-        bumps.Add(new BumpInfo(bumpDuration, (int) localPos));
+        Bumps.Add(new BumpInfo() { Point = (int) localPos, SpawnTime = Runner.SimulationTime });
     }
 
-    class BumpInfo {
-        public float timer;
-        public int pointX;
-        public BumpInfo(float timer, int pointX) {
-            this.timer = timer;
-            this.pointX = pointX;
-        }
+    private struct BumpInfo : INetworkStruct {
+        [Networked] public int Point { get; set; }
+        [Networked] public float SpawnTime { get; set; }
     }
 }

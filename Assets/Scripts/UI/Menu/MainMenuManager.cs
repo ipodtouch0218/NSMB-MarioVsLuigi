@@ -14,29 +14,22 @@ using NSMB.Utils;
 
 public class MainMenuManager : MonoBehaviour {
 
+    //---Static Variables
     public static readonly int NicknameMin = 2, NicknameMax = 20;
-
     public static MainMenuManager Instance;
 
     public AudioSource sfx, music;
     public GameObject lobbiesContent, lobbyPrefab;
-    bool quit, validName;
-    public GameObject connecting;
+    private bool quit, validName;
 
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox;
     public GameObject[] levelCameraPositions;
-    public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
-    public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoom, privateJoinRoom;
-    public Button joinRoomBtn, createRoomBtn, startGameBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, privateToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public TMP_InputField nicknameField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, rebindCountdown, rebindText, reconnectText, updateText;
-    public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
     public string connectThroughSecret = "";
@@ -49,24 +42,26 @@ public class MainMenuManager : MonoBehaviour {
     [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
     [SerializeField] private CanvasGroup hostControlsGroup;
 
-    public Image overallColor, shirtColor;
-    public GameObject palette, paletteDisabled;
+    [SerializeField] private GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, connecting;
+    [SerializeField] private GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
+    [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
+    [SerializeField] private Button joinRoomBtn, createRoomBtn, startGameBtn;
+    [SerializeField] private TMP_InputField nicknameField, lobbyJoinField, chatTextField;
+
+    [SerializeField] private Image overallsColorImage, shirtColorImage;
+    [SerializeField] private GameObject playerColorPaletteIcon, playerColorDisabledIcon;
+
+    [SerializeField] private List<string> maps;
+
+    //---PrivateVariables
+    private readonly Dictionary<string, RoomIcon> currentRooms = new();
+    private Coroutine playerPingUpdateCoroutine;
 
     public ScrollRect settingsScroll;
-
-    public Selectable[] roomSettings;
-
-    public List<string> maps;
-
-    private readonly Dictionary<string, RoomIcon> currentRooms = new();
-
-    private Coroutine playerUpdateRoutine;
-
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
     private PlayerData LocalData => Runner.GetLocalPlayerData();
-
 
     // LOBBY CALLBACKS
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
@@ -133,7 +128,7 @@ public class MainMenuManager : MonoBehaviour {
         int index = Array.IndexOf(NetworkHandler.Regions, info.Region);
 
         if (index != -1)
-            region.SetValueWithoutNotify(index);
+            regionDropdown.SetValueWithoutNotify(index);
     }
 
     // ROOM CALLBACKS
@@ -150,7 +145,6 @@ public class MainMenuManager : MonoBehaviour {
 
     // CONNECTION CALLBACKS
     public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
-
         if (cause != ShutdownReason.Ok)
             OpenErrorBox(cause);
 
@@ -164,7 +158,6 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
-
         OpenErrorBox(cause);
 
         selectedRoom = null;
@@ -208,8 +201,8 @@ public class MainMenuManager : MonoBehaviour {
             EnterRoom();
         }
 
-        region.ClearOptions();
-        region.AddOptions(NetworkHandler.Regions.ToList());
+        regionDropdown.ClearOptions();
+        regionDropdown.AddOptions(NetworkHandler.Regions.ToList());
         //TODO: change to current region
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
@@ -264,10 +257,10 @@ public class MainMenuManager : MonoBehaviour {
 
         joinRoomBtn.interactable = connected && selectedRoom != null && validName;
         createRoomBtn.interactable = connected && validName;
-        region.interactable = connected;
+        regionDropdown.interactable = connected;
     }
 
-    private List<PlayerRef> waitingForJoinMessage = new();
+    private readonly List<PlayerRef> waitingForJoinMessage = new();
     public IEnumerator OnPlayerDataValidated(PlayerRef player) {
         yield return null; //wait a frame because reasons
         if (waitingForJoinMessage.Remove(player)) {
@@ -293,8 +286,8 @@ public class MainMenuManager : MonoBehaviour {
             return;
         }
 
-        if (Runner.IsServer)
-            playerUpdateRoutine ??= StartCoroutine(UpdatePings());
+        if (Runner.IsServer && playerPingUpdateCoroutine == null)
+            playerPingUpdateCoroutine = StartCoroutine(UpdatePings());
 
         StartCoroutine(SetScroll());
 
@@ -307,7 +300,7 @@ public class MainMenuManager : MonoBehaviour {
         OpenInLobbyMenu();
 
         if (Runner.IsServer)
-            chat.AddChatMessage("You are the room's host! Click on your player's names to control your room.", Color.red);
+            chat.AddChatMessage("You are the room's host! Click on your players' names to control your room.", Color.red);
 
         SessionInfo session = Runner.SessionInfo;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
@@ -330,8 +323,8 @@ public class MainMenuManager : MonoBehaviour {
         settingsScroll.verticalNormalizedPosition = 1;
     }
 
-    public void OpenTitleScreen() {
-        title.SetActive(true);
+    private void DisableAllMenus() {
+        title.SetActive(false);
         bg.SetActive(false);
         mainMenu.SetActive(false);
         optionsMenu.SetActive(false);
@@ -341,36 +334,26 @@ public class MainMenuManager : MonoBehaviour {
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
         privatePrompt.SetActive(false);
+    }
+
+    public void OpenTitleScreen() {
+        DisableAllMenus();
+        title.SetActive(true);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
     }
     public void OpenMainMenu() {
-        title.SetActive(false);
+        DisableAllMenus();
         bg.SetActive(true);
         mainMenu.SetActive(true);
-        optionsMenu.SetActive(false);
-        controlsMenu.SetActive(false);
-        lobbyMenu.SetActive(false);
-        createLobbyPrompt.SetActive(false);
-        inLobbyMenu.SetActive(false);
-        creditsMenu.SetActive(false);
-        privatePrompt.SetActive(false);
-        updateBox.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
 
     }
     public void OpenLobbyMenu() {
-        title.SetActive(false);
+        DisableAllMenus();
         bg.SetActive(true);
-        mainMenu.SetActive(false);
-        optionsMenu.SetActive(false);
-        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(true);
-        createLobbyPrompt.SetActive(false);
-        inLobbyMenu.SetActive(false);
-        creditsMenu.SetActive(false);
-        privatePrompt.SetActive(false);
 
         foreach (RoomIcon room in currentRooms.Values)
             room.UpdateUI(room.session);
@@ -378,74 +361,40 @@ public class MainMenuManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(lobbySelected);
     }
     public void OpenCreateLobby() {
-        title.SetActive(false);
+        DisableAllMenus();
         bg.SetActive(true);
-        mainMenu.SetActive(false);
-        optionsMenu.SetActive(false);
-        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(true);
         createLobbyPrompt.SetActive(true);
-        inLobbyMenu.SetActive(false);
-        creditsMenu.SetActive(false);
-        privatePrompt.SetActive(false);
 
         privateToggle.isOn = false;
 
         EventSystem.current.SetSelectedGameObject(createLobbySelected);
     }
     public void OpenOptions() {
-        title.SetActive(false);
+        DisableAllMenus();
         bg.SetActive(true);
-        mainMenu.SetActive(false);
         optionsMenu.SetActive(true);
-        controlsMenu.SetActive(false);
-        lobbyMenu.SetActive(false);
-        createLobbyPrompt.SetActive(false);
-        inLobbyMenu.SetActive(false);
-        creditsMenu.SetActive(false);
-        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(optionsSelected);
     }
     public void OpenControls() {
-        title.SetActive(false);
+        DisableAllMenus();
         bg.SetActive(true);
-        mainMenu.SetActive(false);
-        optionsMenu.SetActive(false);
         controlsMenu.SetActive(true);
-        lobbyMenu.SetActive(false);
-        createLobbyPrompt.SetActive(false);
-        inLobbyMenu.SetActive(false);
-        creditsMenu.SetActive(false);
-        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(controlsSelected);
     }
     public void OpenCredits() {
-        title.SetActive(false);
+        DisableAllMenus();
         bg.SetActive(true);
-        mainMenu.SetActive(false);
-        optionsMenu.SetActive(false);
-        controlsMenu.SetActive(false);
-        lobbyMenu.SetActive(false);
-        createLobbyPrompt.SetActive(false);
-        inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(true);
-        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(creditsSelected);
     }
     public void OpenInLobbyMenu() {
-        title.SetActive(false);
+        DisableAllMenus();
         bg.SetActive(true);
-        mainMenu.SetActive(false);
-        optionsMenu.SetActive(false);
-        controlsMenu.SetActive(false);
-        lobbyMenu.SetActive(false);
-        createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(true);
-        creditsMenu.SetActive(false);
-        privatePrompt.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(currentLobbySelected);
     }
@@ -482,7 +431,6 @@ public class MainMenuManager : MonoBehaviour {
         musicSlider.value =          Settings.Instance.VolumeMusic;
         sfxSlider.value =            Settings.Instance.VolumeSFX;
         masterSlider.value =         Settings.Instance.VolumeMaster;
-
         ndsResolutionToggle.isOn =   Settings.Instance.ndsResolution;
         aspectToggle.interactable =  Settings.Instance.ndsResolution;
         aspectToggle.isOn =          Settings.Instance.fourByThreeRatio;
@@ -504,7 +452,7 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void ConnectToDropdownRegion() {
-        string targetRegion = NetworkHandler.Regions[region.value];
+        string targetRegion = NetworkHandler.Regions[regionDropdown.value];
         if (lastRegion == targetRegion)
             return;
 
@@ -525,9 +473,9 @@ public class MainMenuManager : MonoBehaviour {
         OpenLobbyMenu();
         ClearChat();
 
-        if (playerUpdateRoutine != null) {
-            StopCoroutine(playerUpdateRoutine);
-            playerUpdateRoutine = null;
+        if (playerPingUpdateCoroutine != null) {
+            StopCoroutine(playerPingUpdateCoroutine);
+            playerPingUpdateCoroutine = null;
         }
 
         await NetworkHandler.ConnectToRegion();
@@ -773,83 +721,6 @@ public class MainMenuManager : MonoBehaviour {
         //LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
     }
 
-    /*
-    private void RunCommand(string[] args) {
-        if (Runner.IsClient) {
-            chat.LocalChatMessage("You cannot use room commands if you aren't the host!", Color.red);
-            return;
-        }
-        string command = args.Length > 0 ? args[0].ToLower() : "";
-        switch (command) {
-        case "kick": {
-            if (args.Length < 2) {
-                LocalChatMessage("Usage: /kick <player name>", Color.red);
-                return;
-            }
-            string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
-            if (target == null) {
-                LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
-                return;
-            }
-            Kick(target);
-            return;
-        }
-        case "host": {
-            if (args.Length < 2) {
-                LocalChatMessage("Usage: /host <player name>", Color.red);
-                return;
-            }
-            string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == strTarget);
-            if (target == null) {
-                LocalChatMessage($"Error: Unknown player {args[1]}", Color.red);
-                return;
-            }
-            Promote(target);
-            return;
-        }
-        case "help": {
-            string sub = args.Length > 1 ? args[1] : "";
-            string msg = sub switch {
-                "kick" => "/kick <player name> - Kick a player from the room",
-                "ban" => "/ban <player name> - Ban a player from rejoining the room",
-                "host" => "/host <player name> - Make a player the host for the room",
-                "mute" => "/mute <playername> - Prevents a player from talking in chat",
-                //"debug" => "/debug - Enables debug & in-development features",
-                _ => "Available commands: /kick, /host, /mute, /ban",
-            };
-            LocalChatMessage(msg, Color.red);
-            return;
-        }
-        case "mute": {
-            if (args.Length < 2) {
-                LocalChatMessage("Usage: /mute <player name>", Color.red);
-                return;
-            }
-            string strTarget = args[1].ToLower();
-            Player target = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
-            if (target == null) {
-                LocalChatMessage($"Unknown player {args[1]}", Color.red);
-                return;
-            }
-            Mute(target);
-            return;
-        }
-        case "ban": {
-            if (args.Length < 2) {
-                LocalChatMessage("Usage: /ban <player name>", Color.red);
-                return;
-            }
-            BanOrUnban(args[1]);
-            return;
-        }
-        }
-        LocalChatMessage($"Error: Unknown command. Try /help for help.", Color.red);
-        return;
-    }
-    */
-
     public void SwapCharacter(TMP_Dropdown dropdown) {
         byte character = (byte) dropdown.value;
 
@@ -863,33 +734,34 @@ public class MainMenuManager : MonoBehaviour {
 
         byte skin = LocalData.SkinIndex;
         if (skin == 0) {
-            paletteDisabled.SetActive(true);
-            palette.SetActive(false);
+            playerColorDisabledIcon.SetActive(true);
+            playerColorPaletteIcon.SetActive(false);
         } else {
-            paletteDisabled.SetActive(false);
-            palette.SetActive(true);
+            playerColorDisabledIcon.SetActive(false);
+            playerColorPaletteIcon.SetActive(true);
             PlayerColors colors = ScriptableManager.Instance.skins[skin].GetPlayerColors(data);
-            overallColor.color = colors.overallsColor;
-            shirtColor.color = colors.hatColor;
+            overallsColorImage.color = colors.overallsColor;
+            shirtColorImage.color = colors.hatColor;
         }
     }
 
     public void SetPlayerSkin(byte index) {
 
         if (index == 0) {
-            paletteDisabled.SetActive(true);
-            palette.SetActive(false);
+            playerColorDisabledIcon.SetActive(true);
+            playerColorPaletteIcon.SetActive(false);
         } else {
-            paletteDisabled.SetActive(false);
-            palette.SetActive(true);
+            playerColorDisabledIcon.SetActive(false);
+            playerColorPaletteIcon.SetActive(true);
 
             CharacterData character = Runner.GetLocalPlayerData().GetCharacterData();
             PlayerColors colors = ScriptableManager.Instance.skins[index].GetPlayerColors(character);
-            overallColor.color = colors.overallsColor;
-            shirtColor.color = colors.hatColor;
+            overallsColorImage.color = colors.overallsColor;
+            shirtColorImage.color = colors.hatColor;
         }
 
-        LocalData?.Rpc_SetSkinIndex(index);
+        if (LocalData)
+            LocalData.Rpc_SetSkinIndex(index);
 
         Settings.Instance.skin = index;
         Settings.Instance.SaveSettingsToPreferences();
@@ -935,7 +807,7 @@ public class MainMenuManager : MonoBehaviour {
         sfx.PlayOneShot(clip);
         quit = true;
 
-        yield return new WaitForSecondsRealtime(clip.length);
+        yield return new WaitForSeconds(clip.length);
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

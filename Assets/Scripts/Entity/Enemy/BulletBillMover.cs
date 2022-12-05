@@ -134,18 +134,21 @@ public class BulletBillMover : KillableEntity {
 
 #if UNITY_EDITOR
     //---Debug
+    private Vector2? boxOffset;
     public void OnDrawGizmosSelected() {
         if (!GameManager.Instance)
             return;
 
+        boxOffset ??= new Vector2(GameManager.Instance.LevelWidth, 0f);
+
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(body.position, searchVector);
         //left border check
-        if (body.position.x - playerSearchRadius < GameManager.Instance.GetLevelMinX())
-            Gizmos.DrawCube(body.position + new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
+        if (body.position.x - playerSearchRadius < GameManager.Instance.LevelMinX)
+            Gizmos.DrawCube(body.position + boxOffset.Value, searchVector);
         //right border check
-        if (body.position.x + playerSearchRadius > GameManager.Instance.GetLevelMaxX())
-            Gizmos.DrawCube(body.position - new Vector2(GameManager.Instance.levelWidthTile * 0.5f, 0), searchVector);
+        if (body.position.x + playerSearchRadius > GameManager.Instance.LevelMaxX)
+            Gizmos.DrawCube(body.position - boxOffset.Value, searchVector);
     }
 #endif
 }
