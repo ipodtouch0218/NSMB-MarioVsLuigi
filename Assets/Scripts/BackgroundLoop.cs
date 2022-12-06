@@ -82,8 +82,12 @@ public class BackgroundLoop : MonoBehaviour {
             c.name = obj.name + i;
         }
         Destroy(clone);
-        Destroy(obj.GetComponent<SpriteRenderer>());
+        if (obj.GetComponent<LegacyAnimateSpriteRenderer>() is LegacyAnimateSpriteRenderer anim)
+            Destroy(anim);
+        if (obj.GetComponent<SpriteRenderer>() is SpriteRenderer sRenderer)
+            Destroy(sRenderer);
     }
+
     private void RepositionChildObjects(GameObject obj) {
         if (!obj)
             return;

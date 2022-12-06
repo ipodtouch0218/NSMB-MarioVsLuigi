@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 using Fusion;
@@ -24,7 +24,7 @@ public class MarioBrosPlatform : NetworkBehaviour {
     private Color32[] pixels;
     private Texture2D displacementMap;
 
-    public void Start() {
+    public void Awake() {
         Initialize();
     }
 
@@ -40,8 +40,8 @@ public class MarioBrosPlatform : NetworkBehaviour {
             return;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
-
         spriteRenderer.size = new Vector2(platformWidth, 1.25f);
+
         if (changeCollider)
             GetComponent<BoxCollider2D>().size = new Vector2(platformWidth, 5f / 8f);
 
@@ -55,7 +55,7 @@ public class MarioBrosPlatform : NetworkBehaviour {
         mpb.SetFloat("PointsPerTile", samplesPerTile);
     }
 
-    public void Update() {
+    public override void Render() {
         for (int i = 0; i < platformWidth * samplesPerTile; i++)
             pixels[i] = BlankColor;
 
@@ -63,7 +63,7 @@ public class MarioBrosPlatform : NetworkBehaviour {
             float percentageCompleted = bump.SpawnTime / bumpDuration;
             float v = Mathf.Sin(Mathf.PI * percentageCompleted);
             for (int x = -bumpWidthPoints - bumpBlurPoints; x <= bumpWidthPoints + bumpBlurPoints; x++) {
-                int index = bump.Point + x;
+                int index = bump.point + x;
                 if (index < 0 || index >= platformWidth * samplesPerTile)
                     continue;
 
@@ -86,8 +86,10 @@ public class MarioBrosPlatform : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        for (int i = 0; i < Bumps.Count - 1; i++) {
-
+        //TODO: don't use linq
+        foreach (BumpInfo bump in Bumps.ToList()) {
+            if (bump.SpawnTime + bumpDuration > Runner.SimulationTime)
+                Bumps.Remove(bump);
         }
     }
 
@@ -110,11 +112,12 @@ public class MarioBrosPlatform : NetworkBehaviour {
         player.PlaySound(Enums.Sounds.World_Block_Bump);
         InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BumpOffset);
 
-        Bumps.Add(new BumpInfo() { Point = (int) localPos, SpawnTime = Runner.SimulationTime });
+        Bumps.Add(new BumpInfo() { point = (int) localPos, SpawnTime = Runner.SimulationTime });
     }
 
+    //---Helpers
     private struct BumpInfo : INetworkStruct {
-        [Networked] public int Point { get; set; }
+        public int point;
         [Networked] public float SpawnTime { get; set; }
     }
 }

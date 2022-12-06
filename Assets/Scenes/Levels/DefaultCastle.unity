@@ -12970,7 +12970,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1637169062}
   - component: {fileID: 1637169063}
-  - component: {fileID: 1637169064}
+  - component: {fileID: 1637169065}
+  - component: {fileID: 1637169066}
   m_Layer: 1
   m_Name: Foreground
   m_TagString: Untagged
@@ -13039,32 +13040,50 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 5.12, y: 2.62}
+  m_Size: {x: 5.12, y: 5.12}
   m_AdaptiveModeThreshold: 0
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &1637169064
-Animator:
-  serializedVersion: 4
+--- !u!111 &1637169065
+Animation:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1637169061}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4445d87ad17f2ff499b5efdeb22b8a93, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 6324221901187c1439d5d6dd8dbbbcd0, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 6324221901187c1439d5d6dd8dbbbcd0, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
+--- !u!114 &1637169066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1637169061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frame: 0
+  frames:
+  - {fileID: 60390689, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  - {fileID: -1225161913, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  - {fileID: 1607644316, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  - {fileID: -1828964215, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  - {fileID: -1218531289, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  - {fileID: -1928666995, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  - {fileID: 1223106022, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  - {fileID: -1669520036, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
 --- !u!1001 &1708235442
 PrefabInstance:
   m_ObjectHideFlags: 0
