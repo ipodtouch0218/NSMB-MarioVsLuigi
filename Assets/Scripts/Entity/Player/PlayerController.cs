@@ -249,7 +249,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             NetworkHandler.OnInput += OnInput;
         }
 
-
         Lives = SessionData.Instance.Lives;
 
         //use |= as the spectate manager sets it first
@@ -1384,18 +1383,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
         }
 
-        RaycastHit2D hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x - Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Time.fixedDeltaTime).magnitude, Layers.MaskAnyGround);
+        RaycastHit2D hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x - Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Runner.DeltaTime).magnitude, Layers.MaskAnyGround);
         if (hit) {
             //hit ground
             float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
             if (Mathf.Abs(angle) > 89)
                 return;
 
-            float x = Mathf.Abs(FloorAngle - angle) > 0.1f ? previousFrameVelocity.x : body.velocity.x;
+            float x = Mathf.Abs(FloorAngle - angle) > 1f ? previousFrameVelocity.x : body.velocity.x;
 
             FloorAngle = angle;
 
-            float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x;
+            float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.1f;
             body.velocity = new Vector2(x, change);
             IsOnGround = true;
             WasGroundedLastFrame = true;
@@ -1406,10 +1405,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 if (Mathf.Abs(angle) > 89)
                     return;
 
-                float x = Mathf.Abs(FloorAngle - angle) > 0.1f ? previousFrameVelocity.x : body.velocity.x;
+                float x = Mathf.Abs(FloorAngle - angle) > 1f ? previousFrameVelocity.x : body.velocity.x;
                 FloorAngle = angle;
 
-                float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x;
+                float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.1f;
                 body.velocity = new Vector2(x, change);
                 IsOnGround = true;
                 WasGroundedLastFrame = true;
@@ -1867,11 +1866,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsSkidding = false;
             IsTurnaround = false;
 
-            if (body.velocity.x == 0)
-                return;
 
+            float angle = Mathf.Abs(FloorAngle);
             if (IsSliding) {
-                float angle = Mathf.Abs(FloorAngle);
                 if (angle > slopeSlidingAngle) {
                     //uphill / downhill
                     acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * ((Mathf.Sign(FloorAngle) == sign) ? -1 : 1);
@@ -1889,8 +1886,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             int direction = (int) Mathf.Sign(body.velocity.x);
             float newX = body.velocity.x + acc * Runner.DeltaTime * direction;
 
-            if ((direction == -1) ^ (newX <= 0))
-                newX = 0;
+            float target = angle > 30 ? Math.Sign(FloorAngle) * -SPEED_STAGE_MAX[0] : 0;
+            if ((direction == -1) ^ (newX <= target))
+                newX = target;
+
+            if (body.velocity.x == target)
+                return;
 
             if (IsSliding) {
                 newX = Mathf.Clamp(newX, -SPEED_SLIDE_MAX, SPEED_SLIDE_MAX);
@@ -2403,6 +2404,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         HandleSlopes();
+
         HandleFacingDirection(heldButtons);
 
         //slow-rise check

@@ -167,6 +167,7 @@ MonoBehaviour:
   iceCarryable: 1
   flying: 0
   hitbox: {fileID: 0}
+  sRenderer: {fileID: 0}
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 4.5
@@ -459,7 +460,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   InterpolationSpace: 1
-  InterpolationTarget: {fileID: 0}
+  InterpolationTarget: {fileID: 8088900794427276647}
   InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3

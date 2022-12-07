@@ -188,6 +188,7 @@ MonoBehaviour:
   iceCarryable: 1
   flying: 0
   hitbox: {fileID: 0}
+  sRenderer: {fileID: 0}
   deadSprite: {fileID: -728934508601558331, guid: b455056ca00f84e48a8040f94ae8170d,
     type: 3}
   speed: 0.875
@@ -477,7 +478,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   InterpolationSpace: 1
-  InterpolationTarget: {fileID: 0}
+  InterpolationTarget: {fileID: 3591845850498963736}
   InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3

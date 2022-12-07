@@ -74,7 +74,6 @@ public class GameEventRpcs : NetworkBehaviour {
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_LoadingComplete() {
-
         //Populate scoreboard
         ScoreboardUpdater.Instance.Populate(gm.AlivePlayers);
         if (Settings.Instance.scoreboardAlways)

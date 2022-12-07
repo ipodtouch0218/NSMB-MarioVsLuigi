@@ -132,7 +132,7 @@ public class StarBouncer : CollectableEntity {
             }
         }
 
-        if (!passthrough && body.position.y < GameManager.Instance.GetLevelMinY())
+        if (!passthrough && body.position.y < GameManager.Instance.LevelMinY)
             Runner.Despawn(Object, true);
     }
 

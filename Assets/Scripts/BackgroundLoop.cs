@@ -5,19 +5,19 @@ using NSMB.Extensions;
 
 public class BackgroundLoop : MonoBehaviour {
 
+    //---Static Variables
     public static BackgroundLoop Instance { get; private set; }
+    private static readonly Vector2 ScreenBounds = new(7f, 4.5f);
 
+    //---Public Variables
+    public bool teleportedThisFrame;
+
+    //---Misc Variables
     private GameObject[] children;
     private Vector3[] truePositions, positionsAfterPixelSnap;
     private float[] ppus, halfWidths;
-
-    private Camera mainCamera;
-    private Vector2 screenBounds;
     private Vector3 lastPosition;
 
-    public bool wrap;
-
-    #region Unity Methods
     public void Start() {
         Instance = this;
 
@@ -37,8 +37,6 @@ public class BackgroundLoop : MonoBehaviour {
             positionsAfterPixelSnap[i] = truePositions[i] = children[i].transform.position;
         }
 
-        mainCamera = GetComponent<Camera>();
-        screenBounds = new Vector2(6.5f, 4f);
         foreach (GameObject obj in children)
             LoadChildObjects(obj);
 
@@ -48,16 +46,14 @@ public class BackgroundLoop : MonoBehaviour {
     public void LateUpdate() {
         Reposition();
     }
-    #endregion
 
-    #region Public Methods
     public void Reposition() {
         for (int i = 0; i < children.Length; i++) {
             GameObject obj = children[i];
             float difference = transform.position.x - lastPosition.x + (obj.transform.position.x - positionsAfterPixelSnap[i].x);
             float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(lastPosition.z / obj.transform.position.z));
 
-            if (wrap)
+            if (teleportedThisFrame)
                 parallaxSpeed = 1;
 
             truePositions[i] += difference * parallaxSpeed * Vector3.right;
@@ -65,15 +61,13 @@ public class BackgroundLoop : MonoBehaviour {
 
             RepositionChildObjects(obj);
         }
-        wrap = false;
+        teleportedThisFrame = false;
         lastPosition = transform.position;
     }
-    #endregion
 
-    #region Helper Methods
     private void LoadChildObjects(GameObject obj) {
         float objectWidth = halfWidths[Array.IndexOf(children, obj)] * 2f;
-        int childsNeeded = (int) Mathf.Ceil(screenBounds.x / objectWidth) + 1;
+        int childsNeeded = (int) Mathf.Ceil(ScreenBounds.x / objectWidth) + 1;
         GameObject clone = Instantiate(obj);
         for (int i = 0; i <= childsNeeded; i++) {
             GameObject c = Instantiate(clone);
@@ -97,10 +91,10 @@ public class BackgroundLoop : MonoBehaviour {
             GameObject firstChild = parent.GetChild(0).gameObject;
             GameObject lastChild = parent.GetChild(parent.childCount - 1).gameObject;
             float halfObjectWidth = halfWidths[Array.IndexOf(children, obj)];
-            if (transform.position.x + screenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
+            if (transform.position.x + ScreenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
                 firstChild.transform.SetAsLastSibling();
                 firstChild.transform.position = new Vector3(lastChild.transform.position.x + halfObjectWidth * 2, lastChild.transform.position.y, lastChild.transform.position.z);
-            } else if (transform.position.x - screenBounds.x < firstChild.transform.position.x - halfObjectWidth) {
+            } else if (transform.position.x - ScreenBounds.x < firstChild.transform.position.x - halfObjectWidth) {
                 lastChild.transform.SetAsFirstSibling();
                 lastChild.transform.position = new Vector3(firstChild.transform.position.x - halfObjectWidth * 2, firstChild.transform.position.y, firstChild.transform.position.z);
             }
@@ -124,5 +118,4 @@ public class BackgroundLoop : MonoBehaviour {
 
         return pos;
     }
-    #endregion
 }

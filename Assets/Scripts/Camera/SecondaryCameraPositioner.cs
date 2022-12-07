@@ -5,10 +5,7 @@ public class SecondaryCameraPositioner : MonoBehaviour {
     private bool destroyed = false;
 
     public void UpdatePosition() {
-        if (destroyed)
-            return;
-
-        if (!GameManager.Instance)
+        if (!GameManager.Instance || destroyed)
             return;
 
         if (!GameManager.Instance.loopingLevel) {

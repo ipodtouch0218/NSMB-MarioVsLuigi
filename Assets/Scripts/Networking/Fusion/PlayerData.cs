@@ -156,15 +156,6 @@ public class PlayerData : NetworkBehaviour {
         Team = team;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void Rpc_SceneLoaded() {
-        //no gamemanager, how can we be loaded???
-        if (!GameManager.Instance)
-            return;
-
-        IsLoaded = true;
-    }
-
     public static void OnLoadStateChanged(Changed<PlayerData> changed) {
         if (GameManager.Instance)
             GameManager.Instance.OnPlayerLoaded();

@@ -5,13 +5,14 @@ using NSMB.Utils;
 
 public class CameraController : MonoBehaviour {
 
+    //---Static Variables
     private static readonly Vector2 AirOffset = new(0, .65f);
     private static readonly Vector2 AirThreshold = new(0.5f, 1.3f), GroundedThreshold = new(0.5f, 0f);
+    public static float ScreenShake = 0;
 
     //---Public Variables
-    public static float ScreenShake = 0;
     public Vector3 currentPosition;
-    public bool IsControllingCamera { get; set; } = false;
+    public bool IsControllingCamera { get; set; }
 
     //---Private Variables
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
@@ -41,7 +42,7 @@ public class CameraController : MonoBehaviour {
     }
 
     public void Recenter(Vector2 pos) {
-        currentPosition = pos + AirOffset;
+        transform.position = playerPos = currentPosition = pos + AirOffset;
         smoothDampVel = Vector3.zero;
         SetPosition(pos);
     }
@@ -91,7 +92,7 @@ public class CameraController : MonoBehaviour {
             xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
             right = currentPosition.x > playerPos.x;
             if (IsControllingCamera)
-                BackgroundLoop.Instance.wrap = true;
+                BackgroundLoop.Instance.teleportedThisFrame = true;
         }
 
         if (xDifference > 0.25f)
@@ -107,10 +108,8 @@ public class CameraController : MonoBehaviour {
         if (validFloor && lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0)
             targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 2f;
 
-
         // Smoothing
-
-        targetPosition = Vector3.SmoothDamp(currentPosition, targetPosition, ref smoothDampVel, .5f);
+        targetPosition = Vector3.SmoothDamp(currentPosition, targetPosition, ref smoothDampVel, 0.5f);
 
         // Clamping to within level bounds
 
@@ -125,6 +124,9 @@ public class CameraController : MonoBehaviour {
         return targetPosition;
     }
 
+    //---DEBUG
+#if UNITY_EDITOR
+    private static Vector3 HalfRight = Vector3.right * 0.5f;
     public void OnDrawGizmos() {
         if (!controller)
             return;
@@ -133,11 +135,12 @@ public class CameraController : MonoBehaviour {
         Vector2 threshold = controller.IsOnGround ? GroundedThreshold : AirThreshold;
         Gizmos.DrawWireCube(playerPos, threshold * 2);
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(new(playerPos.x, lastFloor), Vector3.right / 2);
+        Gizmos.DrawWireCube(new(playerPos.x, lastFloor), HalfRight);
     }
+#endif
 
     private static Vector2 AntiJitter(Vector3 vec) {
-        vec.y = ((int) (vec.y * 100)) / 100f;
+        vec.y = ((int) (vec.y * 100)) * 0.001f;
         return vec;
     }
 }

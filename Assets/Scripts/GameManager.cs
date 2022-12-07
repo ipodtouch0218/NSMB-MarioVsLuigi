@@ -12,6 +12,7 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using System.Threading.Tasks;
 
 public class GameManager : NetworkBehaviour {
 
@@ -54,16 +55,16 @@ public class GameManager : NetworkBehaviour {
 
     //---Properties
     public NetworkRNG Random { get; set; }
+
     private float? levelWidth, levelHeight, middleX, minX, minY, maxX, maxY;
     public float LevelWidth => levelWidth ??= levelWidthTile * tilemap.transform.localScale.x;
     public float LevelHeight => levelHeight ??= levelHeightTile * tilemap.transform.localScale.x;
     public float LevelMinX => minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
     public float LevelMaxX => maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-    public float LevelMiddleX => middleX ??= (LevelMaxX + LevelMinX) * 0.5f;
+    public float LevelMiddleX => middleX ??= LevelMinX + (LevelWidth * 0.5f);
     public float LevelMinY => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
     public float LevelMaxY => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
 
-    public float GetLevelMinY() => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
     //---Public Variables
     public readonly HashSet<NetworkObject> networkObjects = new();
     public SingleParticleManager particleManager;
@@ -95,13 +96,6 @@ public class GameManager : NetworkBehaviour {
 
 
     // EVENT CALLBACK
-    public void SendAndExecuteEvent(object eventId, object parameters, object sendOption, object eventOptions = null) {
-        //if (eventOptions == null)
-        //    eventOptions = NetworkUtils.EventOthers;
-        //
-        //HandleEvent((byte) eventId, parameters, PhotonNetwork.LocalPlayer, null);
-        //PhotonNetwork.RaiseEvent((byte) eventId, parameters, eventOptions, sendOption);
-    }
     /*
         public void HandleEvent(byte eventId, object customData, Player sender, ParameterDictionary parameters) {
             object[] data = customData as object[];
@@ -137,18 +131,6 @@ public class GameManager : NetworkBehaviour {
                 tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
                 //Debug.Log($"SetTileBatch by {sender?.NickName} ({sender?.UserId}): {tileObjects[0]}");
                 break;
-            }
-            case (byte) Enums.NetEventIds.SyncTilemap: {
-                if (!(sender?.IsMasterClient ?? false))
-                    return;
-
-                Hashtable changes = (Hashtable) customData;
-                //Debug.Log($"SyncTilemap by {sender?.NickName} ({sender?.UserId}): {changes}");
-                Utils.ApplyTilemapChanges(originalTiles, originalTilesOrigin, tilemap, changes);
-                break;
-            }
-            case (byte) Enums.NetEventIds.BumpTile: {
-
             }
             case (byte) Enums.NetEventIds.SetThenBumpTile: {
 
@@ -197,13 +179,9 @@ public class GameManager : NetworkBehaviour {
 
                 break;
             }
-            case (byte) Enums.NetEventIds.SpawnResizableParticle: {
-
-            }
             }
         }
     */
-
 
     public void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
         TileBase[] tileObjects = new TileBase[tiles.Length];
@@ -212,7 +190,7 @@ public class GameManager : NetworkBehaviour {
             if (tile == "")
                 continue;
 
-            tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
+            tileObjects[i] = Utils.GetCacheTile(tile);
         }
 
         tilemap.SetTilesBlock(new BoundsInt(tileOrigin.x, tileOrigin.y, 0, tileDimensions.x, tileDimensions.y, 1), tileObjects);
@@ -247,6 +225,10 @@ public class GameManager : NetworkBehaviour {
         NetworkHandler.OnPlayerLeft -=   OnPlayerLeft;
     }
 
+    public void OnValidate() {
+        levelWidth = levelHeight = middleX = minX = minY = maxX = maxY = null;
+    }
+
     public void Awake() {
         Instance = this;
         spectationManager = GetComponent<SpectationManager>();
@@ -266,7 +248,6 @@ public class GameManager : NetworkBehaviour {
         //spawning in editor
         if (!NetworkHandler.Runner.SessionInfo.IsValid) {
             //uhhh
-
             _ = NetworkHandler.CreateRoom(new() {
                 Scene = SceneManager.GetActiveScene().buildIndex,
             }, GameMode.Single);
@@ -305,23 +286,14 @@ public class GameManager : NetworkBehaviour {
                 RealPlayerCount++;
             }
 
-
             //create pooled fireball instances (6 per player)
             for (int i = 0; i < RealPlayerCount * 6; i++)
                 Runner.Spawn(PrefabList.Instance.Obj_Fireball);
         }
 
-        //finished loading
-        if (Runner.IsSinglePlayer) {
-            CheckIfAllPlayersLoaded();
-        } else {
-            //tell our host that we're done loading
-            PlayerData data = NetworkHandler.Runner.GetLocalPlayerData();
-            if (data)
-                data.Rpc_FinishedLoading();
-        }
-
-        Camera.main.transform.position = spawnpoint;
+        //tell our host that we're done loading
+        PlayerData localData = Runner.GetLocalPlayerData();
+        localData.Rpc_FinishedLoading();
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -365,28 +337,29 @@ public class GameManager : NetworkBehaviour {
     }
 
     private void CheckIfAllPlayersLoaded() {
-        if (!NetworkHandler.Runner.IsServer || loaded)
+        if (!Runner.IsServer || loaded)
             return;
 
-        foreach (PlayerRef player in NetworkHandler.Runner.ActivePlayers) {
-            PlayerData data = player.GetPlayerData(NetworkHandler.Runner);
+        if (!Runner.IsSinglePlayer) {
+            foreach (PlayerRef player in Runner.ActivePlayers) {
+                PlayerData data = player.GetPlayerData(Runner);
 
-            if (data == null || data.IsCurrentlySpectating)
-                continue;
+                if (data == null || data.IsCurrentlySpectating)
+                    continue;
 
-            if (!data.IsLoaded)
-                return;
+                if (!data.IsLoaded)
+                    return;
+            }
         }
 
         loaded = true;
         SceneManager.SetActiveScene(gameObject.scene);
-        GameStartTimer = TickTimer.CreateFromSeconds(NetworkHandler.Runner, 5.7f);
+        GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0f : 5.7f);
 
-        if (Runner.IsServer)
-            StartCoroutine(CallLoadingComplete(2));
+        StartCoroutine(CallLoadingComplete(2));
 
-        foreach (PlayerRef player in NetworkHandler.Runner.ActivePlayers)
-            player.GetPlayerData(NetworkHandler.Runner).IsLoaded = false;
+        foreach (PlayerRef player in Runner.ActivePlayers)
+            player.GetPlayerData(Runner).IsLoaded = false;
     }
 
     private IEnumerator CallLoadingComplete(float seconds) {
