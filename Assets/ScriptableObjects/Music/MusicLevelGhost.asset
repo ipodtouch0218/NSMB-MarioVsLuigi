@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
   m_Name: MusicLevelGhost
   m_EditorClassIdentifier: 
-  clip: {fileID: 0}
-  fastClip: {fileID: 0}
+  clip: {fileID: 8300000, guid: 38069c3c365a1d549b1eedee80f119f8, type: 3}
+  fastClip: {fileID: 8300000, guid: f948a7013798a594bb618e62ae3e80fb, type: 3}
   loopStartSample: 1.622
   loopEndSample: 44.093

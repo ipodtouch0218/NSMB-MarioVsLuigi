@@ -54,13 +54,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _IsFrozen: 0
+  _IsFrozen:
+    _value: 0
   _IsDead:
     _value: 0
-  collide: 1
   iceCarryable: 0
   flying: 0
   hitbox: {fileID: 0}
+  sRenderer: {fileID: 0}
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 7.25
@@ -70,8 +71,6 @@ MonoBehaviour:
   shakeSpeed: 80
   shakeAmount: 2
   autoBreak: 3
-  shatterParticles: {fileID: 6779589790155936114, guid: 18ec030fd34201b4c90cac2de9b22a2d,
-    type: 3}
   unfreezeReason: 0
 --- !u!50 &-1029166702606754831
 Rigidbody2D:
@@ -153,14 +152,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  goUpSlopes: 0
-  onGround: 0
-  hitRoof: 0
-  hitRight: 0
-  hitLeft: 0
-  crushableGround: 0
-  floorAngle: 0
+  _OnGround:
+    _value: 0
+  _HitRoof:
+    _value: 0
+  _HitLeft:
+    _value: 0
+  _HitRight:
+    _value: 0
+  _CrushableGround:
+    _value: 0
+  _FloorAngle: 0
   currentCollider: {fileID: 7126150137336674110}
+  goUpSlopes: 0
   floorAndRoofCutoff: 0.2
 --- !u!114 &472015331249174581
 MonoBehaviour:
@@ -322,7 +326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
   InterpolationSpace: 0
-  InterpolationTarget: {fileID: 0}
+  InterpolationTarget: {fileID: 3560772426833456990}
   InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
@@ -334,6 +338,8 @@ MonoBehaviour:
     RotBlendStart: 0.1
     RotBlendEnd: 0.5
     RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
 --- !u!1 &5906585881545024381
 GameObject:
   m_ObjectHideFlags: 0

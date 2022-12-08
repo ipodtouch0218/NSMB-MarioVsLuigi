@@ -11,7 +11,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     private static readonly Collider2D[] CollisionBuffer = new Collider2D[16];
 
     //---Networked Variables
-    [Networked] private PlayerController Owner { get; set; }
+    [Networked] public PlayerController Owner { get; set; }
     [Networked] private float CurrentSpeed { get; set; }
     [Networked] public NetworkBool AlreadyBounced { get; set; }
     [Networked] public NetworkBool IsIceball { get; set; }
@@ -42,12 +42,9 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         FacingRight = right;
         AlreadyBounced = false;
         Owner = owner;
-        Object.AssignInputAuthority(owner.Object.InputAuthority);
 
         foreach (SpriteRenderer r in renderers)
             r.flipX = FacingRight;
-
-        Owner.ActiveFireballs++;
 
         //speed
         body.gravityScale = IsIceball ? 2.2f : 4.4f;
@@ -99,7 +96,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         //TDO: this mispredicts. is body.simulated not allowed?
         IsActive = false;
         body.simulated = false;
-        Owner.ActiveFireballs--;
     }
 
     //---Helper Methods

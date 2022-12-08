@@ -36,14 +36,14 @@ namespace NSMB.Utils {
             if (!manager)
                 manager = GameManager.Instance;
 
-            if (!manager.loopingLevel)
+            if (!manager || !manager.loopingLevel)
                 return false;
 
             if (location.x < manager.LevelMinX) {
-                location.x += manager.levelWidthTile * 0.5f;
+                location.x += manager.LevelWidth;
                 return true;
             } else if (location.x >= manager.LevelMaxX) {
-                location.x -= manager.levelWidthTile * 0.5f;
+                location.x -= manager.LevelWidth;
                 return true;
             }
             return false;
@@ -342,8 +342,8 @@ namespace NSMB.Utils {
 
         public static float WrappedDistance(Vector2 a, Vector2 b) {
             GameManager gm = GameManager.Instance;
-            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.levelWidthTile * 0.25f)
-                a.x -= gm.levelWidthTile * 0.5f * Mathf.Sign(a.x - b.x);
+            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.LevelWidth * 0.5f)
+                a.x -= gm.LevelWidth * Mathf.Sign(a.x - b.x);
 
             return Vector2.Distance(a, b);
         }

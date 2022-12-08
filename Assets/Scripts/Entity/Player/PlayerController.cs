@@ -68,7 +68,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public TickTimer PipeReentryTimer { get; set; }
     //Walljump
     [Networked(OnChanged = nameof(OnWallJumpTimerChanged))] public TickTimer WallJumpTimer { get; set; }
-    [Networked] public TickTimer WallSlideTimer { get; set; }
+    [Networked] public TickTimer WallSlideEndTimer { get; set; }
     [Networked] public NetworkBool WallSlideLeft { get; set; }
     [Networked] public NetworkBool WallSlideRight { get; set; }
 
@@ -80,12 +80,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     //-Entity Interactions
     [Networked] public HoldableEntity HeldEntity { get; set; }
+    [Networked] public float HoldStartTime { get; set; }
     [Networked] public TickTimer ShellSlowdownTimer { get; set; }
     [Networked] public TickTimer DamageInvincibilityTimer { get; set; }
 
     //-Powerup Stuffs
     [Networked(OnChanged = nameof(OnFireballAnimCounterChanged))] private byte FireballAnimCounter { get; set; }
-    [Networked] public byte ActiveFireballs { get; set; }
     [Networked] public TickTimer FireballShootTimer { get; set; }
     [Networked] public TickTimer FireballDelayTimer { get; set; }
     [Networked] public NetworkBool CanShootAdditionalFireball { get; set; }
@@ -146,7 +146,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [SerializeField] public CharacterData character;
 
     public bool crushGround, hitRoof, groundpoundLastFrame, hitBlock, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, stationaryGiantEnd, fireballKnockback, startedSliding;
-    public float jumpLandingTimer, pickupTimer, powerupFlash;
+    public float jumpLandingTimer, powerupFlash;
 
     //MOVEMENT STAGES
     private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
@@ -263,9 +263,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        GameManager.Instance.AlivePlayers.Remove(this);
         NetworkHandler.OnInput -= OnInput;
         NetworkHandler.OnInputMissing -= OnInputMissing;
+
+        if (GameManager.Instance)
+            GameManager.Instance.AlivePlayers.Remove(this);
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) {
@@ -661,45 +663,46 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         switch (State) {
         case Enums.PowerupState.IceFlower:
         case Enums.PowerupState.FireFlower: {
-                if (WallSlideLeft || WallSlideRight || IsGroundpounding || JumpState == PlayerJumpState.TripleJump || IsSpinnerFlying || IsDrilling || IsCrouching || IsSliding)
-                    return;
+            if (WallSlideLeft || WallSlideRight || IsGroundpounding || JumpState == PlayerJumpState.TripleJump || IsSpinnerFlying || IsDrilling || IsCrouching || IsSliding)
+                return;
 
-                if (!FireballDelayTimer.ExpiredOrNotRunning(Runner))
-                    return;
+            if (!FireballDelayTimer.ExpiredOrNotRunning(Runner))
+                return;
 
-                if (ActiveFireballs <= 1) {
-                    FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
-                    CanShootAdditionalFireball = ActiveFireballs == 0;
-                } else if (FireballShootTimer.ExpiredOrNotRunning(Runner)) {
-                    FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
-                    CanShootAdditionalFireball = true;
-                } else if (CanShootAdditionalFireball) {
-                    CanShootAdditionalFireball = false;
-                } else {
-                    return;
-                }
-
-                bool ice = State == Enums.PowerupState.IceFlower;
-                bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
-                Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
-
-                FireballMover inactiveFireball = GameManager.Instance.PooledFireballs.First(fm => !fm.IsActive);
-                inactiveFireball.Initialize(this, spawnPos, ice, right);
-
-                FireballDelayTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
-                FireballAnimCounter++;
-
-                //weird interaction in the main game...
-                WallJumpTimer = TickTimer.None;
-                break;
+            int activeFireballs = GameManager.Instance.PooledFireballs.Count(fm => fm.Owner == this && fm.IsActive);
+            if (activeFireballs <= 1) {
+                FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
+                CanShootAdditionalFireball = activeFireballs == 0;
+            } else if (FireballShootTimer.ExpiredOrNotRunning(Runner)) {
+                FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
+                CanShootAdditionalFireball = true;
+            } else if (CanShootAdditionalFireball) {
+                CanShootAdditionalFireball = false;
+            } else {
+                return;
             }
+
+            bool ice = State == Enums.PowerupState.IceFlower;
+            bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
+            Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
+
+            FireballMover inactiveFireball = GameManager.Instance.PooledFireballs.First(fm => !fm.IsActive);
+            inactiveFireball.Initialize(this, spawnPos, ice, right);
+
+            FireballDelayTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
+            FireballAnimCounter++;
+
+            //weird interaction in the main game...
+            WallJumpTimer = TickTimer.None;
+            break;
+        }
         case Enums.PowerupState.PropellerMushroom: {
-                if (IsGroundpounding || (IsSpinnerFlying && IsDrilling) || IsPropellerFlying || IsCrouching || IsSliding || !WallJumpTimer.ExpiredOrNotRunning(Runner))
-                    return;
+            if (IsGroundpounding || (IsSpinnerFlying && IsDrilling) || IsPropellerFlying || IsCrouching || IsSliding || !WallJumpTimer.ExpiredOrNotRunning(Runner))
+                return;
 
-                StartPropeller();
-                break;
-            }
+            StartPropeller();
+            break;
+        }
         }
     }
 
@@ -969,8 +972,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsTurnaround = false;
         IsGroundpounding = false;
         IsInKnockback = false;
-        WallSlideLeft = false;
         WallSlideRight = false;
+        WallSlideLeft = false;
         animator.SetBool("knockback", false);
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
@@ -1026,6 +1029,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         GiantStartTimer = TickTimer.None;
         IsGroundpounding = false;
         body.isKinematic = true;
+        body.velocity = Vector2.zero;
 
         Vector2 spawnpoint = GameManager.Instance.GetSpawnpoint(PlayerId);
         transform.position = body.position = spawnpoint;
@@ -1042,7 +1046,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         body.velocity = Vector2.zero;
         WallSlideLeft = false;
         WallSlideRight = false;
-        WallSlideTimer = TickTimer.None;
+        WallSlideEndTimer = TickTimer.None;
         WallJumpTimer = TickTimer.None;
         IsSpinnerFlying = false;
         FacingRight = true;
@@ -1311,14 +1315,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (HeldEntity != null) {
             HeldEntity.Holder = this;
             HeldEntity.PreviousHolder = null;
+            HoldStartTime = Runner.SimulationTime;
 
             if (HeldEntity is FrozenCube) {
                 animator.Play("head-pickup");
                 animator.ResetTrigger("fireball");
                 PlaySound(Enums.Sounds.Player_Voice_DoubleJump, 2);
-                pickupTimer = 0;
-            } else {
-                pickupTimer = pickupTime;
             }
             animator.ResetTrigger("throw");
             animator.SetBool("holding", true);
@@ -1339,6 +1341,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 if (!IsInShell && Mathf.Abs(FloorAngle) >= slopeSlidingAngle) {
                     IsGroundpounding = false;
                     IsSliding = true;
+                    GroundpoundHeld = false;
                     body.velocity = new Vector2(-Mathf.Sign(FloorAngle) * SPEED_SLIDE_MAX, 0);
                     startedSliding = true;
                 } else {
@@ -1356,6 +1359,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
         if (!((FacingRight && hitRight) || (!FacingRight && hitLeft)) && IsCrouching && Mathf.Abs(FloorAngle) >= slopeSlidingAngle && !IsInShell && State != Enums.PowerupState.MegaMushroom) {
             IsSliding = true;
+            GroundpoundHeld = false;
             IsCrouching = false;
         }
         if (IsSliding && IsOnGround && Mathf.Abs(FloorAngle) > slopeSlidingAngle) {
@@ -1370,10 +1374,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         }
 
-        if (IsSliding && (up || ((left ^ right) && !down) || (Mathf.Abs(FloorAngle) < slopeSlidingAngle && IsOnGround && body.velocity.x == 0 && !down) || (FacingRight && hitRight) || (!FacingRight && hitLeft))) {
+        if (up || ((left ^ right) && !down) || (Mathf.Abs(FloorAngle) < slopeSlidingAngle && IsOnGround && body.velocity.x == 0 && !down) || (FacingRight && hitRight) || (!FacingRight && hitLeft)) {
             IsSliding = false;
-
-            //alreadyGroundpounded = false;
         }
     }
 
@@ -1509,8 +1511,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsCrouching = false;
             return;
         }
-        bool prevCrouchState = IsCrouching || IsGroundpounding;
-        IsCrouching = ((IsOnGround && crouchInput && !IsGroundpounding) || (!IsOnGround && crouchInput && IsCrouching) || (IsCrouching && ForceCrouchCheck())) && !HeldEntity;
+
+        IsCrouching = ((IsOnGround && crouchInput && !IsGroundpounding) || (!IsOnGround && (crouchInput || body.velocity.y > 0) && IsCrouching) || (IsCrouching && ForceCrouchCheck())) && !HeldEntity;
     }
 
     public bool ForceCrouchCheck() {
@@ -1530,13 +1532,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private void HandleWallslide(bool holdingLeft, bool holdingRight, bool jump) {
 
         Vector2 currentWallDirection;
-        if (holdingLeft) {
-            currentWallDirection = Vector2.left;
-        } else if (holdingRight) {
-            currentWallDirection = Vector2.right;
-        } else if (WallSlideLeft) {
+        if (WallSlideLeft) {
             currentWallDirection = Vector2.left;
         } else if (WallSlideRight) {
+            currentWallDirection = Vector2.right;
+        } else if (holdingLeft) {
+            currentWallDirection = Vector2.left;
+        } else if (holdingRight) {
             currentWallDirection = Vector2.right;
         } else {
             return;
@@ -1544,8 +1546,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         HandleWallSlideStopChecks(currentWallDirection, holdingRight, holdingLeft);
 
-        WallSlideRight &= !WallSlideTimer.Expired(Runner) && hitRight && body.velocity.y < -0.1f;
-        WallSlideLeft &= !WallSlideTimer.Expired(Runner) && hitLeft && body.velocity.y < -0.1f;
+        if (WallSlideEndTimer.Expired(Runner)) {
+            WallSlideRight = false;
+            WallSlideLeft = false;
+            WallSlideEndTimer = TickTimer.None;
+            return;
+        }
 
         if (WallSlideLeft || WallSlideRight) {
             //walljump check
@@ -1562,9 +1568,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
                 WallJumpTimer = TickTimer.CreateFromSeconds(Runner, 16f / 60f);
                 animator.SetTrigger("walljump");
-                WallSlideTimer = TickTimer.None;
+                WallSlideRight = false;
+                WallSlideLeft = false;
+                WallSlideEndTimer = TickTimer.None;
             }
-        } else {
+        } else if (hitLeft || hitRight) {
             //walljump starting check
             bool canWallslide = !IsInShell && body.velocity.y < -0.1f && !IsGroundpounding && !IsOnGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !IsSpinnerFlying && !IsDrilling && !IsCrouching && !IsSliding && !IsInKnockback;
             if (!canWallslide)
@@ -1575,7 +1583,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 return;
 
             //Check 2
-            if (!WallSlideTimer.ExpiredOrNotRunning(Runner))
+            if (!WallSlideEndTimer.ExpiredOrNotRunning(Runner))
                 return;
 
             //Check 4: already handled
@@ -1592,39 +1600,30 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             //Start wallslide
             WallSlideRight = currentWallDirection == Vector2.right && hitRight;
             WallSlideLeft = currentWallDirection == Vector2.left && hitLeft;
+            WallSlideEndTimer = TickTimer.None;
 
             if (WallSlideRight || WallSlideLeft)
                 IsPropellerFlying = false;
         }
-
-        WallSlideRight &= !WallSlideTimer.Expired(Runner) && hitRight;
-        WallSlideLeft &= !WallSlideTimer.Expired(Runner) && hitLeft;
     }
 
     private void HandleWallSlideStopChecks(Vector2 wallDirection, bool right, bool left) {
         bool floorCheck = !Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.3f, Layers.MaskAnyGround);
-        if (!floorCheck) {
-            WallSlideTimer = TickTimer.None;
+        bool moveDownCheck = body.velocity.y < 0;
+        bool heightLowerCheck = Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.2f), wallDirection, MainHitbox.size.x * 2, Layers.MaskOnlyGround);
+        if (!floorCheck || !moveDownCheck || !heightLowerCheck) {
             WallSlideRight = false;
             WallSlideLeft = false;
+            WallSlideEndTimer = TickTimer.None;
             return;
         }
 
-        bool moveDownCheck = body.velocity.y < 0;
-        if (!moveDownCheck)
-            return;
-
-        bool wallCollisionCheck = wallDirection == Vector2.left ? hitLeft : hitRight;
-        if (!wallCollisionCheck)
-            return;
-
-        bool heightLowerCheck = Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.2f), wallDirection, MainHitbox.size.x * 2, Layers.MaskOnlyGround);
-        if (!heightLowerCheck)
-            return;
-
-        if ((wallDirection == Vector2.left && !left) || (wallDirection == Vector2.right && !right)) {
-            if (WallSlideTimer.ExpiredOrNotRunning(Runner))
-                WallSlideTimer = TickTimer.CreateFromSeconds(Runner, 16 / 60f);
+        if ((wallDirection == Vector2.left && (!left || !hitLeft)) || (wallDirection == Vector2.right && (!right || !hitRight))) {
+            if (WallSlideEndTimer.ExpiredOrNotRunning(Runner)) {
+                WallSlideEndTimer = TickTimer.CreateFromSeconds(Runner, 16 / 60f);
+            }
+        } else {
+            WallSlideEndTimer = TickTimer.None;
         }
     }
 
@@ -1649,7 +1648,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsSkidding = false;
             IsTurnaround = false;
             IsSliding = false;
-            WallSlideTimer = TickTimer.None;
+            WallSlideEndTimer = TickTimer.None;
             IsGroundpounding = false;
             GroundpoundStartTimer = TickTimer.None;
             IsDrilling = false;
@@ -1666,7 +1665,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsSkidding = false;
         IsTurnaround = false;
         IsSliding = false;
-        WallSlideTimer = TickTimer.None;
+        WallSlideEndTimer = TickTimer.None;
         IsGroundpounding = false;
         GroundpoundStartTimer = TickTimer.None;
         IsDrilling = false;
@@ -1991,7 +1990,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         //    Utils.TickTimer(ref invincible, 0, delta);
 
         Utils.TickTimer(ref jumpLandingTimer, 0, delta);
-        Utils.TickTimer(ref pickupTimer, 0, -delta, pickupTime);
     }
 
     public void FinishMegaMario(bool success) {
@@ -2474,7 +2472,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     private void SetHoldingOffset() {
         if (HeldEntity is FrozenCube) {
-            HeldEntity.holderOffset = new(HeldEntity.hitbox.size.x * 0.25f, MainHitbox.size.y * (1f - Utils.QuadraticEaseOut(1f - (pickupTimer / pickupTime))), -2);
+            float time = Mathf.Clamp01((Runner.SimulationTime - HoldStartTime) / pickupTime);
+            HeldEntity.holderOffset = new(HeldEntity.hitbox.size.x * 0.25f, MainHitbox.size.y * (1f - Utils.QuadraticEaseOut(1f - time)), -2);
         } else {
             HeldEntity.holderOffset = new((FacingRight ? 1 : -1) * 0.25f, (State >= Enums.PowerupState.Mushroom ? 0.3f : 0.075f) - HeldEntity.sRenderer.localBounds.min.y, !FacingRight ? -0.09f : 0f);
         }

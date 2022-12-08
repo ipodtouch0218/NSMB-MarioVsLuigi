@@ -103,10 +103,10 @@ public class PlayerAnimationController : NetworkBehaviour {
         float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
 
         //Particles
-        SetParticleEmission(drillParticle, controller.IsDrilling);
-        SetParticleEmission(sparkles,      controller.IsStarmanInvincible);
-        SetParticleEmission(dust,          (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.CurrentPipe);
-        SetParticleEmission(giantParticle, controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
+        SetParticleEmission(drillParticle, !controller.IsDead && controller.IsDrilling);
+        SetParticleEmission(sparkles,      !controller.IsDead && controller.IsStarmanInvincible);
+        SetParticleEmission(dust,          !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.CurrentPipe);
+        SetParticleEmission(giantParticle, !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
         SetParticleEmission(fireParticle,  animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
 
         if (controller.IsDrilling)
@@ -158,9 +158,6 @@ public class PlayerAnimationController : NetworkBehaviour {
             } else {
                 modelRotationTarget = new Vector3(0, 180, 0);
             }
-            modelRotateInstantly = true;
-        } else if (controller.CurrentPipe) {
-            modelRotationTarget = new Vector3(0, 180, 0);
             modelRotateInstantly = true;
         } else if (animator.GetBool("inShell") && (!controller.OnSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
             modelRotationTarget += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1400 * (controller.FacingRight ? -1 : 1));
@@ -242,17 +239,17 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("facingRight",   (left ^ right) ? right : controller.FacingRight);
         animator.SetBool("flying",        controller.IsSpinnerFlying);
         animator.SetBool("drill",         controller.IsDrilling);
-        animator.SetFloat("velocityY", body.velocity.y);
-        animator.SetBool("doublejump", controller.JumpState == PlayerController.PlayerJumpState.DoubleJump);
-        animator.SetBool("triplejump", controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
-        animator.SetBool("holding", controller.HeldEntity != null);
-        animator.SetBool("head carry", controller.HeldEntity != null && controller.HeldEntity is FrozenCube);
-        animator.SetBool("pipe", controller.CurrentPipe != null);
-        animator.SetBool("blueshell", controller.State == Enums.PowerupState.BlueShell);
-        animator.SetBool("mini", controller.State == Enums.PowerupState.MiniMushroom);
-        animator.SetBool("mega", controller.State == Enums.PowerupState.MegaMushroom);
-        animator.SetBool("inShell", controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
-        animator.SetBool("turnaround", controller.IsTurnaround);
+        animator.SetFloat("velocityY",    body.velocity.y);
+        animator.SetBool("doublejump",    controller.JumpState == PlayerController.PlayerJumpState.DoubleJump);
+        animator.SetBool("triplejump",    controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
+        animator.SetBool("holding",       controller.HeldEntity != null);
+        animator.SetBool("head carry",    controller.HeldEntity != null && controller.HeldEntity is FrozenCube);
+        animator.SetBool("pipe",          controller.CurrentPipe != null);
+        animator.SetBool("blueshell",     controller.State == Enums.PowerupState.BlueShell);
+        animator.SetBool("mini",          controller.State == Enums.PowerupState.MiniMushroom);
+        animator.SetBool("mega",          controller.State == Enums.PowerupState.MegaMushroom);
+        animator.SetBool("inShell",       controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
+        animator.SetBool("turnaround",    controller.IsTurnaround);
 
         float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.FloorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.FloorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);
         if (controller.stuckInBlock) {
@@ -333,7 +330,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         HandleDeathAnimation();
         HandlePipeAnimation();
 
-        transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
+        transform.position = new(transform.position.x, transform.position.y, controller.PipeEntering ? 1 : -4);
     }
 
     private void HandleDeathAnimation() {
@@ -363,7 +360,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
         }
-        if (controller.Object.HasInputAuthority && deathTimer + Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f) && Runner.IsForward)
+        if (Runner.IsForward && Object.HasInputAuthority && deathTimer + Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f))
             controller.fadeOut.FadeOutAndIn(0.33f, .1f);
 
         if (body.position.y < GameManager.Instance.LevelMinY - transform.lossyScale.y) {

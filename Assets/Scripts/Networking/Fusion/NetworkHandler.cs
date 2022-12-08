@@ -223,6 +223,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         runner.ProvideInput = true;
         runner.AddCallbacks(this);
     }
+
+    public void OnApplicationQuit() {
+        if (Runner && !Runner.IsShutdown)
+            Runner.Shutdown();
+    }
     #endregion
 
     #region Room-Related Methods

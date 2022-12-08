@@ -157,7 +157,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnLoadStateChanged(Changed<PlayerData> changed) {
-        if (GameManager.Instance)
+        if (changed.Behaviour.IsLoaded && GameManager.Instance)
             GameManager.Instance.OnPlayerLoaded();
     }
 

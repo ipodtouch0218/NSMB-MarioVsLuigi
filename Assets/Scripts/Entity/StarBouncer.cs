@@ -147,7 +147,8 @@ public class StarBouncer : CollectableEntity {
         if (!GameManager.Instance.gameover && !Collector)
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
 
-        Destroy(icon.gameObject);
+        if (icon)
+            Destroy(icon.gameObject);
     }
 
     private IEnumerator PulseEffect() {

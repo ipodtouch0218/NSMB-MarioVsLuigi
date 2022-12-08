@@ -7,7 +7,7 @@ public class BackgroundLoop : MonoBehaviour {
 
     //---Static Variables
     public static BackgroundLoop Instance { get; private set; }
-    private static readonly Vector2 ScreenBounds = new(7f, 4.5f);
+    private static readonly Vector2 ScreenBounds = new(7.5f, 5f);
 
     //---Public Variables
     public bool teleportedThisFrame;

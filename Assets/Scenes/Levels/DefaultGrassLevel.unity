@@ -252,7 +252,6 @@ Transform:
   - {fileID: 1922393262}
   - {fileID: 992935485}
   - {fileID: 1693744773}
-  - {fileID: 1512896785}
   - {fileID: 1901234081}
   - {fileID: 199968020}
   - {fileID: 1845180065}
@@ -272,7 +271,7 @@ GameObject:
   m_Component:
   - component: {fileID: 199968020}
   m_Layer: 0
-  m_Name: StarSpawn (9)
+  m_Name: StarSpawn (8)
   m_TagString: StarSpawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4113,6 +4112,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3474641543873908501, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 76.7
+      objectReference: {fileID: 0}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: tilemap
@@ -4241,6 +4245,16 @@ PrefabInstance:
     - target: {fileID: 5500062339093502141, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6094452135693837193, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 13.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6094452135693837193, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_enableKerning
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6097373057582557604, guid: 43d56bd18d06e9b4abe323618a20a228,
@@ -4581,37 +4595,6 @@ Transform:
   - {fileID: 643464984}
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1512896784
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1512896785}
-  m_Layer: 0
-  m_Name: StarSpawn (7)
-  m_TagString: StarSpawn
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!4 &1512896785
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1512896784}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.5, y: 1.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 195012562}
-  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1542081885
 GameObject:
@@ -4969,7 +4952,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 2.56, y: 3.62}
+  m_Size: {x: 8, y: 10}
   m_AdaptiveModeThreshold: 0.205
   m_SpriteTileMode: 1
   m_WasSpriteAssigned: 1
@@ -4983,8 +4966,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1831778352}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.5, z: 30}
-  m_LocalScale: {x: 3, y: 3, z: 1}
+  m_LocalPosition: {x: 0, y: -2.158, z: 30}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1542081886}
@@ -5102,7 +5085,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1901234081}
   m_Layer: 0
-  m_Name: StarSpawn (8)
+  m_Name: StarSpawn (7)
   m_TagString: StarSpawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5216,7 +5199,7 @@ SpriteRenderer:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 2
+  m_DrawMode: 0
   m_Size: {x: 5.12, y: 1.27}
   m_AdaptiveModeThreshold: 0
   m_SpriteTileMode: 1
@@ -5231,8 +5214,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1959336204}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.85, z: 20}
-  m_LocalScale: {x: 3, y: 3, z: 2}
+  m_LocalPosition: {x: 0, y: -2.95, z: 20}
+  m_LocalScale: {x: 1, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1542081886}

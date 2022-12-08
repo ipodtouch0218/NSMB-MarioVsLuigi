@@ -140,7 +140,7 @@ public class CameraController : MonoBehaviour {
 #endif
 
     private static Vector2 AntiJitter(Vector3 vec) {
-        vec.y = ((int) (vec.y * 100)) * 0.001f;
+        vec.y = ((int) (vec.y * 100)) * 0.01f;
         return vec;
     }
 }

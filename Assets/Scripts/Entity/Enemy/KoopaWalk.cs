@@ -49,7 +49,7 @@ public class KoopaWalk : HoldableEntity {
 
         float remainingWakeupTimer = WakeupTimer.RemainingTime(Runner) ?? 0f;
         if (IsUpsideDown) {
-            dampVelocity = Mathf.Min(dampVelocity + Time.fixedDeltaTime * 3, 1);
+            dampVelocity = Mathf.Min(dampVelocity + Runner.DeltaTime * 3, 1);
             graphicsTransform.eulerAngles = new Vector3(
                 graphicsTransform.eulerAngles.x,
                 graphicsTransform.eulerAngles.y,

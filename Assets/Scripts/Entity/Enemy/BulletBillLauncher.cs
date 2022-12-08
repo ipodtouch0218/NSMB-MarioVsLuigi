@@ -35,6 +35,9 @@ public class BulletBillLauncher : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
+        if (GameManager.Instance.gameover)
+            return;
+
         if (ShootTimer.Expired(Runner)) {
             TryToShoot();
             ShootTimer = TickTimer.CreateFromSeconds(Runner, initialShootTimer);

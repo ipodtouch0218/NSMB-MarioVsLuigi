@@ -72,7 +72,7 @@ public class FrozenCube : HoldableEntity {
     public override void Despawned(NetworkRunner runner, bool hasState) {
         Instantiate(PrefabList.Instance.Particle_IceBreak, transform.position, Quaternion.identity);
 
-        if (FrozenEntity && FrozenEntity.IsCarryable)
+        if (FrozenEntity)
             FrozenEntity.transform.SetParent(null);
     }
 

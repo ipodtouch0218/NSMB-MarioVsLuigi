@@ -94,95 +94,6 @@ public class GameManager : NetworkBehaviour {
     private LoopingMusic loopMusic;
     public AudioSource music, sfx;
 
-
-    // EVENT CALLBACK
-    /*
-        public void HandleEvent(byte eventId, object customData, Player sender, ParameterDictionary parameters) {
-            object[] data = customData as object[];
-
-            //Debug.Log($"id:{eventId} sender:{sender} master:{sender?.IsMasterClient ?? false}");
-            switch (eventId) {
-            case (byte) Enums.NetEventIds.SetTile: {
-
-                int x = (int) data[0];
-                int y = (int) data[1];
-                string tilename = (string) data[2];
-                Vector3Int loc = new(x, y, 0);
-
-                TileBase tile = Utils.GetTileFromCache(tilename);
-                tilemap.SetTile(loc, tile);
-                //Debug.Log($"SetTile by {sender?.NickName} ({sender?.UserId}): {tilename}");
-                break;
-            }
-            case (byte) Enums.NetEventIds.SetTileBatch: {
-                int x = (int) data[0];
-                int y = (int) data[1];
-                int width = (int) data[2];
-                int height = (int) data[3];
-                string[] tiles = (string[]) data[4];
-                TileBase[] tileObjects = new TileBase[tiles.Length];
-                for (int i = 0; i < tiles.Length; i++) {
-                    string tile = tiles[i];
-                    if (tile == "")
-                        continue;
-
-                    tileObjects[i] = (TileBase) Resources.Load("Tilemaps/Tiles/" + tile);
-                }
-                tilemap.SetTilesBlock(new BoundsInt(x, y, 0, width, height, 1), tileObjects);
-                //Debug.Log($"SetTileBatch by {sender?.NickName} ({sender?.UserId}): {tileObjects[0]}");
-                break;
-            }
-            case (byte) Enums.NetEventIds.SetThenBumpTile: {
-
-                int x = (int) data[0];
-                int y = (int) data[1];
-
-                bool downwards = (bool) data[2];
-                string newTile = (string) data[3];
-                string spawnResult = (string) data[4];
-
-                Vector3Int loc = new(x, y, 0);
-
-                tilemap.SetTile(loc, Utils.GetTileFromCache(newTile));
-                //Debug.Log($"SetThenBumpTile by {sender?.NickName} ({sender?.UserId}): {newTile}");
-                tilemap.RefreshTile(loc);
-
-                GameObject bump = (GameObject) Instantiate(Resources.Load("Prefabs/Bump/BlockBump"), Utils.TilemapToWorldPosition(loc) + Vector3.one * 0.25f, Quaternion.identity);
-                BlockBump bb = bump.GetComponentInChildren<BlockBump>();
-
-                bb.fromAbove = downwards;
-                bb.resultTile = newTile;
-                bb.sprite = tilemap.GetSprite(loc);
-                bb.resultPrefab = spawnResult;
-
-                tilemap.SetTile(loc, null);
-                break;
-            }
-            case (byte) Enums.NetEventIds.SpawnParticle: {
-                int x = (int) data[0];
-                int y = (int) data[1];
-                string particleName = (string) data[2];
-                Vector3 color = data.Length > 3 ? (Vector3) data[3] : new Vector3(1, 1, 1);
-                Vector3 worldPos = Utils.TilemapToWorldPosition(new(x, y)) + new Vector3(0.25f, 0.25f);
-
-                GameObject particle;
-                if (particleName == "BrickBreak") {
-                    brickBreak.transform.position = worldPos;
-                    brickBreak.Emit(new() { startColor = new Color(color.x, color.y, color.z, 1) }, 4);
-                } else {
-                    particle = (GameObject) Instantiate(Resources.Load("Prefabs/Particle/" + particleName), worldPos, Quaternion.identity);
-
-                    ParticleSystem system = particle.GetComponent<ParticleSystem>();
-                    ParticleSystem.MainModule main = system.main;
-                    main.startColor = new Color(color.x, color.y, color.z, 1);
-                }
-
-                break;
-            }
-            }
-        }
-    */
-
     public void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
         TileBase[] tileObjects = new TileBase[tiles.Length];
         for (int i = 0; i < tiles.Length; i++) {
@@ -269,26 +180,12 @@ public class GameManager : NetworkBehaviour {
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
         enemySpawns = FindObjectsOfType<EnemySpawnpoint>();
 
-        if (Runner.IsServer) {
+        if (Runner.IsServer && Runner.IsSinglePlayer) {
             //handle spawning in editor
             if (Runner.IsSinglePlayer) {
                 Runner.Spawn(PrefabList.Instance.SessionDataHolder);
                 Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
             }
-
-            //create player instances
-            foreach (PlayerRef player in Runner.ActivePlayers) {
-                PlayerData data = player.GetPlayerData(Runner);
-                if (!data || data.IsCurrentlySpectating)
-                    continue;
-
-                Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player);
-                RealPlayerCount++;
-            }
-
-            //create pooled fireball instances (6 per player)
-            for (int i = 0; i < RealPlayerCount * 6; i++)
-                Runner.Spawn(PrefabList.Instance.Obj_Fireball);
         }
 
         //tell our host that we're done loading
@@ -328,6 +225,7 @@ public class GameManager : NetworkBehaviour {
             }
         }
 
+        CheckIfAllPlayersLoaded();
         CheckForWinner();
     }
 
@@ -356,10 +254,25 @@ public class GameManager : NetworkBehaviour {
         SceneManager.SetActiveScene(gameObject.scene);
         GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0f : 5.7f);
 
-        StartCoroutine(CallLoadingComplete(2));
+        //create player instances
+        foreach (PlayerRef player in Runner.ActivePlayers) {
+            PlayerData data = player.GetPlayerData(Runner);
+            if (!data)
+                continue;
 
-        foreach (PlayerRef player in Runner.ActivePlayers)
-            player.GetPlayerData(Runner).IsLoaded = false;
+            data.IsLoaded = false;
+            if (data.IsCurrentlySpectating)
+                continue;
+
+            Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player);
+            RealPlayerCount++;
+        }
+
+        //create pooled fireball instances (6 per player)
+        for (int i = 0; i < RealPlayerCount * 6; i++)
+            Runner.Spawn(PrefabList.Instance.Obj_Fireball);
+
+        StartCoroutine(CallLoadingComplete(2));
     }
 
     private IEnumerator CallLoadingComplete(float seconds) {
@@ -457,6 +370,9 @@ public class GameManager : NetworkBehaviour {
                     data.Team = (sbyte) Mathf.Clamp(data.Team, 0, ScriptableManager.Instance.teams.Length);
             }
         }
+
+        foreach (PlayerRef player in Runner.ActivePlayers)
+            player.GetPlayerData(Runner).IsLoaded = false;
 
         yield return new WaitForSecondsRealtime(secondsUntilMenu);
         Runner.SetActiveScene(0);
@@ -684,10 +600,10 @@ public class GameManager : NetworkBehaviour {
         if (players == 0)
             players = 1;
 
-        float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI/(2*players));
+        float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI / (2 * players));
         float scale = (2 - (players + 1f) / players) * size;
 
-        Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2 ? scale * ySize : 0), 0);
+        Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * ySize : 0), 0);
         Utils.WrapWorldLocation(ref spawn);
 
         return spawn;

@@ -149,6 +149,7 @@ public class MainMenuManager : MonoBehaviour {
             OpenErrorBox(cause);
 
         selectedRoom = null;
+        GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         if (!runner.IsCloudReady) {
             foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
                 Destroy(value);

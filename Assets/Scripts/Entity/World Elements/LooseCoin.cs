@@ -8,6 +8,7 @@ public class LooseCoin : Coin {
     //---Networked Variables
     [Networked] private TickTimer CollectableTimer { get; set; }
     [Networked] private TickTimer DespawnTimer { get; set; }
+    [Networked] private Vector3 PreviousFrameVelocity { get; set; }
 
     //---Serialized Variables
     [SerializeField] private float despawn = 8;
@@ -17,9 +18,6 @@ public class LooseCoin : Coin {
     private PhysicsEntity physics;
     private new Animation animation;
     private BoxCollider2D hitbox;
-
-    //---Misc Variables
-    private Vector2 prevFrameVelocity;
 
     public override void Awake() {
         base.Awake();
@@ -55,21 +53,21 @@ public class LooseCoin : Coin {
 
         physics.UpdateCollisions();
         if (physics.OnGround) {
-            body.velocity -= body.velocity * Time.fixedDeltaTime;
+            body.velocity -= body.velocity * Runner.DeltaTime;
             if (physics.HitRoof) {
                 Runner.Despawn(Object);
                 return;
             }
 
             //isforward is ok, the sound isnt top priority
-            if (prevFrameVelocity.y < -1f && Runner.IsForward)
+            if (PreviousFrameVelocity.y < -1.85f && Runner.IsForward)
                 PlaySound(Enums.Sounds.World_Coin_Drop);
         }
 
         float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
         spriteRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
 
-        prevFrameVelocity = body.velocity;
+        PreviousFrameVelocity = body.velocity;
     }
 
     //---IPlayerInteractable overrides
