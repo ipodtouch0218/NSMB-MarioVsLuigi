@@ -2,7 +2,12 @@ using UnityEngine;
 
 public class SecondaryCameraPositioner : MonoBehaviour {
 
+    private Camera camera;
     private bool destroyed = false;
+
+    public void Start() {
+        camera = Camera.main;
+    }
 
     public void UpdatePosition() {
         if (!GameManager.Instance || destroyed)
@@ -14,7 +19,7 @@ public class SecondaryCameraPositioner : MonoBehaviour {
             return;
         }
 
-        bool right = Camera.main.transform.position.x > GameManager.Instance.LevelMiddleX;
+        bool right = camera.transform.position.x > GameManager.Instance.LevelMiddleX;
         transform.localPosition = new Vector3(GameManager.Instance.levelWidthTile * (right ? -1 : 1), 0, 0);
     }
 }

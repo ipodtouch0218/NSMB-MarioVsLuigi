@@ -73,7 +73,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool WallSlideRight { get; set; }
 
     //-Death & Respawning
-    [Networked(OnChanged = nameof(OnDeadChanged))] public NetworkBool IsDead { get; set; }
+    [Networked(OnChanged = nameof(OnDeadChanged))] public NetworkBool IsDead { get; set; } = false;
     [Networked(OnChanged = nameof(OnRespawningChanged))] public NetworkBool IsRespawning { get; set; }
     [Networked] public TickTimer RespawnTimer { get; set; }
     [Networked] public TickTimer PreRespawnTimer { get; set; }
@@ -102,6 +102,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     //---Properties
     public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
     public override bool IsCarryable => true;
+    public bool WallSliding => WallSlideLeft || WallSlideRight;
     public bool IsStarmanInvincible => !StarmanTimer.ExpiredOrNotRunning(Runner);
     public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
     public int PlayerId => data.PlayerId;
@@ -663,7 +664,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         switch (State) {
         case Enums.PowerupState.IceFlower:
         case Enums.PowerupState.FireFlower: {
-            if (WallSlideLeft || WallSlideRight || IsGroundpounding || JumpState == PlayerJumpState.TripleJump || IsSpinnerFlying || IsDrilling || IsCrouching || IsSliding)
+            if (WallSliding || IsGroundpounding || JumpState == PlayerJumpState.TripleJump || IsSpinnerFlying || IsDrilling || IsCrouching || IsSliding)
                 return;
 
             if (!FireballDelayTimer.ExpiredOrNotRunning(Runner))
@@ -1553,7 +1554,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
         }
 
-        if (WallSlideLeft || WallSlideRight) {
+        if (WallSliding) {
             //walljump check
             FacingRight = WallSlideLeft;
             if (jump && WallJumpTimer.ExpiredOrNotRunning(Runner)) {
@@ -1628,7 +1629,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void HandleJumping(bool jumpHeld, bool doJump) {
-        if (IsInKnockback || IsDrilling || (State == Enums.PowerupState.MegaMushroom && JumpState == PlayerJumpState.SingleJump) || WallSlideLeft || WallSlideRight)
+        if (IsInKnockback || IsDrilling || (State == Enums.PowerupState.MegaMushroom && JumpState == PlayerJumpState.SingleJump) || WallSliding)
             return;
 
         if (!DoEntityBounce && !doJump)
@@ -2206,9 +2207,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             JumpBufferTime = Runner.SimulationTime + 0.15f;
         }
 
-        bool canJump = pressedButtons.IsSet(PlayerControls.Jump) || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSlideLeft || WallSlideRight));
+        bool canJump = pressedButtons.IsSet(PlayerControls.Jump) || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
         bool doJump = canJump && (IsOnGround || Runner.SimulationTime <= CoyoteTime);
-        bool doWalljump = canJump && !IsOnGround && (WallSlideLeft || WallSlideRight);
+        bool doWalljump = canJump && !IsOnGround && WallSliding;
 
         //GROUNDPOUND BUFFERING
         if (pressedButtons.IsSet(PlayerControls.Down)) {
@@ -2453,7 +2454,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 float htv = WalkingMaxSpeed * 1.18f + (remainingTime * 2f);
                 body.velocity = new(Mathf.Clamp(body.velocity.x, -htv, htv), Mathf.Max(body.velocity.y, !PropellerSpinTimer.ExpiredOrNotRunning(Runner) ? -propellerSpinFallSpeed : -propellerFallSpeed));
             }
-        } else if (WallSlideLeft || WallSlideRight) {
+        } else if (WallSliding) {
             body.velocity = new(body.velocity.x, Mathf.Max(body.velocity.y, wallslideSpeed));
         } else if (IsGroundpounding) {
             body.velocity = new(body.velocity.x, Mathf.Max(body.velocity.y, -groundpoundVelocity));
@@ -2502,7 +2503,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (IsOnGround || IsInKnockback || IsGroundpounding || IsDrilling
             || HeldEntity || IsCrouching || IsSliding || IsInShell
-            || WallSlideLeft || WallSlideRight)
+            || WallSliding)
             return;
 
         if (!IsPropellerFlying && !IsSpinnerFlying && (left || right))
@@ -2635,7 +2636,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (player.Object.HasInputAuthority)
             ScoreboardUpdater.Instance.OnDeathToggle();
-
     }
 
     private GameObject respawnParticle;

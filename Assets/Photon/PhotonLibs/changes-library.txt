@@ -3,6 +3,26 @@ Photon C# Client Library - Changelog
 Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
+Version 4.1.6.20 (09. November 2022 - rev6568)
+    Changed: EnetPeer.Disconnect() will no longer Sleep for a minimum of time. Instead the Socket might want to "linger" on close, if needs be.
+    Fixed: Discarded unreliable commands did not return memory that was pooled (causing additional allocations).
+    Changed: SocketUdp to use a non-blocking Socket. Before receiving data, we Poll the socket. This fixes an issue where apps were freezing for up to a second on freeze (specifically on Unity IL2CPP Windows Standalone builds).
+
+Version 4.1.6.19 (12. October 2022 - rev6519)
+    Changed: Handling of incorrect stream data.
+	
+Version 4.1.6.18 (20. September 2022 - rev6501)
+    Changed: WebSocket.jslib (in Unity related SDKs) to use stringToUTF8 instead of writeStringToMemory (which is obsolete).
+
+Version 4.1.6.17 (02. August 2022 - rev6472)
+    Changed: SequenceDeltaLimitResends to 100 and SequenceDeltaLimitSends to 75.
+
+Version 4.1.6.16 (20. June 2022)
+    Note: No notable changes.
+
+Version 4.1.6.15 (02. June 2022)
+    Note: No notable changes.
+
 Version 4.1.6.14 (26. April 2022 - rev6414)
     Fixed: WSS PhotonClientWebSocket blocking the main thread when sending isn't possible. Without loss. This affects the RTT however.
     Changed: PhotonClientWebSocket will return PhotonSocketError.Busy, if previous Task is not completed yet.

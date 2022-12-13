@@ -601,6 +601,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
+    gravitySource: 0
     maxNumParticles: 1000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 1
@@ -3985,6 +3986,7 @@ ParticleSystem:
         m_RotationOrder: 4
     minVertexDistance: 0.2
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     ribbonCount: 1
     shadowBias: 0.5
     worldSpace: 0
@@ -5413,6 +5415,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
+    gravitySource: 0
     maxNumParticles: 1000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
@@ -8855,6 +8858,7 @@ ParticleSystem:
         m_RotationOrder: 4
     minVertexDistance: 0.2
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     ribbonCount: 1
     shadowBias: 0.5
     worldSpace: 0
@@ -9724,8 +9728,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1027938211771126355}
-  - component: {fileID: 1027938211771126354}
   - component: {fileID: -5076542876201361600}
+  - component: {fileID: 7263807594913351691}
   m_Layer: 0
   m_Name: GiantPowerup
   m_TagString: Untagged
@@ -9749,26 +9753,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &1027938211771126354
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1027938211771126356}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: f8891bb3a561cfe44a12debf21c04f63, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &-5076542876201361600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9781,3 +9765,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e5fbc103d533164493b7c7708d7d456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onlyDisable: 0
+--- !u!111 &7263807594913351691
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027938211771126356}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 66ab56123559def4795652ce97ffe21e, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 66ab56123559def4795652ce97ffe21e, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0

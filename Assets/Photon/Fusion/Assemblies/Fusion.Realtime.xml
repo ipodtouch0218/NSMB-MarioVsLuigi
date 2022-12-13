@@ -112,25 +112,19 @@
             <param name="properties">New set of Custom Properties</param>
             <returns>True if the change was made, false otherwise</returns>
         </member>
-        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.UpdateRoomVisibility(System.Boolean)">
+        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.UpdateRoomIsVisible(System.Boolean)">
             <summary>
             Change the IsVisible Property of the current Room
             </summary>
             <param name="value">New value of IsVisible</param>
             <returns>True if the change was made, false otherwise</returns>
         </member>
-        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.UpdateRoomOpenness(System.Boolean)">
+        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.UpdateRoomIsOpen(System.Boolean)">
             <summary>
             Change the IsOpen Property of the current Room
             </summary>
             <param name="value">New value of IsOpen</param>
             <returns>True if the change was made, false otherwise</returns>
-        </member>
-        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.GetRoomProperties">
-            <summary>
-            Get Current Custom Properties of Room
-            </summary>
-            <returns>Custom Properties Dictionary</returns>
         </member>
         <member name="M:Fusion.Photon.Realtime.FusionRelayClient.Update">
             <summary>
@@ -149,7 +143,7 @@
             <param name="isVisible">Signal if the Session should Visiable/Invisible</param>
             <returns>EnterRoomParams reference.</returns>
         </member>
-        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.BuildJoinParams(Fusion.Photon.Realtime.TypedLobby,System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty})">
+        <member name="M:Fusion.Photon.Realtime.FusionRelayClient.BuildJoinParams(Fusion.Photon.Realtime.TypedLobby,System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty},Fusion.Photon.Realtime.MatchmakingMode)">
             <summary>
             Build a new OpJoinRandomRoomParams that will be used to setup which Room the local peer wants to join
             </summary>
@@ -422,13 +416,13 @@
             </summary>
         </member>
         <member name="F:Fusion.Photon.Realtime.ConnectionHandler.DisconnectAfterKeepAlive">
-            <summary>Option to let the fallback thread call Disconnect after the KeepAliveInBackground time. Default: false.</summary>
-            <remarks>
-            If set to true, the thread will disconnect the client regularly, should the client not call SendOutgoingCommands / Service.
-            This may happen due to an app being in background (and not getting a lot of CPU time) or when loading assets.
+             <summary>Option to let the fallback thread call Disconnect after the KeepAliveInBackground time. Default: false.</summary>
+             <remarks>
+             If set to true, the thread will disconnect the client regularly, should the client not call SendOutgoingCommands / Service.
+             This may happen due to an app being in background (and not getting a lot of CPU time) or when loading assets.
             
-            If false, a regular timeout time will have to pass (on top) to time out the client.
-            </remarks>
+             If false, a regular timeout time will have to pass (on top) to time out the client.
+             </remarks>
         </member>
         <member name="F:Fusion.Photon.Realtime.ConnectionHandler.KeepAliveInBackground">
             <summary>Defines for how long the Fallback Thread should keep the connection, before it may time out as usual.</summary>
@@ -663,7 +657,7 @@
             <summary>OnStatusChanged: The server is not available or the address is wrong. Make sure the port is provided and the server is up.</summary>
         </member>
         <member name="F:Fusion.Photon.Realtime.DisconnectCause.DnsExceptionOnConnect">
-            <summary>OnStatusChanged: Dns resolution for a hostname failed. The exception for this is being catched and logged with error level.</summary>
+            <summary>OnStatusChanged: Dns resolution for a hostname failed. The exception for this is being caught and logged with error level.</summary>
         </member>
         <member name="F:Fusion.Photon.Realtime.DisconnectCause.ServerAddressInvalid">
             <summary>OnStatusChanged: The server address was parsed as IPv4 illegally. An illegal address would be e.g. 192.168.1.300. IPAddress.TryParse() will let this pass but our check won't.</summary>
@@ -710,6 +704,10 @@
         </member>
         <member name="F:Fusion.Photon.Realtime.DisconnectCause.DisconnectByDisconnectMessage">
             <summary>The client received a "Disconnect Message" from the server. Check the debug logs for details.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.DisconnectCause.ApplicationQuit">
+            <summary>Used in case the application quits. Can be useful to not load new scenes or re-connect in OnDisconnected.</summary>
+            <remarks>ConnectionHandler.OnDisable() will use this, if the Unity engine already called OnApplicationQuit (ConnectionHandler.AppQuits = true).</remarks>
         </member>
         <member name="T:Fusion.Photon.Realtime.ServerConnection">
             <summary>Available server (types) for internally used field: server.</summary>
@@ -1180,15 +1178,20 @@
         </member>
         <member name="M:Fusion.Photon.Realtime.LoadBalancingClient.ConnectToRegionMaster(System.String)">
              <summary>
-             Connects you to a specific region's Master Server, using the Name Server to find the IP.
+             Connects you to a specific region's Master Server, using the Name Server to get the IP.
              </summary>
              <remarks>
              If the region is null or empty, no connection will be made.
              If the region (code) provided is not available, the connection process will fail on the Name Server.
-             This method connects only to the region defined. No "Best Region" pinging will be done.
+             This method connects only to the region defined. Any "Best Region" pinging should get done beforehand.
             
-             If the region string does not contain a "/", this means no specific cluster is requested.
-             To support "Sharding", the region gets a "/*" postfix in this case, to select a random cluster.
+             To support "sharding", a region string may contain a "/*" to pick a random cluster or "/clustername"
+             to connect to a specific cluster.
+             With a "/" or no cluster postfix, the client connects to the default cluster (a specific one
+             for a region).
+            
+             By default, the region string provided by the Name Server does not contain a cluster (and only the
+             default cluster is used).
              </remarks>
              <returns>If the operation could be sent. If false, no operation was sent.</returns>
         </member>
@@ -1943,15 +1946,7 @@
             automatically refer to the default lobby.
             </remarks>
         </member>
-        <member name="M:Fusion.Photon.Realtime.ILobbyCallbacks.OnRoomListUpdate(System.Collections.Generic.List{Fusion.Photon.Realtime.RoomInfo})">
-            <summary>
-            Called for any update of the room-listing while in a lobby (InLobby) on the Master Server.
-            </summary>
-            <remarks>
-            Each item is a RoomInfo which might include custom properties (provided you defined those as lobby-listed when creating a room).
-            Not all types of lobbies provide a listing of rooms to the client. Some are silent and specialized for server-side matchmaking.
-            </remarks>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:Fusion.Photon.Realtime.ILobbyCallbacks.OnRoomListUpdate(System.Collections.Generic.List{Fusion.Photon.Realtime.RoomInfo})" -->
         <member name="M:Fusion.Photon.Realtime.ILobbyCallbacks.OnLobbyStatisticsUpdate(System.Collections.Generic.List{Fusion.Photon.Realtime.TypedLobbyInfo})">
             <summary>
             Called when the Master Server sent an update for the Lobby Statistics.
@@ -2070,6 +2065,9 @@
              This wraps up multiple internal actions.
             
              Wait for the callback OnConnectedToMaster, before you use lobbies and join or create rooms.
+            
+             OnLeftRoom also gets called, when the application quits.
+             It makes sense to check static ConnectionHandler.AppQuits before loading scenes in OnLeftRoom().
              </remarks>
         </member>
         <member name="T:Fusion.Photon.Realtime.IInRoomCallbacks">
@@ -3872,6 +3870,13 @@
         <member name="P:Fusion.Photon.Realtime.Region.Cluster">
             <summary>Unlike the CloudRegionCode, this may contain cluster information.</summary>
         </member>
+        <member name="P:Fusion.Photon.Realtime.Region.Ping">
+            <summary>Weighted ping time.</summary>
+            <remarks>
+            Regions gets pinged 5 times (RegionPinger.Attempts).
+            Out of those, the worst rtt is discarded and the best will be counted two times for a weighted average.
+            </remarks>
+        </member>
         <member name="T:Fusion.Photon.Realtime.RegionHandler">
              <summary>
              Provides methods to work with Photon's regions (Photon Cloud) and can be use to find the one with best ping.
@@ -3885,6 +3890,11 @@
              more regions get pinged.
              Not all regions will be pinged. As soon as the results are final, the client will connect to the best region,
              so you can check the ping results when connected to the Master Server.
+            
+             Regions gets pinged 5 times (RegionPinger.Attempts).
+             Out of those, the worst rtt is discarded and the best will be counted two times for a weighted average.
+            
+             Usually UDP will be used to ping the Master Servers. In WebGL, WSS is used instead.
             
              It makes sense to make clients "sticky" to a region when one gets selected.
              This can be achieved by storing the SummaryToCache value, once pinging was done.
@@ -3917,11 +3927,14 @@
             When connecting again, use it as previous summary to speed up pinging regions and to make the best region sticky for the client.
             </remarks>
         </member>
+        <member name="M:Fusion.Photon.Realtime.RegionHandler.Abort">
+            <summary>Calling this will stop pinging the regions and suppress the onComplete callback.</summary>
+        </member>
         <member name="M:Fusion.Photon.Realtime.RegionPinger.GetPingImplementation">
             <summary>Selects the best fitting ping implementation or uses the one set in RegionHandler.PingImplementation.</summary>
             <returns>PhotonPing instance to use.</returns>
         </member>
-        <member name="M:Fusion.Photon.Realtime.RegionPinger.Start">
+        <member name="M:Fusion.Photon.Realtime.RegionPinger.Start(UnityEngine.MonoBehaviour)">
             <summary>
             Starts the ping routine for the assigned region.
             </summary>
@@ -3929,7 +3942,7 @@
             Pinging runs in a ThreadPool worker item or (if needed) in a Thread.
             WebGL runs pinging on the Main Thread as coroutine.
             </remarks>
-            <returns>Always true.</returns>
+            <returns>True unless Aborted.</returns>
         </member>
         <member name="M:Fusion.Photon.Realtime.RegionPinger.RegionPingCoroutine">
             <remarks>

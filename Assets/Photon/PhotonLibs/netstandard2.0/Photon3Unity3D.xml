@@ -2487,6 +2487,15 @@
         <member name="M:ExitGames.Client.Photon.SocketUdpAsync.Send(System.Byte[],System.Int32)">
             <summary>used by PhotonPeer*</summary>
         </member>
+        <member name="T:ExitGames.Client.Photon.SocketUdpBlocking">
+            <summary>Encapsulates the network i/o functionality for the realtime library.</summary>
+        </member>
+        <member name="M:ExitGames.Client.Photon.SocketUdpBlocking.Send(System.Byte[],System.Int32)">
+            <summary>used by PhotonPeer*</summary>
+        </member>
+        <member name="M:ExitGames.Client.Photon.SocketUdpBlocking.ReceiveLoop">
+            <summary>Endless loop, run in Receive Thread.</summary>
+        </member>
         <member name="M:ExitGames.Client.Photon.StreamBuffer.ToArray">
             <summary>
             Allocates a new byte[] that is the exact used length. Use GetBuffer for nonalloc operations.

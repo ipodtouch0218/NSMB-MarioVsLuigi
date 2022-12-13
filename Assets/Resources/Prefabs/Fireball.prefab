@@ -4887,7 +4887,6 @@ GameObject:
   - component: {fileID: 3843124130648117525}
   - component: {fileID: 844320328102276428}
   - component: {fileID: 376300006025663058}
-  - component: {fileID: -3035145909365686512}
   - component: {fileID: 1011982274984717417}
   - component: {fileID: 2644380969240041381}
   - component: {fileID: 2914323514277592658}
@@ -4932,6 +4931,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _Owner: {fileID: 0}
   _AlreadyBounced:
     _value: 0
   _IsIceball:
@@ -5135,20 +5135,6 @@ MonoBehaviour:
   currentCollider: {fileID: -1769135492019179076}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3
---- !u!114 &-3035145909365686512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1011982274984717421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  killTime: 0
 --- !u!114 &1011982274984717417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5186,7 +5172,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1164692562165207756}
   - {fileID: 376300006025663058}
-  - {fileID: -3035145909365686512}
   - {fileID: 1011982274984717417}
   - {fileID: 2914323514277592658}
   SimulationBehaviours: []

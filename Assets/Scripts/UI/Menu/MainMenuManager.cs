@@ -827,4 +827,15 @@ public class MainMenuManager : MonoBehaviour {
 
         data.Rpc_SetPermanentSpectator(toggle.isOn);
     }
+
+    //---Debug
+#if UNITY_EDITOR
+    private static readonly Vector3 MaxCameraSize = new(16f/9f * 7f, 7f);
+    public void OnDrawGizmos() {
+        foreach (GameObject positioner in levelCameraPositions) {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(positioner.transform.position, MaxCameraSize);
+        }
+    }
+#endif
 }

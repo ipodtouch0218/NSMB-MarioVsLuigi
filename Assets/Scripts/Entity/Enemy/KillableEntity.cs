@@ -220,7 +220,11 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     public override void Freeze(FrozenCube cube) {
         audioSource.Stop();
         IsFrozen = true;
-        animator.enabled = false;
+        if (animator)
+            animator.enabled = false;
+        if (legacyAnimation)
+            legacyAnimation.enabled = false;
+
         foreach (BoxCollider2D hitboxes in GetComponentsInChildren<BoxCollider2D>()) {
             hitboxes.enabled = false;
         }
@@ -233,7 +237,8 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
     public override void Unfreeze(UnfreezeReason reasonByte) {
         IsFrozen = false;
-        animator.enabled = true;
+        if (animator)
+            animator.enabled = true;
         if (body)
             body.isKinematic = false;
         hitbox.enabled = true;

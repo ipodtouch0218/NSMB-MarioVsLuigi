@@ -904,11 +904,6 @@
             </summary>
             <returns>True if the Join Confirmation was received, false otherwise</returns>
         </member>
-        <member name="M:Fusion.CloudServices.Service_UpdateSessionInfo">
-            <summary>
-            Update the <see cref="T:Fusion.SessionInfo"/> data based on the current LBC Information after the peer enters a Room
-            </summary>
-        </member>
         <member name="M:Fusion.CloudServices.Service_SendHostMigrationSnapshots">
             <summary>
             Host Snapshot Update Service
@@ -949,12 +944,13 @@
             Initilize the Log system from the Realtime SDK to use the Fusion Log System
             </summary>
         </member>
-        <member name="M:Fusion.CloudServices.UpdateSessionInfo(Fusion.SessionInfo,Fusion.Photon.Realtime.RoomInfo)">
+        <member name="M:Fusion.CloudServices.UpdateSessionInfo(Fusion.SessionInfo,Fusion.Photon.Realtime.RoomInfo,System.String)">
             <summary>
             Converts a <see cref="T:Fusion.Photon.Realtime.RoomInfo"/> to a <see cref="T:Fusion.SessionInfo"/>
             </summary>
             <param name="sessionInfo"><see cref="T:Fusion.SessionInfo"/> </param>
             <param name="roomInfo"><see cref="T:Fusion.Photon.Realtime.RoomInfo"/> ref</param>
+            <param name="region">Room Region</param>
             <returns><see cref="T:Fusion.SessionInfo"/> ref</returns>
         </member>
         <member name="T:Fusion.CloudServicesMetadata">
@@ -4495,6 +4491,46 @@
             </summary>
             <param name="bvh"></param>
         </member>
+        <member name="T:Fusion.LagCompensationUtils.ContactData">
+            <summary>
+            Details regarding a shape intersection.
+            It does not carry information about the intersection happening or not.
+            </summary>
+        </member>
+        <member name="F:Fusion.LagCompensationUtils.ContactData.Point">
+            <summary>
+            Contact point.
+            </summary>
+        </member>
+        <member name="F:Fusion.LagCompensationUtils.ContactData.Normal">
+            <summary>
+            Vector that described the plane of smallest penetration between the shapes.
+            </summary>
+        </member>
+        <member name="F:Fusion.LagCompensationUtils.ContactData.Penetration">
+            <summary>
+            Penetration along the normal plane.
+            </summary>
+        </member>
+        <member name="M:Fusion.LagCompensationUtils.LocalAABBSphereIntersection(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)">
+            <summary>
+            Checks if a sphere in the local space of an AABB intersects with it.
+            </summary>
+            <param name="aabbExtents">The extents of the AABB in the positive direction of each axis.</param>
+            <param name="sphereCenter">The center of the sphere in the local space of the AABB.</param>
+            <param name="sphereRadius">The radius of the sphere.</param>
+            <returns>True if there is intersection. False otherwise.</returns>
+        </member>
+        <member name="M:Fusion.LagCompensationUtils.LocalAABBSphereContact(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,Fusion.LagCompensationUtils.ContactData@)">
+            <summary>
+            Checks if a sphere in the local space of an AABB intersects with it and outputs contact data (also in local space).
+            </summary>
+            <param name="aabbExtents">The extents of the AABB in the positive direction of each axis.</param>
+            <param name="sphereCenter">The center of the sphere in the local space of the AABB.</param>
+            <param name="sphereRadius">The radius of the sphere.</param>
+            <param name="contact"><see cref="T:Fusion.LagCompensationUtils.ContactData">Contact data</see> in the local space of the AABB. Default if there is no intersection.</param>
+            <returns>True if there is intersection. False otherwise.</returns>
+        </member>
         <member name="T:Fusion.Hitbox">
             <summary>
             Represents a single lag-compensated collider.
@@ -5546,6 +5582,16 @@
             <summary>
             Sets the array value at the supplied index.
             </summary>
+        </member>
+        <member name="M:Fusion.NetworkArray`1.GetRef(System.Int32)">
+            <summary>
+            This method is exposed with an extension method to filter
+            types to unmanaged ones only. This is not exhaustive,
+            as wrapped types are likely to pass this.
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+            <exception cref="T:System.IndexOutOfRangeException"></exception>
         </member>
         <member name="M:Fusion.NetworkArray`1.ToArray">
             <summary>
@@ -8127,6 +8173,14 @@
             Default: true
             </summary>
         </member>
+        <member name="F:Fusion.StartGameArgs.MatchmakingMode">
+            <summary>
+            Session Join Matchmaking Mode when joining a Session.
+            For more information, check <see cref="T:Fusion.Photon.Realtime.MatchmakingMode"/>
+            
+            Default: <see cref="F:Fusion.Photon.Realtime.MatchmakingMode.FillRoom"/>
+            </summary>
+        </member>
         <member name="F:Fusion.StartGameArgs.CustomLobbyName">
             <summary>
             Session Custom Lobby to be published in
@@ -8348,21 +8402,6 @@
             </summary>
             <returns>Formatted <see cref="T:Fusion.SessionInfo"/></returns>
         </member>
-        <member name="F:Fusion.SessionInfo.SessionUpdateState.DONE">
-            <summary>
-            Session is ready to be used
-            </summary>
-        </member>
-        <member name="F:Fusion.SessionInfo.SessionUpdateState.WAIT_FOR_UPDATE">
-            <summary>
-            There is a pending refresh to be done
-            </summary>
-        </member>
-        <member name="F:Fusion.SessionInfo.SessionUpdateState.TRIGGER_UPDATE">
-            <summary>
-            Signal the Session data must be updated
-            </summary>
-        </member>
         <member name="T:Fusion.StartGameResult">
             <summary>
             Represents the result of starting the Fusion Simulation
@@ -8376,6 +8415,12 @@
         <member name="P:Fusion.StartGameResult.ShutdownReason">
             <summary>
             Start Game Shutdown Reason
+            </summary>
+        </member>
+        <member name="P:Fusion.StartGameResult.ErrorMessage">
+            <summary>
+            Custom Error Message filled with data about the Shutdown.
+            Usually used to store custom data when the StartGame fails.
             </summary>
         </member>
         <member name="M:Fusion.StartGameResult.ToString">

@@ -340,7 +340,7 @@ GameObject:
   - component: {fileID: 200514979}
   - component: {fileID: 200514980}
   m_Layer: 1
-  m_Name: Background (2)
+  m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -354,8 +354,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 200514978}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.83, y: 2.28, z: 25}
-  m_LocalScale: {x: 1.4794922, y: 0.931202, z: 1}
+  m_LocalPosition: {x: 0.83, y: -0.5, z: 25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 61731049}
@@ -406,7 +406,7 @@ SpriteRenderer:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 1
+  m_DrawMode: 0
   m_Size: {x: 8, y: 7}
   m_AdaptiveModeThreshold: 0.271
   m_SpriteTileMode: 1
@@ -1310,7 +1310,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852669702}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 4.5, z: 35}
+  m_LocalPosition: {x: 0, y: 1, z: 35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

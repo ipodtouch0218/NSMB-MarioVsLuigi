@@ -216,13 +216,16 @@ public class FrozenCube : HoldableEntity {
 
         if ((player.IsGroundpounding || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
             KillWithReason(UnfreezeReason.Groundpounded);
+            return;
 
         } else if (!attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
             KillWithReason(UnfreezeReason.BlockBump);
+            return;
 
         } else if (FastSlide) {
             player.DoKnockback(body.position.x > player.body.position.x, 1, false, 0);
             Kill();
+            return;
         }
         if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround) {
             fallen = true;

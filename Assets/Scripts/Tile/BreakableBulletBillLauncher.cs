@@ -9,7 +9,7 @@ public class BreakableBulletBillLauncher : InteractableTile {
     [SerializeField] private GameObject breakParticle;
 
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
-        if (!(interacter is PlayerController))
+        if (interacter is not PlayerController)
             return false;
 
         PlayerController player = (PlayerController) interacter;

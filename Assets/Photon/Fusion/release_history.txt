@@ -1,3 +1,38 @@
+# 1.1.5
+
+## F2
+
+### Build 643 (Dec 01, 2022)
+
+**Bug Fixes**
+
+- Fixed: Issue in the resolution of lag-compensated sphere overlaps that could cause hits to be missed, introduced on build 1.1.5 F 624 and also present on build 640
+
+## F
+
+### Build 640 (Nov 30, 2022)
+
+**What's New**
+
+- StartGameResult.ErrorMessage
+- `NetworkArray<T>.GetRef(int)` - an extension method that returns a reference to a selected element. Limited to `unmanaged` types, throws `NotSupportedException` if the type is not trivially copyable (e.g. floats with non-zero accuracy, types using methods with `NetworkSerializeMethod` attribute for serialization)
+
+**Changes**
+
+- Photon Realtime SDK to v4.1.6.20
+- Expose MatchmakingMode via StartGameArgs
+
+**Bug Fixes**
+
+- Fixed: Missing Session Update on Player Enter/Left
+- Fixed: Update Session Properties on Host Migration
+- Fixed: ILWeaver now allows for `= default` initialization syntax for `[Networked]` properties of struct type
+- Fixed: ILWeaver depending on unpredictable order in which assemblies are post-processed
+- Fixed: Lag-compensated sphere overlaps against box-shaped hitboxes and box overlaps against sphere-shared hitboxes now correctly return the hit point and normal
+- Fixed: Inspecting `NetworkObject` altering values of fields holding initial values. Define `FUSION_DISABLE_NBEDITOR_PRESERVE_BACKING_FIELDS` to restore the old behaviour
+- Fixed: Unity stripping `ReadWriteUtilsForWeaver` methods used for interpolation when High code stripping level is selected
+- Fixed: Nested objects state memory not being released in some cases
+
 # 1.1.4
 
 ## F

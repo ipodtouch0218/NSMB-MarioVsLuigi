@@ -6363,7 +6363,7 @@ GameObject:
   - component: {fileID: 763815595}
   - component: {fileID: 763815596}
   m_Layer: 1
-  m_Name: Sky
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6377,8 +6377,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 763815594}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.08, z: 30}
-  m_LocalScale: {x: 4, y: 4, z: 3}
+  m_LocalPosition: {x: 0, y: -2.5, z: 30}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1457634497}
@@ -6430,7 +6430,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 1.28, y: 3}
+  m_Size: {x: 5.12, y: 12}
   m_AdaptiveModeThreshold: 0
   m_SpriteTileMode: 1
   m_WasSpriteAssigned: 1
@@ -23824,7 +23824,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 1.28, y: 3}
+  m_Size: {x: 3.9999998, y: 8}
   m_AdaptiveModeThreshold: 0
   m_SpriteTileMode: 1
   m_WasSpriteAssigned: 1
@@ -23838,8 +23838,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1758446270}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 20}
-  m_LocalScale: {x: 3.5, y: 3.5, z: 3.5}
+  m_LocalPosition: {x: 0, y: -4, z: 20}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1457634497}

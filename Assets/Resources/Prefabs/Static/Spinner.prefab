@@ -267,7 +267,7 @@ MonoBehaviour:
   hitbox: {fileID: 650858211456639898}
   idleSpinSpeed: -100
   fastSpinSpeed: -1800
-  pressSpeed: 8.5
+  pressSpeed: 12
   spinSpeed: 0
 --- !u!68 &494105199198006985
 EdgeCollider2D:

@@ -6540,68 +6540,142 @@ namespace Fusion.Editor {
       .Cast<NetworkBehaviour>()
       .Where(x => x.Object && x.Object.IsValid && x.Object.gameObject.activeInHierarchy);
 
-    public override void OnInspectorGUI() {
+    [NonSerialized]
+    int[] _buffer = Array.Empty<int>();
 
+    
+    public override void OnInspectorGUI() {
       base.PrepareInspectorGUI();
 
-      // copy changes from the state
-      serializedObject.UpdateIfRequiredOrScript();
-      foreach (var target in ValidTargets) {
-        target.CopyStateToBackingFields();
-      }
+      bool hasBeenApplied = false;
+#if !FUSION_DISABLE_NBEDITOR_PRESERVE_BACKING_FIELDS
+      // serialize unchanged serialized state into zero-initialized memory;
+      // this makes sure defaults are preserved
+      TransferBackingFields(backingFieldsToState: true);
+#endif
+      try {
 
-      EditorGUI.BeginChangeCheck();
+        // after the original values have been saved, they can be overwritten with
+        // whatever is in the state
+        foreach (var target in ValidTargets) {
+          target.CopyStateToBackingFields();
+        }
+
+        // move C# fields to SerializedObject
+        serializedObject.UpdateIfRequiredOrScript();
+
+        EditorGUI.BeginChangeCheck();
 
 #if ODIN_INSPECTOR && !FUSION_ODIN_DISABLED
-      base.DrawDefaultInspector();
+        base.DrawDefaultInspector();
 #else
-      // can networked properties be altered for all selected targets?
-      bool? hasStateAuthorityForAllTargets = null;
-      foreach (var target in ValidTargets) {
-        if (target.Object.HasStateAuthority) {
-          hasStateAuthorityForAllTargets = true;
-        } else {
-          hasStateAuthorityForAllTargets = false;
-          break;
-        }
-      }
-
-      SerializedProperty prop = serializedObject.GetIterator();
-      for (bool enterChildren = true; prop.NextVisible(enterChildren); enterChildren = false) {
-        var field = UnityInternal.ScriptAttributeUtility.GetFieldInfoFromProperty(prop, out var type);
-        var attributes = field?.GetCustomAttributes<DefaultForPropertyAttribute>() ?? Array.Empty<DefaultForPropertyAttribute>();
-        if (attributes.Any()) {
-          using (new EditorGUI.DisabledScope(hasStateAuthorityForAllTargets == false)) {
-#if FUSION_DEV
-            DrawNetworkedProperty(prop);
-#else
-            EditorGUILayout.PropertyField(prop, true);
-#endif
-          }
-        } else {
-          using (new EditorGUI.DisabledScope(prop.propertyPath == FusionEditorGUI.ScriptPropertyName)) {
-            EditorGUILayout.PropertyField(prop, true);
-          }
-        }
-      }
-#endif
-
-      if (EditorGUI.EndChangeCheck()) {
-        serializedObject.ApplyModifiedProperties();
-
-        // move changes to the state
+        // can networked properties be altered for all selected targets?
+        bool? hasStateAuthorityForAllTargets = null;
         foreach (var target in ValidTargets) {
           if (target.Object.HasStateAuthority) {
-            target.CopyBackingFieldsToState(false);
+            hasStateAuthorityForAllTargets = true;
+          } else {
+            hasStateAuthorityForAllTargets = false;
+            break;
           }
-          
+        }
+
+        SerializedProperty prop = serializedObject.GetIterator();
+        for (bool enterChildren = true; prop.NextVisible(enterChildren); enterChildren = false) {
+          var field = UnityInternal.ScriptAttributeUtility.GetFieldInfoFromProperty(prop, out var type);
+          var attributes = field?.GetCustomAttributes<DefaultForPropertyAttribute>() ?? Array.Empty<DefaultForPropertyAttribute>();
+          if (attributes.Any()) {
+            using (new EditorGUI.DisabledScope(hasStateAuthorityForAllTargets == false)) {
+#if FUSION_DEV
+              DrawNetworkedProperty(prop);
+#else
+              EditorGUILayout.PropertyField(prop, true);
+#endif
+            }
+          } else {
+            using (new EditorGUI.DisabledScope(prop.propertyPath == FusionEditorGUI.ScriptPropertyName)) {
+              EditorGUILayout.PropertyField(prop, true);
+            }
+          }
+        }
+#endif
+        
+        if (EditorGUI.EndChangeCheck()) {
+          // serialized properties -> C# fields
+          serializedObject.ApplyModifiedProperties();
+          hasBeenApplied = true;
+
+          // C# fields -> state
+          foreach (var target in ValidTargets) {
+            if (target.Object.HasStateAuthority) {
+              target.CopyBackingFieldsToState(false);
+            }
+          }
+        }
+      } finally {
+#if !FUSION_DISABLE_NBEDITOR_PRESERVE_BACKING_FIELDS
+        // now restore the default values
+        TransferBackingFields(backingFieldsToState: false);
+        serializedObject.Update();
+        if (hasBeenApplied) {
+          serializedObject.ApplyModifiedProperties();
         }
       }
+#endif
 
       DrawNetworkObjectCheck();
       DrawBehaviourActions();
     }
 
+    unsafe bool TransferBackingFields(bool backingFieldsToState) {
+
+      if (Allocator.REPLICATE_WORD_SIZE == sizeof(int)) {
+        int offset = 0;
+        bool hadChanges = false;
+
+        int requiredSize = ValidTargets.Sum(x => x.WordCount);
+        if (backingFieldsToState) {
+          if (_buffer.Length >= requiredSize) {
+            Array.Clear(_buffer, 0, _buffer.Length);
+          } else {
+            _buffer = new int[requiredSize];
+          }
+        } else {
+          if (_buffer.Length < requiredSize) {
+            throw new InvalidOperationException("Buffer is too small");
+          }
+        }
+
+        fixed (int* p = _buffer) {
+          foreach (var target in ValidTargets) {
+            var ptr = target.Ptr;
+
+            try {
+              target.Ptr = p + offset;
+              if (backingFieldsToState) {
+                target.CopyBackingFieldsToState(false);
+              } else {
+                target.CopyStateToBackingFields();
+              }
+              
+              if (!hadChanges) {
+                if (Native.MemCmp(target.Ptr, ptr, target.WordCount * Allocator.REPLICATE_WORD_SIZE) != 0) {
+                  hadChanges = true;
+                }
+              }
+
+            } finally {
+              target.Ptr = ptr;
+            }
+
+            offset += target.WordCount;
+          }
+        }
+
+        return hadChanges;
+      }
+    }
+    
 
     /// <summary>
     /// Checks if GameObject or parent GameObject has a NetworkObject, and draws a warning and buttons for adding one if not.

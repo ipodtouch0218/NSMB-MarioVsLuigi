@@ -83,6 +83,11 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             return;
         }
 
+        if (body.position.y < GameManager.Instance.LevelMinY) {
+            Destroy();
+            return;
+        }
+
         if (!HandleCollision())
             return;
 
@@ -245,6 +250,10 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             mover.fireGraphics.SetActive(false);
             mover.iceTrail.Stop();
             mover.fireTrail.Stop();
+
+            //dont play particles below the killplane
+            if (mover.body.position.y < GameManager.Instance.LevelMinY)
+                return;
 
             if (mover.IsIceball) {
                 mover.iceBreak.Play();
