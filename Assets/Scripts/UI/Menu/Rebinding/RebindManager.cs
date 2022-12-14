@@ -14,7 +14,7 @@ public class RebindManager : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private InputActionAsset controls;
     [SerializeField] private GameObject headerTemplate, buttonTemplate, axisTemplate, playerSettings, resetAll;
-    [SerializeField] private Toggle fireballToggle;
+    [SerializeField] private Toggle fireballToggle, autosprintToggle;
 
     //---Private Variablse
     private readonly List<RebindButton> buttons = new();
@@ -59,6 +59,8 @@ public class RebindManager : MonoBehaviour {
 
         fireballToggle.isOn = true;
         Settings.Instance.fireballFromSprint = true;
+        autosprintToggle.isOn = true;
+        Settings.Instance.autoSprint = true;
         Settings.Instance.SaveSettingsToPreferences();
         SaveRebindings();
     }

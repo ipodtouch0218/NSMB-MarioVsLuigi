@@ -46,4 +46,3 @@ public class PowerupCollectBasic : MonoBehaviour, IPowerupCollect {
         return PowerupReserveResult.ReserveOldPowerup;
     }
 }
-

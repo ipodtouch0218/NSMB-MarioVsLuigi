@@ -119,7 +119,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         }
 
         if (controller.cameraController.IsControllingCamera)
-            HorizontalCamera.OFFSET_TARGET = (controller.IsSpinnerFlying || controller.IsPropellerFlying) ? 0.5f : 0f;
+            HorizontalCamera.SizeIncreaseTarget = (controller.IsSpinnerFlying || controller.IsPropellerFlying) ? 0.5f : 0f;
     }
 
     private IEnumerator BlinkRoutine() {

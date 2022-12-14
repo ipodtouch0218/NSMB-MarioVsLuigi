@@ -35,8 +35,7 @@ public class SettingButtonManager : MonoBehaviour {
         Settings.SaveSettingsToPreferences();
     }
 
-    public void OnAutoSprintToggle(Toggle toggle)
-    {
+    public void OnAutoSprintToggle(Toggle toggle) {
         Settings.autoSprint = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
@@ -64,7 +63,7 @@ public class SettingButtonManager : MonoBehaviour {
         }
     }
 
-        public void OnVsyncToggle(Toggle toggle) {
+    public void OnVsyncToggle(Toggle toggle) {
         Settings settings = Settings.Instance;
         settings.vsync = toggle.isOn;
         QualitySettings.vSyncCount = toggle.isOn ? 1 : 0;

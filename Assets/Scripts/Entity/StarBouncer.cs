@@ -7,7 +7,7 @@ using NSMB.Utils;
 
 public class StarBouncer : CollectableEntity {
 
-    private static int ANY_GROUND_MASK = -1;
+    private static LayerMask AnyGroundMask;
 
     //---Networked Variables
     [Networked] public NetworkBool IsStationary { get; set; }
@@ -30,7 +30,6 @@ public class StarBouncer : CollectableEntity {
 
     //--Private Variables
     private float pulseEffectCounter;
-    private bool canBounce;
     private TrackIcon icon;
 
     public override void Awake() {
@@ -89,8 +88,18 @@ public class StarBouncer : CollectableEntity {
         if (GameManager.Instance.IsMusicEnabled)
             GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
 
-        if (ANY_GROUND_MASK == -1)
-            ANY_GROUND_MASK = LayerMask.GetMask("Ground", "PassthroughInvalid");
+        if (AnyGroundMask == default)
+            AnyGroundMask = 1 << Layers.LayerGround | 1 << Layers.LayerPassthrough;
+    }
+
+    public override void Render() {
+        if (IsStationary || (GameManager.Instance?.gameover ?? false))
+            return;
+
+        graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
+
+        float timeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0;
+        sRenderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);
     }
 
     public override void FixedUpdateNetwork() {
@@ -108,18 +117,14 @@ public class StarBouncer : CollectableEntity {
         if (IsStationary)
             return;
 
-        float timeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0;
-        sRenderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);
-
         body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (fast ? 2f : 1f), body.velocity.y);
 
-        canBounce |= body.velocity.y < 0;
         Collectable |= body.velocity.y < 0;
 
         if (HandleCollision())
             return;
 
-        if (passthrough && Collectable && body.velocity.y <= 0 && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, ANY_GROUND_MASK)) {
+        if (passthrough && Collectable && body.velocity.y <= 0 && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, AnyGroundMask)) {
             passthrough = false;
             gameObject.layer = Layers.LayerEntity;
             sRenderer.color = Color.white;
@@ -134,13 +139,6 @@ public class StarBouncer : CollectableEntity {
 
         if (!passthrough && body.position.y < GameManager.Instance.LevelMinY)
             Runner.Despawn(Object, true);
-    }
-
-    public override void Render() {
-        if (IsStationary || (GameManager.Instance?.gameover ?? false))
-            return;
-
-        graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -169,7 +167,7 @@ public class StarBouncer : CollectableEntity {
             body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
         }
 
-        if (physics.OnGround && canBounce) {
+        if (physics.OnGround && Collectable) {
             body.velocity = new(body.velocity.x, bounceAmount);
             if (physics.HitRoof) {
                 Runner.Despawn(Object, true);

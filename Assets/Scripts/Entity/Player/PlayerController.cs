@@ -98,6 +98,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public TickTimer GiantTimer { get; set; }
     [Networked] public TickTimer GiantEndTimer { get; set; }
     [Networked] public NetworkBool IsInShell { get; set; }
+    [Networked] public FrozenCube FrozenCube { get; set; }
 
     //---Properties
     public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
@@ -183,14 +184,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float SLIDING_45_ACC = 13.1835975f;
     private static readonly float SLIDING_22_ACC = 5.2734375f;
 
-
-
-
-    public FrozenCube frozenObject;
-
-    public Vector2 giantSavedVelocity, previousFrameVelocity, previousFramePosition;
-
-
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
     private Enums.Particle footstepParticle = Enums.Particle.None;
@@ -203,6 +196,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private TrackIcon icon;
 
     public PlayerData data;
+    public Vector2 giantSavedVelocity, previousFrameVelocity, previousFramePosition;
 
 
 
@@ -267,7 +261,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         NetworkHandler.OnInput -= OnInput;
         NetworkHandler.OnInputMissing -= OnInputMissing;
 
-        if (GameManager.Instance)
+        if (GameManager.Instance && hasState)
             GameManager.Instance.AlivePlayers.Remove(this);
     }
 
@@ -283,17 +277,16 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         bool jump = ControlSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
         bool powerup = ControlSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
         bool sprint = ControlSystem.controls.Player.Sprint.ReadValue<float>() >= 0.5f;
-        bool sprintPowerup = sprint && Settings.Instance.fireballFromSprint;
 
         //TODO: changeable deadzone?
-        newInput.buttons.Set(PlayerControls.Up, joystick.y > 0.25f);
-        newInput.buttons.Set(PlayerControls.Down, joystick.y < -0.25f);
-        newInput.buttons.Set(PlayerControls.Left, joystick.x < -0.25f);
-        newInput.buttons.Set(PlayerControls.Right, joystick.x > 0.25f);
-        newInput.buttons.Set(PlayerControls.Jump, jump);
-        newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
-        newInput.buttons.Set(PlayerControls.Sprint, sprint || Settings.Instance.autoSprint);
-        newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprintPowerup);
+        newInput.buttons.Set(PlayerControls.Up,                  joystick.y > 0.25f);
+        newInput.buttons.Set(PlayerControls.Down,                joystick.y < -0.25f);
+        newInput.buttons.Set(PlayerControls.Left,                joystick.x < -0.25f);
+        newInput.buttons.Set(PlayerControls.Right,               joystick.x > 0.25f);
+        newInput.buttons.Set(PlayerControls.Jump,                jump);
+        newInput.buttons.Set(PlayerControls.PowerupAction,       powerup);
+        newInput.buttons.Set(PlayerControls.Sprint,              sprint || Settings.Instance.autoSprint);
+        newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprint && Settings.Instance.fireballFromSprint);
 
         input.Set(newInput);
     }
@@ -490,7 +483,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 continue;
 
             //don't interact with our own frozen cube
-            if (frozenObject && frozenObject.gameObject == collidedObject)
+            if (FrozenCube && FrozenCube.gameObject == collidedObject)
                 continue;
 
             if (collidedObject.GetComponentInParent<IPlayerInteractable>() is IPlayerInteractable interactable) {
@@ -754,25 +747,25 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         switch (State) {
         case Enums.PowerupState.MiniMushroom:
         case Enums.PowerupState.NoPowerup: {
-                Death(false, false);
-                nowDead = true;
-                break;
-            }
+            Death(false, false);
+            nowDead = true;
+            break;
+        }
         case Enums.PowerupState.Mushroom: {
-                State = Enums.PowerupState.NoPowerup;
-                powerupFlash = 2f;
-                SpawnStars(1, false);
-                break;
-            }
+            State = Enums.PowerupState.NoPowerup;
+            powerupFlash = 2f;
+            SpawnStars(1, false);
+            break;
+        }
         case Enums.PowerupState.FireFlower:
         case Enums.PowerupState.IceFlower:
         case Enums.PowerupState.PropellerMushroom:
         case Enums.PowerupState.BlueShell: {
-                State = Enums.PowerupState.Mushroom;
-                powerupFlash = 2f;
-                SpawnStars(1, false);
-                break;
-            }
+            State = Enums.PowerupState.Mushroom;
+            powerupFlash = 2f;
+            SpawnStars(1, false);
+            break;
+        }
         }
         IsPropellerFlying = false;
         PropellerLaunchTimer = TickTimer.None;
@@ -793,8 +786,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         IsFrozen = true;
-        frozenObject = cube;
-        frozenObject.AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, 1.75f);
+        FrozenCube = cube;
+        FrozenCube.AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, 1.75f);
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;
@@ -824,9 +817,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             _ => 1
         };
 
-        if (frozenObject && frozenObject.Object.HasStateAuthority) {
-            frozenObject.Holder?.DoKnockback(frozenObject.Holder.FacingRight, 1, true, 0);
-            frozenObject.Kill();
+        if (FrozenCube && FrozenCube.Object.HasStateAuthority) {
+            FrozenCube.Holder?.DoKnockback(FrozenCube.Holder.FacingRight, 1, true, 0);
+            FrozenCube.Kill();
         }
 
         if (knockbackStars > 0)
@@ -2102,7 +2095,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         if (IsFrozen) {
-            if (!frozenObject) {
+            if (!FrozenCube) {
                 Unfreeze(UnfreezeReason.Other);
             } else {
                 body.velocity = Vector2.zero;
@@ -2194,11 +2187,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         //---HANDLE INPUTS
-        bool right = heldButtons.IsSet(PlayerControls.Right);
-        bool left = heldButtons.IsSet(PlayerControls.Left);
-        bool down = heldButtons.IsSet(PlayerControls.Down);
-        bool up = heldButtons.IsSet(PlayerControls.Up);
-        bool jumpHeld = heldButtons.IsSet(PlayerControls.Jump);
+        bool right =         heldButtons.IsSet(PlayerControls.Right);
+        bool left =          heldButtons.IsSet(PlayerControls.Left);
+        bool down =          heldButtons.IsSet(PlayerControls.Down);
+        bool up =            heldButtons.IsSet(PlayerControls.Up);
+        bool jumpHeld =      heldButtons.IsSet(PlayerControls.Jump);
         bool powerupAction = heldButtons.IsSet(PlayerControls.PowerupAction);
 
         //JUMP BUFFERING

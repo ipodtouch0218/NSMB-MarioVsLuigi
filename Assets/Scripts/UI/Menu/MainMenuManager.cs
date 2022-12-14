@@ -29,7 +29,7 @@ public class MainMenuManager : MonoBehaviour {
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, rebindCountdown, rebindText, reconnectText, updateText;
+    public TMP_Text errorText, rebindCountdown, rebindText, lobbyHeaderText, reconnectText, updateText;
     public RebindManager rebindManager;
     public static string lastRegion;
     public string connectThroughSecret = "";
@@ -43,7 +43,7 @@ public class MainMenuManager : MonoBehaviour {
     [SerializeField] private CanvasGroup hostControlsGroup;
 
     [SerializeField] private GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, connecting;
-    [SerializeField] private GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
+    [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
     [SerializeField] private Button joinRoomBtn, createRoomBtn, startGameBtn;
     [SerializeField] private TMP_InputField nicknameField, lobbyJoinField, chatTextField;
@@ -152,7 +152,7 @@ public class MainMenuManager : MonoBehaviour {
         GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         if (!runner.IsCloudReady) {
             foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
-                Destroy(value);
+                Destroy(value.gameObject);
                 currentRooms.Remove(key);
             }
         }
@@ -164,7 +164,7 @@ public class MainMenuManager : MonoBehaviour {
         selectedRoom = null;
         if (!runner.IsCloudReady) {
             foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
-                Destroy(value);
+                Destroy(value.gameObject);
                 currentRooms.Remove(key);
             }
         }
@@ -177,8 +177,8 @@ public class MainMenuManager : MonoBehaviour {
 
     public void Start() {
         //Clear game-specific settings so they don't carry over
-        HorizontalCamera.OFFSET_TARGET = 0;
-        HorizontalCamera.OFFSET = 0;
+        HorizontalCamera.SizeIncreaseTarget = 0;
+        HorizontalCamera.SizeIncreaseCurrent = 0;
         Time.timeScale = 1;
 
         if (GlobalController.Instance.disconnectCause != null) {
@@ -204,10 +204,10 @@ public class MainMenuManager : MonoBehaviour {
 
         regionDropdown.ClearOptions();
         regionDropdown.AddOptions(NetworkHandler.Regions.ToList());
-        //TODO: change to current region
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
         nicknameField.characterLimit = NicknameMax;
+        UpdateNickname();
 
         rebindManager.Init();
 
@@ -305,7 +305,8 @@ public class MainMenuManager : MonoBehaviour {
 
         SessionInfo session = Runner.SessionInfo;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
-        SetText(lobbyText, name.ToValidUsername() + "'s Lobby", true);
+        bool addS = !name.ToLower().EndsWith("s");
+        lobbyHeaderText.text = name.ToValidUsername() + "'" + (addS ? "s" : "") + " Lobby";
 
         //clear text field
         chatTextField.SetTextWithoutNotify("");
@@ -788,10 +789,7 @@ public class MainMenuManager : MonoBehaviour {
 
         Settings.Instance.SaveSettingsToPreferences();
     }
-    private void SetText(GameObject obj, string txt, bool filter) {
-        TextMeshProUGUI textComp = obj.GetComponent<TextMeshProUGUI>();
-        textComp.text = filter ? txt.Filter() : txt;
-    }
+
     public void OpenLinks() {
         Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/blob/master/LINKS.md");
     }
