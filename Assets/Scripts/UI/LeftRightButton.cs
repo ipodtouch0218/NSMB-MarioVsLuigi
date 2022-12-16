@@ -1,28 +1,30 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class LeftRightButton : Selectable {
 
-    public GameObject leftArrow;
-    public GameObject rightArrow;
-    public float cutoff = 0.6f, offset = 10;
+    //---Serialized Variables
+    [SerializeField] private GameObject leftArrow;
+    [SerializeField] private GameObject rightArrow;
+    [SerializeField] private float cutoff = 0.6f;
 
-    bool leftSelected, rightSelected;
-    float leftOffset, rightOffset;
-    RectTransform leftTransform, rightTransform;
+    //---Private Variables
+    private bool leftSelected, rightSelected;
+    private float leftOffset, rightOffset;
+    private RectTransform leftTransform, rightTransform;
 
     protected override void OnEnable() {
         base.OnEnable();
         ControlSystem.controls.Player.Movement.performed += OnNavigation;
-        ControlSystem.controls.Player.Movement.canceled += OnNavigation;
+        ControlSystem.controls.Player.Movement.canceled +=  OnNavigation;
     }
 
     protected override void OnDisable() {
         base.OnDisable();
         ControlSystem.controls.Player.Movement.performed -= OnNavigation;
-        ControlSystem.controls.Player.Movement.canceled -= OnNavigation;
+        ControlSystem.controls.Player.Movement.canceled -=  OnNavigation;
     }
 
     protected override void Start() {

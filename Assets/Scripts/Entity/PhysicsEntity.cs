@@ -5,7 +5,7 @@ using Fusion;
 public class PhysicsEntity : NetworkBehaviour {
 
     //---Staic Variables
-    private static LayerMask GroundMask = 0;
+    private static LayerMask GroundMask = default;
     private static readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
     //---Networked Variables
@@ -21,10 +21,10 @@ public class PhysicsEntity : NetworkBehaviour {
 
     //---Serialized Variables
     [SerializeField] private bool goUpSlopes;
-    [SerializeField] private float floorAndRoofCutoff = 0.3f;
+    [SerializeField] private float floorAndRoofCutoff = 0.5f;
 
     private void Start() {
-        if (GroundMask == 0)
+        if (GroundMask == default)
             GroundMask = LayerMask.GetMask("Ground", "IceBlock");
     }
 

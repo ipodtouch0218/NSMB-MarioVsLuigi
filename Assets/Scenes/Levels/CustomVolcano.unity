@@ -43952,6 +43952,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2500780753419200967, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
+      propertyPath: fireDeath
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2500780753419200967, guid: 2dd296828f2080541ab2b41eeda650a7,
+        type: 3}
       propertyPath: widthTiles
       value: 80
       objectReference: {fileID: 0}

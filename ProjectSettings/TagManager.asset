@@ -31,6 +31,8 @@ TagManager:
   - frozencube
   - Squishy
   - Powerup
+  - coin
+  - loosecoin
   layers:
   - Default
   - TransparentFX

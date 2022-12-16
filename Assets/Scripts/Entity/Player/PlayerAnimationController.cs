@@ -107,7 +107,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         SetParticleEmission(sparkles,      !controller.IsDead && controller.IsStarmanInvincible);
         SetParticleEmission(dust,          !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.CurrentPipe);
         SetParticleEmission(giantParticle, !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
-        SetParticleEmission(fireParticle,  animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
+        SetParticleEmission(fireParticle,  !controller.IsRespawning && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
 
         if (controller.IsDrilling)
             drillParticleAudio.clip = controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill;

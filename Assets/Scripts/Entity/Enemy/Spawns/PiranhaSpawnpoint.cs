@@ -1,8 +1,8 @@
-public class PirahnaSpawnpoint : EnemySpawnpoint {
+public class PiranhaSpawnpoint : EnemySpawnpoint {
 
     private PiranhaPlantController plant;
 
-    public void Start() {
+    public void Awake() {
         plant = GetComponent<PiranhaPlantController>();
     }
 

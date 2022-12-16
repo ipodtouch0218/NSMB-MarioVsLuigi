@@ -2618,17 +2618,19 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     public static void OnDeadChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
-        if (!player.IsDead) {
+        if (player.IsDead) {
+            if (!GameManager.Instance.IsMusicEnabled)
+                return;
+
+            player.animator.Play("deadstart");
+            player.PlaySound(player.cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
+
+            if (player.Object.HasInputAuthority)
+                ScoreboardUpdater.Instance.OnDeathToggle();
+        } else {
             //respawn poof particle
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, player.body.position);
-            return;
         }
-
-        player.animator.Play("deadstart");
-        player.PlaySound(player.cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
-
-        if (player.Object.HasInputAuthority)
-            ScoreboardUpdater.Instance.OnDeathToggle();
     }
 
     private GameObject respawnParticle;

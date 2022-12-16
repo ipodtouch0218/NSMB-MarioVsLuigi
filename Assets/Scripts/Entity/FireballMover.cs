@@ -55,7 +55,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         }
 
         //physics
-        body.simulated = true;
         nrb.TeleportToPosition(spawnpoint, Vector3.zero);
         body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
     }
@@ -63,7 +62,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     public override void Spawned() {
         base.Spawned();
 
-        body.simulated = false;
+        body.isKinematic = true;
         iceGraphics.SetActive(false);
         fireGraphics.SetActive(false);
 
@@ -72,6 +71,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     }
 
     public override void FixedUpdateNetwork() {
+        body.isKinematic = !IsActive;
         if (!IsActive)
             return;
 
@@ -98,13 +98,16 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     }
 
     public void Destroy() {
-        //TDO: this mispredicts. is body.simulated not allowed?
         IsActive = false;
-        body.simulated = false;
+        body.velocity = Vector2.zero;
+        body.isKinematic = true;
     }
 
     //---Helper Methods
     private bool HandleCollision() {
+        if (!IsActive)
+            return false;
+
         physics.UpdateCollisions();
 
         if (physics.OnGround && !AlreadyBounced) {
@@ -131,6 +134,8 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     }
 
     private bool CheckForEntityCollision() {
+        if (!IsActive)
+            return false;
 
         int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + physics.currentCollider.offset, ((BoxCollider2D) physics.currentCollider).size, 0, default, CollisionBuffer);
 
@@ -142,6 +147,10 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
                 continue;
 
             if (collidedObject.GetComponentInParent<IFireballInteractable>() is IFireballInteractable interactable) {
+                //don't interact with our owner
+                if (interactable is PlayerController player && player == Owner)
+                    continue;
+
                 bool result = IsIceball ? interactable.InteractWithIceball(this) : interactable.InteractWithFireball(this);
                 if (result) {
                     //true = interacted & destroy.
@@ -156,8 +165,12 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---IPlayerInteractable overrides
     public void InteractWithPlayer(PlayerController player) {
+        //If we're not active, don't collide.
+        if (!IsActive)
+            return;
+
         //Check if they own us. If so, don't collide.
-        if (Object.InputAuthority == player.Object.InputAuthority)
+        if (Owner == player)
             return;
 
         //If they have knockback invincibility, don't collide.

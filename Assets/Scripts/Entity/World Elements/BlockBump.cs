@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Utils;
-using UnityEngine.Tilemaps;
 
 public class BlockBump : NetworkBehaviour {
 
@@ -64,11 +64,8 @@ public class BlockBump : NetworkBehaviour {
         if (DespawnTimer.Expired(Runner)) {
             Vector3Int loc = Utils.WorldToTilemapPosition(transform.position);
             Kill(loc);
+            DespawnTimer = TickTimer.None;
         }
-    }
-
-    public override void Despawned(NetworkRunner runner, bool hasState) {
-        base.Despawned(runner, hasState);
     }
 
     public void Kill(Vector3Int loc) {

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class SecondaryCameraPositioner : MonoBehaviour {
 
-    private Camera camera;
+    private new Camera camera;
     private bool destroyed = false;
 
     public void Start() {

@@ -6,11 +6,15 @@ using NSMB.Utils;
 
 public class KoopaWalk : HoldableEntity {
 
+    //---Static Variables
+    private static readonly Vector2 BlockOffset = new(0, 0.05f);
+
     //---Networked Variables
     [Networked] public TickTimer WakeupTimer { get; set; }
     [Networked] public NetworkBool IsInShell { get; set; }
     [Networked] public NetworkBool IsStationary { get; set; }
     [Networked] public NetworkBool IsUpsideDown { get; set; }
+    [Networked] private Vector2 VelocityLastFrame { get; set; }
 
     //---Serialized Variables
     [SerializeField] private Sprite deadSprite;
@@ -25,11 +29,33 @@ public class KoopaWalk : HoldableEntity {
 
     //---Private Variables
     private float dampVelocity;
-    private Vector2 blockOffset = new(0, 0.05f), velocityLastFrame;
 
     public override void Render() {
+        if (IsFrozen || IsDead)
+            return;
+
+        //Renderer flip
+        sRenderer.flipX = FacingRight ^ flipXFlip;
+
+        //Animation
         animator.SetBool("shell", IsInShell || Holder != null);
         animator.SetFloat("xVel", IsStationary ? 0 : Mathf.Abs(body.velocity.x));
+
+        //"Flip" rotation
+        float remainingWakeupTimer = WakeupTimer.RemainingTime(Runner) ?? 0f;
+        if (IsUpsideDown) {
+            dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
+            graphicsTransform.eulerAngles = new Vector3(
+                graphicsTransform.eulerAngles.x,
+                graphicsTransform.eulerAngles.y,
+                Mathf.Lerp(graphicsTransform.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
+        } else {
+            dampVelocity = 0;
+            graphicsTransform.eulerAngles = new Vector3(
+                graphicsTransform.eulerAngles.x,
+                graphicsTransform.eulerAngles.y,
+                remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
+        }
     }
 
     public override void FixedUpdateNetwork() {
@@ -44,23 +70,6 @@ public class KoopaWalk : HoldableEntity {
 
         if (IsFrozen || IsDead)
             return;
-
-        sRenderer.flipX = FacingRight ^ flipXFlip;
-
-        float remainingWakeupTimer = WakeupTimer.RemainingTime(Runner) ?? 0f;
-        if (IsUpsideDown) {
-            dampVelocity = Mathf.Min(dampVelocity + Runner.DeltaTime * 3, 1);
-            graphicsTransform.eulerAngles = new Vector3(
-                graphicsTransform.eulerAngles.x,
-                graphicsTransform.eulerAngles.y,
-                Mathf.Lerp(graphicsTransform.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
-        } else {
-            dampVelocity = 0;
-            graphicsTransform.eulerAngles = new Vector3(
-                graphicsTransform.eulerAngles.x,
-                graphicsTransform.eulerAngles.y,
-                remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
-        }
 
         if (IsInShell) {
             hitbox.size = inShellHitboxSize;
@@ -83,26 +92,26 @@ public class KoopaWalk : HoldableEntity {
         physics.UpdateCollisions();
 
         if (physics.HitRight && FacingRight) {
-            Turnaround(false, velocityLastFrame.x);
+            Turnaround(false, VelocityLastFrame.x);
         } else if (physics.HitLeft && !FacingRight) {
-            Turnaround(true, velocityLastFrame.x);
+            Turnaround(true, VelocityLastFrame.x);
         }
 
-        if (physics.OnGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
+        if (physics.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
             Vector3 redCheckPos = body.position + new Vector2(0.1f * (FacingRight ? 1 : -1), 0);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref redCheckPos);
 
             //turn around if no ground
             if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
-                Turnaround(!FacingRight, velocityLastFrame.x);
+                Turnaround(!FacingRight, VelocityLastFrame.x);
         }
 
         if (!IsStationary)
             body.velocity = new((IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
         HandleTile();
-        velocityLastFrame = body.velocity;
+        VelocityLastFrame = body.velocity;
     }
 
     private void HandleTile() {
@@ -115,7 +124,7 @@ public class KoopaWalk : HoldableEntity {
             Vector2 p = point.point + (point.normal * -0.15f);
             if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
                 if (!putdown && IsInShell && !IsStationary) {
-                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
+                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + BlockOffset);
                     TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
                     if (!tile || !IsInShell)
                         continue;
@@ -174,13 +183,11 @@ public class KoopaWalk : HoldableEntity {
         if (IsActuallyStationary)
             return;
 
-        if (IsInShell && hitWallOnLeft == FacingRight)
+        if (Runner.IsForward && IsInShell && hitWallOnLeft == FacingRight)
             PlaySound(Enums.Sounds.World_Block_Bump);
 
         FacingRight = hitWallOnLeft;
         body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
-        if (IsInShell)
-            PlaySound(Enums.Sounds.World_Block_Bump);
     }
 
 
@@ -265,13 +272,15 @@ public class KoopaWalk : HoldableEntity {
 
         EnterShell(false, bumper as PlayerController);
         IsUpsideDown = canBeFlipped;
-        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
         body.velocity = new(body.velocity.x, 5.5f);
 
         if (IsStationary) {
             body.velocity = new(bumper.body.position.x < body.position.x ? 1f : -1f, body.velocity.y);
             physics.OnGround = false;
         }
+
+        if (Runner.IsForward)
+            PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
     //---FreezableEntity overrides
@@ -299,7 +308,7 @@ public class KoopaWalk : HoldableEntity {
                         continue;
 
                     //kill entity we ran into
-                    killable.SpecialKill(killable.body.position.x > body.position.x, false, ComboCounter++);
+                    killable.SpecialKill((killable.body ? killable.body.position.x : killable.transform.position.x) > body.position.x, false, ComboCounter++);
 
                     //kill ourselves if we're being held too
                     if (Holder)

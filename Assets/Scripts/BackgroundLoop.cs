@@ -66,7 +66,7 @@ public class BackgroundLoop : MonoBehaviour {
 
     private void LoadChildObjects(GameObject obj) {
         float objectWidth = halfWidths[Array.IndexOf(children, obj)] * 2f;
-        int childsNeeded = (int) Mathf.Ceil(ScreenBounds.x / objectWidth) + 2;
+        int childsNeeded = (int) Mathf.Ceil(ScreenBounds.x * 2f / objectWidth);
         GameObject clone = Instantiate(obj);
         for (int i = 0; i <= childsNeeded; i++) {
             GameObject c = Instantiate(clone);

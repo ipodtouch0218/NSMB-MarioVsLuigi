@@ -51,7 +51,7 @@ GameObject:
   - component: {fileID: 5412312900953502766}
   - component: {fileID: 157777260401815061}
   m_Layer: 10
-  m_Name: animatorsarestupid
+  m_Name: Graphics
   m_TagString: piranhaplant
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -85,13 +85,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _IsFrozen: 0
+  _IsFrozen:
+    _value: 0
   _IsDead:
     _value: 0
-  collide: 0
   iceCarryable: 0
   flying: 0
   hitbox: {fileID: 0}
+  sRenderer: {fileID: 0}
   playerDetectSize: 1
   popupTimerRequirement: 3.6
 --- !u!212 &1900118008454034842
@@ -359,7 +360,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 0}
-  InterpolateErrorCorrection: 1
+  InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
     MaxRate: 10
@@ -370,3 +371,5 @@ MonoBehaviour:
     RotBlendStart: 0.1
     RotBlendEnd: 0.5
     RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03

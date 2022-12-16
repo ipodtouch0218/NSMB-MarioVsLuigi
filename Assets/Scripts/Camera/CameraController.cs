@@ -31,20 +31,20 @@ public class CameraController : MonoBehaviour {
 
     public void LateUpdate() {
         currentPosition = CalculateNewPosition();
-        if (IsControllingCamera) {
+        if (!IsControllingCamera)
+            return;
 
-            Vector3 shakeOffset = Vector3.zero;
-            if ((ScreenShake -= Time.deltaTime) > 0 && controller.IsOnGround)
-                shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
+        Vector3 shakeOffset = Vector3.zero;
+        if ((ScreenShake -= Time.deltaTime) > 0 && controller.IsOnGround)
+            shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
 
-            SetPosition(currentPosition + shakeOffset);
-        }
+        SetPosition(currentPosition + shakeOffset);
     }
 
     public void Recenter(Vector2 pos) {
-        transform.position = playerPos = currentPosition = pos + AirOffset;
+        playerPos = currentPosition = pos + AirOffset;
         smoothDampVel = Vector3.zero;
-        SetPosition(pos);
+        SetPosition(playerPos);
     }
 
     private void SetPosition(Vector3 position) {
@@ -63,7 +63,7 @@ public class CameraController : MonoBehaviour {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
-        if (!controller.IsDead || controller.IsRespawning)
+        if (!controller.IsDead && !controller.IsRespawning)
             playerPos = AntiJitter(transform.position);
 
         float vOrtho = targetCamera.orthographicSize;

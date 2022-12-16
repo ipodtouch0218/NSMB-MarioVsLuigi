@@ -120,6 +120,7 @@ public class WaterSplash : MonoBehaviour, IPlayerInteractable {
     }
 
     public void InteractWithPlayer(PlayerController player) {
-        player.Death(false, false);
+        Debug.Log("a");
+        player.Death(false, fireDeath);
     }
 }

@@ -15,7 +15,6 @@ public class PiranhaPlantController : KillableEntity {
     //---Misc Variables
     private bool upsideDown;
 
-
     public override void Awake() {
         base.Awake();
         upsideDown = transform.eulerAngles.z != 0;
@@ -24,6 +23,11 @@ public class PiranhaPlantController : KillableEntity {
     public override void Spawned() {
         base.Spawned();
         PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
+    }
+
+    public override void Render() {
+        animator.SetBool("dead", IsDead);
+        sRenderer.enabled = !IsDead;
     }
 
     public override void FixedUpdateNetwork() {
@@ -38,7 +42,6 @@ public class PiranhaPlantController : KillableEntity {
                 return;
         }
 
-        animator.SetBool("dead", IsDead);
         if (IsDead)
             return;
 
@@ -91,6 +94,19 @@ public class PiranhaPlantController : KillableEntity {
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {
         Kill();
+    }
+
+    public override bool InteractWithIceball(FireballMover iceball) {
+        if (IsDead)
+            return false;
+
+        if (!IsFrozen) {
+            Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, transform.position, onBeforeSpawned: (runner, obj) => {
+                FrozenCube cube = obj.GetComponent<FrozenCube>();
+                cube.OnBeforeSpawned(this);
+            });
+        }
+        return true;
     }
 
     //---Debug
