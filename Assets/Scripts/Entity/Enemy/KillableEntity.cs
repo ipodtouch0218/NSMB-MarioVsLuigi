@@ -73,7 +73,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         CheckForEntityCollisions();
 
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-        if (!body.isKinematic && /*Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) &&*/ Utils.IsTileSolidAtWorldLocation(loc)) {
+        if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(loc)) {
             SpecialKill(FacingRight, false, 0);
         }
     }

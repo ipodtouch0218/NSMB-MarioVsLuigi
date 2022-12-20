@@ -183,7 +183,7 @@ public class KoopaWalk : HoldableEntity {
         if (IsActuallyStationary)
             return;
 
-        if (Runner.IsForward && IsInShell && hitWallOnLeft == FacingRight)
+        if (Runner.IsForward && IsInShell && hitWallOnLeft != FacingRight)
             PlaySound(Enums.Sounds.World_Block_Bump);
 
         FacingRight = hitWallOnLeft;

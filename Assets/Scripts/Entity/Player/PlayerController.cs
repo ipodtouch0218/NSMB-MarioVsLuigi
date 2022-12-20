@@ -53,6 +53,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     //Groundpound
     [Networked(OnChanged = nameof(OnGroundpoundingChanged))] public NetworkBool IsGroundpounding { get; set; }
     [Networked] public TickTimer GroundpoundStartTimer { get; set; }
+    [Networked] public TickTimer GroundpoundCooldownTimer { get; set; }
     [Networked] public NetworkBool WasGroundedLastFrame { get; set; }
     [Networked] private NetworkBool GroundpoundHeld { get; set; }
     [Networked] private float GroundpoundStartTime { get; set; }
@@ -704,7 +705,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (UsedPropellerThisJump)
             return;
 
-        body.velocity = new(body.velocity.x, propellerLaunchVelocity);
         PropellerLaunchTimer = TickTimer.CreateFromSeconds(Runner, 1f);
 
         IsPropellerFlying = true;
@@ -717,7 +717,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (IsOnGround) {
             IsOnGround = false;
-            body.position += Vector2.up * 0.15f;
+            body.position += Vector2.up * 0.05f;
         }
         UsedPropellerThisJump = true;
     }
@@ -833,7 +833,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsInKnockback)
             return;
 
-        Debug.Log("a");
         DoKnockback(bumper.body.position.x < body.position.x, 1, false, 0);
     }
 
@@ -1143,7 +1142,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (grounded)
             offset = Vector2.down / 2f;
 
-        Vector2 checkPosition = body.position + (Vector2.up * checkSize * 0.5f) + (2 * Time.fixedDeltaTime * body.velocity) + offset;
+        Vector2 checkPosition = body.position + (Vector2.up * checkSize * 0.5f) + (2 * Runner.DeltaTime * body.velocity) + offset;
 
         Vector3Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
         Vector3Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
@@ -1342,13 +1341,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     body.velocity = Vector2.zero;
                     if (!down || State == Enums.PowerupState.MegaMushroom) {
                         IsGroundpounding = false;
-                        GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+                        GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.2667f);
                     }
                 }
             }
-            if (up && (GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.05f) {
+            if (up && !GroundpoundStartTimer.IsActive(Runner)) {
                 IsGroundpounding = false;
                 body.velocity = Vector2.down * groundpoundVelocity;
+                GroundpoundCooldownTimer = TickTimer.CreateFromSeconds(Runner, 0.125f);
             }
         }
         if (!((FacingRight && hitRight) || (!FacingRight && hitLeft)) && IsCrouching && Mathf.Abs(FloorAngle) >= slopeSlidingAngle && !IsInShell && State != Enums.PowerupState.MegaMushroom) {
@@ -1360,7 +1360,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             float angleDeg = FloorAngle * Mathf.Deg2Rad;
 
             bool uphill = Mathf.Sign(FloorAngle) == Mathf.Sign(body.velocity.x);
-            float speed = Time.fixedDeltaTime * 5f * (uphill ? Mathf.Clamp01(1f - (Mathf.Abs(body.velocity.x) / RunningMaxSpeed)) : 4f);
+            float speed = Runner.DeltaTime * 5f * (uphill ? Mathf.Clamp01(1f - (Mathf.Abs(body.velocity.x) / RunningMaxSpeed)) : 4f);
 
             float newX = Mathf.Clamp(body.velocity.x - (Mathf.Sin(angleDeg) * speed), -(RunningMaxSpeed * 1.3f), RunningMaxSpeed * 1.3f);
             float newY = Mathf.Sin(angleDeg) * newX + 0.4f;
@@ -1421,7 +1421,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private bool GroundSnapCheck() {
-        if (IsDead || body.velocity.y > 0.1f || CurrentPipe)
+        if (IsDead || body.velocity.y > 0.1f || PropellerLaunchTimer.IsActive(Runner) || CurrentPipe)
             return false;
 
         RaycastHit2D hit = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
@@ -2052,7 +2052,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (body.velocity.y > 0)
             return;
 
-        Vector2 nextPos = body.position + Time.fixedDeltaTime * 2f * body.velocity;
+        Vector2 nextPos = body.position + Runner.DeltaTime * 2f * body.velocity;
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(nextPos + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize))
             //we are not going to be inside a block next fixed update
@@ -2266,7 +2266,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (PropellerLaunchTimer.IsActive(Runner)) {
             float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
-            body.velocity = new(body.velocity.x, propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0));
+            float targetVelocity = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0);
+            body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y + 0.45f, targetVelocity));
         }
 
         if (powerupAction && IsPropellerFlying && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime * 0.25f) {
@@ -2467,7 +2468,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private void SetHoldingOffset() {
         if (HeldEntity is FrozenCube) {
             float time = Mathf.Clamp01((Runner.SimulationTime - HoldStartTime) / pickupTime);
-            HeldEntity.holderOffset = new(HeldEntity.hitbox.size.x * 0.25f, MainHitbox.size.y * (1f - Utils.QuadraticEaseOut(1f - time)), -2);
+            HeldEntity.holderOffset = new(0, MainHitbox.size.y * (1f - Utils.QuadraticEaseOut(1f - time)), -2);
         } else {
             HeldEntity.holderOffset = new((FacingRight ? 1 : -1) * 0.25f, (State >= Enums.PowerupState.Mushroom ? 0.3f : 0.075f) - HeldEntity.sRenderer.localBounds.min.y, !FacingRight ? -0.09f : 0f);
         }
@@ -2475,6 +2476,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     private void ThrowHeldItem(bool left, bool right, bool crouch) {
         if (IsFunctionallyRunning && State != Enums.PowerupState.MiniMushroom && State != Enums.PowerupState.MegaMushroom && !IsStarmanInvincible && !IsSpinnerFlying && !IsPropellerFlying)
+            return;
+
+        if (HeldEntity is FrozenCube && (Runner.SimulationTime - HoldStartTime) < pickupTime * 0.75f)
             return;
 
         bool throwRight = FacingRight;
@@ -2496,7 +2500,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (IsOnGround || IsInKnockback || IsGroundpounding || IsDrilling
             || HeldEntity || IsCrouching || IsSliding || IsInShell
-            || WallSliding)
+            || WallSliding || GroundpoundCooldownTimer.IsActive(Runner))
             return;
 
         if (!IsPropellerFlying && !IsSpinnerFlying && (left || right))
@@ -2537,7 +2541,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     private void HandleGroundpound() {
         if (IsGroundpounding && !GroundpoundStartTimer.ExpiredOrNotRunning(Runner)) {
-            if (GroundpoundStartTimer.RemainingTime(Runner) <= .1f) {
+            if (GroundpoundStartTimer.RemainingTime(Runner) <= .066f) {
                 body.velocity = Vector2.zero;
             } else {
                 body.velocity = Vector2.up * 1.5f;
@@ -2682,7 +2686,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         player.PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
-        player.animator.SetTrigger("propeller_start");
     }
 
     public static void OnIsSpinnerFlyingChanged(Changed<PlayerController> changed) {

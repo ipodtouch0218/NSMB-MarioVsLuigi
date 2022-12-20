@@ -8,7 +8,6 @@ public class FrozenCube : HoldableEntity {
 
     //---Networked Variables
     [Networked] public TickTimer AutoBreakTimer { get; set; }
-    [Networked] private TickTimer ThrowTimer { get; set; }
     [Networked] private FreezableEntity FrozenEntity { get; set; }
     [Networked] private NetworkBool FastSlide { get; set; }
 
@@ -77,24 +76,46 @@ public class FrozenCube : HoldableEntity {
     }
 
     public override void FixedUpdateNetwork() {
-        base.FixedUpdateNetwork();
 
-        if (IsDead)
-            return;
-
-        if (GameManager.Instance && GameManager.Instance.gameover) {
+        if (Holder) {
             body.velocity = Vector2.zero;
-            body.angularVelocity = 0;
-            animator.enabled = false;
-            body.isKinematic = true;
-            return;
-        }
+            transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
+            body.position = Holder.body.position + (Vector2) holderOffset;
+            hitbox.enabled = false;
+            sRenderer.flipX = !FacingRight;
+        } else {
+            if (GameManager.Instance && GameManager.Instance.gameover) {
+                body.velocity = Vector2.zero;
+                body.angularVelocity = 0;
+                if (animator)
+                    animator.enabled = false;
 
-        if (ThrowTimer.Expired(Runner)) {
-            ThrowTimer = TickTimer.None;
+                body.isKinematic = true;
+                return;
+            }
 
-            if (PreviousHolder)
-                Physics2D.IgnoreCollision(hitbox, PreviousHolder.MainHitbox, false);
+            if (IsDead) {
+                hitbox.enabled = false;
+                gameObject.layer = Layers.LayerHitsNothing;
+
+                if (WasSpecialKilled) {
+                    body.angularVelocity = 400f * (FacingRight ? 1 : -1);
+                    body.constraints = RigidbodyConstraints2D.None;
+                }
+            } else {
+                hitbox.enabled = true;
+                gameObject.layer = Holder || FastSlide ? Layers.LayerEntity : Layers.LayerIceBlock;
+                body.constraints = RigidbodyConstraints2D.FreezeRotation;
+            }
+
+            CheckForEntityCollisions();
+
+            Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
+            if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(loc)) {
+                SpecialKill(FacingRight, false, 0);
+                return;
+            }
+            hitbox.enabled = true;
         }
 
         if (body.position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
@@ -107,6 +128,9 @@ public class FrozenCube : HoldableEntity {
             return;
         }
 
+        if (Holder)
+            return;
+
         if (!FastSlide && !Holder) {
             float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
             if (remainingTime < 1f)
@@ -114,7 +138,7 @@ public class FrozenCube : HoldableEntity {
         }
 
         //our entity despawned. remove.
-        if (FrozenEntity == null) {
+        if (!FrozenEntity) {
             Runner.Despawn(Object);
             return;
         }
@@ -250,6 +274,7 @@ public class FrozenCube : HoldableEntity {
         base.Pickup(player);
         Physics2D.IgnoreCollision(hitbox, player.MainHitbox);
         AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, (AutoBreakTimer.RemainingTime(Runner) ?? 0f) + 1f);
+        body.velocity = Vector2.zero;
     }
 
     public override void Throw(bool toRight, bool crouch) {
@@ -258,7 +283,6 @@ public class FrozenCube : HoldableEntity {
         fallen = false;
         flying = false;
         FastSlide = true;
-        ThrowTimer = TickTimer.CreateFromSeconds(Runner, 1f);
 
         if (FrozenEntity.IsFlying) {
             fallen = true;
@@ -285,7 +309,7 @@ public class FrozenCube : HoldableEntity {
         for (int i = 0; i < count; i++) {
             GameObject obj = CollisionBuffer[i].gameObject;
 
-            if (obj == gameObject || Holder?.gameObject == obj || PreviousHolder?.gameObject == obj || FrozenEntity?.gameObject == obj)
+            if (obj == gameObject)
                 continue;
 
             if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
@@ -295,6 +319,9 @@ public class FrozenCube : HoldableEntity {
 
             if (obj.TryGetComponent(out KillableEntity killable)) {
                 if (killable.IsDead || killable == FrozenEntity)
+                    continue;
+
+                if (Holder == killable || PreviousHolder == killable || FrozenEntity == killable)
                     continue;
 
                 //kill entity we ran into

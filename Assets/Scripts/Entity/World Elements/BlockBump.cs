@@ -53,7 +53,7 @@ public class BlockBump : NetworkBehaviour {
 
         //graphics bs
         Tilemap tm = GameManager.Instance.tilemap;
-        if (tm.GetTile(TileLocation) == null)
+        if (!tm.GetTile(TileLocation))
             tm.SetTile(TileLocation, Utils.GetCacheTile("Tilemaps/Tiles/" + OldTile));
 
         spriteRenderer.sprite = GameManager.Instance.tilemap.GetSprite(TileLocation);
@@ -62,15 +62,16 @@ public class BlockBump : NetworkBehaviour {
 
     public override void FixedUpdateNetwork() {
         if (DespawnTimer.Expired(Runner)) {
-            Vector3Int loc = Utils.WorldToTilemapPosition(transform.position);
-            Kill(loc);
             DespawnTimer = TickTimer.None;
+            Kill();
         }
     }
 
-    public void Kill(Vector3Int loc) {
-        if (Object.HasStateAuthority)
-            GameManager.Instance.rpcs.Rpc_SetTile((short) loc.x, (short) loc.y, ResultTile.ToString());
+    public void Kill() {
+        if (Object.HasStateAuthority) {
+            Vector3Int location = Utils.WorldToTilemapPosition(transform.position);
+            GameManager.Instance.rpcs.Rpc_SetTile((short) location.x, (short) location.y, ResultTile.ToString());
+        }
 
         if (SpawnPrefab == NetworkPrefabRef.Empty) {
             Runner.Despawn(Object);

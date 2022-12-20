@@ -16,8 +16,8 @@ MonoBehaviour:
   prefab:
     RawGuidValue: 467d8d6c11c84374a9f38f758becc536
   soundEffect: 16
-  spawnChance: 1.5
-  losingSpawnBonus: 1
+  spawnChance: 0.5
+  losingSpawnBonus: 1.5
   big: 0
   vertical: 1
   custom: 1

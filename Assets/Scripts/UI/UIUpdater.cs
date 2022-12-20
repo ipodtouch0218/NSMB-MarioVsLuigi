@@ -60,15 +60,18 @@ public class UIUpdater : NetworkBehaviour {
         itemColor.color = new(GameManager.Instance.levelUIColor.r - 0.2f, GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f, GameManager.Instance.levelUIColor.a);
 
         teamsParent.SetActive(teams);
+        uiDebug.gameObject.SetActive(!Runner.IsServer);
     }
 
     public override void Render() {
 
-        pingSample = Mathf.Lerp(pingSample, GetCurrentPing(), Mathf.Clamp01(Time.unscaledDeltaTime));
-        if (pingSample == float.NaN)
-            pingSample = 0;
+        if (!Runner.IsServer) {
+            pingSample = Mathf.Lerp(pingSample, GetCurrentPing(), Mathf.Clamp01(Time.unscaledDeltaTime));
+            if (pingSample == float.NaN)
+                pingSample = 0;
 
-        uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: " + (int) pingSample + "ms</font>";
+            uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: " + (int) pingSample + "ms</font>";
+        }
 
         //Player stuff update.
         player = GameManager.Instance.localPlayer;
