@@ -1,3 +1,4 @@
+using Fusion;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -28,10 +29,10 @@ public class Settings : Singleton<Settings> {
     }
 
     //---Public Variables
-    public string nickname, controlsJsonString;
+    public string nickname;
     public byte character, skin;
     public bool ndsResolution = false, fireballFromSprint = true, autoSprint = false, vsync = false, fourByThreeRatio = false;
-    public bool scoreboardAlways = false, filter = true;
+    public bool scoreboardAlways = false, chatFiltering = true;
 
     //---Private Variables
     [SerializeField] private AudioMixer mixer;
@@ -59,7 +60,7 @@ public class Settings : Singleton<Settings> {
         vsync =              PlayerPrefs.GetInt("VSync", 0) == 1;
         fourByThreeRatio =   PlayerPrefs.GetInt("NDS4by3", 0) == 1;
         scoreboardAlways =   PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
-        filter =             PlayerPrefs.GetInt("ChatFilter", 1) == 1;
+        chatFiltering =      PlayerPrefs.GetInt("ChatFilter", 1) == 1;
         character =          (byte) PlayerPrefs.GetInt("Character", 0);
         skin =               (byte) PlayerPrefs.GetInt("Skin", 0);
     }
@@ -75,7 +76,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("VSync",                   vsync ? 1 : 0);
         PlayerPrefs.SetInt("NDS4by3",                 fourByThreeRatio ? 1 : 0);
         PlayerPrefs.SetInt("ScoreboardAlwaysVisible", scoreboardAlways ? 1 : 0);
-        PlayerPrefs.SetInt("ChatFilter",              filter ? 1 : 0);
+        PlayerPrefs.SetInt("ChatFilter",              chatFiltering ? 1 : 0);
         PlayerPrefs.SetInt("Character",               character);
         PlayerPrefs.SetInt("Skin",                    skin);
         PlayerPrefs.Save();

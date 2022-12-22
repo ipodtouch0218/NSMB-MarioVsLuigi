@@ -118,7 +118,7 @@ public class GameManager : NetworkBehaviour {
         body.velocity = new Vector2(right ? 7 : -7, 6);
         body.angularVelocity = right ^ flip ? -300 : 300;
 
-        particle.transform.position += new Vector3(sr.size.x / 4f, size.y / 4f * (flip ? -1 : 1));
+        particle.transform.position += new Vector3(sr.size.x * 0.25f, size.y * 0.25f * (flip ? -1 : 1));
     }
 
     //Register pause event
@@ -158,7 +158,7 @@ public class GameManager : NetworkBehaviour {
     public void Start() {
         //spawning in editor
         if (!NetworkHandler.Runner.SessionInfo.IsValid) {
-            //uhhh
+            //join a singleplayer room if we're not in one
             _ = NetworkHandler.CreateRoom(new() {
                 Scene = SceneManager.GetActiveScene().buildIndex,
             }, GameMode.Single);
@@ -181,11 +181,9 @@ public class GameManager : NetworkBehaviour {
         enemySpawns = FindObjectsOfType<EnemySpawnpoint>();
 
         if (Runner.IsServer && Runner.IsSinglePlayer) {
-            //handle spawning in editor
-            if (Runner.IsSinglePlayer) {
-                Runner.Spawn(PrefabList.Instance.SessionDataHolder);
-                Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
-            }
+            //handle spawning in editor by spawning the room + player objects
+            Runner.Spawn(PrefabList.Instance.SessionDataHolder);
+            Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
         }
 
         //tell our host that we're done loading
@@ -605,14 +603,14 @@ public class GameManager : NetworkBehaviour {
 
         Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * ySize : 0), 0);
         Utils.WrapWorldLocation(ref spawn);
-
         return spawn;
     }
 
     //---Debug
 #if UNITY_EDITOR
     private static readonly int DebugSpawns = 10;
-    private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f);
+    private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f), StarSpawnBox = new(1f, 0.9f, 0.2f, 0.2f);
+    private static readonly Vector3 OneFourth = new(0.25f, 0.25f);
     public void OnDrawGizmos() {
         if (!tilemap)
             return;
@@ -632,19 +630,18 @@ public class GameManager : NetworkBehaviour {
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(origin, size);
 
-        Vector3 oneFourth = Vector3.one * 0.25f;
         for (int x = 0; x < levelWidthTile; x++) {
             for (int y = 0; y < levelHeightTile; y++) {
                 Vector3Int loc = new(x+levelMinTileX, y+levelMinTileY, 0);
                 TileBase tile = tilemap.GetTile(loc);
                 if (tile is CoinTile)
-                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + oneFourth, "coin");
+                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + OneFourth, "coin");
                 if (tile is PowerupTile)
-                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + oneFourth, "powerup");
+                    Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + OneFourth, "powerup");
             }
         }
 
-        Gizmos.color = new(1, 0.9f, 0.2f, 0.2f);
+        Gizmos.color = StarSpawnBox;
         foreach (GameObject starSpawn in GameObject.FindGameObjectsWithTag("StarSpawn")) {
             Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
             Gizmos.DrawIcon(starSpawn.transform.position, "star", true, StarSpawnTint);

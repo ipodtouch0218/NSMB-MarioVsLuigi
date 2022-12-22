@@ -1203,14 +1203,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
     }
 
-    private int InteractWithTile(Vector3Int tilePos, InteractableTile.InteractionDirection direction) {
+    private bool InteractWithTile(Vector3Int tilePos, InteractableTile.InteractionDirection direction) {
         TileBase tile = GameManager.Instance.tilemap.GetTile(tilePos);
-        if (!tile)
-            return 0;
-        if (tile is InteractableTile it)
-            return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos)) ? 1 : 0;
+        if (!tile || tile is not InteractableTile it)
+            return false;
 
-        return 0;
+        return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos));
     }
     #endregion
 
@@ -2241,9 +2239,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y, -0.1f));
             bool tempHitBlock = false;
             foreach (Vector3Int tile in tilesJumpedInto) {
-                int temp = InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
-                if (temp != -1)
-                    tempHitBlock |= temp == 1;
+                tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
             }
             if (tempHitBlock && State == Enums.PowerupState.MegaMushroom) {
                 CameraController.ScreenShake = 0.15f;
@@ -2478,7 +2474,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsFunctionallyRunning && State != Enums.PowerupState.MiniMushroom && State != Enums.PowerupState.MegaMushroom && !IsStarmanInvincible && !IsSpinnerFlying && !IsPropellerFlying)
             return;
 
-        if (HeldEntity is FrozenCube && (Runner.SimulationTime - HoldStartTime) < pickupTime * 0.75f)
+        if (HeldEntity is FrozenCube && (Runner.SimulationTime - HoldStartTime) < pickupTime)
             return;
 
         bool throwRight = FacingRight;
@@ -2555,14 +2551,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (!(IsOnGround && (IsGroundpounding || IsDrilling) && hitBlock))
             return;
-
+        
         bool tempHitBlock = false, hitAnyBlock = false;
         foreach (Vector3Int tile in tilesStandingOn) {
-            int temp = InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
-            if (temp != -1) {
-                hitAnyBlock = true;
-                tempHitBlock |= temp == 1;
-            }
+            tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
+            hitAnyBlock = true;
         }
         hitBlock = tempHitBlock;
         if (IsDrilling) {

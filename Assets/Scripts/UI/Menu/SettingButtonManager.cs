@@ -46,7 +46,7 @@ public class SettingButtonManager : MonoBehaviour {
     }
 
     public void OnChatFilterToggle(Toggle toggle) {
-        Settings.filter = toggle.isOn;
+        Settings.chatFiltering = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
 

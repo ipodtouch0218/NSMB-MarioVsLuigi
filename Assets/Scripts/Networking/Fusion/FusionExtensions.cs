@@ -7,7 +7,7 @@ using Fusion;
 namespace NSMB.Extensions {
     public static class FusionExtensions {
 
-        private static readonly Dictionary<string, string> SPECIAL_PLAYERS = new() {
+        private static readonly Dictionary<string, string> SpecialPlayers = new() {
             ["cf03abdb5d2ef1b6f0d30ae40303936f9ab22f387f8a1072e2849c8292470af1"] = "ipodtouch0218",
             ["d5ba21667a5da00967cc5ebd64c0d648e554fb671637adb3d22a688157d39bf6"] = "mindnomad",
             ["95962949aacdbb42a6123732dabe9c7200ded59d7eeb39c889067bafeebecc72"] = "MPS64",
@@ -33,7 +33,7 @@ namespace NSMB.Extensions {
                 sb.Append(b.ToString("X2"));
 
             string hash = sb.ToString().ToLower();
-            return SPECIAL_PLAYERS.ContainsKey(hash) && data.GetRawNickname() == SPECIAL_PLAYERS[hash];
+            return SpecialPlayers.ContainsKey(hash) && data.GetRawNickname() == SpecialPlayers[hash];
         }
 
         public static PlayerData GetPlayerData(this PlayerRef player, NetworkRunner runner) {

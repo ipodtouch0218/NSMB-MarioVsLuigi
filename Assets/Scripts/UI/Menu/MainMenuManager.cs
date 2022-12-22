@@ -440,7 +440,7 @@ public class MainMenuManager : MonoBehaviour {
         autoSprintToggle.isOn =      Settings.Instance.autoSprint;
         vsyncToggle.isOn =           Settings.Instance.vsync;
         scoreboardToggle.isOn =      Settings.Instance.scoreboardAlways;
-        filterToggle.isOn =          Settings.Instance.filter;
+        filterToggle.isOn =          Settings.Instance.chatFiltering;
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
         fullscreenToggle.isOn =      Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
     }

@@ -27,11 +27,13 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     private PhysicsEntity physics;
     private NetworkRigidbody2D nrb;
     private SpriteRenderer[] renderers;
+    private BoxCollider2D hitbox;
 
     public override void Awake() {
         base.Awake();
         physics = GetComponent<PhysicsEntity>();
         nrb = GetComponent<NetworkRigidbody2D>();
+        hitbox = GetComponent<BoxCollider2D>();
         renderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
@@ -72,6 +74,8 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     public override void FixedUpdateNetwork() {
         body.isKinematic = !IsActive;
+        hitbox.enabled = IsActive;
+
         if (!IsActive)
             return;
 
@@ -218,6 +222,9 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---IFireballInteractable overrides
     public bool InteractWithFireball(FireballMover fireball) {
+        if (!IsActive || !fireball.IsActive)
+            return false;
+
         //fire + ice = both destroy
         if (IsIceball) {
             fireball.Destroy();
@@ -227,6 +234,9 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     }
 
     public bool InteractWithIceball(FireballMover iceball) {
+        if (!IsActive || !iceball.IsActive)
+            return false;
+
         //fire + ice = both destroy
         if (!IsIceball) {
             iceball.Destroy();
