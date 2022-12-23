@@ -9,6 +9,7 @@ using UnityEngine.Tilemaps;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using System.Runtime.CompilerServices;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 
@@ -269,6 +270,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public void OnInput(NetworkRunner runner, NetworkInput input) {
         PlayerNetworkInput newInput = new();
 
+        //input nothing when paused
         if (GameManager.Instance.paused) {
             input.Set(newInput);
             return;
@@ -2551,7 +2553,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (!(IsOnGround && (IsGroundpounding || IsDrilling) && hitBlock))
             return;
-        
+
         bool tempHitBlock = false, hitAnyBlock = false;
         foreach (Vector3Int tile in tilesStandingOn) {
             tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down);

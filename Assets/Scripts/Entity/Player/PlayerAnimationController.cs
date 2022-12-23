@@ -81,7 +81,7 @@ public class PlayerAnimationController : NetworkBehaviour {
     }
 
     public override void Render() {
-        UpdateAnimatorStates();
+        UpdateAnimatorVariables();
         HandleAnimations();
         SetFacingDirection();
         InterpolateFacingDirection();
@@ -220,7 +220,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         }
     }
 
-    public void UpdateAnimatorStates() {
+    public void UpdateAnimatorVariables() {
 
         bool right = controller.PreviousInputs.buttons.IsSet(PlayerControls.Right);
         bool left =  controller.PreviousInputs.buttons.IsSet(PlayerControls.Left);
