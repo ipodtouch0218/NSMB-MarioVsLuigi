@@ -247,7 +247,7 @@ public class FrozenCube : HoldableEntity {
             return;
 
         } else if (FastSlide) {
-            player.DoKnockback(body.position.x > player.body.position.x, 1, false, 0);
+            player.DoKnockback(body.position.x > player.body.position.x, 1, false, gameObject);
             Kill();
             return;
         }

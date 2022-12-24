@@ -16,22 +16,21 @@ public class MainMenuManager : MonoBehaviour {
 
     //---Static Variables
     public static readonly int NicknameMin = 2, NicknameMax = 20;
+    private static readonly WaitForSeconds WaitTwoSeconds = new(2);
     public static MainMenuManager Instance;
+    public static string CurrentRegion;
 
     public AudioSource sfx, music;
     public GameObject lobbiesContent, lobbyPrefab;
-    private bool quit, validName;
 
-    public GameObject[] levelCameraPositions;
     public RoomIcon selectedRoom, privateJoinRoom;
     public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, privateToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected;
-    public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, rebindCountdown, rebindText, lobbyHeaderText, reconnectText, updateText;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, updateBoxSelected;
+    public GameObject errorBox, errorButton, rebindPrompt;
+    public TMP_Text errorText, rebindCountdown, rebindText, lobbyHeaderText, updateText;
     public RebindManager rebindManager;
-    public static string lastRegion;
     public string connectThroughSecret = "";
     public bool askedToJoin;
 
@@ -47,17 +46,18 @@ public class MainMenuManager : MonoBehaviour {
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
     [SerializeField] private Button joinRoomBtn, createRoomBtn, startGameBtn;
     [SerializeField] private TMP_InputField nicknameField, lobbyJoinField, chatTextField;
+    [SerializeField] private ScrollRect settingsScroll;
 
     [SerializeField] private Image overallsColorImage, shirtColorImage;
     [SerializeField] private GameObject playerColorPaletteIcon, playerColorDisabledIcon;
 
-    [SerializeField] private List<string> maps;
+    [SerializeField] private List<MapData> maps;
 
     //---PrivateVariables
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
-    private Coroutine playerPingUpdateCoroutine;
+    private Coroutine playerPingUpdateCoroutine, quitCoroutine;
+    private bool validName;
 
-    public ScrollRect settingsScroll;
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
@@ -186,11 +186,16 @@ public class MainMenuManager : MonoBehaviour {
             GlobalController.Instance.disconnectCause = null;
         }
 
-        Camera.main.transform.position = levelCameraPositions[UnityEngine.Random.Range(0, maps.Count)].transform.position;
-        levelDropdown.AddOptions(maps);
+        //Level Dropdown
+        PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
+        levelDropdown.AddOptions(maps.Select(md => md.mapName).ToList());
+
+        //Region Dropdown
+        regionDropdown.ClearOptions();
+        regionDropdown.AddOptions(NetworkHandler.Regions.ToList());
 
         //Photon stuff.
-        LoadSettings(!Runner.IsCloudReady);
+        ApplySettings();
 
         if (!Runner.IsCloudReady) {
             //initial connection to the game
@@ -202,8 +207,6 @@ public class MainMenuManager : MonoBehaviour {
             EnterRoom();
         }
 
-        regionDropdown.ClearOptions();
-        regionDropdown.AddOptions(NetworkHandler.Regions.ToList());
 
         lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
         nicknameField.characterLimit = NicknameMax;
@@ -261,6 +264,7 @@ public class MainMenuManager : MonoBehaviour {
         regionDropdown.interactable = connected;
     }
 
+    //TODO: refactor, wtf?
     private readonly List<PlayerRef> waitingForJoinMessage = new();
     public IEnumerator OnPlayerDataValidated(PlayerRef player) {
         yield return null; //wait a frame because reasons
@@ -274,7 +278,7 @@ public class MainMenuManager : MonoBehaviour {
 
     private IEnumerator UpdatePings() {
         while (true) {
-            yield return new WaitForSecondsRealtime(2f);
+            yield return WaitTwoSeconds;
             foreach (PlayerRef player in Runner.ActivePlayers)
                 player.GetPlayerData(Runner).Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
         }
@@ -297,7 +301,6 @@ public class MainMenuManager : MonoBehaviour {
         SetPlayerSkin(data ? data.SkinIndex : Settings.Instance.skin);
         spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
-
         OpenInLobbyMenu();
 
         if (Runner.IsServer)
@@ -308,7 +311,7 @@ public class MainMenuManager : MonoBehaviour {
         bool addS = !name.ToLower().EndsWith("s");
         lobbyHeaderText.text = name.ToValidUsername() + "'" + (addS ? "s" : "") + " Lobby";
 
-        //clear text field
+        //clear chat input field
         chatTextField.SetTextWithoutNotify("");
 
         GlobalController.Instance.DiscordController.UpdateActivity(session);
@@ -316,7 +319,14 @@ public class MainMenuManager : MonoBehaviour {
         hostControlsGroup.interactable = data.IsRoomOwner;
         roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
 
-        Camera.main.transform.position = levelCameraPositions[SessionData.Instance.Level].transform.position;
+        PreviewLevel(SessionData.Instance.Level);
+    }
+
+    public void PreviewLevel(int levelIndex) {
+        if (levelIndex < 0 || levelIndex >= maps.Count)
+            levelIndex = 0;
+
+        Camera.main.transform.position = maps[levelIndex].levelPreviewPosition.transform.position;
     }
 
     private IEnumerator SetScroll() {
@@ -424,11 +434,8 @@ public class MainMenuManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(errorButton);
     }
 
-    private void LoadSettings(bool nickname) {
-        if (nickname)
-            nicknameField.text = Settings.Instance.nickname;
-        else
-            nicknameField.SetTextWithoutNotify(Settings.Instance.nickname);
+    private void ApplySettings() {
+        nicknameField.text = Settings.Instance.nickname;
 
         musicSlider.value =          Settings.Instance.VolumeMusic;
         sfxSlider.value =            Settings.Instance.VolumeSFX;
@@ -455,25 +462,25 @@ public class MainMenuManager : MonoBehaviour {
 
     public void ConnectToDropdownRegion() {
         string targetRegion = NetworkHandler.Regions[regionDropdown.value];
-        if (lastRegion == targetRegion)
+        if (CurrentRegion == targetRegion)
             return;
 
-        for (int i = 0; i < lobbiesContent.transform.childCount; i++) {
-            GameObject roomObj = lobbiesContent.transform.GetChild(i).gameObject;
-            if (roomObj.GetComponent<RoomIcon>().joinPrivate || !roomObj.activeSelf)
+        foreach (RoomIcon room in currentRooms.Values) {
+            if (room.joinPrivate || !room.gameObject.activeSelf)
                 continue;
 
-            Destroy(roomObj);
+            Destroy(room.gameObject);
         }
+        currentRooms.Clear();
         selectedRoom = null;
-        lastRegion = targetRegion;
+        CurrentRegion = targetRegion;
 
         _ = NetworkHandler.ConnectToRegion(targetRegion);
     }
 
     public async void QuitRoom() {
         OpenLobbyMenu();
-        ClearChat();
+        chat.ClearChat();
 
         if (playerPingUpdateCoroutine != null) {
             StopCoroutine(playerPingUpdateCoroutine);
@@ -541,7 +548,7 @@ public class MainMenuManager : MonoBehaviour {
             SessionData.Instance.SetGameStarted(true);
 
             //load the correct scene
-            Runner.SetActiveScene(SessionData.Instance.Level + 1);
+            Runner.SetActiveScene(GetCurrentSceneRef());
         }
     }
 
@@ -587,11 +594,6 @@ public class MainMenuManager : MonoBehaviour {
         }, players: maxPlayers);
 
         createLobbyPrompt.SetActive(false);
-    }
-
-    public void ClearChat() {
-        for (int i = 1; i < chatContent.transform.childCount; i++)
-            Destroy(chatContent.transform.GetChild(i).gameObject);
     }
 
     public void UpdateStartGameButton() {
@@ -795,17 +797,15 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void Quit() {
-        if (quit)
+        if (quitCoroutine != null)
             return;
 
-        StartCoroutine(FinishQuitting());
+        quitCoroutine = StartCoroutine(FinishQuitting());
     }
 
     private IEnumerator FinishQuitting() {
         AudioClip clip = Enums.Sounds.UI_Quit.GetClip();
         sfx.PlayOneShot(clip);
-        quit = true;
-
         yield return new WaitForSeconds(clip.length);
 
 #if UNITY_EDITOR
@@ -826,14 +826,31 @@ public class MainMenuManager : MonoBehaviour {
         data.Rpc_SetPermanentSpectator(toggle.isOn);
     }
 
+    private SceneRef GetCurrentSceneRef() {
+        if (!SessionData.Instance)
+            return SceneRef.None;
+
+        byte index = SessionData.Instance.Level;
+        return maps[index].buildIndex;
+    }
+
     //---Debug
 #if UNITY_EDITOR
     private static readonly Vector3 MaxCameraSize = new(16f/9f * 7f, 7f);
     public void OnDrawGizmos() {
-        foreach (GameObject positioner in levelCameraPositions) {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(positioner.transform.position, MaxCameraSize);
+        Gizmos.color = Color.red;
+        foreach (MapData map in maps) {
+            if (map.levelPreviewPosition)
+                Gizmos.DrawWireCube(map.levelPreviewPosition.transform.position, MaxCameraSize);
         }
     }
 #endif
+
+    //---Helpers
+    [Serializable]
+    public class MapData {
+        public string mapName;
+        public GameObject levelPreviewPosition;
+        public int buildIndex;
+    }
 }

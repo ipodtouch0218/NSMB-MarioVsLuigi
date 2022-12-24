@@ -40006,17 +40006,6 @@ MonoBehaviour:
   music: {fileID: 887693667}
   lobbiesContent: {fileID: 1508729836}
   lobbyPrefab: {fileID: 1927022865}
-  levelCameraPositions:
-  - {fileID: 1477183160}
-  - {fileID: 978599145}
-  - {fileID: 1015827595}
-  - {fileID: 1673401199}
-  - {fileID: 323530410}
-  - {fileID: 482273330}
-  - {fileID: 8984563}
-  - {fileID: 927866350}
-  - {fileID: 1215474819}
-  - {fileID: 1774958591}
   selectedRoom: {fileID: 0}
   privateJoinRoom: {fileID: 1692533255}
   ndsResolutionToggle: {fileID: 1450387490}
@@ -40045,17 +40034,14 @@ MonoBehaviour:
   creditsSelected: {fileID: 1722575666}
   controlsSelected: {fileID: 378613054}
   privateSelected: {fileID: 1974161483}
-  reconnectSelected: {fileID: 393919388}
   updateBoxSelected: {fileID: 699942805}
   errorBox: {fileID: 276608278}
   errorButton: {fileID: 1139030223}
   rebindPrompt: {fileID: 295478739}
-  reconnectBox: {fileID: 0}
   errorText: {fileID: 997536057}
   rebindCountdown: {fileID: 395885055}
   rebindText: {fileID: 1382848006}
   lobbyHeaderText: {fileID: 465989237}
-  reconnectText: {fileID: 0}
   updateText: {fileID: 664659097}
   rebindManager: {fileID: 1657549225}
   connectThroughSecret: 
@@ -40089,22 +40075,42 @@ MonoBehaviour:
   nicknameField: {fileID: 377987071}
   lobbyJoinField: {fileID: 931915726}
   chatTextField: {fileID: 1621615365}
+  settingsScroll: {fileID: 1144564698}
   overallsColorImage: {fileID: 1385748054}
   shirtColorImage: {fileID: 584898080}
   playerColorPaletteIcon: {fileID: 1087430716}
   playerColorDisabledIcon: {fileID: 1622845023}
   maps:
-  - Grassland
-  - Bricks
-  - Fortress
-  - Pipes
-  - Ice
-  - '[C] Jungle'
-  - '[C] Sky'
-  - '[C] Volcano'
-  - '[C] Bonus'
-  - '[C] Desert'
-  settingsScroll: {fileID: 1144564698}
+  - mapName: Grassland
+    levelPreviewPosition: {fileID: 1477183160}
+    buildIndex: 1
+  - mapName: Bricks
+    levelPreviewPosition: {fileID: 978599145}
+    buildIndex: 2
+  - mapName: Fortress
+    levelPreviewPosition: {fileID: 1015827595}
+    buildIndex: 3
+  - mapName: Pipes
+    levelPreviewPosition: {fileID: 1673401199}
+    buildIndex: 4
+  - mapName: Ice
+    levelPreviewPosition: {fileID: 323530410}
+    buildIndex: 5
+  - mapName: '[C] Jungle'
+    levelPreviewPosition: {fileID: 482273330}
+    buildIndex: 6
+  - mapName: '[C] Sky'
+    levelPreviewPosition: {fileID: 8984563}
+    buildIndex: 7
+  - mapName: '[C] Volcano'
+    levelPreviewPosition: {fileID: 927866350}
+    buildIndex: 8
+  - mapName: '[C] Bonus'
+    levelPreviewPosition: {fileID: 1215474819}
+    buildIndex: 9
+  - mapName: '[C] Desert'
+    levelPreviewPosition: {fileID: 1774958591}
+    buildIndex: 10
 --- !u!4 &887693662
 Transform:
   m_ObjectHideFlags: 0
@@ -43037,7 +43043,7 @@ GameObject:
   m_Component:
   - component: {fileID: 978599146}
   m_Layer: 0
-  m_Name: CameraPositionBrickyard
+  m_Name: CameraPositionBricks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43875,7 +43881,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1015827596}
   m_Layer: 0
-  m_Name: CameraPositionCastle
+  m_Name: CameraPositionFortress
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

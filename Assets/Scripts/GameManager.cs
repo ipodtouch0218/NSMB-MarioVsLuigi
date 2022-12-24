@@ -322,7 +322,7 @@ public class GameManager : NetworkBehaviour {
         TMP_Text tmpText = text.GetComponent<TMP_Text>();
 
         if (winningTeam == -1) {
-            tmpText.text = "It's a draw";
+            tmpText.text = "It's a draw...";
         } else {
             if (SessionData.Instance.Teams) {
                 Team team = ScriptableManager.Instance.teams[winningTeam];
@@ -334,10 +334,6 @@ public class GameManager : NetworkBehaviour {
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
-
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
-        mixer.SetFloat("MusicSpeed", 1f);
-        mixer.SetFloat("MusicPitch", 1f);
 
         bool draw = winningTeam == -1;
         bool win = !draw && winningTeam == Runner.GetLocalPlayerData().Team;

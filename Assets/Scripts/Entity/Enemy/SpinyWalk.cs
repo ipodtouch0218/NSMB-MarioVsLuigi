@@ -25,7 +25,7 @@ public class SpinyWalk : KoopaWalk {
             bool originalFacing = player.FacingRight;
             if (player.IsInShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 //Do knockback to player, colliding with us in shell going opposite ways
-                player.DoKnockback(player.body.position.x < body.position.x, 0, false, 0);
+                player.DoKnockback(player.body.position.x < body.position.x, 0, false, gameObject);
 
             SpecialKill(!originalFacing, false, player.StarCombo++);
         } else if (!Holder) {

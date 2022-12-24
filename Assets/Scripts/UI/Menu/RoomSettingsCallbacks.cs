@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
-using NSMB.Extensions;
 using NSMB.Utils;
 
 public class RoomSettingsCallbacks : MonoBehaviour {
@@ -37,8 +34,8 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         ChangeDrawOnTimeUp(lobbyData.DrawOnTimeUp);
         ChangeCustomPowerups(lobbyData.CustomPowerups);
 
-        if (MainMenuManager.Instance)
-            MainMenuManager.Instance.UpdateStartGameButton();
+        if (MainMenuManager.Instance is MainMenuManager mm)
+            mm.UpdateStartGameButton();
     }
 
     #region Level Index
@@ -57,9 +54,9 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     }
     private void ChangeLevelIndex(int index, bool changed) {
         levelDropdown.SetValueWithoutNotify(index);
-        if (changed) {
-            MainMenuManager.Instance.chat.AddChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
-            Camera.main.transform.position = MainMenuManager.Instance.levelCameraPositions[index].transform.position;
+        if (changed && MainMenuManager.Instance is MainMenuManager mm) {
+            mm.chat.AddChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
+            mm.PreviewLevel(index);
         }
     }
     #endregion
@@ -261,8 +258,9 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         privateEnabledToggle.SetIsOnWithoutNotify(value);
     }
     public void CopyRoomCode() {
-        TextEditor te = new();
-        te.text = Runner.SessionInfo.Name;
+        TextEditor te = new() {
+            text = Runner.SessionInfo.Name
+        };
         te.SelectAll();
         te.Copy();
     }

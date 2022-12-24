@@ -541,8 +541,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             //They are invincible. let them decide if they've hit us.
             if (IsStarmanInvincible) {
                 //oh, we both are. bonk.
-                DoKnockback(other.body.position.x > body.position.x, 1, true, 0);
-                other.DoKnockback(other.body.position.x < body.position.x, 1, true, 0);
+                DoKnockback(other.body.position.x > body.position.x, 1, true, other.gameObject);
+                other.DoKnockback(other.body.position.x < body.position.x, 1, true, gameObject);
             }
             return;
         }
@@ -551,7 +551,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             //we are invincible. murder time :)
             if (other.State == Enums.PowerupState.MegaMushroom) {
                 //wait fuck-
-                DoKnockback(other.body.position.x > body.position.x, 1, true, 0);
+                DoKnockback(other.body.position.x > body.position.x, 1, true, other.gameObject);
                 return;
             }
 
@@ -574,8 +574,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     IsDrilling = false;
                     PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                 } else if (!otherAbove) {
-                    DoKnockback(other.body.position.x < body.position.x, 0, true, 0);
-                    other.DoKnockback(other.body.position.x > body.position.x, 0, true, 0);
+                    DoKnockback(other.body.position.x < body.position.x, 0, true, other.gameObject);
+                    other.DoKnockback(other.body.position.x > body.position.x, 0, true, gameObject);
                 }
             } else if (State == Enums.PowerupState.MegaMushroom) {
                 //only we are giant
@@ -592,8 +592,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 //hit them. powerdown them
                 if (other.IsInShell) {
                     //collide with both
-                    DoKnockback(other.body.position.x < body.position.x, 1, true, 0);
-                    other.DoKnockback(other.body.position.x > body.position.x, 1, true, 0);
+                    DoKnockback(other.body.position.x < body.position.x, 1, true, other.gameObject);
+                    other.DoKnockback(other.body.position.x > body.position.x, 1, true, gameObject);
                 } else {
                     other.Powerdown(false);
                 }
@@ -623,7 +623,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (State == Enums.PowerupState.MiniMushroom && other.State != Enums.PowerupState.MiniMushroom) {
                 //we are mini, they arent. special rules.
                 if (groundpounded) {
-                    other.DoKnockback(other.body.position.x < body.position.x, 1, false, 0);
+                    other.DoKnockback(other.body.position.x < body.position.x, 1, false, gameObject);
                     IsGroundpounding = false;
                     DoEntityBounce = true;
                 } else {
@@ -631,13 +631,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 }
             } else if (other.State == Enums.PowerupState.MiniMushroom && groundpounded) {
                 //we are big, groundpounding a mini opponent. squish.
-                other.DoKnockback(other.body.position.x > body.position.x, 3, false, 0);
+                other.DoKnockback(other.body.position.x > body.position.x, 3, false, gameObject);
                 DoEntityBounce = false;
             } else {
                 if (other.State == Enums.PowerupState.MiniMushroom && groundpounded) {
                     other.Powerdown(false);
                 } else {
-                    other.DoKnockback(other.body.position.x < body.position.x, groundpounded ? 3 : 1, false, 0);
+                    other.DoKnockback(other.body.position.x < body.position.x, groundpounded ? 3 : 1, false, gameObject);
                 }
             }
             body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);
@@ -646,8 +646,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove && IsOnGround && other.IsOnGround && (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed)) {
             //bump
 
-            DoKnockback(other.body.transform.position.x > body.position.x, 1, true, 0);
-            other.DoKnockback(other.body.transform.position.x < body.position.x, 1, true, 0);
+            DoKnockback(other.body.transform.position.x > body.position.x, 1, true, other.gameObject);
+            other.DoKnockback(other.body.transform.position.x < body.position.x, 1, true, gameObject);
         }
     }
     #endregion
@@ -819,13 +819,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             _ => 1
         };
 
-        if (FrozenCube && FrozenCube.Object.HasStateAuthority) {
-            FrozenCube.Holder?.DoKnockback(FrozenCube.Holder.FacingRight, 1, true, 0);
+        if (FrozenCube) {
+            FrozenCube.Holder?.DoKnockback(FrozenCube.Holder.FacingRight, 1, true, gameObject);
             FrozenCube.Kill();
         }
 
         if (knockbackStars > 0)
-            DoKnockback(FacingRight, knockbackStars, true, -1);
+            DoKnockback(FacingRight, knockbackStars, true, null);
         else
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1.5f);
     }
@@ -835,7 +835,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsInKnockback)
             return;
 
-        DoKnockback(bumper.body.position.x < body.position.x, 1, false, 0);
+        DoKnockback(bumper.body.position.x < body.position.x, 1, false, bumper.gameObject);
     }
 
     #region -- COIN / STAR COLLECTION --
@@ -1216,7 +1216,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     #region -- KNOCKBACK --
 
-    public void DoKnockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
+    public void DoKnockback(bool fromRight, int starsToDrop, bool fireball, GameObject attacker) {
         if (fireball && fireballKnockback && IsInKnockback)
             return;
         if (IsInKnockback && !fireballKnockback)
@@ -1240,16 +1240,15 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         initialKnockbackFacingRight = FacingRight;
 
         //TODO:
-        //PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
-        //if (attackerView >= 0) {
-        //    if (attacker)
-        //        SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
-        //
-        //    if (fireballKnockback)
-        //        PlaySound(Enums.Sounds.Player_Sound_Collision_Fireball, 0, 3);
-        //    else
-        //        PlaySound(Enums.Sounds.Player_Sound_Collision, 0, 3);
-        //}
+        if (attacker) {
+
+            SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
+
+            if (fireballKnockback)
+                PlaySound(Enums.Sounds.Player_Sound_Collision_Fireball, 0, 3);
+            else
+                PlaySound(Enums.Sounds.Player_Sound_Collision, 0, 3);
+        }
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", FacingRight != fromRight);
 
@@ -1263,9 +1262,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
             fireball ? 0 : 4.5f
         );
-
-        //if (IsOnGround && !fireball)
-        //    body.position += Vector2.up * 0.15f;
 
         IsOnGround = false;
         IsInShell = false;
@@ -1447,20 +1443,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 continue;
 
             //Enter pipe
-            CurrentPipe = pipe;
-            PipeEntering = true;
-            PipeTimer = TickTimer.CreateFromSeconds(Runner, animationController.pipeDuration * 0.5f);
-            body.velocity = PipeDirection = Vector2.down;
-
-            transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
-
-            IsCrouching = false;
-            IsSliding = false;
-            IsPropellerFlying = false;
-            IsDrilling = false;
-            UsedPropellerThisJump = false;
-            IsGroundpounding = false;
-            IsInShell = false;
+            EnterPipe(pipe, Vector2.down);
             break;
         }
     }
@@ -1479,21 +1462,27 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 continue;
 
             //pipe found
-            CurrentPipe = pipe;
-            PipeEntering = true;
-            PipeTimer = TickTimer.CreateFromSeconds(Runner, animationController.pipeDuration * 0.5f);
-            body.velocity = PipeDirection = Vector2.up;
-
-            transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
-
-            IsCrouching = false;
-            IsSliding = false;
-            IsPropellerFlying = false;
-            UsedPropellerThisJump = false;
-            IsSpinnerFlying = false;
-            IsInShell = false;
+            EnterPipe(pipe, Vector2.up);
             break;
         }
+    }
+
+    private void EnterPipe(PipeManager pipe, Vector2 direction) {
+        CurrentPipe = pipe;
+        PipeEntering = true;
+        PipeTimer = TickTimer.CreateFromSeconds(Runner, animationController.pipeDuration * 0.5f);
+        body.velocity = PipeDirection = direction;
+
+        transform.position = body.position = new Vector2(pipe.transform.position.x, transform.position.y);
+
+        IsCrouching = false;
+        IsSliding = false;
+        IsPropellerFlying = false;
+        UsedPropellerThisJump = false;
+        IsSpinnerFlying = false;
+        IsInShell = false;
+        if (StarmanTimer.IsActive(Runner))
+            StarmanTimer = TickTimer.CreateFromSeconds(Runner, (StarmanTimer.RemainingTime(Runner) ?? 0) + animationController.pipeDuration);
     }
     #endregion
 

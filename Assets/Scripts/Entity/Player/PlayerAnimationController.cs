@@ -331,7 +331,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         HandleDeathAnimation();
         HandlePipeAnimation();
 
-        transform.position = new(transform.position.x, transform.position.y, controller.PipeEntering ? 1 : -4);
+        transform.position = new(transform.position.x, transform.position.y, controller.CurrentPipe ? 1 : -4);
     }
 
     private void HandleDeathAnimation() {
@@ -399,6 +399,7 @@ public class PlayerAnimationController : NetworkBehaviour {
                 controller.cameraController.Recenter(tpPos + (Vector3) offset);
                 controller.PipeTimer = TickTimer.CreateFromSeconds(Runner, pipeDuration * 0.5f);
                 controller.PipeEntering = false;
+                controller.CurrentPipe = pe.otherPipe;
             } else {
                 //end pipe animation
                 controller.CurrentPipe = null;

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
@@ -9,9 +10,13 @@ using NSMB.Utils;
 
 public class ChatManager : MonoBehaviour {
 
+    //---Serialized Variables
     [SerializeField] private ChatMessage messagePrefab;
     [SerializeField] private TMP_InputField chatbox;
     [SerializeField] private GameObject chatWindow;
+
+    //---Private Variables
+    private readonly List<ChatMessage> chatMessages = new();
 
     public void AddChatMessage(string message, Color? color = null, bool filter = false) {
 
@@ -27,6 +32,7 @@ public class ChatManager : MonoBehaviour {
             message = message.Filter();
 
         chat.SetText(message);
+        chatMessages.Add(chat);
         Canvas.ForceUpdateCanvases();
     }
 
@@ -49,6 +55,13 @@ public class ChatManager : MonoBehaviour {
 
         SessionData.Instance.Rpc_ChatIncomingMessage(text);
         StartCoroutine(SelectTextboxNextFrame());
+    }
+
+    public void ClearChat() {
+        foreach (ChatMessage message in chatMessages)
+            Destroy(message.gameObject);
+
+        chatMessages.Clear();
     }
 
     private IEnumerator SelectTextboxNextFrame() {

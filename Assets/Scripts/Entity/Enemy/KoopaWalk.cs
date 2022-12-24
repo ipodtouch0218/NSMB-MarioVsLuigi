@@ -218,7 +218,7 @@ public class KoopaWalk : HoldableEntity {
         } else if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.FacingRight;
             if (IsInShell && !IsStationary && player.IsInShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                player.DoKnockback(player.body.position.x < body.position.x, 0, true, 0);
+                player.DoKnockback(player.body.position.x < body.position.x, 0, true, gameObject);
 
             SpecialKill(!originalFacing, false, player.StarCombo++);
 

@@ -1,13 +1,14 @@
-﻿using Fusion;
-using UnityEngine;
+﻿using UnityEngine;
+
+using Fusion;
 
 public class PipeManager : NetworkBehaviour {
 
     public bool entryAllowed = true, bottom = false, miniOnly = false;
     public PipeManager otherPipe;
 
-#if UNITY_EDITOR
     //---Debug
+#if UNITY_EDITOR
     private static readonly Color LineColor = new(1f, 1f, 0f, 0.25f);
     private static readonly float LineWidth = 0.125f;
     public void OnDrawGizmos() {
