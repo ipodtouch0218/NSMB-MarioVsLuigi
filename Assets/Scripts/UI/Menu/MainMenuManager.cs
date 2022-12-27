@@ -10,6 +10,7 @@ using TMPro;
 using Fusion;
 using Fusion.Sockets;
 using NSMB.Extensions;
+using NSMB.Rebinding;
 using NSMB.Utils;
 
 public class MainMenuManager : MonoBehaviour {
@@ -18,112 +19,46 @@ public class MainMenuManager : MonoBehaviour {
     public static readonly int NicknameMin = 2, NicknameMax = 20;
     private static readonly WaitForSeconds WaitTwoSeconds = new(2);
     public static MainMenuManager Instance;
-    public static string CurrentRegion;
 
+    //---Properties
+    private NetworkRunner Runner => NetworkHandler.Instance.runner;
+    private PlayerData LocalData => Runner.GetLocalPlayerData();
+
+    //---Public Variables
     public AudioSource sfx, music;
-    public GameObject lobbiesContent, lobbyPrefab;
-
-    public RoomIcon selectedRoom, privateJoinRoom;
     public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, privateToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, updateBoxSelected;
-    public GameObject errorBox, errorButton, rebindPrompt;
-    public TMP_Text errorText, rebindCountdown, rebindText, lobbyHeaderText, updateText;
-    public RebindManager rebindManager;
-    public string connectThroughSecret = "";
-    public bool askedToJoin;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, updateBoxSelected;
 
     //---Serialized Fields
+    [SerializeField] private RebindManager rebindManager;
     [SerializeField] public PlayerListHandler playerList;
+    [SerializeField] public RoomListManager roomManager;
     [SerializeField] private ColorChooser colorManager;
     [SerializeField] public ChatManager chat;
     [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
     [SerializeField] private CanvasGroup hostControlsGroup;
 
-    [SerializeField] private GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, connecting;
+    [SerializeField] private GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, controlsMenu, updateBox, connecting;
     [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
+    [SerializeField] private GameObject errorBox, errorButton;
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
-    [SerializeField] private Button joinRoomBtn, createRoomBtn, startGameBtn;
-    [SerializeField] private TMP_InputField nicknameField, lobbyJoinField, chatTextField;
+    [SerializeField] private Button createRoomBtn, startGameBtn;
+    [SerializeField] private TMP_InputField nicknameField, chatTextField;
+    [SerializeField] private TMP_Text errorText, lobbyHeaderText, updateText;
     [SerializeField] private ScrollRect settingsScroll;
+    [SerializeField] private Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
 
     [SerializeField] private Image overallsColorImage, shirtColorImage;
     [SerializeField] private GameObject playerColorPaletteIcon, playerColorDisabledIcon;
 
     [SerializeField] private List<MapData> maps;
 
-    //---PrivateVariables
-    private readonly Dictionary<string, RoomIcon> currentRooms = new();
+    //---Private Variables
     private Coroutine playerPingUpdateCoroutine, quitCoroutine;
     private bool validName;
 
-
-    //---Properties
-    private NetworkRunner Runner => NetworkHandler.Instance.runner;
-    private PlayerData LocalData => Runner.GetLocalPlayerData();
-
     // LOBBY CALLBACKS
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
-
-        List<string> invalidRooms = currentRooms.Keys.ToList();
-
-        foreach (SessionInfo session in sessionList) {
-
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.Lives, out int lives);
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string host);
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int players);
-
-            bool valid = true;
-            valid &= session.IsVisible && session.IsOpen;
-            valid &= session.MaxPlayers > 0 && session.MaxPlayers <= 10;
-            valid &= players > 0 && players <= 10;
-            valid &= lives <= 99;
-            valid &= stars >= 1 && stars <= 99;
-            valid &= coins >= 1 && coins <= 99;
-            valid &= host.IsValidUsername();
-
-            if (valid) {
-                invalidRooms.Remove(session.Name);
-            } else {
-                continue;
-            }
-
-            RoomIcon roomIcon;
-            if (currentRooms.ContainsKey(session.Name)) {
-                roomIcon = currentRooms[session.Name];
-            } else {
-                GameObject newLobby = Instantiate(lobbyPrefab, Vector3.zero, Quaternion.identity);
-                newLobby.name = session.Name;
-                newLobby.SetActive(true);
-                newLobby.transform.SetParent(lobbiesContent.transform, false);
-
-                currentRooms[session.Name] = roomIcon = newLobby.GetComponent<RoomIcon>();
-                roomIcon.session = session;
-            }
-
-            roomIcon.UpdateUI(session);
-        }
-
-        foreach (string key in invalidRooms) {
-            if (!currentRooms.ContainsKey(key))
-                continue;
-
-            Destroy(currentRooms[key].gameObject);
-            currentRooms.Remove(key);
-        }
-
-        if (askedToJoin && selectedRoom != null) {
-            JoinSelectedRoom();
-            askedToJoin = false;
-            selectedRoom = null;
-        }
-
-        privateJoinRoom.transform.SetAsFirstSibling();
-    }
-
     public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
         int index = Array.IndexOf(NetworkHandler.Regions, info.Region);
 
@@ -148,25 +83,14 @@ public class MainMenuManager : MonoBehaviour {
         if (cause != ShutdownReason.Ok)
             OpenErrorBox(cause);
 
-        selectedRoom = null;
         GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
-        if (!runner.IsCloudReady) {
-            foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
-                Destroy(value.gameObject);
-                currentRooms.Remove(key);
-            }
-        }
     }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
         OpenErrorBox(cause);
 
-        selectedRoom = null;
         if (!runner.IsCloudReady) {
-            foreach ((string key, RoomIcon value) in currentRooms.ToArray()) {
-                Destroy(value.gameObject);
-                currentRooms.Remove(key);
-            }
+            roomManager.ClearRooms();
         }
     }
 
@@ -179,7 +103,6 @@ public class MainMenuManager : MonoBehaviour {
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.SizeIncreaseTarget = 0;
         HorizontalCamera.SizeIncreaseCurrent = 0;
-        Time.timeScale = 1;
 
         if (GlobalController.Instance.disconnectCause != null) {
             OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
@@ -207,8 +130,6 @@ public class MainMenuManager : MonoBehaviour {
             EnterRoom();
         }
 
-
-        lobbyPrefab = lobbiesContent.transform.Find("Template").gameObject;
         nicknameField.characterLimit = NicknameMax;
         UpdateNickname();
 
@@ -238,7 +159,6 @@ public class MainMenuManager : MonoBehaviour {
         NetworkHandler.OnPlayerJoined +=       OnPlayerJoined;
         NetworkHandler.OnPlayerLeft +=         OnPlayerLeft;
         NetworkHandler.OnLobbyConnect +=       OnLobbyConnect;
-        NetworkHandler.OnSessionListUpdated += OnSessionListUpdated;
         NetworkHandler.OnShutdown +=           OnShutdown;
         NetworkHandler.OnJoinSessionFailed +=  OnShutdown;
         NetworkHandler.OnConnectFailed +=      OnConnectFailed;
@@ -248,7 +168,6 @@ public class MainMenuManager : MonoBehaviour {
         NetworkHandler.OnPlayerJoined -=       OnPlayerJoined;
         NetworkHandler.OnPlayerLeft -=         OnPlayerLeft;
         NetworkHandler.OnLobbyConnect -=       OnLobbyConnect;
-        NetworkHandler.OnSessionListUpdated -= OnSessionListUpdated;
         NetworkHandler.OnShutdown -=           OnShutdown;
         NetworkHandler.OnJoinSessionFailed -=  OnShutdown;
         NetworkHandler.OnConnectFailed -=      OnConnectFailed;
@@ -257,9 +176,7 @@ public class MainMenuManager : MonoBehaviour {
     public void Update() {
         bool connected = Runner && Runner.State == NetworkRunner.States.Starting && Runner.IsCloudReady;
         connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
-        privateJoinRoom.gameObject.SetActive(connected);
 
-        joinRoomBtn.interactable = connected && selectedRoom != null && validName;
         createRoomBtn.interactable = connected && validName;
         regionDropdown.interactable = connected;
     }
@@ -309,7 +226,7 @@ public class MainMenuManager : MonoBehaviour {
         SessionInfo session = Runner.SessionInfo;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
         bool addS = !name.ToLower().EndsWith("s");
-        lobbyHeaderText.text = name.ToValidUsername() + "'" + (addS ? "s" : "") + " Lobby";
+        lobbyHeaderText.text = name.ToValidUsername() + "'" + (addS ? "s" : "") + " Room";
 
         //clear chat input field
         chatTextField.SetTextWithoutNotify("");
@@ -345,7 +262,7 @@ public class MainMenuManager : MonoBehaviour {
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
-        privatePrompt.SetActive(false);
+        privateRoomIdPrompt.SetActive(false);
     }
 
     public void OpenTitleScreen() {
@@ -367,8 +284,7 @@ public class MainMenuManager : MonoBehaviour {
         bg.SetActive(true);
         lobbyMenu.SetActive(true);
 
-        foreach (RoomIcon room in currentRooms.Values)
-            room.UpdateUI(room.session);
+        roomManager.RefreshRooms();
 
         EventSystem.current.SetSelectedGameObject(lobbySelected);
     }
@@ -409,11 +325,6 @@ public class MainMenuManager : MonoBehaviour {
         inLobbyMenu.SetActive(true);
 
         EventSystem.current.SetSelectedGameObject(currentLobbySelected);
-    }
-    public void OpenPrivatePrompt() {
-        privatePrompt.SetActive(true);
-        lobbyJoinField.text = "";
-        EventSystem.current.SetSelectedGameObject(privateSelected);
     }
 
     public void OpenErrorBox(Enum cause) {
@@ -462,18 +373,11 @@ public class MainMenuManager : MonoBehaviour {
 
     public void ConnectToDropdownRegion() {
         string targetRegion = NetworkHandler.Regions[regionDropdown.value];
-        if (CurrentRegion == targetRegion)
+        if (NetworkHandler.CurrentRegion == targetRegion)
             return;
 
-        foreach (RoomIcon room in currentRooms.Values) {
-            if (room.joinPrivate || !room.gameObject.activeSelf)
-                continue;
-
-            Destroy(room.gameObject);
-        }
-        currentRooms.Clear();
-        selectedRoom = null;
-        CurrentRegion = targetRegion;
+        roomManager.ClearRooms();
+        NetworkHandler.CurrentRegion = targetRegion;
 
         _ = NetworkHandler.ConnectToRegion(targetRegion);
     }
@@ -550,39 +454,6 @@ public class MainMenuManager : MonoBehaviour {
             //load the correct scene
             Runner.SetActiveScene(GetCurrentSceneRef());
         }
-    }
-
-    public void SelectRoom(GameObject room) {
-        if (selectedRoom)
-            selectedRoom.Unselect();
-
-        selectedRoom = room.GetComponent<RoomIcon>();
-        selectedRoom.Select();
-
-        joinRoomBtn.interactable = room != null && nicknameField.text.Length >= NicknameMin;
-    }
-
-    public void JoinSelectedRoom() {
-        if (!selectedRoom)
-            return;
-
-        if (selectedRoom.joinPrivate) {
-            OpenPrivatePrompt();
-        } else {
-            _ = NetworkHandler.JoinRoom(selectedRoom.session.Name);
-        }
-    }
-
-    public void JoinSpecificRoom() {
-        string id = lobbyJoinField.text.ToUpper();
-        int index = id.Length > 0 ? NetworkHandler.RoomIdValidChars.IndexOf(id[0]) : -1;
-        if (id.Length < 8 || index < 0 || index >= NetworkHandler.Regions.Length) {
-            OpenErrorBox("Invalid Room ID");
-            return;
-        }
-
-        privatePrompt.SetActive(false);
-        _ = NetworkHandler.JoinRoom(id);
     }
 
     public void CreateRoom() {

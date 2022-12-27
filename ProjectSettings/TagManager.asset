@@ -24,15 +24,12 @@ TagManager:
   - uicamera
   - CanvasMask
   - Backgrounds
-  - DestructablePipe
   - FadeUI
   - lava
   - MarioBrosPlatform
   - frozencube
   - Squishy
   - Powerup
-  - coin
-  - loosecoin
   layers:
   - Default
   - TransparentFX

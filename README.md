@@ -33,7 +33,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 <details>
   <summary><h2>Opening in Unity Editor</h2></summary>
 
-1. Install Unity 2022.1.12f1 (or newer) via Unity Hub (Installs > Install Editor > Scroll to bottom)
+1. Install Unity 2022.2.1f1 (or newer) via Unity Hub (Installs > Install Editor > Scroll to bottom)
 2. Download and install [git](https://git-scm.com/downloads). Do NOT use the .zip download, as it will cause errors within Unity.
 3. Open Command Prompt (Windows) or Terminal (MacOS / Linux)
 4. Navigate to the folder you want the source code to be in using `cd <path>`. For example, `cd %USERPROFILE%\Documents` will save it in My Documents.

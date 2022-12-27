@@ -5,75 +5,85 @@ using TMPro;
 
 using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 
-public class RebindButton : MonoBehaviour {
+namespace NSMB.Rebinding {
+    public class RebindButton : MonoBehaviour {
 
-    //---Public Variables
-    public InputAction targetAction;
-    public InputBinding targetBinding;
-    public int index;
+        //---Static Variables
+        private static readonly WaitForSeconds WaitOneSecond = new(1);
 
-    //---Serialized Variables
-    [SerializeField] private int timeoutTime = 6;
+        //---Public Variables
+        public RebindManager manager;
+        public InputAction targetAction;
+        public InputBinding targetBinding;
+        public int index;
 
-    //---Private Variables
-    private RebindingOperation rebinding;
-    private TMP_Text ourText;
-    private Coroutine countdown;
+        //---Serialized Variables
+        [SerializeField] private int timeoutTime = 6;
 
-    public void Start() {
-        ourText = GetComponentInChildren<TMP_Text>();
-        SetText();
-        targetAction.actionMap.Enable();
-    }
+        //---Private Variables
+        private RebindingOperation rebinding;
+        private TMP_Text ourText;
+        private Coroutine countdownCoroutine;
 
-    public void StartRebind() {
-
-        targetAction.actionMap.Disable();
-
-        MainMenuManager.Instance.rebindPrompt.SetActive(true);
-        MainMenuManager.Instance.rebindText.text = $"Rebinding {targetAction.name} {targetBinding.name} ({targetBinding.groups})\nPress any button or key.";
-
-        rebinding = targetAction
-            .PerformInteractiveRebinding()
-            .WithControlsExcluding("Mouse")
-            .WithControlsHavingToMatchPath($"<{targetBinding.groups}>")
-            // .WithCancelingThrough()
-            .WithAction(targetAction)
-            .WithTargetBinding(index)
-            .WithTimeout(timeoutTime)
-            .OnMatchWaitForAnother(0.2f)
-            // .OnApplyBinding((op,str) => ApplyBind(str))
-            .OnCancel(CleanRebind)
-            .OnComplete(OnRebindComplete)
-            .Start();
-
-        countdown = StartCoroutine(TimeoutCountdown());
-    }
-
-    private IEnumerator TimeoutCountdown() {
-        for (int i = timeoutTime; i > 0; i--) {
-            MainMenuManager.Instance.rebindCountdown.text = i.ToString();
-            yield return new WaitForSecondsRealtime(1);
+        public void Start() {
+            ourText = GetComponentInChildren<TMP_Text>();
+            UpdateText();
+            targetAction.actionMap.Enable();
         }
-    }
 
-    private void OnRebindComplete(RebindingOperation operation) {
-        SetText();
-        CleanRebind(operation);
-        RebindManager.Instance.SaveRebindings();
-    }
+        public void StartRebind() {
 
-    private void CleanRebind(RebindingOperation operation) {
-        targetAction.actionMap.Enable();
-        rebinding.Dispose();
-        MainMenuManager.Instance.rebindPrompt.SetActive(false);
-        StopCoroutine(countdown);
-    }
+            targetAction.actionMap.Disable();
 
-    public void SetText() {
-        targetBinding = targetAction.bindings[index];
-        ourText.text = InputControlPath.ToHumanReadableString(
-            targetBinding.effectivePath,
-            InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
+            manager.rebindPrompt.SetActive(true);
+            manager.rebindPromptText.text = $"Rebinding {targetAction.name} {targetBinding.name} ({targetBinding.groups})\nPress any button or key.";
+
+            rebinding = targetAction
+                .PerformInteractiveRebinding()
+                .WithControlsExcluding("Mouse")
+                .WithControlsHavingToMatchPath($"<{targetBinding.groups}>")
+                // .WithCancelingThrough()
+                .WithAction(targetAction)
+                .WithTargetBinding(index)
+                .WithTimeout(timeoutTime)
+                .OnMatchWaitForAnother(0.2f)
+                // .OnApplyBinding((op,str) => ApplyBind(str))
+                .OnCancel(CleanRebind)
+                .OnComplete(OnRebindComplete)
+                .Start();
+
+            countdownCoroutine = StartCoroutine(TimeoutCountdown());
+        }
+
+        private IEnumerator TimeoutCountdown() {
+            for (int i = timeoutTime; i > 0; i--) {
+                manager.rebindCountdownText.text = i.ToString();
+                yield return WaitOneSecond;
+            }
+        }
+
+        private void OnRebindComplete(RebindingOperation operation) {
+            UpdateText();
+            CleanRebind(operation);
+            manager.SaveRebindings();
+        }
+
+        private void CleanRebind(RebindingOperation operation) {
+            targetAction.actionMap.Enable();
+            rebinding.Dispose();
+            manager.rebindPrompt.SetActive(false);
+
+            if (countdownCoroutine != null) {
+                StopCoroutine(countdownCoroutine);
+                countdownCoroutine = null;
+            }
+        }
+
+        public void UpdateText() {
+            targetBinding = targetAction.bindings[index];
+            ourText.text = InputControlPath.ToHumanReadableString(
+                targetBinding.effectivePath,
+                InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
+        }
     }
 }

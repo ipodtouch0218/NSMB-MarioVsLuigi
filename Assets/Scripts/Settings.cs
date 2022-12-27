@@ -1,6 +1,7 @@
-using Fusion;
 using UnityEngine;
 using UnityEngine.Audio;
+
+using NSMB.Utils;
 
 public class Settings : Singleton<Settings> {
 
@@ -27,6 +28,8 @@ public class Settings : Singleton<Settings> {
             ApplyVolumeSettings();
         }
     }
+
+    public bool ValidNickname => nickname.IsValidUsername(false);
 
     //---Public Variables
     public string nickname;

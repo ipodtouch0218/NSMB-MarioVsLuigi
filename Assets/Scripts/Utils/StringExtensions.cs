@@ -11,12 +11,12 @@ namespace NSMB.Utils {
             return input;
         }
 
-        public static bool IsValidUsername(this string input) {
+        public static bool IsValidUsername(this string input, bool allowDiscriminator = true) {
             if (input == null)
                 return false;
 
             string count = MainMenuManager.NicknameMin + "," + MainMenuManager.NicknameMax;
-            return Regex.IsMatch(input, "^[0-9A-Za-z]{" + count + "}(\\([0-9]\\))?$");
+            return Regex.IsMatch(input, "^[0-9A-Za-z]{" + count + "}" + (allowDiscriminator ? "(\\([0-9]\\))?" : "") + "$");
         }
 
         public static string ToValidUsername(this string input, bool discrim = true) {

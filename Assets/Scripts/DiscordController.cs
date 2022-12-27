@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,33 +8,37 @@ using Fusion;
 
 public class DiscordController : MonoBehaviour {
 
-    public Discord.Discord discord;
-    public ActivityManager activityManager;
+    //---Static Variables
+    private static readonly long DiscordAppId = 962073502469459999;
 
-    public void Awake() {
+    //---Private Variables
+    private Discord.Discord discord;
+    private ActivityManager activityManager;
+
+    public void Start() {
 #if UNITY_WEBGL
+        enabled = false;
         return;
 #endif
 
-        discord = new Discord.Discord(962073502469459999, (ulong) CreateFlags.NoRequireDiscord);
+        discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
         activityManager = discord.GetActivityManager();
         activityManager.OnActivityJoinRequest += AskToJoin;
         activityManager.OnActivityJoin += TryJoinGame;
 
-//#if UNITY_STANDALONE_WIN
         try {
             string filename = AppDomain.CurrentDomain.ToString();
             filename = string.Join(" ", filename.Split(" ")[..^2]);
-            string dir = AppDomain.CurrentDomain.BaseDirectory + "\\" + filename;
+            string dir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + filename;
             activityManager.RegisterCommand(dir);
             Debug.Log($"[DISCORD] Set launch path to \"{dir}\"");
         } catch {
             Debug.Log($"[DISCORD] Failed to set launch path (on {Application.platform})");
         }
-//#endif
     }
 
     public void TryJoinGame(string secret) {
+        //TODO: MainMenu jank...
         if (SceneManager.GetActiveScene().buildIndex != 0)
             return;
 
@@ -51,9 +56,6 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void Update() {
-#if UNITY_WEBGL
-        return;
-#endif
         try {
             discord.RunCallbacks();
         } catch { }
@@ -98,18 +100,15 @@ public class DiscordController : MonoBehaviour {
                 } else {
                     activity.Timestamps = new() { End = gm.gameEndTimestamp / 1000 };
                 }
-
             } else {
                 //in a room, but on the main menu.
                 activity.Assets = new() { LargeImage = "mainmenu" };
             }
-
         } else {
             //in the main menu, not in a room
             activity.Details = "Browsing the Main Menu...";
             activity.Assets = new() { LargeImage = "mainmenu" };
         }
-
 
         activityManager.UpdateActivity(activity, (res) => {
             //head empty.

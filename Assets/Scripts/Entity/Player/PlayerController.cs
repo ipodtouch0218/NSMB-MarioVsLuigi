@@ -38,6 +38,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked(OnChanged = nameof(OnIsSlidingChanged))] public NetworkBool IsSliding { get; set; }
     [Networked] public NetworkBool IsSkidding { get; set; }
     [Networked] public NetworkBool IsTurnaround { get; set; }
+    [Networked] private float TurnaroundFrames { get; set; } //TODO: change somehow
+    [Networked] private int TurnaroundBoostFrames { get; set; } //TODO: change somehow
     [Networked] private float JumpBufferTime { get; set; }
     [Networked] private float CoyoteTime { get; set; }
     [Networked] private float TimeGrounded { get; set; }
@@ -176,8 +178,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     private static readonly float TURNAROUND_THRESHOLD = 2.8125f;
     private static readonly float TURNAROUND_ACC = 28.125f;
-    private float turnaroundFrames;
-    private int turnaroundBoostFrames;
 
     private static readonly float[] BUTTON_RELEASE_ICE_DEC = { 0.439453125f, 1.483154296875f, 1.483154296875f, 1.483154296875f, 1.483154296875f };
     private static readonly float SKIDDING_ICE_DEC = 3.955078125f;
@@ -400,7 +400,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 GameObject go = contact.collider.gameObject;
                 Vector2 n = contact.normal;
                 Vector2 p = contact.point + (contact.normal * -0.15f);
-                if (n == Vector2.up && contact.point.y > body.position.y)
+                if (n == Vector2.up && contact.point.y - 0.02f > body.position.y)
                     continue;
 
                 Vector3Int vec = Utils.WorldToTilemapPosition(p);
@@ -1790,13 +1790,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                         } else {
                             acc = SKIDDING_DEC;
                         }
-                        turnaroundFrames = 0;
+                        TurnaroundFrames = 0;
                     } else {
                         if (onIce) {
                             acc = WALK_TURNAROUND_ICE_ACC;
                         } else {
-                            turnaroundFrames = Mathf.Min(turnaroundFrames + 0.2f, WALK_TURNAROUND_ACC.Length - 1);
-                            acc = State == Enums.PowerupState.MegaMushroom ? WALK_TURNAROUND_MEGA_ACC[(int) turnaroundFrames] : WALK_TURNAROUND_ACC[(int) turnaroundFrames];
+                            TurnaroundFrames = Mathf.Min(TurnaroundFrames + 0.2f, WALK_TURNAROUND_ACC.Length - 1);
+                            acc = State == Enums.PowerupState.MegaMushroom ? WALK_TURNAROUND_MEGA_ACC[(int) TurnaroundFrames] : WALK_TURNAROUND_ACC[(int) TurnaroundFrames];
                         }
                     }
                 } else {
@@ -1808,13 +1808,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     IsSkidding = false;
                 }
 
-                if (IsTurnaround && turnaroundBoostFrames > 0 && speed != 0) {
+                if (IsTurnaround && TurnaroundBoostFrames > 0 && speed != 0) {
                     IsTurnaround = false;
                     IsSkidding = false;
                 }
 
                 if (IsTurnaround && speed < TURNAROUND_THRESHOLD) {
-                    if (--turnaroundBoostFrames <= 0) {
+                    if (--TurnaroundBoostFrames <= 0) {
                         acc = TURNAROUND_ACC;
                         IsSkidding = false;
                     } else {
@@ -1836,7 +1836,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (IsSkidding && !IsTurnaround && Mathf.Sign(newX) != sign) {
                 //turnaround
                 IsTurnaround = true;
-                turnaroundBoostFrames = 5;
+                TurnaroundBoostFrames = 5;
                 newX = 0;
             }
 
@@ -2199,7 +2199,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             GroundpoundHeld = true;
         }
         //dont groundpound if we're holding another direction
-        if (!down || left || right || up)
+        if (!down || (!IsPropellerFlying && (left || right || up)))
             GroundpoundHeld = false;
 
         bool doGroundpound = GroundpoundHeld && Runner.SimulationTime >= GroundpoundStartTime;
@@ -2254,10 +2254,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (PropellerLaunchTimer.IsActive(Runner)) {
             float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
             float targetVelocity = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0);
-            body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y + 0.45f, targetVelocity));
-        }
-
-        if (powerupAction && IsPropellerFlying && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime * 0.25f) {
+            body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y + 0.4f, targetVelocity));
+            if (IsOnGround)
+                body.position += Vector2.up * 0.05f;
+        } else if (powerupAction && IsPropellerFlying && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime * 0.25f) {
             PropellerSpinTimer = TickTimer.CreateFromSeconds(Runner, propellerSpinTime);
             PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
         }

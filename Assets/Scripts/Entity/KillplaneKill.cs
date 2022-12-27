@@ -10,6 +10,9 @@ public class KillplaneKill : NetworkBehaviour {
     //---Serialized Variables
     [SerializeField] private float killTime = 0f;
 
+    //---Private Variables
+    private bool killed;
+
     public override void Spawned() {
         KillTimer = TickTimer.CreateFromSeconds(Runner, killTime);
     }
@@ -22,5 +25,16 @@ public class KillplaneKill : NetworkBehaviour {
             KillTimer = TickTimer.None;
             Runner.Despawn(Object);
         }
+    }
+
+    public void Update() {
+        if (killed || (Object && Object.IsValid))
+            return;
+
+        if (transform.position.y >= GameManager.Instance.LevelMinY)
+            return;
+
+        Destroy(gameObject, killTime);
+        killed = true;
     }
 }

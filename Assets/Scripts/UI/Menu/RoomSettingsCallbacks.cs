@@ -17,22 +17,22 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Runner;
-    private SessionData Lobby => SessionData.Instance;
+    private SessionData Room => SessionData.Instance;
 
-    public void UpdateAllSettings(SessionData lobbyData, bool level) {
-        if (!lobbyData.Object.IsValid)
+    public void UpdateAllSettings(SessionData roomData, bool level) {
+        if (!roomData.Object.IsValid)
             return;
 
-        ChangePrivate(lobbyData.PrivateRoom);
-        ChangeMaxPlayers(lobbyData.MaxPlayers);
-        ChangeLevelIndex(lobbyData.Level, level);
-        ChangeStarRequirement(lobbyData.StarRequirement);
-        ChangeCoinRequirement(lobbyData.CoinRequirement);
-        ChangeTeams(lobbyData.Teams);
-        ChangeLives(lobbyData.Lives);
-        ChangeTime(lobbyData.Timer);
-        ChangeDrawOnTimeUp(lobbyData.DrawOnTimeUp);
-        ChangeCustomPowerups(lobbyData.CustomPowerups);
+        ChangePrivate(roomData.PrivateRoom);
+        ChangeMaxPlayers(roomData.MaxPlayers);
+        ChangeLevelIndex(roomData.Level, level);
+        ChangeStarRequirement(roomData.StarRequirement);
+        ChangeCoinRequirement(roomData.CoinRequirement);
+        ChangeTeams(roomData.Teams);
+        ChangeLives(roomData.Lives);
+        ChangeTime(roomData.Timer);
+        ChangeDrawOnTimeUp(roomData.DrawOnTimeUp);
+        ChangeCustomPowerups(roomData.CustomPowerups);
 
         if (MainMenuManager.Instance is MainMenuManager mm)
             mm.UpdateStartGameButton();
@@ -43,14 +43,14 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (!Runner.IsServer)
             return;
 
-        int oldValue = Lobby.Level;
+        int oldValue = Room.Level;
         int newValue = levelDropdown.value;
         if (newValue == oldValue || newValue < 0) {
             ChangeLevelIndex(oldValue, false);
             return;
         }
 
-        Lobby.SetLevel((byte) newValue);
+        Room.SetLevel((byte) newValue);
     }
     private void ChangeLevelIndex(int index, bool changed) {
         levelDropdown.SetValueWithoutNotify(index);
@@ -66,7 +66,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (!Runner.IsServer)
             return;
 
-        int oldValue = Lobby.StarRequirement;
+        int oldValue = Room.StarRequirement;
         int.TryParse(starsInputField.text, out int newValue);
 
         if (newValue == oldValue || newValue < 1 || newValue > 99) {
@@ -74,7 +74,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
         }
 
-        Lobby.SetStarRequirement((sbyte) newValue);
+        Room.SetStarRequirement((sbyte) newValue);
     }
     private void ChangeStarRequirement(int stars) {
         starsInputField.text = stars.ToString();
@@ -86,7 +86,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (!Runner.IsServer)
             return;
 
-        int oldValue = Lobby.CoinRequirement;
+        int oldValue = Room.CoinRequirement;
         int.TryParse(coinsInputField.text, out int newValue);
 
         if (newValue == oldValue || newValue < 1 || newValue > 99) {
@@ -94,7 +94,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
         }
 
-        Lobby.SetCoinRequirement((byte) newValue);
+        Room.SetCoinRequirement((byte) newValue);
     }
     private void ChangeCoinRequirement(int coins) {
         coinsInputField.text = coins.ToString();
@@ -106,14 +106,14 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (!Runner.IsServer)
             return;
 
-        int oldValue = Lobby.Lives;
+        int oldValue = Room.Lives;
         int.TryParse(livesInputField.text, out int newValue);
         if (newValue == -1 || newValue < 1 || newValue > 99) {
             ChangeLives(oldValue);
             return;
         }
 
-        Lobby.SetLives((sbyte) newValue);
+        Room.SetLives((sbyte) newValue);
     }
     public void EnableLives() {
         if (!Runner.IsServer)
@@ -121,7 +121,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
         int newValue = livesEnabledToggle.isOn ? int.Parse(livesInputField.text) : -1;
 
-        Lobby.SetLives((sbyte) newValue);
+        Room.SetLives((sbyte) newValue);
     }
 
     private void ChangeLives(int lives) {
@@ -139,7 +139,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (!Runner.IsServer)
             return;
 
-        int oldValue = Lobby.Timer;
+        int oldValue = Room.Timer;
         int newValue = Utils.ParseTimeToSeconds(timerInputField.text);
 
         if (newValue == oldValue || newValue < 1 || newValue > 99) {
@@ -147,7 +147,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
         }
 
-        Lobby.SetTimer(newValue);
+        Room.SetTimer(newValue);
     }
     public void EnableTime() {
         if (!Runner.IsServer)
@@ -156,7 +156,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         int newValue = Utils.ParseTimeToSeconds(timerInputField.text);
         newValue = timerEnabledToggle.isOn ? newValue : -1;
 
-        Lobby.SetTimer(newValue);
+        Room.SetTimer(newValue);
     }
     private void ChangeTime(int time) {
         timerEnabledToggle.SetIsOnWithoutNotify(time != -1);
@@ -179,7 +179,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
         bool newValue = drawEnabledToggle.isOn;
 
-        Lobby.SetDrawOnTimeUp(newValue);
+        Room.SetDrawOnTimeUp(newValue);
     }
     private void ChangeDrawOnTimeUp(bool value) {
         drawEnabledToggle.SetIsOnWithoutNotify(value);
@@ -193,7 +193,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
         bool newValue = teamsEnabledToggle.isOn;
 
-        Lobby.SetTeams(newValue);
+        Room.SetTeams(newValue);
 
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
@@ -211,7 +211,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
         bool newValue = customPowerupsEnabledToggle.isOn;
 
-        Lobby.SetCustomPowerups(newValue);
+        Room.SetCustomPowerups(newValue);
     }
     private void ChangeCustomPowerups(bool value) {
         customPowerupsEnabledToggle.SetIsOnWithoutNotify(value);
@@ -223,7 +223,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (!Runner.IsServer)
             return;
 
-        int oldValue = Lobby.MaxPlayers;
+        int oldValue = Room.MaxPlayers;
         int newValue = (int) playersSlider.value;
         int currentPlayers = Runner.SessionInfo.PlayerCount;
 
@@ -237,7 +237,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
         }
 
-        Lobby.SetMaxPlayers((byte) newValue);
+        Room.SetMaxPlayers((byte) newValue);
     }
     private void ChangeMaxPlayers(int value) {
         playersSlider.SetValueWithoutNotify(value);
@@ -252,7 +252,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
         bool newValue = privateEnabledToggle.isOn;
 
-        Lobby.SetPrivateRoom(newValue);
+        Room.SetPrivateRoom(newValue);
     }
     private void ChangePrivate(bool value) {
         privateEnabledToggle.SetIsOnWithoutNotify(value);

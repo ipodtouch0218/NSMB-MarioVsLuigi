@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class SettingButtonManager : MonoBehaviour {
 
+    //---Private Variables
     private int prevWidth = 1280;
     private int prevHeight = 720;
 
@@ -12,14 +13,17 @@ public class SettingButtonManager : MonoBehaviour {
         Settings.VolumeMusic = slider.value;
         Settings.SaveSettingsToPreferences();
     }
+
     public void SetVolumeSFX(Slider slider) {
         Settings.VolumeSFX = slider.value;
         Settings.SaveSettingsToPreferences();
     }
+
     public void SetVolumeMaster(Slider slider) {
         Settings.VolumeMaster = slider.value;
         Settings.SaveSettingsToPreferences();
     }
+
     public void OnNdsResolutionToggle(Toggle toggle) {
         MainMenuManager.Instance.aspectToggle.interactable = Settings.ndsResolution = toggle.isOn;
         Settings.SaveSettingsToPreferences();
@@ -49,7 +53,6 @@ public class SettingButtonManager : MonoBehaviour {
         Settings.chatFiltering = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
-
 
     public void OnFullscreenToggle(Toggle toggle) {
         bool value = toggle.isOn;

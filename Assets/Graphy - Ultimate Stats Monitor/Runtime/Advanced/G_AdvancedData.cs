@@ -120,8 +120,8 @@ namespace Tayx.Graphy.Advanced
                     m_rectTransform.anchorMax                               = Vector2.one;
                     m_rectTransform.anchorMin                               = Vector2.up;
                     m_rectTransform.anchoredPosition                        = new Vector2(0, -ySideOffset);
-                    
-                    
+
+
                     m_backgroundImages[0].rectTransform.anchorMax           = Vector2.up;
                     m_backgroundImages[0].rectTransform.anchorMin           = Vector2.zero;
                     m_backgroundImages[0].rectTransform.anchoredPosition    = new Vector2(xSideOffsetBackgroundImage, 0);
@@ -137,7 +137,7 @@ namespace Tayx.Graphy.Advanced
                     m_backgroundImages[0].rectTransform.anchorMax           = Vector2.one;
                     m_backgroundImages[0].rectTransform.anchorMin           = Vector2.right;
                     m_backgroundImages[0].rectTransform.anchoredPosition    = new Vector2(-xSideOffsetBackgroundImage, 0);
-                    
+
                     break;
 
                 case GraphyManager.ModulePosition.BOTTOM_LEFT:
@@ -149,7 +149,7 @@ namespace Tayx.Graphy.Advanced
                     m_backgroundImages[0].rectTransform.anchorMax           = Vector2.up;
                     m_backgroundImages[0].rectTransform.anchorMin           = Vector2.zero;
                     m_backgroundImages[0].rectTransform.anchoredPosition    = new Vector2(xSideOffsetBackgroundImage, 0);
-                    
+
                     break;
 
                 case GraphyManager.ModulePosition.BOTTOM_RIGHT:
@@ -161,7 +161,7 @@ namespace Tayx.Graphy.Advanced
                     m_backgroundImages[0].rectTransform.anchorMax           = Vector2.one;
                     m_backgroundImages[0].rectTransform.anchorMin           = Vector2.right;
                     m_backgroundImages[0].rectTransform.anchoredPosition    = new Vector2(-xSideOffsetBackgroundImage, 0);
-                    
+
                     break;
 
                 case GraphyManager.ModulePosition.FREE:
@@ -195,7 +195,7 @@ namespace Tayx.Graphy.Advanced
                     m_screenResolutionText          .alignment = TextAnchor.UpperRight;
                     m_gameWindowResolutionText      .alignment = TextAnchor.UpperRight;
                     m_operatingSystemText           .alignment = TextAnchor.UpperRight;
-                    
+
                     break;
 
                 case GraphyManager.ModulePosition.FREE:
@@ -228,14 +228,14 @@ namespace Tayx.Graphy.Advanced
         {
             SetState(m_previousModuleState);
         }
-        
+
         public void UpdateParameters()
         {
             foreach (var image in m_backgroundImages)
             {
                 image.color = m_graphyManager.BackgroundColor;
             }
-            
+
             SetPosition(m_graphyManager.AdvancedModulePosition);
             SetState(m_graphyManager.AdvancedModuleState);
         }
@@ -314,9 +314,9 @@ namespace Tayx.Graphy.Advanced
                 + "]";
 
             float preferredWidth = 0;
-            
+
             // Resize the background overlay
-            
+
             List<Text> texts = new List<Text>()
             {
                 m_graphicsDeviceVersionText,

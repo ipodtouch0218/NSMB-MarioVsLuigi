@@ -2,20 +2,20 @@
 using UnityEngine.UI;
 using TMPro;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 public class RoomIcon : MonoBehaviour {
-
-    //---Serialized Variables
-    [SerializeField] private Color defaultColor, highlightColor, selectedColor;
-    [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText;
 
     //---Public Variables
     public SessionInfo session;
     public bool joinPrivate;
 
-    //---Components
+    //---Serialized Variables
+    [SerializeField] private Color defaultColor, highlightColor, selectedColor;
+    [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText;
+
+    //---Private Variables
     private Image icon;
 
     public void Start() {
@@ -58,8 +58,6 @@ public class RoomIcon : MonoBehaviour {
 
         symbols += "<sprite=38>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);
         symbols += "<sprite=37>" + Utils.GetSymbolString(coins.ToString(), Utils.smallSymbols);
-        //if (password)
-        //    symbols += "<sprite=7>";
 
         symbolsText.text = symbols;
     }
@@ -77,7 +75,7 @@ public class RoomIcon : MonoBehaviour {
     }
 
     public void Unhover() {
-        if (MainMenuManager.Instance.selectedRoom == this) {
+        if (MainMenuManager.Instance.roomManager.SelectedRoom == this) {
             Select();
         } else {
             Unselect();

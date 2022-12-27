@@ -13,11 +13,13 @@ using NSMB.Utils;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
-    private static GameObject prefab;
+    //---Static Variables
     public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us" };
-    private static string CurrentRegion;
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
+
+    public static string CurrentRegion;
+    private static GameObject prefab;
 
     public static NetworkRunner Runner => Instance.runner;
 
@@ -116,8 +118,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         Debug.Log("[Network] Disconnected from Server");
 
         OnDisconnectedFromServer?.Invoke(runner);
-        Debug.Log(runner.State);
-        //Runner.Shutdown();
         RecreateInstance();
     }
 
@@ -152,7 +152,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
 
             if (player == Runner.LocalPlayer) {
-                //create lobby data
+                //create room data
                 NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
                 SessionData.Instance = session.GetComponent<SessionData>();
             }
