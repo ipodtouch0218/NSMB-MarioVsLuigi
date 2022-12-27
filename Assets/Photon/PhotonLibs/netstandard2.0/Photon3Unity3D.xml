@@ -2487,6 +2487,15 @@
         <member name="M:ExitGames.Client.Photon.SocketUdpAsync.Send(System.Byte[],System.Int32)">
             <summary>used by PhotonPeer*</summary>
         </member>
+        <member name="T:ExitGames.Client.Photon.SocketUdpBlocking">
+            <summary>Encapsulates the network i/o functionality for the realtime library.</summary>
+        </member>
+        <member name="M:ExitGames.Client.Photon.SocketUdpBlocking.Send(System.Byte[],System.Int32)">
+            <summary>used by PhotonPeer*</summary>
+        </member>
+        <member name="M:ExitGames.Client.Photon.SocketUdpBlocking.ReceiveLoop">
+            <summary>Endless loop, run in Receive Thread.</summary>
+        </member>
         <member name="M:ExitGames.Client.Photon.StreamBuffer.ToArray">
             <summary>
             Allocates a new byte[] that is the exact used length. Use GetBuffer for nonalloc operations.
@@ -2592,12 +2601,13 @@
             <param name="dictionary">IDictionary to return as string.</param>
             <param name="includeTypes"> </param>
         </member>
-        <member name="M:ExitGames.Client.Photon.SupportClass.ByteArrayToString(System.Byte[])">
+        <member name="M:ExitGames.Client.Photon.SupportClass.ByteArrayToString(System.Byte[],System.Int32)">
             <summary>
             Converts a byte-array to string (useful as debugging output).
             Uses BitConverter.ToString(list) internally after a null-check of list.
             </summary>
             <param name="list">Byte-array to convert to string.</param>
+            <param name="length">Length of bytes to convert to string. If negative, list.Length is converted. Optional. Default: -1. </param>
             <returns>
             List of bytes as string.
             </returns>

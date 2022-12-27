@@ -19,3 +19,5 @@ MonoBehaviour:
   m_AnimationStartTime: 0
   m_AnimationStartFrame: 0
   m_TileColliderType: 2
+  breakParticle: {fileID: 135764822071322507, guid: 48dd05d6e5db3a84e9abb9f5710a952f,
+    type: 3}

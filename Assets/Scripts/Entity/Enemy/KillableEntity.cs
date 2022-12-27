@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-using Photon.Pun;
+using Fusion;
+using NSMB.Extensions;
 using NSMB.Utils;
 
-public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICustomSerializeView {
+public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFireballInteractable {
 
-    private static readonly float RESEND_RATE = 0.5f;
-
+    //---Static Variables
     private static readonly Enums.Sounds[] COMBOS = {
         Enums.Sounds.Enemy_Shell_Kick,
         Enums.Sounds.Enemy_Shell_Combo1,
@@ -18,128 +17,214 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         Enums.Sounds.Enemy_Shell_Combo6,
         Enums.Sounds.Enemy_Shell_Combo7,
     };
+    protected readonly Collider2D[] CollisionBuffer = new Collider2D[32];
+    protected readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
-    public bool Frozen { get; set; } = false;
-    public bool IsCarryable => iceCarryable;
-    public bool IsFlying => flying;
-    public bool Active { get; set; } = true;
+    //---Networked Variables
+    [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
+    [Networked] protected NetworkBool WasSpecialKilled { get; set; }
+    [Networked] protected NetworkBool WasGroundpounded { get; set; }
+    [Networked] protected byte ComboCounter { get; set; }
 
-    public bool dead, left = true, collide = true, iceCarryable = true, flying;
-    public Rigidbody2D body;
+    //---Properties
+    public override bool IsCarryable => iceCarryable;
+    public override bool IsFlying => flying;
+
+    //---Serialized Variables
+    [SerializeField] protected bool iceCarryable = true;
+    [SerializeField] protected bool flying = false;
+
+    //---Components
     public BoxCollider2D hitbox;
     protected Animator animator;
-    protected SpriteRenderer sRenderer;
+    protected LegacyAnimateSpriteRenderer legacyAnimation;
+    public SpriteRenderer sRenderer;
     protected AudioSource audioSource;
     protected PhysicsEntity physics;
 
-    private byte previousFlags;
-    private double lastSendTimestamp;
-
-    #region Pun Serialization
-    public void Serialize(List<byte> buffer) {
-        SerializationUtils.PackToByte(out byte flags, dead, left);
-
-        bool forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
-
-        if (flags != previousFlags || forceResend) {
-            SerializationUtils.WriteByte(buffer, flags);
-
-            previousFlags = flags;
-            lastSendTimestamp = PhotonNetwork.Time;
-        }
-    }
-
-    public void Deserialize(List<byte> buffer, ref int index, PhotonMessageInfo info) {
-        SerializationUtils.UnpackFromByte(buffer, ref index, out bool[] flags);
-
-        //dead = flags[0]; //synchronizing dead state causes issues with laggy players dying to dead enemies on their screen
-        left = flags[1];
-    }
-    #endregion
-
-    #region Unity Methods
-    public virtual void Start() {
-        body = GetComponent<Rigidbody2D>();
+    public override void Awake() {
+        base.Awake();
         hitbox = GetComponent<BoxCollider2D>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         audioSource = GetComponent<AudioSource>();
-        sRenderer = GetComponent<SpriteRenderer>();
+        sRenderer = GetComponentInChildren<SpriteRenderer>();
+        legacyAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
     }
 
-    public virtual void FixedUpdate() {
-        if (!(photonView?.IsMine ?? true) || !GameManager.Instance || !photonView.IsMine || !body)
+    public override void FixedUpdateNetwork() {
+        if (!GameManager.Instance || !body || IsFrozen)
             return;
+
+        if (IsDead) {
+            hitbox.enabled = false;
+            gameObject.layer = Layers.LayerHitsNothing;
+
+            if (WasSpecialKilled) {
+                body.angularVelocity = 400f * (FacingRight ? 1 : -1);
+                body.constraints = RigidbodyConstraints2D.None;
+            }
+        } else {
+            hitbox.enabled = true;
+            gameObject.layer = Layers.LayerEntity;
+            body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+
+        CheckForEntityCollisions();
 
         Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-        if (body && !dead && !Frozen && !body.isKinematic && Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc))
-            photonView.RPC(nameof(SpecialKill), RpcTarget.All, left, false, 0);
-    }
-    #endregion
-
-    #region Unity Callbacks
-    public void OnTriggerEnter2D(Collider2D collider) {
-        KillableEntity entity = collider.GetComponentInParent<KillableEntity>();
-        if (!collide || !photonView.IsMine || !entity || entity.dead)
-            return;
-
-        bool goLeft = body.position.x < collider.attachedRigidbody.position.x;
-        if (body.position.x == collider.attachedRigidbody.position.x) {
-            goLeft = body.position.y > collider.attachedRigidbody.position.y;
+        if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(loc)) {
+            SpecialKill(FacingRight, false, 0);
         }
-        photonView.RPC("SetLeft", RpcTarget.All, goLeft);
     }
-    #endregion
 
-    #region Helper Methods
-    public virtual void InteractWithPlayer(PlayerController player) {
-        if (player.Frozen)
+    protected virtual void CheckForEntityCollisions() {
+
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
+
+        for (int i = 0; i < count; i++) {
+            GameObject obj = CollisionBuffer[i].gameObject;
+
+            if (obj == gameObject)
+                continue;
+
+            if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
+                if (killable.IsDead)
+                    continue;
+
+                bool goRight = body.position.x > killable.body.position.x;
+                if (Mathf.Abs(body.position.x - killable.body.position.x) < 0.001f) {
+                    if (Mathf.Abs(body.position.y - killable.body.position.y) < 0.001f) {
+                        goRight = Object.Id.Raw < killable.Object.Id.Raw;
+                    } else {
+                        goRight = body.position.y < killable.body.position.y;
+                    }
+                }
+
+                FacingRight = goRight;
+            }
+        }
+    }
+
+    public virtual void Kill() {
+        if (IsDead)
             return;
+
+        SpecialKill(false, false, 0);
+    }
+
+    public virtual void SpecialKill(bool right, bool groundpound, int combo) {
+        if (IsDead)
+            return;
+
+        IsDead = true;
+        WasSpecialKilled = true;
+        WasGroundpounded = groundpound;
+        ComboCounter = (byte) combo;
+        FacingRight = right;
+
+        body.constraints = RigidbodyConstraints2D.None;
+        body.velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
+        body.angularVelocity = 400f * (FacingRight ? 1 : -1);
+        body.gravityScale = 1.5f;
+
+        Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.position + hitbox.offset);
+    }
+
+    public virtual void OnIsDeadChanged() {
+        if (IsDead) {
+            //death effects
+            if (animator)
+                animator.enabled = false;
+            audioSource.enabled = true;
+
+            if (WasSpecialKilled)
+                PlaySound(!IsFrozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
+
+            if (WasGroundpounded)
+                Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.position + hitbox.offset, Quaternion.identity);
+
+        } else {
+            //undo death effects
+            if (animator)
+                animator.enabled = true;
+        }
+    }
+
+    public void PlaySound(Enums.Sounds sound) {
+        audioSource.PlayOneShot(sound);
+    }
+
+    //---IPlayerInteractable overrides
+    public virtual void InteractWithPlayer(PlayerController player) {
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.onGround;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.IsOnGround;
 
-        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
-            photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x > 0);
-        } else if (player.invincible > 0 || player.inShell || player.sliding
-            || (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove)
-            || player.state == Enums.PowerupState.MegaMushroom) {
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
+            FacingRight = damageDirection.x < 0;
+        } else if (player.IsStarmanInvincible || player.IsInShell || player.IsSliding
+            || (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
+            || player.State == Enums.PowerupState.MegaMushroom) {
 
-            photonView.RPC(nameof(SpecialKill), RpcTarget.All, player.body.velocity.x > 0, player.groundpound, player.StarCombo++);
+            SpecialKill(player.body.velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
         } else if (attackedFromAbove) {
-            if (player.state == Enums.PowerupState.MiniMushroom) {
-                if (player.groundpound) {
-                    player.groundpound = false;
-                    photonView.RPC(nameof(Kill), RpcTarget.All);
+            if (player.State == Enums.PowerupState.MiniMushroom) {
+                if (player.IsGroundpounding) {
+                    player.IsGroundpounding = false;
+                    Kill();
                 }
-                player.bounce = true;
+                player.DoEntityBounce = true;
             } else {
-                photonView.RPC(nameof(Kill), RpcTarget.All);
-                player.bounce = !player.groundpound;
+                Kill();
+                player.DoEntityBounce = !player.IsGroundpounding;
             }
-            player.photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
-            player.drill = false;
+            if (Runner.IsForward)
+                player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+            player.IsDrilling = false;
 
-        } else if (player.hitInvincibilityCounter <= 0) {
-            player.photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
-            photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x < 0);
+        } else if (player.IsDamageable) {
+            player.Powerdown(false);
+            FacingRight = damageDirection.x > 0;
         }
     }
-    #endregion
 
-    #region PunRPCs
-    [PunRPC]
-    public void SetLeft(bool left) {
-        this.left = left;
-        body.velocity = new Vector2(Mathf.Abs(body.velocity.x) * (left ? -1 : 1), body.velocity.y);
+    //---IFireballInteractable overrides
+    public virtual bool InteractWithFireball(FireballMover fireball) {
+        if (IsDead)
+            return false;
+
+        SpecialKill(fireball.FacingRight, false, 0);
+        return true;
     }
 
-    [PunRPC]
-    public virtual void Freeze(int cube) {
+    public virtual bool InteractWithIceball(FireballMover iceball) {
+        if (IsDead)
+            return false;
+
+        if (!IsFrozen) {
+            Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
+                FrozenCube cube = obj.GetComponent<FrozenCube>();
+                cube.OnBeforeSpawned(this);
+            });
+        }
+        return true;
+    }
+
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        SpecialKill(false, false, 0);
+    }
+
+    //---FreezableEntity overrides
+    public override void Freeze(FrozenCube cube) {
         audioSource.Stop();
-        PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
-        Frozen = true;
-        animator.enabled = false;
+        IsFrozen = true;
+        if (animator)
+            animator.enabled = false;
+        if (legacyAnimation)
+            legacyAnimation.enabled = false;
+
         foreach (BoxCollider2D hitboxes in GetComponentsInChildren<BoxCollider2D>()) {
             hitboxes.enabled = false;
         }
@@ -150,10 +235,10 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         }
     }
 
-    [PunRPC]
-    public virtual void Unfreeze(byte reasonByte) {
-        Frozen = false;
-        animator.enabled = true;
+    public override void Unfreeze(UnfreezeReason reasonByte) {
+        IsFrozen = false;
+        if (animator)
+            animator.enabled = true;
         if (body)
             body.isKinematic = false;
         hitbox.enabled = true;
@@ -162,40 +247,8 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         SpecialKill(false, false, 0);
     }
 
-    [PunRPC]
-    public virtual void Kill() {
-        SpecialKill(false, false, 0);
+    //---OnChangeds
+    public static void OnIsDeadChanged(Changed<KillableEntity> changed) {
+        changed.Behaviour.OnIsDeadChanged();
     }
-
-    [PunRPC]
-    public virtual void SpecialKill(bool right, bool groundpound, int combo) {
-        if (dead)
-            return;
-
-        dead = true;
-
-        body.constraints = RigidbodyConstraints2D.None;
-        body.velocity = new(2f * (right ? 1 : -1), 2.5f);
-        body.angularVelocity = 400f * (right ? 1 : -1);
-        body.gravityScale = 1.5f;
-        audioSource.enabled = true;
-        animator.enabled = true;
-        hitbox.enabled = false;
-        animator.speed = 0;
-        gameObject.layer = LayerMask.NameToLayer("HitsNothing");
-        PlaySound(!Frozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, combo)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
-        if (groundpound)
-            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.up * 0.5f, Quaternion.identity);
-
-        if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.InstantiateRoomObject("Prefabs/LooseCoin", body.position + Vector2.up * 0.5f, Quaternion.identity);
-
-        body.velocity = new(2f * (right ? 1 : -1), 2.5f);
-    }
-
-    [PunRPC]
-    public void PlaySound(Enums.Sounds sound) {
-        audioSource.PlayOneShot(sound.GetClip());
-    }
-    #endregion
 }

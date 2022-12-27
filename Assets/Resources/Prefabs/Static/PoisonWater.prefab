@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3106545712320729601}
   - component: {fileID: 6004104070224972752}
   - component: {fileID: 2500780753419200967}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: PoisonWater
   m_TagString: poison
   m_Icon: {fileID: 0}
@@ -96,7 +96,26 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.55}
@@ -135,3 +154,4 @@ MonoBehaviour:
   resistance: 0
   animationSpeed: 9
   splashParticle: Prefabs/Particle/PoisonWaterSplash
+  fireDeath: 0

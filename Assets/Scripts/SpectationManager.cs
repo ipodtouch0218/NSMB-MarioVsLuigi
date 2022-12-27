@@ -3,7 +3,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
-using NSMB.Utils;
+using Fusion;
+using NSMB.Extensions;
 
 public class SpectationManager : MonoBehaviour {
 
@@ -37,11 +38,11 @@ public class SpectationManager : MonoBehaviour {
     private int targetIndex;
 
     public void OnEnable() {
-        InputSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
+        ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
     }
 
     public void OnDisable() {
-        InputSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
+        ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
     }
 
     public void Update() {
@@ -58,14 +59,14 @@ public class SpectationManager : MonoBehaviour {
             return;
 
         UIUpdater.Instance.player = TargetPlayer;
-        if (!TargetPlayer || !TargetPlayer.photonView)
+        if (!TargetPlayer)
             return;
 
-        spectatingText.text = $"Spectating: { TargetPlayer.photonView.Owner.GetUniqueNickname() }";
+        spectatingText.text = "Spectating: " + TargetPlayer.Object.InputAuthority.GetPlayerData(TargetPlayer.Runner).GetNickname();
     }
 
     public void SpectateNextPlayer() {
-        List<PlayerController> players = GameManager.Instance.players;
+        NetworkLinkedList<PlayerController> players = GameManager.Instance.AlivePlayers;
         int count = players.Count;
         if (count <= 0)
             return;
@@ -82,7 +83,7 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectatePreviousPlayer() {
-        List<PlayerController> players = GameManager.Instance.players;
+        NetworkLinkedList<PlayerController> players = GameManager.Instance.AlivePlayers;
         int count = players.Count;
         if (count <= 0)
             return;
@@ -106,7 +107,7 @@ public class SpectationManager : MonoBehaviour {
             index += 9;
             index %= 10;
 
-            List<PlayerController> sortedPlayers = new(GameManager.Instance.players);
+            List<PlayerController> sortedPlayers = new(GameManager.Instance.AlivePlayers);
             sortedPlayers.Sort(new PlayerComparer());
 
             if (index >= sortedPlayers.Count)
@@ -126,14 +127,14 @@ public class SpectationManager : MonoBehaviour {
             if (!x ^ !y)
                 return !x ? 1 : -1;
 
-            if (x.stars == y.stars || x.lives == 0 || y.lives == 0) {
-                if (Mathf.Max(0, x.lives) == Mathf.Max(0, y.lives))
-                    return x.playerId - y.playerId;
+            if (x.Stars == y.Stars || x.Lives == 0 || y.Lives == 0) {
+                if (Mathf.Max(0, x.Lives) == Mathf.Max(0, y.Lives))
+                    return x.PlayerId - y.PlayerId;
 
-                return y.lives - x.lives;
+                return y.Lives - x.Lives;
             }
 
-            return y.stars - x.stars;
+            return y.Stars - x.Stars;
         }
     }
 }

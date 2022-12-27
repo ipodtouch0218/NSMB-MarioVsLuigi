@@ -116,6 +116,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -159,6 +160,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -240,7 +242,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 128
+        y: 144
         width: 16
         height: 16
       alignment: 0
@@ -261,7 +263,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 128
+        y: 144
         width: 16
         height: 16
       alignment: 0
@@ -282,7 +284,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 128
+        y: 144
         width: 16
         height: 16
       alignment: 0
@@ -303,7 +305,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 128
+        y: 144
         width: 16
         height: 16
       alignment: 0
@@ -324,7 +326,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 112
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -345,7 +347,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 112
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -366,7 +368,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 112
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -387,7 +389,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 112
+        y: 128
         width: 16
         height: 16
       alignment: 0
@@ -408,7 +410,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1
-        y: 96
+        y: 112
         width: 14
         height: 16
       alignment: 0
@@ -429,7 +431,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 18
-        y: 96
+        y: 112
         width: 11
         height: 16
       alignment: 0
@@ -450,7 +452,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 38
-        y: 96
+        y: 112
         width: 4
         height: 16
       alignment: 0
@@ -471,7 +473,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 50
-        y: 96
+        y: 112
         width: 12
         height: 16
       alignment: 0
@@ -492,7 +494,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1
-        y: 80
+        y: 96
         width: 14
         height: 16
       alignment: 0
@@ -513,7 +515,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 18
-        y: 80
+        y: 96
         width: 11
         height: 16
       alignment: 0
@@ -534,11 +536,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 38
-        y: 80
+        y: 96
         width: 4
         height: 16
-      alignment: 9
-      pivot: {x: 0.7271519, y: 0.5}
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -555,11 +557,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 50
-        y: 80
+        y: 96
         width: 12
         height: 16
-      alignment: 9
-      pivot: {x: 0.59464675, y: 0.52129555}
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -576,7 +578,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 64
+        y: 80
         width: 16
         height: 16
       alignment: 0
@@ -597,7 +599,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 64
+        y: 80
         width: 16
         height: 16
       alignment: 0
@@ -618,7 +620,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 64
+        y: 80
         width: 16
         height: 16
       alignment: 0
@@ -639,7 +641,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 64
+        y: 80
         width: 16
         height: 16
       alignment: 0
@@ -660,7 +662,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 48
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -681,7 +683,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 48
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -702,7 +704,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 48
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -723,7 +725,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 48
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -744,7 +746,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 32
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -765,7 +767,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 32
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -786,7 +788,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 32
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -807,7 +809,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 32
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -828,7 +830,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 16
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -849,7 +851,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 16
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -870,7 +872,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 16
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -891,7 +893,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 16
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -912,7 +914,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -933,7 +935,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 0
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -954,7 +956,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 0
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -975,7 +977,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 0
+        y: 16
         width: 16
         height: 16
       alignment: 0
@@ -991,6 +993,90 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: animated-blocks_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 680e558d63e698d4699ec10fd7d2f175
+      internalID: 1601389771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: animated-blocks_5
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e24cf52a4ec85ca41b96b257e30d2f04
+      internalID: 1306169281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: animated-blocks_6
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7dc1fd385b610df469b542ee4278084c
+      internalID: 1279731124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: animated-blocks_7
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88c326c29afc2ba4aa64de8c1e0b5946
+      internalID: -1657124262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1002,8 +1088,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      animation_18: 3988752837330785565
+      animated-blocks_0: 1300903088
+      animated-blocks_5: 1306169281
       animated-blocks_3: -644409675
+      animated-blocks_4: 1601389771
       animation_24: 4602633912051959003
       animation_27: -3318003699947615551
       animation_12: 595918852289861335
@@ -1013,12 +1101,14 @@ TextureImporter:
       animation_3: 2250798203632615395
       animation_6: -6030831360514867012
       animation_9: -3961342211389282260
+      animated-blocks_7: -1657124262
       animation_8: 2620925746830137660
       animation_11: -6910632858783443427
       animation_5: 3442106473843032738
       animation_7: 3684821612489964542
       animation_21: 6700115880502462848
       animation_23: 5563996254464901877
+      animated-blocks_6: 1279731124
       animation_19: -4876230672202525009
       animation_22: 4366118933763392549
       animation_10: -2074995507315294404
@@ -1037,10 +1127,9 @@ TextureImporter:
       animation_4: 1709446548163320796
       animation_25: -8450008797135637194
       animation_16: 6764869996083366342
-      animated-blocks_0: 1300903088
+      animation_18: 3988752837330785565
   spritePackingTag: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

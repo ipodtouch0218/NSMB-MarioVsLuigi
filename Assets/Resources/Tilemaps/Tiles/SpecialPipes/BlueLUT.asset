@@ -21,6 +21,9 @@ MonoBehaviour:
   m_TileColliderType: 2
   leftDestroy: BlueLUD
   rightDestroy: BlueRUD
-  pipeParticle: BluePipe
   upsideDownPipe: 0
   leftOfPipe: 1
+  pipeParticle: {fileID: 4966771921777507886, guid: 426521c4a62d1104495209bc35f8977e,
+    type: 3}
+  destroyedPipeParticle: {fileID: 8187660937656757357, guid: 32d407958dbf598419a1a2b7cd7067ca,
+    type: 3}

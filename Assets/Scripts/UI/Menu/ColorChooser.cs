@@ -1,17 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using NSMB.Utils;
+using UnityEngine.UI;
+
+using NSMB.Extensions;
 
 public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
+    //---Serialized Variables
     [SerializeField] private Canvas baseCanvas;
     [SerializeField] private GameObject template, blockerTemplate, content;
     [SerializeField] private Sprite clearSprite;
     [SerializeField] private string property;
 
-    private List<ColorButton> colorButtons = new();
+    //---Private Variables
+    private readonly List<ColorButton> colorButtons = new();
     private List<Button> buttons;
     private List<Navigation> navigations;
     private GameObject blocker;
@@ -22,7 +25,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
         buttons = new();
         navigations = new();
 
-        PlayerColorSet[] colors = GlobalController.Instance.skins;
+        PlayerColorSet[] colors = ScriptableManager.Instance.skins;
 
         for (int i = 0; i < colors.Length; i++) {
             PlayerColorSet color = colors[i];
@@ -62,29 +65,41 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
             buttons[i].navigation = navigations[i];
         }
 
-        ChangeCharacter(Utils.GetCharacterData());
+        CharacterData character = NetworkHandler.Instance.runner.LocalPlayer.GetCharacterData(NetworkHandler.Instance.runner);
+        ChangeCharacter(character);
     }
 
-    public void ChangeCharacter(PlayerData data) {
+    public void ChangeCharacter(CharacterData data) {
         foreach (ColorButton b in colorButtons)
             b.Instantiate(data);
     }
 
     public void SelectColor(Button button) {
         selected = buttons.IndexOf(button);
-        MainMenuManager.Instance.SetPlayerColor(buttons.IndexOf(button));
-        Close();
+        MainMenuManager.Instance.SetPlayerSkin((byte) buttons.IndexOf(button));
+        Close(false);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);
     }
+
     public void Open() {
         blocker = Instantiate(blockerTemplate, baseCanvas.transform);
         blocker.SetActive(true);
         content.SetActive(true);
 
         EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
     }
-    public void Close() {
+
+    public void Close(bool playSound) {
         Destroy(blocker);
         EventSystem.current.SetSelectedGameObject(gameObject);
         content.SetActive(false);
+
+        if (playSound && MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Back);
     }
 }

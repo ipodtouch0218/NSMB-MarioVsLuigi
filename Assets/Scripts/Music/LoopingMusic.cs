@@ -5,22 +5,23 @@ public class LoopingMusic : MonoBehaviour {
     private bool _fastMusic;
     public bool FastMusic {
         set {
-            if (_fastMusic ^ value) {
-                float scaleFactor = value ? 0.8f : 1.25f;
-                float newTime = audioSource.time * scaleFactor;
+            if (_fastMusic == value)
+                return;
 
-                if (currentSong.loopEndSample != -1) {
-                    float songStart = currentSong.loopStartSample * (value ? 0.8f : 1f);
-                    float songEnd = currentSong.loopEndSample * (value ? 0.8f : 1f);
+            float scaleFactor = value ? 0.8f : 1.25f;
+            float newTime = audioSource.time * scaleFactor;
 
-                    if (newTime >= songEnd)
-                        newTime = songStart + (newTime - songEnd);
-                }
+            if (currentSong.loopEndSample != -1) {
+                float songStart = currentSong.loopStartSample * (value ? 0.8f : 1f);
+                float songEnd = currentSong.loopEndSample * (value ? 0.8f : 1f);
 
-                audioSource.clip = value && currentSong.fastClip ? currentSong.fastClip : currentSong.clip;
-                audioSource.time = newTime;
-                audioSource.Play();
+                if (newTime >= songEnd)
+                    newTime = songStart + (newTime - songEnd);
             }
+
+            audioSource.clip = value && currentSong.fastClip ? currentSong.fastClip : currentSong.clip;
+            audioSource.time = newTime;
+            audioSource.Play();
 
             _fastMusic = value;
         }

@@ -1,51 +1,51 @@
 using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-using Photon.Pun;
-using Photon.Realtime;
 using Discord;
+using Fusion;
 
 public class DiscordController : MonoBehaviour {
 
-    public Discord.Discord discord;
-    public ActivityManager activityManager;
+    //---Static Variables
+    private static readonly long DiscordAppId = 962073502469459999;
 
-    public void Awake() {
+    //---Private Variables
+    private Discord.Discord discord;
+    private ActivityManager activityManager;
+
+    public void Start() {
 #if UNITY_WEBGL
+        enabled = false;
         return;
 #endif
 
-        discord = new Discord.Discord(962073502469459999, (ulong) CreateFlags.NoRequireDiscord);
+        discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
         activityManager = discord.GetActivityManager();
         activityManager.OnActivityJoinRequest += AskToJoin;
         activityManager.OnActivityJoin += TryJoinGame;
 
-//#if UNITY_STANDALONE_WIN
         try {
             string filename = AppDomain.CurrentDomain.ToString();
             filename = string.Join(" ", filename.Split(" ")[..^2]);
-            string dir = AppDomain.CurrentDomain.BaseDirectory + "\\" + filename;
+            string dir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + filename;
             activityManager.RegisterCommand(dir);
             Debug.Log($"[DISCORD] Set launch path to \"{dir}\"");
         } catch {
             Debug.Log($"[DISCORD] Failed to set launch path (on {Application.platform})");
         }
-//#endif
     }
 
     public void TryJoinGame(string secret) {
+        //TODO: MainMenu jank...
         if (SceneManager.GetActiveScene().buildIndex != 0)
             return;
 
         Debug.Log($"[DISCORD] Attempting to join game with secret \"{secret}\"");
-        string[] split = secret.Split("-");
-        string region = split[0];
-        string room = split[1];
 
-        MainMenuManager.lastRegion = region;
-        MainMenuManager.Instance.connectThroughSecret = room;
-        PhotonNetwork.Disconnect();
+        //TODO: add "disconnect" prompt
+        _ = NetworkHandler.JoinRoom(secret);
     }
 
     //TODO this doesn't work???
@@ -56,9 +56,6 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void Update() {
-#if UNITY_WEBGL
-        return;
-#endif
         try {
             discord.RunCallbacks();
         } catch { }
@@ -68,7 +65,7 @@ public class DiscordController : MonoBehaviour {
         discord?.Dispose();
     }
 
-    public void UpdateActivity() {
+    public void UpdateActivity(SessionInfo session = null) {
 #if UNITY_WEBGL
         return;
 #endif
@@ -76,51 +73,42 @@ public class DiscordController : MonoBehaviour {
             return;
 
         Activity activity = new();
+        session ??= NetworkHandler.Runner?.SessionInfo;
 
-        if (GameManager.Instance) {
-            //in a level
-            GameManager gm = GameManager.Instance;
-            Room room = PhotonNetwork.CurrentRoom;
+        if (SessionData.Instance) {
 
-            activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = room.IsVisible ? "In a Public Game" : "In a Private Game";
-            activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
+            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
+            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount + 1, MaxSize = SessionData.Instance.MaxPlayers }, Id = session.Name + "1" };
+            activity.State = session.IsVisible ? "In a Public Game" : "In a Private Game";
+            activity.Secrets = new() { Join = session.Name };
 
-            ActivityAssets assets = new();
-            if (gm.richPresenceId != "")
-                assets.LargeImage = $"level-{gm.richPresenceId}";
-            else
-                assets.LargeImage = "mainmenu";
-            assets.LargeText = gm.levelName;
+            if (GameManager.Instance) {
+                //in a level
+                GameManager gm = GameManager.Instance;
 
-            activity.Assets = assets;
+                ActivityAssets assets = new();
+                if (gm.richPresenceId != "")
+                    assets.LargeImage = "level-" + gm.richPresenceId;
+                else
+                    assets.LargeImage = "mainmenu";
+                assets.LargeText = gm.levelName;
 
-            if (gm.timedGameDuration == -1) {
-                activity.Timestamps = new() { Start = gm.startRealTime / 1000 };
+                activity.Assets = assets;
+
+                if (SessionData.Instance.Timer <= 0) {
+                    activity.Timestamps = new() { Start = gm.gameStartTimestamp / 1000 };
+                } else {
+                    activity.Timestamps = new() { End = gm.gameEndTimestamp / 1000 };
+                }
             } else {
-                activity.Timestamps = new() { End = gm.endRealTime / 1000 };
+                //in a room, but on the main menu.
+                activity.Assets = new() { LargeImage = "mainmenu" };
             }
-
-        } else if (PhotonNetwork.InRoom) {
-            //in a room
-            Room room = PhotonNetwork.CurrentRoom;
-
-            activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
-            activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
-
-            activity.Assets = new() { LargeImage = "mainmenu" };
-
         } else {
             //in the main menu, not in a room
-
             activity.Details = "Browsing the Main Menu...";
             activity.Assets = new() { LargeImage = "mainmenu" };
-
         }
-
 
         activityManager.UpdateActivity(activity, (res) => {
             //head empty.

@@ -1,52 +1,71 @@
 using UnityEngine;
-using Photon.Pun;
-using NSMB.Utils;
+
+using Fusion;
 
 public class GoombaWalk : KillableEntity {
-    [SerializeField] float speed, deathTimer = -1, terminalVelocity = -8;
 
-    public new void Start() {
-        base.Start();
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
-        animator.SetBool("dead", false);
+    //---Networked Variables
+    [Networked] private TickTimer DespawnTimer { get; set; }
+
+    //---Serialized Variables
+    [SerializeField] private Sprite deadSprite;
+    [SerializeField] private float speed, terminalVelocity = -8;
+
+    public override void Spawned() {
+        base.Spawned();
+        body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
     }
 
-    public new void FixedUpdate() {
+    public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
-            animator.enabled = false;
+            legacyAnimation.enabled = false;
             body.isKinematic = true;
             return;
         }
 
-        base.FixedUpdate();
-        if (dead) {
-            if (deathTimer >= 0 && (photonView?.IsMine ?? true)) {
-                Utils.TickTimer(ref deathTimer, 0, Time.fixedDeltaTime);
-                if (deathTimer == 0)
-                    PhotonNetwork.Destroy(gameObject);
+        if (IsDead) {
+            if (DespawnTimer.Expired(Runner)) {
+                DespawnTimer = TickTimer.None;
+                Runner.Despawn(Object);
             }
             return;
         }
 
+        HandleWallCollisions();
 
-        physics.UpdateCollisions();
-        if (physics.hitLeft || physics.hitRight) {
-            left = physics.hitRight;
-        }
-        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
-        sRenderer.flipX = !left;
+        body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(terminalVelocity, body.velocity.y));
+        sRenderer.flipX = FacingRight;
     }
 
-    [PunRPC]
+    private void HandleWallCollisions() {
+        physics.UpdateCollisions();
+        if (physics.HitLeft || physics.HitRight)
+            FacingRight = physics.HitLeft;
+    }
+
+    //---KillableEntity overrides
     public override void Kill() {
+        IsDead = true;
+
         body.velocity = Vector2.zero;
         body.isKinematic = true;
-        speed = 0;
-        dead = true;
-        deathTimer = 0.5f;
-        hitbox.enabled = false;
-        animator.SetBool("dead", true);
+
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
+    }
+
+    public override void OnIsDeadChanged() {
+        base.OnIsDeadChanged();
+
+        if (IsDead) {
+            if (!WasSpecialKilled) {
+                legacyAnimation.enabled = false;
+                sRenderer.sprite = deadSprite;
+            }
+        } else {
+            legacyAnimation.enabled = true;
+        }
     }
 }

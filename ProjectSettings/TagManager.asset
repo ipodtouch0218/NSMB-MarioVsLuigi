@@ -7,8 +7,6 @@ TagManager:
   - goomba
   - koopa
   - Bullet
-  - Powerup
-  - coin
   - bigstar
   - StarSpawn
   - MainStar
@@ -18,7 +16,6 @@ TagManager:
   - piranhaplant
   - pipe
   - LoadingCanvas
-  - loosecoin
   - wintext
   - bulletbill
   - spinner
@@ -27,11 +24,12 @@ TagManager:
   - uicamera
   - CanvasMask
   - Backgrounds
-  - DestructablePipe
   - FadeUI
   - lava
   - MarioBrosPlatform
   - frozencube
+  - Squishy
+  - Powerup
   layers:
   - Default
   - TransparentFX
@@ -39,7 +37,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Player
   - PlayerPassthrough
   - Ground
   - Entity

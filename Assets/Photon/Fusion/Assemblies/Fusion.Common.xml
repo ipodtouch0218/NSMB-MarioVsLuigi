@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Fusion.Common</name>
+    </assembly>
+    <members>
+        <member name="T:Fusion.Async.TaskManager">
+            <summary>
+            Task Factory is used to create new Tasks and Schedule long running Tasks
+            </summary>
+        </member>
+        <member name="P:Fusion.Async.TaskManager.TaskFactory">
+            <summary>
+            Stores a Task Factory ready made to be used with Unity
+            </summary>
+        </member>
+        <member name="M:Fusion.Async.TaskManager.Setup">
+            <summary>
+            Setup a new TaskFactory tailored to work with Unity
+            </summary>
+        </member>
+        <member name="M:Fusion.Async.TaskManager.Service(System.Func{System.Threading.Tasks.Task{System.Boolean}},System.Threading.CancellationToken,System.Int32,System.String)">
+            <summary>
+            Start a Service Task that will invoke a Recurring Action every each interval in millis
+            </summary>
+            <param name="recurringAction">Action invoked every interval. It can return false to stop the service</param>
+            <param name="cancellationToken">CancellationToken used to stop the service</param>
+            <param name="interval">Interval between action invoke</param>
+            <param name="serviceName">Custom id name for the Service</param>
+            <returns>Service Task</returns>
+        </member>
+        <member name="M:Fusion.Async.TaskManager.Run(System.Func{System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken,System.Threading.Tasks.TaskCreationOptions)">
+            <summary>
+            Run an Action asynchronously
+            </summary>
+            <param name="action">Action to be invoked</param>
+            <param name="cancellationToken">CancellationToken used to stop the Action</param>
+            <param name="options">Extra Task Creation options</param>
+            <returns>Async Task based on the Action</returns>
+        </member>
+        <member name="M:Fusion.Async.TaskManager.ContinueWhenAll(System.Threading.Tasks.Task[],System.Func{System.Threading.CancellationToken,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+            <summary>
+            Run a continuation Task after all other Tasks have completed
+            </summary>
+            <param name="precedingTasks">List of pending tasks to wait</param>
+            <param name="action">Action to run after the Tasks</param>
+            <param name="cancellationToken">ellationToken used to stop the Action</param>
+            <returns>Async Task based on the Action</returns>
+        </member>
+        <member name="M:Fusion.Async.TaskManager.Delay(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Custom Task Delay method as Task.Delay is not supported by WebGL Builds
+            </summary>
+            <param name="delay">Delay in milliseconds to wait</param>
+            <param name="token">Cancelation Token used to stop the Delay</param>
+            <returns>Awaitable Task</returns>
+        </member>
+        <member name="T:Fusion.Collections.SynchronizedQueue`1">
+            <summary>
+            Queue that usese Sync locks for each operations
+            </summary>
+            <typeparam name="T">Type used by the internal Queue</typeparam>
+        </member>
+        <member name="M:Fusion.CompressionUtils.Compress(System.Byte[])">
+            <summary>
+            Compress the byte array uisng GZip
+            </summary>
+            <param name="data">Original byte array</param>
+            <returns>Compressed byte array</returns>
+        </member>
+        <member name="M:Fusion.CompressionUtils.Decompress(System.Byte[])">
+            <summary>
+            Decompress the byte array using GZip
+            </summary>
+            <param name="data">Compressed byte array</param>
+            <returns>Decompressed byte array</returns>
+        </member>
+        <member name="P:Fusion.Protocol.ICommunicator.CommunicatorID">
+            <summary>
+            Represents the current ID of the communicator.
+            </summary>
+        </member>
+        <member name="M:Fusion.Protocol.ICommunicator.SendPackage(System.Byte,System.Int32,System.Boolean,System.Byte*,System.Int32)">
+            <summary>
+            Sends a package data using the communication system
+            </summary>
+            <param name="code">Event Code used to send the Package</param>
+            <param name="targetActor">Target Actor of the Package</param>
+            <param name="reliable">Flag if this Package should be sent reliably</param>
+            <param name="buffer">Data Buffer</param>
+            <param name="bufferLength">Buffer Length</param>
+        </member>
+        <member name="M:Fusion.Protocol.ICommunicator.ReceivePackage(System.Int32@,System.Byte*,System.Int32)">
+            <summary>
+            Retrieve a Data Package
+            </summary>
+            <param name="senderActor">Data Package Sender</param>
+            <param name="buffer">Buffer to be filled with the Data</param>
+            <param name="bufferLength">Buffer length</param>
+            <returns>Total number of bytes written to buffer</returns>
+        </member>
+        <member name="M:Fusion.Protocol.ICommunicator.Poll">
+            <summary>
+            Check if there are data package to be retrieved
+            </summary>
+            <returns>True if the internal buffer has pendind data</returns>
+        </member>
+        <member name="M:Fusion.Protocol.ICommunicator.PushPackage(System.Int32,System.Int32,System.Object)">
+            <summary>
+            Push a new Package into the communicator queues
+            </summary>
+            <param name="senderActor">Data Sender Actor</param>
+            <param name="eventCode">Event Code of the Package</param>
+            <param name="data">Package</param>
+        </member>
+        <member name="M:Fusion.Protocol.ICommunicator.RegisterPackageCallback``1(System.Action{System.Int32,``0})">
+            <summary>
+            Register a callback for a specific Message Type
+            </summary>
+            <typeparam name="K"></typeparam>
+            <param name="callback"></param>
+        </member>
+        <member name="M:Fusion.Protocol.ICommunicator.SendMessage(System.Int32,Fusion.Protocol.IMessage)">
+            <summary>
+            Send a Protocol Message using the communicator system
+            </summary>
+            <param name="targetActor">Target Actor of the Protocol Message</param>
+            <param name="message">Protocol Message to be sent</param>
+        </member>
+        <member name="M:Fusion.Protocol.ICommunicator.Service">
+            <summary>
+            Step the Communicator internals
+            </summary>
+        </member>
+        <member name="T:Fusion.Protocol.IMessage">
+            <summary>
+            Represents a Protocol Message
+            
+            Used to tag the Messages in <see cref="T:Fusion.Protocol.ICommunicator"/>.
+            </summary>
+        </member>
+        <member name="T:Fusion.JsonUtils">
+            <summary>
+            Collection of simple JSON Utility methods
+            </summary>
+        </member>
+        <member name="M:Fusion.JsonUtils.RemoveExtraReferences(System.String)">
+            <summary>
+            Removes from a JSON serialized by Unity Serializer the "referenes" field.
+            This aims to reduce the JSON size when sending accross the network
+            </summary>
+            <param name="baseJson">JSON output of "JsonUtility.ToJson" call</param>
+            <returns>Same JSON but without the "referenes" object</returns>
+        </member>
+        <member name="F:Fusion.Log.LogLevel">
+            <summary>
+            Set the Log Level based on the severity of the Log.
+            
+            Default: <see cref="F:Fusion.LogType.Debug"/>
+            </summary>
+        </member>
+        <member name="M:Fusion.Log.Init(Fusion.ILogger,Fusion.LogType)">
+            <summary>
+            Initialize the Log class with a Custom Logger implementation.
+            It will change the current <see cref="F:Fusion.Log.LogLevel"/> to <see cref="F:Fusion.LogType.Debug"/> by default when called.
+            </summary>
+            <param name="logger">Custom Logger Implementation</param>
+            <param name="LogLevel">New LogLevel</param>
+        </member>
+        <member name="M:Fusion.Profiling.FusionSamplers.IncrementFrame">
+            <summary>
+            Instructs all sub-Samplers to register a frame change. The next Add will go to the next frame section.
+            </summary>
+        </member>
+        <member name="M:Fusion.Profiling.FusionSamplers.GetSampler(System.Int32,System.String)">
+            <summary>
+            Get Sampler from the connection specific collection.
+            </summary>
+        </member>
+        <member name="M:Fusion.Profiling.FusionSamplers.GetSampler(System.String)">
+            <summary>
+            Get Sampler from the common samplers (non-connection specific) collection.
+            </summary>
+        </member>
+        <member name="M:Fusion.Radix.Sort(Fusion.Radix.SortTarget*,Fusion.Radix.SortTarget*,System.Int32,System.Int32*,System.Int32*)">
+            <summary>
+            Sort 4 byte integers
+            </summary>
+            <param name="a">array to sort</param>
+            <param name="t">temp array that is >= aLength</param>
+            <param name="aLength">length of array</param>
+            <param name="p">integer array with size (1 &lt;&lt; RADIX)</param>
+            <param name="c">integer array with size (1 &lt;&lt; RADIX) * 4</param>
+        </member>
+        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsBuildFlags">
+            <summary>
+            Flags for BuildFlags
+            </summary>
+        </member>
+        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsBuildTypes">
+            <summary>
+            Flags for BuildTypes
+            </summary>
+        </member>
+        <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsDotNetVersion">
+            <summary>
+            Flags for DotNetVersion
+            </summary>
+        </member>
+    </members>
+</doc>

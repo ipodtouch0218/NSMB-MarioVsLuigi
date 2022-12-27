@@ -1,24 +1,30 @@
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Photon.Pun;
+
+using Fusion;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-public class MarioBrosPlatform : MonoBehaviourPun {
+public class MarioBrosPlatform : NetworkBehaviour {
 
-    private static readonly Vector2 BUMP_OFFSET = new(-0.25f, -0.1f);
+    //---Static Variables
+    private static readonly Vector2 BumpOffset = new(-0.25f, -0.1f);
+    private static readonly Color BlankColor = new(0, 0, 0, 255);
 
-    [Delayed]
-    public int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
-    public float bumpDuration = 0.4f;
-    public bool changeCollider = true;
+    //---Networked Variables
+    [Networked, Capacity(8)] private NetworkLinkedList<BumpInfo> Bumps => default;
 
-    private readonly List<BumpInfo> bumps = new();
+    //---Serialized Variables
+    [Delayed] [SerializeField] private int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
+    [SerializeField] private float bumpDuration = 0.4f;
+    [SerializeField] private bool changeCollider = true;
+
+    //---Misc Variables
     private SpriteRenderer spriteRenderer;
     private MaterialPropertyBlock mpb;
     private Color32[] pixels;
     private Texture2D displacementMap;
 
-    public void Start() {
+    public void Awake() {
         Initialize();
     }
 
@@ -34,8 +40,8 @@ public class MarioBrosPlatform : MonoBehaviourPun {
             return;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
-
         spriteRenderer.size = new Vector2(platformWidth, 1.25f);
+
         if (changeCollider)
             GetComponent<BoxCollider2D>().size = new Vector2(platformWidth, 5f / 8f);
 
@@ -48,22 +54,16 @@ public class MarioBrosPlatform : MonoBehaviourPun {
         mpb.SetFloat("PlatformWidth", platformWidth);
         mpb.SetFloat("PointsPerTile", samplesPerTile);
     }
-    public void Update() {
+
+    public override void Render() {
         for (int i = 0; i < platformWidth * samplesPerTile; i++)
-            pixels[i] = new Color32(0, 0, 0, 255);
+            pixels[i] = BlankColor;
 
-        for (int i = bumps.Count - 1; i >= 0; i--) {
-            BumpInfo bump = bumps[i];
-            bump.timer -= Time.deltaTime;
-            if (bump.timer <= 0) {
-                bumps.RemoveAt(i);
-                continue;
-            }
-
-            float percentageCompleted = bump.timer / bumpDuration;
+        foreach (BumpInfo bump in Bumps) {
+            float percentageCompleted = bump.SpawnTime / bumpDuration;
             float v = Mathf.Sin(Mathf.PI * percentageCompleted);
             for (int x = -bumpWidthPoints - bumpBlurPoints; x <= bumpWidthPoints + bumpBlurPoints; x++) {
-                int index = bump.pointX + x;
+                int index = bump.point + x;
                 if (index < 0 || index >= platformWidth * samplesPerTile)
                     continue;
 
@@ -85,15 +85,20 @@ public class MarioBrosPlatform : MonoBehaviourPun {
         spriteRenderer.SetPropertyBlock(mpb);
     }
 
-    [PunRPC]
-    public void Bump(int id, Vector2 worldPos) {
+    public override void FixedUpdateNetwork() {
+        //TODO: don't use linq
+        foreach (BumpInfo bump in Bumps.ToList()) {
+            if (bump.SpawnTime + bumpDuration > Runner.SimulationTime)
+                Bumps.Remove(bump);
+        }
+    }
 
-        PlayerController player = PhotonView.Find(id).GetComponent<PlayerController>();
+    public void Bump(PlayerController player, Vector2 worldPos) {
 
         float localPos = transform.InverseTransformPoint(worldPos).x;
 
         if (Mathf.Abs(localPos) > platformWidth) {
-            worldPos.x += GameManager.Instance.levelWidthTile / 2f;
+            worldPos.x += GameManager.Instance.LevelWidth;
             localPos = transform.InverseTransformPoint(worldPos).x;
         }
 
@@ -105,17 +110,14 @@ public class MarioBrosPlatform : MonoBehaviourPun {
             return;
 
         player.PlaySound(Enums.Sounds.World_Block_Bump);
-        if (player.photonView.IsMine)
-            InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BUMP_OFFSET);
-        bumps.Add(new BumpInfo(bumpDuration, (int) localPos));
+        InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BumpOffset);
+
+        Bumps.Add(new BumpInfo() { point = (int) localPos, SpawnTime = Runner.SimulationTime });
     }
 
-    class BumpInfo {
-        public float timer;
-        public int pointX;
-        public BumpInfo(float timer, int pointX) {
-            this.timer = timer;
-            this.pointX = pointX;
-        }
+    //---Helpers
+    private struct BumpInfo : INetworkStruct {
+        public int point;
+        [Networked] public float SpawnTime { get; set; }
     }
 }

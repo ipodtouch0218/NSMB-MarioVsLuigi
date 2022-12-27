@@ -1,157 +1,290 @@
 ﻿using UnityEngine;
-using Photon.Pun;
 
-public class FireballMover : MonoBehaviourPun {
+using Fusion;
+using NSMB.Extensions;
+using NSMB.Utils;
 
-    public bool left, isIceball;
+[RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
+public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
-    [SerializeField] private float speed = 3f, bounceHeight = 4.5f, terminalVelocity = 6.25f;
+    //---Static Variables
+    private static readonly Collider2D[] CollisionBuffer = new Collider2D[16];
 
-    private Rigidbody2D body;
+    //---Networked Variables
+    [Networked] public PlayerController Owner { get; set; }
+    [Networked] private float CurrentSpeed { get; set; }
+    [Networked] public NetworkBool AlreadyBounced { get; set; }
+    [Networked] public NetworkBool IsIceball { get; set; }
+    [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
+
+    //---Serialized Variables
+    [SerializeField] private ParticleSystem iceBreak, fireBreak, iceTrail, fireTrail;
+    [SerializeField] private GameObject iceGraphics, fireGraphics;
+    [SerializeField] private float fireSpeed = 6.25f, iceSpeed = 4.25f;
+    [SerializeField] private float bounceHeight = 6.75f, terminalVelocity = 6.25f;
+
+    //---Components
     private PhysicsEntity physics;
-    private bool breakOnImpact;
+    private NetworkRigidbody2D nrb;
+    private SpriteRenderer[] renderers;
+    private BoxCollider2D hitbox;
 
-    public void Start() {
-        body = GetComponent<Rigidbody2D>();
+    public override void Awake() {
+        base.Awake();
         physics = GetComponent<PhysicsEntity>();
-
-        object[] data = photonView.InstantiationData;
-        left = (bool) data[0];
-        if (data.Length > 1 && isIceball)
-            speed += Mathf.Abs((float) data[1] / 3f);
-
-        body.velocity = new Vector2(speed * (left ? -1 : 1), -speed);
+        nrb = GetComponent<NetworkRigidbody2D>();
+        hitbox = GetComponent<BoxCollider2D>();
+        renderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
-    public void FixedUpdate() {
+    public void Initialize(PlayerController owner, Vector2 spawnpoint, bool ice, bool right) {
+        //vars
+        IsActive = true;
+        IsIceball = ice;
+        FacingRight = right;
+        AlreadyBounced = false;
+        Owner = owner;
+
+        foreach (SpriteRenderer r in renderers)
+            r.flipX = FacingRight;
+
+        //speed
+        body.gravityScale = IsIceball ? 2.2f : 4.4f;
+        if (IsIceball) {
+            CurrentSpeed = iceSpeed + Mathf.Abs(owner.body.velocity.x / 3f);
+        } else {
+            CurrentSpeed = fireSpeed;
+        }
+
+        //physics
+        nrb.TeleportToPosition(spawnpoint, Vector3.zero);
+        body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
+    }
+
+    public override void Spawned() {
+        base.Spawned();
+
+        body.isKinematic = true;
+        iceGraphics.SetActive(false);
+        fireGraphics.SetActive(false);
+
+        transform.SetParent(GameManager.Instance.objectPoolParent.transform);
+        GameManager.Instance.PooledFireballs.Add(this);
+    }
+
+    public override void FixedUpdateNetwork() {
+        body.isKinematic = !IsActive;
+        hitbox.enabled = IsActive;
+
+        if (!IsActive)
+            return;
+
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
-            GetComponent<Animator>().enabled = false;
-            body.isKinematic = true;
+            foreach (Animation anim in GetComponentsInChildren<Animation>())
+                anim.enabled = false;
+            body.simulated = false;
             return;
         }
 
-        HandleCollision();
+        if (body.position.y < GameManager.Instance.LevelMinY) {
+            Destroy();
+            return;
+        }
 
-        float gravityInOneFrame = body.gravityScale * Physics2D.gravity.y * Time.fixedDeltaTime;
-        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(-terminalVelocity, body.velocity.y));
+        if (!HandleCollision())
+            return;
+
+        if (!CheckForEntityCollision())
+            return;
+
+        body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
-    private void HandleCollision() {
+    public void Destroy() {
+        IsActive = false;
+        body.velocity = Vector2.zero;
+        body.isKinematic = true;
+    }
+
+    //---Helper Methods
+    private bool HandleCollision() {
+        if (!IsActive)
+            return false;
+
         physics.UpdateCollisions();
 
-        if (physics.onGround && !breakOnImpact) {
-            float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.floorAngle * Mathf.Deg2Rad)) * 1.25f;
-            if (Mathf.Sign(physics.floorAngle) != Mathf.Sign(body.velocity.x))
+        if (physics.OnGround && !AlreadyBounced) {
+            float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
+            if (Mathf.Sign(physics.FloorAngle) != Mathf.Sign(body.velocity.x))
                 boost = 0;
 
-            body.velocity = new Vector2(body.velocity.x, bounceHeight + boost);
-        } else if (isIceball && body.velocity.y > 1.5f)  {
-            breakOnImpact = true;
+            body.velocity = new(body.velocity.x, bounceHeight + boost);
+        } else if (IsIceball && body.velocity.y > 0.1f)  {
+            AlreadyBounced = true;
         }
-        bool breaking = physics.hitLeft || physics.hitRight || physics.hitRoof || (physics.onGround && breakOnImpact);
-        if (photonView && breaking) {
-            if (photonView.IsMine)
-                PhotonNetwork.Destroy(gameObject);
-            else
-                Destroy(gameObject);
+        bool breaking = physics.HitLeft || physics.HitRight || physics.HitRoof || (physics.OnGround && AlreadyBounced && body.velocity.y < 1f);
+        if (breaking) {
+            Destroy();
+            return false;
         }
+
+        if (Utils.IsTileSolidAtWorldLocation(body.position)) {
+            Destroy();
+            return false;
+        }
+
+        return true;
     }
 
-    public void OnDestroy() {
-        if (!GameManager.Instance.gameover)
-            Instantiate(Resources.Load("Prefabs/Particle/" + (isIceball ? "IceballWall" : "FireballWall")), transform.position, Quaternion.identity);
+    private bool CheckForEntityCollision() {
+        if (!IsActive)
+            return false;
+
+        int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + physics.currentCollider.offset, ((BoxCollider2D) physics.currentCollider).size, 0, default, CollisionBuffer);
+
+        for (int i = 0; i < count; i++) {
+            GameObject collidedObject = CollisionBuffer[i].gameObject;
+
+            //don't interact with ourselves.
+            if (CollisionBuffer[i].attachedRigidbody == body)
+                continue;
+
+            if (collidedObject.GetComponentInParent<IFireballInteractable>() is IFireballInteractable interactable) {
+                //don't interact with our owner
+                if (interactable is PlayerController player && player == Owner)
+                    continue;
+
+                bool result = IsIceball ? interactable.InteractWithIceball(this) : interactable.InteractWithFireball(this);
+                if (result) {
+                    //true = interacted & destroy.
+                    Destroy();
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
-    [PunRPC]
-    protected void Kill() {
-        if (photonView.IsMine)
-            PhotonNetwork.Destroy(photonView);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collider) {
-        if (!photonView.IsMine)
+    //---IPlayerInteractable overrides
+    public void InteractWithPlayer(PlayerController player) {
+        //If we're not active, don't collide.
+        if (!IsActive)
             return;
 
-        switch (collider.tag) {
-        case "koopa":
-        case "goomba": {
-            KillableEntity en = collider.gameObject.GetComponentInParent<KillableEntity>();
-            if (en.dead || en.Frozen)
+        //Check if they own us. If so, don't collide.
+        if (Owner == player)
+            return;
+
+        //If they have knockback invincibility, don't collide.
+        if (!player.DamageInvincibilityTimer.ExpiredOrNotRunning(Runner))
+            return;
+
+        //Starman Check
+        if (player.IsStarmanInvincible)
+            return;
+
+        //Player state checks
+        switch (player.State) {
+        case Enums.PowerupState.MegaMushroom: {
+            return;
+        }
+        case Enums.PowerupState.MiniMushroom: {
+            player.Death(false, false);
+            return;
+        }
+        case Enums.PowerupState.BlueShell: {
+            if (IsIceball && (player.IsInShell || player.IsCrouching || player.IsGroundpounding))
+                player.ShellSlowdownTimer = TickTimer.CreateFromSeconds(Runner, 0.65f);
+            return;
+        }
+        }
+
+        //Collision is a GO
+        if (IsIceball) {
+            //iceball
+            if (!player.IsFrozen) {
+                Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
+                    FrozenCube cube = obj.GetComponent<FrozenCube>();
+                    cube.OnBeforeSpawned(player);
+                });
+            }
+        } else {
+            //fireball
+            //TODO: damage source?
+            player.DoKnockback(FacingRight, 1, true, gameObject);
+        }
+
+        //Destroy ourselves.
+        Destroy();
+    }
+
+    //---IFireballInteractable overrides
+    public bool InteractWithFireball(FireballMover fireball) {
+        if (!IsActive || !fireball.IsActive)
+            return false;
+
+        //fire + ice = both destroy
+        if (IsIceball) {
+            fireball.Destroy();
+            return true;
+        }
+        return false;
+    }
+
+    public bool InteractWithIceball(FireballMover iceball) {
+        if (!IsActive || !iceball.IsActive)
+            return false;
+
+        //fire + ice = both destroy
+        if (!IsIceball) {
+            iceball.Destroy();
+            return true;
+        }
+        return false;
+    }
+
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        //do nothing when bumped
+    }
+
+    //---OnChanged callbacks
+    public static void OnIsActiveChanged(Changed<FireballMover> changed) {
+        FireballMover mover = changed.Behaviour;
+
+        if (mover.IsActive) {
+            //activate graphics and particles
+            bool ice = mover.IsIceball;
+
+            if (ice) {
+                mover.iceTrail.Play();
+                mover.fireTrail.Stop();
+            } else {
+                mover.fireTrail.Play();
+                mover.iceTrail.Stop();
+            }
+            mover.iceGraphics.SetActive(ice);
+            mover.fireGraphics.SetActive(!ice);
+        } else {
+            //disable graphics & trail, but play poof fx
+            mover.iceGraphics.SetActive(false);
+            mover.fireGraphics.SetActive(false);
+            mover.iceTrail.Stop();
+            mover.fireTrail.Stop();
+
+            //dont play particles below the killplane
+            if (mover.body.position.y < GameManager.Instance.LevelMinY)
                 return;
 
-            if (isIceball) {
-                PhotonNetwork.Instantiate("Prefabs/FrozenCube", en.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { en.photonView.ViewID });
-                PhotonNetwork.Destroy(gameObject);
+            if (mover.IsIceball) {
+                mover.iceBreak.Play();
+                mover.sfx.PlayOneShot(Enums.Sounds.Powerup_Iceball_Break);
             } else {
-                en.photonView.RPC("SpecialKill", RpcTarget.All, !left, false, 0);
-                PhotonNetwork.Destroy(gameObject);
+                mover.fireBreak.Play();
+                mover.sfx.PlayOneShot(Enums.Sounds.Powerup_Fireball_Break);
             }
-            break;
-        }
-        case "frozencube": {
-            FrozenCube fc = collider.gameObject.GetComponentInParent<FrozenCube>();
-            if (fc.dead)
-                return;
-            // TODO: Stuff here
-
-            if (isIceball) {
-                PhotonNetwork.Destroy(gameObject);
-            } else {
-                fc.gameObject.GetComponent<FrozenCube>().photonView.RPC("Kill", RpcTarget.All);
-                PhotonNetwork.Destroy(gameObject);
-            }
-            break;
-        }
-        case "Fireball": {
-            FireballMover otherball = collider.gameObject.GetComponentInParent<FireballMover>();
-            if (isIceball ^ otherball.isIceball) {
-                PhotonNetwork.Destroy(collider.gameObject);
-                PhotonNetwork.Destroy(gameObject);
-            }
-            break;
-        }
-        case "bulletbill": {
-            KillableEntity bb = collider.gameObject.GetComponentInParent<BulletBillMover>();
-            if (isIceball && !bb.Frozen) {
-                PhotonNetwork.Instantiate("Prefabs/FrozenCube", bb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bb.photonView.ViewID });
-            }
-            PhotonNetwork.Destroy(gameObject);
-
-            break;
-        }
-        case "bobomb": {
-            BobombWalk bobomb = collider.gameObject.GetComponentInParent<BobombWalk>();
-            if (bobomb.dead || bobomb.Frozen)
-                return;
-            if (!isIceball) {
-                if (!bobomb.lit) {
-                    bobomb.photonView.RPC("Light", RpcTarget.All);
-                } else {
-                    bobomb.photonView.RPC("Kick", RpcTarget.All, body.position.x < bobomb.body.position.x, 0f, false);
-                }
-                PhotonNetwork.Destroy(gameObject);
-            } else {
-                PhotonNetwork.Instantiate("Prefabs/FrozenCube", bobomb.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { bobomb.photonView.ViewID });
-                PhotonNetwork.Destroy(gameObject);
-            }
-            break;
-        }
-        case "piranhaplant": {
-            KillableEntity killa = collider.gameObject.GetComponentInParent<KillableEntity>();
-            if (killa.dead)
-                return;
-            AnimatorStateInfo asi = killa.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
-            if (asi.IsName("end") && asi.normalizedTime > 0.5f)
-                return;
-            if (!isIceball) {
-                killa.photonView.RPC("Kill", RpcTarget.All);
-                PhotonNetwork.Destroy(gameObject);
-            } else {
-                PhotonNetwork.Instantiate("Prefabs/FrozenCube", killa.transform.position + new Vector3(0, 0.1f, 0), Quaternion.identity, 0, new object[] { killa.photonView.ViewID });
-            }
-            break;
-        }
         }
     }
 }

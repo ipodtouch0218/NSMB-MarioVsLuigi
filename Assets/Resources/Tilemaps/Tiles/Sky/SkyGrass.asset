@@ -175,7 +175,8 @@ MonoBehaviour:
     - {x: 0, y: -1, z: 0}
     - {x: 1, y: -1, z: 0}
     m_RuleTransform: 0
+  siblings: []
   isBackgroundTile: 0
   iceSkidding: 0
-  footstepMaterial: 
-  frictionFactor: 1
+  footstepSound: 31
+  footstepParticle: 0

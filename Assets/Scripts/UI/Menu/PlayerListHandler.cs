@@ -1,75 +1,64 @@
-// using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
-using ExitGames.Client.Photon;
 
-public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
+using Fusion;
+using NSMB.Extensions;
+
+public class PlayerListHandler : MonoBehaviour {
 
     [SerializeField] private GameObject contentPane, template;
-    private readonly Dictionary<string, PlayerListEntry> playerListEntries = new();
+    private readonly Dictionary<PlayerRef, PlayerListEntry> playerListEntries = new();
 
-    //Room callbacks
-    public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) { }
-    public void OnMasterClientSwitched(Player newMasterClient) {
+    private NetworkRunner Runner => NetworkHandler.Instance.runner;
+
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+        AddPlayerEntry(player);
         UpdateAllPlayerEntries();
     }
-    public void OnPlayerEnteredRoom(Player newPlayer) {
-        if (!newPlayer.IsLocal) {
-            AddPlayerEntry(newPlayer);
-            UpdateAllPlayerEntries();
-        }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        RemovePlayerEntry(player);
+        UpdateAllPlayerEntries();
     }
 
-    public void OnPlayerLeftRoom(Player otherPlayer) {
-        if (!otherPlayer.IsLocal) {
-            RemovePlayerEntry(otherPlayer);
-            UpdateAllPlayerEntries();
-        }
-    }
-    public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) {
-        if (changedProps.ContainsKey(Enums.NetPlayerProperties.Spectator))
-            UpdateAllPlayerEntries();
-        else
-            UpdatePlayerEntry(targetPlayer);
-    }
-
-    //Register callbacks
     public void OnEnable() {
-        PhotonNetwork.AddCallbackTarget(this);
-        if (PhotonNetwork.InRoom)
+        if (!NetworkHandler.Instance.runner)
+            return;
+
+        if (NetworkHandler.Instance.runner.SessionInfo.IsValid)
             PopulatePlayerEntries(true);
-    }
-    public void OnDisable() {
-        PhotonNetwork.RemoveCallbackTarget(this);
-        RemoveAllPlayerEntries();
+
+        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
     }
 
-    //Unity start
-    public void Start() {
-        if (PhotonNetwork.InRoom)
-            PopulatePlayerEntries(false);
+    public void OnDisable() {
+        RemoveAllPlayerEntries();
+
+        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
     }
 
     public void PopulatePlayerEntries(bool addSelf) {
         RemoveAllPlayerEntries();
-        List<Player> players = PhotonNetwork.CurrentRoom.Players.Values.ToList();
-        if (addSelf)
-            players.Add(PhotonNetwork.LocalPlayer);
-
-        players.ForEach(AddPlayerEntry);
+        foreach (PlayerRef player in Runner.ActivePlayers) {
+            if (addSelf || Runner.LocalPlayer != player)
+                AddPlayerEntry(player);
+        }
     }
 
-    public void AddPlayerEntry(Player player) {
-        string id = player.UserId;
-        if (!playerListEntries.ContainsKey(id)) {
+    public void AddPlayerEntry(PlayerRef player) {
+        PlayerData data = player.GetPlayerData(Runner);
+        if (!data || !template)
+            return;
+
+        if (!playerListEntries.ContainsKey(player)) {
             GameObject go = Instantiate(template, contentPane.transform);
-            go.name = $"{player.NickName} ({player.UserId})";
+            go.name = $"{data.GetNickname()} ({data.GetUserId()})";
             go.SetActive(true);
-            playerListEntries[id] = go.GetComponent<PlayerListEntry>();
-            playerListEntries[id].player = player;
+            playerListEntries[player] = go.GetComponent<PlayerListEntry>();
+            playerListEntries[player].player = player;
         }
 
         UpdatePlayerEntry(player);
@@ -80,37 +69,36 @@ public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
         playerListEntries.Clear();
     }
 
-    public void RemovePlayerEntry(Player player) {
-        string id = player.UserId;
-        if (!playerListEntries.ContainsKey(id))
+    public void RemovePlayerEntry(PlayerRef player) {
+        if (!playerListEntries.ContainsKey(player))
             return;
 
-        Destroy(playerListEntries[id].gameObject);
-        playerListEntries.Remove(id);
+        Destroy(playerListEntries[player].gameObject);
+        playerListEntries.Remove(player);
     }
 
     public void UpdateAllPlayerEntries() {
-        PhotonNetwork.CurrentRoom.Players.Values.ToList().ForEach(UpdatePlayerEntry);
+        foreach (PlayerRef player in Runner.ActivePlayers)
+            UpdatePlayerEntry(player);
     }
 
-    public void UpdatePlayerEntry(Player player) {
-        string id = player.UserId;
-        if (!playerListEntries.ContainsKey(id)) {
+    public void UpdatePlayerEntry(PlayerRef player) {
+        if (!playerListEntries.ContainsKey(player)) {
             AddPlayerEntry(player);
             return;
         }
 
-        playerListEntries[id].UpdateText();
+        playerListEntries[player].UpdateText();
         ReorderEntries();
     }
 
     public void ReorderEntries() {
-        foreach (var players in PhotonNetwork.PlayerList.Reverse()) {
-            string id = players.UserId;
-            if (!playerListEntries.ContainsKey(id))
+        foreach (PlayerRef player in Runner.ActivePlayers.OrderBy(pr => (int) pr)) {
+
+            if (!playerListEntries.ContainsKey(player))
                 continue;
 
-            playerListEntries[id].transform.SetAsFirstSibling();
+            playerListEntries[player].transform.SetAsFirstSibling();
         }
     }
 }

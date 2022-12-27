@@ -1,4 +1,4 @@
-﻿#if UNITY_WEBGL || WEBSOCKET || ((UNITY_XBOXONE || UNITY_GAMECORE) && UNITY_EDITOR)
+﻿#if UNITY_WEBGL || WEBSOCKET || WEBSOCKET_PROXYCONFIG
 
 // --------------------------------------------------------------------------------------------------------------------
 // <summary>
@@ -12,6 +12,8 @@ namespace ExitGames.Client.Photon
 {
     using System;
     using System.Text;
+    using ExitGames.Client.Photon;
+
     #if UNITY_WEBGL && !UNITY_EDITOR
     using System.Runtime.InteropServices;
     #else
@@ -24,25 +26,38 @@ namespace ExitGames.Client.Photon
     public class WebSocket
     {
         private Uri mUrl;
+        private string mProxyAddress;
+
         /// <summary>Photon uses this to agree on a serialization protocol. Either: GpBinaryV16 or GpBinaryV18. Based on enum SerializationProtocol.</summary>
         private string protocols = "GpBinaryV16";
 
-        public WebSocket(Uri url, string serialization = null)
+        public Action<DebugLevel, string> DebugReturn { get; set; }
+
+        public WebSocket(Uri url, string proxyAddress, string protocols = null)
         {
             this.mUrl = url;
-            if (serialization != null)
+            this.mProxyAddress = proxyAddress;
+
+            if (protocols != null)
             {
-                this.protocols = serialization;
+                this.protocols = protocols;
             }
 
             string protocol = mUrl.Scheme;
             if (!protocol.Equals("ws") && !protocol.Equals("wss"))
+            {
                 throw new ArgumentException("Unsupported protocol: " + protocol);
+            }
+        }
+
+        public string ProxyAddress
+        {
+            get { return mProxyAddress; }
         }
 
         public void SendString(string str)
         {
-            Send(Encoding.UTF8.GetBytes (str));
+            Send(Encoding.UTF8.GetBytes(str));
         }
 
         public string RecvString()
@@ -50,10 +65,10 @@ namespace ExitGames.Client.Photon
             byte[] retval = Recv();
             if (retval == null)
                 return null;
-            return Encoding.UTF8.GetString (retval);
+            return Encoding.UTF8.GetString(retval);
         }
 
-    #if UNITY_WEBGL && !UNITY_EDITOR
+        #if UNITY_WEBGL && !UNITY_EDITOR
         [DllImport("__Internal")]
         private static extern int SocketCreate (string url, string protocols);
 
@@ -123,22 +138,71 @@ namespace ExitGames.Client.Photon
                 return Encoding.UTF8.GetString (buffer);
             }
         }
-    #else
+        #else
         WebSocketSharp.WebSocket m_Socket;
         Queue<byte[]> m_Messages = new Queue<byte[]>();
         bool m_IsConnected = false;
         string m_Error = null;
 
+
         public void Connect()
         {
-            m_Socket = new WebSocketSharp.WebSocket(mUrl.ToString(), new string[] { this.protocols });
-            m_Socket.SslConfiguration.EnabledSslProtocols = m_Socket.SslConfiguration.EnabledSslProtocols | (SslProtocols)(3072| 768);
-            m_Socket.OnMessage += (sender, e) => m_Messages.Enqueue(e.RawData);
-            m_Socket.OnOpen += (sender, e) => m_IsConnected = true;
-            //this.m_Socket.Log.Level = LogLevel.Debug;
-            //this.m_Socket.Log.Output += Output;
+            m_Socket = new WebSocketSharp.WebSocket(mUrl.ToString(), new string[] {this.protocols});
+            m_Socket.Log.Output = (ld, f) =>
+                                  {
+                                      var s = string.Format("WebSocketSharp: {0}", ld.Message);
+                                      switch (ld.Level)
+                                      {
+                                          case WebSocketSharp.LogLevel.Trace:
+                                          case WebSocketSharp.LogLevel.Debug:
+                                              DebugReturn(DebugLevel.ALL, s);
+                                              break;
+                                          case WebSocketSharp.LogLevel.Info:
+                                              DebugReturn(DebugLevel.INFO, s);
+                                              break;
+                                          case WebSocketSharp.LogLevel.Warn:
+                                              DebugReturn(DebugLevel.WARNING, s);
+                                              break;
+                                          case WebSocketSharp.LogLevel.Error:
+                                          case WebSocketSharp.LogLevel.Fatal:
+                                              DebugReturn(DebugLevel.ERROR, s);
+                                              break;
+                                      }
+                                  };
+
+            string user = null;
+            string pass = null;
+
+            if (!String.IsNullOrEmpty(mProxyAddress))
+            {
+                var authDelim = mProxyAddress.IndexOf("@");
+                if (authDelim != -1)
+                {
+                    user = mProxyAddress.Substring(0, authDelim);
+                    mProxyAddress = mProxyAddress.Substring(authDelim + 1);
+                    var passDelim = user.IndexOf(":");
+                    if (passDelim != -1)
+                    {
+                        pass = user.Substring(passDelim + 1);
+                        user = user.Substring(0, passDelim);
+                    }
+                }
+
+                // throws an exception, if scheme not specified
+                m_Socket.SetProxy("http://" + mProxyAddress, user, pass);
+            }
+
+            if (m_Socket.IsSecure)
+            {
+                m_Socket.SslConfiguration.EnabledSslProtocols = m_Socket.SslConfiguration.EnabledSslProtocols | (SslProtocols)(3072 | 768);
+            }
+
+            m_Socket.OnMessage += (sender, e) => { m_Messages.Enqueue(e.RawData); };
+            m_Socket.OnOpen += (sender, e) => { m_IsConnected = true; };
+            m_Socket.OnError += (sender, e) => { m_Error = e.Message + (e.Exception == null ? "" : " / " + e.Exception); };
+
             this.m_Socket.OnClose += SocketOnClose;
-            m_Socket.OnError += (sender, e) => m_Error = e.Message + (e.Exception == null ? "" : " / " + e.Exception);
+
             m_Socket.ConnectAsync();
         }
 
@@ -155,7 +219,10 @@ namespace ExitGames.Client.Photon
             }
         }
 
-        public bool Connected { get { return m_IsConnected; } }// added by TS
+        public bool Connected
+        {
+            get { return m_IsConnected; }
+        }
 
 
         public void Send(byte[] buffer)
@@ -177,12 +244,9 @@ namespace ExitGames.Client.Photon
 
         public string Error
         {
-            get
-            {
-                return m_Error;
-            }
+            get { return m_Error; }
         }
-    #endif
+        #endif
     }
 }
 #endif

@@ -1,36 +1,43 @@
 using UnityEngine;
-using Photon.Pun;
 
-public class EnemySpawnpoint : MonoBehaviour {
+using Fusion;
+using NSMB.Utils;
 
-    public string prefab;
-    public GameObject currentEntity;
+public class EnemySpawnpoint : NetworkBehaviour {
+
+    //---Networked Variables
+    [Networked] private NetworkObject CurrentEntity { get; set; }
+
+    //---Serialized Variables
+    [SerializeField] private NetworkPrefabRef prefab;
 
     public virtual bool AttemptSpawning() {
-        if (currentEntity)
+        if (CurrentEntity)
             return false;
 
-        foreach (var hit in Physics2D.OverlapCircleAll(transform.position, 1.5f)) {
-            if (hit.gameObject.CompareTag("Player"))
-                //cant spawn here
-                return false;
-        }
+        if (Runner.GetPhysicsScene2D().OverlapCircle(transform.position, 1.5f, Layers.MaskOnlyPlayers))
+            return false;
 
-        currentEntity = PhotonNetwork.InstantiateRoomObject(prefab, transform.position, transform.rotation);
+        CurrentEntity = Runner.Spawn(prefab, transform.position, transform.rotation);
         return true;
     }
 
     public void OnDrawGizmos() {
-        string icon = prefab.Split("/")[^1];
-        float offset = prefab switch {
-            "Prefabs/Enemy/BlueKoopa" => 0.15f,
-            "Prefabs/Enemy/RedKoopa" => 0.15f,
-            "Prefabs/Enemy/Koopa" => 0.15f,
-            "Prefabs/Enemy/Bobomb" => 0.22f,
-            "Prefabs/Enemy/Goomba" => 0.22f,
-            "Prefabs/Enemy/Spiny" => -0.03125f,
-            _ => 0,
-        };
-        Gizmos.DrawIcon(transform.position + offset * Vector3.up, icon, true, new Color(1, 1, 1, 0.5f));
+        if (prefab == NetworkPrefabRef.Empty)
+            return;
+
+        //TODO: reimplement
+
+        //string icon = prefab.;
+        //float offset = icon switch {
+        //    "BlueKoopa" => 0.15f,
+        //    "RedKoopa" => 0.15f,
+        //    "Koopa" => 0.15f,
+        //    "Bobomb" => 0.22f,
+        //    "Goomba" => 0.22f,
+        //    "Spiny" => -0.03125f,
+        //    _ => 0,
+        //};
+        //Gizmos.DrawIcon(transform.position + offset * Vector3.up, icon, true, new Color(1, 1, 1, 0.5f));
     }
 }

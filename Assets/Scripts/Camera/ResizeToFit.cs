@@ -1,17 +1,25 @@
 using UnityEngine;
 
+[RequireComponent(typeof(RectTransform))]
 public class ResizeToFit : MonoBehaviour {
 
-    public float aspect = 4f / 3f;
+    //---Serialized Variables
+    [SerializeField] private float aspect = 4f / 3f;
+
+    //---Private Variables
     private RectTransform rect;
     private RectTransform parent;
 
-    public void Start() {
+    public void Awake() {
         rect = GetComponent<RectTransform>();
         parent = rect.parent.GetComponent<RectTransform>();
     }
+
     public void LateUpdate() {
-        if (GlobalController.Instance.settings.fourByThreeRatio && GlobalController.Instance.settings.ndsResolution)
+        if (!Settings.Instance.ndsResolution)
+            return;
+
+        if (Settings.Instance.fourByThreeRatio)
             SizeToParent(aspect);
         else
             SizeToParent(Camera.main.aspect);
@@ -34,5 +42,4 @@ public class ResizeToFit : MonoBehaviour {
         }
         rect.sizeDelta = new(w, h);
     }
-
 }

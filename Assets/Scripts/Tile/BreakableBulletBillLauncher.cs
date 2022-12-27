@@ -3,14 +3,17 @@ using UnityEngine.Tilemaps;
 
 using NSMB.Utils;
 
-[CreateAssetMenu(fileName = "BreakableBulletBillLauncher", menuName = "ScriptableObjects/Tiles/BreakableBulletBillLauncher", order = 5)]
+[CreateAssetMenu(fileName = "BreakableBulletBillLauncher", menuName = "ScriptableObjects/Tiles/BreakableBulletBillLauncher")]
 public class BreakableBulletBillLauncher : InteractableTile {
-    public override bool Interact(MonoBehaviour interacter, InteractionDirection direction, Vector3 worldLocation) {
-        if (!(interacter is PlayerController))
+
+    [SerializeField] private GameObject breakParticle;
+
+    public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
+        if (interacter is not PlayerController)
             return false;
 
-        PlayerController player = (PlayerController)interacter;
-        if (player.state != Enums.PowerupState.MegaMushroom)
+        PlayerController player = (PlayerController) interacter;
+        if (player.State != Enums.PowerupState.MegaMushroom)
             return false;
         if (direction == InteractionDirection.Down || direction == InteractionDirection.Up)
             return false;
@@ -25,10 +28,9 @@ public class BreakableBulletBillLauncher : InteractableTile {
             //photon doesn't like serializing nulls
             tiles[i] = "";
 
-        object[] parametersParticle = new object[] { (Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), "DestructableBulletBillLauncher" };
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnResizableParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+        GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
 
-        BulkModifyTilemap(origin, new Vector2Int(1, height), tiles);
+        GameManager.Instance.BulkModifyTilemap(origin, new Vector2Int(1, height), tiles);
         return true;
     }
 
@@ -55,10 +57,5 @@ public class BreakableBulletBillLauncher : InteractableTile {
             searchVector += Vector3Int.down;
         }
         return height;
-    }
-
-    private void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tilenames) {
-        object[] parametersTile = new object[] { tileOrigin.x, tileOrigin.y, tileDimensions.x, tileDimensions.y, tilenames };
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetTileBatch, parametersTile, ExitGames.Client.Photon.SendOptions.SendReliable);
     }
 }

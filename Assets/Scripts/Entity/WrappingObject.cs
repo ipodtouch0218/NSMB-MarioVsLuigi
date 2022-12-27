@@ -1,33 +1,33 @@
 ﻿using UnityEngine;
 
-public class WrappingObject : MonoBehaviour {
+using Fusion;
 
-    private Rigidbody2D body;
+[RequireComponent(typeof(NetworkRigidbody2D))]
+public class WrappingObject : NetworkBehaviour {
+
+    private NetworkRigidbody2D nrb;
     private Vector2 width;
-    private float min, max;
 
-    public void Start() {
-        body = GetComponent<Rigidbody2D>();
-        if (!body)
-            body = GetComponentInParent<Rigidbody2D>();
+    public void Awake() {
+        nrb = GetComponent<NetworkRigidbody2D>();
+        if (!nrb)
+            nrb = GetComponentInParent<NetworkRigidbody2D>();
 
-        // null propagation is ok w/ GameManager.Instance
-        if (!(GameManager.Instance?.loopingLevel ?? false)) {
+        if (!nrb || !GameManager.Instance || !GameManager.Instance.loopingLevel) {
             enabled = false;
             return;
         }
 
-        min = GameManager.Instance.GetLevelMinX();
-        max = GameManager.Instance.GetLevelMaxX();
-        width = new(GameManager.Instance.levelWidthTile / 2f, 0);
+        width = new(GameManager.Instance.LevelWidth, 0);
     }
 
-    public void FixedUpdate() {
-        if (body.position.x < min) {
-            transform.position = body.position += width;
-        } else if (body.position.x > max) {
-            transform.position = body.position -= width;
+    public override void FixedUpdateNetwork() {
+        if (nrb.Rigidbody.position.x < GameManager.Instance.LevelMinX) {
+            Vector3 newPos = nrb.Rigidbody.position + width;
+            nrb.TeleportToPosition(newPos);
+        } else if (nrb.Rigidbody.position.x > GameManager.Instance.LevelMaxX) {
+            Vector3 newPos = nrb.Rigidbody.position - width;
+            nrb.TeleportToPosition(newPos);
         }
-        body.centerOfMass = Vector2.zero;
     }
 }

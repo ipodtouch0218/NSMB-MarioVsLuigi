@@ -1,4 +1,9 @@
-# NSMB-MarioVsLuigi
+<a href="https://ipodtouch0218.itch.io/nsmb-mariovsluigi">
+  <p align="center">
+    <img src="https://raw.githubusercontent.com/ipodtouch0218/NSMB-MarioVsLuigi/master/Assets/Sprites/UI/Menu/Title.png?raw=true" alt="NSMB-MarioVsLuigi Logo" width="350px">
+  </p>
+</a>
+
 A unity-standalone 2-10 player remake of the Mario vs. Luigi gamemode from the New Super Mario Bros DS download game. 
 
 Includes the 5 default levels (Grassland, Bricks, Castle, Pipes, and Ice), along with a handful of custom levels to battle on! 
@@ -28,7 +33,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 <details>
   <summary><h2>Opening in Unity Editor</h2></summary>
 
-1. Install Unity 2022.1.9f1 (or newer) via Unity Hub (Installs > Install Editor > Scroll to bottom, if you do not see the version of your choice here, switch to the "Archive" tab and open the "download archive" link)
+1. Install Unity 2022.2.1f1 (or newer) via Unity Hub (Installs > Install Editor > Scroll to bottom, if you do not see the version of your choice here, switch to the "Archive" tab and open the "download archive" link)
 2. Download and install [git](https://git-scm.com/downloads). Do NOT use the .zip download, as it will cause errors within Unity.
 3. Open Command Prompt (Windows) or Terminal (MacOS / Linux)
 4. Navigate to the folder you want the source code to be in using `cd <path>`. For example, `cd %USERPROFILE%\Documents` will save it in My Documents.
@@ -60,14 +65,17 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [@ShadowWalker13](https://github.com/ShadowWalker13)
 * [@GithubSPerez](https://github.com/GithubSPerez)
 * [@mindnomad](https://github.com/mindnomad)
+* [@Jeffjewett27](https://github.com/Jeffjewett27)
 
 ### Music:
 * [RENREN](https://mistajub.bandcamp.com/)
+* River J
 
 ### QA Testing:
 * TheCyVap
 * Shadow_Walker13
-  
+* Fawndue
+
 ### Level Design:
 * Skarph
 * TheCyVap

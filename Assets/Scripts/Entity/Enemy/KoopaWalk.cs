@@ -1,34 +1,65 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using Photon.Pun;
+using Fusion;
 using NSMB.Utils;
 
 public class KoopaWalk : HoldableEntity {
 
+    //---Static Variables
+    private static readonly Vector2 BlockOffset = new(0, 0.05f);
+
+    //---Networked Variables
+    [Networked] public TickTimer WakeupTimer { get; set; }
+    [Networked] public NetworkBool IsInShell { get; set; }
+    [Networked] public NetworkBool IsStationary { get; set; }
+    [Networked] public NetworkBool IsUpsideDown { get; set; }
+    [Networked] private Vector2 VelocityLastFrame { get; set; }
+
+    //---Serialized Variables
+    [SerializeField] private Sprite deadSprite;
+    [SerializeField] private Transform graphicsTransform;
     [SerializeField] private Vector2 outShellHitboxSize, inShellHitboxSize;
     [SerializeField] private Vector2 outShellHitboxOffset, inShellHitboxOffset;
     [SerializeField] protected float walkSpeed, kickSpeed, wakeup = 15;
+    [SerializeField] public bool dontFallOffEdges, blue, canBeFlipped = true, flipXFlip, putdown;
 
-    public bool IsStationary => !holder && stationary;
-    public bool red, blue, shell, stationary, upsideDown, canBeFlipped = true, flipXFlip, putdown;
+    //---Properties
+    public bool IsActuallyStationary => !Holder && IsStationary;
 
-    private BoxCollider2D worldHitbox;
-    private Vector2 blockOffset = new(0, 0.05f), velocityLastFrame;
-    private float dampVelocity, currentSpeed;
-    protected float wakeupTimer;
-    protected int combo;
+    //---Private Variables
+    private float dampVelocity;
 
-    #region Unity Methods
-    public override void Start() {
-        base.Start();
-        hitbox = transform.GetChild(0).GetComponent<BoxCollider2D>();
-        worldHitbox = GetComponent<BoxCollider2D>();
+    public override void Render() {
+        if (IsFrozen || IsDead)
+            return;
 
-        body.velocity = new Vector2(-walkSpeed, 0);
+        //Renderer flip
+        sRenderer.flipX = FacingRight ^ flipXFlip;
+
+        //Animation
+        animator.SetBool("shell", IsInShell || Holder != null);
+        animator.SetFloat("xVel", IsStationary ? 0 : Mathf.Abs(body.velocity.x));
+
+        //"Flip" rotation
+        float remainingWakeupTimer = WakeupTimer.RemainingTime(Runner) ?? 0f;
+        if (IsUpsideDown) {
+            dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
+            graphicsTransform.eulerAngles = new Vector3(
+                graphicsTransform.eulerAngles.x,
+                graphicsTransform.eulerAngles.y,
+                Mathf.Lerp(graphicsTransform.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
+        } else {
+            dampVelocity = 0;
+            graphicsTransform.eulerAngles = new Vector3(
+                graphicsTransform.eulerAngles.x,
+                graphicsTransform.eulerAngles.y,
+                remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
+        }
     }
 
-    public override void FixedUpdate() {
+    public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.gameover) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -36,215 +67,66 @@ public class KoopaWalk : HoldableEntity {
             body.isKinematic = true;
             return;
         }
-        base.FixedUpdate();
 
-        if (Frozen || dead)
+        if (IsFrozen || IsDead)
             return;
 
-        sRenderer.flipX = !left ^ flipXFlip;
+        if (IsInShell) {
+            hitbox.size = inShellHitboxSize;
+            hitbox.offset = inShellHitboxOffset;
 
-        if (upsideDown) {
-            dampVelocity = Mathf.Min(dampVelocity + Time.fixedDeltaTime * 3, 1);
-            transform.eulerAngles = new Vector3(
-                transform.eulerAngles.x,
-                transform.eulerAngles.y,
-                Mathf.Lerp(transform.eulerAngles.z, 180f, dampVelocity) + (wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0));
-        } else {
-            dampVelocity = 0;
-            transform.eulerAngles = new Vector3(
-                transform.eulerAngles.x,
-                transform.eulerAngles.y,
-                wakeupTimer < 3 && wakeupTimer > 0 ? (Mathf.Sin(wakeupTimer * 120f) * 15f) : 0);
-        }
+            if (IsStationary) {
+                if (physics.OnGround)
+                    body.velocity = new(0, body.velocity.y);
 
-        if (shell) {
-            worldHitbox.size = hitbox.size = inShellHitboxSize;
-            worldHitbox.offset = hitbox.offset = inShellHitboxOffset;
-
-            if (stationary) {
-                if (physics.onGround)
-                    body.velocity = new Vector2(0, body.velocity.y);
-                if ((wakeupTimer -= Time.fixedDeltaTime) < 0) {
-                    if (photonView.IsMine)
-                        photonView.RPC(nameof(WakeUp), RpcTarget.All);
+                if (WakeupTimer.Expired(Runner)) {
+                    WakeUp();
+                    WakeupTimer = TickTimer.None;
                 }
-            } else {
-                wakeupTimer = wakeup;
             }
         } else {
-            worldHitbox.size = hitbox.size = outShellHitboxSize;
-            worldHitbox.offset = hitbox.offset = outShellHitboxOffset;
+            hitbox.size = outShellHitboxSize;
+            hitbox.offset = outShellHitboxOffset;
         }
 
-        if (physics.hitRight && !left) {
-            if (photonView && photonView.IsMine) {
-                photonView.RPC(nameof(Turnaround), RpcTarget.All, false, velocityLastFrame.x);
-            } else {
-                Turnaround(false, velocityLastFrame.x);
-            }
-        } else if (physics.hitLeft && left) {
-            if (photonView && photonView.IsMine) {
-                photonView.RPC(nameof(Turnaround), RpcTarget.All, true, velocityLastFrame.x);
-            } else {
-                Turnaround(true, velocityLastFrame.x);
-            }
+        physics.UpdateCollisions();
+
+        if (physics.HitRight && FacingRight) {
+            Turnaround(false, VelocityLastFrame.x);
+        } else if (physics.HitLeft && !FacingRight) {
+            Turnaround(true, VelocityLastFrame.x);
         }
 
-        if (physics.onGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && red && !shell) {
-            Vector3 redCheckPos = body.position + new Vector2(0.1f * (left ? -1 : 1), 0);
+        if (physics.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
+            Vector3 redCheckPos = body.position + new Vector2(0.1f * (FacingRight ? 1 : -1), 0);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref redCheckPos);
 
-            if (!Physics2D.Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround)) {
-                if (photonView && photonView.IsMine) {
-                    photonView.RPC(nameof(Turnaround), RpcTarget.All, left, velocityLastFrame.x);
-                } else {
-                    Turnaround(left, velocityLastFrame.x);
-                }
-            }
+            //turn around if no ground
+            if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
+                Turnaround(!FacingRight, VelocityLastFrame.x);
         }
 
-        if (physics.onGround) {
-            if (stationary) {
-                //body.velocity = new(body.velocity.x, 0);
-            } else {
-                body.velocity = new Vector2((shell ? currentSpeed : walkSpeed) * (left ? -1 : 1), body.velocity.y);
-            }
-        }
-
-        velocityLastFrame = body.velocity;
-
-        if (!photonView.IsMineOrLocal())
-            return;
+        if (!IsStationary)
+            body.velocity = new((IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
         HandleTile();
-        animator.SetBool("shell", shell || holder != null);
-        animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
+        VelocityLastFrame = body.velocity;
     }
 
-    public new void OnTriggerEnter2D(Collider2D collider) {
-        if (!shell)
-            base.OnTriggerEnter2D(collider);
-
-        if (!photonView.IsMineOrLocal() || !shell || IsStationary || putdown || dead)
-            return;
-
-        GameObject obj = collider.gameObject;
-        KillableEntity killa = obj.GetComponentInParent<KillableEntity>();
-        switch (obj.tag) {
-        case "koopa":
-        case "bobomb":
-        case "bulletbill":
-        case "frozencube":
-        case "goomba":
-            if (killa.dead)
-                break;
-            killa.photonView.RPC(nameof(SpecialKill), RpcTarget.All, killa.body.position.x > body.position.x, false, combo++);
-            if (holder)
-                photonView.RPC(nameof(SpecialKill), RpcTarget.All, killa.body.position.x < body.position.x, false, combo++);
-            break;
-        case "piranhaplant":
-            if (killa.dead)
-                break;
-            killa.photonView.RPC(nameof(Kill), RpcTarget.All);
-            if (holder)
-                photonView.RPC(nameof(Kill), RpcTarget.All);
-
-            break;
-        case "coin":
-            if (!holder && !stationary && previousHolder)
-                previousHolder.photonView.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.AllViaServer, obj.GetPhotonView().ViewID, new Vector2(obj.transform.position.x, collider.transform.position.y));
-            break;
-        case "loosecoin":
-            if (!holder && !stationary && previousHolder) {
-                Transform parent = obj.transform.parent;
-                previousHolder.photonView.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.AllViaServer, parent.gameObject.GetPhotonView().ViewID, (Vector2) parent.position);
-            }
-            break;
-        }
-    }
-
-    #endregion
-
-    #region Public Methods
-    public override void InteractWithPlayer(PlayerController player) {
-        Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = damageDirection.y > 0;
-        if (holder)
-            return;
-
-
-        if (shell && blue && player.groundpound && !player.onGround) {
-            photonView.RPC(nameof(BlueBecomeItem), RpcTarget.All);
-            return;
-        }
-        if (!attackedFromAbove && player.state == Enums.PowerupState.BlueShell && player.crouching && !player.inShell) {
-            player.body.velocity = new(0, player.body.velocity.y);
-            photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x > 0);
-        } else if (player.sliding || player.inShell || player.invincible > 0 || player.state == Enums.PowerupState.MegaMushroom) {
-            bool originalFacing = player.facingRight;
-            if (shell && !stationary && player.inShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                player.photonView.RPC(nameof(PlayerController.Knockback), RpcTarget.All, player.body.position.x < body.position.x, 0, true, photonView.ViewID);
-            photonView.RPC(nameof(SpecialKill), RpcTarget.All, !originalFacing, false, player.StarCombo++);
-        } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
-            photonView.RPC(nameof(EnterShell), RpcTarget.All);
-            if (!blue) {
-                photonView.RPC(nameof(Kick), RpcTarget.All, player.body.position.x < body.position.x, 1f, player.groundpound);
-                player.photonView.RPC(nameof(PlayerController.SetHoldingOld), RpcTarget.All, photonView.ViewID);
-                previousHolder = player;
-            }
-        } else if (attackedFromAbove && (!shell || !IsStationary)) {
-            if (player.state == Enums.PowerupState.MiniMushroom) {
-                if (player.groundpound) {
-                    player.groundpound = false;
-                    photonView.RPC(nameof(EnterShell), RpcTarget.All);
-                }
-                player.bounce = true;
-            } else {
-                photonView.RPC(nameof(EnterShell), RpcTarget.All);
-                player.bounce = !player.groundpound;
-            }
-            player.photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
-            player.drill = false;
-        } else {
-            if (shell && IsStationary) {
-                if (!holder) {
-                    if (player.CanPickup()) {
-                        photonView.RPC(nameof(Pickup), RpcTarget.All, player.photonView.ViewID);
-                        player.photonView.RPC(nameof(PlayerController.SetHolding), RpcTarget.All, photonView.ViewID);
-                    } else {
-                        photonView.RPC(nameof(Kick), RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);
-                        player.photonView.RPC(nameof(PlayerController.SetHoldingOld), RpcTarget.All, photonView.ViewID);
-                        previousHolder = player;
-                    }
-                }
-            } else if (player.hitInvincibilityCounter <= 0) {
-                player.photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
-                if (!shell)
-                    photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x < 0);
-            }
-        }
-    }
-    #endregion
-
-    #region Helper Methods
     private void HandleTile() {
-        if (holder)
+        if (Holder)
             return;
-        physics.UpdateCollisions();
 
-        ContactPoint2D[] collisions = new ContactPoint2D[20];
-        int collisionAmount = worldHitbox.GetContacts(collisions);
+        int collisionAmount = hitbox.GetContacts(ContactBuffer);
         for (int i = 0; i < collisionAmount; i++) {
-            var point = collisions[i];
+            ContactPoint2D point = ContactBuffer[i];
             Vector2 p = point.point + (point.normal * -0.15f);
             if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
-                if (!putdown && shell && !stationary) {
-                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + blockOffset);
+                if (!putdown && IsInShell && !IsStationary) {
+                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + BlockOffset);
                     TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
-                    if (tile == null)
-                        continue;
-                    if (!shell)
+                    if (!tile || !IsInShell)
                         continue;
 
                     if (tile is InteractableTile it)
@@ -256,126 +138,225 @@ public class KoopaWalk : HoldableEntity {
             }
         }
     }
-    #endregion
 
-    #region PunRPCs
-    [PunRPC]
-    public override void Freeze(int cube) {
-        base.Freeze(cube);
-        stationary = true;
-    }
-
-    [PunRPC]
-    public override void Kick(bool fromLeft, float kickFactor, bool groundpound) {
-        left = !fromLeft;
-        stationary = false;
-        currentSpeed = kickSpeed + 1.5f * kickFactor;
-        body.velocity = new Vector2(currentSpeed * (left ? -1 : 1), groundpound ? 3.5f : 0);
-        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
-    }
-
-    [PunRPC]
-    public override void Throw(bool facingLeft, bool crouch, Vector2 pos) {
-        if (holder == null)
-            return;
-
-        stationary = crouch;
-        currentSpeed = kickSpeed + 1.5f * (Mathf.Abs(holder.body.velocity.x) / holder.RunningMaxSpeed);
-        body.position = pos;
-
-        Debug.DrawLine(body.position + hitbox.offset - hitbox.size / 2f, body.position + hitbox.offset + hitbox.size / 2f, Color.white, 10f);
-        if (Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size))
-            transform.position = body.position = new Vector2(holder.transform.position.x, transform.position.y);
-
-        previousHolder = holder;
-        holder = null;
-        shell = true;
-        photonView.TransferOwnership(PhotonNetwork.MasterClient);
-        left = facingLeft;
-        if (crouch) {
-            body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
-            putdown = true;
-        } else {
-            body.velocity = new Vector2(currentSpeed * (facingLeft ? -1 : 1), body.velocity.y);
-        }
-    }
-    [PunRPC]
     public void WakeUp() {
-        shell = false;
-        body.velocity = new Vector2(-walkSpeed, 0);
-        left = true;
-        upsideDown = false;
-        stationary = false;
-        if (holder && photonView.IsMine)
-            holder.photonView.RPC("HoldingWakeup", RpcTarget.All);
-        holder = null;
-        previousHolder = null;
+        IsInShell = false;
+        body.velocity = new(-walkSpeed, 0);
+        FacingRight = false;
+        IsUpsideDown = false;
+        IsStationary = false;
+
+        if (Holder)
+            Holder.SetHeldEntity(null);
+
+        Holder = null;
+        PreviousHolder = null;
     }
-    [PunRPC]
-    public void EnterShell() {
-        if (blue && !shell) {
+
+    public void EnterShell(bool becomeItem, PlayerController player) {
+        if (blue && !IsInShell && becomeItem) {
             BlueBecomeItem();
             return;
         }
         body.velocity = Vector2.zero;
-        wakeupTimer = wakeup;
-        combo = 0;
-        shell = true;
-        stationary = true;
+        WakeupTimer = TickTimer.CreateFromSeconds(Runner, wakeup);
+        ComboCounter = 0;
+        IsInShell = true;
+        IsStationary = true;
+
+        if (player) {
+            Holder = null;
+            PreviousHolder = player;
+            ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
+        }
     }
-    [PunRPC]
+
     public void BlueBecomeItem() {
-        if (photonView.IsMine)
-            PhotonNetwork.Destroy(photonView);
-
-        if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.Instantiate("Prefabs/Powerup/BlueShell", transform.position, Quaternion.identity, 0, new object[] { 0.1f });
+        Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
+            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
+        });
+        Runner.Despawn(Object);
     }
 
-    [PunRPC]
+
     protected void Turnaround(bool hitWallOnLeft, float x) {
-        if (IsStationary)
+        if (IsActuallyStationary)
             return;
 
-        if (shell && hitWallOnLeft != left)
+        if (Runner.IsForward && IsInShell && hitWallOnLeft != FacingRight)
             PlaySound(Enums.Sounds.World_Block_Bump);
 
-        left = !hitWallOnLeft;
-        body.velocity = new Vector2((x > 0.5f ? Mathf.Abs(x) : currentSpeed) * (left ? -1 : 1), body.velocity.y);
-        if (shell)
-            PlaySound(Enums.Sounds.World_Block_Bump);
+        FacingRight = hitWallOnLeft;
+        body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
     }
 
-    [PunRPC]
-    public void Bump() {
-        if (dead)
+
+    //---IPlayerInteractable overrides
+    public override void InteractWithPlayer(PlayerController player) {
+
+        //don't interact with our lovely holder
+        if (Holder == player)
             return;
 
-        if (!shell) {
-            stationary = true;
+        //temporary invincibility
+        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+            return;
+
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = damageDirection.y > 0;
+
+        //TODO: refactor
+
+        if (IsInShell && blue && player.IsGroundpounding && !player.IsOnGround) {
+            BlueBecomeItem();
+            return;
+        }
+        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
+            player.body.velocity = new(0, player.body.velocity.y);
+            FacingRight = damageDirection.x < 0;
+
+        } else if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
+            bool originalFacing = player.FacingRight;
+            if (IsInShell && !IsStationary && player.IsInShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
+                player.DoKnockback(player.body.position.x < body.position.x, 0, true, gameObject);
+
+            SpecialKill(!originalFacing, false, player.StarCombo++);
+
+        } else if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
+            EnterShell(true, player);
+            if (!blue) {
+                Kick(player, player.body.position.x < body.position.x, 1f, player.IsGroundpounding);
+                PreviousHolder = player;
+            }
+
+        } else if (attackedFromAbove && (!IsInShell || !IsActuallyStationary)) {
+            if (player.State == Enums.PowerupState.MiniMushroom) {
+                if (player.IsGroundpounding) {
+                    player.IsGroundpounding = false;
+                    EnterShell(true, player);
+                }
+                player.DoEntityBounce = true;
+            } else {
+                EnterShell(true, player);
+                player.DoEntityBounce = !player.IsGroundpounding;
+            }
+            PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+            player.IsDrilling = false;
+        } else {
+            if (IsInShell && IsActuallyStationary) {
+                if (!Holder) {
+                    if (player.CanPickupItem) {
+                        Pickup(player);
+                    } else {
+                        Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                        PreviousHolder = player;
+                    }
+                }
+            } else if (player.IsDamageable) {
+                player.Powerdown(false);
+                if (!IsInShell)
+                    FacingRight = damageDirection.x > 0;
+            }
+        }
+    }
+
+    //---IBlockBumpable overrides
+    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+        if (IsDead)
+            return;
+
+        if (!IsInShell) {
+            IsStationary = true;
             putdown = true;
         }
-        wakeupTimer = wakeup;
-        shell = true;
-        upsideDown = canBeFlipped;
-        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
-        body.velocity = new Vector2(body.velocity.x, 5.5f);
+
+        EnterShell(false, bumper as PlayerController);
+        IsUpsideDown = canBeFlipped;
+        body.velocity = new(body.velocity.x, 5.5f);
+
+        if (IsStationary) {
+            body.velocity = new(bumper.body.position.x < body.position.x ? 1f : -1f, body.velocity.y);
+            physics.OnGround = false;
+        }
+
+        if (Runner.IsForward)
+            PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
-    [PunRPC]
+    //---FreezableEntity overrides
+    public override void Freeze(FrozenCube cube) {
+        base.Freeze(cube);
+        IsStationary = true;
+    }
+
+    //---KillableEntity overrides
+    protected override void CheckForEntityCollisions() {
+
+        if (!(!IsInShell || IsActuallyStationary || putdown || IsDead)) {
+
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
+
+            for (int i = 0; i < count; i++) {
+                GameObject obj = CollisionBuffer[i].gameObject;
+
+                if (obj == gameObject)
+                    continue;
+
+                //killable entities
+                if (obj.TryGetComponent(out KillableEntity killable)) {
+                    if (killable.IsDead)
+                        continue;
+
+                    //kill entity we ran into
+                    killable.SpecialKill((killable.body ? killable.body.position.x : killable.transform.position.x) > body.position.x, false, ComboCounter++);
+
+                    //kill ourselves if we're being held too
+                    if (Holder)
+                        SpecialKill(killable.body.position.x < body.position.x, false, 0);
+
+                    continue;
+                }
+
+                //coins
+                if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
+                    coin.InteractWithPlayer(PreviousHolder);
+                    continue;
+                }
+            }
+        }
+
+        base.CheckForEntityCollisions();
+    }
+
     public override void Kill() {
-        EnterShell();
+        EnterShell(false, null);
     }
 
-    [PunRPC]
     public override void SpecialKill(bool right, bool groundpound, int combo) {
         base.SpecialKill(right, groundpound, combo);
-        shell = true;
-        if (holder)
-            holder.photonView.RPC("SetHolding", RpcTarget.All, -1);
-
-        holder = null;
     }
 
-    #endregion
+    public override void OnIsDeadChanged() {
+        base.OnIsDeadChanged();
+        if (IsDead)
+            sRenderer.sprite = deadSprite;
+    }
+
+    //---ThrowableEntity overrides
+    public override void Kick(PlayerController thrower, bool toRight, float kickFactor, bool groundpound) {
+        base.Kick(thrower, toRight, kickFactor, groundpound);
+        IsStationary = false;
+        WakeupTimer = TickTimer.None;
+    }
+
+    public override void Throw(bool toRight, bool crouch) {
+        throwSpeed = CurrentKickSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.velocity.x) / Holder.RunningMaxSpeed);
+        base.Throw(toRight, crouch);
+
+        IsStationary = crouch;
+        IsInShell = true;
+        if (!crouch)
+            WakeupTimer = TickTimer.None;
+        putdown = crouch;
+    }
 }

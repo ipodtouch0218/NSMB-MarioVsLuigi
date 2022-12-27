@@ -1,50 +1,55 @@
 using UnityEngine;
-using Photon.Pun;
 
+using Fusion;
 using NSMB.Utils;
 
-public class RespawningInvisibleBlock : MonoBehaviour {
+public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
 
-    private double bumpTime;
+    private static readonly Vector3 BlockOffset = new(0.25f, 0.25f);
+    private static readonly Color GizmoColor = new(1, 1, 1, 0.5f);
 
-    public void OnTriggerEnter2D(Collider2D collision) {
-        Vector3Int tileLocation = Utils.WorldToTilemapPosition(transform.position);
+    //---Networked Variables
+    [Networked] private TickTimer BumpTimer { get; set; }
 
-        if (PhotonNetwork.Time - bumpTime < 0)
+    //---Serialized Variables
+    [SerializeField] private string bumpTile = "SpecialTiles/YellowQuestion";
+    [SerializeField] private string resultTile = "SpecialTiles/EmptyYellowQuestion";
+
+    public void InteractWithPlayer(PlayerController player) {
+        if (!BumpTimer.ExpiredOrNotRunning(Runner))
             return;
 
+        //no block can be at our location
+        Vector3Int tileLocation = Utils.WorldToTilemapPosition(transform.position);
         if (Utils.GetTileAtTileLocation(tileLocation) != null)
             return;
 
-        if (collision.gameObject.GetComponent<PlayerController>() is not PlayerController player)
-            return;
-
-        if (!player.photonView.IsMine)
-            return;
-
-        Rigidbody2D body = collision.attachedRigidbody;
+        //player has to be moving upwards
         if (player.previousFrameVelocity.y <= 0)
             return;
 
-        BoxCollider2D bc = collision as BoxCollider2D;
-        if (bc == null)
-            return;
-        if (body.position.y + (bc.size.y * body.transform.lossyScale.y) - (player.previousFrameVelocity.y * Time.fixedDeltaTime) > transform.position.y)
+        //player has to bump us from below
+        if (player.body.position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.previousFrameVelocity.y * Runner.DeltaTime) > transform.position.y)
             return;
 
-        DoBump(tileLocation, collision.gameObject.GetPhotonView());
-        bumpTime = PhotonNetwork.Time + 0.25d;
-        collision.attachedRigidbody.velocity = new(body.velocity.x, 0);
+        BumpTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+        DoBump(tileLocation, player);
+
+        //stop player velocity
+        player.body.velocity = new(player.body.velocity.x, 0);
     }
 
-    public void DoBump(Vector3Int tileLocation, PhotonView player) {
-        player.RPC(nameof(PlayerController.AttemptCollectCoin), RpcTarget.All, -1, (Vector2) Utils.TilemapToWorldPosition(tileLocation) + Vector2.one / 4f);
+    public void DoBump(Vector3Int tileLocation, PlayerController player) {
+        Vector3 location = Utils.TilemapToWorldPosition(tileLocation) + BlockOffset;
+        Coin.GivePlayerCoin(player, location);
 
-        object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, false, "SpecialTiles/EmptyYellowQuestion", "Coin" };
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SetThenBumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
+        if (GameManager.Instance.Object.HasStateAuthority) {
+            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
+                resultTile, false, Vector2.zero, true, NetworkPrefabRef.Empty);
+        }
     }
 
     public void OnDrawGizmos() {
-        Gizmos.DrawIcon(transform.position, "HiddenBlock", true, new Color(1, 1, 1, 0.5f));
+        Gizmos.DrawIcon(transform.position, "HiddenBlock", true, GizmoColor);
     }
 }

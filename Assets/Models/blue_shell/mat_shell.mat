@@ -96,7 +96,8 @@ Material:
     m_Floats:
     - IsEyeTexture: 0
     - OutlineSize: 0.02
-    - PowerupState: -1.66
+    - PowerupState: 0
+    - RainbowEnabled: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -113,6 +114,7 @@ Material:
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
+    - _MultiPowerupMaterial: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _QueueControl: 1
@@ -127,7 +129,10 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - MultiplyColor: {r: 1, g: 1, b: 1, a: 0}
     - OutlineColor: {r: 0, g: 0, b: 0, a: 0}
+    - OverallsColor: {r: 0, g: 0, b: 0, a: 0}
+    - ShirtColor: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
@@ -145,4 +150,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 6
+  version: 7

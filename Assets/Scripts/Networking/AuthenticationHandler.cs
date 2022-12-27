@@ -1,13 +1,16 @@
+using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Networking;
 
-using Photon.Pun;
-using Photon.Realtime;
+using Fusion.Photon.Realtime;
 
 public class AuthenticationHandler {
 
     private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
 
-    public static void Authenticate(string userid, string token, string region) {
+    public async static Task<AuthenticationValues> Authenticate(string userid, string token) {
 
         string request = URL + "?";
         if (userid != null)
@@ -22,25 +25,51 @@ public class AuthenticationHandler {
         client.disposeDownloadHandlerOnDispose = true;
         client.disposeUploadHandlerOnDispose = true;
 
-        UnityWebRequestAsyncOperation resp = client.SendWebRequest();
-        resp.completed += (a) => {
-            if (client.result != UnityWebRequest.Result.Success) {
-                if (MainMenuManager.Instance) {
-                    MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode);
-                    MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
-                }
-                return;
+        await client.SendWebRequest();
+
+        if (client.result != UnityWebRequest.Result.Success) {
+            if (MainMenuManager.Instance) {
+                MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode);
+                //MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
             }
+            return null;
+        }
 
-            AuthenticationValues values = new();
-            values.AuthType = CustomAuthenticationType.Custom;
-            values.UserId = userid;
-            values.AddAuthParameter("data", client.downloadHandler.text.Trim());
-            PhotonNetwork.AuthValues = values;
+        AuthenticationValues values = new();
+        values.AuthType = CustomAuthenticationType.Custom;
+        values.UserId = userid;
+        values.AddAuthParameter("data", client.downloadHandler.text.Trim());
 
-            PhotonNetwork.ConnectToRegion(region);
+        client.Dispose();
 
-            client.Dispose();
-        };
+        return values;
+    }
+}
+
+public class UnityWebRequestAwaiter : INotifyCompletion {
+    private UnityWebRequestAsyncOperation asyncOp;
+    private Action continuation;
+
+    public UnityWebRequestAwaiter(UnityWebRequestAsyncOperation asyncOp) {
+        this.asyncOp = asyncOp;
+        asyncOp.completed += OnRequestCompleted;
+    }
+
+    public bool IsCompleted => asyncOp.isDone;
+
+    public void GetResult() { }
+
+    public void OnCompleted(Action continuation) {
+        this.continuation = continuation;
+    }
+
+    private void OnRequestCompleted(AsyncOperation obj) {
+        continuation();
+    }
+}
+
+public static class ExtensionMethods {
+    public static UnityWebRequestAwaiter GetAwaiter(this UnityWebRequestAsyncOperation asyncOp) {
+        return new UnityWebRequestAwaiter(asyncOp);
     }
 }

@@ -1,34 +1,33 @@
 using UnityEngine;
-using Photon.Pun;
 
-public class GenericMover : MonoBehaviour {
+using Fusion;
 
-    public AnimationCurve x;
-    public AnimationCurve y;
+public class GenericMover : NetworkBehaviour {
 
-    public float animationTimeSeconds = 1;
+    //---Networked Variables
+    [Networked] private Vector3 Origin { get; set; }
 
-    private Vector3? origin = null;
-    private double timestamp = 0;
+    //---Serialized Variables
+    [SerializeField] private AnimationCurve x, y;
+    [SerializeField] private float animationOffset = 0;
 
-    public void Awake() {
-        if (origin == null)
-            origin = transform.position;
+    public override void Spawned() {
+        Origin = transform.position;
     }
 
-    public void Update() {
-        int start = GameManager.Instance.startServerTime;
+    public override void FixedUpdateNetwork() {
+        float secondsElapsed = Runner.SimulationTime - GameManager.Instance.GameStartTime;
+        float xOffset = EvaluateCurve(x, animationOffset, secondsElapsed);
+        float yOffset = EvaluateCurve(y, animationOffset, secondsElapsed);
 
-        if (PhotonNetwork.Time <= timestamp) {
-            timestamp += Time.deltaTime;
-        } else {
-            timestamp = (float) PhotonNetwork.Time;
-        }
+        transform.position = Origin + new Vector3(xOffset, yOffset,0);
+    }
 
-        double time = timestamp - (start / (double) 1000);
-        time /= animationTimeSeconds;
-        time %= animationTimeSeconds;
+    private static float EvaluateCurve(AnimationCurve curve, double offset, double time) {
+        if (curve.length <= 0)
+            return 0;
 
-        transform.position = (origin ?? default) + new Vector3(x.Evaluate((float) time), y.Evaluate((float) time), 0);
+        float end = curve.keys[^1].time;
+        return curve.Evaluate((float) ((time + (offset * end)) % end));
     }
 }

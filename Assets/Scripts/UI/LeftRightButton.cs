@@ -1,28 +1,30 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class LeftRightButton : Selectable {
 
-    public GameObject leftArrow;
-    public GameObject rightArrow;
-    public float cutoff = 0.6f, offset = 10;
+    //---Serialized Variables
+    [SerializeField] private GameObject leftArrow;
+    [SerializeField] private GameObject rightArrow;
+    [SerializeField] private float cutoff = 0.6f;
 
-    bool leftSelected, rightSelected;
-    float leftOffset, rightOffset;
-    RectTransform leftTransform, rightTransform;
+    //---Private Variables
+    private bool leftSelected, rightSelected;
+    private float leftOffset, rightOffset;
+    private RectTransform leftTransform, rightTransform;
 
     protected override void OnEnable() {
         base.OnEnable();
-        InputSystem.controls.Player.Movement.performed += OnNavigation;
-        InputSystem.controls.Player.Movement.canceled += OnNavigation;
+        ControlSystem.controls.Player.Movement.performed += OnNavigation;
+        ControlSystem.controls.Player.Movement.canceled +=  OnNavigation;
     }
 
     protected override void OnDisable() {
         base.OnDisable();
-        InputSystem.controls.Player.Movement.performed -= OnNavigation;
-        InputSystem.controls.Player.Movement.canceled -= OnNavigation;
+        ControlSystem.controls.Player.Movement.performed -= OnNavigation;
+        ControlSystem.controls.Player.Movement.canceled -=  OnNavigation;
     }
 
     protected override void Start() {
@@ -47,7 +49,7 @@ public class LeftRightButton : Selectable {
         if (Vector2.Dot(direction, Vector2.left) > cutoff) {
             //select left
             if (!leftSelected) {
-                GameManager.Instance.SpectationManager.SpectatePreviousPlayer();
+                GameManager.Instance.spectationManager.SpectatePreviousPlayer();
                 SetOffset(false, true);
             }
             leftSelected = true;
@@ -59,7 +61,7 @@ public class LeftRightButton : Selectable {
         if (Vector2.Dot(direction, Vector2.right) > cutoff) {
             //select left
             if (!rightSelected) {
-                GameManager.Instance.SpectationManager.SpectateNextPlayer();
+                GameManager.Instance.spectationManager.SpectateNextPlayer();
                 SetOffset(true, true);
             }
             rightSelected = true;
