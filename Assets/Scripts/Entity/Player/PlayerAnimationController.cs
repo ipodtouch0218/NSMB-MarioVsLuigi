@@ -253,7 +253,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("turnaround",     controller.IsTurnaround);
 
         float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.FloorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.FloorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);
-        if (controller.stuckInBlock) {
+        if (controller.IsStuckInBlock) {
             animatedVelocity = 0;
         } else if (controller.IsPropellerFlying) {
             animatedVelocity = 2.5f;

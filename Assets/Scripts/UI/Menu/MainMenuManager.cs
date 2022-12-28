@@ -43,7 +43,7 @@ public class MainMenuManager : MonoBehaviour {
     [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
     [SerializeField] private GameObject errorBox, errorButton;
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
-    [SerializeField] private Button createRoomBtn, startGameBtn;
+    [SerializeField] private Button createRoomBtn, joinRoomBtn, startGameBtn;
     [SerializeField] private TMP_InputField nicknameField, chatTextField;
     [SerializeField] private TMP_Text errorText, lobbyHeaderText, updateText;
     [SerializeField] private ScrollRect settingsScroll;
@@ -177,6 +177,7 @@ public class MainMenuManager : MonoBehaviour {
         bool connected = Runner && Runner.State == NetworkRunner.States.Starting && Runner.IsCloudReady;
         connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
 
+        joinRoomBtn.interactable = connected && roomManager.SelectedRoom != null;
         createRoomBtn.interactable = connected && validName;
         regionDropdown.interactable = connected;
     }

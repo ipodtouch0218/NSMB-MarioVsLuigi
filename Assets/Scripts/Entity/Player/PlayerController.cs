@@ -75,7 +75,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public TickTimer WallSlideEndTimer { get; set; }
     [Networked] public NetworkBool WallSlideLeft { get; set; }
     [Networked] public NetworkBool WallSlideRight { get; set; }
-
+    //Stuck
+    [Networked] public NetworkBool IsStuckInBlock { get; set; }
     //-Death & Respawning
     [Networked(OnChanged = nameof(OnDeadChanged))] public NetworkBool IsDead { get; set; } = false;
     [Networked(OnChanged = nameof(OnRespawningChanged))] public NetworkBool IsRespawning { get; set; }
@@ -151,7 +152,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [SerializeField] private GameObject models;
     [SerializeField] public CharacterData character;
 
-    public bool crushGround, hitRoof, groundpoundLastFrame, hitBlock, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, stationaryGiantEnd, fireballKnockback, startedSliding;
+    public bool crushGround, hitRoof, groundpoundLastFrame, hitBlock, hitLeft, hitRight, stationaryGiantEnd, fireballKnockback, startedSliding;
     public float jumpLandingTimer, powerupFlash;
 
     //MOVEMENT STAGES
@@ -1411,7 +1412,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void HandleLayerState() {
-        bool hitsNothing = animator.GetBool("pipe") || IsDead || stuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
+        bool hitsNothing = animator.GetBool("pipe") || IsDead || IsStuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
 
         gameObject.layer = hitsNothing ? Layers.LayerHitsNothing : Layers.LayerPlayer;
     }
@@ -1900,10 +1901,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f, false)) {
-            alreadyStuckInBlock = stuckInBlock = false;
+            IsStuckInBlock = false;
             return false;
         }
-        stuckInBlock = true;
+        bool wasStuckLastFrame = IsStuckInBlock;
+        IsStuckInBlock = true;
         body.gravityScale = 0;
         body.velocity = Vector2.zero;
         IsGroundpounding = false;
@@ -1912,7 +1914,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsSpinnerFlying = false;
         IsOnGround = true;
 
-        if (!alreadyStuckInBlock) {
+        if (!wasStuckLastFrame) {
             // Code for mario to instantly teleport to the closest free position when he gets stuck
 
             //prevent mario from clipping to the floor if we got pushed in via our hitbox changing (shell on ice, for example)
@@ -1958,12 +1960,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 Vector2 lastPos = checkPos;
                 checkPos += new Vector2(Mathf.Cos(radAngle) * travelDistance, Mathf.Sin(radAngle) * travelDistance);
                 transform.position = body.position = new(checkPos.x, body.position.y + (checkPos.y - lastPos.y));
-                stuckInBlock = false;
+                IsStuckInBlock = false;
                 return false; // Freed
             }
         }
 
-        alreadyStuckInBlock = true;
         body.velocity = Vector2.right * 2f;
         return true;
     }
