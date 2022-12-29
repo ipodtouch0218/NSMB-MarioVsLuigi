@@ -333,18 +333,23 @@ public class GameManager : NetworkBehaviour {
         }
 
         yield return new WaitForSecondsRealtime(1);
-        text.GetComponent<Animator>().SetTrigger("start");
 
         bool draw = winningTeam == -1;
         bool win = !draw && winningTeam == Runner.GetLocalPlayerData().Team;
         int secondsUntilMenu = draw ? 5 : 4;
 
-        if (draw)
+        if (draw) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Draw);
-        else if (win)
+            text.GetComponent<Animator>().SetTrigger("startNegative");
+        }
+        else if (win) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Win);
-        else
+            text.GetComponent<Animator>().SetTrigger("start");
+        }
+        else {
             music.PlayOneShot(Enums.Sounds.UI_Match_Lose);
+            text.GetComponent<Animator>().SetTrigger("startNegative");
+        }
 
         //TODO: make a results screen?
 
