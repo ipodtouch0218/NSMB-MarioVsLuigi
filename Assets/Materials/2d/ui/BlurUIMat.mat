@@ -60,7 +60,7 @@ Material:
     - _ColorMask: 15
     - _Cull: 2
     - _Cutoff: 0.5
-    - _Distance: 0.002
+    - _Distance: 0.0015
     - _DstBlend: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0

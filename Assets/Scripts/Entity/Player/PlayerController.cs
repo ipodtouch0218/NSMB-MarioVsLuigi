@@ -740,9 +740,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     #region -- POWERUP / POWERDOWN --
 
-    public void Powerdown(bool ignoreInvincible) {
-        if (ignoreInvincible || !IsDamageable)
-            return;
+    public bool Powerdown(bool ignoreInvincible) {
+        if (!ignoreInvincible && !IsDamageable)
+            return false;
 
         PreviousState = State;
         bool nowDead = false;
@@ -779,6 +779,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
             PlaySound(Enums.Sounds.Player_Sound_Powerdown);
         }
+        return true;
     }
     #endregion
 
@@ -1302,7 +1303,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         HeldEntity = entity;
 
-        if (HeldEntity != null) {
+        if (HeldEntity) {
             HeldEntity.Holder = this;
             HeldEntity.PreviousHolder = null;
             HoldStartTime = Runner.SimulationTime;
@@ -1845,10 +1846,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         } else if (IsOnGround) {
             //not holding anything, sliding, or holding both directions. decelerate
-
             IsSkidding = false;
             IsTurnaround = false;
-
 
             float angle = Mathf.Abs(FloorAngle);
             if (IsSliding) {
@@ -1873,7 +1872,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if ((direction == -1) ^ (newX <= target))
                 newX = target;
 
-            if (body.velocity.x == target)
+            if (Mathf.Abs(body.velocity.x - target) < 0.01f)
                 return;
 
             if (IsSliding) {
@@ -1889,16 +1888,15 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsInShell |= State == Enums.PowerupState.BlueShell && !IsSliding && IsOnGround && IsFunctionallyRunning && !HeldEntity && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
         if (IsOnGround || WasGroundedLastFrame)
             body.velocity = new(body.velocity.x, 0);
-
     }
 
+    private static readonly Vector2 CheckSizeOffset = new(1f, 0.75f);
     private bool HandleStuckInBlock() {
         if (!body || State == Enums.PowerupState.MegaMushroom)
             return false;
 
-        Vector2 checkSize = WorldHitboxSize * new Vector2(1, 0.75f);
-        Vector2 checkPos = transform.position + (Vector3) (Vector2.up * checkSize / 2f);
-
+        Vector2 checkSize = WorldHitboxSize * CheckSizeOffset;
+        Vector2 checkPos = transform.position + (Vector3) (Vector2.up * checkSize * 0.5f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f, false)) {
             IsStuckInBlock = false;

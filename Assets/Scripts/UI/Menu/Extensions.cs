@@ -75,7 +75,7 @@ namespace NSMB.Extensions {
         /// <param name="x">The new X value. If null, the existing X value is kept.</param>
         /// <param name="y">The new Y value. If null, the existing Y value is kept.</param>
         /// <param name="z">The new Z value. If null, the existing Z value is kept.</param>
-        public static void SetNonNulls(this Vector3 vec, float? x, float? y, float? z) {
+        public static void SetNonNulls(this ref Vector3 vec, float? x, float? y, float? z) {
             vec.x = x ?? vec.x;
             vec.y = y ?? vec.y;
             vec.z = z ?? vec.z;

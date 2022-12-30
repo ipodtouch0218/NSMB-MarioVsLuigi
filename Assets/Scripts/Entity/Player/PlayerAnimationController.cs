@@ -12,7 +12,11 @@ public class PlayerAnimationController : NetworkBehaviour {
     //---Static Variables
     private static readonly WaitForSeconds BlinkDelay = new(0.1f);
 
+    //---Public Variables
+    public bool deathUp, wasTurnaround, enableGlow;
+
     //---Networked Variables
+
 
     //---Serialized Variables
     [SerializeField] private Avatar smallAvatar, largeAvatar;
@@ -34,14 +38,13 @@ public class PlayerAnimationController : NetworkBehaviour {
     //---Properties
     public Color GlowColor { get; set; }
 
-
+    //---Private Variables
     private Enums.PlayerEyeState eyeState;
     private float propellerVelocity;
-    public bool deathUp, wasTurnaround, enableGlow;
     private Vector3 modelRotationTarget;
     private bool modelRotateInstantly;
-
     private Coroutine blinkRoutine;
+
 
     public void Awake() {
         controller = GetComponent<PlayerController>();
@@ -59,7 +62,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         PlayerData data = Object.InputAuthority.GetPlayerData(Runner);
 
-        if (ScriptableManager.Instance.skins[data?.SkinIndex ?? 0] is PlayerColorSet colorSet) {
+        if (ScriptableManager.Instance.skins[data ? data.SkinIndex : 0] is PlayerColorSet colorSet) {
             PlayerColors colors = colorSet.GetPlayerColors(controller.character);
             primaryColor = colors.overallsColor.linear;
             secondaryColor = colors.hatColor.linear;
@@ -150,25 +153,26 @@ public class PlayerAnimationController : NetworkBehaviour {
         modelRotateInstantly = false;
 
         if (controller.IsInKnockback) {
-            modelRotationTarget = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
+            modelRotationTarget.Set(0, controller.FacingRight ? 110 : 250, 0);
             modelRotateInstantly = true;
+
         } else if (controller.IsDead) {
             if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
-                modelRotationTarget = new Vector3(-15, controller.FacingRight ? 110 : 250, 0);
+                modelRotationTarget.Set(-15, controller.FacingRight ? 110 : 250, 0);
             } else {
-                modelRotationTarget = new Vector3(0, 180, 0);
+                modelRotationTarget.Set(0, 180, 0);
             }
             modelRotateInstantly = true;
+
         } else if (animator.GetBool("inShell") && (!controller.OnSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
             modelRotationTarget += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1400 * (controller.FacingRight ? -1 : 1));
             modelRotateInstantly = true;
+
         } else if (wasTurnaround || controller.IsSkidding || controller.IsTurnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
-            if (controller.FacingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.IsSkidding)) {
-                modelRotationTarget = new Vector3(0, 250, 0);
-            } else {
-                modelRotationTarget = new Vector3(0, 110, 0);
-            }
+            bool flip = controller.FacingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || controller.IsSkidding);
+            modelRotationTarget.Set(0, flip ? 250 : 110, 0);
             modelRotateInstantly = true;
+
         } else {
             if (controller.OnSpinner && controller.IsOnGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity) {
                 modelRotationTarget += controller.OnSpinner.spinSpeed * delta * Vector3.up;
@@ -178,9 +182,9 @@ public class PlayerAnimationController : NetworkBehaviour {
                 modelRotationTarget += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(Runner) ?? 0f) * 1400) - (controller.IsDrilling ? 900 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.ExpiredOrNotRunning(Runner) && body.velocity.y < 0 ? 700 : 0), 0) * delta;
                 modelRotateInstantly = true;
             } else if (controller.WallSlideLeft || controller.WallSlideRight) {
-                modelRotationTarget = new Vector3(0, controller.WallSlideRight ? 110 : 250, 0);
+                modelRotationTarget.Set(0, controller.WallSlideRight ? 110 : 250, 0);
             } else {
-                modelRotationTarget = new Vector3(0, controller.FacingRight ? 110 : 250, 0);
+                modelRotationTarget.Set(0, controller.FacingRight ? 110 : 250, 0);
             }
         }
 
@@ -267,12 +271,13 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetFloat("velocityX", animatedVelocity);
     }
 
+    private static readonly Vector2 ZeroPointFive = new(0.5f, 0.5f);
     public void HandleMiscStates() {
         if (controller.GiantEndTimer.IsActive(Runner)) {
             transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
         } else {
             transform.localScale = controller.State switch {
-                Enums.PowerupState.MiniMushroom => Vector3.one / 2,
+                Enums.PowerupState.MiniMushroom => ZeroPointFive,
                 Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingTime(Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
                 _ => Vector3.one,
             };
@@ -290,7 +295,7 @@ public class PlayerAnimationController : NetworkBehaviour {
                 materialBlock.SetColor("GlowColor", GlowColor);
         }
 
-        materialBlock.SetFloat("RainbowEnabled", controller.IsStarmanInvincible ? 1.1f : 0f);
+        materialBlock.SetFloat("RainbowEnabled", controller.IsStarmanInvincible ? 1f : 0f);
         int ps = controller.State switch {
             Enums.PowerupState.FireFlower => 1,
             Enums.PowerupState.PropellerMushroom => 2,
@@ -304,7 +309,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         Vector3 giantMultiply = Vector3.one;
         float giantTimeRemaining = controller.GiantTimer.RemainingTime(Runner) ?? 0f;
         if (controller.State == Enums.PowerupState.MegaMushroom && controller.GiantTimer.IsRunning && giantTimeRemaining < 4) {
-            float v = ((Mathf.Sin(giantTimeRemaining * 20f) + 1f) / 2f * 0.9f) + 0.1f;
+            float v = ((Mathf.Sin(giantTimeRemaining * 20f) + 1f) * 0.45f) + 0.1f;
             giantMultiply = new Vector3(v, 1, v);
         }
         materialBlock.SetVector("MultiplyColor", giantMultiply);

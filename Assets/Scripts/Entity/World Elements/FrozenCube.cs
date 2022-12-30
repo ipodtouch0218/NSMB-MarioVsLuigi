@@ -228,8 +228,8 @@ public class FrozenCube : HoldableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = damageDirection.y > -0.4f;
 
-        if (PreviousHolder == player)
-            return;
+        //if (PreviousHolder == player)
+        //    return;
 
         if (!Holder && (player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom || player.IsInShell)) {
             Kill();

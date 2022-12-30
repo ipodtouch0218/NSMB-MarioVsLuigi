@@ -155,12 +155,12 @@ public class KoopaWalk : HoldableEntity {
 
     public void EnterShell(bool becomeItem, PlayerController player) {
         if (blue && !IsInShell && becomeItem) {
-            BlueBecomeItem();
+            BlueBecomeItem(player);
             return;
         }
         body.velocity = Vector2.zero;
         WakeupTimer = TickTimer.CreateFromSeconds(Runner, wakeup);
-        ComboCounter = 0;
+        ComboCounter = 1;
         IsInShell = true;
         IsStationary = true;
 
@@ -171,7 +171,10 @@ public class KoopaWalk : HoldableEntity {
         }
     }
 
-    public void BlueBecomeItem() {
+    public void BlueBecomeItem(PlayerController player) {
+        if (Runner.IsForward)
+            player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+
         Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
         });
@@ -205,33 +208,51 @@ public class KoopaWalk : HoldableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = damageDirection.y > 0;
 
-        //TODO: refactor
-
-        if (IsInShell && blue && player.IsGroundpounding && !player.IsOnGround) {
-            BlueBecomeItem();
-            return;
-        }
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
-            player.body.velocity = new(0, player.body.velocity.y);
-            FacingRight = damageDirection.x < 0;
-
-        } else if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
+        //always damage exceptions
+        if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.FacingRight;
             if (IsInShell && !IsStationary && player.IsInShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.DoKnockback(player.body.position.x < body.position.x, 0, true, gameObject);
 
             SpecialKill(!originalFacing, false, player.StarCombo++);
+            return;
+        }
 
-        } else if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
-            EnterShell(true, player);
-            if (!blue) {
-                Kick(player, player.body.position.x < body.position.x, 1f, player.IsGroundpounding);
-                PreviousHolder = player;
+        //attempt to be picked up (or kick)
+        if (IsInShell && IsActuallyStationary) {
+            if (!Holder) {
+                if (player.CanPickupItem) {
+                    Pickup(player);
+                } else {
+                    Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                    PreviousHolder = player;
+                }
+            }
+            return;
+        }
+
+        if (attackedFromAbove) {
+            //get hit by player
+
+            //blue koopa: check to become a blue shell item
+            if (blue && (!IsInShell || (IsInShell && player.HasGroundpoundHitbox))) {
+                BlueBecomeItem(player);
+                return;
             }
 
-        } else if (attackedFromAbove && (!IsInShell || !IsActuallyStationary)) {
+            //groundpound by big mario: shell & kick
+            if (player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom) {
+                EnterShell(true, player);
+                if (!blue) {
+                    Kick(player, player.body.position.x < body.position.x, 1f, true);
+                    PreviousHolder = player;
+                }
+                return;
+            }
+
+            //bounced on
             if (player.State == Enums.PowerupState.MiniMushroom) {
-                if (player.IsGroundpounding) {
+                if (player.HasGroundpoundHitbox) {
                     player.IsGroundpounding = false;
                     EnterShell(true, player);
                 }
@@ -242,21 +263,20 @@ public class KoopaWalk : HoldableEntity {
             }
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.IsDrilling = false;
+
         } else {
-            if (IsInShell && IsActuallyStationary) {
-                if (!Holder) {
-                    if (player.CanPickupItem) {
-                        Pickup(player);
-                    } else {
-                        Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
-                        PreviousHolder = player;
-                    }
-                }
-            } else if (player.IsDamageable) {
-                player.Powerdown(false);
-                if (!IsInShell)
-                    FacingRight = damageDirection.x > 0;
+            //damage player
+
+            //turn around when hitting a crouching blue shell player
+            if (player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
+                player.body.velocity = new(0, player.body.velocity.y);
+                FacingRight = damageDirection.x < 0;
+                return;
             }
+
+            //finally attempt to damage player
+            if (player.Powerdown(false) && !IsInShell)
+                FacingRight = damageDirection.x > 0;
         }
     }
 
@@ -292,7 +312,7 @@ public class KoopaWalk : HoldableEntity {
     //---KillableEntity overrides
     protected override void CheckForEntityCollisions() {
 
-        if (!(!IsInShell || IsActuallyStationary || putdown || IsDead)) {
+        if (!((!IsInShell && !Holder) || IsActuallyStationary || putdown || IsDead)) {
 
             int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 

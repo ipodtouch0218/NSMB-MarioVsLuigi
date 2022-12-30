@@ -6,7 +6,7 @@ public class SpinyWalk : KoopaWalk {
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
 
-        //TODO: refactor
+        //TODO: refactor. heavily.
 
         if (Holder)
             return;

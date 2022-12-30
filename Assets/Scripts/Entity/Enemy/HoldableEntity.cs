@@ -26,6 +26,7 @@ public abstract class HoldableEntity : KillableEntity {
             body.position = Holder.body.position + (Vector2) holderOffset;
             hitbox.enabled = false;
             sRenderer.flipX = !FacingRight;
+            CheckForEntityCollisions();
         } else {
             base.FixedUpdateNetwork();
             hitbox.enabled = true;

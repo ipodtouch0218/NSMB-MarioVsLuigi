@@ -893,7 +893,7 @@ MonoBehaviour:
   m_PixelsPerUnitMultiplier: 1
 --- !u!95 &6820641359554773461
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -910,7 +910,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!114 &9179565819503335474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1472,7 +1472,7 @@ AudioSource:
     m_RotationOrder: 4
 --- !u!95 &4068457237609990628
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1489,7 +1489,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!81 &5063321644330613871
 AudioListener:
   m_ObjectHideFlags: 0
@@ -5010,6 +5010,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
+    m_ColorSpace: -1
     m_NumColorKeys: 8
     m_NumAlphaKeys: 2
   ndsCanvas: {fileID: 1955773772637164072}
@@ -5018,7 +5019,6 @@ MonoBehaviour:
   graphy: {fileID: 65175768685879623}
   loadingCanvas: {fileID: 4559077638615233841}
   ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
-  settings: {fileID: 0}
   controlsJson: 
   checkedForVersion: 0
   nickname: 
@@ -5089,7 +5089,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cda16b7402b2d7499a959740bd07318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
   nickname: 
   character: 0
   skin: 0
@@ -5099,7 +5098,8 @@ MonoBehaviour:
   vsync: 0
   fourByThreeRatio: 0
   scoreboardAlways: 0
-  filter: 1
+  chatFiltering: 1
+  mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
 --- !u!82 &1776850482587567145
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10657,7 +10657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerList: {fileID: 2628469307357434847}
   emptyText: Loading...
-  iveLoadedText: Waiting for others...
+  waitingForOthersText: Waiting for others...
   readyToStartText: Starting...
   spectatorText: Joining as Spectator...
 --- !u!1 &4095823768780909971
@@ -16952,7 +16952,7 @@ MonoBehaviour:
   m_PixelsPerUnitMultiplier: 1
 --- !u!95 &395400566598555363
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -16969,7 +16969,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1 &6379181540883698325
 GameObject:
   m_ObjectHideFlags: 0
@@ -19448,6 +19448,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
@@ -22970,7 +22971,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 3796527870854254880}
     m_Modifications:
     - target: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
@@ -23138,7 +23139,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6666609915669367846}
   m_SourcePrefab: {fileID: 100100000, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
 --- !u!224 &8895848656777689062 stripped
 RectTransform:
