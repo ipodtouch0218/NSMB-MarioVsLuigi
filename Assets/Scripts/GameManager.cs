@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -12,7 +11,6 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
-using System.Threading.Tasks;
 
 public class GameManager : NetworkBehaviour {
 
