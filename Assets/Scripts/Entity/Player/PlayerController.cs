@@ -1432,7 +1432,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     #region -- PIPES --
 
     private void DownwardsPipeCheck(bool down) {
-        if (!down || State == Enums.PowerupState.MegaMushroom || !IsOnGround || IsInKnockback || IsInShell)
+        if (!down || State == Enums.PowerupState.MegaMushroom || !IsOnGround || IsInKnockback || IsInShell || HeldEntity)
             return;
 
         foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.position, Vector2.down, 0.1f)) {
@@ -1450,7 +1450,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void UpwardsPipeCheck(bool up) {
-        if (!up || IsGroundpounding || !hitRoof || State == Enums.PowerupState.MegaMushroom)
+        if (!up || IsGroundpounding || !hitRoof || State == Enums.PowerupState.MegaMushroom || IsInKnockback || HeldEntity)
             return;
 
         //todo: change to nonalloc?

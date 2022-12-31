@@ -181,7 +181,6 @@ public class KoopaWalk : HoldableEntity {
         Runner.Despawn(Object);
     }
 
-
     protected void Turnaround(bool hitWallOnLeft, float x) {
         if (IsActuallyStationary)
             return;
@@ -237,6 +236,7 @@ public class KoopaWalk : HoldableEntity {
             //blue koopa: check to become a blue shell item
             if (blue && (!IsInShell || (IsInShell && player.HasGroundpoundHitbox))) {
                 BlueBecomeItem(player);
+                player.DoEntityBounce = !player.IsGroundpounding;
                 return;
             }
 
@@ -330,9 +330,11 @@ public class KoopaWalk : HoldableEntity {
                     //kill entity we ran into
                     killable.SpecialKill((killable.body ? killable.body.position.x : killable.transform.position.x) > body.position.x, false, ComboCounter++);
 
-                    //kill ourselves if we're being held too
-                    if (Holder)
-                        SpecialKill(killable.body.position.x < body.position.x, false, 0);
+                    //if we hit another moving shell (or we're being held), we both die.
+                    if (Holder || (killable is KoopaWalk kw && kw.IsInShell && !kw.IsActuallyStationary)) {
+                        SpecialKill((killable.body ? killable.body.position.x : killable.transform.position.x) < body.position.x, false, 0);
+                        return;
+                    }
 
                     continue;
                 }

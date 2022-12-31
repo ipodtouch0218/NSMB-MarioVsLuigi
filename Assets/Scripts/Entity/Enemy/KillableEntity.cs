@@ -89,7 +89,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
                 continue;
 
             if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
-                if (killable.IsDead)
+                if (killable.IsDead || killable is PiranhaPlantController)
                     continue;
 
                 bool goRight = body.position.x > killable.body.position.x;
