@@ -37,13 +37,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked(OnChanged = nameof(OnIsSlidingChanged))] public NetworkBool IsSliding { get; set; }
     [Networked] public NetworkBool IsSkidding { get; set; }
     [Networked] public NetworkBool IsTurnaround { get; set; }
-    [Networked] private float TurnaroundFrames { get; set; } //TODO: change somehow
+    [Networked] private byte TurnaroundFrames { get; set; } //TODO: change somehow
     [Networked] private int TurnaroundBoostFrames { get; set; } //TODO: change somehow
     [Networked] private float JumpBufferTime { get; set; }
     [Networked] private float CoyoteTime { get; set; }
     [Networked] private float TimeGrounded { get; set; }
     [Networked] public NetworkBool IgnoreCoyoteTime { get; set; }
     [Networked] public float FloorAngle { get; set; }
+    [Networked] public NetworkBool OnIce { get; set; }
     //Jumping
     [Networked] public NetworkBool Jumping { get; set; }
     [Networked] public PlayerJumpState JumpState { get; set; }
@@ -128,6 +129,17 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return arr.Length - 1;
         }
     }
+    private int GravityStage {
+        get {
+            float yVel = body.velocity.y;
+            float?[] arr = GRAVITY_STAGE_MAX;
+            for (int i = 1; i < arr.Length; i++) {
+                if (yVel >= arr[i])
+                    return i - 1;
+            }
+            return arr.Length - 1;
+        }
+    }
 
     private int _starCombo;
     public int StarCombo {
@@ -146,7 +158,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
 
 
-    [SerializeField] public float slowriseGravity = 0.85f, normalGravity = 2.5f, flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, wallslideSpeed = -4.25f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
+    [SerializeField] public float flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, wallslideSpeed = -4.25f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
     [SerializeField] public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, propellerDrillBuffer, heightSmallModel = 0.42f, heightLargeModel = 0.82f;
     [SerializeField] private GameObject models;
     [SerializeField] public CharacterData character;
@@ -159,7 +171,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float[] SPEED_STAGE_MAX = { 0.9375f, 2.8125f, 4.21875f, 5.625f, 8.4375f };
     private static readonly float SPEED_SLIDE_MAX = 7.5f;
     private static readonly float[] SPEED_STAGE_ACC = { 7.9101585f, 3.955081725f, 3.515625f, 2.63671875f, 84.375f };
-    private static readonly float[] WALK_TURNAROUND_ACC = { 39.74853510198f, 8.7890625f, 14.062536f };
+    private static readonly float[] ICE_STAGE_ACC = { 1.9775390625f, 3.955081725f, 3.515625f, 2.63671875f, 84.375f };
+    private static readonly float[] WALK_TURNAROUND_ACC = { 3.955078125f, 8.7890625f, 8.7890625f, 21.093756f };
     private static readonly float BUTTON_RELEASE_DEC = 3.9550781196f;
     private static readonly float SKIDDING_THRESHOLD = 4.6875f;
     private static readonly float SKIDDING_DEC = 10.54687536f;
@@ -186,10 +199,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float SLIDING_45_ACC = 13.1835975f;
     private static readonly float SLIDING_22_ACC = 5.2734375f;
 
+    private static readonly float?[] GRAVITY_STAGE_MAX = { null, 4.16015625f, 2.109375f, 0f, -5.859375f };
+    private static readonly float?[] GRAVITY_STAGE_ACC = { null, -28.125f, -38.671875f, -28.125f, -38.671875f };
+    private static readonly float GRAVITY_HELD = -7.03125f;
+
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
     private Enums.Particle footstepParticle = Enums.Particle.None;
-    public bool onIce;
     private readonly List<Vector3Int> tilesStandingOn = new(), tilesJumpedInto = new(), tilesHitSide = new();
 
     private bool initialKnockbackFacingRight = false;
@@ -443,7 +459,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void UpdateTileProperties() {
-        onIce = false;
+        OnIce = false;
         footstepSound = Enums.Sounds.Player_Walk_Grass;
         footstepParticle = Enums.Particle.None;
         foreach (Vector3Int pos in tilesStandingOn) {
@@ -454,7 +470,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (tile is TileWithProperties propTile) {
                 footstepSound = propTile.footstepSound;
                 footstepParticle = propTile.footstepParticle;
-                onIce = propTile.iceSkidding;
+                OnIce = propTile.iceSkidding;
             }
         }
     }
@@ -1113,7 +1129,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         bool right = PreviousInputs.buttons.IsSet(PlayerControls.Right);
 
         bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == Mathf.Sign(body.velocity.x));
-        if (onIce && (left ^ right) && reverse) {
+        if (OnIce && (left ^ right) && reverse) {
             PlaySound(Enums.Sounds.World_Ice_Skidding);
             return;
         }
@@ -1273,7 +1289,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         PropellerSpinTimer = TickTimer.None;
         IsSliding = false;
         IsDrilling = false;
-        body.gravityScale = normalGravity;
+        body.gravityScale = 1;
         WallSlideLeft = WallSlideRight = false;
 
         SpawnStars(starsToDrop, false);
@@ -1662,7 +1678,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         float vel = State switch {
             Enums.PowerupState.MegaMushroom => megaJumpVelocity,
-            _ => jumpVelocity + Mathf.Abs(body.velocity.x) / RunningMaxSpeed * 1.05f,
+            _ => 6.62109375f + Mathf.Lerp(0, 0.46875f, Mathf.Clamp01(Mathf.Abs(body.velocity.x) - SPEED_STAGE_MAX[1] + (SPEED_STAGE_MAX[1] * 0.5f)))
         };
 
         if (canSpecialJump && JumpState == PlayerJumpState.SingleJump) {
@@ -1759,7 +1775,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             maxStage = WALK_STAGE;
 
         int stage = MovementStage;
-        float acc = State == Enums.PowerupState.MegaMushroom ? SPEED_STAGE_MEGA_ACC[stage] : SPEED_STAGE_ACC[stage];
+        float acc = OnIce ? ICE_STAGE_ACC[stage] : (State == Enums.PowerupState.MegaMushroom ? SPEED_STAGE_MEGA_ACC[stage] : SPEED_STAGE_ACC[stage]);
         float sign = Mathf.Sign(body.velocity.x);
 
         if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !IsSliding) {
@@ -1784,7 +1800,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     }
 
                     if (IsSkidding) {
-                        if (onIce) {
+                        if (OnIce) {
                             acc = SKIDDING_ICE_DEC;
                         } else if (speed > SPEED_STAGE_MAX[RUN_STAGE]) {
                             acc = SKIDDING_STAR_DEC;
@@ -1793,17 +1809,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                         }
                         TurnaroundFrames = 0;
                     } else {
-                        if (onIce) {
+                        if (OnIce) {
                             acc = WALK_TURNAROUND_ICE_ACC;
                         } else {
-                            TurnaroundFrames = Mathf.Min(TurnaroundFrames + 0.2f, WALK_TURNAROUND_ACC.Length - 1);
-                            acc = State == Enums.PowerupState.MegaMushroom ? WALK_TURNAROUND_MEGA_ACC[(int) TurnaroundFrames] : WALK_TURNAROUND_ACC[(int) TurnaroundFrames];
+                            TurnaroundFrames = (byte) Mathf.Clamp(TurnaroundFrames + 1, 0, WALK_TURNAROUND_ACC.Length - 1);
+                            acc = State == Enums.PowerupState.MegaMushroom ? WALK_TURNAROUND_MEGA_ACC[TurnaroundFrames] : WALK_TURNAROUND_ACC[TurnaroundFrames];
                         }
                     }
                 } else {
-                    acc = SPEED_STAGE_ACC[0];
+                    acc = SPEED_STAGE_ACC[0] * 0.8f;
                 }
             } else {
+                TurnaroundFrames = 0;
 
                 if (IsSkidding && !IsTurnaround) {
                     IsSkidding = false;
@@ -1857,7 +1874,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     //flat ground
                     acc = -SPEED_STAGE_ACC[0];
                 }
-            } else if (onIce)
+            } else if (OnIce)
                 acc = -BUTTON_RELEASE_ICE_DEC[stage];
             else if (IsInKnockback)
                 acc = -KNOCKBACK_DEC;
@@ -2011,7 +2028,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             } else if ((!IsInShell || !GiantStartTimer.ExpiredOrNotRunning(Runner)) && (right || left)) {
                 FacingRight = right;
             }
-            if (!IsInShell && ((Mathf.Abs(body.velocity.x) < 0.5f && IsCrouching) || onIce) && (right || left))
+            if (!IsInShell && ((Mathf.Abs(body.velocity.x) < 0.5f && IsCrouching) || OnIce) && (right || left))
                 FacingRight = right;
         }
     }
@@ -2358,7 +2375,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     || edgeLanding
                     || (Mathf.Abs(body.velocity.x) < 0.1f)) {
 
-                    if (!onIce)
+                    if (!OnIce)
                         body.velocity = Vector2.zero;
 
                     animator.Play("jumplanding" + (edgeLanding ? "-edge" : ""));
@@ -2389,28 +2406,43 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsSpinnerFlying || IsPropellerFlying) {
             body.gravityScale = flyingGravity;
         } else {
-            float gravityModifier = State switch {
-                Enums.PowerupState.MiniMushroom => 0.4f,
-                _ => 1,
-            };
-            float slowriseModifier = State switch {
-                Enums.PowerupState.MegaMushroom => 3f,
-                _ => 1f,
-            };
-            if (IsGroundpounding)
-                gravityModifier *= 1.5f;
 
-            if (body.velocity.y > 2.5) {
-                if (jumpHeld || State == Enums.PowerupState.MegaMushroom) {
-                    body.gravityScale = slowriseGravity * slowriseModifier;
-                } else {
-                    body.gravityScale = normalGravity * 1.5f * gravityModifier;
-                }
-            } else if (IsOnGround || (IsGroundpounding && GroundpoundStartTimer.IsActive(Runner))) {
-                body.gravityScale = 0f;
+            if (IsOnGround || (Runner.SimulationTime <= CoyoteTime - 0.02f) || (IsGroundpounding && GroundpoundStartTimer.IsActive(Runner))) {
+                body.gravityScale = 0.15f;
             } else {
-                body.gravityScale = normalGravity * (gravityModifier / 1.2f);
+                int stage = GravityStage;
+                float? acc = GRAVITY_STAGE_ACC[stage];
+                if (jumpHeld) {
+                    acc ??= GRAVITY_HELD;
+                } else {
+                    acc = GRAVITY_STAGE_ACC[^1];
+                }
+
+                body.gravityScale = acc.Value / Physics2D.gravity.y;
             }
+
+            //float gravityModifier = State switch {
+            //    Enums.PowerupState.MiniMushroom => 0.4f,
+            //    _ => 1,
+            //};
+            //float slowriseModifier = State switch {
+            //    Enums.PowerupState.MegaMushroom => 3f,
+            //    _ => 1f,
+            //};
+            //if (IsGroundpounding)
+            //    gravityModifier *= 1.5f;
+
+            //if (body.velocity.y > 2.5) {
+            //    if (jumpHeld || State == Enums.PowerupState.MegaMushroom) {
+            //        body.gravityScale = slowriseGravity * slowriseModifier;
+            //    } else {
+            //        body.gravityScale = normalGravity * 1.5f * gravityModifier;
+            //    }
+            //} else if (IsOnGround || (IsGroundpounding && GroundpoundStartTimer.IsActive(Runner))) {
+            //    body.gravityScale = 0f;
+            //} else {
+            //    body.gravityScale = normalGravity * (gravityModifier / 1.2f);
+            //}
         }
 
         //Terminal velocity

@@ -58,7 +58,8 @@ public class BobombWalk : HoldableEntity {
         if (IsFrozen || IsDead)
             return;
 
-        HandleCollision();
+        if (HandleCollision())
+            return;
 
         sRenderer.flipX = !FacingRight;
 
@@ -73,9 +74,9 @@ public class BobombWalk : HoldableEntity {
         PreviousFrameVelocity = body.velocity;
     }
 
-    private void HandleCollision() {
+    private bool HandleCollision() {
         if (Holder)
-            return;
+            return false;
 
         physics.UpdateCollisions();
         if (Lit && physics.OnGround) {
@@ -92,8 +93,12 @@ public class BobombWalk : HoldableEntity {
             Turnaround(true);
         }
 
-        if (physics.OnGround && physics.HitRoof)
-            SpecialKill(false, false, 0);
+        if (physics.OnGround && physics.HitRoof) {
+            Detonate();
+            return true;
+        }
+
+        return false;
     }
 
     public void Light() {

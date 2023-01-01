@@ -264,8 +264,8 @@ public class PlayerAnimationController : NetworkBehaviour {
         } else if (controller.State == Enums.PowerupState.MegaMushroom && (left || right)) {
             animatedVelocity = 4.5f;
         } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
-            animatedVelocity = Mathf.Max(controller.onIce ? 3.5f : 2f, animatedVelocity);
-        } else if (controller.onIce) {
+            animatedVelocity = Mathf.Max(controller.OnIce ? 3.5f : 2f, animatedVelocity);
+        } else if (controller.OnIce) {
             animatedVelocity = 0;
         }
         animator.SetFloat("velocityX", animatedVelocity);

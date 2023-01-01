@@ -76,7 +76,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         }
 
         FacingRight = true;
-        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 15f);
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 10f);
     }
 
     public override void Render() {
@@ -110,7 +110,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             return;
         } else {
             float timeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
-            sRenderer.enabled = !(timeRemaining <= 3 && timeRemaining * blinkingRate % 1 < 0.5f);
+            sRenderer.enabled = !(timeRemaining <= 1 && timeRemaining * blinkingRate % 1 < 0.5f);
         }
 
         Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
