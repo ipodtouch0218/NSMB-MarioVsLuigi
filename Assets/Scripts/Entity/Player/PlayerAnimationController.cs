@@ -271,7 +271,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetFloat("velocityX", animatedVelocity);
     }
 
-    private static readonly Vector2 ZeroPointFive = new(0.5f, 0.5f);
+    private static readonly Vector3 ZeroPointFive = new(0.5f, 0.5f, 0.5f);
     public void HandleMiscStates() {
         if (controller.GiantEndTimer.IsActive(Runner)) {
             transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
