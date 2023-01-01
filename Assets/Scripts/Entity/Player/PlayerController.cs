@@ -178,8 +178,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float SKIDDING_DEC = 10.54687536f;
     private static readonly float SKIDDING_STAR_DEC = SPEED_STAGE_ACC[^1];
 
-    private static readonly float WALLJUMP_HSPEED = 4.21874f;
+    private static readonly float WALLJUMP_HSPEED = 4.21875f;
     private static readonly float WALLJUMP_VSPEED = 6.4453125f;
+    private static readonly float WALLJUMP_MINI_VSPEED = 5.1708984375f;
 
     private static readonly float KNOCKBACK_DEC = 7.9101585f;
 
@@ -201,7 +202,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     private static readonly float?[] GRAVITY_STAGE_MAX = { null, 4.16015625f, 2.109375f, 0f, -5.859375f };
     private static readonly float?[] GRAVITY_STAGE_ACC = { null, -28.125f, -38.671875f, -28.125f, -38.671875f };
+    private static readonly float?[] GRAVITY_MINI_MAX = { null, 4.566650390625f, 2.633056640625f, 0f, -3.929443359375f };
+    private static readonly float?[] GRAVITY_MINI_ACC = { null, -7.03125f, -10.546875f, -7.03125f, -10.546875f};
     private static readonly float GRAVITY_HELD = -7.03125f;
+    private static readonly float GRAVITY_MINI_HELD = -4.833984375f;
+
+
 
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
@@ -1561,7 +1567,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
                 hitRight = false;
                 hitLeft = false;
-                body.velocity = new Vector2(WALLJUMP_HSPEED * (WallSlideLeft ? 1 : -1), WALLJUMP_VSPEED);
+                body.velocity = new Vector2(WALLJUMP_HSPEED * (WallSlideLeft ? 1 : -1), State == Enums.PowerupState.MiniMushroom ? WALLJUMP_MINI_VSPEED : WALLJUMP_VSPEED);
                 JumpState = PlayerJumpState.SingleJump;
                 IsOnGround = false;
                 DoEntityBounce = false;
@@ -1635,9 +1641,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         if (!DoEntityBounce && OnSpinner && IsOnGround && !HeldEntity) {
-            //wait for spinner to depress
-            if (OnSpinner.ArmPosition < 0.5f)
-                return;
+            //wait for spinner to depress?
+            //if (OnSpinner.ArmPosition < 0.5f)
+            //    return;
 
             body.velocity = new(body.velocity.x, launchVelocity);
             IsSpinnerFlying = true;
@@ -1678,6 +1684,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         float vel = State switch {
             Enums.PowerupState.MegaMushroom => megaJumpVelocity,
+            Enums.PowerupState.MiniMushroom => 5.408935546875f + Mathf.Lerp(0, 0.428466796875f, Mathf.Clamp01(Mathf.Abs(body.velocity.x) - SPEED_STAGE_MAX[1] + (SPEED_STAGE_MAX[1] * 0.5f))),
             _ => 6.62109375f + Mathf.Lerp(0, 0.46875f, Mathf.Clamp01(Mathf.Abs(body.velocity.x) - SPEED_STAGE_MAX[1] + (SPEED_STAGE_MAX[1] * 0.5f)))
         };
 
@@ -1817,7 +1824,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                         }
                     }
                 } else {
-                    acc = SPEED_STAGE_ACC[0] * 0.8f;
+                    acc = SPEED_STAGE_ACC[0] * 0.85f;
                 }
             } else {
                 TurnaroundFrames = 0;
@@ -2411,11 +2418,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 body.gravityScale = 0.15f;
             } else {
                 int stage = GravityStage;
-                float? acc = GRAVITY_STAGE_ACC[stage];
+                bool mini = State == Enums.PowerupState.MiniMushroom;
+                float? acc = (mini ? GRAVITY_MINI_ACC : GRAVITY_STAGE_ACC)[stage];
                 if (jumpHeld) {
-                    acc ??= GRAVITY_HELD;
+                    acc ??= (mini ? GRAVITY_MINI_HELD : GRAVITY_HELD);
                 } else {
-                    acc = GRAVITY_STAGE_ACC[^1];
+                    acc = (mini ? GRAVITY_MINI_ACC : GRAVITY_STAGE_ACC)[^1];
                 }
 
                 body.gravityScale = acc.Value / Physics2D.gravity.y;
