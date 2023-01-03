@@ -120,7 +120,7 @@ MonoBehaviour:
     instantiationMode: 1
   - dependency: {fileID: 11400000, guid: d9fb0796a9d007641a5f2d4f66b72964, type: 2}
     instantiationMode: 1
-  - dependency: {fileID: -1121539586, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  - dependency: {fileID: 102900000, guid: e725a070cec140c4caffb81624c8c787, type: 3}
     instantiationMode: 1
   - dependency: {fileID: 2800000, guid: f1fe85cfa0c021a4fbff813082d1d1e3, type: 3}
     instantiationMode: 1
@@ -135,6 +135,8 @@ MonoBehaviour:
   - dependency: {fileID: 2800000, guid: 0a4f5f0bc0be803448b90af68098fff6, type: 3}
     instantiationMode: 1
   - dependency: {fileID: 11400000, guid: 5fab97d7529e6ce41a5029ba12122691, type: 2}
+    instantiationMode: 1
+  - dependency: {fileID: 7400000, guid: 81951041cb1d0580eb7e18b192cf757e, type: 2}
     instantiationMode: 1
   - dependency: {fileID: 2800000, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
     instantiationMode: 1
@@ -272,7 +274,8 @@ Texture2D:
   m_MipCount: 1
   m_IsReadable: 1
   m_IsPreProcessed: 0
-  m_IgnoreMasterTextureLimit: 0
+  m_IgnoreMipmapLimit: 0
+  m_MipmapLimitGroupName: 
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_VTOnly: 0

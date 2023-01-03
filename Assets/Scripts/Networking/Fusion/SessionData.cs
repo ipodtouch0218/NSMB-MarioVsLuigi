@@ -1,9 +1,7 @@
-using Collections.Unsafe;
+using System.Collections.Generic;
+
 using Fusion;
 using Fusion.Sockets;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.InputSystem.Controls;
 
 public class SessionData : NetworkBehaviour {
 
@@ -139,7 +137,6 @@ public class SessionData : NetworkBehaviour {
         });
     }
 
-    #region RPCS
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_ChatIncomingMessage(string message, RpcInfo info = default) => Chat.IncomingPlayerMessage(message, info);
@@ -147,10 +144,7 @@ public class SessionData : NetworkBehaviour {
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_ChatDisplayMessage(string message, PlayerRef player) => Chat.DisplayPlayerMessage(message, player);
 
-    #endregion
-
     //---OnChangeds
-
     public static void StartChanged(Changed<SessionData> data) {
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.OnGameStartChanged();

@@ -76,7 +76,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
     public void SelectColor(Button button) {
         selected = buttons.IndexOf(button);
-        MainMenuManager.Instance.SetPlayerSkin((byte) buttons.IndexOf(button));
+        MainMenuManager.Instance.SwapPlayerSkin((byte) buttons.IndexOf(button), true);
         Close(false);
 
         if (MainMenuManager.Instance)

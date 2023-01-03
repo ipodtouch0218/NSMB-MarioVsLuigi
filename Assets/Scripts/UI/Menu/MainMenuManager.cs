@@ -57,6 +57,7 @@ public class MainMenuManager : MonoBehaviour {
     //---Private Variables
     private Coroutine playerPingUpdateCoroutine, quitCoroutine;
     private bool validName;
+    private byte currentSkin;
 
     // LOBBY CALLBACKS
     public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
@@ -216,7 +217,7 @@ public class MainMenuManager : MonoBehaviour {
 
         PlayerData data = Runner.GetLocalPlayerData();
         characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.character);
-        SetPlayerSkin(data ? data.SkinIndex : Settings.Instance.skin);
+        SwapPlayerSkin(data ? data.SkinIndex : Settings.Instance.skin, false);
         spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
         OpenInLobbyMenu();
@@ -597,31 +598,30 @@ public class MainMenuManager : MonoBehaviour {
         //LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
     }
 
-    public void SwapCharacter(TMP_Dropdown dropdown) {
-        byte character = (byte) dropdown.value;
+    public void UI_CharacterDropdownChanged() {
+        byte value = (byte) characterDropdown.value;
+        SwapCharacter(value, true);
 
-        LocalData.Rpc_SetCharacterIndex(character);
+        CharacterData data = ScriptableManager.Instance.characters[value];
+        sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected, data);
+    }
+
+    public void SwapCharacter(byte character, bool callback) {
+        if (callback) {
+            LocalData.Rpc_SetCharacterIndex(character);
+        } else {
+            characterDropdown.SetValueWithoutNotify(character);
+        }
+
         Settings.Instance.character = character;
         Settings.Instance.SaveSettingsToPreferences();
 
-        CharacterData data = ScriptableManager.Instance.characters[dropdown.value];
-        sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected, data);
+        CharacterData data = ScriptableManager.Instance.characters[character];
         colorManager.ChangeCharacter(data);
-
-        byte skin = LocalData.SkinIndex;
-        if (skin == 0) {
-            playerColorDisabledIcon.SetActive(true);
-            playerColorPaletteIcon.SetActive(false);
-        } else {
-            playerColorDisabledIcon.SetActive(false);
-            playerColorPaletteIcon.SetActive(true);
-            PlayerColors colors = ScriptableManager.Instance.skins[skin].GetPlayerColors(data);
-            overallsColorImage.color = colors.overallsColor;
-            shirtColorImage.color = colors.hatColor;
-        }
+        SwapPlayerSkin(currentSkin, false);
     }
 
-    public void SetPlayerSkin(byte index) {
+    public void SwapPlayerSkin(byte index, bool callback) {
 
         if (index == 0) {
             playerColorDisabledIcon.SetActive(true);
@@ -636,11 +636,13 @@ public class MainMenuManager : MonoBehaviour {
             shirtColorImage.color = colors.hatColor;
         }
 
-        if (LocalData)
+        if (callback) {
             LocalData.Rpc_SetSkinIndex(index);
+            Settings.Instance.skin = index;
+            Settings.Instance.SaveSettingsToPreferences();
+        }
 
-        Settings.Instance.skin = index;
-        Settings.Instance.SaveSettingsToPreferences();
+        currentSkin = index;
     }
 
     private void UpdateNickname() {

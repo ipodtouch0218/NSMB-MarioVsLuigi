@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 
 using Fusion;
+using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
-using Fusion.Sockets;
 
 public class PlayerData : NetworkBehaviour {
 
@@ -15,19 +15,19 @@ public class PlayerData : NetworkBehaviour {
 
     //---Networked Variables
     [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] private string Nickname { get; set; } = "noname";
-    [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
-    [Networked, Capacity(32)] private string UserId { get; set; }
-    [Networked] public sbyte PlayerId { get; set; }
-    [Networked(OnChanged = nameof(OnStartSettingChanged))] public sbyte Team { get; set; }
-    [Networked(OnChanged = nameof(OnStartSettingChanged))] public NetworkBool IsManualSpectator { get; set; }
-    [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
-    [Networked] public NetworkBool IsRoomOwner { get; set; }
-    [Networked(OnChanged = nameof(OnLoadStateChanged))] public NetworkBool IsLoaded { get; set; }
-    [Networked] public NetworkBool IsMuted { get; set; }
-    [Networked] public TickTimer MessageCooldownTimer { get; set; }
-    [Networked(OnChanged = nameof(OnSettingChanged))] public byte CharacterIndex { get; set; }
-    [Networked] public byte SkinIndex { get; set; }
-    [Networked(OnChanged = nameof(OnSettingChanged))] public int Ping { get; set; }
+    [Networked, Capacity(28)]                                    private string DisplayNickname { get; set; } = "noname";
+    [Networked, Capacity(32)]                                    private string UserId { get; set; }
+    [Networked]                                                  public sbyte PlayerId { get; set; }
+    [Networked(OnChanged = nameof(OnStartSettingChanged))]       public sbyte Team { get; set; }
+    [Networked(OnChanged = nameof(OnStartSettingChanged))]       public NetworkBool IsManualSpectator { get; set; }
+    [Networked]                                                  public NetworkBool IsCurrentlySpectating { get; set; }
+    [Networked]                                                  public NetworkBool IsRoomOwner { get; set; }
+    [Networked(OnChanged = nameof(OnLoadStateChanged))]          public NetworkBool IsLoaded { get; set; }
+    [Networked]                                                  public NetworkBool IsMuted { get; set; }
+    [Networked]                                                  public TickTimer MessageCooldownTimer { get; set; }
+    [Networked(OnChanged = nameof(OnCharacterChanged))]          public byte CharacterIndex { get; set; }
+    [Networked(OnChanged = nameof(OnSkinChanged))]               public byte SkinIndex { get; set; }
+    [Networked(OnChanged = nameof(OnSettingChanged))]            public int Ping { get; set; }
 
     //---Private Variables
     private Tick lastUpdatedTick;
@@ -162,15 +162,10 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnSettingChanged(Changed<PlayerData> changed) {
-        if (!MainMenuManager.Instance)
+        if (!MainMenuManager.Instance || changed.Behaviour.lastUpdatedTick >= changed.Behaviour.Runner.Tick)
             return;
 
-        if (changed.Behaviour.lastUpdatedTick >= changed.Behaviour.Runner.Tick) {
-            return;
-        } else {
-            changed.Behaviour.lastUpdatedTick = changed.Behaviour.Runner.Tick;
-        }
-
+        changed.Behaviour.lastUpdatedTick = changed.Behaviour.Runner.Tick;
         MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
     }
 
@@ -184,5 +179,20 @@ public class PlayerData : NetworkBehaviour {
 
     public static void OnNameChanged(Changed<PlayerData> changed) {
         changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.Nickname + ")";
+    }
+
+    public static void OnCharacterChanged(Changed<PlayerData> changed) {
+        if (!MainMenuManager.Instance)
+            return;
+
+        MainMenuManager.Instance.SwapCharacter(changed.Behaviour.CharacterIndex, false);
+        OnSettingChanged(changed);
+    }
+
+    public static void OnSkinChanged(Changed<PlayerData> changed) {
+        if (!MainMenuManager.Instance)
+            return;
+
+        MainMenuManager.Instance.SwapPlayerSkin(changed.Behaviour.SkinIndex, false);
     }
 }

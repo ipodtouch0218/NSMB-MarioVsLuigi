@@ -273,6 +273,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             PlayerPrefs.Save();
 
             OnLobbyConnect?.Invoke(Runner, Runner.LobbyInfo);
+        } else {
+            OnShutdown?.Invoke(Runner, result.ShutdownReason);
         }
 
         return result;

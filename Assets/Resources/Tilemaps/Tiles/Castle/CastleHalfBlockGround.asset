@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ffb1820c005ca6489850e83a844726b, type: 3}
-  m_Name: CastleGround
+  m_Name: CastleHalfBlockGround
   m_EditorClassIdentifier: 
   m_DefaultSprite: {fileID: -2204218097580962714, guid: a4f9db535870eae41abdc512667ac3d3,
     type: 3}
@@ -213,7 +213,8 @@ MonoBehaviour:
     m_Neighbors: 
     m_NeighborPositions: []
     m_RuleTransform: 0
-  siblings: []
+  siblings:
+  - {fileID: 11400000, guid: f5b1012adba51db42b587a40f22883ce, type: 2}
   isBackgroundTile: 0
   iceSkidding: 0
   footstepSound: 31

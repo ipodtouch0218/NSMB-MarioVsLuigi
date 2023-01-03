@@ -1665,7 +1665,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         bool topSpeed = Mathf.Abs(body.velocity.x) >= RunningMaxSpeed;
-        bool canSpecialJump = (doJump || (DoEntityBounce && jumpHeld)) && ProperJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && (Runner.SimulationTime - TimeGrounded < 0.2f) && !HeldEntity && JumpState != PlayerJumpState.TripleJump && !IsCrouching && !IsInShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
+        bool canSpecialJump = (doJump || (DoEntityBounce && jumpHeld)) && ProperJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && ((Runner.SimulationTime - TimeGrounded < 0.2f) || DoEntityBounce) && !HeldEntity && JumpState != PlayerJumpState.TripleJump && !IsCrouching && !IsInShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
         float jumpBoost = 0;
 
         IsSkidding = false;
@@ -2414,7 +2414,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             body.gravityScale = flyingGravity;
         } else {
 
-            if (IsOnGround || (Runner.SimulationTime <= CoyoteTime - 0.02f) || (IsGroundpounding && GroundpoundStartTimer.IsActive(Runner))) {
+            if (IsGroundpounding) {
+                if (GroundpoundStartTimer.IsActive(Runner)) {
+                    body.gravityScale = 0.15f;
+                } else {
+                    body.gravityScale = GRAVITY_STAGE_ACC[^1].Value / Physics.gravity.y;
+                }
+            } else if (IsOnGround || (Runner.SimulationTime <= CoyoteTime - 0.02f)) {
                 body.gravityScale = 0.15f;
             } else {
                 int stage = GravityStage;
@@ -2428,29 +2434,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
                 body.gravityScale = acc.Value / Physics2D.gravity.y;
             }
-
-            //float gravityModifier = State switch {
-            //    Enums.PowerupState.MiniMushroom => 0.4f,
-            //    _ => 1,
-            //};
-            //float slowriseModifier = State switch {
-            //    Enums.PowerupState.MegaMushroom => 3f,
-            //    _ => 1f,
-            //};
-            //if (IsGroundpounding)
-            //    gravityModifier *= 1.5f;
-
-            //if (body.velocity.y > 2.5) {
-            //    if (jumpHeld || State == Enums.PowerupState.MegaMushroom) {
-            //        body.gravityScale = slowriseGravity * slowriseModifier;
-            //    } else {
-            //        body.gravityScale = normalGravity * 1.5f * gravityModifier;
-            //    }
-            //} else if (IsOnGround || (IsGroundpounding && GroundpoundStartTimer.IsActive(Runner))) {
-            //    body.gravityScale = 0f;
-            //} else {
-            //    body.gravityScale = normalGravity * (gravityModifier / 1.2f);
-            //}
         }
 
         //Terminal velocity
