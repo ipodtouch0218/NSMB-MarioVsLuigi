@@ -4858,7 +4858,7 @@ GameObject:
   - component: {fileID: -1107023245251777124}
   m_Layer: 9
   m_Name: BigStar
-  m_TagString: bigstar
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -4,20 +4,11 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - goomba
-  - koopa
-  - Bullet
-  - bigstar
   - StarSpawn
-  - MainStar
-  - Fireball
-  - bobomb
   - MovingPlatform
-  - piranhaplant
   - pipe
   - LoadingCanvas
   - wintext
-  - bulletbill
   - spinner
   - platform
   - poison

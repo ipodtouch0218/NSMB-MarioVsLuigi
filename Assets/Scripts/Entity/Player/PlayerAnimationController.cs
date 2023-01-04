@@ -336,7 +336,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         HandleDeathAnimation();
         HandlePipeAnimation();
 
-        transform.position = new(transform.position.x, transform.position.y, controller.CurrentPipe ? 1 : -4);
+        transform.position = new(transform.position.x, transform.position.y, controller.IsDead ? -6 : (controller.CurrentPipe ? 1 : -4));
     }
 
     private void HandleDeathAnimation() {

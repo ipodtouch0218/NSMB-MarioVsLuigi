@@ -67,7 +67,7 @@ public class BulletBillMover : KillableEntity {
 
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
-        if (IsFrozen || player.IsFrozen)
+        if (IsFrozen || player.IsFrozen || (player.State == Enums.PowerupState.BlueShell && player.IsCrouching))
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
@@ -85,9 +85,9 @@ public class BulletBillMover : KillableEntity {
             return;
         }
         if (attackedFromAbove) {
-            if (!(player.State == Enums.PowerupState.MiniMushroom && !player.IsGroundpounding)) {
+            if (!(player.State == Enums.PowerupState.MiniMushroom && !player.IsGroundpounding))
                 Kill();
-            }
+
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.IsDrilling = false;
             player.IsGroundpounding = false;
@@ -133,6 +133,7 @@ public class BulletBillMover : KillableEntity {
 
 #if UNITY_EDITOR
     //---Debug
+    private static readonly Color RedHalfAlpha = new(1f, 0f, 0f, 0.5f);
     private Vector2? boxOffset;
     public void OnDrawGizmosSelected() {
         if (!GameManager.Instance)
@@ -140,7 +141,7 @@ public class BulletBillMover : KillableEntity {
 
         boxOffset ??= new Vector2(GameManager.Instance.LevelWidth, 0f);
 
-        Gizmos.color = new Color(1, 0, 0, 0.5f);
+        Gizmos.color = RedHalfAlpha;
         Gizmos.DrawCube(body.position, searchVector);
         //left border check
         if (body.position.x - playerSearchRadius < GameManager.Instance.LevelMinX)

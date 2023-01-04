@@ -223,4 +223,10 @@ public class StarBouncer : CollectableEntity {
     public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing when bumped
     }
+
+    //---BasicEntity overrides
+    public override void Destroy(DestroyCause cause) {
+        if (cause != DestroyCause.Lava)
+            base.Destroy(cause);
+    }
 }

@@ -46,7 +46,7 @@ namespace NSMB.Loading {
             }
         }
 
-        public void TeleportToBeginning() {
+        private void TeleportToBeginning() {
             goombaHit = false;
             goomba = mario.Scale > 0 && (mario.Scale >= 2 || Random.value < 0.5f);
             animator.SetBool("goomba", goomba);

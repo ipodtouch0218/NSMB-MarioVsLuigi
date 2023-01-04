@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 3106545712320729601}
   - component: {fileID: 6004104070224972752}
   - component: {fileID: 2500780753419200967}
+  - component: {fileID: 2023664385349516667}
   m_Layer: 10
-  m_Name: PoisonWater
-  m_TagString: poison
+  m_Name: Poison
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 64, y: 2}
+  m_Size: {x: 1.5, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -123,13 +124,13 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
     oldSize: {x: 0.16, y: 0.16}
-    newSize: {x: 64, y: 2}
+    newSize: {x: 1.5, y: 2}
     adaptiveTilingThreshold: 0.5
     drawMode: 1
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 64, y: 1.4}
+  m_Size: {x: 1.5, y: 1.4}
   m_EdgeRadius: 0
 --- !u!114 &2500780753419200967
 MonoBehaviour:
@@ -143,7 +144,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0733d35123a9ad4aaf63213211c5b4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  widthTiles: 128
+  _interpolationDataSource: 0
+  splashPrefab: {fileID: 5915462787734291377, guid: 54793bd6f9fdffd4cb86e445ffca9741,
+    type: 3}
+  widthTiles: 3
   pointsPerTile: 4
   splashWidth: 1
   heightTiles: 3
@@ -151,7 +155,29 @@ MonoBehaviour:
   kconstant: 100
   damping: 0.985
   splashVelocity: 10
-  resistance: 0
   animationSpeed: 9
-  splashParticle: Prefabs/Particle/PoisonWaterSplash
   fireDeath: 0
+--- !u!114 &2023664385349516667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6004104070224972751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 67841
+  NetworkGuid:
+    RawGuidValue: 2dd296828f2080541ab2b41eeda650a7
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 2500780753419200967}
+  SimulationBehaviours: []

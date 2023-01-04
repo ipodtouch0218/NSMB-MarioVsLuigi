@@ -41,6 +41,15 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
         sfx.PlayOneShot(sound, character, variant, volume);
     }
 
+    public virtual void Destroy(DestroyCause cause) {
+        Runner.Despawn(Object);
+    }
+
     //---IBlockBumpable overrides
     public abstract void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction);
+
+    //---Helpers
+    public enum DestroyCause {
+        None, Killplane, Lava
+    }
 }

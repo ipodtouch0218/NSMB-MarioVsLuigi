@@ -15,6 +15,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     [Networked] private float CurrentSpeed { get; set; }
     [Networked] public NetworkBool AlreadyBounced { get; set; }
     [Networked] public NetworkBool IsIceball { get; set; }
+    [Networked] public NetworkBool PlayBreakEffect { get; set; }
     [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
 
     //---Serialized Variables
@@ -41,6 +42,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         //vars
         IsActive = true;
         IsIceball = ice;
+        PlayBreakEffect = true;
         FacingRight = right;
         AlreadyBounced = false;
         Owner = owner;
@@ -101,7 +103,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
     }
 
-    public void Destroy() {
+    public override void Destroy(DestroyCause cause = DestroyCause.None) {
         IsActive = false;
         body.velocity = Vector2.zero;
         body.isKinematic = true;
@@ -276,6 +278,10 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
             //dont play particles below the killplane
             if (mover.body.position.y < GameManager.Instance.LevelMinY)
+                return;
+
+            //or if the killer said so
+            if (!mover.PlayBreakEffect)
                 return;
 
             if (mover.IsIceball) {

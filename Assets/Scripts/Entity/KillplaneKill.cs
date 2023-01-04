@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
+using UnityEngine.Rendering.UI;
 
 public class KillplaneKill : NetworkBehaviour {
 
@@ -13,21 +15,19 @@ public class KillplaneKill : NetworkBehaviour {
     //---Private Variables
     private bool killed;
 
-    public override void Spawned() {
-        KillTimer = TickTimer.CreateFromSeconds(Runner, killTime);
-    }
-
     public override void FixedUpdateNetwork() {
-        if (transform.position.y >= GameManager.Instance.LevelMinY)
-            return;
+        //used when we are networked
 
-        if (KillTimer.Expired(Runner)) {
-            KillTimer = TickTimer.None;
+        //if it is not running, check if we're below the stage
+        if (!KillTimer.IsRunning && transform.position.y < GameManager.Instance.LevelMinY)
+            KillTimer = TickTimer.CreateFromSeconds(Runner, killTime);
+
+        if (KillTimer.Expired(Runner))
             Runner.Despawn(Object);
-        }
     }
 
     public void Update() {
+        //used when we aren't networked
         if (killed || (Object && Object.IsValid))
             return;
 
