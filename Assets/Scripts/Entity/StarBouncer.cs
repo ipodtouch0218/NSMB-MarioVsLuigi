@@ -14,12 +14,13 @@ public class StarBouncer : CollectableEntity {
     [Networked] public NetworkBool DroppedByPit { get; set; }
     [Networked] public NetworkBool Collectable { get; set; }
     [Networked] public NetworkBool Fast { get; set; }
+    [Networked] public NetworkBool Passthrough { get; set; }
     [Networked] public TickTimer DespawnTimer { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private float pulseAmount = 0.2f, pulseSpeed = 0.2f, moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f, blinkingSpeed = 0.5f, lifespan = 15f;
-
-    public bool passthrough = true, fast = false;
+    [SerializeField] private float pulseAmount = 0.2f, pulseSpeed = 0.2f;
+    [SerializeField] private float moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f;
+    [SerializeField] private float blinkingSpeed = 0.5f, lifespan = 15f;
 
     //---Components
     private SpriteRenderer sRenderer;
@@ -38,12 +39,6 @@ public class StarBouncer : CollectableEntity {
         sRenderer = GetComponentInChildren<SpriteRenderer>();
         worldCollider = GetComponent<BoxCollider2D>();
         animator = GetComponent<Animator>();
-    }
-
-    public static void OnCollectedChanged(Changed<StarBouncer> changed) {
-        StarBouncer star = changed.Behaviour;
-        if (star.Collector)
-            star.Runner.Despawn(star.Object);
     }
 
     public void OnBeforeSpawned(byte direction, bool stationary, bool pit) {
@@ -72,10 +67,10 @@ public class StarBouncer : CollectableEntity {
         } else {
             //player dropped star
 
-            passthrough = true;
+            Passthrough = true;
             sRenderer.color = new(1, 1, 1, 0.55f);
             gameObject.layer = Layers.LayerHitsNothing;
-            body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (fast ? 2f : 1f), deathBoostAmount);
+            body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), deathBoostAmount);
 
             //death via pit boost
             if (DroppedByPit)
@@ -117,19 +112,19 @@ public class StarBouncer : CollectableEntity {
         if (IsStationary)
             return;
 
-        body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (fast ? 2f : 1f), body.velocity.y);
+        body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), body.velocity.y);
 
         Collectable |= body.velocity.y < 0;
 
         if (HandleCollision())
             return;
 
-        if (passthrough && Collectable && body.velocity.y <= 0 && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, AnyGroundMask)) {
-            passthrough = false;
+        if (Passthrough && Collectable && body.velocity.y <= 0 && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, AnyGroundMask)) {
+            Passthrough = false;
             gameObject.layer = Layers.LayerEntity;
             sRenderer.color = Color.white;
         }
-        if (!passthrough) {
+        if (!Passthrough) {
             if (Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale)) {
                 gameObject.layer = Layers.LayerHitsNothing;
             } else {
@@ -137,7 +132,7 @@ public class StarBouncer : CollectableEntity {
             }
         }
 
-        if (!passthrough && body.position.y < GameManager.Instance.LevelMinY)
+        if (!Passthrough && body.position.y < GameManager.Instance.LevelMinY)
             Runner.Despawn(Object, true);
     }
 
@@ -228,5 +223,12 @@ public class StarBouncer : CollectableEntity {
     public override void Destroy(DestroyCause cause) {
         if (cause != DestroyCause.Lava)
             base.Destroy(cause);
+    }
+
+    //---OnChangeds
+    public static void OnCollectedChanged(Changed<StarBouncer> changed) {
+        StarBouncer star = changed.Behaviour;
+        if (star.Collector)
+            star.Runner.Despawn(star.Object);
     }
 }

@@ -182,7 +182,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnCharacterChanged(Changed<PlayerData> changed) {
-        if (!MainMenuManager.Instance)
+        if (!MainMenuManager.Instance || !changed.Behaviour.Object.HasInputAuthority)
             return;
 
         MainMenuManager.Instance.SwapCharacter(changed.Behaviour.CharacterIndex, false);
@@ -190,7 +190,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnSkinChanged(Changed<PlayerData> changed) {
-        if (!MainMenuManager.Instance)
+        if (!MainMenuManager.Instance || !changed.Behaviour.Object.HasInputAuthority)
             return;
 
         MainMenuManager.Instance.SwapPlayerSkin(changed.Behaviour.SkinIndex, false);

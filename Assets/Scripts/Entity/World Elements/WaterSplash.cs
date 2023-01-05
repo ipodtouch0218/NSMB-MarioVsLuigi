@@ -129,6 +129,10 @@ public class WaterSplash : NetworkBehaviour {
                 continue;
             }
 
+            //don't splash stationary stars
+            if (entity is StarBouncer sb && sb.IsStationary)
+                continue;
+
             if (Runner.IsServer) {
                 if (!splashedEntities.Contains(obj.gameObject)) {
                     Rpc_Splash(entity.body.position, -Mathf.Abs(Mathf.Min(-3, entity.body.velocity.y)));

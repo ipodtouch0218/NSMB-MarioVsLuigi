@@ -14,7 +14,9 @@ public class BobombWalk : HoldableEntity {
 
     //---Serialized Variables
     [SerializeField] private GameObject explosionPrefab;
+#pragma warning disable CS0414
     [SerializeField] private float walkSpeed = 0.6f, kickSpeed = 4.5f, detonationTime = 4f;
+#pragma warning restore CS0414
     [SerializeField] private int explosionTileSize = 1;
 
     //---Misc Variables

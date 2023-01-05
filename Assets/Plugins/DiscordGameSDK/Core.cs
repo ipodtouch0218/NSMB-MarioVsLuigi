@@ -50,6 +50,7 @@ namespace Discord
         InvalidGiftCode = 41,
         PurchaseError = 42,
         TransactionAborted = 43,
+        DrawingInitFailed = 44,
     }
 
     public enum CreateFlags
@@ -87,6 +88,12 @@ namespace Discord
         User,
     }
 
+    public enum ActivityPartyPrivacy
+    {
+        Private = 0,
+        Public = 1,
+    }
+
     public enum ActivityType
     {
         Playing,
@@ -99,6 +106,13 @@ namespace Discord
     {
         Join = 1,
         Spectate,
+    }
+
+    public enum ActivitySupportedPlatformFlags
+    {
+        Desktop = 1,
+        Android = 2,
+        iOS = 4,
     }
 
     public enum ActivityJoinRequestReply
@@ -154,6 +168,20 @@ namespace Discord
         Default,
         Extended,
         Global,
+    }
+
+    public enum KeyVariant
+    {
+        Normal,
+        Right,
+        Left,
+    }
+
+    public enum MouseButton
+    {
+        Left,
+        Middle,
+        Right,
     }
 
     public enum EntitlementType
@@ -267,6 +295,8 @@ namespace Discord
         public string Id;
 
         public PartySize Size;
+
+        public ActivityPartyPrivacy Privacy;
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -307,6 +337,8 @@ namespace Discord
         public ActivitySecrets Secrets;
 
         public bool Instance;
+
+        public UInt32 SupportedPlatforms;
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -342,6 +374,32 @@ namespace Discord
         public UInt32 Capacity;
 
         public bool Locked;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public partial struct ImeUnderline
+    {
+        public Int32 From;
+
+        public Int32 To;
+
+        public UInt32 Color;
+
+        public UInt32 BackgroundColor;
+
+        public bool Thick;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public partial struct Rect
+    {
+        public Int32 Left;
+
+        public Int32 Top;
+
+        public Int32 Right;
+
+        public Int32 Bottom;
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -415,22 +473,22 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetTypeMethod(IntPtr methodsPtr, LobbyType type);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetOwnerMethod(IntPtr methodsPtr, Int64 ownerId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetCapacityMethod(IntPtr methodsPtr, UInt32 capacity);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetMetadataMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string key, [MarshalAs(UnmanagedType.LPStr)]string value);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result DeleteMetadataMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string key);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetLockedMethod(IntPtr methodsPtr, bool locked);
 
             internal SetTypeMethod SetType;
@@ -542,10 +600,10 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetMetadataMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string key, [MarshalAs(UnmanagedType.LPStr)]string value);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result DeleteMetadataMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string key);
 
             internal SetMetadataMethod SetMetadata;
@@ -601,16 +659,16 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result FilterMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string key, LobbySearchComparison comparison, LobbySearchCast cast, [MarshalAs(UnmanagedType.LPStr)]string value);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SortMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string key, LobbySearchCast cast, [MarshalAs(UnmanagedType.LPStr)]string value);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result LimitMethod(IntPtr methodsPtr, UInt32 limit);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result DistanceMethod(IntPtr methodsPtr, LobbySearchDistance distance);
 
             internal FilterMethod Filter;
@@ -708,52 +766,52 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void DestroyHandler(IntPtr MethodsPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result RunCallbacksMethod(IntPtr methodsPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SetLogHookCallback(IntPtr ptr, LogLevel level, [MarshalAs(UnmanagedType.LPStr)]string message);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SetLogHookMethod(IntPtr methodsPtr, LogLevel minLevel, IntPtr callbackData, SetLogHookCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetApplicationManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetUserManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetImageManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetActivityManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetRelationshipManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetLobbyManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetNetworkManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetOverlayManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetStorageManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetStoreManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetVoiceManagerMethod(IntPtr discordPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate IntPtr GetAchievementManagerMethod(IntPtr discordPtr);
 
             internal DestroyHandler Destroy;
@@ -847,7 +905,7 @@ namespace Discord
             internal UInt32 AchievementVersion;
         }
 
-        [DllImport(Constants.DllName, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(Constants.DllName, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
         private static extern Result DiscordCreate(UInt32 version, ref FFICreateParams createParams, out IntPtr manager);
 
         public delegate void SetLogHookHandler(LogLevel level, string message);
@@ -990,7 +1048,7 @@ namespace Discord
             OverlayEvents = new OverlayManager.FFIEvents();
             OverlayEventsPtr = Marshal.AllocHGlobal(Marshal.SizeOf(OverlayEvents));
             createParams.OverlayEvents = OverlayEventsPtr;
-            createParams.OverlayVersion = 1;
+            createParams.OverlayVersion = 2;
             StorageEvents = new StorageManager.FFIEvents();
             StorageEventsPtr = Marshal.AllocHGlobal(Marshal.SizeOf(StorageEvents));
             createParams.StorageEvents = StorageEventsPtr;
@@ -1008,7 +1066,7 @@ namespace Discord
             createParams.AchievementEvents = AchievementEventsPtr;
             createParams.AchievementVersion = 1;
             InitEvents(EventsPtr, ref Events);
-            var result = DiscordCreate(2, ref createParams, out MethodsPtr);
+            var result = DiscordCreate(3, ref createParams, out MethodsPtr);
             if (result != Result.Ok)
             {
                 Dispose();
@@ -1233,28 +1291,28 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ValidateOrExitCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ValidateOrExitMethod(IntPtr methodsPtr, IntPtr callbackData, ValidateOrExitCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetCurrentLocaleMethod(IntPtr methodsPtr, StringBuilder locale);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetCurrentBranchMethod(IntPtr methodsPtr, StringBuilder branch);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetOAuth2TokenCallback(IntPtr ptr, Result result, ref OAuth2Token oauth2Token);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetOAuth2TokenMethod(IntPtr methodsPtr, IntPtr callbackData, GetOAuth2TokenCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetTicketCallback(IntPtr ptr, Result result, [MarshalAs(UnmanagedType.LPStr)]ref string data);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetTicketMethod(IntPtr methodsPtr, IntPtr callbackData, GetTicketCallback callback);
 
             internal ValidateOrExitMethod ValidateOrExit;
@@ -1373,7 +1431,7 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void CurrentUserUpdateHandler(IntPtr ptr);
 
             internal CurrentUserUpdateHandler OnCurrentUserUpdate;
@@ -1382,19 +1440,19 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetCurrentUserMethod(IntPtr methodsPtr, ref User currentUser);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetUserCallback(IntPtr ptr, Result result, ref User user);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetUserMethod(IntPtr methodsPtr, Int64 userId, IntPtr callbackData, GetUserCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetCurrentUserPremiumTypeMethod(IntPtr methodsPtr, ref PremiumType premiumType);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result CurrentUserHasFlagMethod(IntPtr methodsPtr, UserFlag flag, ref bool hasFlag);
 
             internal GetCurrentUserMethod GetCurrentUser;
@@ -1518,16 +1576,16 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FetchCallback(IntPtr ptr, Result result, ImageHandle handleResult);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FetchMethod(IntPtr methodsPtr, ImageHandle handle, bool refresh, IntPtr callbackData, FetchCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetDimensionsMethod(IntPtr methodsPtr, ImageHandle handle, ref ImageDimensions dimensions);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetDataMethod(IntPtr methodsPtr, ImageHandle handle, byte[] data, Int32 dataLen);
 
             internal FetchMethod Fetch;
@@ -1614,16 +1672,16 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ActivityJoinHandler(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)]string secret);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ActivitySpectateHandler(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)]string secret);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ActivityJoinRequestHandler(IntPtr ptr, ref User user);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ActivityInviteHandler(IntPtr ptr, ActivityActionType type, ref User user, ref Activity activity);
 
             internal ActivityJoinHandler OnActivityJoin;
@@ -1638,40 +1696,40 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result RegisterCommandMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string command);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result RegisterSteamMethod(IntPtr methodsPtr, UInt32 steamId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void UpdateActivityCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void UpdateActivityMethod(IntPtr methodsPtr, ref Activity activity, IntPtr callbackData, UpdateActivityCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ClearActivityCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ClearActivityMethod(IntPtr methodsPtr, IntPtr callbackData, ClearActivityCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SendRequestReplyCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SendRequestReplyMethod(IntPtr methodsPtr, Int64 userId, ActivityJoinRequestReply reply, IntPtr callbackData, SendRequestReplyCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SendInviteCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SendInviteMethod(IntPtr methodsPtr, Int64 userId, ActivityActionType type, [MarshalAs(UnmanagedType.LPStr)]string content, IntPtr callbackData, SendInviteCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void AcceptInviteCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void AcceptInviteMethod(IntPtr methodsPtr, Int64 userId, IntPtr callbackData, AcceptInviteCallback callback);
 
             internal RegisterCommandMethod RegisterCommand;
@@ -1896,10 +1954,10 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void RefreshHandler(IntPtr ptr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void RelationshipUpdateHandler(IntPtr ptr, ref Relationship relationship);
 
             internal RefreshHandler OnRefresh;
@@ -1910,19 +1968,19 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate bool FilterCallback(IntPtr ptr, ref Relationship relationship);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FilterMethod(IntPtr methodsPtr, IntPtr callbackData, FilterCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result CountMethod(IntPtr methodsPtr, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetMethod(IntPtr methodsPtr, Int64 userId, ref Relationship relationship);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetAtMethod(IntPtr methodsPtr, UInt32 index, ref Relationship relationship);
 
             internal FilterMethod Filter;
@@ -2056,28 +2114,28 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void LobbyUpdateHandler(IntPtr ptr, Int64 lobbyId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void LobbyDeleteHandler(IntPtr ptr, Int64 lobbyId, UInt32 reason);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void MemberConnectHandler(IntPtr ptr, Int64 lobbyId, Int64 userId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void MemberUpdateHandler(IntPtr ptr, Int64 lobbyId, Int64 userId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void MemberDisconnectHandler(IntPtr ptr, Int64 lobbyId, Int64 userId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void LobbyMessageHandler(IntPtr ptr, Int64 lobbyId, Int64 userId, IntPtr dataPtr, Int32 dataLen);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SpeakingHandler(IntPtr ptr, Int64 lobbyId, Int64 userId, bool speaking);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void NetworkMessageHandler(IntPtr ptr, Int64 lobbyId, Int64 userId, byte channelId, IntPtr dataPtr, Int32 dataLen);
 
             internal LobbyUpdateHandler OnLobbyUpdate;
@@ -2100,136 +2158,136 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetLobbyCreateTransactionMethod(IntPtr methodsPtr, ref IntPtr transaction);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetLobbyUpdateTransactionMethod(IntPtr methodsPtr, Int64 lobbyId, ref IntPtr transaction);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetMemberUpdateTransactionMethod(IntPtr methodsPtr, Int64 lobbyId, Int64 userId, ref IntPtr transaction);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void CreateLobbyCallback(IntPtr ptr, Result result, ref Lobby lobby);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void CreateLobbyMethod(IntPtr methodsPtr, IntPtr transaction, IntPtr callbackData, CreateLobbyCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void UpdateLobbyCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void UpdateLobbyMethod(IntPtr methodsPtr, Int64 lobbyId, IntPtr transaction, IntPtr callbackData, UpdateLobbyCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void DeleteLobbyCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void DeleteLobbyMethod(IntPtr methodsPtr, Int64 lobbyId, IntPtr callbackData, DeleteLobbyCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ConnectLobbyCallback(IntPtr ptr, Result result, ref Lobby lobby);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ConnectLobbyMethod(IntPtr methodsPtr, Int64 lobbyId, [MarshalAs(UnmanagedType.LPStr)]string secret, IntPtr callbackData, ConnectLobbyCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ConnectLobbyWithActivitySecretCallback(IntPtr ptr, Result result, ref Lobby lobby);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ConnectLobbyWithActivitySecretMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string activitySecret, IntPtr callbackData, ConnectLobbyWithActivitySecretCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void DisconnectLobbyCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void DisconnectLobbyMethod(IntPtr methodsPtr, Int64 lobbyId, IntPtr callbackData, DisconnectLobbyCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetLobbyMethod(IntPtr methodsPtr, Int64 lobbyId, ref Lobby lobby);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetLobbyActivitySecretMethod(IntPtr methodsPtr, Int64 lobbyId, StringBuilder secret);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetLobbyMetadataValueMethod(IntPtr methodsPtr, Int64 lobbyId, [MarshalAs(UnmanagedType.LPStr)]string key, StringBuilder value);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetLobbyMetadataKeyMethod(IntPtr methodsPtr, Int64 lobbyId, Int32 index, StringBuilder key);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result LobbyMetadataCountMethod(IntPtr methodsPtr, Int64 lobbyId, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result MemberCountMethod(IntPtr methodsPtr, Int64 lobbyId, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetMemberUserIdMethod(IntPtr methodsPtr, Int64 lobbyId, Int32 index, ref Int64 userId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetMemberUserMethod(IntPtr methodsPtr, Int64 lobbyId, Int64 userId, ref User user);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetMemberMetadataValueMethod(IntPtr methodsPtr, Int64 lobbyId, Int64 userId, [MarshalAs(UnmanagedType.LPStr)]string key, StringBuilder value);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetMemberMetadataKeyMethod(IntPtr methodsPtr, Int64 lobbyId, Int64 userId, Int32 index, StringBuilder key);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result MemberMetadataCountMethod(IntPtr methodsPtr, Int64 lobbyId, Int64 userId, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void UpdateMemberCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void UpdateMemberMethod(IntPtr methodsPtr, Int64 lobbyId, Int64 userId, IntPtr transaction, IntPtr callbackData, UpdateMemberCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SendLobbyMessageCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SendLobbyMessageMethod(IntPtr methodsPtr, Int64 lobbyId, byte[] data, Int32 dataLen, IntPtr callbackData, SendLobbyMessageCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetSearchQueryMethod(IntPtr methodsPtr, ref IntPtr query);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SearchCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SearchMethod(IntPtr methodsPtr, IntPtr query, IntPtr callbackData, SearchCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void LobbyCountMethod(IntPtr methodsPtr, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetLobbyIdMethod(IntPtr methodsPtr, Int32 index, ref Int64 lobbyId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ConnectVoiceCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ConnectVoiceMethod(IntPtr methodsPtr, Int64 lobbyId, IntPtr callbackData, ConnectVoiceCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void DisconnectVoiceCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void DisconnectVoiceMethod(IntPtr methodsPtr, Int64 lobbyId, IntPtr callbackData, DisconnectVoiceCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result ConnectNetworkMethod(IntPtr methodsPtr, Int64 lobbyId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result DisconnectNetworkMethod(IntPtr methodsPtr, Int64 lobbyId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result FlushNetworkMethod(IntPtr methodsPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result OpenNetworkChannelMethod(IntPtr methodsPtr, Int64 lobbyId, byte channelId, bool reliable);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SendNetworkMessageMethod(IntPtr methodsPtr, Int64 lobbyId, Int64 userId, byte channelId, byte[] data, Int32 dataLen);
 
             internal GetLobbyCreateTransactionMethod GetLobbyCreateTransaction;
@@ -2890,10 +2948,10 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void MessageHandler(IntPtr ptr, UInt64 peerId, byte channelId, IntPtr dataPtr, Int32 dataLen);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void RouteUpdateHandler(IntPtr ptr, [MarshalAs(UnmanagedType.LPStr)]string routeData);
 
             internal MessageHandler OnMessage;
@@ -2904,28 +2962,28 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void GetPeerIdMethod(IntPtr methodsPtr, ref UInt64 peerId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result FlushMethod(IntPtr methodsPtr);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result OpenPeerMethod(IntPtr methodsPtr, UInt64 peerId, [MarshalAs(UnmanagedType.LPStr)]string routeData);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result UpdatePeerMethod(IntPtr methodsPtr, UInt64 peerId, [MarshalAs(UnmanagedType.LPStr)]string routeData);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result ClosePeerMethod(IntPtr methodsPtr, UInt64 peerId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result OpenChannelMethod(IntPtr methodsPtr, UInt64 peerId, byte channelId, bool reliable);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result CloseChannelMethod(IntPtr methodsPtr, UInt64 peerId, byte channelId);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SendMessageMethod(IntPtr methodsPtr, UInt64 peerId, byte channelId, byte[] data, Int32 dataLen);
 
             internal GetPeerIdMethod GetPeerId;
@@ -3113,7 +3171,7 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ToggleHandler(IntPtr ptr, bool locked);
 
             internal ToggleHandler OnToggle;
@@ -3122,35 +3180,80 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void IsEnabledMethod(IntPtr methodsPtr, ref bool enabled);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void IsLockedMethod(IntPtr methodsPtr, ref bool locked);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SetLockedCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SetLockedMethod(IntPtr methodsPtr, bool locked, IntPtr callbackData, SetLockedCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void OpenActivityInviteCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void OpenActivityInviteMethod(IntPtr methodsPtr, ActivityActionType type, IntPtr callbackData, OpenActivityInviteCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void OpenGuildInviteCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void OpenGuildInviteMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string code, IntPtr callbackData, OpenGuildInviteCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void OpenVoiceSettingsCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void OpenVoiceSettingsMethod(IntPtr methodsPtr, IntPtr callbackData, OpenVoiceSettingsCallback callback);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate Result InitDrawingDxgiMethod(IntPtr methodsPtr, IntPtr swapchain, bool useMessageForwarding);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void OnPresentMethod(IntPtr methodsPtr);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void ForwardMessageMethod(IntPtr methodsPtr, IntPtr message);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void KeyEventMethod(IntPtr methodsPtr, bool down, [MarshalAs(UnmanagedType.LPStr)]string keyCode, KeyVariant variant);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void CharEventMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string character);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void MouseButtonEventMethod(IntPtr methodsPtr, byte down, Int32 clickCount, MouseButton which, Int32 x, Int32 y);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void MouseMotionEventMethod(IntPtr methodsPtr, Int32 x, Int32 y);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void ImeCommitTextMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string text);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void ImeSetCompositionMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string text, ref ImeUnderline underlines, Int32 from, Int32 to);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void ImeCancelCompositionMethod(IntPtr methodsPtr);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void SetImeCompositionRangeCallbackCallback(IntPtr ptr, Int32 from, Int32 to, ref Rect bounds);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void SetImeCompositionRangeCallbackMethod(IntPtr methodsPtr, IntPtr callbackData, SetImeCompositionRangeCallbackCallback callback);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void SetImeSelectionBoundsCallbackCallback(IntPtr ptr, Rect anchor, Rect focus, bool isAnchorFirst);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate void SetImeSelectionBoundsCallbackMethod(IntPtr methodsPtr, IntPtr callbackData, SetImeSelectionBoundsCallbackCallback callback);
+
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            internal delegate bool IsPointInsideClickZoneMethod(IntPtr methodsPtr, Int32 x, Int32 y);
 
             internal IsEnabledMethod IsEnabled;
 
@@ -3163,6 +3266,32 @@ namespace Discord
             internal OpenGuildInviteMethod OpenGuildInvite;
 
             internal OpenVoiceSettingsMethod OpenVoiceSettings;
+
+            internal InitDrawingDxgiMethod InitDrawingDxgi;
+
+            internal OnPresentMethod OnPresent;
+
+            internal ForwardMessageMethod ForwardMessage;
+
+            internal KeyEventMethod KeyEvent;
+
+            internal CharEventMethod CharEvent;
+
+            internal MouseButtonEventMethod MouseButtonEvent;
+
+            internal MouseMotionEventMethod MouseMotionEvent;
+
+            internal ImeCommitTextMethod ImeCommitText;
+
+            internal ImeSetCompositionMethod ImeSetComposition;
+
+            internal ImeCancelCompositionMethod ImeCancelComposition;
+
+            internal SetImeCompositionRangeCallbackMethod SetImeCompositionRangeCallback;
+
+            internal SetImeSelectionBoundsCallbackMethod SetImeSelectionBoundsCallback;
+
+            internal IsPointInsideClickZoneMethod IsPointInsideClickZone;
         }
 
         public delegate void SetLockedHandler(Result result);
@@ -3172,6 +3301,10 @@ namespace Discord
         public delegate void OpenGuildInviteHandler(Result result);
 
         public delegate void OpenVoiceSettingsHandler(Result result);
+
+        public delegate void SetImeCompositionRangeCallbackHandler(Int32 from, Int32 to, ref Rect bounds);
+
+        public delegate void SetImeSelectionBoundsCallbackHandler(Rect anchor, Rect focus, bool isAnchorFirst);
 
         public delegate void ToggleHandler(bool locked);
 
@@ -3286,6 +3419,95 @@ namespace Discord
             Methods.OpenVoiceSettings(MethodsPtr, GCHandle.ToIntPtr(wrapped), OpenVoiceSettingsCallbackImpl);
         }
 
+        public void InitDrawingDxgi(IntPtr swapchain, bool useMessageForwarding)
+        {
+            var res = Methods.InitDrawingDxgi(MethodsPtr, swapchain, useMessageForwarding);
+            if (res != Result.Ok)
+            {
+                throw new ResultException(res);
+            }
+        }
+
+        public void OnPresent()
+        {
+            Methods.OnPresent(MethodsPtr);
+        }
+
+        public void ForwardMessage(IntPtr message)
+        {
+            Methods.ForwardMessage(MethodsPtr, message);
+        }
+
+        public void KeyEvent(bool down, string keyCode, KeyVariant variant)
+        {
+            Methods.KeyEvent(MethodsPtr, down, keyCode, variant);
+        }
+
+        public void CharEvent(string character)
+        {
+            Methods.CharEvent(MethodsPtr, character);
+        }
+
+        public void MouseButtonEvent(byte down, Int32 clickCount, MouseButton which, Int32 x, Int32 y)
+        {
+            Methods.MouseButtonEvent(MethodsPtr, down, clickCount, which, x, y);
+        }
+
+        public void MouseMotionEvent(Int32 x, Int32 y)
+        {
+            Methods.MouseMotionEvent(MethodsPtr, x, y);
+        }
+
+        public void ImeCommitText(string text)
+        {
+            Methods.ImeCommitText(MethodsPtr, text);
+        }
+
+        public void ImeSetComposition(string text, ImeUnderline underlines, Int32 from, Int32 to)
+        {
+            Methods.ImeSetComposition(MethodsPtr, text, ref underlines, from, to);
+        }
+
+        public void ImeCancelComposition()
+        {
+            Methods.ImeCancelComposition(MethodsPtr);
+        }
+
+        [MonoPInvokeCallback]
+        private static void SetImeCompositionRangeCallbackCallbackImpl(IntPtr ptr, Int32 from, Int32 to, ref Rect bounds)
+        {
+            GCHandle h = GCHandle.FromIntPtr(ptr);
+            SetImeCompositionRangeCallbackHandler callback = (SetImeCompositionRangeCallbackHandler)h.Target;
+            h.Free();
+            callback(from, to, ref bounds);
+        }
+
+        public void SetImeCompositionRangeCallback(SetImeCompositionRangeCallbackHandler callback)
+        {
+            GCHandle wrapped = GCHandle.Alloc(callback);
+            Methods.SetImeCompositionRangeCallback(MethodsPtr, GCHandle.ToIntPtr(wrapped), SetImeCompositionRangeCallbackCallbackImpl);
+        }
+
+        [MonoPInvokeCallback]
+        private static void SetImeSelectionBoundsCallbackCallbackImpl(IntPtr ptr, Rect anchor, Rect focus, bool isAnchorFirst)
+        {
+            GCHandle h = GCHandle.FromIntPtr(ptr);
+            SetImeSelectionBoundsCallbackHandler callback = (SetImeSelectionBoundsCallbackHandler)h.Target;
+            h.Free();
+            callback(anchor, focus, isAnchorFirst);
+        }
+
+        public void SetImeSelectionBoundsCallback(SetImeSelectionBoundsCallbackHandler callback)
+        {
+            GCHandle wrapped = GCHandle.Alloc(callback);
+            Methods.SetImeSelectionBoundsCallback(MethodsPtr, GCHandle.ToIntPtr(wrapped), SetImeSelectionBoundsCallbackCallbackImpl);
+        }
+
+        public bool IsPointInsideClickZone(Int32 x, Int32 y)
+        {
+            return Methods.IsPointInsideClickZone(MethodsPtr, x, y);
+        }
+
         [MonoPInvokeCallback]
         private static void OnToggleImpl(IntPtr ptr, bool locked)
         {
@@ -3309,46 +3531,46 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result ReadMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string name, byte[] data, Int32 dataLen, ref UInt32 read);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ReadAsyncCallback(IntPtr ptr, Result result, IntPtr dataPtr, Int32 dataLen);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ReadAsyncMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string name, IntPtr callbackData, ReadAsyncCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ReadAsyncPartialCallback(IntPtr ptr, Result result, IntPtr dataPtr, Int32 dataLen);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void ReadAsyncPartialMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string name, UInt64 offset, UInt64 length, IntPtr callbackData, ReadAsyncPartialCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result WriteMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string name, byte[] data, Int32 dataLen);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void WriteAsyncCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void WriteAsyncMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string name, byte[] data, Int32 dataLen, IntPtr callbackData, WriteAsyncCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result DeleteMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string name);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result ExistsMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string name, ref bool exists);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void CountMethod(IntPtr methodsPtr, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result StatMethod(IntPtr methodsPtr, [MarshalAs(UnmanagedType.LPStr)]string name, ref FileStat stat);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result StatAtMethod(IntPtr methodsPtr, Int32 index, ref FileStat stat);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetPathMethod(IntPtr methodsPtr, StringBuilder path);
 
             internal ReadMethod Read;
@@ -3549,10 +3771,10 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void EntitlementCreateHandler(IntPtr ptr, ref Entitlement entitlement);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void EntitlementDeleteHandler(IntPtr ptr, ref Entitlement entitlement);
 
             internal EntitlementCreateHandler OnEntitlementCreate;
@@ -3563,43 +3785,43 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FetchSkusCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FetchSkusMethod(IntPtr methodsPtr, IntPtr callbackData, FetchSkusCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void CountSkusMethod(IntPtr methodsPtr, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetSkuMethod(IntPtr methodsPtr, Int64 skuId, ref Sku sku);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetSkuAtMethod(IntPtr methodsPtr, Int32 index, ref Sku sku);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FetchEntitlementsCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FetchEntitlementsMethod(IntPtr methodsPtr, IntPtr callbackData, FetchEntitlementsCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void CountEntitlementsMethod(IntPtr methodsPtr, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetEntitlementMethod(IntPtr methodsPtr, Int64 entitlementId, ref Entitlement entitlement);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetEntitlementAtMethod(IntPtr methodsPtr, Int32 index, ref Entitlement entitlement);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result HasSkuEntitlementMethod(IntPtr methodsPtr, Int64 skuId, ref bool hasEntitlement);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void StartPurchaseCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void StartPurchaseMethod(IntPtr methodsPtr, Int64 skuId, IntPtr callbackData, StartPurchaseCallback callback);
 
             internal FetchSkusMethod FetchSkus;
@@ -3815,7 +4037,7 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SettingsUpdateHandler(IntPtr ptr);
 
             internal SettingsUpdateHandler OnSettingsUpdate;
@@ -3824,37 +4046,37 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetInputModeMethod(IntPtr methodsPtr, ref InputMode inputMode);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SetInputModeCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SetInputModeMethod(IntPtr methodsPtr, InputMode inputMode, IntPtr callbackData, SetInputModeCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result IsSelfMuteMethod(IntPtr methodsPtr, ref bool mute);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetSelfMuteMethod(IntPtr methodsPtr, bool mute);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result IsSelfDeafMethod(IntPtr methodsPtr, ref bool deaf);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetSelfDeafMethod(IntPtr methodsPtr, bool deaf);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result IsLocalMuteMethod(IntPtr methodsPtr, Int64 userId, ref bool mute);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetLocalMuteMethod(IntPtr methodsPtr, Int64 userId, bool mute);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetLocalVolumeMethod(IntPtr methodsPtr, Int64 userId, ref byte volume);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result SetLocalVolumeMethod(IntPtr methodsPtr, Int64 userId, byte volume);
 
             internal GetInputModeMethod GetInputMode;
@@ -4042,7 +4264,7 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIEvents
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void UserAchievementUpdateHandler(IntPtr ptr, ref UserAchievement userAchievement);
 
             internal UserAchievementUpdateHandler OnUserAchievementUpdate;
@@ -4051,25 +4273,25 @@ namespace Discord
         [StructLayout(LayoutKind.Sequential)]
         internal partial struct FFIMethods
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SetUserAchievementCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void SetUserAchievementMethod(IntPtr methodsPtr, Int64 achievementId, byte percentComplete, IntPtr callbackData, SetUserAchievementCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FetchUserAchievementsCallback(IntPtr ptr, Result result);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void FetchUserAchievementsMethod(IntPtr methodsPtr, IntPtr callbackData, FetchUserAchievementsCallback callback);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate void CountUserAchievementsMethod(IntPtr methodsPtr, ref Int32 count);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetUserAchievementMethod(IntPtr methodsPtr, Int64 userAchievementId, ref UserAchievement userAchievement);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             internal delegate Result GetUserAchievementAtMethod(IntPtr methodsPtr, Int32 index, ref UserAchievement userAchievement);
 
             internal SetUserAchievementMethod SetUserAchievement;
