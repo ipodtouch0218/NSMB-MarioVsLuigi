@@ -19,11 +19,11 @@ public class ScoreboardUpdater : MonoBehaviour {
     private bool manuallyToggled = false, autoToggled = false;
 
     public void OnEnable() {
-        ControlSystem.controls.UI.Scoreboard.performed += OnToggle;
+        ControlSystem.controls.UI.Scoreboard.performed += OnToggleScoreboard;
     }
 
     public void OnDisable() {
-        ControlSystem.controls.UI.Scoreboard.performed -= OnToggle;
+        ControlSystem.controls.UI.Scoreboard.performed -= OnToggleScoreboard;
     }
 
     public void Awake() {
@@ -31,10 +31,10 @@ public class ScoreboardUpdater : MonoBehaviour {
         animator = GetComponent<Animator>();
         entryComparer ??= new ScoreboardEntry.EntryComparer();
 
-        teamsHeader.SetActive(SessionData.Instance?.Teams ?? false);
+        teamsHeader.SetActive(SessionData.Instance ? SessionData.Instance.Teams : false);
     }
 
-    private void OnToggle(InputAction.CallbackContext context) {
+    private void OnToggleScoreboard(InputAction.CallbackContext context) {
         ManualToggle();
     }
 
@@ -46,7 +46,7 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     public void ManualToggle() {
         if (autoToggled && !manuallyToggled) {
-            //exception, already open. close.
+            // exception: the scoreboard's already open. close.
             manuallyToggled = false;
             autoToggled = false;
         } else {
@@ -61,25 +61,28 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
 
     public void OnDeathToggle() {
-        if (!manuallyToggled) {
-            PlayAnimation(true);
-            autoToggled = true;
-        }
+        if (manuallyToggled)
+            return;
+
+        PlayAnimation(true);
+        autoToggled = true;
     }
 
     public void OnRespawnToggle() {
-        if (!manuallyToggled) {
-            PlayAnimation(false);
-            autoToggled = false;
-        }
+        if (manuallyToggled)
+            return;
+
+        PlayAnimation(false);
+        autoToggled = false;
     }
 
-    public void Reposition() {
+    public void RepositionEntries() {
+        // Order the scoreboard entries by stars, lives, then id
         entries.Sort(entryComparer);
         entries.ForEach(se => se.transform.SetAsLastSibling());
     }
 
-    public void Populate(IEnumerable<PlayerController> players) {
+    public void CreateEntries(IEnumerable<PlayerController> players) {
         foreach (PlayerController player in players) {
             if (!player)
                 continue;
@@ -95,6 +98,6 @@ public class ScoreboardUpdater : MonoBehaviour {
             entries.Add(entry);
         }
 
-        Reposition();
+        RepositionEntries();
     }
 }

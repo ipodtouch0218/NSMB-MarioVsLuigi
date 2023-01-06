@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -8,6 +7,7 @@ using NSMB.Utils;
 [RequireComponent(typeof(GameManager))]
 public class GameEventRpcs : NetworkBehaviour {
 
+    //---Static Variables
     private static readonly Vector3 OneFourth = new(0.25f, 0.25f);
 
     //---Private Variables
@@ -53,6 +53,7 @@ public class GameEventRpcs : NetworkBehaviour {
         tilemap.SetTile(new(x, y, 0), tile);
     }
 
+#pragma warning disable IDE0060
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_UpdateSpectatorTilemap([RpcTarget] PlayerRef targetPlayer, TileChangeInfo[] changes, string[] tileNames) {
         foreach (TileChangeInfo change in changes) {
@@ -60,22 +61,23 @@ public class GameEventRpcs : NetworkBehaviour {
             tilemap.SetTile(new(change.x, change.y, 0), tile);
         }
     }
+#pragma warning restore IDE0060
 
-    //---LOADING
-
+    //---GAME STATE
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_EndGame(int team) {
         if (gm.gameover)
             return;
 
-        //TODO: don't use a coroutine?
+        // TODO: don't use a coroutine?
+        // eh, it should be alrite, since it's an RPC and isn't predictive.
         StartCoroutine(gm.EndGame(team));
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_LoadingComplete() {
-        //Populate scoreboard
-        ScoreboardUpdater.Instance.Populate(gm.AlivePlayers);
+        // Populate scoreboard
+        ScoreboardUpdater.Instance.CreateEntries(gm.AlivePlayers);
         if (Settings.Instance.scoreboardAlways)
             ScoreboardUpdater.Instance.SetEnabled();
 

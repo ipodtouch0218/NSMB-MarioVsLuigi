@@ -4,6 +4,7 @@ using UnityEngine.Rendering.Universal;
 
 using Fusion;
 using NSMB.Utils;
+using System;
 
 public class DebugControls : MonoBehaviour {
 
@@ -46,6 +47,9 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.F5, PrefabList.Instance.Enemy_Bobomb);
         DebugEntity(Key.F6, PrefabList.Instance.Enemy_BulletBill);
         DebugEntity(Key.F7, PrefabList.Instance.Enemy_Spiny);
+        DebugEntity(Key.F8, PrefabList.Instance.Obj_BigStar, (runner, obj) => {
+            obj.GetComponent<StarBouncer>().OnBeforeSpawned(2, false, false);
+        });
 
         FreezePlayer(Key.F9);
 
@@ -99,12 +103,12 @@ public class DebugControls : MonoBehaviour {
         });
     }
 
-    private void DebugEntity(Key key, NetworkPrefabRef enemy) {
+    private void DebugEntity(Key key, NetworkPrefabRef enemy, NetworkRunner.OnBeforeSpawned spawned = null) {
         if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame)
             return;
 
         Vector3 pos = GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().FacingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0);
-        NetworkHandler.Instance.runner.Spawn(enemy, pos);
+        NetworkHandler.Instance.runner.Spawn(enemy, pos, onBeforeSpawned: spawned);
     }
 #endif
 }

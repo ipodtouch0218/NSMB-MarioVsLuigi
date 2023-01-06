@@ -50,18 +50,20 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
     [SerializeField] public GameObject objectPoolParent;
+    [SerializeField] private TMP_Text winText;
+    [SerializeField] private Animator winTextAnimator;
 
     //---Properties
     public NetworkRNG Random { get; set; }
 
     private float? levelWidth, levelHeight, middleX, minX, minY, maxX, maxY;
-    public float LevelWidth => levelWidth ??= levelWidthTile * tilemap.transform.localScale.x;
-    public float LevelHeight => levelHeight ??= levelHeightTile * tilemap.transform.localScale.x;
-    public float LevelMinX => minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-    public float LevelMaxX => maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float LevelWidth =>   levelWidth ??= levelWidthTile * tilemap.transform.localScale.x;
+    public float LevelHeight =>  levelHeight ??= levelHeightTile * tilemap.transform.localScale.x;
+    public float LevelMinX =>    minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float LevelMaxX =>    maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
     public float LevelMiddleX => middleX ??= LevelMinX + (LevelWidth * 0.5f);
-    public float LevelMinY => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
-    public float LevelMaxY => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    public float LevelMinY =>    minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    public float LevelMaxY =>    maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
 
     //---Public Variables
     public readonly HashSet<NetworkObject> networkObjects = new();
@@ -84,7 +86,6 @@ public class GameManager : NetworkBehaviour {
     private GameObject[] starSpawns;
 
     //Audio
-    public Enums.MusicState? musicState = null;
     private bool hurryUpSoundPlayed;
 
     //---Components
@@ -92,6 +93,7 @@ public class GameManager : NetworkBehaviour {
     private LoopingMusic loopMusic;
     public AudioSource music, sfx;
 
+    //TODO: figure out how to do rollback-able.... fuck
     public void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
         TileBase[] tileObjects = new TileBase[tiles.Length];
         for (int i = 0; i < tiles.Length; i++) {
@@ -119,7 +121,7 @@ public class GameManager : NetworkBehaviour {
         particle.transform.position += new Vector3(sr.size.x * 0.25f, size.y * 0.25f * (flip ? -1 : 1));
     }
 
-    //Register pause event
+    // Register pause & networking events
     public void OnEnable() {
         ControlSystem.controls.UI.Pause.performed += OnPause;
         NetworkHandler.OnShutdown +=     OnShutdown;
@@ -135,6 +137,8 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void OnValidate() {
+        // Remove our cached values if we change something in editor.
+        // We shouldn't have to worry about values changing mid-game ever.
         levelWidth = levelHeight = middleX = minX = minY = maxX = maxY = null;
     }
 
@@ -154,9 +158,9 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void Start() {
-        //spawning in editor
+        // Handles spawning in editor
         if (!NetworkHandler.Runner.SessionInfo.IsValid) {
-            //join a singleplayer room if we're not in one
+            // Join a singleplayer room if we're not in one
             _ = NetworkHandler.CreateRoom(new() {
                 Scene = SceneManager.GetActiveScene().buildIndex,
             }, GameMode.Single);
@@ -164,27 +168,27 @@ public class GameManager : NetworkBehaviour {
     }
 
     public override void Spawned() {
-        //by default, spectate. when we get assigned a player object, we disable it there.
+        // By default, spectate. when we get assigned a player object, we disable it there.
         spectationManager.Spectating = true;
 
-        //Load + enable player controls
+        // Load + enable player controls
         ControlSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
         Runner.ProvideInput = true;
 
-        //Setup respawning tilemap
+        // Setup respawning tilemap
         tilemap.RefreshAllTiles();
 
-        //Find objects in the scene
+        // Find objects in the scene
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
         enemySpawns = FindObjectsOfType<EnemySpawnpoint>();
 
         if (Runner.IsServer && Runner.IsSinglePlayer) {
-            //handle spawning in editor by spawning the room + player objects
+            // Handle spawning in editor by spawning the room + player data objects
             Runner.Spawn(PrefabList.Instance.SessionDataHolder);
             Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
         }
 
-        //tell our host that we're done loading
+        // Tell our host that we're done loading
         PlayerData localData = Runner.GetLocalPlayerData();
         localData.Rpc_FinishedLoading();
     }
@@ -193,13 +197,9 @@ public class GameManager : NetworkBehaviour {
         if (!runner.IsServer || !hasState)
             return;
 
-        //remove all network objects.
+        // Remove all networked objects. Fusion doesn't do this for us, unlike PUN.
         foreach (var obj in networkObjects)
             runner.Despawn(obj);
-    }
-
-    public void OnPlayerLoaded() {
-        CheckIfAllPlayersLoaded();
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
@@ -208,6 +208,7 @@ public class GameManager : NetworkBehaviour {
 
         //send spectating player the current level
         if (Utils.GetTilemapChanges(originalTiles, originalTilesOrigin, tilemap, out TileChangeInfo[] tilePositions, out string[] tileNames)) {
+            Debug.Log($"sent spectator tile changes. {tilePositions.Length} tiles changed.");
             rpcs.Rpc_UpdateSpectatorTilemap(player, tilePositions, tileNames);
         }
     }
@@ -230,8 +231,12 @@ public class GameManager : NetworkBehaviour {
         SceneManager.LoadScene(0);
     }
 
-    private void CheckIfAllPlayersLoaded() {
-        if (!Runner.IsServer || loaded)
+    /// <summary>
+    /// Officially starts the game if all clients say that they're loaded.
+    /// </summary>
+    public void CheckIfAllPlayersLoaded() {
+        // If we aren't the server, don't bother checking. We can't start the game regardless.
+        if (!Runner || !Runner.IsServer || loaded)
             return;
 
         if (!Runner.IsSinglePlayer) {
@@ -246,11 +251,23 @@ public class GameManager : NetworkBehaviour {
             }
         }
 
+        // Everyone is loaded, officially start the game.
         loaded = true;
         SceneManager.SetActiveScene(gameObject.scene);
         GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0f : 5.7f);
 
-        //create player instances
+        // Find out how many players we have
+        foreach (PlayerRef client in Runner.ActivePlayers) {
+            PlayerData data = client.GetPlayerData(Runner);
+            if (!data || data.IsCurrentlySpectating)
+                continue;
+
+            RealPlayerCount++;
+        }
+
+        List<int> spawnpoints = Enumerable.Range(0, RealPlayerCount).ToList();
+
+        // Create player instances
         foreach (PlayerRef player in Runner.ActivePlayers) {
             PlayerData data = player.GetPlayerData(Runner);
             if (!data)
@@ -260,11 +277,17 @@ public class GameManager : NetworkBehaviour {
             if (data.IsCurrentlySpectating)
                 continue;
 
-            Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player);
-            RealPlayerCount++;
+            Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player, onBeforeSpawned: (runner, obj) => {
+                // Set the spawnpoint that they should spawn at
+                int index = UnityEngine.Random.Range(0, spawnpoints.Count);
+                int spawnpoint = spawnpoints[index];
+                spawnpoints.RemoveAt(index);
+
+                obj.GetComponent<PlayerController>().OnBeforeSpawned(spawnpoint);
+            });
         }
 
-        //create pooled fireball instances (6 per player)
+        // Create pooled Fireball instances (max of 6 per player)
         for (int i = 0; i < RealPlayerCount * 6; i++)
             Runner.Spawn(PrefabList.Instance.Obj_Fireball);
 
@@ -277,56 +300,55 @@ public class GameManager : NetworkBehaviour {
     }
 
     private void StartGame() {
-        //Spawn players
+        // Respawn players
         foreach (PlayerController player in AlivePlayers)
             player.PreRespawn();
 
-        //Play start sfx
+        // Play start jingle
         if (Runner.IsForward)
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
+        StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
-        //Respawn enemies
+        // Respawn enemies
         foreach (EnemySpawnpoint point in enemySpawns)
             point.AttemptSpawning();
 
-        //Start timer
+        // Start timer
         int timer = SessionData.Instance.Timer;
         if (timer > 0)
             GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer);
 
-        //Start some things that should be booted
+        // Start "WaitForGameStart" objects
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
             wfgs.AttemptExecute();
 
-        //Big star
+        // Spawn the initial Big Star
         AttemptSpawnBigStar();
 
+        // Keep track of game timestamps
         GameStartTime = Runner.SimulationTime;
-
         gameStartTimestamp = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
         gameEndTimestamp = (timer > 0) ? gameStartTimestamp + timer * 1000 : 0;
 
+        // Update Discord RPC status
         GlobalController.Instance.DiscordController.UpdateActivity();
-
-        StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
     }
 
     internal IEnumerator EndGame(int winningTeam) {
         gameover = true;
         SessionData.Instance.SetGameStarted(false);
 
+        //TODO: Clean this up, massively.
         music.Stop();
-        GameObject text = GameObject.FindWithTag("wintext");
-        TMP_Text tmpText = text.GetComponent<TMP_Text>();
 
         if (winningTeam == -1) {
-            tmpText.text = "It's a draw...";
+            winText.text = "It's a draw...";
         } else {
             if (SessionData.Instance.Teams) {
                 Team team = ScriptableManager.Instance.teams[winningTeam];
-                tmpText.text = team.displayName + " Wins!";
+                winText.text = team.displayName + " Wins!";
             } else {
-                tmpText.text = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname() + " Wins!";
+                winText.text = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname() + " Wins!";
             }
         }
 
@@ -338,48 +360,44 @@ public class GameManager : NetworkBehaviour {
 
         if (draw) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Draw);
-            text.GetComponent<Animator>().SetTrigger("startNegative");
-        }
-        else if (win) {
+            winTextAnimator.SetTrigger("startNegative");
+        } else if (win) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Win);
-            text.GetComponent<Animator>().SetTrigger("start");
-        }
-        else {
+            winTextAnimator.SetTrigger("start");
+        } else {
             music.PlayOneShot(Enums.Sounds.UI_Match_Lose);
-            text.GetComponent<Animator>().SetTrigger("startNegative");
+            winTextAnimator.SetTrigger("startNegative");
         }
 
         //TODO: make a results screen?
 
         if (Runner.IsServer) {
-            //handle player states
+            // Handle resetting player states for the next game
             foreach (PlayerRef player in Runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(Runner);
 
-                //set loading state = false
+                // Set IsLoaded to false
                 data.IsLoaded = false;
 
-                //disable spectating
+                // Set spectating state to false
                 data.IsCurrentlySpectating = false;
 
-                //move non-teams into valid teams range
+                // Move people without teams into a valid teams range
                 if (SessionData.Instance.Teams)
                     data.Team = (sbyte) Mathf.Clamp(data.Team, 0, ScriptableManager.Instance.teams.Length);
             }
         }
 
-        foreach (PlayerRef player in Runner.ActivePlayers)
-            player.GetPlayerData(Runner).IsLoaded = false;
-
+        // Return back to the main menu
         yield return new WaitForSecondsRealtime(secondsUntilMenu);
         Runner.SetActiveScene(0);
     }
 
     public override void FixedUpdateNetwork() {
-
         if (gameover)
             return;
 
+        // Seed RNG for this tick
         Random = new(Runner.Simulation.Tick);
 
         if (IsMusicEnabled)
@@ -400,6 +418,7 @@ public class GameManager : NetworkBehaviour {
             IsMusicEnabled = true;
         }
 
+        // Handle sound effects for the timer, if it's enabled
         if (GameEndTimer.IsRunning) {
             if (GameEndTimer.Expired(Runner)) {
                 CheckForWinner();
@@ -439,12 +458,12 @@ public class GameManager : NetworkBehaviour {
             Vector3 spawnPos = activeStarSpawns[index].transform.position;
 
             if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 4, Layers.MaskOnlyPlayers)) {
-                //a player is too close to the spawn
+                // A player is too close to this spawn. Discard
                 activeStarSpawns.RemoveAt(index);
                 continue;
             }
 
-            //Valid spawn
+            // Found a valid spawn
             Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
                 obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
             });
@@ -452,7 +471,7 @@ public class GameManager : NetworkBehaviour {
             return;
         }
 
-        //no star could spawn. wait a few and try again...
+        // No star could spawn. wait a few ticks and try again...
         BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
     }
 
@@ -462,6 +481,9 @@ public class GameManager : NetworkBehaviour {
         nametag.SetActive(true);
     }
 
+    /// <summary>
+    /// Checks if a team has won, and calls Rpc_EndGame if so
+    /// </summary>
     public void CheckForWinner() {
         if (gameover || !Object.HasStateAuthority)
             return;
@@ -474,44 +496,37 @@ public class GameManager : NetworkBehaviour {
         bool timeUp = GameEndTimer.Expired(Runner);
 
         if (aliveTeams == 0) {
-            //all teams dead, draw?
+            // All teams dead, draw?
             rpcs.Rpc_EndGame(PlayerRef.None);
             return;
         }
 
         if (aliveTeams == 1 && RealPlayerCount > 1) {
-            //one team left alive (and it's not a solo game), they win.
+            // One team left alive (and it's not a solo game), they win immediately.
             rpcs.Rpc_EndGame(firstPlaceTeam);
             return;
         }
 
         if (hasFirstPlace) {
-            //we have a team that's clearly in first...
+            // We have a team that's clearly in first...
             if (starGame && firstPlaceStars >= requiredStars) {
-                //and they have enough stars.
+                // And they have enough stars.
                 rpcs.Rpc_EndGame(firstPlaceTeam);
                 return;
             }
-            //they don't have enough stars. wait 'till later
+            // They don't have enough stars. wait 'till later
         }
 
         if (timeUp) {
-            //ran out of time, instantly end if DrawOnTimeUp is set
+            // Ran out of time, instantly end if DrawOnTimeUp is set
             if (SessionData.Instance.DrawOnTimeUp) {
-                //no one wins
+                // No one wins
                 rpcs.Rpc_EndGame(PlayerRef.None);
                 return;
             }
-            //keep playing
+            // Keep playing into overtime.
         }
-    }
-
-    private void TryChangeSong(Enums.MusicState state, MusicData musicToPlay) {
-        if (musicState == state)
-            return;
-
-        loopMusic.Play(musicToPlay);
-        musicState = state;
+        // Keep playing
     }
 
     private void HandleMusic() {
@@ -531,11 +546,11 @@ public class GameManager : NetworkBehaviour {
         speedup |= AlivePlayers.Count <= 2 && AlivePlayers.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
 
         if (mega) {
-            TryChangeSong(Enums.MusicState.MegaMushroom, megaMushroomMusic);
+            loopMusic.Play(megaMushroomMusic);
         } else if (invincible) {
-            TryChangeSong(Enums.MusicState.Starman, invincibleMusic);
+            loopMusic.Play(invincibleMusic);
         } else {
-            TryChangeSong(Enums.MusicState.Normal, mainMusic);
+            loopMusic.Play(mainMusic);
         }
 
         loopMusic.FastMusic = speedup;

@@ -23,11 +23,6 @@ public static class Enums {
         Normal, HalfBlink, FullBlink, Death
     }
 
-    // Music Enums
-    public enum MusicState {
-        Normal, MegaMushroom, Starman
-    }
-
     //Sound effects
     public enum Sounds : byte {
         //CURRENT HIGHEST NUMBER: 94

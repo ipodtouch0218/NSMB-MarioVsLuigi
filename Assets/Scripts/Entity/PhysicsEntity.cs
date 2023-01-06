@@ -14,6 +14,7 @@ public class PhysicsEntity : NetworkBehaviour {
     [Networked] public NetworkBool HitLeft { get; set; }
     [Networked] public NetworkBool HitRight { get; set; }
     [Networked] public NetworkBool CrushableGround { get; set; }
+    [Networked] public Vector2 PreviousTickVelocity { get; set; }
     [Networked] public float FloorAngle { get; set; }
 
     //---Public Variables
@@ -23,7 +24,14 @@ public class PhysicsEntity : NetworkBehaviour {
     [SerializeField] private bool goUpSlopes;
     [SerializeField] private float floorAndRoofCutoff = 0.5f;
 
-    private void Start() {
+    //---Components
+    private Rigidbody2D body;
+
+    public void Awake() {
+        body = GetComponent<Rigidbody2D>();
+    }
+
+    public void Start() {
         if (GroundMask == default)
             GroundMask = LayerMask.GetMask("Ground", "IceBlock");
     }
@@ -46,19 +54,29 @@ public class PhysicsEntity : NetworkBehaviour {
                 continue;
 
             if (Vector2.Dot(point.normal, Vector2.up) > floorAndRoofCutoff) {
-                //touching floor
+                // touching floor
+                // If we're moving upwards, don't touch the floor.
+                // Most likely, we're inside a semisolid.
+                if (PreviousTickVelocity.y > 0)
+                    continue;
+
+                // Make sure that we're also above the floor, so we don't
+                // get crushed when inside a semisolid.
+                if (point.point.y > currentCollider.bounds.min.y)
+                    continue;
+
                 OnGround = true;
                 CrushableGround |= !point.collider.gameObject.CompareTag("platform");
                 FloorAngle = Vector2.SignedAngle(Vector2.up, point.normal);
             } else if (GroundMask == (GroundMask | (1 << point.collider.gameObject.layer))) {
                 if (Vector2.Dot(point.normal, Vector2.down) > floorAndRoofCutoff) {
-                    //touching roof
+                    // touching roof
                     HitRoof = true;
                 } else {
-                    //touching a wall
-                    if (Mathf.Abs(previousHeightY - point.point.y) < 0.2f) {
+                    // touching a wall
+                    if (Mathf.Abs(previousHeightY - point.point.y) < 0.2f)
                         continue;
-                    }
+
                     previousHeightY = point.point.y;
 
                     if (point.normal.x < 0) {
@@ -71,5 +89,7 @@ public class PhysicsEntity : NetworkBehaviour {
         }
         HitRight = hitRightCount >= 1;
         HitLeft = hitLeftCount >= 1;
+
+        PreviousTickVelocity = body.velocity;
     }
 }

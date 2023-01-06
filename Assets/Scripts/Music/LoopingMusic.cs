@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class LoopingMusic : MonoBehaviour {
 
+    //---Properties
     private bool _fastMusic;
     public bool FastMusic {
         set {
@@ -28,23 +29,13 @@ public class LoopingMusic : MonoBehaviour {
         get => currentSong.fastClip && _fastMusic;
     }
 
+    //---Serialized Variables
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private MusicData currentSong;
 
     public void Start() {
         if (currentSong)
-            Play(currentSong);
-    }
-
-    public void Play(MusicData song) {
-        currentSong = song;
-        audioSource.loop = true;
-        audioSource.clip = _fastMusic && song.fastClip ? song.fastClip : song.clip;
-        audioSource.time = 0;
-        audioSource.Play();
-    }
-    public void Stop() {
-        audioSource.Stop();
+            Play(currentSong, true);
     }
 
     public void Update() {
@@ -59,5 +50,20 @@ public class LoopingMusic : MonoBehaviour {
             if (time >= songEnd)
                 audioSource.time = songStart + (time - songEnd);
         }
+    }
+
+    public void Play(MusicData song, bool restartIfAlreadyPlaying = false) {
+        if (currentSong == song && !restartIfAlreadyPlaying)
+            return;
+
+        currentSong = song;
+        audioSource.loop = true;
+        audioSource.clip = _fastMusic && song.fastClip ? song.fastClip : song.clip;
+        audioSource.time = 0;
+        audioSource.Play();
+    }
+
+    public void Stop() {
+        audioSource.Stop();
     }
 }

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 
 using NSMB.Utils;
-using System.Linq;
 
 public class TeamScoreboard : MonoBehaviour {
 
@@ -35,7 +35,7 @@ public class TeamScoreboard : MonoBehaviour {
             UpdateText();
     }
 
-    public bool CheckForStarCountUpdates() {
+    private bool CheckForStarCountUpdates() {
         bool updated = false;
         foreach (int index in teamStars.Keys.ToList()) {
             int currStars = teamStars[index];
@@ -49,7 +49,7 @@ public class TeamScoreboard : MonoBehaviour {
         return updated;
     }
 
-    public void UpdateText() {
+    private void UpdateText() {
         string newString = "";
         foreach ((int index, int stars) in teamStars)
             newString += ScriptableManager.Instance.teams[index].textSprite + Utils.GetSymbolString(stars.ToString()) + " ";

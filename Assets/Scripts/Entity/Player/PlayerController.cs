@@ -9,6 +9,7 @@ using UnityEngine.Tilemaps;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using Mono.Cecil;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 
@@ -28,6 +29,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public byte Stars { get; set; }
     [Networked] public byte Coins { get; set; }
     [Networked] public sbyte Lives { get; set; }
+    [Networked] private sbyte SpawnpointIndex { get; set; }
     //-Player Movement
     //Generic
     [Networked] public PlayerNetworkInput PreviousInputs { get; set; }
@@ -132,7 +134,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private int GravityStage {
         get {
             float yVel = body.velocity.y;
-            float?[] arr = GRAVITY_STAGE_MAX;
+            float?[] arr = State == Enums.PowerupState.MegaMushroom ? GRAVITY_MEGA_MAX : (State == Enums.PowerupState.MiniMushroom ? GRAVITY_MINI_MAX : GRAVITY_STAGE_MAX);
             for (int i = 1; i < arr.Length; i++) {
                 if (yVel >= arr[i])
                     return i - 1;
@@ -158,7 +160,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
 
 
-    [SerializeField] public float flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, jumpVelocity = 6.25f, megaJumpVelocity = 16f, launchVelocity = 12f, wallslideSpeed = -4.25f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
+    [SerializeField] public float flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, launchVelocity = 12f, wallslideSpeed = -4.25f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
     [SerializeField] public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, propellerDrillBuffer, heightSmallModel = 0.42f, heightLargeModel = 0.82f;
     [SerializeField] private GameObject models;
     [SerializeField] public CharacterData character;
@@ -188,7 +190,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float[] SPEED_STAGE_SPINNER_ACC = { 7.91015625f, 3.955078125f };
 
     private static readonly float[] SPEED_STAGE_MEGA_ACC = { 28.125f, 4.83398433f, 4.83398433f, 4.83398433f, 4.83398433f };
-    private static readonly float[] WALK_TURNAROUND_MEGA_ACC = { 4.614257808f, 10.546875f, 21.09375f };
+    private static readonly float[] WALK_TURNAROUND_MEGA_ACC = { 4.614257808f, 10.546875f, 21.09375f, 21.09375f };
 
     private static readonly float TURNAROUND_THRESHOLD = 2.8125f;
     private static readonly float TURNAROUND_ACC = 28.125f;
@@ -201,13 +203,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float SLIDING_22_ACC = 5.2734375f;
 
     private static readonly float?[] GRAVITY_STAGE_MAX = { null, 4.16015625f, 2.109375f, 0f, -5.859375f };
-    private static readonly float?[] GRAVITY_STAGE_ACC = { null, -28.125f, -38.671875f, -28.125f, -38.671875f };
+    private static readonly float[] GRAVITY_STAGE_ACC = { -7.03125f, -28.125f, -38.671875f, -28.125f, -38.671875f };
     private static readonly float?[] GRAVITY_MINI_MAX = { null, 4.566650390625f, 2.633056640625f, 0f, -3.929443359375f };
-    private static readonly float?[] GRAVITY_MINI_ACC = { null, -7.03125f, -10.546875f, -7.03125f, -10.546875f};
-    private static readonly float GRAVITY_HELD = -7.03125f;
-    private static readonly float GRAVITY_MINI_HELD = -4.833984375f;
-
-
+    private static readonly float[] GRAVITY_MINI_ACC = { -4.833984375f, -7.03125f, -10.546875f, -7.03125f, -10.546875f};
+    private static readonly float?[] GRAVITY_MEGA_MAX = { null, 4.04296875f,};
+    private static readonly float[] GRAVITY_MEGA_ACC = { -28.125f, -38.671875f };
 
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
@@ -251,6 +251,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         NetworkHandler.OnInputMissing -= OnInputMissing;
     }
 
+    public void OnBeforeSpawned(int spawnpoint) {
+        SpawnpointIndex = (sbyte) spawnpoint;
+    }
+
     public override void Spawned() {
         base.Spawned();
 
@@ -273,7 +277,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         //use |= as the spectate manager sets it first
         cameraController.IsControllingCamera |= Object.HasInputAuthority;
 
-        Vector3 spawnpoint = GameManager.Instance.GetSpawnpoint(PlayerId, 1);
+        Vector3 spawnpoint = GameManager.Instance.GetSpawnpoint(0, 1);
         networkRigidbody.TeleportToPosition(spawnpoint);
         cameraController.Recenter(spawnpoint);
 
@@ -1049,7 +1053,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         body.isKinematic = true;
         body.velocity = Vector2.zero;
 
-        Vector2 spawnpoint = GameManager.Instance.GetSpawnpoint(PlayerId);
+        Vector2 spawnpoint = GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
         transform.position = body.position = spawnpoint;
         cameraController.Recenter(spawnpoint);
     }
@@ -1580,7 +1584,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         } else if (hitLeft || hitRight) {
             //walljump starting check
-            bool canWallslide = !IsInShell && body.velocity.y < -0.1f && !IsGroundpounding && !IsOnGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !IsSpinnerFlying && !IsDrilling && !IsCrouching && !IsSliding && !IsInKnockback;
+            bool canWallslide = !IsInShell && body.velocity.y < -0.1f && !IsGroundpounding && !IsOnGround && !HeldEntity && State != Enums.PowerupState.MegaMushroom && !IsSpinnerFlying && !IsDrilling && !IsCrouching && !IsSliding && !IsInKnockback && PropellerLaunchTimer.ExpiredOrNotRunning(Runner);
             if (!canWallslide)
                 return;
 
@@ -1682,10 +1686,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IgnoreCoyoteTime = true;
         IsOnGround = false;
 
+        float t = Mathf.Clamp01(Mathf.Abs(body.velocity.x) - SPEED_STAGE_MAX[1] + (SPEED_STAGE_MAX[1] * 0.5f));
         float vel = State switch {
-            Enums.PowerupState.MegaMushroom => megaJumpVelocity,
-            Enums.PowerupState.MiniMushroom => 5.408935546875f + Mathf.Lerp(0, 0.428466796875f, Mathf.Clamp01(Mathf.Abs(body.velocity.x) - SPEED_STAGE_MAX[1] + (SPEED_STAGE_MAX[1] * 0.5f))),
-            _ => 6.62109375f + Mathf.Lerp(0, 0.46875f, Mathf.Clamp01(Mathf.Abs(body.velocity.x) - SPEED_STAGE_MAX[1] + (SPEED_STAGE_MAX[1] * 0.5f)))
+            Enums.PowerupState.MegaMushroom => 12.1875f + Mathf.Lerp(0, 0.52734375f, t),
+            Enums.PowerupState.MiniMushroom => 5.408935546875f + Mathf.Lerp(0, 0.428466796875f, t),
+            _ => 6.62109375f + Mathf.Lerp(0, 0.46875f, t),
         };
 
         if (canSpecialJump && JumpState == PlayerJumpState.SingleJump) {
@@ -2418,21 +2423,23 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 if (GroundpoundStartTimer.IsActive(Runner)) {
                     body.gravityScale = 0.15f;
                 } else {
-                    body.gravityScale = GRAVITY_STAGE_ACC[^1].Value / Physics.gravity.y;
+                    body.gravityScale = GRAVITY_STAGE_ACC[^1] / Physics.gravity.y;
                 }
             } else if (IsOnGround || (Runner.SimulationTime <= CoyoteTime - 0.02f)) {
                 body.gravityScale = 0.15f;
             } else {
                 int stage = GravityStage;
+                bool mega = State == Enums.PowerupState.MegaMushroom;
                 bool mini = State == Enums.PowerupState.MiniMushroom;
-                float? acc = (mini ? GRAVITY_MINI_ACC : GRAVITY_STAGE_ACC)[stage];
-                if (jumpHeld) {
-                    acc ??= (mini ? GRAVITY_MINI_HELD : GRAVITY_HELD);
-                } else {
-                    acc = (mini ? GRAVITY_MINI_ACC : GRAVITY_STAGE_ACC)[^1];
-                }
 
-                body.gravityScale = acc.Value / Physics2D.gravity.y;
+                float?[] maxArr = mega ? GRAVITY_MEGA_MAX : (mini ? GRAVITY_MINI_MAX : GRAVITY_STAGE_MAX);
+                float[] accArr = mega ? GRAVITY_MEGA_ACC : (mini ? GRAVITY_MINI_ACC : GRAVITY_STAGE_ACC);
+
+                float acc = accArr[stage];
+                if (maxArr[GravityStage] == null)
+                    acc = jumpHeld ? accArr[0] : accArr[^1];
+
+                body.gravityScale = acc / Physics2D.gravity.y;
             }
         }
 

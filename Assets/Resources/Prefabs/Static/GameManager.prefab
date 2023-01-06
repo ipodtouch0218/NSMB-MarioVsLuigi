@@ -5547,6 +5547,8 @@ MonoBehaviour:
   richPresenceId: 
   levelName: Unknown
   objectPoolParent: {fileID: 7998357169434227364}
+  winText: {fileID: 3474641543873908501}
+  winTextAnimator: {fileID: 8395432290395498094}
   particleManager: {fileID: 0}
   rpcs: {fileID: 0}
   nametagCanvas: {fileID: 5453462452561088483}

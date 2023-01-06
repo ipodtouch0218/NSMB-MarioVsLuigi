@@ -3604,7 +3604,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\n<color=yellow>Game by</color>\nipodtouch0218\n\n<color=yellow>Github
-    Contributors</color>\nGradedWarrior\nTheMoogle\nSkillz\nSkarph\nZest\nkittenchilly\nAmy54Desu\nKraken\nShadowWalker13\nPerez\nmindnomad\nJeffjewett27\nAtwerJ\nPordrack\n\n<color=yellow>Music</color>\nRENREN\nRiver
+    Contributors</color>\nGradedWarrior\nTheMoogle\nSkillz\nSkarph\nZest\nkittenchilly\nAmy54Desu\nKraken\nShadowWalker13\nPerez\nmindnomad\nJeffjewett27\nAtwerJ\nPordrack\nvlcoo\n\n<color=yellow>Music</color>\nRENREN\nRiver
     J\n\n<color=yellow>QA Testing</color>\nTheCyVap\nShadow_Walker13\nFawndue\n\n<color=yellow>Level
     Design</color>\nSkarph\nTheCyVap\nmindnomad\n\n<color=yellow>Original Game /
     Resources</color>\nNew Super Mario Bros.\nNew Super Mario Bros. Wii\nSuper Mario
@@ -6327,7 +6327,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36.65
+  m_fontSize: 36.7
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -18305,8 +18305,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 887693661}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: OpenLobbyMenu
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: OpenRoomListMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -32770,8 +32770,8 @@ RectTransform:
   - {fileID: 965484367}
   - {fileID: 1304607404}
   - {fileID: 1593795830}
-  - {fileID: 536087968}
   - {fileID: 749373549}
+  - {fileID: 536087968}
   - {fileID: 182241349}
   - {fileID: 1325357896}
   - {fileID: 1386786003}
@@ -82112,8 +82112,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 887693661}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: OpenCreateLobby
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: OpenCreateRoomPrompt
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

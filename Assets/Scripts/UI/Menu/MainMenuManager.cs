@@ -59,86 +59,71 @@ public class MainMenuManager : MonoBehaviour {
     private bool validName;
     private byte currentSkin;
 
-    // LOBBY CALLBACKS
-    public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
-        int index = Array.IndexOf(NetworkHandler.Regions, info.Region);
-
-        if (index != -1)
-            regionDropdown.SetValueWithoutNotify(index);
-    }
-
-    // ROOM CALLBACKS
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        waitingForJoinMessage.Add(player);
-        UpdateStartGameButton();
-    }
-
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        chat.AddChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
-        sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
-        UpdateStartGameButton();
-    }
-
-    // CONNECTION CALLBACKS
-    public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
-        if (cause != ShutdownReason.Ok)
-            OpenErrorBox(cause);
-
-        GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
-    }
-
-    public void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
-        OpenErrorBox(cause);
-
-        if (!runner.IsCloudReady) {
-            roomManager.ClearRooms();
-        }
-    }
-
-    // Unity Stuff
     public void Awake() {
         Instance = this;
     }
 
+    public void OnEnable() {
+        // Register network callbacks
+        NetworkHandler.OnPlayerJoined +=       OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft +=         OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect +=       OnLobbyConnect;
+        NetworkHandler.OnShutdown +=           OnShutdown;
+        NetworkHandler.OnJoinSessionFailed +=  OnShutdown;
+        NetworkHandler.OnConnectFailed +=      OnConnectFailed;
+    }
+
+    public void OnDisable() {
+        // Unregister network callbacks
+        NetworkHandler.OnPlayerJoined -=       OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -=         OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect -=       OnLobbyConnect;
+        NetworkHandler.OnShutdown -=           OnShutdown;
+        NetworkHandler.OnJoinSessionFailed -=  OnShutdown;
+        NetworkHandler.OnConnectFailed -=      OnConnectFailed;
+    }
+
     public void Start() {
-        //Clear game-specific settings so they don't carry over
+        // Clear game-specific settings so they don't carry over
         HorizontalCamera.SizeIncreaseTarget = 0;
         HorizontalCamera.SizeIncreaseCurrent = 0;
 
         if (GlobalController.Instance.disconnectCause != null) {
-            OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
+            if (GlobalController.Instance.disconnectCause != ShutdownReason.Ok)
+                OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
+
             GlobalController.Instance.disconnectCause = null;
         }
 
-        //Level Dropdown
+        // Level Dropdown
         PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
         levelDropdown.AddOptions(maps.Select(md => md.mapName).ToList());
 
-        //Region Dropdown
+        // Region Dropdown
         regionDropdown.ClearOptions();
         regionDropdown.AddOptions(NetworkHandler.Regions.ToList());
 
-        //Photon stuff.
-        ApplySettings();
-
+        // Photon stuff.
         if (!Runner.IsCloudReady) {
-            //initial connection to the game
+            // Initial connection to the game
             OpenTitleScreen();
             _ = NetworkHandler.ConnectToRegion();
 
         } else if (Runner.SessionInfo.IsValid) {
-            //call enterroom callback
+            // Call enterroom callback
             EnterRoom();
         }
 
+        // Controls & Settings
+        rebindManager.Init();
+        ApplySettings();
         nicknameField.characterLimit = NicknameMax;
         UpdateNickname();
 
-        rebindManager.Init();
-
+        // Discord RPC
         GlobalController.Instance.DiscordController.UpdateActivity();
-        EventSystem.current.SetSelectedGameObject(title);
 
+        // Version Checking
 #if PLATFORM_WEBGL
         fullscreenToggle.interactable = false;
 #else
@@ -154,24 +139,8 @@ public class MainMenuManager : MonoBehaviour {
             GlobalController.Instance.checkedForVersion = true;
         }
 #endif
-    }
 
-    public void OnEnable() {
-        NetworkHandler.OnPlayerJoined +=       OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft +=         OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect +=       OnLobbyConnect;
-        NetworkHandler.OnShutdown +=           OnShutdown;
-        NetworkHandler.OnJoinSessionFailed +=  OnShutdown;
-        NetworkHandler.OnConnectFailed +=      OnConnectFailed;
-    }
-
-    public void OnDisable() {
-        NetworkHandler.OnPlayerJoined -=       OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft -=         OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect -=       OnLobbyConnect;
-        NetworkHandler.OnShutdown -=           OnShutdown;
-        NetworkHandler.OnJoinSessionFailed -=  OnShutdown;
-        NetworkHandler.OnConnectFailed -=      OnConnectFailed;
+        EventSystem.current.SetSelectedGameObject(title);
     }
 
     public void Update() {
@@ -198,47 +167,57 @@ public class MainMenuManager : MonoBehaviour {
     private IEnumerator UpdatePings() {
         while (true) {
             yield return WaitTwoSeconds;
-            foreach (PlayerRef player in Runner.ActivePlayers)
+            foreach (PlayerRef player in Runner.ActivePlayers) {
                 player.GetPlayerData(Runner).Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
+            }
         }
     }
 
     public void EnterRoom() {
 
+        // If the game is already started, we want to immediately load in.
         if (SessionData.Instance.GameStarted) {
             OnGameStartChanged();
             return;
         }
 
+        // Start the ping update routine if we're the server
         if (Runner.IsServer && playerPingUpdateCoroutine == null)
             playerPingUpdateCoroutine = StartCoroutine(UpdatePings());
 
-        StartCoroutine(SetScroll());
+        // Open the in-room menu
+        OpenInRoomMenu();
+        StartCoroutine(ResetRoomSettingScrollPosition());
 
+        // Set the player settings
         PlayerData data = Runner.GetLocalPlayerData();
         characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.character);
         SwapPlayerSkin(data ? data.SkinIndex : Settings.Instance.skin, false);
         spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
-        OpenInLobbyMenu();
+        // Set the room settings
+        hostControlsGroup.interactable = data.IsRoomOwner;
+        roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
 
+        // Preview the current level
+        PreviewLevel(SessionData.Instance.Level);
+
+        // Reset chat input field
+        chatTextField.SetTextWithoutNotify("");
+
+        // Host chat notification
         if (Runner.IsServer)
             chat.AddChatMessage("You are the room's host! Click on your players' names to control your room.", Color.red);
 
+        // Update the room header text
         SessionInfo session = Runner.SessionInfo;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
         bool addS = !name.ToLower().EndsWith("s");
         lobbyHeaderText.text = name.ToValidUsername() + "'" + (addS ? "s" : "") + " Room";
 
-        //clear chat input field
-        chatTextField.SetTextWithoutNotify("");
-
+        // Discord RPC
         GlobalController.Instance.DiscordController.UpdateActivity(session);
 
-        hostControlsGroup.interactable = data.IsRoomOwner;
-        roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
-
-        PreviewLevel(SessionData.Instance.Level);
     }
 
     public void PreviewLevel(int levelIndex) {
@@ -248,7 +227,7 @@ public class MainMenuManager : MonoBehaviour {
         Camera.main.transform.position = maps[levelIndex].levelPreviewPosition.transform.position;
     }
 
-    private IEnumerator SetScroll() {
+    private IEnumerator ResetRoomSettingScrollPosition() {
         settingsScroll.verticalNormalizedPosition = 1;
         yield return null;
         settingsScroll.verticalNormalizedPosition = 1;
@@ -281,7 +260,7 @@ public class MainMenuManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
 
     }
-    public void OpenLobbyMenu() {
+    public void OpenRoomListMenu() {
         DisableAllMenus();
         bg.SetActive(true);
         lobbyMenu.SetActive(true);
@@ -290,7 +269,7 @@ public class MainMenuManager : MonoBehaviour {
 
         EventSystem.current.SetSelectedGameObject(lobbySelected);
     }
-    public void OpenCreateLobby() {
+    public void OpenCreateRoomPrompt() {
         DisableAllMenus();
         bg.SetActive(true);
         lobbyMenu.SetActive(true);
@@ -321,7 +300,7 @@ public class MainMenuManager : MonoBehaviour {
 
         EventSystem.current.SetSelectedGameObject(creditsSelected);
     }
-    public void OpenInLobbyMenu() {
+    public void OpenInRoomMenu() {
         DisableAllMenus();
         bg.SetActive(true);
         inLobbyMenu.SetActive(true);
@@ -348,8 +327,7 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     private void ApplySettings() {
-        nicknameField.text = Settings.Instance.nickname;
-
+        nicknameField.text =         Settings.Instance.nickname;
         musicSlider.value =          Settings.Instance.VolumeMusic;
         sfxSlider.value =            Settings.Instance.VolumeSFX;
         masterSlider.value =         Settings.Instance.VolumeMaster;
@@ -385,7 +363,7 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public async void QuitRoom() {
-        OpenLobbyMenu();
+        OpenRoomListMenu();
         chat.ClearChat();
 
         if (playerPingUpdateCoroutine != null) {
@@ -403,59 +381,45 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void StartGame() {
-
-        //don't start if everyone's a spectator
-        if (Runner.ActivePlayers.All(ap => ap.GetPlayerData(Runner).IsManualSpectator))
+        // We can't start the game if we're not the server.
+        if (!Runner.IsServer)
             return;
 
-        //do host related stuff
-        if (Runner.IsServer) {
-            //set starting
+        // Make sure we can actually start the game
+        if (!IsRoomConfigurationValid())
+            return;
 
-            bool teamMode = SessionData.Instance.Teams;
-            bool hasTwoTeams = false;
-            int teamOne = -1;
+        // Actually start the game.
+        SessionData.Instance.SetGameStarted(true);
 
-            //set spectating values for players
-            sbyte count = 0;
-            foreach (PlayerRef player in Runner.ActivePlayers) {
-                PlayerData data = player.GetPlayerData(Runner);
+        // Set PlayerIDs and spectator values for players
+        sbyte count = 0;
+        foreach (PlayerRef player in Runner.ActivePlayers) {
+            PlayerData data = player.GetPlayerData(Runner);
+            if (!data)
+                continue;
 
-                if (!data)
-                    continue;
+            data.IsCurrentlySpectating = data.IsManualSpectator;
+            data.IsLoaded = false;
 
-                data.IsCurrentlySpectating = data.IsManualSpectator;
-                if (data.IsCurrentlySpectating) {
-                    data.PlayerId = -1;
-                    data.Team = -1;
-                } else {
-                    data.PlayerId = count;
-                    if (!teamMode) {
-                        data.Team = count;
-                    } else if (data.Team == -1) {
-                        data.Team = 0;
-                    }
-
-                    if (!hasTwoTeams) {
-                        if (teamOne == -1)
-                            teamOne = data.Team;
-                        else if (teamOne != data.Team)
-                            hasTwoTeams = true;
-                    }
-
-                    count++;
-                }
+            if (data.IsCurrentlySpectating) {
+                data.PlayerId = -1;
+                data.Team = -1;
+                continue;
             }
 
-            //don't start if there's only one team (if not singleplayer)
-            if (teamMode && !hasTwoTeams && count != 1)
-                return;
+            data.PlayerId = count;
+            if (!SessionData.Instance.Teams) {
+                data.Team = count;
+            } else if (data.Team == -1) {
+                data.Team = 0;
+            }
 
-            SessionData.Instance.SetGameStarted(true);
-
-            //load the correct scene
-            Runner.SetActiveScene(GetCurrentSceneRef());
+            count++;
         }
+
+        // Load the correct scene
+        Runner.SetActiveScene(GetCurrentSceneRef());
     }
 
     public void CreateRoom() {
@@ -476,19 +440,23 @@ public class MainMenuManager : MonoBehaviour {
             return;
         }
 
-        IEnumerable<PlayerData> datas = Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner));
+        startGameBtn.interactable = IsRoomConfigurationValid();
+    }
+
+    private bool IsRoomConfigurationValid() {
+        List<PlayerData> nonSpectators = Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner)).Where(pd => !pd.IsManualSpectator).ToList();
         bool validRoomConfig = true;
 
-        int realPlayers = datas.Where(pd => !pd.IsManualSpectator).Count();
+        int realPlayers = nonSpectators.Count();
         validRoomConfig &= realPlayers >= 1;
 
         //only do team checks if there's more than one player
-        if (SessionData.Instance.Teams && datas.Count() > 1) {
-            int teams = datas.Where(pd => !pd.IsManualSpectator).Select(pd => pd.Team).Distinct().Count();
+        if (SessionData.Instance.Teams && realPlayers > 1) {
+            int teams = nonSpectators.Select(pd => pd.Team).Distinct().Count();
             validRoomConfig &= teams > 1;
         }
 
-        startGameBtn.interactable = validRoomConfig;
+        return validRoomConfig;
     }
 
     public void Kick(PlayerRef target) {
@@ -706,6 +674,43 @@ public class MainMenuManager : MonoBehaviour {
 
         byte index = SessionData.Instance.Level;
         return maps[index].buildIndex;
+    }
+
+    // Network callbacks
+    // LOBBY CALLBACKS
+    public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
+        int index = Array.IndexOf(NetworkHandler.Regions, info.Region);
+
+        if (index != -1)
+            regionDropdown.SetValueWithoutNotify(index);
+    }
+
+    // ROOM CALLBACKS
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+        waitingForJoinMessage.Add(player);
+        UpdateStartGameButton();
+    }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        chat.AddChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
+        sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
+        UpdateStartGameButton();
+    }
+
+    // CONNECTION CALLBACKS
+    public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
+        if (cause != ShutdownReason.Ok)
+            OpenErrorBox(cause);
+
+        GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
+    }
+
+    public void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
+        OpenErrorBox(cause);
+
+        if (!runner.IsCloudReady) {
+            roomManager.ClearRooms();
+        }
     }
 
     //---Debug

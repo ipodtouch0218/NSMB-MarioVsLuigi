@@ -1,12 +1,13 @@
 using UnityEngine;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "BreakableBrickTile", menuName = "ScriptableObjects/Tiles/BreakableBrickTile")]
 public class BreakableBrickTile : InteractableTile {
 
-    [ColorUsage(false), SerializeField] protected Color particleColor;
+    //---Serialized Variables
+    [SerializeField] protected Color particleColor;
     [SerializeField] public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
 
     protected bool BreakBlockCheck(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {

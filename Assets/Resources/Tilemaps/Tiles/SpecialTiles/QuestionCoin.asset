@@ -23,7 +23,7 @@ MonoBehaviour:
   m_AnimationStartTime: 0
   m_AnimationStartFrame: 0
   m_TileColliderType: 2
-  particleColor: {r: 0.9254902, g: 0.80784315, b: 0.39215687, a: 0}
+  particleColor: {r: 0.9254902, g: 0.80784315, b: 0.39215687, a: 1}
   breakableBySmallMario: 0
   breakableByLargeMario: 0
   breakableByGiantMario: 1

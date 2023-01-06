@@ -4902,16 +4902,16 @@ MonoBehaviour:
     _value: 0
   _Fast:
     _value: 0
+  _Passthrough:
+    _value: 0
   pulseAmount: 0.15
   pulseSpeed: 16
   moveSpeed: 1.5
   rotationSpeed: 6
-  bounceAmount: 7
+  bounceAmount: 7.5
   deathBoostAmount: 8.5
   blinkingSpeed: 0.25
   lifespan: 15
-  passthrough: 0
-  fast: 0
 --- !u!50 &1973747262660636108
 Rigidbody2D:
   serializedVersion: 4
@@ -5040,6 +5040,7 @@ MonoBehaviour:
     _value: 0
   _CrushableGround:
     _value: 0
+  _PreviousTickVelocity: {x: 0, y: 0}
   _FloorAngle: 0
   currentCollider: {fileID: 1973747262660636111}
   goUpSlopes: 0

@@ -22,9 +22,11 @@ public class ScoreboardEntry : MonoBehaviour {
     private int playerId, currentLives, currentStars;
     private bool isCameraController, rainbowEnabled;
 
-    public void Start() {
-
+    public void Awake() {
         rectTransform = GetComponent<RectTransform>();
+    }
+
+    public void Start() {
 
         if (!target) {
             enabled = false;
@@ -65,14 +67,14 @@ public class ScoreboardEntry : MonoBehaviour {
             return;
         }
 
+        // No changes. don't do anything, as we would waste time updating the mesh.
         if (target.Lives == currentLives && target.Stars == currentStars)
-            // No changes.
             return;
 
         currentLives = target.Lives;
         currentStars = target.Stars;
         UpdateText();
-        ScoreboardUpdater.Instance.Reposition();
+        ScoreboardUpdater.Instance.RepositionEntries();
     }
 
     private void UpdateText() {
@@ -86,8 +88,8 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public class EntryComparer : IComparer<ScoreboardEntry> {
         public int Compare(ScoreboardEntry x, ScoreboardEntry y) {
-            if (x.target == null ^ y.target == null)
-                return x.target == null ? 1 : -1;
+            if (!x.target ^ !y.target)
+                return !x.target ? 1 : -1;
 
             if (x.currentStars == y.currentStars || x.currentLives == 0 || y.currentLives == 0) {
                 if (Mathf.Max(0, x.currentLives) == Mathf.Max(0, y.currentLives))

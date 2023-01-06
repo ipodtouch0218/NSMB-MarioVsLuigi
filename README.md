@@ -68,6 +68,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [@Jeffjewett27](https://github.com/Jeffjewett27)
 * [@AtwerJ](https://github.com/AtwerJ)
 * [@Pordrack](https://github.com/Pordrack)
+* [@VLC](https://github.com/vlcoo)
 
 ### Music:
 * [RENREN](https://mistajub.bandcamp.com/)
@@ -83,7 +84,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * TheCyVap
 * mindnomad
  
-### Rippers:
+### Asset Rips:
   
 * Demon2Warrior (Background)
 * VentureSonic (Background)
