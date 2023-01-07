@@ -9,7 +9,6 @@ using UnityEngine.Tilemaps;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
-using Mono.Cecil;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 
@@ -324,19 +323,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (Object.InputAuthority != player)
             return;
 
-        //when we drop inputs, continue predicting the previous set of inputs.
+        // When we drop inputs, continue predicting the previous set of inputs.
         input.Set(PreviousInputs);
     }
 
     public override void FixedUpdateNetwork() {
-        //game ended, freeze.
-
         if (!GameManager.Instance.IsMusicEnabled) {
             models.SetActive(false);
             return;
         }
 
         if (GameManager.Instance.gameover) {
+            //game ended, freeze.
             body.velocity = Vector2.zero;
             animator.enabled = false;
             body.isKinematic = true;
@@ -486,7 +484,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void CheckForEntityCollision() {
-        //Don't check for collisions if we're dead, frozen, in a pipe, etc.
+        // Don't check for collisions if we're dead, frozen, in a pipe, etc.
         if (IsDead || IsFrozen || CurrentPipe)
             return;
 
@@ -503,24 +501,24 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         for (int i = 0; i < collisions; i++) {
             GameObject collidedObject = CollisionBuffer[i].gameObject;
 
-            //don't interact with ourselves.
+            // Don't interact with ourselves.
             if (CollisionBuffer[i].attachedRigidbody == body)
                 continue;
 
-            //don't interact with objects we're holding.
+            // Or objects we're holding.
             if (HeldEntity && HeldEntity.gameObject == collidedObject)
                 continue;
 
-            //don't interact with our own frozen cube
+            // Or our own frozen cube
             if (FrozenCube && FrozenCube.gameObject == collidedObject)
                 continue;
 
             if (collidedObject.GetComponentInParent<IPlayerInteractable>() is IPlayerInteractable interactable) {
-                //don't interact with frozen entities.
+                // Or frozen entities.
                 if (interactable is FreezableEntity freezable && freezable.IsFrozen)
                     continue;
 
-                //don't interact with dead entities.
+                // Or dead entities.
                 if (interactable is KillableEntity killable && killable.IsDead)
                     continue;
 
@@ -561,12 +559,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     public void InteractWithPlayer(PlayerController other) {
 
-        //hit players
+        // hit players
 
         if (other.IsStarmanInvincible) {
-            //They are invincible. let them decide if they've hit us.
+            // They are invincible. let them decide if they've hit us.
             if (IsStarmanInvincible) {
-                //oh, we both are. bonk.
+                // Oh, we both are. bonk.
                 DoKnockback(other.body.position.x > body.position.x, 1, true, other.gameObject);
                 other.DoKnockback(other.body.position.x < body.position.x, 1, true, gameObject);
             }
@@ -574,9 +572,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         if (IsStarmanInvincible) {
-            //we are invincible. murder time :)
+            // We are invincible. murder time :)
             if (other.State == Enums.PowerupState.MegaMushroom) {
-                //wait fuck-
+                // Wait fuck-
                 DoKnockback(other.body.position.x > body.position.x, 1, true, other.gameObject);
                 return;
             }
@@ -590,10 +588,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         bool above = dot > 0.7f;
         bool otherAbove = dot < -0.7f;
 
-        //mega mushroom cases
+        // Mega mushroom cases
         if (State == Enums.PowerupState.MegaMushroom || other.State == Enums.PowerupState.MegaMushroom) {
             if (State == Enums.PowerupState.MegaMushroom && other.State == Enums.PowerupState.MegaMushroom) {
-                //both giant
+                // Both giant
                 if (above) {
                     DoEntityBounce = true;
                     IsGroundpounding = false;
@@ -604,20 +602,20 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     other.DoKnockback(other.body.position.x > body.position.x, 0, true, gameObject);
                 }
             } else if (State == Enums.PowerupState.MegaMushroom) {
-                //only we are giant
+                // Only we are giant
                 other.Powerdown(false);
                 body.velocity = previousFrameVelocity;
             }
             return;
         }
 
-        //blue shell cases
+        // Blue shell cases
         if (IsInShell) {
-            //we are blue shell
+            // We are blue shell
             if (!otherAbove) {
-                //hit them. powerdown them
+                // Hit them, powerdown them
                 if (other.IsInShell) {
-                    //collide with both
+                    // Collide with both
                     DoKnockback(other.body.position.x < body.position.x, 1, true, other.gameObject);
                     other.DoKnockback(other.body.position.x > body.position.x, 1, true, gameObject);
                 } else {
@@ -635,19 +633,19 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         if (!above && other.State == Enums.PowerupState.BlueShell && !other.IsInShell && other.IsCrouching && !IsGroundpounding && !IsDrilling) {
-            //they are blue shell
+            // They are blue shell
             DoEntityBounce = true;
             PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             return;
         }
 
         if (other.IsDamageable && above) {
-            //hit them from above
+            // Hit them from above
             DoEntityBounce = !IsGroundpounding && !IsDrilling;
             bool groundpounded = HasGroundpoundHitbox || IsDrilling;
 
             if (State == Enums.PowerupState.MiniMushroom && other.State != Enums.PowerupState.MiniMushroom) {
-                //we are mini, they arent. special rules.
+                // We are mini, they arent. special rules.
                 if (groundpounded) {
                     other.DoKnockback(other.body.position.x < body.position.x, 1, false, gameObject);
                     IsGroundpounding = false;
@@ -656,7 +654,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                 }
             } else if (other.State == Enums.PowerupState.MiniMushroom && groundpounded) {
-                //we are big, groundpounding a mini opponent. squish.
+                // We are big, groundpounding a mini opponent. squish.
                 other.DoKnockback(other.body.position.x > body.position.x, 3, false, gameObject);
                 DoEntityBounce = false;
             } else {
@@ -670,7 +668,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
             return;
         } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove && IsOnGround && other.IsOnGround && (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed)) {
-            //bump
+            // Bump
 
             DoKnockback(other.body.transform.position.x > body.position.x, 1, true, other.gameObject);
             other.DoKnockback(other.body.transform.position.x < body.position.x, 1, true, gameObject);
@@ -715,7 +713,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             FireballDelayTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
             FireballAnimCounter++;
 
-            //weird interaction in the main game...
+            // Weird interaction in the main game...
             WallJumpTimer = TickTimer.None;
             break;
         }
@@ -851,10 +849,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             FrozenCube.Kill();
         }
 
-        if (knockbackStars > 0)
+        if (knockbackStars > 0) {
             DoKnockback(FacingRight, knockbackStars, true, null);
-        else
+        } else {
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1.5f);
+        }
     }
     #endregion
 

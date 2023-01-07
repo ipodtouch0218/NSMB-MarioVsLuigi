@@ -84,7 +84,11 @@ public class PlayerAnimationController : NetworkBehaviour {
     }
 
     public override void Render() {
-        UpdateAnimatorVariables();
+        if (!Object.IsProxy) {
+            // Animator variables are networked via NetworkMecanimAnimator
+            UpdateAnimatorVariables();
+        }
+
         HandleAnimations();
         SetFacingDirection();
         InterpolateFacingDirection();
@@ -105,7 +109,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
 
-        //Particles
+        // Particles
         SetParticleEmission(drillParticle, !controller.IsDead && controller.IsDrilling);
         SetParticleEmission(sparkles,      !controller.IsDead && controller.IsStarmanInvincible);
         SetParticleEmission(dust,          !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.CurrentPipe);
