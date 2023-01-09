@@ -36,7 +36,7 @@ public class LooseCoin : Coin {
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance && GameManager.Instance.gameover) {
+        if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             animation.enabled = false;
             body.isKinematic = true;

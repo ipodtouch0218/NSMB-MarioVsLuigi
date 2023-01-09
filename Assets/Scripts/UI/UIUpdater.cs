@@ -11,24 +11,28 @@ public class UIUpdater : NetworkBehaviour {
 
     public static UIUpdater Instance { get; set; }
 
+    //---Public Variables
     public PlayerController player;
+
+    //---Serialized Variables
     [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
     [SerializeField] private Sprite storedItemNull;
     [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     [SerializeField] private Image itemReserve, itemColor;
 
-    private float pingSample = 0;
-    private Material timerMaterial;
-    private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
+    //---Private Variables
     private readonly List<Image> backgrounds = new();
-    private bool uiHidden;
-
-    private PlayerRef localPlayer;
+    private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
     private CharacterData character;
-    private int coins = -1, teamStars = -1, stars = -1, lives = -1, timer = -1;
+    private Material timerMaterial;
+    private PlayerRef localPlayer;
+    private bool uiHidden;
 
     private TeamManager teamManager;
     private bool teams;
+
+    private float pingSample = 0;
+    private int coins = -1, teamStars = -1, stars = -1, lives = -1, timer = -1;
 
     public void Awake() {
         Instance = this;
@@ -57,7 +61,11 @@ public class UIUpdater : NetworkBehaviour {
         foreach (Image bg in backgrounds)
             bg.color = GameManager.Instance.levelUIColor;
 
-        itemColor.color = new(GameManager.Instance.levelUIColor.r - 0.2f, GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f, GameManager.Instance.levelUIColor.a);
+        Color uiColor = GameManager.Instance.levelUIColor;
+        uiColor.r -= 0.2f;
+        uiColor.g -= 0.2f;
+        uiColor.b -= 0.2f;
+        itemColor.color = uiColor;
 
         teamsParent.SetActive(teams);
         uiDebug.gameObject.SetActive(!Runner.IsServer);
@@ -114,7 +122,7 @@ public class UIUpdater : NetworkBehaviour {
     }
 
     private void UpdateTextUI() {
-        if (!player || GameManager.Instance.gameover)
+        if (!player || GameManager.Instance.GameEnded)
             return;
 
         if (teams) {

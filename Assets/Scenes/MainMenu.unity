@@ -47693,8 +47693,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 887693661}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: OpenLobbyMenu
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: OpenRoomListMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

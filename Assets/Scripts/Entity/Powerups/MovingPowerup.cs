@@ -85,7 +85,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance && GameManager.Instance.gameover) {
+        if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
             return;

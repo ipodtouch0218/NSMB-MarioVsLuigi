@@ -35,7 +35,7 @@ public class BulletBillLauncher : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance.gameover)
+        if (GameManager.Instance.GameEnded)
             return;
 
         if (ShootTimer.Expired(Runner)) {

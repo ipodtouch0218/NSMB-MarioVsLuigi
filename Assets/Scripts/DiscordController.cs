@@ -78,7 +78,7 @@ public class DiscordController : MonoBehaviour {
         if (SessionData.Instance) {
 
             activity.Details = NetworkHandler.Runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount + 1, MaxSize = SessionData.Instance.MaxPlayers }, Id = session.Name + "1" };
+            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = SessionData.Instance.MaxPlayers }, Id = session.Name + "1" };
             activity.State = session.IsVisible ? "In a Public Game" : "In a Private Game";
             activity.Secrets = new() { Join = session.Name };
 
@@ -96,9 +96,9 @@ public class DiscordController : MonoBehaviour {
                 activity.Assets = assets;
 
                 if (SessionData.Instance.Timer <= 0) {
-                    activity.Timestamps = new() { Start = gm.gameStartTimestamp / 1000 };
+                    activity.Timestamps = new() { Start = (long) gm.gameStartTimestamp };
                 } else {
-                    activity.Timestamps = new() { End = gm.gameEndTimestamp / 1000 };
+                    activity.Timestamps = new() { End = (long) gm.gameEndTimestamp };
                 }
             } else {
                 //in a room, but on the main menu.

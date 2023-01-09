@@ -66,7 +66,7 @@ public class GameEventRpcs : NetworkBehaviour {
     //---GAME STATE
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_EndGame(int team) {
-        if (gm.gameover)
+        if (gm.GameEnded)
             return;
 
         // TODO: don't use a coroutine?

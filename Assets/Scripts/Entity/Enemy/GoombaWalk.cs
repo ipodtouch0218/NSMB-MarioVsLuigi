@@ -18,7 +18,7 @@ public class GoombaWalk : KillableEntity {
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
-        if (GameManager.Instance && GameManager.Instance.gameover) {
+        if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             legacyAnimation.enabled = false;

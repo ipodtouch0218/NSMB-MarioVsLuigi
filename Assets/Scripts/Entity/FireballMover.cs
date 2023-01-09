@@ -81,7 +81,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         if (!IsActive)
             return;
 
-        if (GameManager.Instance && GameManager.Instance.gameover) {
+        if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             foreach (Animation anim in GetComponentsInChildren<Animation>())
                 anim.enabled = false;

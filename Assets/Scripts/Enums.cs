@@ -17,6 +17,13 @@ public static class Enums {
         return ScriptableManager.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
     }
 
+    public enum GameState : byte {
+        Loading,  // Waiting for all players to finish loading the game
+        Starting, // All players are loaded, starting animation is playing
+        Playing,  // Game is actively playing
+        Ended     // Game ended, returning to the room menu soon
+    }
+
     #region ANIMATION & MUSIC
     // Animation enums
     public enum PlayerEyeState {

@@ -88,7 +88,7 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Render() {
-        if (IsStationary || (GameManager.Instance?.gameover ?? false))
+        if (IsStationary || (GameManager.Instance?.GameEnded ?? false))
             return;
 
         graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
@@ -98,7 +98,7 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance?.gameover ?? false) {
+        if (GameManager.Instance?.GameEnded ?? false) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
             return;
@@ -137,7 +137,7 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (!GameManager.Instance.gameover && !Collector)
+        if (!GameManager.Instance.GameEnded && !Collector)
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
 
         if (icon)

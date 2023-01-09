@@ -333,7 +333,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
         }
 
-        if (GameManager.Instance.gameover) {
+        if (GameManager.Instance.GameEnded) {
             //game ended, freeze.
             body.velocity = Vector2.zero;
             animator.enabled = false;
@@ -678,7 +678,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     #region -- CONTROLLER FUNCTIONS --
     private void ActivatePowerupAction() {
-        if (IsDead || IsFrozen || IsInKnockback || CurrentPipe || GameManager.Instance.gameover || HeldEntity)
+        if (IsDead || IsFrozen || IsInKnockback || CurrentPipe || GameManager.Instance.GameEnded || HeldEntity)
             return;
 
         switch (State) {
@@ -749,7 +749,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void OnReserveItem(InputAction.CallbackContext context) {
-        if (!Object.HasInputAuthority || GameManager.Instance.paused || GameManager.Instance.gameover)
+        if (!Object.HasInputAuthority || GameManager.Instance.paused || GameManager.Instance.GameEnded)
             return;
 
         if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead) {

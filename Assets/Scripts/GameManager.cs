@@ -11,6 +11,7 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using System;
 
 public class GameManager : NetworkBehaviour {
 
@@ -37,6 +38,7 @@ public class GameManager : NetworkBehaviour {
     [Networked] public float GameStartTime { get; set; } = -1;
     [Networked] public int RealPlayerCount { get; set; }
     [Networked] public NetworkBool IsMusicEnabled { get; set; }
+    [Networked] public Enums.GameState GameState { get; set; }
 
     //---Serialized Variables
     [SerializeField] private MusicData mainMusic, invincibleMusic, megaMushroomMusic;
@@ -57,13 +59,15 @@ public class GameManager : NetworkBehaviour {
     public NetworkRNG Random { get; set; }
 
     private float? levelWidth, levelHeight, middleX, minX, minY, maxX, maxY;
-    public float LevelWidth =>   levelWidth ??= levelWidthTile * tilemap.transform.localScale.x;
-    public float LevelHeight =>  levelHeight ??= levelHeightTile * tilemap.transform.localScale.x;
-    public float LevelMinX =>    minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-    public float LevelMaxX =>    maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float LevelWidth   => levelWidth ??= levelWidthTile * tilemap.transform.localScale.x;
+    public float LevelHeight  => levelHeight ??= levelHeightTile * tilemap.transform.localScale.x;
+    public float LevelMinX    => minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float LevelMaxX    => maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
     public float LevelMiddleX => middleX ??= LevelMinX + (LevelWidth * 0.5f);
-    public float LevelMinY =>    minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
-    public float LevelMaxY =>    maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    public float LevelMinY    => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    public float LevelMaxY    => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+
+    public bool GameEnded => GameState == Enums.GameState.Ended;
 
     //---Public Variables
     public readonly HashSet<NetworkObject> networkObjects = new();
@@ -73,8 +77,8 @@ public class GameManager : NetworkBehaviour {
     public Canvas nametagCanvas;
     public GameObject nametagPrefab;
     public PlayerController localPlayer;
-    public long gameStartTimestamp, gameEndTimestamp;
-    public bool paused, loaded, gameover;
+    public double gameStartTimestamp, gameEndTimestamp;
+    public bool paused;
 
     public EnemySpawnpoint[] enemySpawns;
     public TileBase[] originalTiles;
@@ -188,9 +192,15 @@ public class GameManager : NetworkBehaviour {
             Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
         }
 
-        // Tell our host that we're done loading
-        PlayerData localData = Runner.GetLocalPlayerData();
-        localData.Rpc_FinishedLoading();
+        if (GameStartTime <= 0) {
+            // The game hasn't started.
+            // Tell our host that we're done loading
+            PlayerData localData = Runner.GetLocalPlayerData();
+            localData.Rpc_FinishedLoading();
+        } else {
+            // The game HAS already started.
+            SetGameTimestamps();
+        }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -236,7 +246,7 @@ public class GameManager : NetworkBehaviour {
     /// </summary>
     public void CheckIfAllPlayersLoaded() {
         // If we aren't the server, don't bother checking. We can't start the game regardless.
-        if (!Runner || !Runner.IsServer || loaded)
+        if (!Runner || !Runner.IsServer || GameState != Enums.GameState.Loading)
             return;
 
         if (!Runner.IsSinglePlayer) {
@@ -252,7 +262,7 @@ public class GameManager : NetworkBehaviour {
         }
 
         // Everyone is loaded, officially start the game.
-        loaded = true;
+        GameState = Enums.GameState.Starting;
         SceneManager.SetActiveScene(gameObject.scene);
         GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0f : 5.7f);
 
@@ -300,6 +310,8 @@ public class GameManager : NetworkBehaviour {
     }
 
     private void StartGame() {
+        GameState = Enums.GameState.Playing;
+
         // Respawn players
         foreach (PlayerController player in AlivePlayers)
             player.PreRespawn();
@@ -327,15 +339,24 @@ public class GameManager : NetworkBehaviour {
 
         // Keep track of game timestamps
         GameStartTime = Runner.SimulationTime;
-        gameStartTimestamp = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
-        gameEndTimestamp = (timer > 0) ? gameStartTimestamp + timer * 1000 : 0;
+        SetGameTimestamps();
 
         // Update Discord RPC status
         GlobalController.Instance.DiscordController.UpdateActivity();
     }
 
+    private void SetGameTimestamps() {
+        double now = DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
+        float secondsSinceStart = Runner.SimulationTime - GameStartTime;
+        gameStartTimestamp = now - secondsSinceStart;
+
+        int timer = SessionData.Instance.Timer;
+        if (timer > 0)
+            gameEndTimestamp = gameStartTimestamp + timer;
+    }
+
     internal IEnumerator EndGame(int winningTeam) {
-        gameover = true;
+        GameState = Enums.GameState.Ended;
         SessionData.Instance.SetGameStarted(false);
 
         //TODO: Clean this up, massively.
@@ -394,7 +415,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        if (gameover)
+        if (GameEnded)
             return;
 
         // Seed RNG for this tick
@@ -485,7 +506,7 @@ public class GameManager : NetworkBehaviour {
     /// Checks if a team has won, and calls Rpc_EndGame if so
     /// </summary>
     public void CheckForWinner() {
-        if (gameover || !Object.HasStateAuthority)
+        if (GameState != Enums.GameState.Playing || !Object.HasStateAuthority)
             return;
 
         int requiredStars = SessionData.Instance.StarRequirement;
@@ -561,7 +582,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void Pause() {
-        if (gameover || !IsMusicEnabled)
+        if (GameState != Enums.GameState.Playing || !IsMusicEnabled)
             return;
 
         paused = !paused;

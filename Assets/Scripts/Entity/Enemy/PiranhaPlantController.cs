@@ -33,7 +33,7 @@ public class PiranhaPlantController : KillableEntity {
     public override void FixedUpdateNetwork() {
         GameManager gm = GameManager.Instance;
         if (gm) {
-            if (gm.gameover) {
+            if (gm.GameEnded) {
                 animator.enabled = false;
                 return;
             }

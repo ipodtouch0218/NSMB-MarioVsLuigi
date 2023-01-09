@@ -84,7 +84,7 @@ public class FrozenCube : HoldableEntity {
             hitbox.enabled = false;
             sRenderer.flipX = !FacingRight;
         } else {
-            if (GameManager.Instance && GameManager.Instance.gameover) {
+            if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
                 body.angularVelocity = 0;
                 if (animator)

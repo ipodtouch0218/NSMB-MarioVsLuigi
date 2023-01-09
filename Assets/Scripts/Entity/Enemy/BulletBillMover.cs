@@ -38,7 +38,7 @@ public class BulletBillMover : KillableEntity {
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance && GameManager.Instance.gameover) {
+        if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             animation.enabled = false;
