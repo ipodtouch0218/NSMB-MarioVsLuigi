@@ -10475,7 +10475,6 @@ GameObject:
   - component: {fileID: 3452636116809643534}
   - component: {fileID: 453221688236677073}
   - component: {fileID: 2433599474194652050}
-  - component: {fileID: -6081123839799641209}
   - component: {fileID: 2531603336008789008}
   m_Layer: 10
   m_Name: PlayerMario
@@ -10542,6 +10541,8 @@ MonoBehaviour:
   _IgnoreCoyoteTime:
     _value: 0
   _FloorAngle: 0
+  _OnIce:
+    _value: 0
   _Jumping:
     _value: 0
   _JumpState: 0
@@ -10568,6 +10569,8 @@ MonoBehaviour:
     _value: 0
   _WallSlideRight:
     _value: 0
+  _IsStuckInBlock:
+    _value: 0
   _IsDead:
     _value: 1
   _IsRespawning:
@@ -10588,8 +10591,6 @@ MonoBehaviour:
   networkRigidbody: {fileID: 0}
   cameraController: {fileID: 0}
   animationController: {fileID: 0}
-  slowriseGravity: 1.05
-  normalGravity: 3.25
   flyingGravity: 0.8
   flyingTerminalVelocity: 1.40625
   drillVelocity: 7.5
@@ -10597,8 +10598,6 @@ MonoBehaviour:
   groundpoundVelocity: 11.25
   blinkingSpeed: 0.25
   terminalVelocity: -7.5
-  jumpVelocity: 6.938281
-  megaJumpVelocity: 12.65625
   launchVelocity: 12
   wallslideSpeed: -4.6875
   giantStartTime: 1.5
@@ -10620,14 +10619,11 @@ MonoBehaviour:
   hitBlock: 0
   hitLeft: 0
   hitRight: 0
-  stuckInBlock: 0
-  alreadyStuckInBlock: 0
   stationaryGiantEnd: 0
   fireballKnockback: 0
   startedSliding: 0
   jumpLandingTimer: 0
   powerupFlash: 0
-  onIce: 0
   data: {fileID: 0}
   giantSavedVelocity: {x: 0, y: 0}
   previousFrameVelocity: {x: 0, y: 0}
@@ -10645,6 +10641,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  deathUp: 0
+  wasTurnaround: 0
+  enableGlow: 0
   smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
   largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
   dust: {fileID: 4824223342336871185}
@@ -10667,9 +10666,6 @@ MonoBehaviour:
   deathForce: 7
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
-  deathUp: 0
-  wasTurnaround: 0
-  enableGlow: 0
 --- !u!50 &4824223341387914443
 Rigidbody2D:
   serializedVersion: 4
@@ -10987,7 +10983,6 @@ MonoBehaviour:
   - {fileID: 79918617084146557}
   - {fileID: 4824223341387914442}
   - {fileID: 2433599474194652050}
-  - {fileID: -6081123839799641209}
   - {fileID: 2531603336008789008}
   SimulationBehaviours: []
 --- !u!114 &2433599474194652050
@@ -11018,36 +11013,6 @@ MonoBehaviour:
     RotTeleportRadians: 0
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
---- !u!114 &-6081123839799641209
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824223341387914446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  Animator: {fileID: 0}
-  TotalWords: 4
-  SyncSettings: 79
-  FloatAccuracy:
-    _value: 0
-    _inverse: 0
-    _hash: -814817977
-  TimeAccuracy:
-    _value: 0
-    _inverse: 0
-    _hash: 1061325578
-  WeightAccuracy:
-    _value: 0
-    _inverse: 0
-    _hash: -814817977
-  StateHashes: 0000000015b524dc47ef5bf556c27298bd01fa6551d1ef2fba1267d20e639a1f5c39e536d3bcc62fc92dfcc5c37a344a80d40749f0b7eca172f8a02449008d495391b7a3c672fc77e5c2ffd1cbc98d3ed158b7d4174540a8d68173646f89212fae4d12e333fcef56d13d40ba8dab84536a24afd318f37680aca7c5bffadd549f3b196753b8c8dcefaa659078bb7b4b94a9d60703f80769beeaaa25291f66c7e7fa5be914755d75eb3630d40976eee290358343723592c0ba76ff615801f2d1f7e4cfff041606b3a724bba6bdd4ea3ef42eef67ef9f8e7064165652646a23a24962c8319e79e798cbbf9ed1a9142de756e8038224d68c754bd1ce061658ea67e9b90c5e7784d7b6ba5dccbab430432d8b6c5a491f25427ed24e247f2d2bd053a28e636a95d6e2578d73516eba62d704e001088e180b1cadf536a6ee2121416a76e4c6fbc0ce825eb636c59099dc736e5919f4ffefaaf3a69a0e95236ca94031e10d26b417b399d2bd17ff574bea3c13cb4e5a963d679382eec3f50718df09deb748eb9366cbc9e4d81ef1023922d5f4aa279e4ec4
-  TriggerHashes: 000000006fb88ee83741934fd3bcc62f40262abed68c754b
 --- !u!114 &2531603336008789008
 MonoBehaviour:
   m_ObjectHideFlags: 0

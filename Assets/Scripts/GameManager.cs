@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,7 +12,6 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
-using System;
 
 public class GameManager : NetworkBehaviour {
 
@@ -46,7 +46,7 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     [SerializeField] public bool loopingLevel = true;
     [SerializeField] public Vector3 spawnpoint;
-    [SerializeField] private GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
+    [SerializeField] private GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, nametagPrefab;
     [SerializeField, ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
     [SerializeField] public Tilemap tilemap;
     [SerializeField] public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
@@ -75,7 +75,6 @@ public class GameManager : NetworkBehaviour {
     public TeamManager teamManager = new();
     public GameEventRpcs rpcs;
     public Canvas nametagCanvas;
-    public GameObject nametagPrefab;
     public PlayerController localPlayer;
     public double gameStartTimestamp, gameEndTimestamp;
     public bool paused;

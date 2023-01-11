@@ -410,7 +410,7 @@ public class PlayerAnimationController : NetworkBehaviour {
                 controller.CurrentPipe = null;
                 body.isKinematic = false;
                 controller.IsOnGround = false;
-                controller.ProperJump = false;
+                controller.JumpState = PlayerController.PlayerJumpState.None;
                 controller.IsCrouching = false;
                 controller.PipeReentryTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
                 body.velocity = Vector2.zero;

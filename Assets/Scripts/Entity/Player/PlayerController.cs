@@ -51,8 +51,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public PlayerJumpState JumpState { get; set; }
     [Networked] public NetworkBool ProperJump { get; set; }
     [Networked] public NetworkBool DoEntityBounce { get; set; }
+    [Networked] public TickTimer JumpLandingTimer { get; set; }
     //Knockback
     [Networked] public NetworkBool IsInKnockback { get; set; }
+    [Networked] public NetworkBool IsFireballKnockback { get; set; }
     [Networked] public TickTimer KnockbackTimer { get; set; }
     //Groundpound
     [Networked(OnChanged = nameof(OnGroundpoundingChanged))] public NetworkBool IsGroundpounding { get; set; }
@@ -164,8 +166,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [SerializeField] private GameObject models;
     [SerializeField] public CharacterData character;
 
-    public bool crushGround, hitRoof, groundpoundLastFrame, hitBlock, hitLeft, hitRight, stationaryGiantEnd, fireballKnockback, startedSliding;
-    public float jumpLandingTimer, powerupFlash;
+    public bool crushGround, hitRoof, groundpoundLastFrame, hitBlock, hitLeft, hitRight, stationaryGiantEnd, startedSliding;
+    public float powerupFlash;
 
     //MOVEMENT STAGES
     private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
@@ -354,6 +356,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
 
         } else if (!IsFrozen && GetInput(out PlayerNetworkInput input)) {
+
             NetworkButtons heldButtons = input.buttons;
             NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
             PreviousInputs = input;
@@ -377,13 +380,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
 
             UpdateTileProperties();
-            TickCounters(Runner.DeltaTime);
-
             CheckForPowerupActions(pressedButtons);
             HandleMovement(heldButtons, pressedButtons);
-
-            HandleGiantTiles(true);
         }
+
+        if (!IsFrozen)
+            HandleGiantTiles(true);
 
         animationController.HandleMiscStates();
         HandleLayerState();
@@ -416,7 +418,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         OnSpinner = null;
         foreach (BoxCollider2D hitbox in hitboxes) {
             Runner.GetPhysicsScene2D().Simulate(0f);
-            //int collisionCount = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale, 0, contacts);
             int collisionCount = hitbox.GetContacts(TileContactBuffer);
 
             for (int i = 0; i < collisionCount; i++) {
@@ -528,7 +529,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     public void OnCollisionStay2D(Collision2D collision) {
-        if ((IsInKnockback && !fireballKnockback) || IsFrozen)
+        if ((IsInKnockback && !IsFireballKnockback) || IsFrozen)
             return;
 
         GameObject obj = collision.gameObject;
@@ -1243,9 +1244,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     #region -- KNOCKBACK --
 
     public void DoKnockback(bool fromRight, int starsToDrop, bool fireball, GameObject attacker) {
-        if (fireball && fireballKnockback && IsInKnockback)
+        if (fireball && IsFireballKnockback && IsInKnockback)
             return;
-        if (IsInKnockback && !fireballKnockback)
+        if (IsInKnockback && !IsFireballKnockback)
             return;
 
         if (GameManager.Instance.GameStartTime == -1 || !DamageInvincibilityTimer.ExpiredOrNotRunning(Runner) || CurrentPipe || IsFrozen || IsDead || !GiantStartTimer.ExpiredOrNotRunning(Runner) || !GiantEndTimer.ExpiredOrNotRunning(Runner))
@@ -1257,12 +1258,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
         }
 
-        if (IsInKnockback || fireballKnockback)
+        if (IsInKnockback || IsFireballKnockback)
             starsToDrop = Mathf.Min(1, starsToDrop);
 
         IsInKnockback = true;
         KnockbackTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
-        fireballKnockback = fireball;
+        IsFireballKnockback = fireball;
         initialKnockbackFacingRight = FacingRight;
 
         //TODO:
@@ -1270,7 +1271,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
             SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
 
-            if (fireballKnockback)
+            if (IsFireballKnockback)
                 PlaySound(Enums.Sounds.Player_Sound_Collision_Fireball, 0, 3);
             else
                 PlaySound(Enums.Sounds.Player_Sound_Collision, 0, 3);
@@ -1616,10 +1617,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
     }
 
+    private static readonly Vector2 WallSlideLowerHeightOffset = new(0f, 0.2f);
     private void HandleWallSlideStopChecks(Vector2 wallDirection, bool right, bool left) {
         bool floorCheck = !Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.3f, Layers.MaskAnyGround);
         bool moveDownCheck = body.velocity.y < 0;
-        bool heightLowerCheck = Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.2f), wallDirection, MainHitbox.size.x * 2, Layers.MaskOnlyGround);
+        bool heightLowerCheck = Runner.GetPhysicsScene2D().Raycast(body.position + WallSlideLowerHeightOffset, wallDirection, MainHitbox.size.x * 2, Layers.MaskOnlyGround);
         if (!floorCheck || !moveDownCheck || !heightLowerCheck) {
             WallSlideRight = false;
             WallSlideLeft = false;
@@ -1644,10 +1646,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         if (!DoEntityBounce && OnSpinner && IsOnGround && !HeldEntity) {
-            //wait for spinner to depress?
-            //if (OnSpinner.ArmPosition < 0.5f)
-            //    return;
-
+            // Jump of spinner
             body.velocity = new(body.velocity.x, launchVelocity);
             IsSpinnerFlying = true;
             IsOnGround = false;
@@ -1764,7 +1763,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
 
-        if (IsGroundpounding || IsInKnockback || CurrentPipe || jumpLandingTimer > 0 || !(WallJumpTimer.ExpiredOrNotRunning(Runner) || IsOnGround || body.velocity.y < 0))
+        if (IsGroundpounding || IsInKnockback || CurrentPipe || JumpLandingTimer.IsActive(Runner) || !(WallJumpTimer.ExpiredOrNotRunning(Runner) || IsOnGround || body.velocity.y < 0))
             return;
 
         if (!IsOnGround)
@@ -1899,8 +1898,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if ((direction == -1) ^ (newX <= target))
                 newX = target;
 
-            if (Mathf.Abs(body.velocity.x - target) < 0.01f)
-                return;
+            //if (Mathf.Abs(body.velocity.x - target) < 0.01f)
+            //    return;
 
             if (IsSliding) {
                 newX = Mathf.Clamp(newX, -SPEED_SLIDE_MAX, SPEED_SLIDE_MAX);
@@ -1992,13 +1991,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         body.velocity = Vector2.right * 2f;
         return true;
-    }
-
-    void TickCounters(float delta) {
-        //if (!pipeEntering)
-        //    Utils.TickTimer(ref invincible, 0, delta);
-
-        Utils.TickTimer(ref jumpLandingTimer, 0, delta);
     }
 
     public void FinishMegaMario(bool success) {
@@ -2391,7 +2383,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
                     animator.Play("jumplanding" + (edgeLanding ? "-edge" : ""));
                     if (edgeLanding)
-                        jumpLandingTimer = 0.15f;
+                        JumpLandingTimer = TickTimer.CreateFromSeconds(Runner, 0.15f);
                 }
             }
         }
@@ -2710,20 +2702,22 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     //---Debug
 #if UNITY_EDITOR
+    private List<Renderer> renderers = new();
     public void OnDrawGizmos() {
         if (!body)
             return;
 
+        Gizmos.color = Color.white;
         Gizmos.DrawRay(body.position, body.velocity);
         Gizmos.DrawCube(body.position + new Vector2(0, WorldHitboxSize.y * 0.5f) + (body.velocity * Runner.DeltaTime), WorldHitboxSize);
 
-        Gizmos.color = Color.white;
-        foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
-            if (r is ParticleSystemRenderer)
-                continue;
-
-            Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
+        if (renderers.Count == 0) {
+            GetComponentsInChildren(true, renderers);
+            renderers.RemoveAll(r => r is ParticleSystemRenderer);
         }
+
+        foreach (Renderer r in renderers)
+            Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
     }
 #endif
 
