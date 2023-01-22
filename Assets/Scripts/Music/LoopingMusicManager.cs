@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LoopingMusic : MonoBehaviour {
+public class LoopingMusicManager : MonoBehaviour {
 
     //---Properties
     private bool _fastMusic;

@@ -8,7 +8,7 @@ using NSMB.Utils;
 public class GameEventRpcs : NetworkBehaviour {
 
     //---Static Variables
-    private static readonly Vector3 OneFourth = new(0.25f, 0.25f);
+    private static readonly Vector3 OneFourth = new(0.25f, 0.25f, 0f);
 
     //---Private Variables
     private GameManager gm;
@@ -36,8 +36,7 @@ public class GameEventRpcs : NetworkBehaviour {
         gm.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - gm.RealPlayerCount * 0.2f);
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_BumpBlock(short x, short y, string oldTile, string newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
+    public void BumpBlock(short x, short y, string oldTile, string newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
         Vector3Int loc = new(x, y, 0);
 
         Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + OneFourth;

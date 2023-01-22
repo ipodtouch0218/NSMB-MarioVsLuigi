@@ -46,7 +46,7 @@ public class RouletteTile : BreakableBrickTile {
             bool downwards = direction == InteractionDirection.Down;
             Vector2 offset = downwards ? bottomSpawnOffset + (spawnResult == PrefabList.Instance.Powerup_MegaMushroom ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
 
-            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
                 resultTile, downwards, offset, false, spawnResult);
         }
 

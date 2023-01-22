@@ -41,7 +41,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] private byte TurnaroundFrames { get; set; } //TODO: change somehow
     [Networked] private int TurnaroundBoostFrames { get; set; } //TODO: change somehow
     [Networked] private float JumpBufferTime { get; set; }
-    [Networked] private float CoyoteTime { get; set; }
+    [Networked] public float CoyoteTime { get; set; }
     [Networked] private float TimeGrounded { get; set; }
     [Networked] public NetworkBool IgnoreCoyoteTime { get; set; }
     [Networked] public float FloorAngle { get; set; }
@@ -364,7 +364,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             groundpoundLastFrame = IsGroundpounding;
             WasGroundedLastFrame = IsOnGround;
 
-            HandleBlockSnapping();
+            //HandleBlockSnapping();
             CheckForEntityCollision();
 
             HandleGroundCollision();
@@ -387,7 +387,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (!IsFrozen)
             HandleGiantTiles(true);
 
-        animationController.HandleMiscStates();
+        animationController.HandleDeathAnimation();
+        animationController.HandlePipeAnimation();
         HandleLayerState();
         UpdateHitbox();
         previousFrameVelocity = body.velocity;

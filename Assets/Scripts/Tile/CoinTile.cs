@@ -45,7 +45,7 @@ public class CoinTile : BreakableBrickTile {
         Bump(interacter, direction, worldLocation);
 
         if (GameManager.Instance.Object.HasStateAuthority) {
-            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
                 resultTile, direction == InteractionDirection.Down, Vector2.zero, true, NetworkPrefabRef.Empty);
         }
 

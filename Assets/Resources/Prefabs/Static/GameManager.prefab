@@ -5521,6 +5521,7 @@ MonoBehaviour:
   _RealPlayerCount: 0
   _IsMusicEnabled:
     _value: 0
+  _GameState: 0
   mainMusic: {fileID: 11400000, guid: 488f1c737d498714c951d86c1a790bcc, type: 2}
   invincibleMusic: {fileID: 11400000, guid: fb397722d9ffbb145a088ac9ce60908c, type: 2}
   megaMushroomMusic: {fileID: 11400000, guid: 3fb519076901a294493ae6e0c10c979b, type: 2}
@@ -5539,6 +5540,7 @@ MonoBehaviour:
   pauseButton: {fileID: 2224320915739540639}
   hostExitUI: {fileID: 6204975543479415834}
   hostExitButton: {fileID: 5369760449356936416}
+  nametagPrefab: {fileID: 7542548910130765567}
   levelUIColor: {r: 0.09411766, g: 0.69803923, b: 0.6666667, a: 1}
   tilemap: {fileID: 0}
   spawnBigPowerups: 1
@@ -5550,21 +5552,19 @@ MonoBehaviour:
   winText: {fileID: 3474641543873908501}
   winTextAnimator: {fileID: 8395432290395498094}
   particleManager: {fileID: 0}
-  rpcs: {fileID: 0}
+  rpcs: {fileID: 6418608900138254647}
   nametagCanvas: {fileID: 5453462452561088483}
-  nametagPrefab: {fileID: 7542548910130765567}
   localPlayer: {fileID: 0}
   gameStartTimestamp: 0
   gameEndTimestamp: 0
   paused: 0
-  loaded: 0
-  gameover: 0
   enemySpawns: []
   originalTiles: []
   originalTilesOrigin:
     m_Position: {x: 0, y: 0, z: 0}
     m_Size: {x: 0, y: 0, z: 0}
-  spectationManager: {fileID: 0}
+  spectationManager: {fileID: 3058852347368318539}
+  musicManager: {fileID: 9060135030118423222}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
   size: 1.39

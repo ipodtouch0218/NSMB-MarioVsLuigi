@@ -29,6 +29,20 @@ public class GameManager : NetworkBehaviour {
         private set => _instance = value;
     }
 
+    //---Properties
+    public NetworkRNG Random { get; set; }
+
+    private float? levelWidth, levelHeight, middleX, minX, minY, maxX, maxY;
+    public float LevelWidth   => levelWidth ??= levelWidthTile * tilemap.transform.localScale.x;
+    public float LevelHeight  => levelHeight ??= levelHeightTile * tilemap.transform.localScale.x;
+    public float LevelMinX    => minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float LevelMaxX    => maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
+    public float LevelMiddleX => middleX ??= LevelMinX + (LevelWidth * 0.5f);
+    public float LevelMinY    => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+    public float LevelMaxY    => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
+
+    public bool GameEnded => GameState == Enums.GameState.Ended;
+
     //---Networked Variables
     [Networked] public TickTimer BigStarRespawnTimer { get; set; }
     [Networked] public TickTimer GameStartTimer { get; set; }
@@ -55,20 +69,6 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] private TMP_Text winText;
     [SerializeField] private Animator winTextAnimator;
 
-    //---Properties
-    public NetworkRNG Random { get; set; }
-
-    private float? levelWidth, levelHeight, middleX, minX, minY, maxX, maxY;
-    public float LevelWidth   => levelWidth ??= levelWidthTile * tilemap.transform.localScale.x;
-    public float LevelHeight  => levelHeight ??= levelHeightTile * tilemap.transform.localScale.x;
-    public float LevelMinX    => minX ??= (levelMinTileX * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-    public float LevelMaxX    => maxX ??= ((levelMinTileX + levelWidthTile) * tilemap.transform.localScale.x) + tilemap.transform.position.x;
-    public float LevelMiddleX => middleX ??= LevelMinX + (LevelWidth * 0.5f);
-    public float LevelMinY    => minY ??= (levelMinTileY * tilemap.transform.localScale.y) + tilemap.transform.position.y;
-    public float LevelMaxY    => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y) + tilemap.transform.position.y;
-
-    public bool GameEnded => GameState == Enums.GameState.Ended;
-
     //---Public Variables
     public readonly HashSet<NetworkObject> networkObjects = new();
     public SingleParticleManager particleManager;
@@ -87,21 +87,19 @@ public class GameManager : NetworkBehaviour {
     private TickTimer StartMusicTimer { get; set; }
     private readonly List<GameObject> activeStarSpawns = new();
     private GameObject[] starSpawns;
-
-    //Audio
     private bool hurryUpSoundPlayed;
 
     //---Components
     public SpectationManager spectationManager;
-    private LoopingMusic loopMusic;
+    [SerializeField] private LoopingMusicManager musicManager;
     public AudioSource music, sfx;
 
-    //TODO: figure out how to do rollback-able.... fuck
+    // TODO: figure out how to do rollback-able.... fuck
     public void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
         TileBase[] tileObjects = new TileBase[tiles.Length];
         for (int i = 0; i < tiles.Length; i++) {
             string tile = tiles[i];
-            if (tile == "")
+            if (string.IsNullOrEmpty(tile))
                 continue;
 
             tileObjects[i] = Utils.GetCacheTile(tile);
@@ -110,7 +108,7 @@ public class GameManager : NetworkBehaviour {
         tilemap.SetTilesBlock(new BoundsInt(tileOrigin.x, tileOrigin.y, 0, tileDimensions.x, tileDimensions.y, 1), tileObjects);
     }
 
-    //TODO: convert to RPC...?
+    // TODO: convert to RPC...?
     public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, GameObject prefab) {
         GameObject particle = Instantiate(prefab, pos, Quaternion.Euler(0, 0, flip ? 180 : 0));
 
@@ -147,10 +145,8 @@ public class GameManager : NetworkBehaviour {
 
     public void Awake() {
         Instance = this;
-        spectationManager = GetComponent<SpectationManager>();
-        loopMusic = GetComponent<LoopingMusic>();
+        musicManager = GetComponent<LoopingMusicManager>();
         particleManager = GetComponentInChildren<SingleParticleManager>();
-        rpcs = GetComponent<GameEventRpcs>();
 
         //tiles
         originalTilesOrigin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
@@ -209,6 +205,63 @@ public class GameManager : NetworkBehaviour {
         // Remove all networked objects. Fusion doesn't do this for us, unlike PUN.
         foreach (var obj in networkObjects)
             runner.Despawn(obj);
+    }
+
+    public override void FixedUpdateNetwork() {
+        if (GameEnded)
+            return;
+
+        // Seed RNG for this tick
+        Random = new(Runner.Simulation.Tick);
+
+        if (BigStarRespawnTimer.Expired(Runner)) {
+            if (AttemptSpawnBigStar())
+                BigStarRespawnTimer = TickTimer.None;
+            else
+                BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+        }
+
+        if (GameStartTimer.Expired(Runner)) {
+            GameStartTimer = TickTimer.None;
+            StartGame();
+        }
+
+        if (StartMusicTimer.Expired(Runner)) {
+            StartMusicTimer = TickTimer.None;
+            IsMusicEnabled = true;
+        }
+
+        if (IsMusicEnabled)
+            HandleMusic();
+
+        // Handle sound effects for the timer, if it's enabled
+        if (GameEndTimer.IsRunning) {
+            if (GameEndTimer.Expired(Runner)) {
+                CheckForWinner();
+
+                //time end sfx
+                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
+                GameEndTimer = TickTimer.None;
+                return;
+            }
+
+            int tickrate = Runner.Config.Simulation.TickRate;
+            int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
+
+            if (!hurryUpSoundPlayed && remainingTicks < 60 * tickrate) {
+                //60 second warning
+                hurryUpSoundPlayed = true;
+                sfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
+            } else if (remainingTicks < (10 * tickrate)) {
+                //10 second "dings"
+                if (remainingTicks % tickrate == 0)
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+
+                //at 3 seconds, double speed
+                if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+            }
+        }
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
@@ -300,6 +353,7 @@ public class GameManager : NetworkBehaviour {
         for (int i = 0; i < RealPlayerCount * 6; i++)
             Runner.Spawn(PrefabList.Instance.Obj_Fireball);
 
+        // Tell everyone else to start the game
         StartCoroutine(CallLoadingComplete(2));
     }
 
@@ -318,6 +372,7 @@ public class GameManager : NetworkBehaviour {
         // Play start jingle
         if (Runner.IsForward)
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
+
         StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
         // Respawn enemies
@@ -344,6 +399,9 @@ public class GameManager : NetworkBehaviour {
         GlobalController.Instance.DiscordController.UpdateActivity();
     }
 
+    /// <summary>
+    /// Sets the game timestamps for Discord RPC
+    /// </summary>
     private void SetGameTimestamps() {
         double now = DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
         float secondsSinceStart = Runner.SimulationTime - GameStartTime;
@@ -355,10 +413,11 @@ public class GameManager : NetworkBehaviour {
     }
 
     internal IEnumerator EndGame(int winningTeam) {
+        //TODO: Clean this up, massively.
+
         GameState = Enums.GameState.Ended;
         SessionData.Instance.SetGameStarted(false);
 
-        //TODO: Clean this up, massively.
         music.Stop();
 
         if (winningTeam == -1) {
@@ -413,62 +472,11 @@ public class GameManager : NetworkBehaviour {
         Runner.SetActiveScene(0);
     }
 
-    public override void FixedUpdateNetwork() {
-        if (GameEnded)
-            return;
-
-        // Seed RNG for this tick
-        Random = new(Runner.Simulation.Tick);
-
-        if (IsMusicEnabled)
-            HandleMusic();
-
-        if (BigStarRespawnTimer.Expired(Runner)) {
-            BigStarRespawnTimer = TickTimer.None;
-            AttemptSpawnBigStar();
-        }
-
-        if (GameStartTimer.Expired(Runner)) {
-            GameStartTimer = TickTimer.None;
-            StartGame();
-        }
-
-        if (StartMusicTimer.Expired(Runner)) {
-            StartMusicTimer = TickTimer.None;
-            IsMusicEnabled = true;
-        }
-
-        // Handle sound effects for the timer, if it's enabled
-        if (GameEndTimer.IsRunning) {
-            if (GameEndTimer.Expired(Runner)) {
-                CheckForWinner();
-
-                //time end sfx
-                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
-                GameEndTimer = TickTimer.None;
-                return;
-            }
-
-            int tickrate = Runner.Config.Simulation.TickRate;
-            int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
-
-            if (!hurryUpSoundPlayed && remainingTicks < 60 * tickrate) {
-                //60 second warning
-                hurryUpSoundPlayed = true;
-                sfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
-            } else if (remainingTicks < (10 * tickrate)) {
-                //10 second "dings"
-                if (remainingTicks % tickrate == 0)
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
-
-                //at 3 seconds, double speed
-                if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
-            }
-        }
-    }
-
-    private void AttemptSpawnBigStar() {
+    /// <summary>
+    /// Spawns a Big Star if we can find a valid spawnpoint.
+    /// </summary>
+    /// <returns>If the </returns>
+    private bool AttemptSpawnBigStar() {
 
         for (int i = 0; i < starSpawns.Length; i++) {
             if (activeStarSpawns.Count <= 0)
@@ -488,11 +496,11 @@ public class GameManager : NetworkBehaviour {
                 obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
             });
             activeStarSpawns.RemoveAt(index);
-            return;
+            return true;
         }
 
-        // No star could spawn. wait a few ticks and try again...
-        BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+        // No star could spawn.
+        return false;
     }
 
     public void CreateNametag(PlayerController controller) {
@@ -566,14 +574,14 @@ public class GameManager : NetworkBehaviour {
         speedup |= AlivePlayers.Count <= 2 && AlivePlayers.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
 
         if (mega) {
-            loopMusic.Play(megaMushroomMusic);
+            musicManager.Play(megaMushroomMusic);
         } else if (invincible) {
-            loopMusic.Play(invincibleMusic);
+            musicManager.Play(invincibleMusic);
         } else {
-            loopMusic.Play(mainMusic);
+            musicManager.Play(mainMusic);
         }
 
-        loopMusic.FastMusic = speedup;
+        musicManager.FastMusic = speedup;
     }
 
     public void OnPause(InputAction.CallbackContext context) {
@@ -592,27 +600,27 @@ public class GameManager : NetworkBehaviour {
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
+    //---UI Callbacks
     public void AttemptQuit() {
-        if (Runner.GetLocalPlayerData().IsRoomOwner) {
-            //prompt for ending game or leaving
-            sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-            pausePanel.SetActive(false);
-            hostExitUI.SetActive(true);
-            EventSystem.current.SetSelectedGameObject(hostExitButton);
+        if (!Runner.GetLocalPlayerData().IsRoomOwner) {
+            QuitGame();
             return;
         }
 
-        Quit();
+        //prompt for ending game or leaving
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide);
+        pausePanel.SetActive(false);
+        hostExitUI.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(hostExitButton);
     }
 
-    //---UI Callbacks
     public void HostEndMatch() {
         pauseUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         rpcs.Rpc_EndGame(PlayerRef.None);
     }
 
-    public void Quit() {
+    public void QuitGame() {
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         Runner.Shutdown();
     }
@@ -633,7 +641,7 @@ public class GameManager : NetworkBehaviour {
             players = 1;
 
         float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI / (2 * players));
-        float scale = (2 - (players + 1f) / players) * size;
+        float scale = (2f - (players + 1f) / players) * size;
 
         Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * ySize : 0), 0);
         Utils.WrapWorldLocation(ref spawn);

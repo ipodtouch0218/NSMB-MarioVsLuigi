@@ -11,18 +11,15 @@ public class PlayerAnimationController : NetworkBehaviour {
 
     //---Static Variables
     private static readonly WaitForSeconds BlinkDelay = new(0.1f);
+    private static readonly Vector3 ZeroPointFive = new(0.5f, 0.5f, 0.5f);
 
     //---Public Variables
     public bool deathUp, wasTurnaround, enableGlow;
-
-    //---Networked Variables
-
 
     //---Serialized Variables
     [SerializeField] private Avatar smallAvatar, largeAvatar;
     [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
     [SerializeField] private GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
-    [SerializeField] private Material glowMaterial;
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
     [SerializeField] public float pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] private AudioClip normalDrill, propellerDrill;
@@ -44,7 +41,6 @@ public class PlayerAnimationController : NetworkBehaviour {
     private Vector3 modelRotationTarget;
     private bool modelRotateInstantly;
     private Coroutine blinkRoutine;
-
 
     public void Awake() {
         controller = GetComponent<PlayerController>();
@@ -88,6 +84,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         HandleAnimations();
         SetFacingDirection();
         InterpolateFacingDirection();
+        HandleMiscStates();
     }
 
     public void HandleAnimations() {
@@ -108,7 +105,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         // Particles
         SetParticleEmission(drillParticle, !controller.IsDead && controller.IsDrilling);
         SetParticleEmission(sparkles,      !controller.IsDead && controller.IsStarmanInvincible);
-        SetParticleEmission(dust,          !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2 && controller.IsOnGround)) && !controller.CurrentPipe);
+        SetParticleEmission(dust,          !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (((controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2) || controller.IsInShell) && controller.IsOnGround)) && !controller.CurrentPipe);
         SetParticleEmission(giantParticle, !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
         SetParticleEmission(fireParticle,  !controller.IsRespawning && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
 
@@ -231,7 +228,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         animator.SetBool("onLeft",         controller.WallSlideLeft);
         animator.SetBool("onRight",        controller.WallSlideRight);
-        animator.SetBool("onGround",       controller.IsOnGround);
+        animator.SetBool("onGround",       controller.IsOnGround || (Runner.SimulationTime <= controller.CoyoteTime - 0.05f));
         animator.SetBool("invincible",     controller.IsStarmanInvincible);
         animator.SetBool("skidding",       controller.IsSkidding);
         animator.SetBool("propeller",      controller.IsPropellerFlying);
@@ -271,8 +268,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetFloat("velocityX", animatedVelocity);
     }
 
-    private static readonly Vector3 ZeroPointFive = new(0.5f, 0.5f, 0.5f);
-    public void HandleMiscStates() {
+    private void HandleMiscStates() {
         if (controller.GiantEndTimer.IsActive(Runner)) {
             transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
         } else {
@@ -333,13 +329,11 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.avatar = large ? largeAvatar : smallAvatar;
         animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
 
-        HandleDeathAnimation();
-        HandlePipeAnimation();
 
         transform.position = new(transform.position.x, transform.position.y, controller.IsDead ? -6 : (controller.CurrentPipe ? 1 : -4));
     }
 
-    private void HandleDeathAnimation() {
+    public void HandleDeathAnimation() {
         if (!controller.IsDead || controller.IsRespawning)
             return;
 
@@ -376,7 +370,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         }
     }
 
-    private void HandlePipeAnimation() {
+    public void HandlePipeAnimation() {
         if (!controller.CurrentPipe)
             return;
 

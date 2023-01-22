@@ -44,7 +44,7 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
         Coin.GivePlayerCoin(player, location);
 
         if (GameManager.Instance.Object.HasStateAuthority) {
-            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
                 resultTile, false, Vector2.zero, true, NetworkPrefabRef.Empty);
         }
     }

@@ -21629,6 +21629,7 @@ MonoBehaviour:
     _value: 0
   _IsTurnaround:
     _value: 0
+  _CoyoteTime: 0
   _IgnoreCoyoteTime:
     _value: 0
   _FloorAngle: 0
@@ -21642,6 +21643,8 @@ MonoBehaviour:
   _DoEntityBounce:
     _value: 0
   _IsInKnockback:
+    _value: 0
+  _IsFireballKnockback:
     _value: 0
   _IsGroundpounding:
     _value: 0
@@ -21711,9 +21714,7 @@ MonoBehaviour:
   hitLeft: 0
   hitRight: 0
   stationaryGiantEnd: 0
-  fireballKnockback: 0
   startedSliding: 0
-  jumpLandingTimer: 0
   powerupFlash: 0
   data: {fileID: 0}
   giantSavedVelocity: {x: 0, y: 0}
@@ -22087,7 +22088,7 @@ MonoBehaviour:
   m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 2
+  _interpolationDataSource: 0
   InterpolationSpace: 1
   InterpolationTarget: {fileID: 8927504140826809228}
   InterpolateErrorCorrection: 0

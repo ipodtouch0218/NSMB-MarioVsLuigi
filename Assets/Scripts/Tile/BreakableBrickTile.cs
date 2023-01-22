@@ -61,7 +61,7 @@ public class BreakableBrickTile : InteractableTile {
 
         //Bump
         if (GameManager.Instance.Object.HasStateAuthority) {
-            GameManager.Instance.rpcs.Rpc_BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
                 "SpecialTiles/" + name, direction == InteractionDirection.Down, Vector2.zero, false, NetworkPrefabRef.Empty);
         }
     }

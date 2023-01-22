@@ -4950,6 +4950,8 @@ MonoBehaviour:
     _value: 0
   _IsIceball:
     _value: 0
+  _PlayBreakEffect:
+    _value: 0
   _IsActive:
     _value: 0
   iceBreak: {fileID: 1425112719999528230}
@@ -5170,6 +5172,7 @@ MonoBehaviour:
     _value: 0
   _CrushableGround:
     _value: 0
+  _PreviousTickVelocity: {x: 0, y: 0}
   _FloorAngle: 0
   currentCollider: {fileID: -1769135492019179076}
   goUpSlopes: 0
@@ -5254,7 +5257,6 @@ GameObject:
   - component: {fileID: 4710279457085823811}
   - component: {fileID: 3062558160749003415}
   - component: {fileID: 8640911904975915065}
-  - component: {fileID: 7295262672021045176}
   m_Layer: 9
   m_Name: IceGraphics
   m_TagString: Untagged
@@ -5364,20 +5366,6 @@ MonoBehaviour:
   - {fileID: 750297706712597742, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
   - {fileID: -8127487528002223245, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
   - {fileID: -3915765450054648673, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
---- !u!114 &7295262672021045176
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2135618848759859508}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  frame: 0
-  frames: []
 --- !u!1 &5079778509045743664
 GameObject:
   m_ObjectHideFlags: 0
