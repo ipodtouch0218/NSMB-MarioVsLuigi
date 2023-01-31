@@ -5,6 +5,7 @@ using UnityEngine;
 using Fusion;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
+[OrderAfter(typeof(NetworkPhysicsSimulation2D))]
 public class WaterSplash : NetworkBehaviour {
 
     //---Static Variables
@@ -57,8 +58,8 @@ public class WaterSplash : NetworkBehaviour {
 
         heightTex.Apply();
 
-        hitbox.offset = new(0, heightTiles * 0.25f - 0.2f);
-        hitbox.size = new(widthTiles * 0.5f, heightTiles * 0.5f - 0.1f);
+        hitbox.offset = new(0, heightTiles * 0.25f/* - 0.2f*/);
+        hitbox.size = new(widthTiles * 0.5f, heightTiles * 0.5f /*- 0.1f*/);
         spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
 
         properties = new();
@@ -69,6 +70,8 @@ public class WaterSplash : NetworkBehaviour {
     }
 
     public void FixedUpdate() {
+        // TODO: move to a compute shader?
+
         if (!initialized) {
             Initialize();
             initialized = true;
@@ -109,7 +112,7 @@ public class WaterSplash : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        //find entities inside our collider
+        // Find entities inside our collider
         int count = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
 
         for (int i = 0; i < count; i++) {
@@ -117,9 +120,9 @@ public class WaterSplash : NetworkBehaviour {
             if (!obj || obj.GetComponentInParent<BasicEntity>() is not BasicEntity entity)
                 continue;
 
-            //player collisions are special
+            // Player collisions are special
             if (entity is PlayerController player) {
-                if (player.IsDead)
+                if (player.IsDead || player.CurrentPipe)
                     continue;
 
                 if (Runner.IsServer)
@@ -129,7 +132,7 @@ public class WaterSplash : NetworkBehaviour {
                 continue;
             }
 
-            //don't splash stationary stars
+            // Don't splash stationary stars
             if (entity is StarBouncer sb && sb.IsStationary)
                 continue;
 
@@ -139,9 +142,9 @@ public class WaterSplash : NetworkBehaviour {
                     splashedEntities.Add(obj.gameObject);
                 }
 
-                //kill entity if they're below the surface of the posion/lava
+                // Kill entity if they're below the surface of the posion/lava
                 if (entity.GetComponentInChildren<Renderer>().bounds.max.y < transform.position.y + heightTiles * 0.5f - 0.1f) {
-                    //dont let fireballs "poof"
+                    // Don't let fireballs "poof"
                     if (entity is FireballMover fm)
                         fm.PlayBreakEffect = false;
 
@@ -154,7 +157,7 @@ public class WaterSplash : NetworkBehaviour {
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_Splash(Vector2 position, float power) {
+    private void Rpc_Splash(Vector2 position, float power) {
         Instantiate(splashPrefab, position, Quaternion.identity);
 
         float tile = (transform.InverseTransformPoint(position).x / widthTiles + 0.25f) * 2f;

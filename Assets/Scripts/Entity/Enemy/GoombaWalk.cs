@@ -18,6 +18,7 @@ public class GoombaWalk : KillableEntity {
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
+
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -42,6 +43,7 @@ public class GoombaWalk : KillableEntity {
 
     private void HandleWallCollisions() {
         physics.UpdateCollisions();
+
         if (physics.HitLeft || physics.HitRight)
             FacingRight = physics.HitLeft;
     }

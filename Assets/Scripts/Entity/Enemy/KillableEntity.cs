@@ -57,7 +57,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             return;
 
         if (IsDead) {
-            hitbox.enabled = false;
+            //hitbox.enabled = false;
             gameObject.layer = Layers.LayerHitsNothing;
 
             if (WasSpecialKilled) {
@@ -65,7 +65,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
                 body.constraints = RigidbodyConstraints2D.None;
             }
         } else {
-            hitbox.enabled = true;
+            //hitbox.enabled = true;
             gameObject.layer = Layers.LayerEntity;
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
         }

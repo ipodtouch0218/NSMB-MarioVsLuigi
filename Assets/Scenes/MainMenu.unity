@@ -3352,6 +3352,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: PiranhaPlant
       objectReference: {fileID: 0}
+    - target: {fileID: 1900118007787000350, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3206924239527984068, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
       propertyPath: soundRange
@@ -3856,6 +3861,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spiny
       objectReference: {fileID: 0}
+    - target: {fileID: 1435431862184428451, guid: acafae0748a6d984ca08e285f836acaf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1435431862184428454, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
       propertyPath: m_RootOrder
@@ -3914,7 +3924,7 @@ PrefabInstance:
     - target: {fileID: 8953494174965512807, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
       propertyPath: Flags
-      value: 2561
+      value: 133633
       objectReference: {fileID: 0}
     - target: {fileID: 8953494174965512807, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
@@ -4276,7 +4286,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5594,7 +5604,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &182241349
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7571,6 +7581,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Goomba
+      objectReference: {fileID: 0}
+    - target: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
@@ -16019,6 +16034,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: PiranhaPlant
       objectReference: {fileID: 0}
+    - target: {fileID: 1900118007787000350, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3206924239527984068, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
       propertyPath: soundRange
@@ -24273,7 +24293,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &536087968
 RectTransform:
   m_ObjectHideFlags: 0
@@ -30126,6 +30146,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RedKoopa
       objectReference: {fileID: 0}
+    - target: {fileID: 7426856683177255958, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255959, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: m_Mass
@@ -31989,8 +32014,8 @@ RectTransform:
   m_Father: {fileID: 1664241379}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -32235,7 +32260,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -33683,7 +33708,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2121398055}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.76695275
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -41238,6 +41263,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add,
+        type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
@@ -43926,6 +43956,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Spiny
+      objectReference: {fileID: 0}
+    - target: {fileID: 1435431862184428451, guid: acafae0748a6d984ca08e285f836acaf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1435431862184428454, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
@@ -47086,7 +47121,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -50682,6 +50717,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add,
+        type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
@@ -51330,6 +51370,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RedKoopa
+      objectReference: {fileID: 0}
+    - target: {fileID: 7426856683177255958, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255959, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
@@ -71355,6 +71400,16 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 71
+      m_TileSpriteIndex: 199
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 2147483650
+  - first: {x: -38, y: -10, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 71
       m_TileSpriteIndex: 198
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
@@ -71622,6 +71677,16 @@ Tilemap:
       dummyAlignment: 0
       m_AllTileFlags: 2147483650
   - first: {x: -39, y: -9, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 71
+      m_TileSpriteIndex: 202
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 2147483650
+  - first: {x: -38, y: -9, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 71
@@ -77546,7 +77611,7 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: fb2b70db8cc13f74f97dca46a587890e, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 5ca3423ea52ed94408852305b7aaae70, type: 2}
-  - m_RefCount: 54
+  - m_RefCount: 56
     m_Data: {fileID: 11400000, guid: fd9440277b1bbbf47912d733f39b993a, type: 2}
   - m_RefCount: 11
     m_Data: {fileID: 11400000, guid: 3532b2dd7d04184489604475da441af1, type: 2}
@@ -78190,7 +78255,7 @@ Tilemap:
       type: 3}
   - m_RefCount: 2
     m_Data: {fileID: 863867184008000231, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae, type: 3}
-  - m_RefCount: 25
+  - m_RefCount: 26
     m_Data: {fileID: -4988122654707678320, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
   - m_RefCount: 2
@@ -78199,7 +78264,7 @@ Tilemap:
   - m_RefCount: 13
     m_Data: {fileID: 1979728170566909823, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
-  - m_RefCount: 5
+  - m_RefCount: 6
     m_Data: {fileID: -3128345703424356310, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
   - m_RefCount: 6
@@ -78235,7 +78300,7 @@ Tilemap:
     m_Data: {fileID: -6288595345864003279, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 1267
+  - m_RefCount: 1269
     m_Data:
       e00: 1
       e01: 0
@@ -78272,7 +78337,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 1379
+  - m_RefCount: 1381
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -78385,8 +78450,14 @@ CompositeCollider2D:
         Y: -25000050
       - X: -214999984
         Y: -25000050
-    - - X: -189999936
+    - - X: -184999936
         Y: -50000020
+      - X: -184999936
+        Y: -39999980
+      - X: -184999984
+        Y: -39999948
+      - X: -189999936
+        Y: -39999948
       - X: -189999936
         Y: -24999978
       - X: -189999984
@@ -78419,7 +78490,7 @@ CompositeCollider2D:
         Y: -24999950
       - X: -325000032
         Y: -50000048
-      - X: -189999984
+      - X: -184999984
         Y: -50000048
     - - X: -219999936
         Y: -165000016
@@ -79669,7 +79740,10 @@ CompositeCollider2D:
       - {x: -24.000008, y: -2.5000021}
       - {x: -24.000002, y: -2.500005}
       - {x: -21.499998, y: -2.500005}
-    - - {x: -18.999994, y: -5.000002}
+    - - {x: -18.499994, y: -5.000002}
+      - {x: -18.499994, y: -3.999998}
+      - {x: -18.499998, y: -3.9999948}
+      - {x: -18.999994, y: -3.9999948}
       - {x: -18.999994, y: -2.4999979}
       - {x: -18.999998, y: -2.499995}
       - {x: -20.000002, y: -2.499995}
@@ -79686,7 +79760,7 @@ CompositeCollider2D:
       - {x: -31.999998, y: -2.499995}
       - {x: -32.500004, y: -2.499995}
       - {x: -32.500004, y: -5.000005}
-      - {x: -18.999998, y: -5.000005}
+      - {x: -18.499998, y: -5.000005}
     - - {x: -21.999994, y: -16.500002}
       - {x: -21.999994, y: -13.999998}
       - {x: -21.999998, y: -13.999995}
@@ -80511,8 +80585,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00032043457}
-  m_SizeDelta: {x: -32, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.00018310547}
+  m_SizeDelta: {x: -32, y: -193.47632}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1508729838
 MonoBehaviour:
@@ -83158,6 +83232,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RedKoopa
       objectReference: {fileID: 0}
+    - target: {fileID: 7426856683177255958, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255959, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: m_Mass
@@ -83290,8 +83369,8 @@ Transform:
   m_Children:
   - {fileID: 978599146}
   - {fileID: 359376402}
-  - {fileID: 1878268567}
   - {fileID: 609347626}
+  - {fileID: 1878268567}
   - {fileID: 439423799}
   m_Father: {fileID: 355157176}
   m_RootOrder: 1
@@ -85654,7 +85733,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17.7
+  m_fontSize: 14.6
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -86510,10 +86589,10 @@ RectTransform:
   m_Father: {fileID: 1508729837}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 38}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 8, y: -8}
+  m_SizeDelta: {x: 552, y: 38}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1692533253
 MonoBehaviour:
@@ -87399,7 +87478,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17.5
+  m_fontSize: 17.45
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -88997,11 +89076,11 @@ Transform:
   m_Children:
   - {fileID: 927866351}
   - {fileID: 357520314}
-  - {fileID: 1784311114}
-  - {fileID: 1757648852}
   - {fileID: 847137553}
   - {fileID: 1282532910}
   - {fileID: 1669781568}
+  - {fileID: 1784311114}
+  - {fileID: 1757648852}
   m_Father: {fileID: 355157176}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -89866,6 +89945,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Bobomb
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286581577125373952, guid: 4db60a94570bf8843bb647670a2fa38e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3286581577125373960, guid: 4db60a94570bf8843bb647670a2fa38e,
         type: 3}
@@ -94783,6 +94867,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RedKoopa
+      objectReference: {fileID: 0}
+    - target: {fileID: 7426856683177255958, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255959, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
@@ -100961,8 +101050,8 @@ RectTransform:
   m_Father: {fileID: 1486647692}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -101118,6 +101207,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spiny (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1435431862184428451, guid: acafae0748a6d984ca08e285f836acaf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1435431862184428454, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
       propertyPath: m_RootOrder
@@ -101253,7 +101347,7 @@ RectTransform:
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 24, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -101733,8 +101827,8 @@ RectTransform:
   m_Father: {fileID: 816669721}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -101961,6 +102055,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: BlueKoopa
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074886471065804745, guid: 66003d5404cd23b469d9ff540b488311,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2074886471065804748, guid: 66003d5404cd23b469d9ff540b488311,
         type: 3}

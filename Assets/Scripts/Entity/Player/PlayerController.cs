@@ -268,6 +268,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         data = Object.InputAuthority.GetPlayerData(Runner);
         if (Object.HasInputAuthority) {
+            networkRigidbody.InterpolationDataSource = InterpolationDataSources.Predicted;
+
             GameManager.Instance.localPlayer = this;
             GameManager.Instance.spectationManager.Spectating = false;
             NetworkHandler.OnInput += OnInput;
@@ -329,6 +331,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         input.Set(PreviousInputs);
     }
 
+    public override void Render() {
+        HandleLayerState();
+    }
+
     public override void FixedUpdateNetwork() {
         if (!GameManager.Instance.IsMusicEnabled) {
             models.SetActive(false);
@@ -344,23 +350,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         if (IsDead) {
-
-            if (PreRespawnTimer.Expired(Runner)) {
-                PreRespawn();
-                PreRespawnTimer = TickTimer.None;
-            }
-
-            if (RespawnTimer.Expired(Runner)) {
-                Respawn();
-                RespawnTimer = TickTimer.None;
-            }
-
+            HandleRespawnTimers();
         } else if (!IsFrozen && GetInput(out PlayerNetworkInput input)) {
 
             NetworkButtons heldButtons = input.buttons;
             NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
             PreviousInputs = input;
 
+            // TODO: remove groundpoundLastFrame? Do we even need this anymore?
             groundpoundLastFrame = IsGroundpounding;
             WasGroundedLastFrame = IsOnGround;
 
@@ -389,12 +386,25 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         animationController.HandleDeathAnimation();
         animationController.HandlePipeAnimation();
-        HandleLayerState();
+
         UpdateHitbox();
         previousFrameVelocity = body.velocity;
+
         previousFramePosition = body.position;
     }
     #endregion
+
+    private void HandleRespawnTimers() {
+        if (PreRespawnTimer.Expired(Runner)) {
+            PreRespawn();
+            PreRespawnTimer = TickTimer.None;
+        }
+
+        if (RespawnTimer.Expired(Runner)) {
+            Respawn();
+            RespawnTimer = TickTimer.None;
+        }
+    }
 
     private void CheckForPowerupActions(NetworkButtons pressedButtons) {
         //powerup action button check
@@ -582,7 +592,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
 
             other.Powerdown(false);
-            body.velocity = previousFrameVelocity;
             return;
         }
 
@@ -606,7 +615,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             } else if (State == Enums.PowerupState.MegaMushroom) {
                 // Only we are giant
                 other.Powerdown(false);
-                body.velocity = previousFrameVelocity;
             }
             return;
         }
@@ -666,8 +674,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     other.DoKnockback(other.body.position.x < body.position.x, groundpounded ? 3 : 1, false, gameObject);
                 }
             }
-            body.velocity = new Vector2(previousFrameVelocity.x, body.velocity.y);
-
             return;
         } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove && IsOnGround && other.IsOnGround && (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed)) {
             // Bump
@@ -2273,7 +2279,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (PropellerLaunchTimer.IsActive(Runner)) {
             float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
             float targetVelocity = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0);
-            body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y + 0.4f, targetVelocity));
+            body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y + (24f * Runner.DeltaTime), targetVelocity));
             if (IsOnGround)
                 body.position += Vector2.up * 0.05f;
         } else if (powerupAction && IsPropellerFlying && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime * 0.25f) {

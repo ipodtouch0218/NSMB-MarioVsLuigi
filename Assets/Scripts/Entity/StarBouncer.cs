@@ -21,10 +21,10 @@ public class StarBouncer : CollectableEntity {
     [SerializeField] private float pulseAmount = 0.2f, pulseSpeed = 0.2f;
     [SerializeField] private float moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f;
     [SerializeField] private float blinkingSpeed = 0.5f, lifespan = 15f;
+    [SerializeField] private Transform graphicTransform;
 
     //---Components
     private SpriteRenderer sRenderer;
-    private Transform graphicTransform;
     private PhysicsEntity physics;
     private BoxCollider2D worldCollider;
     private Animator animator;
@@ -55,24 +55,23 @@ public class StarBouncer : CollectableEntity {
     public override void Spawned() {
         base.Spawned();
 
-        graphicTransform = transform.Find("Graphic");
         icon = UIUpdater.Instance.CreateTrackIcon(this);
 
         if (IsStationary) {
-            //main star
+            // Main star: use the "spawn-in" animation
             animator.enabled = true;
             body.isKinematic = true;
             body.velocity = Vector2.zero;
             StartCoroutine(PulseEffect());
-        } else {
-            //player dropped star
 
+        } else {
+            // Player-dropped star
             Passthrough = true;
             sRenderer.color = new(1, 1, 1, 0.55f);
             gameObject.layer = Layers.LayerHitsNothing;
             body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), deathBoostAmount);
 
-            //death via pit boost
+            // Death via pit boost, we need some extra velocity
             if (DroppedByPit)
                 body.velocity += Vector2.up * 3;
 
@@ -80,6 +79,7 @@ public class StarBouncer : CollectableEntity {
             worldCollider.enabled = true;
         }
 
+        // Don't make a spawn sound if we're spawned before the game starts
         if (GameManager.Instance.IsMusicEnabled)
             GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
 
@@ -113,7 +113,6 @@ public class StarBouncer : CollectableEntity {
             return;
 
         body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), body.velocity.y);
-
         Collectable |= body.velocity.y < 0;
 
         if (HandleCollision())
@@ -125,15 +124,17 @@ public class StarBouncer : CollectableEntity {
             sRenderer.color = Color.white;
         }
         if (!Passthrough) {
+            if (body.position.y < GameManager.Instance.LevelMinY) {
+                Runner.Despawn(Object);
+                return;
+            }
+
             if (Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale)) {
                 gameObject.layer = Layers.LayerHitsNothing;
             } else {
                 gameObject.layer = Layers.LayerEntity;
             }
         }
-
-        if (!Passthrough && body.position.y < GameManager.Instance.LevelMinY)
-            Runner.Despawn(Object, true);
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -216,7 +217,7 @@ public class StarBouncer : CollectableEntity {
 
     //---IBlockBumpable overrides
     public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
-        //do nothing when bumped
+        // Do nothing when bumped
     }
 
     //---BasicEntity overrides

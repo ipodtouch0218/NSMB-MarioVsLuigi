@@ -41,8 +41,8 @@
     "HostMigrationSnapshotInterval": 20,
     "Simulation": {
         "InputDataWordCount": 0,
-        "TickRate": 60,
-        "MaxPrediction": 60,
+        "TickRate": 30,
+        "MaxPrediction": 30,
         "DefaultPlayers": 10,
         "ReplicationMode": 0,
         "ObjectInterest": false,
@@ -157,7 +157,7 @@
         "Assembly-CSharp",
         "Assembly-CSharp-firstpass"
     ],
-    "UseSerializableDictionary": true,
+    "UseSerializableDictionary": false,
     "NullChecksForNetworkedProperties": true,
     "CheckRpcAttributeUsage": false,
     "CheckNetworkedPropertiesBeingEmpty": false

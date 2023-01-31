@@ -92,7 +92,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         }
 
         if (FollowPlayer) {
-            body.position = new(FollowPlayer.transform.position.x, FollowPlayer.cameraController.currentPosition.y + 1.68f);
+            body.position = new(FollowPlayer.body.position.x, FollowPlayer.cameraController.currentPosition.y + 1.68f);
 
             if (FollowEndTimer.ExpiredOrNotRunning(Runner)) {
                 FollowPlayer = null;

@@ -25,11 +25,11 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
             return;
 
         //player has to be moving upwards
-        if (player.previousFrameVelocity.y <= 0)
+        if (player.body.velocity.y < 0.1f)
             return;
 
         //player has to bump us from below
-        if (player.body.position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.previousFrameVelocity.y * Runner.DeltaTime) > transform.position.y)
+        if (player.body.position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.body.velocity.y * Runner.DeltaTime) > transform.position.y)
             return;
 
         BumpTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);

@@ -3,7 +3,7 @@
 using Fusion;
 using NSMB.Utils;
 
-[OrderAfter(typeof(PlayerController))]
+[OrderAfter(typeof(PlayerController), typeof(NetworkRigidbody2D))]
 public abstract class HoldableEntity : KillableEntity {
 
     //---Networked Variables
@@ -21,15 +21,16 @@ public abstract class HoldableEntity : KillableEntity {
 
     public override void FixedUpdateNetwork() {
         if (Holder) {
+            //body.velocity = Holder.body.velocity;
             body.velocity = Vector2.zero;
             transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
-            body.position = Holder.body.position + (Vector2) holderOffset;
+            body.position = Holder.body.position + (Holder.body.velocity * Runner.DeltaTime) + (Vector2) holderOffset;
             hitbox.enabled = false;
             sRenderer.flipX = !FacingRight;
             CheckForEntityCollisions();
         } else {
-            base.FixedUpdateNetwork();
             hitbox.enabled = true;
+            base.FixedUpdateNetwork();
         }
     }
 
