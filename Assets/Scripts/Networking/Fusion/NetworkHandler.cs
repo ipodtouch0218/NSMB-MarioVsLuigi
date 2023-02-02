@@ -147,7 +147,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
         Debug.Log($"[Network] Player joined room (UserId = {runner.GetPlayerUserId(player)})");
 
-        if (runner.IsServer) {
+        if (runner.IsServer && !runner.IsSinglePlayer) {
             //create player data
             runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
 

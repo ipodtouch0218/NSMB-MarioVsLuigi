@@ -184,7 +184,8 @@ public class GameManager : NetworkBehaviour {
         if (Runner.IsServer && Runner.IsSinglePlayer) {
             // Handle spawning in editor by spawning the room + player data objects
             Runner.Spawn(PrefabList.Instance.SessionDataHolder);
-            Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
+            NetworkObject localData = Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
+            Runner.SetPlayerObject(Runner.LocalPlayer, localData);
         }
 
         if (GameStartTime <= 0) {
