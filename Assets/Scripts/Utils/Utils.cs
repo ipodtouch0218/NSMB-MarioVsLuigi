@@ -348,6 +348,15 @@ namespace NSMB.Utils {
             return Vector2.Distance(a, b);
         }
 
+        public static float WrappedDistance(Vector2 a, Vector2 b, out float xDifference) {
+            GameManager gm = GameManager.Instance;
+            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.LevelWidth * 0.5f)
+                a.x -= gm.LevelWidth * Mathf.Sign(a.x - b.x);
+
+            xDifference = a.x - b.x;
+            return Vector2.Distance(a, b);
+        }
+
         public static bool GetSessionProperty(SessionInfo session, string key, out int value) {
             if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
                 value = property;

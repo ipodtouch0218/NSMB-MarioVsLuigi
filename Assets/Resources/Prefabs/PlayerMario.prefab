@@ -10543,7 +10543,7 @@ MonoBehaviour:
   _FloorAngle: 0
   _OnIce:
     _value: 0
-  _Jumping:
+  _IsJumping:
     _value: 0
   _JumpState: 0
   _ProperJump:
@@ -10744,6 +10744,7 @@ MonoBehaviour:
   - {fileID: 3452636116809643534}
   soundOrigin: {fileID: 4824223341387914440}
   soundRange: 12
+  maxPanning: 0.5
 --- !u!82 &5377451828833222271
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10998,7 +10999,7 @@ MonoBehaviour:
   _interpolationDataSource: 1
   InterpolationSpace: 1
   InterpolationTarget: {fileID: 8279152070748857899}
-  InterpolateErrorCorrection: 0
+  InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
     MaxRate: 45

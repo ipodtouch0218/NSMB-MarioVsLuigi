@@ -47,7 +47,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public float FloorAngle { get; set; }
     [Networked] public NetworkBool OnIce { get; set; }
     //Jumping
-    [Networked] public NetworkBool Jumping { get; set; }
+    [Networked(OnChanged = nameof(OnJumpEffectChanged))] private byte JumpEffectCounter { get; set; }
+    [Networked] public NetworkBool IsJumping { get; set; }
     [Networked] public PlayerJumpState JumpState { get; set; }
     [Networked] public NetworkBool ProperJump { get; set; }
     [Networked] public NetworkBool DoEntityBounce { get; set; }
@@ -1107,7 +1108,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (Object.HasInputAuthority)
             ScoreboardUpdater.Instance.OnRespawnToggle();
-
     }
     #endregion
 
@@ -1701,16 +1701,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (canSpecialJump && JumpState == PlayerJumpState.SingleJump) {
             //Double jump
             JumpState = PlayerJumpState.DoubleJump;
-            if (Runner.IsForward)
-                PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
-
         } else if (canSpecialJump && JumpState == PlayerJumpState.DoubleJump) {
             //Triple Jump
             JumpState = PlayerJumpState.TripleJump;
             jumpBoost = 0.5f;
-            if (Runner.IsForward)
-                PlaySound(Enums.Sounds.Player_Voice_TripleJump);
-
         } else {
             //Normal jump
             JumpState = PlayerJumpState.SingleJump;
@@ -1718,21 +1712,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         body.velocity = new(body.velocity.x, vel + jumpBoost);
         ProperJump = true;
-        Jumping = true;
-
-        if (!DoEntityBounce) {
-            //play jump sound
-            if (Runner.IsForward) {
-                Enums.Sounds sound = State switch {
-                    Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Jump,
-                    Enums.PowerupState.MegaMushroom => Enums.Sounds.Powerup_MegaMushroom_Jump,
-                    _ => Enums.Sounds.Player_Sound_Jump,
-                };
-                PlaySound(sound);
-            }
-        }
+        IsJumping = true;
+        JumpEffectCounter++;
         DoEntityBounce = false;
-
     }
 
     public void UpdateHitbox() {
@@ -2328,7 +2310,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             UsedPropellerThisJump = false;
             WallSlideLeft = false;
             WallSlideRight = false;
-            Jumping = false;
+            IsJumping = false;
             if (IsDrilling)
                 SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
 
@@ -2343,7 +2325,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsSkidding = false;
             IsTurnaround = false;
 
-            if (!Jumping)
+            if (!IsJumping)
                 ProperJump = false;
         }
 
@@ -2707,9 +2689,40 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         player.PlaySound(Enums.Sounds.World_Spinner_Launch);
     }
 
+    public static void OnJumpEffectChanged(Changed<PlayerController> changed) {
+        PlayerController player = changed.Behaviour;
+        if (!player.IsJumping)
+            return;
+
+        // Voice SFX
+        switch (player.JumpState) {
+        case PlayerJumpState.DoubleJump:
+            player.PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
+            break;
+        case PlayerJumpState.TripleJump:
+            player.PlaySound(Enums.Sounds.Player_Voice_TripleJump);
+            break;
+        }
+
+        changed.LoadOld();
+        bool entityBounce = player.DoEntityBounce;
+        changed.LoadNew();
+
+        if (entityBounce)
+            return;
+
+        // Jump SFX
+        Enums.Sounds sound = player.State switch {
+            Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Jump,
+            Enums.PowerupState.MegaMushroom => Enums.Sounds.Powerup_MegaMushroom_Jump,
+            _ => Enums.Sounds.Player_Sound_Jump,
+        };
+        player.PlaySound(sound);
+    }
+
     //---Debug
 #if UNITY_EDITOR
-    private List<Renderer> renderers = new();
+    private readonly List<Renderer> renderers = new();
     public void OnDrawGizmos() {
         if (!body)
             return;

@@ -15,9 +15,12 @@ namespace NSMB.Loading {
 
         //---Private Variables
         private TMP_Text text;
+        private GameObject playerListParent;
 
         public void Awake() {
             text = GetComponent<TMP_Text>();
+            playerListParent = playerList.transform.parent.gameObject;
+            playerListParent.SetActive(false);
         }
 
         public void Update() {
@@ -35,13 +38,14 @@ namespace NSMB.Loading {
             //we're still loading
             if (!GameManager.Instance.Object.IsValid) {
                 text.text = emptyText;
+                playerListParent.SetActive(false);
                 return;
             }
 
             //game starting
             if (GameManager.Instance.GameStartTimer.IsRunning) {
                 text.text = readyToStartText;
-                playerList.text = "";
+                playerListParent.SetActive(false);
                 return;
             }
 
@@ -55,7 +59,8 @@ namespace NSMB.Loading {
                 if (!data.IsCurrentlySpectating && !data.IsLoaded)
                     waitingFor.Add(data.GetNickname());
             }
-            playerList.text = waitingFor.Count == 0 ? "" : "Waiting for:\n\n- " + string.Join("\n- ", waitingFor);
+            playerListParent.SetActive(true);
+            playerList.text = waitingFor.Count == 0 ? "" : "\n- " + string.Join("\n- ", waitingFor);
         }
     }
 }

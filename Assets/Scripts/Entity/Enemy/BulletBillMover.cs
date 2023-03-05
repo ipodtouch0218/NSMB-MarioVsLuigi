@@ -1,8 +1,12 @@
 using UnityEngine;
 
 using NSMB.Utils;
+using Fusion;
 
 public class BulletBillMover : KillableEntity {
+
+    //---Networked Variables
+    [Networked] private TickTimer DespawnTimer { get; set; }
 
     //---Serialized Variables
     [SerializeField] private float speed, playerSearchRadius = 4, despawnDistance = 8;
@@ -46,8 +50,14 @@ public class BulletBillMover : KillableEntity {
             return;
         }
 
-        if (IsFrozen)
+        if (IsFrozen || IsDead)
             return;
+
+        if (DespawnTimer.Expired(Runner)) {
+            DespawnTimer = TickTimer.None;
+            Runner.Despawn(Object);
+            return;
+        }
 
         body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
         DespawnCheck();
@@ -67,11 +77,11 @@ public class BulletBillMover : KillableEntity {
 
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
-        if (IsFrozen || player.IsFrozen || (player.State == Enums.PowerupState.BlueShell && player.IsCrouching))
+        if (IsDead || IsFrozen || player.IsFrozen || (player.State == Enums.PowerupState.BlueShell && player.IsCrouching))
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
 
         if (player.IsStarmanInvincible || player.IsInShell || player.IsSliding
             || ((player.IsGroundpounding || player.IsDrilling) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
@@ -81,7 +91,7 @@ public class BulletBillMover : KillableEntity {
                 player.DoEntityBounce = true;
                 player.IsDrilling = false;
             }
-            Kill();
+            SpecialKill(false, true, player.StarCombo++);
             return;
         }
         if (attackedFromAbove) {
@@ -111,24 +121,34 @@ public class BulletBillMover : KillableEntity {
 
     //---KillableEntity overrides
     public override void Kill() {
-        SpecialKill(FacingRight, false, 0);
+        IsDead = true;
+        body.velocity = Vector2.zero;
+        body.constraints = RigidbodyConstraints2D.None;
+        body.angularVelocity = 400f * (FacingRight ? -1 : 1);
+        body.gravityScale = 1.5f;
+        body.isKinematic = false;
     }
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {
         IsDead = true;
-        body.velocity = Vector2.right * 2.5f;
-        body.constraints = RigidbodyConstraints2D.None;
-        body.angularVelocity = 400f * (right ? 1 : -1);
-        body.gravityScale = 1.5f;
-        body.isKinematic = false;
-        animation.enabled = false;
-        hitbox.enabled = false;
-        gameObject.layer = Layers.LayerHitsNothing;
+        WasSpecialKilled = true;
+        WasGroundpounded = groundpound;
+        body.velocity = Vector2.zero;
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
+    }
 
-        if (groundpound)
-            Instantiate(Resources.Load("Prefabs/Particle/EnemySpecialKill"), body.position + Vector2.right * 0.5f, Quaternion.identity);
+    public override void OnIsDeadChanged() {
+        base.OnIsDeadChanged();
 
-        PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+        if (IsDead) {
+            trailParticles.Stop();
+            if (WasSpecialKilled) {
+                sRenderer.enabled = false;
+            }
+        } else {
+            sRenderer.enabled = true;
+            trailParticles.Play();
+        }
     }
 
 #if UNITY_EDITOR
