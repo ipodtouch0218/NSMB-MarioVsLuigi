@@ -29,6 +29,7 @@ public class MainMenuManager : MonoBehaviour {
     public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, privateToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, updateBoxSelected;
+    public Image ColorBar;
 
     //---Serialized Fields
     [SerializeField] private RebindManager rebindManager;
@@ -218,6 +219,10 @@ public class MainMenuManager : MonoBehaviour {
         // Discord RPC
         GlobalController.Instance.DiscordController.UpdateActivity(session);
 
+        //Color bar at the top
+        UnityEngine.Random.InitState(name.GetHashCode() + 2035767);
+        ColorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f, 1f, 1f);
+        //Me when iPod sees my code!!!!
     }
 
     public void PreviewLevel(int levelIndex) {
