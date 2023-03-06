@@ -483,7 +483,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2061862550066614901
 Transform:
   m_ObjectHideFlags: 0
@@ -5854,7 +5854,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4471174548985650791
 Transform:
   m_ObjectHideFlags: 0
@@ -21836,7 +21836,6 @@ MonoBehaviour:
   - {fileID: 3270782425811840124}
   soundOrigin: {fileID: 8636928217783201364}
   soundRange: 12
-  maxPanning: 0.8
 --- !u!82 &9191589652819086563
 AudioSource:
   m_ObjectHideFlags: 0

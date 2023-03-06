@@ -16,10 +16,10 @@ public class WaterSplash : NetworkBehaviour {
     [Delayed] [SerializeField] private int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
     [Delayed] [SerializeField] private float heightTiles = 1;
     [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, animationSpeed = 1f;
-    [SerializeField] private bool fireDeath;
+    [SerializeField] private LiquidType liquidType;
 
     //---Private Variables
-    private readonly HashSet<GameObject> splashedEntities = new();
+    private readonly HashSet<Collider2D> splashedEntities = new();
     private Texture2D heightTex;
     private SpriteRenderer spriteRenderer;
     private MaterialPropertyBlock properties;
@@ -58,8 +58,8 @@ public class WaterSplash : NetworkBehaviour {
 
         heightTex.Apply();
 
-        hitbox.offset = new(0, heightTiles * 0.25f/* - 0.2f*/);
-        hitbox.size = new(widthTiles * 0.5f, heightTiles * 0.5f /*- 0.1f*/);
+        hitbox.offset = new(0, heightTiles * 0.25f - 0.1f);
+        hitbox.size = new(widthTiles * 0.5f, heightTiles * 0.5f - 0.2f);
         spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
 
         properties = new();
@@ -120,40 +120,68 @@ public class WaterSplash : NetworkBehaviour {
             if (!obj || obj.GetComponentInParent<BasicEntity>() is not BasicEntity entity)
                 continue;
 
+            // Don't splash stationary stars
+            if (entity is StarBouncer sb && sb.IsStationary)
+                continue;
+
+            // Don't splash stationary coins
+            if (entity is FloatingCoin)
+                continue;
+
+            if (Runner.IsServer) {
+                bool? underSurface = null;
+                if (!splashedEntities.Contains(obj)) {
+                    underSurface ??= entity.GetComponentInChildren<Renderer>()?.bounds.max.y < transform.position.y + heightTiles * 0.5f - 0.1f;
+                    if (!underSurface ?? true) {
+                        Rpc_Splash(entity.body.position, -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)));
+                    }
+                    splashedEntities.Add(obj);
+                }
+
+                if (liquidType != LiquidType.Water && entity is not PlayerController) {
+                    // Kill entity if they're below the surface of the posion/lava
+                    underSurface ??= entity.GetComponentInChildren<Renderer>()?.bounds.max.y < transform.position.y + heightTiles * 0.5f - 0.1f;
+                    if (underSurface ?? false) {
+                        // Don't let fireballs "poof"
+                        if (entity is FireballMover fm)
+                            fm.PlayBreakEffect = false;
+
+                        entity.Destroy(BasicEntity.DestroyCause.Lava);
+                    }
+                }
+            }
+
             // Player collisions are special
             if (entity is PlayerController player) {
                 if (player.IsDead || player.CurrentPipe)
                     continue;
 
-                if (Runner.IsServer)
-                    Rpc_Splash(entity.body.position, -Mathf.Abs(Mathf.Min(-3, entity.body.velocity.y)));
-
-                player.Death(false, fireDeath);
-                continue;
-            }
-
-            // Don't splash stationary stars
-            if (entity is StarBouncer sb && sb.IsStationary)
-                continue;
-
-            if (Runner.IsServer) {
-                if (!splashedEntities.Contains(obj.gameObject)) {
-                    Rpc_Splash(entity.body.position, -Mathf.Abs(Mathf.Min(-3, entity.body.velocity.y)));
-                    splashedEntities.Add(obj.gameObject);
-                }
-
-                // Kill entity if they're below the surface of the posion/lava
-                if (entity.GetComponentInChildren<Renderer>().bounds.max.y < transform.position.y + heightTiles * 0.5f - 0.1f) {
-                    // Don't let fireballs "poof"
-                    if (entity is FireballMover fm)
-                        fm.PlayBreakEffect = false;
-
-                    entity.Destroy(BasicEntity.DestroyCause.Lava);
+                if (liquidType == LiquidType.Water) {
+                    player.IsSwimming = true;
+                } else {
+                    player.Death(false, liquidType == LiquidType.Lava);
+                    continue;
                 }
             }
         }
 
-        splashedEntities.IntersectWith(CollisionBuffer.Take(count).Select(c => c.gameObject));
+        foreach (var obj in splashedEntities) {
+            if (CollisionBuffer.Contains(obj))
+                continue;
+
+            BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
+
+            if (Runner.IsServer)
+                Rpc_Splash(entity.body.position, Mathf.Abs(Mathf.Max(5, entity.body.velocity.y)));
+
+            if (entity is PlayerController player) {
+                player.IsSwimming = false;
+                player.WasSwimming = true;
+                player.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.5f;
+            }
+        }
+
+        splashedEntities.IntersectWith(CollisionBuffer);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -166,5 +194,12 @@ public class WaterSplash : NetworkBehaviour {
             int pointsX = (px + totalPoints + i) % totalPoints;
             pointVelocities[pointsX] = -splashVelocity * power;
         }
+    }
+
+    //---Helpers
+    public enum LiquidType {
+        Water,
+        Poison,
+        Lava
     }
 }

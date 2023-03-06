@@ -35,8 +35,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2500780753419200967, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
-      propertyPath: widthTiles
-      value: 3
+      propertyPath: liquidType
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2500780753419200967, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
@@ -44,11 +44,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5915462787734291377, guid: 1ee607c8f8f772742ab6024341752ba9,
         type: 3}
-    - target: {fileID: 2500780753419200967, guid: 2dd296828f2080541ab2b41eeda650a7,
-        type: 3}
-      propertyPath: animationSpeed
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 2500780753419200967, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: splashParticle

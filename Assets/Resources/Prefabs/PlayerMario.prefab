@@ -10744,7 +10744,6 @@ MonoBehaviour:
   - {fileID: 3452636116809643534}
   soundOrigin: {fileID: 4824223341387914440}
   soundRange: 12
-  maxPanning: 0.5
 --- !u!82 &5377451828833222271
 AudioSource:
   m_ObjectHideFlags: 0
@@ -16363,7 +16362,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6155689919788558835
 Transform:
   m_ObjectHideFlags: 0
@@ -21626,7 +21625,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8422425991972032554
 Transform:
   m_ObjectHideFlags: 0

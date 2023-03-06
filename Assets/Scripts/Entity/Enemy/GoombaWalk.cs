@@ -4,9 +4,6 @@ using Fusion;
 
 public class GoombaWalk : KillableEntity {
 
-    //---Networked Variables
-    [Networked] private TickTimer DespawnTimer { get; set; }
-
     //---Serialized Variables
     [SerializeField] private Sprite deadSprite;
     [SerializeField] private float speed, terminalVelocity = -8;
@@ -18,6 +15,8 @@ public class GoombaWalk : KillableEntity {
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
+        if (!Object)
+            return;
 
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
@@ -27,18 +26,12 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        if (IsDead) {
-            if (DespawnTimer.Expired(Runner)) {
-                DespawnTimer = TickTimer.None;
-                Runner.Despawn(Object);
-            }
+        if (IsDead)
             return;
-        }
 
         HandleWallCollisions();
 
         body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(terminalVelocity, body.velocity.y));
-        sRenderer.flipX = FacingRight;
     }
 
     private void HandleWallCollisions() {
@@ -69,5 +62,10 @@ public class GoombaWalk : KillableEntity {
         } else {
             legacyAnimation.enabled = true;
         }
+    }
+
+    //---BasicEntity overrides
+    public override void OnFacingChanged() {
+        sRenderer.flipX = FacingRight;
     }
 }

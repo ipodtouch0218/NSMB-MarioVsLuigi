@@ -156,7 +156,7 @@ MonoBehaviour:
   damping: 0.985
   splashVelocity: 10
   animationSpeed: 9
-  fireDeath: 0
+  liquidType: 1
 --- !u!114 &2023664385349516667
 MonoBehaviour:
   m_ObjectHideFlags: 0

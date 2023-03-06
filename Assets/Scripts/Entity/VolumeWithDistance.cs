@@ -35,7 +35,7 @@ public class VolumeWithDistance : MonoBehaviour {
 
         float percentage = 1f - (distance * soundRangeInverse);
         float volume = Utils.QuadraticEaseOut(percentage);
-        float panning = -xDifference * soundRangeInverse * maxPanning;
+        float panning = Utils.QuadraticEaseOut(-xDifference * soundRangeInverse) * maxPanning;
 
         foreach (AudioSource source in audioSources) {
             source.volume = volume;

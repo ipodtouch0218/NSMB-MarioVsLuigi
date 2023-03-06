@@ -80,6 +80,11 @@ public class PlayerAnimationController : NetworkBehaviour {
     }
 
     public override void Render() {
+        if (GameManager.Instance.GameStartTimer.IsRunning) {
+            DisableAllModels();
+            return;
+        }
+
         UpdateAnimatorVariables();
         HandleAnimations();
         SetFacingDirection();
@@ -252,6 +257,8 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("mega",           controller.State == Enums.PowerupState.MegaMushroom);
         animator.SetBool("inShell",        controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
         animator.SetBool("turnaround",     controller.IsTurnaround);
+        animator.SetBool("swimming",       controller.IsSwimming);
+        animator.SetBool("a_held",         controller.PreviousInputs.buttons.IsSet(PlayerControls.Jump));
 
         float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.FloorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.FloorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);
         if (controller.IsStuckInBlock) {
@@ -270,7 +277,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
     private void HandleMiscStates() {
         if (controller.GiantEndTimer.IsActive(Runner)) {
-            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime / 2f)) * 2.6f));
+            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime * 0.5f)) * 2.6f));
         } else {
             transform.localScale = controller.State switch {
                 Enums.PowerupState.MiniMushroom => ZeroPointFive,
