@@ -69,6 +69,8 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [@AtwerJ](https://github.com/AtwerJ)
 * [@Pordrack](https://github.com/Pordrack)
 * [@VLC](https://github.com/vlcoo)
+* [@Cubby](https://github.com/CubbyCrazes)
+* [@AutumnLeafy](https://github.com/AutumnLeafy)
 
 ### Music:
 * [RENREN](https://mistajub.bandcamp.com/)
