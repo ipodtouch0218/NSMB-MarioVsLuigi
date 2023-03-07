@@ -9,9 +9,6 @@ using UnityEngine.Tilemaps;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine.Rendering.UI;
-using System.Collections.ObjectModel;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 
@@ -86,9 +83,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     //Stuck
     [Networked] public NetworkBool IsStuckInBlock { get; set; }
     //Swimming
-    [Networked] public NetworkBool WasSwimming { get; set; }
+    [Networked] public NetworkBool SwimJump { get; set; }
     [Networked] public float SwimLeaveForceHoldJumpTime { get; set; }
     [Networked] public NetworkBool IsSwimming { get; set; }
+    [Networked] public NetworkBool IsWaterWalking { get; set; }
     //-Death & Respawning
     [Networked(OnChanged = nameof(OnDeadChanged))] public NetworkBool IsDead { get; set; } = false;
     [Networked(OnChanged = nameof(OnRespawningChanged))] public NetworkBool IsRespawning { get; set; }
@@ -136,7 +134,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             float[] arr;
             if (IsSwimming) {
                 if (IsOnGround) {
-                    arr = SWIM_WALK_STAGE_MAX;
+                    if (State == Enums.PowerupState.BlueShell) {
+                        arr = SWIM_WALK_SHELL_STAGE_MAX;
+                    } else {
+                        arr = SWIM_WALK_STAGE_MAX;
+                    }
                 } else {
                     arr = SWIM_STAGE_MAX;
                 }
@@ -228,12 +230,17 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float SWIM_MAX_VSPEED = 4.833984375f;
     private static readonly float SWIM_TERMINAL_VELOCITY_AHELD = -0.9375f;
     private static readonly float SWIM_TERMINAL_VELOCITY = -2.8125f;
+    private static readonly float SWIM_BUTTON_RELEASE_DEC = 1.7578125f;
 
     private static readonly float[] SWIM_STAGE_MAX = { 0f, 2.109375f };
     private static readonly float[] SWIM_STAGE_ACC = { 1.7578125f, 3.076171875f, 0.439453125f };
+    private static readonly float[] SWIM_SHELL_STAGE_MAX = { 3.1640625f };
+    private static readonly float[] SWIM_SHELL_STAGE_ACC = { 6.15234375f, 6.15234375f };
 
     private static readonly float[] SWIM_WALK_STAGE_MAX = { 1.0546875f, 1.0546875f };
     private static readonly float[] SWIM_WALK_STAGE_ACC = { 3.07617875f, 1.7578125f  };
+    private static readonly float[] SWIM_WALK_SHELL_STAGE_MAX = { 1.58203125f, 1.58203125f };
+    private static readonly float[] SWIM_WALK_SHELL_STAGE_ACC = { 6.15234375f, 6.15234375f };
     private static readonly float SWIM_GROUNDPOUND_DEC = 38.671875f;
 
     private static readonly float?[] GRAVITY_STAGE_MAX = { null, 4.16015625f, 2.109375f, 0f, -5.859375f };
@@ -1190,10 +1197,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Kick);
             return;
         }
+        if (IsWaterWalking) {
+            footstepSound = Enums.Sounds.Player_Walk_Water;
+        }
         if (footstepParticle != Enums.Particle.None)
             GameManager.Instance.particleManager.Play((Enums.Particle) ((int) footstepParticle + (FacingRight ? 1 : 0)), body.position);
 
-        if (Mathf.Abs(body.velocity.x) < WalkingMaxSpeed)
+        if (!IsWaterWalking && Mathf.Abs(body.velocity.x) < WalkingMaxSpeed)
             return;
 
         PlaySound(footstepSound, (byte) (footstepVariant ? 1 : 2), Mathf.Abs(body.velocity.x) / (RunningMaxSpeed + 4));
@@ -1480,11 +1490,23 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsDead || body.velocity.y > 0.1f || PropellerLaunchTimer.IsActive(Runner) || CurrentPipe)
             return false;
 
-        RaycastHit2D hit = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
+        RaycastHit2D hit;
+        if (IsWaterWalking) {
+            hit = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, 1 << Layers.LayerEntityHitbox);
+            if (hit && hit.collider.gameObject.CompareTag("water")) {
+                body.position = new(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
+                return true;
+            } else {
+                IsWaterWalking = false;
+            }
+        }
+
+        hit = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
         if (hit) {
             body.position = new(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
             return true;
         }
+
         return false;
     }
 
@@ -1793,7 +1815,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         int maxStage;
         if (IsSwimming)
-            maxStage = SWIM_STAGE_MAX.Length - 1;
+            if (State == Enums.PowerupState.BlueShell) {
+                maxStage = SWIM_SHELL_STAGE_MAX.Length - 1;
+            } else {
+                maxStage = SWIM_STAGE_MAX.Length - 1;
+            }
         else if (IsStarmanInvincible && run && IsOnGround)
             maxStage = STAR_STAGE;
         else if (run)
@@ -1802,20 +1828,37 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             maxStage = WALK_STAGE;
 
         float[] maxArray = SPEED_STAGE_MAX;
-        if (IsSwimming)
-            if (IsOnGround)
-                maxArray = SWIM_WALK_STAGE_MAX;
-            else
-                maxArray = SWIM_STAGE_MAX;
-
+        if (IsSwimming) {
+            if (IsOnGround) {
+                if (State == Enums.PowerupState.BlueShell) {
+                    maxArray = SWIM_WALK_SHELL_STAGE_MAX;
+                } else {
+                    maxArray = SWIM_WALK_STAGE_MAX;
+                }
+            } else {
+                if (State == Enums.PowerupState.BlueShell) {
+                    maxArray = SWIM_SHELL_STAGE_MAX;
+                } else {
+                    maxArray = SWIM_STAGE_MAX;
+                }
+            }
+        }
         int stage = MovementStage;
 
         float acc;
         if (IsSwimming) {
             if (IsOnGround) {
-                acc = SWIM_WALK_STAGE_ACC[stage];
+                if (State == Enums.PowerupState.BlueShell) {
+                    acc = SWIM_WALK_SHELL_STAGE_ACC[stage];
+                } else {
+                    acc = SWIM_WALK_STAGE_ACC[stage];
+                }
             } else {
-                acc = SWIM_STAGE_ACC[stage];
+                if (State == Enums.PowerupState.BlueShell) {
+                    acc = SWIM_SHELL_STAGE_ACC[stage];
+                } else {
+                    acc = SWIM_STAGE_ACC[stage];
+                }
             }
         } else if (OnIce) {
             acc = ICE_STAGE_ACC[stage];
@@ -1842,7 +1885,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (reverse) {
                 IsTurnaround = false;
                 if (IsOnGround) {
-                    if (speed >= SKIDDING_THRESHOLD && !HeldEntity && State != Enums.PowerupState.MegaMushroom) {
+                    if (!IsSwimming && speed >= SKIDDING_THRESHOLD && !HeldEntity && State != Enums.PowerupState.MegaMushroom) {
                         IsSkidding = true;
                         FacingRight = sign == 1;
                     }
@@ -1908,12 +1951,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
             body.velocity = new(newX, body.velocity.y);
 
-        } else if (IsOnGround) {
+        } else if (IsOnGround || IsSwimming) {
             //not holding anything, sliding, or holding both directions. decelerate
             IsSkidding = false;
             IsTurnaround = false;
 
             float angle = Mathf.Abs(FloorAngle);
+            if (IsSwimming)
+                acc = -SWIM_BUTTON_RELEASE_DEC;
             if (IsSliding) {
                 if (angle > slopeSlidingAngle) {
                     //uphill / downhill
@@ -2263,10 +2308,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         bool canJump = pressedButtons.IsSet(PlayerControls.Jump) || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
-        bool doJump = (canJump && (IsOnGround || Runner.SimulationTime <= CoyoteTime)) || (!IsSwimming && WasSwimming);
+        bool doJump = (canJump && (IsOnGround || Runner.SimulationTime <= CoyoteTime)) || (!IsSwimming && SwimJump);
         bool doWalljump = canJump && !IsOnGround && WallSliding;
 
-        WasSwimming = false;
+        SwimJump = false;
 
         //GROUNDPOUND BUFFERING
         if (pressedButtons.IsSet(PlayerControls.Down)) {
@@ -2332,6 +2377,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             ThrowHeldItem(left, right, down);
         }
 
+        IsWaterWalking &= State == Enums.PowerupState.MiniMushroom && (Mathf.Abs(body.velocity.x) > 0.3f || left || right);
         if (IsSwimming) {
             bool paddle = pressedButtons.IsSet(PlayerControls.Jump);
             HandleSwimming(left, right, paddle, jumpHeld);

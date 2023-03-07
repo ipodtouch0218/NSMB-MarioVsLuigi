@@ -8,17 +8,21 @@ using Fusion;
 [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
 public class WaterSplash : NetworkBehaviour {
 
-    //---Static Variables
-    private static readonly Collider2D[] CollisionBuffer = new Collider2D[32];
-
     //---Serialized Variables
-    [SerializeField] private GameObject splashPrefab;
+    [SerializeField] private GameObject splashPrefab, splashExitPrefab;
+    [SerializeField] private SpriteMask mask;
     [Delayed] [SerializeField] private int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
     [Delayed] [SerializeField] private float heightTiles = 1;
     [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, animationSpeed = 1f;
     [SerializeField] private LiquidType liquidType;
 
+    //---Properties
+    private float SurfaceHeight => transform.position.y + heightTiles * 0.5f - 0.1f;
+
     //---Private Variables
+    private readonly Collider2D[] CollisionBuffer = new Collider2D[32];
+    private int collisionCount;
+
     private readonly HashSet<Collider2D> splashedEntities = new();
     private Texture2D heightTex;
     private SpriteRenderer spriteRenderer;
@@ -36,6 +40,7 @@ public class WaterSplash : NetworkBehaviour {
 
     private void OnValidate() {
         ValidationUtility.SafeOnValidate(Initialize);
+        if (!splashExitPrefab) splashExitPrefab = splashPrefab;
     }
 
     private void Initialize() {
@@ -58,9 +63,11 @@ public class WaterSplash : NetworkBehaviour {
 
         heightTex.Apply();
 
-        hitbox.offset = new(0, heightTiles * 0.25f - 0.1f);
-        hitbox.size = new(widthTiles * 0.5f, heightTiles * 0.5f - 0.2f);
+        hitbox.offset = new(0, heightTiles * 0.25f);
+        hitbox.size = new(widthTiles * 0.5f, heightTiles * 0.5f);
         spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
+        if (mask)
+            mask.transform.localScale = new(widthTiles * mask.sprite.pixelsPerUnit / 32f, (heightTiles - 1f) * mask.sprite.pixelsPerUnit / 32f + 2f, 1f);
 
         properties = new();
         properties.SetTexture("Heightmap", heightTex);
@@ -111,11 +118,19 @@ public class WaterSplash : NetworkBehaviour {
         spriteRenderer.SetPropertyBlock(properties);
     }
 
+    //public override void Render() {
+    //    for (int i = 0; i < collisionCount; i++) {
+    //        var obj = CollisionBuffer[i];
+
+    //        if ()
+    //    }
+    //}
+
     public override void FixedUpdateNetwork() {
         // Find entities inside our collider
-        int count = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
+        collisionCount = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < collisionCount; i++) {
             var obj = CollisionBuffer[i];
             if (!obj || obj.GetComponentInParent<BasicEntity>() is not BasicEntity entity)
                 continue;
@@ -128,19 +143,29 @@ public class WaterSplash : NetworkBehaviour {
             if (entity is FloatingCoin)
                 continue;
 
+            if (liquidType == LiquidType.Water && entity is PlayerController player && player.State == Enums.PowerupState.MiniMushroom) {
+                if (!player.IsSwimming && Mathf.Abs(player.body.velocity.x) > 0.3f && player.body.velocity.y < 0) {
+                    // player is running on the water
+                    player.body.position = new(player.body.position.x, hitbox.bounds.max.y);
+                    player.IsOnGround = true;
+                    player.IsWaterWalking = true;
+                    continue;
+                }
+            }
+
+            bool? underSurface = null;
             if (Runner.IsServer) {
-                bool? underSurface = null;
                 if (!splashedEntities.Contains(obj)) {
-                    underSurface ??= entity.GetComponentInChildren<Renderer>()?.bounds.max.y < transform.position.y + heightTiles * 0.5f - 0.1f;
-                    if (!underSurface ?? true) {
-                        Rpc_Splash(entity.body.position, -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)));
+                    bool splash = entity.body.position.y > SurfaceHeight - 0.5f && (entity is not PlayerController pl || pl.State != Enums.PowerupState.MiniMushroom);
+                    if (splash) {
+                        Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
                     }
                     splashedEntities.Add(obj);
                 }
 
                 if (liquidType != LiquidType.Water && entity is not PlayerController) {
                     // Kill entity if they're below the surface of the posion/lava
-                    underSurface ??= entity.GetComponentInChildren<Renderer>()?.bounds.max.y < transform.position.y + heightTiles * 0.5f - 0.1f;
+                    underSurface ??= entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
                     if (underSurface ?? false) {
                         // Don't let fireballs "poof"
                         if (entity is FireballMover fm)
@@ -152,14 +177,27 @@ public class WaterSplash : NetworkBehaviour {
             }
 
             // Player collisions are special
-            if (entity is PlayerController player) {
-                if (player.IsDead || player.CurrentPipe)
+            if (entity is PlayerController player2) {
+                if (player2.IsDead || player2.CurrentPipe)
                     continue;
 
                 if (liquidType == LiquidType.Water) {
-                    player.IsSwimming = true;
+                    float height = player2.body.position.y + (player2.WorldHitboxSize.y * 0.5f);
+                    bool underwater = height <= SurfaceHeight;
+
+                    if (player2.IsSwimming && !underwater) {
+                        // jumped out of the water
+                        player2.IsSwimming = false;
+                        player2.SwimJump = true;
+                        player2.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
+                        if (Runner.IsServer)
+                            Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Exit);
+                    } else {
+                        player2.IsSwimming = underwater;
+                        player2.IsWaterWalking = false;
+                    }
                 } else {
-                    player.Death(false, liquidType == LiquidType.Lava);
+                    player2.Death(false, liquidType == LiquidType.Lava);
                     continue;
                 }
             }
@@ -171,13 +209,31 @@ public class WaterSplash : NetworkBehaviour {
 
             BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
 
-            if (Runner.IsServer)
-                Rpc_Splash(entity.body.position, Mathf.Abs(Mathf.Max(5, entity.body.velocity.y)));
-
             if (entity is PlayerController player) {
-                player.IsSwimming = false;
-                player.WasSwimming = true;
-                player.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.5f;
+                float height = player.body.position.y + player.WorldHitboxSize.y;
+                bool underwater = height <= SurfaceHeight;
+
+                if (underwater) {
+                    // swam out the side of the water
+                    player.IsSwimming = true;
+                } else {
+                    // jumped out of the water
+                    if (player.IsSwimming) {
+                        player.IsSwimming = false;
+                        player.SwimJump = true;
+                        player.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
+                        if (Runner.IsServer)
+                            Rpc_Splash(new(player.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player.body.velocity.y)), ParticleType.Exit);
+                    }
+                }
+                continue;
+            }
+
+            if (Runner.IsServer) {
+                bool aboveWater = (entity.body?.position.y ?? entity.transform.position.y) >= SurfaceHeight;
+                if (aboveWater) {
+                    Rpc_Splash(entity.body.position, Mathf.Abs(Mathf.Max(5, entity.body.velocity.y)), aboveWater ? ParticleType.Exit : ParticleType.None);
+                }
             }
         }
 
@@ -185,8 +241,15 @@ public class WaterSplash : NetworkBehaviour {
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void Rpc_Splash(Vector2 position, float power) {
-        Instantiate(splashPrefab, position, Quaternion.identity);
+    private void Rpc_Splash(Vector2 position, float power, ParticleType particle) {
+        switch (particle) {
+        case ParticleType.Enter:
+            Instantiate(splashPrefab, position, Quaternion.identity);
+            break;
+        case ParticleType.Exit:
+            Instantiate(splashExitPrefab, position, Quaternion.identity);
+            break;
+        }
 
         float tile = (transform.InverseTransformPoint(position).x / widthTiles + 0.25f) * 2f;
         int px = (int) (tile * totalPoints);
@@ -200,6 +263,12 @@ public class WaterSplash : NetworkBehaviour {
     public enum LiquidType {
         Water,
         Poison,
-        Lava
+        Lava,
+    }
+
+    public enum ParticleType : byte {
+        None,
+        Enter,
+        Exit,
     }
 }

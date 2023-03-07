@@ -18,7 +18,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
     //---Serialized Variables
     [SerializeField] private Avatar smallAvatar, largeAvatar;
-    [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
+    [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle;
     [SerializeField] private GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
     [SerializeField] public float pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
@@ -97,22 +97,24 @@ public class PlayerAnimationController : NetworkBehaviour {
             models.SetActive(true);
 
             // Disable Particles
-            SetParticleEmission(drillParticle, false);
-            SetParticleEmission(sparkles,      false);
-            SetParticleEmission(dust,          false);
-            SetParticleEmission(giantParticle, false);
-            SetParticleEmission(fireParticle,  false);
+            SetParticleEmission(drillParticle,   false);
+            SetParticleEmission(sparkles,        false);
+            SetParticleEmission(dust,            false);
+            SetParticleEmission(giantParticle,   false);
+            SetParticleEmission(fireParticle,    false);
+            SetParticleEmission(bubblesParticle, false);
             return;
         }
 
         float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
 
         // Particles
-        SetParticleEmission(drillParticle, !controller.IsDead && controller.IsDrilling);
-        SetParticleEmission(sparkles,      !controller.IsDead && controller.IsStarmanInvincible);
-        SetParticleEmission(dust,          !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (((controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2) || controller.IsInShell) && controller.IsOnGround)) && !controller.CurrentPipe);
-        SetParticleEmission(giantParticle, !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
-        SetParticleEmission(fireParticle,  !controller.IsRespawning && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
+        SetParticleEmission(drillParticle,   !controller.IsDead && controller.IsDrilling);
+        SetParticleEmission(sparkles,        !controller.IsDead && controller.IsStarmanInvincible);
+        SetParticleEmission(dust,            !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && Mathf.Abs(body.velocity.x) > 1))) || (((controller.IsSliding && Mathf.Abs(body.velocity.x) > 0.2) || controller.IsInShell) && controller.IsOnGround)) && !controller.CurrentPipe);
+        SetParticleEmission(giantParticle,   !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
+        SetParticleEmission(fireParticle,    !controller.IsRespawning && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
+        SetParticleEmission(bubblesParticle, controller.IsSwimming);
 
         if (controller.IsDrilling)
             drillParticleAudio.clip = controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill;
@@ -122,6 +124,8 @@ public class PlayerAnimationController : NetworkBehaviour {
         } else if (controller.WallSlideLeft || controller.WallSlideRight) {
             dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * 0.75f * (controller.WallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * 0.75f);
         }
+
+        bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, controller.WorldHitboxSize.y);
 
         if (controller.cameraController.IsControllingCamera)
             HorizontalCamera.SizeIncreaseTarget = (controller.IsSpinnerFlying || controller.IsPropellerFlying) ? 0.5f : 0f;
