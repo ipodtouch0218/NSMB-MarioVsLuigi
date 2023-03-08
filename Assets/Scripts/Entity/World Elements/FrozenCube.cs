@@ -251,7 +251,7 @@ public class FrozenCube : HoldableEntity {
             Kill();
             return;
         }
-        if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround) {
+        if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround && !player.IsSwimming) {
             fallen = true;
             Pickup(player);
         }

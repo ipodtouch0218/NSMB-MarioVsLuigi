@@ -661,6 +661,11 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1060841653561283886, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4157375552812710484, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: Flags
@@ -754,12 +759,12 @@ PrefabInstance:
     - target: {fileID: 8572227882836430079, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_Size.y
-      value: 3.3
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 8572227882836430079, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_Offset.y
-      value: 1.65
+      value: 1.75
       objectReference: {fileID: 0}
     - target: {fileID: 8572227882836430079, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -821,6 +826,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 859204837}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -1302,6 +1313,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 859204837}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -1685,6 +1702,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 859204837}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -4552,6 +4575,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 859204837}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -4616,6 +4645,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: frame
+      value: 2.022941
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -4811,6 +4845,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 859204837}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -7994,6 +8034,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 859204837}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -8200,12 +8246,12 @@ PrefabInstance:
     - target: {fileID: 8572227882836430079, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_Size.y
-      value: 3.3
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 8572227882836430079, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_Offset.y
-      value: 1.65
+      value: 1.75
       objectReference: {fileID: 0}
     - target: {fileID: 8572227882836430079, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -8230,6 +8276,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 859204837}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId

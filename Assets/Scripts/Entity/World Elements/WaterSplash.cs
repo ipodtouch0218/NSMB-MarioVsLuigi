@@ -56,7 +56,7 @@ public class WaterSplash : NetworkBehaviour {
 
         heightTex = new Texture2D(totalPoints, 1, TextureFormat.RGBA32, false);
 
-        Color32 gray = new(128, 0, 0, 255);
+        Color gray = new(0.5f, 0f, 0f, 1f);
         colors = new Color32[totalPoints];
         for (int i = 0; i < totalPoints; i++)
             colors[i] = gray;
@@ -153,10 +153,9 @@ public class WaterSplash : NetworkBehaviour {
                 }
             }
 
-            bool? underSurface = null;
             if (Runner.IsServer) {
                 if (!splashedEntities.Contains(obj)) {
-                    bool splash = entity.body.position.y > SurfaceHeight - 0.5f && (entity is not PlayerController pl || pl.State != Enums.PowerupState.MiniMushroom);
+                    bool splash = entity.body.position.y > SurfaceHeight - 0.5f && (entity is not PlayerController pl || pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f);
                     if (splash) {
                         Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
                     }
@@ -165,8 +164,8 @@ public class WaterSplash : NetworkBehaviour {
 
                 if (liquidType != LiquidType.Water && entity is not PlayerController) {
                     // Kill entity if they're below the surface of the posion/lava
-                    underSurface ??= entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
-                    if (underSurface ?? false) {
+                    bool underSurface = entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
+                    if (underSurface) {
                         // Don't let fireballs "poof"
                         if (entity is FireballMover fm)
                             fm.PlayBreakEffect = false;
@@ -185,7 +184,7 @@ public class WaterSplash : NetworkBehaviour {
                     float height = player2.body.position.y + (player2.WorldHitboxSize.y * 0.5f);
                     bool underwater = height <= SurfaceHeight;
 
-                    if (player2.IsSwimming && !underwater) {
+                    if (player2.IsSwimming && !underwater && player2.body.velocity.y > 0) {
                         // jumped out of the water
                         player2.IsSwimming = false;
                         player2.SwimJump = true;
@@ -213,7 +212,7 @@ public class WaterSplash : NetworkBehaviour {
                 float height = player.body.position.y + player.WorldHitboxSize.y;
                 bool underwater = height <= SurfaceHeight;
 
-                if (underwater) {
+                if (underwater || player.body.velocity.y < 0) {
                     // swam out the side of the water
                     player.IsSwimming = true;
                 } else {
