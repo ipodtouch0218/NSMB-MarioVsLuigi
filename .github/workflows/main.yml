@@ -46,6 +46,9 @@ jobs:
       matrix:
         targetPlatform:
           - StandaloneLinux64
+          - StandaloneWindows64
+          - StandaloneWindows
+          - StandaloneOSX
           - WebGL
     steps:
       - uses: actions/checkout@v3
