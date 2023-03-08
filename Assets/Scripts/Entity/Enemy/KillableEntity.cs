@@ -21,6 +21,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     protected readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
     //---Networked Variables
+    [Networked] protected TickTimer DespawnTimer { get; set; }
     [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
     [Networked] protected NetworkBool WasSpecialKilled { get; set; }
     [Networked] protected NetworkBool WasGroundpounded { get; set; }
@@ -56,6 +57,12 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         if (!GameManager.Instance || !body || IsFrozen)
             return;
 
+        if (DespawnTimer.Expired(Runner)) {
+            IsDead = true;
+            Runner.Despawn(Object);
+            return;
+        }
+
         if (IsDead) {
             //hitbox.enabled = false;
             gameObject.layer = Layers.LayerHitsNothing;
@@ -64,6 +71,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
                 body.angularVelocity = 400f * (FacingRight ? 1 : -1);
                 body.constraints = RigidbodyConstraints2D.None;
             }
+            return;
         } else {
             //hitbox.enabled = true;
             gameObject.layer = Layers.LayerEntity;

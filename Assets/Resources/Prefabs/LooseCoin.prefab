@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7313813804966619559}
   - component: {fileID: 7440053010099547169}
-  - component: {fileID: 7174137950827053746}
   - component: {fileID: 1917642254078187410}
   m_Layer: 9
   m_Name: Graphics
@@ -75,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+  m_Sprite: {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -87,22 +86,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!111 &7174137950827053746
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 510247005471066579}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 16495a0606a4a694a93933375bf4f212, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 16495a0606a4a694a93933375bf4f212, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!114 &1917642254078187410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,6 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frame: 0
+  fps: 6
   frames:
   - {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
@@ -414,6 +398,7 @@ MonoBehaviour:
     _value: 0
   _CrushableGround:
     _value: 0
+  _PreviousTickVelocity: {x: 0, y: 0}
   _FloorAngle: 0
   currentCollider: {fileID: 786289218142832792}
   goUpSlopes: 0

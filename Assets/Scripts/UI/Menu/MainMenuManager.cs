@@ -219,10 +219,9 @@ public class MainMenuManager : MonoBehaviour {
         // Discord RPC
         GlobalController.Instance.DiscordController.UpdateActivity(session);
 
-        //Color bar at the top
+        // Host-based header color
         UnityEngine.Random.InitState(name.GetHashCode() + 2035767);
-        ColorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f, 1f, 1f);
-        //Me when iPod sees my code!!!!
+        ColorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
     }
 
     public void PreviewLevel(int levelIndex) {

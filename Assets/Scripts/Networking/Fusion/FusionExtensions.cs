@@ -23,7 +23,7 @@ namespace NSMB.Extensions {
             if (!data)
                 return false;
 
-            string userId = data.GetUserId();
+            string userId = data.GetUserIdString();
             if (userId == null)
                 return false;
 

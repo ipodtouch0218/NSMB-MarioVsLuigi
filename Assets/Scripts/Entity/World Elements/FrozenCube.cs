@@ -247,11 +247,11 @@ public class FrozenCube : HoldableEntity {
             return;
 
         } else if (FastSlide) {
-            player.DoKnockback(body.position.x > player.body.position.x, 1, false, gameObject);
+            player.DoKnockback(body.position.x > player.body.position.x, 1, false, Object);
             Kill();
             return;
         }
-        if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround) {
+        if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround && !player.IsSwimming) {
             fallen = true;
             Pickup(player);
         }

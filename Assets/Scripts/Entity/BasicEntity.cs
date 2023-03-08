@@ -8,7 +8,7 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
     //---Networked Variables
     private NetworkBool facingRightDefault = false;
-    [Networked(Default = nameof(facingRightDefault))] public NetworkBool FacingRight { get; set; }
+    [Networked(Default = nameof(facingRightDefault), OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
 
     //---Components
     [NonSerialized] public Rigidbody2D body;
@@ -45,8 +45,15 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
         Runner.Despawn(Object);
     }
 
+    public virtual void OnFacingChanged() { }
+
     //---IBlockBumpable overrides
     public abstract void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction);
+
+    //---OnChangeds
+    public static void OnFacingRightChanged(Changed<BasicEntity> changed) {
+        changed.Behaviour.OnFacingChanged();
+    }
 
     //---Helpers
     public enum DestroyCause {

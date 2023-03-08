@@ -430,6 +430,12 @@ public class GameManager : NetworkBehaviour {
             } else {
                 winText.text = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname() + " Wins!";
             }
+
+            if (Runner.IsServer) {
+                foreach (PlayerController player in teamManager.GetTeamMembers(winningTeam)) {
+                    player.data.Wins++;
+                }
+            }
         }
 
         yield return new WaitForSecondsRealtime(1);

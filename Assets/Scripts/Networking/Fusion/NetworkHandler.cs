@@ -166,7 +166,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         PlayerData data = player.GetPlayerData(runner);
-        Debug.Log($"[Network] {data.GetNickname()} ({player.GetPlayerData(runner).GetUserId()}) left the room");
+        Debug.Log($"[Network] {data.GetNickname()} ({player.GetPlayerData(runner).GetUserIdString()}) left the room");
 
         OnPlayerLeft(runner, player);
 

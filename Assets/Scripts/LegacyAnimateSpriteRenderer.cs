@@ -1,36 +1,36 @@
 using UnityEngine;
 
-[RequireComponent(typeof(SpriteRenderer), typeof(Animation))]
+[RequireComponent(typeof(SpriteRenderer))]
 [ExecuteInEditMode]
 public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
-    //---Public Variables
-    public float frame; //must be a float because animators dont support ints, apparently?
-
     //---Serialized Variables
+    [SerializeField] private float frame; //must be a float because animators dont support ints, apparently?
+    [SerializeField] private float fps = 8;
     [SerializeField] private Sprite[] frames;
 
     //---Private Variables
     private SpriteRenderer sRenderer;
 
+    public void OnValidate() {
+        frame = 0f;
+    }
+
     public void Awake() {
         sRenderer = GetComponent<SpriteRenderer>();
+        frame = 0f;
     }
 
+    [ExecuteAlways]
     public void Update() {
-        int frame = Mathf.FloorToInt(this.frame);
-
-        if (frames == null || frames.Length == 0)
+        if (frames == null || frames.Length == 0 || !sRenderer)
             return;
 
-        frame = Mathf.Clamp(frame, 0, frames.Length);
+        frame += fps * Time.deltaTime;
+        frame = Mathf.Repeat(frame, frames.Length);
+        int currentFrame = Mathf.FloorToInt(frame);
 
-        if (frames[frame] != sRenderer.sprite)
-            sRenderer.sprite = frames[frame];
-    }
-
-    public void OnRenderObject() {
-        if (!Application.isPlaying)
-            Update();
+        if (frames[currentFrame] != sRenderer.sprite)
+            sRenderer.sprite = frames[currentFrame];
     }
 }

@@ -5,9 +5,6 @@ using Fusion;
 
 public class BulletBillMover : KillableEntity {
 
-    //---Networked Variables
-    [Networked] private TickTimer DespawnTimer { get; set; }
-
     //---Serialized Variables
     [SerializeField] private float speed, playerSearchRadius = 4, despawnDistance = 8;
     [SerializeField] private ParticleSystem shootParticles, trailParticles;
@@ -42,6 +39,10 @@ public class BulletBillMover : KillableEntity {
     }
 
     public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
+        if (!Object.IsValid)
+            return;
+
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -52,12 +53,6 @@ public class BulletBillMover : KillableEntity {
 
         if (IsFrozen || IsDead)
             return;
-
-        if (DespawnTimer.Expired(Runner)) {
-            DespawnTimer = TickTimer.None;
-            Runner.Despawn(Object);
-            return;
-        }
 
         body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
         DespawnCheck();

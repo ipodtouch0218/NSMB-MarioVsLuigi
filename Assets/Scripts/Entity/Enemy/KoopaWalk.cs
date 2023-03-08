@@ -14,7 +14,8 @@ public class KoopaWalk : HoldableEntity {
     [Networked] public NetworkBool IsInShell { get; set; }
     [Networked] public NetworkBool IsStationary { get; set; }
     [Networked] public NetworkBool IsUpsideDown { get; set; }
-    [Networked] private Vector2 VelocityLastFrame { get; set; }
+    [Networked] private Vector2 LastFrameVelocity { get; set; }
+    [Networked] private NetworkBool Putdown { get; set; }
 
     //---Serialized Variables
     [SerializeField] private Sprite deadSprite;
@@ -22,7 +23,7 @@ public class KoopaWalk : HoldableEntity {
     [SerializeField] private Vector2 outShellHitboxSize, inShellHitboxSize;
     [SerializeField] private Vector2 outShellHitboxOffset, inShellHitboxOffset;
     [SerializeField] protected float walkSpeed, kickSpeed, wakeup = 15;
-    [SerializeField] public bool dontFallOffEdges, blue, canBeFlipped = true, flipXFlip, putdown;
+    [SerializeField] public bool dontFallOffEdges, blue, canBeFlipped = true, flipXFlip;
 
     //---Properties
     public bool IsActuallyStationary => !Holder && IsStationary;
@@ -33,9 +34,6 @@ public class KoopaWalk : HoldableEntity {
     public override void Render() {
         if (IsFrozen || IsDead)
             return;
-
-        //Renderer flip
-        sRenderer.flipX = FacingRight ^ flipXFlip;
 
         //Animation
         animator.SetBool("shell", IsInShell || Holder != null);
@@ -60,6 +58,9 @@ public class KoopaWalk : HoldableEntity {
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
+        if (!Object)
+            return;
+
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -92,9 +93,9 @@ public class KoopaWalk : HoldableEntity {
         physics.UpdateCollisions();
 
         if (physics.HitRight && FacingRight) {
-            Turnaround(false, VelocityLastFrame.x);
+            Turnaround(false, LastFrameVelocity.x);
         } else if (physics.HitLeft && !FacingRight) {
-            Turnaround(true, VelocityLastFrame.x);
+            Turnaround(true, LastFrameVelocity.x);
         }
 
         if (physics.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
@@ -104,14 +105,14 @@ public class KoopaWalk : HoldableEntity {
 
             //turn around if no ground
             if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
-                Turnaround(!FacingRight, VelocityLastFrame.x);
+                Turnaround(!FacingRight, LastFrameVelocity.x);
         }
 
         if (!IsStationary)
             body.velocity = new((IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
         HandleTile();
-        VelocityLastFrame = body.velocity;
+        LastFrameVelocity = body.velocity;
     }
 
     private void HandleTile() {
@@ -123,7 +124,7 @@ public class KoopaWalk : HoldableEntity {
             ContactPoint2D point = ContactBuffer[i];
             Vector2 p = point.point + (point.normal * -0.15f);
             if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
-                if (!putdown && IsInShell && !IsStationary) {
+                if (!Putdown && IsInShell && !IsStationary) {
                     Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + BlockOffset);
                     TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
                     if (!tile || !IsInShell)
@@ -132,9 +133,9 @@ public class KoopaWalk : HoldableEntity {
                     if (tile is InteractableTile it)
                         it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
                 }
-            } else if (point.normal.y > 0 && putdown) {
+            } else if (point.normal.y > 0 && Putdown) {
                 body.velocity = new Vector2(0, body.velocity.y);
-                putdown = false;
+                Putdown = false;
             }
         }
     }
@@ -211,7 +212,7 @@ public class KoopaWalk : HoldableEntity {
         if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
             bool originalFacing = player.FacingRight;
             if (IsInShell && !IsStationary && player.IsInShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                player.DoKnockback(player.body.position.x < body.position.x, 0, true, gameObject);
+                player.DoKnockback(player.body.position.x < body.position.x, 0, true, Object);
 
             SpecialKill(!originalFacing, false, player.StarCombo++);
             return;
@@ -287,7 +288,7 @@ public class KoopaWalk : HoldableEntity {
 
         if (!IsInShell) {
             IsStationary = true;
-            putdown = true;
+            Putdown = true;
         }
 
         EnterShell(false, bumper as PlayerController);
@@ -312,7 +313,7 @@ public class KoopaWalk : HoldableEntity {
     //---KillableEntity overrides
     protected override void CheckForEntityCollisions() {
 
-        if (!((!IsInShell && !Holder) || IsActuallyStationary || putdown || IsDead)) {
+        if (!((!IsInShell && !Holder) || IsActuallyStationary || Putdown || IsDead)) {
 
             int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
@@ -354,12 +355,9 @@ public class KoopaWalk : HoldableEntity {
         EnterShell(false, null);
     }
 
-    public override void SpecialKill(bool right, bool groundpound, int combo) {
-        base.SpecialKill(right, groundpound, combo);
-    }
-
     public override void OnIsDeadChanged() {
         base.OnIsDeadChanged();
+
         if (IsDead)
             sRenderer.sprite = deadSprite;
     }
@@ -379,6 +377,11 @@ public class KoopaWalk : HoldableEntity {
         IsInShell = true;
         if (!crouch)
             WakeupTimer = TickTimer.None;
-        putdown = crouch;
+        Putdown = crouch;
+    }
+
+    //---BasicEntity overrides
+    public override void OnFacingChanged() {
+        sRenderer.flipX = FacingRight ^ flipXFlip;
     }
 }

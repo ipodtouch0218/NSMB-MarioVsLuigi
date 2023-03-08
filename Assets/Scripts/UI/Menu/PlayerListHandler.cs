@@ -55,7 +55,7 @@ public class PlayerListHandler : MonoBehaviour {
 
         if (!playerListEntries.ContainsKey(player)) {
             GameObject go = Instantiate(template, contentPane.transform);
-            go.name = $"{data.GetNickname()} ({data.GetUserId()})";
+            go.name = $"{data.GetNickname()} ({data.GetUserIdString()})";
             go.SetActive(true);
             playerListEntries[player] = go.GetComponent<PlayerListEntry>();
             playerListEntries[player].player = player;

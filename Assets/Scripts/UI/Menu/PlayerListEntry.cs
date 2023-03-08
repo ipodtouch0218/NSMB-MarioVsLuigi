@@ -13,7 +13,7 @@ public class PlayerListEntry : MonoBehaviour {
     public PlayerRef player;
 
     //---Serialized Variables
-    [SerializeField] private TMP_Text nameText, pingText;
+    [SerializeField] private TMP_Text nameText, pingText, winsText;
     [SerializeField] private Image colorStrip;
     [SerializeField] private RectTransform background, options;
     [SerializeField] private GameObject blockerTemplate, firstButton;
@@ -38,6 +38,12 @@ public class PlayerListEntry : MonoBehaviour {
         PlayerData data = player.GetPlayerData(runner);
 
         colorStrip.color = Utils.GetPlayerColor(runner, player);
+
+        if (data.Wins == 0) {
+            winsText.text = "";
+        } else {
+            winsText.text = data.Wins + "<sprite=55>";
+        }
 
         enabled = player.HasRainbowName();
 
@@ -131,7 +137,7 @@ public class PlayerListEntry : MonoBehaviour {
 
     public void CopyPlayerId() {
         TextEditor te = new();
-        te.text = player.GetPlayerData(NetworkHandler.Instance.runner).GetUserId();
+        te.text = player.GetPlayerData(NetworkHandler.Instance.runner).GetUserIdString();
         te.SelectAll();
         te.Copy();
         HideDropdown(true);

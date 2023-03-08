@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,8 +17,9 @@ public class PlayerData : NetworkBehaviour {
     //---Networked Variables
     [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] private string Nickname { get; set; } = "noname";
     [Networked, Capacity(28)]                                    private string DisplayNickname { get; set; } = "noname";
-    [Networked, Capacity(32)]                                    private string UserId { get; set; }
+    [Networked]                                                  public Guid UserId { get; set; }
     [Networked]                                                  public sbyte PlayerId { get; set; }
+    [Networked]                                                  public uint Wins { get; set; }
     [Networked(OnChanged = nameof(OnStartSettingChanged))]       public sbyte Team { get; set; }
     [Networked(OnChanged = nameof(OnStartSettingChanged))]       public NetworkBool IsManualSpectator { get; set; }
     [Networked]                                                  public NetworkBool IsCurrentlySpectating { get; set; }
@@ -32,7 +34,6 @@ public class PlayerData : NetworkBehaviour {
     //---Private Variables
     private Tick lastUpdatedTick;
     private NetAddress address;
-    private string cachedUserId;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -44,6 +45,9 @@ public class PlayerData : NetworkBehaviour {
 
         PlayerId = -1;
         Team = (sbyte) ((Object.InputAuthority + 1) % 5);
+
+        if (SessionData.Instance)
+            SessionData.Instance.LoadWins(this);
 
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.
@@ -59,14 +63,19 @@ public class PlayerData : NetworkBehaviour {
             SetNickname(nickname);
 
             //expose their userid
-            //TODO: use an auth-server signed userid, to disallow userid spoofing.
-            UserId = Runner.GetPlayerUserId(Object.InputAuthority)?.Replace("-", "");
+            Guid.TryParse(Runner.GetPlayerUserId(Object.InputAuthority), out Guid id);
+            UserId = id;
 
             IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
         }
 
         if (MainMenuManager.Instance)
             StartCoroutine(MainMenuManager.Instance.OnPlayerDataValidated(Object.InputAuthority));
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        if (hasState)
+            SessionData.Instance.SaveWins(this);
     }
 
     public string GetRawNickname() {
@@ -77,10 +86,7 @@ public class PlayerData : NetworkBehaviour {
         return filter ? DisplayNickname.ToString().Filter() : DisplayNickname.ToString();
     }
 
-    public string GetUserId() {
-        cachedUserId ??= Regex.Replace(UserId.ToString(), "(.{8})(.{4})(.{4})(.{4})(.{12})", "$1-$2-$3-$4-$5");
-        return cachedUserId;
-    }
+    public string GetUserIdString() => UserId.ToString();
 
     public void SetNickname(string name) {
         //limit nickname to valid characters only.

@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 using Fusion;
 using Fusion.Sockets;
+using NSMB.Extensions;
 
 public class SessionData : NetworkBehaviour {
 
@@ -31,6 +33,7 @@ public class SessionData : NetworkBehaviour {
     [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool Teams { get; set; }
 
     //---Private Variables
+    private readonly Dictionary<Guid, uint> wins = new();
     private readonly Dictionary<int, NetAddress> playerAddresses = new();
     private Tick lastUpdatedTick;
     private HashSet<NetAddress> bannedIps;
@@ -67,6 +70,15 @@ public class SessionData : NetworkBehaviour {
 
         playerAddresses[request.RemoteAddress.ActorId] = request.RemoteAddress;
         return true;
+    }
+
+    public void SaveWins(PlayerData data) {
+        wins[data.UserId] = data.Wins;
+    }
+
+    public void LoadWins(PlayerData data) {
+        if (wins.ContainsKey(data.UserId))
+            data.Wins = wins[data.UserId];
     }
 
     public void AddBan(PlayerRef player) {

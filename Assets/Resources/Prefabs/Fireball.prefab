@@ -5254,7 +5254,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3427681855993351045}
   - component: {fileID: 4710279457085823811}
-  - component: {fileID: 3062558160749003415}
   - component: {fileID: 8640911904975915065}
   m_Layer: 9
   m_Name: IceGraphics
@@ -5271,7 +5270,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2135618848759859508}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.114118546, y: 0.063157685, z: 0.0076697357}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2.5, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5319,7 +5318,7 @@ SpriteRenderer:
   m_SortingLayerID: -755315459
   m_SortingLayer: 1
   m_SortingOrder: 2
-  m_Sprite: {fileID: 5353841184698615464, guid: eddf8ec042b3e614e925d846a27642df,
+  m_Sprite: {fileID: -3915765450054648673, guid: eddf8ec042b3e614e925d846a27642df,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -5331,22 +5330,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!111 &3062558160749003415
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2135618848759859508}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 4242676935ff5db45a412f2bdf662d6f, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 4242676935ff5db45a412f2bdf662d6f, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 1
 --- !u!114 &8640911904975915065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5360,6 +5343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frame: 0
+  fps: 8
   frames:
   - {fileID: 5353841184698615464, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
   - {fileID: 750297706712597742, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
@@ -5375,7 +5359,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3913916938386061855}
   - component: {fileID: 7450112483459336877}
-  - component: {fileID: 626030610019862117}
   - component: {fileID: 6699095901315088683}
   m_Layer: 9
   m_Name: FireGraphics
@@ -5392,7 +5375,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5079778509045743664}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.114118546, y: 0.063157685, z: 0.0076697357}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2.5, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5440,7 +5423,7 @@ SpriteRenderer:
   m_SortingLayerID: -755315459
   m_SortingLayer: 1
   m_SortingOrder: 2
-  m_Sprite: {fileID: 5353841184698615464, guid: 8b4c76bfff99dba4b90ef29e19c39f48,
+  m_Sprite: {fileID: -3915765450054648673, guid: 8b4c76bfff99dba4b90ef29e19c39f48,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -5452,22 +5435,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!111 &626030610019862117
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5079778509045743664}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 4242676935ff5db45a412f2bdf662d6f, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 4242676935ff5db45a412f2bdf662d6f, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 1
 --- !u!114 &6699095901315088683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5481,6 +5448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frame: 0
+  fps: 8
   frames:
   - {fileID: 5353841184698615464, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
   - {fileID: 750297706712597742, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
@@ -5510,7 +5478,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6123894138715371252}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.114118546, y: -0.063157685, z: -0.0076697357}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

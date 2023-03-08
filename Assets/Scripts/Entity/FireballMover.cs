@@ -214,8 +214,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             }
         } else {
             //fireball
-            //TODO: damage source?
-            player.DoKnockback(FacingRight, 1, true, gameObject);
+            player.DoKnockback(FacingRight, 1, true, Object);
         }
 
         //Destroy ourselves.

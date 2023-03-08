@@ -21,6 +21,7 @@ TagManager:
   - frozencube
   - Squishy
   - Powerup
+  - water
   layers:
   - Default
   - TransparentFX

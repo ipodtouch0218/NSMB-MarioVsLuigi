@@ -9,7 +9,8 @@ using NSMB.Utils;
 public class BobombWalk : HoldableEntity {
 
     //---Networked Variables
-    [Networked] public TickTimer DetonationTimer { get; set; }
+    [Networked(OnChanged = nameof(OnDetonationTimerChanged))] public TickTimer DetonationTimer { get; set; }
+    [Networked(OnChanged = nameof(OnDetonatedChanged))] private NetworkBool Detonated { get; set; }
     [Networked] private Vector3 PreviousFrameVelocity { get; set; }
 
     //---Serialized Variables
@@ -21,7 +22,6 @@ public class BobombWalk : HoldableEntity {
 
     //---Misc Variables
     private MaterialPropertyBlock mpb;
-    private GameObject explosion;
 
     //---Properties
     public bool Lit => !DetonationTimer.ExpiredOrNotRunning(Runner);
@@ -107,22 +107,13 @@ public class BobombWalk : HoldableEntity {
         if (Lit)
             return;
 
-        animator.SetTrigger("lit");
         DetonationTimer = TickTimer.CreateFromSeconds(Runner, detonationTime);
         body.velocity = Vector2.zero;
-        PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
     }
 
     public void Detonate() {
         IsDead = true;
-
-        //disable hitbox and sprite
-        sRenderer.enabled = false;
-        hitbox.enabled = false;
-
-        //spawn explosion
-        if (!explosion)
-            explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        Detonated = true;
 
         //damage entities in range. TODO: change to nonalloc?
         List<Collider2D> hits = new();
@@ -285,5 +276,29 @@ public class BobombWalk : HoldableEntity {
     public override void Kick(PlayerController kicker, bool toRight, float speed, bool groundpound) {
         //always do a groundpound variant kick
         base.Kick(kicker, toRight, speed, true);
+    }
+
+    //---OnChangeds
+    public static void OnDetonatedChanged(Changed<BobombWalk> changed) {
+        BobombWalk bomb = changed.Behaviour;
+
+        if (bomb.Detonated) {
+            //spawn explosion
+            Instantiate(bomb.explosionPrefab, bomb.transform.position, Quaternion.identity);
+            bomb.sRenderer.enabled = false;
+        } else {
+            bomb.sRenderer.enabled = true;
+        }
+    }
+
+    public static void OnDetonationTimerChanged(Changed<BobombWalk> changed) {
+        BobombWalk bomb = changed.Behaviour;
+        bool lit = bomb.Lit;
+        bomb.animator.SetBool("lit", lit);
+
+        if (!lit)
+            return;
+
+        bomb.PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
     }
 }

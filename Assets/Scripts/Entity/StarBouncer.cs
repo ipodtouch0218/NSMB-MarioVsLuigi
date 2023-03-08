@@ -22,6 +22,7 @@ public class StarBouncer : CollectableEntity {
     [SerializeField] private float moveSpeed = 3f, rotationSpeed = 30f, bounceAmount = 4f, deathBoostAmount = 20f;
     [SerializeField] private float blinkingSpeed = 0.5f, lifespan = 15f;
     [SerializeField] private Transform graphicTransform;
+    [SerializeField] private ParticleSystem particles;
 
     //---Components
     private SpriteRenderer sRenderer;
@@ -112,6 +113,9 @@ public class StarBouncer : CollectableEntity {
         if (IsStationary)
             return;
 
+        if (!Collectable && body.velocity.y < 0)
+            sRenderer.color = Color.white;
+
         body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), body.velocity.y);
         Collectable |= body.velocity.y < 0;
 
@@ -121,7 +125,6 @@ public class StarBouncer : CollectableEntity {
         if (Passthrough && Collectable && body.velocity.y <= 0 && !Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, AnyGroundMask)) {
             Passthrough = false;
             gameObject.layer = Layers.LayerEntity;
-            sRenderer.color = Color.white;
         }
         if (!Passthrough) {
             if (body.position.y < GameManager.Instance.LevelMinY) {
@@ -206,12 +209,14 @@ public class StarBouncer : CollectableEntity {
         if (Collector) {
             //play fx
             graphicTransform.gameObject.SetActive(false);
+            particles.Stop();
             bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team;
             Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
             Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
         } else {
             //oops...
             graphicTransform.gameObject.SetActive(true);
+            particles.Play();
         }
     }
 

@@ -4912,6 +4912,7 @@ MonoBehaviour:
   blinkingSpeed: 0.25
   lifespan: 15
   graphicTransform: {fileID: 7308630834410186342}
+  particles: {fileID: 3060121057263043570}
 --- !u!50 &1973747262660636108
 Rigidbody2D:
   serializedVersion: 4
