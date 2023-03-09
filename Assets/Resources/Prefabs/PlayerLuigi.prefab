@@ -21176,7 +21176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 7596518164324340154}
-  currentAudio: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
+  currentAudio: {fileID: 0}
 --- !u!1 &6933185090643879978
 GameObject:
   m_ObjectHideFlags: 0
@@ -27108,7 +27108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 6512662349643127263}
-  currentAudio: {fileID: 11400000, guid: e2dbe5f1a0e0d8941852390d7da5e601, type: 2}
+  currentAudio: {fileID: 0}
 --- !u!1 &8730947203993462797
 GameObject:
   m_ObjectHideFlags: 0
@@ -27325,6 +27325,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Bubbles
+      objectReference: {fileID: 0}
+    - target: {fileID: 5283455114949125859, guid: 18aedb0cd9e0c224681a437988b3928c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8567921914689578137, guid: 18aedb0cd9e0c224681a437988b3928c,
         type: 3}

@@ -911,6 +911,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &9179565819503335474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1490,6 +1491,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!81 &5063321644330613871
 AudioListener:
   m_ObjectHideFlags: 0
@@ -5020,8 +5022,9 @@ MonoBehaviour:
   loadingCanvas: {fileID: 4559077638615233841}
   ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
   controlsJson: 
-  checkedForVersion: 0
   nickname: 
+  checkedForVersion: 0
+  mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
 --- !u!114 &-428314071820370687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17106,6 +17109,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6379181540883698325
 GameObject:
   m_ObjectHideFlags: 0

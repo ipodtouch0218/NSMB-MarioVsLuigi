@@ -85,7 +85,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.Save();
     }
 
-    private void ApplyVolumeSettings() {
+    public void ApplyVolumeSettings() {
         mixer.SetFloat("MusicVolume", Mathf.Log10(VolumeMusic) * 20);
         mixer.SetFloat("SoundVolume", Mathf.Log10(VolumeSFX) * 20);
         mixer.SetFloat("MasterVolume", Mathf.Log10(VolumeMaster) * 20);

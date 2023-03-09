@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 using Fusion;
 using NSMB.Loading;
+using System.Collections;
 
 public class GlobalController : Singleton<GlobalController> {
 
@@ -18,14 +20,19 @@ public class GlobalController : Singleton<GlobalController> {
 
     public RenderTexture ndsTexture;
     public string controlsJson = null;
+    public string nickname;
 
     public bool checkedForVersion;
     public ShutdownReason? disconnectCause = null;
 
+    //---Serialized Variables
+    [SerializeField] private AudioMixer mixer;
+
+    //---Private Variables
     private int windowWidth, windowHeight;
+    private Coroutine fadeRoutine;
 
 
-    public string nickname;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
@@ -75,5 +82,37 @@ public class GlobalController : Singleton<GlobalController> {
         windowWidth = currentWidth;
         windowHeight = currentHeight;
 #endif
+    }
+
+    public void OnApplicationFocus(bool focus) {
+        if (focus) {
+            Settings.Instance.ApplyVolumeSettings();
+            if (fadeRoutine != null)
+                StopCoroutine(fadeRoutine);
+            fadeRoutine = null;
+        } else {
+            fadeRoutine ??= StartCoroutine(FadeMusic());
+        }
+    }
+
+    private IEnumerator FadeMusic() {
+        mixer.GetFloat("MusicVolume", out float currentVolume);
+        currentVolume = ToLinearScale(currentVolume);
+        float fadeRate = currentVolume * 2f;
+
+        while (currentVolume > 0f) {
+            currentVolume -= fadeRate * Time.deltaTime;
+            mixer.SetFloat("MusicVolume", ToLogScale(currentVolume));
+            yield return null;
+        }
+        mixer.SetFloat("MusicVolume", -80f);
+    }
+
+    private static float ToLinearScale(float x) {
+        return Mathf.Pow(10, x / 20);
+    }
+
+    private static float ToLogScale(float x) {
+        return 20 * Mathf.Log10(x);
     }
 }

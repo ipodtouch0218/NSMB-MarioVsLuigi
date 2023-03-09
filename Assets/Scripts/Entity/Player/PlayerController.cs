@@ -9,6 +9,7 @@ using UnityEngine.Tilemaps;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using UnityEditor.Experimental.GraphView;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 
@@ -1483,6 +1484,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
     }
 
+
     private void HandleLayerState() {
         bool hitsNothing = animator.GetBool("pipe") || IsDead || IsStuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
 
@@ -1490,7 +1492,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private bool GroundSnapCheck() {
-        if (IsDead || body.velocity.y > 0.1f || PropellerLaunchTimer.IsActive(Runner) || CurrentPipe)
+        if (IsDead || (body.velocity.y > 0.1f && FloorAngle == 0) || PropellerLaunchTimer.IsActive(Runner) || CurrentPipe)
             return false;
 
         RaycastHit2D hit;
@@ -1872,7 +1874,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         } else {
             acc = SPEED_STAGE_ACC[stage];
         }
+
         float sign = Mathf.Sign(body.velocity.x);
+        bool uphill = Mathf.Sign(FloorAngle) == sign;
 
         if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !IsSliding) {
             //we can walk here
@@ -1881,7 +1885,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == sign);
 
             //check that we're not going above our limit
-            float max = maxArray[maxStage];
+            float max = maxArray[maxStage] + CalculateSlopeMaxSpeedOffset(Mathf.Abs(FloorAngle) * (uphill ? 1 : -1));
             //floating point & network accuracy bs means -0.01
             if (speed - 0.01f > max) {
                 acc = -acc;
@@ -1964,10 +1968,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             float angle = Mathf.Abs(FloorAngle);
             if (IsSwimming)
                 acc = -SWIM_BUTTON_RELEASE_DEC;
-            if (IsSliding) {
+            else if (IsSliding) {
                 if (angle > slopeSlidingAngle) {
                     //uphill / downhill
-                    acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * ((Mathf.Sign(FloorAngle) == sign) ? -1 : 1);
+                    acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * (uphill ? -1 : 1);
                 } else {
                     //flat ground
                     acc = -SPEED_STAGE_ACC[0];
@@ -2003,6 +2007,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsOnGround || WasGroundedLastFrame)
             body.velocity = new(body.velocity.x, 0);
     }
+    private float CalculateSlopeMaxSpeedOffset(float floorAngle) => (float) (-0.0304687 * floorAngle);
+
 
     private static readonly Vector2 CheckSizeOffset = new(1f, 0.75f);
     private bool HandleStuckInBlock() {
