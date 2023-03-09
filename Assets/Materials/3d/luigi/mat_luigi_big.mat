@@ -110,6 +110,7 @@ Material:
     - IsEyeTexture: 0
     - OutlineSize: 0.01
     - PowerupState: 0
+    - RainbowEnabled: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -120,6 +121,7 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EnableBackfaces: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 1
     - _Glossiness: 0
@@ -143,8 +145,8 @@ Material:
     m_Colors:
     - MultiplyColor: {r: 1, g: 1, b: 1, a: 0}
     - OutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - OverallsColor: {r: 0.21294737, g: 0.32941175, b: 0.094117604, a: 1}
-    - ShirtColor: {r: 0.31372547, g: 0.21960777, b: 0.21960777, a: 1}
+    - OverallsColor: {r: 0, g: 0, b: 0, a: 0}
+    - ShirtColor: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
     - _Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

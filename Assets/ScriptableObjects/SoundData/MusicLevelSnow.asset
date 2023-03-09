@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
+  m_Script: {fileID: 11500000, guid: f75ce5d91f7ab344aaab1a8902dcd8b0, type: 3}
   m_Name: MusicLevelSnow
   m_EditorClassIdentifier: 
   clip: {fileID: 8300000, guid: c58af46243493f8448e59389c86687a9, type: 3}
   fastClip: {fileID: 8300000, guid: 15e74ade2ad0e5342bb45cb31467c094, type: 3}
-  loopStartSample: 5.047
-  loopEndSample: 68.191
+  loopStartSeconds: 5.047
+  loopEndSeconds: 68.191

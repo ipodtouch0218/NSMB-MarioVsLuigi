@@ -10496,9 +10496,9 @@ Transform:
   m_Children:
   - {fileID: 8279152070748857899}
   - {fileID: 4824223342336871191}
+  - {fileID: 4449298775754595051}
   - {fileID: 4824223340723290472}
   - {fileID: 7204722370227943865}
-  - {fileID: 4449298775754595051}
   - {fileID: 55892875068643011}
   - {fileID: 1175968403111424936}
   - {fileID: 5963926363534668188}
@@ -10518,6 +10518,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  body: {fileID: 4824223341387914443}
+  sfx: {fileID: 5377451828833222271}
   _IsFrozen:
     _value: 0
   _State: 2
@@ -10551,6 +10553,8 @@ MonoBehaviour:
     _value: 0
   _DoEntityBounce:
     _value: 0
+  _BounceJump:
+    _value: 0
   _IsInKnockback:
     _value: 0
   _IsFireballKnockback:
@@ -10580,6 +10584,8 @@ MonoBehaviour:
   _SwimLeaveForceHoldJumpTime: 0
   _IsSwimming:
     _value: 0
+  _IsWaterWalking:
+    _value: 0
   _IsDead:
     _value: 1
   _IsRespawning:
@@ -10596,10 +10602,10 @@ MonoBehaviour:
     _value: 0
   _FrozenCube: {fileID: 0}
   fadeOut: {fileID: 0}
-  sfxBrick: {fileID: 0}
-  networkRigidbody: {fileID: 0}
-  cameraController: {fileID: 0}
-  animationController: {fileID: 0}
+  sfxBrick: {fileID: 3452636116809643534}
+  networkRigidbody: {fileID: 2433599474194652050}
+  cameraController: {fileID: 8020175873997104482}
+  animationController: {fileID: 79918617084146557}
   flyingGravity: 0.8
   flyingTerminalVelocity: 1.40625
   drillVelocity: 7.5
@@ -10673,6 +10679,12 @@ MonoBehaviour:
   deathForce: 7
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
+  dustPlayer: {fileID: 8224161238141519067}
+  drillPlayer: {fileID: 8471508636101087076}
+  wallSlideData: {fileID: 11400000, guid: e2dbe5f1a0e0d8941852390d7da5e601, type: 2}
+  shellSlideData: {fileID: 11400000, guid: c74256c46183cf14ab95e81152a2d8d9, type: 2}
+  spinnerDrillData: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
+  propellerDrillData: {fileID: 11400000, guid: eef8bb198b37ff940a8a8de713e95481, type: 2}
 --- !u!50 &4824223341387914443
 Rigidbody2D:
   serializedVersion: 4
@@ -10720,6 +10732,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &4824223341387914442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11032,6 +11045,7 @@ GameObject:
   - component: {fileID: 4824223342336871190}
   - component: {fileID: 8020350199704251203}
   - component: {fileID: 2064833281695251147}
+  - component: {fileID: 8224161238141519067}
   m_Layer: 10
   m_Name: smoke
   m_TagString: Untagged
@@ -15970,6 +15984,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b73da02d946c92409564fcf9c2a6aa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  system: {fileID: 4824223342336871185}
+  sfx: {fileID: 8020350199704251203}
+--- !u!114 &8224161238141519067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824223342336871188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557273f467ae31f4b8e07bbb89e73e8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 8020350199704251203}
+  currentAudio: {fileID: 11400000, guid: e2dbe5f1a0e0d8941852390d7da5e601, type: 2}
 --- !u!1 &5037544308120838001
 GameObject:
   m_ObjectHideFlags: 0
@@ -16561,6 +16591,7 @@ GameObject:
   - component: {fileID: 1558602334125849933}
   - component: {fileID: 6648400330319602470}
   - component: {fileID: 6802351186447855124}
+  - component: {fileID: 8471508636101087076}
   m_Layer: 0
   m_Name: drill
   m_TagString: Untagged
@@ -21488,6 +21519,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b73da02d946c92409564fcf9c2a6aa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  system: {fileID: 599751029868069242}
+  sfx: {fileID: 6648400330319602470}
+--- !u!114 &8471508636101087076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7679988149848556112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557273f467ae31f4b8e07bbb89e73e8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 6648400330319602470}
+  currentAudio: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
 --- !u!1 &8080987513463232339
 GameObject:
   m_ObjectHideFlags: 0

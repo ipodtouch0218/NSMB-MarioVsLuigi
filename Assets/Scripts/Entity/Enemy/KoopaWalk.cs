@@ -156,7 +156,7 @@ public class KoopaWalk : HoldableEntity {
 
     public void EnterShell(bool becomeItem, PlayerController player) {
         if (blue && !IsInShell && becomeItem) {
-            BlueBecomeItem(player);
+            BlueBecomeItem();
             return;
         }
         body.velocity = Vector2.zero;
@@ -172,10 +172,7 @@ public class KoopaWalk : HoldableEntity {
         }
     }
 
-    public void BlueBecomeItem(PlayerController player) {
-        if (Runner.IsForward)
-            player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
-
+    public void BlueBecomeItem() {
         Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
         });
@@ -197,19 +194,19 @@ public class KoopaWalk : HoldableEntity {
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
 
-        //don't interact with our lovely holder
+        // don't interact with our lovely holder
         if (Holder == player)
             return;
 
-        //temporary invincibility
+        // temporary invincibility
         if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = damageDirection.y > 0;
 
-        //always damage exceptions
-        if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
+        // always damage exceptions
+        if (player.InstakillsEnemies) {
             bool originalFacing = player.FacingRight;
             if (IsInShell && !IsStationary && player.IsInShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
                 player.DoKnockback(player.body.position.x < body.position.x, 0, true, Object);
@@ -218,7 +215,7 @@ public class KoopaWalk : HoldableEntity {
             return;
         }
 
-        //attempt to be picked up (or kick)
+        // attempt to be picked up (or kick)
         if (IsInShell && IsActuallyStationary) {
             if (!Holder) {
                 if (player.CanPickupItem) {
@@ -232,16 +229,16 @@ public class KoopaWalk : HoldableEntity {
         }
 
         if (attackedFromAbove) {
-            //get hit by player
+            // get hit by player
 
-            //blue koopa: check to become a blue shell item
+            // blue koopa: check to become a blue shell item
             if (blue && (!IsInShell || (IsInShell && player.HasGroundpoundHitbox))) {
-                BlueBecomeItem(player);
+                BlueBecomeItem();
                 player.DoEntityBounce = !player.IsGroundpounding;
                 return;
             }
 
-            //groundpound by big mario: shell & kick
+            // groundpound by big mario: shell & kick
             if (player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom) {
                 EnterShell(true, player);
                 if (!blue) {
@@ -251,7 +248,7 @@ public class KoopaWalk : HoldableEntity {
                 return;
             }
 
-            //bounced on
+            // bounced on
             if (player.State == Enums.PowerupState.MiniMushroom) {
                 if (player.HasGroundpoundHitbox) {
                     player.IsGroundpounding = false;
@@ -262,20 +259,20 @@ public class KoopaWalk : HoldableEntity {
                 EnterShell(true, player);
                 player.DoEntityBounce = !player.IsGroundpounding;
             }
-            PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+
             player.IsDrilling = false;
 
         } else {
-            //damage player
+            // damage player
 
-            //turn around when hitting a crouching blue shell player
+            // turn around when hitting a crouching blue shell player
             if (player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
                 player.body.velocity = new(0, player.body.velocity.y);
                 FacingRight = damageDirection.x < 0;
                 return;
             }
-
-            //finally attempt to damage player
+            
+            // finally attempt to damage player
             if (player.Powerdown(false) && !IsInShell)
                 FacingRight = damageDirection.x > 0;
         }

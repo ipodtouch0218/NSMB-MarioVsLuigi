@@ -49,9 +49,6 @@ public class SpinyWalk : KoopaWalk {
                                 //mini mario is groundpounding, cancel their groundpound & stop moving
                                 EnterShell(true, player);
                                 player.IsGroundpounding = false;
-                            } else {
-                                //mini mario not groundpounding, just bounce.
-                                PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                             }
                             player.DoEntityBounce = true;
                         } else {
@@ -62,7 +59,6 @@ public class SpinyWalk : KoopaWalk {
                             } else {
                                 //normal mario isnt groundpounding, we get stopped
                                 EnterShell(true, player);
-                                PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                                 player.DoEntityBounce = true;
                                 FacingRight = damageDirection.x > 0;
                             }

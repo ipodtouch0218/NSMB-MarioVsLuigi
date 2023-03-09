@@ -155,7 +155,7 @@ public class WaterSplash : NetworkBehaviour {
 
             if (Runner.IsServer) {
                 if (!splashedEntities.Contains(obj)) {
-                    bool splash = entity.body.position.y > SurfaceHeight - 0.5f && (entity is not PlayerController pl || pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f);
+                    bool splash = entity.body.position.y > SurfaceHeight - 0.5f && (entity is not PlayerController pl || (!pl.IsDead && liquidType == LiquidType.Water && (pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f)));
                     if (splash) {
                         Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
                     }
@@ -196,6 +196,8 @@ public class WaterSplash : NetworkBehaviour {
                         player2.IsWaterWalking = false;
                     }
                 } else {
+                    if (Runner.IsServer)
+                        Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Enter);
                     player2.Death(false, liquidType == LiquidType.Lava);
                     continue;
                 }
@@ -253,7 +255,9 @@ public class WaterSplash : NetworkBehaviour {
         float tile = (transform.InverseTransformPoint(position).x / widthTiles + 0.25f) * 2f;
         int px = (int) (tile * totalPoints);
         for (int i = -splashWidth; i <= splashWidth; i++) {
-            int pointsX = (px + totalPoints + i) % totalPoints;
+            int pointsX = px + i;
+            pointsX = (int) Mathf.Repeat(pointsX, totalPoints);
+
             pointVelocities[pointsX] = -splashVelocity * power;
         }
     }

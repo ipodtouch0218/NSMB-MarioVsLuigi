@@ -27,7 +27,7 @@ TextureImporter:
       213: -176354558837914207
     second: loading_7
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -44,11 +44,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -67,7 +68,7 @@ TextureImporter:
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
-  spriteExtrude: 1
+  spriteExtrude: 0
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
@@ -87,13 +88,15 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -172,7 +175,7 @@ TextureImporter:
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -188,12 +191,12 @@ TextureImporter:
       name: loading_1
       rect:
         serializedVersion: 2
-        x: 5
+        x: 6
         y: 0
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -209,12 +212,12 @@ TextureImporter:
       name: loading_2
       rect:
         serializedVersion: 2
-        x: 10
+        x: 12
         y: 0
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -230,12 +233,12 @@ TextureImporter:
       name: loading_3
       rect:
         serializedVersion: 2
-        x: 15
+        x: 18
         y: 0
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -251,12 +254,12 @@ TextureImporter:
       name: loading_4
       rect:
         serializedVersion: 2
-        x: 20
+        x: 24
         y: 0
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -272,12 +275,12 @@ TextureImporter:
       name: loading_5
       rect:
         serializedVersion: 2
-        x: 25
+        x: 30
         y: 0
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -293,12 +296,12 @@ TextureImporter:
       name: loading_6
       rect:
         serializedVersion: 2
-        x: 30
+        x: 36
         y: 0
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -314,12 +317,12 @@ TextureImporter:
       name: loading_7
       rect:
         serializedVersion: 2
-        x: 35
+        x: 42
         y: 0
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -342,17 +345,16 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      loading_1: -3243969905789220278
-      loading_3: -9038400482918282348
-      loading_7: -176354558837914207
       loading_0: -2914503216214332612
-      loading_4: 3541541065571182360
-      loading_6: -6746097347225962745
-      loading_5: -6469537607060608100
+      loading_1: -3243969905789220278
       loading_2: -2240947139059371774
-  spritePackingTag: 
+      loading_3: -9038400482918282348
+      loading_4: 3541541065571182360
+      loading_5: -6469537607060608100
+      loading_6: -6746097347225962745
+      loading_7: -176354558837914207
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

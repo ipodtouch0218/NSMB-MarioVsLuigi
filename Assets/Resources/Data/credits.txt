@@ -1,0 +1,71 @@
+
+<color=yellow>Game by</color>
+ipodtouch0218
+
+<color=yellow>Github Contributors</color>
+GradedWarrior
+TheMoogle
+Skillz
+Skarph
+Zest
+kittenchilly
+Amy54Desu
+Kraken
+ShadowWalker13
+Perez
+mindnomad
+Jeffjewett27
+AtwerJ
+Pordrack
+vlcoo
+CubbyCrazes
+AutumnLeafy
+
+<color=yellow>Music</color>
+RENREN
+River J
+
+<color=yellow>QA Testing</color>
+TheCyVap
+Shadow_Walker13
+Fawndue
+
+<color=yellow>Level Design</color>
+Skarph
+TheCyVap
+mindnomad
+
+<color=yellow>Original Game / Resources</color>
+New Super Mario Bros.
+New Super Mario Bros. Wii
+Super Mario Maker 2
+(c) Nintendo
+
+<color=yellow>Asset Rippers</color>
+Demon2Warrior (Background)
+VentureSonic (Background)
+Keira (Background)
+Ohthatguy (Background)
+Poudink (Tiles)
+Someone (Tiles)
+Hiccup (Tiles)
+Jouv (Tiles)
+Mr-SUGOI (Tiles)
+mindnomad (Tiles/Sound)
+
+Symbolcom (Enemies)
+Mr. C (Enemies)
+Ragey (Enemies)
+Techokami (Enemies)
+
+A Refracted Swindler (UI)
+Treeki (UI)
+
+Double S (Models)
+KartMakerBrosU (Models)
+TeridaxXD001 (Models)
+Skarph (Models/Sound)
+LukeWarnut (Sound)
+Luke Hackett (Sound)
+CubbyCrazes (Sound)
+ 

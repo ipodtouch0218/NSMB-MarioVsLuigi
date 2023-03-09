@@ -169,14 +169,13 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.IsOnGround;
 
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
-            FacingRight = damageDirection.x < 0;
-        } else if (player.IsStarmanInvincible || player.IsInShell || player.IsSliding
-            || (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
-            || player.State == Enums.PowerupState.MegaMushroom) {
-
+        bool groundpounded = attackedFromAbove && player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom;
+        if (player.InstakillsEnemies || groundpounded) {
             SpecialKill(player.body.velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
-        } else if (attackedFromAbove) {
+            return;
+        }
+
+        if (attackedFromAbove) {
             if (player.State == Enums.PowerupState.MiniMushroom) {
                 if (player.IsGroundpounding) {
                     player.IsGroundpounding = false;
@@ -187,9 +186,11 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
                 Kill();
                 player.DoEntityBounce = !player.IsGroundpounding;
             }
-            if (Runner.IsForward)
-                player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+
             player.IsDrilling = false;
+
+        } else if (player.IsCrouchedInShell) {
+            FacingRight = damageDirection.x < 0;
 
         } else if (player.IsDamageable) {
             player.Powerdown(false);

@@ -207,16 +207,18 @@ public class StarBouncer : CollectableEntity {
     //---CollectableEntity overrides
     public override void OnCollectedChanged() {
         if (Collector) {
-            //play fx
+            // play collection fx
             graphicTransform.gameObject.SetActive(false);
             particles.Stop();
+            sfx.Stop();
             bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team;
             Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
             Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
         } else {
-            //oops...
+            // oops...
             graphicTransform.gameObject.SetActive(true);
             particles.Play();
+            sfx.Play();
         }
     }
 
@@ -229,12 +231,5 @@ public class StarBouncer : CollectableEntity {
     public override void Destroy(DestroyCause cause) {
         if (cause != DestroyCause.Lava)
             base.Destroy(cause);
-    }
-
-    //---OnChangeds
-    public static void OnCollectedChanged(Changed<StarBouncer> changed) {
-        StarBouncer star = changed.Behaviour;
-        if (star.Collector)
-            star.Runner.Despawn(star.Object);
     }
 }

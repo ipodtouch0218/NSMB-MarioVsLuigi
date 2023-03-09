@@ -1,9 +1,9 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MusicData", menuName = "ScriptableObjects/MusicData")]
-public class MusicData : ScriptableObject {
+[CreateAssetMenu(fileName = "LoopingMusicData", menuName = "ScriptableObjects/LoopingSound/MusicData")]
+public class LoopingMusicData : LoopingSoundData {
 
-    public AudioClip clip, fastClip;
-    public float loopStartSample, loopEndSample;
+    public AudioClip fastClip;
+    public float speedupFactor = 1.25f;
 
 }

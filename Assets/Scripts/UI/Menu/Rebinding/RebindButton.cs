@@ -2,8 +2,10 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
-
 using static UnityEngine.InputSystem.InputActionRebindingExtensions;
+
+using NSMB.Extensions;
+
 
 namespace NSMB.Rebinding {
     public class RebindButton : MonoBehaviour {
@@ -32,6 +34,16 @@ namespace NSMB.Rebinding {
         }
 
         public void StartRebind() {
+
+            if (MainMenuManager.Instance)
+                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
+
+            if (manager.IsUnbinding) {
+                targetAction.ApplyBindingOverride(index, path: "");
+                UpdateText();
+                //manager.ToggleUnbinding();
+                return;
+            }
 
             targetAction.actionMap.Disable();
 
@@ -66,6 +78,9 @@ namespace NSMB.Rebinding {
             UpdateText();
             CleanRebind(operation);
             manager.SaveRebindings();
+
+            if (MainMenuManager.Instance)
+                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
         }
 
         private void CleanRebind(RebindingOperation operation) {

@@ -494,6 +494,13 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+  m_TaaSettings:
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
 --- !u!114 &482268095346116758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -654,6 +661,13 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+  m_TaaSettings:
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
 --- !u!114 &482268096050949391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2665,6 +2679,13 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+  m_TaaSettings:
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
 --- !u!114 &5958562601690126037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4113,7 +4134,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 76.7
+  m_fontSize: 76.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4175,6 +4196,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4050413685647265443
 GameObject:
   m_ObjectHideFlags: 0
@@ -4375,7 +4397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 2
+  m_Version: 3
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
   m_LightLayerMask: 1
@@ -4385,7 +4407,7 @@ MonoBehaviour:
   m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 1
+  m_SoftShadowQuality: 2
 --- !u!1 &4356384969809622383
 GameObject:
   m_ObjectHideFlags: 0
@@ -4711,6 +4733,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4553414409645440068
 GameObject:
   m_ObjectHideFlags: 0
@@ -5468,7 +5491,7 @@ GameObject:
   - component: {fileID: 5500062339093502141}
   - component: {fileID: 5500062339093502114}
   - component: {fileID: 6418608900138254647}
-  - component: {fileID: 9060135030118423222}
+  - component: {fileID: 1965679957714577119}
   - component: {fileID: 3058852347368318539}
   - component: {fileID: 3063105634746227037}
   - component: {fileID: 8814515203468784576}
@@ -5564,7 +5587,7 @@ MonoBehaviour:
     m_Position: {x: 0, y: 0, z: 0}
     m_Size: {x: 0, y: 0, z: 0}
   spectationManager: {fileID: 3058852347368318539}
-  musicManager: {fileID: 9060135030118423222}
+  musicManager: {fileID: 0}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
   size: 1.39
@@ -5582,7 +5605,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
---- !u!114 &9060135030118423222
+--- !u!114 &1965679957714577119
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5591,7 +5614,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5500062339093502118}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 557273f467ae31f4b8e07bbb89e73e8e, type: 3}
+  m_Script: {fileID: 11500000, guid: 6df7a72a9c9567c4fb2b2856d308cfa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 3063105634746227037}
@@ -6291,6 +6314,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6710909780320671668
 GameObject:
   m_ObjectHideFlags: 0

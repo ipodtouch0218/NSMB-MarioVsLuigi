@@ -47,11 +47,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public float FloorAngle { get; set; }
     [Networked] public NetworkBool OnIce { get; set; }
     //Jumping
-    [Networked(OnChanged = nameof(OnJumpEffectChanged))] private byte JumpEffectCounter { get; set; }
+    [Networked(OnChanged = nameof(OnJumpAnimCounterChanged))] private byte JumpAnimCounter { get; set; }
     [Networked] public NetworkBool IsJumping { get; set; }
     [Networked] public PlayerJumpState JumpState { get; set; }
     [Networked] public NetworkBool ProperJump { get; set; }
     [Networked] public NetworkBool DoEntityBounce { get; set; }
+    [Networked] public NetworkBool BounceJump { get; set; }
     [Networked] public TickTimer JumpLandingTimer { get; set; }
     //Knockback
     [Networked(OnChanged = nameof(OnIsInKnockbackChanged))] public NetworkBool IsInKnockback { get; set; }
@@ -86,7 +87,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool SwimJump { get; set; }
     [Networked] public float SwimLeaveForceHoldJumpTime { get; set; }
     [Networked] public NetworkBool IsSwimming { get; set; }
-    [Networked] public NetworkBool IsWaterWalking { get; set; }
+    [Networked(OnChanged = nameof(OnIsWaterWalkingChanged))] public NetworkBool IsWaterWalking { get; set; }
     //-Death & Respawning
     [Networked(OnChanged = nameof(OnDeadChanged))] public NetworkBool IsDead { get; set; } = false;
     [Networked(OnChanged = nameof(OnRespawningChanged))] public NetworkBool IsRespawning { get; set; }
@@ -119,10 +120,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
     public override bool IsCarryable => true;
     public bool WallSliding => WallSlideLeft || WallSlideRight;
+    public bool InstakillsEnemies => IsStarmanInvincible || IsInShell || IsSliding || State == Enums.PowerupState.MegaMushroom;
+    public bool IsCrouchedInShell => State == Enums.PowerupState.BlueShell && IsCrouching && !IsInShell;
     public bool IsStarmanInvincible => !StarmanTimer.ExpiredOrNotRunning(Runner);
     public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
     public int PlayerId => data.PlayerId;
-    public bool CanPickupItem => State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && JumpState < PlayerJumpState.DoubleJump && !IsGroundpounding;
+    public bool CanPickupItem => State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && JumpState < PlayerJumpState.DoubleJump && !IsGroundpounding && !(!HeldEntity && IsSwimming && PreviousInputs.buttons.IsSet(PlayerControls.Jump));
     public bool HasGroundpoundHitbox => IsGroundpounding && !IsOnGround && GroundpoundStartTimer.ExpiredOrNotRunning(Runner);
     public float RunningMaxSpeed => SPEED_STAGE_MAX[RUN_STAGE];
     public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
@@ -276,10 +279,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         cameraController = GetComponentInChildren<CameraController>();
         animator = GetComponentInChildren<Animator>();
         sfxBrick = GetComponents<AudioSource>()[1];
-        //hitboxManager = GetComponent<WrappingHitbox>();
         animationController = GetComponent<PlayerAnimationController>();
         networkRigidbody = GetComponent<NetworkRigidbody2D>();
+    }
 
+    public void Start() {
         fadeOut = GameObject.FindGameObjectWithTag("FadeUI").GetComponent<FadeOutManager>();
     }
 
@@ -649,7 +653,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     DoEntityBounce = true;
                     IsGroundpounding = false;
                     IsDrilling = false;
-                    PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                 } else if (!otherAbove) {
                     DoKnockback(other.body.position.x < body.position.x, 0, true, other.Object);
                     other.DoKnockback(other.body.position.x > body.position.x, 0, true, Object);
@@ -687,7 +690,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (!above && other.State == Enums.PowerupState.BlueShell && !other.IsInShell && other.IsCrouching && !IsGroundpounding && !IsDrilling) {
             // They are blue shell
             DoEntityBounce = true;
-            PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             return;
         }
 
@@ -702,8 +704,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     other.DoKnockback(other.body.position.x < body.position.x, 1, false, Object);
                     IsGroundpounding = false;
                     DoEntityBounce = true;
-                } else {
-                    PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
                 }
             } else if (other.State == Enums.PowerupState.MiniMushroom && groundpounded) {
                 // We are big, groundpounding a mini opponent. squish.
@@ -1765,7 +1765,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         body.velocity = new(body.velocity.x, vel + jumpBoost);
         ProperJump = true;
         IsJumping = true;
-        JumpEffectCounter++;
+        JumpAnimCounter++;
+        BounceJump = DoEntityBounce;
         DoEntityBounce = false;
     }
 
@@ -2612,8 +2613,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 if (IsOnGround)
                     body.position += Vector2.up * 0.05f;
 
-                if (!DoEntityBounce && !IsOnGround)
-                    JumpEffectCounter++;
+                JumpAnimCounter++;
 
                 IsOnGround = false;
                 IsCrouching = false;
@@ -2642,7 +2642,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void ThrowHeldItem(bool left, bool right, bool crouch) {
-        if (IsFunctionallyRunning && !IsSwimming && State != Enums.PowerupState.MiniMushroom && State != Enums.PowerupState.MegaMushroom && !IsStarmanInvincible && !IsSpinnerFlying && !IsPropellerFlying)
+        if (IsFunctionallyRunning && State != Enums.PowerupState.MiniMushroom && State != Enums.PowerupState.MegaMushroom && !IsStarmanInvincible && !IsSpinnerFlying && !IsPropellerFlying)
             return;
 
         if (HeldEntity is FrozenCube && !IsSwimming && (Runner.SimulationTime - HoldStartTime) < pickupTime)
@@ -2861,11 +2861,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         player.PlaySound(Enums.Sounds.World_Spinner_Launch);
     }
 
-    public static void OnJumpEffectChanged(Changed<PlayerController> changed) {
+    public static void OnJumpAnimCounterChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
         if (player.IsSwimming) {
             // Paddle
-            //player.PlaySound(Enums.Sounds.Player_Sound_water);
+            player.PlaySound(Enums.Sounds.Player_Sound_Swim);
             player.animator.SetTrigger("paddle");
             return;
         }
@@ -2883,12 +2883,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             break;
         }
 
-        changed.LoadOld();
-        bool entityBounce = player.DoEntityBounce;
-        changed.LoadNew();
-
-        if (entityBounce)
+        if (player.BounceJump) {
+            player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             return;
+        }
 
         // Jump SFX
         Enums.Sounds sound = player.State switch {
@@ -2897,6 +2895,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             _ => Enums.Sounds.Player_Sound_Jump,
         };
         player.PlaySound(sound);
+    }
+
+    public static void OnIsWaterWalkingChanged(Changed<PlayerController> changed) {
+        PlayerController player = changed.Behaviour;
+        if (!player.IsWaterWalking)
+            return;
+
+        player.PlaySound(Enums.Sounds.Powerup_MiniMushroom_WaterWalk);
     }
 
     public static void OnIsInKnockbackChanged(Changed<PlayerController> changed) {

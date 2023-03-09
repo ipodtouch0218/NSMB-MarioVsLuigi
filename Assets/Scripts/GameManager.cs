@@ -55,7 +55,7 @@ public class GameManager : NetworkBehaviour {
     [Networked] public Enums.GameState GameState { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private MusicData mainMusic, invincibleMusic, megaMushroomMusic;
+    [SerializeField] private LoopingMusicData mainMusic, invincibleMusic, megaMushroomMusic;
     [SerializeField] public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     [SerializeField] public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     [SerializeField] public bool loopingLevel = true;
@@ -91,7 +91,7 @@ public class GameManager : NetworkBehaviour {
 
     //---Components
     public SpectationManager spectationManager;
-    [SerializeField] private LoopingMusicManager musicManager;
+    [SerializeField] private LoopingMusicPlayer musicManager;
     public AudioSource music, sfx;
 
     // TODO: figure out how to do rollback-able.... fuck
@@ -145,7 +145,7 @@ public class GameManager : NetworkBehaviour {
 
     public void Awake() {
         Instance = this;
-        musicManager = GetComponent<LoopingMusicManager>();
+        musicManager = GetComponent<LoopingMusicPlayer>();
         particleManager = GetComponentInChildren<SingleParticleManager>();
 
         //tiles

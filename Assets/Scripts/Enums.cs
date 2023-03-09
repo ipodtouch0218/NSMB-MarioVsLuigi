@@ -32,7 +32,7 @@ public static class Enums {
 
     //Sound effects
     public enum Sounds : byte {
-        //CURRENT HIGHEST NUMBER: 95
+        //CURRENT HIGHEST NUMBER: 97
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
         [SoundData("enemy/freeze_shatter")]                     Enemy_Generic_FreezeShatter = 1,
@@ -68,6 +68,7 @@ public static class Enums {
         [SoundData("player/powerdown")]                         Player_Sound_Powerdown = 27,
         [SoundData("player/respawn")]                           Player_Sound_Respawn = 28,
         [SoundData("player/slide_end")]                         Player_Sound_SlideEnd = 92,
+        [SoundData("player/swim")]                              Player_Sound_Swim = 96,
         [SoundData("player/walljump")]                          Player_Sound_WallJump = 29,
         [SoundData("player/wallslide")]                         Player_Sound_WallSlide = 30,
 
@@ -102,6 +103,7 @@ public static class Enums {
         [SoundData("powerup/minimushroom_collect")]             Powerup_MiniMushroom_Collect = 45, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
         [SoundData("powerup/minimushroom_groundpound")]         Powerup_MiniMushroom_Groundpound = 54,
         [SoundData("powerup/minimushroom_jump")]                Powerup_MiniMushroom_Jump = 55,
+        [SoundData("powerup/minimushroom_waterwalk")]           Powerup_MiniMushroom_WaterWalk = 97,
         [SoundData("powerup/propellermushroom_drill")]          Powerup_PropellerMushroom_Drill = 56,
         [SoundData("powerup/propellermushroom_kick")]           Powerup_PropellerMushroom_Kick = 57,
         [SoundData("powerup/propellermushroom_spin")]           Powerup_PropellerMushroom_Spin = 58,

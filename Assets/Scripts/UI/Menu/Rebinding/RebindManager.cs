@@ -11,13 +11,22 @@ namespace NSMB.Rebinding {
 
         //---Serialized Variables
         [SerializeField] internal GameObject rebindPrompt;
-        [SerializeField] internal TMP_Text rebindPromptText, rebindCountdownText;
+        [SerializeField] internal TMP_Text rebindPromptText, rebindCountdownText, unbindButtonText;
         [SerializeField] private InputActionAsset controls;
         [SerializeField] private GameObject headerTemplate, buttonTemplate, axisTemplate, playerSettings, resetAll;
         [SerializeField] private Toggle fireballToggle, autosprintToggle;
+        [SerializeField] private Button unbindButton;
 
-        //---Private Variablse
+        //---Properties
+        public bool IsUnbinding => isUnbinding;
+
+        //---Private Variabls
         private readonly List<RebindButton> buttons = new();
+        private bool isUnbinding;
+
+        public void OnDisable() {
+            isUnbinding = false;
+        }
 
         public void Init() {
             buttonTemplate.SetActive(false);
@@ -59,6 +68,11 @@ namespace NSMB.Rebinding {
             Settings.Instance.autoSprint = autosprintToggle.isOn = false;
             Settings.Instance.SaveSettingsToPreferences();
             SaveRebindings();
+        }
+
+        public void ToggleUnbinding() {
+            isUnbinding = !isUnbinding;
+            unbindButtonText.text = isUnbinding ? "Click to Unbind..." : "Unbind";
         }
 
         private void CreateActions() {

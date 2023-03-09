@@ -8,9 +8,12 @@ using NSMB.Utils;
 
 public class BobombWalk : HoldableEntity {
 
+    //---Static Variables
+    private static readonly List<Collider2D> DetonationHits = new();
+
     //---Networked Variables
     [Networked(OnChanged = nameof(OnDetonationTimerChanged))] public TickTimer DetonationTimer { get; set; }
-    [Networked(OnChanged = nameof(OnDetonatedChanged))] private NetworkBool Detonated { get; set; }
+    [Networked(OnChanged = nameof(OnIsDetonatedChanged))] private NetworkBool IsDetonated { get; set; }
     [Networked] private Vector3 PreviousFrameVelocity { get; set; }
 
     //---Serialized Variables
@@ -57,7 +60,7 @@ public class BobombWalk : HoldableEntity {
             return;
         }
 
-        if (IsFrozen || IsDead)
+        if (!Object || IsFrozen || IsDead)
             return;
 
         if (HandleCollision())
@@ -113,14 +116,14 @@ public class BobombWalk : HoldableEntity {
 
     public void Detonate() {
         IsDead = true;
-        Detonated = true;
+        IsDetonated = true;
 
         //damage entities in range. TODO: change to nonalloc?
-        List<Collider2D> hits = new();
-        Runner.GetPhysicsScene2D().OverlapCircle(body.position + hitbox.offset, 1f, default, hits);
+        DetonationHits.Clear();
+        Runner.GetPhysicsScene2D().OverlapCircle(body.position + hitbox.offset, 1f, default, DetonationHits);
 
         //use distinct to only damage enemies once
-        foreach (GameObject hitObj in hits.Select(c => c.gameObject).Distinct()) {
+        foreach (GameObject hitObj in DetonationHits.Select(c => c.gameObject).Distinct()) {
             //don't interact with ourselves
             if (hitObj == gameObject)
                 continue;
@@ -157,7 +160,7 @@ public class BobombWalk : HoldableEntity {
         }
 
         //suicide ourselves
-        Runner.Despawn(Object);
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
     }
 
     public void Turnaround(bool hitWallOnLeft) {
@@ -171,43 +174,49 @@ public class BobombWalk : HoldableEntity {
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
 
-        //temporary invincibility, we dont want to spam the kick sound
+        // Temporary invincibility, we dont want to spam the kick sound
         if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
             return;
 
-        //TODO: rewrite?
-        Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
-
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
-            FacingRight = damageDirection.x < 0;
-
-        } else if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible) {
+        // Special insta-kill cases
+        if (player.InstakillsEnemies) {
             SpecialKill(player.body.velocity.x > 0, false, player.StarCombo++);
             return;
+        }
 
-        } else if (attackedFromAbove && !Lit) {
-            if (player.State != Enums.PowerupState.MiniMushroom || (player.IsGroundpounding && attackedFromAbove))
-                Light();
+        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
 
-            PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
-            if (player.IsGroundpounding && player.State != Enums.PowerupState.MiniMushroom) {
-                Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+        // Normal interactions
+        if (Lit) {
+            if (!Holder && player.CanPickupItem) {
+                // pickup by player
+                Pickup(player);
             } else {
-                player.DoEntityBounce = true;
-                player.IsGroundpounding = false;
+                // kicked by player
+                Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
             }
-            player.IsDrilling = false;
         } else {
-            if (Lit) {
-                if (!Holder) {
-                    if (player.CanPickupItem) {
-                        Pickup(player);
-                    } else {
-                        Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
-                    }
+            if (attackedFromAbove) {
+                // light
+                bool mini = player.State == Enums.PowerupState.MiniMushroom;
+                if (!mini || player.IsGroundpounding)
+                    Light();
+
+                if (!mini && player.IsGroundpounding) {
+                    Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                } else {
+                    player.DoEntityBounce = true;
+                    player.IsGroundpounding = false;
                 }
+
+                player.IsDrilling = false;
+            } else if (player.IsCrouchedInShell) {
+                // Bounce off blue shell crouched player
+                FacingRight = damageDirection.x < 0;
+                return;
             } else if (player.IsDamageable) {
+                // damage
                 player.Powerdown(false);
                 FacingRight = damageDirection.x > 0;
             }
@@ -279,15 +288,17 @@ public class BobombWalk : HoldableEntity {
     }
 
     //---OnChangeds
-    public static void OnDetonatedChanged(Changed<BobombWalk> changed) {
+    public static void OnIsDetonatedChanged(Changed<BobombWalk> changed) {
         BobombWalk bomb = changed.Behaviour;
 
-        if (bomb.Detonated) {
+        if (bomb.IsDetonated) {
             //spawn explosion
             Instantiate(bomb.explosionPrefab, bomb.transform.position, Quaternion.identity);
             bomb.sRenderer.enabled = false;
+            bomb.sfx.Pause();
         } else {
             bomb.sRenderer.enabled = true;
+            bomb.sfx.UnPause();
         }
     }
 

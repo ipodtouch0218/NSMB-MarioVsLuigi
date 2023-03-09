@@ -23,6 +23,8 @@ public class PlayerAnimationController : NetworkBehaviour {
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
     [SerializeField] public float pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] private AudioClip normalDrill, propellerDrill;
+    [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
+    [SerializeField] private LoopingSoundData wallSlideData, shellSlideData, spinnerDrillData, propellerDrillData;
 
     //---Components
     private readonly List<Renderer> renderers = new();
@@ -124,6 +126,9 @@ public class PlayerAnimationController : NetworkBehaviour {
         } else if (controller.WallSlideLeft || controller.WallSlideRight) {
             dust.transform.localPosition = new Vector2(controller.MainHitbox.size.x * 0.75f * (controller.WallSlideLeft ? -1 : 1), controller.MainHitbox.size.y * 0.75f);
         }
+
+        dustPlayer.SetSoundData((controller.IsInShell || controller.IsSliding || controller.IsCrouchedInShell) ? shellSlideData : wallSlideData);
+        drillPlayer.SetSoundData(controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrillData : spinnerDrillData);
 
         bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, controller.WorldHitboxSize.y);
 

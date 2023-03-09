@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
+  m_Script: {fileID: 11500000, guid: f75ce5d91f7ab344aaab1a8902dcd8b0, type: 3}
   m_Name: MusicStar
   m_EditorClassIdentifier: 
   clip: {fileID: 8300000, guid: f27d61b2f9585d34d87f516602d80084, type: 3}
   fastClip: {fileID: 8300000, guid: fb7f7b07afee8bf4cb6cfd9914335de2, type: 3}
-  loopStartSample: 9.133
-  loopEndSample: 26.945
+  loopStartSeconds: 9.133
+  loopEndSeconds: 26.945

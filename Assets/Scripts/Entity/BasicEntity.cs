@@ -11,15 +11,19 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     [Networked(Default = nameof(facingRightDefault), OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
 
     //---Components
-    [NonSerialized] public Rigidbody2D body;
-    [NonSerialized] public AudioSource sfx;
+    public Rigidbody2D body;
+    public AudioSource sfx;
 
     //---Private Variables
     private bool brickBreakSound;
 
+    public void OnValidate() {
+        Awake();
+    }
+
     public virtual void Awake() {
-        body = GetComponent<Rigidbody2D>();
-        sfx = GetComponent<AudioSource>();
+        if (!body) body = GetComponent<Rigidbody2D>();
+        if (!sfx)  sfx = GetComponent<AudioSource>();
     }
 
     public override void Spawned() {

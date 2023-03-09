@@ -93,7 +93,6 @@ public class BulletBillMover : KillableEntity {
             if (!(player.State == Enums.PowerupState.MiniMushroom && !player.IsGroundpounding))
                 Kill();
 
-            PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
             player.IsDrilling = false;
             player.IsGroundpounding = false;
             player.DoEntityBounce = true;

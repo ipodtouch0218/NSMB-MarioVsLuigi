@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
-  m_Name: MusicMainMenu
+  m_Name: ShellslideSound
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: c9850c9bc8b015b4eb42ff8acd836e8b, type: 3}
-  loopStartSample: 3.6685
-  loopEndSample: 18.427
+  clip: {fileID: 8300000, guid: e9e8673a6dce3524c9ec16c0d228ac69, type: 3}
+  loopStartSeconds: 1.443
+  loopEndSeconds: 1.972
