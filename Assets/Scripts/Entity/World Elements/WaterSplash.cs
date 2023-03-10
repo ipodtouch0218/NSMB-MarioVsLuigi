@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 using Fusion;
+using UnityEngine.Rendering.UI;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
@@ -153,25 +154,31 @@ public class WaterSplash : NetworkBehaviour {
                 }
             }
 
-            if (Runner.IsServer) {
-                if (!splashedEntities.Contains(obj)) {
-                    bool splash = entity.body.position.y > SurfaceHeight - 0.5f && (entity is not PlayerController pl || (!pl.IsDead && liquidType == LiquidType.Water && (pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f)));
-                    if (splash) {
-                        Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
-                    }
-                    splashedEntities.Add(obj);
+            bool contains = splashedEntities.Contains(obj);
+            if (Runner.IsServer && !contains) {
+                bool splash = entity.body.position.y > SurfaceHeight - 0.5f;
+                if (entity is PlayerController pl) {
+                    splash &= !pl.IsDead;
+                    splash &= liquidType == LiquidType.Water;
+                    splash &= pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f;
                 }
 
-                if (liquidType != LiquidType.Water && entity is not PlayerController) {
-                    // Kill entity if they're below the surface of the posion/lava
-                    bool underSurface = entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
-                    if (underSurface) {
-                        // Don't let fireballs "poof"
-                        if (entity is FireballMover fm)
-                            fm.PlayBreakEffect = false;
+                if (splash)
+                    Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
+            }
 
-                        entity.Destroy(BasicEntity.DestroyCause.Lava);
-                    }
+            if (!contains)
+                splashedEntities.Add(obj);
+
+            // Kill entity if they're below the surface of the posion/lava
+            if (liquidType != LiquidType.Water && entity is not PlayerController) {
+                bool underSurface = entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
+                if (underSurface) {
+                    // Don't let fireballs "poof"
+                    if (entity is FireballMover fm)
+                        fm.PlayBreakEffect = false;
+
+                    entity.Destroy(BasicEntity.DestroyCause.Lava);
                 }
             }
 
@@ -180,9 +187,10 @@ public class WaterSplash : NetworkBehaviour {
                 if (player2.IsDead || player2.CurrentPipe)
                     continue;
 
+                float height = player2.body.position.y + (player2.WorldHitboxSize.y * 0.5f);
+                bool underwater = height <= SurfaceHeight;
+
                 if (liquidType == LiquidType.Water) {
-                    float height = player2.body.position.y + (player2.WorldHitboxSize.y * 0.5f);
-                    bool underwater = height <= SurfaceHeight;
 
                     if (player2.IsSwimming && !underwater && player2.body.velocity.y > 0) {
                         // jumped out of the water
@@ -196,6 +204,9 @@ public class WaterSplash : NetworkBehaviour {
                         player2.IsWaterWalking = false;
                     }
                 } else {
+                    if (!underwater)
+                        continue;
+
                     if (Runner.IsServer)
                         Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Enter);
                     player2.Death(false, liquidType == LiquidType.Lava);
@@ -205,7 +216,8 @@ public class WaterSplash : NetworkBehaviour {
         }
 
         foreach (var obj in splashedEntities) {
-            if (CollisionBuffer.Contains(obj))
+
+            if (CollisionBuffer.Take(collisionCount).Contains(obj))
                 continue;
 
             BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
@@ -236,9 +248,10 @@ public class WaterSplash : NetworkBehaviour {
                     Rpc_Splash(entity.body.position, Mathf.Abs(Mathf.Max(5, entity.body.velocity.y)), aboveWater ? ParticleType.Exit : ParticleType.None);
                 }
             }
+
         }
 
-        splashedEntities.IntersectWith(CollisionBuffer);
+        splashedEntities.IntersectWith(CollisionBuffer.Take(collisionCount));
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

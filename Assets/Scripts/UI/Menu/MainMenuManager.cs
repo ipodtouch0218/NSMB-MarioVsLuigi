@@ -534,7 +534,7 @@ public class MainMenuManager : MonoBehaviour {
         }
 
         SessionData.Instance.AddBan(target);
-        chat.AddChatMessage($"Successfully kicked {target.GetPlayerData(runner).GetNickname()}", Color.red);
+        chat.AddChatMessage($"Successfully banned {target.GetPlayerData(runner).GetNickname()}", Color.red);
         Runner.Disconnect(target);
 
         //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
@@ -595,10 +595,9 @@ public class MainMenuManager : MonoBehaviour {
 
     public void SwapPlayerSkin(byte index, bool callback) {
 
-        if (index == 0) {
-            playerColorDisabledIcon.SetActive(true);
-            playerColorPaletteIcon.SetActive(false);
-        } else {
+        bool disabled = index == 0;
+
+        if (!disabled) {
             playerColorDisabledIcon.SetActive(false);
             playerColorPaletteIcon.SetActive(true);
 
@@ -607,6 +606,9 @@ public class MainMenuManager : MonoBehaviour {
             overallsColorImage.color = colors.overallsColor;
             shirtColorImage.color = colors.hatColor;
         }
+
+        playerColorDisabledIcon.SetActive(disabled);
+        playerColorPaletteIcon.SetActive(!disabled);
 
         if (callback) {
             LocalData.Rpc_SetSkinIndex(index);
@@ -643,10 +645,7 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void Quit() {
-        if (quitCoroutine != null)
-            return;
-
-        quitCoroutine = StartCoroutine(FinishQuitting());
+        quitCoroutine ??= StartCoroutine(FinishQuitting());
     }
 
     private IEnumerator FinishQuitting() {

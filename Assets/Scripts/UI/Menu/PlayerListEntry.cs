@@ -42,7 +42,7 @@ public class PlayerListEntry : MonoBehaviour {
         if (data.Wins == 0) {
             winsText.text = "";
         } else {
-            winsText.text = data.Wins + "<sprite=55>";
+            winsText.text = "<sprite=55>" + data.Wins;
         }
 
         enabled = player.HasRainbowName();

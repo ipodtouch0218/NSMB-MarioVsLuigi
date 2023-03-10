@@ -514,7 +514,7 @@ MonoBehaviour:
       m_Width: 21
       m_Height: 20
       m_HorizontalBearingX: -2
-      m_HorizontalBearingY: 19
+      m_HorizontalBearingY: 21
       m_HorizontalAdvance: 21
     m_GlyphRect:
       m_X: 40
@@ -1312,15 +1312,15 @@ MonoBehaviour:
     sprite: {fileID: -1676610151, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   - m_Index: 55
     m_Metrics:
-      m_Width: 15
+      m_Width: 13
       m_Height: 13
       m_HorizontalBearingX: 1
       m_HorizontalBearingY: 12
       m_HorizontalAdvance: 15
     m_GlyphRect:
-      m_X: 125
+      m_X: 141
       m_Y: 38
-      m_Width: 15
+      m_Width: 13
       m_Height: 13
     m_Scale: 1.3
     m_AtlasIndex: 0

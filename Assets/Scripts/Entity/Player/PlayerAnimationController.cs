@@ -266,7 +266,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("mega",           controller.State == Enums.PowerupState.MegaMushroom);
         animator.SetBool("inShell",        controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
         animator.SetBool("turnaround",     controller.IsTurnaround);
-        animator.SetBool("swimming",       controller.IsSwimming);
+        animator.SetBool("swimming",       controller.IsSwimming && !controller.IsGroundpounding && !controller.IsDrilling);
         animator.SetBool("a_held",         controller.PreviousInputs.buttons.IsSet(PlayerControls.Jump));
 
         float animatedVelocity = Mathf.Abs(body.velocity.x) + Mathf.Abs(body.velocity.y * Mathf.Sin(controller.FloorAngle * Mathf.Deg2Rad)) * (Mathf.Sign(controller.FloorAngle) == Mathf.Sign(body.velocity.x) ? 0 : 1);

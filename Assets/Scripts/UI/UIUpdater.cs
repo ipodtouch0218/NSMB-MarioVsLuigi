@@ -197,4 +197,14 @@ public class UIUpdater : NetworkBehaviour {
             return 0;
         }
     }
+
+    public void OnReserveItemIconClicked() {
+        if (!GameManager.Instance)
+            return;
+
+        if (!GameManager.Instance.localPlayer)
+            return;
+
+        GameManager.Instance.localPlayer.RPC_SpawnReserveItem();
+    }
 }

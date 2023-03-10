@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 using Fusion.Photon.Realtime;
+using Fusion;
 
 public class AuthenticationHandler {
 
