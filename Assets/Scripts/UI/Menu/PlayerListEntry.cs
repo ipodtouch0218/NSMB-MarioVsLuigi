@@ -53,17 +53,7 @@ public class PlayerListEntry : MonoBehaviour {
             pingText.text = "";
         } else {
             int ping = data.Ping;
-            string pingColor;
-            if (ping < 0) {
-                pingColor = "black";
-            } else if (ping < 80) {
-                pingColor = "#00b900";
-            } else if (ping < 120) {
-                pingColor = "orange";
-            } else {
-                pingColor = "red";
-            }
-            pingText.text = $"<color={pingColor}>{ping}";
+            pingText.text = ping + " " + Utils.GetPingSymbol(ping);
         }
 
         string characterSymbol = data.GetCharacterData().uistring;

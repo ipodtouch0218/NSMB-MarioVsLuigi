@@ -1,21 +1,27 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class CloudPlatform : MonoBehaviour {
+using Fusion;
 
+public class CloudPlatform : SimulationBehaviour {
+
+    //---Static Variables
+    private static readonly Collider2D[] CollisionBuffer = new Collider2D[32];
+
+    //---Serialized Variables
     [SerializeField] private EdgeCollider2D ground;
     [SerializeField] private BoxCollider2D trigger;
-    [Delayed] [SerializeField] private int platformWidth = 8, samplesPerTile = 8;
+    [SerializeField, Delayed] private int platformWidth = 8, samplesPerTile = 8;
     [SerializeField] private float time = 0.25f;
     [SerializeField] private bool changeCollider = true;
 
+    //---Private Variables
+    private readonly List<CloudContact> positions = new();
+    private Color32[] pixels;
     private MaterialPropertyBlock mpb;
     private Texture2D displacementMap;
     private SpriteRenderer spriteRenderer;
-    private List<CloudContact> positions = new();
-    private Color32[] pixels;
 
     public void Start() {
         Initialize();
@@ -31,18 +37,19 @@ public class CloudPlatform : MonoBehaviour {
             return;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.size = new(platformWidth / 2f, 1f);
+        spriteRenderer.size = new(platformWidth * 0.5f, 1f);
 
         if (changeCollider) {
-            ground.SetPoints(new Vector2[] { Vector2.zero, new(platformWidth / 2f, 0) }.ToList());
+            ground.SetPoints(new Vector2[] { Vector2.zero, new(platformWidth * 0.5f, 0) }.ToList());
             ground.offset = new(0, 5/16f);
 
-            trigger.size = new(platformWidth / 2f, 0.5f - 5/16f);
-            trigger.offset = new(platformWidth / 4f, 13/32f);
+            trigger.size = new(platformWidth * 0.5f, 0.5f - 5/16f);
+            trigger.offset = new(platformWidth * 0.25f, 13/32f);
         }
 
-        displacementMap = new(platformWidth * samplesPerTile, 1);
-        displacementMap.wrapMode = TextureWrapMode.Mirror;
+        displacementMap = new(platformWidth * samplesPerTile, 1) {
+            wrapMode = TextureWrapMode.Mirror
+        };
 
         pixels = new Color32[platformWidth * samplesPerTile];
         for (int i = 0; i < platformWidth * samplesPerTile; i++)
@@ -52,38 +59,48 @@ public class CloudPlatform : MonoBehaviour {
 
         mpb = new();
         spriteRenderer.GetPropertyBlock(mpb);
-
         mpb.SetFloat("PlatformWidth", platformWidth);
         spriteRenderer.SetPropertyBlock(mpb);
     }
 
-    public void Update() {
-        for (int i = 0; i < platformWidth * samplesPerTile; i++)
-            pixels[i].r = 0;
+    public override void Render() {
 
-        for (int i = 0; i < positions.Count; i++) {
-            CloudContact contact = positions[i];
+        // Update collisions
+        int collisionCount = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + trigger.offset, trigger.size, 0, CollisionBuffer);
+        for (int i = 0; i < collisionCount; i++) {
+            var obj = CollisionBuffer[i];
 
-            if (contact.obj == null) {
-                positions.RemoveAt(i--);
-                continue;
-            }
+            HandleTrigger(obj);
+        }
 
-            if (!contact.exit && contact.obj.velocity.y > 0.2f)
+        // Update collision timers
+        foreach (CloudContact contact in positions) {
+            if (!contact.exit && (!contact.collider || contact.rb.velocity.y > 0.2f))
                 contact.exit = true;
 
             if (contact.exit) {
-                contact.timer += Time.deltaTime / 3f;
-                if (contact.timer >= time) {
-                    positions.RemoveAt(i--);
-                    continue;
-                }
+                contact.timer += Time.deltaTime * 0.333f;
             } else {
                 contact.timer = Mathf.Max(0, contact.timer - Time.deltaTime);
             }
+        }
+
+        // Purge old collisions
+        positions.RemoveAll(cc => !cc.collider || cc.exit && cc.timer >= time);
+
+        IEnumerable<Collider2D> currentCollisions = CollisionBuffer.Take(collisionCount);
+        foreach (CloudContact contact in positions.Where(contact => !contact.exit && !currentCollisions.Contains(contact.collider))) {
+            contact.exit = true;
+        }
+
+        // Handle graphics
+        for (int i = 0; i < platformWidth * samplesPerTile; i++)
+            pixels[i].r = 0;
+
+        foreach (CloudContact contact in positions) {
 
             float percentageCompleted = 1f - (contact.timer / time);
-            float v = Mathf.Sin(Mathf.PI / 2f * percentageCompleted);
+            float v = Mathf.Sin(Mathf.PI * 0.5f * percentageCompleted);
 
             int point = contact.Point;
             int width = contact.Width;
@@ -110,48 +127,28 @@ public class CloudPlatform : MonoBehaviour {
         spriteRenderer.SetPropertyBlock(mpb);
     }
 
-    public void OnTriggerEnter2D(Collider2D collision) {
-        HandleTrigger(collision);
-    }
-
-    public void OnTriggerStay2D(Collider2D collision) {
-        HandleTrigger(collision);
-    }
-
-    public void OnTriggerExit2D(Collider2D collision) {
-        StartCoroutine(AttemptRemove(collision));
-    }
-
-    IEnumerator AttemptRemove(Collider2D collision) {
-        yield return null;
-        yield return null;
-        CloudContact contact = GetContact(collision.attachedRigidbody);
-        if (contact != null)
-            contact.exit = true;
-    }
-
     private void HandleTrigger(Collider2D collision) {
         Rigidbody2D rb = collision.attachedRigidbody;
-        if (rb.isKinematic || rb.velocity.y > 0.2f || rb.position.y < transform.position.y)
+        if (!rb || rb.isKinematic || rb.velocity.y > 0.2f || rb.position.y < transform.position.y)
             return;
 
-        if (GetContact(collision.attachedRigidbody) == null)
+        if (GetContact(collision) == null)
             positions.Add(new(this, collision.attachedRigidbody, collision as BoxCollider2D));
     }
 
-    private CloudContact GetContact(Rigidbody2D body) {
+    private CloudContact GetContact(Collider2D collider) {
         foreach (CloudContact contact in positions) {
             if (contact.exit)
                 continue;
 
-            if (contact.obj.gameObject == body.gameObject)
+            if (contact.collider == collider)
                 return contact;
         }
         return null;
     }
 
     public class CloudContact {
-        public Rigidbody2D obj;
+        public Rigidbody2D rb;
         public CloudPlatform platform;
         public float timer;
         public bool exit;
@@ -160,10 +157,10 @@ public class CloudPlatform : MonoBehaviour {
             get {
                 if (exit)
                     return lastPoint;
-                return lastPoint = (int) (platform.transform.InverseTransformPoint(obj.transform.position).x * platform.samplesPerTile);
+                return lastPoint = (int) (platform.transform.InverseTransformPoint(rb.transform.position).x * platform.samplesPerTile);
             }
         }
-        private BoxCollider2D collider;
+        public BoxCollider2D collider;
         public int Width {
             get {
                 if (collider)
@@ -171,9 +168,9 @@ public class CloudPlatform : MonoBehaviour {
                 return (int) (1.75f * platform.samplesPerTile);
             }
         }
-        public CloudContact(CloudPlatform platform, Rigidbody2D obj, BoxCollider2D collider) {
+        public CloudContact(CloudPlatform platform, Rigidbody2D rb, BoxCollider2D collider) {
+            this.rb = rb;
             this.platform = platform;
-            this.obj = obj;
             this.collider = collider;
             timer = 0.05f;
         }

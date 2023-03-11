@@ -33,7 +33,7 @@ namespace NSMB.Extensions {
                 sb.Append(b.ToString("X2"));
 
             string hash = sb.ToString().ToLower();
-            return SpecialPlayers.ContainsKey(hash) && data.GetRawNickname() == SpecialPlayers[hash];
+            return SpecialPlayers.ContainsKey(hash) && data.Nickname == SpecialPlayers[hash];
         }
 
         public static PlayerData GetPlayerData(this PlayerRef player, NetworkRunner runner) {

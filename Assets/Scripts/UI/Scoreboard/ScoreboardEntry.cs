@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -19,8 +20,8 @@ public class ScoreboardEntry : MonoBehaviour {
     //---Private Variables
     private PlayerData data;
     private RectTransform rectTransform;
-    private int playerId, currentLives, currentStars;
-    private bool isCameraController, rainbowEnabled;
+    private int playerId, currentLives, currentStars, currentPing;
+    private bool isCameraController, rainbowEnabled, disconnected;
 
     public void Awake() {
         rectTransform = GetComponent<RectTransform>();
@@ -36,7 +37,7 @@ public class ScoreboardEntry : MonoBehaviour {
         data = target.Object.InputAuthority.GetPlayerData(target.Runner);
 
         playerId = target.PlayerId;
-        nameText.text = data.GetNickname();
+        nameText.text = (data.IsRoomOwner ? "<sprite=60>" : "<sprite=56>") + data.GetNickname();
 
         Color c = target.animationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);
@@ -61,23 +62,33 @@ public class ScoreboardEntry : MonoBehaviour {
     }
 
     private void CheckForTextUpdate() {
-        if (!target) {
+        if (disconnected)
+            return;
+
+        if (!data || !data.Object || !data.Object.IsValid) {
+            disconnected = true;
+            nameText.text = Regex.Replace(nameText.text, "<sprite=\\d*>", "<sprite=61>");
+
+        } else if (!data.IsRoomOwner && currentPing != data.Ping) {
+            currentPing = data.Ping;
+            nameText.text = Utils.GetPingSymbol(currentPing) + data.GetNickname();
+        }
+
+        if (!target || disconnected) {
             // our target lost all lives (or dc'd)
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
             return;
         }
 
-        // No changes. don't do anything, as we would waste time updating the mesh.
-        if (target.Lives == currentLives && target.Stars == currentStars)
-            return;
-
-        currentLives = target.Lives;
-        currentStars = target.Stars;
-        UpdateText();
-        ScoreboardUpdater.Instance.RepositionEntries();
+        if (target.Lives != currentLives || target.Stars != currentStars) {
+            currentLives = target.Lives;
+            currentStars = target.Stars;
+            UpdateScoreText();
+            ScoreboardUpdater.Instance.RepositionEntries();
+        }
     }
 
-    private void UpdateText() {
+    private void UpdateScoreText() {
         string txt = "";
         if (currentLives >= 0)
             txt += target.data.GetCharacterData().uistring + Utils.GetSymbolString(currentLives.ToString());

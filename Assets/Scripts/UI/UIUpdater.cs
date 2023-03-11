@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,8 +31,6 @@ public class UIUpdater : NetworkBehaviour {
 
     private TeamManager teamManager;
     private bool teams;
-
-    private float pingSample = 0;
     private int coins = -1, teamStars = -1, stars = -1, lives = -1, timer = -1;
 
     public void Awake() {
@@ -44,7 +43,6 @@ public class UIUpdater : NetworkBehaviour {
 
         localPlayer = Runner.LocalPlayer;
         character = localPlayer.GetCharacterData(Runner);
-        pingSample = GetCurrentPing();
 
         teamsParent = uiTeamStars.transform.parent.gameObject;
         starsParent = uiStars.transform.parent.gameObject;
@@ -68,18 +66,13 @@ public class UIUpdater : NetworkBehaviour {
         itemColor.color = uiColor;
 
         teamsParent.SetActive(teams);
-        uiDebug.gameObject.SetActive(!Runner.IsServer);
+
+        if (!Runner.IsServer) {
+            StartCoroutine(UpdatePingTextCoroutine());
+        }
     }
 
     public override void Render() {
-
-        if (!Runner.IsServer) {
-            pingSample = Mathf.Lerp(pingSample, GetCurrentPing(), Mathf.Clamp01(Time.unscaledDeltaTime));
-            if (pingSample == float.NaN)
-                pingSample = 0;
-
-            uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: " + (int) pingSample + "ms</font>";
-        }
 
         //Player stuff update.
         player = GameManager.Instance.localPlayer;
@@ -195,6 +188,15 @@ public class UIUpdater : NetworkBehaviour {
             return (int) (Runner.GetPlayerRtt(localPlayer) * 1000f);
         } catch {
             return 0;
+        }
+    }
+
+    private static readonly WaitForSeconds PingSampleRate = new(0.5f);
+    private IEnumerator UpdatePingTextCoroutine() {
+        while (true) {
+            yield return PingSampleRate;
+            int ping = GetCurrentPing();
+            uiDebug.text = "<mark=#00000090 padding=\"16,16,10,10\">" + Utils.GetPingSymbol(ping) + ping;
         }
     }
 

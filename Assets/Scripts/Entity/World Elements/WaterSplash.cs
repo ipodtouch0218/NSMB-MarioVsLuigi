@@ -3,11 +3,13 @@ using System.Linq;
 using UnityEngine;
 
 using Fusion;
-using UnityEngine.Rendering.UI;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
 public class WaterSplash : NetworkBehaviour {
+
+    //---Static Variables
+    private static readonly Collider2D[] CollisionBuffer = new Collider2D[32];
 
     //---Serialized Variables
     [SerializeField] private GameObject splashPrefab, splashExitPrefab;
@@ -21,9 +23,6 @@ public class WaterSplash : NetworkBehaviour {
     private float SurfaceHeight => transform.position.y + heightTiles * 0.5f - 0.1f;
 
     //---Private Variables
-    private readonly Collider2D[] CollisionBuffer = new Collider2D[32];
-    private int collisionCount;
-
     private readonly HashSet<Collider2D> splashedEntities = new();
     private Texture2D heightTex;
     private SpriteRenderer spriteRenderer;
@@ -129,90 +128,11 @@ public class WaterSplash : NetworkBehaviour {
 
     public override void FixedUpdateNetwork() {
         // Find entities inside our collider
-        collisionCount = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
+        int collisionCount = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
 
         for (int i = 0; i < collisionCount; i++) {
             var obj = CollisionBuffer[i];
-            if (!obj || obj.GetComponentInParent<BasicEntity>() is not BasicEntity entity)
-                continue;
-
-            // Don't splash stationary stars
-            if (entity is StarBouncer sb && sb.IsStationary)
-                continue;
-
-            // Don't splash stationary coins
-            if (entity is FloatingCoin)
-                continue;
-
-            if (liquidType == LiquidType.Water && entity is PlayerController player && player.State == Enums.PowerupState.MiniMushroom) {
-                if (!player.IsSwimming && Mathf.Abs(player.body.velocity.x) > 0.3f && player.body.velocity.y < 0) {
-                    // player is running on the water
-                    player.body.position = new(player.body.position.x, hitbox.bounds.max.y);
-                    player.IsOnGround = true;
-                    player.IsWaterWalking = true;
-                    continue;
-                }
-            }
-
-            bool contains = splashedEntities.Contains(obj);
-            if (Runner.IsServer && !contains) {
-                bool splash = entity.body.position.y > SurfaceHeight - 0.5f;
-                if (entity is PlayerController pl) {
-                    splash &= !pl.IsDead;
-                    splash &= liquidType == LiquidType.Water;
-                    splash &= pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f;
-                }
-
-                if (splash)
-                    Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
-            }
-
-            if (!contains)
-                splashedEntities.Add(obj);
-
-            // Kill entity if they're below the surface of the posion/lava
-            if (liquidType != LiquidType.Water && entity is not PlayerController) {
-                bool underSurface = entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
-                if (underSurface) {
-                    // Don't let fireballs "poof"
-                    if (entity is FireballMover fm)
-                        fm.PlayBreakEffect = false;
-
-                    entity.Destroy(BasicEntity.DestroyCause.Lava);
-                }
-            }
-
-            // Player collisions are special
-            if (entity is PlayerController player2) {
-                if (player2.IsDead || player2.CurrentPipe)
-                    continue;
-
-                float height = player2.body.position.y + (player2.WorldHitboxSize.y * 0.5f);
-                bool underwater = height <= SurfaceHeight;
-
-                if (liquidType == LiquidType.Water) {
-
-                    if (player2.IsSwimming && !underwater && player2.body.velocity.y > 0) {
-                        // jumped out of the water
-                        player2.IsSwimming = false;
-                        player2.SwimJump = true;
-                        player2.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
-                        if (Runner.IsServer)
-                            Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Exit);
-                    } else {
-                        player2.IsSwimming = underwater;
-                        player2.IsWaterWalking = false;
-                    }
-                } else {
-                    if (!underwater)
-                        continue;
-
-                    if (Runner.IsServer)
-                        Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Enter);
-                    player2.Death(false, liquidType == LiquidType.Lava);
-                    continue;
-                }
-            }
+            HandleEntityCollision(obj);
         }
 
         foreach (var obj in splashedEntities) {
@@ -252,6 +172,89 @@ public class WaterSplash : NetworkBehaviour {
         }
 
         splashedEntities.IntersectWith(CollisionBuffer.Take(collisionCount));
+    }
+
+    private void HandleEntityCollision(Collider2D obj) {
+        if (!obj || obj.GetComponentInParent<BasicEntity>() is not BasicEntity entity)
+            return;
+
+        // Don't splash stationary stars
+        if (entity is StarBouncer sb && sb.IsStationary)
+            return;
+
+        // Don't splash stationary coins
+        if (entity is FloatingCoin)
+            return;
+
+        if (liquidType == LiquidType.Water && entity is PlayerController player && player.State == Enums.PowerupState.MiniMushroom) {
+            if (!player.IsSwimming && Mathf.Abs(player.body.velocity.x) > 0.3f && player.body.velocity.y < 0) {
+                // player is running on the water
+                player.body.position = new(player.body.position.x, hitbox.bounds.max.y);
+                player.IsOnGround = true;
+                player.IsWaterWalking = true;
+                return;
+            }
+        }
+
+        bool contains = splashedEntities.Contains(obj);
+        if (Runner.IsServer && !contains) {
+            bool splash = entity.body.position.y > SurfaceHeight - 0.5f;
+            if (entity is PlayerController pl) {
+                splash &= !pl.IsDead;
+                splash &= liquidType == LiquidType.Water;
+                splash &= pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f;
+            }
+
+            if (splash)
+                Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
+        }
+
+        if (!contains)
+            splashedEntities.Add(obj);
+
+        // Kill entity if they're below the surface of the posion/lava
+        if (liquidType != LiquidType.Water && entity is not PlayerController) {
+            bool underSurface = entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
+            if (underSurface) {
+                // Don't let fireballs "poof"
+                if (entity is FireballMover fm)
+                    fm.PlayBreakEffect = false;
+
+                entity.Destroy(BasicEntity.DestroyCause.Lava);
+            }
+        }
+
+        // Player collisions are special
+        if (entity is PlayerController player2) {
+            if (player2.IsDead || player2.CurrentPipe)
+                return;
+
+            float height = player2.body.position.y + (player2.WorldHitboxSize.y * 0.5f);
+            bool underwater = height <= SurfaceHeight;
+
+            if (liquidType == LiquidType.Water) {
+
+                if (player2.IsSwimming && !underwater && player2.body.velocity.y > 0) {
+                    // jumped out of the water
+                    player2.IsSwimming = false;
+                    player2.SwimJump = true;
+                    player2.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
+                    if (Runner.IsServer)
+                        Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Exit);
+                } else {
+                    player2.IsSwimming = underwater;
+                    player2.IsWaterWalking = false;
+                }
+            } else {
+                if (!underwater)
+                    return;
+
+                if (Runner.IsServer)
+                    Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Enter);
+                player2.Death(false, liquidType == LiquidType.Lava);
+                return;
+            }
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

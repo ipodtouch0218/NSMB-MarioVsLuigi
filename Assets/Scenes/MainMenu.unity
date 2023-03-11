@@ -1982,7 +1982,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1
-  m_Sprite: {fileID: -1225161913, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  m_Sprite: {fileID: 60390689, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2005,7 +2005,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frame: 1.9194651
+  frame: 0.10302639
   fps: 8
   frames:
   - {fileID: 60390689, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
@@ -45044,11 +45044,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1324877903}
-  m_RootOrder: 1
+  m_Father: {fileID: 1619623747}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.437, y: 0.07}
+  m_AnchorMax: {x: 0.122, y: 0.07}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
@@ -45084,7 +45084,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: vW.X.Y.Z-beta
+  m_text: v1.8.0.0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 5ade88ee859873b4882004e755013bf7, type: 2}
@@ -45111,12 +45111,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
+  m_fontSize: 14
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 0
-  m_fontSizeMax: 24
+  m_fontSizeMax: 14
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 1024
@@ -45127,7 +45127,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -45147,7 +45147,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 5, y: 0, z: 0, w: 5}
+  m_margin: {x: 2, y: 0, z: 2, w: 2}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -52524,7 +52524,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 571112100}
-  - {fileID: 1037881117}
   - {fileID: 1860640960}
   m_Father: {fileID: 1619623747}
   m_RootOrder: 0
@@ -55518,7 +55517,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frame: 2.919465
+  frame: 6.103023
   fps: 8
   frames:
   - {fileID: 1676685922, guid: bc84ac99b7339e644a9a148d5a22d9b3, type: 3}
@@ -55585,7 +55584,7 @@ SpriteRenderer:
   m_SortingLayerID: -1013106893
   m_SortingLayer: -1
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1296168170, guid: bc84ac99b7339e644a9a148d5a22d9b3, type: 3}
+  m_Sprite: {fileID: 134405086, guid: bc84ac99b7339e644a9a148d5a22d9b3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -56540,7 +56539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frame: 2.919465
+  frame: 6.103023
   fps: 8
   frames:
   - {fileID: -1194393796, guid: 507f9d3e904abe34da025f747e616629, type: 3}
@@ -56607,7 +56606,7 @@ SpriteRenderer:
   m_SortingLayerID: -1013106893
   m_SortingLayer: -1
   m_SortingOrder: -2
-  m_Sprite: {fileID: -1151083762, guid: 507f9d3e904abe34da025f747e616629, type: 3}
+  m_Sprite: {fileID: -1880769187, guid: 507f9d3e904abe34da025f747e616629, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -83344,6 +83343,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1037881117}
   - {fileID: 1324877903}
   - {fileID: 820727546}
   - {fileID: 1248603849}

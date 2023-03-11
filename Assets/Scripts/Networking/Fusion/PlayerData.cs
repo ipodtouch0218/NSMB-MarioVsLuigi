@@ -15,7 +15,7 @@ public class PlayerData : NetworkBehaviour {
     public static bool Locked => SessionData.Instance && SessionData.Instance.GameStarted;
 
     //---Networked Variables
-    [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] private string Nickname { get; set; } = "noname";
+    [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] public string Nickname { get; set; } = "noname";
     [Networked, Capacity(28)]                                    private string DisplayNickname { get; set; } = "noname";
     [Networked]                                                  public Guid UserId { get; set; }
     [Networked]                                                  public sbyte PlayerId { get; set; }
@@ -34,6 +34,7 @@ public class PlayerData : NetworkBehaviour {
     //---Private Variables
     private Tick lastUpdatedTick;
     private NetAddress address;
+    private string filteredNickname;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -78,12 +79,8 @@ public class PlayerData : NetworkBehaviour {
             SessionData.Instance.SaveWins(this);
     }
 
-    public string GetRawNickname() {
-        return Nickname.ToString();
-    }
-
     public string GetNickname(bool filter = true) {
-        return filter ? DisplayNickname.ToString().Filter() : DisplayNickname.ToString();
+        return filter ? DisplayNickname : (filteredNickname ??= DisplayNickname.Filter());
     }
 
     public string GetUserIdString() => UserId.ToString();

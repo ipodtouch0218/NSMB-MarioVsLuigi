@@ -591,6 +591,22 @@ namespace NSMB.Utils {
             return Color.HSVToRGB(hue, saturation * s, value * v);
         }
 
+        public static string GetPingSymbol(int ping) {
+            string pingSymbol;
+            if (ping <= 0) {
+                pingSymbol = "<sprite=60>";
+            } else if (ping < 60) {
+                pingSymbol = "<sprite=56>";
+            } else if (ping < 110) {
+                pingSymbol = "<sprite=57>";
+            } else if (ping < 150) {
+                pingSymbol = "<sprite=58>";
+            } else {
+                pingSymbol = "<sprite=59>";
+            }
+            return pingSymbol;
+        }
+
         public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {
             counter = Mathf.Clamp(counter - delta, min, max);
         }

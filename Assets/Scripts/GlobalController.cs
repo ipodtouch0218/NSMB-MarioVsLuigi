@@ -48,6 +48,9 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void Start() {
+        if (!Application.isFocused)
+            mixer.SetFloat("MusicVolume", -80f);
+
         ControlSystem.controls.UI.DebugInfo.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };

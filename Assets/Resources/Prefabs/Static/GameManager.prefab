@@ -1120,8 +1120,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 2.5, y: 0}
-  m_SizeDelta: {x: -2.499978, y: 0}
+  m_AnchoredPosition: {x: 2.2999878, y: 1}
+  m_SizeDelta: {x: -2.2999878, y: -1}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &5635728515037933166
 CanvasRenderer:
@@ -1151,11 +1151,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <mark=#00000088 padding="10, 10, -0, 0"><font="SuperMarioDsRegular-Ea4R8
-    SDF">----ms</font>
+  m_text: <mark=#00000090 padding="16,16,10,10"><sprite=60>Hosting...
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1a4825385be168043a8c7cf620fd048d, type: 2}
-  m_sharedMaterial: {fileID: -5523348169385239366, guid: 1a4825385be168043a8c7cf620fd048d,
+  m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
+  m_sharedMaterial: {fileID: 6015020410494396785, guid: d42c556520644b148ada62f0b573e1a5,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -1183,7 +1182,7 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 0
   m_fontSizeMax: 14
   m_fontStyle: 0
@@ -1195,8 +1194,8 @@ MonoBehaviour:
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 50
-  m_enableWordWrapping: 1
+  m_charWidthMaxAdj: 0
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}

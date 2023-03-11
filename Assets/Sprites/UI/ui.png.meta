@@ -249,9 +249,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 40
-        y: 36
+        y: 34
         width: 21
-        height: 20
+        height: 21
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1319,10 +1319,10 @@ TextureImporter:
       name: ui_54
       rect:
         serializedVersion: 2
-        x: 141
-        y: 38
-        width: 13
-        height: 13
+        x: 188
+        y: 56
+        width: 11
+        height: 11
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1332,6 +1332,132 @@ TextureImporter:
       bones: []
       spriteID: 8cb5a16756d5fc54db9bcde5685d00b7
       internalID: 1471587138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ui_55
+      rect:
+        serializedVersion: 2
+        x: 117
+        y: 36
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0511fd2d6ac80e34490def70e7411315
+      internalID: 1763873500
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ui_56
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 36
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1811fc7fe207ff42a7cfdaed35a0382
+      internalID: -1507071055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ui_57
+      rect:
+        serializedVersion: 2
+        x: 151
+        y: 36
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad8ab8c6a7742c84fb185664161ead64
+      internalID: 1021722474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ui_58
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 36
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0608d00d2e04ad469331e13fa0a8145
+      internalID: 116447381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ui_59
+      rect:
+        serializedVersion: 2
+        x: 185
+        y: 36
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87748f25433e72945b990345e28589ea
+      internalID: -1762235557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ui_60
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 36
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efb0be281e9629c4490cfb90dc501b8f
+      internalID: 762531918
       vertices: []
       indices: 
       edges: []
@@ -1399,7 +1525,13 @@ TextureImporter:
       ui_52: -769868482
       ui_53: -1676610151
       ui_54: 1471587138
+      ui_55: 1763873500
+      ui_56: -1507071055
+      ui_57: 1021722474
+      ui_58: 116447381
+      ui_59: -1762235557
       ui_6: -1683070159
+      ui_60: 762531918
       ui_7: 268930356
       ui_8: 1261997413
       ui_9: 1346584908
