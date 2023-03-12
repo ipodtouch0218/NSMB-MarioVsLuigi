@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 using Fusion;
 using NSMB.Loading;
-using System.Collections;
 
 public class GlobalController : Singleton<GlobalController> {
 

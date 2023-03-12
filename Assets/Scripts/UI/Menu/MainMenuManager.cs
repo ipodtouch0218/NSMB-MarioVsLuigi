@@ -12,6 +12,7 @@ using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Rebinding;
 using NSMB.Utils;
+using UnityEngine.Serialization;
 
 public class MainMenuManager : MonoBehaviour {
 
@@ -26,10 +27,9 @@ public class MainMenuManager : MonoBehaviour {
 
     //---Public Variables
     public AudioSource sfx, music;
-    public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, privateToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, updateBoxSelected;
-    public Image ColorBar;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, creditsSelected, controlsSelected, updateBoxSelected;
 
     //---Serialized Fields
     [SerializeField] private RebindManager rebindManager;
@@ -50,6 +50,7 @@ public class MainMenuManager : MonoBehaviour {
     [SerializeField] private ScrollRect settingsScroll;
     [SerializeField] private Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
 
+    [SerializeField, FormerlySerializedAs("ColorBar")] private Image colorBar;
     [SerializeField] private Image overallsColorImage, shirtColorImage;
     [SerializeField] private GameObject playerColorPaletteIcon, playerColorDisabledIcon;
 
@@ -221,7 +222,7 @@ public class MainMenuManager : MonoBehaviour {
 
         // Host-based header color
         UnityEngine.Random.InitState(name.GetHashCode() + 2035767);
-        ColorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
+        colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
     }
 
     public void PreviewLevel(int levelIndex) {
@@ -278,10 +279,6 @@ public class MainMenuManager : MonoBehaviour {
         bg.SetActive(true);
         lobbyMenu.SetActive(true);
         createLobbyPrompt.SetActive(true);
-
-        privateToggle.isOn = false;
-
-        EventSystem.current.SetSelectedGameObject(createLobbySelected);
     }
     public void OpenOptions() {
         DisableAllMenus();
@@ -331,20 +328,20 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     private void ApplySettings() {
-        nicknameField.text =         Settings.Instance.nickname;
-        musicSlider.value =          Settings.Instance.VolumeMusic;
-        sfxSlider.value =            Settings.Instance.VolumeSFX;
-        masterSlider.value =         Settings.Instance.VolumeMaster;
-        ndsResolutionToggle.isOn =   Settings.Instance.ndsResolution;
-        aspectToggle.interactable =  Settings.Instance.ndsResolution;
-        aspectToggle.isOn =          Settings.Instance.fourByThreeRatio;
-        fireballToggle.isOn =        Settings.Instance.fireballFromSprint;
-        autoSprintToggle.isOn =      Settings.Instance.autoSprint;
-        vsyncToggle.isOn =           Settings.Instance.vsync;
-        scoreboardToggle.isOn =      Settings.Instance.scoreboardAlways;
-        filterToggle.isOn =          Settings.Instance.chatFiltering;
-        QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
-        fullscreenToggle.isOn =      Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
+        nicknameField.text =                     Settings.Instance.nickname;
+        musicSlider.value =                      Settings.Instance.VolumeMusic;
+        sfxSlider.value =                        Settings.Instance.VolumeSFX;
+        masterSlider.value =                     Settings.Instance.VolumeMaster;
+        ndsResolutionToggle.SetIsOnWithoutNotify(Settings.Instance.ndsResolution);
+        aspectToggle.interactable =              Settings.Instance.ndsResolution;
+        aspectToggle.SetIsOnWithoutNotify(       Settings.Instance.fourByThreeRatio);
+        fireballToggle.SetIsOnWithoutNotify(     Settings.Instance.fireballFromSprint);
+        autoSprintToggle.SetIsOnWithoutNotify(   Settings.Instance.autoSprint);
+        vsyncToggle.SetIsOnWithoutNotify(        Settings.Instance.vsync);
+        scoreboardToggle.SetIsOnWithoutNotify(   Settings.Instance.scoreboardAlways);
+        filterToggle.SetIsOnWithoutNotify(       Settings.Instance.chatFiltering);
+        QualitySettings.vSyncCount =             Settings.Instance.vsync ? 1 : 0;
+        fullscreenToggle.SetIsOnWithoutNotify(   Screen.fullScreenMode == FullScreenMode.FullScreenWindow);
     }
 
     public void BackSound() {
@@ -353,6 +350,10 @@ public class MainMenuManager : MonoBehaviour {
 
     public void ConfirmSound() {
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
+    }
+
+    public void CursorSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
     }
 
     public void ConnectToDropdownRegion() {
@@ -424,17 +425,6 @@ public class MainMenuManager : MonoBehaviour {
 
         // Load the correct scene
         Runner.SetActiveScene(GetCurrentSceneRef());
-    }
-
-    public void CreateRoom() {
-        Settings.Instance.nickname = nicknameField.text;
-        byte maxPlayers = (byte) lobbyPlayersSlider.value;
-
-        _ = NetworkHandler.CreateRoom(new() {
-            IsVisible = !privateToggle.isOn
-        }, players: maxPlayers);
-
-        createLobbyPrompt.SetActive(false);
     }
 
     public void UpdateStartGameButton() {
@@ -645,7 +635,8 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void Quit() {
-        quitCoroutine ??= StartCoroutine(FinishQuitting());
+        if (quitCoroutine == null)
+            quitCoroutine = StartCoroutine(FinishQuitting());
     }
 
     private IEnumerator FinishQuitting() {

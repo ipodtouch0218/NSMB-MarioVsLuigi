@@ -295,6 +295,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         args.GameMode = gamemode;
         args.SessionName = idBuilder.ToString();
         args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname);
+        args.PlayerCount = 9;
         args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
         args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.nickname;

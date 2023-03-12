@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Fusion;
 using Fusion.Sockets;
 using NSMB.Extensions;
+using NSMB.Utils;
 
 public class SessionData : NetworkBehaviour {
 
@@ -52,8 +53,10 @@ public class SessionData : NetworkBehaviour {
             MainMenuManager.Instance.EnterRoom();
 
         PrivateRoom = !Runner.SessionInfo.IsVisible;
+        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
+        MaxPlayers = (byte) players;
 
-        if (HasStateAuthority) {
+        if (Runner.IsServer) {
             bannedIds = new();
             bannedIps = new();
             NetworkHandler.OnConnectRequest += OnConnectRequest;

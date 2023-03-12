@@ -59,8 +59,10 @@ public class LooseCoin : Coin {
                 return;
             }
 
+            Debug.Log($"{PreviousFrameVelocity.y} < {-1f * (physics.FloorAngle / 90f)}");
+
             //isforward is ok, the sound isnt top priority
-            if (PreviousFrameVelocity.y < -1f * (90f - physics.FloorAngle) && Runner.IsForward)
+            if (Runner.IsForward && PreviousFrameVelocity.y < -1f * (90f - physics.FloorAngle))
                 PlaySound(Enums.Sounds.World_Coin_Drop);
         }
 

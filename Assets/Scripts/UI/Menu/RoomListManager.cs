@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
 
 using Fusion;
 using NSMB.Utils;
@@ -27,11 +25,8 @@ public class RoomListManager : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private RoomIcon roomIconPrefab, privateRoomIcon;
-    [SerializeField] private GameObject roomListScrollRect;
+    [SerializeField] private GameObject roomListScrollRect, privateRoomIdPrompt;
     [SerializeField] private Button joinRoomButton;
-
-    [SerializeField] private GameObject privateRoomIdPrompt, privateRoomIdPromptSelected;
-    [SerializeField] private TMP_InputField privateRoomIdField;
 
     //---Private Variables
     private readonly Dictionary<string, RoomIcon> rooms = new();
@@ -61,22 +56,8 @@ public class RoomListManager : MonoBehaviour {
         }
     }
 
-    public void JoinPrivateRoom() {
-        string id = privateRoomIdField.text.ToUpper();
-        int index = id.Length > 0 ? NetworkHandler.RoomIdValidChars.IndexOf(id[0]) : -1;
-        if (id.Length < 8 || index < 0 || index >= NetworkHandler.Regions.Length) {
-            MainMenuManager.Instance.OpenErrorBox("Invalid Room ID");
-            return;
-        }
-
-        privateRoomIdPrompt.SetActive(false);
-        _ = NetworkHandler.JoinRoom(id);
-    }
-
     private void OpenPrivateRoomPrompt() {
         privateRoomIdPrompt.SetActive(true);
-        privateRoomIdField.text = "";
-        EventSystem.current.SetSelectedGameObject(privateRoomIdPromptSelected);
     }
 
     public void RefreshRooms() {

@@ -112,9 +112,9 @@ Shader "Custom/UISh"
             {
                 half4 color = (tex2D(_CameraOpaqueTexture, IN.screenPosition.xy / IN.screenPosition.w) + _TextureSampleAdd) * IN.color;
 
-                for (int x=-_Iterations; x<_Iterations; x++) {
-                    for (int y=-_Iterations; y<_Iterations; y++) {
-                        half2 pos = half2 (x * _Distance, y * _Distance);
+                for (int x = -_Iterations; x < _Iterations; x++) {
+                    for (int y = -_Iterations; y < _Iterations; y++) {
+                        half2 pos = half2(x * _Distance, y * _Distance);
                         color += (tex2D(_CameraOpaqueTexture, (IN.screenPosition.xy / IN.screenPosition.w) + pos) + _TextureSampleAdd) * IN.color;
                     }
                 }
