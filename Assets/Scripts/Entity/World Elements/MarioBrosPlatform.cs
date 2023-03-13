@@ -2,16 +2,18 @@ using System.Linq;
 using UnityEngine;
 
 using Fusion;
+using static Unity.Burst.Intrinsics.X86;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-public class MarioBrosPlatform : NetworkBehaviour {
+public class MarioBrosPlatform : NetworkBehaviour, IPlayerInteractable {
 
     //---Static Variables
+    private static readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[48];
     private static readonly Vector2 BumpOffset = new(-0.25f, -0.1f);
     private static readonly Color BlankColor = new(0, 0, 0, 255);
 
     //---Networked Variables
-    [Networked, Capacity(8)] private NetworkLinkedList<BumpInfo> Bumps => default;
+    [Networked, Capacity(10)] private NetworkLinkedList<BumpInfo> Bumps => default;
 
     //---Serialized Variables
     [Delayed] [SerializeField] private int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
@@ -19,9 +21,10 @@ public class MarioBrosPlatform : NetworkBehaviour {
     [SerializeField] private bool changeCollider = true;
 
     //---Misc Variables
-    private SpriteRenderer spriteRenderer;
-    private MaterialPropertyBlock mpb;
     private Color32[] pixels;
+    private SpriteRenderer spriteRenderer;
+    private BoxCollider2D boxCollider;
+    private MaterialPropertyBlock mpb;
     private Texture2D displacementMap;
 
     public void Awake() {
@@ -36,14 +39,15 @@ public class MarioBrosPlatform : NetworkBehaviour {
 
     private void Initialize() {
         if (this == null)
-            //what
+            // What
             return;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.size = new Vector2(platformWidth, 1.25f);
 
+        boxCollider = GetComponent<BoxCollider2D>();
         if (changeCollider)
-            GetComponent<BoxCollider2D>().size = new Vector2(platformWidth, 5f / 8f);
+            boxCollider.size = new Vector2(platformWidth, 5f / 8f);
 
         displacementMap = new(platformWidth * samplesPerTile, 1);
         pixels = new Color32[platformWidth * samplesPerTile];
@@ -60,8 +64,9 @@ public class MarioBrosPlatform : NetworkBehaviour {
             pixels[i] = BlankColor;
 
         foreach (BumpInfo bump in Bumps) {
-            float percentageCompleted = bump.SpawnTime / bumpDuration;
+            float percentageCompleted = (Runner.Tick - bump.spawnTick) * Runner.DeltaTime / bumpDuration;
             float v = Mathf.Sin(Mathf.PI * percentageCompleted);
+
             for (int x = -bumpWidthPoints - bumpBlurPoints; x <= bumpWidthPoints + bumpBlurPoints; x++) {
                 int index = bump.point + x;
                 if (index < 0 || index >= platformWidth * samplesPerTile)
@@ -78,6 +83,7 @@ public class MarioBrosPlatform : NetworkBehaviour {
                 pixels[index].r = (byte) (Mathf.Clamp01(color) * 255);
             }
         }
+
         displacementMap.SetPixels32(pixels);
         displacementMap.Apply();
 
@@ -86,9 +92,9 @@ public class MarioBrosPlatform : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        //TODO: don't use linq
+        // TODO: don't use linq
         foreach (BumpInfo bump in Bumps.ToList()) {
-            if (bump.SpawnTime + bumpDuration > Runner.SimulationTime)
+            if (bump.spawnTick + (bumpDuration / Runner.DeltaTime) < Runner.Tick)
                 Bumps.Remove(bump);
         }
     }
@@ -103,21 +109,47 @@ public class MarioBrosPlatform : NetworkBehaviour {
         }
 
         localPos /= platformWidth + 1;
-        localPos += 0.5f; // get rid of negative coords
+        localPos += 0.5f; // Get rid of negative coords
+        localPos = Mathf.Clamp01(localPos);
         localPos *= samplesPerTile * platformWidth;
 
-        if (displacementMap.GetPixel((int) localPos, 0).r != 0)
-            return;
+        foreach (BumpInfo bump in Bumps) {
+            // If we're too close to another bump, don't create a new one.
+            if (Mathf.Abs(bump.point - localPos) < bumpWidthPoints + bumpBlurPoints)
+                return;
+        }
 
-        player.PlaySound(Enums.Sounds.World_Block_Bump);
+        // TODO: change
+        if (Runner.IsForward)
+            player.PlaySound(Enums.Sounds.World_Block_Bump);
+
         InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BumpOffset);
 
-        Bumps.Add(new BumpInfo() { point = (int) localPos, SpawnTime = Runner.SimulationTime });
+        Bumps.Add(new BumpInfo() { point = (int) localPos, spawnTick = Runner.Tick });
+    }
+
+    //---IPlayerInteractable overrides
+    public void InteractWithPlayer(PlayerController player) {
+        if (player.IsInKnockback || player.IsFrozen || player.body.position.y > transform.position.y)
+            return;
+
+        int contacts = boxCollider.GetContacts(ContactBuffer);
+        for (int i = 0; i < contacts; i++) {
+            ContactPoint2D contact = ContactBuffer[i];
+
+            if (contact.rigidbody.gameObject != player.gameObject)
+                continue;
+
+            if (contact.normal != Vector2.up)
+                return;
+
+            Bump(player, new(player.body.position.x, contact.point.y));
+        }
     }
 
     //---Helpers
     private struct BumpInfo : INetworkStruct {
         public int point;
-        [Networked] public float SpawnTime { get; set; }
+        public int spawnTick;
     }
 }

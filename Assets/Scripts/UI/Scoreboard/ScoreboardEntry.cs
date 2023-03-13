@@ -23,6 +23,8 @@ public class ScoreboardEntry : MonoBehaviour {
     private int playerId, currentLives, currentStars, currentPing;
     private bool isCameraController, rainbowEnabled, disconnected;
 
+    private int deathTick;
+
     public void Awake() {
         rectTransform = GetComponent<RectTransform>();
     }
@@ -77,6 +79,8 @@ public class ScoreboardEntry : MonoBehaviour {
         if (!target || disconnected) {
             // our target lost all lives (or dc'd)
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
+            deathTick = NetworkHandler.Runner.Tick;
+            ScoreboardUpdater.Instance.RepositionEntries();
             return;
         }
 
@@ -99,6 +103,9 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public class EntryComparer : IComparer<ScoreboardEntry> {
         public int Compare(ScoreboardEntry x, ScoreboardEntry y) {
+            if (!x.target && !y.target)
+                return y.deathTick - x.deathTick;
+
             if (!x.target ^ !y.target)
                 return !x.target ? 1 : -1;
 

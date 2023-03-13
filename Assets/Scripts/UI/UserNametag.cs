@@ -28,14 +28,16 @@ public class UserNametag : MonoBehaviour {
     }
 
     public void LateUpdate() {
-        if (parent == null) {
+        if (!parent) {
             Destroy(gameObject);
             return;
         }
 
         nametag.SetActive(!(parent.IsDead && parent.IsRespawning));
 
-        Vector2 worldPos = new(parent.transform.position.x, parent.transform.position.y + (parent.WorldHitboxSize.y * 1.2f) + 0.5f);
+        Vector2 worldPos = parent.animationController.models.transform.position;
+        worldPos.y += parent.WorldHitboxSize.y * 1.2f + 0.5f;
+
         if (GameManager.Instance.loopingLevel && Mathf.Abs(cam.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * (1 / 4f))
             worldPos.x += Mathf.Sign(cam.transform.position.x) * GameManager.Instance.levelWidthTile / 2f;
 

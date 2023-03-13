@@ -271,7 +271,7 @@ public class KoopaWalk : HoldableEntity {
                 FacingRight = damageDirection.x < 0;
                 return;
             }
-            
+
             // finally attempt to damage player
             if (player.Powerdown(false) && !IsInShell)
                 FacingRight = damageDirection.x > 0;
@@ -291,6 +291,9 @@ public class KoopaWalk : HoldableEntity {
         EnterShell(false, bumper as PlayerController);
         IsUpsideDown = canBeFlipped;
         body.velocity = new(body.velocity.x, 5.5f);
+
+        if (Holder)
+            Holder.SetHeldEntity(null);
 
         if (IsStationary) {
             body.velocity = new(bumper.body.position.x < body.position.x ? 1f : -1f, body.velocity.y);

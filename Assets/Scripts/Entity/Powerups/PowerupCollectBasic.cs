@@ -16,7 +16,7 @@ public class PowerupCollectBasic : MonoBehaviour, IPowerupCollect {
             return PowerupReserveResult.ReserveNewPowerup;
 
         //reserve if we cant fit with our new hitbox
-        if (player.State == Enums.PowerupState.MiniMushroom && player.IsOnGround && runner.GetPhysicsScene2D().Raycast(player.body.position, Vector2.up, 0.3f, Layers.MaskOnlyGround))
+        if (player.State == Enums.PowerupState.MiniMushroom && player.IsOnGround && runner.GetPhysicsScene2D().Raycast(player.body.position, Vector2.up, 0.3f, Layers.MaskSolidGround))
             return PowerupReserveResult.ReserveNewPowerup;
 
         Powerup currentPowerup = player.State.GetPowerupScriptable();

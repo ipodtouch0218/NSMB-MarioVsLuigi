@@ -196,7 +196,7 @@ public class UIUpdater : NetworkBehaviour {
         while (true) {
             yield return PingSampleRate;
             int ping = GetCurrentPing();
-            uiDebug.text = "<mark=#00000090 padding=\"16,16,10,10\">" + Utils.GetPingSymbol(ping) + ping;
+            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
         }
     }
 

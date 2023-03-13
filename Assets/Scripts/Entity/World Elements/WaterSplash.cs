@@ -135,12 +135,16 @@ public class WaterSplash : NetworkBehaviour {
             HandleEntityCollision(obj);
         }
 
+        IEnumerable<Collider2D> currentCollisions = CollisionBuffer.Take(collisionCount);
+
         foreach (var obj in splashedEntities) {
 
-            if (CollisionBuffer.Take(collisionCount).Contains(obj))
+            if (!obj || currentCollisions.Contains(obj))
                 continue;
 
             BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
+            if (!entity)
+                continue;
 
             if (entity is PlayerController player) {
                 float height = player.body.position.y + player.WorldHitboxSize.y;

@@ -104,7 +104,7 @@ public class FrozenCube : HoldableEntity {
                 }
             } else {
                 hitbox.enabled = true;
-                gameObject.layer = Holder || FastSlide ? Layers.LayerEntity : Layers.LayerIceBlock;
+                gameObject.layer = Holder || FastSlide ? Layers.LayerEntity : Layers.LayerGroundEntity;
                 body.constraints = RigidbodyConstraints2D.FreezeRotation;
             }
 
@@ -153,7 +153,7 @@ public class FrozenCube : HoldableEntity {
         }
 
         if (FastSlide && physics.OnGround && physics.FloorAngle != 0) {
-            RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskOnlyGround);
+            RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
             if (ray) {
                 body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
                 if (ray.distance < 0.1f)

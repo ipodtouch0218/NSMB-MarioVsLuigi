@@ -15,11 +15,12 @@ public class PlayerAnimationController : NetworkBehaviour {
 
     //---Public Variables
     public bool deathUp, wasTurnaround, enableGlow;
+    public GameObject models;
 
     //---Serialized Variables
     [SerializeField] private Avatar smallAvatar, largeAvatar;
     [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle;
-    [SerializeField] private GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
+    [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
     [SerializeField] public float pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] private AudioClip normalDrill, propellerDrill;

@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 717523893114735356}
   - component: {fileID: 717523893114735357}
   - component: {fileID: 717523893114735296}
-  m_Layer: 8
+  - component: {fileID: 1610279813323714423}
+  m_Layer: 14
   m_Name: MarioBrosPlatform
   m_TagString: MarioBrosPlatform
   m_Icon: {fileID: 0}
@@ -150,3 +151,27 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 12, y: 0.625}
   m_EdgeRadius: 0
+--- !u!114 &1610279813323714423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717523893114735297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 0
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: b9269a89e3e698d49b203e24f8b2e221
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 717523893114735357}
+  SimulationBehaviours: []

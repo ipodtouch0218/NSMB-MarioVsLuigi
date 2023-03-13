@@ -412,15 +412,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Debug Info",
-                    "type": "Button",
-                    "id": "8cc650dc-a45e-4887-b332-7b0fdfdb1106",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "!SpectatePlayerByIndex",
                     "type": "Button",
                     "id": "39bd28f4-bd03-4374-9e6f-ba1c13f41a2c",
@@ -852,50 +843,6 @@
                 },
                 {
                     "name": "",
-                    "id": "1b8a9c51-6fb0-4003-b3da-e9c59e91d92e",
-                    "path": "<Keyboard>/backquote",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard",
-                    "action": "Debug Info",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0267a921-9477-4fca-a466-67d3fece6585",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard",
-                    "action": "Debug Info",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "bcc0af49-9727-421a-ba9c-493d50b2caaa",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Debug Info",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ce5c24b0-8663-43ab-b7cc-40433414bbf1",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Debug Info",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "18c51067-d4f9-4332-a5aa-24899ebb4169",
                     "path": "<Keyboard>/tab",
                     "interactions": "",
@@ -1045,6 +992,120 @@
                     "processors": "",
                     "groups": "Keyboard",
                     "action": "!SpectatePlayerByIndex",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Debug",
+            "id": "a9644b88-61e9-43f4-b83d-f87aff12c2de",
+            "actions": [
+                {
+                    "name": "FPS Counter",
+                    "type": "Button",
+                    "id": "54336541-e28e-4a19-8fe5-5a45256cfe9e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Toggle HUD",
+                    "type": "Button",
+                    "id": "434a094a-7d82-4eb2-b8a1-6ceb36e3e224",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "efd02df4-7402-4083-9369-304202ce485d",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "FPS Counter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "892c11ba-4cf6-4119-9375-5d1025d0f50b",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "FPS Counter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "29b84e97-3c86-4dc7-b255-aac2c93bb8b6",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "FPS Counter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "035cf071-87a2-4334-8921-ad526aa915c5",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "FPS Counter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "52c87d5f-f396-422e-8e4b-526954d91ed8",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Toggle HUD",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f1002247-1567-4f46-8bbd-a7f1e47e743a",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Toggle HUD",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7e8c9e49-bf52-46e6-ad1f-4ad6fc67e50d",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Toggle HUD",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a5f3d8f4-10ac-421f-81ef-7db04d995253",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Toggle HUD",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

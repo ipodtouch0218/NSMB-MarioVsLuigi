@@ -60,7 +60,7 @@ public class GameManager : NetworkBehaviour {
     [SerializeField] public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     [SerializeField] public bool loopingLevel = true;
     [SerializeField] public Vector3 spawnpoint;
-    [SerializeField] private GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, nametagPrefab;
+    [SerializeField] private GameObject hud, pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, nametagPrefab;
     [SerializeField, ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
     [SerializeField] public Tilemap tilemap;
     [SerializeField] public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
@@ -124,14 +124,16 @@ public class GameManager : NetworkBehaviour {
 
     // Register pause & networking events
     public void OnEnable() {
-        ControlSystem.controls.UI.Pause.performed += OnPause;
+        ControlSystem.controls.UI.Pause.performed +=        OnPause;
+        ControlSystem.controls.Debug.ToggleHUD.performed += OnToggleHud;
         NetworkHandler.OnShutdown +=     OnShutdown;
         NetworkHandler.OnPlayerJoined += OnPlayerJoined;
         NetworkHandler.OnPlayerLeft +=   OnPlayerLeft;
     }
 
     public void OnDisable() {
-        ControlSystem.controls.UI.Pause.performed -= OnPause;
+        ControlSystem.controls.UI.Pause.performed -=        OnPause;
+        ControlSystem.controls.Debug.ToggleHUD.performed -= OnToggleHud;
         NetworkHandler.OnShutdown -=     OnShutdown;
         NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
         NetworkHandler.OnPlayerLeft -=   OnPlayerLeft;
@@ -145,7 +147,6 @@ public class GameManager : NetworkBehaviour {
 
     public void Awake() {
         Instance = this;
-        musicManager = GetComponent<LoopingMusicPlayer>();
         particleManager = GetComponentInChildren<SingleParticleManager>();
 
         //tiles
@@ -589,6 +590,10 @@ public class GameManager : NetworkBehaviour {
         }
 
         musicManager.FastMusic = speedup;
+    }
+
+    public void OnToggleHud(InputAction.CallbackContext context) {
+        hud.SetActive(!hud.activeSelf);
     }
 
     public void OnPause(InputAction.CallbackContext context) {

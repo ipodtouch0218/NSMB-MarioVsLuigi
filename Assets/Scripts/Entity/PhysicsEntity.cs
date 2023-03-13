@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Utils;
 
 public class PhysicsEntity : NetworkBehaviour {
 
@@ -33,7 +34,7 @@ public class PhysicsEntity : NetworkBehaviour {
 
     public void Start() {
         if (GroundMask == default)
-            GroundMask = LayerMask.GetMask("Ground", "IceBlock");
+            GroundMask = 1 << Layers.LayerGround | 1 << Layers.LayerGroundEntity;
     }
 
     public void UpdateCollisions() {

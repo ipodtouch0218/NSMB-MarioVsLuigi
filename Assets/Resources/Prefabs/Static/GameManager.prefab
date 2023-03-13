@@ -1151,18 +1151,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <mark=#00000090 padding="16,16,10,10"><sprite=60>Hosting...
+  m_text: <mark=#000000b0 padding="16,16,10,10"><font="MarioFont"><sprite=60>Hosting
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
-  m_sharedMaterial: {fileID: 6015020410494396785, guid: d42c556520644b148ada62f0b573e1a5,
-    type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4292467161
+  m_fontColor: {r: 0.85, g: 0.85, b: 0.85, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -5557,6 +5556,7 @@ MonoBehaviour:
   cameraMaxX: 1000
   loopingLevel: 1
   spawnpoint: {x: 0, y: 0, z: 0}
+  hud: {fileID: 1230832738604519832}
   pauseUI: {fileID: 2934122842234400586}
   pausePanel: {fileID: 2534023630337648780}
   pauseButton: {fileID: 2224320915739540639}
@@ -5586,7 +5586,7 @@ MonoBehaviour:
     m_Position: {x: 0, y: 0, z: 0}
     m_Size: {x: 0, y: 0, z: 0}
   spectationManager: {fileID: 3058852347368318539}
-  musicManager: {fileID: 0}
+  musicManager: {fileID: 1965679957714577119}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
   size: 1.39

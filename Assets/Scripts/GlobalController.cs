@@ -51,7 +51,7 @@ public class GlobalController : Singleton<GlobalController> {
         if (!Application.isFocused)
             mixer.SetFloat("MusicVolume", -80f);
 
-        ControlSystem.controls.UI.DebugInfo.performed += (context) => {
+        ControlSystem.controls.Debug.FPSCounter.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
     }
