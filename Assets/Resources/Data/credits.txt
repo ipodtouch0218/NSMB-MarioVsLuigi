@@ -24,6 +24,7 @@ AutumnLeafy
 <color=yellow>Music</color>
 RENREN
 River J
+CubbyCrazes
 
 <color=yellow>QA Testing</color>
 TheCyVap
@@ -68,4 +69,3 @@ Skarph (Models/Sound)
 LukeWarnut (Sound)
 Luke Hackett (Sound)
 CubbyCrazes (Sound)
- 

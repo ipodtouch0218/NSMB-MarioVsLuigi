@@ -75,6 +75,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 ### Music:
 * [RENREN](https://mistajub.bandcamp.com/)
 * River J
+* CubbyCrazes
 
 ### QA Testing:
 * TheCyVap
@@ -87,7 +88,6 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * mindnomad
  
 ### Asset Rips:
-  
 * Demon2Warrior (Background)
 * VentureSonic (Background)
 * Keira (Background)
