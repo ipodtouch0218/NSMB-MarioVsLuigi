@@ -10,7 +10,7 @@ namespace NSMB.Utils {
 
         private static int? _layerGround, _layerSemisolid, _layerHitsNothing, _layerDefault, _layerPassthrough, _layerLooseCoin, _layerEntity, _layerEntityHitbox, _layerPlayer, _layerGroundEntity;
         public static int LayerGround       => LazyLoadLayer(ref _layerGround, "Ground");
-        public static int LayerSemisolid    => LazyLoadLayer(ref _layerSemisolid, "Semisolid");
+        public static int LayerSemisolid    => LazyLoadLayer(ref _layerSemisolid, "Semisolids");
         public static int LayerHitsNothing  => LazyLoadLayer(ref _layerHitsNothing, "HitsNothing");
         public static int LayerDefault      => LazyLoadLayer(ref _layerDefault, "Default");
         public static int LayerPassthrough  => LazyLoadLayer(ref _layerPassthrough, "PlayerPassthrough");

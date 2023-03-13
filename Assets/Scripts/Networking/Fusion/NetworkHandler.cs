@@ -17,9 +17,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us" };
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
-
-    public static string CurrentRegion;
     private static GameObject prefab;
+
+    //---Properties
+    public static string CurrentRegion { get; set; }
 
     public static NetworkRunner Runner => Instance.runner;
 
@@ -236,6 +237,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         string token = PlayerPrefs.GetString("token", null);
 
         return await AuthenticationHandler.Authenticate(id, token);
+    }
+
+    public static async Task<StartGameResult> ConnectToSameRegion() {
+        return await ConnectToRegion(CurrentRegion);
     }
 
     public static async Task<StartGameResult> ConnectToRegion(string region = "") {

@@ -446,7 +446,7 @@ PrefabInstance:
         type: 3}
       propertyPath: mainMusic
       value: 
-      objectReference: {fileID: 11400000, guid: 2cfae2267b801f944813218ca08798fb,
+      objectReference: {fileID: 11400000, guid: eae4ecaf38d1e7645bfcceb2b03e01af,
         type: 2}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
@@ -681,6 +681,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -780,6 +786,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -879,6 +891,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -1056,12 +1074,12 @@ PrefabInstance:
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Size.y
-      value: 1.4
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
       propertyPath: m_Offset.y
-      value: 0.55
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 6004104070224972752, guid: 2dd296828f2080541ab2b41eeda650a7,
         type: 3}
@@ -6319,6 +6337,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -7215,6 +7239,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -7314,6 +7344,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -22742,6 +22778,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -22878,6 +22920,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -22977,6 +23025,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -23192,6 +23246,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 921256176}
     m_Modifications:
+    - target: {fileID: 388009723025345444, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+        type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
