@@ -53,63 +53,63 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Super Mario Maker 2
 
 ### Contributors:
-* [@ipodtouch0218](https://github.com/ipodtouch0218)
-* @GradedWarrior
-* [@TheMoogle](https://github.com/TheMoogle)
-* [@Skillz](https://github.com/Skillz808)
-* [@skarph](https://github.com/skarph)
-* [@Zest](https://github.com/zestydevy)
-* [@kittenchilly](https://github.com/kittenchilly)
 * [@Amy54Desu](https://github.com/Amy54Desu)
-* [@Kraken](https://github.com/KrakHub)
-* [@ShadowWalker13](https://github.com/ShadowWalker13)
-* [@GithubSPerez](https://github.com/GithubSPerez)
-* [@mindnomad](https://github.com/mindnomad)
-* [@Jeffjewett27](https://github.com/Jeffjewett27)
 * [@AtwerJ](https://github.com/AtwerJ)
-* [@Pordrack](https://github.com/Pordrack)
-* [@VLC](https://github.com/vlcoo)
-* [@CubbyCrazes](https://github.com/CubbyCrazes)
 * [@AutumnLeafy](https://github.com/AutumnLeafy)
+* [@CubbyCrazes](https://github.com/CubbyCrazes)
+* [@GithubSPerez](https://github.com/GithubSPerez)
+* @GradedWarrior
+* [@Jeffjewett27](https://github.com/Jeffjewett27)
+* [@kittenchilly](https://github.com/kittenchilly)
+* [@Kraken](https://github.com/KrakHub)
+* [@mindnomad](https://github.com/mindnomad)
+* [@Pordrack](https://github.com/Pordrack)
+* [@skarph](https://github.com/skarph)
+* [@Skillz](https://github.com/Skillz808)
+* [@ShadowWalker13](https://github.com/ShadowWalker13)
+* [@TheMoogle](https://github.com/TheMoogle)
+* [@VLC](https://github.com/vlcoo)
+* [@Zest](https://github.com/zestydevy)
 
 ### Music:
+* CubbyCrazes
 * [RENREN](https://mistajub.bandcamp.com/)
 * River J
-* CubbyCrazes
 
 ### QA Testing:
-* TheCyVap
-* Shadow_Walker13
 * Fawndue
+* Shadow_Walker13
+* TheCyVap
 
 ### Level Design:
+* mindnomad
 * Skarph
 * TheCyVap
-* mindnomad
  
 ### Asset Rips:
+* A Refracted Swindler (UI)
+* CubbyCrazes (Sound)
 * Demon2Warrior (Background)
-* VentureSonic (Background)
-* Keira (Background)
-* Ohthatguy (Background)
-* Poudink (Tiles)
-* Someone (Tiles)
+* Double S (Models)
+* Guywah (Fonts)
 * Hiccup (Tiles)
 * Jouv (Tiles)
-* Mr-SUGOI (Tiles)
-* mindnomad (Tiles/Sound)
-* Symbolcom (Enemies)
-* Mr. C (Enemies)
-* Ragey (Enemies)
-* Technokami (Enemies)
-* A Refracted Swindler (UI)
-* Treeki (UI)
-* Double S (Models)
 * KartMakerBrosU (Models)
-* TeridaxXDOO1 (Models)
-* Skarph (Models/Sound)
-* LukeWarnut (Sound)
+* Keira (Background)
 * Luke Hackett (Sound)
-* CubbyCrazes (Sound)
+* LukeWarnut (Sound)
+* mindnomad (Tiles/Sound)
+* Mr. C (Enemies)
+* Mr-SUGOI (Tiles)
+* Ohthatguy (Background)
+* Poudink (Tiles)
+* Ragey (Enemies)
+* Skarph (Models/Sound)
+* Someone (Tiles)
+* Symbolcom (Enemies)
+* Techokami (Enemies)
+* TeridaxXD001 (Models)
+* Treeki (UI)
+* VentureSonic (Background)
 
 </details>

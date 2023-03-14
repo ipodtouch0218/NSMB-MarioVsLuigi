@@ -3,38 +3,40 @@
 ipodtouch0218
 
 <color=yellow>Github Contributors</color>
-GradedWarrior
-TheMoogle
-Skillz
-Skarph
-Zest
-kittenchilly
 Amy54Desu
-Kraken
-ShadowWalker13
-Perez
-mindnomad
-Jeffjewett27
 AtwerJ
-Pordrack
-vlcoo
-CubbyCrazes
 AutumnLeafy
+CubbyCrazes
+GithubSPerez
+radedWarrior
+Jeffjewett27
+kittenchilly
+Kraken
+mindnomad
+Pordrack
+skarph
+Skillz
+ShadowWalker
+TheMoogle
+VLC
+Zest
+
 
 <color=yellow>Music</color>
+CubbyCrazes
 RENREN
 River J
-CubbyCrazes
 
 <color=yellow>QA Testing</color>
-TheCyVap
-Shadow_Walker13
 Fawndue
+Shadow_Walker13
+TheCyVap
+
 
 <color=yellow>Level Design</color>
+mindnomad
 Skarph
 TheCyVap
-mindnomad
 
 <color=yellow>Original Game / Resources</color>
 New Super Mario Bros.
@@ -43,29 +45,37 @@ Super Mario Maker 2
 (c) Nintendo
 
 <color=yellow>Asset Rippers</color>
+A Refracted Swindler (UI)
+CubbyCrazes (Sound)
 Demon2Warrior (Background)
-VentureSonic (Background)
-Keira (Background)
-Ohthatguy (Background)
-Poudink (Tiles)
-Someone (Tiles)
+Double S (Models)
+Guywah (Fonts)
 Hiccup (Tiles)
 Jouv (Tiles)
-Mr-SUGOI (Tiles)
-mindnomad (Tiles/Sound)
-
-Symbolcom (Enemies)
-Mr. C (Enemies)
-Ragey (Enemies)
-Techokami (Enemies)
-
-A Refracted Swindler (UI)
-Treeki (UI)
-
-Double S (Models)
 KartMakerBrosU (Models)
-TeridaxXD001 (Models)
-Skarph (Models/Sound)
-LukeWarnut (Sound)
+Keira (Background)
 Luke Hackett (Sound)
-CubbyCrazes (Sound)
+LukeWarnut (Sound)
+mindnomad (Tiles/Sound)
+Mr. C (Enemies)
+Mr-SUGOI (Tiles)
+Ohthatguy (Background)
+Poudink (Tiles)
+Ragey (Enemies)
+Skarph (Models/Sound)
+Someone (Tiles)
+Symbolcom (Enemies)
+Techokami (Enemies)
+TeridaxXD001 (Models)
+Treeki (UI)
+VentureSonic (Background)
+
+
+
+
+
+
+
+
+
+
