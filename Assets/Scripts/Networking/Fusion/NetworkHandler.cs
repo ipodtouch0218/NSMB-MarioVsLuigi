@@ -21,8 +21,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     //---Properties
     public static string CurrentRegion { get; set; }
-
     public static NetworkRunner Runner => Instance.runner;
+    public static bool Connecting => AuthenticationHandler.IsAuthenticating || (Runner && Runner.State == NetworkRunner.States.Starting && !Runner.IsCloudReady);
+    public static bool Connected => !Connecting && Runner && (Runner.State == NetworkRunner.States.Running || Runner.IsCloudReady);
+    public static bool Disconnected => !Connecting && !Connected;
 
     //---Exposed callbacks for Events
     public delegate void OnConnectedToServerDelegate(NetworkRunner runner);
@@ -244,17 +246,22 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     public static async Task<StartGameResult> ConnectToRegion(string region = "") {
-        //exit if we're already in a room
-        if ((Runner.SessionInfo.IsValid || Runner.LobbyInfo.IsValid) && !Runner.IsShutdown)
+        // Exit if we're already in a room
+        if ((Runner.SessionInfo.IsValid || Runner.LobbyInfo.IsValid) && !Runner.IsShutdown) {
             await Runner.Shutdown();
+        } else {
+            DestroyImmediate(Runner);
+            Instance.runner = Instance.gameObject.AddComponent<NetworkRunner>();
+        }
 
         if (string.IsNullOrEmpty(region)) {
             Debug.Log("[Network] Connecting to lobby with best ping.");
+            region = "";
         } else {
             Debug.Log($"[Network] Connecting to lobby {region}");
         }
 
-        //version separation
+        // Version separation
         AppSettings appSettings = new() {
             AppIdFusion = PhotonAppSettings.Instance.AppSettings.AppIdFusion,
             AppVersion = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value,
@@ -263,10 +270,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             FixedRegion = region,
         };
 
-        //Authenticate
+        // Authenticate
         AuthenticationValues authValues = await Authenticate();
 
-        //And join lobby
+        // And join lobby
         StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues, customAppSettings: appSettings);
         if (result.Ok) {
             CurrentRegion = Runner.LobbyInfo.Region;
@@ -282,32 +289,49 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             OnShutdown?.Invoke(Runner, result.ShutdownReason);
         }
 
+        AuthenticationHandler.IsAuthenticating = false;
         return result;
     }
 
     public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host, int players = 10) {
-        //create a random room id.
-        StringBuilder idBuilder = new();
 
-        //first char should correspond to region.
-        int index = Array.IndexOf(Regions, CurrentRegion);
-        idBuilder.Append(RoomIdValidChars[index >= 0 ? index : 0]);
 
-        //fill rest of the string with random chars
-        for (int i = 1; i < RoomIdLength; i++)
-            idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
+        int attempts = 3;
 
-        args.GameMode = gamemode;
-        args.SessionName = idBuilder.ToString();
-        args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname);
-        args.PlayerCount = 9;
-        args.SessionProperties = NetworkUtils.DefaultRoomProperties;
+        while (attempts-- > 0) {
+            // Create a random room id.
+            StringBuilder idBuilder = new();
 
-        args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.nickname;
-        args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;
+            // First char should correspond to region.
+            int index = Array.IndexOf(Regions, CurrentRegion);
+            idBuilder.Append(RoomIdValidChars[index >= 0 ? index : 0]);
 
-        //attempt to create the room
-        return await Runner.StartGame(args);
+            // Fill rest of the string with random chars
+            for (int i = 1; i < RoomIdLength; i++)
+                idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
+
+            Debug.Log($"[Network] Creating a game in {CurrentRegion} with the ID {idBuilder}");
+            args.GameMode = gamemode;
+            args.SessionName = idBuilder.ToString();
+            args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname);
+            args.PlayerCount = 9;
+            args.SessionProperties = NetworkUtils.DefaultRoomProperties;
+
+            args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.nickname;
+            args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;
+
+            // Attempt to create the room
+            StartGameResult results = await Runner.StartGame(args);
+            if (results.Ok)
+                return results;
+
+            if (results.ShutdownReason != ShutdownReason.GameIdAlreadyExists)
+                return null;
+
+            Debug.Log($"[Network] Failed to create a game with the ID {idBuilder} (the id already exists.) Trying {attempts} more time(s)...");
+        }
+
+        return null;
     }
 
     public static async Task<StartGameResult> JoinRoom(string roomId) {
@@ -320,6 +344,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             await ConnectToRegion(targetRegion);
         }
 
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.nonNetworkShutdown = true;
+
         Debug.Log($"[Network] Attempting to join game with ID: {roomId}");
         //attempt to join the room
         StartGameResult result = await Runner.StartGame(new() {
@@ -330,10 +357,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         });
         Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
         if (!result.Ok) {
-            OnJoinSessionFailed?.Invoke(Runner, result.ShutdownReason);
+            //OnJoinSessionFailed?.Invoke(Runner, result.ShutdownReason);
             //automatically go back to the lobby.
             await ConnectToRegion(originalRegion);
         }
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.nonNetworkShutdown = false;
 
         return result;
     }

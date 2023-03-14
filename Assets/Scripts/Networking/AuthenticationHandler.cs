@@ -5,13 +5,17 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 using Fusion.Photon.Realtime;
-using Fusion;
 
 public class AuthenticationHandler {
 
+    //---Static Variables
     private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
 
+    public static bool IsAuthenticating { get; set; }
+
     public async static Task<AuthenticationValues> Authenticate(string userid, string token) {
+
+        IsAuthenticating = true;
 
         string request = URL + "?";
         if (userid != null)
@@ -33,6 +37,7 @@ public class AuthenticationHandler {
                 MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode);
                 //MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
             }
+            IsAuthenticating = false;
             return null;
         }
 

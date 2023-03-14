@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using TMPro;
 
@@ -11,8 +12,8 @@ using Fusion;
 using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Rebinding;
+using NSMB.UI.Prompts;
 using NSMB.Utils;
-using UnityEngine.Serialization;
 
 public class MainMenuManager : MonoBehaviour {
 
@@ -26,6 +27,7 @@ public class MainMenuManager : MonoBehaviour {
     private PlayerData LocalData => Runner.GetLocalPlayerData();
 
     //---Public Variables
+    public bool nonNetworkShutdown;
     public AudioSource sfx, music;
     public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
@@ -39,12 +41,13 @@ public class MainMenuManager : MonoBehaviour {
     [SerializeField] public ChatManager chat;
     [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
     [SerializeField] private CanvasGroup hostControlsGroup;
+    [SerializeField] private NetworkErrorPrompt networkErrorPrompt;
 
     [SerializeField] private GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, controlsMenu, updateBox, connecting;
     [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
     [SerializeField] private GameObject errorBox, errorButton;
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
-    [SerializeField] private Button createRoomBtn, joinRoomBtn, startGameBtn;
+    [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
     [SerializeField] private TMP_InputField nicknameField, chatTextField;
     [SerializeField] private TMP_Text errorText, lobbyHeaderText, updateText;
     [SerializeField] private ScrollRect settingsScroll;
@@ -58,7 +61,7 @@ public class MainMenuManager : MonoBehaviour {
 
     //---Private Variables
     private Coroutine playerPingUpdateCoroutine, quitCoroutine;
-    private bool validName;
+    private bool validName, initialConnection;
     private byte currentSkin;
 
     public void Awake() {
@@ -109,7 +112,6 @@ public class MainMenuManager : MonoBehaviour {
         if (!Runner.IsCloudReady) {
             // Initial connection to the game
             OpenTitleScreen();
-            _ = NetworkHandler.ConnectToRegion();
 
         } else if (Runner.SessionInfo.IsValid) {
             // Call enterroom callback
@@ -146,12 +148,19 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void Update() {
-        bool connected = Runner && Runner.State == NetworkRunner.States.Starting && Runner.IsCloudReady;
-        connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
 
-        joinRoomBtn.interactable = connected && roomManager.SelectedRoom != null;
-        createRoomBtn.interactable = connected && validName;
-        regionDropdown.interactable = connected;
+        bool connectedToNetwork = NetworkHandler.Connected;
+        bool connectingToNetwork = NetworkHandler.Connecting;
+
+        connecting.SetActive(connectingToNetwork && lobbyMenu.activeInHierarchy);
+
+
+        joinRoomBtn.interactable = connectedToNetwork && roomManager.SelectedRoom != null;
+        createRoomBtn.interactable = connectedToNetwork && validName;
+        //regionDropdown.interactable = connectedToNetwork;
+
+        reconnectBtn.gameObject.SetActive(NetworkHandler.Disconnected);
+        joinPrivateRoomBtn.gameObject.SetActive(connectedToNetwork);
     }
 
     //TODO: refactor, wtf?
@@ -270,6 +279,9 @@ public class MainMenuManager : MonoBehaviour {
         bg.SetActive(true);
         lobbyMenu.SetActive(true);
 
+        if (NetworkHandler.Disconnected)
+            Reconnect();
+
         roomManager.RefreshRooms();
 
         EventSystem.current.SetSelectedGameObject(lobbySelected);
@@ -325,6 +337,20 @@ public class MainMenuManager : MonoBehaviour {
         errorBox.SetActive(true);
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
+        nonNetworkShutdown = false;
+    }
+
+    public void OpenNetworkErrorBox(string text) {
+        networkErrorPrompt.OpenWithText(text);
+    }
+
+    public void OpenNetworkErrorBox(ShutdownReason reason) {
+        if (nonNetworkShutdown) {
+            OpenErrorBox(reason);
+            return;
+        }
+
+        OpenNetworkErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(reason, reason.ToString()));
     }
 
     private void ApplySettings() {
@@ -365,6 +391,10 @@ public class MainMenuManager : MonoBehaviour {
         NetworkHandler.CurrentRegion = targetRegion;
 
         _ = NetworkHandler.ConnectToRegion(targetRegion);
+    }
+
+    public void Reconnect() {
+        _ = NetworkHandler.ConnectToSameRegion();
     }
 
     public async void QuitRoom() {
@@ -694,7 +724,7 @@ public class MainMenuManager : MonoBehaviour {
     // CONNECTION CALLBACKS
     public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
         if (cause != ShutdownReason.Ok)
-            OpenErrorBox(cause);
+            OpenNetworkErrorBox(cause);
 
         GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
     }

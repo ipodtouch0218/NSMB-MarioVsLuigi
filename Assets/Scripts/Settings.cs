@@ -55,8 +55,8 @@ public class Settings : Singleton<Settings> {
             nickname = "Player" + Random.Range(1000, 10000);
 
         VolumeSFX =          PlayerPrefs.GetFloat("volumeSFX", 0.5f);
-        VolumeMusic =        PlayerPrefs.GetFloat("volumeMusic", 0.25f);
-        VolumeMaster =       PlayerPrefs.GetFloat("volumeMaster", 1);
+        VolumeMusic =        PlayerPrefs.GetFloat("volumeMusic", 0.5f);
+        VolumeMaster =       PlayerPrefs.GetFloat("volumeMaster", 0.5f);
         ndsResolution =      PlayerPrefs.GetInt("NDSResolution", 0) == 1;
         fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         autoSprint =         PlayerPrefs.GetInt("AutoSprint", 0) == 1;

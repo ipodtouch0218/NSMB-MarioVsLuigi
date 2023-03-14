@@ -9,7 +9,6 @@ public class RoomIcon : MonoBehaviour {
 
     //---Public Variables
     public SessionInfo session;
-    public bool joinPrivate;
 
     //---Serialized Variables
     [SerializeField] private Color defaultColor, highlightColor, selectedColor;
@@ -24,9 +23,6 @@ public class RoomIcon : MonoBehaviour {
     }
 
     public void UpdateUI(SessionInfo newSession) {
-        if (joinPrivate)
-            return;
-
         session = newSession;
 
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxPlayers);

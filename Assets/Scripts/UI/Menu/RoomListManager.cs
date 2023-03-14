@@ -49,14 +49,10 @@ public class RoomListManager : MonoBehaviour {
         if (!SelectedRoom)
             return;
 
-        if (SelectedRoom.joinPrivate) {
-            OpenPrivateRoomPrompt();
-        } else {
-            _ = NetworkHandler.JoinRoom(SelectedRoom.session.Name);
-        }
+        _ = NetworkHandler.JoinRoom(SelectedRoom.session.Name);
     }
 
-    private void OpenPrivateRoomPrompt() {
+    public void OpenPrivateRoomPrompt() {
         privateRoomIdPrompt.SetActive(true);
     }
 
@@ -143,6 +139,6 @@ public class RoomListManager : MonoBehaviour {
         //    selectedRoom = null;
         //}
 
-        privateRoomIcon.transform.SetAsFirstSibling();
+        //privateRoomIcon.transform.SetAsFirstSibling();
     }
 }

@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: MusicMainMenu
   m_EditorClassIdentifier: 
   clip: {fileID: 8300000, guid: c9850c9bc8b015b4eb42ff8acd836e8b, type: 3}
-  loopStartSeconds: 3.6685
-  loopEndSeconds: 18.427
+  loopStartSeconds: 39.272
+  loopEndSeconds: 78.558
+  fastClip: {fileID: 0}
+  speedupFactor: 1.25
