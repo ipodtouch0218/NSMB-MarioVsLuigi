@@ -21,7 +21,7 @@ jobs:
         id: checklicense_job
         run: |
           echo "Skip activation job: ${{ env.UNITY_LICENSE != '' }}"
-          echo "::set-output name=is_unity_license_set::${{ env.UNITY_LICENSE != '' }}"
+          echo "is_unity_license_set::${{ env.UNITY_LICENSE != '' }}" >> $GITHUB_OUTPUT
   activation:
     needs: [checklicense]
     if: needs.checklicense.outputs.is_unity_license_set == 'false'
