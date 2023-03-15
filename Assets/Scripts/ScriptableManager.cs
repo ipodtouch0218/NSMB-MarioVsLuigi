@@ -6,10 +6,6 @@ public class ScriptableManager : Singleton<ScriptableManager> {
     public CharacterData[]  characters;
     public Team[]           teams;
 
-    public void Awake() {
-        if (!InstanceCheck())
-            return;
-
-        Instance = this;
-    }
+    public void Awake() => Set(this);
+    public void OnDestroy() => Release();
 }

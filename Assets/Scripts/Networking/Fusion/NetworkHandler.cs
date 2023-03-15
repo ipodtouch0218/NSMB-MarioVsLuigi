@@ -162,7 +162,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         }
 
         if (runner.LocalPlayer != player)
-            GlobalController.Instance.DiscordController.UpdateActivity();
+            GlobalController.Instance.discordController.UpdateActivity();
 
         OnPlayerJoined?.Invoke(runner, player);
     }
@@ -173,7 +173,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         OnPlayerLeft(runner, player);
 
-        GlobalController.Instance.DiscordController.UpdateActivity();
+        GlobalController.Instance.discordController.UpdateActivity();
         runner.Despawn(data.Object);
         runner.SetPlayerObject(player, null);
     }

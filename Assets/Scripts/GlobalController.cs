@@ -6,14 +6,16 @@ using UnityEngine.SceneManagement;
 
 using Fusion;
 using NSMB.Loading;
+using NSMB.Extensions;
+using NSMB.UI.Pause.Options;
 
 public class GlobalController : Singleton<GlobalController> {
 
-    //---Public Properties
-    public DiscordController DiscordController { get; private set; }
-
     //---Public Variables
+    public DiscordController discordController;
     public Gradient rainbowGradient;
+
+    public PauseOptionMenuManager optionsManager;
 
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
     public LoadingCanvas loadingCanvas;
@@ -27,25 +29,23 @@ public class GlobalController : Singleton<GlobalController> {
 
     //---Serialized Variables
     [SerializeField] private AudioMixer mixer;
+    [SerializeField] private AudioSource sfx;
 
     //---Private Variables
     private int windowWidth, windowHeight;
     private Coroutine fadeRoutine;
-
-
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
         Instantiate(Resources.Load("Prefabs/Static/GlobalController"));
     }
 
-    public void Awake() {
-        if (!InstanceCheck())
-            return;
-
-        Instance = this;
-        DiscordController = GetComponent<DiscordController>();
+    public void OnValidate() {
+        if (!discordController) discordController = GetComponent<DiscordController>();
     }
+
+    public void Awake() => Set(this);
+    public void OnDestroy() => Release();
 
     public void Start() {
         if (!Application.isFocused)
@@ -109,6 +109,10 @@ public class GlobalController : Singleton<GlobalController> {
             yield return null;
         }
         mixer.SetFloat("MusicVolume", -80f);
+    }
+
+    public void PlaySound(Enums.Sounds sound) {
+        sfx.PlayOneShot(sound);
     }
 
     private static float ToLinearScale(float x) {

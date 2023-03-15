@@ -40,11 +40,10 @@ public class Settings : Singleton<Settings> {
     //---Private Variables
     [SerializeField] private AudioMixer mixer;
 
-    public void Awake() {
-        if (!InstanceCheck())
-            return;
+    public void Awake() => Set(this);
+    public void OnDestroy() => Release();
 
-        Instance = this;
+    public void Start() {
         LoadSettingsFromPreferences();
         ApplyVolumeSettings();
     }
@@ -54,9 +53,9 @@ public class Settings : Singleton<Settings> {
         if (nickname == null || nickname == "")
             nickname = "Player" + Random.Range(1000, 10000);
 
-        VolumeSFX =          PlayerPrefs.GetFloat("volumeSFX", 0.5f);
-        VolumeMusic =        PlayerPrefs.GetFloat("volumeMusic", 0.5f);
-        VolumeMaster =       PlayerPrefs.GetFloat("volumeMaster", 0.5f);
+        VolumeSFX =          PlayerPrefs.GetFloat("volumeSFX", 0.75f);
+        VolumeMusic =        PlayerPrefs.GetFloat("volumeMusic", 0.75f);
+        VolumeMaster =       PlayerPrefs.GetFloat("volumeMaster", 0.75f);
         ndsResolution =      PlayerPrefs.GetInt("NDSResolution", 0) == 1;
         fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         autoSprint =         PlayerPrefs.GetInt("AutoSprint", 0) == 1;

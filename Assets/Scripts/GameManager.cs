@@ -398,7 +398,7 @@ public class GameManager : NetworkBehaviour {
         SetGameTimestamps();
 
         // Update Discord RPC status
-        GlobalController.Instance.DiscordController.UpdateActivity();
+        GlobalController.Instance.discordController.UpdateActivity();
     }
 
     /// <summary>

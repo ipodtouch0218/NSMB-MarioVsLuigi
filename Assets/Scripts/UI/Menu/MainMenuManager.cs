@@ -15,12 +15,11 @@ using NSMB.Rebinding;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
 
-public class MainMenuManager : MonoBehaviour {
+public class MainMenuManager : Singleton<MainMenuManager> {
 
     //---Static Variables
     public static readonly int NicknameMin = 2, NicknameMax = 20;
     private static readonly WaitForSeconds WaitTwoSeconds = new(2);
-    public static MainMenuManager Instance;
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
@@ -64,9 +63,8 @@ public class MainMenuManager : MonoBehaviour {
     private bool validName, initialConnection;
     private byte currentSkin;
 
-    public void Awake() {
-        Instance = this;
-    }
+    public void Awake() => Set(this, false);
+    public void OnDestroy() => Release();
 
     public void OnEnable() {
         // Register network callbacks
@@ -125,7 +123,7 @@ public class MainMenuManager : MonoBehaviour {
         UpdateNickname();
 
         // Discord RPC
-        GlobalController.Instance.DiscordController.UpdateActivity();
+        GlobalController.Instance.discordController.UpdateActivity();
 
         // Version Checking
 #if PLATFORM_WEBGL
@@ -227,7 +225,7 @@ public class MainMenuManager : MonoBehaviour {
         lobbyHeaderText.text = name.ToValidUsername() + "'" + (addS ? "s" : "") + " Room";
 
         // Discord RPC
-        GlobalController.Instance.DiscordController.UpdateActivity(session);
+        GlobalController.Instance.discordController.UpdateActivity(session);
 
         // Host-based header color
         UnityEngine.Random.InitState(name.GetHashCode() + 2035767);
@@ -293,11 +291,7 @@ public class MainMenuManager : MonoBehaviour {
         createLobbyPrompt.SetActive(true);
     }
     public void OpenOptions() {
-        DisableAllMenus();
-        bg.SetActive(true);
-        optionsMenu.SetActive(true);
-
-        EventSystem.current.SetSelectedGameObject(optionsSelected);
+        GlobalController.Instance.optionsManager.OpenMenu();
     }
     public void OpenControls() {
         DisableAllMenus();
@@ -407,7 +401,7 @@ public class MainMenuManager : MonoBehaviour {
         }
 
         await NetworkHandler.ConnectToRegion();
-        GlobalController.Instance.DiscordController.UpdateActivity();
+        GlobalController.Instance.discordController.UpdateActivity();
     }
 
     public void OnGameStartChanged() {
