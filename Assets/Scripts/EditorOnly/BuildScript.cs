@@ -1,8 +1,11 @@
 #if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Build.Reporting;
 
 public class BuildScript : EditorWindow
 {
@@ -43,6 +46,77 @@ public class BuildScript : EditorWindow
         build.BuildLinux();
         build.BuildMac();
         build.BuildWebGL();
+    }
+
+    // based on https://github.com/game-ci/documentation/blob/main/example/BuildScript.cs
+    public static void GABuild() 
+    {
+        var commandArguments = new Dictionary<string, string>();
+
+        string[] args = System.Environment.GetCommandLineArgs();
+
+        for (int current = 0, next = 1; current < args.Length; current++, next++) {
+            bool isFlag = args[current].StartsWith("-");
+            if (!isFlag) continue;
+            string flag = args[current].TrimStart('-');
+
+            bool flagHasValue = next < args.Length && !args[next].StartsWith("-");
+            string value = flagHasValue ? args[next].TrimStart('-') : string.Empty;
+            
+            commandArguments.Add(flag, value);
+        }
+
+        if (!commandArguments.TryGetValue("buildTarget", out string target)) {
+            Console.WriteLine("Missing argument -buildTarget");
+            EditorApplication.Exit(120);
+        }
+
+        if (!commandArguments.TryGetValue("customBuildPath", out string buildPath)) {
+            Console.WriteLine("Missing argument -customBuildPath");
+            EditorApplication.Exit(130);
+        }
+
+        var buildTarget = (BuildTarget) Enum.Parse(typeof(BuildTarget), target);
+        Build(buildTarget, buildPath);
+    }
+
+    private static void Build(BuildTarget buildTarget, string buildPath) 
+    {
+        var buildOptions = new BuildPlayerOptions() {
+            scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(s => s.path).ToArray(),
+            target = buildTarget,
+            locationPathName = buildPath,
+            
+        };
+
+        BuildSummary summary = BuildPipeline.BuildPlayer(buildOptions).summary;
+        
+        Console.WriteLine("Build Results:");
+        Console.WriteLine($"Duration: {summary.totalTime.ToString()}");
+        Console.WriteLine($"Warnings: {summary.totalWarnings.ToString()}");
+        Console.WriteLine($"Errors: {summary.totalErrors.ToString()}");
+        Console.WriteLine($"Size: {summary.totalSize.ToString()}");
+        
+        switch (summary.result)
+        {
+        case BuildResult.Succeeded:
+            Console.WriteLine("Build succeeded!");
+            EditorApplication.Exit(0);
+            break;
+        case BuildResult.Failed:
+            Console.WriteLine("Build failed!");
+            EditorApplication.Exit(101);
+            break;
+        case BuildResult.Cancelled:
+            Console.WriteLine("Build cancelled!");
+            EditorApplication.Exit(102);
+            break;
+        case BuildResult.Unknown:
+        default:
+            Console.WriteLine("Build result is unknown!");
+            EditorApplication.Exit(103);
+            break;
+        }
     }
 
     void OnGUI()

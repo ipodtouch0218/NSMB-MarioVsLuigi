@@ -61,6 +61,7 @@ jobs:
             Library-
       - uses: game-ci/unity-builder@v2
         with:
+          buildMethod: BuildScript.GABuild
           projectPath: ${{ env.PROJECT_PATH }}
           targetPlatform: ${{ matrix.targetPlatform }}
       - uses: actions/upload-artifact@v3
