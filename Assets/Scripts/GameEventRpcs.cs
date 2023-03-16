@@ -77,7 +77,7 @@ public class GameEventRpcs : NetworkBehaviour {
     public void Rpc_LoadingComplete() {
         // Populate scoreboard
         ScoreboardUpdater.Instance.CreateEntries(gm.AlivePlayers);
-        if (Settings.Instance.scoreboardAlways)
+        if (Settings.Instance.genericScoreboardAlways)
             ScoreboardUpdater.Instance.SetEnabled();
 
         GlobalController.Instance.loadingCanvas.EndLoading();

@@ -8,7 +8,7 @@ namespace NSMB.UI.Pause.Options {
     public class ScrollablePauseOption : PauseOption {
 
         //---Public Variables
-        public int currentOptionIndex;
+        public int value;
         public List<string> options;
 
         //---Serialized Variables
@@ -21,32 +21,34 @@ namespace NSMB.UI.Pause.Options {
 
         public void Awake() {
             if (!loader)
-                ChangeIndex(0);
+                SetValue(0, false);
         }
 
         public override void Selected() {
             base.Selected();
-            ChangeIndex(currentOptionIndex);
+            SetValue(value, false);
         }
 
         public override void OnLeftPress() {
-            ChangeIndex(currentOptionIndex - 1);
+            SetValue(value - 1);
         }
 
         public override void OnRightPress() {
-            ChangeIndex(currentOptionIndex + 1);
+            SetValue(value + 1);
         }
 
-        public void ChangeIndex(int newIndex) {
-            int previous = currentOptionIndex;
-            currentOptionIndex = Mathf.Clamp(newIndex, 0, options.Count - 1);
+        public void SetValue(int newIndex, bool callback = true) {
+            int previous = value;
+            value = Mathf.Clamp(newIndex, 0, options.Count - 1);
 
-            display.text = options.Count > 0 ? options[currentOptionIndex] : "No options set.";
-            leftButton.interactable = currentOptionIndex != 0;
-            rightButton.interactable = currentOptionIndex != options.Count - 1;
+            display.text = options.Count > 0 ? options[value] : "No options set.";
+            leftButton.interactable = value != 0;
+            rightButton.interactable = value != options.Count - 1;
 
-            if (previous != currentOptionIndex)
+            if (callback && previous != value) {
                 OnValueChanged?.Invoke();
+                loader?.OnValueChanged(this, previous);
+            }
         }
     }
 }

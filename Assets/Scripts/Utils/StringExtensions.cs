@@ -5,7 +5,7 @@ namespace NSMB.Utils {
     public static class StringExtensions {
 
         public static string Filter(this string input) {
-            if (Settings.Instance.chatFiltering)
+            if (Settings.Instance.genericChatFiltering)
                 return ChatFilter.FilterString(input);
 
             return input;

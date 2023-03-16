@@ -2,7 +2,6 @@ using UnityEngine;
 using TMPro;
 
 using NSMB.UI.Pause.Loaders;
-using UnityEngine.Events;
 
 namespace NSMB.UI.Pause.Options {
     public class PauseOption : MonoBehaviour {

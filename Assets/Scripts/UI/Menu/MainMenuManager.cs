@@ -118,7 +118,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         // Controls & Settings
         rebindManager.Init();
-        ApplySettings();
+        nicknameField.text = Settings.Instance.genericNickname;
         nicknameField.characterLimit = NicknameMax;
         UpdateNickname();
 
@@ -200,8 +200,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         // Set the player settings
         PlayerData data = Runner.GetLocalPlayerData();
-        characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.character);
-        SwapPlayerSkin(data ? data.SkinIndex : Settings.Instance.skin, false);
+        characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.genericCharacter);
+        SwapPlayerSkin(data ? data.SkinIndex : (byte) Settings.Instance.genericSkin, false);
         spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
         // Set the room settings
@@ -345,23 +345,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         }
 
         OpenNetworkErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(reason, reason.ToString()));
-    }
-
-    private void ApplySettings() {
-        nicknameField.text =                     Settings.Instance.nickname;
-        musicSlider.value =                      Settings.Instance.VolumeMusic;
-        sfxSlider.value =                        Settings.Instance.VolumeSFX;
-        masterSlider.value =                     Settings.Instance.VolumeMaster;
-        ndsResolutionToggle.SetIsOnWithoutNotify(Settings.Instance.ndsResolution);
-        aspectToggle.interactable =              Settings.Instance.ndsResolution;
-        aspectToggle.SetIsOnWithoutNotify(       Settings.Instance.fourByThreeRatio);
-        fireballToggle.SetIsOnWithoutNotify(     Settings.Instance.fireballFromSprint);
-        autoSprintToggle.SetIsOnWithoutNotify(   Settings.Instance.autoSprint);
-        vsyncToggle.SetIsOnWithoutNotify(        Settings.Instance.vsync);
-        scoreboardToggle.SetIsOnWithoutNotify(   Settings.Instance.scoreboardAlways);
-        filterToggle.SetIsOnWithoutNotify(       Settings.Instance.chatFiltering);
-        QualitySettings.vSyncCount =             Settings.Instance.vsync ? 1 : 0;
-        fullscreenToggle.SetIsOnWithoutNotify(   Screen.fullScreenMode == FullScreenMode.FullScreenWindow);
     }
 
     public void BackSound() {
@@ -599,8 +582,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             characterDropdown.SetValueWithoutNotify(character);
         }
 
-        Settings.Instance.character = character;
-        Settings.Instance.SaveSettingsToPreferences();
+        Settings.Instance.genericCharacter = character;
+        Settings.Instance.SaveSettings();
 
         CharacterData data = ScriptableManager.Instance.characters[character];
         colorManager.ChangeCharacter(data);
@@ -626,15 +609,15 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         if (callback) {
             LocalData.Rpc_SetSkinIndex(index);
-            Settings.Instance.skin = index;
-            Settings.Instance.SaveSettingsToPreferences();
+            Settings.Instance.genericSkin = index;
+            Settings.Instance.SaveSettings();
         }
 
         currentSkin = index;
     }
 
     private void UpdateNickname() {
-        validName = Settings.Instance.nickname.IsValidUsername();
+        validName = Settings.Instance.genericNickname.IsValidUsername();
         if (!validName) {
             ColorBlock colors = nicknameField.colors;
             colors.normalColor = new(1, 0.7f, 0.7f, 1);
@@ -648,10 +631,10 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void SetUsername(TMP_InputField field) {
-        Settings.Instance.nickname = field.text;
+        Settings.Instance.genericNickname = field.text;
         UpdateNickname();
 
-        Settings.Instance.SaveSettingsToPreferences();
+        Settings.Instance.SaveSettings();
     }
 
     public void OpenLinks() {

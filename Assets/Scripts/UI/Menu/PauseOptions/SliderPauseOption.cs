@@ -6,7 +6,7 @@ namespace NSMB.UI.Pause.Options {
     public class SliderPauseOption : PauseOption {
 
         //---Serialized Variables
-        [SerializeField] protected Slider slider;
+        [SerializeField] public Slider slider;
 
         public override void OnValidate() {
             base.OnValidate();

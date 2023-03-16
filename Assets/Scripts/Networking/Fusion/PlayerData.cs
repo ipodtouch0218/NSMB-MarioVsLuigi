@@ -52,8 +52,8 @@ public class PlayerData : NetworkBehaviour {
 
         if (Object.HasInputAuthority) {
             //we're the client. update with our data.
-            Rpc_SetCharacterIndex(Settings.Instance.character);
-            Rpc_SetSkinIndex(Settings.Instance.skin);
+            Rpc_SetCharacterIndex((byte) Settings.Instance.genericCharacter);
+            Rpc_SetSkinIndex((byte) Settings.Instance.genericSkin);
 
             if (Runner.IsServer)
                 IsRoomOwner = true;

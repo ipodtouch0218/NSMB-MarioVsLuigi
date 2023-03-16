@@ -3,10 +3,11 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.Universal;
 
 using Fusion;
-using NSMB.Loading;
 using NSMB.Extensions;
+using NSMB.Loading;
 using NSMB.UI.Pause.Options;
 
 public class GlobalController : Singleton<GlobalController> {
@@ -17,6 +18,7 @@ public class GlobalController : Singleton<GlobalController> {
 
     public PauseOptionMenuManager optionsManager;
 
+    public ScriptableRendererFeature outlineFeature;
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
     public LoadingCanvas loadingCanvas;
 
@@ -26,14 +28,15 @@ public class GlobalController : Singleton<GlobalController> {
 
     public bool checkedForVersion;
     public ShutdownReason? disconnectCause = null;
+    public int windowWidth, windowHeight;
 
     //---Serialized Variables
     [SerializeField] private AudioMixer mixer;
     [SerializeField] private AudioSource sfx;
 
     //---Private Variables
-    private int windowWidth, windowHeight;
-    private Coroutine fadeRoutine;
+    private Coroutine fadeMusicRoutine;
+    private Coroutine fadeSfxRoutine;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
@@ -48,9 +51,10 @@ public class GlobalController : Singleton<GlobalController> {
     public void OnDestroy() => Release();
 
     public void Start() {
-        if (!Application.isFocused)
-            mixer.SetFloat("MusicVolume", -80f);
-
+        if (!Application.isFocused) {
+            if (Settings.Instance.audioMuteMusicOnUnfocus) mixer.SetFloat("MusicVolume", -80f);
+            if (Settings.Instance.audioMuteSFXOnUnfocus)   mixer.SetFloat("SoundVolume", -80f);
+        }
         ControlSystem.controls.Debug.FPSCounter.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
@@ -60,10 +64,10 @@ public class GlobalController : Singleton<GlobalController> {
         int currentWidth = Screen.width;
         int currentHeight = Screen.height;
 
-        if (Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0) {
+        if (Settings.Instance.graphicsNdsEnabled && SceneManager.GetActiveScene().buildIndex != 0) {
             float aspect = (float) currentWidth / currentHeight;
             int targetHeight = 224;
-            int targetWidth = (int) (targetHeight * (Settings.Instance.fourByThreeRatio ? (4/3f) : aspect));
+            int targetWidth = (int) (targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : aspect));
             if (ndsTexture == null || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
                 if (ndsTexture != null)
                     ndsTexture.Release();
@@ -90,25 +94,35 @@ public class GlobalController : Singleton<GlobalController> {
     public void OnApplicationFocus(bool focus) {
         if (focus) {
             Settings.Instance.ApplyVolumeSettings();
-            if (fadeRoutine != null)
-                StopCoroutine(fadeRoutine);
-            fadeRoutine = null;
+            StopCoroutineNullable(ref fadeMusicRoutine);
+            StopCoroutineNullable(ref fadeSfxRoutine);
         } else {
-            fadeRoutine ??= StartCoroutine(FadeMusic());
+            if (Settings.Instance.audioMuteMusicOnUnfocus)
+                fadeMusicRoutine ??= StartCoroutine(FadeVolume("MusicVolume"));
+            if (Settings.Instance.audioMuteSFXOnUnfocus)
+                fadeSfxRoutine ??= StartCoroutine(FadeVolume("SoundVolume"));
         }
     }
 
-    private IEnumerator FadeMusic() {
-        mixer.GetFloat("MusicVolume", out float currentVolume);
+    private void StopCoroutineNullable(ref Coroutine coroutine) {
+        if (coroutine == null)
+            return;
+
+        StopCoroutine(coroutine);
+        coroutine = null;
+    }
+
+    private IEnumerator FadeVolume(string key) {
+        mixer.GetFloat(key, out float currentVolume);
         currentVolume = ToLinearScale(currentVolume);
         float fadeRate = currentVolume * 2f;
 
         while (currentVolume > 0f) {
             currentVolume -= fadeRate * Time.deltaTime;
-            mixer.SetFloat("MusicVolume", ToLogScale(currentVolume));
+            mixer.SetFloat(key, ToLogScale(currentVolume));
             yield return null;
         }
-        mixer.SetFloat("MusicVolume", -80f);
+        mixer.SetFloat(key, -80f);
     }
 
     public void PlaySound(Enums.Sounds sound) {

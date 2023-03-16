@@ -9,49 +9,125 @@ public class SettingButtonManager : MonoBehaviour {
 
     private Settings Settings => Settings.Instance;
 
-    public void SetVolumeMusic(Slider slider) {
-        Settings.VolumeMusic = slider.value;
-        Settings.SaveSettingsToPreferences();
+
+    //---GRAPHICS CALLBACKS
+    public void Graphics_Option_FullscreenResolution() {
+
+    }
+
+    public void Graphics_Option_WindowMode() {
+
+    }
+
+    public void Graphics_Toggle_NDSResolution() {
+
+    }
+
+    public void Graphics_Toggle_NDSResolutionFourByThree() {
+
+    }
+
+    public void Graphics_Toggle_VSync() {
+
+    }
+
+    public void Graphics_Slider_MaxFramerate() {
+
+    }
+
+    public void Graphics_Toggle_PlayerOutlines() {
+
+    }
+
+    //---AUDIO CALLBACKS
+    public void Audio_Slider_MasterVolume(Slider slider) {
+        Settings.AudioMasterVolume = slider.value;
+        Settings.SaveSettings();
+    }
+
+    public void Audio_Slider_MusicVolume(Slider slider) {
+        Settings.AudioMusicVolume = slider.value;
+        Settings.SaveSettings();
+    }
+
+    public void Audio_Slider_SFXVolume(Slider slider) {
+        Settings.AudioSFXVolume = slider.value;
+        Settings.SaveSettings();
+    }
+
+    public void Audio_Toggle_MuteMusicOnUnfocus() {
+
+    }
+
+    public void Audio_Toggle_MuteSFXOnUnfocus() {
+
+    }
+
+    public void Audio_Toggle_DirectionalAudio() {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public void SetVolumeMusic(Slider slider) {
+        Settings.AudioMusicVolume = slider.value;
+        Settings.SaveSettings();
     }
 
     public void SetVolumeSFX(Slider slider) {
-        Settings.VolumeSFX = slider.value;
-        Settings.SaveSettingsToPreferences();
+        Settings.AudioSFXVolume = slider.value;
+        Settings.SaveSettings();
     }
 
     public void SetVolumeMaster(Slider slider) {
-        Settings.VolumeMaster = slider.value;
-        Settings.SaveSettingsToPreferences();
+        Settings.AudioMasterVolume = slider.value;
+        Settings.SaveSettings();
     }
 
     public void OnNdsResolutionToggle(Toggle toggle) {
-        MainMenuManager.Instance.aspectToggle.interactable = Settings.ndsResolution = toggle.isOn;
-        Settings.SaveSettingsToPreferences();
+        MainMenuManager.Instance.aspectToggle.interactable = Settings.graphicsNdsEnabled = toggle.isOn;
+        Settings.SaveSettings();
     }
 
     public void OnAspectToggle(Toggle toggle) {
-        Settings.fourByThreeRatio = toggle.isOn;
-        Settings.SaveSettingsToPreferences();
+        Settings.graphicsNdsForceAspect = toggle.isOn;
+        Settings.SaveSettings();
     }
 
     public void OnFireballToggle(Toggle toggle) {
-        Settings.fireballFromSprint = toggle.isOn;
-        Settings.SaveSettingsToPreferences();
+        Settings.controlsFireballSprint = toggle.isOn;
+        Settings.SaveSettings();
     }
 
     public void OnAutoSprintToggle(Toggle toggle) {
-        Settings.autoSprint = toggle.isOn;
-        Settings.SaveSettingsToPreferences();
+        Settings.controlsAutoSprint = toggle.isOn;
+        Settings.SaveSettings();
     }
 
     public void OnScoreboardToggle(Toggle toggle) {
-        Settings.scoreboardAlways = toggle.isOn;
-        Settings.SaveSettingsToPreferences();
+        Settings.genericScoreboardAlways = toggle.isOn;
+        Settings.SaveSettings();
     }
 
     public void OnChatFilterToggle(Toggle toggle) {
-        Settings.chatFiltering = toggle.isOn;
-        Settings.SaveSettingsToPreferences();
+        Settings.genericChatFiltering = toggle.isOn;
+        Settings.SaveSettings();
     }
 
     public void OnFullscreenToggle(Toggle toggle) {
@@ -68,8 +144,8 @@ public class SettingButtonManager : MonoBehaviour {
 
     public void OnVsyncToggle(Toggle toggle) {
         Settings settings = Settings.Instance;
-        settings.vsync = toggle.isOn;
+        //settings.vsync = toggle.isOn;
         QualitySettings.vSyncCount = toggle.isOn ? 1 : 0;
-        settings.SaveSettingsToPreferences();
+        settings.SaveSettings();
     }
 }

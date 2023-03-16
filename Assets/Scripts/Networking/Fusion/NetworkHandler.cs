@@ -313,11 +313,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             Debug.Log($"[Network] Creating a game in {CurrentRegion} with the ID {idBuilder}");
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
-            args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname);
+            args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname);
             args.PlayerCount = 9;
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
-            args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.nickname;
+            args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname;
             args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;
 
             // Attempt to create the room
@@ -352,7 +352,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         StartGameResult result = await Runner.StartGame(new() {
             GameMode = GameMode.Client,
             SessionName = roomId,
-            ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.nickname),
+            ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname),
             DisableClientSessionCreation = true,
         });
         Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");

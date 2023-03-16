@@ -45,7 +45,7 @@ public class UserNametag : MonoBehaviour {
         Vector3 screenPoint = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;
         screenPoint.z = 0;
 
-        if (Settings.Instance.ndsResolution && Settings.Instance.fourByThreeRatio) {
+        if (Settings.Instance.graphicsNdsEnabled && Settings.Instance.graphicsNdsForceAspect) {
             // handle black borders
             float screenW = Screen.width;
             float screenH = Screen.height;

@@ -16,10 +16,10 @@ public class ResizeToFit : MonoBehaviour {
     }
 
     public void LateUpdate() {
-        if (!Settings.Instance.ndsResolution)
+        if (!Settings.Instance.graphicsNdsEnabled)
             return;
 
-        if (Settings.Instance.fourByThreeRatio)
+        if (Settings.Instance.graphicsNdsForceAspect)
             SizeToParent(aspect);
         else
             SizeToParent(Camera.main.aspect);

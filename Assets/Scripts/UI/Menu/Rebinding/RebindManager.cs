@@ -64,9 +64,9 @@ namespace NSMB.Rebinding {
                 button.UpdateText();
             }
 
-            Settings.Instance.fireballFromSprint = fireballToggle.isOn = true;
-            Settings.Instance.autoSprint = autosprintToggle.isOn = false;
-            Settings.Instance.SaveSettingsToPreferences();
+            Settings.Instance.controlsFireballSprint = fireballToggle.isOn = true;
+            Settings.Instance.controlsAutoSprint = autosprintToggle.isOn = false;
+            Settings.Instance.SaveSettings();
             SaveRebindings();
         }
 

@@ -23,7 +23,7 @@ public class HorizontalCamera : MonoBehaviour {
     public void Update() {
         SizeIncreaseCurrent = Mathf.SmoothDamp(SizeIncreaseCurrent, SizeIncreaseTarget, ref SizeIncreaseVelocity, 1f);
         AdjustCamera();
-        ourCamera.targetTexture = renderToTextureIfAvailable && Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0
+        ourCamera.targetTexture = renderToTextureIfAvailable && Settings.Instance.graphicsNdsEnabled && SceneManager.GetActiveScene().buildIndex != 0
             ? GlobalController.Instance.ndsTexture
             : null;
     }

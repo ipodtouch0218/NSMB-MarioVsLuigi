@@ -14,8 +14,9 @@ namespace NSMB.UI.Pause.Loaders {
             spo.options.Clear();
 
             IEnumerable<string> newOptions =
-                Screen.resolutions.
-                Select(res => res.width + "x" + res.height);
+                Screen.resolutions
+                .Select(res => res.width + "x" + res.height)
+                .Distinct();
 
             spo.options.AddRange(newOptions);
 
@@ -28,7 +29,15 @@ namespace NSMB.UI.Pause.Loaders {
                 }
             }
 
-            spo.ChangeIndex(index);
+            spo.SetValue(index, false);
+        }
+
+        public override void OnValueChanged(PauseOption option, object previous) {
+            if (option is not ScrollablePauseOption spo)
+                return;
+
+            var res = Screen.resolutions[spo.value];
+            Screen.SetResolution(res.width, res.height, Screen.fullScreen);
         }
     }
 }

@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+using Mono.Cecil.Cil;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -77,6 +79,7 @@ namespace NSMB.UI.Pause.Options {
 
             Back = true;
             SetCurrentOption(-1);
+            SelectedTab.Unhighlighted();
             GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
         }
 
@@ -115,11 +118,16 @@ namespace NSMB.UI.Pause.Options {
 
             if (Back && (down || right)) {
                 Back = false;
-                if (right && currentTabIndex != 0) {
-                    SetTab(0, false);
+                if (right) {
+                    if (currentTabIndex != 0)
+                        SetTab(0, false);
+                    else
+                        SelectedTab.Highlighted();
                 }
                 if (down) {
                     SetCurrentOption(0);
+                    if (currentOptionIndex == -1)
+                        SelectedTab.Highlighted();
                 }
                 GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
                 return;
@@ -144,6 +152,7 @@ namespace NSMB.UI.Pause.Options {
                     // Enable the back button
                     Back = true;
                     SetCurrentOption(-1);
+                    SelectedTab.Unhighlighted();
                     GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
                 }
                 int newTabIndex = Mathf.Clamp(currentTabIndex + (left ? -1 : 1), 0, tabs.Count - 1);
@@ -166,6 +175,12 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void CloseMenu() {
+            if (SelectedTab)
+                SelectedTab.Deselected();
+
+            if (SelectedOption)
+                SelectedOption.Deselected();
+
             gameObject.SetActive(false);
             GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
         }

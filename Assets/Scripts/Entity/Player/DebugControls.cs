@@ -62,10 +62,10 @@ public class DebugControls : MonoBehaviour {
             group.alpha = 1f - group.alpha;
         }
         if (kb[Key.Y].wasPressedThisFrame) {
-            Settings.Instance.ndsResolution = !Settings.Instance.ndsResolution;
+            Settings.Instance.graphicsNdsEnabled = !Settings.Instance.graphicsNdsEnabled;
         }
         if (kb[Key.U].wasPressedThisFrame) {
-            Settings.Instance.fourByThreeRatio = !Settings.Instance.fourByThreeRatio;
+            Settings.Instance.graphicsNdsForceAspect = !Settings.Instance.graphicsNdsForceAspect;
         }
         if (kb[Key.I].wasPressedThisFrame) {
             feature.SetActive(!feature.isActive);
