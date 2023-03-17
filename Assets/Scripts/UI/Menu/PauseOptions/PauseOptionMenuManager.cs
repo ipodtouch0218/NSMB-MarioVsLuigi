@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-using Mono.Cecil.Cil;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -229,10 +227,10 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void SetTab(int index, bool sound = true) {
+            SetCurrentOption(-1);
+
             if (currentTabIndex == index)
                 return;
-
-            SetCurrentOption(-1);
 
             if (SelectedTab)
                 SelectedTab.Deselected();

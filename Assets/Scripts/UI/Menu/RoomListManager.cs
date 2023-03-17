@@ -42,7 +42,7 @@ public class RoomListManager : MonoBehaviour {
 
     public void SelectRoom(RoomIcon room) {
         SelectedRoom = room;
-        joinRoomButton.interactable = SelectedRoom && Settings.Instance.ValidNickname;
+        joinRoomButton.interactable = SelectedRoom && Settings.Instance.genericNickname.IsValidUsername(false);
     }
 
     public void JoinSelectedRoom() {

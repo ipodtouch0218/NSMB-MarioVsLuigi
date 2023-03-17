@@ -14,7 +14,7 @@ namespace NSMB.UI.Pause.Options {
         private PropertyInfo property;
 
         public override void LoadOptions(PauseOption option) {
-            if (option is not O oOption)
+            if (option is not O optionType)
                 return;
 
             if (string.IsNullOrEmpty(fieldName))
@@ -33,22 +33,20 @@ namespace NSMB.UI.Pause.Options {
                 value = (V) field.GetValue(Settings.Instance);
             }
 
-            SetValue(oOption, value);
+            SetValue(optionType, value);
         }
 
         public abstract void SetValue(O pauseOption, V value);
         public abstract V GetValue(O pauseOption);
 
-        public override void OnValueChanged(PauseOption option, object previousValue) {
-            if (option is not O oOption)
+        public override void OnValueChanged(PauseOption option, object newValue) {
+            if (option is not O optionType)
                 return;
 
-            V value = GetValue(oOption);
+            V value = GetValue(optionType);
 
             field?.SetValue(Settings.Instance, value);
             property?.SetValue(Settings.Instance, value);
-
-            Settings.Instance.SaveSettings();
         }
     }
 }

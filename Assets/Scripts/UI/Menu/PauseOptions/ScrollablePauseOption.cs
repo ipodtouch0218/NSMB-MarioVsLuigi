@@ -47,7 +47,11 @@ namespace NSMB.UI.Pause.Options {
 
             if (callback && previous != value) {
                 OnValueChanged?.Invoke();
-                loader?.OnValueChanged(this, previous);
+
+                if (loader)
+                    loader.OnValueChanged(this, value);
+
+                Settings.Instance.SaveSettings();
             }
         }
     }

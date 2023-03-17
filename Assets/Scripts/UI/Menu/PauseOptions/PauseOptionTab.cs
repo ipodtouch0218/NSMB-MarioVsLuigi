@@ -24,6 +24,7 @@ namespace NSMB.UI.Pause.Options {
         public virtual void Selected() {
             foreach (PauseOption option in options) {
                 option.gameObject.SetActive(true);
+                option.Deselected();
             }
             text.color = selectedTextColor;
             image.sprite = selectedSprite;

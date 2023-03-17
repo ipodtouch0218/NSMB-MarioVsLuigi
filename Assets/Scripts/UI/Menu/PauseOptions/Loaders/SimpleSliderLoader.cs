@@ -7,7 +7,7 @@ namespace NSMB.UI.Pause.Loaders {
         }
 
         public override void SetValue(SliderPauseOption pauseOption, float value) {
-            pauseOption.slider.value = value;
+            pauseOption.slider.SetValueWithoutNotify(value);
         }
     }
 }

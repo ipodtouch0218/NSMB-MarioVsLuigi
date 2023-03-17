@@ -4,7 +4,7 @@ using UnityEngine.Audio;
 
 using NSMB.Utils;
 using System.Linq;
-using UnityEngine.Rendering.Universal;
+using System.Xml.Serialization;
 
 public class Settings : Singleton<Settings> {
 
@@ -59,7 +59,25 @@ public class Settings : Singleton<Settings> {
 
     public int GraphicsFullscreenMode {
         get => (int) Screen.fullScreenMode;
-        set => Screen.fullScreenMode = (FullScreenMode) value;
+        set {
+            FullScreenMode mode = (FullScreenMode) value;
+
+            if (mode == FullScreenMode.Windowed) {
+                if (Screen.fullScreenMode == FullScreenMode.Windowed)
+                    return;
+
+                Screen.SetResolution(GlobalController.Instance.windowWidth, GlobalController.Instance.windowHeight, mode);
+                return;
+            } else {
+                string[] split = GraphicsFullscreenResolution.Split(',');
+                if (split.Length != 2)
+                    return;
+
+                int width = int.Parse(split[0]);
+                int height = int.Parse(split[1]);
+                Screen.SetResolution(width, height, mode);
+            }
+        }
     }
 
     public bool GraphicsVsync {
@@ -103,32 +121,32 @@ public class Settings : Singleton<Settings> {
 
     public void SaveSettings() {
         //Generic
-        PlayerPrefs.SetString("Generic.Nickname", genericNickname);
-        PlayerPrefs.SetInt("Generic.ScoreboardAlwaysVisible", genericScoreboardAlways ? 1 : 0);
-        PlayerPrefs.SetInt("Generic.ChatFilter", genericChatFiltering ? 1 : 0);
-        PlayerPrefs.SetInt("Generic.Character", genericCharacter);
-        PlayerPrefs.SetInt("Generic.Skin", genericSkin);
+        PlayerPrefs.SetString("Generic_Nickname", genericNickname);
+        PlayerPrefs.SetInt("Generic_ScoreboardAlwaysVisible", genericScoreboardAlways ? 1 : 0);
+        PlayerPrefs.SetInt("Generic_ChatFilter", genericChatFiltering ? 1 : 0);
+        PlayerPrefs.SetInt("Generic_Character", genericCharacter);
+        PlayerPrefs.SetInt("Generic_Skin", genericSkin);
 
         //Graphics
-        PlayerPrefs.SetString("Graphics.FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
-        PlayerPrefs.SetInt("Graphics.FullscreenMode", GraphicsFullscreenMode);
-        PlayerPrefs.SetInt("Graphics.NDS.Enabled", graphicsNdsEnabled ? 1 : 0);
-        PlayerPrefs.SetInt("Graphics.NDS.ForceAspect", graphicsNdsForceAspect ? 1 : 0);
-        PlayerPrefs.SetInt("Graphics.VSync", GraphicsVsync ? 1 : 0);
-        PlayerPrefs.SetInt("Graphics.MaxFPS", GraphicsMaxFps);
-        PlayerPrefs.SetInt("Graphics.PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
+        PlayerPrefs.SetString("Graphics_FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
+        PlayerPrefs.SetInt("Graphics_FullscreenMode", GraphicsFullscreenMode);
+        PlayerPrefs.SetInt("Graphics_NDS_Enabled", graphicsNdsEnabled ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_NDS_ForceAspect", graphicsNdsForceAspect ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_VSync", GraphicsVsync ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_MaxFPS", GraphicsMaxFps);
+        PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
 
         //Audio
-        PlayerPrefs.SetFloat("Audio.MasterVolume", AudioMasterVolume);
-        PlayerPrefs.SetFloat("Audio.MusicVolume", AudioMusicVolume);
-        PlayerPrefs.SetFloat("Audio.SFXVolume", AudioSFXVolume);
-        PlayerPrefs.SetInt("Audio.MuteMusicOnUnfocus", audioMuteMusicOnUnfocus ? 1 : 0);
-        PlayerPrefs.SetInt("Audio.MuteSFXOnUnfocus", audioMuteSFXOnUnfocus ? 1 : 0);
-        PlayerPrefs.SetInt("Audio.Panning", audioPanning ? 1 : 0);
+        PlayerPrefs.SetFloat("Audio_MasterVolume", AudioMasterVolume);
+        PlayerPrefs.SetFloat("Audio_MusicVolume", AudioMusicVolume);
+        PlayerPrefs.SetFloat("Audio_SFXVolume", AudioSFXVolume);
+        PlayerPrefs.SetInt("Audio_MuteMusicOnUnfocus", audioMuteMusicOnUnfocus ? 1 : 0);
+        PlayerPrefs.SetInt("Audio_MuteSFXOnUnfocus", audioMuteSFXOnUnfocus ? 1 : 0);
+        PlayerPrefs.SetInt("Audio_Panning", audioPanning ? 1 : 0);
 
         //Controls
-        PlayerPrefs.SetInt("Controls.FireballFromSprint", controlsFireballSprint ? 1 : 0);
-        PlayerPrefs.SetInt("Controls.AutoSprint", controlsAutoSprint ? 1 : 0);
+        PlayerPrefs.SetInt("Controls_FireballFromSprint", controlsFireballSprint ? 1 : 0);
+        PlayerPrefs.SetInt("Controls_AutoSprint", controlsAutoSprint ? 1 : 0);
         PlayerPrefs.Save();
     }
 
@@ -139,8 +157,7 @@ public class Settings : Singleton<Settings> {
     }
 
     public void LoadSettings() {
-        int version = PlayerPrefs.GetInt("version", 0);
-        for (int i = version; i < VersionUpdaters.Count(); i++) {
+        for (int i = 0; i < VersionUpdaters.Count(); i++) {
             VersionUpdaters[i]();
             SaveSettings();
         }
@@ -174,7 +191,7 @@ public class Settings : Singleton<Settings> {
         graphicsNdsEnabled = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
         graphicsNdsForceAspect = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
         GraphicsVsync = PlayerPrefs.GetInt("VSync", 0) == 1;
-        GraphicsMaxFps = -1;
+        GraphicsMaxFps = 0;
         GraphicsPlayerOutlines = true;
 
         AudioMasterVolume = PlayerPrefs.GetFloat("volumeMaster", 0.75f);
@@ -186,36 +203,39 @@ public class Settings : Singleton<Settings> {
 
         controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         controlsAutoSprint = false;
+
+        MassDeleteKeys("Nickname", "ScoreboardAlwaysVisible", "ChatFilter", "Character", "Skin", "NDSResolution",
+            "NDS4by3", "VSync", "volumeMaster", "volumeMusic", "volumeSFX", "FireballFromSprint");
     }
 
     public void LoadFromVersion1() {
         //Generic
-        GetIfExists("Generic.Nickname", out genericNickname);
-        GetIfExists("Generic.ScoreboardAlwaysVisible", out genericScoreboardAlways);
-        GetIfExists("Generic.ChatFilter", out genericChatFiltering);
-        GetIfExists("Generic.Character", out genericCharacter);
-        GetIfExists("Generic.Skin", out genericSkin);
+        GetIfExists("Generic_Nickname", out genericNickname);
+        GetIfExists("Generic_ScoreboardAlwaysVisible", out genericScoreboardAlways);
+        GetIfExists("Generic_ChatFilter", out genericChatFiltering);
+        GetIfExists("Generic_Character", out genericCharacter);
+        GetIfExists("Generic_Skin", out genericSkin);
 
         //Graphics
-        if (GetIfExists("Graphics.FullscreenMode", out int tempFullscreenMode)) GraphicsFullscreenMode = tempFullscreenMode;
-        if (GetIfExists("Graphics.FullscreenResolution", out string tempFullscreenResolution)) GraphicsFullscreenResolution = tempFullscreenResolution;
-        GetIfExists("Graphics.NDS.Enabled", out graphicsNdsEnabled);
-        GetIfExists("Graphics.NDS.ForceAspect", out graphicsNdsForceAspect);
-        if (GetIfExists("Graphics.MaxFPS", out int tempMaxFps)) GraphicsMaxFps = tempMaxFps;
-        if (GetIfExists("Graphics.VSync", out bool tempVsync)) GraphicsVsync = tempVsync;
-        if (GetIfExists("Graphics.PlayerOutlines", out bool tempOutlines)) GraphicsPlayerOutlines = tempOutlines;
+        if (GetIfExists("Graphics_FullscreenMode", out int tempFullscreenMode)) GraphicsFullscreenMode = tempFullscreenMode;
+        if (GetIfExists("Graphics_FullscreenResolution", out string tempFullscreenResolution)) GraphicsFullscreenResolution = tempFullscreenResolution;
+        GetIfExists("Graphics_NDS_Enabled", out graphicsNdsEnabled);
+        GetIfExists("Graphics_NDS_ForceAspect", out graphicsNdsForceAspect);
+        if (GetIfExists("Graphics_MaxFPS", out int tempMaxFps)) GraphicsMaxFps = tempMaxFps;
+        if (GetIfExists("Graphics_VSync", out bool tempVsync)) GraphicsVsync = tempVsync;
+        if (GetIfExists("Graphics_PlayerOutlines", out bool tempOutlines)) GraphicsPlayerOutlines = tempOutlines;
 
         //Audio
-        if (GetIfExists("Audio.MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;
-        if (GetIfExists("Audio.MusicVolume", out float tempMusicVolume)) AudioMusicVolume = tempMusicVolume;
-        if (GetIfExists("Audio.SFXVolume", out float tempSFXVolume)) AudioSFXVolume = tempSFXVolume;
-        GetIfExists("Audio.MuteMusicOnUnfocus", out audioMuteMusicOnUnfocus);
-        GetIfExists("Audio.MuteSFXOnUnfocus", out audioMuteSFXOnUnfocus);
-        GetIfExists("Audio.Panning", out audioPanning);
+        if (GetIfExists("Audio_MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;
+        if (GetIfExists("Audio_MusicVolume", out float tempMusicVolume)) AudioMusicVolume = tempMusicVolume;
+        if (GetIfExists("Audio_SFXVolume", out float tempSFXVolume)) AudioSFXVolume = tempSFXVolume;
+        GetIfExists("Audio_MuteMusicOnUnfocus", out audioMuteMusicOnUnfocus);
+        GetIfExists("Audio_MuteSFXOnUnfocus", out audioMuteSFXOnUnfocus);
+        GetIfExists("Audio_Panning", out audioPanning);
 
         //Controls
-        GetIfExists("Controls.FireballFromSprint", out controlsFireballSprint);
-        GetIfExists("Controls.AutoSprint", out controlsAutoSprint);
+        GetIfExists("Controls_FireballFromSprint", out controlsFireballSprint);
+        GetIfExists("Controls_AutoSprint", out controlsAutoSprint);
     }
 
     private bool GetIfExists(string key, out string value) {
@@ -256,5 +276,11 @@ public class Settings : Singleton<Settings> {
 
         value = PlayerPrefs.GetInt(key) == 1;
         return true;
+    }
+
+    private void MassDeleteKeys(params string[] keys) {
+        foreach (string key in keys)
+            PlayerPrefs.DeleteKey(key);
+        PlayerPrefs.Save();
     }
 }

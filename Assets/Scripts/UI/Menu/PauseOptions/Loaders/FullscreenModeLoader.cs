@@ -46,20 +46,17 @@ namespace NSMB.UI.Pause.Loaders {
             spo.SetValue(index, false);
         }
 
-        public override void OnValueChanged(PauseOption option, object previousValue) {
+        public override void OnValueChanged(PauseOption option, object newValue) {
             if (option is not ScrollablePauseOption spo)
                 return;
 
-            int previous = (int) previousValue;
             int value = spo.value;
             FullScreenMode newMode = validModes[value];
 
-            if (previous != value) {
-                if (newMode == FullScreenMode.Windowed) {
-                    Screen.SetResolution(GlobalController.Instance.windowWidth, GlobalController.Instance.windowHeight, false);
-                } else {
-                    Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, newMode);
-                }
+            if (newMode == FullScreenMode.Windowed) {
+                Screen.SetResolution(GlobalController.Instance.windowWidth, GlobalController.Instance.windowHeight, false);
+            } else {
+                Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, newMode);
             }
         }
     }

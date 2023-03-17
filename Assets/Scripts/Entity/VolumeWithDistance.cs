@@ -8,10 +8,9 @@ public class VolumeWithDistance : MonoBehaviour {
     [SerializeField] private AudioSource[] audioSources;
     [SerializeField] private Transform soundOrigin;
     [SerializeField] private float soundRange = 12f;
-    //[SerializeField] private float maxPanning = 0.8f;
+    [SerializeField] private float maxPanning = 0.8f;
 
     private float soundRangeInverse;
-    private float maxPanning = 0.8f;
 
     public void OnValidate() => Awake();
 
@@ -35,7 +34,7 @@ public class VolumeWithDistance : MonoBehaviour {
 
         float percentage = 1f - (distance * soundRangeInverse);
         float volume = Utils.QuadraticEaseOut(percentage);
-        float panning = Utils.QuadraticEaseOut(-xDifference * soundRangeInverse) * maxPanning;
+        float panning = Settings.Instance.audioPanning ? Utils.QuadraticEaseOut(-xDifference * soundRangeInverse) * maxPanning : 0f;
 
         foreach (AudioSource source in audioSources) {
             source.volume = volume;

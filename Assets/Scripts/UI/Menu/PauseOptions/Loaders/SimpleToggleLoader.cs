@@ -7,7 +7,7 @@ namespace NSMB.UI.Pause.Loaders {
         }
 
         public override void SetValue(TogglePauseOption pauseOption, bool value) {
-            pauseOption.toggle.isOn = value;
+            pauseOption.toggle.SetIsOnWithoutNotify(value);
         }
     }
 }

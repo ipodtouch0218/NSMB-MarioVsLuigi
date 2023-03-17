@@ -13,17 +13,18 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void Awake() {
-            toggle.onValueChanged.AddListener(CallOnChanged);
+            toggle.onValueChanged.AddListener(OnToggleValueChanged);
         }
 
         public override void OnClick() {
             toggle.isOn = !toggle.isOn;
-            CallOnChanged(toggle.isOn);
         }
 
-        public void CallOnChanged(bool value) {
+        public void OnToggleValueChanged(bool value) {
             if (loader)
-                loader.OnValueChanged(this, !value);
+                loader.OnValueChanged(this, value);
+
+            Settings.Instance.SaveSettings();
         }
     }
 }

@@ -626,6 +626,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         } else {
             ColorBlock colors = nicknameField.colors;
             colors.normalColor = Color.white;
+            colors.highlightedColor = new(0.7f, 0.7f, 0.7f, 1);
             nicknameField.colors = colors;
         }
     }
@@ -642,8 +643,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void Quit() {
-        if (quitCoroutine == null)
-            quitCoroutine = StartCoroutine(FinishQuitting());
+        quitCoroutine ??= StartCoroutine(FinishQuitting());
     }
 
     private IEnumerator FinishQuitting() {

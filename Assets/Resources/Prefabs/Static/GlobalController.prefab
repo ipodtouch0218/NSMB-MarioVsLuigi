@@ -8093,11 +8093,8 @@ MonoBehaviour:
   genericSkin: 0
   genericScoreboardAlways: 0
   genericChatFiltering: 0
-  graphicsFullscreenResolution: 
-  graphicsFullscreenMode: 0
   graphicsNdsEnabled: 0
   graphicsNdsForceAspect: 0
-  graphicsPlayerOutlines: 0
   audioMuteMusicOnUnfocus: 0
   audioMuteSFXOnUnfocus: 0
   audioPanning: 0
@@ -8864,6 +8861,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6036977198078649523}
   - component: {fileID: 741476365933484402}
+  - component: {fileID: 852923079013994160}
   m_Layer: 0
   m_Name: AudioMusicVolume
   m_TagString: Untagged
@@ -8907,8 +8905,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 1639122728262565370}
   label: {fileID: 8391411537502836044}
-  loader: {fileID: 0}
+  loader: {fileID: 852923079013994160}
   slider: {fileID: 1496548819257921054}
+--- !u!114 &852923079013994160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970950269207908408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c23e65cc52e45d40a3104818308bc7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fieldName: AudioMusicVolume
 --- !u!1 &2037932724986744989
 GameObject:
   m_ObjectHideFlags: 0
@@ -9754,6 +9765,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2970493785311276882}
   - component: {fileID: 6134921613847221878}
+  - component: {fileID: 3042663950173116828}
   m_Layer: 0
   m_Name: AudioMasterVolume
   m_TagString: Untagged
@@ -9797,8 +9809,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 1639122728262565370}
   label: {fileID: 9103576172508027373}
-  loader: {fileID: 0}
+  loader: {fileID: 3042663950173116828}
   slider: {fileID: 8843731649553317982}
+--- !u!114 &3042663950173116828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2281447618164142310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c23e65cc52e45d40a3104818308bc7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fieldName: AudioMasterVolume
 --- !u!1 &2281564462965489971
 GameObject:
   m_ObjectHideFlags: 0
@@ -12146,8 +12171,8 @@ RectTransform:
   m_Father: {fileID: 2671707853640636631}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.695, y: 0}
-  m_AnchorMax: {x: 0.695, y: 1}
+  m_AnchorMin: {x: 0.6949695, y: 0}
+  m_AnchorMax: {x: 0.6949695, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 37.5, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -12181,7 +12206,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: -1315510071, guid: 49098f7ff250eda4a8c1d4fc85836d89, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -12625,8 +12650,8 @@ RectTransform:
   m_Father: {fileID: 3256415729822254310}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.695, y: 0}
-  m_AnchorMax: {x: 0.695, y: 1}
+  m_AnchorMin: {x: 0.6949695, y: 0}
+  m_AnchorMax: {x: 0.6949695, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 37.5, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -12660,7 +12685,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: -1315510071, guid: 49098f7ff250eda4a8c1d4fc85836d89, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -12970,7 +12995,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 3991678395262423160}
   m_HandleRect: {fileID: 2804768920806904246}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.0001
   m_MaxValue: 1
   m_WholeNumbers: 0
   m_Value: 0.695
@@ -15797,7 +15822,7 @@ RectTransform:
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.695, y: 1}
+  m_AnchorMax: {x: 0.6949695, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -16429,7 +16454,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 4311337450967804521}
   m_HandleRect: {fileID: 4942505118251576698}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.0001
   m_MaxValue: 1
   m_WholeNumbers: 0
   m_Value: 0.695
@@ -17955,8 +17980,8 @@ RectTransform:
   m_Father: {fileID: 7546030577241828921}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.695, y: 0}
-  m_AnchorMax: {x: 0.695, y: 1}
+  m_AnchorMin: {x: 0.6949695, y: 0}
+  m_AnchorMax: {x: 0.6949695, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 37.5, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -17990,7 +18015,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: -1315510071, guid: 49098f7ff250eda4a8c1d4fc85836d89, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -19904,7 +19929,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: -1315510071, guid: 49098f7ff250eda4a8c1d4fc85836d89, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -19946,7 +19971,7 @@ RectTransform:
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.695, y: 1}
+  m_AnchorMax: {x: 0.6949695, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -21350,7 +21375,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 5337675183470383697}
   m_HandleRect: {fileID: 8141725034548531360}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.0001
   m_MaxValue: 1
   m_WholeNumbers: 0
   m_Value: 0.695
@@ -23388,7 +23413,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: -1315510071, guid: 49098f7ff250eda4a8c1d4fc85836d89, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -23544,7 +23569,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4e112e117f2f0e43894cd0050bda463, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fieldName: graphicsPlayerOutlines
+  fieldName: GraphicsPlayerOutlines
 --- !u!1 &5730159635392656699
 GameObject:
   m_ObjectHideFlags: 0
@@ -24091,7 +24116,7 @@ RectTransform:
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.695, y: 1}
+  m_AnchorMax: {x: 0.6949695, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -26748,6 +26773,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6713096041018717550}
   - component: {fileID: 2629030813878993983}
+  - component: {fileID: 6286483970983854371}
   m_Layer: 0
   m_Name: GraphicsLimitFramerate
   m_TagString: Untagged
@@ -26792,13 +26818,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 1639122728262565370}
   label: {fileID: 50652531967479398}
-  loader: {fileID: 0}
+  loader: {fileID: 6286483970983854371}
   slider: {fileID: 7502158644093253967}
   valueLabel: {fileID: 8634822354217227490}
   numberMultiplier: 5
   numberFormat: F0
   zeroOverride: 
   maxOverride: Off
+--- !u!114 &6286483970983854371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6312618182761928149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae98d8e7dcabcd54f802316bedf6e718, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6312638822179082398
 GameObject:
   m_ObjectHideFlags: 0
@@ -30894,7 +30932,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: -1315510071, guid: 49098f7ff250eda4a8c1d4fc85836d89, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -32139,6 +32177,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6129031881614075398}
   - component: {fileID: 2205691763459803675}
+  - component: {fileID: 2177300723113066843}
   m_Layer: 0
   m_Name: AudioSfxVolume
   m_TagString: Untagged
@@ -32182,8 +32221,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 1639122728262565370}
   label: {fileID: 7477200452413456830}
-  loader: {fileID: 0}
+  loader: {fileID: 2177300723113066843}
   slider: {fileID: 8337809876621811842}
+--- !u!114 &2177300723113066843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7760174668844892336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c23e65cc52e45d40a3104818308bc7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fieldName: AudioSFXVolume
 --- !u!1 &7823788606767178777
 GameObject:
   m_ObjectHideFlags: 0

@@ -143,10 +143,10 @@ TextureImporter:
       name: slider_1
       rect:
         serializedVersion: 2
-        x: 6
-        y: 7
-        width: 9
-        height: 9
+        x: 4
+        y: 3
+        width: 12
+        height: 12
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 4, y: 4, z: 4, w: 4}
@@ -169,7 +169,7 @@ TextureImporter:
         width: 4
         height: 3
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 1, y: 1, z: 1, w: 1}
       outline: []
       physicsShape: []
