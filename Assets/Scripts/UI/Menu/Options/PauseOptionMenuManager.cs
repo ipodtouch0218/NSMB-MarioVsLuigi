@@ -62,7 +62,7 @@ namespace NSMB.UI.Pause.Options {
                 return;
 
             ControlSystem.controls.UI.Navigate.performed -= OnNavigate;
-            ControlSystem.controls.UI.Navigate.canceled += OnNavigate;
+            ControlSystem.controls.UI.Navigate.canceled -= OnNavigate;
             ControlSystem.controls.UI.Cancel.performed -= OnCancel;
             ControlSystem.controls.UI.Submit.performed -= OnSubmit;
 
@@ -72,8 +72,10 @@ namespace NSMB.UI.Pause.Options {
         }
 
         private void OnCancel(InputAction.CallbackContext context) {
-            if (Back)
+            if (Back) {
+                CloseMenu();
                 return;
+            }
 
             Back = true;
             SetCurrentOption(-1);
@@ -168,8 +170,8 @@ namespace NSMB.UI.Pause.Options {
             currentTabIndex = -1;
             currentOptionIndex = -1;
             Back = false;
-            SetTab(0);
-            SetCurrentOption(0);
+            SetTab(0, false);
+            //SetCurrentOption(0);
         }
 
         public void CloseMenu() {
@@ -194,7 +196,7 @@ namespace NSMB.UI.Pause.Options {
             int original = currentOptionIndex;
             currentOptionIndex = index;
 
-            while ((!SelectedOption || SelectedOption is DividerOption) && index >= 0 && index < SelectedTab.options.Count) {
+            while ((!SelectedOption || SelectedOption is NonselectableOption) && index >= 0 && index < SelectedTab.options.Count) {
                 currentOptionIndex += direction;
             }
 

@@ -21,6 +21,9 @@ public class VolumeWithDistance : MonoBehaviour {
     public void LateUpdate() {
 
         GameManager inst = GameManager.Instance;
+        if (!inst)
+            return;
+
         Vector3 listener = (inst != null && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
 
         float distance = Utils.WrappedDistance(listener, soundOrigin.position, out float xDifference);

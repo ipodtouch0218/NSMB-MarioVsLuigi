@@ -37,7 +37,6 @@ namespace NSMB.UI.Pause.Loaders {
                     validModes = new[] { FullScreenMode.FullScreenWindow };
                     break;
                 }
-                return;
             }
 
             spo.options.AddRange(validModes.Select(fsm => FullscreenDisplayNames[(int) fsm]));

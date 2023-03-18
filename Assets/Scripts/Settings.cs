@@ -159,8 +159,8 @@ public class Settings : Singleton<Settings> {
     public void LoadSettings() {
         for (int i = 0; i < VersionUpdaters.Count(); i++) {
             VersionUpdaters[i]();
-            SaveSettings();
         }
+        SaveSettings();
     }
 
     private void LoadFromVersion0() {

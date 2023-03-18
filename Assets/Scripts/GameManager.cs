@@ -88,6 +88,7 @@ public class GameManager : NetworkBehaviour {
     private readonly List<GameObject> activeStarSpawns = new();
     private GameObject[] starSpawns;
     private bool hurryUpSoundPlayed;
+    private bool pauseStateLastFrame, optionsWereOpenLastFrame;
 
     //---Components
     public SpectationManager spectationManager;
@@ -264,6 +265,11 @@ public class GameManager : NetworkBehaviour {
                     sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
             }
         }
+    }
+
+    public void Update() {
+        pauseStateLastFrame = paused;
+        optionsWereOpenLastFrame = GlobalController.Instance.optionsManager.gameObject.activeSelf;
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
@@ -597,19 +603,20 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void OnPause(InputAction.CallbackContext context) {
-        Pause();
-    }
-
-    public void Pause() {
-        if (GameState != Enums.GameState.Playing || !IsMusicEnabled)
+        if (optionsWereOpenLastFrame)
             return;
 
-        paused = !paused;
+        Pause(!pauseStateLastFrame);
+    }
+
+    public void Pause(bool newState) {
+        if (paused == newState || GameState != Enums.GameState.Playing)
+            return;
+
+        paused = newState;
         sfx.PlayOneShot(Enums.Sounds.UI_Pause);
         pauseUI.SetActive(paused);
-        pausePanel.SetActive(true);
-        hostExitUI.SetActive(false);
-        EventSystem.current.SetSelectedGameObject(pauseButton);
+        pausePanel.SetActive(paused);
     }
 
     //---UI Callbacks
@@ -619,7 +626,7 @@ public class GameManager : NetworkBehaviour {
             return;
         }
 
-        //prompt for ending game or leaving
+        // Prompt for ending game or leaving
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         pausePanel.SetActive(false);
         hostExitUI.SetActive(true);
@@ -642,6 +649,11 @@ public class GameManager : NetworkBehaviour {
         hostExitUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Back);
         EventSystem.current.SetSelectedGameObject(pauseButton);
+    }
+
+    public void OpenOptions() {
+        GlobalController.Instance.optionsManager.OpenMenu();
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide);
     }
 
     //---Helpers

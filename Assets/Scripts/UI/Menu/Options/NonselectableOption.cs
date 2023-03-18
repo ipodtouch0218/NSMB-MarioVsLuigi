@@ -1,5 +1,5 @@
 namespace NSMB.UI.Pause.Options {
-    public class DividerOption : PauseOption {
+    public class NonselectableOption : PauseOption {
 
         public override void Selected() { }
 

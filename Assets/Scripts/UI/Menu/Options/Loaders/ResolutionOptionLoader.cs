@@ -36,6 +36,7 @@ namespace NSMB.UI.Pause.Loaders {
             }
 
             spo.SetValue(index, false);
+            return;
         }
 
         public override void OnValueChanged(PauseOption option, object newValue) {

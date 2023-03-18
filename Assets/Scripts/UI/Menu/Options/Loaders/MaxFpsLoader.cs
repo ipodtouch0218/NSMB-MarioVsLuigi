@@ -8,7 +8,8 @@ namespace NSMB.UI.Pause.Loaders {
             if (option is not SliderPauseOption spo)
                 return;
 
-            spo.slider.value = Settings.Instance.GraphicsMaxFps <= 0 ? (int) spo.slider.maxValue : (Settings.Instance.GraphicsMaxFps / 5);
+            int value = Settings.Instance.GraphicsMaxFps <= 0 ? (int) spo.slider.maxValue : (Settings.Instance.GraphicsMaxFps / 5);
+            spo.slider.SetValueWithoutNotify(value);
         }
 
         public override void OnValueChanged(PauseOption option, object newValue) {
