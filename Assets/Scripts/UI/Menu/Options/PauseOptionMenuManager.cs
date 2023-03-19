@@ -200,7 +200,7 @@ namespace NSMB.UI.Pause.Options {
                 currentOptionIndex += direction;
             }
 
-            if (currentOptionIndex == SelectedTab.options.Count)
+            if (currentOptionIndex >= SelectedTab.options.Count)
                 currentOptionIndex = original;
 
             if (currentOptionIndex < -1)

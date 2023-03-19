@@ -8,11 +8,11 @@ namespace NSMB.UI.Pause.Options {
 
         //---Serialized Variables
         [SerializeField] private PauseOptionMenuManager manager;
-        [SerializeField] private TMP_Text label;
+        [SerializeField] internal TMP_Text label;
         [SerializeField] protected PauseOptionLoader loader;
 
         //---Private Variables
-        private string originalText;
+        protected string originalText;
 
         public virtual void OnValidate() {
             if (!manager) manager = GetComponentInParent<PauseOptionMenuManager>();

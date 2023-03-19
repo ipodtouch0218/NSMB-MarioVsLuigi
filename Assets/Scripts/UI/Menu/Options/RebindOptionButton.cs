@@ -1,0 +1,54 @@
+﻿using UnityEngine;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine.InputSystem;
+
+namespace NSMB.UI.Pause.Options {
+    public class RebindOptionButton : MonoBehaviour {
+
+        //---Public Variables
+        [HideInInspector] public InputAction action;
+        public int bindingIndex = -1;
+
+        //---Serialized Variables
+        [SerializeField] private TMP_Text label;
+
+        public void OnEnable() {
+            UpdateLabel();
+        }
+
+        public void Selected() {
+
+        }
+
+        public void Deselected() {
+
+        }
+
+        private void UpdateLabel() {
+            InputBinding targetBinding = action.bindings[bindingIndex];
+            if (targetBinding.isComposite) {
+                string combined = "";
+                int count = bindingIndex;
+                while ((targetBinding = action.bindings[++count]).isPartOfComposite) {
+                    string addition = InputControlPath.ToHumanReadableString(
+                            targetBinding.effectivePath,
+                            InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
+
+                    combined += addition + ",";
+                }
+                if (combined == "Up Arrow,Down Arrow,Left Arrow,Right Arrow,") {
+                    combined = "Arrow Keys,";
+                }
+                if (combined.Length > 11)
+                    combined = combined[..0] + "....";
+
+                label.text = combined[..^1];
+            } else {
+                label.text = InputControlPath.ToHumanReadableString(
+                        targetBinding.effectivePath,
+                        InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
+            }
+        }
+    }
+}
