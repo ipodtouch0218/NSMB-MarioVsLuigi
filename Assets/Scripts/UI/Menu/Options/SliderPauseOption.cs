@@ -5,8 +5,11 @@ namespace NSMB.UI.Pause.Options {
 
     public class SliderPauseOption : PauseOption {
 
-        //---Serialized Variables
-        [SerializeField] public Slider slider;
+        //---Public Variables
+        public Slider slider;
+
+        //---Private Variables
+        private float holdTime;
 
         public override void OnValidate() {
             base.OnValidate();
@@ -19,16 +22,38 @@ namespace NSMB.UI.Pause.Options {
 
         public override void OnLeftPress() {
             if (slider.wholeNumbers)
-                slider.value -= 1;
-            else
-                slider.value -= (slider.maxValue - slider.minValue) * 0.1f;
+                slider.value--;
+            holdTime = 0;
         }
 
         public override void OnRightPress() {
             if (slider.wholeNumbers)
-                slider.value += 1;
-            else
-                slider.value += (slider.maxValue - slider.minValue) * 0.1f;
+                slider.value++;
+            holdTime = 0;
+        }
+
+        public override void OnLeftHeld() {
+            holdTime += Time.deltaTime;
+            if (slider.wholeNumbers) {
+                if (holdTime > 0.15f) {
+                    slider.value--;
+                    holdTime = 0;
+                }
+            } else {
+                slider.value -= (slider.maxValue - slider.minValue) * 0.5f * Time.deltaTime;
+            }
+        }
+
+        public override void OnRightHeld() {
+            holdTime += Time.deltaTime;
+            if (slider.wholeNumbers) {
+                if (holdTime > 0.15f) {
+                    slider.value++;
+                    holdTime = 0;
+                }
+            } else {
+                slider.value += (slider.maxValue - slider.minValue) * 0.5f * Time.deltaTime;
+            }
         }
 
         public virtual void OnSliderValueChanged(float newValue) {

@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -71,6 +72,27 @@ namespace NSMB.UI.Pause.Options {
             }
         }
 
+        public void Update() {
+            if (!SelectedOption)
+                return;
+
+            Vector2 direction = ControlSystem.controls.UI.Navigate.ReadValue<Vector2>();
+            direction = direction.normalized;
+            float u = Vector2.Dot(direction, Vector2.up);
+            float d = Vector2.Dot(direction, Vector2.down);
+            float l = Vector2.Dot(direction, Vector2.left);
+            float r = Vector2.Dot(direction, Vector2.right);
+            bool up = u > d && u > l && u > r;
+            bool down = !up && d > u && d > l && d > r;
+            bool left = !up && !down && l > u && l > d && l > r;
+            bool right = !up && !down && !left && r > u && r > d && r > l;
+
+            if (left)
+                SelectedOption.OnLeftHeld();
+            else if (right)
+                SelectedOption.OnRightHeld();
+        }
+
         private void OnCancel(InputAction.CallbackContext context) {
             if (Back) {
                 CloseMenu();
@@ -137,7 +159,7 @@ namespace NSMB.UI.Pause.Options {
             if (up || down) {
                 // Move between options
                 int newOptionIndex = Mathf.Clamp(currentOptionIndex + (up ? -1 : 1), -1, SelectedTab.options.Count - 1);
-                SetCurrentOption(newOptionIndex);
+                SetCurrentOption(newOptionIndex, true);
 
             } else if (currentOption) {
                 // Give this input to the option
@@ -185,7 +207,7 @@ namespace NSMB.UI.Pause.Options {
             GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
         }
 
-        public void SetCurrentOption(int index) {
+        public void SetCurrentOption(int index, bool center = false) {
             if (currentOptionIndex == index || index >= SelectedTab.options.Count || index < -1)
                 return;
 
@@ -196,7 +218,7 @@ namespace NSMB.UI.Pause.Options {
             int original = currentOptionIndex;
             currentOptionIndex = index;
 
-            while ((!SelectedOption || SelectedOption is NonselectableOption) && index >= 0 && index < SelectedTab.options.Count) {
+            while (SelectedOption is NonselectableOption && index >= 0 && index < SelectedTab.options.Count) {
                 currentOptionIndex += direction;
             }
 
@@ -214,8 +236,17 @@ namespace NSMB.UI.Pause.Options {
                 }
             }
 
-            if (SelectedOption)
+            if (SelectedOption) {
                 SelectedOption.Selected();
+                if (center) {
+                    scroll.verticalNormalizedPosition = scroll.ScrollToCenter(SelectedOption.rectTransform, false);
+                }
+            } else {
+                // No selected option = tab selected
+                if (center) {
+                    scroll.verticalNormalizedPosition = 1f;
+                }
+            }
         }
 
         public void SetCurrentOption(PauseOption option) {
