@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
   m_Name: 16 Metal
   m_EditorClassIdentifier: 
-  index: 16
   colors:
   - player: {fileID: 0}
     hatColor: {r: 0.6627451, g: 0.6627451, b: 0.6627451, a: 1}
-    overallsColor: {r: 0.34901962, g: 0.34901962, b: 0.34901962, a: 1}
+    overallsColor: {r: 0.1792453, g: 0.1792453, b: 0.1792453, a: 1}
+    Name: Super Mario Land 2
+  ColorText: Super Mario Land 2

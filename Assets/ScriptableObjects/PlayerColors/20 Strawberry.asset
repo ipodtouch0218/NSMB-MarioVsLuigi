@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 1, g: 0.5518868, b: 0.9110614, a: 1}
+    hatColor: {r: 1, g: 0.5529412, b: 0.72199476, a: 1}
     overallsColor: {r: 0.7735849, g: 0, b: 0, a: 1}
+    Name: Strawberry Pink
+  ColorText: Strawberry Pink

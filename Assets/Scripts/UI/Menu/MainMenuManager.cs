@@ -30,7 +30,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public AudioSource sfx, music;
     public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, creditsSelected, controlsSelected, updateBoxSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, creditsSelected, controlsSelected, updateBoxSelected, ColorName;
+    public byte currentSkin;
 
     //---Serialized Fields
     [SerializeField] private RebindManager rebindManager;
@@ -61,7 +62,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     //---Private Variables
     private Coroutine playerPingUpdateCoroutine, quitCoroutine;
     private bool validName, initialConnection;
-    private byte currentSkin;
 
     public void Awake() => Set(this, false);
     public void OnDestroy() => Release();
@@ -629,6 +629,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             PlayerColors colors = ScriptableManager.Instance.skins[index].GetPlayerColors(character);
             overallsColorImage.color = colors.overallsColor;
             shirtColorImage.color = colors.hatColor;
+            ColorName.GetComponent<TMP_Text>().text = colors.Name;
         }
 
         playerColorDisabledIcon.SetActive(disabled);

@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
   m_Name: 15 Reverse
   m_EditorClassIdentifier: 
-  index: 15
   colors:
   - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
     hatColor: {r: 0.25882354, g: 0.25882354, b: 1, a: 1}
     overallsColor: {r: 0.91764706, g: 0.15686275, b: 0.23529412, a: 1}
-  - player: {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
+    Name: Mario Bros. Arcade
+  - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
     hatColor: {r: 0.25882354, g: 0.25882354, b: 1, a: 1}
     overallsColor: {r: 0.23294118, g: 0.91764706, b: 0.15686274, a: 1}
+    Name: Mario Bros. Arcade
+  ColorText: Mario Bros. Arcade
