@@ -25,15 +25,14 @@ public class ScrollCameraToggle : MonoBehaviour
 		{
 			if (scrollCamera.isActiveAndEnabled)
 			{
-                Debug.Log("Scroll Camera is Disabled");
                 scrollCamera.enabled = false;
             }
             return;
 		}
 
+        //Else, re-enable Camera Component
 		if (scrollCamera.isActiveAndEnabled == false)
 		{
-            Debug.Log("Scroll Camera is Re-Enabled");
             scrollCamera.enabled = true;
 		}
     }
