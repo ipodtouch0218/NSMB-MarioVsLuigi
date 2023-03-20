@@ -172,8 +172,7 @@ public class GameManager : NetworkBehaviour {
         // By default, spectate. when we get assigned a player object, we disable it there.
         spectationManager.Spectating = true;
 
-        // Load + enable player controls
-        ControlSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
+        // Eregednable player controls
         Runner.ProvideInput = true;
 
         // Setup respawning tilemap
@@ -425,6 +424,7 @@ public class GameManager : NetworkBehaviour {
 
         GameState = Enums.GameState.Ended;
         SessionData.Instance.SetGameStarted(false);
+        SessionData.Instance.GameStartTimer = TickTimer.None;
 
         music.Stop();
 

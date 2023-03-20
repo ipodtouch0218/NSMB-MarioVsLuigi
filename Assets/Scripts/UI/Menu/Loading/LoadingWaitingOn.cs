@@ -16,12 +16,18 @@ namespace NSMB.Loading {
         //---Private Variables
         private TMP_Text text;
         private GameObject playerListParent;
+        private string ourNickname;
 
         public void Awake() {
             text = GetComponent<TMP_Text>();
             playerListParent = playerList.transform.parent.gameObject;
-            playerListParent.SetActive(false);
         }
+
+        public void OnEnable() {
+            playerListParent.SetActive(false);
+            ourNickname = NetworkHandler.Runner.GetLocalPlayerData().GetNickname();
+        }
+
 
         public void Update() {
             if (!GameManager.Instance || !(GameManager.Instance.Object?.IsValid ?? false))
@@ -29,28 +35,25 @@ namespace NSMB.Loading {
 
             PlayerData ourData = NetworkHandler.Instance.runner.LocalPlayer.GetPlayerData(NetworkHandler.Instance.runner);
 
-            //loading as spectator
+            // Loading (as spectator)
             if (ourData.IsCurrentlySpectating) {
                 text.text = spectatorText;
                 return;
             }
 
-            //we're still loading
+            // Still loading
             if (!GameManager.Instance.Object.IsValid) {
                 text.text = emptyText;
                 playerListParent.SetActive(false);
                 return;
             }
 
-            //game starting
+            // Game starting
             if (GameManager.Instance.GameStartTimer.IsRunning) {
                 text.text = readyToStartText;
                 playerListParent.SetActive(false);
                 return;
             }
-
-            //waiting for otherrs
-            text.text = waitingForOthersText;
 
             HashSet<string> waitingFor = new();
             foreach (PlayerController pc in GameManager.Instance.AlivePlayers) {
@@ -59,8 +62,19 @@ namespace NSMB.Loading {
                 if (!data.IsCurrentlySpectating && !data.IsLoaded)
                     waitingFor.Add(data.GetNickname());
             }
-            playerListParent.SetActive(true);
-            playerList.text = waitingFor.Count == 0 ? "" : "\n- " + string.Join("\n- ", waitingFor);
+
+            if (waitingFor.Contains(ourNickname)) {
+                // Loading
+                text.text = emptyText;
+                playerListParent.SetActive(false);
+
+            } else {
+                // Waiting for others
+                text.text = waitingForOthersText;
+
+                playerListParent.SetActive(true);
+                playerList.text = waitingFor.Count == 0 ? "" : "\n- " + string.Join("\n- ", waitingFor);
+            }
         }
     }
 }

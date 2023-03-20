@@ -5,6 +5,10 @@ using UnityEngine.Audio;
 using NSMB.Utils;
 using System.Linq;
 using System.Xml.Serialization;
+using UnityEditor.ShaderGraph;
+using UnityEngine.InputSystem;
+using Tayx.Graphy.Utils.NumString;
+using System.IO;
 
 public class Settings : Singleton<Settings> {
 
@@ -95,6 +99,11 @@ public class Settings : Singleton<Settings> {
         set => GlobalController.Instance.outlineFeature.SetActive(value);
     }
 
+    public string ControlsBindings {
+        get => ControlSystem.controls.asset.SaveBindingOverridesAsJson();
+        set => ControlSystem.controls.asset.LoadBindingOverridesFromJson(value);
+    }
+
     public bool ValidNickname => genericNickname.IsValidUsername(false);
 
     //---Public Variables
@@ -147,6 +156,8 @@ public class Settings : Singleton<Settings> {
         //Controls
         PlayerPrefs.SetInt("Controls_FireballFromSprint", controlsFireballSprint ? 1 : 0);
         PlayerPrefs.SetInt("Controls_AutoSprint", controlsAutoSprint ? 1 : 0);
+        PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
+
         PlayerPrefs.Save();
     }
 
@@ -201,11 +212,17 @@ public class Settings : Singleton<Settings> {
         audioMuteSFXOnUnfocus = false;
         audioPanning = true;
 
+        FileInfo bindingsFile = new(Application.persistentDataPath + "/controls.json");
+        if (bindingsFile.Exists) {
+            ControlsBindings = File.ReadAllText(bindingsFile.FullName);
+            bindingsFile.Delete();
+        }
         controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         controlsAutoSprint = false;
 
         MassDeleteKeys("Nickname", "ScoreboardAlwaysVisible", "ChatFilter", "Character", "Skin", "NDSResolution",
             "NDS4by3", "VSync", "volumeMaster", "volumeMusic", "volumeSFX", "FireballFromSprint");
+
     }
 
     public void LoadFromVersion1() {
@@ -236,6 +253,7 @@ public class Settings : Singleton<Settings> {
         //Controls
         GetIfExists("Controls_FireballFromSprint", out controlsFireballSprint);
         GetIfExists("Controls_AutoSprint", out controlsAutoSprint);
+        if (GetIfExists("Controls_Bindings", out string tempBindings)) ControlsBindings = tempBindings;
     }
 
     private bool GetIfExists(string key, out string value) {

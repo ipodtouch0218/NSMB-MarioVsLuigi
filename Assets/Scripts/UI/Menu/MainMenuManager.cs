@@ -48,7 +48,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
     [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
     [SerializeField] private TMP_InputField nicknameField, chatTextField;
-    [SerializeField] private TMP_Text errorText, lobbyHeaderText, updateText;
+    [SerializeField] private TMP_Text errorText, lobbyHeaderText, updateText, startGameButtonText;
     [SerializeField] private ScrollRect settingsScroll;
     [SerializeField] private Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
 
@@ -214,6 +214,9 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         // Reset chat input field
         chatTextField.SetTextWithoutNotify("");
 
+        // Reset the "Game start" button counting down
+        CountdownTick(-1);
+
         // Host chat notification
         if (Runner.IsServer)
             chat.AddChatMessage("You are the room's host! Click on your players' names to control your room.", Color.red);
@@ -359,6 +362,10 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
     }
 
+    public void StartSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
+    }
+
     public void ConnectToDropdownRegion() {
         string targetRegion = NetworkHandler.Regions[regionDropdown.value];
         if (NetworkHandler.CurrentRegion == targetRegion)
@@ -392,17 +399,35 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             GlobalController.Instance.loadingCanvas.Initialize();
     }
 
-    public void StartGame() {
+    public void StartCountdown() {
+
         // We can't start the game if we're not the server.
         if (!Runner.IsServer)
             return;
 
-        // Make sure we can actually start the game
-        if (!IsRoomConfigurationValid())
-            return;
+        if (SessionData.Instance.GameStartTimer.IsRunning) {
+            // Cancel early.
+            SessionData.Instance.GameStartTimer = TickTimer.None;
+            sfx.PlayOneShot(Enums.Sounds.UI_Back);
 
-        // Actually start the game.
-        SessionData.Instance.SetGameStarted(true);
+        } else {
+            // Make sure we can actually start the game
+            if (!IsRoomConfigurationValid())
+                return;
+
+            // Actually start the game.
+            SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+        }
+    }
+
+    public void CountdownTick(int time) {
+        if (time > 0)
+            startGameButtonText.text = "Starting in " + time + "...";
+        else
+            startGameButtonText.text = "Start Game";
+    }
+
+    public void StartGame() {
 
         // Set PlayerIDs and spectator values for players
         sbyte count = 0;
@@ -430,6 +455,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             count++;
         }
 
+        SessionData.Instance.SetGameStarted(true);
+
         // Load the correct scene
         Runner.SetActiveScene(GetCurrentSceneRef());
     }
@@ -444,7 +471,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         startGameBtn.interactable = IsRoomConfigurationValid();
     }
 
-    private bool IsRoomConfigurationValid() {
+    public bool IsRoomConfigurationValid() {
         List<PlayerData> nonSpectators = Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner)).Where(pd => !pd.IsManualSpectator).ToList();
         bool validRoomConfig = true;
 

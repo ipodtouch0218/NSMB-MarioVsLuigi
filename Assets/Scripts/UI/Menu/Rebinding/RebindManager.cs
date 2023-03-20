@@ -33,27 +33,8 @@ namespace NSMB.Rebinding {
             axisTemplate.SetActive(false);
             headerTemplate.SetActive(false);
 
-            LoadBindings();
             CreateActions();
             resetAll.transform.SetAsLastSibling();
-        }
-
-        public void LoadBindings() {
-            string json = GlobalController.Instance.controlsJson;
-
-            if (!string.IsNullOrEmpty(json)) {
-                // we have old bindings...
-                controls.LoadBindingOverridesFromJson(json);
-
-            } else if (ControlSystem.file.Exists) {
-                //load bindings...
-                try {
-                    controls.LoadBindingOverridesFromJson(File.ReadAllText(ControlSystem.file.FullName));
-                    GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
-                } catch (Exception e) {
-                    Debug.LogError(e.Message);
-                }
-            }
         }
 
         public void ResetActions() {
@@ -145,13 +126,7 @@ namespace NSMB.Rebinding {
         }
 
         public void SaveRebindings() {
-            string json = controls.SaveBindingOverridesAsJson();
-
-            if (!ControlSystem.file.Exists)
-                ControlSystem.file.Directory.Create();
-
-            File.WriteAllText(ControlSystem.file.FullName, json);
-            GlobalController.Instance.controlsJson = json;
+            Settings.Instance.SaveSettings();
         }
     }
 }

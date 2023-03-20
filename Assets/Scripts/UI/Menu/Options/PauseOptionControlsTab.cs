@@ -83,13 +83,7 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void SaveRebindings() {
-            string json = controls.SaveBindingOverridesAsJson();
-
-            if (!ControlSystem.file.Exists)
-                ControlSystem.file.Directory.Create();
-
-            //File.WriteAllText(ControlSystem.file.FullName, json);
-            GlobalController.Instance.controlsJson = json;
+            Settings.Instance.SaveSettings();
         }
     }
 }

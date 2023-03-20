@@ -181,6 +181,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: slider_3
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 3
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 4, y: 4, z: 4, w: 4}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f11909b06eee1ce40a6618c4dc1cdc08
+      internalID: 822071376
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -195,6 +216,7 @@ TextureImporter:
       slider_0: -1644797283
       slider_1: -1315510071
       slider_2: 1403928389
+      slider_3: 822071376
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

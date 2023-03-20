@@ -5,13 +5,13 @@ using UnityEngine.InputSystem;
 using TMPro;
 
 using NSMB.Extensions;
-using UnityEditor.Rendering.LookDev;
 
 namespace NSMB.UI.Pause {
     public class PauseMenuManager : MonoBehaviour {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text[] options;
+        [SerializeField] private Material enabledMaterial, disabledMaterial;
 
         //---Private Variables
         private string[] originalText;
@@ -42,6 +42,7 @@ namespace NSMB.UI.Pause {
 
             skipSound = true;
             isHost = NetworkHandler.Runner && NetworkHandler.Runner.GetLocalPlayerData().IsRoomOwner;
+            options[1].fontMaterial = isHost ? enabledMaterial : disabledMaterial;
             SelectOption(0);
         }
 
@@ -87,7 +88,7 @@ namespace NSMB.UI.Pause {
         public void IncrementOption(int increment) {
             int newIndex = selected + increment;
 
-            if (newIndex == 1 && true || !isHost)
+            if (newIndex == 1 && !isHost)
                 newIndex += increment;
 
             if (newIndex < 0 || newIndex >= options.Length)

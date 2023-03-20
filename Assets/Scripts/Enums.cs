@@ -32,7 +32,7 @@ public static class Enums {
 
     //Sound effects
     public enum Sounds : byte {
-        //CURRENT HIGHEST NUMBER: 97
+        //CURRENT HIGHEST NUMBER: 98
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
         [SoundData("enemy/freeze_shatter")]                     Enemy_Generic_FreezeShatter = 1,
@@ -128,6 +128,7 @@ public static class Enums {
         [SoundData("ui/match_draw")]                            UI_Match_Draw = 87,
         [SoundData("ui/countdown0")]                            UI_Countdown_0 = 88,
         [SoundData("ui/countdown1")]                            UI_Countdown_1 = 89,
+        [SoundData("ui/file_select")]                           UI_FileSelect = 98,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,

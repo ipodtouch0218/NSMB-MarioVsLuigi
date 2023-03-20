@@ -4,7 +4,6 @@ using UnityEngine;
 public class ControlSystem : MonoBehaviour {
 
     public static Controls controls;
-    public static FileInfo file;
 
     public void Awake() {
         if (controls != null)
@@ -12,7 +11,5 @@ public class ControlSystem : MonoBehaviour {
 
         controls = new();
         controls.Enable();
-
-        file = new(Application.persistentDataPath + "/controls.json");
     }
 }

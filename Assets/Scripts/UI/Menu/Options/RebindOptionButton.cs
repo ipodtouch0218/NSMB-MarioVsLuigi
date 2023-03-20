@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine.InputSystem;
+using TMPro;
 
 namespace NSMB.UI.Pause.Options {
     public class RebindOptionButton : MonoBehaviour {

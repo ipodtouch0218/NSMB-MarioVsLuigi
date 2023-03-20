@@ -23,8 +23,6 @@ public class GlobalController : Singleton<GlobalController> {
     public LoadingCanvas loadingCanvas;
 
     public RenderTexture ndsTexture;
-    public string controlsJson = null;
-    public string nickname;
 
     public bool checkedForVersion;
     public ShutdownReason? disconnectCause = null;

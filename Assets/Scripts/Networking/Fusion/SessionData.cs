@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 using Fusion;
 using Fusion.Sockets;
@@ -23,6 +24,7 @@ public class SessionData : NetworkBehaviour {
     //---Networked Variables
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultMaxPlayers))]        public byte MaxPlayers { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool PrivateRoom { get; set; }
+    [Networked(OnChanged = nameof(GameStartTimerChanged))]                                      public TickTimer GameStartTimer { get; set; }
     [Networked(OnChanged = nameof(StartChanged))]                                               public NetworkBool GameStarted { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                             public byte Level { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultStarRequirement))]   public sbyte StarRequirement { get; set; }
@@ -60,6 +62,29 @@ public class SessionData : NetworkBehaviour {
             bannedIds = new();
             bannedIps = new();
             NetworkHandler.OnConnectRequest += OnConnectRequest;
+        }
+    }
+
+    public override void FixedUpdateNetwork() {
+        if (!GameStarted && GameStartTimer.IsRunning && MainMenuManager.Instance) {
+
+            if (!MainMenuManager.Instance.IsRoomConfigurationValid()) {
+                GameStartTimer = TickTimer.None;
+                return;
+            }
+
+            if (GameStartTimer.Expired(Runner)) {
+                // Start game
+                MainMenuManager.Instance.StartGame();
+
+            } else {
+                int ticksLeft = (GameStartTimer.RemainingTicks(Runner) ?? 0) + 1;
+                if (ticksLeft % Runner.Config.Simulation.TickRate == 0) {
+                    // Send countdown
+                    int seconds = ticksLeft / Runner.Config.Simulation.TickRate;
+                    MainMenuManager.Instance.CountdownTick(seconds);
+                }
+            }
         }
     }
 
@@ -183,5 +208,14 @@ public class SessionData : NetworkBehaviour {
             MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(lobby, oldLevel != newLevel);
 
         lobby.lastUpdatedTick = currentTick;
+    }
+
+    public static void GameStartTimerChanged(Changed<SessionData> data) {
+        if (!data.Behaviour.GameStartTimer.IsRunning) {
+            MainMenuManager.Instance.chat.AddChatMessage("Game start cancelled.", Color.blue);
+            MainMenuManager.Instance.CountdownTick(-1);
+        } else {
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
+        }
     }
 }
