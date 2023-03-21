@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
-  m_Name: 10 Builder
+  m_Name: 22 Deluxe
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
-    hatColor: {r: 1, g: 0.7921569, b: 0.16862746, a: 1}
-    overallsColor: {r: 0.91764706, g: 0.15686275, b: 0.23529412, a: 1}
-    Name: Builder Outfit
+    hatColor: {r: 0.48235294, g: 0.41568628, b: 0.10980392, a: 1}
+    overallsColor: {r: 0.87843144, g: 0.18039216, b: 0.13725491, a: 1}
+    Name: SMB Deluxe
   - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
-    hatColor: {r: 1, g: 0.79215693, b: 0.16862746, a: 1}
-    overallsColor: {r: 0.10980393, g: 0.5803922, b: 0.11764707, a: 1}
-    Name: Builder Outfit
-  ColorText: Builder Outfit
+    hatColor: {r: 0.48235294, g: 0.41568628, b: 0.10980392, a: 1}
+    overallsColor: {r: 0.098039225, g: 0.58431375, b: 0.098039225, a: 1}
+    Name: SMB Deluxe
+  ColorText: SMB Deluxe

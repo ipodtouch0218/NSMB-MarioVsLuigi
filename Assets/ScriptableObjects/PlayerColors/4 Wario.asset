@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
   m_Name: 4 Wario
   m_EditorClassIdentifier: 
-  index: 4
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 1, g: 0.8745098, b: 0.27450982, a: 1}
-    overallsColor: {r: 0.2901961, g: 0.05490196, b: 0.49803922, a: 1}
+    hatColor: {r: 0.9056604, g: 0.69068044, b: 0, a: 1}
+    overallsColor: {r: 0.41230103, g: 0.04903879, b: 0.5471698, a: 1}
+    Name: Wario's Outfit
+  ColorText: Wario's Outfit

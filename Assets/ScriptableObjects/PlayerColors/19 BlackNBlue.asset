@@ -16,3 +16,5 @@ MonoBehaviour:
   - player: {fileID: 0}
     hatColor: {r: 0.27058825, g: 0.5921569, b: 0.9803922, a: 1}
     overallsColor: {r: 0.17254902, g: 0.17254902, b: 0.17254902, a: 1}
+    Name: Mario Bros. GBA
+  ColorText: Mario Bros. GBA

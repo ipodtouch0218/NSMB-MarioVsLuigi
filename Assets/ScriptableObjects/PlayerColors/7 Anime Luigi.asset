@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
   m_Name: 7 Anime Luigi
   m_EditorClassIdentifier: 
-  index: 7
   colors:
   - player: {fileID: 0}
     hatColor: {r: 0.050980393, g: 0.2784314, b: 0.48235294, a: 1}
     overallsColor: {r: 0.9490196, g: 0.70980394, b: 0.3137255, a: 1}
+    Name: Luigi (Anime)
+  ColorText: Luigi (Anime)
