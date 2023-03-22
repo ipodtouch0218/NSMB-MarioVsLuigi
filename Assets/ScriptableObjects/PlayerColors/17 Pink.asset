@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
   m_Name: 17 Pink
   m_EditorClassIdentifier: 
-  index: 17
   colors:
   - player: {fileID: 0}
     hatColor: {r: 1, g: 0.43137255, b: 0.6666667, a: 1}
     overallsColor: {r: 1, g: 0.6967669, b: 0.43137252, a: 1}
+    Name: Citrus Pink
+  ColorText: Citrus Pink

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
   m_Name: 6 Spike
   m_EditorClassIdentifier: 
-  index: 6
   colors:
   - player: {fileID: 0}
     hatColor: {r: 0.28235295, g: 0.1254902, b: 0.1254902, a: 1}
     overallsColor: {r: 0.7176471, g: 0.56078434, b: 0.43529412, a: 1}
+    Name: Mocha Brown
+  ColorText: Mocha Brown

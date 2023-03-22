@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
   m_Name: 3 Blue
   m_EditorClassIdentifier: 
-  index: 3
   colors:
   - player: {fileID: 0}
     hatColor: {r: 0, g: 0.09433965, b: 0.4716981, a: 1}
     overallsColor: {r: 0.13725491, g: 0.36862746, b: 1, a: 1}
+    Name: Basic Blue
+  ColorText: Basic Blue

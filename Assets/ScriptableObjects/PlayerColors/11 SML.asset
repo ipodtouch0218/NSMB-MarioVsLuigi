@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
   m_Name: 11 SML
   m_EditorClassIdentifier: 
-  index: 11
   colors:
   - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
     hatColor: {r: 0.16078432, g: 0.25490198, b: 0.22352943, a: 1}
     overallsColor: {r: 0.48235297, g: 0.50980395, b: 0.0627451, a: 1}
-  - player: {fileID: 11400000, guid: 083779ae7bd92ab4295d580d757b328e, type: 2}
+    Name: Game Boy Green
+  - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
     hatColor: {r: 0.48235297, g: 0.50980395, b: 0.0627451, a: 1}
     overallsColor: {r: 0.16078432, g: 0.25490198, b: 0.22352943, a: 1}
+    Name: Game Boy Green
+  ColorText: Game Boy Green
