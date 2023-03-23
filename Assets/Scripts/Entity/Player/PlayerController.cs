@@ -273,9 +273,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     #endregion
 
     #region Unity Methods
-    public override void Awake() {
-        base.Awake();
-
+    public void Awake() {
         cameraController = GetComponentInChildren<CameraController>();
         animator = GetComponentInChildren<Animator>();
         sfxBrick = GetComponents<AudioSource>()[1];
@@ -474,7 +472,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         crushGround = false;
         OnSpinner = null;
         foreach (BoxCollider2D hitbox in hitboxes) {
-            Runner.GetPhysicsScene2D().Simulate(0f);
+            //Runner.GetPhysicsScene2D().Simulate(0f);
             int collisionCount = hitbox.GetContacts(TileContactBuffer);
 
             for (int i = 0; i < collisionCount; i++) {
@@ -1445,12 +1443,16 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 FloorAngle = angle;
 
                 float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.1f;
-                body.velocity = new Vector2(x, change);
+                body.velocity = new(x, change);
                 IsOnGround = true;
                 WasGroundedLastFrame = true;
             } else {
                 FloorAngle = 0;
             }
+        }
+
+        if (Mathf.Abs(body.velocity.x) < 0.1f && body.velocity.y < 0 && body.velocity.y > -0.01f) {
+            body.velocity = Vector2.zero;
         }
     }
 
@@ -1921,7 +1923,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 newX = Mathf.Clamp(newX, -max, max);
             }
 
-            if (IsSkidding && !IsTurnaround && Mathf.Sign(newX) != sign) {
+            if (IsSkidding && !IsTurnaround && (Mathf.Sign(newX) != sign || speed < 0.05f)) {
                 //turnaround
                 IsTurnaround = true;
                 TurnaroundBoostFrames = 5;
@@ -1977,15 +1979,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsOnGround || WasGroundedLastFrame)
             body.velocity = new(body.velocity.x, 0);
     }
-    private float CalculateSlopeMaxSpeedOffset(float floorAngle) => (float) (-0.0304687 * floorAngle);
+
+    private float CalculateSlopeMaxSpeedOffset(float floorAngle) {
+        return (float) (-0.0304687 * floorAngle);
+    }
 
 
-    private static readonly Vector2 CheckSizeOffset = new(1f, 0.75f);
+    private static readonly Vector2 StuckInBlockSizeCheck = new(1f, 0.75f);
     private bool HandleStuckInBlock() {
         if (!body || State == Enums.PowerupState.MegaMushroom)
             return false;
 
-        Vector2 checkSize = WorldHitboxSize * CheckSizeOffset;
+        Vector2 checkSize = WorldHitboxSize * StuckInBlockSizeCheck;
         Vector2 checkPos = transform.position + (Vector3) (Vector2.up * checkSize * 0.5f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f, false)) {
@@ -2027,8 +2032,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 do {
                     testPos = checkPos + new Vector2(Mathf.Cos(radAngle) * testDistance, Mathf.Sin(radAngle) * testDistance);
                     testDistance += distanceInterval;
-                }
-                while (Utils.IsAnyTileSolidBetweenWorldBox(testPos, checkSize * 0.975f));
+                } while (Utils.IsAnyTileSolidBetweenWorldBox(testPos, checkSize * 0.975f));
 
                 // This is to give right angles more priority over others when deciding
                 float adjustedDistance = testDistance * (1 + Mathf.Abs(Mathf.Sin(radAngle * 2) / 2));
@@ -2798,7 +2802,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (player.IsSliding)
             return;
 
-        if (!player.IsOnGround || Mathf.Abs(player.body.velocity.x) > 0.01f)
+        if (!player.IsOnGround || Mathf.Abs(player.body.velocity.x) > 0.1f)
             return;
 
         player.PlaySound(Enums.Sounds.Player_Sound_SlideEnd);

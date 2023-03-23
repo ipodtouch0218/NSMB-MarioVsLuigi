@@ -25,21 +25,21 @@ public class StarBouncer : CollectableEntity {
     [SerializeField] private ParticleSystem particles;
 
     //---Components
-    private SpriteRenderer sRenderer;
-    private PhysicsEntity physics;
-    private BoxCollider2D worldCollider;
-    private Animator animator;
+    [SerializeField] private SpriteRenderer sRenderer;
+    [SerializeField] private PhysicsEntity physics;
+    [SerializeField] private BoxCollider2D worldCollider;
+    [SerializeField] private Animator animator;
 
     //--Private Variables
     private float pulseEffectCounter;
     private TrackIcon icon;
 
-    public override void Awake() {
-        base.Awake();
-        physics = GetComponent<PhysicsEntity>();
-        sRenderer = GetComponentInChildren<SpriteRenderer>();
-        worldCollider = GetComponent<BoxCollider2D>();
-        animator = GetComponent<Animator>();
+    public override void OnValidate() {
+        base.OnValidate();
+        if (!physics) physics = GetComponent<PhysicsEntity>();
+        if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (!worldCollider) worldCollider = GetComponent<BoxCollider2D>();
+        if (!animator) animator = GetComponent<Animator>();
     }
 
     public void OnBeforeSpawned(byte direction, bool stationary, bool pit) {

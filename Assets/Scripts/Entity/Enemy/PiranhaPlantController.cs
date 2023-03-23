@@ -7,22 +7,16 @@ public class PiranhaPlantController : KillableEntity {
 
     //---Networked Variables
     [Networked] public TickTimer PopupTimer { get; set; }
+    [Networked] private NetworkBool IsUpsideDown { get; set; }
 
     //---Serialized Variables
     [SerializeField] private float playerDetectSize = 1;
     [SerializeField] private float popupTimerRequirement = 6f;
 
-    //---Misc Variables
-    private bool upsideDown;
-
-    public override void Awake() {
-        base.Awake();
-        upsideDown = transform.eulerAngles.z != 0;
-    }
-
     public override void Spawned() {
         base.Spawned();
         PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
+        IsUpsideDown = transform.eulerAngles.z != 0;
     }
 
     public override void Render() {
@@ -88,8 +82,8 @@ public class PiranhaPlantController : KillableEntity {
         IsDead = true;
         hitbox.enabled = false;
 
-        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + new Vector3(0, upsideDown ? -0.5f : 0.5f, 0));
-        Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up * (upsideDown ? -1f : 1f));
+        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + new Vector3(0, IsUpsideDown ? -0.5f : 0.5f, 0));
+        Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up * (IsUpsideDown ? -1f : 1f));
     }
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {

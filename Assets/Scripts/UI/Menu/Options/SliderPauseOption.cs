@@ -16,7 +16,8 @@ namespace NSMB.UI.Pause.Options {
             if (!slider) slider = GetComponentInChildren<Slider>();
         }
 
-        public virtual void Awake() {
+        public override void Awake() {
+            base.Awake();
             slider.onValueChanged.AddListener(OnSliderValueChanged);
         }
 

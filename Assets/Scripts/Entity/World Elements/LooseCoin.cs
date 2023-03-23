@@ -13,17 +13,17 @@ public class LooseCoin : Coin {
     [SerializeField] private float despawn = 8;
 
     //---Components
-    private SpriteRenderer spriteRenderer;
-    private PhysicsEntity physics;
-    private new Animation animation;
-    private BoxCollider2D hitbox;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private PhysicsEntity physics;
+    [SerializeField] private Animation spriteAnimation;
+    [SerializeField] private BoxCollider2D hitbox;
 
-    public override void Awake() {
-        base.Awake();
-        hitbox = GetComponent<BoxCollider2D>();
-        physics = GetComponent<PhysicsEntity>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        animation = GetComponentInChildren<Animation>();
+    public override void OnValidate() {
+        base.OnValidate();
+        if (!spriteRenderer) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (!physics) physics = GetComponent<PhysicsEntity>();
+        if (!spriteAnimation) spriteAnimation = GetComponentInChildren<Animation>();
+        if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
     }
 
     public override void Spawned() {
@@ -37,7 +37,7 @@ public class LooseCoin : Coin {
     public override void FixedUpdateNetwork() {
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
-            animation.enabled = false;
+            spriteAnimation.enabled = false;
             body.isKinematic = true;
             return;
         }

@@ -211,6 +211,9 @@ public class SessionData : NetworkBehaviour {
     }
 
     public static void GameStartTimerChanged(Changed<SessionData> data) {
+        if (!MainMenuManager.Instance)
+            return;
+
         if (!data.Behaviour.GameStartTimer.IsRunning) {
             MainMenuManager.Instance.chat.AddChatMessage("Game start cancelled.", Color.blue);
             MainMenuManager.Instance.CountdownTick(-1);

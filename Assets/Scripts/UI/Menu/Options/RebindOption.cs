@@ -14,7 +14,9 @@ namespace NSMB.UI.Pause.Options {
         //---Private Variables
         private int selectedIndex;
 
-        public void Awake() {
+        public override void Awake() {
+            base.Awake();
+
             int indexCounter = 0;
             for (int i = 0; i < buttons.Length; i++) {
                 buttons[i].action = action;

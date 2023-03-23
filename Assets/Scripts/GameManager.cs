@@ -166,6 +166,8 @@ public class GameManager : NetworkBehaviour {
                 Scene = SceneManager.GetActiveScene().buildIndex,
             }, GameMode.Single);
         }
+
+        nametagCanvas.gameObject.SetActive(Settings.Instance.GraphicsPlayerNametags);
     }
 
     public override void Spawned() {
@@ -487,9 +489,9 @@ public class GameManager : NetworkBehaviour {
     }
 
     /// <summary>
-    /// Spawns a Big Star if we can find a valid spawnpoint.
+    /// Spawns a Big Star, if we can find a valid spawnpoint.
     /// </summary>
-    /// <returns>If the </returns>
+    /// <returns>If the start is successfully spawned</returns>
     private bool AttemptSpawnBigStar() {
 
         for (int i = 0; i < starSpawns.Length; i++) {
@@ -524,7 +526,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     /// <summary>
-    /// Checks if a team has won, and calls Rpc_EndGame if so
+    /// Checks if a team has won, and calls Rpc_EndGame if one has.
     /// </summary>
     public void CheckForWinner() {
         if (GameState != Enums.GameState.Playing || !Object.HasStateAuthority)
@@ -568,7 +570,8 @@ public class GameManager : NetworkBehaviour {
             }
             // Keep playing into overtime.
         }
-        // Keep playing
+
+        // No winner, Keep playing
     }
 
     private void HandleMusic() {

@@ -66,10 +66,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player1
+  m_text: <sprite=60>ipodtouch0218
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 5ade88ee859873b4882004e755013bf7, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 38e8769007229044bb229d69f8cbae74, type: 2}
+  m_sharedMaterial: {fileID: -4437592673344618727, guid: 03bd50bb8343d1d4dbb0873e4c9abb95,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -93,7 +94,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16.35
+  m_fontSize: 24
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -132,7 +133,7 @@ MonoBehaviour:
   m_margin: {x: 5, y: 1, z: 0, w: 1}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &300488298119222403
@@ -301,6 +302,22 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4665740268674911898}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
+          m_MethodName: SelectOption
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 8836673496241253950}
+            m_ObjectArgumentAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &315483226426769787
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,7 +433,6 @@ GameObject:
   - component: {fileID: 482268095346116759}
   - component: {fileID: 482268095346116758}
   - component: {fileID: 8692065426933415886}
-  - component: {fileID: 7830399380807812602}
   m_Layer: 0
   m_Name: ScrollCamera
   m_TagString: Untagged
@@ -558,19 +574,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46bee7e6d45c5f240826fa0a672ae652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7830399380807812602
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 482268095346116756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c8924c95603bd7438ed9078e045c528, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainCameraTransform: {fileID: 0}
+  mainCamera: {fileID: 482268096050949619}
+  secondaryCamera: {fileID: 482268095346116753}
 --- !u!1 &482268096050949616
 GameObject:
   m_ObjectHideFlags: 0
@@ -1569,10 +1574,26 @@ MonoBehaviour:
         - m_Target: {fileID: 5500062339093502114}
           m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
           m_MethodName: Pause
-          m_Mode: 1
+          m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4665740268674911898}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
+          m_MethodName: SelectOption
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 7812754501161860349}
+            m_ObjectArgumentAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -2750,6 +2771,22 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4665740268674911898}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
+          m_MethodName: SelectOption
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 4405735558105478583}
+            m_ObjectArgumentAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &2534023630337648780
 GameObject:
   m_ObjectHideFlags: 0
@@ -3570,6 +3607,22 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4665740268674911898}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
+          m_MethodName: SelectOption
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 6576780699861244675}
+            m_ObjectArgumentAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &3558827354498402342
 GameObject:
   m_ObjectHideFlags: 0
@@ -3869,7 +3922,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 82.35
+  m_fontSize: 76.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

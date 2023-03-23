@@ -98,6 +98,9 @@ namespace NSMB.UI.Pause {
         }
 
         public void SelectOption(int index) {
+            if (selected == index)
+                return;
+
             for (int i = 0; i < options.Length; i++) {
                 options[i].text = originalText[i];
             }
@@ -110,6 +113,7 @@ namespace NSMB.UI.Pause {
         }
 
         public void SelectOption(TMP_Text option) {
+            skipSound = true;
             SelectOption(Array.IndexOf(options, option));
         }
     }

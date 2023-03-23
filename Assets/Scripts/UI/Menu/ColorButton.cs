@@ -5,11 +5,13 @@ using TMPro;
 
 public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
+    //---Public Variables
+    public PlayerColorSet palette;
+
+    //---Serialized Variables
+    [SerializeField] private TMP_Text colorNameString;
     [SerializeField] private Sprite overlayUnpressed, overlayPressed;
     [SerializeField] private Image shirt, overalls, overlay;
-    public GameObject ColorNameString;
-
-    public PlayerColorSet palette;
 
     public void Instantiate(CharacterData player) {
         if (palette == null) {
@@ -27,7 +29,7 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
     public void OnSelect(BaseEventData eventData) {
         overlay.enabled = true;
         overlay.sprite = overlayUnpressed;
-        ColorNameString.GetComponent<TMP_Text>().text = palette.ColorText;
+        colorNameString.text = palette ? palette.ColorText : "Default Colors";
     }
 
     public void OnDeselect(BaseEventData eventData) {
@@ -37,6 +39,6 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
     public void OnPress() {
         overlay.sprite = overlayPressed;
-        ColorNameString.GetComponent<TMP_Text>().text = palette.ColorText;
+        colorNameString.text = palette ? palette.ColorText : "Default Colors";
     }
 }

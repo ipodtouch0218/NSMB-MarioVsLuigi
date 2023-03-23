@@ -12,7 +12,9 @@ namespace NSMB.UI.Pause.Options {
             if (!toggle) toggle = GetComponentInChildren<Toggle>();
         }
 
-        public void Awake() {
+        public override void Awake() {
+            base.Awake();
+
             toggle.onValueChanged.AddListener(OnToggleValueChanged);
         }
 

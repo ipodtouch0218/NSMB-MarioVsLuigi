@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 using Fusion;
@@ -11,19 +10,15 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     [Networked(Default = nameof(facingRightDefault), OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
 
     //---Components
-    public Rigidbody2D body;
-    public AudioSource sfx;
+    [SerializeField] public Rigidbody2D body;
+    [SerializeField] public AudioSource sfx;
 
     //---Private Variables
     private bool brickBreakSound;
 
-    public void OnValidate() {
-        Awake();
-    }
-
-    public virtual void Awake() {
+    public virtual void OnValidate() {
         if (!body) body = GetComponent<Rigidbody2D>();
-        if (!sfx)  sfx = GetComponent<AudioSource>();
+        if (!sfx) sfx = GetComponent<AudioSource>();
     }
 
     public override void Spawned() {

@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0,
+  m_Sprite: {fileID: -2074995507315294404, guid: f4b7221be8b79c94c9c8919163014cb0,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frame: 3.905633
+  frame: 0
   fps: 6
   frames:
   - {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
@@ -138,7 +138,7 @@ Transform:
   m_Children:
   - {fileID: 1414799463671012512}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8516101862555970818
 MonoBehaviour:
@@ -153,8 +153,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  body: {fileID: 0}
+  sfx: {fileID: 0}
   _Collector: {fileID: 0}
   sRenderer: {fileID: 388009723025345444}
+  hitbox: {fileID: -4656064841297145525}
 --- !u!61 &-4656064841297145525
 BoxCollider2D:
   m_ObjectHideFlags: 0

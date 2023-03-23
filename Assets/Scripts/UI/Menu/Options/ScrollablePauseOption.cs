@@ -19,7 +19,8 @@ namespace NSMB.UI.Pause.Options {
         //---Events
         public UnityEvent OnValueChanged;
 
-        public void Awake() {
+        public override void Awake() {
+            base.Awake();
             if (!loader)
                 SetValue(0, false);
         }

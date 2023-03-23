@@ -421,10 +421,14 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void CountdownTick(int time) {
-        if (time > 0)
+        if (time > 0) {
             startGameButtonText.text = "Starting in " + time + "...";
-        else
+            hostControlsGroup.interactable = false;
+        } else {
             startGameButtonText.text = "Start Game";
+            PlayerData data = Runner.GetLocalPlayerData();
+            hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
+        }
     }
 
     public void StartGame() {

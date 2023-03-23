@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0,
+  m_Sprite: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -160,9 +160,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  body: {fileID: 1694848990786736830}
+  sfx: {fileID: 6080179494260564542}
   _Collector: {fileID: 0}
   sRenderer: {fileID: 7440053010099547169}
   despawn: 8
+  spriteRenderer: {fileID: 7440053010099547169}
+  physics: {fileID: 5943513950730874965}
+  spriteAnimation: {fileID: 0}
+  hitbox: {fileID: 786289218142832792}
 --- !u!50 &1694848990786736830
 Rigidbody2D:
   serializedVersion: 4
@@ -348,6 +354,7 @@ MonoBehaviour:
   - {fileID: 6080179494260564542}
   soundOrigin: {fileID: 786289218142832796}
   soundRange: 12
+  maxPanning: 0.8
 --- !u!114 &786289218142832794
 MonoBehaviour:
   m_ObjectHideFlags: 0

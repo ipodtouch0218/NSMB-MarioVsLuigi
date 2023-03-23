@@ -239,6 +239,7 @@ namespace NSMB.UI.Pause.Options {
             if (SelectedOption) {
                 SelectedOption.Selected();
                 if (center) {
+                    // TODO: doesnt work smh. figure it out, future me.
                     scroll.verticalNormalizedPosition = scroll.ScrollToCenter(SelectedOption.rectTransform, false);
                 }
             } else {

@@ -22,7 +22,7 @@ namespace NSMB.UI.Pause.Options {
             if (!loader) loader = GetComponent<PauseOptionLoader>();
         }
 
-        public void Awake() {
+        public virtual void Awake() {
             rectTransform = GetComponent<RectTransform>();
         }
 

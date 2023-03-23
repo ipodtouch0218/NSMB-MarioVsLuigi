@@ -21,25 +21,27 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     [SerializeField] private float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
     [SerializeField] private bool avoidPlayers;
 
-    //---Component Variables
-    private SpriteRenderer sRenderer;
-    protected PhysicsEntity physics;
-    private Animator childAnimator;
-    private BoxCollider2D hitbox;
+    //---Components
+    [SerializeField] private SpriteRenderer sRenderer;
+    [SerializeField] protected PhysicsEntity physics;
+    [SerializeField] private Animator childAnimator;
+    [SerializeField] private BoxCollider2D hitbox;
     private IPowerupCollect collectScript;
 
     //---Misc Variables
     private int originalLayer;
 
-    public override void Awake() {
-        base.Awake();
-        sRenderer = GetComponentInChildren<SpriteRenderer>();
-        physics = GetComponent<PhysicsEntity>();
-        hitbox = GetComponent<BoxCollider2D>();
-        collectScript = GetComponent<IPowerupCollect>();
-        childAnimator = GetComponentInChildren<Animator>();
+    public override void OnValidate() {
+        base.OnValidate();
+        if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (!physics) physics = GetComponent<PhysicsEntity>();
+        if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
+        if (!childAnimator) childAnimator = GetComponentInChildren<Animator>();
+    }
 
+    public void Awake() {
         originalLayer = sRenderer.sortingOrder;
+        collectScript = GetComponent<IPowerupCollect>();
 
         if (GroundMask == 0)
             GroundMask = (1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough);

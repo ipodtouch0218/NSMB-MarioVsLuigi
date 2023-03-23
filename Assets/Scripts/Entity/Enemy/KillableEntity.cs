@@ -36,21 +36,21 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     [SerializeField] protected bool flying = false;
 
     //---Components
-    public BoxCollider2D hitbox;
-    protected Animator animator;
-    protected LegacyAnimateSpriteRenderer legacyAnimation;
-    public SpriteRenderer sRenderer;
-    protected AudioSource audioSource;
-    protected PhysicsEntity physics;
+    [SerializeField] public BoxCollider2D hitbox;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected LegacyAnimateSpriteRenderer legacyAnimation;
+    [SerializeField] public SpriteRenderer sRenderer;
+    [SerializeField] protected AudioSource audioSource;
+    [SerializeField] protected PhysicsEntity physics;
 
-    public override void Awake() {
-        base.Awake();
-        hitbox = GetComponent<BoxCollider2D>();
-        animator = GetComponentInChildren<Animator>();
-        audioSource = GetComponent<AudioSource>();
-        sRenderer = GetComponentInChildren<SpriteRenderer>();
-        legacyAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
-        physics = GetComponent<PhysicsEntity>();
+    public override void OnValidate() {
+        base.OnValidate();
+        if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
+        if (!animator) animator = GetComponentInChildren<Animator>();
+        if (!audioSource) audioSource = GetComponent<AudioSource>();
+        if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (!legacyAnimation) legacyAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
+        if (!physics) physics = GetComponent<PhysicsEntity>();
     }
 
     public override void FixedUpdateNetwork() {

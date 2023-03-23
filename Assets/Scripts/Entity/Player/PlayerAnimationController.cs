@@ -261,6 +261,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("triplejump",     controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
         animator.SetBool("holding",        controller.HeldEntity != null);
         animator.SetBool("head carry",     controller.HeldEntity != null && controller.HeldEntity is FrozenCube);
+        animator.SetBool("carry_start",    controller.HeldEntity != null && controller.HeldEntity is FrozenCube && (Runner.SimulationTime - controller.HoldStartTime) < controller.pickupTime);
         animator.SetBool("pipe",           controller.CurrentPipe != null);
         animator.SetBool("blueshell",      controller.State == Enums.PowerupState.BlueShell);
         animator.SetBool("mini",           controller.State == Enums.PowerupState.MiniMushroom);

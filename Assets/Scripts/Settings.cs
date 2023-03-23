@@ -4,10 +4,7 @@ using UnityEngine.Audio;
 
 using NSMB.Utils;
 using System.Linq;
-using System.Xml.Serialization;
-using UnityEditor.ShaderGraph;
 using UnityEngine.InputSystem;
-using Tayx.Graphy.Utils.NumString;
 using System.IO;
 
 public class Settings : Singleton<Settings> {
@@ -99,6 +96,16 @@ public class Settings : Singleton<Settings> {
         set => GlobalController.Instance.outlineFeature.SetActive(value);
     }
 
+    private bool _graphicsPlayerNametags;
+    public bool GraphicsPlayerNametags {
+        get => _graphicsPlayerNametags;
+        set {
+            _graphicsPlayerNametags = value;
+            if (GameManager.Instance)
+                GameManager.Instance.nametagCanvas.gameObject.SetActive(value);
+        }
+    }
+
     public string ControlsBindings {
         get => ControlSystem.controls.asset.SaveBindingOverridesAsJson();
         set => ControlSystem.controls.asset.LoadBindingOverridesFromJson(value);
@@ -111,7 +118,7 @@ public class Settings : Singleton<Settings> {
     public int genericCharacter, genericSkin;
     public bool genericScoreboardAlways, genericChatFiltering;
 
-    public bool graphicsNdsEnabled, graphicsNdsForceAspect;
+    public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNametags;
 
     public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning;
 
@@ -144,6 +151,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Graphics_VSync", GraphicsVsync ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_MaxFPS", GraphicsMaxFps);
         PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_Nametags", GraphicsPlayerNametags ? 1 : 0);
 
         //Audio
         PlayerPrefs.SetFloat("Audio_MasterVolume", AudioMasterVolume);
@@ -204,6 +212,7 @@ public class Settings : Singleton<Settings> {
         GraphicsVsync = PlayerPrefs.GetInt("VSync", 0) == 1;
         GraphicsMaxFps = 0;
         GraphicsPlayerOutlines = true;
+        GraphicsPlayerNametags = true;
 
         AudioMasterVolume = PlayerPrefs.GetFloat("volumeMaster", 0.75f);
         AudioMusicVolume = PlayerPrefs.GetFloat("volumeMusic", 0.5f);
@@ -241,6 +250,7 @@ public class Settings : Singleton<Settings> {
         if (GetIfExists("Graphics_MaxFPS", out int tempMaxFps)) GraphicsMaxFps = tempMaxFps;
         if (GetIfExists("Graphics_VSync", out bool tempVsync)) GraphicsVsync = tempVsync;
         if (GetIfExists("Graphics_PlayerOutlines", out bool tempOutlines)) GraphicsPlayerOutlines = tempOutlines;
+        if (GetIfExists("Graphics_PlayerNametags", out bool tempNametags)) GraphicsPlayerNametags = tempNametags;
 
         //Audio
         if (GetIfExists("Audio_MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;

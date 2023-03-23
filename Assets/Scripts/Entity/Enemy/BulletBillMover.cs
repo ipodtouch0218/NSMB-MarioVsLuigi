@@ -9,14 +9,18 @@ public class BulletBillMover : KillableEntity {
     [SerializeField] private float speed, playerSearchRadius = 4, despawnDistance = 8;
     [SerializeField] private ParticleSystem shootParticles, trailParticles;
 
-    //---Misc Variables
+    //---Components
+    [SerializeField] private Animation spriteAnimation;
+
+    //---Private Variables
     private Vector2 searchVector;
-    private new Animation animation;
 
-    public override void Awake() {
-        base.Awake();
-        animation = GetComponentInChildren<Animation>();
+    public override void OnValidate() {
+        base.OnValidate();
+        if (!spriteAnimation) spriteAnimation = GetComponent<Animation>();
+    }
 
+    public void Awake() {
         searchVector = new(playerSearchRadius * 2, 100);
     }
 
@@ -46,7 +50,7 @@ public class BulletBillMover : KillableEntity {
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
-            animation.enabled = false;
+            spriteAnimation.enabled = false;
             body.isKinematic = true;
             return;
         }

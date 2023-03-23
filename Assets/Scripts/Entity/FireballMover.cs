@@ -25,17 +25,17 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     [SerializeField] private float bounceHeight = 6.75f, terminalVelocity = 6.25f;
 
     //---Components
-    private PhysicsEntity physics;
-    private NetworkRigidbody2D nrb;
-    private SpriteRenderer[] renderers;
-    private BoxCollider2D hitbox;
+    [SerializeField] private PhysicsEntity physics;
+    [SerializeField] private NetworkRigidbody2D nrb;
+    [SerializeField] private SpriteRenderer[] renderers;
+    [SerializeField] private BoxCollider2D hitbox;
 
-    public override void Awake() {
-        base.Awake();
-        physics = GetComponent<PhysicsEntity>();
-        nrb = GetComponent<NetworkRigidbody2D>();
-        hitbox = GetComponent<BoxCollider2D>();
-        renderers = GetComponentsInChildren<SpriteRenderer>();
+    public override void OnValidate() {
+        base.OnValidate();
+        if (!physics) physics = GetComponent<PhysicsEntity>();
+        if (!nrb) nrb = GetComponent<NetworkRigidbody2D>();
+        if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
+        if ((renderers?.Length ?? 0) == 0) renderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
     public void Initialize(PlayerController owner, Vector2 spawnpoint, bool ice, bool right) {

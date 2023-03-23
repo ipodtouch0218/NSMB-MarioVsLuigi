@@ -137,6 +137,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &8836298984178612590
 GameObject:
   m_ObjectHideFlags: 0
@@ -192,14 +193,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  body: {fileID: 8836298984178612591}
+  sfx: {fileID: 3399800873378663516}
   _IsFrozen:
     _value: 0
   _IsDead:
     _value: 0
   iceCarryable: 1
   flying: 0
-  hitbox: {fileID: 0}
-  sRenderer: {fileID: 0}
+  hitbox: {fileID: 8836298984178612584}
+  animator: {fileID: 3696720750550087088}
+  legacyAnimation: {fileID: 0}
+  sRenderer: {fileID: 8133877121043965814}
+  audioSource: {fileID: 3399800873378663516}
+  physics: {fileID: 818487035572622980}
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 4.5
@@ -226,7 +233,6 @@ MonoBehaviour:
   blue: 0
   canBeFlipped: 1
   flipXFlip: 0
-  putdown: 0
 --- !u!50 &8836298984178612591
 Rigidbody2D:
   serializedVersion: 4
@@ -322,6 +328,7 @@ MonoBehaviour:
     _value: 0
   _CrushableGround:
     _value: 0
+  _PreviousTickVelocity: {x: 0, y: 0}
   _FloorAngle: 0
   currentCollider: {fileID: 8836298984178612584}
   goUpSlopes: 0
@@ -369,6 +376,7 @@ MonoBehaviour:
   - {fileID: 3399800873378663516}
   soundOrigin: {fileID: 8836298984178612587}
   soundRange: 12
+  maxPanning: 0.8
 --- !u!82 &3399800873378663516
 AudioSource:
   m_ObjectHideFlags: 0
