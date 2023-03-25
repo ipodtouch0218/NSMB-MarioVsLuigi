@@ -3,11 +3,12 @@ using UnityEngine.InputSystem;
 using TMPro;
 
 namespace NSMB.UI.Pause.Options {
-    public class RebindOptionButton : MonoBehaviour {
+    public class RebindPauseOptionButton : MonoBehaviour {
 
         //---Public Variables
         [HideInInspector] public InputAction action;
         public int bindingIndex = -1;
+        public InputBinding Binding => action.bindings[bindingIndex];
 
         //---Serialized Variables
         [SerializeField] private TMP_Text label;
@@ -24,7 +25,7 @@ namespace NSMB.UI.Pause.Options {
 
         }
 
-        private void UpdateLabel() {
+        public void UpdateLabel() {
             InputBinding targetBinding = action.bindings[bindingIndex];
             if (targetBinding.isComposite) {
                 string combined = "";
@@ -40,7 +41,7 @@ namespace NSMB.UI.Pause.Options {
                     combined = "Arrow Keys,";
                 }
                 if (combined.Length > 11)
-                    combined = combined[..0] + "....";
+                    combined = "....";
 
                 label.text = combined[..^1];
             } else {

@@ -30,11 +30,10 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public AudioSource sfx, music;
     public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, creditsSelected, controlsSelected, updateBoxSelected, ColorName;
+    public GameObject mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
     public byte currentSkin;
 
     //---Serialized Fields
-    [SerializeField] private RebindManager rebindManager;
     [SerializeField] public PlayerListHandler playerList;
     [SerializeField] public RoomListManager roomManager;
     [SerializeField] private ColorChooser colorManager;
@@ -43,7 +42,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     [SerializeField] private CanvasGroup hostControlsGroup;
     [SerializeField] private NetworkErrorPrompt networkErrorPrompt;
 
-    [SerializeField] private GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, controlsMenu, updateBox, connecting;
+    [SerializeField] private GameObject title, bg, mainMenu, lobbyMenu, createLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox, connecting;
     [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
     [SerializeField] private GameObject errorBox, errorButton;
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
@@ -117,7 +116,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         }
 
         // Controls & Settings
-        rebindManager.Init();
         nicknameField.text = Settings.Instance.genericNickname;
         nicknameField.characterLimit = NicknameMax;
         UpdateNickname();
@@ -252,8 +250,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         title.SetActive(false);
         bg.SetActive(false);
         mainMenu.SetActive(false);
-        optionsMenu.SetActive(false);
-        controlsMenu.SetActive(false);
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
@@ -295,13 +291,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
     public void OpenOptions() {
         GlobalController.Instance.optionsManager.OpenMenu();
-    }
-    public void OpenControls() {
-        DisableAllMenus();
-        bg.SetActive(true);
-        controlsMenu.SetActive(true);
-
-        EventSystem.current.SetSelectedGameObject(controlsSelected);
     }
     public void OpenCredits() {
         DisableAllMenus();

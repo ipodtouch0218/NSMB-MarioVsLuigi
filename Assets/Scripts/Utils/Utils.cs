@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Extensions;
+using System.Runtime.CompilerServices;
 
 namespace NSMB.Utils {
     public class Utils {

@@ -7,6 +7,7 @@ namespace NSMB.UI.Pause.Options {
     public class PauseOptionTab : MonoBehaviour {
 
         //---Serialized Variables
+        [Header("Tab Graphic")]
         [SerializeField] private Sprite selectedSprite;
         [SerializeField] private Sprite deselectedSprite;
         [SerializeField] private Color selectedTextColor = Color.white;

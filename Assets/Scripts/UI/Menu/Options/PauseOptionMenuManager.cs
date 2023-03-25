@@ -73,6 +73,9 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void Update() {
+            if (!Application.isPlaying)
+                return;
+
             if (!SelectedOption)
                 return;
 

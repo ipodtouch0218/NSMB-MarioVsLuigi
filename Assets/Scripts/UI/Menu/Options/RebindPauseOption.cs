@@ -3,13 +3,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace NSMB.UI.Pause.Options {
-    public class RebindOption : PauseOption {
+    public class RebindPauseOption : PauseOption {
 
         //---Public Variables
         [HideInInspector] public InputAction action;
 
         //---Serialized Variables
-        [SerializeField] private RebindOptionButton[] buttons;
+        [SerializeField] private RebindPauseOptionButton[] buttons;
+        [SerializeField] private PauseOptionControlsTab rebindManager;
 
         //---Private Variables
         private int selectedIndex;
@@ -47,15 +48,13 @@ namespace NSMB.UI.Pause.Options {
             OnButtonClick(buttons[selectedIndex]);
         }
 
-        public void OnButtonClick(RebindOptionButton button) {
+        public void OnButtonClick(RebindPauseOptionButton button) {
             int index = Array.IndexOf(buttons, button);
 
             SetCurrentOption(index);
-            //if (button.IsComposite) {
-            //    // Open prompt for composite bindings
-            //} else {
-            //    // Immediately open rebind prompt
-            //}
+
+            // Start rebinding:
+            rebindManager.StartRebind(button);
         }
 
         private void SetCurrentOption(int index) {

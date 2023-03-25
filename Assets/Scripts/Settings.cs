@@ -122,7 +122,7 @@ public class Settings : Singleton<Settings> {
 
     public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning;
 
-    public bool controlsFireballSprint, controlsAutoSprint;
+    public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
 
     //---Private Variables
     [SerializeField] private AudioMixer mixer;
@@ -133,17 +133,20 @@ public class Settings : Singleton<Settings> {
     public void Start() {
         VersionUpdaters = new Action[] { LoadFromVersion0, LoadFromVersion1 };
         LoadSettings();
+
+        // Potential duplicate bindings not activating fix?
+        //InputSystem.settings.SetInternalFeatureFlag("DISABLE_SHORTCUT_SUPPORT", true);
     }
 
     public void SaveSettings() {
-        //Generic
+        // Generic
         PlayerPrefs.SetString("Generic_Nickname", genericNickname);
         PlayerPrefs.SetInt("Generic_ScoreboardAlwaysVisible", genericScoreboardAlways ? 1 : 0);
         PlayerPrefs.SetInt("Generic_ChatFilter", genericChatFiltering ? 1 : 0);
         PlayerPrefs.SetInt("Generic_Character", genericCharacter);
         PlayerPrefs.SetInt("Generic_Skin", genericSkin);
 
-        //Graphics
+        // Graphics
         PlayerPrefs.SetString("Graphics_FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
         PlayerPrefs.SetInt("Graphics_FullscreenMode", GraphicsFullscreenMode);
         PlayerPrefs.SetInt("Graphics_NDS_Enabled", graphicsNdsEnabled ? 1 : 0);
@@ -153,7 +156,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_Nametags", GraphicsPlayerNametags ? 1 : 0);
 
-        //Audio
+        // Audio
         PlayerPrefs.SetFloat("Audio_MasterVolume", AudioMasterVolume);
         PlayerPrefs.SetFloat("Audio_MusicVolume", AudioMusicVolume);
         PlayerPrefs.SetFloat("Audio_SFXVolume", AudioSFXVolume);
@@ -161,9 +164,10 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Audio_MuteSFXOnUnfocus", audioMuteSFXOnUnfocus ? 1 : 0);
         PlayerPrefs.SetInt("Audio_Panning", audioPanning ? 1 : 0);
 
-        //Controls
+        // Controls
         PlayerPrefs.SetInt("Controls_FireballFromSprint", controlsFireballSprint ? 1 : 0);
         PlayerPrefs.SetInt("Controls_AutoSprint", controlsAutoSprint ? 1 : 0);
+        PlayerPrefs.SetInt("Controls_PropellerJump", controlsPropellerJump ? 1 : 0);
         PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
 
         PlayerPrefs.Save();
@@ -228,6 +232,7 @@ public class Settings : Singleton<Settings> {
         }
         controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         controlsAutoSprint = false;
+        controlsPropellerJump = false;
 
         MassDeleteKeys("Nickname", "ScoreboardAlwaysVisible", "ChatFilter", "Character", "Skin", "NDSResolution",
             "NDS4by3", "VSync", "volumeMaster", "volumeMusic", "volumeSFX", "FireballFromSprint");
@@ -263,6 +268,7 @@ public class Settings : Singleton<Settings> {
         //Controls
         GetIfExists("Controls_FireballFromSprint", out controlsFireballSprint);
         GetIfExists("Controls_AutoSprint", out controlsAutoSprint);
+        GetIfExists("Controls_PropellerJump", out controlsPropellerJump);
         if (GetIfExists("Controls_Bindings", out string tempBindings)) ControlsBindings = tempBindings;
     }
 
