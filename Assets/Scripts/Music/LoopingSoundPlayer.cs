@@ -34,7 +34,7 @@ public class LoopingSoundPlayer : MonoBehaviour {
     }
 
     public virtual void Play(LoopingSoundData song, bool restartIfAlreadyPlaying = false) {
-        if (currentAudio == song && !restartIfAlreadyPlaying)
+        if (currentAudio == song && !audioSource.isPlaying && !restartIfAlreadyPlaying)
             return;
 
         currentAudio = song;
@@ -44,7 +44,16 @@ public class LoopingSoundPlayer : MonoBehaviour {
         audioSource.Play();
     }
 
-    public void Stop() {
-        audioSource.Stop();
+    public void Restart() {
+        if (currentAudio)
+            Play(currentAudio, true);
+    }
+
+    public void Unpause() {
+        audioSource.UnPause();
+    }
+
+    public void Pause() {
+        audioSource.Pause();
     }
 }

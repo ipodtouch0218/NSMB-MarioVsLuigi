@@ -22,38 +22,50 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public override void OnLeftPress() {
-            if (slider.wholeNumbers)
+            if (slider.wholeNumbers) {
                 slider.value--;
-            holdTime = 0;
+                holdTime = -0.33f;
+            } else {
+                holdTime = 0;
+            }
         }
 
         public override void OnRightPress() {
-            if (slider.wholeNumbers)
+            if (slider.wholeNumbers) {
                 slider.value++;
-            holdTime = 0;
+                holdTime = -0.33f;
+            } else {
+                holdTime = 0;
+            }
         }
 
         public override void OnLeftHeld() {
             holdTime += Time.deltaTime;
+
+            float range = slider.maxValue - slider.minValue;
             if (slider.wholeNumbers) {
-                if (holdTime > 0.15f) {
+
+                if (holdTime > 3f / range) {
                     slider.value--;
                     holdTime = 0;
                 }
             } else {
-                slider.value -= (slider.maxValue - slider.minValue) * 0.5f * Time.deltaTime;
+                slider.value -= range * 0.5f * Time.deltaTime;
             }
         }
 
         public override void OnRightHeld() {
             holdTime += Time.deltaTime;
+
+            float range = slider.maxValue - slider.minValue;
             if (slider.wholeNumbers) {
-                if (holdTime > 0.15f) {
+
+                if (holdTime > 3f / range) {
                     slider.value++;
                     holdTime = 0;
                 }
             } else {
-                slider.value += (slider.maxValue - slider.minValue) * 0.5f * Time.deltaTime;
+                slider.value += range * 0.5f * Time.deltaTime;
             }
         }
 

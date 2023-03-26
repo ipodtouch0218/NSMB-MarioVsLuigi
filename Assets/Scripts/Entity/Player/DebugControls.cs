@@ -53,9 +53,11 @@ public class DebugControls : MonoBehaviour {
 
         FreezePlayer(Key.F9);
 
-        if (kb[Key.T].wasPressedThisFrame) {
-            CanvasGroup group = GameManager.Instance.transform.Find("New HUD").GetComponent<CanvasGroup>();
-            group.alpha = 1f - group.alpha;
+        if (kb[Key.U].wasPressedThisFrame) {
+            GameManager.Instance.musicManager.Restart();
+        }
+        if (kb[Key.I].wasPressedThisFrame) {
+            GameManager.Instance.musicManager.Pause();
         }
         if (kb[Key.O].wasPressedThisFrame) {
             GameManager.Instance.localPlayer.cameraController.IsControllingCamera = !GameManager.Instance.localPlayer.GetComponent<PlayerController>().cameraController.IsControllingCamera;

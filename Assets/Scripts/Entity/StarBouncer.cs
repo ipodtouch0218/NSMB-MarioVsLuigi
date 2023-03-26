@@ -211,8 +211,10 @@ public class StarBouncer : CollectableEntity {
             graphicTransform.gameObject.SetActive(false);
             particles.Stop();
             sfx.Stop();
-            bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team;
-            Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
+
+            bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
+            Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
+
             Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
         } else {
             // oops...

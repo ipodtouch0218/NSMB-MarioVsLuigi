@@ -92,7 +92,7 @@ public class GameManager : NetworkBehaviour {
 
     //---Components
     public SpectationManager spectationManager;
-    [SerializeField] private LoopingMusicPlayer musicManager;
+    public LoopingMusicPlayer musicManager;
     public AudioSource music, sfx;
 
     // TODO: figure out how to do rollback-able.... fuck
@@ -450,7 +450,8 @@ public class GameManager : NetworkBehaviour {
         yield return new WaitForSecondsRealtime(1);
 
         bool draw = winningTeam == -1;
-        bool win = !draw && winningTeam == Runner.GetLocalPlayerData().Team;
+        PlayerData local = Runner.GetLocalPlayerData();
+        bool win = !draw && (winningTeam == local.Team || local.IsCurrentlySpectating);
         int secondsUntilMenu = draw ? 5 : 4;
 
         if (draw) {

@@ -41,6 +41,8 @@ public class SessionData : NetworkBehaviour {
     private Tick lastUpdatedTick;
     private HashSet<NetAddress> bannedIps;
     private HashSet<string> bannedIds;
+    private float lastStartCancelTime = -10f;
+    private bool playedStartSound;
 
     //---Properties
     private ChatManager Chat => MainMenuManager.Instance.chat;
@@ -214,11 +216,22 @@ public class SessionData : NetworkBehaviour {
         if (!MainMenuManager.Instance)
             return;
 
-        if (!data.Behaviour.GameStartTimer.IsRunning) {
-            MainMenuManager.Instance.chat.AddChatMessage("Game start cancelled.", Color.blue);
+        SessionData sd = data.Behaviour;
+        float time = sd.Runner.SimulationTime;
+
+        if (!sd.GameStartTimer.IsRunning) {
+            if (sd.playedStartSound) {
+                MainMenuManager.Instance.chat.AddChatMessage("Game start cancelled.", Color.blue);
+            }
+            sd.lastStartCancelTime = sd.Runner.SimulationTime;
             MainMenuManager.Instance.CountdownTick(-1);
+            sd.playedStartSound = false;
         } else {
-            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
+            if (sd.lastStartCancelTime + 3f < time || sd.Runner.GetLocalPlayerData().IsRoomOwner) {
+                MainMenuManager.Instance.chat.AddChatMessage("Game starting in 3 seconds...", Color.blue);
+                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
+                sd.playedStartSound = true;
+            }
         }
     }
 }

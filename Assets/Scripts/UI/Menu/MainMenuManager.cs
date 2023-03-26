@@ -59,7 +59,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     [SerializeField] private List<MapData> maps;
 
     //---Private Variables
-    private Coroutine playerPingUpdateCoroutine, quitCoroutine;
+    private Coroutine playerPingUpdateCoroutine, quitCoroutine, fadeMusicCoroutine;
     private bool validName, initialConnection;
 
     public void Awake() => Set(this, false);
@@ -413,10 +413,24 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         if (time > 0) {
             startGameButtonText.text = "Starting in " + time + "...";
             hostControlsGroup.interactable = false;
+            if (time == 1 && fadeMusicCoroutine == null)
+                fadeMusicCoroutine = StartCoroutine(FadeMusic());
         } else {
             startGameButtonText.text = "Start Game";
             PlayerData data = Runner.GetLocalPlayerData();
             hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
+            if (fadeMusicCoroutine != null) {
+                StopCoroutine(fadeMusicCoroutine);
+                fadeMusicCoroutine = null;
+            }
+            music.volume = 1;
+        }
+    }
+
+    private IEnumerator FadeMusic() {
+        while (music.volume > 0) {
+            music.volume -= Time.deltaTime;
+            yield return null;
         }
     }
 
