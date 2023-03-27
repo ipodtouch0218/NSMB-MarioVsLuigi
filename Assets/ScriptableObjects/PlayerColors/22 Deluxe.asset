@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
-    hatColor: {r: 0.48235294, g: 0.41568628, b: 0.10980392, a: 1}
+    shirtColor: {r: 0.48235294, g: 0.41568628, b: 0.10980392, a: 1}
     overallsColor: {r: 0.87843144, g: 0.18039216, b: 0.13725491, a: 1}
-    Name: SMB Deluxe
+    name: SMB Deluxe
+    hatUsesOverallsColor: 1
   - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
-    hatColor: {r: 0.48235294, g: 0.41568628, b: 0.10980392, a: 1}
+    shirtColor: {r: 0.48235294, g: 0.41568628, b: 0.10980392, a: 1}
     overallsColor: {r: 0.098039225, g: 0.58431375, b: 0.098039225, a: 1}
-    Name: SMB Deluxe
-  ColorText: SMB Deluxe
+    name: SMB Deluxe
+    hatUsesOverallsColor: 1

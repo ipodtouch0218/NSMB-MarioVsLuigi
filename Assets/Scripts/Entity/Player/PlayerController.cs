@@ -2292,7 +2292,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             JumpBufferTime = Runner.SimulationTime + 0.15f;
         }
 
-        bool canJump = pressedButtons.IsSet(PlayerControls.Jump) || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
+        bool jumpPressed = pressedButtons.IsSet(PlayerControls.Jump);
+        bool canJump = jumpPressed || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
         bool doJump = (canJump && (IsOnGround || Runner.SimulationTime <= CoyoteTime)) || (!IsSwimming && SwimJump);
         bool doWalljump = canJump && !IsOnGround && WallSliding;
 
@@ -2341,16 +2342,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
 
-        if (PropellerLaunchTimer.IsActive(Runner)) {
-            IsSwimming = false;
-            float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
-            float targetVelocity = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0);
-            body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y + (24f * Runner.DeltaTime), targetVelocity));
-            if (IsOnGround)
-                body.position += Vector2.up * 0.05f;
-        } else if (powerupAction && IsPropellerFlying && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime * 0.25f) {
-            PropellerSpinTimer = TickTimer.CreateFromSeconds(Runner, propellerSpinTime);
-            PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
+        if (IsPropellerFlying) {
+            if (PropellerLaunchTimer.IsActive(Runner)) {
+                IsSwimming = false;
+                float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
+                float targetVelocity = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0);
+                body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y + (24f * Runner.DeltaTime), targetVelocity));
+                if (IsOnGround)
+                    body.position += Vector2.up * 0.05f;
+            } else if (((jumpPressed && Settings.Instance.controlsPropellerJump) || powerupAction) && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime * 0.25f) {
+                PropellerSpinTimer = TickTimer.CreateFromSeconds(Runner, propellerSpinTime);
+                PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
+            }
         }
 
         if (HeldEntity) {

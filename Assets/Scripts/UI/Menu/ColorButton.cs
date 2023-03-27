@@ -21,7 +21,7 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
         }
 
         PlayerColors col = palette.GetPlayerColors(player);
-        shirt.color = col.hatColor;
+        shirt.color = col.shirtColor;
         overalls.color = col.overallsColor;
         overlay.enabled = false;
     }
@@ -29,7 +29,7 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
     public void OnSelect(BaseEventData eventData) {
         overlay.enabled = true;
         overlay.sprite = overlayUnpressed;
-        colorNameString.text = palette ? palette.ColorText : "Default Colors";
+        colorNameString.text = palette ? palette.currentColorName : "Default Colors";
     }
 
     public void OnDeselect(BaseEventData eventData) {
@@ -39,6 +39,6 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
     public void OnPress() {
         overlay.sprite = overlayPressed;
-        colorNameString.text = palette ? palette.ColorText : "Default Colors";
+        colorNameString.text = palette ? palette.currentColorName : "Default Colors";
     }
 }

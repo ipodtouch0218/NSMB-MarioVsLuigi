@@ -635,8 +635,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             CharacterData character = Runner.GetLocalPlayerData().GetCharacterData();
             PlayerColors colors = ScriptableManager.Instance.skins[index].GetPlayerColors(character);
             overallsColorImage.color = colors.overallsColor;
-            shirtColorImage.color = colors.hatColor;
-            ColorName.GetComponent<TMP_Text>().text = colors.Name;
+            shirtColorImage.color = colors.shirtColor;
+            ColorName.GetComponent<TMP_Text>().text = colors.name;
         }
 
         playerColorDisabledIcon.SetActive(disabled);

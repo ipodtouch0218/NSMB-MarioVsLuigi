@@ -21,7 +21,6 @@ public class PlayerAnimationController : NetworkBehaviour {
     [SerializeField] private Avatar smallAvatar, largeAvatar;
     [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle;
     [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
-    [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
     [SerializeField] public float pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
     [SerializeField] private AudioClip normalDrill, propellerDrill;
     [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
@@ -44,6 +43,7 @@ public class PlayerAnimationController : NetworkBehaviour {
     private Vector3 modelRotationTarget;
     private bool modelRotateInstantly;
     private Coroutine blinkRoutine;
+    private PlayerColors skin;
 
     public void Awake() {
         controller = GetComponent<PlayerController>();
@@ -62,9 +62,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         PlayerData data = Object.InputAuthority.GetPlayerData(Runner);
 
         if (ScriptableManager.Instance.skins[data ? data.SkinIndex : 0] is PlayerColorSet colorSet) {
-            PlayerColors colors = colorSet.GetPlayerColors(controller.character);
-            primaryColor = colors.overallsColor.linear;
-            secondaryColor = colors.hatColor.linear;
+            skin = colorSet.GetPlayerColors(controller.character);
         }
 
         renderers.AddRange(GetComponentsInChildren<MeshRenderer>(true));
@@ -302,8 +300,9 @@ public class PlayerAnimationController : NetworkBehaviour {
             materialBlock = new();
 
             //Customizeable player color
-            materialBlock.SetVector("OverallsColor", primaryColor);
-            materialBlock.SetVector("ShirtColor", secondaryColor);
+            materialBlock.SetVector("OverallsColor", skin.overallsColor.linear);
+            materialBlock.SetVector("ShirtColor", skin.shirtColor.linear);
+            materialBlock.SetFloat("HatUsesOverallsColor", skin.hatUsesOverallsColor ? 1f : 0f);
 
             if (enableGlow)
                 materialBlock.SetColor("GlowColor", GlowColor);

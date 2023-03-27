@@ -10,15 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
-  m_Name: 23 PBJ
+  m_Name: 23 Black
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
-    hatColor: {r: 0.38161904, g: 0.044855822, b: 0.4528302, a: 1}
-    overallsColor: {r: 0.8584906, g: 0.52161604, b: 0.08503916, a: 1}
-    Name: PB & J Sandwich
+    shirtColor: {r: 0, g: 0, b: 0, a: 1}
+    overallsColor: {r: 0.631, g: 0.10694915, b: 0.1604237, a: 1}
+    name: Dusk
+    hatUsesOverallsColor: 1
   - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
-    hatColor: {r: 0.8588236, g: 0.52156866, b: 0.08627451, a: 1}
-    overallsColor: {r: 0.3803922, g: 0.043137256, b: 0.45098042, a: 1}
-    Name: PB & J Sandwich
-  ColorText: PB & J Sandwich
+    shirtColor: {r: 0, g: 0, b: 0, a: 1}
+    overallsColor: {r: 0.05902703, g: 0.312, b: 0.06324324, a: 1}
+    name: Dusk
+    hatUsesOverallsColor: 1

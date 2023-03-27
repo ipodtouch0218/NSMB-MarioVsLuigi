@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 using TMPro;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NSMB.UI.Pause.Options {
     public class PauseOptionControlsTab : PauseOptionTab {
@@ -62,6 +64,8 @@ namespace NSMB.UI.Pause.Options {
 
         private void CreateActions() {
 
+            PauseOption[] existingOptions = options.ToArray();
+
             for (int i = 0; i < controls.actionMaps.Count; i++) {
                 InputActionMap map = controls.actionMaps[i];
 
@@ -92,6 +96,12 @@ namespace NSMB.UI.Pause.Options {
                     options.Add(newOption);
                 }
 
+                if (i == 0) {
+                    // move the default existing settings to be below me.
+                    foreach (PauseOption option in existingOptions) {
+                        option.transform.SetAsLastSibling();
+                    }
+                }
 
                 if (i < controls.actionMaps.Count - 1) {
                     NonselectableOption newSpacer = Instantiate(spacerTemplate);
@@ -101,9 +111,6 @@ namespace NSMB.UI.Pause.Options {
 
                     options.Add(newSpacer);
                 }
-
-                //if (map.name == "Player")
-                //    playerSettings.transform.SetAsLastSibling();
             }
         }
 

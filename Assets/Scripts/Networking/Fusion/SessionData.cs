@@ -232,6 +232,7 @@ public class SessionData : NetworkBehaviour {
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
                 sd.playedStartSound = true;
             }
+            MainMenuManager.Instance.CountdownTick(3);
         }
     }
 }
