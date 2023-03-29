@@ -52,15 +52,15 @@ public class GameEventRpcs : NetworkBehaviour {
         tilemap.SetTile(new(x, y, 0), tile);
     }
 
-#pragma warning disable IDE0060
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_UpdateSpectatorTilemap([RpcTarget] PlayerRef targetPlayer, TileChangeInfo[] changes, string[] tileNames) {
-        foreach (TileChangeInfo change in changes) {
-            TileBase tile = Utils.GetCacheTile(tileNames[change.tileIndex]);
-            tilemap.SetTile(new(change.x, change.y, 0), tile);
-        }
-    }
-#pragma warning restore IDE0060
+//#pragma warning disable IDE0060
+//    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+//    public void Rpc_UpdateSpectatorTilemap([RpcTarget] PlayerRef targetPlayer, TileChangeInfo[] changes, string[] tileNames) {
+//        foreach (TileChangeInfo change in changes) {
+//            TileBase tile = Utils.GetCacheTile(tileNames[change.tileIndex]);
+//            tilemap.SetTile(new(change.x, change.y, 0), tile);
+//        }
+//    }
+//#pragma warning restore IDE0060
 
     //---GAME STATE
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

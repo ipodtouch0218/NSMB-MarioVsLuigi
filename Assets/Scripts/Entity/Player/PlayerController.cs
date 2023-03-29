@@ -1048,7 +1048,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         RespawnTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
-        sfx.enabled = true;
         if (Lives == 0) {
             GameManager.Instance.CheckForWinner();
 

@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: potentially try to instead use the OnParticleSystemStopped callback?
+// I don't know if children will call that though...
 public class ParticleAutoDestroy : MonoBehaviour {
 
-    [SerializeField] private bool onlyDisable = false;
+    //---Serialized Variables
+    [SerializeField] private bool onlyDisable;
 
+    //---Private Variables
     private readonly List<ParticleSystem> systems = new();
 
     public void OnEnable() {

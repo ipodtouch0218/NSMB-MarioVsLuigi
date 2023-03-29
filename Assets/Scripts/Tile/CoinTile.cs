@@ -2,11 +2,13 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Utils;
+using UnityEngine.Tilemaps;
 
 [CreateAssetMenu(fileName = "CoinTile", menuName = "ScriptableObjects/Tiles/CoinTile", order = 1)]
-public class CoinTile : BreakableBrickTile {
+public class CoinTile : BreakableBrickTile, IHaveTileDependencies {
 
-    [SerializeField] private string resultTile;
+    //---Serialized Variables
+    [SerializeField] private TileBase resultTile;
 
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (base.Interact(interacter, direction, worldLocation))
@@ -46,9 +48,13 @@ public class CoinTile : BreakableBrickTile {
 
         if (GameManager.Instance.Object.HasStateAuthority) {
             GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
-                resultTile, direction == InteractionDirection.Down, Vector2.zero, true, NetworkPrefabRef.Empty);
+                resultTile.name, direction == InteractionDirection.Down, Vector2.zero, true, NetworkPrefabRef.Empty);
         }
 
         return false;
+    }
+
+    public TileBase[] GetTileDependencies() {
+        return new TileBase[] { resultTile };
     }
 }

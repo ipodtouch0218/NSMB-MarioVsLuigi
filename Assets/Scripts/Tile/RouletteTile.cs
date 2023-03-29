@@ -1,13 +1,14 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile")]
-public class RouletteTile : BreakableBrickTile {
+public class RouletteTile : BreakableBrickTile, IHaveTileDependencies {
 
     //---Serialized Variables
-    [SerializeField] private string resultTile;
+    [SerializeField] private TileBase resultTile;
     [SerializeField] private Vector2 topSpawnOffset, bottomSpawnOffset;
 
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
@@ -47,11 +48,15 @@ public class RouletteTile : BreakableBrickTile {
             Vector2 offset = downwards ? bottomSpawnOffset + (spawnResult == PrefabList.Instance.Powerup_MegaMushroom ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
 
             GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
-                resultTile, downwards, offset, false, spawnResult);
+                resultTile.name, downwards, offset, false, spawnResult);
         }
 
         interacter.PlaySound(Enums.Sounds.World_Block_Powerup);
 
         return false;
+    }
+
+    public TileBase[] GetTileDependencies() {
+        return new TileBase[] { resultTile };
     }
 }

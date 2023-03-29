@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Utils;
 
-public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
+public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, IHaveTileDependencies {
 
+    //---Static Variables
     private static readonly Vector3 BlockOffset = new(0.25f, 0.25f);
     private static readonly Color GizmoColor = new(1, 1, 1, 0.5f);
 
@@ -12,8 +14,16 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
     [Networked] private TickTimer BumpTimer { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private string bumpTile = "SpecialTiles/YellowQuestion";
-    [SerializeField] private string resultTile = "SpecialTiles/EmptyYellowQuestion";
+    [SerializeField] private TileBase bumpTile;
+    [SerializeField] private TileBase resultTile;
+
+    public void OnValidate() {
+        Start();
+    }
+
+    public void Start() {
+        transform.position = new Vector3(Mathf.FloorToInt(transform.position.x * 2) / 2f, Mathf.FloorToInt(transform.position.y * 2) / 2f, transform.position.z) + BlockOffset;
+    }
 
     public void InteractWithPlayer(PlayerController player) {
         if (!BumpTimer.ExpiredOrNotRunning(Runner))
@@ -44,12 +54,18 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable {
         Coin.GivePlayerCoin(player, location);
 
         if (GameManager.Instance.Object.HasStateAuthority) {
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
-                resultTile, false, Vector2.zero, true, NetworkPrefabRef.Empty);
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile.name,
+                resultTile.name, false, Vector2.zero, true, NetworkPrefabRef.Empty);
         }
     }
 
+#if UNITY_EDITOR
     public void OnDrawGizmos() {
-        Gizmos.DrawIcon(transform.position, "HiddenBlock", true, GizmoColor);
+        Gizmos.DrawIcon(new Vector3(Mathf.FloorToInt(transform.position.x * 2) / 2f, Mathf.FloorToInt(transform.position.y * 2) / 2f, transform.position.z) + BlockOffset, "HiddenBlock", true, GizmoColor);
+    }
+#endif
+
+    public TileBase[] GetTileDependencies() {
+        return new TileBase[] { bumpTile, resultTile };
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 using Discord;
 using Fusion;
+using NSMB.Utils;
 
 public class DiscordController : MonoBehaviour {
 
@@ -78,7 +79,10 @@ public class DiscordController : MonoBehaviour {
         if (SessionData.Instance) {
 
             activity.Details = NetworkHandler.Runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = SessionData.Instance.MaxPlayers }, Id = session.Name + "1" };
+            if (!NetworkHandler.Runner.IsSinglePlayer) {
+                Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxSize);
+                activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = maxSize }, Id = session.Name + "1" };
+            }
             activity.State = session.IsVisible ? "In a Public Game" : "In a Private Game";
             activity.Secrets = new() { Join = session.Name };
 

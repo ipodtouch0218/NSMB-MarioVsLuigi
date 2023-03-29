@@ -141,6 +141,9 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
+        if (!hasState)
+            return;
+
         if (!GameManager.Instance.GameEnded && !Collector)
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
 

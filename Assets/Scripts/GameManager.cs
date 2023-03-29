@@ -91,6 +91,7 @@ public class GameManager : NetworkBehaviour {
     private bool pauseStateLastFrame, optionsWereOpenLastFrame;
 
     //---Components
+    public TileManager tileManager;
     public SpectationManager spectationManager;
     public LoopingMusicPlayer musicManager;
     public AudioSource music, sfx;
@@ -278,10 +279,10 @@ public class GameManager : NetworkBehaviour {
             return;
 
         //send spectating player the current level
-        if (Utils.GetTilemapChanges(originalTiles, originalTilesOrigin, tilemap, out TileChangeInfo[] tilePositions, out string[] tileNames)) {
-            Debug.Log($"sent spectator tile changes. {tilePositions.Length} tiles changed.");
-            rpcs.Rpc_UpdateSpectatorTilemap(player, tilePositions, tileNames);
-        }
+        //if (Utils.GetTilemapChanges(originalTiles, originalTilesOrigin, tilemap, out TileChangeInfo[] tilePositions, out string[] tileNames)) {
+        //    Debug.Log($"sent spectator tile changes. {tilePositions.Length} tiles changed.");
+        //    rpcs.Rpc_UpdateSpectatorTilemap(player, tilePositions, tileNames);
+        //}
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {

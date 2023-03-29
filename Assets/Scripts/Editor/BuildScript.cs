@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,8 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 
-public class BuildScript : EditorWindow
-{
+public class BuildScript : EditorWindow {
     private const string path = "Builds";
 
     // probs could be done better
@@ -30,16 +28,14 @@ public class BuildScript : EditorWindow
     public Vector2 mainScroll;
 
     [MenuItem("Build/Mog Build Menu")]
-    public static void ShowWindow()
-    {
+    public static void ShowWindow() {
         GetWindow<BuildScript>();
     }
 
     /// <summary>
     /// this function is for builds without a graphical unity editor
     /// </summary>
-    public static void BuildAll()
-    {
+    public static void BuildAll() {
         var build = new BuildScript();
         build.BuildWindows64();
         build.BuildWindows32();
@@ -49,8 +45,7 @@ public class BuildScript : EditorWindow
     }
 
     // based on https://github.com/game-ci/documentation/blob/main/example/BuildScript.cs
-    public static void GABuild() 
-    {
+    public static void GABuild() {
         var commandArguments = new Dictionary<string, string>();
 
         string[] args = System.Environment.GetCommandLineArgs();
@@ -62,7 +57,7 @@ public class BuildScript : EditorWindow
 
             bool flagHasValue = next < args.Length && !args[next].StartsWith("-");
             string value = flagHasValue ? args[next].TrimStart('-') : string.Empty;
-            
+
             commandArguments.Add(flag, value);
         }
 
@@ -80,25 +75,23 @@ public class BuildScript : EditorWindow
         Build(buildTarget, buildPath);
     }
 
-    private static void Build(BuildTarget buildTarget, string buildPath) 
-    {
+    private static void Build(BuildTarget buildTarget, string buildPath) {
         var buildOptions = new BuildPlayerOptions() {
             scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(s => s.path).ToArray(),
             target = buildTarget,
             locationPathName = buildPath,
-            
+
         };
 
         BuildSummary summary = BuildPipeline.BuildPlayer(buildOptions).summary;
-        
+
         Console.WriteLine("Build Results:");
         Console.WriteLine($"Duration: {summary.totalTime.ToString()}");
         Console.WriteLine($"Warnings: {summary.totalWarnings.ToString()}");
         Console.WriteLine($"Errors: {summary.totalErrors.ToString()}");
         Console.WriteLine($"Size: {summary.totalSize.ToString()}");
-        
-        switch (summary.result)
-        {
+
+        switch (summary.result) {
         case BuildResult.Succeeded:
             Console.WriteLine("Build succeeded!");
             EditorApplication.Exit(0);
@@ -119,8 +112,7 @@ public class BuildScript : EditorWindow
         }
     }
 
-    void OnGUI()
-    {
+    void OnGUI() {
         mainScroll = EditorGUILayout.BeginScrollView(mainScroll);
         EditorGUILayout.BeginVertical();
         EditorGUILayout.BeginHorizontal();
@@ -141,8 +133,7 @@ public class BuildScript : EditorWindow
         EditorGUILayout.LabelField("Windows 32-bit Build: ");
         windows32Build = EditorGUILayout.Toggle(windows32Build);
         EditorGUILayout.EndHorizontal();
-        if (windows32Build)
-        {
+        if (windows32Build) {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Use Windows 32-bit Debug: ");
             windows32Debug = EditorGUILayout.Toggle(windows32Debug);
@@ -156,8 +147,7 @@ public class BuildScript : EditorWindow
         EditorGUILayout.LabelField("Linux Build: ");
         LinuxBuild = EditorGUILayout.Toggle(LinuxBuild);
         EditorGUILayout.EndHorizontal();
-        if (LinuxBuild)
-        {
+        if (LinuxBuild) {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Use Linux Debug: ");
             LinuxDebug = EditorGUILayout.Toggle(LinuxDebug);
@@ -171,8 +161,7 @@ public class BuildScript : EditorWindow
         EditorGUILayout.LabelField("MacOS Build: ");
         macBuild = EditorGUILayout.Toggle(macBuild);
         EditorGUILayout.EndHorizontal();
-        if (macBuild)
-        {
+        if (macBuild) {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Use MacOS Debug: ");
             macDebug = EditorGUILayout.Toggle(macDebug);
@@ -186,15 +175,13 @@ public class BuildScript : EditorWindow
         EditorGUILayout.LabelField("WebGL Build: ");
         WebBuild = EditorGUILayout.Toggle(WebBuild);
         EditorGUILayout.EndHorizontal();
-        if (WebBuild)
-        {
+        if (WebBuild) {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Use WebGL Debug: ");
             WebDebug = EditorGUILayout.Toggle(WebDebug);
             EditorGUILayout.EndHorizontal();
         }
-        if (GUILayout.Button("Build Game"))
-        {
+        if (GUILayout.Button("Build Game")) {
             if (windows64Build)
                 BuildWindows64();
             if (windows32Build)
@@ -210,92 +197,74 @@ public class BuildScript : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
-    void BuildWindows64()
-    {
+    void BuildWindows64() {
         BuildOptions options = windows64Debug ? BuildOptions.AllowDebugging : BuildOptions.None;
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
-        if (windows64IL)
-        {
+        if (windows64IL) {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.IL2CPP);
             if (windows64Debug)
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Debug);
             else
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Release);
-        }
-        else
-        {
+        } else {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
         }
 
         BuildPipeline.BuildPlayer(EditorBuildSettings.scenes.Where(s => s.enabled).ToArray(), Path.Combine(path, "Windows64", "NSMB-MarioVsLuigi.exe"), BuildTarget.StandaloneWindows64, options);
     }
 
-    void BuildWindows32()
-    {
+    void BuildWindows32() {
         BuildOptions options = windows32Debug ? BuildOptions.AllowDebugging : BuildOptions.None;
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows);
-        if (windows32IL)
-        {
+        if (windows32IL) {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.IL2CPP);
             if (windows32Debug)
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Debug);
             else
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Release);
-        }
-        else
-        {
+        } else {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
         }
 
         BuildPipeline.BuildPlayer(EditorBuildSettings.scenes.Where(s => s.enabled).ToArray(), Path.Combine(path, "Windows32", "NSMB-MarioVsLuigi.exe"), BuildTarget.StandaloneWindows, options);
     }
 
-    void BuildLinux()
-    {
+    void BuildLinux() {
         BuildOptions options = LinuxDebug ? BuildOptions.AllowDebugging : BuildOptions.None;
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneLinux64);
-        if (LinuxIL)
-        {
+        if (LinuxIL) {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.IL2CPP);
             if (LinuxDebug)
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Debug);
             else
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Release);
-        }
-        else
-        {
+        } else {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
         }
 
         BuildPipeline.BuildPlayer(EditorBuildSettings.scenes.Where(s => s.enabled).ToArray(), Path.Combine(path, "Linux", "NSMB-MarioVsLuigi.x86_64"), BuildTarget.StandaloneLinux64, options);
     }
 
-    void BuildMac()
-    {
+    void BuildMac() {
         BuildOptions options = macDebug ? BuildOptions.AllowDebugging : BuildOptions.None;
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneOSX);
-        if (macIL)
-        {
+        if (macIL) {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.IL2CPP);
             if (macDebug)
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Debug);
             else
                 PlayerSettings.SetIl2CppCompilerConfiguration(BuildTargetGroup.Standalone, Il2CppCompilerConfiguration.Release);
-        }
-        else
-        {
+        } else {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
         }
 
         BuildPipeline.BuildPlayer(EditorBuildSettings.scenes.Where(s => s.enabled).ToArray(), Path.Combine(path, "MacOS", "NSMB-MarioVsLuigi.app"), BuildTarget.StandaloneOSX, options);
     }
 
-    void BuildWebGL()
-    {
+    void BuildWebGL() {
         BuildOptions options = WebDebug ? BuildOptions.AllowDebugging : BuildOptions.None;
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.WebGL, BuildTarget.WebGL);
 
         BuildPipeline.BuildPlayer(EditorBuildSettings.scenes.Where(s => s.enabled).ToArray(), Path.Combine(path, "Web"), BuildTarget.WebGL, options);
     }
 }
-#endif

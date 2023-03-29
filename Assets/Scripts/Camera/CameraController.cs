@@ -12,7 +12,16 @@ public class CameraController : MonoBehaviour {
 
     //---Public Variables
     public Vector3 currentPosition;
-    public bool IsControllingCamera { get; set; }
+
+    private bool _isControllingCamera;
+    public bool IsControllingCamera {
+        get => _isControllingCamera;
+        set {
+            _isControllingCamera = value;
+            if (value)
+                UIUpdater.Instance.player = controller;
+        }
+    }
 
     //---Private Variables
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();

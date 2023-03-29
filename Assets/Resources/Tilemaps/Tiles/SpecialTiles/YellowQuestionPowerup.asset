@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9aca9efef55f6a45a53ffcbd56a57cb, type: 3}
-  m_Name: QuestionPowerup
+  m_Name: YellowQuestionPowerup
   m_EditorClassIdentifier: 
   m_AnimatedSprites:
   - {fileID: -8917260427315313510, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
@@ -31,4 +31,4 @@ MonoBehaviour:
   breakableByBombs: 1
   bumpIfNotBroken: 0
   bumpIfBroken: 0
-  resultTile: SpecialTiles/EmptyYellowQuestion
+  resultTile: {fileID: 11400000, guid: 8cc8c3eed522e86409440cf81284951a, type: 2}

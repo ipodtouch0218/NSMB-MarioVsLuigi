@@ -31,6 +31,6 @@ MonoBehaviour:
   breakableByBombs: 0
   bumpIfNotBroken: 0
   bumpIfBroken: 0
-  resultTile: SpecialTiles/EmptyYellowQuestion
+  resultTile: {fileID: 11400000, guid: 8cc8c3eed522e86409440cf81284951a, type: 2}
   topSpawnOffset: {x: 0, y: 0}
   bottomSpawnOffset: {x: 0, y: 0}

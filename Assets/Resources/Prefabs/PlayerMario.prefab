@@ -10672,8 +10672,6 @@ MonoBehaviour:
   blueShell: {fileID: 3629787967981286811}
   propellerHelmet: {fileID: 8712194458326895251}
   propeller: {fileID: 8626919663303982960}
-  primaryColor: {r: 0, g: 0, b: 0, a: 0}
-  secondaryColor: {r: 0, g: 0, b: 0, a: 0}
   pipeDuration: 2
   deathUpTime: 0.6
   deathForce: 7
@@ -10765,6 +10763,7 @@ MonoBehaviour:
   - {fileID: 3452636116809643534}
   soundOrigin: {fileID: 4824223341387914440}
   soundRange: 12
+  maxPanning: 0.8
 --- !u!82 &5377451828833222271
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10772,7 +10771,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4824223341387914446}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}

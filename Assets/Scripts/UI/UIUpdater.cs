@@ -24,7 +24,6 @@ public class UIUpdater : NetworkBehaviour {
     //---Private Variables
     private readonly List<Image> backgrounds = new();
     private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
-    private CharacterData character;
     private Material timerMaterial;
     private PlayerRef localPlayer;
     private bool uiHidden;
@@ -42,7 +41,6 @@ public class UIUpdater : NetworkBehaviour {
         teamManager = GameManager.Instance.teamManager;
 
         localPlayer = Runner.LocalPlayer;
-        character = localPlayer.GetCharacterData(Runner);
 
         teamsParent = uiTeamStars.transform.parent.gameObject;
         starsParent = uiStars.transform.parent.gameObject;
@@ -73,9 +71,6 @@ public class UIUpdater : NetworkBehaviour {
     }
 
     public override void Render() {
-
-        //Player stuff update.
-        player = GameManager.Instance.localPlayer;
 
         if (!player) {
             if (!uiHidden)
@@ -139,7 +134,7 @@ public class UIUpdater : NetworkBehaviour {
         if (player.Lives >= 0) {
             if (player.Lives != lives) {
                 lives = player.Lives;
-                uiLives.text = character.uistring + Utils.GetSymbolString("x" + lives);
+                uiLives.text = player.data.GetCharacterData().uistring + Utils.GetSymbolString("x" + lives);
             }
         } else {
             livesParent.SetActive(false);

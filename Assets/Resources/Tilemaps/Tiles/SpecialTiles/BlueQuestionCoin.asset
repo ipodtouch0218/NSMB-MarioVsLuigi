@@ -31,4 +31,4 @@ MonoBehaviour:
   breakableByBombs: 1
   bumpIfNotBroken: 0
   bumpIfBroken: 0
-  resultTile: SpecialTiles/EmptyBlueQuestion
+  resultTile: {fileID: 11400000, guid: f26d5fab6c8b10b428cc0f638d9199b2, type: 2}

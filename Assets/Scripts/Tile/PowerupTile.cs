@@ -1,13 +1,14 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "PowerupTile", menuName = "ScriptableObjects/Tiles/PowerupTile")]
-public class PowerupTile : BreakableBrickTile {
+public class PowerupTile : BreakableBrickTile, IHaveTileDependencies {
 
-    public string resultTile;
-
+    //---Serialized Variables
+    [SerializeField] private TileBase resultTile;
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         if (base.Interact(interacter, direction, worldLocation))
             return true;
@@ -41,10 +42,14 @@ public class PowerupTile : BreakableBrickTile {
 
         if (GameManager.Instance.Object.HasStateAuthority) {
             GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
-                resultTile, direction == InteractionDirection.Down, Vector2.zero, false, spawnResult);
+                resultTile.name, direction == InteractionDirection.Down, Vector2.zero, false, spawnResult);
         }
 
         interacter.PlaySound(Enums.Sounds.World_Block_Powerup);
         return false;
+    }
+
+    public TileBase[] GetTileDependencies() {
+        return new TileBase[] { resultTile };
     }
 }

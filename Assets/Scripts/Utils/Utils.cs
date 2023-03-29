@@ -432,54 +432,7 @@ namespace NSMB.Utils {
         public static float QuadraticEaseOut(float v) {
             return -1 * v * (v - 2);
         }
-
-        public static bool GetTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap, out TileChangeInfo[] outTilePositions, out string[] outTileNames) {
-
-            List<TileChangeInfo> changes = new();
-            List<string> tiles = new();
-
-            TileBase[] currentTiles = tilemap.GetTilesBlock(bounds);
-
-            for (int i = 0; i < original.Length; i++) {
-                if (currentTiles[i] == original[i])
-                    continue;
-
-                TileBase cTile = currentTiles[i];
-                string path;
-                if (cTile == null) {
-                    path = "";
-                } else {
-                    path = ResourceDB.GetAsset(cTile.name).ResourcesPath;
-                }
-
-                if (!tiles.Contains(path))
-                    tiles.Add(path);
-
-                changes.Add(new() {
-                    x = (short) (bounds.x + i % bounds.size.x),
-                    y = (short) (bounds.y + i / bounds.size.x),
-                    tileIndex = tiles.IndexOf(path),
-                });
-            }
-
-            outTilePositions = changes.ToArray();
-            outTileNames = tiles.ToArray();
-
-            return changes.Count > 0;
-        }
-
-        public static void ApplyTilemapChanges(TileBase[] original, BoundsInt bounds, Tilemap tilemap, ExitGames.Client.Photon.Hashtable changesTable) {
-            TileBase[] copy = (TileBase[]) original.Clone();
-
-            Dictionary<int, int> changes = (Dictionary<int, int>) changesTable["C"];
-            string[] tiles = (string[]) changesTable["T"];
-
-            foreach (KeyValuePair<int, int> pairs in changes) {
-                copy[pairs.Key] = GetCacheTile(tiles[pairs.Value]);
-            }
-
-            tilemap.SetTilesBlock(bounds, copy);
-        }
+        
 
         private static readonly Dictionary<string, TileBase> tileCache = new();
         public static TileBase GetCacheTile(string tilename) {

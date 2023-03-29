@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using TMPro;
@@ -11,7 +12,6 @@ using TMPro;
 using Fusion;
 using Fusion.Sockets;
 using NSMB.Extensions;
-using NSMB.Rebinding;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
 
