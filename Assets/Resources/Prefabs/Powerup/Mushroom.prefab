@@ -54,6 +54,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 0
+  body: {fileID: 1017215213198693187}
+  sfx: {fileID: 0}
   _Collector: {fileID: 0}
   powerupScriptable: {fileID: 11400000, guid: a3c6d7fa6c939be4ead398f0d82b5eb9, type: 2}
   speed: 2
@@ -61,6 +66,10 @@ MonoBehaviour:
   terminalVelocity: 8
   blinkingRate: 4
   avoidPlayers: 0
+  sRenderer: {fileID: 1145319354374527610}
+  physics: {fileID: 3019108884791320526}
+  childAnimator: {fileID: 0}
+  hitbox: {fileID: 1017215213198693184}
 --- !u!50 &1017215213198693187
 Rigidbody2D:
   serializedVersion: 4
@@ -78,6 +87,12 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 2.2
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -92,6 +107,25 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -120,7 +154,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &3019108884791320526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -134,14 +167,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  goUpSlopes: 0
-  onGround: 0
-  hitRoof: 0
-  hitRight: 0
-  hitLeft: 0
-  crushableGround: 0
-  floorAngle: 0
+  _OnGround:
+    _value: 0
+  _HitRoof:
+    _value: 0
+  _HitLeft:
+    _value: 0
+  _HitRight:
+    _value: 0
+  _CrushableGround:
+    _value: 0
+  _PreviousTickVelocity: {x: 0, y: 0}
+  _FloorAngle: 0
   currentCollider: {fileID: 1017215213198693184}
+  goUpSlopes: 0
   floorAndRoofCutoff: 0.3
 --- !u!114 &8906202613893743769
 MonoBehaviour:
@@ -155,8 +194,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   killTime: 0
+  entity: {fileID: 1017215213198693185}
 --- !u!114 &3502658418062677356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,11 +219,11 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1017215213198693185}
-  - {fileID: 1017215213198693186}
   - {fileID: 3019108884791320526}
-  - {fileID: 8906202613893743769}
   - {fileID: 2258520988097781654}
-  SimulationBehaviours: []
+  SimulationBehaviours:
+  - {fileID: 1017215213198693186}
+  - {fileID: 8906202613893743769}
 --- !u!114 &2258520988097781654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,6 +250,8 @@ MonoBehaviour:
     RotBlendStart: 0.1
     RotBlendEnd: 0.5
     RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
 --- !u!114 &7863306663182383513
 MonoBehaviour:
   m_ObjectHideFlags: 0

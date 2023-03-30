@@ -16,7 +16,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     [Networked] public NetworkBool AlreadyBounced { get; set; }
     [Networked] public NetworkBool IsIceball { get; set; }
     [Networked] public NetworkBool PlayBreakEffect { get; set; }
-    [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
 
     //---Serialized Variables
     [SerializeField] private ParticleSystem iceBreak, fireBreak, iceTrail, fireTrail;
@@ -90,7 +89,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         }
 
         if (body.position.y < GameManager.Instance.LevelMinY) {
-            Destroy();
+            DespawnEntity();
             return;
         }
 
@@ -101,12 +100,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             return;
 
         body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
-    }
-
-    public override void Destroy(DestroyCause cause = DestroyCause.None) {
-        IsActive = false;
-        body.velocity = Vector2.zero;
-        body.isKinematic = true;
     }
 
     //---Helper Methods
@@ -127,12 +120,12 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         }
         bool breaking = physics.HitLeft || physics.HitRight || physics.HitRoof || (physics.OnGround && AlreadyBounced && body.velocity.y < 1f);
         if (breaking) {
-            Destroy();
+            DespawnEntity();
             return false;
         }
 
         if (Utils.IsTileSolidAtWorldLocation(body.position)) {
-            Destroy();
+            DespawnEntity();
             return false;
         }
 
@@ -160,13 +153,57 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
                 bool result = IsIceball ? interactable.InteractWithIceball(this) : interactable.InteractWithFireball(this);
                 if (result) {
                     //true = interacted & destroy.
-                    Destroy();
+                    DespawnEntity();
                     return false;
                 }
             }
         }
 
         return true;
+    }
+
+    //---BasicEntity overrides
+    public override void DespawnEntity() {
+        IsActive = false;
+    }
+
+    public override void OnIsActiveChanged() {
+        if (IsActive) {
+            //activate graphics and particles
+            bool ice = IsIceball;
+
+            if (ice) {
+                iceTrail.Play();
+                fireTrail.Stop();
+            } else {
+                fireTrail.Play();
+                iceTrail.Stop();
+            }
+            iceGraphics.SetActive(ice);
+            fireGraphics.SetActive(!ice);
+        } else {
+            //disable graphics & trail, but play poof fx
+            iceGraphics.SetActive(false);
+            fireGraphics.SetActive(false);
+            iceTrail.Stop();
+            fireTrail.Stop();
+
+            //dont play particles below the killplane
+            if (body.position.y < GameManager.Instance.LevelMinY)
+                return;
+
+            //or if the killer said so
+            if (!PlayBreakEffect)
+                return;
+
+            if (IsIceball) {
+                iceBreak.Play();
+                sfx.PlayOneShot(Enums.Sounds.Powerup_Iceball_Break);
+            } else {
+                fireBreak.Play();
+                sfx.PlayOneShot(Enums.Sounds.Powerup_Fireball_Break);
+            }
+        }
     }
 
     //---IPlayerInteractable overrides
@@ -218,7 +255,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         }
 
         //Destroy ourselves.
-        Destroy();
+        DespawnEntity();
     }
 
     //---IFireballInteractable overrides
@@ -228,7 +265,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         //fire + ice = both destroy
         if (IsIceball) {
-            fireball.Destroy();
+            fireball.DespawnEntity();
             return true;
         }
         return false;
@@ -240,7 +277,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         //fire + ice = both destroy
         if (!IsIceball) {
-            iceball.Destroy();
+            iceball.DespawnEntity();
             return true;
         }
         return false;
@@ -249,47 +286,5 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     //---IBlockBumpable overrides
     public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing when bumped
-    }
-
-    //---OnChanged callbacks
-    public static void OnIsActiveChanged(Changed<FireballMover> changed) {
-        FireballMover mover = changed.Behaviour;
-
-        if (mover.IsActive) {
-            //activate graphics and particles
-            bool ice = mover.IsIceball;
-
-            if (ice) {
-                mover.iceTrail.Play();
-                mover.fireTrail.Stop();
-            } else {
-                mover.fireTrail.Play();
-                mover.iceTrail.Stop();
-            }
-            mover.iceGraphics.SetActive(ice);
-            mover.fireGraphics.SetActive(!ice);
-        } else {
-            //disable graphics & trail, but play poof fx
-            mover.iceGraphics.SetActive(false);
-            mover.fireGraphics.SetActive(false);
-            mover.iceTrail.Stop();
-            mover.fireTrail.Stop();
-
-            //dont play particles below the killplane
-            if (mover.body.position.y < GameManager.Instance.LevelMinY)
-                return;
-
-            //or if the killer said so
-            if (!mover.PlayBreakEffect)
-                return;
-
-            if (mover.IsIceball) {
-                mover.iceBreak.Play();
-                mover.sfx.PlayOneShot(Enums.Sounds.Powerup_Iceball_Break);
-            } else {
-                mover.fireBreak.Play();
-                mover.sfx.PlayOneShot(Enums.Sounds.Powerup_Fireball_Break);
-            }
-        }
     }
 }

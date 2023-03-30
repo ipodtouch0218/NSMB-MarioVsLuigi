@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,10 +10,12 @@ using NSMB.Utils;
 
 public class SessionData : NetworkBehaviour {
 
+    //---Static Variables
     public static SessionData Instance;
+    private static readonly WaitForSeconds WaitTwoSeconds = new(2);
 
 #pragma warning disable CS0414
-    //--Default values
+    //---Default values
     private readonly byte defaultMaxPlayers = 10;
     private readonly sbyte defaultStarRequirement = 10;
     private readonly byte defaultCoinRequirement = 8;
@@ -43,6 +46,7 @@ public class SessionData : NetworkBehaviour {
     private HashSet<string> bannedIds;
     private float lastStartCancelTime = -10f;
     private bool playedStartSound;
+    private Coroutine pingUpdaterCorotuine;
 
     //---Properties
     private ChatManager Chat => MainMenuManager.Instance.chat;
@@ -64,6 +68,8 @@ public class SessionData : NetworkBehaviour {
             bannedIds = new();
             bannedIps = new();
             NetworkHandler.OnConnectRequest += OnConnectRequest;
+
+            pingUpdaterCorotuine = StartCoroutine(UpdatePings());
         }
     }
 
@@ -90,8 +96,20 @@ public class SessionData : NetworkBehaviour {
         }
     }
 
+    private IEnumerator UpdatePings() {
+        while (true) {
+            yield return WaitTwoSeconds;
+            foreach (PlayerRef player in Runner.ActivePlayers) {
+                player.GetPlayerData(Runner).Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
+            }
+        }
+    }
+
     public override void Despawned(NetworkRunner runner, bool hasState) {
         NetworkHandler.OnConnectRequest -= OnConnectRequest;
+
+        if (pingUpdaterCorotuine != null)
+            StopCoroutine(pingUpdaterCorotuine);
     }
 
     private bool OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {

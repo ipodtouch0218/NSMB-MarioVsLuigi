@@ -23,7 +23,7 @@ public class PowerupTile : BreakableBrickTile, IHaveTileDependencies {
                 //Break
 
                 //Tilemap
-                GameManager.Instance.tilemap.SetTile(tileLocation, null);
+                GameManager.Instance.tileManager.SetTile(tileLocation, null);
 
                 //Particle
                 //TODO:
@@ -41,8 +41,8 @@ public class PowerupTile : BreakableBrickTile, IHaveTileDependencies {
         Bump(interacter, direction, worldLocation);
 
         if (GameManager.Instance.Object.HasStateAuthority) {
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
-                resultTile.name, direction == InteractionDirection.Down, Vector2.zero, false, spawnResult);
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+                resultTile, direction == InteractionDirection.Down, Vector2.zero, false, spawnResult);
         }
 
         interacter.PlaySound(Enums.Sounds.World_Block_Powerup);

@@ -25,7 +25,7 @@ public class RouletteTile : BreakableBrickTile, IHaveTileDependencies {
                 //Break
 
                 //Tilemap
-                GameManager.Instance.tilemap.SetTile(tileLocation, null);
+                GameManager.Instance.tileManager.SetTile(tileLocation, null);
 
                 //Particles
                 for (int x = 0; x < 2; x++) {
@@ -47,8 +47,8 @@ public class RouletteTile : BreakableBrickTile, IHaveTileDependencies {
             bool downwards = direction == InteractionDirection.Down;
             Vector2 offset = downwards ? bottomSpawnOffset + (spawnResult == PrefabList.Instance.Powerup_MegaMushroom ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
 
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
-                resultTile.name, downwards, offset, false, spawnResult);
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+                resultTile, downwards, offset, false, spawnResult);
         }
 
         interacter.PlaySound(Enums.Sounds.World_Block_Powerup);

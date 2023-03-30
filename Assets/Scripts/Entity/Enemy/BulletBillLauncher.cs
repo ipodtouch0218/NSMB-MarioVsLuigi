@@ -7,10 +7,10 @@ public class BulletBillLauncher : NetworkBehaviour {
 
     //---Networked Variables
     [Networked] TickTimer ShootTimer { get; set; }
-    [Networked, Capacity(3)] NetworkArray<BulletBillMover> BulletBills => default;
 
     //---Serialized Variables
     [SerializeField] private float playerSearchRadius = 7, playerCloseCutoff = 1, initialShootTimer = 5;
+    [SerializeField] private BulletBillMover[] bulletBills;
 
     //---Private Variables
     private Vector2 searchBox, closeSearchPosition, closeSearchBox = new(1.5f, 1f);
@@ -48,12 +48,8 @@ public class BulletBillLauncher : NetworkBehaviour {
         if (!Utils.IsTileSolidAtWorldLocation(transform.position))
             return;
 
-        byte activeBills = 0;
-        foreach (BulletBillMover bill in BulletBills) {
-            if (bill)
-                activeBills++;
-        }
-        if (activeBills >= 3)
+        BulletBillMover bill = FindInactiveBill();
+        if (!bill)
             return;
 
         //Check for close players
@@ -62,35 +58,40 @@ public class BulletBillLauncher : NetworkBehaviour {
 
         //Shoot left
         if (IntersectsPlayer(leftSearchPosition, searchBox)) {
-            SpawnBill(leftSpawnPosition, false);
+            SpawnBill(bill, leftSpawnPosition, false);
             return;
         }
 
         //Shoot right
         if (IntersectsPlayer(rightSearchPosition, searchBox)) {
-            SpawnBill(rightSpawnPosition, true);
+            SpawnBill(bill, rightSpawnPosition, true);
             return;
         }
     }
 
-    private void SpawnBill(Vector2 spawnpoint, bool facingRight) {
-        NetworkObject obj = Runner.Spawn(PrefabList.Instance.Enemy_BulletBill, spawnpoint, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<BulletBillMover>().OnBeforeSpawned(facingRight);
-        });
-        BulletBillMover bbm = obj.GetComponent<BulletBillMover>();
+    private void SpawnBill(BulletBillMover bill, Vector2 spawnpoint, bool facingRight) {
 
-        for (int i = 0; i < BulletBills.Length; i++) {
-            if (!BulletBills[i]) {
-                BulletBills.Set(i, bbm);
-                break;
-            }
-        }
+        if (!bill)
+            return;
+
+        bill.RespawnEntity();
+        bill.FacingRight = facingRight;
+        bill.nrb.TeleportToPosition(spawnpoint, Vector3.zero);
     }
 
     private bool IntersectsPlayer(Vector2 origin, Vector2 searchBox) {
         return Runner.GetPhysicsScene2D().OverlapBox(origin, searchBox, 0, Layers.MaskOnlyPlayers);
     }
 
+    private BulletBillMover FindInactiveBill() {
+        foreach (BulletBillMover b in bulletBills) {
+            if (!b.IsActive)
+                return b;
+        }
+        return null;
+    }
+
+#if UNITY_EDITOR
     public void OnDrawGizmosSelected() {
         Gizmos.color = new(1, 0, 0, 0.5f);
         Gizmos.DrawCube(closeSearchPosition, closeSearchBox);
@@ -98,4 +99,5 @@ public class BulletBillLauncher : NetworkBehaviour {
         Gizmos.DrawCube(leftSearchPosition, searchBox);
         Gizmos.DrawCube(rightSearchPosition, searchBox);
     }
+#endif
 }

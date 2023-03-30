@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+using Fusion;
+
 public class TilemapChunkPopulator : AssetModificationProcessor {
 
     public static string[] OnWillSaveAssets(string[] paths) {
@@ -53,6 +55,7 @@ public class TilemapChunkPopulator : AssetModificationProcessor {
             GameObject newObject = new();
             newObject.transform.SetParent(parent);
             TilemapChunk newChunk = newObject.AddComponent<TilemapChunk>();
+            newObject.AddComponent<NetworkObject>();
             chunks.Add(newChunk);
         }
 
@@ -62,8 +65,9 @@ public class TilemapChunkPopulator : AssetModificationProcessor {
             ushort y = (ushort) (i / chunkmapWidth);
 
             chunk.name = $"TilemapChunk ({x},{y})";
-            chunk.defaultChunkX = x;
-            chunk.defaultChunkY = y;
+            chunk.chunkX = x;
+            chunk.chunkY = y;
+            chunk.LoadState();
         }
 
 

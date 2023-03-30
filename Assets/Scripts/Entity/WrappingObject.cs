@@ -3,8 +3,9 @@
 using Fusion;
 
 [RequireComponent(typeof(NetworkRigidbody2D))]
-public class WrappingObject : NetworkBehaviour {
+public class WrappingObject : SimulationBehaviour {
 
+    //---Private Variables
     private NetworkRigidbody2D nrb;
     private Vector2 width;
 

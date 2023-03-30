@@ -79,9 +79,8 @@ public class GameManager : NetworkBehaviour {
     public double gameStartTimestamp, gameEndTimestamp;
     public bool paused;
 
-    public EnemySpawnpoint[] enemySpawns;
-    public TileBase[] originalTiles;
-    public BoundsInt originalTilesOrigin;
+    public KillableEntity[] enemies;
+    public FloatingCoin[] coins;
 
     //---Private Variables
     private TickTimer StartMusicTimer { get; set; }
@@ -104,7 +103,7 @@ public class GameManager : NetworkBehaviour {
             if (string.IsNullOrEmpty(tile))
                 continue;
 
-            tileObjects[i] = Utils.GetCacheTile(tile);
+            //tileObjects[i] = Utils.GetCacheTile(tile);
         }
 
         tilemap.SetTilesBlock(new BoundsInt(tileOrigin.x, tileOrigin.y, 0, tileDimensions.x, tileDimensions.y, 1), tileObjects);
@@ -151,10 +150,6 @@ public class GameManager : NetworkBehaviour {
         Instance = this;
         particleManager = GetComponentInChildren<SingleParticleManager>();
 
-        //tiles
-        originalTilesOrigin = new(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
-        originalTiles = tilemap.GetTilesBlock(originalTilesOrigin);
-
         //Make UI color translucent
         levelUIColor.a = .7f;
     }
@@ -183,7 +178,8 @@ public class GameManager : NetworkBehaviour {
 
         // Find objects in the scene
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-        enemySpawns = FindObjectsOfType<EnemySpawnpoint>();
+        enemies = FindObjectsOfType<KillableEntity>().Where(ke => ke is not BulletBillMover).ToArray();
+        coins = FindObjectsOfType<FloatingCoin>();
 
         if (Runner.IsServer && Runner.IsSinglePlayer) {
             // Handle spawning in editor by spawning the room + player data objects
@@ -386,8 +382,8 @@ public class GameManager : NetworkBehaviour {
         StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
         // Respawn enemies
-        foreach (EnemySpawnpoint point in enemySpawns)
-            point.AttemptSpawning();
+        foreach (KillableEntity enemy in enemies)
+            enemy.RespawnEntity();
 
         // Start timer
         int timer = SessionData.Instance.Timer;

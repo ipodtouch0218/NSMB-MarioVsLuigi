@@ -12,31 +12,13 @@ public class GameEventRpcs : NetworkBehaviour {
 
     //---Private Variables
     private GameManager gm;
-    private Tilemap tilemap;
-    private FloatingCoin[] coins;
 
     public void Awake() {
         gm = GetComponent<GameManager>();
-        tilemap = gm.tilemap;
-
-        coins = FindObjectsOfType<FloatingCoin>();
     }
 
     //---TILES
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_ResetTilemap() {
-        tilemap.SetTilesBlock(gm.originalTilesOrigin, gm.originalTiles);
-
-        foreach (FloatingCoin coin in coins)
-            coin.ResetCoin();
-
-        foreach (EnemySpawnpoint point in gm.enemySpawns)
-            point.AttemptSpawning();
-
-        gm.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - gm.RealPlayerCount * 0.2f);
-    }
-
-    public void BumpBlock(short x, short y, string oldTile, string newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
+    public void BumpBlock(short x, short y, ushort oldTile, ushort newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
         Vector3Int loc = new(x, y, 0);
 
         Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + OneFourth;
@@ -46,21 +28,15 @@ public class GameEventRpcs : NetworkBehaviour {
         });
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_SetTile(short x, short y, string tilename) {
-        TileBase tile = Utils.GetCacheTile(tilename);
-        tilemap.SetTile(new(x, y, 0), tile);
-    }
+    public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
+        Vector3Int loc = new(x, y, 0);
 
-//#pragma warning disable IDE0060
-//    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-//    public void Rpc_UpdateSpectatorTilemap([RpcTarget] PlayerRef targetPlayer, TileChangeInfo[] changes, string[] tileNames) {
-//        foreach (TileChangeInfo change in changes) {
-//            TileBase tile = Utils.GetCacheTile(tileNames[change.tileIndex]);
-//            tilemap.SetTile(new(change.x, change.y, 0), tile);
-//        }
-//    }
-//#pragma warning restore IDE0060
+        Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + OneFourth;
+
+        Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
+            obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, offset);
+        });
+    }
 
     //---GAME STATE
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

@@ -27,7 +27,7 @@ public class CoinTile : BreakableBrickTile, IHaveTileDependencies {
                 //Break
 
                 //Tilemap
-                GameManager.Instance.tilemap.SetTile(tileLocation, null);
+                GameManager.Instance.tileManager.SetTile(tileLocation, null);
 
                 //Particle
                 //TODO:
@@ -46,10 +46,8 @@ public class CoinTile : BreakableBrickTile, IHaveTileDependencies {
 
         Bump(interacter, direction, worldLocation);
 
-        if (GameManager.Instance.Object.HasStateAuthority) {
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
-                resultTile.name, direction == InteractionDirection.Down, Vector2.zero, true, NetworkPrefabRef.Empty);
-        }
+        GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+            resultTile, direction == InteractionDirection.Down, Vector2.zero, true, NetworkPrefabRef.Empty);
 
         return false;
     }

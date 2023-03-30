@@ -4902,7 +4902,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: -927170474769652834, guid: 6a8295a206a133847aa7c4b37eaa0337,
+  m_Sprite: {fileID: 2740354904297333526, guid: 6a8295a206a133847aa7c4b37eaa0337,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -5010,7 +5010,7 @@ Transform:
   - {fileID: 552913906689110687}
   - {fileID: 4914380577473150768}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2721581803245764244
 MonoBehaviour:
@@ -5025,19 +5025,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 1
+  body: {fileID: 3091356493132500068}
+  sfx: {fileID: 5407584048357268515}
   _IsFrozen:
     _value: 0
   _IsDead:
     _value: 0
   iceCarryable: 1
   flying: 1
-  hitbox: {fileID: 0}
-  sRenderer: {fileID: 0}
+  collideWithOtherEnemies: 0
+  dieWhenInsideBlock: 0
+  hitbox: {fileID: 2627485830306083576}
+  animator: {fileID: 0}
+  legacyAnimation: {fileID: 5184426367989315057}
+  sRenderer: {fileID: 4540435544182297773}
+  audioSource: {fileID: 5407584048357268515}
+  physics: {fileID: 0}
   speed: 1.5
   playerSearchRadius: 12
   despawnDistance: 10
   shootParticles: {fileID: 7693979224894144423}
   trailParticles: {fileID: 1566471443926189886}
+  spriteAnimation: {fileID: 0}
 --- !u!50 &3091356493132500068
 Rigidbody2D:
   serializedVersion: 4
@@ -5122,7 +5134,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &3529903825791625940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5135,8 +5146,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   killTime: 0
+  entity: {fileID: 2721581803245764244}
 --- !u!114 &6793168269546059589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5153,6 +5164,7 @@ MonoBehaviour:
   - {fileID: 5407584048357268515}
   soundOrigin: {fileID: 2627485830306083583}
   soundRange: 12
+  maxPanning: 0.8
 --- !u!82 &5407584048357268515
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5165,7 +5177,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
   m_audioClip: {fileID: 8300000, guid: eb19a8df530de3544a1363521b6393a1, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -5273,10 +5285,10 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2721581803245764244}
+  - {fileID: 8651934288568289201}
+  SimulationBehaviours:
   - {fileID: 473391894580253470}
   - {fileID: 3529903825791625940}
-  - {fileID: 8651934288568289201}
-  SimulationBehaviours: []
 --- !u!114 &8651934288568289201
 MonoBehaviour:
   m_ObjectHideFlags: 0

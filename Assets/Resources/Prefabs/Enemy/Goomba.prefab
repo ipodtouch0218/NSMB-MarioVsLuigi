@@ -133,7 +133,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &7523289063499453456
 Transform:
@@ -164,14 +164,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 1
+  body: {fileID: 7523289063499453455}
+  sfx: {fileID: 5674404523704379184}
   _IsFrozen:
     _value: 0
   _IsDead:
     _value: 0
   iceCarryable: 1
   flying: 0
-  hitbox: {fileID: 0}
-  sRenderer: {fileID: 0}
+  hitbox: {fileID: 7523289063499453452}
+  animator: {fileID: 0}
+  legacyAnimation: {fileID: 2072787540995169967}
+  sRenderer: {fileID: 7821411591339125535}
+  audioSource: {fileID: 5674404523704379184}
+  physics: {fileID: 7551600738196628425}
   deadSprite: {fileID: -728934508601558331, guid: b455056ca00f84e48a8040f94ae8170d,
     type: 3}
   speed: 0.875
@@ -288,7 +297,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &2884479414836889194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,8 +309,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   killTime: 0
+  entity: {fileID: 7523289063499453453}
 --- !u!114 &7415037304459295726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,6 +327,7 @@ MonoBehaviour:
   - {fileID: 5674404523704379184}
   soundOrigin: {fileID: 7523289063499453456}
   soundRange: 12
+  maxPanning: 0.8
 --- !u!82 &5674404523704379184
 AudioSource:
   m_ObjectHideFlags: 0
@@ -449,10 +458,10 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 7523289063499453453}
   - {fileID: 7551600738196628425}
+  - {fileID: 217785053388766539}
+  SimulationBehaviours:
   - {fileID: 4710538364186427609}
   - {fileID: 2884479414836889194}
-  - {fileID: 217785053388766539}
-  SimulationBehaviours: []
 --- !u!114 &217785053388766539
 MonoBehaviour:
   m_ObjectHideFlags: 0

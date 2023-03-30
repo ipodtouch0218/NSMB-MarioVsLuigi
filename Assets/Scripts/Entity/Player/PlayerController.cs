@@ -66,6 +66,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool WasGroundedLastFrame { get; set; }
     [Networked] private NetworkBool GroundpoundHeld { get; set; }
     [Networked] private float GroundpoundStartTime { get; set; }
+    [Networked] private NetworkBool HitBlock { get; set; }
     //Spinner
     [Networked] public SpinnerAnimator OnSpinner { get; set; }
     [Networked(OnChanged = nameof(OnIsSpinnerFlyingChanged))] public NetworkBool IsSpinnerFlying { get; set; }
@@ -192,7 +193,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [SerializeField] private GameObject models;
     [SerializeField] public CharacterData character;
 
-    public bool crushGround, hitRoof, groundpoundLastFrame, hitBlock, hitLeft, hitRight, stationaryGiantEnd, startedSliding;
+    public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight, stationaryGiantEnd, startedSliding;
     public float powerupFlash;
 
     //MOVEMENT STAGES
@@ -281,7 +282,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         networkRigidbody = GetComponent<NetworkRigidbody2D>();
     }
 
-    public void Start() {
+    public override void Start() {
         fadeOut = GameObject.FindGameObjectWithTag("FadeUI").GetComponent<FadeOutManager>();
     }
 
@@ -499,19 +500,22 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     if (go.CompareTag("spinner"))
                         OnSpinner = go.GetComponentInParent<SpinnerAnimator>();
 
-                    tilesStandingOn.Add(vec);
+                    if (!tilesStandingOn.Contains(vec))
+                        tilesStandingOn.Add(vec);
 
                 } else if (((1 << contact.collider.gameObject.layer) & Layers.MaskSolidGround) != 0) {
                     if (Vector2.Dot(n, Vector2.down) > .9f) {
                         up++;
-                        tilesJumpedInto.Add(vec);
+                        if (!tilesJumpedInto.Contains(vec))
+                            tilesJumpedInto.Add(vec);
                     } else {
                         if (n.x < 0) {
                             right++;
                         } else {
                             left++;
                         }
-                        tilesHitSide.Add(vec);
+                        if (!tilesHitSide.Contains(vec))
+                            tilesHitSide.Add(vec);
                     }
                 }
             }
@@ -2659,7 +2663,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             //start drill
             if (body.velocity.y < 0) {
                 IsDrilling = true;
-                hitBlock = true;
+                HitBlock = true;
                 body.velocity = new(0, body.velocity.y);
             }
         } else if (IsPropellerFlying) {
@@ -2668,7 +2672,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (remainingTime < 0.6f && body.velocity.y < 4) {
                 IsDrilling = true;
                 PropellerLaunchTimer = TickTimer.None;
-                hitBlock = true;
+                HitBlock = true;
             }
         } else {
             //start groundpound
@@ -2680,7 +2684,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             WallSlideRight = false;
             IsGroundpounding = true;
             JumpState = PlayerJumpState.None;
-            hitBlock = true;
+            HitBlock = true;
             IsSliding = false;
             body.velocity = Vector2.up * 1.5f;
             GroundpoundHeld = false;
@@ -2702,7 +2706,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             GroundpoundStartTimer = TickTimer.None;
         }
 
-        if (!(IsOnGround && (IsGroundpounding || IsDrilling) && hitBlock))
+        if (!(IsOnGround && (IsGroundpounding || IsDrilling) && HitBlock))
             return;
 
         bool tempHitBlock = false, hitAnyBlock = false;
@@ -2710,12 +2714,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
             hitAnyBlock = true;
         }
-        hitBlock = tempHitBlock;
+        HitBlock = tempHitBlock;
         if (IsDrilling) {
-            IsSpinnerFlying &= hitBlock;
-            IsPropellerFlying &= hitBlock;
-            IsDrilling = hitBlock;
-            if (hitBlock)
+            IsSpinnerFlying &= HitBlock;
+            IsPropellerFlying &= HitBlock;
+            IsDrilling = HitBlock;
+            if (HitBlock)
                 IsOnGround = false;
         } else {
             //groundpound
@@ -2732,7 +2736,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     CameraController.ScreenShake = 0.15f;
                 }
             }
-            if (!hitBlock && State == Enums.PowerupState.MegaMushroom) {
+            if (!HitBlock && State == Enums.PowerupState.MegaMushroom) {
                 PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
                 SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position);
                 CameraController.ScreenShake = 0.35f;

@@ -8,6 +8,11 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     //---Networked Variables
     private NetworkBool facingRightDefault = false;
     [Networked(Default = nameof(facingRightDefault), OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
+    [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
+    [Networked] public TickTimer DespawnTimer { get; set; }
+
+    //---Public Variables
+    public bool isRespawningEntity;
 
     //---Components
     [SerializeField] public Rigidbody2D body;
@@ -15,14 +20,30 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
     //---Private Variables
     private bool brickBreakSound;
+    private Vector2 spawnLocation;
 
     public virtual void OnValidate() {
         if (!body) body = GetComponent<Rigidbody2D>();
         if (!sfx) sfx = GetComponent<AudioSource>();
     }
 
+    public virtual void Start() {
+        if (body)
+            spawnLocation = body.position;
+    }
+
     public override void Spawned() {
         GameManager.Instance.networkObjects.Add(Object);
+        if (isRespawningEntity)
+            DespawnEntity();
+    }
+
+    public override void FixedUpdateNetwork() {
+        if (DespawnTimer.Expired(Runner)) {
+            DespawnTimer = TickTimer.None;
+            DespawnEntity();
+            return;
+        }
     }
 
     public void Update() {
@@ -40,22 +61,48 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
         sfx.PlayOneShot(sound, character, variant, volume);
     }
 
-    public virtual void Destroy(DestroyCause cause) {
-        Runner.Despawn(Object);
+    public virtual void RespawnEntity() {
+        if (IsActive)
+            return;
+
+        if (body) {
+            body.position = spawnLocation;
+            body.velocity = Vector2.zero;
+            body.rotation = 0;
+        }
+        IsActive = true;
     }
 
-    public virtual void OnFacingChanged() { }
+    public virtual void DespawnEntity() {
+        if (!isRespawningEntity) {
+            Runner.Despawn(Object);
+            return;
+        }
+
+        if (!IsActive)
+            return;
+
+        if (body) {
+            body.position = spawnLocation;
+            body.velocity = Vector2.zero;
+            body.rotation = 0;
+        }
+        IsActive = false;
+    }
+
+    public virtual void OnIsActiveChanged() { }
+
+    public virtual void OnFacingRightChanged() { }
 
     //---IBlockBumpable overrides
     public abstract void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction);
 
     //---OnChangeds
     public static void OnFacingRightChanged(Changed<BasicEntity> changed) {
-        changed.Behaviour.OnFacingChanged();
+        changed.Behaviour.OnFacingRightChanged();
     }
 
-    //---Helpers
-    public enum DestroyCause {
-        None, Killplane, Lava
+    public static void OnIsActiveChanged(Changed<BasicEntity> changed) {
+        changed.Behaviour.OnIsActiveChanged();
     }
 }

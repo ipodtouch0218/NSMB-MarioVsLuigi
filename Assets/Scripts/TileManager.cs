@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -28,11 +27,32 @@ public class TileManager : NetworkBehaviour {
         base.FixedUpdateNetwork();
     }
 
-    public void SetTile(TileBase tile, int x, int y) {
-        SetTile(GetTileIdFromTileInstance(tile), x, y);
+    public void ResetMap() {
+        foreach (TilemapChunk chunk in chunks)
+            chunk.ResetMap();
+
+        foreach (FloatingCoin coin in gm.coins)
+            coin.ResetCoin();
+
+        foreach (KillableEntity enemy in gm.enemies)
+            enemy.RespawnEntity();
+
+        gm.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - gm.RealPlayerCount * 0.2f);
     }
 
-    public void SetTile(ushort tileId, int x, int y) {
+    public void SetTile(Vector3Int loc, TileBase tile) {
+        SetTile(loc.x, loc.y, tile);
+    }
+
+    public void SetTile(Vector3Int loc, ushort tileId) {
+        SetTile(loc.x, loc.y, tileId);
+    }
+
+    public void SetTile(int x, int y, TileBase tile) {
+        SetTile(x, y, GetTileIdFromTileInstance(tile));
+    }
+
+    public void SetTile(int x, int y, ushort tileId) {
         if (tileId > sceneTiles.Length)
             return;
 
@@ -43,7 +63,7 @@ public class TileManager : NetworkBehaviour {
         int chunkX = (x - WorldOriginX) % 16;
         int chunkY = (y - WorldOriginY) % 16;
 
-        chunk[chunkX, chunkY] = tileId;
+        chunk.SetTile(chunkX, chunkY, tileId);
     }
 
     public ushort GetTileIdFromTileInstance(TileBase tile) {
@@ -73,6 +93,9 @@ public class TileManager : NetworkBehaviour {
 #if UNITY_EDITOR
     private static Vector3 ChunkSize = new(8, 8, 0);
     public void OnDrawGizmos() {
+        if (!gm.tilemap)
+            return;
+
         Gizmos.color = Color.black;
         for (int x = 0; x < ChunksX; x++) {
             for (int y = 0; y < ChunksY; y++) {

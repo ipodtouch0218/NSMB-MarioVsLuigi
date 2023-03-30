@@ -300,9 +300,9 @@ public class PlayerAnimationController : NetworkBehaviour {
             materialBlock = new();
 
             // Customizable player color
-            materialBlock.SetVector("OverallsColor", skin.overallsColor != null ? skin.overallsColor.linear : Color.clear);
-            materialBlock.SetVector("ShirtColor", skin.shirtColor != null ? skin.shirtColor.linear : Color.clear);
-            materialBlock.SetFloat("HatUsesOverallsColor", skin.hatUsesOverallsColor ? 1f : 0f);
+            materialBlock.SetVector("OverallsColor", skin?.overallsColor.linear ?? Color.clear);
+            materialBlock.SetVector("ShirtColor", skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
+            materialBlock.SetFloat("HatUsesOverallsColor", (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
 
             if (enableGlow)
                 materialBlock.SetColor("GlowColor", GlowColor);

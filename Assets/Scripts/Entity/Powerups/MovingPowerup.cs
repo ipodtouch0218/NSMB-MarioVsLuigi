@@ -11,7 +11,6 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     //---Networked Variables
     [Networked] protected PlayerController FollowPlayer { get; set; }
     [Networked] private TickTimer FollowEndTimer { get; set; }
-    [Networked] private TickTimer DespawnTimer { get; set; }
     [Networked] private TickTimer IgnorePlayerTimer { get; set; }
 
     //---Public Variables
@@ -72,7 +71,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
             if (Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
-                DespawnWithPoof();
+                DespawnEntity();
                 return;
             }
         }
@@ -87,11 +86,15 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
             return;
         }
+
+        if (!Object)
+            return;
 
         if (FollowPlayer) {
             body.position = new(FollowPlayer.body.position.x, FollowPlayer.cameraController.currentPosition.y + 1.68f);
@@ -107,13 +110,8 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             }
         }
 
-        if (DespawnTimer.Expired(Runner)) {
-            DespawnWithPoof();
-            return;
-        } else {
-            float timeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
-            sRenderer.enabled = !(timeRemaining <= 1 && timeRemaining * blinkingRate % 1 < 0.5f);
-        }
+        float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
+        sRenderer.enabled = !(despawnTimeRemaining <= 1 && despawnTimeRemaining * blinkingRate % 1 < 0.5f);
 
         Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
         Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
@@ -149,15 +147,15 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(body.velocity.y, bouncePower));
 
             if (physics.HitRoof || (physics.HitLeft && physics.HitRight)) {
-                DespawnWithPoof();
+                DespawnEntity();
                 return;
             }
         }
     }
 
-    public void DespawnWithPoof() {
-        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, body.position + hitbox.offset);
-        Runner.Despawn(Object, true);
+    public override void Despawned(NetworkRunner runner, bool hasState) {
+        if (!Collector)
+            GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, body.position + hitbox.offset);
     }
 
     //---IBlockBumpable overrides

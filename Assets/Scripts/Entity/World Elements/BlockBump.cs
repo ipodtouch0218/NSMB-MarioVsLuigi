@@ -7,14 +7,14 @@ using NSMB.Utils;
 public class BlockBump : NetworkBehaviour {
 
     //---Networked Variables
-    [Networked] private TickTimer           DespawnTimer { get; set; }
-    [Networked] private NetworkString<_128> ResultTile { get; set; }
-    [Networked] private NetworkString<_128> OldTile { get; set; }
-    [Networked] private NetworkBool         IsDownwards { get; set; }
-    [Networked] private NetworkBool         SpawnCoin { get; set; }
-    [Networked] private NetworkPrefabRef    SpawnPrefab { get; set; }
-    [Networked] private Vector2             SpawnOffset { get; set; }
-    [Networked] private Vector3Int          TileLocation { get; set; }
+    [Networked] private TickTimer        DespawnTimer { get; set; }
+    [Networked] private ushort           ResultTile { get; set; }
+    [Networked] private ushort           BumpTile { get; set; }
+    [Networked] private NetworkBool      IsDownwards { get; set; }
+    [Networked] private NetworkBool      SpawnCoin { get; set; }
+    [Networked] private NetworkPrefabRef SpawnPrefab { get; set; }
+    [Networked] private Vector2          SpawnOffset { get; set; }
+    [Networked] private Vector3Int       TileLocation { get; set; }
 
     //---Components
     private SpriteRenderer spriteRenderer;
@@ -25,9 +25,9 @@ public class BlockBump : NetworkBehaviour {
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
-    public void OnBeforeSpawned(Vector3Int tileLocation, string oldTile, string resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
+    public void OnBeforeSpawned(Vector3Int tileLocation, ushort bumpTile, ushort resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
         TileLocation = tileLocation;
-        OldTile = oldTile;
+        BumpTile = bumpTile;
         ResultTile = resultTile;
         SpawnPrefab = spawnPrefab ?? NetworkPrefabRef.Empty;
         IsDownwards = downwards;
@@ -36,6 +36,15 @@ public class BlockBump : NetworkBehaviour {
 
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
     }
+
+    public void OnBeforeSpawned(Vector3Int tileLocation, TileBase bumpTile, TileBase resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
+        TileManager tm = GameManager.Instance.tileManager;
+        ushort bumpTileId = tm.GetTileIdFromTileInstance(bumpTile);
+        ushort resultTileId = tm.GetTileIdFromTileInstance(resultTile);
+
+        OnBeforeSpawned(tileLocation, bumpTileId, resultTileId, spawnPrefab, downwards, spawnCoin, spawnOffset);
+    }
+
 
     public override void Spawned() {
         animator.SetBool("down", IsDownwards);
@@ -52,12 +61,12 @@ public class BlockBump : NetworkBehaviour {
         hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(0.5f, -0.5f);
 
         //graphics bs
-        Tilemap tm = GameManager.Instance.tilemap;
-        if (!tm.GetTile(TileLocation))
-            tm.SetTile(TileLocation, Utils.GetCacheTile("Tilemaps/Tiles/" + OldTile));
+        Tilemap tilemap = GameManager.Instance.tilemap;
+        TileManager tm = GameManager.Instance.tileManager;
 
+        tilemap.SetTile(TileLocation, tm.sceneTiles[BumpTile]);
         spriteRenderer.sprite = GameManager.Instance.tilemap.GetSprite(TileLocation);
-        GameManager.Instance.tilemap.SetTile(TileLocation, null);
+        tm.SetTile(TileLocation, null);
     }
 
     public override void FixedUpdateNetwork() {
@@ -68,10 +77,7 @@ public class BlockBump : NetworkBehaviour {
     }
 
     public void Kill() {
-        if (Object.HasStateAuthority) {
-            Vector3Int location = Utils.WorldToTilemapPosition(transform.position);
-            GameManager.Instance.rpcs.Rpc_SetTile((short) location.x, (short) location.y, ResultTile.ToString());
-        }
+        GameManager.Instance.tileManager.SetTile(TileLocation, ResultTile);
 
         if (SpawnPrefab == NetworkPrefabRef.Empty) {
             Runner.Despawn(Object);

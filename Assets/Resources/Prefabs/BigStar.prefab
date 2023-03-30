@@ -4893,6 +4893,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 0
   body: {fileID: 1973747262660636108}
   sfx: {fileID: 7844204986304545686}
   _Collector: {fileID: 0}
@@ -4916,6 +4919,10 @@ MonoBehaviour:
   lifespan: 15
   graphicTransform: {fileID: 7308630834410186342}
   particles: {fileID: 3060121057263043570}
+  sRenderer: {fileID: 3409460790137144535}
+  physics: {fileID: 4404708631857811697}
+  worldCollider: {fileID: 1973747262660636111}
+  animator: {fileID: 7013426154861581906}
 --- !u!50 &1973747262660636108
 Rigidbody2D:
   serializedVersion: 4
@@ -5021,7 +5028,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &4404708631857811697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5066,6 +5072,7 @@ MonoBehaviour:
   - {fileID: 7844204986304545686}
   soundOrigin: {fileID: 1973747262660636105}
   soundRange: 5
+  maxPanning: 0.8
 --- !u!82 &7844204986304545686
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5200,10 +5207,10 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1973747262660636110}
-  - {fileID: 1973747262660636107}
   - {fileID: 4404708631857811697}
   - {fileID: -1107023245251777124}
-  SimulationBehaviours: []
+  SimulationBehaviours:
+  - {fileID: 1973747262660636107}
 --- !u!114 &-1107023245251777124
 MonoBehaviour:
   m_ObjectHideFlags: 0

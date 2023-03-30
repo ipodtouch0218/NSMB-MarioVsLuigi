@@ -6,17 +6,17 @@ using NSMB.Utils;
 public class PiranhaPlantController : KillableEntity {
 
     //---Networked Variables
+    [Networked(Default = nameof(upsideDown))] private NetworkBool IsUpsideDown { get; set; }
     [Networked] public TickTimer PopupTimer { get; set; }
-    [Networked] private NetworkBool IsUpsideDown { get; set; }
 
     //---Serialized Variables
     [SerializeField] private float playerDetectSize = 1;
     [SerializeField] private float popupTimerRequirement = 6f;
+    [SerializeField] private NetworkBool upsideDown;
 
     public override void Spawned() {
         base.Spawned();
         PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
-        IsUpsideDown = transform.eulerAngles.z != 0;
     }
 
     public override void Render() {
@@ -25,6 +25,7 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         GameManager gm = GameManager.Instance;
         if (gm) {
             if (gm.GameEnded) {
@@ -39,7 +40,8 @@ public class PiranhaPlantController : KillableEntity {
         if (IsDead)
             return;
 
-        if (Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
+        if (!Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f))) {
+            // No tile at our origin, so our pipe was destroyed.
             Kill();
             return;
         }
@@ -54,12 +56,8 @@ public class PiranhaPlantController : KillableEntity {
         }
     }
 
-    public void Respawn() {
-        if (IsFrozen || !IsDead)
-            return;
-
-        IsFrozen = false;
-        IsDead = false;
+    public override void RespawnEntity() {
+        base.RespawnEntity();
         PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
         animator.Play("end", 0, 1);
         hitbox.enabled = true;
@@ -67,6 +65,7 @@ public class PiranhaPlantController : KillableEntity {
 
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
+        // Don't use player.InstakillsEnemies as we don't want sliding to kill us.
         if (player.IsStarmanInvincible || player.IsInShell || player.State == Enums.PowerupState.MegaMushroom) {
             Kill();
         } else {
@@ -76,13 +75,9 @@ public class PiranhaPlantController : KillableEntity {
 
     //---KillableEntity overrides
     public override void Kill() {
-        PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
-        PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
-
         IsDead = true;
         hitbox.enabled = false;
 
-        GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + new Vector3(0, IsUpsideDown ? -0.5f : 0.5f, 0));
         Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up * (IsUpsideDown ? -1f : 1f));
     }
 
@@ -103,9 +98,19 @@ public class PiranhaPlantController : KillableEntity {
         return true;
     }
 
+    public override void OnIsDeadChanged() {
+        if (IsDead) {
+            PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
+            PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
+            GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + new Vector3(0, IsUpsideDown ? -0.5f : 0.5f, 0));
+        }
+    }
+
+#if UNITY_EDITOR
     //---Debug
-    private void OnDrawGizmosSelected() {
+    public void OnDrawGizmosSelected() {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawSphere(transform.position + (Vector3) (playerDetectSize * new Vector2(0, transform.eulerAngles.z != 0 ? -0.5f : 0.5f)), playerDetectSize);
     }
+#endif
 }

@@ -7,7 +7,6 @@ public class LooseCoin : Coin {
 
     //---Networked Variables
     [Networked] private int CollectableTick { get; set; }
-    [Networked] private TickTimer DespawnTimer { get; set; }
 
     //---Serialized Variables
     [SerializeField] private float despawn = 8;
@@ -35,15 +34,11 @@ public class LooseCoin : Coin {
     }
 
     public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             spriteAnimation.enabled = false;
             body.isKinematic = true;
-            return;
-        }
-
-        if (DespawnTimer.Expired(Runner)) {
-            Runner.Despawn(Object);
             return;
         }
 

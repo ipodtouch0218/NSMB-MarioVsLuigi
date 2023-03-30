@@ -160,6 +160,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 0
   body: {fileID: 1694848990786736830}
   sfx: {fileID: 6080179494260564542}
   _Collector: {fileID: 0}
@@ -367,7 +370,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &786289218142832795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -380,8 +382,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   killTime: 0
+  entity: {fileID: 786289218142832793}
 --- !u!114 &5943513950730874965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -433,11 +435,11 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 786289218142832793}
-  - {fileID: 786289218142832794}
-  - {fileID: 786289218142832795}
   - {fileID: 5943513950730874965}
   - {fileID: 2965949114585547753}
-  SimulationBehaviours: []
+  SimulationBehaviours:
+  - {fileID: 786289218142832794}
+  - {fileID: 786289218142832795}
 --- !u!114 &2965949114585547753
 MonoBehaviour:
   m_ObjectHideFlags: 0

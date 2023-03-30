@@ -432,20 +432,6 @@ namespace NSMB.Utils {
         public static float QuadraticEaseOut(float v) {
             return -1 * v * (v - 2);
         }
-        
-
-        private static readonly Dictionary<string, TileBase> tileCache = new();
-        public static TileBase GetCacheTile(string tilename) {
-            if (tilename == null || tilename == "")
-                return null;
-
-            if (!tilename.StartsWith("Tilemaps/Tiles/"))
-                tilename = "Tilemaps/Tiles/" + tilename;
-
-            return tileCache.ContainsKey(tilename) ?
-                tileCache[tilename] :
-                tileCache[tilename] = Resources.Load(tilename) as TileBase;
-        }
 
         private static readonly Dictionary<char, byte> uiSymbols = new() {
             ['c'] = 6,

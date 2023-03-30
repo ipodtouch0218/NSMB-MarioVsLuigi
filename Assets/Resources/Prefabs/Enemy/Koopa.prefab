@@ -193,6 +193,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 1
   body: {fileID: 8836298984178612591}
   sfx: {fileID: 3399800873378663516}
   _IsFrozen:
@@ -345,8 +348,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   killTime: 0.25
+  entity: {fileID: 8836298984178612580}
 --- !u!114 &-4308704378559277832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,7 +362,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &8052291530585558525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,10 +509,10 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 8836298984178612580}
   - {fileID: 818487035572622980}
+  - {fileID: 3223149270553166802}
+  SimulationBehaviours:
   - {fileID: 7052311415719264077}
   - {fileID: -4308704378559277832}
-  - {fileID: 3223149270553166802}
-  SimulationBehaviours: []
 --- !u!114 &3223149270553166802
 MonoBehaviour:
   m_ObjectHideFlags: 0

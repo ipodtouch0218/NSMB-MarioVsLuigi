@@ -4944,14 +4944,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 1
+  body: {fileID: 1186833380152900418}
+  sfx: {fileID: 3843124130648117525}
   _Owner: {fileID: 0}
   _AlreadyBounced:
     _value: 0
   _IsIceball:
     _value: 0
   _PlayBreakEffect:
-    _value: 0
-  _IsActive:
     _value: 0
   iceBreak: {fileID: 1425112719999528230}
   fireBreak: {fileID: 6930344890943084446}
@@ -4963,6 +4966,12 @@ MonoBehaviour:
   iceSpeed: 4.25
   bounceHeight: 6.75
   terminalVelocity: 6.25
+  physics: {fileID: 376300006025663058}
+  nrb: {fileID: 2914323514277592658}
+  renderers:
+  - {fileID: 4710279457085823811}
+  - {fileID: 7450112483459336877}
+  hitbox: {fileID: -1769135492019179076}
 --- !u!50 &1186833380152900418
 Rigidbody2D:
   serializedVersion: 4
@@ -5148,6 +5157,7 @@ MonoBehaviour:
   - {fileID: 3843124130648117525}
   soundOrigin: {fileID: 1011982274984717416}
   soundRange: 12
+  maxPanning: 0.8
 --- !u!114 &376300006025663058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5188,7 +5198,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &2644380969240041381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5213,9 +5222,9 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1164692562165207756}
   - {fileID: 376300006025663058}
-  - {fileID: 1011982274984717417}
   - {fileID: 2914323514277592658}
-  SimulationBehaviours: []
+  SimulationBehaviours:
+  - {fileID: 1011982274984717417}
 --- !u!114 &2914323514277592658
 MonoBehaviour:
   m_ObjectHideFlags: 0

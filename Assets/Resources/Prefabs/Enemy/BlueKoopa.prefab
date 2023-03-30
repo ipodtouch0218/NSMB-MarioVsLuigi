@@ -5,7 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 452667592475924850, guid: 8cf8f49ac0882ed44953ea53ff901f11,
@@ -31,7 +31,12 @@ PrefabInstance:
     - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 5
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: SimulationBehaviours.Array.size
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
@@ -47,17 +52,27 @@ PrefabInstance:
         type: 3}
       propertyPath: NetworkedBehaviours.Array.data[2]
       value: 
-      objectReference: {fileID: 555484830957607402}
+      objectReference: {fileID: 5391161095116940661}
     - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: NetworkedBehaviours.Array.data[3]
       value: 
-      objectReference: {fileID: 2476915399165588063}
+      objectReference: {fileID: 5391161095116940661}
     - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: NetworkedBehaviours.Array.data[4]
       value: 
       objectReference: {fileID: 5391161095116940661}
+    - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: SimulationBehaviours.Array.data[0]
+      value: 
+      objectReference: {fileID: 555484830957607402}
+    - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: SimulationBehaviours.Array.data[1]
+      value: 
+      objectReference: {fileID: 2476915399165588063}
     - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
@@ -193,7 +208,9 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents:
     - {fileID: 452667592475924850, guid: 8cf8f49ac0882ed44953ea53ff901f11, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8cf8f49ac0882ed44953ea53ff901f11, type: 3}
 --- !u!114 &555484830957607402 stripped
 MonoBehaviour:

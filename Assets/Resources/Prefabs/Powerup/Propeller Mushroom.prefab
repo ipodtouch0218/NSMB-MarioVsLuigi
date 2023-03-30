@@ -128,6 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frame: 0
+  fps: 8
   frames:
   - {fileID: 974339405, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   - {fileID: 94257346, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
@@ -191,6 +192,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 0
+  body: {fileID: 5334425534174023790}
+  sfx: {fileID: 0}
   _Collector: {fileID: 0}
   powerupScriptable: {fileID: 11400000, guid: 797462c66e600c04dbd7898d6d95bd38, type: 2}
   speed: 0
@@ -198,6 +204,10 @@ MonoBehaviour:
   terminalVelocity: 8
   blinkingRate: 4
   avoidPlayers: 0
+  sRenderer: {fileID: 5475970293224446295}
+  physics: {fileID: 7925340915895753955}
+  childAnimator: {fileID: 0}
+  hitbox: {fileID: 5334425534174023789}
   flyingPathX:
     serializedVersion: 2
     m_Curve:
@@ -326,6 +336,12 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 2.2
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -340,6 +356,25 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -368,7 +403,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &7925340915895753955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,6 +426,7 @@ MonoBehaviour:
     _value: 0
   _CrushableGround:
     _value: 0
+  _PreviousTickVelocity: {x: 0, y: 0}
   _FloorAngle: 0
   currentCollider: {fileID: 5334425534174023789}
   goUpSlopes: 0
@@ -408,8 +443,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   killTime: 0
+  entity: {fileID: 5334425534174023788}
 --- !u!114 &8395133427796137537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -433,11 +468,11 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5334425534174023788}
-  - {fileID: 5334425534174023791}
   - {fileID: 7925340915895753955}
-  - {fileID: 4576572072748730292}
   - {fileID: 6579073807157730491}
-  SimulationBehaviours: []
+  SimulationBehaviours:
+  - {fileID: 5334425534174023791}
+  - {fileID: 4576572072748730292}
 --- !u!114 &6579073807157730491
 MonoBehaviour:
   m_ObjectHideFlags: 0

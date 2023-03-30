@@ -46,7 +46,7 @@ public class BreakableBrickTile : InteractableTile {
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Tilemap
-        GameManager.Instance.tilemap.SetTile(tileLocation, null);
+        GameManager.Instance.tileManager.SetTile(tileLocation, null);
 
         //Particle
         GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f, particleColor);
@@ -60,10 +60,8 @@ public class BreakableBrickTile : InteractableTile {
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Bump
-        if (GameManager.Instance.Object.HasStateAuthority) {
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, "",
-                "SpecialTiles/" + name, direction == InteractionDirection.Down, Vector2.zero, false, NetworkPrefabRef.Empty);
-        }
+        GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+            this, direction == InteractionDirection.Down, Vector2.zero, false, NetworkPrefabRef.Empty);
     }
 
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {

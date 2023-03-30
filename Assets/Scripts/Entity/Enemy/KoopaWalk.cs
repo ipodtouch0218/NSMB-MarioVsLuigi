@@ -176,7 +176,7 @@ public class KoopaWalk : HoldableEntity {
         Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
         });
-        Runner.Despawn(Object);
+        DespawnEntity();
     }
 
     protected void Turnaround(bool hitWallOnLeft, float x) {
@@ -190,6 +190,15 @@ public class KoopaWalk : HoldableEntity {
         body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
     }
 
+    //---BasicEntity overrides
+    public override void RespawnEntity() {
+        base.RespawnEntity();
+        IsInShell = false;
+        IsStationary = false;
+        IsUpsideDown = false;
+        WakeupTimer = TickTimer.None;
+        Putdown = false;
+    }
 
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
@@ -381,7 +390,7 @@ public class KoopaWalk : HoldableEntity {
     }
 
     //---BasicEntity overrides
-    public override void OnFacingChanged() {
+    public override void OnFacingRightChanged() {
         sRenderer.flipX = FacingRight ^ flipXFlip;
     }
 }

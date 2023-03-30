@@ -15,7 +15,6 @@ public class StarBouncer : CollectableEntity {
     [Networked] public NetworkBool Collectable { get; set; }
     [Networked] public NetworkBool Fast { get; set; }
     [Networked] public NetworkBool Passthrough { get; set; }
-    [Networked] public TickTimer DespawnTimer { get; set; }
 
     //---Serialized Variables
     [SerializeField] private float pulseAmount = 0.2f, pulseSpeed = 0.2f;
@@ -55,7 +54,6 @@ public class StarBouncer : CollectableEntity {
 
     public override void Spawned() {
         base.Spawned();
-
         icon = UIUpdater.Instance.CreateTrackIcon(this);
 
         if (IsStationary) {
@@ -99,18 +97,14 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         if (GameManager.Instance?.GameEnded ?? false) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
             return;
         }
 
-        if (DespawnTimer.Expired(Runner)) {
-            Runner.Despawn(Object, true);
-            return;
-        }
-
-        if (IsStationary)
+        if (!Object || IsStationary)
             return;
 
         if (!Collectable && body.velocity.y < 0)
@@ -128,7 +122,7 @@ public class StarBouncer : CollectableEntity {
         }
         if (!Passthrough) {
             if (body.position.y < GameManager.Instance.LevelMinY) {
-                Runner.Despawn(Object);
+                DespawnEntity();
                 return;
             }
 
@@ -141,9 +135,6 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (!hasState)
-            return;
-
         if (!GameManager.Instance.GameEnded && !Collector)
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
 
@@ -172,7 +163,7 @@ public class StarBouncer : CollectableEntity {
         if (physics.OnGround && Collectable) {
             body.velocity = new(body.velocity.x, bounceAmount);
             if (physics.HitRoof) {
-                Runner.Despawn(Object, true);
+                DespawnEntity();
                 return true;
             }
         }
@@ -199,7 +190,7 @@ public class StarBouncer : CollectableEntity {
 
         //game mechanics
         if (IsStationary && GameManager.Instance.Object.HasStateAuthority)
-            GameManager.Instance.rpcs.Rpc_ResetTilemap();
+            GameManager.Instance.tileManager.ResetMap();
 
         GameManager.Instance.CheckForWinner();
 
@@ -230,11 +221,5 @@ public class StarBouncer : CollectableEntity {
     //---IBlockBumpable overrides
     public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
         // Do nothing when bumped
-    }
-
-    //---BasicEntity overrides
-    public override void Destroy(DestroyCause cause) {
-        if (cause != DestroyCause.Lava)
-            base.Destroy(cause);
     }
 }

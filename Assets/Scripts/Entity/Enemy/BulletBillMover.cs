@@ -10,55 +10,50 @@ public class BulletBillMover : KillableEntity {
     [SerializeField] private ParticleSystem shootParticles, trailParticles;
 
     //---Components
-    [SerializeField] private Animation spriteAnimation;
+    [SerializeField] public NetworkRigidbody2D nrb;
 
     //---Private Variables
     private Vector2 searchVector;
 
     public override void OnValidate() {
         base.OnValidate();
-        if (!spriteAnimation) spriteAnimation = GetComponent<Animation>();
+        if (!nrb) nrb = GetComponent<NetworkRigidbody2D>();
     }
 
     public void Awake() {
-        searchVector = new(playerSearchRadius * 2, 100);
-    }
-
-    public void OnBeforeSpawned(bool shootRight) {
-        FacingRight = shootRight;
-    }
-
-    public override void Spawned() {
-        base.Spawned();
-        body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
-
-        if (FacingRight) {
-            trailParticles.transform.localPosition *= new Vector2(-1, 1);
-            ParticleSystem.ShapeModule shape = shootParticles.shape;
-            shape.rotation = new Vector3(0, 0, -33);
-        }
-
-        shootParticles.Play();
-        sRenderer.flipX = FacingRight;
+        searchVector = new(playerSearchRadius * 2, playerSearchRadius * 4);
     }
 
     public override void FixedUpdateNetwork() {
-        base.FixedUpdateNetwork();
-        if (!Object.IsValid)
-            return;
 
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
-            spriteAnimation.enabled = false;
+            legacyAnimation.enabled = false;
             body.isKinematic = true;
             return;
+        }
+
+        if (DespawnTimer.Expired(Runner)) {
+            DespawnTimer = TickTimer.None;
+            DespawnEntity();
+        }
+
+        if (IsDead || !IsActive) {
+            gameObject.layer = Layers.LayerHitsNothing;
+            body.isKinematic = false;
+        } else {
+            gameObject.layer = Layers.LayerEntityHitbox;
+            body.isKinematic = true;
+            body.freezeRotation = true;
+            body.rotation = 0;
+            body.angularVelocity = 0;
         }
 
         if (IsFrozen || IsDead)
             return;
 
-        body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
+        body.velocity = new(speed * (FacingRight ? 1 : -1), 0);
         DespawnCheck();
     }
 
@@ -71,7 +66,7 @@ public class BulletBillMover : KillableEntity {
                 return;
         }
 
-        Runner.Despawn(Object);
+        DespawnEntity();
     }
 
     //---IPlayerInteractable overrides
@@ -82,9 +77,7 @@ public class BulletBillMover : KillableEntity {
         Vector2 damageDirection = (player.body.position - body.position).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
 
-        if (player.IsStarmanInvincible || player.IsInShell || player.IsSliding
-            || ((player.IsGroundpounding || player.IsDrilling) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)
-            || player.State == Enums.PowerupState.MegaMushroom) {
+        if (player.InstakillsEnemies || ((player.IsGroundpounding || player.IsDrilling) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)) {
 
             if (player.IsDrilling) {
                 player.DoEntityBounce = true;
@@ -146,6 +139,23 @@ public class BulletBillMover : KillableEntity {
         } else {
             sRenderer.enabled = true;
             trailParticles.Play();
+        }
+    }
+
+
+    //---BasicEntity overrides
+    public override void OnFacingRightChanged() {
+        sRenderer.flipX = FacingRight;
+        trailParticles.transform.localPosition *= new Vector2(-1, 1);
+        ParticleSystem.ShapeModule shape = shootParticles.shape;
+        shape.rotation = new Vector3(0, 0, FacingRight ? -33 : 147);
+    }
+
+    public override void OnIsActiveChanged() {
+        base.OnIsActiveChanged();
+        if (IsActive) {
+            shootParticles.Play();
+            sfx.Play();
         }
     }
 

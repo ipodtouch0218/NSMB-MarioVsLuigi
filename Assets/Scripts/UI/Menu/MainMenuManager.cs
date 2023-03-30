@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using TMPro;
@@ -19,7 +18,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     //---Static Variables
     public static readonly int NicknameMin = 2, NicknameMax = 20;
-    private static readonly WaitForSeconds WaitTwoSeconds = new(2);
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
@@ -171,15 +169,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         playerList.AddPlayerEntry(player);
     }
 
-    private IEnumerator UpdatePings() {
-        while (true) {
-            yield return WaitTwoSeconds;
-            foreach (PlayerRef player in Runner.ActivePlayers) {
-                player.GetPlayerData(Runner).Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
-            }
-        }
-    }
-
     public void EnterRoom() {
 
         // If the game is already started, we want to immediately load in.
@@ -187,10 +176,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             OnGameStartChanged();
             return;
         }
-
-        // Start the ping update routine if we're the server
-        if (Runner.IsServer && playerPingUpdateCoroutine == null)
-            playerPingUpdateCoroutine = StartCoroutine(UpdatePings());
 
         // Open the in-room menu
         OpenInRoomMenu();

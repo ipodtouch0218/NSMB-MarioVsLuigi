@@ -10,7 +10,7 @@ using NSMB.Utils;
 public class ScoreboardEntry : MonoBehaviour {
 
     //---Serialized Variables
-    [SerializeField] private TMP_Text nameText, valuesText;
+    [SerializeField] private TMP_Text nameText, underlayText, valuesText;
     [SerializeField] private Image background;
     [SerializeField] private float normalWidth = 250, controllerWidth = 280;
 
@@ -39,7 +39,7 @@ public class ScoreboardEntry : MonoBehaviour {
         data = target.Object.InputAuthority.GetPlayerData(target.Runner);
 
         playerId = target.PlayerId;
-        nameText.text = (data.IsRoomOwner ? "<sprite=60>" : "<sprite=56>") + data.GetNickname();
+        nameText.text = underlayText.text = (data.IsRoomOwner ? "<sprite=60>" : "<sprite=56>") + data.GetNickname();
 
         Color c = target.animationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);
@@ -69,11 +69,11 @@ public class ScoreboardEntry : MonoBehaviour {
 
         if (!data || !data.Object || !data.Object.IsValid) {
             disconnected = true;
-            nameText.text = Regex.Replace(nameText.text, "<sprite=\\d*>", "<sprite=61>");
+            nameText.text = underlayText.text  = Regex.Replace(nameText.text, "<sprite=\\d*>", "<sprite=61>");
 
         } else if (!data.IsRoomOwner && currentPing != data.Ping) {
             currentPing = data.Ping;
-            nameText.text = Utils.GetPingSymbol(currentPing) + data.GetNickname();
+            nameText.text = underlayText.text  = Utils.GetPingSymbol(currentPing) + data.GetNickname();
         }
 
         if (!target || disconnected) {

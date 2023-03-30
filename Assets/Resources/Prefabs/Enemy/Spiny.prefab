@@ -55,14 +55,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _IsActive:
+    _value: 0
+  isRespawningEntity: 0
+  body: {fileID: 1435431862184428450}
+  sfx: {fileID: 5072740182388110993}
   _IsFrozen:
     _value: 0
   _IsDead:
     _value: 0
   iceCarryable: 1
   flying: 0
-  hitbox: {fileID: 0}
-  sRenderer: {fileID: 0}
+  hitbox: {fileID: 1435431862184428453}
+  animator: {fileID: 1376368638781678059}
+  legacyAnimation: {fileID: 0}
+  sRenderer: {fileID: 5045576353537437192}
+  audioSource: {fileID: 5072740182388110993}
+  physics: {fileID: 7066327238497152073}
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 4.5
@@ -88,7 +97,6 @@ MonoBehaviour:
   blue: 0
   canBeFlipped: 0
   flipXFlip: 1
-  putdown: 0
 --- !u!50 &1435431862184428450
 Rigidbody2D:
   serializedVersion: 4
@@ -173,7 +181,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &618591213112214912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,8 +193,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355385f5811a80c4fb2dd412dad21d3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   killTime: 0.1
+  entity: {fileID: 618591213112214914}
 --- !u!114 &7066327238497152073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,6 +218,7 @@ MonoBehaviour:
     _value: 0
   _CrushableGround:
     _value: 0
+  _PreviousTickVelocity: {x: 0, y: 0}
   _FloorAngle: 0
   currentCollider: {fileID: 1435431862184428453}
   goUpSlopes: 0
@@ -231,6 +239,7 @@ MonoBehaviour:
   - {fileID: 5072740182388110993}
   soundOrigin: {fileID: 1435431862184428454}
   soundRange: 12
+  maxPanning: 0.8
 --- !u!82 &5072740182388110993
 AudioSource:
   m_ObjectHideFlags: 0
@@ -360,11 +369,11 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 618591213112214914}
-  - {fileID: 3278359404849032757}
-  - {fileID: 618591213112214912}
   - {fileID: 7066327238497152073}
   - {fileID: 3461155966662633466}
-  SimulationBehaviours: []
+  SimulationBehaviours:
+  - {fileID: 3278359404849032757}
+  - {fileID: 618591213112214912}
 --- !u!114 &3461155966662633466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -498,3 +507,4 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

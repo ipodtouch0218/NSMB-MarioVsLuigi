@@ -21,7 +21,6 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     protected readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
     //---Networked Variables
-    [Networked] protected TickTimer DespawnTimer { get; set; }
     [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
     [Networked] protected NetworkBool WasSpecialKilled { get; set; }
     [Networked] protected NetworkBool WasGroundpounded { get; set; }
@@ -34,6 +33,8 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     //---Serialized Variables
     [SerializeField] protected bool iceCarryable = true;
     [SerializeField] protected bool flying = false;
+    [SerializeField] protected bool collideWithOtherEnemies = true;
+    [SerializeField] protected bool dieWhenInsideBlock = true;
 
     //---Components
     [SerializeField] public BoxCollider2D hitbox;
@@ -53,19 +54,27 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         if (!physics) physics = GetComponent<PhysicsEntity>();
     }
 
+    public override void Spawned() {
+        DespawnEntity();
+        OnIsActiveChanged();
+    }
+
     public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
         if (!GameManager.Instance || !body || IsFrozen)
             return;
 
-        if (DespawnTimer.Expired(Runner)) {
-            IsDead = true;
-            Runner.Despawn(Object);
-            return;
-        }
-
-        if (IsDead) {
-            //hitbox.enabled = false;
+        if (!IsActive) {
             gameObject.layer = Layers.LayerHitsNothing;
+            body.angularVelocity = 0;
+            body.constraints = RigidbodyConstraints2D.FreezeRotation;
+            body.velocity = Vector2.zero;
+            body.isKinematic = true;
+            return;
+
+        } else if (IsDead) {
+            gameObject.layer = Layers.LayerHitsNothing;
+            body.isKinematic = false;
 
             if (WasSpecialKilled) {
                 body.angularVelocity = 400f * (FacingRight ? 1 : -1);
@@ -73,16 +82,20 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             }
             return;
         } else {
-            //hitbox.enabled = true;
             gameObject.layer = Layers.LayerEntity;
+            body.isKinematic = false;
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
 
-        CheckForEntityCollisions();
+        if (collideWithOtherEnemies) {
+            CheckForEntityCollisions();
+        }
 
-        Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-        if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(loc)) {
-            SpecialKill(FacingRight, false, 0);
+        if (dieWhenInsideBlock) {
+            Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
+            if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(loc)) {
+                SpecialKill(FacingRight, false, 0);
+            }
         }
     }
 
@@ -161,6 +174,33 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
     public void PlaySound(Enums.Sounds sound) {
         audioSource.PlayOneShot(sound);
+    }
+
+    //---BasicEntity overrides
+    public override void OnIsActiveChanged() {
+        if (IsActive) {
+            if (sRenderer)
+                sRenderer.enabled = true;
+        } else {
+            if (sRenderer)
+                sRenderer.enabled = false;
+        }
+    }
+
+    public override void RespawnEntity() {
+        base.RespawnEntity();
+        IsDead = false;
+        IsFrozen = false;
+        FacingRight = false;
+        WasSpecialKilled = false;
+        WasGroundpounded = false;
+        ComboCounter = 0;
+        //gameObject.layer = Layers.LayerEntity;
+    }
+
+    public override void DespawnEntity() {
+        base.DespawnEntity();
+        IsDead = true;
     }
 
     //---IPlayerInteractable overrides

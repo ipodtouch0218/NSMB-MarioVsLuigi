@@ -135,18 +135,20 @@ Tilemap:
   m_AnimatedTiles:
   - first: {x: 1, y: 2, z: 0}
     second:
+      serializedVersion: 2
       m_AnimatedSprites:
       - {fileID: 1290563008405666652, guid: 02501bf114d1a0a4f98fa72f08e7c70c, type: 3}
       m_AnimationSpeed: 1
       m_AnimationTimeOffset: 0
-      m_IsLooping: 1
+      m_Flags: 0
   - first: {x: 1, y: 3, z: 0}
     second:
+      serializedVersion: 2
       m_AnimatedSprites:
       - {fileID: 1778087341, guid: ad3de27574a028b45ac509a9ad22abc5, type: 3}
       m_AnimationSpeed: 1
       m_AnimationTimeOffset: 0
-      m_IsLooping: 1
+      m_Flags: 0
   m_TileAssetArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
@@ -412,7 +414,7 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
---- !u!114 &5205167261325008669
+--- !u!114 &3339760216865032523
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -65,7 +65,7 @@ public class GoombaWalk : KillableEntity {
     }
 
     //---BasicEntity overrides
-    public override void OnFacingChanged() {
+    public override void OnFacingRightChanged() {
         sRenderer.flipX = FacingRight;
     }
 }

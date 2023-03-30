@@ -224,7 +224,8 @@ public class WaterSplash : NetworkBehaviour {
                 if (entity is FireballMover fm)
                     fm.PlayBreakEffect = false;
 
-                entity.Destroy(BasicEntity.DestroyCause.Lava);
+                if (entity is not StarBouncer)
+                    entity.DespawnEntity();
             }
         }
 

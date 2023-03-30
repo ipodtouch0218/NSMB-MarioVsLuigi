@@ -360,20 +360,23 @@ Tilemap:
   m_AnimatedTiles:
   - first: {x: -4, y: -2, z: 0}
     second:
+      serializedVersion: 2
       m_AnimatedSprites:
       - {fileID: 0}
       m_AnimationSpeed: 0
       m_AnimationTimeOffset: 0
-      m_IsLooping: 1
+      m_Flags: 0
   - first: {x: -3, y: -2, z: 0}
     second:
+      serializedVersion: 2
       m_AnimatedSprites:
       - {fileID: 0}
       m_AnimationSpeed: 0
       m_AnimationTimeOffset: 0
-      m_IsLooping: 1
+      m_Flags: 0
   - first: {x: -4, y: -1, z: 0}
     second:
+      serializedVersion: 2
       m_AnimatedSprites:
       - {fileID: 775316621, guid: 0370724d18844184d950a518e4daf31d, type: 3}
       - {fileID: -1228109020, guid: 0370724d18844184d950a518e4daf31d, type: 3}
@@ -382,14 +385,15 @@ Tilemap:
       - {fileID: 775316621, guid: 0370724d18844184d950a518e4daf31d, type: 3}
       m_AnimationSpeed: 8
       m_AnimationTimeOffset: 0
-      m_IsLooping: 1
+      m_Flags: 0
   - first: {x: -3, y: -1, z: 0}
     second:
+      serializedVersion: 2
       m_AnimatedSprites:
       - {fileID: 0}
       m_AnimationSpeed: 0
       m_AnimationTimeOffset: 0
-      m_IsLooping: 1
+      m_Flags: 0
   m_TileAssetArray:
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 1be6d01f40498994faf9bd74d702e17f, type: 2}
@@ -607,7 +611,7 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
---- !u!114 &5555304753123294964
+--- !u!114 &3494393734182921140
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
