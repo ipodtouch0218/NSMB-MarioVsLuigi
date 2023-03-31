@@ -159,7 +159,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     //---IBlockBumpable overrides
-    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
         if (direction == InteractableTile.InteractionDirection.Down || FollowPlayer)
             return;
 

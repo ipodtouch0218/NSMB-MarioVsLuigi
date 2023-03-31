@@ -30,8 +30,8 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, I
             return;
 
         //no block can be at our location
-        Vector3Int tileLocation = Utils.WorldToTilemapPosition(transform.position);
-        if (Utils.GetTileAtTileLocation(tileLocation) != null)
+        Vector2Int tileLocation = Utils.WorldToTilemapPosition(transform.position);
+        if (Utils.GetTileAtTileLocation(tileLocation))
             return;
 
         //player has to be moving upwards
@@ -49,14 +49,12 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, I
         player.body.velocity = new(player.body.velocity.x, 0);
     }
 
-    public void DoBump(Vector3Int tileLocation, PlayerController player) {
+    public void DoBump(Vector2Int tileLocation, PlayerController player) {
         Vector3 location = Utils.TilemapToWorldPosition(tileLocation) + BlockOffset;
         Coin.GivePlayerCoin(player, location);
 
-        if (GameManager.Instance.Object.HasStateAuthority) {
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
-                resultTile, false, Vector2.zero, true, NetworkPrefabRef.Empty);
-        }
+        GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
+            resultTile, false, Vector2.zero, true, NetworkPrefabRef.Empty);
     }
 
 #if UNITY_EDITOR

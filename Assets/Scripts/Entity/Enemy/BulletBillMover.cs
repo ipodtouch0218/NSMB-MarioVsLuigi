@@ -106,7 +106,7 @@ public class BulletBillMover : KillableEntity {
     }
 
     //---IBlockBumpable overrides
-    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing
     }
 

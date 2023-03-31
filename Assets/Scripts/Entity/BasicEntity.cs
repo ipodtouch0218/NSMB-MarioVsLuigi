@@ -95,7 +95,7 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     public virtual void OnFacingRightChanged() { }
 
     //---IBlockBumpable overrides
-    public abstract void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction);
+    public abstract void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction);
 
     //---OnChangeds
     public static void OnFacingRightChanged(Changed<BasicEntity> changed) {

@@ -15,7 +15,7 @@ public class RouletteTile : BreakableBrickTile, IHaveTileDependencies {
         if (base.Interact(interacter, direction, worldLocation))
             return true;
 
-        Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
+        Vector2Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         NetworkPrefabRef spawnResult = PrefabList.Instance.Powerup_Mushroom;
 
@@ -30,7 +30,7 @@ public class RouletteTile : BreakableBrickTile, IHaveTileDependencies {
                 //Particles
                 for (int x = 0; x < 2; x++) {
                     for (int y = 0; y < 2; y++) {
-                        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.TilemapToWorldPosition(tileLocation + new Vector3Int(x, y, 0)) + Vector3.one * 0.25f, particleColor);
+                        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.TilemapToWorldPosition(tileLocation + new Vector2Int(x, y)) + Vector3.one * 0.25f, particleColor);
                     }
                 }
 

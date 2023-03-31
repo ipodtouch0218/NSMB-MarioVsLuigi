@@ -46,7 +46,7 @@ public class PropellerPowerup : MovingPowerup {
     }
 
     //---IBlockBumpable overrides
-    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing when bumped. We're flying, remember?
     }
 }

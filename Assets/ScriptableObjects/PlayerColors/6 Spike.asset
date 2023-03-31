@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 0.28235295, g: 0.1254902, b: 0.1254902, a: 1}
+    shirtColor: {r: 0.28235295, g: 0.1254902, b: 0.1254902, a: 1}
     overallsColor: {r: 0.7176471, g: 0.56078434, b: 0.43529412, a: 1}
-    Name: Mocha Brown
-  ColorText: Mocha Brown
+    name: Foreman Spike
+    hatUsesOverallsColor: 0

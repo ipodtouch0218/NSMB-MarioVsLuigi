@@ -21,7 +21,7 @@ public class GameManager : NetworkBehaviour {
             if (_instance)
                 return _instance;
 
-            if (SceneManager.GetActiveScene().buildIndex >= 2 || SceneManager.GetActiveScene().buildIndex < 0)
+            if (SceneManager.GetActiveScene().buildIndex != 0)
                 _instance = FindObjectOfType<GameManager>();
 
             return _instance;
@@ -96,7 +96,7 @@ public class GameManager : NetworkBehaviour {
     public AudioSource music, sfx;
 
     // TODO: figure out how to do rollback-able.... fuck
-    public void BulkModifyTilemap(Vector3Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
+    public void BulkModifyTilemap(Vector2Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
         TileBase[] tileObjects = new TileBase[tiles.Length];
         for (int i = 0; i < tiles.Length; i++) {
             string tile = tiles[i];
@@ -699,10 +699,12 @@ public class GameManager : NetworkBehaviour {
 
         for (int x = 0; x < levelWidthTile; x++) {
             for (int y = 0; y < levelHeightTile; y++) {
-                Vector3Int loc = new(x+levelMinTileX, y+levelMinTileY, 0);
-                TileBase tile = tilemap.GetTile(loc);
+                Vector2Int loc = new(x + levelMinTileX, y + levelMinTileY);
+                TileBase tile = tilemap.GetTile((Vector3Int) loc);
+
                 if (tile is CoinTile)
                     Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + OneFourth, "coin");
+
                 if (tile is PowerupTile)
                     Gizmos.DrawIcon(Utils.TilemapToWorldPosition(loc, this) + OneFourth, "powerup");
             }

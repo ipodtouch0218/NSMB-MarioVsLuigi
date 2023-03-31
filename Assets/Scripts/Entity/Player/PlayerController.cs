@@ -46,6 +46,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool IgnoreCoyoteTime { get; set; }
     [Networked] public float FloorAngle { get; set; }
     [Networked] public NetworkBool OnIce { get; set; }
+    //Tile Interactions
+    [Networked, Capacity(16)] private NetworkLinkedList<Vector2Int> TilesStandingOn => default;
+    [Networked, Capacity(16)] private NetworkLinkedList<Vector2Int> TilesJumpedInto => default;
+    [Networked, Capacity(16)] private NetworkLinkedList<Vector2Int> TilesHitSide => default;
     //Jumping
     [Networked(OnChanged = nameof(OnJumpAnimCounterChanged))] private byte JumpAnimCounter { get; set; }
     [Networked] public NetworkBool IsJumping { get; set; }
@@ -60,6 +64,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public TickTimer KnockbackTimer { get; set; }
     [Networked] public NetworkObject KnockbackAttacker { get; set; }
     //Groundpound
+    [Networked(OnChanged = nameof(OnGroundpoundAnimCounterChanged))] private byte GroundpoundAnimCounter { get; set; }
     [Networked(OnChanged = nameof(OnGroundpoundingChanged))] public NetworkBool IsGroundpounding { get; set; }
     [Networked] public TickTimer GroundpoundStartTimer { get; set; }
     [Networked] public TickTimer GroundpoundCooldownTimer { get; set; }
@@ -193,7 +198,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [SerializeField] private GameObject models;
     [SerializeField] public CharacterData character;
 
-    public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight, stationaryGiantEnd, startedSliding;
+    public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight, stationaryGiantEnd;
     public float powerupFlash;
 
     //MOVEMENT STAGES
@@ -259,7 +264,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     //Tile data
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
     private Enums.Particle footstepParticle = Enums.Particle.None;
-    private readonly List<Vector3Int> tilesStandingOn = new(), tilesJumpedInto = new(), tilesHitSide = new();
 
     private bool initialKnockbackFacingRight = false;
     private bool footstepVariant;
@@ -323,7 +327,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         Lives = SessionData.Instance.Lives;
 
         //use |= as the spectate manager sets it first
-        cameraController.IsControllingCamera |= Object.HasInputAuthority;
+        cameraController.IsControllingCamera = Object.HasInputAuthority;
 
         Vector3 spawnpoint = GameManager.Instance.GetSpawnpoint(0, 1);
         networkRigidbody.TeleportToPosition(spawnpoint);
@@ -463,9 +467,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     #region -- COLLISIONS --
     private void HandleGroundCollision() {
-        tilesJumpedInto.Clear();
-        tilesStandingOn.Clear();
-        tilesHitSide.Clear();
+        TilesJumpedInto.Clear();
+        TilesStandingOn.Clear();
+        TilesHitSide.Clear();
 
         bool ignoreRoof = false;
         int down = 0, left = 0, right = 0, up = 0;
@@ -473,7 +477,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         crushGround = false;
         OnSpinner = null;
         foreach (BoxCollider2D hitbox in hitboxes) {
-            //Runner.GetPhysicsScene2D().Simulate(0f);
             int collisionCount = hitbox.GetContacts(TileContactBuffer);
 
             for (int i = 0; i < collisionCount; i++) {
@@ -484,7 +487,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 if (n == Vector2.up && contact.point.y - 0.02f > body.position.y)
                     continue;
 
-                Vector3Int vec = Utils.WorldToTilemapPosition(p);
+                Vector2Int vec = Utils.WorldToTilemapPosition(p);
                 if (!contact.collider || contact.collider.CompareTag("Player"))
                     continue;
 
@@ -500,22 +503,22 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     if (go.CompareTag("spinner"))
                         OnSpinner = go.GetComponentInParent<SpinnerAnimator>();
 
-                    if (!tilesStandingOn.Contains(vec))
-                        tilesStandingOn.Add(vec);
+                    if (!TilesStandingOn.Contains(vec))
+                        TilesStandingOn.Add(vec);
 
                 } else if (((1 << contact.collider.gameObject.layer) & Layers.MaskSolidGround) != 0) {
                     if (Vector2.Dot(n, Vector2.down) > .9f) {
                         up++;
-                        if (!tilesJumpedInto.Contains(vec))
-                            tilesJumpedInto.Add(vec);
+                        if (!TilesJumpedInto.Contains(vec))
+                            TilesJumpedInto.Add(vec);
                     } else {
                         if (n.x < 0) {
                             right++;
                         } else {
                             left++;
                         }
-                        if (!tilesHitSide.Contains(vec))
-                            tilesHitSide.Add(vec);
+                        if (!TilesHitSide.Contains(vec))
+                            TilesHitSide.Add(vec);
                     }
                 }
             }
@@ -531,7 +534,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         OnIce = false;
         footstepSound = Enums.Sounds.Player_Walk_Grass;
         footstepParticle = Enums.Particle.None;
-        foreach (Vector3Int pos in tilesStandingOn) {
+        foreach (Vector2Int pos in TilesStandingOn) {
             TileBase tile = Utils.GetTileAtTileLocation(pos);
             if (!tile)
                 continue;
@@ -881,7 +884,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
     #endregion
 
-    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
         if (IsInKnockback)
             return;
 
@@ -1201,12 +1204,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         Vector2 checkPosition = body.position + (Vector2.up * checkSize * 0.5f) + (2 * Runner.DeltaTime * body.velocity) + offset;
 
-        Vector3Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
-        Vector3Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
+        Vector2Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
+        Vector2Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
 
         for (int x = 0; x <= size.x; x++) {
             for (int y = 0; y <= size.y; y++) {
-                Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
+                Vector2Int tileLocation = new(minPos.x + x, minPos.y + y);
                 Vector2 worldPosCenter = Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f;
                 Utils.WrapTileLocation(ref tileLocation);
 
@@ -1224,9 +1227,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     dir = InteractableTile.InteractionDirection.Right;
                 }
 
-                BreakablePipeTile pipe = GameManager.Instance.tilemap.GetTile<BreakablePipeTile>(tileLocation);
-                if (pipe && (pipe.upsideDownPipe || !pipes || IsGroundpounding))
-                    continue;
+                TileBase tile = GameManager.Instance.tileManager.GetTile(tileLocation);
+                if (tile is BreakablePipeTile pipe) {
+                    if (pipe.upsideDownPipe || !pipes || IsGroundpounding)
+                        continue;
+                }
 
                 InteractWithTile(tileLocation, dir);
             }
@@ -1234,7 +1239,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (pipes) {
             for (int x = 0; x <= size.x; x++) {
                 for (int y = size.y; y >= 0; y--) {
-                    Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
+                    Vector2Int tileLocation = new(minPos.x + x, minPos.y + y);
                     Vector2 worldPosCenter = Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f;
                     Utils.WrapTileLocation(ref tileLocation);
 
@@ -1250,9 +1255,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                         dir = InteractableTile.InteractionDirection.Right;
                     }
 
-                    BreakablePipeTile pipe = GameManager.Instance.tilemap.GetTile<BreakablePipeTile>(tileLocation);
-                    if (!pipe || !pipe.upsideDownPipe || dir == InteractableTile.InteractionDirection.Up)
-                        continue;
+                    TileBase tile = GameManager.Instance.tileManager.GetTile(tileLocation);
+                    if (tile is BreakablePipeTile pipe) {
+                        if (!pipe.upsideDownPipe || dir == InteractableTile.InteractionDirection.Up)
+                            continue;
+                    }
 
                     InteractWithTile(tileLocation, dir);
                 }
@@ -1260,12 +1267,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
     }
 
-    private bool InteractWithTile(Vector3Int tilePos, InteractableTile.InteractionDirection direction) {
-        TileBase tile = GameManager.Instance.tilemap.GetTile(tilePos);
-        if (!tile || tile is not InteractableTile it)
-            return false;
+    private bool InteractWithTile(Vector2Int tilePos, InteractableTile.InteractionDirection direction) {
+        TileBase tile = GameManager.Instance.tileManager.GetTile(tilePos);
+        if (tile is InteractableTile it)
+            return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos));
 
-        return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos));
+        return false;
     }
     #endregion
 
@@ -1364,7 +1371,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private void HandleSliding(bool up, bool down, bool left, bool right) {
-        startedSliding = false;
         if (IsGroundpounding) {
             if (IsOnGround) {
                 if (State == Enums.PowerupState.MegaMushroom) {
@@ -1377,7 +1383,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     IsSliding = true;
                     GroundpoundHeld = false;
                     body.velocity = new Vector2(-Mathf.Sign(FloorAngle) * SPEED_SLIDE_MAX, 0);
-                    startedSliding = true;
                 } else {
                     body.velocity = Vector2.zero;
                     if (!down || State == Enums.PowerupState.MegaMushroom) {
@@ -2205,11 +2210,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
                 Vector2 checkPosition = body.position + Vector2.up * checkSize / 2f + offset;
 
-                Vector3Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
-                Vector3Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
+                Vector2Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
+                Vector2Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
 
                 for (int x = 0; x <= size.x; x++) {
-                    Vector3Int tileLocation = new(minPos.x + x, minPos.y + size.y, 0);
+                    Vector2Int tileLocation = new(minPos.x + x, minPos.y + size.y);
                     Utils.WrapTileLocation(ref tileLocation);
                     TileBase tile = Utils.GetTileAtTileLocation(tileLocation);
 
@@ -2322,7 +2327,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         //activate blocks jumped into
         if (hitRoof) {
             bool tempHitBlock = false;
-            foreach (Vector3Int tile in tilesJumpedInto) {
+            foreach (Vector2Int tile in TilesJumpedInto) {
                 tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
             }
             if (tempHitBlock && State == Enums.PowerupState.MegaMushroom) {
@@ -2382,7 +2387,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 down = true;
 
                 if (hitLeft || hitRight) {
-                    foreach (var tile in tilesHitSide)
+                    foreach (var tile in TilesHitSide)
                         InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
                     FacingRight = hitLeft;
                     PlaySound(Enums.Sounds.World_Block_Bump);
@@ -2709,38 +2714,20 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (!(IsOnGround && (IsGroundpounding || IsDrilling) && HitBlock))
             return;
 
-        bool tempHitBlock = false, hitAnyBlock = false;
-        foreach (Vector3Int tile in tilesStandingOn) {
-            tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
-            hitAnyBlock = true;
+        GroundpoundAnimCounter++;
+
+        Debug.Log($"Groundpound on tick {Runner.Tick} at {body.position} ({GroundpoundAnimCounter})");
+
+        foreach (Vector2Int tile in TilesStandingOn) {
+            HitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
         }
-        HitBlock = tempHitBlock;
+
         if (IsDrilling) {
             IsSpinnerFlying &= HitBlock;
             IsPropellerFlying &= HitBlock;
             IsDrilling = HitBlock;
             if (HitBlock)
                 IsOnGround = false;
-        } else {
-            //groundpound
-            if (hitAnyBlock) {
-                if (State != Enums.PowerupState.MegaMushroom) {
-                    Enums.Sounds sound = State switch {
-                        Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Groundpound,
-                        _ => Enums.Sounds.Player_Sound_GroundpoundLanding,
-                    };
-                    PlaySound(sound);
-                    SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position);
-                    //GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
-                } else {
-                    CameraController.ScreenShake = 0.15f;
-                }
-            }
-            if (!HitBlock && State == Enums.PowerupState.MegaMushroom) {
-                PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
-                SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position);
-                CameraController.ScreenShake = 0.35f;
-            }
         }
     }
 
@@ -2751,6 +2738,28 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         player.PlaySound(Enums.Sounds.Player_Sound_GroundpoundStart);
+    }
+
+    public static void OnGroundpoundAnimCounterChanged(Changed<PlayerController> changed) {
+        PlayerController player = changed.Behaviour;
+
+        //groundpound
+        if (player.State != Enums.PowerupState.MegaMushroom) {
+            //GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
+            Enums.Sounds sound = player.State switch {
+                Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Groundpound,
+                _ => Enums.Sounds.Player_Sound_GroundpoundLanding,
+            };
+            player.PlaySound(sound);
+            player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
+        } else {
+            CameraController.ScreenShake = 0.15f;
+        }
+        if (!player.HitBlock && player.State == Enums.PowerupState.MegaMushroom) {
+            player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
+            player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
+            CameraController.ScreenShake = 0.35f;
+        }
     }
 
     public static void OnWallJumpTimerChanged(Changed<PlayerController> changed) {

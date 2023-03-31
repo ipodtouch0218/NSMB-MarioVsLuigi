@@ -6,7 +6,6 @@ using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Extensions;
-using System.Runtime.CompilerServices;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -22,15 +21,32 @@ namespace NSMB.Utils {
                 v &= (byte) ~(1 << index);
         }
 
-        public static Vector3Int WorldToTilemapPosition(Vector3 worldVec, GameManager manager = null, bool wrap = true) {
+        public static Vector2Int WorldToTilemapPosition(Vector2 worldVec, GameManager manager = null, bool wrap = true) {
             if (!manager)
                 manager = GameManager.Instance;
 
-            Vector3Int tileLocation = manager.tilemap.WorldToCell(worldVec);
+            Vector2Int tileLocation = (Vector2Int) manager.tilemap.WorldToCell(worldVec);
             if (wrap)
                 WrapTileLocation(ref tileLocation, manager);
 
             return tileLocation;
+        }
+
+        public static bool WrapWorldLocation(ref Vector2 location, GameManager manager = null) {
+            if (!manager)
+                manager = GameManager.Instance;
+
+            if (!manager || !manager.loopingLevel)
+                return false;
+
+            if (location.x < manager.LevelMinX) {
+                location.x += manager.LevelWidth;
+                return true;
+            } else if (location.x >= manager.LevelMaxX) {
+                location.x -= manager.LevelWidth;
+                return true;
+            }
+            return false;
         }
 
         public static bool WrapWorldLocation(ref Vector3 location, GameManager manager = null) {
@@ -64,43 +80,57 @@ namespace NSMB.Utils {
             }
         }
 
-        public static Vector3 TilemapToWorldPosition(Vector3Int tileVec, GameManager manager = null) {
+        public static void WrapTileLocation(ref Vector2Int tileLocation, GameManager manager = null) {
             if (!manager)
                 manager = GameManager.Instance;
 
-            return manager.tilemap.CellToWorld(tileVec);
+            if (!manager.loopingLevel)
+                return;
+
+            if (tileLocation.x < manager.levelMinTileX) {
+                tileLocation.x += manager.levelWidthTile;
+            } else if (tileLocation.x >= manager.levelMinTileX + manager.levelWidthTile) {
+                tileLocation.x -= manager.levelWidthTile;
+            }
         }
 
-        public static TileBase GetTileAtTileLocation(Vector3Int tileLocation) {
-            WrapTileLocation(ref tileLocation);
-            return GameManager.Instance.tilemap.GetTile(tileLocation);
+        public static Vector3 TilemapToWorldPosition(Vector2Int tileVec, GameManager manager = null) {
+            if (!manager)
+                manager = GameManager.Instance;
+
+            return manager.tilemap.CellToWorld((Vector3Int) tileVec);
         }
-        public static TileBase GetTileAtWorldLocation(Vector3 worldLocation) {
+
+        public static TileBase GetTileAtTileLocation(Vector2Int tileLocation) {
+            WrapTileLocation(ref tileLocation);
+            return GameManager.Instance.tileManager.GetTile(tileLocation);
+        }
+        public static TileBase GetTileAtWorldLocation(Vector2 worldLocation) {
             return GetTileAtTileLocation(WorldToTilemapPosition(worldLocation));
         }
 
-        public static bool IsTileSolidAtTileLocation(Vector3Int tileLocation) {
+        public static bool IsTileSolidAtTileLocation(Vector2Int tileLocation) {
             WrapTileLocation(ref tileLocation);
             return GetColliderType(tileLocation) == Tile.ColliderType.Grid;
         }
 
-        private static Tile.ColliderType GetColliderType(Vector3Int tileLocation) {
+        private static Tile.ColliderType GetColliderType(Vector2Int tileLocation) {
 
-            Tilemap tm = GameManager.Instance.tilemap;
+            TileBase tileBase = GetTileAtTileLocation(tileLocation);
 
-            if (tm.GetTile<Tile>(tileLocation) is Tile tile)
-                return tile.colliderType;
+            if (tileBase is AnimatedTile aTile)
+                return aTile.m_TileColliderType;
 
-            if (tm.GetTile<RuleTile>(tileLocation) is RuleTile rule)
-                return rule.m_DefaultColliderType;
+            if (tileBase is RuleTile rTile)
+                return rTile.m_DefaultColliderType;
 
-            if (tm.GetTile<AnimatedTile>(tileLocation) is AnimatedTile animated)
-                return animated.m_TileColliderType;
+            if (tileBase is Tile tTile)
+                return tTile.colliderType;
 
             return Tile.ColliderType.None;
         }
 
-        public static bool IsTileSolidBetweenWorldBox(Vector3Int tileLocation, Vector2 worldLocation, Vector2 worldBox, bool boxcast = true) {
+        public static bool IsTileSolidBetweenWorldBox(Vector2Int tileLocation, Vector2 worldLocation, Vector2 worldBox, bool boxcast = true) {
             if (boxcast) {
                 Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
                 if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
@@ -109,11 +139,11 @@ namespace NSMB.Utils {
 
             Vector2 ogWorldLocation = worldLocation;
             while (GetTileAtTileLocation(tileLocation) is TileInteractionRelocator it) {
-                worldLocation += (Vector2) (Vector3) it.offset * 0.5f;
+                worldLocation += (Vector2) it.offset * 0.5f;
                 tileLocation += it.offset;
             }
 
-            Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix(tileLocation);
+            Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix((Vector3Int) tileLocation);
 
             Vector2 halfBox = worldBox * 0.5f;
             List<Vector2> boxPoints = new() {
@@ -123,7 +153,7 @@ namespace NSMB.Utils {
                 ogWorldLocation + Vector2.down * halfBox + Vector2.right * halfBox  // -+
             };
 
-            Sprite sprite = GameManager.Instance.tilemap.GetSprite(tileLocation);
+            Sprite sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) tileLocation);
             switch (GetColliderType(tileLocation)) {
             case Tile.ColliderType.Grid:
                 return true;
@@ -139,7 +169,7 @@ namespace NSMB.Utils {
                         Vector2 point = points[j];
                         point *= 0.5f;
                         point = tileTransform.MultiplyPoint(point);
-                        point += (Vector2) (Vector3) tileLocation * 0.5f;
+                        point += (Vector2) tileLocation * 0.5f;
                         point += (Vector2) GameManager.Instance.tilemap.transform.position;
                         point += Vector2.one * 0.25f;
                         points[j] = point;
@@ -172,18 +202,18 @@ namespace NSMB.Utils {
             return false;
         }
 
-        public static bool IsTileSolidAtWorldLocation(Vector3 worldLocation) {
+        public static bool IsTileSolidAtWorldLocation(Vector2 worldLocation) {
             Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
             if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
                 return true;
 
             while (GetTileAtWorldLocation(worldLocation) is TileInteractionRelocator it)
-                worldLocation += (Vector3) it.offset * 0.5f;
+                worldLocation += (Vector2) it.offset * 0.5f;
 
-            Vector3Int tileLocation = WorldToTilemapPosition(worldLocation);
-            Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix(tileLocation);
+            Vector2Int tileLocation = WorldToTilemapPosition(worldLocation);
+            Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix((Vector3Int) tileLocation);
 
-            Sprite sprite = GameManager.Instance.tilemap.GetSprite(tileLocation);
+            Sprite sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) tileLocation);
             switch (GetColliderType(tileLocation)) {
             case Tile.ColliderType.Grid:
                 return true;
@@ -198,7 +228,7 @@ namespace NSMB.Utils {
                         Vector2 point = points[j];
                         point *= 0.5f;
                         point = tileTransform.MultiplyPoint(point);
-                        point += (Vector2) (Vector3) tileLocation * 0.5f;
+                        point += (Vector2) tileLocation * 0.5f;
                         point += (Vector2) GameManager.Instance.tilemap.transform.position;
                         point += Vector2.one * 0.25f;
                         points[j] = point;
@@ -325,13 +355,13 @@ namespace NSMB.Utils {
         }
 
         public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize, bool boxcast = true) {
-            Vector3Int minPos = WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
-            Vector3Int size = WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
+            Vector2Int minPos = WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
+            Vector2Int size = WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
 
             for (int x = 0; x <= size.x; x++) {
                 for (int y = 0; y <= size.y; y++) {
 
-                    Vector3Int tileLocation = new(minPos.x + x, minPos.y + y, 0);
+                    Vector2Int tileLocation = new(minPos.x + x, minPos.y + y);
                     WrapTileLocation(ref tileLocation);
 
                     if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize, boxcast))

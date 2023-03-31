@@ -40,11 +40,25 @@ public class TileManager : NetworkBehaviour {
         gm.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - gm.RealPlayerCount * 0.2f);
     }
 
-    public void SetTile(Vector3Int loc, TileBase tile) {
+    public TileBase GetTile(int x, int y) {
+
+        TilemapChunk chunk = GetChunkAtTileLocation(x, y);
+        if (!chunk)
+            return null;
+
+        ushort tileId = chunk.GetTile(TileLocationToChunkIndex(x, y));
+        return GetTileInstanceFromTileId(tileId);
+    }
+
+    public TileBase GetTile(Vector2Int loc) {
+        return GetTile(loc.x, loc.y);
+    }
+
+    public void SetTile(Vector2Int loc, TileBase tile) {
         SetTile(loc.x, loc.y, tile);
     }
 
-    public void SetTile(Vector3Int loc, ushort tileId) {
+    public void SetTile(Vector2Int loc, ushort tileId) {
         SetTile(loc.x, loc.y, tileId);
     }
 
@@ -60,10 +74,7 @@ public class TileManager : NetworkBehaviour {
         if (!chunk)
             return;
 
-        int chunkX = (x - WorldOriginX) % 16;
-        int chunkY = (y - WorldOriginY) % 16;
-
-        chunk.SetTile(chunkX, chunkY, tileId);
+        chunk.SetTile(TileLocationToChunkIndex(x, y), tileId);
     }
 
     public ushort GetTileIdFromTileInstance(TileBase tile) {
@@ -77,6 +88,16 @@ public class TileManager : NetworkBehaviour {
         }
 
         return 0;
+    }
+
+    public TileBase GetTileInstanceFromTileId(ushort id) {
+        return sceneTiles[id];
+    }
+
+    private int TileLocationToChunkIndex(int x, int y) {
+        x = (x - WorldOriginX) % 16;
+        y = (y - WorldOriginY) % 16;
+        return x + (y * 16);
     }
 
     private TilemapChunk GetChunkAtTileLocation(int x, int y) {

@@ -24,24 +24,24 @@ public class BreakablePipeTile : InteractableTile {
             return false;
 
 
-        Tilemap tilemap = GameManager.Instance.tilemap;
-        Vector3Int ourLocation = Utils.WorldToTilemapPosition(worldLocation);
+        TileManager tilemap = GameManager.Instance.tileManager;
+        Vector2Int ourLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         if (leftOfPipe && direction == InteractionDirection.Left) {
-            if (Utils.GetTileAtTileLocation(ourLocation + Vector3Int.right) is InteractableTile otherPipe) {
+            if (Utils.GetTileAtTileLocation(ourLocation + Vector2Int.right) is InteractableTile otherPipe) {
                 return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.right * 0.5f));
             }
         }
         if (!leftOfPipe && direction == InteractionDirection.Right) {
-            if (Utils.GetTileAtTileLocation(ourLocation + Vector3Int.left) is InteractableTile otherPipe) {
+            if (Utils.GetTileAtTileLocation(ourLocation + Vector2Int.left) is InteractableTile otherPipe) {
                 return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.left* 0.5f));
             }
         }
 
         int height = GetPipeHeight(ourLocation);
-        Vector3Int origin = GetPipeOrigin(ourLocation);
-        Vector3Int pipeDirection = upsideDownPipe ? Vector3Int.up : Vector3Int.down;
-        Vector3Int hat = origin - (pipeDirection * (height - 1));
+        Vector2Int origin = GetPipeOrigin(ourLocation);
+        Vector2Int pipeDirection = upsideDownPipe ? Vector2Int.up : Vector2Int.down;
+        Vector2Int hat = origin - (pipeDirection * (height - 1));
 
         if (ourLocation.y == GameManager.Instance.levelMinTileY + 1)
             //exception: dont break out of bounds.
@@ -83,7 +83,7 @@ public class BreakablePipeTile : InteractableTile {
                 addHat = bottom;
                 tileHeight = GetPipeHeight(ourLocation);
 
-                world -= (Vector2) ((Vector3) (ourLocation - origin) / 2f);
+                world -= (Vector2) (ourLocation - origin) * 0.5f;
 
                 if (bottom)
                     world += Vector2.up * 0.5f;
@@ -98,22 +98,22 @@ public class BreakablePipeTile : InteractableTile {
         if (addHat) {
             if (leftOfPipe) {
                 //we're the left side. modify the right side too.
-                if (shrink) {
-                    tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat).name;
-                    tiles[start + 1] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.right).name;
-                } else {
-                    tiles[start] = "SpecialPipes/" + leftDestroy;
-                    tiles[start + 1] = "SpecialPipes/" + rightDestroy;
-                }
+                //if (shrink) {
+                //    tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat).name;
+                //    tiles[start + 1] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.right).name;
+                //} else {
+                //    tiles[start] = "SpecialPipes/" + leftDestroy;
+                //    tiles[start + 1] = "SpecialPipes/" + rightDestroy;
+                //}
             } else {
                 //we're the right side. modify the left side too.
-                if (shrink) {
-                    tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.left).name;
-                    tiles[start + 1] = "SpecialPipes/" + tilemap.GetTile(hat).name;
-                } else {
-                    tiles[start] = "SpecialPipes/" + leftDestroy;
-                    tiles[start + 1] = "SpecialPipes/" + rightDestroy;
-                }
+                //if (shrink) {
+                //    tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.left).name;
+                //    tiles[start + 1] = "SpecialPipes/" + tilemap.GetTile(hat).name;
+                //} else {
+                //    tiles[start] = "SpecialPipes/" + leftDestroy;
+                //    tiles[start + 1] = "SpecialPipes/" + rightDestroy;
+                //}
             }
         }
 
@@ -122,34 +122,36 @@ public class BreakablePipeTile : InteractableTile {
             if (tiles[i] == null)
                 tiles[i] = "";
 
-        Vector3Int offset = upsideDownPipe ? Vector3Int.zero : pipeDirection * (tileHeight-1);
-        GameManager.Instance.BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector3Int.zero : Vector3Int.left), new Vector2Int(2, tileHeight), tiles);
+        Vector2Int offset = upsideDownPipe ? Vector2Int.zero : pipeDirection * (tileHeight-1);
+        GameManager.Instance.BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector2Int.zero : Vector2Int.left), new Vector2Int(2, tileHeight), tiles);
 
         player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Break_Pipe);
         return true;
     }
 
-    private Vector3Int GetPipeOrigin(Vector3Int ourLocation) {
-        Tilemap tilemap = GameManager.Instance.tilemap;
-        Vector3Int searchDirection = upsideDownPipe ? Vector3Int.up : Vector3Int.down;
-        Vector3Int searchVector = upsideDownPipe ? Vector3Int.up : Vector3Int.down;
-        while (tilemap.GetTile<BreakablePipeTile>(ourLocation + searchVector))
+    private Vector2Int GetPipeOrigin(Vector2Int ourLocation) {
+        TileManager tm = GameManager.Instance.tileManager;
+        Vector2Int searchDirection = upsideDownPipe ? Vector2Int.up : Vector2Int.down;
+        Vector2Int searchVector = upsideDownPipe ? Vector2Int.up : Vector2Int.down;
+
+        while (tm.GetTile(ourLocation + searchVector) is BreakablePipeTile)
             searchVector += searchDirection;
+
         return ourLocation + searchVector - searchDirection;
     }
 
-    private int GetPipeHeight(Vector3Int ourLocation) {
+    private int GetPipeHeight(Vector2Int ourLocation) {
         int height = 1;
-        Tilemap tilemap = GameManager.Instance.tilemap;
-        Vector3Int searchVector = Vector3Int.up;
-        while (tilemap.GetTile<BreakablePipeTile>(ourLocation + searchVector)) {
+        TileManager tm = GameManager.Instance.tileManager;
+        Vector2Int searchVector = Vector2Int.up;
+        while (tm.GetTile(ourLocation + searchVector) is BreakablePipeTile) {
             height++;
-            searchVector += Vector3Int.up;
+            searchVector += Vector2Int.up;
         }
-        searchVector = Vector3Int.down;
-        while (tilemap.GetTile<BreakablePipeTile>(ourLocation + searchVector)) {
+        searchVector = Vector2Int.down;
+        while (tm.GetTile(ourLocation + searchVector) is BreakablePipeTile) {
             height++;
-            searchVector += Vector3Int.down;
+            searchVector += Vector2Int.down;
         }
         return height;
     }

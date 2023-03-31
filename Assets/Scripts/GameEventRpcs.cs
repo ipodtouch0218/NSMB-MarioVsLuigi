@@ -19,7 +19,7 @@ public class GameEventRpcs : NetworkBehaviour {
 
     //---TILES
     public void BumpBlock(short x, short y, ushort oldTile, ushort newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
-        Vector3Int loc = new(x, y, 0);
+        Vector2Int loc = new(x, y);
 
         Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + OneFourth;
 
@@ -29,7 +29,7 @@ public class GameEventRpcs : NetworkBehaviour {
     }
 
     public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
-        Vector3Int loc = new(x, y, 0);
+        Vector2Int loc = new(x, y);
 
         Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + OneFourth;
 

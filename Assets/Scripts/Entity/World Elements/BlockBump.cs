@@ -14,7 +14,7 @@ public class BlockBump : NetworkBehaviour {
     [Networked] private NetworkBool      SpawnCoin { get; set; }
     [Networked] private NetworkPrefabRef SpawnPrefab { get; set; }
     [Networked] private Vector2          SpawnOffset { get; set; }
-    [Networked] private Vector3Int       TileLocation { get; set; }
+    [Networked] private Vector2Int       TileLocation { get; set; }
 
     //---Components
     private SpriteRenderer spriteRenderer;
@@ -25,7 +25,7 @@ public class BlockBump : NetworkBehaviour {
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
-    public void OnBeforeSpawned(Vector3Int tileLocation, ushort bumpTile, ushort resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
+    public void OnBeforeSpawned(Vector2Int tileLocation, ushort bumpTile, ushort resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
         TileLocation = tileLocation;
         BumpTile = bumpTile;
         ResultTile = resultTile;
@@ -37,7 +37,7 @@ public class BlockBump : NetworkBehaviour {
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
     }
 
-    public void OnBeforeSpawned(Vector3Int tileLocation, TileBase bumpTile, TileBase resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
+    public void OnBeforeSpawned(Vector2Int tileLocation, TileBase bumpTile, TileBase resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
         TileManager tm = GameManager.Instance.tileManager;
         ushort bumpTileId = tm.GetTileIdFromTileInstance(bumpTile);
         ushort resultTileId = tm.GetTileIdFromTileInstance(resultTile);
@@ -64,8 +64,8 @@ public class BlockBump : NetworkBehaviour {
         Tilemap tilemap = GameManager.Instance.tilemap;
         TileManager tm = GameManager.Instance.tileManager;
 
-        tilemap.SetTile(TileLocation, tm.sceneTiles[BumpTile]);
-        spriteRenderer.sprite = GameManager.Instance.tilemap.GetSprite(TileLocation);
+        tilemap.SetTile((Vector3Int) TileLocation, tm.GetTileInstanceFromTileId(BumpTile));
+        spriteRenderer.sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) TileLocation);
         tm.SetTile(TileLocation, null);
     }
 

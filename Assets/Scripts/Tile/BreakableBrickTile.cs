@@ -43,7 +43,7 @@ public class BreakableBrickTile : InteractableTile {
     }
 
     public void Break(BasicEntity interacter, Vector3 worldLocation, Enums.Sounds sound) {
-        Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
+        Vector2Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Tilemap
         GameManager.Instance.tileManager.SetTile(tileLocation, null);
@@ -57,7 +57,7 @@ public class BreakableBrickTile : InteractableTile {
 
     public void BumpWithAnimation(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
         Bump(interacter, direction, worldLocation);
-        Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
+        Vector2Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         //Bump
         GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,

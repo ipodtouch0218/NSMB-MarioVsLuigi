@@ -13,7 +13,7 @@ public class PowerupTile : BreakableBrickTile, IHaveTileDependencies {
         if (base.Interact(interacter, direction, worldLocation))
             return true;
 
-        Vector3Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
+        Vector2Int tileLocation = Utils.WorldToTilemapPosition(worldLocation);
 
         NetworkPrefabRef spawnResult = PrefabList.Instance.Powerup_Mushroom;
 

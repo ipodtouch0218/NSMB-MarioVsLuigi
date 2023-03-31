@@ -125,8 +125,8 @@ public class KoopaWalk : HoldableEntity {
             Vector2 p = point.point + (point.normal * -0.15f);
             if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
                 if (!Putdown && IsInShell && !IsStationary) {
-                    Vector3Int tileLoc = Utils.WorldToTilemapPosition(p + BlockOffset);
-                    TileBase tile = GameManager.Instance.tilemap.GetTile(tileLoc);
+                    Vector2Int tileLoc = Utils.WorldToTilemapPosition(p + BlockOffset);
+                    TileBase tile = GameManager.Instance.tileManager.GetTile(tileLoc);
                     if (!tile || !IsInShell)
                         continue;
 
@@ -288,7 +288,7 @@ public class KoopaWalk : HoldableEntity {
     }
 
     //---IBlockBumpable overrides
-    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
         if (IsDead)
             return;
 

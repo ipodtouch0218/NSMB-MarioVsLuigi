@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Utils;
 
 public class GoombaWalk : KillableEntity {
 
@@ -26,8 +27,10 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        if (IsDead)
+        if (IsDead) {
+            gameObject.layer = Layers.LayerEntity;
             return;
+        }
 
         HandleWallCollisions();
 

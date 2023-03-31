@@ -261,7 +261,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     //---IBlockBumpable overrides
-    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
         SpecialKill(false, false, 0);
     }
 

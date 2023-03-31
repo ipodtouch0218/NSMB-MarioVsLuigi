@@ -18,9 +18,9 @@ public class BreakableBulletBillLauncher : InteractableTile {
         if (direction == InteractionDirection.Down || direction == InteractionDirection.Up)
             return false;
 
-        Vector3Int ourLocation = Utils.WorldToTilemapPosition(worldLocation);
+        Vector2Int ourLocation = Utils.WorldToTilemapPosition(worldLocation);
         int height = GetLauncherHeight(ourLocation);
-        Vector3Int origin = GetLauncherOrigin(ourLocation);
+        Vector2Int origin = GetLauncherOrigin(ourLocation);
 
         string[] tiles = new string[height];
 
@@ -34,27 +34,30 @@ public class BreakableBulletBillLauncher : InteractableTile {
         return true;
     }
 
-    private Vector3Int GetLauncherOrigin(Vector3Int ourLocation) {
-        Tilemap tilemap = GameManager.Instance.tilemap;
-        Vector3Int searchDirection = Vector3Int.down;
-        Vector3Int searchVector = Vector3Int.down;
-        while (tilemap.GetTile<BreakableBulletBillLauncher>(ourLocation + searchVector))
+    private Vector2Int GetLauncherOrigin(Vector2Int ourLocation) {
+        TileManager tm = GameManager.Instance.tileManager;
+        Vector2Int searchDirection = Vector2Int.down;
+        Vector2Int searchVector = Vector2Int.down;
+
+        while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher)
             searchVector += searchDirection;
+
         return ourLocation + searchVector - searchDirection;
     }
 
-    private int GetLauncherHeight(Vector3Int ourLocation) {
+    private int GetLauncherHeight(Vector2Int ourLocation) {
         int height = 1;
-        Tilemap tilemap = GameManager.Instance.tilemap;
-        Vector3Int searchVector = Vector3Int.up;
-        while (tilemap.GetTile<BreakableBulletBillLauncher>(ourLocation + searchVector)) {
+        TileManager tm = GameManager.Instance.tileManager;
+        Vector2Int searchVector = Vector2Int.up;
+        while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher) {
             height++;
-            searchVector += Vector3Int.up;
+            searchVector += Vector2Int.up;
         }
-        searchVector = Vector3Int.down;
-        while (tilemap.GetTile<BreakableBulletBillLauncher>(ourLocation + searchVector)) {
+
+        searchVector = Vector2Int.down;
+        while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher) {
             height++;
-            searchVector += Vector3Int.down;
+            searchVector += Vector2Int.down;
         }
         return height;
     }

@@ -142,15 +142,15 @@ public class BobombWalk : HoldableEntity {
         }
 
         //(sort or) 'splode tiles in range.
-        Vector3Int tileLocation = Utils.WorldToTilemapPosition(body.position);
-        Tilemap tm = GameManager.Instance.tilemap;
+        Vector2Int tileLocation = Utils.WorldToTilemapPosition(body.position);
+        TileManager tm = GameManager.Instance.tileManager;
         for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
             for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
                 //use taxi-cab distance to make a somewhat circular explosion
                 if (Mathf.Abs(x) + Mathf.Abs(y) > explosionTileSize)
                     continue;
 
-                Vector3Int ourLocation = tileLocation + new Vector3Int(x, y, 0);
+                Vector2Int ourLocation = tileLocation + new Vector2Int(x, y);
                 Utils.WrapTileLocation(ref ourLocation);
 
                 TileBase tile = tm.GetTile(ourLocation);
@@ -224,7 +224,7 @@ public class BobombWalk : HoldableEntity {
     }
 
     //---IBlockBumpable overrides
-    public override void BlockBump(BasicEntity bumper, Vector3Int tile, InteractableTile.InteractionDirection direction) {
+    public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
         //Light if we get bumped
         Light();
     }

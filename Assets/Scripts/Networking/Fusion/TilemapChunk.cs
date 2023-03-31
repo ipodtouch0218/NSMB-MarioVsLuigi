@@ -22,6 +22,8 @@ public class TilemapChunk : NetworkBehaviour, IBeforeTick, IAfterTick {
     private bool updatedDirtyCounterThisTick;
 
     public void BeforeTick() {
+        updatedDirtyCounterThisTick = false;
+
         if (!Runner.IsResimulation)
             return;
 
@@ -30,27 +32,37 @@ public class TilemapChunk : NetworkBehaviour, IBeforeTick, IAfterTick {
 
         // the the tilemap is different from it's current state.
         UpdateTilemapState();
-        Debug.Log($"{latestDirtyCounter} -> {DirtyCounter}");
+        Debug.Log($"before resimulation tick {Runner.Tick}: {latestDirtyCounter} -> {DirtyCounter}");
         latestDirtyCounter = DirtyCounter;
     }
 
     public void AfterTick() {
-        latestDirtyCounter = DirtyCounter;
 
         // the tilemap was updated via the dirty counter
         if (updatedDirtyCounterThisTick) {
+            Debug.Log($"tilemap was updated tick {Runner.Tick}: {latestDirtyCounter} -> {DirtyCounter}");
             UpdateTilemapState();
             updatedDirtyCounterThisTick = false;
         }
+
+        latestDirtyCounter = DirtyCounter;
     }
 
     public override void Spawned() {
         Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
     }
 
+    public override void Render() {
+        if (latestDirtyCounter != DirtyCounter) {
+            UpdateTilemapState();
+            latestDirtyCounter = DirtyCounter;
+        }
+    }
+
     public void LoadState() {
         GameManager gm = GameManager.Instance;
         Tilemap tilemap = gm.tilemap;
+        Debug.Log(tilemap);
         ourBounds = new(gm.levelMinTileX + (chunkX * 16), gm.levelMinTileY + (chunkY * 16), 0, 16, 16, 1);
         tilemap.GetTilesBlockNonAlloc(ourBounds, TileBuffer);
 
@@ -94,7 +106,6 @@ public class TilemapChunk : NetworkBehaviour, IBeforeTick, IAfterTick {
                 TileBuffer[i] = tm.sceneTiles[src[i]];
             }
         }
-        Debug.Log("tilebuffer loaded ");
     }
 
     public void SetTile(int index, ushort value) {
@@ -108,4 +119,23 @@ public class TilemapChunk : NetworkBehaviour, IBeforeTick, IAfterTick {
     public void SetTile(int x, int y, ushort value) {
         SetTile(x + (y * 16), value);
     }
+
+    public ushort GetTile(int index) {
+        return Tiles[index];
+    }
+
+    public ushort GetTile(int x, int y) {
+        return GetTile(x + (y * 16));
+    }
+
+#if UNITY_EDITOR
+    private static readonly Color SelectedColor = new(0.5f, 0.5f, 0.5f, 0.2f);
+    private static readonly Vector3 ChunkSize = new(8, 8, 0);
+    public void OnDrawGizmosSelected() {
+        Gizmos.color = SelectedColor;
+        GameManager gm = GameManager.Instance;
+        Gizmos.DrawCube(new(gm.LevelMinX + 4 + (chunkX * 8), gm.LevelMinY + 4 + (chunkY * 8)), ChunkSize);
+    }
+
+#endif
 }
