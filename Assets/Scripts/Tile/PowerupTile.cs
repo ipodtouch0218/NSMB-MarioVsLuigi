@@ -18,7 +18,7 @@ public class PowerupTile : BreakableBrickTile, IHaveTileDependencies {
         NetworkPrefabRef spawnResult = PrefabList.Instance.Powerup_Mushroom;
 
         if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.PreviousHolder != null)) {
-            PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk)interacter).PreviousHolder;
+            PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk) interacter).PreviousHolder;
             if (player.State == Enums.PowerupState.MegaMushroom) {
                 //Break
 

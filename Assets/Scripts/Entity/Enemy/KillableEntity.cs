@@ -114,8 +114,8 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
                     continue;
 
                 bool goRight = body.position.x > killable.body.position.x;
-                if (Mathf.Abs(body.position.x - killable.body.position.x) < 0.001f) {
-                    if (Mathf.Abs(body.position.y - killable.body.position.y) < 0.001f) {
+                if (Mathf.Abs(body.position.x - killable.body.position.x) < 0.015f) {
+                    if (Mathf.Abs(body.position.y - killable.body.position.y) < 0.015f) {
                         goRight = Object.Id.Raw < killable.Object.Id.Raw;
                     } else {
                         goRight = body.position.y < killable.body.position.y;

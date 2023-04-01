@@ -22,7 +22,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     //---Networked Variables
     //-Player State
-    [Networked] public Enums.PowerupState State { get; set; }
+    [Networked(OnChanged = nameof(OnPowerupStateChanged))] public Enums.PowerupState State { get; set; }
     [Networked] public Enums.PowerupState PreviousState { get; set; }
     [Networked] public Enums.PowerupState StoredPowerup { get; set; }
     [Networked] public byte Stars { get; set; }
@@ -71,7 +71,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool WasGroundedLastFrame { get; set; }
     [Networked] private NetworkBool GroundpoundHeld { get; set; }
     [Networked] private float GroundpoundStartTime { get; set; }
-    [Networked] private NetworkBool HitBlock { get; set; }
+    [Networked] private NetworkBool ContinueGroundpound { get; set; }
     //Spinner
     [Networked] public SpinnerAnimator OnSpinner { get; set; }
     [Networked(OnChanged = nameof(OnIsSpinnerFlyingChanged))] public NetworkBool IsSpinnerFlying { get; set; }
@@ -794,13 +794,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return false;
 
         PreviousState = State;
-        bool nowDead = false;
 
         switch (State) {
         case Enums.PowerupState.MiniMushroom:
         case Enums.PowerupState.NoPowerup: {
             Death(false, false);
-            nowDead = true;
             break;
         }
         case Enums.PowerupState.Mushroom: {
@@ -824,9 +822,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         PropellerSpinTimer = TickTimer.None;
         UsedPropellerThisJump = false;
 
-        if (!nowDead) {
+        if (!IsDead) {
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
-            PlaySound(Enums.Sounds.Player_Sound_Powerdown);
         }
         return true;
     }
@@ -2668,7 +2665,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             //start drill
             if (body.velocity.y < 0) {
                 IsDrilling = true;
-                HitBlock = true;
+                ContinueGroundpound = true;
                 body.velocity = new(0, body.velocity.y);
             }
         } else if (IsPropellerFlying) {
@@ -2677,7 +2674,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (remainingTime < 0.6f && body.velocity.y < 4) {
                 IsDrilling = true;
                 PropellerLaunchTimer = TickTimer.None;
-                HitBlock = true;
+                ContinueGroundpound = true;
             }
         } else {
             //start groundpound
@@ -2689,7 +2686,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             WallSlideRight = false;
             IsGroundpounding = true;
             JumpState = PlayerJumpState.None;
-            HitBlock = true;
+            ContinueGroundpound = true;
             IsSliding = false;
             body.velocity = Vector2.up * 1.5f;
             GroundpoundHeld = false;
@@ -2711,22 +2708,23 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             GroundpoundStartTimer = TickTimer.None;
         }
 
-        if (!(IsOnGround && (IsGroundpounding || IsDrilling) && HitBlock))
+        if (!(IsOnGround && (IsGroundpounding || IsDrilling) && ContinueGroundpound))
             return;
 
         GroundpoundAnimCounter++;
 
         Debug.Log($"Groundpound on tick {Runner.Tick} at {body.position} ({GroundpoundAnimCounter})");
 
+        ContinueGroundpound = false;
         foreach (Vector2Int tile in TilesStandingOn) {
-            HitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
+            ContinueGroundpound |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
         }
 
         if (IsDrilling) {
-            IsSpinnerFlying &= HitBlock;
-            IsPropellerFlying &= HitBlock;
-            IsDrilling = HitBlock;
-            if (HitBlock)
+            IsSpinnerFlying &= ContinueGroundpound;
+            IsPropellerFlying &= ContinueGroundpound;
+            IsDrilling = ContinueGroundpound;
+            if (ContinueGroundpound)
                 IsOnGround = false;
         }
     }
@@ -2755,7 +2753,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         } else {
             CameraController.ScreenShake = 0.15f;
         }
-        if (!player.HitBlock && player.State == Enums.PowerupState.MegaMushroom) {
+        if (!player.ContinueGroundpound && player.State == Enums.PowerupState.MegaMushroom) {
             player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
             player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
             CameraController.ScreenShake = 0.35f;
@@ -2909,6 +2907,27 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             player.SpawnParticle("Prefabs/Particle/PlayerBounce", player.KnockbackAttacker.transform.position);
 
         player.PlaySound(player.IsFireballKnockback ? Enums.Sounds.Player_Sound_Collision_Fireball : Enums.Sounds.Player_Sound_Collision, 0, 3);
+    }
+
+    public static void OnPowerupStateChanged(Changed<PlayerController> changed) {
+        PlayerController player = changed.Behaviour;
+
+        if (player.IsDead || player.IsRespawning)
+            return;
+
+        Enums.PowerupState previous = player.PreviousState;
+        Enums.PowerupState current = player.State;
+
+        // we've taken damage when we go from > mushroom to mushroom, or mushroom to no powerup
+
+        if ((previous > Enums.PowerupState.Mushroom && current == Enums.PowerupState.Mushroom)
+            || (previous == Enums.PowerupState.Mushroom && current == Enums.PowerupState.NoPowerup)) {
+            // Taken damage
+            player.PlaySound(Enums.Sounds.Player_Sound_Powerdown);
+        } else {
+            // Collected powerup is handled in the MovingPowerup class.
+            // (because the sound is powerup dependent)
+        }
     }
 
     //---Debug

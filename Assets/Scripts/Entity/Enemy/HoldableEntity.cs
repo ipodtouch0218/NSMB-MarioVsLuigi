@@ -11,6 +11,7 @@ public abstract class HoldableEntity : KillableEntity {
     [Networked] public PlayerController PreviousHolder { get; set; }
     [Networked] protected TickTimer ThrowInvincibility { get; set; }
     [Networked] protected float CurrentKickSpeed { get; set; }
+    [Networked(OnChanged = nameof(OnKickedChanged))] protected NetworkBool Kicked { get; set; }
 
     //---Serailized Variables
     [SerializeField] protected float throwSpeed = 4.5f;
@@ -43,12 +44,9 @@ public abstract class HoldableEntity : KillableEntity {
             PreviousHolder = kicker;
         }
         FacingRight = toRight;
-
+        Kicked = true;
         CurrentKickSpeed = throwSpeed + 1.5f * kickFactor;
         body.velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
-
-        if (Runner.IsForward)
-            PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
     public virtual void Throw(bool toRight, bool crouching) {
@@ -58,18 +56,20 @@ public abstract class HoldableEntity : KillableEntity {
         if (Utils.IsTileSolidAtWorldLocation(body.position))
             transform.position = body.position = new(Holder.transform.position.x, body.position.y);
 
-        ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, crouching ? 0.5f : 0.2f);
+        ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, crouching ? 0.6f : 0.35f);
         PreviousHolder = Holder;
         Holder = null;
         FacingRight = toRight;
+        Kicked = false;
 
-        body.velocity = new Vector2((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+        body.velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
     }
 
     public virtual void Pickup(PlayerController player) {
         if (Holder)
             return;
 
+        Kicked = false;
         player.SetHeldEntity(this);
     }
 
@@ -105,5 +105,14 @@ public abstract class HoldableEntity : KillableEntity {
             Holder.SetHeldEntity(null);
 
         base.SpecialKill(right, groundpound, combo);
+    }
+
+    //---OnChanged
+    public static void OnKickedChanged(Changed<HoldableEntity> changed) {
+        HoldableEntity entity = changed.Behaviour;
+        if (!entity.Kicked)
+            return;
+
+        entity.PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 }

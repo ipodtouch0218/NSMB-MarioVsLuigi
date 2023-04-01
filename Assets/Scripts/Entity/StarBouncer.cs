@@ -195,7 +195,7 @@ public class StarBouncer : CollectableEntity {
         GameManager.Instance.CheckForWinner();
 
         //despawn
-        DespawnTimer = TickTimer.CreateFromTicks(Runner, 1);
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 2f);
     }
 
     //---CollectableEntity overrides
@@ -210,11 +210,16 @@ public class StarBouncer : CollectableEntity {
             Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
 
             Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+            if (icon)
+                icon.gameObject.SetActive(false);
+
         } else {
             // oops...
             graphicTransform.gameObject.SetActive(true);
             particles.Play();
             sfx.Play();
+            if (icon)
+                icon.gameObject.SetActive(true);
         }
     }
 

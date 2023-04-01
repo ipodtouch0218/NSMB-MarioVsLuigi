@@ -102,8 +102,8 @@ public class TileManager : NetworkBehaviour {
 
     private TilemapChunk GetChunkAtTileLocation(int x, int y) {
 
-        int chunkX = (x - WorldOriginX) / 16;
-        int chunkY = (y - WorldOriginY) / 16;
+        int chunkX = Mathf.FloorToInt((x - WorldOriginX) / 16f);
+        int chunkY = Mathf.FloorToInt((y - WorldOriginY) / 16f);
 
         if (chunkX < 0 || chunkX >= ChunksX || chunkY < 0 || chunkY >= ChunksY)
             return null;

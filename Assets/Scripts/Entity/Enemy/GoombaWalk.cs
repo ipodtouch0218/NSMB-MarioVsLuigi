@@ -19,6 +19,11 @@ public class GoombaWalk : KillableEntity {
         if (!Object)
             return;
 
+        if (!IsActive) {
+            body.velocity = Vector2.zero;
+            return;
+        }
+
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
@@ -27,7 +32,7 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        if (IsDead) {
+        if (IsDead && !WasSpecialKilled) {
             gameObject.layer = Layers.LayerEntity;
             return;
         }

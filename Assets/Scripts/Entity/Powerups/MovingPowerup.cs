@@ -12,6 +12,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     [Networked] protected PlayerController FollowPlayer { get; set; }
     [Networked] private TickTimer FollowEndTimer { get; set; }
     [Networked] private TickTimer IgnorePlayerTimer { get; set; }
+    [Networked] private PowerupReserveResult ReserveResult { get; set; }
 
     //---Public Variables
     public Powerup powerupScriptable;
@@ -67,7 +68,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         } else {
             //spawned as a normal item.
             gameObject.layer = Layers.LayerEntity;
-            Vector2 size = hitbox.size * transform.lossyScale * 0.5f;
+            Vector2 size = hitbox.size * transform.lossyScale * 0.35f;
             Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
             if (Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
@@ -190,34 +191,61 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
         //change the player's powerup state
         Enums.PowerupState oldState = player.State;
-
         Powerup newPowerup = powerupScriptable;
         Enums.PowerupState newState = newPowerup.state;
-        PowerupReserveResult reserve = collectScript.OnPowerupCollect(player, this);
 
-        switch (reserve) {
-        case PowerupReserveResult.NoneButPlaySound: {
-            //just play the collect sound
-            player.PlaySound(newPowerup.soundEffect);
-            break;
-        }
+        ReserveResult = collectScript.OnPowerupCollect(player, this);
+
+        switch (ReserveResult) {
         case PowerupReserveResult.ReserveOldPowerup: {
-            //reserve the powerup we just had
-            player.SetReserveItem(oldState);
-            if (newState == Enums.PowerupState.MegaMushroom)
-                break;
-
-            player.PlaySound(newPowerup.soundEffect);
+            Collector.SetReserveItem(oldState);
             break;
         }
         case PowerupReserveResult.ReserveNewPowerup: {
-            //reserve the new powerup
-            player.SetReserveItem(newState);
-            player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
+            Collector.SetReserveItem(newState);
             break;
         }
         }
 
         Runner.Despawn(Object);
+    }
+
+    //---CollectableEntity overrides
+    public override void OnCollectedChanged() {
+        if (Collector) {
+            sRenderer.enabled = false;
+        } else {
+            sRenderer.enabled = true;
+        }
+    }
+
+    //---OnChangeds
+    public static void OnReserveResultChanged(Changed<MovingPowerup> changed) {
+        MovingPowerup powerup = changed.Behaviour;
+        PlayerController collector = powerup.Collector;
+
+        Powerup newPowerup = powerup.powerupScriptable;
+        Enums.PowerupState newState = newPowerup.state;
+
+        switch (powerup.ReserveResult) {
+        case PowerupReserveResult.NoneButPlaySound: {
+            //just play the collect sound
+            collector.PlaySound(newPowerup.soundEffect);
+            break;
+        }
+        case PowerupReserveResult.ReserveOldPowerup: {
+            //reserve the powerup we just had
+            if (newState == Enums.PowerupState.MegaMushroom)
+                break;
+
+            collector.PlaySound(newPowerup.soundEffect);
+            break;
+        }
+        case PowerupReserveResult.ReserveNewPowerup: {
+            //reserve the new powerup
+            collector.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
+            break;
+        }
+        }
     }
 }
