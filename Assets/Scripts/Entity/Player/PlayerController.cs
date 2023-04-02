@@ -400,7 +400,15 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (IsDead) {
             HandleRespawnTimers();
-        } else if (!IsFrozen && GetInput(out PlayerNetworkInput input)) {
+        } else if (!IsFrozen) {
+
+            // If we can't get inputs from the player, just go based on their previous networked input state.
+            PlayerNetworkInput input;
+            if (GetInput(out PlayerNetworkInput currentInputs)) {
+                input = currentInputs;
+            } else {
+                input = PreviousInputs;
+            }
 
             NetworkButtons heldButtons = input.buttons;
             NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
@@ -438,7 +446,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         UpdateHitbox();
         previousFrameVelocity = body.velocity;
-
         previousFramePosition = body.position;
     }
     #endregion

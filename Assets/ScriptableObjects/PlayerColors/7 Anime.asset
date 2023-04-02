@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: 7 Anime
   m_EditorClassIdentifier: 
   colors:
-  - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
+  - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
     shirtColor: {r: 0.12156863, g: 0.1882353, b: 0.7019608, a: 1}
     overallsColor: {r: 0.87058824, g: 0.20784314, b: 0.18039216, a: 1}
     name: SMB Anime
     hatUsesOverallsColor: 1
-  - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
+  - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
     shirtColor: {r: 0.9921569, g: 0.7843138, b: 0, a: 1}
     overallsColor: {r: 0.050980393, g: 0.21176471, b: 0.68235296, a: 1}
     name: SMB Anime
