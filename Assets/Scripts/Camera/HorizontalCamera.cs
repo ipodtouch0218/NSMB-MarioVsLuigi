@@ -8,6 +8,7 @@ public class HorizontalCamera : MonoBehaviour {
 
     public static float SizeIncreaseTarget = 0f, SizeIncreaseCurrent = 0f;
     private static float SizeIncreaseVelocity;
+    private static double sixteenByNine = 16d / 9d;
 
     //---Serialized Variables
     [SerializeField] private bool renderToTextureIfAvailable = true;
@@ -29,11 +30,10 @@ public class HorizontalCamera : MonoBehaviour {
     }
 
     private void AdjustCamera() {
-        float aspect = ourCamera.aspect;
+        double aspectReciprocals = 1d / ourCamera.aspect;
         double size = BaseSize + SizeIncreaseCurrent;
 
         // https://forum.unity.com/threads/how-to-calculate-horizontal-field-of-view.16114/#post-2961964
-        double aspectReciprocals = 1d / aspect;
-        ourCamera.orthographicSize = Mathf.Min((float) size, (float) (size * (16d/9d) * aspectReciprocals));
+        ourCamera.orthographicSize = Mathf.Min((float) size, (float) (size * sixteenByNine * aspectReciprocals));
     }
 }

@@ -104,8 +104,9 @@ public class CameraController : MonoBehaviour {
                 BackgroundLoop.Instance.teleportedThisFrame = true;
         }
 
+        
         if (xDifference > 0.25f)
-            currentPosition.x += (0.25f - xDifference - 0.01f) * (right ? 1 : -1);
+            currentPosition.x += (0.24f - xDifference) * (right ? 1 : -1);
 
         // lagging camera movements
         Vector3 targetPosition = currentPosition;
