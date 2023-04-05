@@ -264,7 +264,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetBool("blueshell",      controller.State == Enums.PowerupState.BlueShell);
         animator.SetBool("mini",           controller.State == Enums.PowerupState.MiniMushroom);
         animator.SetBool("mega",           controller.State == Enums.PowerupState.MegaMushroom);
-        animator.SetBool("inShell",        controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
+        animator.SetBool("inShell",        controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding || controller.IsSliding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
         animator.SetBool("turnaround",     controller.IsTurnaround);
         animator.SetBool("swimming",       controller.IsSwimming && !controller.IsGroundpounding && !controller.IsDrilling);
         animator.SetBool("a_held",         controller.PreviousInputs.buttons.IsSet(PlayerControls.Jump));

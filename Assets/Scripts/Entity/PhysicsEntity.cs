@@ -47,7 +47,7 @@ public class PhysicsEntity : NetworkBehaviour {
         if (!currentCollider)
             return;
 
-        Runner.GetPhysicsScene2D().Simulate(0f);
+        //Runner.GetPhysicsScene2D().Simulate(0f);
         int c = currentCollider.GetContacts(ContactBuffer);
         for (int i = 0; i < c; i++) {
             ContactPoint2D point = ContactBuffer[i];
@@ -63,12 +63,13 @@ public class PhysicsEntity : NetworkBehaviour {
 
                 // Make sure that we're also above the floor, so we don't
                 // get crushed when inside a semisolid.
-                if (point.point.y > currentCollider.bounds.min.y)
+                if (point.point.y > currentCollider.bounds.min.y + 0.01f)
                     continue;
 
                 OnGround = true;
                 CrushableGround |= !point.collider.gameObject.CompareTag("platform");
                 FloorAngle = Vector2.SignedAngle(Vector2.up, point.normal);
+
             } else if (GroundMask == (GroundMask | (1 << point.collider.gameObject.layer))) {
                 if (Vector2.Dot(point.normal, Vector2.down) > floorAndRoofCutoff) {
                     // touching roof

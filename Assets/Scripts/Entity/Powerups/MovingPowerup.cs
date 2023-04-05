@@ -12,7 +12,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     [Networked] protected PlayerController FollowPlayer { get; set; }
     [Networked] private TickTimer FollowEndTimer { get; set; }
     [Networked] private TickTimer IgnorePlayerTimer { get; set; }
-    [Networked] private PowerupReserveResult ReserveResult { get; set; }
+    [Networked(OnChanged = nameof(OnReserveResultChanged))] private PowerupReserveResult ReserveResult { get; set; }
 
     //---Public Variables
     public Powerup powerupScriptable;
@@ -94,7 +94,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             return;
         }
 
-        if (!Object)
+        if (!Object || Collector)
             return;
 
         if (FollowPlayer) {
@@ -207,7 +207,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         }
         }
 
-        Runner.Despawn(Object);
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
     }
 
     //---CollectableEntity overrides

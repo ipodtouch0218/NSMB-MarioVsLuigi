@@ -21743,11 +21743,9 @@ MonoBehaviour:
   crushGround: 0
   hitRoof: 0
   groundpoundLastFrame: 0
-  hitBlock: 0
   hitLeft: 0
   hitRight: 0
   stationaryGiantEnd: 0
-  startedSliding: 0
   powerupFlash: 0
   data: {fileID: 0}
   giantSavedVelocity: {x: 0, y: 0}
@@ -22132,14 +22130,14 @@ MonoBehaviour:
   InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
-    MaxRate: 45
+    MaxRate: 10
     PosBlendStart: 0.25
     PosBlendEnd: 1
     PosMinCorrection: 0.025
     PosTeleportDistance: 2
-    RotBlendStart: 0
-    RotBlendEnd: 0
-    RotTeleportRadians: 0
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
 --- !u!1 &8636928219237579144

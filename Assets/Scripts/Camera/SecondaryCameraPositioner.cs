@@ -8,7 +8,6 @@ public class SecondaryCameraPositioner : MonoBehaviour {
 
     //---Private Variables
     private bool destroyed;
-    private bool onRight = true;
 
     public void OnValidate() {
         if (!secondaryCamera) secondaryCamera = GetComponent<Camera>();
@@ -34,10 +33,7 @@ public class SecondaryCameraPositioner : MonoBehaviour {
 
         if (enable) {
             bool rightHalf = mainCamera.transform.position.x > gm.LevelMiddleX;
-            if (onRight ^ rightHalf) {
-                transform.localPosition = new(gm.levelWidthTile * (rightHalf ? -1 : 1), 0, 0);
-                onRight = rightHalf;
-            }
+            transform.localPosition = new(gm.levelWidthTile * (rightHalf ? -1 : 1), 0, 0);
         }
     }
 }

@@ -54,6 +54,30 @@ public class TileManager : NetworkBehaviour {
         return GetTile(loc.x, loc.y);
     }
 
+    public void SetTileBulk(Vector2Int loc, Vector2Int dimensions, TileBase[] tiles) {
+        SetTileBulk(loc.x, loc.y, dimensions.x, dimensions.y, tiles);
+    }
+
+    public void SetTileBulk(Vector2Int loc, Vector2Int dimensions, ushort[] tileIds) {
+        SetTileBulk(loc.x, loc.y, dimensions.x, dimensions.y, tileIds);
+    }
+
+    public void SetTileBulk(int x, int y, int width, int height, TileBase[] tiles) {
+        ushort[] tileIds = new ushort[tiles.Length];
+        for (int i = 0; i < tiles.Length; i++)
+            tileIds[i] = GetTileIdFromTileInstance(tiles[i]);
+
+        SetTileBulk(x, y, width, height, tileIds);
+    }
+
+    public void SetTileBulk(int x, int y, int width, int height, ushort[] tileIds) {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                SetTile(x + i, y + j, tileIds[i + j * width]);
+            }
+        }
+    }
+
     public void SetTile(Vector2Int loc, TileBase tile) {
         SetTile(loc.x, loc.y, tile);
     }

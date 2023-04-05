@@ -195,7 +195,7 @@ public class StarBouncer : CollectableEntity {
         GameManager.Instance.CheckForWinner();
 
         //despawn
-        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 2f);
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
     }
 
     //---CollectableEntity overrides

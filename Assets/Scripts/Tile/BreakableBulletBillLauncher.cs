@@ -1,11 +1,11 @@
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 using NSMB.Utils;
 
 [CreateAssetMenu(fileName = "BreakableBulletBillLauncher", menuName = "ScriptableObjects/Tiles/BreakableBulletBillLauncher")]
 public class BreakableBulletBillLauncher : InteractableTile {
 
+    //---Serialized Variables
     [SerializeField] private GameObject breakParticle;
 
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
@@ -22,15 +22,10 @@ public class BreakableBulletBillLauncher : InteractableTile {
         int height = GetLauncherHeight(ourLocation);
         Vector2Int origin = GetLauncherOrigin(ourLocation);
 
-        string[] tiles = new string[height];
-
-        for (int i = 0; i < tiles.Length; i++)
-            //photon doesn't like serializing nulls
-            tiles[i] = "";
+        ushort[] emptyTiles = new ushort[height];
 
         GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
-
-        GameManager.Instance.BulkModifyTilemap(origin, new Vector2Int(1, height), tiles);
+        GameManager.Instance.tileManager.SetTileBulk(origin.x, origin.y, 1, height, emptyTiles);
         return true;
     }
 

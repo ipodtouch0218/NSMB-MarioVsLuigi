@@ -42,12 +42,19 @@ public class BulletBillMover : KillableEntity {
         if (IsDead || !IsActive) {
             gameObject.layer = Layers.LayerHitsNothing;
             body.isKinematic = false;
+            if (!IsActive) {
+                body.rotation = 0;
+                body.angularVelocity = 0;
+                body.gravityScale = 0;
+            }
+
         } else {
             gameObject.layer = Layers.LayerEntityHitbox;
             body.isKinematic = true;
             body.freezeRotation = true;
             body.rotation = 0;
             body.angularVelocity = 0;
+            body.gravityScale = 0;
         }
 
         if (IsFrozen || IsDead)

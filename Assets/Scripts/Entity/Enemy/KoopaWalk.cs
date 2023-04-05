@@ -144,6 +144,7 @@ public class KoopaWalk : HoldableEntity {
         IsInShell = false;
         body.velocity = new(-walkSpeed, 0);
         FacingRight = false;
+        sRenderer.flipX = false;
         IsUpsideDown = false;
         IsStationary = false;
 

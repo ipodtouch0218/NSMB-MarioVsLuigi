@@ -208,53 +208,53 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---IPlayerInteractable overrides
     public void InteractWithPlayer(PlayerController player) {
-        //If we're not active, don't collide.
+        // If we're not active, don't collide.
         if (!IsActive)
             return;
 
-        //Check if they own us. If so, don't collide.
+        // Check if they own us. If so, don't collide.
         if (Owner == player)
             return;
 
-        //If they have knockback invincibility, don't collide.
+        // If they have knockback invincibility, don't collide.
         if (!player.DamageInvincibilityTimer.ExpiredOrNotRunning(Runner))
             return;
 
-        //Starman Check
-        if (player.IsStarmanInvincible)
-            return;
+        // Should do damage checks
+        if (player.IsStarmanInvincible || player.data.Team != Owner.data.Team) {
 
-        //Player state checks
-        switch (player.State) {
-        case Enums.PowerupState.MegaMushroom: {
-            return;
-        }
-        case Enums.PowerupState.MiniMushroom: {
-            player.Death(false, false);
-            return;
-        }
-        case Enums.PowerupState.BlueShell: {
-            if (IsIceball && (player.IsInShell || player.IsCrouching || player.IsGroundpounding))
-                player.ShellSlowdownTimer = TickTimer.CreateFromSeconds(Runner, 0.65f);
-            return;
-        }
-        }
-
-        //Collision is a GO
-        if (IsIceball) {
-            //iceball
-            if (!player.IsFrozen) {
-                Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
-                    FrozenCube cube = obj.GetComponent<FrozenCube>();
-                    cube.OnBeforeSpawned(player);
-                });
+            // Player state checks
+            switch (player.State) {
+            case Enums.PowerupState.MegaMushroom: {
+                return;
             }
-        } else {
-            //fireball
-            player.DoKnockback(FacingRight, 1, true, Object);
+            case Enums.PowerupState.MiniMushroom: {
+                player.Death(false, false);
+                return;
+            }
+            case Enums.PowerupState.BlueShell: {
+                if (IsIceball && (player.IsInShell || player.IsCrouching || player.IsGroundpounding))
+                    player.ShellSlowdownTimer = TickTimer.CreateFromSeconds(Runner, 0.65f);
+                return;
+            }
+            }
+
+            // Collision is a GO
+            if (IsIceball) {
+                // iceball
+                if (!player.IsFrozen) {
+                    Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
+                        FrozenCube cube = obj.GetComponent<FrozenCube>();
+                        cube.OnBeforeSpawned(player);
+                    });
+                }
+            } else {
+                // fireball
+                player.DoKnockback(FacingRight, 1, true, Object);
+            }
         }
 
-        //Destroy ourselves.
+        // Destroy ourselves.
         DespawnEntity();
     }
 

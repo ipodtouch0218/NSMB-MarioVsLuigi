@@ -64,7 +64,7 @@ namespace NSMB.UI.Pause.Options {
 
         private void CreateActions() {
 
-            PauseOption[] existingOptions = options.ToArray();
+            List<PauseOption> newOptions = new();
 
             for (int i = 0; i < controls.actionMaps.Count; i++) {
                 InputActionMap map = controls.actionMaps[i];
@@ -79,7 +79,7 @@ namespace NSMB.UI.Pause.Options {
                 newHeader.transform.SetParent(scrollPaneContent, false);
                 newHeader.label.text = map.name;
 
-                options.Add(newHeader);
+                newOptions.Add(newHeader);
 
                 foreach (InputAction action in map.actions) {
 
@@ -93,13 +93,14 @@ namespace NSMB.UI.Pause.Options {
                     newOption.action = action;
                     newOption.gameObject.SetActive(true);
 
-                    options.Add(newOption);
+                    newOptions.Add(newOption);
                 }
 
                 if (i == 0) {
                     // move the default existing settings to be below me.
-                    foreach (PauseOption option in existingOptions) {
+                    foreach (PauseOption option in options) {
                         option.transform.SetAsLastSibling();
+                        newOptions.Add(option);
                     }
                 }
 
@@ -109,9 +110,12 @@ namespace NSMB.UI.Pause.Options {
                     newSpacer.transform.SetParent(scrollPaneContent, false);
                     newSpacer.gameObject.SetActive(true);
 
-                    options.Add(newSpacer);
+                    newOptions.Add(newSpacer);
                 }
             }
+
+            options.Clear();
+            options.AddRange(newOptions);
         }
 
         public void SaveRebindings() {
