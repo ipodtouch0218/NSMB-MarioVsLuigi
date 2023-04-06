@@ -19,10 +19,10 @@ MonoBehaviour:
   m_AnimationStartTime: 0
   m_AnimationStartFrame: 0
   m_TileColliderType: 2
-  leftDestroy: RedLDD
-  rightDestroy: RedRDD
   upsideDownPipe: 1
   leftOfPipe: 1
+  leftBrokenHatTile: {fileID: 11400000}
+  rightBrokenHatTile: {fileID: 11400000}
   pipeParticle: {fileID: 4966771921777507886, guid: 0fdbb7abcf51e8e4481a78d2fac80bb5,
     type: 3}
   destroyedPipeParticle: {fileID: 8187660937656757357, guid: b23e12b21373f7845a082fd8ad065c18,

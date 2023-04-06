@@ -6,21 +6,22 @@ using NSMB.Utils;
 [CreateAssetMenu(fileName = "BreakablePipeTile", menuName = "ScriptableObjects/Tiles/BreakablePipeTile", order = 4)]
 public class BreakablePipeTile : InteractableTile {
 
-    [SerializeField] private string leftDestroy, rightDestroy;
-    [SerializeField] public bool upsideDownPipe, leftOfPipe;
+    //---Public Variables
+    public bool upsideDownPipe, leftOfPipe;
 
-    [SerializeField] GameObject pipeParticle, destroyedPipeParticle;
+    //---Serialized Variables
+    [SerializeField] private TileBase leftBrokenHatTile, rightBrokenHatTile;
+    [SerializeField] private GameObject pipeParticle, destroyedPipeParticle;
 
     public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
-        if (!(interacter is PlayerController))
+        if (interacter is not PlayerController player)
             return false;
 
-        PlayerController player = (PlayerController) interacter;
         if (player.State != Enums.PowerupState.MegaMushroom)
             return false;
 
+        // we've hit the underside of the pipe
         if ((upsideDownPipe && direction == InteractionDirection.Down) || (!upsideDownPipe && direction == InteractionDirection.Up))
-            //we've hit the underside of the pipe
             return false;
 
 
@@ -92,38 +93,30 @@ public class BreakablePipeTile : InteractableTile {
 
             GameManager.Instance.SpawnResizableParticle(world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), alreadyDestroyed ? destroyedPipeParticle : pipeParticle);
         }
-        string[] tiles = new string[tileHeight*2];
+        TileBase[] tiles = new TileBase[tileHeight*2];
 
         int start = upsideDownPipe ? (tileHeight*2)-2 : 0;
         if (addHat) {
-            if (leftOfPipe) {
-                //we're the left side. modify the right side too.
-                //if (shrink) {
-                //    tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat).name;
-                //    tiles[start + 1] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.right).name;
-                //} else {
-                //    tiles[start] = "SpecialPipes/" + leftDestroy;
-                //    tiles[start + 1] = "SpecialPipes/" + rightDestroy;
-                //}
+            if (shrink) {
+                if (leftOfPipe) {
+                    // We're the left side. modify the right side too.
+                    tiles[start] = tilemap.GetTile(hat);
+                    tiles[start + 1] = tilemap.GetTile(hat + Vector2Int.right);
+                } else {
+                    // We're the right side. modify the left side too.
+                    tiles[start] = tilemap.GetTile(hat + Vector2Int.left);
+                    tiles[start + 1] = tilemap.GetTile(hat);
+                }
             } else {
-                //we're the right side. modify the left side too.
-                //if (shrink) {
-                //    tiles[start] = "SpecialPipes/" + tilemap.GetTile(hat + Vector3Int.left).name;
-                //    tiles[start + 1] = "SpecialPipes/" + tilemap.GetTile(hat).name;
-                //} else {
-                //    tiles[start] = "SpecialPipes/" + leftDestroy;
-                //    tiles[start + 1] = "SpecialPipes/" + rightDestroy;
-                //}
+                tiles[start] = leftBrokenHatTile;
+                tiles[start + 1] = rightBrokenHatTile;
             }
         }
 
-        for (int i = 0; i < tiles.Length; i++)
-            //photon doesn't like serializing nulls
-            if (tiles[i] == null)
-                tiles[i] = "";
-
         Vector2Int offset = upsideDownPipe ? Vector2Int.zero : pipeDirection * (tileHeight-1);
-        GameManager.Instance.BulkModifyTilemap(hat + offset + (leftOfPipe ? Vector2Int.zero : Vector2Int.left), new Vector2Int(2, tileHeight), tiles);
+        Vector2Int finalPosition = hat + offset + (leftOfPipe ? Vector2Int.zero : Vector2Int.left);
+
+        GameManager.Instance.tileManager.SetTilesBlock(finalPosition.x, finalPosition.y, 2, tileHeight, tiles);
 
         player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Break_Pipe);
         return true;

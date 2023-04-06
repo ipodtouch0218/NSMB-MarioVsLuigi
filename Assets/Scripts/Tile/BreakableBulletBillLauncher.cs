@@ -25,7 +25,7 @@ public class BreakableBulletBillLauncher : InteractableTile {
         ushort[] emptyTiles = new ushort[height];
 
         GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
-        GameManager.Instance.tileManager.SetTileBulk(origin.x, origin.y, 1, height, emptyTiles);
+        GameManager.Instance.tileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
         return true;
     }
 
