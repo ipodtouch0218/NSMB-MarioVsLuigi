@@ -29,6 +29,7 @@ public class CameraController : MonoBehaviour {
     private Vector3 smoothDampVel, playerPos;
     private Camera targetCamera;
     private float startingZ, lastFloor;
+    private GameManager gmInstance = GameManager.Instance;
 
     public void Awake() {
         //only control the camera if we're the local player.
@@ -69,8 +70,8 @@ public class CameraController : MonoBehaviour {
     }
 
     private Vector3 CalculateNewPosition() {
-        float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
-        float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
+        float minY = gmInstance.cameraMinY, heightY = gmInstance.cameraHeightY;
+        float minX = gmInstance.cameraMinX, maxX = gmInstance.cameraMaxX;
 
         if (!controller.IsDead && !controller.IsRespawning)
             playerPos = AntiJitter(transform.position);
@@ -97,7 +98,7 @@ public class CameraController : MonoBehaviour {
         bool right = currentPosition.x > playerPos.x;
 
         if (xDifference >= 8) {
-            currentPosition.x += (right ? -1 : 1) * GameManager.Instance.LevelWidth;
+            currentPosition.x += (right ? -1 : 1) * gmInstance.LevelWidth;
             xDifference = Vector2.Distance(Vector2.right * currentPosition.x, Vector2.right * playerPos.x);
             right = currentPosition.x > playerPos.x;
             if (IsControllingCamera)
