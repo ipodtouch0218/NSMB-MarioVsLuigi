@@ -2,7 +2,7 @@
 using UnityEngine.Tilemaps;
 
 using Fusion;
-using NSMB.Utils;
+using NSMB.Tiles;
 
 public class BlockBump : NetworkBehaviour {
 

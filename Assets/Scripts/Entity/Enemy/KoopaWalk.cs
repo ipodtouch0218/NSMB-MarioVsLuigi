@@ -2,6 +2,7 @@
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Tiles;
 using NSMB.Utils;
 
 public class KoopaWalk : HoldableEntity {

@@ -2,6 +2,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Tiles;
 using NSMB.Utils;
 
 public class MovingPowerup : CollectableEntity, IBlockBumpable {

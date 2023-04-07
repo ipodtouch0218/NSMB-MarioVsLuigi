@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Tiles;
 
 public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 

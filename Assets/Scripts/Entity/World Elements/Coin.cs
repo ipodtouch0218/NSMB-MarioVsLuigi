@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Tiles;
 
 public abstract class Coin : CollectableEntity {
 

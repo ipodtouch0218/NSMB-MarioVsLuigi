@@ -2,7 +2,7 @@ using System.Linq;
 using UnityEngine;
 
 using Fusion;
-using static Unity.Burst.Intrinsics.X86;
+using NSMB.Tiles;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 public class MarioBrosPlatform : NetworkBehaviour, IPlayerInteractable {

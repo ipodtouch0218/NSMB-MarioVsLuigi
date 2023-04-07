@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Tiles;
 using NSMB.Utils;
 
 public class PropellerPowerup : MovingPowerup {
@@ -29,12 +30,12 @@ public class PropellerPowerup : MovingPowerup {
             base.FixedUpdateNetwork();
 
             if (physics.OnGround) {
-                //start flying
+                // Start flying
                 TimeFlyingStarted = Runner.SimulationTime;
                 FlightOrigin = body.position;
             }
         } else {
-            //we are flying. follow the curve.
+            // We are flying. follow the curve.
             float elapsedTime = Runner.SimulationTime - TimeFlyingStarted;
             float x = flyingPathX.Evaluate(elapsedTime);
             float y = flyingPathY.Evaluate(elapsedTime);
@@ -47,6 +48,6 @@ public class PropellerPowerup : MovingPowerup {
 
     //---IBlockBumpable overrides
     public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
-        //do nothing when bumped. We're flying, remember?
+        // Do nothing when bumped. We're flying, remember?
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Tiles;
 using NSMB.Utils;
 
 public class StarBouncer : CollectableEntity {

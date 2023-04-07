@@ -2,6 +2,7 @@
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Tiles;
 using NSMB.Utils;
 
 public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFireballInteractable {

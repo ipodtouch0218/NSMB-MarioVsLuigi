@@ -1,59 +1,60 @@
 using UnityEngine;
 
-using NSMB.Utils;
+namespace NSMB.Tiles {
 
-[CreateAssetMenu(fileName = "BreakableBulletBillLauncher", menuName = "ScriptableObjects/Tiles/BreakableBulletBillLauncher")]
-public class BreakableBulletBillLauncher : InteractableTile {
+    [CreateAssetMenu(fileName = "BreakableBulletBillLauncher", menuName = "ScriptableObjects/Tiles/BreakableBulletBillLauncher")]
+    public class BreakableBulletBillLauncher : InteractableTile {
 
-    //---Serialized Variables
-    [SerializeField] private GameObject breakParticle;
+        //---Serialized Variables
+        [SerializeField] private GameObject breakParticle;
 
-    public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
-        if (interacter is not PlayerController)
-            return false;
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
+            if (interacter is not PlayerController)
+                return false;
 
-        PlayerController player = (PlayerController) interacter;
-        if (player.State != Enums.PowerupState.MegaMushroom)
-            return false;
-        if (direction == InteractionDirection.Down || direction == InteractionDirection.Up)
-            return false;
+            PlayerController player = (PlayerController) interacter;
+            if (player.State != Enums.PowerupState.MegaMushroom)
+                return false;
+            if (direction == InteractionDirection.Down || direction == InteractionDirection.Up)
+                return false;
 
-        Vector2Int ourLocation = Utils.WorldToTilemapPosition(worldLocation);
-        int height = GetLauncherHeight(ourLocation);
-        Vector2Int origin = GetLauncherOrigin(ourLocation);
+            Vector2Int ourLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
+            int height = GetLauncherHeight(ourLocation);
+            Vector2Int origin = GetLauncherOrigin(ourLocation);
 
-        ushort[] emptyTiles = new ushort[height];
+            ushort[] emptyTiles = new ushort[height];
 
-        GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
-        GameManager.Instance.tileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
-        return true;
-    }
-
-    private Vector2Int GetLauncherOrigin(Vector2Int ourLocation) {
-        TileManager tm = GameManager.Instance.tileManager;
-        Vector2Int searchDirection = Vector2Int.down;
-        Vector2Int searchVector = Vector2Int.down;
-
-        while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher)
-            searchVector += searchDirection;
-
-        return ourLocation + searchVector - searchDirection;
-    }
-
-    private int GetLauncherHeight(Vector2Int ourLocation) {
-        int height = 1;
-        TileManager tm = GameManager.Instance.tileManager;
-        Vector2Int searchVector = Vector2Int.up;
-        while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher) {
-            height++;
-            searchVector += Vector2Int.up;
+            GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
+            GameManager.Instance.tileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
+            return true;
         }
 
-        searchVector = Vector2Int.down;
-        while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher) {
-            height++;
-            searchVector += Vector2Int.down;
+        private Vector2Int GetLauncherOrigin(Vector2Int ourLocation) {
+            TileManager tm = GameManager.Instance.tileManager;
+            Vector2Int searchDirection = Vector2Int.down;
+            Vector2Int searchVector = Vector2Int.down;
+
+            while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher)
+                searchVector += searchDirection;
+
+            return ourLocation + searchVector - searchDirection;
         }
-        return height;
+
+        private int GetLauncherHeight(Vector2Int ourLocation) {
+            int height = 1;
+            TileManager tm = GameManager.Instance.tileManager;
+            Vector2Int searchVector = Vector2Int.up;
+            while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher) {
+                height++;
+                searchVector += Vector2Int.up;
+            }
+
+            searchVector = Vector2Int.down;
+            while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher) {
+                height++;
+                searchVector += Vector2Int.down;
+            }
+            return height;
+        }
     }
 }

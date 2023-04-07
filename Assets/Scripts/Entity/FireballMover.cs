@@ -2,6 +2,7 @@
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Tiles;
 using NSMB.Utils;
 
 [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]

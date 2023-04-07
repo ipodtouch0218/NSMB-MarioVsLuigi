@@ -1,7 +1,8 @@
 using UnityEngine;
 
-using NSMB.Utils;
 using Fusion;
+using NSMB.Tiles;
+using NSMB.Utils;
 
 public class BulletBillMover : KillableEntity {
 

@@ -8,6 +8,7 @@ using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Tiles;
 using NSMB.Utils;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
