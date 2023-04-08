@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace NSMB.UI.Pause.Options {
+
     public class RebindPauseOption : PauseOption {
 
         //---Public Variables
@@ -28,8 +29,8 @@ namespace NSMB.UI.Pause.Options {
                 buttons[i].bindingIndex = indexCounter++;
             }
 
-            originalText = action.name;
-            label.text = originalText;
+            translationKey = "ui.options.controls." + action.actionMap.name.ToLower().Replace(" ", "") + "." + action.name.ToLower().Replace(" ", "");
+            //label.text = originalText;
         }
 
         public override void OnEnable() {

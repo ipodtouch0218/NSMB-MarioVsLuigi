@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
+using NSMB.Translation;
 using NSMB.Utils;
 
 public class RoomIcon : MonoBehaviour {
@@ -25,6 +26,8 @@ public class RoomIcon : MonoBehaviour {
     public void UpdateUI(SessionInfo newSession) {
         session = newSession;
 
+        TranslationManager tm = GlobalController.Instance.translationManager;
+
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxPlayers);
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string hostname);
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
@@ -35,9 +38,10 @@ public class RoomIcon : MonoBehaviour {
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool gameStarted);
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.Teams, out bool teams);
 
-        nameText.text = hostname.ToValidUsername() + "'s Lobby";
-        playersText.text = $"Players: {session.PlayerCount}/{maxPlayers}";
-        inProgressText.text = gameStarted ? "In Progress" : "Not Started";
+
+        nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
+        playersText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.players", "players", session.PlayerCount.ToString(), "maxplayers", maxPlayers.ToString());
+        inProgressText.text = gameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
 
         string symbols = "";
         bool time = timer >= 1;

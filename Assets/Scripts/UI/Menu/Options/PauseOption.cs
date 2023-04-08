@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 
+using NSMB.Translation;
 using NSMB.UI.Pause.Loaders;
 
 namespace NSMB.UI.Pause.Options {
@@ -13,9 +14,10 @@ namespace NSMB.UI.Pause.Options {
         [SerializeField] private PauseOptionMenuManager manager;
         [SerializeField] internal TMP_Text label;
         [SerializeField] protected PauseOptionLoader loader;
+        [SerializeField] protected string translationKey;
 
         //---Private Variables
-        protected string originalText;
+        private bool selected;
 
         public virtual void OnValidate() {
             if (!manager) manager = GetComponentInParent<PauseOptionMenuManager>();
@@ -29,16 +31,29 @@ namespace NSMB.UI.Pause.Options {
         public virtual void OnEnable() {
             if (loader)
                 loader.LoadOptions(this);
+
+            GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        }
+
+        public void OnDisable() {
+            GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
+
+        private void OnLanguageChanged(TranslationManager tm) {
+            if (selected)
+                Selected();
+            else
+                Deselected();
         }
 
         public virtual void Selected() {
-            originalText ??= label.text;
-            label.text = "» " + originalText;
+            label.text = "» " + GetTranslatedString();
+            selected = true;
         }
 
         public virtual void Deselected() {
-            originalText ??= label.text;
-            label.text = originalText;
+            label.text = GetTranslatedString();
+            selected = false;
         }
 
         public virtual void OnClick() { }
@@ -47,5 +62,9 @@ namespace NSMB.UI.Pause.Options {
         public virtual void OnRightPress() { }
         public virtual void OnRightHeld() { }
 
+
+        private string GetTranslatedString() {
+            return GlobalController.Instance.translationManager.GetTranslation(translationKey);
+        }
     }
 }

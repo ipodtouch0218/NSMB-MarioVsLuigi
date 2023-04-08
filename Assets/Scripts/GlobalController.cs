@@ -8,11 +8,13 @@ using UnityEngine.Rendering.Universal;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Loading;
+using NSMB.Translation;
 using NSMB.UI.Pause.Options;
 
 public class GlobalController : Singleton<GlobalController> {
 
     //---Public Variables
+    public TranslationManager translationManager;
     public DiscordController discordController;
     public Gradient rainbowGradient;
 
@@ -53,7 +55,7 @@ public class GlobalController : Singleton<GlobalController> {
             if (Settings.Instance.audioMuteMusicOnUnfocus) mixer.SetFloat("MusicVolume", -80f);
             if (Settings.Instance.audioMuteSFXOnUnfocus)   mixer.SetFloat("SoundVolume", -80f);
         }
-        ControlSystem.controls.Debug.FPSCounter.performed += (context) => {
+        ControlSystem.controls.Debug.FPSMonitor.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
     }

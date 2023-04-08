@@ -1,8 +1,8 @@
 
-<color=yellow>Game by</color>
+<color=yellow>{ui.about.credits.gameby}</color>
 ipodtouch0218
 
-<color=yellow>Github Contributors</color>
+<color=yellow>{ui.about.credits.github}</color>
 Amy54Desu
 AtwerJ
 AutumnLeafy
@@ -22,30 +22,28 @@ TheMoogle
 VLC
 Zest
 
-
-<color=yellow>Music</color>
+<color=yellow>{ui.about.credits.music}</color>
 CubbyCrazes
 RENREN
 River J
 
-<color=yellow>QA Testing</color>
+<color=yellow>{ui.about.credits.qa}</color>
 Fawndue
 Shadow_Walker13
 TheCyVap
 
-
-<color=yellow>Level Design</color>
+<color=yellow>{ui.about.credits.leveldesign}</color>
 mindnomad
 Skarph
 TheCyVap
 
-<color=yellow>Original Game / Resources</color>
+<color=yellow>{ui.about.credits.original}</color>
 New Super Mario Bros.
 New Super Mario Bros. Wii
 Super Mario Maker 2
 (c) Nintendo
 
-<color=yellow>Asset Rippers</color>
+<color=yellow>{ui.about.credits.assets}</color>
 A Refracted Swindler (UI)
 CubbyCrazes (Sound)
 Demon2Warrior (Background)
@@ -70,13 +68,3 @@ Techokami (Enemies)
 TeridaxXD001 (Models)
 Treeki (UI)
 VentureSonic (Background)
-
-
-
-
-
-
-
-
-
-

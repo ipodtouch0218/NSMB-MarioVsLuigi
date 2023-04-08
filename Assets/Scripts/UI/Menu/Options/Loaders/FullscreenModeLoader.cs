@@ -2,18 +2,35 @@ using System;
 using System.Linq;
 using UnityEngine;
 
+using NSMB.Translation;
 using NSMB.UI.Pause.Options;
 
 namespace NSMB.UI.Pause.Loaders {
     public class FullscreenModeLoader : PauseOptionLoader {
 
-        private static readonly string[] FullscreenDisplayNames = { "Exclusive Fullscreen", "Borderless Fullscreen", "Maximized Window", "Windowed" };
+        private static readonly string[] FullscreenDisplayKeys = {
+            "ui.options.graphics.windowmode.fullscreen",
+            "ui.options.graphics.windowmode.borderless",
+            "ui.options.graphics.windowmode.maximized",
+            "ui.options.graphics.windowmode.windowed" };
+
+        //---Private Variables
         private FullScreenMode[] validModes;
+        private PauseOption option;
+
+        public void OnEnable() {
+            GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        }
+
+        public void OnDisable() {
+            GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
 
         public override void LoadOptions(PauseOption option) {
             if (option is not ScrollablePauseOption spo)
                 return;
 
+            this.option = option;
             spo.options.Clear();
 
             if (validModes == null) {
@@ -39,7 +56,7 @@ namespace NSMB.UI.Pause.Loaders {
                 }
             }
 
-            spo.options.AddRange(validModes.Select(fsm => FullscreenDisplayNames[(int) fsm]));
+            spo.options.AddRange(validModes.Select(fsm => FullscreenDisplayKeys[(int) fsm]).Select(GlobalController.Instance.translationManager.GetTranslation));
 
             int index = Array.IndexOf(validModes, Screen.fullScreenMode);
             spo.SetValue(index, false);
@@ -57,6 +74,11 @@ namespace NSMB.UI.Pause.Loaders {
             } else {
                 Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, newMode);
             }
+        }
+
+        private void OnLanguageChanged(TranslationManager tm) {
+            if (option)
+                LoadOptions(option);
         }
     }
 }

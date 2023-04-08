@@ -1002,7 +1002,7 @@
             "id": "a9644b88-61e9-43f4-b83d-f87aff12c2de",
             "actions": [
                 {
-                    "name": "FPS Counter",
+                    "name": "FPS Monitor",
                     "type": "Button",
                     "id": "54336541-e28e-4a19-8fe5-5a45256cfe9e",
                     "expectedControlType": "Button",
@@ -1028,7 +1028,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
-                    "action": "FPS Counter",
+                    "action": "FPS Monitor",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1039,7 +1039,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
-                    "action": "FPS Counter",
+                    "action": "FPS Monitor",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1050,7 +1050,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "FPS Counter",
+                    "action": "FPS Monitor",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1061,7 +1061,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "FPS Counter",
+                    "action": "FPS Monitor",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

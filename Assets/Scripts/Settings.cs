@@ -34,6 +34,11 @@ public class Settings : Singleton<Settings> {
         ApplyVolumeSettings();
     }
 
+    public string GenericLocale {
+        get => GlobalController.Instance.translationManager.CurrentLocale;
+        set => GlobalController.Instance.translationManager.ChangeLanguage(value);
+    }
+
     private string _graphicsFullscreenResolution;
     public string GraphicsFullscreenResolution {
         get {
@@ -145,6 +150,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Generic_ChatFilter", genericChatFiltering ? 1 : 0);
         PlayerPrefs.SetInt("Generic_Character", genericCharacter);
         PlayerPrefs.SetInt("Generic_Skin", genericSkin);
+        PlayerPrefs.SetString("Generic_Locale", GenericLocale);
 
         // Graphics
         PlayerPrefs.SetString("Graphics_FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
@@ -208,6 +214,7 @@ public class Settings : Singleton<Settings> {
         genericChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
         genericCharacter = PlayerPrefs.GetInt("Character", 0);
         genericSkin = PlayerPrefs.GetInt("Skin", 0);
+        GenericLocale = "en-US";
 
         GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;
         GraphicsFullscreenMode = (int) Screen.fullScreenMode;
@@ -236,7 +243,6 @@ public class Settings : Singleton<Settings> {
 
         MassDeleteKeys("Nickname", "ScoreboardAlwaysVisible", "ChatFilter", "Character", "Skin", "NDSResolution",
             "NDS4by3", "VSync", "volumeMaster", "volumeMusic", "volumeSFX", "FireballFromSprint");
-
     }
 
     public void LoadFromVersion1() {
@@ -246,6 +252,7 @@ public class Settings : Singleton<Settings> {
         GetIfExists("Generic_ChatFilter", out genericChatFiltering);
         GetIfExists("Generic_Character", out genericCharacter);
         GetIfExists("Generic_Skin", out genericSkin);
+        if (GetIfExists("Generic_Locale", out string tempLocale)) GenericLocale = tempLocale;
 
         //Graphics
         if (GetIfExists("Graphics_FullscreenMode", out int tempFullscreenMode)) GraphicsFullscreenMode = tempFullscreenMode;

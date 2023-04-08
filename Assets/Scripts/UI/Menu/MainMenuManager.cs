@@ -130,7 +130,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
                 if (upToDate)
                     return;
 
-                updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
+                updateText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.update.prompt", "newversion", latestVersion, "currentversion", Application.version);
+                //updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
                 updateBox.SetActive(true);
                 EventSystem.current.SetSelectedGameObject(updateBoxSelected);
             });
@@ -240,6 +241,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
         privateRoomIdPrompt.SetActive(false);
+        updateBox.SetActive(false);
     }
 
     public void OpenTitleScreen() {

@@ -1024,7 +1024,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             ""id"": ""a9644b88-61e9-43f4-b83d-f87aff12c2de"",
             ""actions"": [
                 {
-                    ""name"": ""FPS Counter"",
+                    ""name"": ""FPS Monitor"",
                     ""type"": ""Button"",
                     ""id"": ""54336541-e28e-4a19-8fe5-5a45256cfe9e"",
                     ""expectedControlType"": ""Button"",
@@ -1050,7 +1050,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""FPS Counter"",
+                    ""action"": ""FPS Monitor"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1061,7 +1061,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""FPS Counter"",
+                    ""action"": ""FPS Monitor"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1072,7 +1072,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""FPS Counter"",
+                    ""action"": ""FPS Monitor"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1083,7 +1083,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""FPS Counter"",
+                    ""action"": ""FPS Monitor"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1191,7 +1191,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_UI_RightClick = m_UI.FindAction("!RightClick", throwIfNotFound: true);
         // Debug
         m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
-        m_Debug_FPSCounter = m_Debug.FindAction("FPS Counter", throwIfNotFound: true);
+        m_Debug_FPSMonitor = m_Debug.FindAction("FPS Monitor", throwIfNotFound: true);
         m_Debug_ToggleHUD = m_Debug.FindAction("Toggle HUD", throwIfNotFound: true);
     }
 
@@ -1458,13 +1458,13 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     // Debug
     private readonly InputActionMap m_Debug;
     private List<IDebugActions> m_DebugActionsCallbackInterfaces = new List<IDebugActions>();
-    private readonly InputAction m_Debug_FPSCounter;
+    private readonly InputAction m_Debug_FPSMonitor;
     private readonly InputAction m_Debug_ToggleHUD;
     public struct DebugActions
     {
         private @Controls m_Wrapper;
         public DebugActions(@Controls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @FPSCounter => m_Wrapper.m_Debug_FPSCounter;
+        public InputAction @FPSMonitor => m_Wrapper.m_Debug_FPSMonitor;
         public InputAction @ToggleHUD => m_Wrapper.m_Debug_ToggleHUD;
         public InputActionMap Get() { return m_Wrapper.m_Debug; }
         public void Enable() { Get().Enable(); }
@@ -1475,9 +1475,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_DebugActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_DebugActionsCallbackInterfaces.Add(instance);
-            @FPSCounter.started += instance.OnFPSCounter;
-            @FPSCounter.performed += instance.OnFPSCounter;
-            @FPSCounter.canceled += instance.OnFPSCounter;
+            @FPSMonitor.started += instance.OnFPSMonitor;
+            @FPSMonitor.performed += instance.OnFPSMonitor;
+            @FPSMonitor.canceled += instance.OnFPSMonitor;
             @ToggleHUD.started += instance.OnToggleHUD;
             @ToggleHUD.performed += instance.OnToggleHUD;
             @ToggleHUD.canceled += instance.OnToggleHUD;
@@ -1485,9 +1485,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
 
         private void UnregisterCallbacks(IDebugActions instance)
         {
-            @FPSCounter.started -= instance.OnFPSCounter;
-            @FPSCounter.performed -= instance.OnFPSCounter;
-            @FPSCounter.canceled -= instance.OnFPSCounter;
+            @FPSMonitor.started -= instance.OnFPSMonitor;
+            @FPSMonitor.performed -= instance.OnFPSMonitor;
+            @FPSMonitor.canceled -= instance.OnFPSMonitor;
             @ToggleHUD.started -= instance.OnToggleHUD;
             @ToggleHUD.performed -= instance.OnToggleHUD;
             @ToggleHUD.canceled -= instance.OnToggleHUD;
@@ -1550,7 +1550,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     }
     public interface IDebugActions
     {
-        void OnFPSCounter(InputAction.CallbackContext context);
+        void OnFPSMonitor(InputAction.CallbackContext context);
         void OnToggleHUD(InputAction.CallbackContext context);
     }
 }
