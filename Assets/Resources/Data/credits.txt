@@ -27,6 +27,9 @@ CubbyCrazes
 RENREN
 River J
 
+<color=yellow>{ui.about.credits.translation}</color>
+
+
 <color=yellow>{ui.about.credits.qa}</color>
 Fawndue
 Shadow_Walker13
@@ -57,7 +60,7 @@ Luke Hackett (Sound)
 LukeWarnut (Sound)
 mindnomad (Tiles/Sound)
 Mr. C (Enemies)
-Mr-SUGOI (Tiles)
+Mr-STF (Tiles)
 Ohthatguy (Background)
 Poudink (Tiles)
 Ragey (Enemies)
@@ -68,3 +71,4 @@ Techokami (Enemies)
 TeridaxXD001 (Models)
 Treeki (UI)
 VentureSonic (Background)
+

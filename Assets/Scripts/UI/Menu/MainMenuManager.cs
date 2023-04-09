@@ -13,6 +13,7 @@ using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
+using NSMB.Translation;
 
 public class MainMenuManager : Singleton<MainMenuManager> {
 
@@ -208,8 +209,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         // Update the room header text
         SessionInfo session = Runner.SessionInfo;
         Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
-        bool addS = !name.ToLower().EndsWith("s");
-        lobbyHeaderText.text = name.ToValidUsername() + "'" + (addS ? "s" : "") + " Room";
+        lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
 
         // Discord RPC
         GlobalController.Instance.discordController.UpdateActivity(session);
@@ -397,13 +397,14 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void CountdownTick(int time) {
+        TranslationManager tm = GlobalController.Instance.translationManager;
         if (time > 0) {
-            startGameButtonText.text = "Starting in " + time + "...";
+            startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
             hostControlsGroup.interactable = false;
             if (time == 1 && fadeMusicCoroutine == null)
                 fadeMusicCoroutine = StartCoroutine(FadeMusic());
         } else {
-            startGameButtonText.text = "Start Game";
+            startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
             PlayerData data = Runner.GetLocalPlayerData();
             hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
             if (fadeMusicCoroutine != null) {

@@ -7,6 +7,7 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using NSMB.Translation;
 
 public class UIUpdater : NetworkBehaviour {
 
@@ -34,6 +35,19 @@ public class UIUpdater : NetworkBehaviour {
 
     public void Awake() {
         Instance = this;
+    }
+
+    public void OnEnable() {
+        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        OnLanguageChanged(GlobalController.Instance.translationManager);
+    }
+
+    public void OnDisable() {
+        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(TranslationManager obj) {
+        UpdatePingText();
     }
 
     public override void Spawned() {
@@ -65,9 +79,8 @@ public class UIUpdater : NetworkBehaviour {
 
         teamsParent.SetActive(teams);
 
-        if (!Runner.IsServer) {
+        if (!Runner.IsServer)
             StartCoroutine(UpdatePingTextCoroutine());
-        }
     }
 
     public override void Render() {
@@ -190,6 +203,14 @@ public class UIUpdater : NetworkBehaviour {
     private IEnumerator UpdatePingTextCoroutine() {
         while (true) {
             yield return PingSampleRate;
+            UpdatePingText();
+        }
+    }
+
+    private void UpdatePingText() {
+        if (Runner.IsServer) {
+            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\"> <sprite=60>" + GlobalController.Instance.translationManager.GetTranslation("ui.game.ping.hosting");
+        } else {
             int ping = GetCurrentPing();
             uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
         }

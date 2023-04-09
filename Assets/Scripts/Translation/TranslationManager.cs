@@ -19,16 +19,17 @@ namespace NSMB.Translation {
 
         //---Serialized Variables
         [SerializeField] private TextAsset defaultLocale;
-        [SerializeField] private TextAsset[] locales;
 
         //---Private Variables
         private Dictionary<string, string> translations;
         private Dictionary<string, string> defaultTranslations;
+        private TextAsset[] locales;
         private bool instantiated;
 
         public void Instantiate() {
             // Load default (english, unmodified) translations as a fallback
             defaultTranslations = LoadLocaleFromJson(defaultLocale.text);
+            locales = Resources.LoadAll<TextAsset>("Data/lang");
 
             // (NON-WEBGL / NON-MOBILE) Copy all languages from assets to streaming assets
             if (IsDesktopPlatform()) {

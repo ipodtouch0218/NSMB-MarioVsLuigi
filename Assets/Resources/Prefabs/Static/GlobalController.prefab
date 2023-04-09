@@ -9030,10 +9030,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultLocale: {fileID: 4900000, guid: 8107b29919e92464da6fee8a3548c599, type: 3}
-  locales:
-  - {fileID: 4900000, guid: 8107b29919e92464da6fee8a3548c599, type: 3}
-  - {fileID: 4900000, guid: 856efab59f7e95f459e88f860a913a33, type: 3}
-  - {fileID: 4900000, guid: eca64b27b26c9e942978f9cf1e15fd9c, type: 3}
 --- !u!82 &1776850482587567145
 AudioSource:
   m_ObjectHideFlags: 0
@@ -11193,6 +11189,7 @@ GameObject:
   - component: {fileID: 7787965330981748516}
   - component: {fileID: 1752824386476369114}
   - component: {fileID: 5909412748572096174}
+  - component: {fileID: 7941479835946323429}
   m_Layer: 5
   m_Name: ready-text
   m_TagString: Untagged
@@ -11318,6 +11315,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7941479835946323429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2159539539181060439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.loading.ready
+  text: {fileID: 5909412748572096174}
 --- !u!1 &2189548562014704988
 GameObject:
   m_ObjectHideFlags: 0
@@ -19820,10 +19831,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerList: {fileID: 2628469307357434847}
-  emptyText: Loading...
-  waitingForOthersText: Waiting for others...
-  readyToStartText: Starting...
-  spectatorText: Joining as Spectator...
 --- !u!1 &4078886687001849267
 GameObject:
   m_ObjectHideFlags: 0
@@ -35199,7 +35206,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 1530434073578936767}
-  templateString: 'Level designed by: {0}'
 --- !u!1 &7238789405595031768
 GameObject:
   m_ObjectHideFlags: 0

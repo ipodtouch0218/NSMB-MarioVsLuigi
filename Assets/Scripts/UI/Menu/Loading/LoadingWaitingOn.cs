@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 
 using NSMB.Extensions;
+using NSMB.Translation;
 
 namespace NSMB.Loading {
 
@@ -11,7 +12,6 @@ namespace NSMB.Loading {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text playerList;
-        [SerializeField] private string emptyText = "Loading...", waitingForOthersText = "Waiting for others...", readyToStartText = "Starting...", spectatorText = "Joining as Spectator...";
 
         //---Private Variables
         private TMP_Text text;
@@ -21,6 +21,7 @@ namespace NSMB.Loading {
         public void Awake() {
             text = GetComponent<TMP_Text>();
             playerListParent = playerList.transform.parent.gameObject;
+            text.text = GlobalController.Instance.translationManager.GetTranslation("ui.loading.loading");
         }
 
         public void OnEnable() {
@@ -33,24 +34,25 @@ namespace NSMB.Loading {
             if (!GameManager.Instance || !(GameManager.Instance.Object?.IsValid ?? false))
                 return;
 
+            TranslationManager tm = GlobalController.Instance.translationManager;
             PlayerData ourData = NetworkHandler.Instance.runner.LocalPlayer.GetPlayerData(NetworkHandler.Instance.runner);
 
             // Loading (as spectator)
             if (ourData.IsCurrentlySpectating) {
-                text.text = spectatorText;
+                text.text = tm.GetTranslation("ui.loading.spectator");
                 return;
             }
 
             // Still loading
             if (!GameManager.Instance.Object.IsValid) {
-                text.text = emptyText;
+                text.text = tm.GetTranslation("ui.loading.loading");
                 playerListParent.SetActive(false);
                 return;
             }
 
             // Game starting
             if (GameManager.Instance.GameStartTimer.IsRunning) {
-                text.text = readyToStartText;
+                text.text = tm.GetTranslation("ui.loading.starting");
                 playerListParent.SetActive(false);
                 return;
             }
@@ -65,12 +67,12 @@ namespace NSMB.Loading {
 
             if (waitingFor.Contains(ourNickname)) {
                 // Loading
-                text.text = emptyText;
+                text.text = tm.GetTranslation("ui.loading.loading");
                 playerListParent.SetActive(false);
 
             } else {
                 // Waiting for others
-                text.text = waitingForOthersText;
+                text.text = tm.GetTranslation("ui.loading.waiting");
 
                 playerListParent.SetActive(true);
                 playerList.text = waitingFor.Count == 0 ? "" : "\n- " + string.Join("\n- ", waitingFor);

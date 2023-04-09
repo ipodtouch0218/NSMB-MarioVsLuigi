@@ -5,11 +5,15 @@ using TMPro;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Translation;
 
 public class SpectationManager : MonoBehaviour {
 
+    //---Serialized Variables
     [SerializeField] private GameObject spectationUI;
     [SerializeField] private TMP_Text spectatingText;
+
+    //---Public Properties
     private bool _spectating = false;
     public bool Spectating {
         get => _spectating;
@@ -35,14 +39,22 @@ public class SpectationManager : MonoBehaviour {
             }
         }
     }
+
+    //---Private Variables
     private int targetIndex;
 
     public void OnEnable() {
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
+        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
     }
 
     public void OnDisable() {
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
+        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(TranslationManager tm) {
+        UpdateSpectateUI();
     }
 
     public void Update() {
@@ -62,7 +74,8 @@ public class SpectationManager : MonoBehaviour {
         if (!TargetPlayer)
             return;
 
-        spectatingText.text = "Spectating: " + TargetPlayer.Object.InputAuthority.GetPlayerData(TargetPlayer.Runner).GetNickname();
+        string username = TargetPlayer.Object.InputAuthority.GetPlayerData(TargetPlayer.Runner).GetNickname();
+        spectatingText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
     }
 
     public void SpectateNextPlayer() {
