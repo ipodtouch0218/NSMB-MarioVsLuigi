@@ -26,5 +26,16 @@ public class StarTrackIcon : TrackIcon {
         }
 
         image.sprite = starSprite;
+
+        //Calculate the Tracking Position on Spawn
+        CalculatePosition();
+    }
+
+    public override void Update() {
+        //If the starTarget is moving, run the position update. Otherwise, don't Calculate the Track Position since the star is not going to move.
+        if (!starTarget.IsStationary)
+        {
+            base.Update();
+        }
     }
 }

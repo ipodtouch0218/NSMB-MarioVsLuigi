@@ -27,6 +27,12 @@ public class TrackIcon : MonoBehaviour {
     }
 
     public virtual void Update() {
+        CalculatePosition();
+    }
+
+    //Made this a method so it can be called in functions other than Update
+    public void CalculatePosition()
+    {
         float percentage = (target.transform.position.x - levelMinX) * levelWidthReciprocal;
         transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
     }
