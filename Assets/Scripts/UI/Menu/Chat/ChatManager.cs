@@ -36,6 +36,14 @@ public class ChatManager : MonoBehaviour {
         Canvas.ForceUpdateCanvases();
     }
 
+    public void AddSystemMessage(string key, params string[] replacements) {
+        AddSystemMessage(key, null, replacements);
+    }
+
+    public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
+        AddChatMessage(GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, replacements), color ?? Color.red);
+    }
+
     public void SendChat() {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerData data = runner.GetLocalPlayerData();
@@ -49,7 +57,7 @@ public class ChatManager : MonoBehaviour {
             return;
 
         if (text.StartsWith("/")) {
-            AddChatMessage("Slash commands are no longer necessary. Click on a player's name to moderate your room instead!", Color.red);
+            AddSystemMessage("ui.inroom.chat.command");
             return;
         }
 

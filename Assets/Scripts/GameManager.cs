@@ -13,6 +13,7 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Utils;
+using NSMB.Translation;
 
 public class GameManager : NetworkBehaviour {
 
@@ -96,20 +97,6 @@ public class GameManager : NetworkBehaviour {
     public LoopingMusicPlayer musicManager;
     public AudioSource music, sfx;
 
-    // TODO: figure out how to do rollback-able.... fuck
-    public void BulkModifyTilemap(Vector2Int tileOrigin, Vector2Int tileDimensions, string[] tiles) {
-        TileBase[] tileObjects = new TileBase[tiles.Length];
-        for (int i = 0; i < tiles.Length; i++) {
-            string tile = tiles[i];
-            if (string.IsNullOrEmpty(tile))
-                continue;
-
-            //tileObjects[i] = Utils.GetCacheTile(tile);
-        }
-
-        tilemap.SetTilesBlock(new BoundsInt(tileOrigin.x, tileOrigin.y, 0, tileDimensions.x, tileDimensions.y, 1), tileObjects);
-    }
-
     // TODO: convert to RPC...?
     public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, GameObject prefab) {
         GameObject particle = Instantiate(prefab, pos, Quaternion.Euler(0, 0, flip ? 180 : 0));
@@ -129,7 +116,6 @@ public class GameManager : NetworkBehaviour {
         ControlSystem.controls.UI.Pause.performed +=        OnPause;
         ControlSystem.controls.Debug.ToggleHUD.performed += OnToggleHud;
         NetworkHandler.OnShutdown +=     OnShutdown;
-        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
         NetworkHandler.OnPlayerLeft +=   OnPlayerLeft;
     }
 
@@ -137,7 +123,6 @@ public class GameManager : NetworkBehaviour {
         ControlSystem.controls.UI.Pause.performed -=        OnPause;
         ControlSystem.controls.Debug.ToggleHUD.performed -= OnToggleHud;
         NetworkHandler.OnShutdown -=     OnShutdown;
-        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
         NetworkHandler.OnPlayerLeft -=   OnPlayerLeft;
     }
 
@@ -271,19 +256,8 @@ public class GameManager : NetworkBehaviour {
         optionsWereOpenLastFrame = GlobalController.Instance.optionsManager.gameObject.activeSelf;
     }
 
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        if (!Runner.IsServer)
-            return;
-
-        //send spectating player the current level
-        //if (Utils.GetTilemapChanges(originalTiles, originalTilesOrigin, tilemap, out TileChangeInfo[] tilePositions, out string[] tileNames)) {
-        //    Debug.Log($"sent spectator tile changes. {tilePositions.Length} tiles changed.");
-        //    rpcs.Rpc_UpdateSpectatorTilemap(player, tilePositions, tileNames);
-        //}
-    }
-
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        //Kill player if they are still alive
+        // Kill player if they are still alive
         if (Object.HasStateAuthority) {
             foreach (PlayerController pl in AlivePlayers) {
                 if (pl.Object.InputAuthority == player)
@@ -428,14 +402,17 @@ public class GameManager : NetworkBehaviour {
 
         music.Stop();
 
+        TranslationManager tm = GlobalController.Instance.translationManager;
+        string resultText;
         if (winningTeam == -1) {
-            winText.text = "It's a draw...";
+            resultText = tm.GetTranslation("ui.result.draw");
         } else {
             if (SessionData.Instance.Teams) {
                 Team team = ScriptableManager.Instance.teams[winningTeam];
-                winText.text = team.displayName + " Wins!";
+                resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", team.displayName);
             } else {
-                winText.text = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname() + " Wins!";
+                string username = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname();
+                resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", username);
             }
 
             if (Runner.IsServer) {
@@ -444,6 +421,7 @@ public class GameManager : NetworkBehaviour {
                 }
             }
         }
+        winText.text = resultText;
 
         yield return new WaitForSecondsRealtime(1);
 

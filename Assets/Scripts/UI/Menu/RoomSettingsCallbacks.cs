@@ -55,7 +55,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private void ChangeLevelIndex(int index, bool changed) {
         levelDropdown.SetValueWithoutNotify(index);
         if (changed && MainMenuManager.Instance is MainMenuManager mm) {
-            mm.chat.AddChatMessage("Map set to: " + levelDropdown.options[index].text, Color.red);
+            mm.chat.AddSystemMessage("ui.inroom.chat.server.map", "map", levelDropdown.options[index].text);
             mm.PreviewLevel(index);
         }
     }

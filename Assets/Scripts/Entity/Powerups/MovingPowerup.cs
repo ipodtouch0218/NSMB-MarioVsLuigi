@@ -76,6 +76,8 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
                 DespawnEntity();
                 return;
             }
+
+            PlaySound(Enums.Sounds.World_Block_Powerup);
         }
 
         FacingRight = true;

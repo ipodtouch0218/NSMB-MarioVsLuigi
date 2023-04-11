@@ -164,7 +164,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public IEnumerator OnPlayerDataValidated(PlayerRef player) {
         yield return null; //wait a frame because reasons
         if (waitingForJoinMessage.Remove(player)) {
-            chat.AddChatMessage(player.GetPlayerData(Runner).GetNickname() + " joined the room", Color.red);
+            chat.AddSystemMessage("ui.inroom.chat.player.joined", "playername", player.GetPlayerData(Runner).GetNickname());
             sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
         }
 
@@ -204,7 +204,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         // Host chat notification
         if (Runner.IsServer)
-            chat.AddChatMessage("You are the room's host! Click on your players' names to control your room.", Color.red);
+            chat.AddSystemMessage("ui.inroom.chat.hostreminder");
 
         // Update the room header text
         SessionInfo session = Runner.SessionInfo;
@@ -484,20 +484,17 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void Kick(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
-        if (target == runner.LocalPlayer) {
-            chat.AddChatMessage("While you can kick yourself, it's probably not what you meant to do.", Color.red);
+        if (target == runner.LocalPlayer)
             return;
-        }
-        chat.AddChatMessage($"Successfully kicked {target.GetPlayerData(runner).GetNickname()}", Color.red);
+
+        chat.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetPlayerData(runner).GetNickname());
         runner.Disconnect(target);
     }
 
     public void Promote(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
-        if (target == runner.LocalPlayer) {
-            chat.AddChatMessage("You are already the host..?", Color.red);
+        if (target == runner.LocalPlayer)
             return;
-        }
 
         //PhotonNetwork.SetMasterClient(target);
         //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
@@ -506,20 +503,14 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void Mute(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
-        if (target == runner.LocalPlayer) {
-            chat.AddChatMessage("While you can mute yourself, it's probably not what you meant to do.", Color.red);
+        if (target == runner.LocalPlayer)
             return;
-        }
+
 
         PlayerData data = target.GetPlayerData(runner);
         bool newMuteState = !data.IsMuted;
         data.IsMuted = newMuteState;
-
-        if (newMuteState) {
-            chat.AddChatMessage($"Successfully muted {data.GetNickname()}", Color.red);
-        } else {
-            chat.AddChatMessage($"Successfully unmuted {data.GetNickname()}", Color.red);
-        }
+        chat.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", "playername", data.GetNickname());
     }
 
     public void BanOrUnban(string playername) {
@@ -547,13 +538,11 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void Ban(PlayerRef target) {
         NetworkRunner runner = NetworkHandler.Instance.runner;
-        if (target == runner.LocalPlayer) {
-            chat.AddChatMessage("While you can ban yourself, it's probably not what you meant to do.", Color.red);
+        if (target == runner.LocalPlayer)
             return;
-        }
 
         SessionData.Instance.AddBan(target);
-        chat.AddChatMessage($"Successfully banned {target.GetPlayerData(runner).GetNickname()}", Color.red);
+        chat.AddSystemMessage("ui.inroom.chat.player.banned", "playername", "target.GetPlayerData(runner).GetNickname()");
         Runner.Disconnect(target);
 
         //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);

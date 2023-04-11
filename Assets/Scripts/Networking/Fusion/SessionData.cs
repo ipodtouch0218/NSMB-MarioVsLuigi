@@ -239,14 +239,14 @@ public class SessionData : NetworkBehaviour {
 
         if (!sd.GameStartTimer.IsRunning) {
             if (sd.playedStartSound) {
-                MainMenuManager.Instance.chat.AddChatMessage("Game start cancelled.", Color.blue);
+                MainMenuManager.Instance.chat.AddSystemMessage("ui.inroom.chat.server.startcancelled");
             }
             sd.lastStartCancelTime = sd.Runner.SimulationTime;
             MainMenuManager.Instance.CountdownTick(-1);
             sd.playedStartSound = false;
         } else {
             if (sd.lastStartCancelTime + 3f < time || sd.Runner.GetLocalPlayerData().IsRoomOwner) {
-                MainMenuManager.Instance.chat.AddChatMessage("Game starting in 3 seconds...", Color.blue);
+                MainMenuManager.Instance.chat.AddSystemMessage("ui.inroom.chat.server.starting", "countdown", Mathf.CeilToInt(sd.GameStartTimer.RemainingTime(sd.Runner) ?? 0).ToString());
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
                 sd.playedStartSound = true;
             }

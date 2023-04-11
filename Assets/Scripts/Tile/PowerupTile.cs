@@ -45,8 +45,6 @@ namespace NSMB.Tiles {
                 GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                     resultTile, direction == InteractionDirection.Down, Vector2.zero, false, spawnResult);
             }
-
-            interacter.PlaySound(Enums.Sounds.World_Block_Powerup);
             return false;
         }
 
