@@ -70,8 +70,7 @@ MonoBehaviour:
   m_text: Did ya bring a light?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03bd50bb8343d1d4dbb0873e4c9abb95, type: 2}
-  m_sharedMaterial: {fileID: -4437592673344618727, guid: 03bd50bb8343d1d4dbb0873e4c9abb95,
-    type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 89b0d01365bdebe41af2f263f3dd02fc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
