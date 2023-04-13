@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 1, g: 0.6067698, b: 0, a: 1}
+    shirtColor: {r: 1, g: 0.6067698, b: 0, a: 1}
     overallsColor: {r: 0.5628174, g: 1, b: 0.43867922, a: 1}
-    Name: Orange n' Lime
-  ColorText: Orange n' Lime
+    hatUsesOverallsColor: 0
+  translationKey: skin.orange

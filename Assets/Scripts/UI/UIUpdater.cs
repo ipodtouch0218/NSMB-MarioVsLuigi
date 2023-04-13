@@ -208,6 +208,9 @@ public class UIUpdater : NetworkBehaviour {
     }
 
     private void UpdatePingText() {
+        if (!Runner)
+            return;
+
         if (Runner.IsServer) {
             uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\"> <sprite=60>" + GlobalController.Instance.translationManager.GetTranslation("ui.game.ping.hosting");
         } else {

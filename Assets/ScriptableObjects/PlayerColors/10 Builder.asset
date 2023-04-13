@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
-    hatColor: {r: 1, g: 0.7921569, b: 0.16862746, a: 1}
+    shirtColor: {r: 1, g: 0.7921569, b: 0.16862746, a: 1}
     overallsColor: {r: 0.91764706, g: 0.15686275, b: 0.23529412, a: 1}
-    Name: Builder Outfit
+    hatUsesOverallsColor: 0
   - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
-    hatColor: {r: 1, g: 0.79215693, b: 0.16862746, a: 1}
+    shirtColor: {r: 1, g: 0.79215693, b: 0.16862746, a: 1}
     overallsColor: {r: 0.10980393, g: 0.5803922, b: 0.11764707, a: 1}
-    Name: Builder Outfit
-  ColorText: Builder Outfit
+    hatUsesOverallsColor: 0
+  translationKey: skin.builder

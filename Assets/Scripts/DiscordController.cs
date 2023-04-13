@@ -6,15 +6,36 @@ using UnityEngine.SceneManagement;
 using Discord;
 using Fusion;
 using NSMB.Utils;
+using NSMB.Translation;
 
 public class DiscordController : MonoBehaviour {
 
     //---Static Variables
     private static readonly long DiscordAppId = 962073502469459999;
 
+    //---Properties
+    private TranslationManager Translation => GlobalController.Instance.translationManager;
+
     //---Private Variables
     private Discord.Discord discord;
     private ActivityManager activityManager;
+
+    public void OnEnable() {
+        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+    }
+
+    public void OnDisable() {
+        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+        discord?.Dispose();
+    }
+
+    private void OnLanguageChanged(TranslationManager tm) {
+        if (NetworkHandler.Runner) {
+            UpdateActivity(NetworkHandler.Runner.SessionInfo);
+        } else {
+            UpdateActivity(null);
+        }
+    }
 
     public void Start() {
 #if UNITY_WEBGL
@@ -62,10 +83,6 @@ public class DiscordController : MonoBehaviour {
         } catch { }
     }
 
-    public void OnDisable() {
-        discord?.Dispose();
-    }
-
     public void UpdateActivity(SessionInfo session = null) {
 #if UNITY_WEBGL
         return;
@@ -78,12 +95,12 @@ public class DiscordController : MonoBehaviour {
 
         if (SessionData.Instance) {
 
-            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? "Playing Offline" : "Playing Online";
+            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? Translation.GetTranslation("discord.offline") : Translation.GetTranslation("discord.online");
             if (!NetworkHandler.Runner.IsSinglePlayer) {
                 Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxSize);
                 activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = maxSize }, Id = session.Name + "1" };
             }
-            activity.State = session.IsVisible ? "In a Public Game" : "In a Private Game";
+            activity.State = session.IsVisible ? Translation.GetTranslation("discord.public") : Translation.GetTranslation("discord.private");
             activity.Secrets = new() { Join = session.Name };
 
             if (GameManager.Instance) {
@@ -110,7 +127,7 @@ public class DiscordController : MonoBehaviour {
             }
         } else {
             //in the main menu, not in a room
-            activity.Details = "Browsing the Main Menu...";
+            activity.Details = Translation.GetTranslation("discord.mainmenu");
             activity.Assets = new() { LargeImage = "mainmenu" };
         }
 

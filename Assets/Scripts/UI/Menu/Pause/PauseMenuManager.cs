@@ -5,44 +5,32 @@ using UnityEngine.InputSystem;
 using TMPro;
 
 using NSMB.Extensions;
+using NSMB.Translation;
 
 namespace NSMB.UI.Pause {
     public class PauseMenuManager : MonoBehaviour {
 
         //---Serialized Variables
-        [SerializeField] private TMP_Text[] options;
+        [SerializeField] private PauseMenuOptionWrapper[] options;
         [SerializeField] private Material enabledMaterial, disabledMaterial;
 
         //---Private Variables
-        private string[] originalText;
-        private EventTrigger[] triggers;
         private bool inputted;
         private int selected;
         private bool skipSound;
         private bool isHost;
-
-        public void Initialize() {
-            originalText = new string[options.Length];
-            triggers = new EventTrigger[options.Length];
-
-            for (int i = 0; i < options.Length; i++) {
-                originalText[i] = options[i].text;
-                triggers[i] = options[i].GetComponent<EventTrigger>();
-            }
-        }
 
         public void OnEnable() {
             ControlSystem.controls.UI.Navigate.performed += OnNavigate;
             ControlSystem.controls.UI.Navigate.canceled += OnNavigate;
             ControlSystem.controls.UI.Submit.performed += OnSubmit;
             ControlSystem.controls.UI.Cancel.performed += OnCancel;
-
-            if (originalText == null || originalText.Length == 0)
-                Initialize();
+            GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
 
             skipSound = true;
             isHost = NetworkHandler.Runner && NetworkHandler.Runner.GetLocalPlayerData().IsRoomOwner;
-            options[1].fontMaterial = isHost ? enabledMaterial : disabledMaterial;
+            options[1].text.fontMaterial = isHost ? enabledMaterial : disabledMaterial;
             SelectOption(0);
         }
 
@@ -51,6 +39,7 @@ namespace NSMB.UI.Pause {
             ControlSystem.controls.UI.Navigate.canceled -= OnNavigate;
             ControlSystem.controls.UI.Submit.performed -= OnSubmit;
             ControlSystem.controls.UI.Cancel.performed -= OnCancel;
+            GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         public void OnNavigate(InputAction.CallbackContext context) {
@@ -75,7 +64,7 @@ namespace NSMB.UI.Pause {
             if (GlobalController.Instance.optionsManager.gameObject.activeSelf)
                 return;
 
-            triggers[selected].OnPointerClick(null);
+            options[selected].trigger.OnPointerClick(null);
         }
 
         public void OnCancel(InputAction.CallbackContext context) {
@@ -98,14 +87,11 @@ namespace NSMB.UI.Pause {
         }
 
         public void SelectOption(int index) {
-            if (selected == index)
+            if (selected == index || selected < 0 || selected >= options.Length)
                 return;
 
-            for (int i = 0; i < options.Length; i++) {
-                options[i].text = originalText[i];
-            }
-            options[index].text = "» " + originalText[index] + " «";
             selected = index;
+            UpdateLabels(selected);
 
             if (!skipSound)
                 GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
@@ -114,7 +100,36 @@ namespace NSMB.UI.Pause {
 
         public void SelectOption(TMP_Text option) {
             skipSound = true;
-            SelectOption(Array.IndexOf(options, option));
+            int index = -1;
+            for (int i = 0; i < options.Length; i++) {
+                if (options[i].text == option) {
+                    index = i;
+                    break;
+                }
+            }
+            SelectOption(index);
+        }
+
+        private void UpdateLabels(int selected) {
+            for (int i = 0; i < options.Length; i++) {
+                PauseMenuOptionWrapper option = options[i];
+                option.text.text = (selected == i) ? ("» " + option.originalText + " «") : option.originalText;
+            }
+        }
+
+        private void OnLanguageChanged(TranslationManager tm) {
+            foreach (PauseMenuOptionWrapper option in options) {
+                option.originalText = tm.GetTranslation(option.translationKey);
+            }
+            UpdateLabels(selected);
+        }
+
+        [Serializable]
+        public class PauseMenuOptionWrapper {
+            public TMP_Text text;
+            public EventTrigger trigger;
+            public string translationKey;
+            [NonSerialized] public string originalText;
         }
     }
 }

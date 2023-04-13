@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 0.9056604, g: 0.69068044, b: 0, a: 1}
+    shirtColor: {r: 0.9056604, g: 0.69068044, b: 0, a: 1}
     overallsColor: {r: 0.41230103, g: 0.04903879, b: 0.5471698, a: 1}
-    Name: Wario's Outfit
-  ColorText: Wario's Outfit
+    hatUsesOverallsColor: 0
+  translationKey: skin.wario

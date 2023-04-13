@@ -5,7 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
@@ -96,5 +96,7 @@ PrefabInstance:
       objectReference: {fileID: 4928671260392873470, guid: 794bc215dd02bf34ab2cfae7702bfdfd,
         type: 3}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bcb5effadc837a45b61571768c543cf, type: 3}

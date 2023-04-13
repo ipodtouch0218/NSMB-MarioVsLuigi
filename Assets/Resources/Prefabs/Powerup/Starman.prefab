@@ -251,6 +251,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -280,6 +281,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     startSize:
@@ -1331,6 +1333,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -1360,6 +1363,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
   UVModule:
@@ -3580,6 +3584,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -3609,6 +3614,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     range: {x: 0, y: 1}
@@ -4041,6 +4047,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -4070,6 +4077,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     widthOverTrail:
@@ -4157,6 +4165,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -4186,6 +4195,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
   CustomDataModule:
@@ -4224,6 +4234,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -4253,6 +4264,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     colorLabel0: Color
@@ -4506,6 +4518,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -4535,6 +4548,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     colorLabel1: Color
@@ -4831,7 +4845,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1017215213198693185, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
@@ -4954,11 +4968,25 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 7863306663182383513, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19, type: 3}
     - {fileID: 5712151088451427927, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1017215213198693199, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 696688190}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1017215213198693191, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 799409233}
+    - targetCorrespondingSourceObject: {fileID: 8453737792750304721, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4033887425581600860}
+    - targetCorrespondingSourceObject: {fileID: 8453737792750304721, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8714625004856551173}
   m_SourcePrefab: {fileID: 100100000, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19, type: 3}
 --- !u!1 &3581337690012010145 stripped
 GameObject:
@@ -4995,6 +5023,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frame: 0
+  fps: 8
   frames:
   - {fileID: -4108787663010400821, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}
   - {fileID: -1073110140, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}

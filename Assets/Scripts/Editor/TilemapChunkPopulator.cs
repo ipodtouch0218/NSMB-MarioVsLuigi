@@ -23,12 +23,12 @@ namespace NSMB.Tiles {
         private static void ProcessScene(string path) {
 
             GameManager gm = Object.FindObjectOfType<GameManager>();
-            Debug.Log("Handling saving of a gameplay scene at " + path);
 
             // No GameManager = Not in a level scene.
             if (!gm || !gm.tilemap)
                 return;
 
+            Debug.Log("Handling saving of a gameplay scene at " + path);
             Tilemap tilemap = gm.tilemap;
 
             // Get unique tiles

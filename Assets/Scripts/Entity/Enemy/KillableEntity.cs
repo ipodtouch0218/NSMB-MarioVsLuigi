@@ -189,6 +189,9 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     public override void RespawnEntity() {
+        if (IsActive)
+            return;
+
         base.RespawnEntity();
         IsDead = false;
         IsFrozen = false;

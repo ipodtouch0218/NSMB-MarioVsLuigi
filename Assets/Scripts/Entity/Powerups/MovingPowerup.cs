@@ -4,6 +4,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
+using NSMB.Extensions;
 
 public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
@@ -13,6 +14,9 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     [Networked] protected PlayerController FollowPlayer { get; set; }
     [Networked] private TickTimer FollowEndTimer { get; set; }
     [Networked] private TickTimer IgnorePlayerTimer { get; set; }
+    [Networked] private float GrowFromBlockStartTime { get; set; }
+    [Networked] private float GrowFromBlockEndTime { get; set; }
+    [Networked] private Vector2 GrowFromBlockOrigin { get; set; }
     [Networked(OnChanged = nameof(OnReserveResultChanged))] private PowerupReserveResult ReserveResult { get; set; }
 
     //---Public Variables
@@ -48,10 +52,15 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             GroundMask = (1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough);
     }
 
-    public void OnBeforeSpawned(PlayerController playerToFollow, float pickupDelay) {
+    public void OnBeforeSpawned(PlayerController playerToFollow, float pickupDelay, Vector2? blockOrigin = null, bool upwards = false) {
         FollowPlayer = playerToFollow;
         FollowEndTimer = TickTimer.CreateFromSeconds(Runner, pickupDelay);
-
+        if (blockOrigin.HasValue) {
+            GrowFromBlockOrigin = blockOrigin.Value;
+            GrowFromBlockStartTime = Runner.SimulationTime;
+            GrowFromBlockEndTime = Runner.SimulationTime + 0.75f;
+            sRenderer.sortingOrder = -1000;
+        }
         if (playerToFollow)
             transform.position = body.position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.currentPosition.y + 1.68f);
     }
@@ -66,17 +75,11 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             body.isKinematic = true;
             gameObject.layer = Layers.LayerHitsNothing;
             sRenderer.sortingOrder = 15;
+
+            PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
         } else {
             //spawned as a normal item.
             gameObject.layer = Layers.LayerEntity;
-            Vector2 size = hitbox.size * transform.lossyScale * 0.35f;
-            Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
-
-            if (Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
-                DespawnEntity();
-                return;
-            }
-
             PlaySound(Enums.Sounds.World_Block_Powerup);
         }
 
@@ -100,7 +103,22 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         if (!Object || Collector)
             return;
 
-        if (FollowPlayer) {
+        bool growing = Runner.SimulationTime < GrowFromBlockEndTime;
+
+        if (growing) {
+            float t = (Runner.SimulationTime - GrowFromBlockStartTime) / (GrowFromBlockEndTime - GrowFromBlockStartTime);
+            body.position = Vector2.Lerp(GrowFromBlockOrigin, GrowFromBlockOrigin + (Vector2.up * 0.5f), t);
+            sRenderer.sortingOrder = -1000;
+            gameObject.layer = Layers.LayerHitsNothing;
+            body.isKinematic = true;
+
+            if (Runner.SimulationTime + Runner.DeltaTime >= GrowFromBlockEndTime) {
+                body.isKinematic = false;
+                gameObject.layer = Layers.LayerEntity;
+                sRenderer.sortingOrder = originalLayer;
+            }
+
+        } else if (FollowPlayer) {
             body.position = new(FollowPlayer.body.position.x, FollowPlayer.cameraController.currentPosition.y + 1.68f);
 
             if (FollowEndTimer.ExpiredOrNotRunning(Runner)) {
@@ -117,22 +135,24 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
         sRenderer.enabled = !(despawnTimeRemaining <= 1 && despawnTimeRemaining * blinkingRate % 1 < 0.5f);
 
-        Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
-        Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
+        if (!growing) {
+            Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
+            Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
-        if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
-            gameObject.layer = Layers.LayerHitsNothing;
-            return;
-        } else {
-            gameObject.layer = Layers.LayerEntity;
-            HandleCollision();
-        }
+            if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
+                gameObject.layer = Layers.LayerHitsNothing;
+                return;
+            } else {
+                gameObject.layer = Layers.LayerEntity;
+                HandleCollision();
+            }
 
-        if (avoidPlayers && physics.OnGround) {
-            PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
-            if (closest) {
-                float dist = closest.body.position.x - body.position.x;
-                FacingRight = dist < 0 || dist > GameManager.Instance.LevelWidth;
+            if (avoidPlayers && physics.OnGround) {
+                PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
+                if (closest) {
+                    float dist = closest.body.position.x - body.position.x;
+                    FacingRight = dist < 0 || dist > GameManager.Instance.LevelWidth;
+                }
             }
         }
 

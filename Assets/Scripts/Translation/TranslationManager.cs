@@ -115,6 +115,8 @@ namespace NSMB.Translation {
         }
 
         public string GetTranslation(string key) {
+            key = key?.ToLower();
+
             if (translations != null && translations.TryGetValue(key, out string value) && !string.IsNullOrWhiteSpace(value))
                 return value;
 

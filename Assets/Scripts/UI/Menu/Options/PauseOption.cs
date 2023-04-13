@@ -14,7 +14,7 @@ namespace NSMB.UI.Pause.Options {
         [SerializeField] private PauseOptionMenuManager manager;
         [SerializeField] internal TMP_Text label;
         [SerializeField] protected PauseOptionLoader loader;
-        [SerializeField] protected string translationKey;
+        [SerializeField] public string translationKey;
 
         //---Private Variables
         private bool selected;
@@ -33,6 +33,7 @@ namespace NSMB.UI.Pause.Options {
                 loader.LoadOptions(this);
 
             GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
         public void OnDisable() {

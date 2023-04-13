@@ -194,6 +194,9 @@ public class KoopaWalk : HoldableEntity {
 
     //---BasicEntity overrides
     public override void RespawnEntity() {
+        if (IsActive)
+            return;
+
         base.RespawnEntity();
         IsInShell = false;
         IsStationary = false;

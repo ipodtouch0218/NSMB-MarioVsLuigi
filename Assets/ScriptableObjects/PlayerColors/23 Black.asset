@@ -16,10 +16,9 @@ MonoBehaviour:
   - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
     shirtColor: {r: 0, g: 0, b: 0, a: 1}
     overallsColor: {r: 0.631, g: 0.10694915, b: 0.1604237, a: 1}
-    name: Dark Theme
     hatUsesOverallsColor: 1
   - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
     shirtColor: {r: 0, g: 0, b: 0, a: 1}
     overallsColor: {r: 0.05902703, g: 0.312, b: 0.06324324, a: 1}
-    name: Dark Theme
     hatUsesOverallsColor: 1
+  translationKey: skin.black

@@ -84,8 +84,12 @@ public class BlockBump : NetworkBehaviour {
             return;
         }
 
-        Vector3 pos = transform.position + Vector3.up * (IsDownwards ? -0.7f : 0.25f);
-        Runner.Spawn(SpawnPrefab, pos + (Vector3) SpawnOffset);
+        Vector3 pos = transform.position + (Vector3.down * 0.25f);
+        Runner.Spawn(SpawnPrefab, pos + (Vector3) SpawnOffset, onBeforeSpawned: (runner, obj) => {
+            if (!IsDownwards) {
+                obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.3f, (Vector2) (transform.position) + (Vector2.down * 0.25f), IsDownwards);
+            }
+        });
         Runner.Despawn(Object);
     }
 }

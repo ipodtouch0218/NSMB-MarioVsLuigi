@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 0.6627451, g: 0.6627451, b: 0.6627451, a: 1}
+    shirtColor: {r: 0.6627451, g: 0.6627451, b: 0.6627451, a: 1}
     overallsColor: {r: 0.1792453, g: 0.1792453, b: 0.1792453, a: 1}
-    Name: Super Mario Land 2
-  ColorText: Super Mario Land 2
+    hatUsesOverallsColor: 0
+  translationKey: skin.marioland

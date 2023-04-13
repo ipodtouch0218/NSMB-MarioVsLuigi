@@ -77,7 +77,7 @@ namespace NSMB.UI.Pause.Options {
                 newHeader.name = "ControlsHeader (" + map.name + ")";
                 newHeader.gameObject.SetActive(true);
                 newHeader.transform.SetParent(scrollPaneContent, false);
-                newHeader.label.text = map.name;
+                newHeader.translationKey = "ui.options.controls." + map.name.ToLower() + ".header";
 
                 newOptions.Add(newHeader);
 

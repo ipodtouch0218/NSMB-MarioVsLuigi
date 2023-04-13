@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
-    hatColor: {r: 0.16078432, g: 0.25490198, b: 0.22352943, a: 1}
+    shirtColor: {r: 0.16078432, g: 0.25490198, b: 0.22352943, a: 1}
     overallsColor: {r: 0.48235297, g: 0.50980395, b: 0.0627451, a: 1}
-    Name: Game Boy Green
+    hatUsesOverallsColor: 0
   - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
-    hatColor: {r: 0.48235297, g: 0.50980395, b: 0.0627451, a: 1}
+    shirtColor: {r: 0.48235297, g: 0.50980395, b: 0.0627451, a: 1}
     overallsColor: {r: 0.16078432, g: 0.25490198, b: 0.22352943, a: 1}
-    Name: Game Boy Green
-  ColorText: Game Boy Green
+    hatUsesOverallsColor: 0
+  translationKey: skin.gb

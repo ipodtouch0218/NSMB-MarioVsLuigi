@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 0.49411765, g: 0.15294118, b: 0.22352941, a: 1}
+    shirtColor: {r: 0.49411765, g: 0.15294118, b: 0.22352941, a: 1}
     overallsColor: {r: 0.9254902, g: 0.67058825, b: 0.67058825, a: 1}
-    Name: Velvet Maroon
-  ColorText: Velvet Maroon
+    hatUsesOverallsColor: 0
+  translationKey: skin.maroon

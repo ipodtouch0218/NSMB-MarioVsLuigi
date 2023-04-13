@@ -147,7 +147,6 @@ GameObject:
   - component: {fileID: 936319883539287593}
   - component: {fileID: 8836673496241253950}
   - component: {fileID: 4505410283954792329}
-  - component: {fileID: 6740514745168343717}
   m_Layer: 5
   m_Name: Options
   m_TagString: Untagged
@@ -318,20 +317,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &6740514745168343717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 300488298119222403}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  key: ui.pause.options
-  text: {fileID: 8836673496241253950}
 --- !u!1 &315483226426769787
 GameObject:
   m_ObjectHideFlags: 0
@@ -1094,7 +1079,6 @@ GameObject:
   - component: {fileID: 4044099756974800979}
   - component: {fileID: 7812754501161860349}
   - component: {fileID: 2446908315344424181}
-  - component: {fileID: 4586223066220086816}
   m_Layer: 5
   m_Name: Continue
   m_TagString: Untagged
@@ -1265,20 +1249,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &4586223066220086816
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1038786741219637242}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  key: ui.pause.continue
-  text: {fileID: 7812754501161860349}
 --- !u!1 &1127053267888249143
 GameObject:
   m_ObjectHideFlags: 0
@@ -1994,7 +1964,6 @@ GameObject:
   - component: {fileID: 6089034280246830126}
   - component: {fileID: 4405735558105478583}
   - component: {fileID: 1778667515456839380}
-  - component: {fileID: 1924434740731802283}
   m_Layer: 5
   m_Name: Quit
   m_TagString: Untagged
@@ -2165,20 +2134,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &1924434740731802283
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2508953583373400204}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  key: ui.pause.quit
-  text: {fileID: 4405735558105478583}
 --- !u!1 &2534023630337648780
 GameObject:
   m_ObjectHideFlags: 0
@@ -2440,10 +2395,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   options:
-  - {fileID: 7812754501161860349}
-  - {fileID: 6576780699861244675}
-  - {fileID: 8836673496241253950}
-  - {fileID: 4405735558105478583}
+  - text: {fileID: 7812754501161860349}
+    trigger: {fileID: 2446908315344424181}
+    translationKey: ui.pause.continue
+  - text: {fileID: 6576780699861244675}
+    trigger: {fileID: 6855086556322649649}
+    translationKey: ui.pause.returntoroom
+  - text: {fileID: 8836673496241253950}
+    trigger: {fileID: 4505410283954792329}
+    translationKey: ui.pause.options
+  - text: {fileID: 4405735558105478583}
+    trigger: {fileID: 1778667515456839380}
+    translationKey: ui.pause.quit
   enabledMaterial: {fileID: 3023213983796840565, guid: 38e8769007229044bb229d69f8cbae74,
     type: 2}
   disabledMaterial: {fileID: 2100000, guid: f3acd0b355e24394f9bcc2afdcd7dd20, type: 2}
@@ -2676,9 +2639,8 @@ GameObject:
   - component: {fileID: 8086824820872978780}
   - component: {fileID: 6576780699861244675}
   - component: {fileID: 6855086556322649649}
-  - component: {fileID: 2756811477790869249}
   m_Layer: 5
-  m_Name: ReturnToLobby
+  m_Name: ReturnToRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2846,20 +2808,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &2756811477790869249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3527226834675331996}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  key: ui.pause.returntoroom
-  text: {fileID: 6576780699861244675}
 --- !u!1 &3558827354498402342
 GameObject:
   m_ObjectHideFlags: 0

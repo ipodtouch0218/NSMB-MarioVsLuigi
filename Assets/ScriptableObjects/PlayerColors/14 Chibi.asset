@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 1, g: 0.83413935, b: 0, a: 1}
+    shirtColor: {r: 1, g: 0.83413935, b: 0, a: 1}
     overallsColor: {r: 0.21176471, g: 0.21176471, b: 0.21176471, a: 1}
-    Name: Chibi
-  ColorText: Chibi
+    hatUsesOverallsColor: 0
+  translationKey: skin.chibi

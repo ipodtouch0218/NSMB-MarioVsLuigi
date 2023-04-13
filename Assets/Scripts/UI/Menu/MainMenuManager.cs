@@ -65,23 +65,27 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public void OnDestroy() => Release();
 
     public void OnEnable() {
-        // Register network callbacks
+        // Register callbacks
         NetworkHandler.OnPlayerJoined +=       OnPlayerJoined;
         NetworkHandler.OnPlayerLeft +=         OnPlayerLeft;
         NetworkHandler.OnLobbyConnect +=       OnLobbyConnect;
         NetworkHandler.OnShutdown +=           OnShutdown;
         NetworkHandler.OnJoinSessionFailed +=  OnShutdown;
         NetworkHandler.OnConnectFailed +=      OnConnectFailed;
+
+        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     public void OnDisable() {
-        // Unregister network callbacks
+        // Unregister callbacks
         NetworkHandler.OnPlayerJoined -=       OnPlayerJoined;
         NetworkHandler.OnPlayerLeft -=         OnPlayerLeft;
         NetworkHandler.OnLobbyConnect -=       OnLobbyConnect;
         NetworkHandler.OnShutdown -=           OnShutdown;
         NetworkHandler.OnJoinSessionFailed -=  OnShutdown;
         NetworkHandler.OnConnectFailed -=      OnConnectFailed;
+        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
     public void Start() {
@@ -96,9 +100,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             GlobalController.Instance.disconnectCause = null;
         }
 
-        // Level Dropdown
         PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
-        levelDropdown.AddOptions(maps.Select(md => md.mapName).ToList());
 
         // Region Dropdown
         regionDropdown.ClearOptions();
@@ -610,10 +612,11 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             playerColorPaletteIcon.SetActive(true);
 
             CharacterData character = Runner.GetLocalPlayerData().GetCharacterData();
-            PlayerColors colors = ScriptableManager.Instance.skins[index].GetPlayerColors(character);
+            PlayerColorSet set = ScriptableManager.Instance.skins[index];
+            PlayerColors colors = set.GetPlayerColors(character);
             overallsColorImage.color = colors.overallsColor;
             shirtColorImage.color = colors.shirtColor;
-            ColorName.GetComponent<TMP_Text>().text = colors.name;
+            ColorName.GetComponent<TMP_Text>().text = set.Name;
         }
 
         playerColorDisabledIcon.SetActive(disabled);
@@ -726,6 +729,11 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         }
     }
 
+    private void OnLanguageChanged(TranslationManager tm) {
+        levelDropdown.ClearOptions();
+        levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
+    }
+
     //---Debug
 #if UNITY_EDITOR
     private static readonly Vector3 MaxCameraSize = new(16f/9f * 7f, 7f);
@@ -741,7 +749,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     //---Helpers
     [Serializable]
     public class MapData {
-        public string mapName;
+        public string translationKey;
         public GameObject levelPreviewPosition;
         public int buildIndex;
     }

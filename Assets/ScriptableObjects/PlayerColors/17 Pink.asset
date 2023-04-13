@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 1, g: 0.43137255, b: 0.6666667, a: 1}
+    shirtColor: {r: 1, g: 0.43137255, b: 0.6666667, a: 1}
     overallsColor: {r: 1, g: 0.6967669, b: 0.43137252, a: 1}
-    Name: Citrus Pink
-  ColorText: Citrus Pink
+    hatUsesOverallsColor: 0
+  translationKey: skin.pink

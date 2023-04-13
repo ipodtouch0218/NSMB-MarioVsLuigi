@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 0.4062106, g: 0.09251513, b: 0.7264151, a: 1}
+    shirtColor: {r: 0.4062106, g: 0.09251513, b: 0.7264151, a: 1}
     overallsColor: {r: 0.18039216, g: 0.15686275, b: 0.2, a: 1}
-    Name: Waluigi's Outfit
-  ColorText: Waluigi's Outfit
+    hatUsesOverallsColor: 0
+  translationKey: skin.waluigi

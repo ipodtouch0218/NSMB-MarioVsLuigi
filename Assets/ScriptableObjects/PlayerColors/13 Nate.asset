@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 0.54901963, g: 0.09411765, b: 0.6117647, a: 1}
+    shirtColor: {r: 0.54901963, g: 0.09411765, b: 0.6117647, a: 1}
     overallsColor: {r: 0.7294118, g: 0.7294118, b: 0.7294118, a: 1}
-    Name: Nate
-  ColorText: Nate
+    hatUsesOverallsColor: 0
+  translationKey: skin.nate

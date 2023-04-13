@@ -941,15 +941,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     public void SpawnItem(NetworkPrefabRef prefab) {
-
         if (prefab == NetworkPrefabRef.Empty)
             prefab = Utils.GetRandomItem(this).prefab;
 
         Runner.Spawn(prefab, new(body.position.x, cameraController.currentPosition.y + 1.68f, 0), onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<MovingPowerup>().OnBeforeSpawned(this, 0f);
         });
-
-        PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
     }
 
     private void SpawnStars(int amount, bool deathplane) {

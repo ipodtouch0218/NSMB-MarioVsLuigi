@@ -29,7 +29,7 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
     public void OnSelect(BaseEventData eventData) {
         overlay.enabled = true;
         overlay.sprite = overlayUnpressed;
-        colorNameString.text = palette ? palette.currentColorName : "Default Colors";
+        colorNameString.text = palette ? palette.Name : GlobalController.Instance.translationManager.GetTranslation("skin.default");
     }
 
     public void OnDeselect(BaseEventData eventData) {
@@ -39,6 +39,6 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
     public void OnPress() {
         overlay.sprite = overlayPressed;
-        colorNameString.text = palette ? palette.currentColorName : "Default Colors";
+        colorNameString.text = palette ? palette.Name : GlobalController.Instance.translationManager.GetTranslation("skin.default");
     }
 }

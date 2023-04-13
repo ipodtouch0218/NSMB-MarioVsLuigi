@@ -1,9 +1,14 @@
 namespace NSMB.UI.Pause.Options {
+
     public class NonselectableOption : PauseOption {
+        public override void Selected() {
+            if (label && !string.IsNullOrEmpty(translationKey))
+                label.text = GlobalController.Instance.translationManager.GetTranslation(translationKey);
+        }
 
-        public override void Selected() { }
-
-        public override void Deselected() { }
-
+        public override void Deselected() {
+            if (label && !string.IsNullOrEmpty(translationKey))
+                label.text = GlobalController.Instance.translationManager.GetTranslation(translationKey);
+        }
     }
 }

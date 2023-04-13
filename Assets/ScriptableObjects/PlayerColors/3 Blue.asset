@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    hatColor: {r: 0, g: 0.09433965, b: 0.4716981, a: 1}
+    shirtColor: {r: 0, g: 0.09433965, b: 0.4716981, a: 1}
     overallsColor: {r: 0.13725491, g: 0.36862746, b: 1, a: 1}
-    Name: Basic Blue
-  ColorText: Basic Blue
+    hatUsesOverallsColor: 0
+  translationKey: skin.blue
