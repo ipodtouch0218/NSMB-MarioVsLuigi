@@ -176,7 +176,7 @@ public class KoopaWalk : HoldableEntity {
 
     public void BlueBecomeItem() {
         Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.1f);
+            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(0.1f);
         });
         DespawnEntity();
     }

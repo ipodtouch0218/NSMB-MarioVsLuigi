@@ -56,10 +56,6 @@ public class BlockBump : NetworkBehaviour {
             coin.GetComponentInChildren<Animator>().SetBool("down", IsDownwards);
         }
 
-        BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
-        hitbox.size = spriteRenderer.sprite.bounds.size;
-        hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(0.5f, -0.5f);
-
         //graphics bs
         Tilemap tilemap = GameManager.Instance.tilemap;
         TileManager tm = GameManager.Instance.tileManager;
@@ -67,6 +63,11 @@ public class BlockBump : NetworkBehaviour {
         tilemap.SetTile((Vector3Int) TileLocation, tm.GetTileInstanceFromTileId(BumpTile));
         spriteRenderer.sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) TileLocation);
         tm.SetTile(TileLocation, null);
+
+        BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
+        hitbox.size = spriteRenderer.sprite.bounds.size;
+        hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(0.5f, -0.5f);
+
     }
 
     public override void FixedUpdateNetwork() {
@@ -84,11 +85,28 @@ public class BlockBump : NetworkBehaviour {
             return;
         }
 
-        Vector3 pos = transform.position + (Vector3.down * 0.25f);
-        Runner.Spawn(SpawnPrefab, pos + (Vector3) SpawnOffset, onBeforeSpawned: (runner, obj) => {
-            if (!IsDownwards) {
-                obj.GetComponent<MovingPowerup>().OnBeforeSpawned(null, 0.3f, (Vector2) (transform.position) + (Vector2.down * 0.25f), IsDownwards);
-            }
+        bool mega = SpawnPrefab == PrefabList.Instance.Powerup_MegaMushroom;
+        Vector2 pos = (Vector2) transform.position + SpawnOffset;
+        Vector2 animOrigin = pos;
+        Vector2 animDestination;
+        float pickupDelay = 0.75f;
+
+        if (mega) {
+            animOrigin += (Vector2.up * 0.5f);
+            animDestination = animOrigin;
+            pickupDelay = 1.5f;
+
+        } else if (IsDownwards) {
+            float blockSize = spriteRenderer.sprite.bounds.size.y * 0.5f;
+            animOrigin += (0.5f - blockSize) * Vector2.up;
+            animDestination = animOrigin + (Vector2.down * 0.5f);
+
+        } else {
+            animDestination = animOrigin + (Vector2.up * 0.5f);
+        }
+
+        Runner.Spawn(SpawnPrefab, animOrigin, onBeforeSpawned: (runner, obj) => {
+            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(pickupDelay, animOrigin, animDestination);
         });
         Runner.Despawn(Object);
     }

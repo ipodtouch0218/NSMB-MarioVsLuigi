@@ -8,6 +8,9 @@ namespace NSMB.Tiles {
     [CreateAssetMenu(fileName = "PowerupTile", menuName = "ScriptableObjects/Tiles/PowerupTile")]
     public class PowerupTile : BreakableBrickTile, IHaveTileDependencies {
 
+        //---Static Variables
+        private static readonly Vector2 SpawnOffset = new(0, -0.25f);
+
         //---Serialized Variables
         [SerializeField] private TileBase resultTile;
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
@@ -40,11 +43,9 @@ namespace NSMB.Tiles {
             }
 
             Bump(interacter, direction, worldLocation);
-
-            if (GameManager.Instance.Object.HasStateAuthority) {
-                GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
-                    resultTile, direction == InteractionDirection.Down, Vector2.zero, false, spawnResult);
-            }
+            bool downwards = direction == InteractionDirection.Down;
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+                resultTile, downwards, SpawnOffset, false, spawnResult);
             return false;
         }
 

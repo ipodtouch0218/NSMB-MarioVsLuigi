@@ -1,12 +1,12 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 using TMPro;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace NSMB.UI.Pause.Options {
+
     public class PauseOptionControlsTab : PauseOptionTab {
 
         //---Static Variables

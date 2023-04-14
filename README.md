@@ -76,6 +76,26 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [RENREN](https://mistajub.bandcamp.com/)
 * River J
 
+### Translators:
+* Bilhal
+* Cecilia
+* Davo
+* Dede
+* Filipianosol
+* Flandre Scarlet
+* Flichka
+* Freeze
+* HatsuneMiku
+* Hyruyoshi
+* Joris
+* Mark 19
+* Mr-STF
+* miyavmeow
+* Shadow_Walker13
+* Snick, It's Him.
+* Tombuntu
+* vlco_o
+
 ### QA Testing:
 * Fawndue
 * Shadow_Walker13

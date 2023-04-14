@@ -28,7 +28,24 @@ RENREN
 River J
 
 <color=yellow>{ui.about.credits.translation}</color>
-
+Bilhal
+Cecilia
+Davo
+Dede
+Filipianosol
+Flandre Scarlet
+Flichka
+Freeze
+HatsuneMiku
+Hyruyoshi
+Joris
+Mark 19
+Mr-STF
+miyavmeow
+Shadow_Walker13
+Snick, It's Him.
+Tombuntu
+vlco_o
 
 <color=yellow>{ui.about.credits.qa}</color>
 Fawndue

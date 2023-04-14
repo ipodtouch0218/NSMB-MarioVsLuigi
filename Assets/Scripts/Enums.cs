@@ -32,7 +32,7 @@ public static class Enums {
 
     //Sound effects
     public enum Sounds : byte {
-        //CURRENT HIGHEST NUMBER: 98
+        //CURRENT HIGHEST NUMBER: 99
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
         [SoundData("enemy/freeze_shatter")]                     Enemy_Generic_FreezeShatter = 1,
@@ -134,6 +134,7 @@ public static class Enums {
         [SoundData("world/block_break")]                        World_Block_Break = 67,
         [SoundData("world/block_bump")]                         World_Block_Bump = 68,
         [SoundData("world/block_powerup")]                      World_Block_Powerup = 69,
+        [SoundData("world/block_powerup_mega")]                 World_Block_Powerup_Mega = 99,
         [SoundData("world/coin_collect")]                       World_Coin_Collect = 70,
         [SoundData("world/coin_drop")]                          World_Coin_Drop = 91,
         [SoundData("world/ice_skidding")]                       World_Ice_Skidding = 71,

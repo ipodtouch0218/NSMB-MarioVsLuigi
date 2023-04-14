@@ -7,6 +7,9 @@ namespace NSMB.Tiles {
     [CreateAssetMenu(fileName = "BreakableBrickTile", menuName = "ScriptableObjects/Tiles/BreakableBrickTile")]
     public class BreakableBrickTile : InteractableTile {
 
+        //---Static Variables
+        private static readonly Vector2 SpawnOffset = new(0, 0.25f);
+
         //---Serialized Variables
         [SerializeField] protected Color particleColor;
         [SerializeField] public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
@@ -61,8 +64,9 @@ namespace NSMB.Tiles {
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
             //Bump
+            bool downwards = direction == InteractionDirection.Down;
             GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
-                this, direction == InteractionDirection.Down, Vector2.zero, false, NetworkPrefabRef.Empty);
+                this, downwards, downwards ? -SpawnOffset : SpawnOffset, false, NetworkPrefabRef.Empty);
         }
 
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {

@@ -32,5 +32,4 @@ MonoBehaviour:
   bumpIfNotBroken: 0
   bumpIfBroken: 0
   resultTile: {fileID: 11400000, guid: 390112f82b204834aba57d186cc4caa9, type: 2}
-  topSpawnOffset: {x: 0.25, y: 0}
-  bottomSpawnOffset: {x: 0.25, y: -0.5}
+  topSpawnOffset: {x: 0.25, y: -0.25}

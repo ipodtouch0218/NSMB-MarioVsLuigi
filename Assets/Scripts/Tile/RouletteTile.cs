@@ -10,14 +10,13 @@ namespace NSMB.Tiles {
 
         //---Serialized Variables
         [SerializeField] private TileBase resultTile;
-        [SerializeField] private Vector2 topSpawnOffset, bottomSpawnOffset;
+        [SerializeField] private Vector2 topSpawnOffset;
 
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             if (base.Interact(interacter, direction, worldLocation))
                 return true;
 
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
-
             NetworkPrefabRef spawnResult = PrefabList.Instance.Powerup_Mushroom;
 
             if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.PreviousHolder != null)) {
@@ -44,15 +43,9 @@ namespace NSMB.Tiles {
 
             Bump(interacter, direction, worldLocation);
 
-            if (GameManager.Instance.Object.HasStateAuthority) {
-                bool downwards = direction == InteractionDirection.Down;
-                Vector2 offset = downwards ? bottomSpawnOffset + (spawnResult == PrefabList.Instance.Powerup_MegaMushroom ? Vector2.down * 0.5f : Vector2.zero) : topSpawnOffset;
-
-                GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
-                    resultTile, downwards, offset, false, spawnResult);
-            }
-
-            interacter.PlaySound(Enums.Sounds.World_Block_Powerup);
+            bool downwards = direction == InteractionDirection.Down;
+            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+                resultTile, downwards, topSpawnOffset, false, spawnResult);
 
             return false;
         }

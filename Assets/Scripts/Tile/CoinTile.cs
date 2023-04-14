@@ -8,6 +8,9 @@ namespace NSMB.Tiles {
     [CreateAssetMenu(fileName = "CoinTile", menuName = "ScriptableObjects/Tiles/CoinTile", order = 1)]
     public class CoinTile : BreakableBrickTile, IHaveTileDependencies {
 
+        //---Static Variables
+        private static readonly Vector2 SpawnOffset = new(0, -0.25f);
+
         //---Serialized Variables
         [SerializeField] private TileBase resultTile;
 
@@ -47,8 +50,9 @@ namespace NSMB.Tiles {
 
             Bump(interacter, direction, worldLocation);
 
+            bool downwards = direction == InteractionDirection.Down;
             GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
-                resultTile, direction == InteractionDirection.Down, Vector2.zero, true, NetworkPrefabRef.Empty);
+                resultTile, downwards, SpawnOffset, true, NetworkPrefabRef.Empty);
 
             return false;
         }

@@ -4,20 +4,24 @@ using UnityEngine;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
-using NSMB.Extensions;
 
 public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
+    //---Static Variables
     private static LayerMask GroundMask;
+    private static readonly int OriginalSortingOrder = 10;
 
     //---Networked Variables
-    [Networked] protected PlayerController FollowPlayer { get; set; }
-    [Networked] private TickTimer FollowEndTimer { get; set; }
-    [Networked] private TickTimer IgnorePlayerTimer { get; set; }
-    [Networked] private float GrowFromBlockStartTime { get; set; }
-    [Networked] private float GrowFromBlockEndTime { get; set; }
-    [Networked] private Vector2 GrowFromBlockOrigin { get; set; }
     [Networked(OnChanged = nameof(OnReserveResultChanged))] private PowerupReserveResult ReserveResult { get; set; }
+    [Networked] protected PlayerController FollowPlayer { get; set; }
+    [Networked] private TickTimer IgnorePlayerTimer { get; set; }
+
+    [Networked] private Vector2 BlockSpawnOrigin { get; set; }
+    [Networked] private Vector2 BlockSpawnDestination { get; set; }
+    [Networked] private NetworkBool BlockSpawn { get; set; }
+    [Networked] private float BlockSpawnAnimationLength { get; set; }
+
+    [Networked] private TickTimer SpawnAnimationTimer { get; set; }
 
     //---Public Variables
     public Powerup powerupScriptable;
@@ -30,11 +34,9 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] protected PhysicsEntity physics;
     [SerializeField] private Animator childAnimator;
+    [SerializeField] private Animation childAnimation;
     [SerializeField] private BoxCollider2D hitbox;
     private IPowerupCollect collectScript;
-
-    //---Misc Variables
-    private int originalLayer;
 
     public override void OnValidate() {
         base.OnValidate();
@@ -45,46 +47,69 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public void Awake() {
-        originalLayer = sRenderer.sortingOrder;
         collectScript = GetComponent<IPowerupCollect>();
 
         if (GroundMask == 0)
             GroundMask = (1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough);
     }
 
-    public void OnBeforeSpawned(PlayerController playerToFollow, float pickupDelay, Vector2? blockOrigin = null, bool upwards = false) {
+    public void OnBeforeSpawned(float pickupDelay) {
+        SpawnAnimationTimer = TickTimer.CreateFromSeconds(Runner, pickupDelay);
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 10f + pickupDelay);
+    }
+
+    public void OnBeforeSpawned(PlayerController playerToFollow) {
+        OnBeforeSpawned(1);
+
         FollowPlayer = playerToFollow;
-        FollowEndTimer = TickTimer.CreateFromSeconds(Runner, pickupDelay);
-        if (blockOrigin.HasValue) {
-            GrowFromBlockOrigin = blockOrigin.Value;
-            GrowFromBlockStartTime = Runner.SimulationTime;
-            GrowFromBlockEndTime = Runner.SimulationTime + 0.75f;
-            sRenderer.sortingOrder = -1000;
+        transform.position = body.position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.currentPosition.y + 1.68f);
+    }
+
+    public void OnBeforeSpawned(float pickupDelay, Vector2 spawnOrigin, Vector2 spawnDestination) {
+        OnBeforeSpawned(pickupDelay);
+
+        BlockSpawn = true;
+        BlockSpawnOrigin = spawnOrigin;
+        BlockSpawnDestination = spawnDestination;
+        BlockSpawnAnimationLength = pickupDelay;
+        body.position = spawnOrigin;
+
+        if (BlockSpawnDestination.y < BlockSpawnOrigin.y) {
+            // Downwards powerup, adjust based on the powerup's height.
+            BlockSpawnDestination = new(BlockSpawnOrigin.x, BlockSpawnOrigin.y - sRenderer.bounds.size.y);
         }
-        if (playerToFollow)
-            transform.position = body.position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.currentPosition.y + 1.68f);
     }
 
     public override void Spawned() {
         base.Spawned();
 
         if (FollowPlayer) {
-            //spawned following a player
-            FollowEndTimer = TickTimer.CreateFromSeconds(Runner, 1f);
-
+            // Spawned following a player.
             body.isKinematic = true;
             gameObject.layer = Layers.LayerHitsNothing;
             sRenderer.sortingOrder = 15;
 
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
+
+        } else if (BlockSpawn) {
+            // Spawned from a block.
+            body.isKinematic = true;
+            gameObject.layer = Layers.LayerHitsNothing;
+            sRenderer.sortingOrder = -1000;
+
+            PlaySound(powerupScriptable.powerupBlockEffect);
+
+            if (childAnimation)
+                childAnimation.Play();
+
         } else {
-            //spawned as a normal item.
+            // Spawned by any other means (blue koopa, usually.)
+            body.isKinematic = false;
             gameObject.layer = Layers.LayerEntity;
-            PlaySound(Enums.Sounds.World_Block_Powerup);
+            sRenderer.sortingOrder = OriginalSortingOrder;
         }
 
         FacingRight = true;
-        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 10f);
     }
 
     public override void Render() {
@@ -103,56 +128,58 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         if (!Object || Collector)
             return;
 
-        bool growing = Runner.SimulationTime < GrowFromBlockEndTime;
-
-        if (growing) {
-            float t = (Runner.SimulationTime - GrowFromBlockStartTime) / (GrowFromBlockEndTime - GrowFromBlockStartTime);
-            body.position = Vector2.Lerp(GrowFromBlockOrigin, GrowFromBlockOrigin + (Vector2.up * 0.5f), t);
-            sRenderer.sortingOrder = -1000;
-            gameObject.layer = Layers.LayerHitsNothing;
-            body.isKinematic = true;
-
-            if (Runner.SimulationTime + Runner.DeltaTime >= GrowFromBlockEndTime) {
-                body.isKinematic = false;
-                gameObject.layer = Layers.LayerEntity;
-                sRenderer.sortingOrder = originalLayer;
-            }
-
-        } else if (FollowPlayer) {
+        if (FollowPlayer) {
+            // Attached to a player. Don't interact, and follow the player.
             body.position = new(FollowPlayer.body.position.x, FollowPlayer.cameraController.currentPosition.y + 1.68f);
 
-            if (FollowEndTimer.ExpiredOrNotRunning(Runner)) {
+            if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
+                SpawnAnimationTimer = TickTimer.None;
                 FollowPlayer = null;
-                sRenderer.sortingOrder = originalLayer;
                 body.isKinematic = false;
+                sRenderer.sortingOrder = OriginalSortingOrder;
             } else {
-                float timeRemaining = FollowEndTimer.RemainingTime(Runner) ?? 0f;
+                float timeRemaining = SpawnAnimationTimer.RemainingTime(Runner) ?? 0f;
                 sRenderer.enabled = !(timeRemaining * blinkingRate % 1 < 0.5f);
                 return;
             }
+        } else if (BlockSpawn) {
+            // Spawning from a block. Lerp between origin & destination.
+            float remaining = SpawnAnimationTimer.RemainingTime(Runner) ?? 0f;
+            float t = 1f - (remaining / BlockSpawnAnimationLength);
+            body.position = Vector2.Lerp(BlockSpawnOrigin, BlockSpawnDestination, t);
+
+            if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
+                SpawnAnimationTimer = TickTimer.None;
+                BlockSpawn = false;
+                sRenderer.sortingOrder = OriginalSortingOrder;
+                body.isKinematic = false;
+            } else {
+                sRenderer.enabled = true;
+                return;
+            }
+
+            return;
         }
 
         float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
         sRenderer.enabled = !(despawnTimeRemaining <= 1 && despawnTimeRemaining * blinkingRate % 1 < 0.5f);
 
-        if (!growing) {
-            Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
-            Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
+        Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
+        Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
-            if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
-                gameObject.layer = Layers.LayerHitsNothing;
-                return;
-            } else {
-                gameObject.layer = Layers.LayerEntity;
-                HandleCollision();
-            }
+        if (Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
+            gameObject.layer = Layers.LayerHitsNothing;
+            return;
+        } else {
+            gameObject.layer = Layers.LayerEntity;
+            HandleCollision();
+        }
 
-            if (avoidPlayers && physics.OnGround) {
-                PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
-                if (closest) {
-                    float dist = closest.body.position.x - body.position.x;
-                    FacingRight = dist < 0 || dist > GameManager.Instance.LevelWidth;
-                }
+        if (avoidPlayers && physics.OnGround) {
+            PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
+            if (closest) {
+                float dist = closest.body.position.x - body.position.x;
+                FacingRight = dist < 0 || dist > GameManager.Instance.LevelWidth;
             }
         }
 
@@ -202,7 +229,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             return;
 
         //don't be collectable if we're following a player
-        if (!FollowEndTimer.ExpiredOrNotRunning(Runner))
+        if (!SpawnAnimationTimer.ExpiredOrNotRunning(Runner))
             return;
 
         //don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,

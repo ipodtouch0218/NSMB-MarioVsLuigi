@@ -1,18 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering.Universal;
 
 using Fusion;
 using NSMB.Utils;
-using System;
 
 public class DebugControls : MonoBehaviour {
 
-    public bool editMode;
-    public ScriptableRendererFeature feature;
-
 #if UNITY_EDITOR
-
     public void Start() {
         if (!Debug.isDebugBuild && !Application.isEditor) {
             enabled = false;
@@ -22,14 +16,6 @@ public class DebugControls : MonoBehaviour {
 
     public void Update() {
         Keyboard kb = Keyboard.current;
-        //if (kb[Key.LeftBracket].wasPressedThisFrame) {
-        //    Time.timeScale /= 2;
-        //    Debug.Log($"[DEBUG] Timescale set to {Time.timeScale}x");
-        //}
-        //if (kb[Key.RightBracket].wasPressedThisFrame) {
-        //    Time.timeScale *= 2;
-        //    Debug.Log($"[DEBUG] Timescale set to {Time.timeScale}x");
-        //}
         DebugItem(Key.Numpad0, NetworkPrefabRef.Empty);
         DebugItem(Key.Numpad1, PrefabList.Instance.Powerup_Mushroom);
         DebugItem(Key.Numpad2, PrefabList.Instance.Powerup_FireFlower);
@@ -79,6 +65,7 @@ public class DebugControls : MonoBehaviour {
             });
         }
     }
+
     private void DebugItem(Key key, NetworkPrefabRef item) {
         if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame)
             return;
@@ -88,7 +75,7 @@ public class DebugControls : MonoBehaviour {
             item = Utils.GetRandomItem(GameManager.Instance.localPlayer).prefab;
 
         NetworkHandler.Instance.runner.Spawn(item, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(GameManager.Instance.localPlayer, 0f);
+            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(GameManager.Instance.localPlayer);
         });
     }
 

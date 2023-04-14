@@ -16,6 +16,7 @@ MonoBehaviour:
   prefab:
     RawGuidValue: b7cdc1e59b36b7044ac57ab9187fc91f
   soundEffect: 78
+  powerupBlockEffect: 69
   spawnChance: 0
   losingSpawnBonus: 0
   big: 0

@@ -301,7 +301,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             sfx.PlayOneShot(Enums.Sounds.UI_Error);
 
         errorBox.SetActive(true);
-        errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
+        errorText.text = GlobalController.Instance.translationManager.GetTranslation(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
         EventSystem.current.SetSelectedGameObject(errorButton);
     }
 

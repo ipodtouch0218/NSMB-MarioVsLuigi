@@ -485,6 +485,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         crushGround = false;
         OnSpinner = null;
         foreach (BoxCollider2D hitbox in hitboxes) {
+            Runner.GetPhysicsScene2D().Simulate(0f); // Without this, megas are broken.
             int collisionCount = hitbox.GetContacts(TileContactBuffer);
 
             for (int i = 0; i < collisionCount; i++) {
@@ -945,7 +946,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             prefab = Utils.GetRandomItem(this).prefab;
 
         Runner.Spawn(prefab, new(body.position.x, cameraController.currentPosition.y + 1.68f, 0), onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(this, 0f);
+            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(this);
         });
     }
 

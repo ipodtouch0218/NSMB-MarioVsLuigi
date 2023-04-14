@@ -9,6 +9,7 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, I
     //---Static Variables
     private static readonly Vector3 BlockOffset = new(0.25f, 0.25f);
     private static readonly Color GizmoColor = new(1, 1, 1, 0.5f);
+    private static readonly Vector2 SpawnOffset = new(0, -0.25f);
 
     //---Networked Variables
     [Networked] private TickTimer BumpTimer { get; set; }
@@ -54,7 +55,7 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, I
         Coin.GivePlayerCoin(player, location);
 
         GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
-            resultTile, false, Vector2.zero, true, NetworkPrefabRef.Empty);
+            resultTile, false, SpawnOffset, true, NetworkPrefabRef.Empty);
     }
 
 #if UNITY_EDITOR

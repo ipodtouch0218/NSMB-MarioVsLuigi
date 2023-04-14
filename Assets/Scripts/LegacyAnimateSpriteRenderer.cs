@@ -5,25 +5,20 @@ using UnityEngine;
 public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
     //---Serialized Variables
-    [SerializeField] private float frame; //must be a float because animators dont support ints, apparently?
+    [SerializeField] private float frame; // Must be a float because legacy animators dont support ints, apparently?
     [SerializeField] private float fps = 8;
     [SerializeField] private Sprite[] frames;
 
     //---Private Variables
     private SpriteRenderer sRenderer;
 
-    public void OnValidate() {
-        frame = 0f;
-    }
-
     public void Awake() {
         sRenderer = GetComponent<SpriteRenderer>();
-        frame = 0f;
     }
 
     [ExecuteAlways]
     public void Update() {
-        if (frames == null || frames.Length == 0 || !sRenderer)
+        if (frames == null || frames.Length == 0 || !sRenderer || !enabled)
             return;
 
         frame += fps * Time.deltaTime;
