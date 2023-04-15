@@ -200,8 +200,8 @@
   "skin.deluxe": "SMB Deluxe",
   "skin.black": "Dark Theme",
   "discord.mainmenu": "Browsing the Main Menu...",
-  "discord.public": "In a public game",
-  "discord.private": "In a private game",
+  "discord.public": "In a Public Game",
+  "discord.private": "In a Private Game",
   "discord.online": "Playing Online",
   "discord.offline": "Playing Offline"
 }

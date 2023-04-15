@@ -59,7 +59,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     //---Private Variables
     private Coroutine playerPingUpdateCoroutine, quitCoroutine, fadeMusicCoroutine;
-    private bool validName, initialConnection;
+    private bool validName;
 
     public void Awake() => Set(this, false);
     public void OnDestroy() => Release();
@@ -708,7 +708,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        chat.AddChatMessage(player.GetPlayerData(runner).GetNickname() + " left the room", Color.red);
+        chat.AddSystemMessage("ui.inroom.chat.player.quit", "playername", player.GetPlayerData(runner).GetNickname());
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
         UpdateStartGameButton();
     }
@@ -717,6 +717,10 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
         if (cause != ShutdownReason.Ok)
             OpenNetworkErrorBox(cause);
+
+        if (inLobbyMenu.activeSelf) {
+            OpenRoomListMenu();
+        }
 
         GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
     }

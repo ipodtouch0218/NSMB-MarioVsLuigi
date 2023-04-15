@@ -53,23 +53,24 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Super Mario Maker 2
 
 ### Contributors:
-* [@Amy54Desu](https://github.com/Amy54Desu)
-* [@AtwerJ](https://github.com/AtwerJ)
-* [@AutumnLeafy](https://github.com/AutumnLeafy)
-* [@CubbyCrazes](https://github.com/CubbyCrazes)
-* [@GithubSPerez](https://github.com/GithubSPerez)
-* @GradedWarrior
-* [@Jeffjewett27](https://github.com/Jeffjewett27)
-* [@kittenchilly](https://github.com/kittenchilly)
-* [@Kraken](https://github.com/KrakHub)
-* [@mindnomad](https://github.com/mindnomad)
-* [@Pordrack](https://github.com/Pordrack)
-* [@skarph](https://github.com/skarph)
-* [@Skillz](https://github.com/Skillz808)
-* [@ShadowWalker13](https://github.com/ShadowWalker13)
-* [@TheMoogle](https://github.com/TheMoogle)
-* [@VLC](https://github.com/vlcoo)
-* [@Zest](https://github.com/zestydevy)
+* [Amy54Desu](https://github.com/Amy54Desu)
+* [AtwerJ](https://github.com/AtwerJ)
+* [AutumnLeafy](https://github.com/AutumnLeafy)
+* [CubbyCrazes](https://github.com/CubbyCrazes)
+* [GithubSPerez](https://github.com/GithubSPerez)
+* GradedWarrior
+* [Jeffjewett27](https://github.com/Jeffjewett27)
+* [kittenchilly](https://github.com/kittenchilly)
+* [Kraken](https://github.com/KrakHub)
+* [mindnomad](https://github.com/mindnomad)
+* [Pordrack](https://github.com/Pordrack)
+* [skarph](https://github.com/skarph)
+* [Skillz](https://github.com/Skillz808)
+* [ShadowWalker13](https://github.com/ShadowWalker13)
+* [TheMoogle](https://github.com/TheMoogle)
+* [Tombuntu](https://github.com/ReXiSp)
+* [VLC](https://github.com/vlcoo)
+* [Zest](https://github.com/zestydevy)
 
 ### Music:
 * CubbyCrazes
@@ -77,6 +78,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * River J
 
 ### Translators:
+* Akselai
 * Bilhal
 * Cecilia
 * Davo

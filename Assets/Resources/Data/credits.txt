@@ -19,6 +19,7 @@ skarph
 Skillz
 ShadowWalker
 TheMoogle
+Tombuntu
 VLC
 Zest
 
@@ -28,6 +29,7 @@ RENREN
 River J
 
 <color=yellow>{ui.about.credits.translation}</color>
+Akselai
 Bilhal
 Cecilia
 Davo

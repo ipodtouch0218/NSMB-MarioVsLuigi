@@ -240,7 +240,7 @@ public class WaterSplash : NetworkBehaviour {
             if (liquidType == LiquidType.Water) {
 
                 if (player2.IsSwimming && !underwater && player2.body.velocity.y > 0) {
-                    // jumped out of the water
+                    // Jumped out of the water
                     player2.IsSwimming = false;
                     player2.SwimJump = true;
                     player2.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
