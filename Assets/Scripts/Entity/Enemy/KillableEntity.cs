@@ -68,7 +68,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             gameObject.layer = Layers.LayerHitsNothing;
             body.angularVelocity = 0;
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
-            body.velocity = v2Zero;
+            body.velocity = Vector2.zero;
             body.isKinematic = true;
             return;
 
@@ -207,7 +207,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     public virtual void InteractWithPlayer(PlayerController player) {
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, v2Up) > 0.5f && !player.IsOnGround;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.IsOnGround;
 
         bool groundpounded = attackedFromAbove && player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom;
         if (player.InstakillsEnemies || groundpounded) {
@@ -278,7 +278,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             hitboxes.enabled = false;
         }
         if (body) {
-            body.velocity = v2Zero;
+            body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             body.isKinematic = true;
         }

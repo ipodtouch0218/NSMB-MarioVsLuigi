@@ -53,7 +53,7 @@ public class BobombWalk : HoldableEntity {
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
-            body.velocity = v2Zero;
+            body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             animator.enabled = false;
             body.isKinematic = true;
@@ -111,7 +111,7 @@ public class BobombWalk : HoldableEntity {
             return;
 
         DetonationTimer = TickTimer.CreateFromSeconds(Runner, detonationTime);
-        body.velocity = v2Zero;
+        body.velocity = Vector2.zero;
     }
 
     public void Detonate() {
@@ -185,7 +185,7 @@ public class BobombWalk : HoldableEntity {
         }
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, v2Up) > 0f;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
 
         // Normal interactions
         if (Lit) {

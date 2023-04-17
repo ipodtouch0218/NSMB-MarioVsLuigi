@@ -173,7 +173,7 @@ public class UIUpdater : NetworkBehaviour {
         else
             return null;
 
-        icon.target = comp.gameObject.transform;
+        icon.target = comp.gameObject;
         icon.gameObject.SetActive(true);
         return icon;
     }
