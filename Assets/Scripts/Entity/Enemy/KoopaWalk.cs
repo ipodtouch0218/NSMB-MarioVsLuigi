@@ -62,7 +62,7 @@ public class KoopaWalk : HoldableEntity {
             return;
 
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
-            body.velocity = Vector2.zero;
+            body.velocity = v2Zero;
             body.angularVelocity = 0;
             animator.enabled = false;
             body.isKinematic = true;
@@ -159,7 +159,7 @@ public class KoopaWalk : HoldableEntity {
             BlueBecomeItem();
             return;
         }
-        body.velocity = Vector2.zero;
+        body.velocity = v2Zero;
         WakeupTimer = TickTimer.CreateFromSeconds(Runner, wakeup);
         ComboCounter = 1;
         IsInShell = true;

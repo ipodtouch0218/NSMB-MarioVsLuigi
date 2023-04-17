@@ -20,12 +20,12 @@ public class GoombaWalk : KillableEntity {
             return;
 
         if (!IsActive) {
-            body.velocity = Vector2.zero;
+            body.velocity = v2Zero;
             return;
         }
 
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
-            body.velocity = Vector2.zero;
+            body.velocity = v2Zero;
             body.angularVelocity = 0;
             legacyAnimation.enabled = false;
             body.isKinematic = true;
@@ -53,7 +53,7 @@ public class GoombaWalk : KillableEntity {
     public override void Kill() {
         IsDead = true;
 
-        body.velocity = Vector2.zero;
+        body.velocity = v2Zero;
         body.isKinematic = true;
 
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);

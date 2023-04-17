@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class TrackIcon : MonoBehaviour {
 
     //---Public Variables
-    public GameObject target;
+    public Transform target;
 
     //---Serialized Variables
     [SerializeField] private float trackMinX, trackMaxX;
@@ -33,7 +33,7 @@ public class TrackIcon : MonoBehaviour {
     //Made this a method so it can be called in functions other than Update
     public void CalculatePosition()
     {
-        float percentage = (target.transform.position.x - levelMinX) * levelWidthReciprocal;
+        float percentage = (target.localPosition.x - levelMinX) * levelWidthReciprocal;
         transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
     }
 }

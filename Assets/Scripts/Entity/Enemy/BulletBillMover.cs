@@ -27,7 +27,7 @@ public class BulletBillMover : KillableEntity {
     public override void FixedUpdateNetwork() {
 
         if (GameManager.Instance && GameManager.Instance.GameEnded) {
-            body.velocity = Vector2.zero;
+            body.velocity = v2Zero;
             body.angularVelocity = 0;
             legacyAnimation.enabled = false;
             body.isKinematic = true;
@@ -75,7 +75,7 @@ public class BulletBillMover : KillableEntity {
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, v2Up) > 0f;
 
         if (player.InstakillsEnemies || ((player.IsGroundpounding || player.IsDrilling) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)) {
 
@@ -113,7 +113,7 @@ public class BulletBillMover : KillableEntity {
     //---KillableEntity overrides
     public override void Kill() {
         IsDead = true;
-        body.velocity = Vector2.zero;
+        body.velocity = v2Zero;
         body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 400f * (FacingRight ? -1 : 1);
         body.gravityScale = 1.5f;
@@ -124,7 +124,7 @@ public class BulletBillMover : KillableEntity {
         IsDead = true;
         WasSpecialKilled = true;
         WasGroundpounded = groundpound;
-        body.velocity = Vector2.zero;
+        body.velocity = v2Zero;
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
     }
 

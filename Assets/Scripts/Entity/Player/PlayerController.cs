@@ -392,7 +392,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (GameManager.Instance.GameEnded) {
             //game ended, freeze.
-            body.velocity = Vector2.zero;
+            body.velocity = v2Zero;
             animator.enabled = false;
             body.isKinematic = true;
             return;
@@ -491,14 +491,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 GameObject go = contact.collider.gameObject;
                 Vector2 n = contact.normal;
                 Vector2 p = contact.point + (contact.normal * -0.15f);
-                if (n == Vector2.up && contact.point.y - 0.02f > body.position.y)
+                if (n == v2Up && contact.point.y - 0.02f > body.position.y)
                     continue;
 
                 Vector2Int vec = Utils.WorldToTilemapPosition(p);
                 if (!contact.collider || contact.collider.CompareTag("Player"))
                     continue;
 
-                if (Vector2.Dot(n, Vector2.up) > .05f) {
+                if (Vector2.Dot(n, v2Up) > .05f) {
                     if (Vector2.Dot(body.velocity.normalized, n) > 0.1f && !IsOnGround) {
                         if (!contact.rigidbody || contact.rigidbody.velocity.y < body.velocity.y)
                             //invalid flooring
@@ -624,7 +624,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
         }
 
-        float dot = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up);
+        float dot = Vector2.Dot((body.position - other.body.position).normalized, v2Up);
         bool above = dot > 0.7f;
         bool otherAbove = dot < -0.7f;
 
@@ -776,7 +776,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         if (IsOnGround) {
             IsOnGround = false;
-            body.position += Vector2.up * 0.05f;
+            body.position += v2Up * 0.05f;
         }
         UsedPropellerThisJump = true;
     }
@@ -977,7 +977,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     starDirection = 1;
             }
 
-            Runner.Spawn(PrefabList.Instance.Obj_BigStar, body.position + Vector2.up * WorldHitboxSize.y, onBeforeSpawned: (runner, obj) => {
+            Runner.Spawn(PrefabList.Instance.Obj_BigStar, body.position + v2Up * WorldHitboxSize.y, onBeforeSpawned: (runner, obj) => {
                 StarBouncer bouncer = obj.GetComponent<StarBouncer>();
                 bouncer.OnBeforeSpawned((byte) starDirection, false, deathplane);
             });
@@ -1082,7 +1082,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         GiantStartTimer = TickTimer.None;
         IsGroundpounding = false;
         body.isKinematic = true;
-        body.velocity = Vector2.zero;
+        body.velocity = v2Zero;
 
         Vector2 spawnpoint = GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
         transform.position = body.position = spawnpoint;
@@ -1096,7 +1096,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsRespawning = false;
         State = Enums.PowerupState.NoPowerup;
         PreviousState = Enums.PowerupState.NoPowerup;
-        body.velocity = Vector2.zero;
+        body.velocity = v2Zero;
         WallSlideLeft = false;
         WallSlideRight = false;
         WallSlideEndTimer = TickTimer.None;
@@ -1129,7 +1129,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         animator.SetTrigger("respawn");
         models.transform.rotation = Quaternion.Euler(0, 180, 0);
         body.isKinematic = false;
-        body.velocity = Vector2.zero;
+        body.velocity = v2Zero;
 
         if (Object.HasInputAuthority)
             ScoreboardUpdater.Instance.OnRespawnToggle();
@@ -1202,11 +1202,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         Vector2 checkSize = WorldHitboxSize * 1.1f;
 
         bool grounded = previousFrameVelocity.y < -8f && IsOnGround;
-        Vector2 offset = Vector2.zero;
+        Vector2 offset = v2Zero;
         if (grounded)
             offset = Vector2.down / 2f;
 
-        Vector2 checkPosition = body.position + (Vector2.up * checkSize * 0.5f) + (2 * Runner.DeltaTime * body.velocity) + offset;
+        Vector2 checkPosition = body.position + (v2Up * checkSize * 0.5f) + (2 * Runner.DeltaTime * body.velocity) + offset;
 
         Vector2Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
         Vector2Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
@@ -1388,7 +1388,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     GroundpoundHeld = false;
                     body.velocity = new Vector2(-Mathf.Sign(FloorAngle) * SPEED_SLIDE_MAX, 0);
                 } else {
-                    body.velocity = Vector2.zero;
+                    body.velocity = v2Zero;
                     if (!down || State == Enums.PowerupState.MegaMushroom) {
                         IsGroundpounding = false;
                         GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.2667f);
@@ -1429,10 +1429,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
         }
 
-        RaycastHit2D hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x - Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Runner.DeltaTime).magnitude, Layers.MaskAnyGround);
+        RaycastHit2D hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (v2Up * 0.05f), new Vector2((MainHitbox.size.x - Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Runner.DeltaTime).magnitude, Layers.MaskAnyGround);
         if (hit) {
             //hit ground
-            float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
+            float angle = Vector2.SignedAngle(v2Up, hit.normal);
             if (Mathf.Abs(angle) > 89)
                 return;
 
@@ -1445,9 +1445,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsOnGround = true;
             WasGroundedLastFrame = true;
         } else if (IsOnGround) {
-            hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, Layers.MaskAnyGround);
+            hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (v2Up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, Layers.MaskAnyGround);
             if (hit) {
-                float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
+                float angle = Vector2.SignedAngle(v2Up, hit.normal);
                 if (Mathf.Abs(angle) > 89)
                     return;
 
@@ -1464,7 +1464,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         if (Mathf.Abs(body.velocity.x) < 0.1f && body.velocity.y < 0 && body.velocity.y > -0.01f) {
-            body.velocity = Vector2.zero;
+            body.velocity = v2Zero;
         }
     }
 
@@ -1481,7 +1481,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         RaycastHit2D hit;
         if (IsWaterWalking) {
-            hit = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, 1 << Layers.LayerEntityHitbox);
+            hit = Runner.GetPhysicsScene2D().BoxCast(body.position + v2Up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, 1 << Layers.LayerEntityHitbox);
             if (hit && hit.collider.gameObject.CompareTag("water")) {
                 body.position = new(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
                 return true;
@@ -1490,7 +1490,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
 
-        hit = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
+        hit = Runner.GetPhysicsScene2D().BoxCast(body.position + v2Up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
         if (hit) {
             body.position = new(body.position.x, hit.point.y + Physics2D.defaultContactOffset);
             return true;
@@ -1524,7 +1524,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         //todo: change to nonalloc?
-        foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.position, Vector2.up, 1f)) {
+        foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.position, v2Up, 1f)) {
             GameObject obj = hit.transform.gameObject;
             if (!obj.CompareTag("pipe"))
                 continue;
@@ -1533,7 +1533,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 continue;
 
             //pipe found
-            EnterPipe(pipe, Vector2.up);
+            EnterPipe(pipe, v2Up);
             break;
         }
     }
@@ -1580,7 +1580,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         float width = MainHitbox.bounds.extents.x;
         float uncrouchHeight = GetHitboxSize(false).y * transform.lossyScale.y;
 
-        bool ret = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * 0.1f, new(width - 0.05f, 0.05f), 0, Vector2.up, uncrouchHeight - 0.1f, Layers.MaskSolidGround);
+        bool ret = Runner.GetPhysicsScene2D().BoxCast(body.position + v2Up * 0.1f, new(width - 0.05f, 0.05f), 0, v2Up, uncrouchHeight - 0.1f, Layers.MaskSolidGround);
         return ret;
     }
 
@@ -1712,7 +1712,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         bool topSpeed = Mathf.Abs(body.velocity.x) >= RunningMaxSpeed;
-        bool canSpecialJump = !down && (doJump || (DoEntityBounce && jumpHeld)) && ProperJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && ((Runner.SimulationTime - TimeGrounded < 0.2f) || DoEntityBounce) && !HeldEntity && JumpState != PlayerJumpState.TripleJump && !IsCrouching && !IsInShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskSolidGround);
+        bool canSpecialJump = !down && (doJump || (DoEntityBounce && jumpHeld)) && ProperJump && !IsSpinnerFlying && !IsPropellerFlying && topSpeed && ((Runner.SimulationTime - TimeGrounded < 0.2f) || DoEntityBounce) && !HeldEntity && JumpState != PlayerJumpState.TripleJump && !IsCrouching && !IsInShell && ((body.velocity.x < 0 && !FacingRight) || (body.velocity.x > 0 && FacingRight)) && !Runner.GetPhysicsScene2D().Raycast(body.position + new Vector2(0, 0.1f), v2Up, 1f, Layers.MaskSolidGround);
         float jumpBoost = 0;
 
         IsSkidding = false;
@@ -1761,7 +1761,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         Vector2 hitbox = GetHitboxSize(crouchHitbox);
 
         MainHitbox.size = hitbox;
-        MainHitbox.offset = Vector2.up * 0.5f * hitbox;
+        MainHitbox.offset = v2Up * 0.5f * hitbox;
         MainHitbox.isTrigger = IsDead;
     }
 
@@ -2003,7 +2003,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return false;
 
         Vector2 checkSize = WorldHitboxSize * StuckInBlockSizeCheck;
-        Vector2 checkPos = transform.position + (Vector3) (Vector2.up * checkSize * 0.5f);
+        Vector2 checkPos = transform.position + (Vector3) (v2Up * checkSize * 0.5f);
 
         if (!Utils.IsAnyTileSolidBetweenWorldBox(checkPos, checkSize * 0.9f, false)) {
             IsStuckInBlock = false;
@@ -2012,7 +2012,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         bool wasStuckLastFrame = IsStuckInBlock;
         IsStuckInBlock = true;
         body.gravityScale = 0;
-        body.velocity = Vector2.zero;
+        body.velocity = v2Zero;
         IsGroundpounding = false;
         IsPropellerFlying = false;
         IsDrilling = false;
@@ -2025,7 +2025,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
             //prevent mario from clipping to the floor if we got pushed in via our hitbox changing (shell on ice, for example)
             transform.position = body.position = previousFramePosition;
-            checkPos = transform.position + (Vector3) (Vector2.up * checkSize / 2f);
+            checkPos = transform.position + (Vector3) (v2Up * checkSize / 2f);
 
             float distanceInterval = 0.025f;
             float minimDistance = 0.95f; // if the minimum actual distance is anything above this value this code will have no effect
@@ -2079,7 +2079,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             PlaySoundEverywhere(Enums.Sounds.Player_Voice_MegaMushroom);
         } else {
             //hit a ceiling, cancel
-            giantSavedVelocity = Vector2.zero;
+            giantSavedVelocity = v2Zero;
             State = Enums.PowerupState.Mushroom;
             GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime - GiantStartTimer.RemainingTime(Runner) ?? 0f);
             animator.enabled = true;
@@ -2138,13 +2138,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         Vector2 nextPos = body.position + Runner.DeltaTime * 2f * body.velocity;
 
-        if (!Utils.IsAnyTileSolidBetweenWorldBox(nextPos + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize))
+        if (!Utils.IsAnyTileSolidBetweenWorldBox(nextPos + WorldHitboxSize.y * 0.5f * v2Up, WorldHitboxSize))
             //we are not going to be inside a block next fixed update
             return;
 
         //we ARE inside a block. figure out the height of the contact
         // 32 pixels per unit
-        RaycastHit2D contact = Runner.GetPhysicsScene2D().BoxCast(nextPos + 3f / 32f * Vector2.up, new(WorldHitboxSize.y, 1f / 32f), 0, Vector2.down, 3f / 32f, Layers.MaskAnyGround);
+        RaycastHit2D contact = Runner.GetPhysicsScene2D().BoxCast(nextPos + 3f / 32f * v2Up, new(WorldHitboxSize.y, 1f / 32f), 0, Vector2.down, 3f / 32f, Layers.MaskAnyGround);
 
         if (!contact || contact.normal.y < 0.1f) {
             //we didn't hit the ground, we must've hit a ceiling or something.
@@ -2159,7 +2159,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         Vector2 newPosition = new(body.position.x, point);
 
-        if (Utils.IsAnyTileSolidBetweenWorldBox(newPosition + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize)) {
+        if (Utils.IsAnyTileSolidBetweenWorldBox(newPosition + WorldHitboxSize.y * 0.5f * v2Up, WorldHitboxSize)) {
             //it's an invalid position anyway, we'd be inside something.
             return;
         }
@@ -2182,7 +2182,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (!FrozenCube) {
                 Unfreeze(UnfreezeReason.Other);
             } else {
-                body.velocity = Vector2.zero;
+                body.velocity = v2Zero;
                 return;
             }
         }
@@ -2192,7 +2192,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         }
 
         if (GiantStartTimer.IsRunning) {
-            body.velocity = Vector2.zero;
+            body.velocity = v2Zero;
             transform.position = body.position = previousFramePosition;
             if (GiantStartTimer.Expired(Runner)) {
                 FinishMegaMario(true);
@@ -2208,11 +2208,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 if (!IsGroundpounding)
                     normalizedVelocity.y = Mathf.Max(0, body.velocity.y);
 
-                Vector2 offset = Vector2.zero;
+                Vector2 offset = v2Zero;
                 if (JumpState == PlayerJumpState.SingleJump && IsOnGround)
                     offset = Vector2.down / 2f;
 
-                Vector2 checkPosition = body.position + Vector2.up * checkSize / 2f + offset;
+                Vector2 checkPosition = body.position + v2Up * checkSize / 2f + offset;
 
                 Vector2Int minPos = Utils.WorldToTilemapPosition(checkPosition - (checkSize / 2), wrap: false);
                 Vector2Int size = Utils.WorldToTilemapPosition(checkPosition + (checkSize / 2), wrap: false) - minPos;
@@ -2237,7 +2237,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
         }
         if (GiantEndTimer.IsRunning && stationaryGiantEnd) {
-            body.velocity = Vector2.zero;
+            body.velocity = v2Zero;
             body.isKinematic = true;
             transform.position = body.position = previousFramePosition;
 
@@ -2361,7 +2361,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 float targetVelocity = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0);
                 body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y + (24f * Runner.DeltaTime), targetVelocity));
                 if (IsOnGround)
-                    body.position += Vector2.up * 0.05f;
+                    body.position += v2Up * 0.05f;
             } else if (((jumpPressed && Settings.Instance.controlsPropellerJump) || powerupAction) && !IsDrilling && body.velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime * 0.25f) {
                 PropellerSpinTimer = TickTimer.CreateFromSeconds(Runner, propellerSpinTime);
                 PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
@@ -2474,7 +2474,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     || (Mathf.Abs(body.velocity.x) < 0.1f)) {
 
                     if (!OnIce)
-                        body.velocity = Vector2.zero;
+                        body.velocity = v2Zero;
 
                     animator.Play("jumplanding" + (edgeLanding ? "-edge" : ""));
                     if (edgeLanding)
@@ -2606,7 +2606,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (jumpPressed) {
                 body.velocity = new(body.velocity.x, body.velocity.y + SWIM_VSPEED);
                 if (IsOnGround)
-                    body.position += Vector2.up * 0.05f;
+                    body.position += v2Up * 0.05f;
 
                 JumpAnimCounter++;
 
@@ -2695,7 +2695,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             JumpState = PlayerJumpState.None;
             ContinueGroundpound = true;
             IsSliding = false;
-            body.velocity = Vector2.up * 1.5f;
+            body.velocity = v2Up * 1.5f;
             GroundpoundHeld = false;
             GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, groundpoundTime * (State == Enums.PowerupState.MegaMushroom ? 1.5f : 1));
         }
@@ -2704,9 +2704,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private void HandleGroundpound() {
         if (IsGroundpounding && !GroundpoundStartTimer.ExpiredOrNotRunning(Runner)) {
             if (GroundpoundStartTimer.RemainingTime(Runner) <= .066f) {
-                body.velocity = Vector2.zero;
+                body.velocity = v2Zero;
             } else {
-                body.velocity = Vector2.up * 1.5f;
+                body.velocity = v2Up * 1.5f;
             }
         }
 

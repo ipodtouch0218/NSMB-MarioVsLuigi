@@ -17,6 +17,8 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     //---Components
     [SerializeField] public Rigidbody2D body;
     [SerializeField] public AudioSource sfx;
+    public static readonly Vector2 v2Up = Vector2.up;
+    public static readonly Vector2 v2Zero = Vector2.zero;
 
     //---Private Variables
     private bool brickBreakSound;

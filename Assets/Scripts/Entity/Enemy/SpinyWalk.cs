@@ -16,7 +16,7 @@ public class SpinyWalk : KoopaWalk {
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, v2Up) > 0f;
 
         if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             FacingRight = damageDirection.x < 0;
