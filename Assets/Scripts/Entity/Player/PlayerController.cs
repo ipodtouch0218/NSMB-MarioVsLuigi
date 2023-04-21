@@ -293,6 +293,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     public void OnEnable() {
         ControlSystem.controls.Player.ReserveItem.performed += OnReserveItem;
+        NetworkHandler.OnInput += OnInput;
         NetworkHandler.OnInputMissing += OnInputMissing;
     }
 
