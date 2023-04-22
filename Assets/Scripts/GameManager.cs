@@ -297,7 +297,7 @@ public class GameManager : NetworkBehaviour {
         // Everyone is loaded, officially start the game.
         GameState = Enums.GameState.Starting;
         SceneManager.SetActiveScene(gameObject.scene);
-        GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0f : 5.7f);
+        GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0.2f : 5.7f);
 
         // Find out how many players we have
         foreach (PlayerRef client in Runner.ActivePlayers) {

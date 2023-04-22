@@ -293,7 +293,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
     public void OnEnable() {
         ControlSystem.controls.Player.ReserveItem.performed += OnReserveItem;
-        NetworkHandler.OnInput += OnInput;
         NetworkHandler.OnInputMissing += OnInputMissing;
     }
 
@@ -337,6 +336,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         GameManager.Instance.AlivePlayers.Add(this);
         GameManager.Instance.teamManager.AddPlayer(this);
+
+        ControlSystem.controls.Enable();
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {

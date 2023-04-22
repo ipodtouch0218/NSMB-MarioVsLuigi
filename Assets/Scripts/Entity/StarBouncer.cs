@@ -122,7 +122,8 @@ public class StarBouncer : CollectableEntity {
             gameObject.layer = Layers.LayerEntity;
         }
         if (!Passthrough) {
-            if (body.position.y < GameManager.Instance.LevelMinY) {
+            if (body.position.y < GameManager.Instance.LevelMinY ||
+                (GameManager.Instance.loopingLevel && (body.position.x < GameManager.Instance.LevelMinX - 0.5f || body.position.x > GameManager.Instance.LevelMaxX + 0.5f))) {
                 DespawnEntity();
                 return;
             }

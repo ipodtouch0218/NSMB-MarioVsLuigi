@@ -57,9 +57,10 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public override void RespawnEntity() {
-        if (IsActive)
+        if (!IsDead)
             return;
 
+        IsActive = false;
         base.RespawnEntity();
         PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
         animator.Play("end", 0, 1);
