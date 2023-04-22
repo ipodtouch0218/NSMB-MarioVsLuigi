@@ -63,7 +63,6 @@ namespace NSMB.Tiles {
         public void LoadState() {
             GameManager gm = GameManager.Instance;
             Tilemap tilemap = gm.tilemap;
-            Debug.Log(tilemap);
             ourBounds = new(gm.levelMinTileX + (chunkX * 16), gm.levelMinTileY + (chunkY * 16), 0, 16, 16, 1);
             tilemap.GetTilesBlockNonAlloc(ourBounds, TileBuffer);
 

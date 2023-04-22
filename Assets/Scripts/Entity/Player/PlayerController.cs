@@ -10,6 +10,7 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Utils;
+using UnityEngine.Rendering.UI;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 
@@ -39,8 +40,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked(OnChanged = nameof(OnIsSlidingChanged))] public NetworkBool IsSliding { get; set; }
     [Networked] public NetworkBool IsSkidding { get; set; }
     [Networked] public NetworkBool IsTurnaround { get; set; }
-    [Networked] private byte TurnaroundFrames { get; set; } //TODO: change somehow
-    [Networked] private int TurnaroundBoostFrames { get; set; } //TODO: change somehow
+    [Networked] private byte WalkingTurnaroundFrames { get; set; } //TODO: change somehow
+    [Networked] private float TurnaroundBoostTime { get; set; } //TODO: change somehow
     [Networked] private float JumpBufferTime { get; set; }
     [Networked] public float CoyoteTime { get; set; }
     [Networked] private float TimeGrounded { get; set; }
@@ -206,7 +207,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
     private static readonly float[] SPEED_STAGE_MAX = { 0.9375f, 2.8125f, 4.21875f, 5.625f, 8.4375f };
     private static readonly float SPEED_SLIDE_MAX = 7.5f;
-    private static readonly float[] SPEED_STAGE_ACC = { 7.9101585f, 3.955081725f, 3.515625f, 2.63671875f, 84.375f };
+    private static readonly float[] SPEED_STAGE_ACC = { 7.91015625f, 3.955081725f, 3.515625f, 2.63671875f, 84.375f };
     private static readonly float[] ICE_STAGE_ACC = { 1.9775390625f, 3.955081725f, 3.515625f, 2.63671875f, 84.375f };
     private static readonly float[] WALK_TURNAROUND_ACC = { 3.955078125f, 8.7890625f, 8.7890625f, 21.093756f };
     private static readonly float BUTTON_RELEASE_DEC = 3.9550781196f;
@@ -226,7 +227,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     private static readonly float[] SPEED_STAGE_MEGA_ACC = { 28.125f, 4.83398433f, 4.83398433f, 4.83398433f, 4.83398433f };
     private static readonly float[] WALK_TURNAROUND_MEGA_ACC = { 4.614257808f, 10.546875f, 21.09375f, 21.09375f };
 
-    private static readonly float TURNAROUND_THRESHOLD = 2.8125f;
+    private static readonly float TURNAROUND_DEC = 10.546875f;
     private static readonly float TURNAROUND_ACC = 28.125f;
 
     private static readonly float[] BUTTON_RELEASE_ICE_DEC = { 0.439453125f, 1.483154296875f, 1.483154296875f, 1.483154296875f, 1.483154296875f };
@@ -1464,7 +1465,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
 
-        if (Mathf.Abs(body.velocity.x) < 0.1f && body.velocity.y < 0 && body.velocity.y > -0.01f) {
+        if (Mathf.Abs(body.velocity.x) < 0.01f && body.velocity.y < 0 && body.velocity.y > -0.01f) {
             body.velocity = Vector2.zero;
         }
     }
@@ -1863,7 +1864,20 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         float sign = Mathf.Sign(body.velocity.x);
         bool uphill = Mathf.Sign(FloorAngle) == sign;
 
-        if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !IsSliding) {
+        if (TurnaroundBoostTime > 0) {
+            TurnaroundBoostTime -= Runner.DeltaTime;
+            body.velocity = new(0, body.velocity.y);
+            if (TurnaroundBoostTime < 0) {
+                IsTurnaround = true;
+                TurnaroundBoostTime = 0;
+            }
+
+        } else if (IsTurnaround) {
+            float newX = body.velocity.x + (TURNAROUND_ACC * (FacingRight ? -1 : 1) * Runner.DeltaTime);
+            IsTurnaround &= IsOnGround && Mathf.Abs(body.velocity.x) < SPEED_STAGE_MAX[1];
+            body.velocity = new(newX, body.velocity.y);
+
+        } else if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !IsSliding) {
             //we can walk here
 
             float speed = Mathf.Abs(body.velocity.x);
@@ -1892,39 +1906,23 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                         } else {
                             acc = SKIDDING_DEC;
                         }
-                        TurnaroundFrames = 0;
+                        WalkingTurnaroundFrames = 0;
                     } else {
                         if (OnIce) {
                             acc = WALK_TURNAROUND_ICE_ACC;
                         } else {
-                            TurnaroundFrames = (byte) Mathf.Clamp(TurnaroundFrames + 1, 0, WALK_TURNAROUND_ACC.Length - 1);
-                            acc = State == Enums.PowerupState.MegaMushroom ? WALK_TURNAROUND_MEGA_ACC[TurnaroundFrames] : WALK_TURNAROUND_ACC[TurnaroundFrames];
+                            WalkingTurnaroundFrames = (byte) Mathf.Clamp(WalkingTurnaroundFrames + 1, 0, WALK_TURNAROUND_ACC.Length - 1);
+                            acc = State == Enums.PowerupState.MegaMushroom ? WALK_TURNAROUND_MEGA_ACC[WalkingTurnaroundFrames] : WALK_TURNAROUND_ACC[WalkingTurnaroundFrames];
                         }
                     }
                 } else {
                     acc = SPEED_STAGE_ACC[0] * 0.85f;
                 }
             } else {
-                TurnaroundFrames = 0;
+                WalkingTurnaroundFrames = 0;
 
                 if (IsSkidding && !IsTurnaround) {
                     IsSkidding = false;
-                }
-
-                if (IsTurnaround && TurnaroundBoostFrames > 0 && speed != 0) {
-                    IsTurnaround = false;
-                    IsSkidding = false;
-                }
-
-                if (IsTurnaround && speed < TURNAROUND_THRESHOLD) {
-                    if (--TurnaroundBoostFrames <= 0) {
-                        acc = TURNAROUND_ACC;
-                        IsSkidding = false;
-                    } else {
-                        acc = 0;
-                    }
-                } else {
-                    IsTurnaround = false;
                 }
             }
 
@@ -1938,8 +1936,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
             if (IsSkidding && !IsTurnaround && (Mathf.Sign(newX) != sign || speed < 0.05f)) {
                 //turnaround
-                IsTurnaround = true;
-                TurnaroundBoostFrames = 5;
+                TurnaroundBoostTime = 10 * Runner.DeltaTime;
                 newX = 0;
             }
 
@@ -1951,7 +1948,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             IsTurnaround = false;
 
             float angle = Mathf.Abs(FloorAngle);
-            if (IsSwimming)
+            if (IsCrouching)
+                acc = -BUTTON_RELEASE_DEC;
+            else if (IsSwimming)
                 acc = -SWIM_BUTTON_RELEASE_DEC;
             else if (IsSliding) {
                 if (angle > slopeSlidingAngle) {
@@ -1974,9 +1973,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             float target = angle > 30 ? Math.Sign(FloorAngle) * -SPEED_STAGE_MAX[0] : 0;
             if ((direction == -1) ^ (newX <= target))
                 newX = target;
-
-            //if (Mathf.Abs(body.velocity.x - target) < 0.01f)
-            //    return;
 
             if (IsSliding) {
                 newX = Mathf.Clamp(newX, -SPEED_SLIDE_MAX, SPEED_SLIDE_MAX);
