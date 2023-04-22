@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: -1837141360104208851, guid: b455056ca00f84e48a8040f94ae8170d,
+  m_Sprite: {fileID: -2665958366948368982, guid: b455056ca00f84e48a8040f94ae8170d,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  runInEditor: 0
   frame: 0
   fps: 12
   frames:
@@ -109,6 +110,7 @@ MonoBehaviour:
   - {fileID: 7518829234646223683, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
   - {fileID: 2147156700845412417, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
   - {fileID: -1837141360104208851, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+  sRenderer: {fileID: 7821411591339125535}
 --- !u!1 &7523289063499453450
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,6 +177,8 @@ MonoBehaviour:
     _value: 0
   iceCarryable: 1
   flying: 0
+  collideWithOtherEnemies: 1
+  dieWhenInsideBlock: 1
   hitbox: {fileID: 7523289063499453452}
   animator: {fileID: 0}
   legacyAnimation: {fileID: 2072787540995169967}

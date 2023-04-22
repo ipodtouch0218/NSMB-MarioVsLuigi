@@ -47,6 +47,7 @@ namespace NSMB.Tiles {
                 GetDependenciesRecursively(td, uniqueTilesList, checkedForDependencies);
             }
             uniqueTilesList = uniqueTilesList.Distinct().ToList();
+            uniqueTilesList.Sort(new TileBaseSorter());
 
             int chunkmapWidth = Mathf.CeilToInt(gm.levelWidthTile / 16f);
             int chunkmapHeight = Mathf.CeilToInt(gm.levelHeightTile / 16f);
@@ -92,6 +93,19 @@ namespace NSMB.Tiles {
             foreach (TileBase childTile in td.GetTileDependencies()) {
                 results.Add(childTile);
                 GetDependenciesRecursively(childTile as IHaveTileDependencies, results, alreadyChecked);
+            }
+        }
+
+        private class TileBaseSorter : IComparer<TileBase> {
+            public int Compare(TileBase x, TileBase y) {
+                if (!x) return 1;
+                if (!y) return -1;
+                if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(x, out string xGuid, out long _) &&
+                    AssetDatabase.TryGetGUIDAndLocalFileIdentifier(y, out string yGuid, out long _)) {
+
+                    return xGuid.CompareTo(yGuid);
+                }
+                return x.name.CompareTo(y.name);
             }
         }
     }

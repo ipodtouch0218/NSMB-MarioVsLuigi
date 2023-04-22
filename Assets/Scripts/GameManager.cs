@@ -57,16 +57,19 @@ public class GameManager : NetworkBehaviour {
     [Networked] public Enums.GameState GameState { get; set; }
 
     //---Serialized Variables
+    [Header("Music")]
     [SerializeField] private LoopingMusicData mainMusic, invincibleMusic, megaMushroomMusic;
+    [Header("Level Configuration")]
     [SerializeField] public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
-    [SerializeField] public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
-    [SerializeField] public bool loopingLevel = true;
-    [SerializeField] public Vector3 spawnpoint;
-    [SerializeField] private GameObject hud, pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, nametagPrefab;
-    [SerializeField, ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
-    [SerializeField] public Tilemap tilemap;
-    [SerializeField] public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
+    [SerializeField] public bool loopingLevel = true, spawnBigPowerups = true, spawnVerticalPowerups = true;
     [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
+    [SerializeField] public Vector3 spawnpoint;
+    [SerializeField, ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
+    [Header("Camera")]
+    [SerializeField] public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
+    [Header("Misc")]
+    [SerializeField] private GameObject hud, pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, nametagPrefab;
+    [SerializeField] public Tilemap tilemap;
     [SerializeField] public GameObject objectPoolParent;
     [SerializeField] private TMP_Text winText;
     [SerializeField] private Animator winTextAnimator;
@@ -81,8 +84,8 @@ public class GameManager : NetworkBehaviour {
     public double gameStartTimestamp, gameEndTimestamp;
     public bool paused;
 
-    public KillableEntity[] enemies;
-    public FloatingCoin[] coins;
+    [NonSerialized] public KillableEntity[] enemies;
+    [NonSerialized] public FloatingCoin[] coins;
 
     //---Private Variables
     private TickTimer StartMusicTimer { get; set; }
@@ -92,10 +95,10 @@ public class GameManager : NetworkBehaviour {
     private bool pauseStateLastFrame, optionsWereOpenLastFrame;
 
     //---Components
-    public TileManager tileManager;
-    public SpectationManager spectationManager;
-    public LoopingMusicPlayer musicManager;
-    public AudioSource music, sfx;
+    [SerializeField] public TileManager tileManager;
+    [SerializeField] public SpectationManager spectationManager;
+    [SerializeField] public LoopingMusicPlayer musicManager;
+    [SerializeField] public AudioSource music, sfx;
 
     // TODO: convert to RPC...?
     public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, GameObject prefab) {
