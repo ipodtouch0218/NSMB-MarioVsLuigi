@@ -48,6 +48,7 @@ namespace NSMB.Tiles {
             }
             uniqueTilesList = uniqueTilesList.Distinct().ToList();
             uniqueTilesList.Sort(new TileBaseSorter());
+            gm.tileManager.sceneTiles = uniqueTilesList.ToArray();
 
             int chunkmapWidth = Mathf.CeilToInt(gm.levelWidthTile / 16f);
             int chunkmapHeight = Mathf.CeilToInt(gm.levelHeightTile / 16f);
@@ -75,7 +76,6 @@ namespace NSMB.Tiles {
             }
 
 
-            gm.tileManager.sceneTiles = uniqueTilesList.ToArray();
             gm.tileManager.chunks = chunks.ToArray();
 
             Debug.Log($"Successfully saved level data. {uniqueTilesList.Count} unique tiles, {requiredChunks} chunks ({gm.levelWidthTile} x {gm.levelHeightTile}).");
@@ -98,13 +98,9 @@ namespace NSMB.Tiles {
 
         private class TileBaseSorter : IComparer<TileBase> {
             public int Compare(TileBase x, TileBase y) {
-                if (!x) return 1;
-                if (!y) return -1;
-                if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(x, out string xGuid, out long _) &&
-                    AssetDatabase.TryGetGUIDAndLocalFileIdentifier(y, out string yGuid, out long _)) {
+                if (!x) return -1;
+                if (!y) return 1;
 
-                    return xGuid.CompareTo(yGuid);
-                }
                 return x.name.CompareTo(y.name);
             }
         }

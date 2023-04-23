@@ -58,17 +58,29 @@ public class GameManager : NetworkBehaviour {
 
     //---Serialized Variables
     [Header("Music")]
-    [SerializeField] private LoopingMusicData mainMusic, invincibleMusic, megaMushroomMusic;
+    [SerializeField] private LoopingMusicData mainMusic;
+    [SerializeField] private LoopingMusicData invincibleMusic;
+    [SerializeField] private LoopingMusicData megaMushroomMusic;
+
     [Header("Level Configuration")]
-    [SerializeField] public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
-    [SerializeField] public bool loopingLevel = true, spawnBigPowerups = true, spawnVerticalPowerups = true;
-    [SerializeField] public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
-    [SerializeField] public Vector3 spawnpoint;
-    [SerializeField, ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
+    public int levelMinTileX;
+    public int levelMinTileY;
+    public int levelWidthTile;
+    public int levelHeightTile;
+    public bool loopingLevel = true, spawnBigPowerups = true, spawnVerticalPowerups = true;
+    public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
+    public Vector3 spawnpoint;
+    [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
+
     [Header("Camera")]
-    [SerializeField] public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
+    public float cameraMinY;
+    public float cameraHeightY;
+    public float cameraMinX = -1000;
+    public float cameraMaxX = 1000;
+
     [Header("Misc")]
-    [SerializeField] private GameObject hud, pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, nametagPrefab;
+    [SerializeField] private GameObject hud;
+    [SerializeField] private GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, nametagPrefab;
     [SerializeField] public Tilemap tilemap;
     [SerializeField] public GameObject objectPoolParent;
     [SerializeField] private TMP_Text winText;

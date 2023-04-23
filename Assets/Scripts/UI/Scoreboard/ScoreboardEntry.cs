@@ -39,7 +39,7 @@ public class ScoreboardEntry : MonoBehaviour {
         data = target.Object.InputAuthority.GetPlayerData(target.Runner);
 
         playerId = target.PlayerId;
-        nameText.text = underlayText.text = (data.IsRoomOwner ? "<sprite=60>" : "<sprite=56>") + data.GetNickname();
+        nameText.text = (data.IsRoomOwner ? "<sprite=60>" : "<sprite=56>") + data.GetNickname();
 
         Color c = target.animationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);

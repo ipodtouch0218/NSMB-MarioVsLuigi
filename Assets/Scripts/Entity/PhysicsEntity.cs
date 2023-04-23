@@ -3,6 +3,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Utils;
 
+[OrderAfter(typeof(NetworkPhysicsSimulation2D))]
 public class PhysicsEntity : NetworkBehaviour {
 
     //---Staic Variables

@@ -10,7 +10,6 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Utils;
-using UnityEngine.Rendering.UI;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 
@@ -60,6 +59,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool DoEntityBounce { get; set; }
     [Networked] public NetworkBool BounceJump { get; set; }
     [Networked] public TickTimer JumpLandingTimer { get; set; }
+    [Networked(OnChanged = nameof(OnHitRoofAnimCounterChanged))] public byte HitRoofAnimCounter { get; set; }
     //Knockback
     [Networked(OnChanged = nameof(OnIsInKnockbackChanged))] public NetworkBool IsInKnockback { get; set; }
     [Networked] public NetworkBool IsFireballKnockback { get; set; }
@@ -482,13 +482,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         TilesStandingOn.Clear();
         TilesHitSide.Clear();
 
-        bool ignoreRoof = false;
         int down = 0, left = 0, right = 0, up = 0;
 
         crushGround = false;
         OnSpinner = null;
         foreach (BoxCollider2D hitbox in hitboxes) {
-            Runner.GetPhysicsScene2D().Simulate(0f); // Without this, megas are broken.
+            //Runner.GetPhysicsScene2D().Simulate(0f); // Without this, megas are broken when shrinking.
             int collisionCount = hitbox.GetContacts(TileContactBuffer);
 
             for (int i = 0; i < collisionCount; i++) {
@@ -539,7 +538,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         IsOnGround = down >= 1;
         hitLeft = left >= 1;
         hitRight = right >= 1;
-        hitRoof = !ignoreRoof && up >= 1;
+        hitRoof = up >= 1;
     }
 
     private void UpdateTileProperties() {
@@ -1622,6 +1621,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 JumpState = PlayerJumpState.SingleJump;
                 IsOnGround = false;
                 DoEntityBounce = false;
+                timeSinceLastBumpSound = 0;
 
                 WallJumpTimer = TickTimer.CreateFromSeconds(Runner, 16f / 60f);
                 animator.SetTrigger("walljump");
@@ -1756,6 +1756,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         JumpAnimCounter++;
         BounceJump = DoEntityBounce;
         DoEntityBounce = false;
+        timeSinceLastBumpSound = 0;
     }
 
     public void UpdateHitbox() {
@@ -1874,7 +1875,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         } else if (IsTurnaround) {
             float newX = body.velocity.x + (TURNAROUND_ACC * (FacingRight ? -1 : 1) * Runner.DeltaTime);
-            IsTurnaround &= IsOnGround && Mathf.Abs(body.velocity.x) < SPEED_STAGE_MAX[1];
+            IsTurnaround &= IsOnGround && Mathf.Abs(body.velocity.x) < SPEED_STAGE_MAX[1] && !hitRight && !hitLeft;
+            IsSkidding &= IsTurnaround;
             body.velocity = new(newX, body.velocity.y);
 
         } else if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !IsSliding) {
@@ -2327,13 +2329,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         //activate blocks jumped into
         if (hitRoof) {
+            HitRoofAnimCounter++;
             bool tempHitBlock = false;
             foreach (Vector2Int tile in TilesJumpedInto) {
                 tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
-            }
-            if (tempHitBlock && State == Enums.PowerupState.MegaMushroom) {
-                CameraController.ScreenShake = 0.15f;
-                PlaySound(Enums.Sounds.World_Block_Bump);
             }
             body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y, IsSwimming && !tempHitBlock ? -2f : -0.1f));
         }
@@ -2932,6 +2931,17 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             // Collected powerup is handled in the MovingPowerup class.
             // (because the sound is powerup dependent)
         }
+    }
+
+    private float timeSinceLastBumpSound;
+    public static void OnHitRoofAnimCounterChanged(Changed<PlayerController> changed) {
+        PlayerController player = changed.Behaviour;
+
+        if (player.timeSinceLastBumpSound + 0.2f > player.Runner.SimulationRenderTime)
+            return;
+
+        player.PlaySound(Enums.Sounds.World_Block_Bump);
+        player.timeSinceLastBumpSound = player.Runner.SimulationRenderTime;
     }
 
     //---Debug

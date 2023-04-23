@@ -4,6 +4,7 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Tiles;
 
+[OrderAfter(typeof(NetworkPhysicsSimulation2D))]
 public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
     //---Networked Variables

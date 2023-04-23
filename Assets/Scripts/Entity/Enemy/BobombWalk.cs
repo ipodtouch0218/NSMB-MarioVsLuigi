@@ -286,6 +286,7 @@ public class BobombWalk : HoldableEntity {
     public override void Kick(PlayerController kicker, bool toRight, float speed, bool groundpound) {
         //always do a groundpound variant kick
         base.Kick(kicker, toRight, speed, true);
+        Kicked = false;
     }
 
     //---OnChangeds
