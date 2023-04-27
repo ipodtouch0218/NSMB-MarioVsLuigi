@@ -125,7 +125,7 @@ namespace NSMB.Tiles {
         private Vector2Int GetPipeOrigin(Vector2Int ourLocation) {
             TileManager tm = GameManager.Instance.tileManager;
             Vector2Int searchDirection = upsideDownPipe ? Vector2Int.up : Vector2Int.down;
-            Vector2Int searchVector = upsideDownPipe ? Vector2Int.up : Vector2Int.down;
+            Vector2Int searchVector = searchDirection;
 
             while (tm.GetTile(ourLocation + searchVector) is BreakablePipeTile)
                 searchVector += searchDirection;

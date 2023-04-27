@@ -29,7 +29,7 @@ public class PropellerPowerup : MovingPowerup {
             gameObject.layer = Layers.LayerEntity;
             base.FixedUpdateNetwork();
 
-            if (physics.OnGround) {
+            if (physics.Data.OnGround) {
                 // Start flying
                 TimeFlyingStarted = Runner.SimulationTime;
                 FlightOrigin = body.position;

@@ -84,8 +84,9 @@ public class BobombWalk : HoldableEntity {
         if (Holder)
             return false;
 
-        physics.UpdateCollisions();
-        if (Lit && physics.OnGround) {
+        PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+
+        if (Lit && data.OnGround) {
             //apply friction
             body.velocity -= body.velocity * (Runner.DeltaTime * 3.5f);
             if (Mathf.Abs(body.velocity.x) < 0.05) {
@@ -93,13 +94,13 @@ public class BobombWalk : HoldableEntity {
             }
         }
 
-        if (physics.HitRight && FacingRight) {
+        if (data.HitRight && FacingRight) {
             Turnaround(false);
-        } else if (physics.HitLeft && !FacingRight) {
+        } else if (data.HitLeft && !FacingRight) {
             Turnaround(true);
         }
 
-        if (physics.OnGround && physics.HitRoof) {
+        if (data.OnGround && data.HitRoof) {
             Detonate();
             return true;
         }

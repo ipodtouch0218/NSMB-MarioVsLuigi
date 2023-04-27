@@ -64,14 +64,14 @@ Material:
     m_Ints: []
     m_Floats:
     - BottomYPos: 0
-    - Height: 5.85
+    - Height: 4
     - Points: 256
     - PointsPerTile: 4
     - TextureIndex: 0
     - WaveHeight: 0.3
     - WaveSpeed: 1.2
     - WaveWidth: 1
-    - WidthTiles: 7.75
+    - WidthTiles: 8
     - _Points: 256
     - _RandomizeOffset: 0
     - _WaveWidth: 2.5
@@ -80,7 +80,7 @@ Material:
     - FoamColor: {r: 1, g: 0.91886795, b: 0.99505395, a: 1}
     - RippleColor: {r: 0.8113208, g: 0.4240299, b: 0.7696766, a: 1}
     - TopColor: {r: 1, g: 0, b: 0.29803923, a: 1}
-    - _Glow: {r: 1, g: 1, b: 1, a: 0}
+    - _Glow: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &5362891914880258063
 MonoBehaviour:

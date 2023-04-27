@@ -202,8 +202,8 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         //gameObject.layer = Layers.LayerEntity;
     }
 
-    public override void DespawnEntity() {
-        base.DespawnEntity();
+    public override void DespawnEntity(object data = null) {
+        base.DespawnEntity(data);
         IsDead = true;
     }
 

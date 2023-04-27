@@ -10,7 +10,7 @@ using NSMB.Utils;
 public class ScoreboardEntry : MonoBehaviour {
 
     //---Serialized Variables
-    [SerializeField] private TMP_Text nameText, underlayText, valuesText;
+    [SerializeField] private TMP_Text nameText, valuesText;
     [SerializeField] private Image background;
     [SerializeField] private float normalWidth = 250, controllerWidth = 280;
 
@@ -69,11 +69,11 @@ public class ScoreboardEntry : MonoBehaviour {
 
         if (!data || !data.Object || !data.Object.IsValid) {
             disconnected = true;
-            nameText.text = underlayText.text  = Regex.Replace(nameText.text, "<sprite=\\d*>", "<sprite=61>");
+            nameText.text = Regex.Replace(nameText.text, "<sprite=\\d*>", "<sprite=61>");
 
         } else if (!data.IsRoomOwner && currentPing != data.Ping) {
             currentPing = data.Ping;
-            nameText.text = underlayText.text  = Utils.GetPingSymbol(currentPing) + data.GetNickname();
+            nameText.text = Utils.GetPingSymbol(currentPing) + data.GetNickname();
         }
 
         if (!target || disconnected) {

@@ -222,9 +222,9 @@ public class WaterSplash : NetworkBehaviour {
             if (underSurface) {
                 // Don't let fireballs "poof"
                 if (entity is FireballMover fm)
-                    fm.PlayBreakEffect = false;
+                    fm.DespawnEntity(false);
 
-                if (entity is not StarBouncer)
+                else if (entity is not StarBouncer)
                     entity.DespawnEntity();
             }
         }

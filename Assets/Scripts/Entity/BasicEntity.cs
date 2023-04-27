@@ -75,7 +75,7 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
         IsActive = true;
     }
 
-    public virtual void DespawnEntity() {
+    public virtual void DespawnEntity(object data = null) {
         if (!isRespawningEntity) {
             Runner.Despawn(Object);
             return;

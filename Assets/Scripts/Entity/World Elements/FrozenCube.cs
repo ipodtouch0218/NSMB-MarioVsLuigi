@@ -152,8 +152,8 @@ public class FrozenCube : HoldableEntity {
             FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
         }
 
-        if (FastSlide && physics.OnGround && physics.FloorAngle != 0) {
-            RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size / 2f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
+        if (FastSlide && physics.Data.OnGround && physics.Data.FloorAngle != 0) {
+            RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size * 0.5f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
             if (ray) {
                 body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
                 if (ray.distance < 0.1f)
@@ -184,9 +184,9 @@ public class FrozenCube : HoldableEntity {
     private bool HandleTile() {
         physics.UpdateCollisions();
 
-        if ((FastSlide && (physics.HitLeft || physics.HitRight))
-            || (flying && fallen && physics.OnGround && !Holder)
-            || ((Holder || physics.OnGround) && physics.HitRoof)) {
+        if ((FastSlide && (physics.Data.HitLeft || physics.Data.HitRight))
+            || (flying && fallen && physics.Data.OnGround && !Holder)
+            || ((Holder || physics.Data.OnGround) && physics.Data.HitRoof)) {
 
             Kill();
             return false;

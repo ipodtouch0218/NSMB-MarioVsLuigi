@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
-using Newtonsoft.Json;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Unity.Collections;
+using UnityEngine;
+using Newtonsoft.Json;
 
 namespace NSMB.Translation {
 
@@ -15,7 +14,7 @@ namespace NSMB.Translation {
         public event Action<TranslationManager> OnLanguageChanged;
 
         //---Properties
-        public string CurrentLocale { get; private set; } = "en-us";
+        public string CurrentLocale { get; private set; }
 
         //---Serialized Variables
         [SerializeField] private TextAsset defaultLocale;

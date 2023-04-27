@@ -73,12 +73,14 @@ public class KoopaWalk : HoldableEntity {
         if (IsFrozen || IsDead)
             return;
 
+        PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+
         if (IsInShell) {
             hitbox.size = inShellHitboxSize;
             hitbox.offset = inShellHitboxOffset;
 
             if (IsStationary) {
-                if (physics.OnGround)
+                if (data.OnGround)
                     body.velocity = new(0, body.velocity.y);
 
                 if (WakeupTimer.Expired(Runner)) {
@@ -91,15 +93,14 @@ public class KoopaWalk : HoldableEntity {
             hitbox.offset = outShellHitboxOffset;
         }
 
-        physics.UpdateCollisions();
 
-        if (physics.HitRight && FacingRight) {
+        if (data.HitRight && FacingRight) {
             Turnaround(false, LastFrameVelocity.x);
-        } else if (physics.HitLeft && !FacingRight) {
+        } else if (data.HitLeft && !FacingRight) {
             Turnaround(true, LastFrameVelocity.x);
         }
 
-        if (physics.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
+        if (data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
             Vector3 redCheckPos = body.position + new Vector2(0.1f * (FacingRight ? 1 : -1), 0);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref redCheckPos);
@@ -311,7 +312,7 @@ public class KoopaWalk : HoldableEntity {
 
         if (IsStationary) {
             body.velocity = new(bumper.body.position.x < body.position.x ? 1f : -1f, body.velocity.y);
-            physics.OnGround = false;
+            physics.Data.OnGround = false;
         }
 
         if (Runner.IsForward)

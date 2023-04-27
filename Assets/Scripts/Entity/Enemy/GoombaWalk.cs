@@ -43,10 +43,10 @@ public class GoombaWalk : KillableEntity {
     }
 
     private void HandleWallCollisions() {
-        physics.UpdateCollisions();
+        PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
 
-        if (physics.HitLeft || physics.HitRight)
-            FacingRight = physics.HitLeft;
+        if (data.HitLeft || data.HitRight)
+            FacingRight = data.HitLeft;
     }
 
     //---KillableEntity overrides

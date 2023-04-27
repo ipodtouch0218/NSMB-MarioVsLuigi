@@ -157,14 +157,14 @@ public class StarBouncer : CollectableEntity {
     private bool HandleCollision() {
         physics.UpdateCollisions();
 
-        if (physics.HitLeft || physics.HitRight) {
-            FacingRight = physics.HitLeft;
+        if (physics.Data.HitLeft || physics.Data.HitRight) {
+            FacingRight = physics.Data.HitLeft;
             body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
         }
 
-        if (physics.OnGround && Collectable) {
+        if (physics.Data.OnGround && Collectable) {
             body.velocity = new(body.velocity.x, bounceAmount);
-            if (physics.HitRoof) {
+            if (physics.Data.HitRoof) {
                 DespawnEntity();
                 return true;
             }

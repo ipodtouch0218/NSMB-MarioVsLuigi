@@ -114,7 +114,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     public override void Render() {
         if (childAnimator)
-            childAnimator.SetBool("onGround", physics.OnGround);
+            childAnimator.SetBool("onGround", physics.Data.OnGround);
     }
 
     public override void FixedUpdateNetwork() {
@@ -175,7 +175,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             HandleCollision();
         }
 
-        if (avoidPlayers && physics.OnGround) {
+        if (avoidPlayers && physics.Data.OnGround) {
             PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
             if (closest) {
                 float dist = closest.body.position.x - body.position.x;
@@ -187,17 +187,17 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public void HandleCollision() {
-        physics.UpdateCollisions();
+        PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
 
-        if (physics.HitLeft || physics.HitRight) {
-            FacingRight = physics.HitLeft;
+        if (data.HitLeft || data.HitRight) {
+            FacingRight = data.HitLeft;
             body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
         }
 
-        if (physics.OnGround) {
+        if (data.OnGround) {
             body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(body.velocity.y, bouncePower));
 
-            if (physics.HitRoof || (physics.HitLeft && physics.HitRight)) {
+            if (data.HitRoof || (data.HitLeft && data.HitRight)) {
                 DespawnEntity();
                 return;
             }

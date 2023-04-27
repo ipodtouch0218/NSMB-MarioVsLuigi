@@ -257,10 +257,10 @@ public class PlayerAnimationController : NetworkBehaviour {
         animator.SetFloat("velocityY",     body.velocity.y);
         animator.SetBool("doublejump",     controller.JumpState == PlayerController.PlayerJumpState.DoubleJump);
         animator.SetBool("triplejump",     controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
-        animator.SetBool("holding",        controller.HeldEntity != null);
-        animator.SetBool("head carry",     controller.HeldEntity != null && controller.HeldEntity is FrozenCube);
-        animator.SetBool("carry_start",    controller.HeldEntity != null && controller.HeldEntity is FrozenCube && (Runner.SimulationTime - controller.HoldStartTime) < controller.pickupTime);
-        animator.SetBool("pipe",           controller.CurrentPipe != null);
+        animator.SetBool("holding",        controller.HeldEntity);
+        animator.SetBool("head carry",     controller.HeldEntity && controller.HeldEntity is FrozenCube);
+        animator.SetBool("carry_start",    controller.HeldEntity && controller.HeldEntity is FrozenCube && (Runner.SimulationTime - controller.HoldStartTime) < controller.pickupTime);
+        animator.SetBool("pipe",           controller.CurrentPipe);
         animator.SetBool("blueshell",      controller.State == Enums.PowerupState.BlueShell);
         animator.SetBool("mini",           controller.State == Enums.PowerupState.MiniMushroom);
         animator.SetBool("mega",           controller.State == Enums.PowerupState.MegaMushroom);
@@ -277,7 +277,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         } else if (controller.State == Enums.PowerupState.MegaMushroom && (left || right)) {
             animatedVelocity = 4.5f;
         } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
-            animatedVelocity = Mathf.Max(controller.OnIce ? 3.5f : 2f, animatedVelocity);
+            animatedVelocity = Mathf.Max(controller.OnIce ? 2.7f : 2f, animatedVelocity);
         } else if (controller.OnIce) {
             animatedVelocity = 0;
         }

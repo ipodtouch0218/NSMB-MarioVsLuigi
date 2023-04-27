@@ -33,7 +33,6 @@ namespace NSMB.Tiles {
 
             // the the tilemap is different from it's current state.
             UpdateTilemapState();
-            Debug.Log($"before resimulation tick {Runner.Tick}: {latestDirtyCounter} -> {DirtyCounter}");
             latestDirtyCounter = DirtyCounter;
         }
 
@@ -41,7 +40,6 @@ namespace NSMB.Tiles {
 
             // the tilemap was updated via the dirty counter
             if (updatedDirtyCounterThisTick) {
-                Debug.Log($"tilemap was updated tick {Runner.Tick}: {latestDirtyCounter} -> {DirtyCounter}");
                 UpdateTilemapState();
                 updatedDirtyCounterThisTick = false;
             }
@@ -50,7 +48,10 @@ namespace NSMB.Tiles {
         }
 
         public override void Spawned() {
-            Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
+            if (Runner.IsServer)
+                Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
+
+            UpdateTilemapState();
         }
 
         public override void Render() {

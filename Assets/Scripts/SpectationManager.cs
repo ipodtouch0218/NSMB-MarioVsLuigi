@@ -46,15 +46,12 @@ public class SpectationManager : MonoBehaviour {
     public void OnEnable() {
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
         GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     public void OnDisable() {
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
         GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
-    }
-
-    private void OnLanguageChanged(TranslationManager tm) {
-        UpdateSpectateUI();
     }
 
     public void Update() {
@@ -63,6 +60,8 @@ public class SpectationManager : MonoBehaviour {
 
         if (!TargetPlayer)
             SpectateNextPlayer();
+        else
+            TargetPlayer.cameraController.IsControllingCamera = true;
     }
 
     public void UpdateSpectateUI() {
@@ -90,7 +89,7 @@ public class SpectationManager : MonoBehaviour {
         while (!TargetPlayer) {
             targetIndex = (targetIndex + 1) % count;
             TargetPlayer = players[targetIndex];
-            if (nulls++ >= count)
+            if (nulls++ > count)
                 break;
         }
     }
@@ -107,7 +106,7 @@ public class SpectationManager : MonoBehaviour {
         while (!TargetPlayer) {
             targetIndex = (targetIndex + count - 1) % count;
             TargetPlayer = players[targetIndex];
-            if (nulls++ >= count)
+            if (nulls++ > count)
                 break;
         }
     }
@@ -133,6 +132,10 @@ public class SpectationManager : MonoBehaviour {
 
             TargetPlayer = newTarget;
         }
+    }
+
+    private void OnLanguageChanged(TranslationManager tm) {
+        UpdateSpectateUI();
     }
 
     public class PlayerComparer : IComparer<PlayerController> {

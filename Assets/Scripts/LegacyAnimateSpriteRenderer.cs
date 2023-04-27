@@ -16,11 +16,7 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
     public void OnValidate() {
         if (!sRenderer) sRenderer = GetComponent<SpriteRenderer>();
 
-        frame = Mathf.Repeat(frame, frames.Length);
-        int currentFrame = Mathf.FloorToInt(frame);
-
-        if (frames[currentFrame] != sRenderer.sprite)
-            sRenderer.sprite = frames[currentFrame];
+        ValidationUtility.SafeOnValidate(SetSprite);
     }
 
     [ExecuteAlways]
@@ -33,6 +29,13 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
             return;
 
         frame += fps * Time.deltaTime;
+        SetSprite();
+    }
+
+    private void SetSprite() {
+        if (!sRenderer)
+            return;
+
         frame = Mathf.Repeat(frame, frames.Length);
         int currentFrame = Mathf.FloorToInt(frame);
 

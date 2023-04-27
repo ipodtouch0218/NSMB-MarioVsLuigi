@@ -4902,7 +4902,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 2740354904297333526, guid: 6a8295a206a133847aa7c4b37eaa0337,
+  m_Sprite: {fileID: 2801264589581574561, guid: 6a8295a206a133847aa7c4b37eaa0337,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -4926,6 +4926,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  runInEditor: 0
   frame: 0
   fps: 24
   frames:
@@ -4969,6 +4970,7 @@ MonoBehaviour:
   - {fileID: 3957211391672382866, guid: 6a8295a206a133847aa7c4b37eaa0337, type: 3}
   - {fileID: -519060384786953374, guid: 6a8295a206a133847aa7c4b37eaa0337, type: 3}
   - {fileID: -3085684383362731524, guid: 6a8295a206a133847aa7c4b37eaa0337, type: 3}
+  sRenderer: {fileID: 4540435544182297773}
 --- !u!1 &2627485830306083579
 GameObject:
   m_ObjectHideFlags: 0
@@ -5049,7 +5051,7 @@ MonoBehaviour:
   despawnDistance: 10
   shootParticles: {fileID: 7693979224894144423}
   trailParticles: {fileID: 1566471443926189886}
-  spriteAnimation: {fileID: 0}
+  nrb: {fileID: 8651934288568289201}
 --- !u!50 &3091356493132500068
 Rigidbody2D:
   serializedVersion: 4

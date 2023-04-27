@@ -6,6 +6,7 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
+[OrderAfter(typeof(PlayerController))]
 public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
     //---Static Variables
@@ -16,7 +17,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     [Networked] private float CurrentSpeed { get; set; }
     [Networked] public NetworkBool AlreadyBounced { get; set; }
     [Networked] public NetworkBool IsIceball { get; set; }
-    [Networked] public NetworkBool PlayBreakEffect { get; set; }
+    [Networked(OnChanged = nameof(OnBreakEffectAnimCounterChanged))] public byte BreakEffectAnimCounter { get; set; }
 
     //---Serialized Variables
     [SerializeField] private ParticleSystem iceBreak, fireBreak, iceTrail, fireTrail;
@@ -42,7 +43,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         //vars
         IsActive = true;
         IsIceball = ice;
-        PlayBreakEffect = true;
         FacingRight = right;
         AlreadyBounced = false;
         Owner = owner;
@@ -60,6 +60,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         //physics
         nrb.TeleportToPosition(spawnpoint, Vector3.zero);
+        body.simulated = true;
         body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
     }
 
@@ -108,18 +109,18 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         if (!IsActive)
             return false;
 
-        physics.UpdateCollisions();
+        PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
 
-        if (physics.OnGround && !AlreadyBounced) {
-            float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
-            if (Mathf.Sign(physics.FloorAngle) != Mathf.Sign(body.velocity.x))
+        if (data.OnGround && !AlreadyBounced) {
+            float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.Data.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
+            if (Mathf.Sign(data.FloorAngle) != Mathf.Sign(body.velocity.x))
                 boost = 0;
 
             body.velocity = new(body.velocity.x, bounceHeight + boost);
         } else if (IsIceball && body.velocity.y > 0.1f)  {
             AlreadyBounced = true;
         }
-        bool breaking = physics.HitLeft || physics.HitRight || physics.HitRoof || (physics.OnGround && AlreadyBounced && body.velocity.y < 1f);
+        bool breaking = data.HitLeft || data.HitRight || data.HitRoof || (data.OnGround && AlreadyBounced && body.velocity.y < 1f);
         if (breaking) {
             DespawnEntity();
             return false;
@@ -164,8 +165,13 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     }
 
     //---BasicEntity overrides
-    public override void DespawnEntity() {
+    public override void DespawnEntity(object data = null) {
+        if (IsActive && (data is not bool dontPlayEffect || !dontPlayEffect))
+            BreakEffectAnimCounter++;
+
         IsActive = false;
+        body.velocity = Vector2.zero;
+        body.simulated = false;
     }
 
     public override void OnIsActiveChanged() {
@@ -188,22 +194,6 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             fireGraphics.SetActive(false);
             iceTrail.Stop();
             fireTrail.Stop();
-
-            //dont play particles below the killplane
-            if (body.position.y < GameManager.Instance.LevelMinY)
-                return;
-
-            //or if the killer said so
-            if (!PlayBreakEffect)
-                return;
-
-            if (IsIceball) {
-                iceBreak.Play();
-                sfx.PlayOneShot(Enums.Sounds.Powerup_Iceball_Break);
-            } else {
-                fireBreak.Play();
-                sfx.PlayOneShot(Enums.Sounds.Powerup_Fireball_Break);
-            }
         }
     }
 
@@ -287,5 +277,22 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
     //---IBlockBumpable overrides
     public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
         //do nothing when bumped
+    }
+
+    //---OnChangeds
+    public static void OnBreakEffectAnimCounterChanged(Changed<FireballMover> changed) {
+        FireballMover fireball = changed.Behaviour;
+
+        //dont play particles below the killplane
+        if (fireball.body.position.y < GameManager.Instance.LevelMinY)
+            return;
+
+        if (fireball.IsIceball) {
+            fireball.iceBreak.Play();
+            fireball.sfx.PlayOneShot(Enums.Sounds.Powerup_Iceball_Break);
+        } else {
+            fireball.fireBreak.Play();
+            fireball.sfx.PlayOneShot(Enums.Sounds.Powerup_Fireball_Break);
+        }
     }
 }
