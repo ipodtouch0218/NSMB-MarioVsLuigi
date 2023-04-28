@@ -523,9 +523,12 @@ namespace NSMB.Utils {
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
 
+            if (player == -1 || player == PlayerRef.None)
+                return spectatorColor;
+
             PlayerData data = player.GetPlayerData(runner);
             //prioritize spectator status
-            if (data.IsManualSpectator || data.IsCurrentlySpectating)
+            if (!data || data.IsManualSpectator || data.IsCurrentlySpectating)
                 return spectatorColor;
 
             //then teams

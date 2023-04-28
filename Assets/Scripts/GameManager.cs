@@ -179,8 +179,6 @@ public class GameManager : NetworkBehaviour {
         enemies = FindObjectsOfType<KillableEntity>().Where(ke => ke is not BulletBillMover).ToArray();
         coins = FindObjectsOfType<FloatingCoin>();
 
-        Debug.Log(string.Join(',', enemies.Select(en => en.name)));
-
         if (Runner.IsServer && Runner.IsSinglePlayer) {
             // Handle spawning in editor by spawning the room + player data objects
             Runner.Spawn(PrefabList.Instance.SessionDataHolder);

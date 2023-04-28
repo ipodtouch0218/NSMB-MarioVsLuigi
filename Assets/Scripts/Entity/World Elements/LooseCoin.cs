@@ -42,13 +42,16 @@ public class LooseCoin : Coin {
             return;
         }
 
+        if (!Object)
+            return;
+
         bool inWall = Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f);
         gameObject.layer = inWall ? Layers.LayerHitsNothing : Layers.LayerEntity;
 
-        physics.UpdateCollisions();
-        if (physics.Data.OnGround) {
+        PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+        if (data.OnGround) {
             body.velocity -= body.velocity * Runner.DeltaTime;
-            if (physics.Data.HitRoof) {
+            if (data.HitRoof) {
                 Runner.Despawn(Object);
                 return;
             }

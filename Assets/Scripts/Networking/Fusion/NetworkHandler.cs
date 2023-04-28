@@ -103,7 +103,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
-        Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress} ({token})");
+        Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress}");
 
         SessionInfo info = runner.SessionInfo;
         if (info.PlayerCount >= SessionData.Instance.MaxPlayers) {

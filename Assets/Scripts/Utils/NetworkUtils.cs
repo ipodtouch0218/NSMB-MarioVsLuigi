@@ -24,7 +24,7 @@ namespace NSMB.Utils {
             [NetConnectFailedReason.ServerRefused] = "ui.error.joinrefused",
         };
 
-        public static Dictionary<string, SessionProperty> DefaultRoomProperties => new() {
+        public static Dictionary<string, SessionProperty> DefaultRoomProperties = new() {
             [Enums.NetRoomProperties.Level] = 0,
             [Enums.NetRoomProperties.StarRequirement] = 10,
             [Enums.NetRoomProperties.CoinRequirement] = 8,

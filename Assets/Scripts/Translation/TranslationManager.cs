@@ -22,14 +22,15 @@ namespace NSMB.Translation {
         //---Private Variables
         private Dictionary<string, string> translations;
         private Dictionary<string, string> defaultTranslations;
-        private TextAsset[] locales;
+        private TextAsset[] defaultLocales;
         private bool instantiated;
 
         public void Instantiate() {
             // Load default (english, unmodified) translations as a fallback
             defaultTranslations = LoadLocaleFromJson(defaultLocale.text);
-            locales = Resources.LoadAll<TextAsset>("Data/lang");
+            defaultLocales = Resources.LoadAll<TextAsset>("Data/lang");
 
+            /*
             // (NON-WEBGL / NON-MOBILE) Copy all languages from assets to streaming assets
             if (IsDesktopPlatform()) {
                 Directory.CreateDirectory(Application.streamingAssetsPath + "/lang");
@@ -40,6 +41,7 @@ namespace NSMB.Translation {
                     }
                 }
             }
+            */
             instantiated = true;
         }
 
@@ -54,18 +56,34 @@ namespace NSMB.Translation {
             if (CurrentLocale == newLocale)
                 return;
 
-            if (IsDesktopPlatform()) {
-                // Load the new language file from the filesystem
-                string path = Path.Combine(Application.streamingAssetsPath, "lang", newLocale + ".json");
-                if (!File.Exists(path))
-                    return;
+            bool foundTranslations = false;
 
-                StreamReader file = File.OpenText(path);
-                string json = file.ReadToEnd();
-                translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-            } else {
+            if (IsDesktopPlatform()) {
+                // Find the language file from the filesystem
+                string path = Path.Combine(Application.streamingAssetsPath, "lang", newLocale + ".json");
+                if (File.Exists(path)) {
+                    StreamReader file = File.OpenText(path);
+                    string json = file.ReadToEnd();
+                    translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                    foundTranslations = true;
+                }
+            }
+
+            if (!foundTranslations) {
                 // Load the new language file from the resources (since we can't read from the filesystem)
-                translations = LoadLocaleFromJson(Resources.Load<TextAsset>("lang/" + newLocale + ".json").text);
+
+                foreach (TextAsset locale in defaultLocales) {
+                    if (locale.name == newLocale) {
+                        translations = LoadLocaleFromJson(locale.text);
+                        foundTranslations = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!foundTranslations) {
+                Debug.Log($"Couldn't find language data in both Resources/Data/lang/{newLocale}");
+                return;
             }
 
             CurrentLocale = newLocale;
@@ -74,21 +92,25 @@ namespace NSMB.Translation {
         }
 
         public LocaleData[] GetLocaleData() {
-            LocaleData[] results;
+            List<LocaleData> results = new();
+
+            // Add the default languages
+            results.AddRange(
+                defaultLocales.Select(ta => new LocaleData() {
+                    Name = ta.text,
+                    Locale = ta.name,
+                })
+            );
 
             if (IsDesktopPlatform()) {
                 // Any new language can be added, so we need to check the filesystem
                 string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "lang"), "*.json");
-                results = files.Select(path => new LocaleData() {
-                    Name = File.ReadAllText(path),
-                    Locale = Path.GetFileNameWithoutExtension(path),
-                }).ToArray();
-            } else {
-                // Return only the default languages
-                results = locales.Select(ta => new LocaleData() {
-                    Name = ta.text,
-                    Locale = ta.name,
-                }).ToArray();
+                results.AddRange(
+                    files.Select(path => new LocaleData() {
+                        Name = File.ReadAllText(path),
+                        Locale = Path.GetFileNameWithoutExtension(path),
+                    })
+                );
             }
 
             // Open the files and get the locale name from the "lang" key
@@ -98,19 +120,12 @@ namespace NSMB.Translation {
                 data.Name = keys["lang"];
             }
 
-            Array.Sort(results, (a, b) => a.Locale.CompareTo(b.Locale));
-            return results;
+            results.Sort((a, b) => a.Locale.CompareTo(b.Locale));
+            return results.ToArray();
         }
 
         public string[] GetLocaleCodes() {
-            if (IsDesktopPlatform()) {
-                // Any new language can be added, so we need to check the filesystem
-                string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "lang"), "*.json");
-                return files.Select(Path.GetFileNameWithoutExtension).ToArray();
-            } else {
-                // Return only the default languages
-                return locales.Select(ta => ta.name).ToArray();
-            }
+            return GetLocaleData().Select(ld => ld.Locale).ToArray();
         }
 
         public string GetTranslation(string key) {

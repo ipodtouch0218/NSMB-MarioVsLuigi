@@ -133,7 +133,7 @@ public class DiscordController : MonoBehaviour {
 
         activityManager.UpdateActivity(activity, (res) => {
             //head empty.
-            Debug.Log($"[DISCORD] Rich Presence Update: {res}");
+            Debug.Log($"[Discord] Rich Presence Update: {res}");
         });
     }
 }

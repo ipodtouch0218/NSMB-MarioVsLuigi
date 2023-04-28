@@ -118,14 +118,6 @@ public class WaterSplash : NetworkBehaviour {
         spriteRenderer.SetPropertyBlock(properties);
     }
 
-    //public override void Render() {
-    //    for (int i = 0; i < collisionCount; i++) {
-    //        var obj = CollisionBuffer[i];
-
-    //        if ()
-    //    }
-    //}
-
     public override void FixedUpdateNetwork() {
         // Find entities inside our collider
         int collisionCount = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
@@ -143,7 +135,7 @@ public class WaterSplash : NetworkBehaviour {
                 continue;
 
             BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
-            if (!entity)
+            if (!entity || (entity is KillableEntity ke && !ke.IsActive))
                 continue;
 
             if (entity is PlayerController player) {

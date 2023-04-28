@@ -60,7 +60,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public NetworkBool DoEntityBounce { get; set; }
     [Networked] public NetworkBool BounceJump { get; set; }
     [Networked] public TickTimer JumpLandingTimer { get; set; }
-    [Networked(OnChanged = nameof(OnHitRoofAnimCounterChanged))] public byte HitRoofAnimCounter { get; set; }
+    [Networked(OnChanged = nameof(OnBlockBumpSoundCounterChanged))] public byte BlockBumpSoundCounter { get; set; }
     //Knockback
     [Networked(OnChanged = nameof(OnIsInKnockbackChanged))] public NetworkBool IsInKnockback { get; set; }
     [Networked] public NetworkBool IsFireballKnockback { get; set; }
@@ -538,7 +538,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             }
         }
 
-        IsOnGround = down >= 1;
+        IsOnGround = down >= 1 && PropellerLaunchTimer.ExpiredOrNotRunning(Runner);
         hitLeft = left >= 1;
         hitRight = right >= 1;
         hitRoof = up >= 1;
@@ -922,14 +922,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public void SetReserveItem(Enums.PowerupState newItem) {
         Powerup currentReserve = StoredPowerup.GetPowerupScriptable();
         if (!currentReserve) {
-            //we don't have a reserve item, so we can just set it
+            // We don't have a reserve item, so we can just set it
             StoredPowerup = newItem;
             return;
         }
 
         Powerup newReserve = newItem.GetPowerupScriptable();
         if (!newReserve) {
-            //not a valid powerup, so just clear our reserve item instead
+            // Not a valid powerup, so just clear our reserve item instead
             StoredPowerup = Enums.PowerupState.NoPowerup;
             return;
         }
@@ -938,11 +938,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         sbyte currentStatePriority = currentReserve ? currentReserve.statePriority : (sbyte) -1;
 
         if (newStatePriority < currentStatePriority) {
-            //new item is less important than our current reserve item, so we don't want to replace it
+            // New item is less important than our current reserve item, so we don't want to replace it
             return;
         }
 
-        // replace our current reserve item with the new one
+        // Replace our current reserve item with the new one
         StoredPowerup = newItem;
     }
 
@@ -961,7 +961,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         bool fastStars = amount > 2 && Stars > 2;
         int starDirection = FacingRight ? 1 : 2;
 
-        // if the level doesn't loop, don't have stars go to the edges of the map
+        // If the level doesn't loop, don't have stars go towards the edges of the map
         if (!gm.loopingLevel) {
             if (body.position.x > gm.LevelMaxX - 2.5f) {
                 starDirection = 1;
@@ -1240,7 +1240,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                         continue;
                 }
 
-                InteractWithTile(tileLocation, dir);
+                InteractWithTile(tileLocation, dir, out bool _);
             }
         }
         if (pipes) {
@@ -1268,16 +1268,19 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                             continue;
                     }
 
-                    InteractWithTile(tileLocation, dir);
+                    InteractWithTile(tileLocation, dir, out bool _);
                 }
             }
         }
     }
 
-    private bool InteractWithTile(Vector2Int tilePos, InteractableTile.InteractionDirection direction) {
-        TileBase tile = GameManager.Instance.tileManager.GetTile(tilePos);
-        if (tile is InteractableTile it)
+    private bool InteractWithTile(Vector2Int tilePos, InteractableTile.InteractionDirection direction, out bool interacted) {
+        InteractableTile it = GameManager.Instance.tileManager.GetTile(tilePos) as InteractableTile;
+        interacted = it;
+
+        if (it) {
             return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos));
+        }
 
         return false;
     }
@@ -1473,7 +1476,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
 
     private void HandleLayerState() {
-        bool hitsNothing = animator.GetBool("pipe") || IsDead || IsStuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
+        bool hitsNothing = CurrentPipe || IsDead || IsStuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
 
         gameObject.layer = hitsNothing ? Layers.LayerHitsNothing : Layers.LayerPlayer;
     }
@@ -1482,6 +1485,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         if (IsDead || (body.velocity.y > 0.1f && FloorAngle == 0) || PropellerLaunchTimer.IsActive(Runner) || CurrentPipe)
             return false;
 
+        // TODO: improve
         RaycastHit2D hit;
         if (IsWaterWalking) {
             hit = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * 0.1f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, 1 << Layers.LayerEntityHitbox);
@@ -1739,6 +1743,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             Enums.PowerupState.MiniMushroom => 5.408935546875f + Mathf.Lerp(0, 0.428466796875f, t),
             _ => 6.62109375f + Mathf.Lerp(0, 0.46875f, t),
         };
+        vel += (body.velocity.x == Mathf.Sign(FloorAngle)) ? 0 : Mathf.Abs(FloorAngle) * 0.02f * t;
 
         if (canSpecialJump && JumpState == PlayerJumpState.SingleJump) {
             //Double jump
@@ -1756,6 +1761,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         ProperJump = true;
         IsJumping = true;
         JumpAnimCounter++;
+        JumpBufferTime = -1;
+
         BounceJump = DoEntityBounce;
         DoEntityBounce = false;
         timeSinceLastBumpSound = 0;
@@ -2335,10 +2342,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         //activate blocks jumped into
         if (hitRoof && !IsStuckInBlock) {
-            HitRoofAnimCounter++;
+            BlockBumpSoundCounter++;
             bool tempHitBlock = false;
             foreach (Vector2Int tile in TilesJumpedInto) {
-                tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
+                tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool _);
             }
             body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y, IsSwimming && !tempHitBlock ? -2f : -0.1f));
         }
@@ -2393,9 +2400,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
                 if (hitLeft || hitRight) {
                     foreach (var tile in TilesHitSide)
-                        InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
+                        InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool _);
                     FacingRight = hitLeft;
-                    PlaySound(Enums.Sounds.World_Block_Bump);
+                    BlockBumpSoundCounter++;
                 }
             }
         }
@@ -2610,6 +2617,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                     body.position += Vector2.up * 0.05f;
 
                 JumpAnimCounter++;
+                JumpBufferTime = -1;
 
                 IsOnGround = false;
                 IsCrouching = false;
@@ -2723,11 +2731,16 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             GroundpoundAnimCounter++;
 
         ContinueGroundpound = false;
+        bool interactedAtLeastOnce = false;
         foreach (Vector2Int tile in TilesStandingOn) {
-            ContinueGroundpound |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down);
+            ContinueGroundpound |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down, out bool interacted);
+            interactedAtLeastOnce |= interacted;
         }
 
         if (IsDrilling) {
+            if (interactedAtLeastOnce)
+                BlockBumpSoundCounter++;
+
             IsSpinnerFlying &= ContinueGroundpound;
             IsPropellerFlying &= ContinueGroundpound;
             IsDrilling = ContinueGroundpound;
@@ -2946,7 +2959,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     }
 
     private float timeSinceLastBumpSound;
-    public static void OnHitRoofAnimCounterChanged(Changed<PlayerController> changed) {
+    public static void OnBlockBumpSoundCounterChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
 
         if (player.timeSinceLastBumpSound + 0.2f > player.Runner.SimulationRenderTime)

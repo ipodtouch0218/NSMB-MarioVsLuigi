@@ -50,12 +50,7 @@ public class UIUpdater : NetworkBehaviour {
         UpdatePingText();
     }
 
-    public override void Spawned() {
-        teams = SessionData.Instance.Teams;
-        teamManager = GameManager.Instance.teamManager;
-
-        localPlayer = Runner.LocalPlayer;
-
+    public void Start() {
         teamsParent = uiTeamStars.transform.parent.gameObject;
         starsParent = uiStars.transform.parent.gameObject;
         coinsParent = uiCoins.transform.parent.gameObject;
@@ -67,6 +62,13 @@ public class UIUpdater : NetworkBehaviour {
         backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
+    }
+
+    public override void Spawned() {
+        teams = SessionData.Instance.Teams;
+        teamManager = GameManager.Instance.teamManager;
+
+        localPlayer = Runner.LocalPlayer;
 
         foreach (Image bg in backgrounds)
             bg.color = GameManager.Instance.levelUIColor;

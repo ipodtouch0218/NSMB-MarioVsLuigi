@@ -39,6 +39,7 @@ public class KoopaWalk : HoldableEntity {
         //Animation
         animator.SetBool("shell", IsInShell || Holder != null);
         animator.SetFloat("xVel", IsStationary ? 0 : Mathf.Abs(body.velocity.x));
+        animator.SetBool("dead",  !IsActive);
 
         //"Flip" rotation
         float remainingWakeupTimer = WakeupTimer.RemainingTime(Runner) ?? 0f;
@@ -73,8 +74,10 @@ public class KoopaWalk : HoldableEntity {
         if (IsFrozen || IsDead)
             return;
 
-        PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+        if (Holder)
+            FacingRight = Holder.FacingRight;
 
+        PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
         if (IsInShell) {
             hitbox.size = inShellHitboxSize;
             hitbox.offset = inShellHitboxOffset;
@@ -146,7 +149,6 @@ public class KoopaWalk : HoldableEntity {
         IsInShell = false;
         body.velocity = new(-walkSpeed, 0);
         FacingRight = false;
-        sRenderer.flipX = false;
         IsUpsideDown = false;
         IsStationary = false;
 

@@ -7,9 +7,13 @@ using NSMB.Extensions;
 
 public class PlayerListHandler : MonoBehaviour {
 
+    //---Serialized Variables
     [SerializeField] private GameObject contentPane, template;
+
+    //---Private Variables
     private readonly Dictionary<PlayerRef, PlayerListEntry> playerListEntries = new();
 
+    //---Properties
     private NetworkRunner Runner => NetworkHandler.Instance.runner;
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
@@ -79,10 +83,13 @@ public class PlayerListHandler : MonoBehaviour {
 
     public void UpdateAllPlayerEntries() {
         foreach (PlayerRef player in Runner.ActivePlayers)
-            UpdatePlayerEntry(player);
+            UpdatePlayerEntry(player, false);
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.chat.UpdatePlayerColors();
     }
 
-    public void UpdatePlayerEntry(PlayerRef player) {
+    public void UpdatePlayerEntry(PlayerRef player, bool updateChat = true) {
         if (!playerListEntries.ContainsKey(player)) {
             AddPlayerEntry(player);
             return;
@@ -90,6 +97,9 @@ public class PlayerListHandler : MonoBehaviour {
 
         playerListEntries[player].UpdateText();
         ReorderEntries();
+
+        if (updateChat && MainMenuManager.Instance)
+            MainMenuManager.Instance.chat.UpdatePlayerColors();
     }
 
     public void ReorderEntries() {

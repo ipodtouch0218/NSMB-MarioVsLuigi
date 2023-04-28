@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f75ce5d91f7ab344aaab1a8902dcd8b0, type: 3}
+  m_Name: MusicMainMenu-B
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: 8fda5db8b0c028b4fabb312a63a7ac0b, type: 3}
+  loopStartSeconds: 76.8
+  loopEndSeconds: 153.6
+  fastClip: {fileID: 0}
+  speedupFactor: 1.25

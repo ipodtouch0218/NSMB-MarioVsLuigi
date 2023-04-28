@@ -18,7 +18,28 @@ public class ChatManager : MonoBehaviour {
     //---Private Variables
     private readonly List<ChatMessage> chatMessages = new();
 
-    public void AddChatMessage(string message, Color? color = null, bool filter = false) {
+    public void OnEnable() {
+        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+    }
+
+    public void OnDisable() {
+        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+    }
+
+    private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        foreach (ChatMessage message in chatMessages) {
+            if (message.player == player)
+                message.player = -1;
+        }
+    }
+
+    public void UpdatePlayerColors() {
+        foreach (ChatMessage message in chatMessages) {
+            message.UpdatePlayerColor();
+        }
+    }
+
+    public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
 
         ChatMessage chat = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, chatWindow.transform);
         chat.gameObject.SetActive(true);
@@ -31,7 +52,7 @@ public class ChatManager : MonoBehaviour {
         if (filter)
             message = message.Filter();
 
-        chat.SetText(message);
+        chat.Initialize(message, player);
         chatMessages.Add(chat);
         Canvas.ForceUpdateCanvases();
     }
@@ -41,7 +62,7 @@ public class ChatManager : MonoBehaviour {
     }
 
     public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
-        AddChatMessage(GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, replacements), color ?? Color.red);
+        AddChatMessage(GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, replacements), PlayerRef.None, color ?? Color.red);
     }
 
     public void SendChat() {
@@ -99,7 +120,7 @@ public class ChatManager : MonoBehaviour {
         //add username
         message = data.GetNickname() + ": " + message.Filter();
 
-        AddChatMessage(message);
+        AddChatMessage(message, source);
     }
 
     public void IncomingPlayerMessage(string message, RpcInfo info) {

@@ -1,4 +1,5 @@
 using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -84,6 +85,12 @@ namespace NSMB.Extensions {
         //easy sound clips
         public static void PlayOneShot(this AudioSource source, Enums.Sounds clip, CharacterData character = null, byte variant = 0, float volume = 1f) {
             source.PlayOneShot(clip.GetClip(character, variant), volume);
+        }
+
+        public static void AddRange<K, V>(this Dictionary<K, V> dict, Dictionary<K, V> adder) {
+            foreach ((K key, V value) in adder) {
+                dict[key] = value;
+            }
         }
     }
 }

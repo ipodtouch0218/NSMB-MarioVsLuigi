@@ -27,7 +27,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     //---Public Variables
     public bool nonNetworkShutdown;
     public AudioSource sfx, music;
-    public Toggle ndsResolutionToggle, fullscreenToggle, fireballToggle, autoSprintToggle, vsyncToggle, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
+    public Toggle spectateToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public GameObject mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
     public byte currentSkin;
@@ -49,7 +49,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     [SerializeField] private TMP_InputField nicknameField, chatTextField;
     [SerializeField] private TMP_Text errorText, lobbyHeaderText, updateText, startGameButtonText;
     [SerializeField] private ScrollRect settingsScroll;
-    [SerializeField] private Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider;
+    [SerializeField] private Slider lobbyPlayersSlider;
 
     [SerializeField, FormerlySerializedAs("ColorBar")] private Image colorBar;
     [SerializeField] private Image overallsColorImage, shirtColorImage;
@@ -500,7 +500,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         //PhotonNetwork.SetMasterClient(target);
         //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
-        chat.AddChatMessage("Changing hosts is not implemented yet!", Color.red);
+        chat.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
     }
 
     public void Mute(PlayerRef target) {
@@ -658,7 +658,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void Quit() {
-        quitCoroutine ??= StartCoroutine(FinishQuitting());
+        if (quitCoroutine == null)
+            quitCoroutine = StartCoroutine(FinishQuitting());
     }
 
     private IEnumerator FinishQuitting() {

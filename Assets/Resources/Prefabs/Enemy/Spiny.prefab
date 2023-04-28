@@ -56,8 +56,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _IsActive:
-    _value: 1
-  isRespawningEntity: 0
+    _value: 0
+  isRespawningEntity: 1
   body: {fileID: 1435431862184428450}
   sfx: {fileID: 5072740182388110993}
   _IsFrozen:

@@ -2,30 +2,31 @@ using System;
 using System.IO;
 using System.Net;
 using UnityEngine;
-
 using Newtonsoft.Json.Linq;
 
 public class UpdateChecker {
 
-    private static readonly string API_URL = "http://api.github.com/repos/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest";
+    private static readonly string ApiURL = "http://api.github.com/repos/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest";
 
     /// <summary>
     /// Returns if we're up to date, OR newer, compared to the latest GitHub release version number
     /// </summary>
     public async static void IsUpToDate(Action<bool, string> callback) {
 
-        //get http results
-        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(API_URL);
+        // Get http results from the GitHub API
+        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(ApiURL);
         request.Accept = "application/json";
         request.UserAgent = "ipodtouch0218/NSMB-MarioVsLuigi";
 
         HttpWebResponse response = (HttpWebResponse) await request.GetResponseAsync();
 
-        if (response.StatusCode != HttpStatusCode.OK)
+        if (response.StatusCode != HttpStatusCode.OK) {
+            Debug.Log($"[Updater] Failed to connect to the GitHub API: {response.StatusCode}: {response.StatusDescription}");
             return;
+        }
 
         try {
-            //get the latest release version number from github
+            // Parse the latest release version number
             string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
             JObject data = JObject.Parse(json);
 
@@ -41,9 +42,9 @@ public class UpdateChecker {
 
             string[] splitVer = Application.version.Split(".");
 
-            Debug.Log($"[UPDATE CHECK] Local version: {Application.version} / Remote version: {tag}");
+            Debug.Log($"[Updater] Local version: {Application.version} / Remote version: {tag}");
 
-            //check if we're a higher version
+            // Check if we're a higher version
             bool upToDate = true;
             for (int i = 0; i < 4; i++) {
                 int.TryParse(splitTag[i], out int remote);

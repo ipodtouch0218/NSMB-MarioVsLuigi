@@ -119,10 +119,6 @@ public class MarioBrosPlatform : NetworkBehaviour, IPlayerInteractable {
                 return;
         }
 
-        // TODO: change
-        if (Runner.IsForward)
-            player.PlaySound(Enums.Sounds.World_Block_Bump);
-
         InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BumpOffset);
 
         Bumps.Add(new BumpInfo() { point = (int) localPos, spawnTick = Runner.Tick });

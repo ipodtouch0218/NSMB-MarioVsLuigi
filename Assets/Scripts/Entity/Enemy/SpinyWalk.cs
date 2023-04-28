@@ -20,7 +20,7 @@ public class SpinyWalk : KoopaWalk {
 
         if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
             FacingRight = damageDirection.x < 0;
-        } else if (player.IsSliding || player.IsInShell || player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom) {
+        } else if (player.InstakillsEnemies) {
             //Special kill
             bool originalFacing = player.FacingRight;
             if (player.IsInShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
@@ -74,5 +74,12 @@ public class SpinyWalk : KoopaWalk {
                 FacingRight = damageDirection.x > 0;
             }
         }
+    }
+
+    public override void OnIsActiveChanged() {
+        base.OnIsActiveChanged();
+
+        if (IsActive)
+            animator.Play("walk");
     }
 }
