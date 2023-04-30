@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  runInEditor: 0
   frame: 0
   fps: 6
   frames:
@@ -105,6 +106,7 @@ MonoBehaviour:
   - {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -2074995507315294404, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  sRenderer: {fileID: 7440053010099547169}
 --- !u!1 &786289218142832788
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,6 +372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nrb: {fileID: 2965949114585547753}
 --- !u!114 &786289218142832795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -397,18 +400,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _OnGround:
-    _value: 0
-  _HitRoof:
-    _value: 0
-  _HitLeft:
-    _value: 0
-  _HitRight:
-    _value: 0
-  _CrushableGround:
-    _value: 0
   _PreviousTickVelocity: {x: 0, y: 0}
-  _FloorAngle: 0
   currentCollider: {fileID: 786289218142832792}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3

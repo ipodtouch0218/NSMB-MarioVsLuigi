@@ -4954,8 +4954,7 @@ MonoBehaviour:
     _value: 0
   _IsIceball:
     _value: 0
-  _PlayBreakEffect:
-    _value: 0
+  _BreakEffectAnimCounter: 0
   iceBreak: {fileID: 1425112719999528230}
   fireBreak: {fileID: 6930344890943084446}
   iceTrail: {fileID: 9011454779400335023}
@@ -5171,18 +5170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _OnGround:
-    _value: 0
-  _HitRoof:
-    _value: 0
-  _HitLeft:
-    _value: 0
-  _HitRight:
-    _value: 0
-  _CrushableGround:
-    _value: 0
   _PreviousTickVelocity: {x: 0, y: 0}
-  _FloorAngle: 0
   currentCollider: {fileID: -1769135492019179076}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3
@@ -5198,6 +5186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nrb: {fileID: 2914323514277592658}
 --- !u!114 &2644380969240041381
 MonoBehaviour:
   m_ObjectHideFlags: 0

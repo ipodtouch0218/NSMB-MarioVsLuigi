@@ -14,7 +14,6 @@ namespace NSMB.UI.Pause.Options {
 
         //---Serialized Variables
         [SerializeField] private Transform scrollPaneContent;
-        [SerializeField] private InputActionAsset controls;
 
         [Header("Templates")]
         [SerializeField] private NonselectableOption spacerTemplate;
@@ -39,8 +38,10 @@ namespace NSMB.UI.Pause.Options {
         private RebindPauseOptionButton currentRebindingButton;
         private RebindingOperation currentRebinding;
         private Coroutine countdown;
-
         private bool initialized;
+
+        //---Properties
+        public InputActionAsset Controls => ControlSystem.controls.asset;
 
         public override void Selected() {
             if (!initialized) {
@@ -66,8 +67,8 @@ namespace NSMB.UI.Pause.Options {
 
             List<PauseOption> newOptions = new();
 
-            for (int i = 0; i < controls.actionMaps.Count; i++) {
-                InputActionMap map = controls.actionMaps[i];
+            for (int i = 0; i < Controls.actionMaps.Count; i++) {
+                InputActionMap map = Controls.actionMaps[i];
 
                 // Controls starting with '!' are not rebindable
                 if (map.name.StartsWith("!"))
@@ -104,7 +105,7 @@ namespace NSMB.UI.Pause.Options {
                     }
                 }
 
-                if (i < controls.actionMaps.Count - 1) {
+                if (i < Controls.actionMaps.Count - 1) {
                     NonselectableOption newSpacer = Instantiate(spacerTemplate);
                     newSpacer.name = "ControlsSpacer";
                     newSpacer.transform.SetParent(scrollPaneContent, false);
@@ -165,7 +166,7 @@ namespace NSMB.UI.Pause.Options {
                 .WithTargetBinding(index)
                 .WithTimeout(timeoutTime)
                 .OnMatchWaitForAnother(0.2f)
-                // .OnApplyBinding((op,str) => ApplyBind(str))
+                // .OnApplyBinding(ApplyRebind)
                 .OnCancel(DisposeRebind)
                 .OnComplete(OnRebindComplete)
                 .Start();

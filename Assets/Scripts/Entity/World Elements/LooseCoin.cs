@@ -58,7 +58,7 @@ public class LooseCoin : Coin {
 
             // TODO: doesn't always trigger, even for host. Strange.
             // IsForward is ok, the sound isnt top priority
-            if (Runner.IsForward && physics.PreviousTickVelocity.y < -0.5f * (Mathf.Sin(physics.Data.FloorAngle) + 1f))
+            if (Runner.IsForward && physics.previousTickVelocity.y < -0.5f * (Mathf.Sin(physics.Data.FloorAngle) + 1f))
                 PlaySound(Enums.Sounds.World_Coin_Drop);
         }
 

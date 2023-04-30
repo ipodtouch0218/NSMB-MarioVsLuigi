@@ -36,6 +36,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     [SerializeField] protected bool flying = false;
     [SerializeField] protected bool collideWithOtherEnemies = true;
     [SerializeField] protected bool dieWhenInsideBlock = true;
+    [SerializeField] protected bool flipSpriteRenderer = false;
 
     //---Components
     [SerializeField] public BoxCollider2D hitbox;
@@ -56,6 +57,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     public override void Spawned() {
+        base.Spawned();
         DespawnEntity();
         OnIsActiveChanged();
     }
@@ -186,6 +188,10 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             if (sRenderer)
                 sRenderer.enabled = false;
         }
+    }
+
+    public override void OnFacingRightChanged() {
+        sRenderer.flipX = FacingRight ^ flipSpriteRenderer;
     }
 
     public override void RespawnEntity() {

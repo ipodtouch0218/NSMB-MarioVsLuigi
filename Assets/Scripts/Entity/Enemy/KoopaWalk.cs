@@ -15,7 +15,6 @@ public class KoopaWalk : HoldableEntity {
     [Networked] public NetworkBool IsInShell { get; set; }
     [Networked] public NetworkBool IsStationary { get; set; }
     [Networked] public NetworkBool IsUpsideDown { get; set; }
-    [Networked] private Vector2 LastFrameVelocity { get; set; }
     [Networked] private NetworkBool Putdown { get; set; }
 
     //---Serialized Variables
@@ -36,12 +35,12 @@ public class KoopaWalk : HoldableEntity {
         if (IsFrozen || IsDead)
             return;
 
-        //Animation
+        // Animation
         animator.SetBool("shell", IsInShell || Holder != null);
         animator.SetFloat("xVel", IsStationary ? 0 : Mathf.Abs(body.velocity.x));
         animator.SetBool("dead",  !IsActive);
 
-        //"Flip" rotation
+        // "Flip" rotation
         float remainingWakeupTimer = WakeupTimer.RemainingTime(Runner) ?? 0f;
         if (IsUpsideDown) {
             dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
@@ -98,9 +97,9 @@ public class KoopaWalk : HoldableEntity {
 
 
         if (data.HitRight && FacingRight) {
-            Turnaround(false, LastFrameVelocity.x);
+            Turnaround(false, physics.previousTickVelocity.x);
         } else if (data.HitLeft && !FacingRight) {
-            Turnaround(true, LastFrameVelocity.x);
+            Turnaround(true, physics.previousTickVelocity.x);
         }
 
         if (data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
@@ -110,14 +109,13 @@ public class KoopaWalk : HoldableEntity {
 
             //turn around if no ground
             if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
-                Turnaround(!FacingRight, LastFrameVelocity.x);
+                Turnaround(!FacingRight, physics.previousTickVelocity.x);
         }
 
         if (!IsStationary)
             body.velocity = new((IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
         HandleTile();
-        LastFrameVelocity = body.velocity;
     }
 
     private void HandleTile() {
@@ -395,10 +393,5 @@ public class KoopaWalk : HoldableEntity {
         if (!crouch)
             WakeupTimer = TickTimer.None;
         Putdown = crouch;
-    }
-
-    //---BasicEntity overrides
-    public override void OnFacingRightChanged() {
-        sRenderer.flipX = FacingRight ^ flipXFlip;
     }
 }

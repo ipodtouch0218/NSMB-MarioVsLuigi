@@ -7,7 +7,7 @@ public class CameraController : MonoBehaviour {
 
     //---Static Variables
     private static readonly Vector2 AirOffset = new(0, .65f);
-    private static readonly Vector2 AirThreshold = new(0.5f, 1.3f), GroundedThreshold = new(0.5f, 0f);
+    private static readonly Vector2 AirThreshold = new(0.55f, 1.3f), GroundedThreshold = new(0.55f, 0f);
     public static float ScreenShake = 0;
 
     //---Public Variables

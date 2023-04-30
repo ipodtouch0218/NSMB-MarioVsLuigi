@@ -172,6 +172,9 @@ MonoBehaviour:
     _value: 0
   iceCarryable: 1
   flying: 0
+  collideWithOtherEnemies: 1
+  dieWhenInsideBlock: 1
+  flipSpriteRenderer: 1
   hitbox: {fileID: 3286581577125373962}
   animator: {fileID: 8735478572021304808}
   legacyAnimation: {fileID: 0}
@@ -181,6 +184,7 @@ MonoBehaviour:
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 4.5
+  nrb: {fileID: 0}
   holderOffset: {x: 0, y: -0.2, z: 0}
   canPlace: 1
   canKick: 1
@@ -274,6 +278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nrb: {fileID: 0}
 --- !u!114 &-2214749743101336736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,18 +306,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _OnGround:
-    _value: 0
-  _HitRoof:
-    _value: 0
-  _HitLeft:
-    _value: 0
-  _HitRight:
-    _value: 0
-  _CrushableGround:
-    _value: 0
   _PreviousTickVelocity: {x: 0, y: 0}
-  _FloorAngle: 0
   currentCollider: {fileID: 3286581577125373962}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.2

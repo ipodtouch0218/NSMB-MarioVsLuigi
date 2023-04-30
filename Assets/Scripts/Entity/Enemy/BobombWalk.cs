@@ -15,7 +15,6 @@ public class BobombWalk : HoldableEntity {
     //---Networked Variables
     [Networked(OnChanged = nameof(OnDetonationTimerChanged))] public TickTimer DetonationTimer { get; set; }
     [Networked(OnChanged = nameof(OnIsDetonatedChanged))] private NetworkBool IsDetonated { get; set; }
-    [Networked] private Vector3 PreviousFrameVelocity { get; set; }
 
     //---Serialized Variables
     [SerializeField] private GameObject explosionPrefab;
@@ -33,19 +32,20 @@ public class BobombWalk : HoldableEntity {
     public override void Spawned() {
         base.Spawned();
         body.velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.velocity.y);
+        mpb ??= new();
     }
 
     public override void Render() {
         base.Render();
 
-        if (!Lit)
+        if (!Lit) {
+            mpb.SetFloat("FlashAmount", 0);
+            sRenderer.SetPropertyBlock(mpb);
             return;
+        }
 
         float timeUntilDetonation = DetonationTimer.RemainingTime(Runner) ?? 0f;
         float redOverlayPercent = 5.39f / (timeUntilDetonation + 2.695f) * 10f % 1f;
-
-        if (mpb == null)
-            sRenderer.GetPropertyBlock(mpb = new());
 
         mpb.SetFloat("FlashAmount", redOverlayPercent);
         sRenderer.SetPropertyBlock(mpb);
@@ -67,8 +67,6 @@ public class BobombWalk : HoldableEntity {
         if (HandleCollision())
             return;
 
-        sRenderer.flipX = !FacingRight;
-
         if (DetonationTimer.Expired(Runner)) {
             Detonate();
             return;
@@ -76,8 +74,6 @@ public class BobombWalk : HoldableEntity {
 
         if (!Lit)
             body.velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.velocity.y);
-
-        PreviousFrameVelocity = body.velocity;
     }
 
     private bool HandleCollision() {
@@ -167,7 +163,7 @@ public class BobombWalk : HoldableEntity {
 
     public void Turnaround(bool hitWallOnLeft) {
         FacingRight = hitWallOnLeft;
-        body.velocity = new((Lit ? Mathf.Abs(PreviousFrameVelocity.x) : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+        body.velocity = new((Lit ? Mathf.Abs(physics.previousTickVelocity.x) : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
         if (Runner.IsForward)
             animator.SetTrigger("turnaround");
@@ -246,6 +242,23 @@ public class BobombWalk : HoldableEntity {
         Light();
     }
 
+    public override void RespawnEntity() {
+        if (IsActive)
+            return;
+
+        base.RespawnEntity();
+        IsDetonated = false;
+        DetonationTimer = TickTimer.None;
+    }
+
+    public override void OnIsDeadChanged() {
+        base.OnIsDeadChanged();
+
+        if (!IsDead) {
+            sfx.Stop();
+        }
+    }
+
     public override void SpecialKill(bool right, bool groundpound, int combo) {
         base.SpecialKill(right, groundpound, combo);
 
@@ -287,16 +300,18 @@ public class BobombWalk : HoldableEntity {
     public override void Kick(PlayerController kicker, bool toRight, float speed, bool groundpound) {
         //always do a groundpound variant kick
         base.Kick(kicker, toRight, speed, true);
-        Kicked = false;
     }
 
     //---OnChangeds
+    private GameObject explosion;
     public static void OnIsDetonatedChanged(Changed<BobombWalk> changed) {
         BobombWalk bomb = changed.Behaviour;
 
         if (bomb.IsDetonated) {
             //spawn explosion
-            Instantiate(bomb.explosionPrefab, bomb.transform.position, Quaternion.identity);
+            if (!bomb.explosion)
+                bomb.explosion = Instantiate(bomb.explosionPrefab, bomb.transform.position, Quaternion.identity);
+
             bomb.sRenderer.enabled = false;
             bomb.sfx.Pause();
         } else {

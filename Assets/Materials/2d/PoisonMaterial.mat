@@ -63,7 +63,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Height: 1.05
+    - Height: 3
     - Points: 256
     - PointsPerTile: 4
     - TextureIndex: 7

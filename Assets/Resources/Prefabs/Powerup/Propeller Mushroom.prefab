@@ -127,6 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  runInEditor: 0
   frame: 0
   fps: 8
   frames:
@@ -138,6 +139,7 @@ MonoBehaviour:
   - {fileID: -404099666, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   - {fileID: 1339308990, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   - {fileID: 2093605636, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
+  sRenderer: {fileID: 5475970293224446295}
 --- !u!1 &5334425534174023786
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,6 +210,7 @@ MonoBehaviour:
   sRenderer: {fileID: 5475970293224446295}
   physics: {fileID: 7925340915895753955}
   childAnimator: {fileID: 0}
+  childAnimation: {fileID: 0}
   hitbox: {fileID: 5334425534174023789}
   flyingPathX:
     serializedVersion: 2
@@ -404,6 +407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nrb: {fileID: 0}
 --- !u!114 &7925340915895753955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -417,18 +421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _OnGround:
-    _value: 0
-  _HitRoof:
-    _value: 0
-  _HitLeft:
-    _value: 0
-  _HitRight:
-    _value: 0
-  _CrushableGround:
-    _value: 0
   _PreviousTickVelocity: {x: 0, y: 0}
-  _FloorAngle: 0
   currentCollider: {fileID: 5334425534174023789}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3

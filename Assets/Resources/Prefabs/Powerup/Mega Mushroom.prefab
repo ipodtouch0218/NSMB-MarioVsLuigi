@@ -176,6 +176,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c3af63798495214db478bad74e4da48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!212 &1959685073963634097 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 1145319354374527610, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+    type: 3}
+  m_PrefabInstance: {fileID: 1501614932865800139}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7027721433493957146 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8453737792750304721, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
@@ -210,6 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  runInEditor: 0
   frame: 16
   fps: 0
   frames:
@@ -230,3 +237,4 @@ MonoBehaviour:
   - {fileID: -399741618, guid: 9f188d58ca4de6148a6e6d1ee86fda7b, type: 3}
   - {fileID: 592006526, guid: 9f188d58ca4de6148a6e6d1ee86fda7b, type: 3}
   - {fileID: -142270678, guid: 9f188d58ca4de6148a6e6d1ee86fda7b, type: 3}
+  sRenderer: {fileID: 1959685073963634097}

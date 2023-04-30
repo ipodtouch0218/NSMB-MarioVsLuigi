@@ -5,15 +5,18 @@ using NSMB.Extensions;
 
 public class VisualizedBlocks : MonoBehaviour {
 
-    public GameObject blockPrefab;
-    [Delayed] public int count = 21, sampleCount = 1024, sampleWidth = 10;
-    public float minHeight = 0.5f, maxHeight = 2f, width = 0.3f, spacing = 0.1f, decayRate = 50f;
-    public FFTWindow window;
+    //---Serialized Variables
+    [SerializeField] private GameObject[] blocks;
+    [SerializeField] private AudioSource music;
+
+    [Header("Settings")]
+    [SerializeField] private GameObject blockPrefab;
+    [SerializeField] [Delayed] private int count = 21, sampleCount = 1024, sampleWidth = 10;
+    [SerializeField] private float minHeight = 0.5f, maxHeight = 2f, width = 0.3f, spacing = 0.1f, decayRate = 50f;
+    [SerializeField] private FFTWindow window;
 
     //---Private Variables
-    private GameObject[] blocks;
     private float[] samples;
-    private AudioSource music;
 
     public void Start() {
         OnValidate();
@@ -27,11 +30,9 @@ public class VisualizedBlocks : MonoBehaviour {
             samples = new float[sampleCount];
 
         if ((blocks?.Length ?? 0) != count) {
-            Debug.Log($"{(blocks?.Length ?? 0)} != {count}");
-            if (blocks != null) {
-                foreach (GameObject block in blocks) {
-                    Destroy(block);
-                }
+            for (int i = 0; i < transform.childCount; i++) {
+                Debug.Log("A");
+                DestroyImmediate(transform.GetChild(i).gameObject);
             }
             blocks = new GameObject[count];
 

@@ -6,12 +6,12 @@ using NSMB.Utils;
 
 public class DebugControls : MonoBehaviour {
 
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
     public void Start() {
-        if (!Debug.isDebugBuild && !Application.isEditor) {
-            enabled = false;
-            return;
-        }
+        //if (!Debug.isDebugBuild && !Application.isEditor) {
+        //    enabled = false;
+        //    return;
+        //}
     }
 
     public void Update() {
@@ -91,5 +91,5 @@ public class DebugControls : MonoBehaviour {
     private void DefaultEntitySpawned(NetworkRunner runner, NetworkObject obj) {
         obj.GetComponent<BasicEntity>().isRespawningEntity = false;
     }
-#endif
+//#endif
 }

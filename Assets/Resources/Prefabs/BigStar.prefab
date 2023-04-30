@@ -5028,6 +5028,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nrb: {fileID: -1107023245251777124}
 --- !u!114 &4404708631857811697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5041,18 +5042,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _OnGround:
-    _value: 0
-  _HitRoof:
-    _value: 0
-  _HitLeft:
-    _value: 0
-  _HitRight:
-    _value: 0
-  _CrushableGround:
-    _value: 0
   _PreviousTickVelocity: {x: 0, y: 0}
-  _FloorAngle: 0
   currentCollider: {fileID: 1973747262660636111}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3

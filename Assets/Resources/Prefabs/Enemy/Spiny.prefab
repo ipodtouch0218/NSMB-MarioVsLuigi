@@ -68,6 +68,7 @@ MonoBehaviour:
   flying: 0
   collideWithOtherEnemies: 1
   dieWhenInsideBlock: 1
+  flipSpriteRenderer: 1
   hitbox: {fileID: 1435431862184428453}
   animator: {fileID: 1376368638781678059}
   legacyAnimation: {fileID: 0}
@@ -77,6 +78,7 @@ MonoBehaviour:
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 4.5
+  nrb: {fileID: 0}
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 1
   canKick: 1
@@ -183,6 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nrb: {fileID: 0}
 --- !u!114 &618591213112214912
 MonoBehaviour:
   m_ObjectHideFlags: 0

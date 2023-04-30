@@ -26,7 +26,8 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void UpdateLabel() {
-            InputBinding targetBinding = action.bindings[bindingIndex];
+            InputBinding targetBinding = Binding;
+
             if (targetBinding.isComposite) {
                 string combined = "";
                 int count = bindingIndex;

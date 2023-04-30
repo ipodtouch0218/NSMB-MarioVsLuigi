@@ -21667,6 +21667,7 @@ MonoBehaviour:
     _value: 0
   _BounceJump:
     _value: 0
+  _BlockBumpSoundCounter: 0
   _IsInKnockback:
     _value: 0
   _IsFireballKnockback:
@@ -21853,6 +21854,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nrb: {fileID: 5594443215964999487}
 --- !u!114 &4918858995667477688
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,17 +3,20 @@
 using Fusion;
 
 [RequireComponent(typeof(NetworkRigidbody2D))]
+[OrderAfter(typeof(PlayerController), typeof(HoldableEntity))]
 public class WrappingObject : SimulationBehaviour {
 
+    //---Serialized Variables
+    [SerializeField] private NetworkRigidbody2D nrb;
+
     //---Private Variables
-    private NetworkRigidbody2D nrb;
     private Vector2 width;
 
-    public void Awake() {
-        nrb = GetComponent<NetworkRigidbody2D>();
-        if (!nrb)
-            nrb = GetComponentInParent<NetworkRigidbody2D>();
+    public void OnValidate() {
+        if (!nrb) nrb = GetComponentInParent<NetworkRigidbody2D>();
+    }
 
+    public void Awake() {
         if (!nrb || !GameManager.Instance || !GameManager.Instance.loopingLevel) {
             enabled = false;
             return;

@@ -10,7 +10,6 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Utils;
-using static UnityEngine.Rendering.DebugUI;
 
 public class PlayerController : FreezableEntity, IPlayerInteractable {
 

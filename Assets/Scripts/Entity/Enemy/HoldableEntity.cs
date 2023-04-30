@@ -3,7 +3,8 @@
 using Fusion;
 using NSMB.Utils;
 
-[OrderAfter(typeof(PlayerController), typeof(NetworkRigidbody2D))]
+[OrderAfter(typeof(PlayerController))]
+[OrderBefore(typeof(WrappingObject))]
 public abstract class HoldableEntity : KillableEntity {
 
     //---Networked Variables
@@ -11,23 +12,39 @@ public abstract class HoldableEntity : KillableEntity {
     [Networked] public PlayerController PreviousHolder { get; set; }
     [Networked] protected TickTimer ThrowInvincibility { get; set; }
     [Networked] protected float CurrentKickSpeed { get; set; }
-    [Networked(OnChanged = nameof(OnKickedChanged))] protected NetworkBool Kicked { get; set; }
+    [Networked(OnChanged = nameof(OnKickedAnimCounterChanged))] protected byte KickedAnimCounter { get; set; }
 
     //---Serailized Variables
     [SerializeField] protected float throwSpeed = 4.5f;
+    [SerializeField] protected NetworkRigidbody2D nrb;
 
     //--Misc Variables
     public Vector3 holderOffset;
     public bool canPlace = true, canKick = true;
 
+    public override void OnValidate() {
+        base.OnValidate();
+        if (!nrb) nrb = GetComponentInParent<NetworkRigidbody2D>();
+    }
+
     public override void FixedUpdateNetwork() {
         if (Holder) {
-            //body.velocity = Holder.body.velocity;
-            body.velocity = Vector2.zero;
+            body.velocity = Holder.body.velocity;
+            //body.velocity = Vector2.zero;
             transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
-            body.position = Holder.body.position + (Holder.body.velocity * Runner.DeltaTime) + (Vector2) holderOffset;
+
+            // Teleport check
+            Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
+            Vector2 diff = newPosition - body.position;
+            Utils.WrapWorldLocation(ref newPosition);
+
+            if (Mathf.Abs(newPosition.x - body.position.x) > 2) {
+                nrb.TeleportToPosition(newPosition, diff);
+            } else {
+                body.position = newPosition;
+            }
+
             hitbox.enabled = false;
-            sRenderer.flipX = !FacingRight;
             CheckForEntityCollisions();
         } else {
             hitbox.enabled = true;
@@ -44,7 +61,7 @@ public abstract class HoldableEntity : KillableEntity {
             PreviousHolder = kicker;
         }
         FacingRight = toRight;
-        Kicked = true;
+        KickedAnimCounter++;
         CurrentKickSpeed = throwSpeed + 1.5f * kickFactor;
         body.velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
     }
@@ -60,7 +77,6 @@ public abstract class HoldableEntity : KillableEntity {
         PreviousHolder = Holder;
         Holder = null;
         FacingRight = toRight;
-        Kicked = false;
 
         body.velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
     }
@@ -69,7 +85,6 @@ public abstract class HoldableEntity : KillableEntity {
         if (Holder)
             return;
 
-        Kicked = false;
         player.SetHeldEntity(this);
     }
 
@@ -108,11 +123,7 @@ public abstract class HoldableEntity : KillableEntity {
     }
 
     //---OnChanged
-    public static void OnKickedChanged(Changed<HoldableEntity> changed) {
-        HoldableEntity entity = changed.Behaviour;
-        if (!entity.Kicked)
-            return;
-
-        entity.PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+    public static void OnKickedAnimCounterChanged(Changed<HoldableEntity> changed) {
+        changed.Behaviour.PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 }

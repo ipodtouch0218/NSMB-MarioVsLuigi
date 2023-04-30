@@ -3,7 +3,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Utils;
 
-public class PhysicsEntity : NetworkBehaviour {
+public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
 
     //---Staic Variables
     private static LayerMask GroundMask = default;
@@ -11,25 +11,29 @@ public class PhysicsEntity : NetworkBehaviour {
 
     //---Networked Variables
     [Networked] public ref PhysicsDataStruct Data => ref MakeRef<PhysicsDataStruct>();
-    [Networked] public Vector2 PreviousTickVelocity { get; set; }
 
     //---Public Variables
     public Collider2D currentCollider;
+    public Vector2 previousTickVelocity;
 
     //---Serialized Variables
     [SerializeField] private bool goUpSlopes;
     [SerializeField] private float floorAndRoofCutoff = 0.5f;
 
     //---Components
-    private Rigidbody2D body;
+    [SerializeField] private Rigidbody2D body;
 
     public void Awake() {
-        body = GetComponent<Rigidbody2D>();
+        if (!body) body = GetComponent<Rigidbody2D>();
     }
 
     public void Start() {
         if (GroundMask == default)
             GroundMask = 1 << Layers.LayerGround | 1 << Layers.LayerGroundEntity;
+    }
+
+    public void BeforeTick() {
+        previousTickVelocity = body.velocity;
     }
 
     public PhysicsDataStruct UpdateCollisions() {
@@ -54,7 +58,7 @@ public class PhysicsEntity : NetworkBehaviour {
                 // touching floor
                 // If we're moving upwards, don't touch the floor.
                 // Most likely, we're inside a semisolid.
-                if (PreviousTickVelocity.y > 0)
+                if (previousTickVelocity.y > 0)
                     continue;
 
                 // Make sure that we're also above the floor, so we don't
@@ -88,7 +92,6 @@ public class PhysicsEntity : NetworkBehaviour {
         Data.HitRight = hitRightCount >= 1;
         Data.HitLeft = hitLeftCount >= 1;
 
-        PreviousTickVelocity = body.velocity;
         return Data;
     }
 
