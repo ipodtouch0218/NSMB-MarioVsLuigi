@@ -12,6 +12,7 @@ public class ChatMessage : MonoBehaviour {
     [SerializeField] private Image image;
 
     //---Public Variables
+    public bool system;
     public PlayerRef player;
 
     public void OnValidate() {
@@ -19,14 +20,18 @@ public class ChatMessage : MonoBehaviour {
         if (!image) image = GetComponent<Image>();
     }
 
-    public void Initialize(string message, PlayerRef player) {
+    public void Initialize(string message, PlayerRef? player) {
         chatText.text = message;
-        this.player = player;
+        if (player == null)
+            system = true;
+        else
+            this.player = player.Value;
+
         UpdatePlayerColor();
     }
 
     public void UpdatePlayerColor() {
-        if (player == PlayerRef.None) {
+        if (system) {
             image.color = Color.white;
         } else {
             image.color = Utils.GetPlayerColor(NetworkHandler.Runner, player, 0.15f);

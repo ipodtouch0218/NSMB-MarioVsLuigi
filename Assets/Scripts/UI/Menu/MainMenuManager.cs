@@ -175,6 +175,9 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void EnterRoom() {
 
+        // Clear the chat
+        chat.ClearChat();
+
         // If the game is already started, we want to immediately load in.
         if (SessionData.Instance.GameStarted) {
             OnGameStartChanged();
@@ -361,7 +364,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public async void QuitRoom() {
         OpenRoomListMenu();
-        chat.ClearChat();
 
         if (playerPingUpdateCoroutine != null) {
             StopCoroutine(playerPingUpdateCoroutine);

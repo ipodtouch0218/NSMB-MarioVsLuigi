@@ -19,11 +19,6 @@ public class PiranhaPlantController : KillableEntity {
         PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
     }
 
-    public override void Render() {
-        animator.SetBool("dead", IsDead);
-        sRenderer.enabled = !IsDead;
-    }
-
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
         GameManager gm = GameManager.Instance;
@@ -56,16 +51,8 @@ public class PiranhaPlantController : KillableEntity {
         }
     }
 
-    public override void RespawnEntity() {
-        if (!IsDead)
-            return;
 
-        IsActive = false;
-        base.RespawnEntity();
-        PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
-        animator.Play("end", 0, 1);
-        hitbox.enabled = true;
-    }
+
 
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
@@ -78,6 +65,17 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     //---KillableEntity overrides
+    public override void RespawnEntity() {
+        if (!IsDead)
+            return;
+
+        IsActive = false;
+        base.RespawnEntity();
+        PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
+        animator.Play("end", 0, 1);
+        hitbox.enabled = true;
+    }
+
     public override void Kill() {
         IsDead = true;
         hitbox.enabled = false;
@@ -108,6 +106,9 @@ public class PiranhaPlantController : KillableEntity {
             PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + new Vector3(0, IsUpsideDown ? -0.5f : 0.5f, 0));
         }
+
+        animator.SetBool("dead", IsDead);
+        sRenderer.enabled = !IsDead;
     }
 
 #if UNITY_EDITOR

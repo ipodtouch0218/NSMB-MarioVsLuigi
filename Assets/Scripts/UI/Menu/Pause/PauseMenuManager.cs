@@ -87,8 +87,10 @@ namespace NSMB.UI.Pause {
         }
 
         public void SelectOption(int index) {
-            if (selected == index || selected < 0 || selected >= options.Length)
+            if (selected == index || selected < 0 || selected >= options.Length || (index == 1 && !isHost)) {
+                skipSound = false;
                 return;
+            }
 
             selected = index;
             UpdateLabels(selected);

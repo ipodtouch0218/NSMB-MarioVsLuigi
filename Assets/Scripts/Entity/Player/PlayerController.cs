@@ -128,7 +128,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
     public override bool IsCarryable => true;
     public bool WallSliding => WallSlideLeft || WallSlideRight;
-    public bool InstakillsEnemies => IsStarmanInvincible || IsInShell || IsSliding || State == Enums.PowerupState.MegaMushroom;
+    public bool InstakillsEnemies => IsStarmanInvincible || IsInShell || (IsSliding && Mathf.Abs(body.velocity.x) > 0.1f) || State == Enums.PowerupState.MegaMushroom;
     public bool IsCrouchedInShell => State == Enums.PowerupState.BlueShell && IsCrouching && !IsInShell;
     public bool IsStarmanInvincible => !StarmanTimer.ExpiredOrNotRunning(Runner);
     public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);

@@ -29,7 +29,7 @@ public class ChatManager : MonoBehaviour {
     private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         foreach (ChatMessage message in chatMessages) {
             if (message.player == player)
-                message.player = -1;
+                message.player = PlayerRef.None;
         }
     }
 
@@ -39,7 +39,7 @@ public class ChatManager : MonoBehaviour {
         }
     }
 
-    public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
+    public void AddChatMessage(string message, PlayerRef? player = null, Color? color = null, bool filter = false) {
 
         ChatMessage chat = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, chatWindow.transform);
         chat.gameObject.SetActive(true);
@@ -62,14 +62,14 @@ public class ChatManager : MonoBehaviour {
     }
 
     public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
-        AddChatMessage(GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, replacements), PlayerRef.None, color ?? Color.red);
+        AddChatMessage(GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, replacements), null, color ?? Color.red);
     }
 
     public void SendChat() {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerData data = runner.GetLocalPlayerData();
         if (!data.MessageCooldownTimer.ExpiredOrNotRunning(runner)) {
-            //can't send a message yet.
+            // Can't send a message yet.
             return;
         }
 
@@ -114,7 +114,7 @@ public class ChatManager : MonoBehaviour {
             return;
 
         //format message, in case we can't trust the host to do it for us.
-        message = message.Substring(0, Mathf.Min(128, message.Length));
+        message = message[..Mathf.Min(128, message.Length)];
         message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
 
         //add username
@@ -139,7 +139,7 @@ public class ChatManager : MonoBehaviour {
             return;
 
         //validate message format
-        message = message.Substring(0, Mathf.Min(128, message.Length));
+        message = message[..Mathf.Min(128, message.Length)];
         message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
 
         //empty message

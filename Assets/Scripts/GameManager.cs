@@ -195,6 +195,13 @@ public class GameManager : NetworkBehaviour {
             // The game HAS already started.
             SetGameTimestamps();
         }
+
+        // Set up alternating music for the default stages
+        if (!mainMusic) {
+            byte musicIndex = SessionData.Instance.AlternatingMusicIndex;
+            int songs = ScriptableManager.Instance.alternatingStageMusic.Length;
+            mainMusic = ScriptableManager.Instance.alternatingStageMusic[musicIndex % songs];
+        }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -473,6 +480,8 @@ public class GameManager : NetworkBehaviour {
                 if (SessionData.Instance.Teams)
                     data.Team = (sbyte) Mathf.Clamp(data.Team, 0, ScriptableManager.Instance.teams.Length);
             }
+
+            SessionData.Instance.AlternatingMusicIndex++;
         }
 
         // Return back to the main menu

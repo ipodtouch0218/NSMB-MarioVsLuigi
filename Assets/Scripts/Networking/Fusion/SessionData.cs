@@ -37,6 +37,7 @@ public class SessionData : NetworkBehaviour {
     [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool DrawOnTimeUp { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCustomPowerups))]    public NetworkBool CustomPowerups { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool Teams { get; set; }
+    [Networked]                                                                                 public byte AlternatingMusicIndex { get; set; }
 
     //---Private Variables
     private readonly Dictionary<Guid, uint> wins = new();

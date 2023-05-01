@@ -1390,8 +1390,6 @@ MonoBehaviour:
   - {fileID: 1620709694516349214}
   image: {fileID: 4880914439789722687}
   scrollPaneContent: {fileID: 7735080667636149746}
-  controls: {fileID: -944628639613478452, guid: d29805f34fe91da4e94010a38823fab7,
-    type: 3}
   spacerTemplate: {fileID: 3339317306750256394}
   controlTemplate: {fileID: 6769179400359917634}
   headerTemplate: {fileID: 8246542296114661711}
@@ -2959,6 +2957,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -8990,6 +8989,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c3ef426263aebe244b5bcf2b9955797c, type: 2}
   - {fileID: 11400000, guid: c09017c0500866d42846620d77edad3a, type: 2}
   - {fileID: 11400000, guid: 3215e8cb10c74044b9c4b199865ddfea, type: 2}
+  alternatingStageMusic:
+  - {fileID: 11400000, guid: 488f1c737d498714c951d86c1a790bcc, type: 2}
+  - {fileID: 11400000, guid: 2cfae2267b801f944813218ca08798fb, type: 2}
 --- !u!114 &1776850482587567144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10222,6 +10224,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -20651,6 +20654,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -21131,6 +21135,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
