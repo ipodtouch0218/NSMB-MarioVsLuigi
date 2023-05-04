@@ -5170,10 +5170,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _PreviousTickVelocity: {x: 0, y: 0}
   currentCollider: {fileID: -1769135492019179076}
+  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3
+  body: {fileID: 0}
 --- !u!114 &1011982274984717417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5313,9 +5314,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -755315459
-  m_SortingLayer: 1
-  m_SortingOrder: 2
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 500
   m_Sprite: {fileID: 5353841184698615464, guid: eddf8ec042b3e614e925d846a27642df,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -5420,9 +5421,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -755315459
-  m_SortingLayer: 1
-  m_SortingOrder: 2
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 500
   m_Sprite: {fileID: 5353841184698615464, guid: 8b4c76bfff99dba4b90ef29e19c39f48,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

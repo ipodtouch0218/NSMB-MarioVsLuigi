@@ -12,9 +12,11 @@ public class NumberParticle : MonoBehaviour {
     private bool ignoreKill;
 
     public void Update() {
-        mpb.SetVector("_ColorOffset", colorOffset);
-        mpb.SetColor("_Overlay", overlay);
-        mr.SetPropertyBlock(mpb);
+        if (mr) {
+            mpb.SetVector("_ColorOffset", colorOffset);
+            mpb.SetColor("_Overlay", overlay);
+            mr.SetPropertyBlock(mpb);
+        }
     }
 
     public void ApplyColorAndText(string newText, Color color, bool final) {

@@ -7,12 +7,13 @@ namespace NSMB.Tiles {
 
         public Vector2Int offset;
 
-        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
             if (Utils.Utils.GetTileAtTileLocation(tileLocation + offset) is InteractableTile tile)
-                return tile.Interact(interacter, direction, (Vector2) worldLocation + ((Vector2) offset * 0.5f));
+                return tile.Interact(interacter, direction, (Vector2) worldLocation + ((Vector2) offset * 0.5f), out bumpSound);
 
+            bumpSound = true;
             return false;
         }
     }

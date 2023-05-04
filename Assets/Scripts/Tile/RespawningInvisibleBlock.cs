@@ -45,6 +45,7 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, I
 
         BumpTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
         DoBump(tileLocation, player);
+        player.BlockBumpSoundCounter++;
 
         //stop player velocity
         player.body.velocity = new(player.body.velocity.x, 0);

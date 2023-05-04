@@ -2,6 +2,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -27,7 +28,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     public Powerup powerupScriptable;
 
     //---Serialized Variables
-    [SerializeField] private float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
+    [SerializeField] private float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4, scaleSize = 0.5f, scaleRate = 30f/4f;
     [SerializeField] private bool avoidPlayers;
 
     //---Components
@@ -37,6 +38,10 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     [SerializeField] private Animation childAnimation;
     [SerializeField] private BoxCollider2D hitbox;
     private IPowerupCollect collectScript;
+
+    //---Private Variables
+    private MaterialPropertyBlock mpb;
+    private bool disableSpawnAnimation;
 
     public override void OnValidate() {
         base.OnValidate();
@@ -88,6 +93,10 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
             body.isKinematic = true;
             gameObject.layer = Layers.LayerHitsNothing;
             sRenderer.sortingOrder = 15;
+            if (childAnimator)
+                childAnimator.enabled = false;
+
+            sRenderer.GetPropertyBlock(mpb = new());
 
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
 
@@ -115,6 +124,28 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     public override void Render() {
         if (childAnimator)
             childAnimator.SetBool("onGround", physics.Data.OnGround);
+
+        if (FollowPlayer && SpawnAnimationTimer.IsActive(Runner)) {
+
+            float timeRemaining = SpawnAnimationTimer.RemainingTime(Runner) ?? 0f;
+            float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
+            sRenderer.transform.localScale = Vector3.one * (1 + adjustment);
+
+            if (!disableSpawnAnimation) {
+                mpb.SetFloat("WaveEnabled", 0);
+                sRenderer.SetPropertyBlock(mpb);
+
+                disableSpawnAnimation = true;
+            }
+
+        } else if (disableSpawnAnimation) {
+
+            sRenderer.transform.localScale = Vector3.one;
+            disableSpawnAnimation = false;
+
+            mpb.SetFloat("WaveEnabled", 1);
+            sRenderer.SetPropertyBlock(mpb);
+        }
     }
 
     public override void FixedUpdateNetwork() {
@@ -137,9 +168,11 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
                 FollowPlayer = null;
                 body.isKinematic = false;
                 sRenderer.sortingOrder = OriginalSortingOrder;
+                sRenderer.gameObject.transform.localScale = Vector3.one;
+                if (childAnimator)
+                    childAnimator.enabled = true;
+
             } else {
-                float timeRemaining = SpawnAnimationTimer.RemainingTime(Runner) ?? 0f;
-                sRenderer.enabled = !(timeRemaining * blinkingRate % 1 < 0.5f);
                 return;
             }
         } else if (BlockSpawn) {

@@ -135,7 +135,7 @@ public class WaterSplash : NetworkBehaviour {
                 continue;
 
             BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
-            if (!entity || (entity is KillableEntity ke && !ke.IsActive))
+            if (!entity || !entity.IsActive)
                 continue;
 
             if (entity is PlayerController player) {
@@ -159,9 +159,9 @@ public class WaterSplash : NetworkBehaviour {
             }
 
             if (Runner.IsServer) {
-                bool aboveWater = (entity.body?.position.y ?? entity.transform.position.y) >= SurfaceHeight;
-                if (aboveWater) {
-                    Rpc_Splash(entity.body.position, Mathf.Abs(Mathf.Max(5, entity.body.velocity.y)), aboveWater ? ParticleType.Exit : ParticleType.None);
+                float heightAboveWater = (entity.body?.position.y ?? entity.transform.position.y) - SurfaceHeight;
+                if (heightAboveWater > 0 && heightAboveWater < 0) {
+                    Rpc_Splash(entity.body.position, Mathf.Abs(Mathf.Max(5, entity.body.velocity.y)), ParticleType.Exit);
                 }
             }
 
@@ -201,7 +201,7 @@ public class WaterSplash : NetworkBehaviour {
                 splash &= pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f;
             }
 
-            if (splash)
+            if (splash && entity.IsActive)
                 Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
         }
 
@@ -213,11 +213,13 @@ public class WaterSplash : NetworkBehaviour {
             bool underSurface = entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
             if (underSurface) {
                 // Don't let fireballs "poof"
-                if (entity is FireballMover fm)
-                    fm.DespawnEntity(false);
-
-                else if (entity is not StarBouncer)
+                if (entity is FireballMover fm) {
+                    if (fm.body.position.y < SurfaceHeight - 0.2f) {
+                        fm.DespawnEntity(false);
+                    }
+                } else if (entity is not StarBouncer) {
                     entity.DespawnEntity();
+                }
             }
         }
 

@@ -11,7 +11,7 @@ using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Utils;
 
-public class PlayerController : FreezableEntity, IPlayerInteractable {
+public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
 
     #region Variables
 
@@ -48,9 +48,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
     [Networked] public float FloorAngle { get; set; }
     [Networked] public NetworkBool OnIce { get; set; }
     //Tile Interactions
-    [Networked, Capacity(16)] private NetworkLinkedList<Vector2Int> TilesStandingOn => default;
-    [Networked, Capacity(16)] private NetworkLinkedList<Vector2Int> TilesJumpedInto => default;
-    [Networked, Capacity(16)] private NetworkLinkedList<Vector2Int> TilesHitSide => default;
+    [Networked, Capacity(8)] private NetworkLinkedList<Vector2Int> TilesStandingOn => default;
+    [Networked, Capacity(8)] private NetworkLinkedList<Vector2Int> TilesJumpedInto => default;
+    [Networked, Capacity(8)] private NetworkLinkedList<Vector2Int> TilesHitSide => default;
     //Jumping
     [Networked(OnChanged = nameof(OnJumpAnimCounterChanged))] private byte JumpAnimCounter { get; set; }
     [Networked] public NetworkBool IsJumping { get; set; }
@@ -306,6 +306,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         SpawnpointIndex = (sbyte) spawnpoint;
     }
 
+    public void BeforeTick() {
+        previousFramePosition = body.position;
+        previousFrameVelocity = body.velocity;
+    }
+
     public override void Spawned() {
         base.Spawned();
 
@@ -448,8 +453,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
         animationController.HandlePipeAnimation();
 
         UpdateHitbox();
-        previousFrameVelocity = body.velocity;
-        previousFramePosition = body.position;
     }
     #endregion
 
@@ -1239,7 +1242,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                         continue;
                 }
 
-                InteractWithTile(tileLocation, dir, out bool _);
+                InteractWithTile(tileLocation, dir, out bool _, out bool _);
             }
         }
         if (pipes) {
@@ -1267,20 +1270,21 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                             continue;
                     }
 
-                    InteractWithTile(tileLocation, dir, out bool _);
+                    InteractWithTile(tileLocation, dir, out bool _, out bool _);
                 }
             }
         }
     }
 
-    private bool InteractWithTile(Vector2Int tilePos, InteractableTile.InteractionDirection direction, out bool interacted) {
+    private bool InteractWithTile(Vector2Int tilePos, InteractableTile.InteractionDirection direction, out bool interacted, out bool bumpSound) {
         InteractableTile it = GameManager.Instance.tileManager.GetTile(tilePos) as InteractableTile;
         interacted = it;
 
         if (it) {
-            return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos));
+            return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos), out bumpSound);
         }
 
+        bumpSound = interacted;
         return false;
     }
     #endregion
@@ -1742,7 +1746,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             Enums.PowerupState.MiniMushroom => 5.408935546875f + Mathf.Lerp(0, 0.428466796875f, t),
             _ => 6.62109375f + Mathf.Lerp(0, 0.46875f, t),
         };
-        vel += (body.velocity.x == Mathf.Sign(FloorAngle)) ? 0 : Mathf.Abs(FloorAngle) * 0.02f * t;
+        vel += (Mathf.Sign(body.velocity.x) != Mathf.Sign(FloorAngle)) ? 0 : Mathf.Abs(FloorAngle) * 0.01f * t;
 
         if (canSpecialJump && JumpState == PlayerJumpState.SingleJump) {
             //Double jump
@@ -2341,11 +2345,19 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
 
         //activate blocks jumped into
         if (hitRoof && !IsStuckInBlock) {
-            BlockBumpSoundCounter++;
             bool tempHitBlock = false;
+            bool interactedAny = false;
             foreach (Vector2Int tile in TilesJumpedInto) {
-                tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool _);
+                tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
+                if (bumpSound)
+                    BlockBumpSoundCounter++;
+
+                interactedAny |= interacted;
             }
+            if (!interactedAny) {
+                BlockBumpSoundCounter++;
+            }
+
             body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y, IsSwimming && !tempHitBlock ? -2f : -0.1f));
         }
 
@@ -2398,10 +2410,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 down = true;
 
                 if (hitLeft || hitRight) {
-                    foreach (var tile in TilesHitSide)
-                        InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool _);
+                    bool interactedAny = false;
+                    foreach (var tile in TilesHitSide) {
+                        InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
+                        if (bumpSound)
+                            BlockBumpSoundCounter++;
+
+                        interactedAny |= interacted;
+                    }
+                    if (!interactedAny) {
+                        BlockBumpSoundCounter++;
+                    }
                     FacingRight = hitLeft;
-                    BlockBumpSoundCounter++;
                 }
             }
         }
@@ -2412,7 +2432,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             if (TimeGrounded == -1)
                 TimeGrounded = Runner.SimulationTime;
 
-            if (Runner.SimulationTime - TimeGrounded > 0.2f)
+            if (Runner.SimulationTime - TimeGrounded > 0.15f)
                 JumpState = PlayerJumpState.None;
 
             if (hitRoof && crushGround && body.velocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
@@ -2677,14 +2697,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             return;
 
         if (IsSpinnerFlying) {
-            //start drill
+            // Start drill
             if (body.velocity.y < 0) {
                 IsDrilling = true;
                 ContinueGroundpound = true;
                 body.velocity = new(0, body.velocity.y);
             }
         } else if (IsPropellerFlying) {
-            //start propeller drill
+            // Start propeller drill
             float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
             if (remainingTime < 0.6f && body.velocity.y < 4) {
                 IsDrilling = true;
@@ -2692,8 +2712,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
                 ContinueGroundpound = true;
             }
         } else {
-            //start groundpound
-            //check if high enough above ground
+            // Start groundpound
+            // Check if high enough above ground
             if (Runner.GetPhysicsScene().BoxCast(body.position, WorldHitboxSize * Vector2.right * 0.5f, Vector3.down, out _, Quaternion.identity, 0.15f * (State == Enums.PowerupState.MegaMushroom ? 2.5f : 1), Layers.MaskAnyGround))
                 return;
 
@@ -2730,16 +2750,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable {
             GroundpoundAnimCounter++;
 
         ContinueGroundpound = false;
-        bool interactedAtLeastOnce = false;
         foreach (Vector2Int tile in TilesStandingOn) {
-            ContinueGroundpound |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down, out bool interacted);
-            interactedAtLeastOnce |= interacted;
+            ContinueGroundpound |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down, out bool _, out bool bumpSound);
+            if (bumpSound)
+                BlockBumpSoundCounter++;
         }
 
         if (IsDrilling) {
-            if (interactedAtLeastOnce)
-                BlockBumpSoundCounter++;
-
             IsSpinnerFlying &= ContinueGroundpound;
             IsPropellerFlying &= ContinueGroundpound;
             IsDrilling = ContinueGroundpound;

@@ -153,7 +153,7 @@ public class BobombWalk : HoldableEntity {
 
                 TileBase tile = tm.GetTile(ourLocation);
                 if (tile is InteractableTile iTile)
-                    iTile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(ourLocation));
+                    iTile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(ourLocation), out bool _);
             }
         }
 

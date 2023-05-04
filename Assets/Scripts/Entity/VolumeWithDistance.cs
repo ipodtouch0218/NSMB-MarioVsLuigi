@@ -10,9 +10,15 @@ public class VolumeWithDistance : MonoBehaviour {
     [SerializeField] private float soundRange = 12f;
     [SerializeField] private float maxPanning = 0.8f;
 
+    //---Private Variables
     private float soundRangeInverse;
 
-    public void OnValidate() => Awake();
+    public void OnValidate() {
+        if (audioSources?.Length <= 0)
+            audioSources = GetComponentsInChildren<AudioSource>();
+
+        if (!soundOrigin) soundOrigin = transform;
+    }
 
     public void Awake() {
         soundRangeInverse = 1f / soundRange;

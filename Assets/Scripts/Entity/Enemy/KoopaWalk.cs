@@ -134,7 +134,7 @@ public class KoopaWalk : HoldableEntity {
                         continue;
 
                     if (tile is InteractableTile it)
-                        it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc));
+                        it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(tileLoc), out bool _);
                 }
             } else if (point.normal.y > 0 && Putdown) {
                 body.velocity = new Vector2(0, body.velocity.y);

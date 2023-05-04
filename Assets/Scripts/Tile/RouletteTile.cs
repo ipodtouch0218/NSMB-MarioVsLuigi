@@ -12,9 +12,11 @@ namespace NSMB.Tiles {
         [SerializeField] private TileBase resultTile;
         [SerializeField] private Vector2 topSpawnOffset;
 
-        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
-            if (base.Interact(interacter, direction, worldLocation))
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
+            if (base.Interact(interacter, direction, worldLocation, out bumpSound))
                 return true;
+
+            bumpSound = true;
 
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
             NetworkPrefabRef spawnResult = PrefabList.Instance.Powerup_Mushroom;

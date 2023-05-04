@@ -80,7 +80,8 @@ public class GameManager : NetworkBehaviour {
 
     [Header("Misc")]
     [SerializeField] private GameObject hud;
-    [SerializeField] private GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, nametagPrefab;
+    [SerializeField] private GameObject pauseUI;
+    [SerializeField] private GameObject nametagPrefab;
     [SerializeField] public Tilemap tilemap;
     [SerializeField] public GameObject objectPoolParent;
     [SerializeField] private TMP_Text winText;
@@ -149,7 +150,6 @@ public class GameManager : NetworkBehaviour {
 
     public void Awake() {
         Instance = this;
-        particleManager = GetComponentInChildren<SingleParticleManager>();
 
         //Make UI color translucent
         levelUIColor.a = .7f;
@@ -620,42 +620,21 @@ public class GameManager : NetworkBehaviour {
         paused = newState;
         sfx.PlayOneShot(Enums.Sounds.UI_Pause);
         pauseUI.SetActive(paused);
-        pausePanel.SetActive(paused);
     }
 
     //---UI Callbacks
-    public void AttemptQuit() {
-        if (!Runner.GetLocalPlayerData().IsRoomOwner) {
-            QuitGame();
-            return;
-        }
-
-        // Prompt for ending game or leaving
-        sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-        pausePanel.SetActive(false);
-        hostExitUI.SetActive(true);
-        EventSystem.current.SetSelectedGameObject(hostExitButton);
-    }
-
-    public void HostEndMatch() {
+    public void PauseEndMatch() {
         pauseUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         rpcs.Rpc_EndGame(PlayerRef.None);
     }
 
-    public void QuitGame() {
+    public void PauseQuitGame() {
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         Runner.Shutdown();
     }
 
-    public void HostQuitCancel() {
-        pausePanel.SetActive(true);
-        hostExitUI.SetActive(false);
-        sfx.PlayOneShot(Enums.Sounds.UI_Back);
-        EventSystem.current.SetSelectedGameObject(pauseButton);
-    }
-
-    public void OpenOptions() {
+    public void PauseOpenOptions() {
         GlobalController.Instance.optionsManager.OpenMenu();
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
     }

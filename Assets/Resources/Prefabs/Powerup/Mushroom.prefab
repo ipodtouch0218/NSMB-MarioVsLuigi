@@ -66,6 +66,8 @@ MonoBehaviour:
   bouncePower: 0
   terminalVelocity: 8
   blinkingRate: 4
+  scaleSize: 0.3
+  scaleRate: 0.13333334
   avoidPlayers: 0
   sRenderer: {fileID: 1145319354374527610}
   physics: {fileID: 3019108884791320526}
@@ -170,10 +172,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _PreviousTickVelocity: {x: 0, y: 0}
   currentCollider: {fileID: 1017215213198693184}
+  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3
+  body: {fileID: 0}
 --- !u!114 &8906202613893743769
 MonoBehaviour:
   m_ObjectHideFlags: 0

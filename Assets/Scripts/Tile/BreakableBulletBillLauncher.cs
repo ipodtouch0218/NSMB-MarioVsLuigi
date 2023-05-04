@@ -8,7 +8,8 @@ namespace NSMB.Tiles {
         //---Serialized Variables
         [SerializeField] private GameObject breakParticle;
 
-        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
+            bumpSound = true;
             if (interacter is not PlayerController)
                 return false;
 
@@ -26,6 +27,7 @@ namespace NSMB.Tiles {
 
             GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
             GameManager.Instance.tileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
+            bumpSound = false;
             return true;
         }
 

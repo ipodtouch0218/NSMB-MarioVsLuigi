@@ -166,7 +166,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---BasicEntity overrides
     public override void DespawnEntity(object data = null) {
-        if (IsActive && (data is not bool dontPlayEffect || !dontPlayEffect))
+        if (IsActive && (data is not bool playEffect || playEffect))
             BreakEffectAnimCounter++;
 
         IsActive = false;

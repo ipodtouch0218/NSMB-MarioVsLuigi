@@ -69,9 +69,16 @@ namespace NSMB.Tiles {
                 this, downwards, downwards ? -SpawnOffset : SpawnOffset, false, NetworkPrefabRef.Empty);
         }
 
-        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             //Breaking block check.
-            return BreakBlockCheck(interacter, direction, worldLocation);
+            bool broken = BreakBlockCheck(interacter, direction, worldLocation);
+
+            bumpSound = !broken;
+            if (interacter is PlayerController player) {
+                bumpSound &= !player.IsGroundpounding;
+            }
+
+            return broken;
         }
     }
 }

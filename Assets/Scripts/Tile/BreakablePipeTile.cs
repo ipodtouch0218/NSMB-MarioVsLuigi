@@ -13,9 +13,12 @@ namespace NSMB.Tiles {
         [SerializeField] private TileBase leftBrokenHatTile, rightBrokenHatTile;
         [SerializeField] private GameObject pipeParticle, destroyedPipeParticle;
 
-        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
+            bumpSound = true;
             if (interacter is not PlayerController player)
                 return false;
+
+            bumpSound = !player.IsGroundpounding;
 
             if (player.State != Enums.PowerupState.MegaMushroom)
                 return false;
@@ -24,18 +27,17 @@ namespace NSMB.Tiles {
             if ((upsideDownPipe && direction == InteractionDirection.Down) || (!upsideDownPipe && direction == InteractionDirection.Up))
                 return false;
 
-
             TileManager tilemap = GameManager.Instance.tileManager;
             Vector2Int ourLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
             if (leftOfPipe && direction == InteractionDirection.Left) {
                 if (Utils.Utils.GetTileAtTileLocation(ourLocation + Vector2Int.right) is InteractableTile otherPipe) {
-                    return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.right * 0.5f));
+                    return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.right * 0.5f), out bumpSound);
                 }
             }
             if (!leftOfPipe && direction == InteractionDirection.Right) {
                 if (Utils.Utils.GetTileAtTileLocation(ourLocation + Vector2Int.left) is InteractableTile otherPipe) {
-                    return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.left* 0.5f));
+                    return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.left* 0.5f), out bumpSound);
                 }
             }
 
@@ -118,7 +120,7 @@ namespace NSMB.Tiles {
 
             GameManager.Instance.tileManager.SetTilesBlock(finalPosition.x, finalPosition.y, 2, tileHeight, tiles);
 
-            player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Break_Pipe);
+            bumpSound = false;
             return true;
         }
 

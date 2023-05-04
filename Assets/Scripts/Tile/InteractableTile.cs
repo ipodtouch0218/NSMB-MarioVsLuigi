@@ -8,7 +8,7 @@ namespace NSMB.Tiles {
         private static readonly Vector3 BumpOffset = new(0.25f, 0.5f), BumpSize = new(0.45f, 0.1f);
         private static readonly Collider2D[] CollisionBuffer = new Collider2D[32];
 
-        public abstract bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation);
+        public abstract bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool playBumpSound);
 
         public static void Bump(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             //check for entities above to bump
