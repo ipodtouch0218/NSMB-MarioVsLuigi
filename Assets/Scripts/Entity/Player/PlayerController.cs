@@ -197,7 +197,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
     [SerializeField] public float flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, launchVelocity = 12f, wallslideSpeed = -4.25f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
     [SerializeField] public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, propellerDrillBuffer, heightSmallModel = 0.42f, heightLargeModel = 0.82f;
-    [SerializeField] private GameObject models;
+    [SerializeField] public GameObject models;
     [SerializeField] public CharacterData character;
 
     public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight, stationaryGiantEnd;
@@ -1953,7 +1953,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
             if (IsSkidding && !IsTurnaround && (Mathf.Sign(newX) != sign || speed < 0.05f)) {
                 //turnaround
-                TurnaroundBoostTime = 10 * Runner.DeltaTime;
+                TurnaroundBoostTime = 0.1667f;
                 newX = 0;
             }
 

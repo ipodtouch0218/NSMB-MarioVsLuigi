@@ -26,5 +26,6 @@ public class StarTrackIcon : TrackIcon {
         }
 
         image.sprite = starSprite;
+        target = starTarget.sRenderer.gameObject;
     }
 }

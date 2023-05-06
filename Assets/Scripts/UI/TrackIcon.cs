@@ -26,7 +26,7 @@ public class TrackIcon : MonoBehaviour {
         levelWidthReciprocal = 2f / gm.levelWidthTile;
     }
 
-    public virtual void Update() {
+    public virtual void LateUpdate() {
         float percentage = (target.transform.position.x - levelMinX) * levelWidthReciprocal;
         transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
     }

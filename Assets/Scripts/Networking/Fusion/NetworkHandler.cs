@@ -296,7 +296,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host, int players = 10) {
 
-
         int attempts = 3;
 
         while (attempts-- > 0) {

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerTrackIcon : TrackIcon {
@@ -21,10 +20,11 @@ public class PlayerTrackIcon : TrackIcon {
         }
 
         image.color = playerTarget.animationController.GlowColor;
+        target = playerTarget.models;
     }
 
-    public override void Update() {
-        base.Update();
+    public override void LateUpdate() {
+        base.LateUpdate();
         transform.localScale = playerTarget.cameraController.IsControllingCamera ? FlipY : TwoThirds;
 
         if (flashRoutine == null && playerTarget.IsDead)

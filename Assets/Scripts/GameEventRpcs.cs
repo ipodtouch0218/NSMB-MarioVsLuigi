@@ -12,21 +12,13 @@ public class GameEventRpcs : NetworkBehaviour {
 
     //---Private Variables
     private GameManager gm;
+    private byte counter;
 
     public void Awake() {
         gm = GetComponent<GameManager>();
     }
 
     //---TILES
-    public void BumpBlock(short x, short y, ushort oldTile, ushort newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
-        Vector2Int loc = new(x, y);
-
-        Vector3 spawnLocation = Utils.TilemapToWorldPosition(loc) + OneFourth;
-
-        Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, offset);
-        });
-    }
 
     public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {
         Vector2Int loc = new(x, y);
@@ -35,7 +27,7 @@ public class GameEventRpcs : NetworkBehaviour {
 
         Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
             obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, offset);
-        });
+        } /*, predictionKey: new() { Byte1 = (byte) Runner.Tick, Byte0 = counter++ } */);
     }
 
     //---GAME STATE

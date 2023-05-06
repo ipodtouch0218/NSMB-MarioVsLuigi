@@ -122,12 +122,22 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
     }
 
     public override void Render() {
+        if (Collector)
+            return;
+
         if (childAnimator)
             childAnimator.SetBool("onGround", physics.Data.OnGround);
 
+        HandleSpawningAnimation();
+        HandleDespawningBlinking();
+    }
+
+    private void HandleSpawningAnimation() {
+
         if (FollowPlayer && SpawnAnimationTimer.IsActive(Runner)) {
 
-            float timeRemaining = SpawnAnimationTimer.RemainingTime(Runner) ?? 0f;
+
+            float timeRemaining = SpawnAnimationTimer.RemainingRenderTime(Runner) ?? 0f;
             float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
             sRenderer.transform.localScale = Vector3.one * (1 + adjustment);
 
@@ -145,6 +155,13 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
             mpb.SetFloat("WaveEnabled", 1);
             sRenderer.SetPropertyBlock(mpb);
+        }
+    }
+
+    private void HandleDespawningBlinking() {
+        float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
+        if (despawnTimeRemaining < 1) {
+            sRenderer.enabled = despawnTimeRemaining * blinkingRate % 1 > 0.5f;
         }
     }
 
@@ -187,15 +204,12 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
                 sRenderer.sortingOrder = OriginalSortingOrder;
                 body.isKinematic = false;
             } else {
-                sRenderer.enabled = true;
+                //sRenderer.enabled = true;
                 return;
             }
 
             return;
         }
-
-        float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
-        sRenderer.enabled = !(despawnTimeRemaining <= 1 && despawnTimeRemaining * blinkingRate % 1 < 0.5f);
 
         Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
         Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
@@ -295,11 +309,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     //---CollectableEntity overrides
     public override void OnCollectedChanged() {
-        if (Collector) {
-            sRenderer.enabled = false;
-        } else {
-            sRenderer.enabled = true;
-        }
+        sRenderer.enabled = !Collector;
     }
 
     //---OnChangeds

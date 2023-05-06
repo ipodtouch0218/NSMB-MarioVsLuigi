@@ -18,6 +18,15 @@ namespace NSMB.Extensions {
             return !timer.ExpiredOrNotRunning(runner);
         }
 
+        public static float? RemainingRenderTime(this TickTimer timer, NetworkRunner runner) {
+
+            float? timeRemaining = timer.RemainingTime(runner);
+            if (!timeRemaining.HasValue)
+                return null;
+
+            return timeRemaining - (runner.Simulation.StateAlpha * runner.DeltaTime);
+        }
+
         public static bool HasRainbowName(this PlayerRef player) {
             PlayerData data = player.GetPlayerData(NetworkHandler.Instance.runner);
             if (!data)

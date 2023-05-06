@@ -3,8 +3,9 @@ using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Tiles;
+using NSMB.Extensions;
 
-public class BlockBump : NetworkBehaviour {
+public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
 
     //---Networked Variables
     [Networked] private TickTimer        DespawnTimer { get; set; }
@@ -16,14 +17,15 @@ public class BlockBump : NetworkBehaviour {
     [Networked] private Vector2          SpawnOffset { get; set; }
     [Networked] private Vector2Int       TileLocation { get; set; }
 
-    //---Components
-    private SpriteRenderer spriteRenderer;
-    private Animator animator;
+    //---Serialized Variables
+    [SerializeField] private Transform hitbox;
+    [SerializeField] private Transform graphics;
+    [SerializeField] private float bumpSize = 0.35f;
+    [SerializeField] private float bumpScale = 0.25f;
+    [SerializeField] private float bumpDuration = 0.15f;
 
-    public void Awake() {
-        animator = GetComponent<Animator>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-    }
+    //---Components
+    [SerializeField] private SpriteRenderer sRenderer;
 
     public void OnBeforeSpawned(Vector2Int tileLocation, ushort bumpTile, ushort resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
         TileLocation = tileLocation;
@@ -34,7 +36,7 @@ public class BlockBump : NetworkBehaviour {
         SpawnOffset = spawnOffset;
         SpawnCoin = spawnCoin;
 
-        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, bumpDuration);
     }
 
     public void OnBeforeSpawned(Vector2Int tileLocation, TileBase bumpTile, TileBase resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
@@ -45,11 +47,7 @@ public class BlockBump : NetworkBehaviour {
         OnBeforeSpawned(tileLocation, bumpTileId, resultTileId, spawnPrefab, downwards, spawnCoin, spawnOffset);
     }
 
-
     public override void Spawned() {
-        animator.SetBool("down", IsDownwards);
-        animator.SetTrigger("start");
-
         //spawn coin effect immediately
         if (SpawnCoin) {
             GameObject coin = Instantiate(PrefabList.Instance.Particle_CoinFromBlock, transform.position + new Vector3(0, IsDownwards ? -0.25f : 0.5f), Quaternion.identity);
@@ -61,16 +59,31 @@ public class BlockBump : NetworkBehaviour {
         TileManager tm = GameManager.Instance.tileManager;
 
         tilemap.SetTile((Vector3Int) TileLocation, tm.GetTileInstanceFromTileId(BumpTile));
-        spriteRenderer.sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) TileLocation);
+        sRenderer.sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) TileLocation);
         tm.SetTile(TileLocation, null);
 
         BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
-        hitbox.size = spriteRenderer.sprite.bounds.size;
+        hitbox.size = sRenderer.sprite.bounds.size;
         hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(0.5f, -0.5f);
+    }
 
+    public override void Render() {
+
+        float elapsedTime = DespawnTimer.RemainingRenderTime(Runner) ?? 0f;
+        float sin = Mathf.Sin((elapsedTime / bumpDuration) * Mathf.PI);
+
+        graphics.localPosition = new(0, (bumpSize * sin) * (IsDownwards ? -1 : 1), 0);
+        graphics.localScale = new(1 + (bumpScale * sin), 1 + (bumpScale * sin), 1);
     }
 
     public override void FixedUpdateNetwork() {
+
+        float elapsedTime = DespawnTimer.RemainingTime(Runner) ?? 0f;
+        float sin = Mathf.Sin((elapsedTime / bumpDuration) * Mathf.PI);
+
+        hitbox.localPosition = new(0, (bumpSize * sin) * (IsDownwards ? -1 : 1), 0);
+        hitbox.localScale = new(1 + (bumpScale * sin), 1 + (bumpScale * sin), 1);
+
         if (DespawnTimer.Expired(Runner)) {
             DespawnTimer = TickTimer.None;
             Kill();
@@ -97,7 +110,7 @@ public class BlockBump : NetworkBehaviour {
             pickupDelay = 1.5f;
 
         } else if (IsDownwards) {
-            float blockSize = spriteRenderer.sprite.bounds.size.y * 0.5f;
+            float blockSize = sRenderer.sprite.bounds.size.y * 0.5f;
             animOrigin += (0.5f - blockSize) * Vector2.up;
             animDestination = animOrigin + (Vector2.down * 0.5f);
 
@@ -110,4 +123,16 @@ public class BlockBump : NetworkBehaviour {
         });
         Runner.Despawn(Object);
     }
+
+    public void PredictedSpawnSpawned() { }
+
+    public void PredictedSpawnUpdate() { }
+
+    public void PredictedSpawnRender() { }
+
+    public void PredictedSpawnFailed() {
+        Runner.Despawn(Object, true);
+    }
+
+    public void PredictedSpawnSuccess() { }
 }

@@ -25,7 +25,7 @@ public class StarBouncer : CollectableEntity {
     [SerializeField] private ParticleSystem particles;
 
     //---Components
-    [SerializeField] private SpriteRenderer sRenderer;
+    [SerializeField] public SpriteRenderer sRenderer;
     [SerializeField] private PhysicsEntity physics;
     [SerializeField] private BoxCollider2D worldCollider;
     [SerializeField] private Animator animator;
