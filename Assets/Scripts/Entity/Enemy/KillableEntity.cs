@@ -58,7 +58,13 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
     public override void Spawned() {
         base.Spawned();
-        DespawnEntity();
+        if (IsRespawningEntity) {
+            DespawnEntity();
+        } else {
+            spawnLocation = body.position;
+            RespawnEntity();
+        }
+
         OnIsActiveChanged();
     }
 

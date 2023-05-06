@@ -28,10 +28,10 @@ public class WrappingObject : SimulationBehaviour {
     public override void FixedUpdateNetwork() {
         if (nrb.Rigidbody.position.x < GameManager.Instance.LevelMinX) {
             Vector3 newPos = nrb.Rigidbody.position + width;
-            nrb.TeleportToPosition(newPos);
+            nrb.TeleportToPosition(newPos, nrb.Rigidbody.velocity);
         } else if (nrb.Rigidbody.position.x > GameManager.Instance.LevelMaxX) {
             Vector3 newPos = nrb.Rigidbody.position - width;
-            nrb.TeleportToPosition(newPos);
+            nrb.TeleportToPosition(newPos, nrb.Rigidbody.velocity);
         }
     }
 }

@@ -52,6 +52,7 @@ public abstract class HoldableEntity : KillableEntity {
         }
     }
 
+
     public virtual void Kick(PlayerController kicker, bool toRight, float kickFactor, bool groundpound) {
         if (Holder)
             return;
@@ -84,6 +85,10 @@ public abstract class HoldableEntity : KillableEntity {
     public virtual void Pickup(PlayerController player) {
         if (Holder)
             return;
+
+        Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
+        Utils.WrapWorldLocation(ref newPosition);
+        nrb.TeleportToPosition(newPosition);
 
         player.SetHeldEntity(this);
     }

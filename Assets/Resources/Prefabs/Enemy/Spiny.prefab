@@ -57,7 +57,6 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _IsActive:
     _value: 0
-  isRespawningEntity: 1
   body: {fileID: 1435431862184428450}
   sfx: {fileID: 5072740182388110993}
   _IsFrozen:
@@ -78,7 +77,7 @@ MonoBehaviour:
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 4.5
-  nrb: {fileID: 0}
+  nrb: {fileID: 3461155966662633466}
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 1
   canKick: 1
@@ -185,7 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nrb: {fileID: 0}
+  nrb: {fileID: 3461155966662633466}
 --- !u!114 &618591213112214912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,10 +212,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _PreviousTickVelocity: {x: 0, y: 0}
   currentCollider: {fileID: 1435431862184428453}
+  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.35
+  body: {fileID: 0}
 --- !u!114 &501032929937061680
 MonoBehaviour:
   m_ObjectHideFlags: 0

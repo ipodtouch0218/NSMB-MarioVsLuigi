@@ -154,7 +154,11 @@ public class BulletBillMover : KillableEntity {
     //---BasicEntity overrides
     public override void OnFacingRightChanged() {
         sRenderer.flipX = FacingRight;
-        trailParticles.transform.localPosition *= new Vector2(-1, 1);
+
+        Vector2 pos = trailParticles.transform.localPosition;
+        pos.x = Mathf.Abs(pos.x) * (FacingRight ? -1 : 1);
+        trailParticles.transform.localPosition = pos;
+
         ParticleSystem.ShapeModule shape = shootParticles.shape;
         shape.rotation = new Vector3(0, 0, FacingRight ? -33 : 147);
     }

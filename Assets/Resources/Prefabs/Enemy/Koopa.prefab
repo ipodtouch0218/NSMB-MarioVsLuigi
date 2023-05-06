@@ -195,7 +195,6 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _IsActive:
     _value: 0
-  isRespawningEntity: 1
   body: {fileID: 8836298984178612591}
   sfx: {fileID: 3399800873378663516}
   _IsFrozen:
@@ -206,6 +205,7 @@ MonoBehaviour:
   flying: 0
   collideWithOtherEnemies: 1
   dieWhenInsideBlock: 1
+  flipSpriteRenderer: 0
   hitbox: {fileID: 8836298984178612584}
   animator: {fileID: 3696720750550087088}
   legacyAnimation: {fileID: 0}
@@ -215,6 +215,7 @@ MonoBehaviour:
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 4.5
+  nrb: {fileID: 3223149270553166802}
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 1
   canKick: 1
@@ -323,10 +324,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _PreviousTickVelocity: {x: 0, y: 0}
   currentCollider: {fileID: 8836298984178612584}
+  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.2
+  body: {fileID: 0}
 --- !u!114 &7052311415719264077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,7 +355,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nrb: {fileID: 0}
+  nrb: {fileID: 3223149270553166802}
 --- !u!114 &8052291530585558525
 MonoBehaviour:
   m_ObjectHideFlags: 0

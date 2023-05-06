@@ -5029,7 +5029,6 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _IsActive:
     _value: 0
-  isRespawningEntity: 1
   body: {fileID: 3091356493132500068}
   sfx: {fileID: 5407584048357268515}
   _IsFrozen:
@@ -5040,6 +5039,7 @@ MonoBehaviour:
   flying: 1
   collideWithOtherEnemies: 0
   dieWhenInsideBlock: 0
+  flipSpriteRenderer: 0
   hitbox: {fileID: 2627485830306083576}
   animator: {fileID: 0}
   legacyAnimation: {fileID: 5184426367989315057}
@@ -5136,7 +5136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nrb: {fileID: 0}
+  nrb: {fileID: 8651934288568289201}
 --- !u!114 &3529903825791625940
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,16 +13,16 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
     [Networked] public TickTimer DespawnTimer { get; set; }
 
-    //---Public Variables
-    public bool isRespawningEntity;
-
     //---Components
     [SerializeField] public Rigidbody2D body;
     [SerializeField] public AudioSource sfx;
 
+    //---Properties
+    public bool IsRespawningEntity => Object.IsSceneObject;
+
     //---Private Variables
     private bool brickBreakSound;
-    private Vector2 spawnLocation;
+    protected Vector2 spawnLocation;
 
     public virtual void OnValidate() {
         if (!body) body = GetComponent<Rigidbody2D>();
@@ -36,7 +36,7 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
     public override void Spawned() {
         GameManager.Instance.networkObjects.Add(Object);
-        if (isRespawningEntity)
+        if (IsRespawningEntity)
             DespawnEntity();
         OnFacingRightChanged();
     }
@@ -77,7 +77,7 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     }
 
     public virtual void DespawnEntity(object data = null) {
-        if (!isRespawningEntity) {
+        if (!IsRespawningEntity) {
             Runner.Despawn(Object);
             return;
         }

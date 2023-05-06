@@ -76,47 +76,47 @@ public class FrozenCube : HoldableEntity {
     }
 
     public override void FixedUpdateNetwork() {
+        base.FixedUpdateNetwork();
+        //if (Holder) {
+        //    body.velocity = Vector2.zero;
+        //    transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
+        //    body.position = Holder.body.position + (Vector2) holderOffset;
+        //    hitbox.enabled = false;
+        //    sRenderer.flipX = !FacingRight;
+        //} else {
+        //    if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        //        body.velocity = Vector2.zero;
+        //        body.angularVelocity = 0;
+        //        if (animator)
+        //            animator.enabled = false;
 
-        if (Holder) {
-            body.velocity = Vector2.zero;
-            transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
-            body.position = Holder.body.position + (Vector2) holderOffset;
-            hitbox.enabled = false;
-            sRenderer.flipX = !FacingRight;
-        } else {
-            if (GameManager.Instance && GameManager.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
-                body.angularVelocity = 0;
-                if (animator)
-                    animator.enabled = false;
+        //        body.isKinematic = true;
+        //        return;
+        //    }
 
-                body.isKinematic = true;
-                return;
-            }
+        //    if (IsDead) {
+        //        hitbox.enabled = false;
+        //        gameObject.layer = Layers.LayerHitsNothing;
 
-            if (IsDead) {
-                hitbox.enabled = false;
-                gameObject.layer = Layers.LayerHitsNothing;
+        //        if (WasSpecialKilled) {
+        //            body.angularVelocity = 400f * (FacingRight ? 1 : -1);
+        //            body.constraints = RigidbodyConstraints2D.None;
+        //        }
+        //    } else {
+        //        hitbox.enabled = true;
+        //        gameObject.layer = Holder || FastSlide ? Layers.LayerEntity : Layers.LayerGroundEntity;
+        //        body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        //    }
 
-                if (WasSpecialKilled) {
-                    body.angularVelocity = 400f * (FacingRight ? 1 : -1);
-                    body.constraints = RigidbodyConstraints2D.None;
-                }
-            } else {
-                hitbox.enabled = true;
-                gameObject.layer = Holder || FastSlide ? Layers.LayerEntity : Layers.LayerGroundEntity;
-                body.constraints = RigidbodyConstraints2D.FreezeRotation;
-            }
+        //    CheckForEntityCollisions();
 
-            CheckForEntityCollisions();
-
-            Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-            if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(loc)) {
-                SpecialKill(FacingRight, false, 0);
-                return;
-            }
-            hitbox.enabled = true;
-        }
+        //    Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
+        //    if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(loc)) {
+        //        SpecialKill(FacingRight, false, 0);
+        //        return;
+        //    }
+        //    hitbox.enabled = true;
+        //}
 
         if (body.position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
             Kill();
@@ -297,9 +297,7 @@ public class FrozenCube : HoldableEntity {
 
     //---IKillableEntity overrides
     protected override void CheckForEntityCollisions() {
-        //don't call base, we dont wanna turn around.
-
-        if (!FastSlide)
+        if (Holder || !FastSlide)
             return;
 
         //only run when fastsliding...
