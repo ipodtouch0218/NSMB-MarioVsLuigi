@@ -1,9 +1,10 @@
-using NSMB.Extensions;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+
+using NSMB.Extensions;
 
 namespace NSMB.UI.Pause.Options {
     public class PauseOptionMenuManager : Selectable {
@@ -24,7 +25,7 @@ namespace NSMB.UI.Pause.Options {
         private bool inputted;
         private GameObject previouslySelected;
 
-        //---Private Propreties
+        //---Propreties
         private PauseOption SelectedOption => (currentOptionIndex >= 0 && currentOptionIndex < SelectedTab.options.Count) ? SelectedTab.options[currentOptionIndex] : null;
         private PauseOptionTab SelectedTab => (currentTabIndex >= 0 && currentTabIndex < tabs.Count) ? tabs[currentTabIndex] : null;
         private bool _back;

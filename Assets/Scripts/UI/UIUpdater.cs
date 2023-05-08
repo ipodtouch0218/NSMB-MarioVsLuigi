@@ -228,6 +228,6 @@ public class UIUpdater : NetworkBehaviour {
         if (!GameManager.Instance.localPlayer)
             return;
 
-        GameManager.Instance.localPlayer.RPC_SpawnReserveItem();
+        GameManager.Instance.localPlayer.OnReserveItem(default);
     }
 }

@@ -32,7 +32,7 @@ public class PrefabList : ScriptableObject {
     public GameObject Particle_1Up, Particle_Giant;
     public GameObject Particle_CoinNumber, Particle_CoinFromBlock;
     public GameObject Particle_StarCollect;
-    public GameObject Particle_Respawn;
+    public RespawnParticle Particle_Respawn;
     public GameObject Particle_Groundpound, Particle_Walljump;
     public GameObject Particle_EnemySpecialKill;
     public GameObject Particle_IceBreak;

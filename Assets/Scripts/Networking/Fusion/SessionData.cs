@@ -25,19 +25,19 @@ public class SessionData : NetworkBehaviour {
 #pragma warning restore CS0414
 
     //---Networked Variables
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultMaxPlayers))]        public byte MaxPlayers { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool PrivateRoom { get; set; }
-    [Networked(OnChanged = nameof(GameStartTimerChanged))]                                      public TickTimer GameStartTimer { get; set; }
-    [Networked(OnChanged = nameof(StartChanged))]                                               public NetworkBool GameStarted { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                             public byte Level { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultStarRequirement))]   public sbyte StarRequirement { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCoinRequirement))]   public byte CoinRequirement { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultLives))]             public sbyte Lives { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultTimer))]             public int Timer { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool DrawOnTimeUp { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCustomPowerups))]    public NetworkBool CustomPowerups { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                             public NetworkBool Teams { get; set; }
-    [Networked]                                                                                 public byte AlternatingMusicIndex { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultMaxPlayers))]      public byte MaxPlayers { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool PrivateRoom { get; set; }
+    [Networked(OnChanged = nameof(GameStartTimerChanged))]                                    public TickTimer GameStartTimer { get; set; }
+    [Networked(OnChanged = nameof(StartChanged))]                                             public NetworkBool GameStarted { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged))]                                           public byte Level { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultLives))]           public sbyte Lives { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultTimer))]           public int Timer { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool DrawOnTimeUp { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCustomPowerups))]  public NetworkBool CustomPowerups { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool Teams { get; set; }
+    [Networked]                                                                               public byte AlternatingMusicIndex { get; set; }
 
     //---Private Variables
     private readonly Dictionary<Guid, uint> wins = new();
@@ -84,7 +84,8 @@ public class SessionData : NetworkBehaviour {
 
             if (GameStartTimer.Expired(Runner)) {
                 // Start game
-                MainMenuManager.Instance.StartGame();
+                if (Runner.IsServer)
+                    Rpc_StartGame();
 
             } else {
                 int ticksLeft = (GameStartTimer.RemainingTicks(Runner) ?? 0) + 1;
@@ -204,6 +205,42 @@ public class SessionData : NetworkBehaviour {
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_ChatDisplayMessage(string message, PlayerRef player) => Chat.DisplayPlayerMessage(message, player);
+
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void Rpc_StartGame() {
+
+        // Set PlayerIDs and spectator values for players
+        sbyte count = 0;
+        foreach (PlayerRef player in Runner.ActivePlayers) {
+            PlayerData data = player.GetPlayerData(Runner);
+            if (!data)
+                continue;
+
+            data.IsCurrentlySpectating = data.IsManualSpectator;
+            data.IsLoaded = false;
+
+            if (data.IsCurrentlySpectating) {
+                data.PlayerId = -1;
+                data.Team = -1;
+                continue;
+            }
+
+            data.PlayerId = count;
+            if (!Teams) {
+                data.Team = count;
+            } else if (data.Team == -1) {
+                data.Team = 0;
+            }
+
+            count++;
+        }
+
+        SetGameStarted(true);
+
+        // Load the correct scene
+        Runner.SetActiveScene(MainMenuManager.Instance.GetCurrentSceneRef());
+    }
 
     //---OnChangeds
     public static void StartChanged(Changed<SessionData> data) {

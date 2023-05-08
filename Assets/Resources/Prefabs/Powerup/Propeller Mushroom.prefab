@@ -159,6 +159,7 @@ GameObject:
   - component: {fileID: 6579073807157730491}
   - component: {fileID: 2970796468099693236}
   - component: {fileID: -6891361109405082350}
+  - component: {fileID: -3672107927577947855}
   m_Layer: 9
   m_Name: Propeller Mushroom
   m_TagString: Powerup
@@ -197,7 +198,6 @@ MonoBehaviour:
   _interpolationDataSource: 2
   _IsActive:
     _value: 0
-  isRespawningEntity: 0
   body: {fileID: 5334425534174023790}
   sfx: {fileID: -6891361109405082350}
   _Collector: {fileID: 0}
@@ -607,3 +607,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-3672107927577947855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5334425534174023786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSources:
+  - {fileID: -6891361109405082350}
+  soundOrigin: {fileID: 5334425534174023778}
+  soundRange: 12
+  maxPanning: 0.8
+  useDistanceToCamera: 1

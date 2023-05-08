@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using TMPro;
@@ -60,6 +61,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     //---Private Variables
     private Coroutine playerPingUpdateCoroutine, quitCoroutine, fadeMusicCoroutine;
     private bool validName;
+    private bool wasSettingsOpen;
 
     public void Awake() => Set(this, false);
     public void OnDestroy() => Release();
@@ -73,6 +75,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         NetworkHandler.OnJoinSessionFailed +=  OnShutdown;
         NetworkHandler.OnConnectFailed +=      OnConnectFailed;
 
+        ControlSystem.controls.UI.Pause.performed += OnPause;
         GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
@@ -85,6 +88,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         NetworkHandler.OnShutdown -=           OnShutdown;
         NetworkHandler.OnJoinSessionFailed -=  OnShutdown;
         NetworkHandler.OnConnectFailed -=      OnConnectFailed;
+
+        ControlSystem.controls.UI.Pause.performed -= OnPause;
         GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
@@ -159,6 +164,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         reconnectBtn.gameObject.SetActive(NetworkHandler.Disconnected);
         joinPrivateRoomBtn.gameObject.SetActive(connectedToNetwork);
+
+        wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
     }
 
     //TODO: refactor, wtf?
@@ -426,40 +433,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         }
     }
 
-    public void StartGame() {
-
-        // Set PlayerIDs and spectator values for players
-        sbyte count = 0;
-        foreach (PlayerRef player in Runner.ActivePlayers) {
-            PlayerData data = player.GetPlayerData(Runner);
-            if (!data)
-                continue;
-
-            data.IsCurrentlySpectating = data.IsManualSpectator;
-            data.IsLoaded = false;
-
-            if (data.IsCurrentlySpectating) {
-                data.PlayerId = -1;
-                data.Team = -1;
-                continue;
-            }
-
-            data.PlayerId = count;
-            if (!SessionData.Instance.Teams) {
-                data.Team = count;
-            } else if (data.Team == -1) {
-                data.Team = 0;
-            }
-
-            count++;
-        }
-
-        SessionData.Instance.SetGameStarted(true);
-
-        // Load the correct scene
-        Runner.SetActiveScene(GetCurrentSceneRef());
-    }
-
     public void UpdateStartGameButton() {
         PlayerData data = Runner.GetLocalPlayerData();
         if (!data || !data.IsRoomOwner) {
@@ -687,7 +660,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         data.Rpc_SetPermanentSpectator(toggle.isOn);
     }
 
-    private SceneRef GetCurrentSceneRef() {
+    public SceneRef GetCurrentSceneRef() {
         if (!SessionData.Instance)
             return SceneRef.None;
 
@@ -736,6 +709,14 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         }
     }
 
+    private void OnPause(InputAction.CallbackContext context) {
+        if (NetworkHandler.Runner.SessionInfo.IsValid && !wasSettingsOpen) {
+            // Open the settings menu if we're inside a room (so we dont have to leave)
+            ConfirmSound();
+            OpenOptions();
+        }
+    }
+
     private void OnLanguageChanged(TranslationManager tm) {
         levelDropdown.ClearOptions();
         levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
@@ -744,6 +725,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     //---Debug
 #if UNITY_EDITOR
     private static readonly Vector3 MaxCameraSize = new(16f/9f * 7f, 7f);
+
     public void OnDrawGizmos() {
         Gizmos.color = Color.red;
         foreach (MapData map in maps) {

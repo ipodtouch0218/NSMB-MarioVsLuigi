@@ -82,7 +82,7 @@ public class KoopaWalk : HoldableEntity {
             hitbox.offset = inShellHitboxOffset;
 
             if (IsStationary) {
-                if (data.OnGround)
+                if (data.OnGround && body.velocity.y < 1)
                     body.velocity = new(0, body.velocity.y);
 
                 if (WakeupTimer.Expired(Runner)) {
@@ -164,7 +164,7 @@ public class KoopaWalk : HoldableEntity {
         }
         body.velocity = Vector2.zero;
         WakeupTimer = TickTimer.CreateFromSeconds(Runner, wakeup);
-        ComboCounter = 1;
+        ComboCounter = 0;
         IsInShell = true;
         IsStationary = true;
 
@@ -299,12 +299,12 @@ public class KoopaWalk : HoldableEntity {
             return;
 
         if (!IsInShell) {
+            EnterShell(false, bumper as PlayerController);
+            IsUpsideDown = canBeFlipped;
             IsStationary = true;
             Putdown = true;
         }
 
-        EnterShell(false, bumper as PlayerController);
-        IsUpsideDown = canBeFlipped;
         body.velocity = new(body.velocity.x, 5.5f);
 
         if (Holder)
@@ -315,8 +315,7 @@ public class KoopaWalk : HoldableEntity {
             physics.Data.OnGround = false;
         }
 
-        if (Runner.IsForward)
-            PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+        KickedAnimCounter++;
     }
 
     //---FreezableEntity overrides
@@ -382,6 +381,7 @@ public class KoopaWalk : HoldableEntity {
         base.Kick(thrower, toRight, kickFactor, groundpound);
         IsStationary = false;
         WakeupTimer = TickTimer.None;
+        ComboCounter = 1;
     }
 
     public override void Throw(bool toRight, bool crouch) {

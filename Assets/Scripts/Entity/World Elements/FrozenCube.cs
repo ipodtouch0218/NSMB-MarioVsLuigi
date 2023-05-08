@@ -335,11 +335,10 @@ public class FrozenCube : HoldableEntity {
     }
 
     public override void Kill() {
-        FrozenEntity?.Unfreeze(unfreezeReason);
-
         if (Holder)
             Holder.SetHeldEntity(null);
 
+        FrozenEntity?.Unfreeze(unfreezeReason);
         Runner.Despawn(Object);
     }
 

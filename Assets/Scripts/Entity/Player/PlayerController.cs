@@ -97,7 +97,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     [Networked] public NetworkBool IsSwimming { get; set; }
     [Networked(OnChanged = nameof(OnIsWaterWalkingChanged))] public NetworkBool IsWaterWalking { get; set; }
     //-Death & Respawning
-    [Networked(OnChanged = nameof(OnDeadChanged))] public NetworkBool IsDead { get; set; } = false;
+    [Networked(OnChanged = nameof(OnDeadChanged))] public NetworkBool IsDead { get; set; }
     [Networked(OnChanged = nameof(OnRespawningChanged))] public NetworkBool IsRespawning { get; set; }
     [Networked] public TickTimer RespawnTimer { get; set; }
     [Networked] public TickTimer PreRespawnTimer { get; set; }
@@ -107,6 +107,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     [Networked] public float HoldStartTime { get; set; }
     [Networked] public TickTimer ShellSlowdownTimer { get; set; }
     [Networked] public TickTimer DamageInvincibilityTimer { get; set; }
+    [Networked] private byte _StarCombo { get; set; }
 
     //-Powerup Stuffs
     [Networked(OnChanged = nameof(OnFireballAnimCounterChanged))] private byte FireballAnimCounter { get; set; }
@@ -139,6 +140,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
     public BoxCollider2D MainHitbox => hitboxes[0];
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
+    public Vector3 Spawnpoint => GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
     private int MovementStage {
         get {
             float xVel = Mathf.Abs(body.velocity.x);
@@ -177,11 +179,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             return arr.Length - 1;
         }
     }
-
-    private int _starCombo;
-    public int StarCombo {
-        get => IsStarmanInvincible ? _starCombo : 0;
-        set => _starCombo = IsStarmanInvincible ? value : 0;
+    public byte StarCombo {
+        get => IsStarmanInvincible ? _StarCombo : (byte) 0;
+        set => _StarCombo = IsStarmanInvincible ? value : (byte) 0;
     }
 
     //---Components
@@ -790,7 +790,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         UsedPropellerThisJump = true;
     }
 
-    private void OnReserveItem(InputAction.CallbackContext context) {
+    public void OnReserveItem(InputAction.CallbackContext context) {
         if (!Object.HasInputAuthority || GameManager.Instance.paused || GameManager.Instance.GameEnded)
             return;
 
@@ -839,7 +839,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         UsedPropellerThisJump = false;
 
         if (!IsDead) {
-            DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+            DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
         }
         return true;
     }
@@ -892,7 +892,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (knockbackStars > 0) {
             DoKnockback(FacingRight, knockbackStars, true, null);
         } else {
-            DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1.5f);
+            DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1f);
         }
     }
     #endregion
@@ -1075,6 +1075,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             return;
         }
 
+        Vector2 spawnpoint = Spawnpoint;
+        networkRigidbody.TeleportToPosition(spawnpoint);
+        cameraController.Recenter(spawnpoint);
+
         IsRespawning = true;
         FacingRight = true;
         transform.localScale = Vector2.one;
@@ -1088,10 +1092,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         IsGroundpounding = false;
         body.isKinematic = true;
         body.velocity = Vector2.zero;
-
-        Vector2 spawnpoint = GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
-        transform.position = body.position = spawnpoint;
-        cameraController.Recenter(spawnpoint);
     }
 
     public void Respawn() {
@@ -1236,8 +1236,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                     dir = InteractableTile.InteractionDirection.Right;
                 }
 
-                TileBase tile = GameManager.Instance.tileManager.GetTile(tileLocation);
-                if (tile is BreakablePipeTile pipe) {
+                if (GameManager.Instance.tileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
                     if (pipe.upsideDownPipe || !pipes || IsGroundpounding)
                         continue;
                 }
@@ -1264,8 +1263,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                         dir = InteractableTile.InteractionDirection.Right;
                     }
 
-                    TileBase tile = GameManager.Instance.tileManager.GetTile(tileLocation);
-                    if (tile is BreakablePipeTile pipe) {
+                    if (GameManager.Instance.tileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
                         if (!pipe.upsideDownPipe || dir == InteractableTile.InteractionDirection.Up)
                             continue;
                     }
@@ -1277,14 +1275,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     }
 
     private bool InteractWithTile(Vector2Int tilePos, InteractableTile.InteractionDirection direction, out bool interacted, out bool bumpSound) {
-        InteractableTile it = GameManager.Instance.tileManager.GetTile(tilePos) as InteractableTile;
-        interacted = it;
 
-        if (it) {
-            return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos), out bumpSound);
+        if (interacted = GameManager.Instance.tileManager.GetTile(tilePos, out InteractableTile tile)) {
+            return tile.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos), out bumpSound);
         }
 
-        bumpSound = interacted;
+        bumpSound = false;
         return false;
     }
     #endregion
@@ -1349,7 +1345,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     }
 
     private void ResetKnockback() {
-        DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
+        DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1f);
         KnockbackTimer = TickTimer.None;
         DoEntityBounce = false;
         IsInKnockback = false;
@@ -1890,7 +1886,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
         } else if (IsTurnaround) {
             float newX = body.velocity.x + (TURNAROUND_ACC * (FacingRight ? -1 : 1) * Runner.DeltaTime);
-            IsTurnaround &= IsOnGround && Mathf.Abs(body.velocity.x) < SPEED_STAGE_MAX[1] && !hitRight && !hitLeft;
+            IsTurnaround &= IsOnGround && !IsCrouching && Mathf.Abs(body.velocity.x) < SPEED_STAGE_MAX[1] && !hitRight && !hitLeft;
             IsSkidding &= IsTurnaround;
             body.velocity = new(newX, body.velocity.y);
 
@@ -2133,7 +2129,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         State = Enums.PowerupState.Mushroom;
         GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime * 0.5f);
         stationaryGiantEnd = false;
-        DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+        DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
         PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
 
         if (body.velocity.y > 0)
@@ -2830,14 +2826,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         }
     }
 
-    private GameObject respawnParticle;
+    private RespawnParticle respawnParticle;
     public static void OnRespawningChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
         if (!player.IsRespawning || player.respawnParticle)
             return;
 
-        player.respawnParticle = Instantiate(PrefabList.Instance.Particle_Respawn, player.body.position, Quaternion.identity);
-        player.respawnParticle.GetComponent<RespawnParticle>().player = player;
+        player.respawnParticle = Instantiate(PrefabList.Instance.Particle_Respawn, player.Spawnpoint, Quaternion.identity);
+        player.respawnParticle.player = player;
     }
 
     public static void OnFireballAnimCounterChanged(Changed<PlayerController> changed) {

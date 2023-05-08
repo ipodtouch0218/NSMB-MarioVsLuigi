@@ -116,48 +116,47 @@ public class BobombWalk : HoldableEntity {
         IsDead = true;
         IsDetonated = true;
 
-        //damage entities in range. TODO: change to nonalloc?
+        // Damage entities in range. TODO: change to nonalloc?
         DetonationHits.Clear();
         Runner.GetPhysicsScene2D().OverlapCircle(body.position + hitbox.offset, 1f, default, DetonationHits);
 
-        //use distinct to only damage enemies once
+        // Use distinct to only damage enemies once
         foreach (GameObject hitObj in DetonationHits.Select(c => c.gameObject).Distinct()) {
-            //don't interact with ourselves
+            // Don't interact with ourselves
             if (hitObj == gameObject)
                 continue;
 
-            //interact with players by powerdown-ing them
+            // Interact with players by powerdown-ing them
             if (hitObj.GetComponentInParent<PlayerController>() is PlayerController player) {
                 player.Powerdown(false);
                 continue;
             }
 
-            //interact with other entities by special killing htem
+            // Interact with other entities by special killing htem
             if (hitObj.GetComponentInParent<KillableEntity>() is KillableEntity en) {
                 en.SpecialKill(transform.position.x < hitObj.transform.position.x, false, 0);
                 continue;
             }
         }
 
-        //(sort or) 'splode tiles in range.
+        // (sort or) 'splode tiles in range.
         Vector2Int tileLocation = Utils.WorldToTilemapPosition(body.position);
         TileManager tm = GameManager.Instance.tileManager;
         for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
             for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
-                //use taxi-cab distance to make a somewhat circular explosion
+                // Use taxi-cab distance to make a somewhat circular explosion
                 if (Mathf.Abs(x) + Mathf.Abs(y) > explosionTileSize)
                     continue;
 
                 Vector2Int ourLocation = tileLocation + new Vector2Int(x, y);
                 Utils.WrapTileLocation(ref ourLocation);
 
-                TileBase tile = tm.GetTile(ourLocation);
-                if (tile is InteractableTile iTile)
-                    iTile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(ourLocation), out bool _);
+                if (tm.GetTile(ourLocation, out InteractableTile tile))
+                    tile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(ourLocation), out bool _);
             }
         }
 
-        //suicide ourselves
+        // Suicide is badass
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
     }
 
@@ -183,7 +182,7 @@ public class BobombWalk : HoldableEntity {
         }
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.2f;
 
         // Normal interactions
         if (Lit) {
@@ -310,7 +309,7 @@ public class BobombWalk : HoldableEntity {
         if (bomb.IsDetonated) {
             //spawn explosion
             if (!bomb.explosion)
-                bomb.explosion = Instantiate(bomb.explosionPrefab, bomb.transform.position, Quaternion.identity);
+                bomb.explosion = Instantiate(bomb.explosionPrefab, bomb.sRenderer.bounds.center, Quaternion.identity);
 
             bomb.sRenderer.enabled = false;
             bomb.sfx.Pause();

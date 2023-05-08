@@ -43,14 +43,12 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     [SerializeField] protected Animator animator;
     [SerializeField] protected LegacyAnimateSpriteRenderer legacyAnimation;
     [SerializeField] public SpriteRenderer sRenderer;
-    [SerializeField] protected AudioSource audioSource;
     [SerializeField] protected PhysicsEntity physics;
 
     public override void OnValidate() {
         base.OnValidate();
         if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
         if (!animator) animator = GetComponentInChildren<Animator>();
-        if (!audioSource) audioSource = GetComponent<AudioSource>();
         if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
         if (!legacyAnimation) legacyAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
         if (!physics) physics = GetComponent<PhysicsEntity>();
@@ -70,7 +68,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
-        if (!GameManager.Instance || !body || IsFrozen)
+        if (!GameManager.Instance || !Object || !body || IsFrozen)
             return;
 
         if (!IsActive) {
@@ -166,7 +164,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
             //death effects
             if (animator)
                 animator.enabled = false;
-            audioSource.enabled = true;
+            sfx.enabled = true;
 
             if (WasSpecialKilled)
                 PlaySound(!IsFrozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
@@ -182,7 +180,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     }
 
     public void PlaySound(Enums.Sounds sound) {
-        audioSource.PlayOneShot(sound);
+        sfx.PlayOneShot(sound);
     }
 
     //---BasicEntity overrides
@@ -211,11 +209,17 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         WasSpecialKilled = false;
         WasGroundpounded = false;
         ComboCounter = 0;
+
+        if (body)
+            body.gravityScale = 2.2f;
         //gameObject.layer = Layers.LayerEntity;
     }
 
     public override void DespawnEntity(object data = null) {
         base.DespawnEntity(data);
+        if (!Object)
+            return;
+
         IsDead = true;
     }
 
@@ -283,7 +287,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
     //---FreezableEntity overrides
     public override void Freeze(FrozenCube cube) {
-        audioSource.Stop();
+        sfx.Stop();
         IsFrozen = true;
         if (animator)
             animator.enabled = false;
@@ -307,7 +311,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
         if (body)
             body.isKinematic = false;
         hitbox.enabled = true;
-        audioSource.enabled = true;
+        sfx.enabled = true;
 
         SpecialKill(false, false, 0);
     }

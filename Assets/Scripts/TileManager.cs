@@ -55,6 +55,21 @@ namespace NSMB.Tiles {
             return GetTile(loc.x, loc.y);
         }
 
+        public bool GetTile<T>(int x, int y, out T outTile) where T : TileBase {
+            TileBase tile = GetTile(x, y);
+            if (tile is T tTile) {
+                outTile = tTile;
+                return true;
+            }
+
+            outTile = null;
+            return false;
+        }
+
+        public bool GetTile<T>(Vector2Int loc, out T outTile) where T : TileBase {
+            return GetTile(loc.x, loc.y, out outTile);
+        }
+
         public void SetTilesBlock(Vector2Int loc, Vector2Int dimensions, TileBase[] tiles) {
             SetTilesBlock(loc.x, loc.y, dimensions.x, dimensions.y, tiles);
         }

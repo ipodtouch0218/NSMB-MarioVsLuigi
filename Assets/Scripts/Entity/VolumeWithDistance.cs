@@ -9,6 +9,7 @@ public class VolumeWithDistance : MonoBehaviour {
     [SerializeField] private Transform soundOrigin;
     [SerializeField] private float soundRange = 12f;
     [SerializeField] private float maxPanning = 0.8f;
+    [SerializeField] private bool useDistanceToCamera;
 
     //---Private Variables
     private float soundRangeInverse;
@@ -25,12 +26,11 @@ public class VolumeWithDistance : MonoBehaviour {
     }
 
     public void LateUpdate() {
-
         GameManager inst = GameManager.Instance;
         if (!inst)
             return;
 
-        Vector3 listener = (inst != null && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
+        Vector3 listener = (!useDistanceToCamera && inst != null && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
 
         float distance = Utils.WrappedDistance(listener, soundOrigin.position, out float xDifference);
         if (distance > soundRange) {

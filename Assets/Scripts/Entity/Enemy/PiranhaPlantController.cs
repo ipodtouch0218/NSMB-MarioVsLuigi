@@ -6,17 +6,30 @@ using NSMB.Utils;
 public class PiranhaPlantController : KillableEntity {
 
     //---Networked Variables
-    [Networked(Default = nameof(upsideDown))] private NetworkBool IsUpsideDown { get; set; }
-    [Networked] public TickTimer PopupTimer { get; set; }
+    [Networked] public TickTimer PopupCountdownTimer { get; set; }
+    [Networked] public TickTimer ChompTimer { get; set; }
+    [Networked] public float PopupAnimationTime { get; set; }
 
     //---Serialized Variables
+    [SerializeField] private Transform interpolationTarget;
     [SerializeField] private float playerDetectSize = 1;
-    [SerializeField] private float popupTimerRequirement = 6f;
-    [SerializeField] private NetworkBool upsideDown;
+    [SerializeField] private float popupTimerRequirement = 6f, popupDistance = 0.5f;
+    [SerializeField] private float popupTime = 0.5f, chompTime = 2f;
+
+    //---Private Variables
+    private Interpolator<float> popupAnimationTimeInterpolator;
 
     public override void Spawned() {
         base.Spawned();
-        PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
+        PopupCountdownTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
+        popupAnimationTimeInterpolator = GetInterpolator<float>(nameof(PopupAnimationTime));
+    }
+
+    public override void Render() {
+        interpolationTarget.localPosition = new(0, (popupAnimationTimeInterpolator.Value - 1) * popupDistance, 0);
+        animator.SetBool("active", ChompTimer.IsRunning);
+        animator.SetBool("chomping", PopupAnimationTime > 0.99f);
+        sRenderer.enabled = !IsDead;
     }
 
     public override void FixedUpdateNetwork() {
@@ -32,8 +45,12 @@ public class PiranhaPlantController : KillableEntity {
                 return;
         }
 
-        if (IsDead)
+        if (IsDead) {
+            hitbox.enabled = false;
+            PopupAnimationTime = 0;
+            ChompTimer = TickTimer.None;
             return;
+        }
 
         if (!Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f))) {
             // No tile at our origin, so our pipe was destroyed.
@@ -41,18 +58,35 @@ public class PiranhaPlantController : KillableEntity {
             return;
         }
 
-        if (PopupTimer.Expired(Runner)) {
-            Collider2D closePlayer = Runner.GetPhysicsScene2D().OverlapCircle(transform.position, playerDetectSize, Layers.MaskOnlyPlayers);
-            if (!closePlayer) {
-                //no players nearby. pop up.
-                animator.SetTrigger("popup");
+        bool chomping = ChompTimer.IsRunning;
+        if (chomping) {
+            // Currently chomping.
+            if (ChompTimer.Expired(Runner)) {
+                // End chomping
+                PopupCountdownTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
+                ChompTimer = TickTimer.None;
             }
-            PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
+        } else {
+            // Not chomping, run the countdown timer.
+            if (PopupCountdownTimer.Expired(Runner)) {
+                Collider2D closePlayer = Runner.GetPhysicsScene2D().OverlapCircle(transform.position, playerDetectSize, Layers.MaskOnlyPlayers);
+                if (!closePlayer) {
+                    // No players nearby. pop up.
+                    ChompTimer = TickTimer.CreateFromSeconds(Runner, chompTime);
+                    PopupCountdownTimer = TickTimer.None;
+                }
+            }
         }
+
+        float change = (1f / popupTime) * Runner.DeltaTime * (chomping ? 1 : -1);
+        PopupAnimationTime = Mathf.Clamp01(PopupAnimationTime + change);
+        hitbox.enabled = PopupAnimationTime >= 0.01f;
+        hitbox.transform.localPosition = new(0, (PopupAnimationTime - 1) * popupDistance, 0);
     }
 
-
-
+    public void PlayChompSound() {
+        PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Chomp);
+    }
 
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
@@ -69,18 +103,20 @@ public class PiranhaPlantController : KillableEntity {
         if (!IsDead)
             return;
 
-        IsActive = false;
-        base.RespawnEntity();
-        PopupTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
-        animator.Play("end", 0, 1);
-        hitbox.enabled = true;
+        IsActive = true;
+        IsDead = false;
+        IsFrozen = false;
+        FacingRight = false;
+        WasSpecialKilled = false;
+        WasGroundpounded = false;
+        ComboCounter = 0;
+
+        PopupCountdownTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
     }
 
     public override void Kill() {
         IsDead = true;
-        hitbox.enabled = false;
-
-        Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up * (IsUpsideDown ? -1f : 1f));
+        Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up);
     }
 
     public override void SpecialKill(bool right, bool groundpound, int combo) {
@@ -104,7 +140,7 @@ public class PiranhaPlantController : KillableEntity {
         if (IsDead) {
             PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
             PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
-            GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + new Vector3(0, IsUpsideDown ? -0.5f : 0.5f, 0));
+            GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + Vector3.up * 0.5f);
         }
 
         animator.SetBool("dead", IsDead);
@@ -115,7 +151,7 @@ public class PiranhaPlantController : KillableEntity {
     //---Debug
     public void OnDrawGizmosSelected() {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawSphere(transform.position + (Vector3) (playerDetectSize * new Vector2(0, transform.eulerAngles.z != 0 ? -0.5f : 0.5f)), playerDetectSize);
+        Gizmos.DrawSphere(transform.position + (Vector3) (playerDetectSize * 0.5f * Vector2.up), playerDetectSize);
     }
 #endif
 }

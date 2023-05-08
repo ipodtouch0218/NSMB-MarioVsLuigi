@@ -68,7 +68,7 @@ MonoBehaviour:
     type: 3}
   Particle_StarCollect: {fileID: 817659606265668166, guid: 0d07cd0662b5f394fa4d95667c1d1814,
     type: 3}
-  Particle_Respawn: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
+  Particle_Respawn: {fileID: 3378887125590929954, guid: cb33e5df66c9644458081c1ddef24e6c,
     type: 3}
   Particle_Groundpound: {fileID: 6621544317595282144, guid: 51b09745b9ed23f49986be6555fd6caa,
     type: 3}

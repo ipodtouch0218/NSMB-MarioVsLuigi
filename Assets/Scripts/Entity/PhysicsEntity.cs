@@ -58,7 +58,7 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
                 // touching floor
                 // If we're moving upwards, don't touch the floor.
                 // Most likely, we're inside a semisolid.
-                if (previousTickVelocity.y > 0)
+                if (previousTickVelocity.y > 0.1f)
                     continue;
 
                 // Make sure that we're also above the floor, so we don't

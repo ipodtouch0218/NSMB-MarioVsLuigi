@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 549419135642806221}
   - component: {fileID: 8658303608481168900}
   - component: {fileID: 4423665312669468572}
-  - component: {fileID: 2844461530477682196}
   m_Layer: 12
   m_Name: WrappingPlatform
   m_TagString: platform
@@ -38,7 +37,7 @@ Transform:
   m_Children:
   - {fileID: 4813915802632404675}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4512469588533065805
 MonoBehaviour:
@@ -93,6 +92,7 @@ MonoBehaviour:
     m_PostInfinity: 1
     m_RotationOrder: 4
   animationOffset: 0
+  interpolationTarget: {fileID: 4813915802632404675}
 --- !u!50 &549419135642806223
 Rigidbody2D:
   serializedVersion: 4
@@ -261,36 +261,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 4512469588533065805}
   - {fileID: 8658303608481168900}
-  - {fileID: 2844461530477682196}
   SimulationBehaviours: []
---- !u!114 &2844461530477682196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 549419135642806219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  InterpolationSpace: 0
-  InterpolationTarget: {fileID: 0}
-  InterpolateErrorCorrection: 0
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 2
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
 --- !u!1 &5006307683767262364
 GameObject:
   m_ObjectHideFlags: 0

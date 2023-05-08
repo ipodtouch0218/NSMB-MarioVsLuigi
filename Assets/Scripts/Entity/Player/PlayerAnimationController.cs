@@ -93,6 +93,22 @@ public class PlayerAnimationController : NetworkBehaviour {
         HandleMiscStates();
     }
 
+    public override void FixedUpdateNetwork() {
+        HandleMegaScale();
+    }
+
+    private void HandleMegaScale() {
+        if (controller.GiantEndTimer.IsActive(Runner)) {
+            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime * 0.5f)) * 2.6f));
+        } else {
+            transform.localScale = controller.State switch {
+                Enums.PowerupState.MiniMushroom => ZeroPointFive,
+                Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingTime(Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
+                _ => Vector3.one,
+            };
+        }
+    }
+
     public void HandleAnimations() {
         if (GameManager.Instance.GameEnded) {
             models.SetActive(true);
@@ -286,11 +302,11 @@ public class PlayerAnimationController : NetworkBehaviour {
 
     private void HandleMiscStates() {
         if (controller.GiantEndTimer.IsActive(Runner)) {
-            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime * 0.5f)) * 2.6f));
+            transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingRenderTime(Runner) ?? 0f) / (controller.giantStartTime * 0.5f)) * 2.6f));
         } else {
             transform.localScale = controller.State switch {
                 Enums.PowerupState.MiniMushroom => ZeroPointFive,
-                Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingTime(Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
+                Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingRenderTime(Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
                 _ => Vector3.one,
             };
         }
@@ -331,7 +347,7 @@ public class PlayerAnimationController : NetworkBehaviour {
             r.SetPropertyBlock(materialBlock);
 
         //hit flash
-        float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingTime(Runner) ?? 0f;
+        float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingRenderTime(Runner) ?? 0f;
         models.SetActive(!controller.IsRespawning && (GameManager.Instance.GameEnded || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
 
         //Model changing

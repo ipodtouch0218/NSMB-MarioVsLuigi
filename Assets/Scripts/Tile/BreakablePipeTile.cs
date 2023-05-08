@@ -71,7 +71,8 @@ namespace NSMB.Tiles {
                 //hit left/right side of pipe
 
                 Vector2 world = worldLocation;
-                bool alreadyDestroyed = tilemap.GetTile(hat).name.EndsWith("D");
+                tilemap.GetTile(hat, out BreakablePipeTile hatTile);
+                bool alreadyDestroyed = (hatTile == hatTile.leftBrokenHatTile || hatTile == hatTile.rightBrokenHatTile);
 
                 if (upsideDownPipe) {
                     if (ourLocation == origin)

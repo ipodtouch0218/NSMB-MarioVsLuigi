@@ -5,7 +5,7 @@ using NSMB.Utils;
 
 [OrderAfter(typeof(PlayerController))]
 [OrderBefore(typeof(WrappingObject))]
-public abstract class HoldableEntity : KillableEntity {
+public abstract class HoldableEntity : KillableEntity, IBeforeTick {
 
     //---Networked Variables
     [Networked] public PlayerController Holder { get; set; }
@@ -21,24 +21,30 @@ public abstract class HoldableEntity : KillableEntity {
     //--Misc Variables
     public Vector3 holderOffset;
     public bool canPlace = true, canKick = true;
+    private bool wasHeldLastTick;
 
     public override void OnValidate() {
         base.OnValidate();
         if (!nrb) nrb = GetComponentInParent<NetworkRigidbody2D>();
     }
 
+    public override void Render() {
+        if (Holder)
+            transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
+    }
+
     public override void FixedUpdateNetwork() {
         if (Holder) {
             body.velocity = Holder.body.velocity;
-            //body.velocity = Vector2.zero;
             transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
+            //body.velocity = Vector2.zero;
 
             // Teleport check
             Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
             Vector2 diff = newPosition - body.position;
             Utils.WrapWorldLocation(ref newPosition);
 
-            if (Mathf.Abs(newPosition.x - body.position.x) > 2) {
+            if (!wasHeldLastTick || Mathf.Abs(newPosition.x - body.position.x) > 2) {
                 nrb.TeleportToPosition(newPosition, diff);
             } else {
                 body.position = newPosition;
@@ -52,6 +58,9 @@ public abstract class HoldableEntity : KillableEntity {
         }
     }
 
+    public void BeforeTick() {
+        wasHeldLastTick = Holder;
+    }
 
     public virtual void Kick(PlayerController kicker, bool toRight, float kickFactor, bool groundpound) {
         if (Holder)
@@ -79,16 +88,12 @@ public abstract class HoldableEntity : KillableEntity {
         Holder = null;
         FacingRight = toRight;
 
-        body.velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+        body.velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), 0);
     }
 
     public virtual void Pickup(PlayerController player) {
         if (Holder)
             return;
-
-        Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
-        Utils.WrapWorldLocation(ref newPosition);
-        nrb.TeleportToPosition(newPosition);
 
         player.SetHeldEntity(this);
     }

@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 2258520988097781654}
   - component: {fileID: 7863306663182383513}
   - component: {fileID: 4207910641862185911}
+  - component: {fileID: -9005566252175493464}
   m_Layer: 9
   m_Name: Mushroom
   m_TagString: Powerup
@@ -57,7 +58,6 @@ MonoBehaviour:
   _interpolationDataSource: 2
   _IsActive:
     _value: 0
-  isRespawningEntity: 0
   body: {fileID: 1017215213198693187}
   sfx: {fileID: 4207910641862185911}
   _Collector: {fileID: 0}
@@ -356,6 +356,24 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-9005566252175493464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1017215213198693191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSources:
+  - {fileID: 4207910641862185911}
+  soundOrigin: {fileID: 1017215213198693199}
+  soundRange: 12
+  maxPanning: 0.8
+  useDistanceToCamera: 1
 --- !u!1 &8453737792750304721
 GameObject:
   m_ObjectHideFlags: 0
