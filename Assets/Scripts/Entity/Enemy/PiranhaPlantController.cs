@@ -29,7 +29,7 @@ public class PiranhaPlantController : KillableEntity {
         interpolationTarget.localPosition = new(0, (popupAnimationTimeInterpolator.Value - 1) * popupDistance, 0);
         animator.SetBool("active", ChompTimer.IsRunning);
         animator.SetBool("chomping", PopupAnimationTime > 0.99f);
-        sRenderer.enabled = !IsDead;
+        //sRenderer.enabled = !IsDead;
     }
 
     public override void FixedUpdateNetwork() {
@@ -143,7 +143,6 @@ public class PiranhaPlantController : KillableEntity {
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + Vector3.up * 0.5f);
         }
 
-        animator.SetBool("dead", IsDead);
         sRenderer.enabled = !IsDead;
     }
 

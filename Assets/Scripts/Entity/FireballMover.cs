@@ -60,7 +60,8 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         //physics
         nrb.TeleportToPosition(spawnpoint, Vector3.zero);
-        body.simulated = true;
+        //body.simulated = true;
+        body.isKinematic = false;
         body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
     }
 
@@ -86,7 +87,8 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             body.velocity = Vector2.zero;
             foreach (Animation anim in GetComponentsInChildren<Animation>())
                 anim.enabled = false;
-            body.simulated = false;
+            body.isKinematic = true;
+            //body.simulated = false;
             return;
         }
 
@@ -171,7 +173,8 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         IsActive = false;
         body.velocity = Vector2.zero;
-        body.simulated = false;
+        //body.simulated = false;
+        body.isKinematic = true;
     }
 
     public override void OnIsActiveChanged() {

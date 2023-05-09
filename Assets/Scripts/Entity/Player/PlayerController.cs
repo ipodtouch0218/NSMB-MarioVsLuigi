@@ -611,12 +611,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
         // hit players
 
+        bool dropStars = data.Team != other.data.Team;
+
         if (other.IsStarmanInvincible) {
             // They are invincible. let them decide if they've hit us.
             if (IsStarmanInvincible) {
                 // Oh, we both are. bonk.
-                DoKnockback(other.body.position.x > body.position.x, 1, true, other.Object);
-                other.DoKnockback(other.body.position.x < body.position.x, 1, true, Object);
+                DoKnockback(other.body.position.x > body.position.x, dropStars ? 1 : 0, true, other.Object);
+                other.DoKnockback(other.body.position.x < body.position.x, dropStars ? 1 : 0, true, Object);
             }
             return;
         }
@@ -625,7 +627,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             // We are invincible. murder time :)
             if (other.State == Enums.PowerupState.MegaMushroom) {
                 // Wait fuck-
-                DoKnockback(other.body.position.x > body.position.x, 1, true, other.Object);
+                DoKnockback(other.body.position.x > body.position.x, dropStars ? 1 : 0, true, other.Object);
                 return;
             }
 
@@ -663,8 +665,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 // Hit them, powerdown them
                 if (other.IsInShell) {
                     // Collide with both
-                    DoKnockback(other.body.position.x < body.position.x, 1, true, other.Object);
-                    other.DoKnockback(other.body.position.x > body.position.x, 1, true, Object);
+                    DoKnockback(other.body.position.x < body.position.x, dropStars ? 1 : 0, true, other.Object);
+                    other.DoKnockback(other.body.position.x > body.position.x, dropStars ? 1 : 0, true, Object);
                 } else {
                     other.Powerdown(false);
                 }
@@ -693,27 +695,26 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             if (State == Enums.PowerupState.MiniMushroom && other.State != Enums.PowerupState.MiniMushroom) {
                 // We are mini, they arent. special rules.
                 if (groundpounded) {
-                    other.DoKnockback(other.body.position.x < body.position.x, 1, false, Object);
+                    other.DoKnockback(other.body.position.x < body.position.x, dropStars ? 1 : 0, false, Object);
                     IsGroundpounding = false;
                     DoEntityBounce = true;
                 }
             } else if (other.State == Enums.PowerupState.MiniMushroom && groundpounded) {
                 // We are big, groundpounding a mini opponent. squish.
-                other.DoKnockback(other.body.position.x > body.position.x, 3, false, Object);
+                other.DoKnockback(other.body.position.x > body.position.x, dropStars ? 3 : 0, false, Object);
                 DoEntityBounce = false;
             } else {
                 if (other.State == Enums.PowerupState.MiniMushroom && groundpounded) {
                     other.Powerdown(false);
                 } else {
-                    other.DoKnockback(other.body.position.x < body.position.x, groundpounded ? 3 : 1, false, Object);
+                    other.DoKnockback(other.body.position.x < body.position.x, dropStars ? (groundpounded ? 3 : 1) : 0, false, Object);
                 }
             }
             return;
         } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove && IsOnGround && other.IsOnGround && (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed)) {
             // Bump
-
-            DoKnockback(other.body.transform.position.x > body.position.x, 1, true, other.Object);
-            other.DoKnockback(other.body.transform.position.x < body.position.x, 1, true, Object);
+            DoKnockback(other.body.transform.position.x > body.position.x, dropStars ? 1 : 0, true, other.Object);
+            other.DoKnockback(other.body.transform.position.x < body.position.x, dropStars ? 1 : 0, true, Object);
         }
     }
     #endregion
@@ -1038,6 +1039,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
 
+        body.velocity = Vector2.zero;
         body.isKinematic = false;
         AttemptThrowHeldItem();
     }

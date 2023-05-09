@@ -3,9 +3,10 @@ using System.Linq;
 using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-[OrderAfter(typeof(NetworkPhysicsSimulation2D))]
+[OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity))]
 public class WaterSplash : NetworkBehaviour {
 
     //---Static Variables
@@ -218,7 +219,9 @@ public class WaterSplash : NetworkBehaviour {
                         fm.DespawnEntity(false);
                     }
                 } else if (entity is not StarBouncer) {
-                    entity.DespawnEntity();
+                    if (!entity.DespawnTimer.IsRunning)
+                        entity.DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
+                    //entity.DespawnEntity();
                 }
             }
         }
@@ -245,8 +248,8 @@ public class WaterSplash : NetworkBehaviour {
                     player2.IsWaterWalking = false;
                 }
             } else {
-                if (!underwater)
-                    return;
+                //if (!underwater)
+                //    return;
 
                 if (Runner.IsServer)
                     Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Enter);

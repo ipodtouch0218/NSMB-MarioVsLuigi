@@ -183,7 +183,6 @@ MonoBehaviour:
   animator: {fileID: 0}
   legacyAnimation: {fileID: 2072787540995169967}
   sRenderer: {fileID: 7821411591339125535}
-  audioSource: {fileID: 5674404523704379184}
   physics: {fileID: 7551600738196628425}
   deadSprite: {fileID: -728934508601558331, guid: b455056ca00f84e48a8040f94ae8170d,
     type: 3}
@@ -248,7 +247,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.175}
+  m_Offset: {x: 0, y: 0.21}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
@@ -259,7 +258,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.3, y: 0.3}
+  m_Size: {x: 0.3, y: 0.38}
   m_EdgeRadius: 0
 --- !u!114 &7551600738196628425
 MonoBehaviour:
@@ -323,6 +322,7 @@ MonoBehaviour:
   soundOrigin: {fileID: 7523289063499453456}
   soundRange: 12
   maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!82 &5674404523704379184
 AudioSource:
   m_ObjectHideFlags: 0

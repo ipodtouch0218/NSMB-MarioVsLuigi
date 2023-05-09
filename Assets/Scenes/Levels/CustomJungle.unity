@@ -20123,6 +20123,31 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1942555963}
     m_Modifications:
+    - target: {fileID: 526604015599624815, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 526604015599624815, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 597171190669668077, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: Flags
+      value: 2561
+      objectReference: {fileID: 0}
+    - target: {fileID: 597171190669668077, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: -701126600292840801
+      objectReference: {fileID: 0}
+    - target: {fileID: 597171190669668077, guid: 28a7f3ea2c44a564d906449744561724,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: -1080445297276467823
+      objectReference: {fileID: 0}
     - target: {fileID: 1900118007787000339, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
       propertyPath: m_RootOrder
@@ -20253,9 +20278,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 28a7f3ea2c44a564d906449744561724, type: 3}
---- !u!4 &1432883594 stripped
+--- !u!4 &1432883592 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 1900118007787000339, guid: 28a7f3ea2c44a564d906449744561724,
+  m_CorrespondingSourceObject: {fileID: 526604015599624815, guid: 28a7f3ea2c44a564d906449744561724,
     type: 3}
   m_PrefabInstance: {fileID: 1432883591}
   m_PrefabAsset: {fileID: 0}
@@ -24019,10 +24044,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1432883594}
   - {fileID: 1226013433}
   - {fileID: 1006188461}
   - {fileID: 1287319192}
+  - {fileID: 1432883592}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

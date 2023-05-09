@@ -13,9 +13,6 @@ public class DiscordController : MonoBehaviour {
     //---Static Variables
     private static readonly long DiscordAppId = 962073502469459999;
 
-    //---Properties
-    private TranslationManager Translation => GlobalController.Instance.translationManager;
-
     //---Private Variables
     private Discord.Discord discord;
     private ActivityManager activityManager;
@@ -53,18 +50,18 @@ public class DiscordController : MonoBehaviour {
             filename = string.Join(" ", filename.Split(" ")[..^2]);
             string dir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + filename;
             activityManager.RegisterCommand(dir);
-            Debug.Log($"[DISCORD] Set launch path to \"{dir}\"");
+            Debug.Log($"[Discord] Set launch path to \"{dir}\"");
         } catch {
-            Debug.Log($"[DISCORD] Failed to set launch path (on {Application.platform})");
+            Debug.Log($"[Discord] Failed to set launch path (on {Application.platform})");
         }
     }
 
     public void TryJoinGame(string secret) {
         //TODO: MainMenu jank...
-        if (SceneManager.GetActiveScene().buildIndex != 0)
+        if (GameManager.Instance)
             return;
 
-        Debug.Log($"[DISCORD] Attempting to join game with secret \"{secret}\"");
+        Debug.Log($"[Discord] Attempting to join game with secret \"{secret}\"");
 
         //TODO: add "disconnect" prompt
         _ = NetworkHandler.JoinRoom(secret);
@@ -73,7 +70,7 @@ public class DiscordController : MonoBehaviour {
     //TODO this doesn't work???
     public void AskToJoin(ref User user) {
         //activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
-        //    Debug.Log($"[DISCORD] Ask to Join response: {res}");
+        //    Debug.Log($"[Discord] Ask to Join response: {res}");
         //});
     }
 
@@ -93,14 +90,16 @@ public class DiscordController : MonoBehaviour {
         Activity activity = new();
         session ??= NetworkHandler.Runner?.SessionInfo;
 
+        TranslationManager translation = GlobalController.Instance.translationManager;
+
         if (SessionData.Instance) {
 
-            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? Translation.GetTranslation("discord.offline") : Translation.GetTranslation("discord.online");
+            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? translation.GetTranslation("discord.offline") : translation.GetTranslation("discord.online");
             if (!NetworkHandler.Runner.IsSinglePlayer) {
                 Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxSize);
                 activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = maxSize }, Id = session.Name + "1" };
             }
-            activity.State = session.IsVisible ? Translation.GetTranslation("discord.public") : Translation.GetTranslation("discord.private");
+            activity.State = session.IsVisible ? translation.GetTranslation("discord.public") : translation.GetTranslation("discord.private");
             activity.Secrets = new() { Join = session.Name };
 
             if (GameManager.Instance) {
@@ -127,7 +126,7 @@ public class DiscordController : MonoBehaviour {
             }
         } else {
             //in the main menu, not in a room
-            activity.Details = Translation.GetTranslation("discord.mainmenu");
+            activity.Details = translation.GetTranslation("discord.mainmenu");
             activity.Assets = new() { LargeImage = "mainmenu" };
         }
 

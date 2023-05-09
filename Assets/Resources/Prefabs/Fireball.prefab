@@ -4943,10 +4943,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0145365c476308445a9e47dafba82648, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  _interpolationDataSource: 2
   _IsActive:
     _value: 0
-  isRespawningEntity: 1
   body: {fileID: 1186833380152900418}
   sfx: {fileID: 3843124130648117525}
   _Owner: {fileID: 0}
@@ -5157,6 +5156,7 @@ MonoBehaviour:
   soundOrigin: {fileID: 1011982274984717416}
   soundRange: 12
   maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!114 &376300006025663058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5169,7 +5169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  _interpolationDataSource: 2
   currentCollider: {fileID: -1769135492019179076}
   previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0

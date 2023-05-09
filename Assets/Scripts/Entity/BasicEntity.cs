@@ -8,8 +8,7 @@ using NSMB.Tiles;
 public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
     //---Networked Variables
-    private NetworkBool facingRightDefault = false;
-    [Networked(Default = nameof(facingRightDefault), OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
+    [Networked(OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
     [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
     [Networked] public TickTimer DespawnTimer { get; set; }
 
