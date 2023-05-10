@@ -1,6 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-[RequireComponent(typeof(SpriteRenderer))]
 [ExecuteInEditMode]
 public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
@@ -12,9 +12,11 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
     //---Components
     [SerializeField] private SpriteRenderer sRenderer;
+    [SerializeField] private Image image;
 
     public void OnValidate() {
         if (!sRenderer) sRenderer = GetComponent<SpriteRenderer>();
+        if (!image) image = GetComponent<Image>();
 
         ValidationUtility.SafeOnValidate(SetSprite);
     }
@@ -25,7 +27,7 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
         if (!runInEditor && !Application.isPlaying)
             return;
 #endif
-        if (frames == null || frames.Length == 0 || !sRenderer || !enabled)
+        if (frames == null || frames.Length == 0 || (!sRenderer && !image) || !enabled)
             return;
 
         frame += fps * Time.deltaTime;
@@ -33,13 +35,20 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
     }
 
     private void SetSprite() {
-        if (!sRenderer)
+
+        if (frames.Length == 0)
             return;
 
         frame = Mathf.Repeat(frame, frames.Length);
         int currentFrame = Mathf.FloorToInt(frame);
+        Sprite currentSprite = frames[currentFrame];
 
-        if (frames[currentFrame] != sRenderer.sprite)
-            sRenderer.sprite = frames[currentFrame];
+        if (sRenderer && currentSprite != sRenderer.sprite) {
+            sRenderer.sprite = currentSprite;
+        }
+
+        if (image && currentSprite != image.sprite) {
+            image.sprite = currentSprite;
+        }
     }
 }

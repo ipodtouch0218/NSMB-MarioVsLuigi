@@ -205,6 +205,8 @@ public class SessionData : NetworkBehaviour {
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void Rpc_ChatDisplayMessage(string message, PlayerRef player) => Chat.DisplayPlayerMessage(message, player);
+    [Rpc(RpcSources.All, RpcTargets.All, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void Rpc_UpdateTypingCounter(RpcInfo info = default) => Chat.SetTypingIndicator(info.Source);
 
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

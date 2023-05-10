@@ -17,6 +17,7 @@ public class ChatManager : MonoBehaviour {
 
     //---Private Variables
     private readonly List<ChatMessage> chatMessages = new();
+    private int previousTextSize;
 
     public void OnEnable() {
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
@@ -65,6 +66,33 @@ public class ChatManager : MonoBehaviour {
         AddChatMessage(GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, replacements), null, color ?? Color.red);
     }
 
+    public void OnTextboxChanged() {
+        if (!MainMenuManager.Instance)
+            return;
+
+        int size = chatbox.text.Length;
+        if (size == previousTextSize)
+            return;
+
+        previousTextSize = size;
+
+        PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(NetworkHandler.Runner.LocalPlayer);
+        if (!ple || ple.typingCounter > 2)
+            return;
+
+        SessionData.Instance.Rpc_UpdateTypingCounter();
+    }
+
+    public void SetTypingIndicator(PlayerRef player) {
+        if (!MainMenuManager.Instance)
+            return;
+
+        PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(player);
+        if (ple) {
+            ple.typingCounter = 4;
+        }
+    }
+
     public void SendChat() {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerData data = runner.GetLocalPlayerData();
@@ -74,7 +102,7 @@ public class ChatManager : MonoBehaviour {
         }
 
         string text = chatbox.text.Replace("<", "«").Replace(">", "»").Trim();
-        if (text == "")
+        if (string.IsNullOrWhiteSpace(text))
             return;
 
         if (text.StartsWith("/")) {
@@ -94,9 +122,8 @@ public class ChatManager : MonoBehaviour {
     }
 
     private IEnumerator SelectTextboxNextFrame() {
-        chatbox.text = "";
         yield return null;
-        chatbox.text = "";
+        chatbox.SetTextWithoutNotify("");
         EventSystem.current.SetSelectedGameObject(chatbox.gameObject);
     }
 
@@ -121,6 +148,13 @@ public class ChatManager : MonoBehaviour {
         message = data.GetNickname() + ": " + message.Filter();
 
         AddChatMessage(message, source);
+
+        if (MainMenuManager.Instance) {
+            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(source);
+            if (ple) {
+                ple.typingCounter = 0;
+            }
+        }
     }
 
     public void IncomingPlayerMessage(string message, RpcInfo info) {

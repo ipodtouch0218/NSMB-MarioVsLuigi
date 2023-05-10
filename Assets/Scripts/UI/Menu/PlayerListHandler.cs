@@ -111,4 +111,11 @@ public class PlayerListHandler : MonoBehaviour {
             playerListEntries[player].transform.SetAsFirstSibling();
         }
     }
+
+    public PlayerListEntry GetPlayerListEntry(PlayerRef player) {
+        if (playerListEntries.ContainsKey(player))
+            return playerListEntries[player];
+
+        return null;
+    }
 }

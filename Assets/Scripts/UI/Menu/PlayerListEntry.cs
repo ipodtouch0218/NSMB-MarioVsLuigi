@@ -11,18 +11,20 @@ public class PlayerListEntry : MonoBehaviour {
 
     //---Public Variables
     public PlayerRef player;
+    public float typingCounter;
 
     //---Serialized Variables
     [SerializeField] private TMP_Text nameText, pingText, winsText;
     [SerializeField] private Image colorStrip;
     [SerializeField] private RectTransform background, options;
-    [SerializeField] private GameObject blockerTemplate, firstButton;
+    [SerializeField] private GameObject blockerTemplate, firstButton, chattingIcon;
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private LayoutElement layout;
     [SerializeField] private GameObject[] adminOnlyOptions;
 
     //---Private Variables
     private GameObject blockerInstance;
+    private bool rainbow;
 
     private void OnDestroy() {
         if (blockerInstance)
@@ -30,12 +32,24 @@ public class PlayerListEntry : MonoBehaviour {
     }
 
     public void Update() {
-        nameText.color = Utils.GetRainbowColor(NetworkHandler.Instance.runner);
+        if (rainbow) {
+            nameText.color = Utils.GetRainbowColor(NetworkHandler.Instance.runner);
+        }
+
+        if (typingCounter > 0) {
+            chattingIcon.SetActive(true);
+            typingCounter -= Time.deltaTime;
+        } else {
+            chattingIcon.SetActive(false);
+            typingCounter = 0;
+        }
     }
 
     public void UpdateText() {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         PlayerData data = player.GetPlayerData(runner);
+
+        rainbow = player.HasRainbowName();
 
         colorStrip.color = Utils.GetPlayerColor(runner, player);
 
@@ -44,8 +58,6 @@ public class PlayerListEntry : MonoBehaviour {
         } else {
             winsText.text = "<sprite=55>" + data.Wins;
         }
-
-        enabled = player.HasRainbowName();
 
         string permissionSymbol = "";
         if (data.IsRoomOwner) {
