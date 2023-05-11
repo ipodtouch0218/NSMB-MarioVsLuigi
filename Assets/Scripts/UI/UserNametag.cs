@@ -17,6 +17,7 @@ public class UserNametag : MonoBehaviour {
     [SerializeField] private TMP_Text text;
     [SerializeField] private Image arrow;
 
+    //---Private Variables
     private string cachedNickname;
     private bool rainbowName;
 
@@ -28,18 +29,18 @@ public class UserNametag : MonoBehaviour {
     }
 
     public void LateUpdate() {
-        if (!parent) {
+        if (!parent || !data) {
             Destroy(gameObject);
             return;
         }
 
-        nametag.SetActive(!(parent.IsDead && parent.IsRespawning));
+        nametag.SetActive(!((parent.IsDead && parent.IsRespawning) || !GameManager.Instance.IsMusicEnabled));
 
         Vector2 worldPos = parent.animationController.models.transform.position;
         worldPos.y += parent.WorldHitboxSize.y * 1.2f + 0.5f;
 
-        if (GameManager.Instance.loopingLevel && Mathf.Abs(cam.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * (1 / 4f))
-            worldPos.x += Mathf.Sign(cam.transform.position.x) * GameManager.Instance.levelWidthTile / 2f;
+        if (GameManager.Instance.loopingLevel && Mathf.Abs(cam.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * 0.25f)
+            worldPos.x += Mathf.Sign(cam.transform.position.x) * GameManager.Instance.LevelWidth;
 
         Vector2 size = new(Screen.width, Screen.height);
         Vector3 screenPoint = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;

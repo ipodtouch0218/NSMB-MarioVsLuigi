@@ -20,8 +20,9 @@ public class ChatMessage : MonoBehaviour {
         if (!image) image = GetComponent<Image>();
     }
 
-    public void Initialize(string message, PlayerRef? player) {
+    public void Initialize(string message, PlayerRef? player, Color? color) {
         chatText.text = message;
+        chatText.color = color ?? Color.black;
         if (player == null)
             system = true;
         else

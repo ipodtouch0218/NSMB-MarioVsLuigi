@@ -7,15 +7,102 @@ using NSMB.Extensions;
 
 public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
 
+    #region //---Combined Variables
+    private TickTimer DespawnTimer {
+        get => Object.IsPredictedSpawn ? predictiveDespawnTimer : NetworkedDespawnTimer;
+        set {
+            if (Object.IsPredictedSpawn)
+                predictiveDespawnTimer = value;
+            else
+                NetworkedDespawnTimer = value;
+        }
+    }
+    private ushort ResultTile {
+        get => Object.IsPredictedSpawn ? predictiveResultTile : NetworkedResultTile;
+        set {
+            if (Object.IsPredictedSpawn)
+                predictiveResultTile = value;
+            else
+                NetworkedResultTile = value;
+        }
+    }
+    private ushort BumpTile {
+        get => Object.IsPredictedSpawn ? predictiveBumpTile : NetworkedBumpTile;
+        set {
+            if (Object.IsPredictedSpawn)
+                predictiveBumpTile = value;
+            else
+                NetworkedBumpTile = value;
+        }
+    }
+    private NetworkBool IsDownwards {
+        get => Object.IsPredictedSpawn ? predictiveIsDownwards : NetworkedIsDownwards;
+        set {
+            if (Object.IsPredictedSpawn)
+                predictiveIsDownwards = value;
+            else
+                NetworkedIsDownwards = value;
+        }
+    }
+    private NetworkBool SpawnCoin {
+        get => Object.IsPredictedSpawn ? predictiveSpawnCoin : NetworkedSpawnCoin;
+        set {
+            if (Object.IsPredictedSpawn)
+                predictiveSpawnCoin = value;
+            else
+                NetworkedSpawnCoin = value;
+        }
+    }
+    private NetworkPrefabRef SpawnPrefab {
+        get => Object.IsPredictedSpawn ? predictiveSpawnPrefab : NetworkedSpawnPrefab;
+        set {
+            if (Object.IsPredictedSpawn)
+                predictiveSpawnPrefab = value;
+            else
+                NetworkedSpawnPrefab = value;
+        }
+    }
+    private Vector2 SpawnOffset {
+        get => Object.IsPredictedSpawn ? predictiveSpawnOffset : NetworkedSpawnOffset;
+        set {
+            if (Object.IsPredictedSpawn)
+                predictiveSpawnOffset = value;
+            else
+                NetworkedSpawnOffset = value;
+        }
+    }
+    private Vector2Int TileLocation {
+        get => Object.IsPredictedSpawn ? predictiveTileLocation : NetworkedTileLocation;
+        set {
+            if (Object.IsPredictedSpawn)
+                predictiveTileLocation = value;
+            else
+                NetworkedTileLocation = value;
+        }
+    }
+    #endregion
+
     //---Networked Variables
-    [Networked] private TickTimer        DespawnTimer { get; set; }
-    [Networked] private ushort           ResultTile { get; set; }
-    [Networked] private ushort           BumpTile { get; set; }
-    [Networked] private NetworkBool      IsDownwards { get; set; }
-    [Networked] private NetworkBool      SpawnCoin { get; set; }
-    [Networked] private NetworkPrefabRef SpawnPrefab { get; set; }
-    [Networked] private Vector2          SpawnOffset { get; set; }
-    [Networked] private Vector2Int       TileLocation { get; set; }
+    [Networked] private TickTimer NetworkedDespawnTimer { get; set; }
+    [Networked] private ushort NetworkedResultTile { get; set; }
+    [Networked] private ushort NetworkedBumpTile { get; set; }
+    [Networked] private NetworkBool NetworkedIsDownwards { get; set; }
+    [Networked] private NetworkBool NetworkedSpawnCoin { get; set; }
+    [Networked] private NetworkPrefabRef NetworkedSpawnPrefab { get; set; }
+    [Networked] private Vector2 NetworkedSpawnOffset { get; set; }
+    [Networked] private Vector2Int NetworkedTileLocation { get; set; }
+
+    #region //---Predictive Variables
+    private TickTimer predictiveDespawnTimer;
+    private ushort predictiveResultTile;
+    private ushort predictiveBumpTile;
+    private NetworkBool predictiveIsDownwards;
+    private NetworkBool predictiveSpawnCoin;
+    private NetworkPrefabRef predictiveSpawnPrefab;
+    private Vector2 predictiveSpawnOffset;
+    private Vector2Int predictiveTileLocation;
+    private Tick spawnTick;
+    #endregion
 
     //---Serialized Variables
     [SerializeField] private Transform hitbox;
@@ -55,12 +142,18 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
         }
 
         //graphics bs
-        Tilemap tilemap = GameManager.Instance.tilemap;
-        TileManager tm = GameManager.Instance.tileManager;
-
-        tilemap.SetTile((Vector3Int) TileLocation, tm.GetTileInstanceFromTileId(BumpTile));
-        sRenderer.sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) TileLocation);
-        tm.SetTile(TileLocation, null);
+        TileBase tile = GameManager.Instance.tileManager.GetTileInstanceFromTileId(BumpTile);
+        Sprite sprite;
+        if (tile is TileWithProperties tp) {
+            sprite = tp.m_DefaultSprite;
+        } else if (tile is AnimatedTile at) {
+            sprite = at.m_AnimatedSprites[0];
+        } else if (tile is Tile t) {
+            sprite = t.sprite;
+        } else {
+            sprite = null;
+        }
+        sRenderer.sprite = sprite;
 
         BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
         hitbox.size = sRenderer.sprite.bounds.size;
@@ -124,15 +217,25 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
         Runner.Despawn(Object);
     }
 
-    public void PredictedSpawnSpawned() { }
+    public void PredictedSpawnSpawned() {
+        spawnTick = Runner.Tick;
+        Spawned();
+    }
 
-    public void PredictedSpawnUpdate() { }
+    public void PredictedSpawnUpdate() {
+        FixedUpdateNetwork();
+        GameManager.Instance.tileManager.SetTile(TileLocation, null);
+    }
 
-    public void PredictedSpawnRender() { }
+    public void PredictedSpawnRender() {
+        Render();
+    }
 
     public void PredictedSpawnFailed() {
         Runner.Despawn(Object, true);
     }
 
-    public void PredictedSpawnSuccess() { }
+    public void PredictedSpawnSuccess() {
+
+    }
 }

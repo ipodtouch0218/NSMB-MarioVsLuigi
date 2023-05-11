@@ -52,11 +52,16 @@ namespace NSMB.Tiles {
             //Tilemap
             GameManager.Instance.tileManager.SetTile(tileLocation, null);
 
-            //Particle
-            GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f, particleColor);
+            if (interacter && interacter.Runner.IsForward) {
+                //Particle
+                GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f, particleColor);
 
-            if (interacter)
-                interacter.PlaySound(sound);
+                //Sound
+                if (interacter)
+                    interacter.PlaySound(sound);
+            }
+
+            Debug.Log("Break block tick " + interacter.Runner.Tick + (interacter.Runner.IsResimulation ? " (R)" : ""));
         }
 
         public void BumpWithAnimation(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {

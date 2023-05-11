@@ -45,15 +45,16 @@ public class ChatManager : MonoBehaviour {
         ChatMessage chat = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, chatWindow.transform);
         chat.gameObject.SetActive(true);
 
-        if (color != null) {
-            Color fColor = (Color) color;
-            message = $"<color=#{(byte) (fColor.r * 255):X2}{(byte) (fColor.g * 255):X2}{(byte) (fColor.b * 255):X2}>" + message;
-        }
+        //if (color != null) {
+        //    Color fColor = (Color) color;
+
+        //    message = $"<color=#{(byte) (fColor.r * 255):X2}{(byte) (fColor.g * 255):X2}{(byte) (fColor.b * 255):X2}>" + message;
+        //}
 
         if (filter)
             message = message.Filter();
 
-        chat.Initialize(message, player);
+        chat.Initialize(message, player, color);
         chatMessages.Add(chat);
         Canvas.ForceUpdateCanvases();
     }
@@ -101,7 +102,7 @@ public class ChatManager : MonoBehaviour {
             return;
         }
 
-        string text = chatbox.text.Replace("<", "«").Replace(">", "»").Trim();
+        string text = chatbox.text.Replace("\n", " ").Trim();
         if (string.IsNullOrWhiteSpace(text))
             return;
 
@@ -142,7 +143,7 @@ public class ChatManager : MonoBehaviour {
 
         //format message, in case we can't trust the host to do it for us.
         message = message[..Mathf.Min(128, message.Length)];
-        message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
+        message = message.Replace("\n", " ").Trim();
 
         //add username
         message = data.GetNickname() + ": " + message.Filter();
@@ -174,7 +175,7 @@ public class ChatManager : MonoBehaviour {
 
         //validate message format
         message = message[..Mathf.Min(128, message.Length)];
-        message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
+        message = message.Replace("\n", " ").Trim();
 
         //empty message
         if (string.IsNullOrWhiteSpace(message))

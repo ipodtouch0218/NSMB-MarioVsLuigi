@@ -34,12 +34,13 @@ namespace NSMB.Tiles {
             // the the tilemap is different from it's current state.
             UpdateTilemapState();
             latestDirtyCounter = DirtyCounter;
+
         }
 
         public void AfterTick() {
 
             // the tilemap was updated via the dirty counter
-            if (updatedDirtyCounterThisTick) {
+            if (updatedDirtyCounterThisTick || (latestDirtyCounter != DirtyCounter)) {
                 UpdateTilemapState();
                 updatedDirtyCounterThisTick = false;
             }
@@ -52,13 +53,6 @@ namespace NSMB.Tiles {
                 Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
 
             UpdateTilemapState();
-        }
-
-        public override void Render() {
-            if (latestDirtyCounter != DirtyCounter) {
-                UpdateTilemapState();
-                latestDirtyCounter = DirtyCounter;
-            }
         }
 
         public void LoadState() {
@@ -110,6 +104,9 @@ namespace NSMB.Tiles {
         }
 
         public void SetTile(int index, ushort value) {
+            if (Tiles[index] == value)
+                return;
+
             Tiles.Set(index, value);
             if (!updatedDirtyCounterThisTick) {
                 updatedDirtyCounterThisTick = true;

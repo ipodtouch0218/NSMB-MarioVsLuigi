@@ -60,6 +60,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         //physics
         nrb.TeleportToPosition(spawnpoint, Vector3.zero);
+        nrb.Rigidbody.position = spawnpoint;
         //body.simulated = true;
         body.isKinematic = false;
         body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);

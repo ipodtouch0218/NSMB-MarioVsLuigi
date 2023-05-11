@@ -423,7 +423,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
             NetworkButtons heldButtons = input.buttons;
             NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
-            PreviousInputs = input;
 
             // TODO: remove groundpoundLastFrame? Do we even need this anymore?
             groundpoundLastFrame = IsGroundpounding;
@@ -447,6 +446,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             UpdateTileProperties();
             CheckForPowerupActions(pressedButtons);
             HandleMovement(heldButtons, pressedButtons);
+
+            PreviousInputs = input;
         }
 
         animationController.HandleDeathAnimation();
@@ -1631,7 +1632,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 timeSinceLastBumpSound = 0;
 
                 WallJumpTimer = TickTimer.CreateFromSeconds(Runner, 16f / 60f);
-                animator.SetTrigger("walljump");
                 WallSlideRight = false;
                 WallSlideLeft = false;
                 WallSlideEndTimer = TickTimer.None;
@@ -2772,8 +2772,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         player.PlaySound(Enums.Sounds.Player_Sound_GroundpoundStart);
     }
 
+    private byte previousGroundpoundCounter;
     public static void OnGroundpoundAnimCounterChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
+
+        //if (player.previousGroundpoundCounter - 1 >= player.GroundpoundAnimCounter) {
+        //    return;
+        //}
+        //player.previousGroundpoundCounter = player.GroundpoundAnimCounter;
 
         //groundpound
         if (player.State != Enums.PowerupState.MegaMushroom) {
@@ -2808,9 +2814,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         player.PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
         player.SpawnParticle(PrefabList.Instance.Particle_Walljump, player.body.position + offset, player.WallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
 
+        player.animator.SetTrigger("walljump");
+
         changed.LoadNew();
     }
 
+    private float lastRespawnParticle;
     public static void OnDeadChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
         if (player.IsDead) {
@@ -2824,7 +2833,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 ScoreboardUpdater.Instance.OnDeathToggle();
         } else {
             //respawn poof particle
-            GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, player.body.position);
+            if (Mathf.Abs(player.lastRespawnParticle - player.Runner.SimulationTime) > 2) {
+                GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, player.Spawnpoint);
+                player.lastRespawnParticle = player.Runner.SimulationTime;
+            }
         }
     }
 

@@ -4944,6 +4944,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  _FacingRight:
+    _value: 0
   _IsActive:
     _value: 0
   body: {fileID: 1186833380152900418}
@@ -5230,14 +5232,14 @@ MonoBehaviour:
   _interpolationDataSource: 2
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 3150262645453679834}
-  InterpolateErrorCorrection: 0
+  InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
+    MinRate: 5
+    MaxRate: 45
+    PosBlendStart: 0.1
+    PosBlendEnd: 0.75
     PosMinCorrection: 0.025
-    PosTeleportDistance: 2
+    PosTeleportDistance: 3
     RotBlendStart: 0.1
     RotBlendEnd: 0.5
     RotTeleportRadians: 1.5
@@ -5350,6 +5352,7 @@ MonoBehaviour:
   - {fileID: -8127487528002223245, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
   - {fileID: -3915765450054648673, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
   sRenderer: {fileID: 4710279457085823811}
+  image: {fileID: 0}
 --- !u!1 &5079778509045743664
 GameObject:
   m_ObjectHideFlags: 0
@@ -5457,6 +5460,7 @@ MonoBehaviour:
   - {fileID: -8127487528002223245, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
   - {fileID: -3915765450054648673, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
   sRenderer: {fileID: 7450112483459336877}
+  image: {fileID: 0}
 --- !u!1 &6123894138715371252
 GameObject:
   m_ObjectHideFlags: 0
