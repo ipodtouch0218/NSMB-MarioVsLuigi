@@ -57,11 +57,12 @@ public class WaterSplash : NetworkBehaviour {
 
         heightTex = new Texture2D(totalPoints, 1, TextureFormat.RGBA32, false);
 
-        Color gray = new(0.5f, 0f, 0f, 1f);
+        Color32 gray = new Color(0.5f, 0.5f, 0.5f, 1);
         colors = new Color32[totalPoints];
         for (int i = 0; i < totalPoints; i++)
             colors[i] = gray;
 
+        heightTex.SetPixels32(colors);
         heightTex.Apply();
 
         hitbox.offset = new(0, heightTiles * 0.25f);

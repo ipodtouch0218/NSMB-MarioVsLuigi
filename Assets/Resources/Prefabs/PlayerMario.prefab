@@ -10518,9 +10518,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _IsActive:
+  _FacingRight:
     _value: 0
-  isRespawningEntity: 0
+  _IsActive:
+    _value: 1
   body: {fileID: 4824223341387914443}
   sfx: {fileID: 5377451828833222271}
   _IsFrozen:
@@ -10766,6 +10767,7 @@ MonoBehaviour:
   soundOrigin: {fileID: 4824223341387914440}
   soundRange: 12
   maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!82 &5377451828833222271
 AudioSource:
   m_ObjectHideFlags: 0

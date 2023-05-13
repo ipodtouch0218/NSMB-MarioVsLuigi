@@ -69,7 +69,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         int oldValue = Room.StarRequirement;
         int.TryParse(starsInputField.text, out int newValue);
 
-        if (newValue == oldValue || newValue < 1 || newValue > 99) {
+        if (newValue == oldValue || newValue < 1 || newValue > 25) {
             ChangeStarRequirement(oldValue);
             return;
         }
@@ -89,7 +89,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         int oldValue = Room.CoinRequirement;
         int.TryParse(coinsInputField.text, out int newValue);
 
-        if (newValue == oldValue || newValue < 1 || newValue > 99) {
+        if (newValue == oldValue || newValue < 2 || newValue > 20) {
             ChangeCoinRequirement(oldValue);
             return;
         }
@@ -108,7 +108,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
 
         int oldValue = Room.Lives;
         int.TryParse(livesInputField.text, out int newValue);
-        if (newValue == -1 || newValue < 1 || newValue > 99) {
+        if (newValue == -1 || newValue < 1 || newValue > 20) {
             ChangeLives(oldValue);
             return;
         }

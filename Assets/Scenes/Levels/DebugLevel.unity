@@ -772,6 +772,11 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 3.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1060841653561283886, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: fc9ca85210711044790e4cd4ea504cc4, type: 2}
     - target: {fileID: 4157375552812710484, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: Flags
@@ -2433,7 +2438,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -5419,7 +5424,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0,
+      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}

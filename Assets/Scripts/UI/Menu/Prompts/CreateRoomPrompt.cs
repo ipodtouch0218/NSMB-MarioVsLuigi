@@ -21,11 +21,12 @@ namespace NSMB.UI.Prompts {
 
         public void CreateRoom() {
             byte maxPlayers = (byte) maxPlayersSlider.value;
-            gameObject.SetActive(false);
 
             _ = NetworkHandler.CreateRoom(new() {
                 IsVisible = !privateRoomToggle.isOn
             }, players: maxPlayers);
+
+            gameObject.SetActive(false);
         }
     }
 }
