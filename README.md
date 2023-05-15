@@ -110,6 +110,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
  
 ### Asset Rips:
 * A Refracted Swindler (UI)
+* Clougo (Tiles)
 * CubbyCrazes (Sound)
 * Demon2Warrior (Background)
 * Double S (Models)

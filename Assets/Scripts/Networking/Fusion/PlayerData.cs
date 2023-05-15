@@ -45,7 +45,10 @@ public class PlayerData : NetworkBehaviour {
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
         PlayerId = -1;
-        Team = (sbyte) ((Object.InputAuthority + 1) % 5);
+        if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers)
+            Team = 0;
+        else
+            Team = (sbyte) ((Object.InputAuthority + 1) % 5);
 
         if (SessionData.Instance)
             SessionData.Instance.LoadWins(this);

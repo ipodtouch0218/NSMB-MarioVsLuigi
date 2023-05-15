@@ -4614,12 +4614,15 @@ MonoBehaviour:
   richPresenceId: 
   levelName: Unknown
   spawnpoint: {x: 0, y: 0, z: 0}
+  spawnCircleWidth: 1.39
+  spawnCircleHeight: 0.8
   levelUIColor: {r: 0.09411766, g: 0.69803923, b: 0.6666667, a: 1}
   cameraMinY: 0
   cameraHeightY: 0
   cameraMinX: -1000
   cameraMaxX: 1000
   hud: {fileID: 1230832738604519832}
+  teamScoreboardElement: {fileID: 3072485350122422921}
   pauseUI: {fileID: 3189185690039869564}
   nametagPrefab: {fileID: 7542548910130765567}
   tilemap: {fileID: 0}
@@ -4638,8 +4641,6 @@ MonoBehaviour:
   musicManager: {fileID: 1965679957714577119}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
-  size: 1.39
-  ySize: 0.8
 --- !u!114 &6418608900138254647
 MonoBehaviour:
   m_ObjectHideFlags: 0

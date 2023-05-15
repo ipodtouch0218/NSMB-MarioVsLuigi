@@ -718,8 +718,18 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     private void OnLanguageChanged(TranslationManager tm) {
+        int selectedLevel = levelDropdown.value;
         levelDropdown.ClearOptions();
         levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
+        levelDropdown.SetValueWithoutNotify(selectedLevel);
+
+        if (Runner && Runner.SessionInfo) {
+            SessionInfo session = Runner.SessionInfo;
+            Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
+            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
+
+            CountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
+        }
     }
 
     //---Debug

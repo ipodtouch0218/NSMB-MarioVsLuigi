@@ -51,6 +51,7 @@ vlco_o
 
 <color=yellow>{ui.about.credits.qa}</color>
 Fawndue
+mindnomad
 Shadow_Walker13
 TheCyVap
 
@@ -67,6 +68,7 @@ Super Mario Maker 2
 
 <color=yellow>{ui.about.credits.assets}</color>
 A Refracted Swindler (UI)
+Clougo (Tiles)
 CubbyCrazes (Sound)
 Demon2Warrior (Background)
 Double S (Models)

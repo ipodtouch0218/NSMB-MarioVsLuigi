@@ -25,9 +25,13 @@ public class PropellerPowerup : MovingPowerup {
             return;
         }
 
+
         if (TimeFlyingStarted <= 0) {
             gameObject.layer = Layers.LayerEntity;
             base.FixedUpdateNetwork();
+
+            if (!Object)
+                return;
 
             if (physics.Data.OnGround) {
                 // Start flying

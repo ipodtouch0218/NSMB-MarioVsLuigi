@@ -362,10 +362,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  _FacingRight:
+    _value: 0
   _IsActive:
     _value: 0
   body: {fileID: 0}
   sfx: {fileID: 7558042822839980312}
+  checkForNearbyPlayersWhenRespawning: 0
   _IsFrozen:
     _value: 0
   _IsDead:

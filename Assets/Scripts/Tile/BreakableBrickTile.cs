@@ -60,8 +60,6 @@ namespace NSMB.Tiles {
                 if (interacter)
                     interacter.PlaySound(sound);
             }
-
-            Debug.Log("Break block tick " + interacter.Runner.Tick + (interacter.Runner.IsResimulation ? " (R)" : ""));
         }
 
         public void BumpWithAnimation(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {

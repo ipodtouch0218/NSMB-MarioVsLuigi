@@ -40,16 +40,10 @@ public class ChatManager : MonoBehaviour {
         }
     }
 
-    public void AddChatMessage(string message, PlayerRef? player = null, Color? color = null, bool filter = false) {
+    public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
 
-        ChatMessage chat = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, chatWindow.transform);
+        ChatMessage chat = Instantiate(messagePrefab, chatWindow.transform);
         chat.gameObject.SetActive(true);
-
-        //if (color != null) {
-        //    Color fColor = (Color) color;
-
-        //    message = $"<color=#{(byte) (fColor.r * 255):X2}{(byte) (fColor.g * 255):X2}{(byte) (fColor.b * 255):X2}>" + message;
-        //}
 
         if (filter)
             message = message.Filter();
@@ -64,7 +58,15 @@ public class ChatManager : MonoBehaviour {
     }
 
     public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
-        AddChatMessage(GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, replacements), null, color ?? Color.red);
+
+        ChatMessage chat = Instantiate(messagePrefab, chatWindow.transform);
+        chat.gameObject.SetActive(true);
+
+        color ??= Color.red;
+
+        chat.InitializeSystem(key, replacements, color);
+        chatMessages.Add(chat);
+        Canvas.ForceUpdateCanvases();
     }
 
     public void OnTextboxChanged() {

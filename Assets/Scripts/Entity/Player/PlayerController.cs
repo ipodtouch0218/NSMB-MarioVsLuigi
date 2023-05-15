@@ -396,7 +396,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     }
 
     public override void FixedUpdateNetwork() {
-        if (!GameManager.Instance.IsMusicEnabled) {
+        if (GameManager.Instance.GameState < Enums.GameState.Playing) {
             models.SetActive(false);
             return;
         }
@@ -603,6 +603,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 if (interactable is KillableEntity killable && killable.IsDead)
                     continue;
 
+                // And don't predict the collection of stars / coins.
+                if (interactable is CollectableEntity && Runner.IsPredictive() && !HasInputAuthority)
+                    continue;
+
                 interactable.InteractWithPlayer(this);
             }
         }
@@ -610,8 +614,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
     public void InteractWithPlayer(PlayerController other) {
 
-        // hit players
+        if (DamageInvincibilityTimer.IsActive(Runner))
+            return;
 
+        if (other.DamageInvincibilityTimer.IsActive(Runner))
+            return;
+
+        // Hit players
         bool dropStars = data.Team != other.data.Team;
 
         if (other.IsStarmanInvincible) {
@@ -688,7 +697,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             return;
         }
 
-        if (other.IsDamageable && above) {
+        if (other.IsDamageable && above && (body.velocity.y < 0.1f || other.IsInShell)) {
             // Hit them from above
             DoEntityBounce = !IsGroundpounding && !IsDrilling;
             bool groundpounded = HasGroundpoundHitbox || IsDrilling;
@@ -809,6 +818,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
     public bool Powerdown(bool ignoreInvincible) {
         if (!ignoreInvincible && !IsDamageable)
+            return false;
+
+        if (Runner.IsPredictive() && !HasInputAuthority)
             return false;
 
         PreviousState = State;
@@ -1003,6 +1015,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (IsDead)
             return;
 
+        if (Runner.IsPredictive() && !HasInputAuthority)
+            return;
+
         IsDead = true;
         PreRespawnTimer = TickTimer.CreateFromSeconds(Runner, 3f);
         RespawnTimer = TickTimer.CreateFromSeconds(Runner, 4.3f);
@@ -1042,7 +1057,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
         body.velocity = Vector2.zero;
         body.isKinematic = false;
-        AttemptThrowHeldItem();
+        AttemptThrowHeldItem(null, true);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -2342,21 +2357,23 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         }
 
         //activate blocks jumped into
-        if (hitRoof && !IsStuckInBlock) {
-            bool tempHitBlock = false;
-            bool interactedAny = false;
-            foreach (Vector2Int tile in TilesJumpedInto) {
-                tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
-                if (bumpSound)
+        if (!Runner.IsPredictive() || HasInputAuthority) {
+            if (hitRoof && !IsStuckInBlock) {
+                bool tempHitBlock = false;
+                bool interactedAny = false;
+                foreach (Vector2Int tile in TilesJumpedInto) {
+                    tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
+                    if (bumpSound)
+                        BlockBumpSoundCounter++;
+
+                    interactedAny |= interacted;
+                }
+                if (!interactedAny) {
                     BlockBumpSoundCounter++;
+                }
 
-                interactedAny |= interacted;
+                body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y, IsSwimming && !tempHitBlock ? -2f : -0.1f));
             }
-            if (!interactedAny) {
-                BlockBumpSoundCounter++;
-            }
-
-            body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y, IsSwimming && !tempHitBlock ? -2f : -0.1f));
         }
 
         if (IsDrilling) {
@@ -2823,7 +2840,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     public static void OnDeadChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
         if (player.IsDead) {
-            if (!GameManager.Instance.IsMusicEnabled)
+            if (GameManager.Instance.GameState < Enums.GameState.Playing)
                 return;
 
             player.animator.Play("deadstart");

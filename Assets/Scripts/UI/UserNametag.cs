@@ -34,7 +34,7 @@ public class UserNametag : MonoBehaviour {
             return;
         }
 
-        nametag.SetActive(!((parent.IsDead && parent.IsRespawning) || !GameManager.Instance.IsMusicEnabled));
+        nametag.SetActive(!((parent.IsDead && parent.IsRespawning) || GameManager.Instance.GameState >= Enums.GameState.Playing));
 
         Vector2 worldPos = parent.animationController.models.transform.position;
         worldPos.y += parent.WorldHitboxSize.y * 1.2f + 0.5f;

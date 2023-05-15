@@ -19,6 +19,9 @@ public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
     //---Properties
     public bool IsRespawningEntity => Object.IsSceneObject;
 
+    //---Public Variables
+    public bool checkForNearbyPlayersWhenRespawning = true;
+
     //---Private Variables
     private bool brickBreakSound;
     protected Vector2 spawnLocation;

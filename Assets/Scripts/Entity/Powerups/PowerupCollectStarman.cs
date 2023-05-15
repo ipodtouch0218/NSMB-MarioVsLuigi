@@ -12,13 +12,13 @@ public class PowerupCollectStarman : MonoBehaviour, IPowerupCollect {
             player.StarCombo = 0;
 
         player.StarmanTimer = TickTimer.CreateFromSeconds(runner, 10f);
-        player.PlaySound(powerup.powerupScriptable.soundEffect);
+        //player.PlaySound(powerup.powerupScriptable.soundEffect);
 
         if (player.HeldEntity) {
             player.HeldEntity.SpecialKill(player.FacingRight, false, 0);
             player.SetHeldEntity(null);
         }
 
-        return PowerupReserveResult.None;
+        return PowerupReserveResult.NoneButPlaySound;
     }
 }

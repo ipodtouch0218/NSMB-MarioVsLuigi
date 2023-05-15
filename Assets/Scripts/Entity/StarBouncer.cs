@@ -80,7 +80,7 @@ public class StarBouncer : CollectableEntity {
         }
 
         // Don't make a spawn sound if we're spawned before the game starts
-        if (GameManager.Instance.IsMusicEnabled)
+        if (GameManager.Instance.GameState == Enums.GameState.Playing)
             GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
 
         if (AnyGroundMask == default)
@@ -137,8 +137,17 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (!GameManager.Instance.GameEnded && !Collector)
+        if (!GameManager.Instance)
+            return;
+
+        if (!GameManager.Instance.GameEnded && !Collector) {
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
+        } else {
+            bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
+            Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
+
+            Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+        }
 
         if (icon)
             Destroy(icon.gameObject);
@@ -197,7 +206,8 @@ public class StarBouncer : CollectableEntity {
         GameManager.Instance.CheckForWinner();
 
         //despawn
-        DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
+        Runner.Despawn(Object);
+        //DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
     }
 
     //---CollectableEntity overrides
@@ -208,10 +218,6 @@ public class StarBouncer : CollectableEntity {
             particles.Stop();
             sfx.Stop();
 
-            bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
-            Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
-
-            Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
             if (icon)
                 icon.gameObject.SetActive(false);
 

@@ -21,6 +21,7 @@ namespace NSMB.Tiles {
         //---Private Variables
         private byte latestDirtyCounter;
         private bool updatedDirtyCounterThisTick;
+        private TilemapCollider2D tilemapCollider;
 
         public void BeforeTick() {
             updatedDirtyCounterThisTick = false;
@@ -34,7 +35,6 @@ namespace NSMB.Tiles {
             // the the tilemap is different from it's current state.
             UpdateTilemapState();
             latestDirtyCounter = DirtyCounter;
-
         }
 
         public void AfterTick() {
@@ -52,6 +52,7 @@ namespace NSMB.Tiles {
             if (Runner.IsServer)
                 Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
 
+            tilemapCollider = GameManager.Instance.tilemap.GetComponent<TilemapCollider2D>();
             UpdateTilemapState();
         }
 
@@ -86,6 +87,7 @@ namespace NSMB.Tiles {
             Tilemap tilemap = GameManager.Instance.tilemap;
             LoadTileBuffer();
             tilemap.SetTilesBlock(ourBounds, TileBuffer);
+            tilemapCollider.ProcessTilemapChanges();
         }
 
         private void LoadTileBuffer(ushort[] src = null) {

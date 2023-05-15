@@ -14,15 +14,10 @@ public class TeamScoreboard : MonoBehaviour {
     private readonly Dictionary<int, int> teamStars = new();
     private TeamManager teamManager;
 
-    public void OnEnable() {
-        TeamManager.OnTeamsFinalized += OnTeamsFinalized;
-    }
+    public void OnTeamsFinalized(TeamManager manager) {
+        if (teamManager != null)
+            return;
 
-    public void OnDisable() {
-        TeamManager.OnTeamsFinalized -= OnTeamsFinalized;
-    }
-
-    private void OnTeamsFinalized(TeamManager manager) {
         teamManager = manager;
         foreach (int teamIndex in teamManager.GetValidTeams())
             teamStars[teamIndex] = 0;

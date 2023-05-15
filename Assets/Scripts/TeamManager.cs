@@ -2,9 +2,6 @@ using System.Collections.Generic;
 
 public class TeamManager {
 
-    public delegate void OnTeamsFinalizedDelegate(TeamManager manager);
-    public static event OnTeamsFinalizedDelegate OnTeamsFinalized;
-
     //---Private Variables
     private readonly Dictionary<int, HashSet<PlayerController>> teams = new();
 
@@ -15,9 +12,6 @@ public class TeamManager {
             teams[teamid] = team = new();
 
         team.Add(player);
-
-        if (GetTotalPlayers() == GameManager.Instance.AlivePlayers.Count)
-            OnTeamsFinalized?.Invoke(this);
     }
 
     public int GetTotalPlayers() {

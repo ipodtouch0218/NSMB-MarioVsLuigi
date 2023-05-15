@@ -4893,11 +4893,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _IsActive:
+  _FacingRight:
     _value: 0
-  isRespawningEntity: 0
+  _IsActive:
+    _value: 1
   body: {fileID: 1973747262660636108}
   sfx: {fileID: 7844204986304545686}
+  checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}
   _IsStationary:
     _value: 0
@@ -5042,10 +5044,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _PreviousTickVelocity: {x: 0, y: 0}
   currentCollider: {fileID: 1973747262660636111}
+  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3
+  body: {fileID: 0}
 --- !u!114 &858852620204674597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5063,6 +5066,7 @@ MonoBehaviour:
   soundOrigin: {fileID: 1973747262660636105}
   soundRange: 5
   maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!82 &7844204986304545686
 AudioSource:
   m_ObjectHideFlags: 0

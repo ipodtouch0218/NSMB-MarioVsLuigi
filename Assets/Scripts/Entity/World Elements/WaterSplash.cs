@@ -65,7 +65,7 @@ public class WaterSplash : NetworkBehaviour {
         heightTex.SetPixels32(colors);
         heightTex.Apply();
 
-        hitbox.offset = new(0, heightTiles * 0.25f);
+        hitbox.offset = new(0, heightTiles * 0.25f - 0.1f);
         hitbox.size = new(widthTiles * 0.5f, heightTiles * 0.5f);
         spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
         if (mask)
@@ -137,7 +137,7 @@ public class WaterSplash : NetworkBehaviour {
                 continue;
 
             BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
-            if (!entity || !entity.IsActive)
+            if (!entity || !entity.Object || !entity.IsActive)
                 continue;
 
             if (entity is PlayerController player) {
@@ -197,6 +197,7 @@ public class WaterSplash : NetworkBehaviour {
         bool contains = splashedEntities.Contains(obj);
         if (Runner.IsServer && !contains) {
             bool splash = entity.body.position.y > SurfaceHeight - 0.5f;
+            Debug.Log(splash);
             if (entity is PlayerController pl) {
                 splash &= !pl.IsDead;
                 splash &= liquidType == LiquidType.Water;

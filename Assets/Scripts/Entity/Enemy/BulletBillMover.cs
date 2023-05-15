@@ -79,7 +79,7 @@ public class BulletBillMover : KillableEntity {
 
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
-        if (IsDead || IsFrozen || player.IsFrozen || (player.State == Enums.PowerupState.BlueShell && player.IsCrouching))
+        if (IsDead || IsFrozen || player.IsFrozen || (player.State == Enums.PowerupState.BlueShell && player.IsCrouchedInShell))
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;

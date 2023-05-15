@@ -207,6 +207,9 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         if (!IsActive)
             return;
 
+        if (Runner.IsPredictive() && !HasInputAuthority)
+            return;
+
         // Check if they own us. If so, don't collide.
         if (Owner == player)
             return;
@@ -216,7 +219,9 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             return;
 
         // Should do damage checks
-        if (player.IsStarmanInvincible || player.data.Team != Owner.data.Team) {
+        if (player.IsStarmanInvincible) {
+
+            bool sameTeam = player.data.Team != Owner.data.Team;
 
             // Player state checks
             switch (player.State) {
@@ -224,7 +229,11 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
                 return;
             }
             case Enums.PowerupState.MiniMushroom: {
-                player.Death(false, false);
+                if (sameTeam)
+                    player.DoKnockback(!FacingRight, 0, true, Object);
+                else
+                    player.Death(false, false);
+
                 return;
             }
             case Enums.PowerupState.BlueShell: {
@@ -245,7 +254,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
                 }
             } else {
                 // fireball
-                player.DoKnockback(FacingRight, 1, true, Object);
+                player.DoKnockback(!FacingRight, sameTeam ? 0 : 1, true, Object);
             }
         }
 
@@ -289,6 +298,10 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         //dont play particles below the killplane
         if (fireball.body.position.y < GameManager.Instance.LevelMinY)
+            return;
+
+        //or if the game is over
+        if (GameManager.Instance.GameState == Enums.GameState.Ended)
             return;
 
         if (fireball.IsIceball) {

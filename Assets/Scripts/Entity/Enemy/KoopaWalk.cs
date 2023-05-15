@@ -288,7 +288,9 @@ public class KoopaWalk : HoldableEntity {
             }
 
             // finally attempt to damage player
-            if (player.Powerdown(false) && !IsInShell)
+            bool damageable = player.IsDamageable;
+            player.Powerdown(false);
+            if (damageable && !IsInShell)
                 FacingRight = damageDirection.x > 0;
         }
     }
@@ -338,7 +340,7 @@ public class KoopaWalk : HoldableEntity {
                     continue;
 
                 //killable entities
-                if (obj.TryGetComponent(out KillableEntity killable)) {
+                if (obj.GetComponentInParent<KillableEntity>() is KillableEntity killable) {
                     if (killable.IsDead)
                         continue;
 

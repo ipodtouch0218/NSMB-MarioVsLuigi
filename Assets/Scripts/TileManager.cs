@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Utils;
 
 namespace NSMB.Tiles {
     [OrderBefore(typeof(PlayerController))]
@@ -35,8 +36,15 @@ namespace NSMB.Tiles {
             foreach (FloatingCoin coin in gm.coins)
                 coin.ResetCoin();
 
-            foreach (KillableEntity enemy in gm.enemies)
+            foreach (KillableEntity enemy in gm.enemies) {
+                if (enemy.checkForNearbyPlayersWhenRespawning) {
+                    if (Runner.GetPhysicsScene2D().OverlapCircle(enemy.body.position, 1.5f, Layers.MaskOnlyPlayers)) {
+                        continue;
+                    }
+                }
+
                 enemy.RespawnEntity();
+            }
 
             gm.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - gm.RealPlayerCount * 0.2f);
         }

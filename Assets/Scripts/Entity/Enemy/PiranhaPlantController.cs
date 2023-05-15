@@ -29,7 +29,7 @@ public class PiranhaPlantController : KillableEntity {
         interpolationTarget.localPosition = new(0, (popupAnimationTimeInterpolator.Value - 1) * popupDistance, 0);
         animator.SetBool("active", ChompTimer.IsRunning);
         animator.SetBool("chomping", PopupAnimationTime > 0.99f);
-        //sRenderer.enabled = !IsDead;
+        sRenderer.enabled = !IsDead;
     }
 
     public override void FixedUpdateNetwork() {
@@ -137,7 +137,7 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public override void OnIsDeadChanged() {
-        if (IsDead) {
+        if (IsDead && GameManager.Instance.GameState == Enums.GameState.Playing) {
             PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
             PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + Vector3.up * 0.5f);

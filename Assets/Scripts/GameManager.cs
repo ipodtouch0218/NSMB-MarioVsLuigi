@@ -14,6 +14,7 @@ using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Translation;
 using NSMB.Utils;
+using UnityEngine.Serialization;
 
 public class GameManager : NetworkBehaviour {
 
@@ -47,7 +48,7 @@ public class GameManager : NetworkBehaviour {
 
     //---Networked Variables
     [Networked] public TickTimer BigStarRespawnTimer { get; set; }
-    [Networked] public TickTimer GameStartTimer { get; set; }
+    [Networked(OnChanged = nameof(OnGameStartTimerChanged))] public TickTimer GameStartTimer { get; set; }
     [Networked] public TickTimer GameEndTimer { get; set; }
     [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
     [Networked, Capacity(60)] public NetworkLinkedList<FireballMover> PooledFireballs => default;
@@ -70,6 +71,8 @@ public class GameManager : NetworkBehaviour {
     public bool loopingLevel = true, spawnBigPowerups = true, spawnVerticalPowerups = true;
     public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
     public Vector3 spawnpoint;
+    [FormerlySerializedAs("size")] public float spawnCircleWidth = 1.39f;
+    [FormerlySerializedAs("ySize")] public float spawnCircleHeight = 0.8f;
     [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
 
     [Header("Camera")]
@@ -80,6 +83,7 @@ public class GameManager : NetworkBehaviour {
 
     [Header("Misc")]
     [SerializeField] private GameObject hud;
+    [SerializeField] private TeamScoreboard teamScoreboardElement;
     [SerializeField] private GameObject pauseUI;
     [SerializeField] private GameObject nametagPrefab;
     [SerializeField] public Tilemap tilemap;
@@ -399,7 +403,8 @@ public class GameManager : NetworkBehaviour {
         SetGameTimestamps();
 
         // Update Discord RPC status
-        GlobalController.Instance.discordController.UpdateActivity();
+        if (Runner.IsForward)
+            GlobalController.Instance.discordController.UpdateActivity();
     }
 
     /// <summary>
@@ -502,7 +507,7 @@ public class GameManager : NetworkBehaviour {
             int index = Random.RangeExclusive(0, activeStarSpawns.Count);
             Vector3 spawnPos = activeStarSpawns[index].transform.position;
 
-            if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 4, Layers.MaskOnlyPlayers)) {
+            if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 3, Layers.MaskOnlyPlayers)) {
                 // A player is too close to this spawn. Discard
                 activeStarSpawns.RemoveAt(index);
                 continue;
@@ -640,7 +645,6 @@ public class GameManager : NetworkBehaviour {
     }
 
     //---Helpers
-    public float size = 1.39f, ySize = 0.8f;
     public Vector3 GetSpawnpoint(int playerIndex, int players = -1) {
         if (players <= -1)
             players = RealPlayerCount;
@@ -648,11 +652,17 @@ public class GameManager : NetworkBehaviour {
             players = 1;
 
         float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI / (2 * players));
-        float scale = (2f - (players + 1f) / players) * size;
+        float scale = (2f - (players + 1f) / players) * spawnCircleWidth;
 
-        Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * ySize : 0), 0);
+        Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * spawnCircleHeight : 0), 0);
         Utils.WrapWorldLocation(ref spawn);
         return spawn;
+    }
+
+    //---OnChangeds
+    public static void OnGameStartTimerChanged(Changed<GameManager> changed) {
+        GameManager gm = changed.Behaviour;
+        gm.teamScoreboardElement.OnTeamsFinalized(gm.teamManager);
     }
 
     //---Debug
