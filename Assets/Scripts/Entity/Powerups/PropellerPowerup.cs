@@ -47,6 +47,12 @@ public class PropellerPowerup : MovingPowerup {
             body.isKinematic = true;
             gameObject.layer = Layers.LayerHitsNothing;
             body.position = FlightOrigin + new Vector2(x, y);
+
+        }
+
+        if (DespawnTimer.Expired(Runner)) {
+            Runner.Despawn(Object);
+            return;
         }
     }
 

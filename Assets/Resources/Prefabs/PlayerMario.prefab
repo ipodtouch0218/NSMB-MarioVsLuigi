@@ -10524,6 +10524,7 @@ MonoBehaviour:
     _value: 1
   body: {fileID: 4824223341387914443}
   sfx: {fileID: 5377451828833222271}
+  checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
     _value: 0
   _State: 2
@@ -10550,6 +10551,8 @@ MonoBehaviour:
   _FloorAngle: 0
   _OnIce:
     _value: 0
+  _Pushing:
+    _value: 0
   _IsJumping:
     _value: 0
   _JumpState: 0
@@ -10562,7 +10565,7 @@ MonoBehaviour:
   _BlockBumpSoundCounter: 0
   _IsInKnockback:
     _value: 0
-  _IsFireballKnockback:
+  _IsWeakKnockback:
     _value: 0
   _KnockbackAttacker: {fileID: 0}
   _IsGroundpounding:
@@ -10571,6 +10574,8 @@ MonoBehaviour:
     _value: 0
   _OnSpinner: {fileID: 0}
   _IsSpinnerFlying:
+    _value: 0
+  _SpinnerLaunchAnimCounter:
     _value: 0
   _IsDrilling:
     _value: 0

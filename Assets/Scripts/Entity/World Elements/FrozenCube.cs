@@ -118,6 +118,12 @@ public class FrozenCube : HoldableEntity {
         //    hitbox.enabled = true;
         //}
 
+        if (Holder || FastSlide) {
+            gameObject.layer = Layers.LayerEntity;
+        } else {
+            gameObject.layer = Layers.LayerGroundEntity;
+        }
+
         if (body.position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
             Kill();
             return;

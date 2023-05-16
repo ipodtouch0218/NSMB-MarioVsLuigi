@@ -32,10 +32,8 @@ public class PlayerTrackIcon : TrackIcon {
     }
 
     private IEnumerator Flash() {
-        bool visible = true;
         while (playerTarget.IsDead) {
-            visible = !visible;
-            image.enabled = visible;
+            image.enabled = !image.enabled;
             yield return FlashWait;
         }
 

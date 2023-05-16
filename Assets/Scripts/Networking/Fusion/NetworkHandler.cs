@@ -354,6 +354,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             SessionName = roomId,
             ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname),
             DisableClientSessionCreation = true,
+            
         });
         Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
         if (!result.Ok) {

@@ -57,6 +57,9 @@ public class WaterSplash : NetworkBehaviour {
 
         heightTex = new Texture2D(totalPoints, 1, TextureFormat.RGBA32, false);
 
+        // TODO: eventually, change to a customrendertexture.
+        //texture = new CustomRenderTexture(totalPoints, 1, RenderTextureFormat.RInt);
+
         Color32 gray = new Color(0.5f, 0.5f, 0.5f, 1);
         colors = new Color32[totalPoints];
         for (int i = 0; i < totalPoints; i++)

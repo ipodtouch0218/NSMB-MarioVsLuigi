@@ -136,7 +136,7 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
 
     public override void Spawned() {
         //spawn coin effect immediately
-        if (SpawnCoin) {
+        if (!Object.IsPredictedSpawn && SpawnCoin) {
             GameObject coin = Instantiate(PrefabList.Instance.Particle_CoinFromBlock, transform.position + new Vector3(0, IsDownwards ? -0.25f : 0.5f), Quaternion.identity);
             coin.GetComponentInChildren<Animator>().SetBool("down", IsDownwards);
         }

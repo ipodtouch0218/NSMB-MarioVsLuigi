@@ -31,6 +31,7 @@ PluginImporter:
         Exclude WindowsStoreApps: 1
         Exclude XboxOne: 1
         Exclude iOS: 1
+        Exclude tvOS: 1
   - first:
       Android: Android
     second:
@@ -92,14 +93,22 @@ PluginImporter:
         CPU: AnyCPU
         DontProcess: false
         PlaceholderPath: 
-        SDK: AnySDK
-        ScriptingBackend: AnyScriptingBackend
+        SDK: UWP
+        ScriptingBackend: Il2Cpp
   - first:
       iPhone: iOS
     second:
       enabled: 0
       settings:
         AddToEmbeddedBinaries: false
+        CPU: AnyCPU
+        CompileFlags: 
+        FrameworkDependencies: 
+  - first:
+      tvOS: tvOS
+    second:
+      enabled: 0
+      settings:
         CPU: AnyCPU
         CompileFlags: 
         FrameworkDependencies: 

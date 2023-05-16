@@ -127,8 +127,7 @@ namespace Fusion.Editor {
   using UnityEditor;
   using UnityEngine;
 
-  public class NetworkPrefabAssetFactoryResource: INetworkPrefabSourceFactory, INetworkPrefabSourceFactoryCustomEditorResolve {
-
+  public class NetworkPrefabAssetFactoryResource : INetworkPrefabSourceFactory, INetworkPrefabSourceFactoryCustomEditorResolve {
     public const int DefaultOrder = 1000;
 
     Type INetworkPrefabSourceFactory.SourceType => typeof(NetworkPrefabSourceUnityResource);
@@ -136,13 +135,19 @@ namespace Fusion.Editor {
     int INetworkPrefabSourceFactory.Order => DefaultOrder;
 
     NetworkPrefabSourceUnityBase INetworkPrefabSourceFactory.TryCreate(string assetPath) {
-      if (PathUtils.MakeRelativeToFolder(assetPath, "Resources", out var resourcesPath)) {
-        var result = ScriptableObject.CreateInstance<NetworkPrefabSourceUnityResource>();
-        result.ResourcePath = PathUtils.GetPathWithoutExtension(resourcesPath);
-        return result;
-      } else {
+      var normalizedPath = PathUtils.MakeSane(assetPath);
+
+      const string ResourcesPart = "/Resources/";
+
+      var resourcesIndex = normalizedPath.IndexOf(ResourcesPart, StringComparison.Ordinal);
+      if (resourcesIndex < 0) {
         return null;
       }
+
+      var resourcePath = normalizedPath.Substring(resourcesIndex + ResourcesPart.Length);
+      var result       = ScriptableObject.CreateInstance<NetworkPrefabSourceUnityResource>();
+      result.ResourcePath = PathUtils.GetPathWithoutExtension(resourcePath);
+      return result;
     }
 
     GameObject INetworkPrefabSourceFactoryCustomEditorResolve.EditorResolveSource(NetworkPrefabSourceUnityBase prefabAsset) {
@@ -151,7 +156,6 @@ namespace Fusion.Editor {
     }
   }
 }
-
 
 #endregion
 
@@ -4520,196 +4524,16 @@ namespace Fusion.Editor {
 namespace Fusion.Editor {
 
   using UnityEditor;
-  using UnityEngine;
-  using System.Collections.Generic;
-  using System;
-  using System.Text;
-  
+
   [CustomPropertyDrawer(typeof(VersaMaskAttribute))]
-  public class VersaMaskAttributeDrawer : PropertyDrawer {
-
-    // persistent cache of XML summaries and values
-    private static Dictionary<Type, (string[] names, string[] summaries, int[] values)> _typeInfo;
-    private static StringBuilder _sb;
-    
-    private const float PAD           = 4;
-    private const float LINE_SPACING  = 18;
-    private const float BOX_INDENT    = 0; //16 - PAD;
-    private const float FOLDOUT_WIDTH = 16;
-    
-    protected virtual (string[] names, string[] summaries, int[] values) GetStringNames() {
-
-      var maskAttribute = attribute as VersaMaskAttribute;
-
-      var fieldType = (maskAttribute.CastTo == null) ? fieldInfo.FieldType : maskAttribute.CastTo;
-      
-      if (_typeInfo == null) {
-        _typeInfo = new Dictionary<Type, (string[], string[], int[])>();
+  public class VersaMaskAttributeDrawer : VersaMaskDrawer {
+    protected override bool FirstIsZero {
+      get {
+        var attr = attribute as VersaMaskAttribute;
+        return attr != null && attr.DefinesZero;
       }
-      if (_typeInfo.TryGetValue(fieldType, out var entry)) {
-        return entry;
-      }
-
-      int[] enumValues = (int[])fieldType.GetEnumValues();
-      string[] names = new string[enumValues.Length];
-      
-      for (int i = 0; i < enumValues.Length; ++i) {
-         names[i] = Enum.GetName(fieldType, enumValues[i]);
-      }
-      
-      // Remove Zero value from the array if need be.
-      int len = enumValues.Length;
-      entry = (new string[len], new string[len], new int[len]);
-
-      for (int i = 0; i < len; i++) {
-        var name  = names[i];
-        entry.names[i]  = ObjectNames.NicifyVariableName(name);
-        entry.values[i] = enumValues[i];
-        var enumField   = fieldType.GetField(name);
-        entry.summaries[i] = XmlDocumentation.GetXmlDocSummary(enumField, true);
-      }
-      _typeInfo.Add(fieldType, entry);
-      return entry;
     }
 
-
-    
-    public override void OnGUI(Rect r, SerializedProperty property, GUIContent label) {
-
-      var attr = attribute as VersaMaskAttribute;
-
-      bool useFoldout = !attr.AlwaysExpanded && !string.IsNullOrEmpty(label.text);
-
-      if (useFoldout) {
-        bool wasEnabled = GUI.enabled;
-        GUI.enabled = true;
-        property.isExpanded = EditorGUI.Toggle(new Rect(r) { xMin = r.xMin + EditorGUIUtility.labelWidth, height = LINE_SPACING, width = FOLDOUT_WIDTH }, property.isExpanded, (GUIStyle)"Foldout");
-        GUI.enabled = wasEnabled;
-      }
-
-      label = EditorGUI.BeginProperty(r, label, property);
-
-      int scratchMask;
-      
-      Rect br = new Rect(r) { xMin = r.xMin + BOX_INDENT };
-      Rect ir = new Rect(br) { height = LINE_SPACING };
-
-      Rect labelRect = new Rect(r) { height = LINE_SPACING };
-
-      var entries = GetStringNames();
-
-      if (attr.AlwaysExpanded || (useFoldout && property.isExpanded)) {
-        scratchMask = property.intValue;
-
-        EditorGUI.LabelField(new Rect(br) { yMin = br.yMin + LINE_SPACING }, "", EditorStyles.helpBox);
-        ir.xMin += PAD * 2;
-        ir.y += PAD;
-
-        var ShowMaskBits = attr.ShowBitmask;
-
-        var names = entries.names;
-        int len   = names.Length;
-        for (int i = 0; i < len; ++i) {
-          ir.y += LINE_SPACING;
-
-          int offsetBit = entries.values[i];
-
-          // Invisible button. Toggle is cosmetic, the button does the actual toggling.
-          if (GUI.Button(ir, "", GUIStyle.none)) {
-            if (offsetBit == 0) {
-              if (scratchMask == 0) {
-                scratchMask = -1;
-              } else {
-                scratchMask = 0;
-              }
-            } else {
-              bool isSelected = (scratchMask & offsetBit) == offsetBit;
-              if (isSelected) {
-                scratchMask &= ~offsetBit;
-              } else {
-                scratchMask |= offsetBit;
-              }              
-            }
-          }
-
-          // Cosmetic Toggle
-          if (offsetBit != 0) {
-            EditorGUI.ToggleLeft(ir, "", (scratchMask & offsetBit) == offsetBit);
-          } else {
-            EditorGUI.ToggleLeft(ir, "", scratchMask == 0);
-          }
-
-          using (new EditorGUI.DisabledScope((scratchMask & offsetBit) != offsetBit || (offsetBit == 0 && scratchMask != 0))) {
-            EditorGUI.LabelField(new Rect(ir) { xMin = ir.xMin + 24 }, new GUIContent(names[i], entries.summaries[i]));
-          }
-        }
-
-        // Draw Label
-        EditorGUI.LabelField(labelRect, label, GUIContent.none);
-
-        // Draw Bitmask (if enabled for this attribute)
-        if (ShowMaskBits) {
-
-          // Determine how many bits of bitmask to show
-          int bitCount = 8; // Show at least one byte
-          var lastValue = entries.values[entries.values.Length - 1];
-          for (; bitCount < 32; ++bitCount) {
-            if (lastValue >> (bitCount + 1) == 0) {
-              break;
-            }
-          }
-          
-          // Build the bitmask label
-          if (_sb == null) {
-            _sb = new StringBuilder(32);
-          } else {
-            _sb.Clear();
-          }
-          for (int b = bitCount - 1; b >= 0; --b) {
-            _sb.Append((scratchMask & (1 << b)) == 0 ? "-" : "1");
-            // Space every 4 bits
-            if (b != 0 && b % 4 == 0) {
-              _sb.Append(" ");
-            }
-          }
-          EditorGUI.LabelField(new Rect(labelRect) { xMin = labelRect.xMin + +EditorGUIUtility.labelWidth + FOLDOUT_WIDTH }, $"[{_sb}]");
-          
-        } else {
-          // Draw All/None buttons when foldout is expanded (and bitmask is not shown)
-          var valueAreaRect = new Rect(labelRect) { xMin = labelRect.xMin + EditorGUIUtility.labelWidth + FOLDOUT_WIDTH };
-          if (GUI.Button(new Rect(valueAreaRect) { width = valueAreaRect.width * .5f }, "All")) {
-            scratchMask = (int)(~0);
-          }
-          if (GUI.Button(new Rect(valueAreaRect) { xMin = valueAreaRect.xMin + valueAreaRect.width * .5f }, "None")) {
-            scratchMask = 0;
-          }
-        }
-      } else {
-        EditorGUI.LabelField(r, label, GUIContent.none, EditorStyles.label);
-        scratchMask = EditorGUI.MaskField(new Rect(r) { xMin = r.xMin + EditorGUIUtility.labelWidth + FOLDOUT_WIDTH}, GUIContent.none, property.intValue, entries.names);
-      }
-
-      // Apply any changes which have been made to the mask
-      if (scratchMask != property.intValue) {
-        Undo.RecordObject(property.serializedObject.targetObject, "Change Mask Selection");
-        property.intValue = scratchMask;
-        property.serializedObject.ApplyModifiedProperties();
-      }
-
-      EditorGUI.EndProperty();
-    }
-
-    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-
-      var attr = attribute as VersaMaskAttribute;
-      bool expanded = (attr.AlwaysExpanded || (property.isExpanded && !string.IsNullOrEmpty(label.text)));
-
-      if (expanded) {
-        var entry = GetStringNames();
-        return LINE_SPACING * (entry.names.Length + 1) + PAD * 2;
-      } else
-        return base.GetPropertyHeight(property, label);
-    }
   }
 }
 
@@ -4719,7 +4543,167 @@ namespace Fusion.Editor {
 
 #region Assets/Photon/Fusion/Scripts/Editor/CustomTypes/VersaMaskDrawer.cs
 
-// Deleted Sept 3, 2022
+// ---------------------------------------------------------------------------------------------
+// <copyright>PhotonNetwork Framework for Unity - Copyright (C) 2020 Exit Games GmbH</copyright>
+// <author>developer@exitgames.com</author>
+// ---------------------------------------------------------------------------------------------
+
+namespace Fusion.Editor {
+  using UnityEngine;
+  using UnityEditor;
+  using System.Collections.Generic;
+  using System;
+
+  public abstract class VersaMaskDrawer : PropertyDrawer {
+    private static readonly GUIContent ReuseGC = new GUIContent();
+    protected abstract      bool       FirstIsZero { get; }
+
+    private static Dictionary<Type, string[]> _nameArrayLookup;
+    private static GUIStyle                   _buttonStyle;
+    private static GUIStyle ButtonStyle => _buttonStyle ??= new GUIStyle(EditorStyles.miniButton) { fontSize = 9 };
+    protected virtual string[] GetStringNames(SerializedProperty property, bool removeZero) {
+      
+      if (_nameArrayLookup == null) {
+        _nameArrayLookup = new Dictionary<Type, string[]>();
+      }
+      if (_nameArrayLookup.TryGetValue(fieldInfo.FieldType, out var names)) {
+        return names;
+      }
+
+      var maskAttr = attribute as VersaMaskAttribute;
+      var rawNames = maskAttr.CastTo != null ? Enum.GetNames(maskAttr.CastTo) : property.enumDisplayNames;
+
+      // Remove Zero value from the array if need be.
+      int len = removeZero ? rawNames.Length - 1 : rawNames.Length;
+      names = new string[len];
+      for (int i = 0; i < len; i++) {
+        names[i] = rawNames[FirstIsZero ? (i + 1) : i];
+      }
+      _nameArrayLookup.Add(fieldInfo.FieldType, names);
+      return names;
+    }
+
+    const float PAD           = 4;
+    const float LINE_SPACING  = 18;
+    const float BOX_INDENT    = 0; //16 - PAD;
+    const float FOLDOUT_WIDTH = 16;
+
+    public override void OnGUI(Rect r, SerializedProperty property, GUIContent label) {
+
+      EditorGUI.BeginProperty(r, label, property);
+      
+      // currentProperty = property;
+      var attr = attribute as VersaMaskAttribute;
+
+      bool useFoldout = !attr.AlwaysExpanded && !string.IsNullOrEmpty(label.text);
+
+      if (useFoldout) {
+        property.isExpanded = EditorGUI.Toggle(new Rect(r) { xMin = r.xMin + EditorGUIUtility.labelWidth, height = LINE_SPACING, width = FOLDOUT_WIDTH }, property.isExpanded, "Foldout");
+      }
+
+      label = EditorGUI.BeginProperty(r, label, property);
+
+      // For extended drawer types, the mask field needs to be named mask
+      var mask = property.FindPropertyRelative("mask");
+
+      // ELSE If this drawer is being used as an attribute, then the property itself is the enum mask.
+      if (mask == null)
+        mask = property;
+
+      // maskValue = mask.intValue;
+
+      int tempMask;
+      var boxRect = new Rect(r) { xMin = r.xMin + BOX_INDENT };
+      var lineRect = new Rect(boxRect) { height = LINE_SPACING };
+
+      var labelRect = new Rect(r) { height = LINE_SPACING };
+
+       // TODO: Cache most of this in dictionaries to reduce GC
+      var nameArray = GetStringNames(property, FirstIsZero);
+
+      if (attr.AlwaysExpanded || (useFoldout && property.isExpanded)) {
+        tempMask = 0;
+
+        EditorGUI.LabelField(new Rect(boxRect) { yMin = boxRect.yMin + LINE_SPACING }, "", EditorStyles.helpBox);
+        lineRect.xMin += PAD * 2;
+        lineRect.y += PAD;
+
+        var showBitMask = attr.ShowBitmask;
+
+        string drawMask = showBitMask ? "" : null;
+
+        int len = nameArray.Length;
+        for (int i = 0; i < len; ++i) {
+          lineRect.y += LINE_SPACING;
+
+          int offsetBit = 1 << i;
+
+          if (EditorGUI.ToggleLeft(lineRect, "", ((mask.intValue & offsetBit) != 0))) {
+            tempMask |= offsetBit;
+            if (showBitMask) {
+              drawMask = "1" + drawMask;
+            }
+          } else if (showBitMask) {
+            drawMask = "0" + drawMask;
+          }
+
+          using (new EditorGUI.DisabledScope((mask.intValue & offsetBit) != 0 == false)) {
+            EditorGUI.LabelField(new Rect(lineRect) { xMin = lineRect.xMin + 24 }, new GUIContent(nameArray[i]));
+          }
+        }
+
+        // Draw Label
+        EditorGUI.LabelField(labelRect, label, GUIContent.none);
+
+        // Draw Bitmask
+        if (showBitMask) {
+          ReuseGC.text =  $" [{drawMask}]";
+          EditorGUI.LabelField(new Rect(labelRect) { xMin = labelRect.xMin + +EditorGUIUtility.labelWidth + FOLDOUT_WIDTH }, ReuseGC);
+        } else {
+          var valueAreaRect = new Rect(labelRect) { xMin = labelRect.xMin + EditorGUIUtility.labelWidth + FOLDOUT_WIDTH };
+          if (GUI.Button(new Rect(valueAreaRect) { width = valueAreaRect.width * .5f }, "All", ButtonStyle)) {
+            tempMask = (int)(~0);
+          }
+          if (GUI.Button(new Rect(valueAreaRect) { xMin = valueAreaRect.xMin + valueAreaRect.width * .5f }, "None", ButtonStyle)) {
+            tempMask = 0;
+          }
+        }
+        
+      } else {
+        ReuseGC.text = null;
+
+        EditorGUI.LabelField(r, label, ReuseGC, EditorStyles.label);
+
+        tempMask = EditorGUI.MaskField(new Rect(r) { xMin = r.xMin + EditorGUIUtility.labelWidth + FOLDOUT_WIDTH}, GUIContent.none, mask.intValue, nameArray);
+      }
+
+      if (tempMask != mask.intValue) {
+        Undo.RecordObject(property.serializedObject.targetObject, "Change Mask Selection");
+        mask.intValue = tempMask;
+        // maskValue = tempMask;
+        property.serializedObject.ApplyModifiedProperties();
+      }
+      EditorGUI.EndProperty();
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+      
+      if (!(attribute is VersaMaskAttribute attr)) {
+        return base.GetPropertyHeight(property, label);
+      }
+
+      var expanded = (attr.AlwaysExpanded || (property.isExpanded && !string.IsNullOrEmpty(label.text)));
+
+      if (expanded) {
+        var stringNames = GetStringNames(property, FirstIsZero);
+        return LINE_SPACING * (stringNames.Length + 1) + PAD * 2;
+      } else
+        return base.GetPropertyHeight(property, label);
+    }
+  }
+
+}
+
 
 #endregion
 

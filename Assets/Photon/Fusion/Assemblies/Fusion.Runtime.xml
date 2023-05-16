@@ -4,6 +4,15 @@
         <name>Fusion.Runtime</name>
     </assembly>
     <members>
+        <member name="M:Fusion.Allocator.CanAllocSizeAssert_Temp(System.Int32)">
+            <summary>
+            Check size of bytes to be allocated
+            </summary>
+            <param name="size">Number of bytes to be allocated</param>
+            <returns>True if size is valid, false otherwise.</returns>
+            <exception cref="T:Fusion.AssertException">If size is less than 1</exception>
+            <exception cref="T:Fusion.AssertException">If size is bigger than <see cref="P:Fusion.Allocator.Config.BlockByteSize"/></exception>
+        </member>
         <member name="T:Fusion.PageSizes">
             <summary>
             Page Bit Shift Lookup Table
@@ -2372,6 +2381,12 @@
         <member name="M:Fusion.NetworkRigidbody.CopyFromBufferToEngine">
             <inheritdoc cref="M:Fusion.NetworkPositionRotation.CopyFromBufferToEngine"/>
         </member>
+        <member name="M:Fusion.NetworkRigidbody.Fusion#IAfterPhysicsSyncTransforms3D#AfterPhysicsSyncTransforms3D">
+            <summary>
+            Implements <see cref="T:Fusion.IAfterPhysicsSyncTransforms3D"/> and copies the rigidbody state from the buffer
+            to the engine if there is a pending copy of this state.
+            </summary>
+        </member>
         <member name="M:Fusion.NetworkRigidbody.CopyFromEngineToBuffer">
             <inheritdoc cref="M:Fusion.NetworkPositionRotation.CopyFromEngineToBuffer"/>
         </member>
@@ -2617,6 +2632,12 @@
         </member>
         <member name="M:Fusion.NetworkRigidbody2D.CopyFromBufferToEngine">
             <inheritdoc cref="M:Fusion.NetworkPositionRotation.CopyFromBufferToEngine"/>
+        </member>
+        <member name="M:Fusion.NetworkRigidbody2D.Fusion#IAfterPhysicsSyncTransforms2D#AfterPhysicsSyncTransforms2D">
+            <summary>
+            Implements <see cref="T:Fusion.IAfterPhysicsSyncTransforms2D"/> and copies the rigidbody state from the buffer
+            to the engine if there is a pending copy of this state.
+            </summary>
         </member>
         <member name="M:Fusion.NetworkRigidbody2D.CopyFromEngineToBuffer">
             <inheritdoc cref="M:Fusion.NetworkPositionRotation.CopyFromEngineToBuffer"/>
@@ -4995,7 +5016,7 @@
             <param name="player">Player who "owns" this overlap. Used by the server to find the exact hitbox snapshots to check against.</param>
             <param name="position">Will be filled with the hitbox position at the time of the tick</param>
             <param name="rotation">Will be filled with the hitbox rotation at the time of the tick</param>
-            <param name="subTickAccuracy">If the query should interpolate between ticks to reflect exactly what was seen on the client.</param>
+            <param name="subtickAccuracy">If the query should interpolate between ticks to reflect exactly what was seen on the client.</param>
         </member>
         <member name="M:Fusion.HitboxManager.FixedUpdateNetwork">
             <summary>
@@ -8901,6 +8922,13 @@
             <param name="dt">Delta Time used to forward the simulation</param>
             <returns>How many Ticks executed on this Update</returns>
         </member>
+        <member name="M:Fusion.Simulation.SendMessageInternal(Fusion.SimulationMessage*,Fusion.Sockets.NetConnection*)">
+            <summary>
+            Enqueue a <see cref="T:Fusion.SimulationMessage"/> on the Out Message List for a specific <see cref="T:Fusion.Sockets.NetConnection"/>
+            </summary>
+            <param name="message">Message to enqueue</param>
+            <param name="netConnection">Target Connection</param>
+        </member>
         <member name="M:Fusion.Simulation.Server.Disconnect(Fusion.Sockets.NetAddress)">
             <summary>
             Disconnect a client based on it's NetAddress
@@ -9384,6 +9412,24 @@
             <summary>
             
             </summary>
+        </member>
+        <member name="F:Fusion.SimulationMessage.Capacity">
+            <summary>
+            Capacity in Bits of this <see cref="T:Fusion.SimulationMessage"/>
+            </summary>
+        </member>
+        <member name="F:Fusion.SimulationMessage.Offset">
+            <summary>
+            Current offset in Bits
+            </summary>
+        </member>
+        <member name="M:Fusion.SimulationMessage.Allocate(Fusion.Simulation,System.Int32)">
+            <summary>
+            Allocate a new <see cref="T:Fusion.SimulationMessage"/>
+            </summary>
+            <param name="sim">Simulation to get the Memory from</param>
+            <param name="capacityInBytes">Size in bytes of the new <see cref="T:Fusion.SimulationMessage"/></param>
+            <returns></returns>
         </member>
         <member name="T:Fusion.SimulationModes">
             <summary>

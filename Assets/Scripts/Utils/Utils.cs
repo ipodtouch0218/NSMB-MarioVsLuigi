@@ -67,6 +67,20 @@ namespace NSMB.Utils {
             return false;
         }
 
+        public static int WrappedDirectionSign(Vector2 a, Vector2 b, GameManager manager = null) {
+            if (!manager)
+                manager = GameManager.Instance;
+
+            if (!manager.loopingLevel)
+                return a.x > b.x ? 1 : -1;
+
+            if (Mathf.Abs(a.x - b.x) > GameManager.Instance.LevelWidth * 0.5f) {
+                return (a.x < b.x) ? 1 : -1;
+            } else {
+                return (a.x > b.x) ? 1 : -1;
+            }
+        }
+
         public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {
             if (!manager)
                 manager = GameManager.Instance;

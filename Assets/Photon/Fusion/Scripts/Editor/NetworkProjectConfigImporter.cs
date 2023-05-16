@@ -148,7 +148,7 @@ namespace Fusion.Editor {
         ctx.DependsOnSourceAsset(assetPath);
         ctx.AddObjectToAsset(guid, prefabSource);
 
-        var index = paths.BinarySearch(assetPath);
+        var index = paths.BinarySearch(assetPath, StringComparer.Ordinal);
         if (index < 0) {
           index = ~index;
         } else {

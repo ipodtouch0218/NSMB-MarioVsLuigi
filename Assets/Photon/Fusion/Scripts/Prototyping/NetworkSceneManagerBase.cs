@@ -94,8 +94,22 @@ namespace Fusion {
       return false;
     }
 
+    public virtual bool TryGetScenePath(SceneRef sceneRef, out string path) {
+      return TryGetScenePathFromBuildSettings(sceneRef, out path);
+    }
+    
+    public virtual bool TryGetSceneRef(string nameOrPath, out SceneRef sceneRef) {
+      var buildIndex = FusionUnitySceneManagerUtils.GetSceneBuildIndex(nameOrPath);
+      if (buildIndex >= 0) {
+        sceneRef = buildIndex;
+        return true;
+      }
+      sceneRef = default;
+      return false;
+    }
+    
     public bool IsScenePathOrNameEqual(Scene scene, SceneRef sceneRef) {
-      if (TryGetScenePathFromBuildSettings(sceneRef, out var path)) {
+      if (TryGetScenePath(sceneRef, out var path)) {
         return IsScenePathOrNameEqual(scene, path);
       } else {
         return false;

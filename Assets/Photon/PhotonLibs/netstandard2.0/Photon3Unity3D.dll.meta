@@ -12,7 +12,7 @@ PluginImporter:
   validateReferences: 1
   platformData:
   - first:
-      '': Any
+      : Any
     second:
       enabled: 0
       settings:
@@ -42,7 +42,7 @@ PluginImporter:
       settings:
         CPU: ARMv7
   - first:
-      Any:
+      Any: 
     second:
       enabled: 1
       settings: {}
@@ -66,6 +66,36 @@ PluginImporter:
       enabled: 0
       settings:
         CPU: AnyCPU
+  - first:
+      GameCoreScarlett: GameCoreScarlett
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      GameCoreXboxOne: GameCoreXboxOne
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Lumin: Lumin
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Nintendo Switch: Switch
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      PS4: PS4
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      PS5: PS5
+    second:
+      enabled: 1
+      settings: {}
   - first:
       Standalone: Linux
     second:
@@ -114,52 +144,31 @@ PluginImporter:
       settings:
         CPU: AnyCPU
         DontProcess: false
-        PlaceholderPath:
+        PlaceholderPath: 
         SDK: AnySDK
         ScriptingBackend: Il2Cpp
-  - first:
-      iPhone: iOS
-    second:
-      enabled: 1
-      settings:
-        AddToEmbeddedBinaries: false
-        CompileFlags:
-        FrameworkDependencies:
-  - first:
-      PS4: PS4
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      PS5: PS5
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Nintendo Switch: Switch
-    second:
-      enabled: 1
-      settings: {}
   - first:
       XboxOne: XboxOne
     second:
       enabled: 1
       settings: {}
   - first:
-      GameCoreScarlett: GameCoreScarlett
+      iPhone: iOS
     second:
       enabled: 1
-      settings: {}
+      settings:
+        AddToEmbeddedBinaries: false
+        CPU: AnyCPU
+        CompileFlags: 
+        FrameworkDependencies: 
   - first:
-      GameCoreXboxOne: GameCoreXboxOne
+      tvOS: tvOS
     second:
       enabled: 1
-      settings: {}
-  - first:
-      Lumin: Lumin
-    second:
-      enabled: 1
-      settings: {}
-  userData:
-  assetBundleName:
-  assetBundleVariant:
+      settings:
+        CPU: AnyCPU
+        CompileFlags: 
+        FrameworkDependencies: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -14,10 +14,6 @@ namespace NSMB.Extensions {
             ["7e9c6f2eaf0ce11098c8a90fcd9d48b13017667e33d09d0cc5dfe924f3ead6c1"] = "Fawndue",
         };
 
-        public static bool IsPredictive(this NetworkRunner runner) {
-            return !runner.IsServer && runner.Simulation.SnapshotHistory.Latest.Tick != runner.Tick;
-        }
-
         public static bool IsActive(this TickTimer timer, NetworkRunner runner) {
             return !timer.ExpiredOrNotRunning(runner);
         }

@@ -19,15 +19,9 @@ public class ScoreboardEntry : MonoBehaviour {
 
     //---Private Variables
     private PlayerData data;
-    private RectTransform rectTransform;
     private int playerId, currentLives, currentStars, currentPing;
-    private bool isCameraController, rainbowEnabled, disconnected;
-
+    private bool rainbowEnabled, disconnected;
     private int deathTick;
-
-    public void Awake() {
-        rectTransform = GetComponent<RectTransform>();
-    }
 
     public void Start() {
 
@@ -49,18 +43,9 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public void Update() {
         CheckForTextUpdate();
-        CheckForCameraControl();
 
         if (rainbowEnabled)
             nameText.color = Utils.GetRainbowColor(target.Runner);
-    }
-
-    private void CheckForCameraControl() {
-        if (!(isCameraController ^ target.cameraController.IsControllingCamera))
-            return;
-
-        isCameraController = target.cameraController.IsControllingCamera;
-        rectTransform.sizeDelta = new(isCameraController ? controllerWidth : normalWidth, rectTransform.sizeDelta.y);
     }
 
     private void CheckForTextUpdate() {

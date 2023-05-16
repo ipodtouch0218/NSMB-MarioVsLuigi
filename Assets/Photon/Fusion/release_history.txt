@@ -1,12 +1,50 @@
-# 1.1.5
+# 1.1.6
 
-## F2
+## F
 
-### Build 643 (Dec 01, 2022)
+### Build 696 (Mar 29, 2023)
+
+**What's New**
+
+- `INetworkStruct` interface to `Fusion.Tick`
+- `NetworkSceneManagerBase.TryGetSceneRef` and `NetworkSceneManagerBase.TryGetScenePath`
+- Addressables support to `NetworkSceneManagerDefault`. To enable define `FUSION_USE_ADDRESSABLES`. Addressable scenes need to be added to `AddressableScenes` array. `SceneRef` for added scenes becomes the sum of a scene's index in this array and `AddressableSceneRefOffset` property. To load addressable scenes, simply use `NetworkRunner.SetActiveScene` with either a correct `SceneRef` or the addressable scene path
+
+**Improvements**
+
+- Improved the performance of 2D and 3D NetworkRigidbody behaviours by preventing multiple calls to SyncTransforms
+- Reduced bandwidth consumption of 2D and 3D `NetworkRigidbody` behaviours
+
+**Changes**
+
+- Made lag compensation buffer only advance when registering a new tick
+- If `CopyBackingFieldsToState` is overridden and the base type is not `NetworkBehaviour`, it needs to call the base method
+- Remove support for Beta SDKs
 
 **Bug Fixes**
 
+- Fixed: Issue in the NetworkTransform interpolation in Shared Mode that could cause the local buffer of states for interpolation to grow, increasing memory consumption
+- Fixed: Issue in the NetworkTransform interpolation in Shared Mode when pausing the editor time that could cause proxies to be delayed relative to their sources
+- Fixed: ILWeaver not releasing all the referenced DLLs before exiting
+- Fixed: Possible `NullReferenceException` when using implicit `NetworkBehaviour` -> `NetworkBehaviourId` cast operator
+- Fixed: Set PlayerTTL to 0 to avoid delay in reconnect
+- Fixed: "return pattern of RpcInvokeInfo not recognised" error when using RpcInvokeInfo
+- Fixed: `subtickAccuracy` parameter with different names in `LagCompensation.PositionRotation` overloads
+- Fixed: This difference could cause a cast from `PlayerRef` from/to `int` and the usage of the wrong overload depending on the parameter name if specified in the method call
+- Fixed: LagCompensation BVH check if the root is being reused by NetworkObjectPool
+- Fixed: `OnChanged` in generic types no longer causes `ILWeaverException`
+- Fixed: Test: Disabled `NetworkRunnerExtenstions` test (was non-functional)
+- Fixed: Behaviour Id valid range check on `NetworkRunner.TryFindBehaviour(NetworkBehaviourId, out NetworkBehaviour)`
+- Fixed: `NetworkRigidBody` does not change velocities when its `RigidBody` is kinematic, to avoid warnings on Unity 2022
+- Fixed: NetworkRunner is not being removed from Instances if not Started
+- Fixed: Linker errors related to `CopyBackingFieldsToState` when generic types are used as base types
+- Fixed: Prefab order being locale-dependent
+- Fixed: Added null check when comparing state authority during object spawn in shared mode
+- Fixed: All folders ending with `Resources` incorrectly recognized as `Resources` folders, making some of the contained prefabs unspawnable
+- Fixed: "unresolved external symbol" runtime errors if an abstract class deriving from `NetworkBehaviour` has no `[Networked]` properties
 - Fixed: Issue in the resolution of lag-compensated sphere overlaps that could cause hits to be missed, introduced on build 1.1.5 F 624 and also present on build 640
+
+# 1.1.5
 
 ## F
 

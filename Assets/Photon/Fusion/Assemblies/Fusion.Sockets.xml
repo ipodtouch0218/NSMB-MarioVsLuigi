@@ -734,8 +734,8 @@
             <summary>
             Check if this Message is compatible with target versions
             </summary>
-            <param name="targetProtocolMessage">Target Protocol Message Version</param>
-            <param name="targetSerializationVersion">Target Fusion Serialization Version</param>
+            <param name="targetProtocolVersion">Target Protocol Message Version</param>
+            <param name="pluginSerializationVersion">Target Fusion Serialization Version</param>
             <param name="enableSerializationVersionCheck">Enable the Serialization Version Check</param>
             <returns>True if message is compatible with versions</returns>
         </member>

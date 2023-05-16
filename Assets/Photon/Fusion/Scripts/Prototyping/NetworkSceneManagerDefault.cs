@@ -1,46 +1,68 @@
 // #define FUSION_NETWORK_SCENE_MANAGER_TRACE
+// #define FUSION_USE_ADDRESSABLES
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-namespace Fusion {
- 
+#if FUSION_USE_ADDRESSABLES
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+#endif
 
+namespace Fusion {
+  
   public class NetworkSceneManagerDefault : NetworkSceneManagerBase {
 
     [Header("Single Peer Options")]
     public int PostLoadDelayFrames = 1;
-
+    
     protected virtual YieldInstruction LoadSceneAsync(SceneRef sceneRef, LoadSceneParameters parameters, Action<Scene> loaded) {
 
-      if (!TryGetScenePathFromBuildSettings(sceneRef, out var scenePath)) {
+      if (!TryGetScenePath(sceneRef, out var scenePath)) {
         throw new InvalidOperationException($"Not going to load {sceneRef}: unable to find the scene name");
       }
 
-      var op = SceneManager.LoadSceneAsync(scenePath, parameters);
-      Assert.Check(op);
+#if FUSION_USE_ADDRESSABLES
+      if (TryFindAddress(sceneRef, out var address)) {
+        Debug.Assert(address == scenePath);
+        var op = Addressables.LoadSceneAsync(address, parameters);
 
-      bool alreadyHandled = false;
+        // to get the scene a callback is used, as it fires immediately when loading finished,
+        // compared to waiting for the coroutine to resume
+        op.Completed += op => {
+          if (op.Status == AsyncOperationStatus.Succeeded) {
+            loaded(op.Result.Scene);
+          }
+        };
+        
+        return StartCoroutine(op);
+      } else 
+#endif
+      {
 
-      // if there's a better way to get scene struct more reliably I'm dying to know
-      UnityAction<Scene, LoadSceneMode> sceneLoadedHandler = (scene, _) => {
-        if (IsScenePathOrNameEqual(scene, scenePath)) {
-          Assert.Check(!alreadyHandled);
-          alreadyHandled = true;
-          loaded(scene);
-        }
-      };
-      SceneManager.sceneLoaded += sceneLoadedHandler;
-      op.completed += _ => {
-        SceneManager.sceneLoaded -= sceneLoadedHandler;
-      };
+        var op = SceneManager.LoadSceneAsync(scenePath, parameters);
+        Assert.Check(op);
 
-      return op;
+        bool alreadyHandled = false;
+
+        // if there's a better way to get scene struct more reliably I'm dying to know
+        UnityAction<Scene, LoadSceneMode> sceneLoadedHandler = (scene, _) => {
+          if (IsScenePathOrNameEqual(scene, scenePath)) {
+            Assert.Check(!alreadyHandled);
+            alreadyHandled = true;
+            loaded(scene);
+          }
+        };
+        SceneManager.sceneLoaded += sceneLoadedHandler;
+        op.completed += _ => {
+          SceneManager.sceneLoaded -= sceneLoadedHandler;
+        };
+
+        return op;
+      }
     }
 
     protected virtual YieldInstruction UnloadSceneAsync(Scene scene) {
@@ -149,6 +171,54 @@ namespace Fusion {
       var sceneObjects = FindNetworkObjects(loadedScene, disable: true);
       finished(sceneObjects);
     }
+    
+#if FUSION_USE_ADDRESSABLES
+    
+    /// <summary>
+    /// SceneRefs for scenes in <see cref="AddressableScenes"/> are equal to their index in the array plus this offset.
+    /// </summary>
+    [Header("Addressables")]
+    [InlineHelp]
+    public int AddressableSceneRefOffset = 1000;
+    [ScenePath]
+    public string[] AddressableScenes;
+    
+    public override bool TryGetScenePath(SceneRef sceneRef, out string path) {
+      if (base.TryGetScenePath(sceneRef, out path)) {
+        return true;
+      }
 
+      if (TryFindAddress(sceneRef, out path)) {
+        return true;
+      }
+
+      return false;
+    }
+
+    public override bool TryGetSceneRef(string nameOrPath, out SceneRef sceneRef) {
+      if (base.TryGetSceneRef(nameOrPath, out sceneRef)) {
+        return true;
+      }
+      
+      var index = FusionUnitySceneManagerUtils.GetSceneIndex(AddressableScenes, nameOrPath);
+      if (index >= 0) {
+        sceneRef = AddressableSceneRefOffset + index;
+        return true;
+      }
+
+      return false;
+    }
+    
+    private bool TryFindAddress(SceneRef sceneRef, out string address) {
+      var index = (int)sceneRef;
+      if (index < AddressableSceneRefOffset || index >= AddressableSceneRefOffset + AddressableScenes.Length) {
+        address = null;
+        return false;
+      }
+
+      address = AddressableScenes[index - AddressableSceneRefOffset];
+      return true;
+    }
+#endif
   }
 }

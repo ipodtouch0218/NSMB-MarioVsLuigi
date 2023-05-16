@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Utils;
 
 [RequireComponent(typeof(NetworkRigidbody2D))]
-[OrderAfter(typeof(PlayerController), typeof(HoldableEntity))]
+[OrderAfter(typeof(PlayerController), typeof(HoldableEntity), typeof(NetworkRigidbody2D))]
 public class WrappingObject : SimulationBehaviour {
 
     //---Serialized Variables
@@ -25,13 +26,17 @@ public class WrappingObject : SimulationBehaviour {
         width = new(GameManager.Instance.LevelWidth, 0);
     }
 
+    public override void Render() {
+        Vector3 pos = transform.position;
+        Utils.WrapWorldLocation(ref pos);
+        transform.position = pos;
+    }
+
     public override void FixedUpdateNetwork() {
         if (nrb.Rigidbody.position.x < GameManager.Instance.LevelMinX) {
-            Vector3 newPos = nrb.Rigidbody.position + width;
-            nrb.TeleportToPosition(newPos, nrb.Rigidbody.velocity, false);
+            nrb.Rigidbody.position = nrb.Rigidbody.position + width;
         } else if (nrb.Rigidbody.position.x > GameManager.Instance.LevelMaxX) {
-            Vector3 newPos = nrb.Rigidbody.position - width;
-            nrb.TeleportToPosition(newPos, nrb.Rigidbody.velocity, false);
+            nrb.Rigidbody.position = nrb.Rigidbody.position - width;
         }
     }
 }

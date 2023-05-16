@@ -207,7 +207,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         if (!IsActive)
             return;
 
-        if (Runner.IsPredictive() && !HasInputAuthority)
+        if (!Runner.IsServer && !player.HasInputAuthority)
             return;
 
         // Check if they own us. If so, don't collide.
