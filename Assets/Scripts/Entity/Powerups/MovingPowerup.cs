@@ -275,13 +275,13 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         if (Collector)
             return;
 
-        //don't be collectable if we're following a player
-        if (!SpawnAnimationTimer.ExpiredOrNotRunning(Runner))
+        //don't be collectable if we're following a player / spawning
+        if (SpawnAnimationTimer.IsActive(Runner))
             return;
 
         //don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,
         // so we dont collect it instantly)
-        if (!IgnorePlayerTimer.ExpiredOrNotRunning(Runner))
+        if (IgnorePlayerTimer.IsActive(Runner))
             return;
 
         Collector = player;

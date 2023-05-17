@@ -215,11 +215,11 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             return;
 
         // If they have knockback invincibility, don't collide.
-        if (!player.DamageInvincibilityTimer.ExpiredOrNotRunning(Runner))
+        if (player.DamageInvincibilityTimer.IsActive(Runner))
             return;
 
         // Should do damage checks
-        if (player.IsStarmanInvincible) {
+        if (!player.IsStarmanInvincible) {
 
             bool sameTeam = player.data.Team != Owner.data.Team;
 

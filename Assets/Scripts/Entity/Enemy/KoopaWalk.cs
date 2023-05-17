@@ -2,6 +2,7 @@
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -41,7 +42,7 @@ public class KoopaWalk : HoldableEntity {
         animator.SetBool("dead",  !IsActive);
 
         // "Flip" rotation
-        float remainingWakeupTimer = WakeupTimer.RemainingTime(Runner) ?? 0f;
+        float remainingWakeupTimer = WakeupTimer.RemainingRenderTime(Runner) ?? 0f;
         if (IsUpsideDown) {
             dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
             graphicsTransform.eulerAngles = new Vector3(
@@ -214,7 +215,7 @@ public class KoopaWalk : HoldableEntity {
             return;
 
         // temporary invincibility
-        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+        if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;
@@ -344,12 +345,15 @@ public class KoopaWalk : HoldableEntity {
                     if (killable.IsDead)
                         continue;
 
-                    //kill entity we ran into
-                    killable.SpecialKill((killable.body ? killable.body.position.x : killable.transform.position.x) > body.position.x, false, ComboCounter++);
+                    Utils.UnwrapLocations(body.position, killable.body ? killable.body.position : killable.transform.position, out Vector2 ourPos, out Vector2 theirPos);
+                    bool fromRight = ourPos.x < theirPos.x;
 
-                    //if we hit another moving shell (or we're being held), we both die.
+                    // Kill entity we ran into
+                    killable.SpecialKill(fromRight, false, ComboCounter++);
+
+                    // If we hit another moving shell (or we're being held), we both die.
                     if (Holder || (killable is KoopaWalk kw && kw.IsInShell && !kw.IsActuallyStationary)) {
-                        SpecialKill((killable.body ? killable.body.position.x : killable.transform.position.x) < body.position.x, false, 0);
+                        SpecialKill(!fromRight, false, 0);
                         return;
                     }
 

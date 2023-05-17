@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
+using NSMB.Utils;
+
 //This is pretty much just the koopawalk script but it causes damage when you stand on it.
 public class SpinyWalk : KoopaWalk {
 
     //---IPlayerInteractable overrides
     public override void InteractWithPlayer(PlayerController player) {
-
-        //TODO: refactor. heavily.
 
         if (Holder)
             return;
@@ -15,63 +15,84 @@ public class SpinyWalk : KoopaWalk {
         if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
             return;
 
-        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+        bool fromRight = ourPos.x < theirPos.x;
+        Vector2 damageDirection = (theirPos - ourPos).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
 
-        if (!attackedFromAbove && player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
-            FacingRight = damageDirection.x < 0;
-        } else if (player.InstakillsEnemies) {
-            //Special kill
-            bool originalFacing = player.FacingRight;
-            if (player.IsInShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                //Do knockback to player, colliding with us in shell going opposite ways
-                player.DoKnockback(player.body.position.x < body.position.x, 0, false, Object);
+        // Special kill
+        if (player.InstakillsEnemies) {
+            SpecialKill(!player.FacingRight, false, player.StarCombo++);
 
-            SpecialKill(!originalFacing, false, player.StarCombo++);
-        } else if (!Holder) {
-            if (IsInShell) {
-                if (IsActuallyStationary) {
-                    //we aren't moving. check for kicks & pickups
-                    if (player.CanPickupItem) {
-                        //pickup-able
-                        Pickup(player);
-                    } else {
-                        //non-pickup able, kick.
-                        Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
-                    }
+            if (player.IsInShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
+                // Do knockback to player, colliding with us in shell going opposite ways
+                player.DoKnockback(!fromRight, 0, false, Object);
+
+            return;
+        }
+
+        // Don't interact with players if we're being held.
+        if (Holder)
+            return;
+
+        // Don't interact with crouched blue shell players
+        if (!attackedFromAbove && player.IsCrouchedInShell) {
+            FacingRight = damageDirection.x < 0;
+            return;
+        }
+
+        if (IsInShell) {
+            // In shell.
+            if (IsActuallyStationary) {
+                // We aren't moving. Check for kicks & pickups
+                if (player.CanPickupItem) {
+                    // Pickup
+                    Pickup(player);
                 } else {
-                    //in shell, moving.
-                    if (attackedFromAbove) {
-                        //being stomped on
-                        if (player.State == Enums.PowerupState.MiniMushroom) {
-                            //mini mario interactions
-                            if (player.IsGroundpounding) {
-                                //mini mario is groundpounding, cancel their groundpound & stop moving
-                                EnterShell(true, player);
-                                player.IsGroundpounding = false;
-                            }
-                            player.DoEntityBounce = true;
-                        } else {
-                            //normal mario interactions
-                            if (player.IsGroundpounding) {
-                                //normal mario is groundpounding, we get kick'd
-                                Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
-                            } else {
-                                //normal mario isnt groundpounding, we get stopped
-                                EnterShell(true, player);
-                                player.DoEntityBounce = true;
-                                FacingRight = damageDirection.x > 0;
-                            }
-                        }
-                    } else if (player.IsDamageable) {
-                        //not being stomped on. just do damage.
-                        player.Powerdown(false);
+                    // Kick
+                    Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                }
+                return;
+            }
+
+            // Moving, in shell. Check for stomps & damage.
+
+            if (attackedFromAbove) {
+                // Stomped.
+                if (player.State == Enums.PowerupState.MiniMushroom) {
+                    //mini mario interactions
+                    if (player.IsGroundpounding) {
+                        //mini mario is groundpounding, cancel their groundpound & stop moving
+                        EnterShell(true, player);
+                        player.IsGroundpounding = false;
+                    }
+                    player.DoEntityBounce = true;
+                } else {
+                    //normal mario interactions
+                    if (player.IsGroundpounding) {
+                        //normal mario is groundpounding, we get kick'd
+                        Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                    } else {
+                        //normal mario isnt groundpounding, we get stopped
+                        EnterShell(true, player);
+                        player.DoEntityBounce = true;
+                        FacingRight = damageDirection.x > 0;
                     }
                 }
-            } else if (player.IsDamageable) {
-                //Not in shell, we can't be stomped on.
+                return;
+            }
+
+            // Not being stomped on. just do damage.
+            if (player.IsDamageable) {
                 player.Powerdown(false);
                 FacingRight = damageDirection.x > 0;
+            }
+        } else {
+            // Not in shell, we can't be stomped on. Always damage.
+            if (player.IsDamageable) {
+                player.Powerdown(false);
+                FacingRight = damageDirection.x > 0;
+                return;
             }
         }
     }

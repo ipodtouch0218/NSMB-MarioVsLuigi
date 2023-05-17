@@ -12,7 +12,6 @@ public class ScoreboardEntry : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private TMP_Text nameText, valuesText;
     [SerializeField] private Image background;
-    [SerializeField] private float normalWidth = 250, controllerWidth = 280;
 
     //---Public Variables
     public PlayerController target;

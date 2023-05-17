@@ -10551,8 +10551,6 @@ MonoBehaviour:
   _FloorAngle: 0
   _OnIce:
     _value: 0
-  _Pushing:
-    _value: 0
   _IsJumping:
     _value: 0
   _JumpState: 0
@@ -11024,7 +11022,7 @@ MonoBehaviour:
   m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 2
+  _interpolationDataSource: 0
   InterpolationSpace: 1
   InterpolationTarget: {fileID: 8279152070748857899}
   InterpolateErrorCorrection: 1

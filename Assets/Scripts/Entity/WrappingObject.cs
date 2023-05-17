@@ -4,8 +4,8 @@ using Fusion;
 using NSMB.Utils;
 
 [RequireComponent(typeof(NetworkRigidbody2D))]
-[OrderAfter(typeof(PlayerController), typeof(HoldableEntity), typeof(NetworkRigidbody2D))]
-public class WrappingObject : SimulationBehaviour {
+[OrderAfter(typeof(PlayerController), typeof(HoldableEntity))]
+public class WrappingObject : SimulationBehaviour, IAfterUpdate {
 
     //---Serialized Variables
     [SerializeField] private NetworkRigidbody2D nrb;
@@ -26,17 +26,19 @@ public class WrappingObject : SimulationBehaviour {
         width = new(GameManager.Instance.LevelWidth, 0);
     }
 
-    public override void Render() {
-        Vector3 pos = transform.position;
-        Utils.WrapWorldLocation(ref pos);
-        transform.position = pos;
+    public void AfterUpdate() {
+        if (nrb.InterpolationTarget) {
+            Vector3 pos = nrb.InterpolationTarget.position;
+            Utils.WrapWorldLocation(ref pos);
+            nrb.InterpolationTarget.position = pos;
+        }
     }
 
     public override void FixedUpdateNetwork() {
         if (nrb.Rigidbody.position.x < GameManager.Instance.LevelMinX) {
-            nrb.Rigidbody.position = nrb.Rigidbody.position + width;
+            nrb.TeleportToPosition(nrb.Rigidbody.position + width, interpolateBackwards: false);
         } else if (nrb.Rigidbody.position.x > GameManager.Instance.LevelMaxX) {
-            nrb.Rigidbody.position = nrb.Rigidbody.position - width;
+            nrb.TeleportToPosition(nrb.Rigidbody.position - width, interpolateBackwards: false);
         }
     }
 }

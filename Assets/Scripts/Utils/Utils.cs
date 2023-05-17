@@ -95,6 +95,20 @@ namespace NSMB.Utils {
             }
         }
 
+        public static void UnwrapLocations(Vector2 a, Vector2 b, out Vector2 newA, out Vector2 newB, GameManager manager = null) {
+            if (!manager)
+                manager = GameManager.Instance;
+
+            newA = a;
+            newB = b;
+
+            if (!manager.loopingLevel)
+                return;
+
+            if (Mathf.Abs(newA.x - newB.x) > manager.LevelWidth * 0.5f)
+                newB.x += manager.LevelWidth * (newB.x > manager.LevelMiddleX ? -1 : 1);
+        }
+
         public static void WrapTileLocation(ref Vector2Int tileLocation, GameManager manager = null) {
             if (!manager)
                 manager = GameManager.Instance;

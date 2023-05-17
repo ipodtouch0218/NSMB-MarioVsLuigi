@@ -117,7 +117,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
                 continue;
 
             if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
-                if (killable.IsDead || killable is PiranhaPlantController)
+                if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlantController)
                     continue;
 
                 bool goRight = body.position.x > killable.body.position.x;
@@ -226,8 +226,9 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
     //---IPlayerInteractable overrides
     public virtual void InteractWithPlayer(PlayerController player) {
 
-        Vector2 damageDirection = (player.body.position - body.position).normalized;
-        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f && !player.IsOnGround;
+        Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+        Vector2 damageDirection = (theirPos - ourPos).normalized;
+        bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
 
         bool groundpounded = attackedFromAbove && player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom;
         if (player.InstakillsEnemies || groundpounded) {

@@ -99,7 +99,7 @@ public class ChatManager : MonoBehaviour {
     public void SendChat() {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerData data = runner.GetLocalPlayerData();
-        if (!data.MessageCooldownTimer.ExpiredOrNotRunning(runner)) {
+        if (data.MessageCooldownTimer.IsActive(runner)) {
             // Can't send a message yet.
             return;
         }
@@ -172,7 +172,7 @@ public class ChatManager : MonoBehaviour {
             return;
 
         //spam prevention.
-        if (data.IsMuted || !data.MessageCooldownTimer.ExpiredOrNotRunning(runner))
+        if (data.IsMuted || data.MessageCooldownTimer.IsActive(runner))
             return;
 
         //validate message format

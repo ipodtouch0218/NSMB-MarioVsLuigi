@@ -228,7 +228,7 @@ public class FrozenCube : HoldableEntity {
             return;
 
         //temporary invincibility
-        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+        if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
             return;
 
         Vector2 damageDirection = (player.body.position - body.position).normalized;

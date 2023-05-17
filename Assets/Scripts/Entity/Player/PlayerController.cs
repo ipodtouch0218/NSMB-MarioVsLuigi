@@ -63,6 +63,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     //Knockback
     [Networked(OnChanged = nameof(OnIsInKnockbackChanged))] public NetworkBool IsInKnockback { get; set; }
     [Networked] public NetworkBool IsWeakKnockback { get; set; }
+    [Networked] public NetworkBool IsForwardsKnockback { get; set; }
     [Networked] public TickTimer KnockbackTimer { get; set; }
     [Networked] public NetworkObject KnockbackAttacker { get; set; }
     //Groundpound
@@ -98,8 +99,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     [Networked] public NetworkBool IsSwimming { get; set; }
     [Networked(OnChanged = nameof(OnIsWaterWalkingChanged))] public NetworkBool IsWaterWalking { get; set; }
     //-Death & Respawning
-    [Networked(OnChanged = nameof(OnDeadChanged))] public NetworkBool IsDead { get; set; }
-    [Networked(OnChanged = nameof(OnRespawningChanged))] public NetworkBool IsRespawning { get; set; }
+    [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
+    [Networked(OnChanged = nameof(OnIsRespawningChanged))] public NetworkBool IsRespawning { get; set; }
     [Networked] public TickTimer RespawnTimer { get; set; }
     [Networked] public TickTimer PreRespawnTimer { get; set; }
 
@@ -132,7 +133,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     public bool WallSliding => WallSlideLeft || WallSlideRight;
     public bool InstakillsEnemies => IsStarmanInvincible || IsInShell || (IsSliding && Mathf.Abs(body.velocity.x) > 0.1f) || State == Enums.PowerupState.MegaMushroom;
     public bool IsCrouchedInShell => State == Enums.PowerupState.BlueShell && IsCrouching && !IsInShell;
-    public bool IsStarmanInvincible => !StarmanTimer.ExpiredOrNotRunning(Runner);
+    public bool IsStarmanInvincible => StarmanTimer.IsActive(Runner);
     public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
     public int PlayerId => data.PlayerId;
     public bool CanPickupItem => State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && JumpState < PlayerJumpState.DoubleJump && !IsGroundpounding && !(!HeldEntity && IsSwimming && PreviousInputs.buttons.IsSet(PlayerControls.Jump));
@@ -330,6 +331,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             GameManager.Instance.spectationManager.Spectating = false;
             NetworkHandler.OnInput += OnInput;
         }
+        /* else if (IsProxy) {
+            networkRigidbody.InterpolationDataSource = InterpolationDataSources.Snapshots;
+        }*/
 
         Lives = SessionData.Instance.Lives;
 
@@ -558,14 +562,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         footstepSound = Enums.Sounds.Player_Walk_Grass;
         footstepParticle = Enums.Particle.None;
         foreach (Vector2Int pos in TilesStandingOn) {
-            TileBase tile = Utils.GetTileAtTileLocation(pos);
-            if (!tile)
-                continue;
-
-            if (tile is TileWithProperties propTile) {
+            if (GameManager.Instance.tileManager.GetTile(pos, out TileWithProperties propTile)) {
                 footstepSound = propTile.footstepSound;
                 footstepParticle = propTile.footstepParticle;
                 OnIce = propTile.iceSkidding;
+                break;
             }
         }
     }
@@ -580,7 +581,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
         int collisions = 0;
         foreach (BoxCollider2D hitbox in hitboxes) {
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, CollisionFilter, TempCollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + (body.velocity * Runner.DeltaTime) + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, CollisionFilter, TempCollisionBuffer);
             Array.Copy(TempCollisionBuffer, 0, CollisionBuffer, collisions, count);
             collisions += count;
         }
@@ -629,8 +630,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         // Hit players
         bool dropStars = data.Team != other.data.Team;
 
-        int directionToOtherPlayer = Utils.WrappedDirectionSign(body.position, other.body.position);
-        bool fromRight = directionToOtherPlayer == -1;
+        Utils.UnwrapLocations(body.position, other.body.position, out Vector2 ours, out Vector2 theirs);
+        bool fromRight = ours.x < theirs.x;
+
+        float dot = Vector2.Dot((ours - theirs).normalized, Vector2.up);
+        bool above = dot > 0.7f;
+        bool otherAbove = dot < -0.7f;
 
         if (other.IsStarmanInvincible) {
             // They are invincible. let them decide if they've hit us.
@@ -653,10 +658,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             other.Powerdown(false);
             return;
         }
-
-        float dot = Vector2.Dot((body.position - other.body.position).normalized, Vector2.up);
-        bool above = dot > 0.7f;
-        bool otherAbove = dot < -0.7f;
 
         // Mega mushroom cases
         if (State == Enums.PowerupState.MegaMushroom || other.State == Enums.PowerupState.MegaMushroom) {
@@ -707,7 +708,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         }
 
 
-        if (other.IsDamageable && above && (body.velocity.y < 0.1f || other.IsInShell)) {
+        if (other.IsDamageable && above/* && (body.velocity.y < 0.1f || other.IsInShell)*/) {
             // Hit them from above
             DoEntityBounce = !IsGroundpounding && !IsDrilling;
             bool groundpounded = HasGroundpoundHitbox || IsDrilling;
@@ -715,7 +716,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             if (State == Enums.PowerupState.MiniMushroom && other.State != Enums.PowerupState.MiniMushroom) {
                 // We are mini, they arent. special rules.
                 if (groundpounded) {
-                    other.DoKnockback(!fromRight, dropStars ? 1 : 0, false, Object);
+                    other.DoKnockback(!fromRight, dropStars ? 3 : 0, false, Object);
                     IsGroundpounding = false;
                     DoEntityBounce = true;
                 }
@@ -732,7 +733,15 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             }
             return;
         } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove) {
-            if (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed) {
+            if (State == Enums.PowerupState.MiniMushroom || other.State == Enums.PowerupState.MiniMushroom) {
+
+                if (State == Enums.PowerupState.MiniMushroom)
+                    DoKnockback(fromRight, dropStars ? 1 : 0, false, other.Object);
+
+                if (other.State == Enums.PowerupState.MiniMushroom)
+                    other.DoKnockback(!fromRight, dropStars ? 1 : 0, false, Object);
+
+            } else if (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed) {
                 // Bump
                 if (IsOnGround)
                     DoKnockback(fromRight, dropStars ? 1 : 0, true, other.Object);
@@ -746,31 +755,35 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
             } else {
                 // Collide
-                float ourX = body.position.x;
-                float otherX = other.body.position.x;
+                int directionToOtherPlayer = fromRight ? -1 : 1;
+                float overlap = ((WorldHitboxSize.x * 0.5f) + (other.WorldHitboxSize.x * 0.5f) - Mathf.Abs(ours.x - theirs.x)) * 0.5f + 0.05f;
 
-                GameManager gm = GameManager.Instance;
-                if (gm.loopingLevel && Mathf.Abs(ourX - otherX) > gm.LevelWidth * 0.5f)
-                    otherX += gm.LevelWidth * Mathf.Sign(ourX - otherX);
+                if (overlap > 0.02f) {
+                    Vector2 ourNewPosition = new(body.position.x + (overlap * directionToOtherPlayer), body.position.y);
+                    Vector2 theirNewPosition = new(other.body.position.x + (overlap * -directionToOtherPlayer), other.body.position.y);
 
-                float avgX = (ourX + otherX) * 0.5f;
-                Vector2 ourNewPosition = new(avgX + WorldHitboxSize.x * 0.55f * directionToOtherPlayer, body.position.y);
-                Vector2 theirNewPosition = new(avgX + other.WorldHitboxSize.x * 0.55f * -directionToOtherPlayer, other.body.position.y);
+                    int hits = 0;
+                    RaycastHit2D hit;
+                    if (hit = Runner.GetPhysicsScene2D().BoxCast(ourNewPosition + (WorldHitboxSize * Vector2.up * 0.55f), WorldHitboxSize, 0, Vector2.zero, Physics2D.defaultContactOffset, Layers.MaskSolidGround)) {
+                        ourNewPosition.x = hit.point.x + hit.normal.x * (WorldHitboxSize.x * 0.5f + Physics2D.defaultContactOffset);
+                        theirNewPosition.x = ourNewPosition.x + hit.normal.x * ((WorldHitboxSize.x + other.WorldHitboxSize.x) * 0.5f + Physics2D.defaultContactOffset);
+                        hits++;
+                    }
+                    if (hit = Runner.GetPhysicsScene2D().BoxCast(theirNewPosition + (other.WorldHitboxSize * Vector2.up * 0.55f), other.WorldHitboxSize, 0, Vector2.zero, Physics2D.defaultContactOffset, Layers.MaskSolidGround)) {
+                        theirNewPosition.x = hit.point.x + hit.normal.x * (other.WorldHitboxSize.x * 0.5f + Physics2D.defaultContactOffset);
+                        ourNewPosition.x = theirNewPosition.x + hit.normal.x * ((WorldHitboxSize.x + other.WorldHitboxSize.x) * 0.5f + Physics2D.defaultContactOffset);
+                        hits++;
+                    }
 
-                RaycastHit2D hit;
-                if (hit = Runner.GetPhysicsScene2D().Raycast(ourNewPosition, Vector2.right * directionToOtherPlayer, WorldHitboxSize.x * 0.5f + Physics2D.defaultContactOffset, Layers.MaskSolidGround)) {
-                    ourNewPosition.x = hit.point.x + hit.normal.x * (WorldHitboxSize.x * 0.5f + Physics2D.defaultContactOffset);
+                    if (hits < 2) {
+                        body.position = ourNewPosition;
+                        other.body.position = theirNewPosition;
+
+                        float avgVel = (body.velocity.x + other.body.velocity.x) * 0.5f;
+                        body.velocity = new(avgVel, body.velocity.y);
+                        other.body.velocity = new(avgVel, other.body.velocity.y);
+                    }
                 }
-                if (hit = Runner.GetPhysicsScene2D().Raycast(theirNewPosition, Vector2.left * directionToOtherPlayer, other.WorldHitboxSize.x * 0.5f+ Physics2D.defaultContactOffset, Layers.MaskSolidGround)) {
-                    theirNewPosition.x = hit.point.x + hit.normal.x * (other.WorldHitboxSize.x * 0.5f + Physics2D.defaultContactOffset);
-                }
-
-                body.position = ourNewPosition;
-                other.body.position = theirNewPosition;
-
-                float avgVel = (body.velocity.x + other.body.velocity.x) * 0.5f;
-                body.velocity = new(avgVel, body.velocity.y);
-                other.body.velocity = new(avgVel, other.body.velocity.y);
             }
         }
     }
@@ -962,7 +975,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (IsInKnockback)
             return;
 
-        DoKnockback(bumper.body.position.x < body.position.x, 1, false, Object);
+        Utils.UnwrapLocations(body.position, bumper.body ? bumper.body.position : bumper.transform.position, out Vector2 ourPos, out Vector2 theirPos);
+        bool onRight = ourPos.x > theirPos.x;
+
+        DoKnockback(!onRight, 1, false, Object);
     }
 
     #region -- COIN / STAR COLLECTION --
@@ -1196,7 +1212,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         IsSwimming = false;
         IsWaterWalking = false;
         ResetKnockback();
-        animator.SetTrigger("respawn");
         models.transform.rotation = Quaternion.Euler(0, 180, 0);
         body.isKinematic = false;
         body.velocity = Vector2.zero;
@@ -1266,7 +1281,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     #region -- TILE COLLISIONS --
     private void HandleGiantTiles(bool pipes) {
         //TODO?
-        if (State != Enums.PowerupState.MegaMushroom || !GiantStartTimer.ExpiredOrNotRunning(Runner))
+        if (State != Enums.PowerupState.MegaMushroom || GiantStartTimer.IsActive(Runner))
             return;
 
         Vector2 checkSize = WorldHitboxSize * 1.1f;
@@ -1274,7 +1289,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         bool grounded = previousFrameVelocity.y < -8f && IsOnGround;
         Vector2 offset = Vector2.zero;
         if (grounded)
-            offset = Vector2.down / 2f;
+            offset = Vector2.down * 0.5f;
 
         Vector2 checkPosition = body.position + (Vector2.up * checkSize * 0.5f) + (2 * Runner.DeltaTime * body.velocity) + offset;
 
@@ -1352,12 +1367,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
     #region -- KNOCKBACK --
     public void DoKnockback(bool fromRight, int starsToDrop, bool weak, NetworkObject attacker) {
-        if (weak && IsWeakKnockback && IsInKnockback)
-            return;
-        if (IsInKnockback && !IsWeakKnockback)
+        if ((weak && IsWeakKnockback && IsInKnockback) || (IsInKnockback && !IsWeakKnockback))
             return;
 
-        if (GameManager.Instance.GameStartTime == -1 || !DamageInvincibilityTimer.ExpiredOrNotRunning(Runner) || CurrentPipe || IsFrozen || IsDead || !GiantStartTimer.ExpiredOrNotRunning(Runner) || !GiantEndTimer.ExpiredOrNotRunning(Runner))
+        if (GameManager.Instance.GameState != Enums.GameState.Playing || DamageInvincibilityTimer.IsActive(Runner) || CurrentPipe || IsFrozen || IsDead || GiantStartTimer.IsActive(Runner) || GiantEndTimer.IsActive(Runner))
             return;
 
         if (State == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -1371,19 +1384,17 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
         IsInKnockback = true;
         IsWeakKnockback = weak;
+        IsForwardsKnockback = FacingRight != fromRight;
         KnockbackAttacker = attacker;
         initialKnockbackFacingRight = FacingRight;
         KnockbackTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
 
-        animator.SetBool("fireballKnockback", weak);
-        animator.SetBool("knockforwards", FacingRight != fromRight);
-
-        float megaVelo = State == Enums.PowerupState.MegaMushroom ? 3 : 1;
         body.velocity = new Vector2(
             (fromRight ? -1 : 1) *
             ((starsToDrop + 1) / 2f) *
             4f *
-            megaVelo *
+            (State == Enums.PowerupState.MegaMushroom ? 3 : 1) *
+            (State == Enums.PowerupState.MiniMushroom ? 2.5f : 1f) *
             (weak ? 0.5f : 1f),
 
             // don't go upwards if we got hit by a fireball
@@ -1546,7 +1557,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
 
     private void HandleLayerState() {
-        bool hitsNothing = CurrentPipe || IsDead || IsStuckInBlock || !GiantStartTimer.ExpiredOrNotRunning(Runner) || (!GiantEndTimer.ExpiredOrNotRunning(Runner) && stationaryGiantEnd);
+        bool hitsNothing = CurrentPipe || IsDead || IsStuckInBlock || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && stationaryGiantEnd);
 
         gameObject.layer = hitsNothing ? Layers.LayerHitsNothing : Layers.LayerPlayer;
     }
@@ -1711,11 +1722,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 return;
 
             //Check 1
-            if (!WallJumpTimer.ExpiredOrNotRunning(Runner))
+            if (WallJumpTimer.IsActive(Runner))
                 return;
 
             //Check 2
-            if (!WallSlideEndTimer.ExpiredOrNotRunning(Runner))
+            if (WallSlideEndTimer.IsActive(Runner))
                 return;
 
             //Check 4: already handled
@@ -2177,7 +2188,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (IsGroundpounding && !IsOnGround)
             return;
 
-        if (!WallJumpTimer.ExpiredOrNotRunning(Runner)) {
+        if (WallJumpTimer.IsActive(Runner)) {
             FacingRight = body.velocity.x > 0;
         } else if (!IsInShell && !IsSliding && !IsSkidding && !IsInKnockback && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || IsTurnaround)) {
             if (right ^ left)
@@ -2185,7 +2196,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         } else if (GiantStartTimer.ExpiredOrNotRunning(Runner) && GiantEndTimer.ExpiredOrNotRunning(Runner) && !IsSkidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || IsTurnaround)) {
             if (IsInKnockback || (IsOnGround && State != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f)) {
                 FacingRight = body.velocity.x > 0;
-            } else if ((!IsInShell || !GiantStartTimer.ExpiredOrNotRunning(Runner)) && (right || left)) {
+            } else if ((!IsInShell || GiantStartTimer.IsActive(Runner)) && (right || left)) {
                 FacingRight = right;
             }
             if (!IsInShell && ((Mathf.Abs(body.velocity.x) < 0.5f && IsCrouching) || OnIce) && (right || left))
@@ -2580,7 +2591,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (!(IsGroundpounding && !IsOnGround)) {
             //Normal walking/running
             HandleWalkingRunning(left, right);
+        }
 
+        if (!(IsGroundpounding && !IsOnGround && !DoEntityBounce)) {
             //Jumping
             HandleJumping(jumpHeld, doJump, down);
         }
@@ -2609,7 +2622,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             } else {
                 float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
                 float htv = WalkingMaxSpeed * 1.18f + (remainingTime * 2f);
-                body.velocity = new(Mathf.Clamp(body.velocity.x, -htv, htv), Mathf.Max(body.velocity.y, !PropellerSpinTimer.ExpiredOrNotRunning(Runner) ? -propellerSpinFallSpeed : -propellerFallSpeed));
+                body.velocity = new(Mathf.Clamp(body.velocity.x, -htv, htv), Mathf.Max(body.velocity.y, PropellerSpinTimer.IsActive(Runner) ? -propellerSpinFallSpeed : -propellerFallSpeed));
             }
         } else if (WallSliding) {
             body.velocity = new(body.velocity.x, Mathf.Max(body.velocity.y, wallslideSpeed));
@@ -2797,7 +2810,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     }
 
     private void HandleGroundpound() {
-        if (IsGroundpounding && !GroundpoundStartTimer.ExpiredOrNotRunning(Runner)) {
+        if (IsGroundpounding && GroundpoundStartTimer.IsActive(Runner)) {
             if (GroundpoundStartTimer.RemainingTime(Runner) <= .066f) {
                 body.velocity = Vector2.zero;
             } else {
@@ -2889,7 +2902,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     }
 
     private float lastRespawnParticle;
-    public static void OnDeadChanged(Changed<PlayerController> changed) {
+    public static void OnIsDeadChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
         if (player.IsDead) {
             if (GameManager.Instance.GameState < Enums.GameState.Playing)
@@ -2906,11 +2919,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, player.Spawnpoint);
                 player.lastRespawnParticle = player.Runner.SimulationTime;
             }
+
+            player.animator.SetTrigger("respawn");
         }
     }
 
     private RespawnParticle respawnParticle;
-    public static void OnRespawningChanged(Changed<PlayerController> changed) {
+    public static void OnIsRespawningChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
         if (!player.IsRespawning || player.respawnParticle)
             return;

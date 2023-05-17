@@ -37,12 +37,12 @@
     "MaxNetworkedObjectCount": 8192,
     "NetworkIdIsObjectName": false,
     "HideNetworkObjectInactivityGuard": false,
-    "EnableHostMigration": false,
-    "HostMigrationSnapshotInterval": 20,
+    "EnableHostMigration": true,
+    "HostMigrationSnapshotInterval": 5,
     "Simulation": {
         "InputDataWordCount": 0,
         "TickRate": 30,
-        "MaxPrediction": 120,
+        "MaxPrediction": 10,
         "DefaultPlayers": 10,
         "ReplicationMode": 0,
         "ObjectInterest": false,
@@ -50,11 +50,11 @@
         "ClientPacketInterval": 1
     },
     "Interpolation": {
-        "DeltaAdjustment": 2,
-        "AllowedJitter": 35,
+        "DeltaAdjustment": 3,
+        "AllowedJitter": 25,
         "SnapLimit": 200,
         "MultiplierMin": 1.25,
-        "MultiplierMax": 3.0
+        "MultiplierMax": 2.0
     },
     "Network": {
         "SocketSendBufferSize": 256,

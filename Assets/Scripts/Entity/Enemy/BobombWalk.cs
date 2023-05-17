@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Tiles;
 using NSMB.Utils;
+using System;
 
 public class BobombWalk : HoldableEntity {
 
@@ -27,7 +28,7 @@ public class BobombWalk : HoldableEntity {
     private MaterialPropertyBlock mpb;
 
     //---Properties
-    public bool Lit => !DetonationTimer.ExpiredOrNotRunning(Runner);
+    public bool Lit => DetonationTimer.IsActive(Runner);
 
     public override void Spawned() {
         base.Spawned();
@@ -172,7 +173,7 @@ public class BobombWalk : HoldableEntity {
     public override void InteractWithPlayer(PlayerController player) {
 
         // Temporary invincibility, we dont want to spam the kick sound
-        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+        if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
             return;
 
         // Special insta-kill cases
@@ -181,7 +182,10 @@ public class BobombWalk : HoldableEntity {
             return;
         }
 
-        Vector2 damageDirection = (player.body.position - body.position).normalized;
+        Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+        bool fromRight = ourPos.x < theirPos.x;
+
+        Vector2 damageDirection = (theirPos - ourPos).normalized;
         bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.2f;
 
         // Normal interactions
@@ -191,7 +195,7 @@ public class BobombWalk : HoldableEntity {
                 Pickup(player);
             } else {
                 // kicked by player
-                Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
             }
         } else {
             if (attackedFromAbove) {
@@ -201,7 +205,7 @@ public class BobombWalk : HoldableEntity {
                     Light();
 
                 if (!mini && player.IsGroundpounding) {
-                    Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                    Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                 } else {
                     player.DoEntityBounce = true;
                     player.IsGroundpounding = false;

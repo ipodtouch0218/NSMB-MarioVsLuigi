@@ -55,7 +55,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private void ChangeLevelIndex(int index, bool changed) {
         levelDropdown.SetValueWithoutNotify(index);
         if (changed && MainMenuManager.Instance is MainMenuManager mm) {
-            mm.chat.AddSystemMessage("ui.inroom.chat.server.map", "map", levelDropdown.options[index].text);
+            mm.chat.AddSystemMessage("ui.inroom.chat.server.map", "map", mm.maps[index].translationKey);
             mm.PreviewLevel(index);
         }
     }
@@ -201,6 +201,9 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private void ChangeTeams(bool value) {
         teamsEnabledToggle.SetIsOnWithoutNotify(value);
         teamSelectorButton.SetEnabled(value);
+
+        if (!teamsEnabledToggle.isOn && value)
+            MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
     }
     #endregion
 

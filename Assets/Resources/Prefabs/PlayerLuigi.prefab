@@ -21633,6 +21633,7 @@ MonoBehaviour:
     _value: 1
   body: {fileID: 8636928217783201367}
   sfx: {fileID: 9191589652819086563}
+  checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
     _value: 0
   _State: 2
@@ -21671,7 +21672,7 @@ MonoBehaviour:
   _BlockBumpSoundCounter: 0
   _IsInKnockback:
     _value: 0
-  _IsFireballKnockback:
+  _IsWeakKnockback:
     _value: 0
   _KnockbackAttacker: {fileID: 0}
   _IsGroundpounding:
@@ -21680,6 +21681,8 @@ MonoBehaviour:
     _value: 0
   _OnSpinner: {fileID: 0}
   _IsSpinnerFlying:
+    _value: 0
+  _SpinnerLaunchAnimCounter:
     _value: 0
   _IsDrilling:
     _value: 0
@@ -22128,7 +22131,7 @@ MonoBehaviour:
   m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 2
+  _interpolationDataSource: 0
   InterpolationSpace: 1
   InterpolationTarget: {fileID: 8927504140826809228}
   InterpolateErrorCorrection: 1

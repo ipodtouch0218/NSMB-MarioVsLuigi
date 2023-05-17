@@ -214,7 +214,9 @@ public class GameManager : NetworkBehaviour {
 
         // Remove all networked objects. Fusion doesn't do this for us, unlike PUN.
         foreach (var obj in networkObjects)
-            runner.Despawn(obj);
+            if (obj)
+                runner.Despawn(obj);
+        networkObjects.Clear();
     }
 
     public override void Render() {
@@ -427,6 +429,8 @@ public class GameManager : NetworkBehaviour {
         SessionData.Instance.SetGameStarted(false);
         SessionData.Instance.GameStartTimer = TickTimer.None;
 
+        Pause(false);
+
         music.Stop();
 
         TranslationManager tm = GlobalController.Instance.translationManager;
@@ -619,7 +623,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void Pause(bool newState) {
-        if (paused == newState || GameState != Enums.GameState.Playing)
+        if (paused == newState || GameState < Enums.GameState.Playing)
             return;
 
         paused = newState;

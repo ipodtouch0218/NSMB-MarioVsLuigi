@@ -143,7 +143,7 @@ namespace NSMB.Translation {
         public string GetTranslationWithReplacements(string key, params string[] replacements) {
             string translation = GetTranslation(key);
             for (int i = 0; i < replacements.Length - 1; i += 2) {
-                translation = translation.Replace("{" + replacements[i] + "}", replacements[i + 1]);
+                translation = translation.Replace("{" + replacements[i] + "}", GetTranslation(replacements[i + 1]));
             }
             return translation;
         }

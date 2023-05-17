@@ -56,7 +56,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     [SerializeField] private Image overallsColorImage, shirtColorImage;
     [SerializeField] private GameObject playerColorPaletteIcon, playerColorDisabledIcon;
 
-    [SerializeField] private List<MapData> maps;
+    [SerializeField] public List<MapData> maps;
 
     //---Private Variables
     private Coroutine playerPingUpdateCoroutine, quitCoroutine, fadeMusicCoroutine;
