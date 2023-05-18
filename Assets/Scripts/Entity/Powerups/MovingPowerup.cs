@@ -100,22 +100,25 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
             PlaySound(Enums.Sounds.Player_Sound_PowerupReserveUse);
 
-        } else if (BlockSpawn) {
-            // Spawned from a block.
-            body.isKinematic = true;
-            gameObject.layer = Layers.LayerHitsNothing;
-            sRenderer.sortingOrder = -1000;
+        } else {
+            if (BlockSpawn) {
+                // Spawned from a block.
+                body.isKinematic = true;
+                gameObject.layer = Layers.LayerHitsNothing;
+                sRenderer.sortingOrder = -1000;
+
+
+                if (childAnimation)
+                    childAnimation.Play();
+
+            } else {
+                // Spawned by any other means (blue koopa, usually.)
+                body.isKinematic = false;
+                gameObject.layer = Layers.LayerEntity;
+                sRenderer.sortingOrder = OriginalSortingOrder;
+            }
 
             PlaySound(powerupScriptable.powerupBlockEffect);
-
-            if (childAnimation)
-                childAnimation.Play();
-
-        } else {
-            // Spawned by any other means (blue koopa, usually.)
-            body.isKinematic = false;
-            gameObject.layer = Layers.LayerEntity;
-            sRenderer.sortingOrder = OriginalSortingOrder;
         }
 
         FacingRight = true;

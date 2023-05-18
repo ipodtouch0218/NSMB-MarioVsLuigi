@@ -16,4 +16,4 @@ MonoBehaviour:
   loopStartSeconds: 39.272
   loopEndSeconds: 78.558
   fastClip: {fileID: 0}
-  speedupFactor: 1.25
+  speedupFactor: 1

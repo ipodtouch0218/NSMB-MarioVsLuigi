@@ -44,16 +44,15 @@ public class RoomIcon : MonoBehaviour {
         inProgressText.text = gameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
 
         string symbols = "";
-        bool time = timer >= 1;
 
         if (powerups)
             symbols += "<sprite=8>";
-        if (time)
-            symbols += "<sprite=6>";
         if (teams)
             symbols += "<sprite=49>";
+        if (timer > 0)
+            symbols += "<sprite=63>" + Utils.GetSymbolString(timer.ToString(), Utils.smallSymbols);
 
-        if (lives >= 1)
+        if (lives > 0)
             symbols += "<sprite=9>" + Utils.GetSymbolString(lives.ToString(), Utils.smallSymbols);
 
         symbols += "<sprite=38>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);

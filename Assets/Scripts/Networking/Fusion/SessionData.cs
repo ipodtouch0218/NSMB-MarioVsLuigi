@@ -16,16 +16,15 @@ public class SessionData : NetworkBehaviour {
 
 #pragma warning disable CS0414
     //---Default values
-    private readonly byte defaultMaxPlayers = 10;
     private readonly sbyte defaultStarRequirement = 10;
     private readonly byte defaultCoinRequirement = 8;
     private readonly sbyte defaultLives = -1;
-    private readonly int defaultTimer = -1;
+    private readonly sbyte defaultTimer = -1;
     private readonly NetworkBool defaultCustomPowerups = true;
 #pragma warning restore CS0414
 
     //---Networked Variables
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultMaxPlayers))]      public byte MaxPlayers { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged))]                                           public byte MaxPlayers { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool PrivateRoom { get; set; }
     [Networked(OnChanged = nameof(GameStartTimerChanged))]                                    public TickTimer GameStartTimer { get; set; }
     [Networked(OnChanged = nameof(StartChanged))]                                             public NetworkBool GameStarted { get; set; }
@@ -33,7 +32,7 @@ public class SessionData : NetworkBehaviour {
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultLives))]           public sbyte Lives { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultTimer))]           public int Timer { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultTimer))]           public sbyte Timer { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool DrawOnTimeUp { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCustomPowerups))]  public NetworkBool CustomPowerups { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool Teams { get; set; }
@@ -62,8 +61,10 @@ public class SessionData : NetworkBehaviour {
             MainMenuManager.Instance.EnterRoom();
 
         PrivateRoom = !Runner.SessionInfo.IsVisible;
-        Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
-        MaxPlayers = (byte) players;
+        if (MaxPlayers == 0) {
+            Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
+            MaxPlayers = (byte) players;
+        }
 
         if (Runner.IsServer) {
             bannedIds = new();
@@ -72,6 +73,8 @@ public class SessionData : NetworkBehaviour {
 
             pingUpdaterCorotuine = StartCoroutine(UpdatePings());
         }
+
+        gameObject.name = "SessionData (" + Runner.SessionInfo.Name + ")";
     }
 
     public override void FixedUpdateNetwork() {
@@ -102,7 +105,9 @@ public class SessionData : NetworkBehaviour {
         while (true) {
             yield return WaitTwoSeconds;
             foreach (PlayerRef player in Runner.ActivePlayers) {
-                player.GetPlayerData(Runner).Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
+                if (player.GetPlayerData(Runner) is not PlayerData pd || !pd)
+                    continue;
+                pd.Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
             }
         }
     }
@@ -167,7 +172,7 @@ public class SessionData : NetworkBehaviour {
         UpdateProperty(Enums.NetRoomProperties.Lives, value);
     }
 
-    public void SetTimer(int value) {
+    public void SetTimer(sbyte value) {
         Timer = value;
         UpdateProperty(Enums.NetRoomProperties.Time, value);
     }

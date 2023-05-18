@@ -17,6 +17,7 @@ public class KoopaWalk : HoldableEntity {
     [Networked] public NetworkBool IsStationary { get; set; }
     [Networked] public NetworkBool IsUpsideDown { get; set; }
     [Networked] private NetworkBool Putdown { get; set; }
+    [Networked(OnChanged = nameof(OnBlueShellCollectorChanged))] private PlayerController BlueShellCollector { get; set; }
 
     //---Serialized Variables
     [SerializeField] private Sprite deadSprite;
@@ -159,8 +160,11 @@ public class KoopaWalk : HoldableEntity {
     }
 
     public void EnterShell(bool becomeItem, PlayerController player) {
+        if (IsDead)
+            return;
+
         if (blue && !IsInShell && becomeItem) {
-            BlueBecomeItem();
+            BlueBecomeItem(player);
             return;
         }
         body.velocity = Vector2.zero;
@@ -176,10 +180,15 @@ public class KoopaWalk : HoldableEntity {
         }
     }
 
-    public void BlueBecomeItem() {
-        Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(0.1f);
-        });
+    public void BlueBecomeItem(PlayerController player) {
+        if (player.HasGroundpoundHitbox) {
+            player.State = Enums.PowerupState.BlueShell;
+            BlueShellCollector = player;
+        } else {
+            Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
+                obj.GetComponent<MovingPowerup>().OnBeforeSpawned(0.1f);
+            });
+        }
         DespawnEntity();
     }
 
@@ -205,6 +214,7 @@ public class KoopaWalk : HoldableEntity {
         IsUpsideDown = false;
         WakeupTimer = TickTimer.None;
         Putdown = false;
+        BlueShellCollector = null;
     }
 
     //---IPlayerInteractable overrides
@@ -249,7 +259,7 @@ public class KoopaWalk : HoldableEntity {
 
             // blue koopa: check to become a blue shell item
             if (blue && (!IsInShell || (IsInShell && player.HasGroundpoundHitbox))) {
-                BlueBecomeItem();
+                BlueBecomeItem(player);
                 player.DoEntityBounce = !player.IsGroundpounding;
                 return;
             }
@@ -399,5 +409,11 @@ public class KoopaWalk : HoldableEntity {
         if (!crouch)
             WakeupTimer = TickTimer.None;
         Putdown = crouch;
+    }
+
+    //---OnChangeds
+    private static void OnBlueShellCollectorChanged(Changed<KoopaWalk> changed) {
+        if (changed.Behaviour.BlueShellCollector)
+            changed.Behaviour.BlueShellCollector.PlaySound(Enums.Sounds.Player_Sound_PowerupCollect);
     }
 }

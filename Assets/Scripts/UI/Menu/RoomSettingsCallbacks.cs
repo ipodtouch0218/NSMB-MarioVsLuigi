@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
-using NSMB.Utils;
 
 public class RoomSettingsCallbacks : MonoBehaviour {
 
@@ -34,8 +33,10 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         ChangeDrawOnTimeUp(roomData.DrawOnTimeUp);
         ChangeCustomPowerups(roomData.CustomPowerups);
 
-        if (MainMenuManager.Instance is MainMenuManager mm)
+        if (MainMenuManager.Instance is MainMenuManager mm) {
+            mm.playerList.UpdateAllPlayerEntries();
             mm.UpdateStartGameButton();
+        }
     }
 
     #region Level Index
@@ -67,9 +68,12 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
 
         int oldValue = Room.StarRequirement;
-        int.TryParse(starsInputField.text, out int newValue);
+        if (!int.TryParse(starsInputField.text, out int newValue))
+            return;
 
-        if (newValue == oldValue || newValue < 1 || newValue > 25) {
+        newValue = Mathf.Clamp(newValue, 1, 25);
+
+        if (oldValue == newValue) {
             ChangeStarRequirement(oldValue);
             return;
         }
@@ -77,7 +81,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         Room.SetStarRequirement((sbyte) newValue);
     }
     private void ChangeStarRequirement(int stars) {
-        starsInputField.text = stars.ToString();
+        starsInputField.SetTextWithoutNotify(stars.ToString());
     }
     #endregion
 
@@ -87,9 +91,12 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
 
         int oldValue = Room.CoinRequirement;
-        int.TryParse(coinsInputField.text, out int newValue);
+        if (!int.TryParse(coinsInputField.text, out int newValue))
+            return;
 
-        if (newValue == oldValue || newValue < 2 || newValue > 20) {
+        newValue = Mathf.Clamp(newValue, 2, 25);
+
+        if (newValue == oldValue) {
             ChangeCoinRequirement(oldValue);
             return;
         }
@@ -97,7 +104,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         Room.SetCoinRequirement((byte) newValue);
     }
     private void ChangeCoinRequirement(int coins) {
-        coinsInputField.text = coins.ToString();
+        coinsInputField.SetTextWithoutNotify(coins.ToString());
     }
     #endregion
 
@@ -107,8 +114,12 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
 
         int oldValue = Room.Lives;
-        int.TryParse(livesInputField.text, out int newValue);
-        if (newValue == -1 || newValue < 1 || newValue > 20) {
+        if (!int.TryParse(livesInputField.text, out int newValue))
+            return;
+
+        newValue = Mathf.Clamp(newValue, 1, 25);
+
+        if (newValue == oldValue) {
             ChangeLives(oldValue);
             return;
         }
@@ -140,23 +151,28 @@ public class RoomSettingsCallbacks : MonoBehaviour {
             return;
 
         int oldValue = Room.Timer;
-        int newValue = Utils.ParseTimeToSeconds(timerInputField.text);
+        if (!int.TryParse(timerInputField.text.Split(":")[0], out int newValue))
+            return;
 
-        if (newValue == oldValue || newValue < 1 || newValue > 99) {
+        newValue = Mathf.Clamp(newValue, 1, 99);
+
+        if (newValue == oldValue) {
             ChangeTime(oldValue);
             return;
         }
 
-        Room.SetTimer(newValue);
+        Room.SetTimer((sbyte) newValue);
     }
     public void EnableTime() {
         if (!Runner.IsServer)
             return;
 
-        int newValue = Utils.ParseTimeToSeconds(timerInputField.text);
-        newValue = timerEnabledToggle.isOn ? newValue : -1;
+        if (!int.TryParse(timerInputField.text.Split(":")[0], out int newValue))
+            return;
 
-        Room.SetTimer(newValue);
+        newValue = timerEnabledToggle.isOn ? Mathf.Clamp(newValue, 1, 99) : -1;
+
+        Room.SetTimer((sbyte) newValue);
     }
     private void ChangeTime(int time) {
         timerEnabledToggle.SetIsOnWithoutNotify(time != -1);
@@ -166,9 +182,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         if (time == -1)
             return;
 
-        int minutes = time / 60;
-        int seconds = time % 60;
-        timerInputField.SetTextWithoutNotify($"{minutes}:{seconds:D2}");
+        timerInputField.SetTextWithoutNotify($"{time}:00");
     }
     #endregion
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     //---Properties
     public static string CurrentRegion { get; set; }
     public static NetworkRunner Runner => Instance.runner;
-    public static bool Connecting => AuthenticationHandler.IsAuthenticating || (Runner && Runner.State == NetworkRunner.States.Starting && !Runner.IsCloudReady);
+    public static bool Connecting => AuthenticationHandler.IsAuthenticating || (Runner && Runner.State == NetworkRunner.States.Starting && !Runner.IsCloudReady) || (Runner && Runner.State == NetworkRunner.States.Running && !Runner.IsConnectedToServer);
     public static bool Connected => !Connecting && Runner && (Runner.State == NetworkRunner.States.Running || Runner.IsCloudReady);
     public static bool Disconnected => !Connecting && !Connected;
 
@@ -86,11 +87,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #region NetworkRunner Callbacks
     void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {
         if (runner.LobbyInfo.IsValid) {
-            //connected to a lobby
-            Debug.Log($"[Network] Successfully connected to a Lobby");
+            // Connected to a lobby
+            Debug.Log($"[Network] Successfully connected to a Lobby ({runner.LobbyInfo.Name}, {runner.LobbyInfo.Region})");
         } else if (runner.SessionInfo.IsValid) {
-            //connected to a session
-            Debug.Log($"[Network] Successfully connected to a Room");
+            // Connected to a session
+            Debug.Log($"[Network] Successfully connected to a Room ({runner.SessionInfo.Name}, {runner.SessionInfo.Region})");
         }
 
         OnConnectedToServer?.Invoke(runner);
@@ -105,8 +106,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
         Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress}");
 
-        SessionInfo info = runner.SessionInfo;
-        if (info.PlayerCount >= SessionData.Instance.MaxPlayers) {
+        if (runner.SessionInfo.PlayerCount >= SessionData.Instance.MaxPlayers) {
             request.Refuse();
             return;
         }
@@ -117,6 +117,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         else
             request.Refuse();
     }
+
     void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner) {
         Debug.Log("[Network] Disconnected from Server");
 
@@ -135,7 +136,20 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         OnCustomAuthenticationResponse?.Invoke(runner, data);
     }
 
-    void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {
+    async void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {
+        Debug.Log($"[Network] Receive host migration signal, we will become a {hostMigrationToken.GameMode}");
+
+        await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
+        RecreateInstance();
+
+        StartGameResult result = await Runner.StartGame(new() {
+            HostMigrationToken = hostMigrationToken,
+            HostMigrationResume = HostMigrationResume,
+            ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname),
+            DisableClientSessionCreation = true,
+
+        });
+
         OnHostMigration?.Invoke(runner, hostMigrationToken);
     }
 
@@ -151,14 +165,23 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         Debug.Log($"[Network] Player joined room (UserId = {runner.GetPlayerUserId(player)})");
 
         if (runner.IsServer && !runner.IsSinglePlayer) {
-            //create player data
-            runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
+            // Create player data
+            PlayerData[] dataObjects = FindObjectsOfType<PlayerData>();
+            PlayerData ourData = FindObjectsOfType<PlayerData>().Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player)).SingleOrDefault();
 
-            if (player == Runner.LocalPlayer) {
-                //create room data
+            if (!ourData) {
+                runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
+            } else {
+                runner.SetPlayerObject(player, ourData.Object);
+            }
+
+            if (player == Runner.LocalPlayer && !SessionData.Instance) {
+                // Create room data
                 NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
                 SessionData.Instance = session.GetComponent<SessionData>();
             }
+
+            runner.PushHostMigrationSnapshot();
         }
 
         if (runner.LocalPlayer != player)
@@ -198,6 +221,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
         Debug.Log($"[Network] Network Shutdown: {shutdownReason}");
 
+        if (shutdownReason == ShutdownReason.HostMigration)
+            return;
+
         OnShutdown?.Invoke(runner, shutdownReason);
         RecreateInstance();
     }
@@ -209,12 +235,15 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     #region Unity Callbacks
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    public static void RecreateInstance() {
+    public static async void RecreateInstance() {
         if (!prefab)
             prefab = (GameObject) Resources.Load("Prefabs/Static/NetworkingHandler");
 
-        if (Instance)
-            Destroy(Instance.gameObject);
+        if (Instance) {
+            if (!Instance.runner.IsShutdown)
+                await Instance.runner.Shutdown(shutdownReason: ShutdownReason.Ok);
+            DestroyImmediate(Instance.gameObject);
+        }
 
         Instance = Instantiate(prefab).GetComponent<NetworkHandler>();
         Instance.Initialize();
@@ -279,7 +308,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (result.Ok) {
             CurrentRegion = Runner.LobbyInfo.Region;
 
-            Debug.Log($"[Network] Connected to lobby in {CurrentRegion} region");
+            Debug.Log($"[Network] Connected to a Lobby ({Runner.LobbyInfo.Name}, {CurrentRegion})");
 
             //save id for later authentication
             PlayerPrefs.SetString("id", Runner.AuthenticationValues.UserId);
@@ -314,7 +343,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
             args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname);
-            args.PlayerCount = 9;
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
             args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname;
@@ -368,4 +396,28 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return result;
     }
     #endregion
+
+    private void HostMigrationResume(NetworkRunner runner) {
+        foreach (var resumeNO in runner.GetResumeSnapshotNetworkObjects()) {
+
+            if (resumeNO.TryGetComponent(out PlayerData data) && resumeNO.InputAuthority == runner.SessionInfo.MaxPlayers - 1) {
+                // Don't bring over the old host's data.
+                continue;
+            }
+
+            PlayerRef newAuthority = resumeNO.InputAuthority;
+            if (newAuthority != PlayerRef.None) {
+                if (newAuthority == runner.SessionInfo.MaxPlayers - 1)
+                    newAuthority = PlayerRef.None;
+                else if (newAuthority == 0)
+                    newAuthority = runner.SessionInfo.MaxPlayers - 1;
+                else
+                    newAuthority -= 1;
+            }
+
+            runner.Spawn(resumeNO, inputAuthority: newAuthority, onBeforeSpawned: (runner, newNO) => {
+                newNO.CopyStateFrom(resumeNO);
+            });
+        }
+    }
 }

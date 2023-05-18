@@ -16,9 +16,10 @@ public class LoopingMusicPlayer : LoopingSoundPlayer {
             if (_fastMusic)
                 scaleFactor = 1f / scaleFactor;
 
-            audioSource.time *= scaleFactor;
+            float time = audioSource.time;
             audioSource.clip = (_fastMusic && CurrentMusicSong.fastClip) ? CurrentMusicSong.fastClip : CurrentMusicSong.clip;
             audioSource.Play();
+            audioSource.time = time * scaleFactor;
 
             Update();
         }

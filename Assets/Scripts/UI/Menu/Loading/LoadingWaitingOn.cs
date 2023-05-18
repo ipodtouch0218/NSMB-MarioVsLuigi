@@ -4,6 +4,7 @@ using TMPro;
 
 using NSMB.Extensions;
 using NSMB.Translation;
+using Fusion;
 
 namespace NSMB.Loading {
 
@@ -29,7 +30,6 @@ namespace NSMB.Loading {
             ourNickname = NetworkHandler.Runner.GetLocalPlayerData().GetNickname();
         }
 
-
         public void Update() {
             if (!GameManager.Instance || !(GameManager.Instance.Object?.IsValid ?? false))
                 return;
@@ -40,6 +40,7 @@ namespace NSMB.Loading {
             // Loading (as spectator)
             if (ourData.IsCurrentlySpectating) {
                 text.text = tm.GetTranslation("ui.loading.spectator");
+                playerListParent.SetActive(false);
                 return;
             }
 
@@ -58,10 +59,13 @@ namespace NSMB.Loading {
             }
 
             HashSet<string> waitingFor = new();
-            foreach (PlayerController pc in GameManager.Instance.AlivePlayers) {
-                PlayerData data = pc.Object.InputAuthority.GetPlayerData(pc.Runner);
+            NetworkRunner runner = GameManager.Instance.Runner;
+            foreach (PlayerRef player in runner.ActivePlayers) {
+                PlayerData data = player.GetPlayerData(runner);
+                if (!data || data.IsCurrentlySpectating)
+                    continue;
 
-                if (!data.IsCurrentlySpectating && !data.IsLoaded)
+                if (!data.IsLoaded)
                     waitingFor.Add(data.GetNickname());
             }
 

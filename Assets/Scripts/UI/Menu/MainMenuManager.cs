@@ -12,9 +12,9 @@ using TMPro;
 using Fusion;
 using Fusion.Sockets;
 using NSMB.Extensions;
+using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
-using NSMB.Translation;
 
 public class MainMenuManager : Singleton<MainMenuManager> {
 
@@ -68,12 +68,13 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void OnEnable() {
         // Register callbacks
-        NetworkHandler.OnPlayerJoined +=       OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft +=         OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect +=       OnLobbyConnect;
-        NetworkHandler.OnShutdown +=           OnShutdown;
-        NetworkHandler.OnJoinSessionFailed +=  OnShutdown;
-        NetworkHandler.OnConnectFailed +=      OnConnectFailed;
+        NetworkHandler.OnPlayerJoined +=           OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft +=             OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect +=           OnLobbyConnect;
+        NetworkHandler.OnShutdown +=               OnShutdown;
+        NetworkHandler.OnJoinSessionFailed +=      OnShutdown;
+        NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
+        NetworkHandler.OnConnectFailed +=          OnConnectFailed;
 
         ControlSystem.controls.UI.Pause.performed += OnPause;
         GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
@@ -82,12 +83,13 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void OnDisable() {
         // Unregister callbacks
-        NetworkHandler.OnPlayerJoined -=       OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft -=         OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect -=       OnLobbyConnect;
-        NetworkHandler.OnShutdown -=           OnShutdown;
-        NetworkHandler.OnJoinSessionFailed -=  OnShutdown;
-        NetworkHandler.OnConnectFailed -=      OnConnectFailed;
+        NetworkHandler.OnPlayerJoined -=           OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -=             OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect -=           OnLobbyConnect;
+        NetworkHandler.OnShutdown -=               OnShutdown;
+        NetworkHandler.OnJoinSessionFailed -=      OnShutdown;
+        NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
+        NetworkHandler.OnConnectFailed -=          OnConnectFailed;
 
         ControlSystem.controls.UI.Pause.performed -= OnPause;
         GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
@@ -139,7 +141,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
                     return;
 
                 updateText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.update.prompt", "newversion", latestVersion, "currentversion", Application.version);
-                //updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
                 updateBox.SetActive(true);
                 EventSystem.current.SetSelectedGameObject(updateBoxSelected);
             });
@@ -152,8 +153,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void Update() {
 
-        bool connectedToNetwork = NetworkHandler.Connected;
-        bool connectingToNetwork = NetworkHandler.Connecting;
+        bool connectedToNetwork = NetworkHandler.Connected && !Runner.SessionInfo;
+        bool connectingToNetwork = NetworkHandler.Connecting || Runner.SessionInfo;
 
         connecting.SetActive(connectingToNetwork && lobbyMenu.activeInHierarchy);
 
@@ -177,7 +178,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
         }
 
-        playerList.AddPlayerEntry(player);
+        //playerList.AddPlayerEntry(player);
     }
 
     public void EnterRoom() {
@@ -195,6 +196,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         OpenInRoomMenu();
         StartCoroutine(ResetRoomSettingScrollPosition());
 
+        playerList.RemoveAllPlayerEntries();
+
         // Set the player settings
         PlayerData data = Runner.GetLocalPlayerData();
         characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.genericCharacter);
@@ -202,7 +205,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
         // Set the room settings
-        hostControlsGroup.interactable = data.IsRoomOwner;
+        hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
         roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
 
         // Preview the current level
@@ -325,8 +328,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         nonNetworkShutdown = false;
     }
 
-    public void OpenNetworkErrorBox(string text) {
-        networkErrorPrompt.OpenWithText(text);
+    public void OpenNetworkErrorBox(string key) {
+        networkErrorPrompt.OpenWithText(key);
     }
 
     public void OpenNetworkErrorBox(ShutdownReason reason) {
@@ -475,7 +478,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         //PhotonNetwork.SetMasterClient(target);
         //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
-        chat.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
+        //chat.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
+        //runner.set
     }
 
     public void Mute(PlayerRef target) {
@@ -519,7 +523,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             return;
 
         SessionData.Instance.AddBan(target);
-        chat.AddSystemMessage("ui.inroom.chat.player.banned", "playername", "target.GetPlayerData(runner).GetNickname()");
+        chat.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetPlayerData(runner).GetNickname());
         Runner.Disconnect(target);
 
         //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
@@ -693,6 +697,16 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
         if (cause != ShutdownReason.Ok)
             OpenNetworkErrorBox(cause);
+
+        if (inLobbyMenu.activeSelf) {
+            OpenRoomListMenu();
+        }
+
+        GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
+    }
+
+    public void OnDisconnect(NetworkRunner runner) {
+        OpenNetworkErrorBox(ShutdownReason.ConnectionRefused);
 
         if (inLobbyMenu.activeSelf) {
             OpenRoomListMenu();

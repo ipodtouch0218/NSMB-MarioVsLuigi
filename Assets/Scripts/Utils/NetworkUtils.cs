@@ -18,6 +18,7 @@ namespace NSMB.Utils {
             [ShutdownReason.GameClosed] = "ui.error.joinclosed",
             [ShutdownReason.GameNotFound] = "ui.error.joinnotfound",
             [ShutdownReason.GameIsFull] = "ui.error.joinfull",
+            [ShutdownReason.ConnectionRefused] = "ui.error.kicked",
 
             [NetConnectFailedReason.Timeout] = "ui.error.jointimeout",
             [NetConnectFailedReason.ServerFull] = "ui.error.joinfull",

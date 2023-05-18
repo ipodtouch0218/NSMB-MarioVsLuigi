@@ -16,7 +16,7 @@ public class PlayerData : NetworkBehaviour {
 
     //---Networked Variables
     [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] public string Nickname { get; set; } = "noname";
-    [Networked, Capacity(28)]                                    private string DisplayNickname { get; set; } = "noname";
+    [Networked, Capacity(28), SerializeField]                    private string DisplayNickname { get; set; } = "noname";
     [Networked]                                                  public Guid UserId { get; set; }
     [Networked]                                                  public sbyte PlayerId { get; set; }
     [Networked]                                                  public uint Wins { get; set; }
@@ -30,6 +30,7 @@ public class PlayerData : NetworkBehaviour {
     [Networked(OnChanged = nameof(OnCharacterChanged))]          public byte CharacterIndex { get; set; }
     [Networked(OnChanged = nameof(OnSkinChanged))]               public byte SkinIndex { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))]            public int Ping { get; set; }
+    [Networked]                                                  public NetworkBool Initialized { get; set; }
 
     //---Private Variables
     private Tick lastUpdatedTick;
@@ -41,11 +42,11 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public override void Spawned() {
-        //keep track of our data, pls kthx
+        // Keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
         PlayerId = -1;
-        if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers)
+        if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1)
             Team = 0;
         else
             Team = (sbyte) ((Object.InputAuthority + 1) % 5);
@@ -54,7 +55,7 @@ public class PlayerData : NetworkBehaviour {
             SessionData.Instance.LoadWins(this);
 
         if (Object.HasInputAuthority) {
-            //we're the client. update with our data.
+            // We're the client. update with our data.
             Rpc_SetCharacterIndex((byte) Settings.Instance.genericCharacter);
             Rpc_SetSkinIndex((byte) Settings.Instance.genericSkin);
 
@@ -63,14 +64,20 @@ public class PlayerData : NetworkBehaviour {
         }
 
         if (Runner.IsServer) {
-            string nickname = Encoding.UTF8.GetString(Runner.GetPlayerConnectionToken(Object.InputAuthority) ?? Encoding.UTF8.GetBytes("noname"));
-            SetNickname(nickname);
+            if (!Initialized) {
+                string nickname = Encoding.UTF8.GetString(Runner.GetPlayerConnectionToken(Object.InputAuthority) ?? Encoding.UTF8.GetBytes("noname"));
+                SetNickname(nickname);
 
-            //expose their userid
-            Guid.TryParse(Runner.GetPlayerUserId(Object.InputAuthority), out Guid id);
-            UserId = id;
+                // Expose their userid
+                Guid.TryParse(Runner.GetPlayerUserId(Object.InputAuthority), out Guid id);
+                UserId = id;
 
-            IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
+                IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
+
+                Initialized = true;
+            } else {
+                SetNickname(Nickname);
+            }
         }
 
         if (MainMenuManager.Instance)
@@ -86,24 +93,30 @@ public class PlayerData : NetworkBehaviour {
         return filter ? DisplayNickname : (filteredNickname ??= DisplayNickname.Filter());
     }
 
-    public string GetUserIdString() => UserId.ToString();
+    public string GetUserIdString() {
+        return UserId.ToString();
+    }
 
     public void SetNickname(string name) {
-        //limit nickname to valid characters only.
+        // Limit nickname to valid characters only.
         name = Regex.Replace(name, @"[^\p{L}\d]", "");
 
-        //enforce character limits
+        // Enforce character limits
         name = name[..Mathf.Min(name.Length, MainMenuManager.NicknameMax)];
 
-        //if this new nickname is invalid, default back to "noname"
+        // If this new nickname is invalid, default back to "noname"
         if (name.Length < MainMenuManager.NicknameMin)
             name = "noname";
 
         Nickname = name;
-        gameObject.name = "PlayerData (" + name + ")";
 
-        //check for players with duplicate names, and add (1), (2), etc
-        int count = Runner.ActivePlayers.Where(pr => pr.GetPlayerData(Runner).Nickname.ToString().Filter() == name).Count() - 1;
+        // Check for players with duplicate names, and add (1), (2), etc
+        int count = Runner.ActivePlayers
+            .Select(pr => pr.GetPlayerData(Runner))
+            .Where(pd => pd && pd.Object)
+            .Where(pd => pd.Nickname.ToString().Filter() == name)
+            .Count() - 1;
+
         if (count > 0)
             name += " (" + count + ")";
 
@@ -184,7 +197,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnNameChanged(Changed<PlayerData> changed) {
-        changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.Nickname + ")";
+        changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.Nickname + ", " + changed.Behaviour.UserId.ToString() + ")";
     }
 
     public static void OnCharacterChanged(Changed<PlayerData> changed) {

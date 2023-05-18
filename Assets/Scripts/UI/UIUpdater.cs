@@ -156,11 +156,11 @@ public class UIUpdater : NetworkBehaviour {
         }
 
         if (SessionData.Instance.Timer > 0) {
-            float? timeRemaining = GameManager.Instance.GameEndTimer.RemainingTime(Runner);
+            float? timeRemaining = GameManager.Instance.GameEndTimer.RemainingRenderTime(Runner);
 
             if (timeRemaining != null) {
                 int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);
-                seconds = Mathf.Clamp(seconds, 0, SessionData.Instance.Timer);
+                seconds = Mathf.Clamp(seconds, 0, SessionData.Instance.Timer * 60);
 
                 if (seconds != timer) {
                     timer = seconds;
@@ -173,6 +173,8 @@ public class UIUpdater : NetworkBehaviour {
                     cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
                     timerMaterial.SetColor("_Color", new Color32(255, 0, 0, 255));
                 }
+            } else {
+                uiCountdown.text = Utils.GetSymbolString("cx" + SessionData.Instance.Timer + ":00");
             }
         } else {
             timerParent.SetActive(false);

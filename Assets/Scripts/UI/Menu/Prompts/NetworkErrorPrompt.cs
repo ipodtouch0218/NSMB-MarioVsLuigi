@@ -9,12 +9,12 @@ namespace NSMB.UI.Prompts {
         //---Serailized Variables
         [SerializeField] private TMP_Text errorText;
 
-        public void OpenWithText(string text) {
+        public void OpenWithText(string key) {
             if (!gameObject.activeSelf && MainMenuManager.Instance)
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Error);
 
             gameObject.SetActive(true);
-            errorText.text = text;
+            errorText.text = GlobalController.Instance.translationManager.GetTranslation(key);
         }
 
         public void Reconnect() {

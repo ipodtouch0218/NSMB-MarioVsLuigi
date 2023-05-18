@@ -108,7 +108,7 @@ public class GameManager : NetworkBehaviour {
     private TickTimer StartMusicTimer { get; set; }
     private readonly List<GameObject> activeStarSpawns = new();
     private GameObject[] starSpawns;
-    private bool hurryUpSoundPlayed;
+    private bool hurryUpSoundPlayed, endSoundPlayed;
     private bool pauseStateLastFrame, optionsWereOpenLastFrame;
 
     //---Components
@@ -219,33 +219,6 @@ public class GameManager : NetworkBehaviour {
         networkObjects.Clear();
     }
 
-    public override void Render() {
-        // Handle sound effects for the timer, if it's enabled
-        if (GameEndTimer.IsRunning) {
-            if (GameEndTimer.Expired(Runner)) {
-                sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
-                return;
-            }
-
-            int tickrate = Runner.Config.Simulation.TickRate;
-            int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
-
-            if (!hurryUpSoundPlayed && remainingTicks < 60 * tickrate) {
-                //60 second warning
-                hurryUpSoundPlayed = true;
-                sfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
-            } else if (remainingTicks < (10 * tickrate)) {
-                //10 second "dings"
-                if (remainingTicks % tickrate == 0)
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
-
-                //at 3 seconds, double speed
-                if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
-            }
-        }
-    }
-
     public override void FixedUpdateNetwork() {
         if (GameEnded)
             return;
@@ -260,6 +233,10 @@ public class GameManager : NetworkBehaviour {
                 BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
         }
 
+        if (Runner.IsServer && GameState == Enums.GameState.Loading && (Runner.Tick % Runner.Simulation.Config.TickRate) == 0) {
+            CheckIfAllPlayersLoaded();
+        }
+
         if (GameStartTimer.Expired(Runner)) {
             GameStartTimer = TickTimer.None;
             StartGame();
@@ -268,10 +245,43 @@ public class GameManager : NetworkBehaviour {
         if (StartMusicTimer.Expired(Runner)) {
             StartMusicTimer = TickTimer.None;
             IsMusicEnabled = true;
+
+            // Start timer
+            int timer = SessionData.Instance.Timer;
+            if (timer > 0)
+                GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer * 60 + 1);
         }
 
         if (IsMusicEnabled)
             HandleMusic();
+
+        if (Runner.IsForward) {
+            // Handle sound effects for the timer, if it's enabled
+            if (GameEndTimer.IsRunning) {
+                if (GameEndTimer.Expired(Runner)) {
+                    if (!endSoundPlayed)
+                        sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
+                    endSoundPlayed = true;
+                } else {
+                    int tickrate = Runner.Config.Simulation.TickRate;
+                    int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
+
+                    if (!hurryUpSoundPlayed && remainingTicks < 61 * tickrate) {
+                        //60 second warning
+                        hurryUpSoundPlayed = true;
+                        sfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
+                    } else if (remainingTicks < (10 * tickrate)) {
+                        //10 second "dings"
+                        if (remainingTicks % tickrate == 0)
+                            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+
+                        //at 3 seconds, double speed
+                        if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
+                            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+                    }
+                }
+            }
+        }
 
         if (GameEndTimer.Expired(Runner)) {
             CheckForWinner();
@@ -388,11 +398,6 @@ public class GameManager : NetworkBehaviour {
         foreach (KillableEntity enemy in enemies)
             enemy.RespawnEntity();
 
-        // Start timer
-        int timer = SessionData.Instance.Timer;
-        if (timer > 0)
-            GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer);
-
         // Start "WaitForGameStart" objects
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
             wfgs.AttemptExecute();
@@ -419,7 +424,7 @@ public class GameManager : NetworkBehaviour {
 
         int timer = SessionData.Instance.Timer;
         if (timer > 0)
-            gameEndTimestamp = gameStartTimestamp + timer;
+            gameEndTimestamp = gameStartTimestamp + (timer * 60);
     }
 
     internal IEnumerator EndGame(int winningTeam) {
@@ -578,6 +583,13 @@ public class GameManager : NetworkBehaviour {
                 rpcs.Rpc_EndGame(PlayerRef.None);
                 return;
             }
+
+            if (RealPlayerCount <= 1) {
+                // One player, no overtime.
+                rpcs.Rpc_EndGame(firstPlaceTeam);
+                return;
+            }
+
             // Keep playing into overtime.
         }
 
@@ -597,6 +609,7 @@ public class GameManager : NetworkBehaviour {
             invincible |= player.IsStarmanInvincible;
         }
 
+        speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
         speedup |= teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
         speedup |= AlivePlayers.Count <= 2 && AlivePlayers.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
 
@@ -633,6 +646,9 @@ public class GameManager : NetworkBehaviour {
 
     //---UI Callbacks
     public void PauseEndMatch() {
+        if (!Runner.IsServer)
+            return;
+
         pauseUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         rpcs.Rpc_EndGame(PlayerRef.None);
@@ -640,7 +656,7 @@ public class GameManager : NetworkBehaviour {
 
     public void PauseQuitGame() {
         sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-        Runner.Shutdown();
+        _ = NetworkHandler.ConnectToRegion();
     }
 
     public void PauseOpenOptions() {

@@ -143,7 +143,7 @@ public class StarBouncer : CollectableEntity {
         if (!GameManager.Instance.GameEnded && !Collector) {
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
         } else {
-            bool sameTeam = Collector.data.Team == Runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
+            bool sameTeam = Collector.data.Team == runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
             Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
 
             Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);

@@ -28,7 +28,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     [Networked] public Enums.PowerupState StoredPowerup { get; set; }
     [Networked] public byte Stars { get; set; }
     [Networked] public byte Coins { get; set; }
-    [Networked] public sbyte Lives { get; set; }
+    [Networked(OnChanged = nameof(OnLivesChanged))] public sbyte Lives { get; set; }
     [Networked] private sbyte SpawnpointIndex { get; set; }
     //-Player Movement
     //Generic
@@ -447,7 +447,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
                 if (!IsOnGround) {
                     if (!IgnoreCoyoteTime)
-                        CoyoteTime = Runner.SimulationTime + 0.07f;
+                        CoyoteTime = Runner.SimulationTime + 0.05f;
 
                     IgnoreCoyoteTime = false;
                 }
@@ -2157,7 +2157,10 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 checkPos += new Vector2(Mathf.Cos(radAngle) * travelDistance, Mathf.Sin(radAngle) * travelDistance);
                 transform.position = body.position = new(checkPos.x, body.position.y + (checkPos.y - lastPos.y));
                 IsStuckInBlock = false;
+                Debug.Log("A");
                 return true;
+            } else {
+                body.position = previousFramePosition;
             }
         }
 
@@ -3077,6 +3080,18 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
         player.PlaySound(Enums.Sounds.World_Block_Bump);
         player.timeSinceLastBumpSound = player.Runner.SimulationRenderTime;
+    }
+
+    public static void OnLivesChanged(Changed<PlayerController> changed) {
+        PlayerController player = changed.Behaviour;
+
+        changed.LoadOld();
+        sbyte previous = player.Lives;
+        changed.LoadNew();
+
+        if (player.Lives > previous) {
+            player.PlaySound(Enums.Sounds.Powerup_Sound_1UP);
+        }
     }
 
     //---Debug

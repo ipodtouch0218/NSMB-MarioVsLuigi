@@ -30,6 +30,7 @@ public class RoomListManager : MonoBehaviour {
 
     //---Private Variables
     private readonly Dictionary<string, RoomIcon> rooms = new();
+    private float lastSelectTime;
 
     public void Awake() {
         NetworkHandler.OnSessionListUpdated += OnSessionListUpdated;
@@ -41,8 +42,16 @@ public class RoomListManager : MonoBehaviour {
     }
 
     public void SelectRoom(RoomIcon room) {
+        if (SelectedRoom == room) {
+            if (Time.time - lastSelectTime < 0.3f) {
+                JoinSelectedRoom();
+                return;
+            }
+        }
+
         SelectedRoom = room;
         joinRoomButton.interactable = SelectedRoom && Settings.Instance.genericNickname.IsValidUsername(false);
+        lastSelectTime = Time.time;
     }
 
     public void JoinSelectedRoom() {
