@@ -221,7 +221,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         // Should do damage checks
         if (!player.IsStarmanInvincible) {
 
-            bool sameTeam = player.data.Team != Owner.data.Team;
+            bool sameTeam = player.data.Team == Owner.data.Team;
 
             // Player state checks
             switch (player.State) {

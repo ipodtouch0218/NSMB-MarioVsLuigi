@@ -200,7 +200,6 @@ public class WaterSplash : NetworkBehaviour {
         bool contains = splashedEntities.Contains(obj);
         if (Runner.IsServer && !contains) {
             bool splash = entity.body.position.y > SurfaceHeight - 0.5f;
-            Debug.Log(splash);
             if (entity is PlayerController pl) {
                 splash &= !pl.IsDead;
                 splash &= liquidType == LiquidType.Water;

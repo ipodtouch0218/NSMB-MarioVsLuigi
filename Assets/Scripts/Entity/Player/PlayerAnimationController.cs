@@ -130,7 +130,7 @@ public class PlayerAnimationController : NetworkBehaviour {
         SetParticleEmission(sparkles,        !controller.IsDead && controller.IsStarmanInvincible);
         SetParticleEmission(dust,            !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && body.velocity.sqrMagnitude > 0.25f))) || (((controller.IsSliding && body.velocity.sqrMagnitude > 0.25f) || controller.IsInShell) && controller.IsOnGround)) && !controller.CurrentPipe);
         SetParticleEmission(giantParticle,   !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
-        SetParticleEmission(fireParticle,    !controller.IsRespawning && animator.GetBool("firedeath") && controller.IsDead && deathTimer > deathUpTime);
+        SetParticleEmission(fireParticle,    !controller.IsRespawning && controller.FireDeath && controller.IsDead && deathTimer > deathUpTime);
         SetParticleEmission(bubblesParticle, controller.IsSwimming);
 
         if (controller.IsDrilling)

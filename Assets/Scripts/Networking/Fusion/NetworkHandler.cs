@@ -179,12 +179,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 // Create room data
                 NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
                 SessionData.Instance = session.GetComponent<SessionData>();
+            } else {
+                // Inherited room data, change the host name to ours.
+                runner.SessionInfo.UpdateCustomProperties(new() {
+                    [Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname,
+                });
             }
 
             runner.PushHostMigrationSnapshot();
         }
 
-        if (runner.LocalPlayer != player)
+        if (player != runner.LocalPlayer)
             GlobalController.Instance.discordController.UpdateActivity();
 
         OnPlayerJoined?.Invoke(runner, player);

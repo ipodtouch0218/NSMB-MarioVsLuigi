@@ -257,13 +257,6 @@ public class KoopaWalk : HoldableEntity {
         if (attackedFromAbove) {
             // get hit by player
 
-            // blue koopa: check to become a blue shell item
-            if (blue && (!IsInShell || (IsInShell && player.HasGroundpoundHitbox))) {
-                BlueBecomeItem(player);
-                player.DoEntityBounce = !player.IsGroundpounding;
-                return;
-            }
-
             // groundpound by big mario: shell & kick
             if (player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom) {
                 EnterShell(true, player);
@@ -282,6 +275,13 @@ public class KoopaWalk : HoldableEntity {
                 }
                 player.DoEntityBounce = true;
             } else {
+                // blue koopa: check to become a blue shell item
+                if (blue && IsInShell && player.HasGroundpoundHitbox) {
+                    BlueBecomeItem(player);
+                    player.DoEntityBounce = !player.IsGroundpounding;
+                    return;
+                }
+
                 EnterShell(true, player);
                 player.DoEntityBounce = !player.IsGroundpounding;
             }

@@ -90,16 +90,16 @@ public class DiscordController : MonoBehaviour {
         Activity activity = new();
         session ??= NetworkHandler.Runner?.SessionInfo;
 
-        TranslationManager translation = GlobalController.Instance.translationManager;
+        TranslationManager tm = GlobalController.Instance.translationManager;
 
         if (SessionData.Instance) {
 
-            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? translation.GetTranslation("discord.offline") : translation.GetTranslation("discord.online");
+            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? tm.GetTranslation("discord.offline") : tm.GetTranslation("discord.online");
             if (!NetworkHandler.Runner.IsSinglePlayer) {
                 Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxSize);
                 activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = maxSize }, Id = session.Name + "1" };
             }
-            activity.State = session.IsVisible ? translation.GetTranslation("discord.public") : translation.GetTranslation("discord.private");
+            activity.State = session.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
             activity.Secrets = new() { Join = session.Name };
 
             if (GameManager.Instance) {
@@ -111,7 +111,7 @@ public class DiscordController : MonoBehaviour {
                     assets.LargeImage = "level-" + gm.richPresenceId;
                 else
                     assets.LargeImage = "mainmenu";
-                assets.LargeText = gm.levelName;
+                assets.LargeText = tm.GetTranslation(gm.levelTranslationKey);
 
                 activity.Assets = assets;
 
@@ -126,7 +126,7 @@ public class DiscordController : MonoBehaviour {
             }
         } else {
             //in the main menu, not in a room
-            activity.Details = translation.GetTranslation("discord.mainmenu");
+            activity.Details = tm.GetTranslation("discord.mainmenu");
             activity.Assets = new() { LargeImage = "mainmenu" };
         }
 

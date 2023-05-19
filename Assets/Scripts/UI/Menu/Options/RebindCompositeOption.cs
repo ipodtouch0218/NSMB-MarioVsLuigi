@@ -1,6 +1,6 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 namespace NSMB.UI.Pause.Options {
     public class RebindCompositeOption : MonoBehaviour {
@@ -9,23 +9,31 @@ namespace NSMB.UI.Pause.Options {
         [SerializeField] private TMP_Text label, buttonLabel;
 
         //---Private Variables
-        private InputAction action;
+        private PauseOptionControlsTab tab;
+        private RebindPauseOptionButton button;
         private int bindingIndex;
 
         public void OnClick() {
-
+            tab.StartRebind(button, bindingIndex);
         }
 
-        public void Instantiate(InputAction action, int bindingIndex) {
-            this.action = action;
+        public void Instantiate(PauseOptionControlsTab tab, RebindPauseOptionButton button, InputAction action, int bindingIndex) {
+            this.tab = tab;
+            this.button = button;
             this.bindingIndex = bindingIndex;
 
-            label.text = action.bindings[bindingIndex].name;
+            string name = action.bindings[bindingIndex].name;
 
-            string button = InputControlPath.ToHumanReadableString(
+            if (GlobalController.Instance.translationManager.TryGetTranslation($"ui.generic.{name}", out string translation)) {
+                label.text = translation;
+            } else {
+                label.text = name;
+            }
+
+            string key = InputControlPath.ToHumanReadableString(
                             action.bindings[bindingIndex].effectivePath,
                             InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
-            buttonLabel.text = button;
+            buttonLabel.text = key;
         }
     }
 }

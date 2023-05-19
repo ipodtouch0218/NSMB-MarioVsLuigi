@@ -318,12 +318,12 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         EventSystem.current.SetSelectedGameObject(errorButton);
     }
 
-    public void OpenErrorBox(string text) {
+    public void OpenErrorBox(string key) {
         if (!errorBox.activeSelf)
             sfx.PlayOneShot(Enums.Sounds.UI_Error);
 
         errorBox.SetActive(true);
-        errorText.text = text;
+        errorText.text = GlobalController.Instance.translationManager.GetTranslation(key);
         EventSystem.current.SetSelectedGameObject(errorButton);
         nonNetworkShutdown = false;
     }

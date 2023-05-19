@@ -69,7 +69,7 @@ public class GameManager : NetworkBehaviour {
     public int levelWidthTile;
     public int levelHeightTile;
     public bool loopingLevel = true, spawnBigPowerups = true, spawnVerticalPowerups = true;
-    public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
+    public string levelDesigner = "", richPresenceId = "", levelTranslationKey = "";
     public Vector3 spawnpoint;
     [FormerlySerializedAs("size")] public float spawnCircleWidth = 1.39f;
     [FormerlySerializedAs("ySize")] public float spawnCircleHeight = 0.8f;

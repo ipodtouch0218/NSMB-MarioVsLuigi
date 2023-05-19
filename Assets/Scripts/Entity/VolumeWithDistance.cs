@@ -30,7 +30,7 @@ public class VolumeWithDistance : MonoBehaviour {
         if (!inst)
             return;
 
-        Vector3 listener = (!useDistanceToCamera && inst != null && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
+        Vector3 listener = (!useDistanceToCamera && inst && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
 
         float distance = Utils.WrappedDistance(listener, soundOrigin.position, out float xDifference);
         if (distance > soundRange) {

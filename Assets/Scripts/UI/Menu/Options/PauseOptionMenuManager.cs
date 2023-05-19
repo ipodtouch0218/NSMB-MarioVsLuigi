@@ -26,6 +26,7 @@ namespace NSMB.UI.Pause.Options {
         private GameObject previouslySelected;
 
         //---Propreties
+        public bool EnableInput { get; set; }
         private PauseOption SelectedOption => (currentOptionIndex >= 0 && currentOptionIndex < SelectedTab.options.Count) ? SelectedTab.options[currentOptionIndex] : null;
         private PauseOptionTab SelectedTab => (currentTabIndex >= 0 && currentTabIndex < tabs.Count) ? tabs[currentTabIndex] : null;
         private bool _back;
@@ -77,8 +78,12 @@ namespace NSMB.UI.Pause.Options {
             if (!Application.isPlaying)
                 return;
 
+            if (!EnableInput)
+                return;
+
             if (!SelectedOption)
                 return;
+
 
             Vector2 direction = ControlSystem.controls.UI.Navigate.ReadValue<Vector2>();
             direction = direction.normalized;
@@ -98,6 +103,9 @@ namespace NSMB.UI.Pause.Options {
         }
 
         private void OnCancel(InputAction.CallbackContext context) {
+            if (!EnableInput)
+                return;
+
             if (Back) {
                 CloseMenu();
                 return;
@@ -110,6 +118,9 @@ namespace NSMB.UI.Pause.Options {
         }
 
         private void OnSubmit(InputAction.CallbackContext context) {
+            if (!EnableInput)
+                return;
+
             if (Back) {
                 CloseMenu();
                 return;
@@ -127,6 +138,9 @@ namespace NSMB.UI.Pause.Options {
                 inputted = false;
                 return;
             }
+
+            if (!EnableInput)
+                return;
 
             if (inputted)
                 return;
@@ -196,6 +210,7 @@ namespace NSMB.UI.Pause.Options {
             currentTabIndex = -1;
             currentOptionIndex = -1;
             Back = false;
+            EnableInput = true;
             SetTab(0, false);
             //SetCurrentOption(0);
         }
@@ -207,6 +222,7 @@ namespace NSMB.UI.Pause.Options {
             if (SelectedOption)
                 SelectedOption.Deselected();
 
+            EnableInput = false;
             gameObject.SetActive(false);
             GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
         }

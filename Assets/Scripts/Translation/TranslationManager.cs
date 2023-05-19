@@ -128,13 +128,30 @@ namespace NSMB.Translation {
             return GetLocaleData().Select(ld => ld.Locale).ToArray();
         }
 
-        public string GetTranslation(string key) {
-            key = key?.ToLower();
+        public bool TryGetTranslation(string key, out string translated) {
+            key ??= "null";
 
-            if (translations != null && translations.TryGetValue(key, out string value) && !string.IsNullOrWhiteSpace(value))
+            if (translations != null && translations.TryGetValue(key.ToLower(), out string value) && !string.IsNullOrWhiteSpace(value)) {
+                translated = value;
+                return true;
+            }
+
+            if (defaultTranslations != null && defaultTranslations.TryGetValue(key.ToLower(), out string valueDef) && !string.IsNullOrWhiteSpace(valueDef)) {
+                translated = valueDef;
+                return true;
+            }
+
+            translated = default;
+            return false;
+        }
+
+        public string GetTranslation(string key) {
+            key ??= "null";
+
+            if (translations != null && translations.TryGetValue(key.ToLower(), out string value) && !string.IsNullOrWhiteSpace(value))
                 return value;
 
-            if (defaultTranslations != null && defaultTranslations.TryGetValue(key, out string valueDef) && !string.IsNullOrWhiteSpace(valueDef))
+            if (defaultTranslations != null && defaultTranslations.TryGetValue(key.ToLower(), out string valueDef) && !string.IsNullOrWhiteSpace(valueDef))
                 return valueDef;
 
             return key;

@@ -15,7 +15,7 @@ namespace NSMB.UI.Prompts {
             string id = roomIdInput.text.ToUpper();
             int index = id.Length > 0 ? NetworkHandler.RoomIdValidChars.IndexOf(id[0]) : -1;
             if (id.Length < 8 || index < 0 || index >= NetworkHandler.Regions.Length) {
-                MainMenuManager.Instance.OpenErrorBox("Invalid Room ID");
+                MainMenuManager.Instance.OpenErrorBox("ui.rooms.joinprivate.invalid");
                 return;
             }
 

@@ -83,6 +83,8 @@ public class UIUpdater : NetworkBehaviour {
 
         if (!Runner.IsServer)
             StartCoroutine(UpdatePingTextCoroutine());
+
+        UpdatePingText();
     }
 
     public override void Render() {

@@ -137,16 +137,16 @@ public class StarBouncer : CollectableEntity {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (!GameManager.Instance)
-            return;
 
-        if (!GameManager.Instance.GameEnded && !Collector) {
-            GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
-        } else {
-            bool sameTeam = Collector.data.Team == runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
-            Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
+        if (GameManager.Instance && hasState && !GameManager.Instance.GameEnded) {
+            if (!Collector) {
+                GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
+            } else {
+                bool sameTeam = Collector.data.Team == runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
+                Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
 
-            Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+                Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+            }
         }
 
         if (icon)

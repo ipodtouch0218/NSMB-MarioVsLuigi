@@ -47,10 +47,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     [Networked] public NetworkBool IgnoreCoyoteTime { get; set; }
     [Networked] public float FloorAngle { get; set; }
     [Networked] public NetworkBool OnIce { get; set; }
-    //Tile Interactions
-    [Networked, Capacity(8)] private NetworkLinkedList<Vector2Int> TilesStandingOn => default;
-    [Networked, Capacity(8)] private NetworkLinkedList<Vector2Int> TilesJumpedInto => default;
-    [Networked, Capacity(8)] private NetworkLinkedList<Vector2Int> TilesHitSide => default;
     //Jumping
     [Networked(OnChanged = nameof(OnJumpAnimCounterChanged))] private byte JumpAnimCounter { get; set; }
     [Networked] public NetworkBool IsJumping { get; set; }
@@ -64,6 +60,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     [Networked(OnChanged = nameof(OnIsInKnockbackChanged))] public NetworkBool IsInKnockback { get; set; }
     [Networked] public NetworkBool IsWeakKnockback { get; set; }
     [Networked] public NetworkBool IsForwardsKnockback { get; set; }
+    [Networked] private NetworkBool KnockbackWasOriginallyFacingRight { get; set; }
     [Networked] public TickTimer KnockbackTimer { get; set; }
     [Networked] public NetworkObject KnockbackAttacker { get; set; }
     //Groundpound
@@ -71,7 +68,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     [Networked(OnChanged = nameof(OnGroundpoundingChanged))] public NetworkBool IsGroundpounding { get; set; }
     [Networked] public TickTimer GroundpoundStartTimer { get; set; }
     [Networked] public TickTimer GroundpoundCooldownTimer { get; set; }
-    [Networked] public NetworkBool WasGroundedLastFrame { get; set; }
     [Networked] private NetworkBool GroundpoundHeld { get; set; }
     [Networked] private float GroundpoundStartTime { get; set; }
     [Networked] private NetworkBool ContinueGroundpound { get; set; }
@@ -101,6 +97,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     //-Death & Respawning
     [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
     [Networked(OnChanged = nameof(OnIsRespawningChanged))] public NetworkBool IsRespawning { get; set; }
+    [Networked] public NetworkBool FireDeath { get; set; }
     [Networked] public TickTimer RespawnTimer { get; set; }
     [Networked] public TickTimer PreRespawnTimer { get; set; }
 
@@ -205,7 +202,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight, stationaryGiantEnd;
     public float powerupFlash;
 
-    //MOVEMENT STAGES
+    #region // MOVEMENT STAGES & CONSTANTS
     private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
     private static readonly float[] SPEED_STAGE_MAX = { 0.9375f, 2.8125f, 4.21875f, 5.625f, 8.4375f };
     private static readonly float SPEED_SLIDE_MAX = 7.5f;
@@ -263,20 +260,25 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     private static readonly float[] GRAVITY_MEGA_ACC = { -28.125f, -38.671875f };
     private static readonly float?[] GRAVITY_SWIM_MAX = { null, 0f};
     private static readonly float[] GRAVITY_SWIM_ACC = { -4.833984375f, -3.076171875f};
+    #endregion
 
-    //Tile data
+    // Footstep Variables
     private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
     private Enums.Particle footstepParticle = Enums.Particle.None;
-
-    private bool initialKnockbackFacingRight = false;
     private bool footstepVariant;
 
+    // Tile data
+    private readonly List<Vector2Int> tilesStandingOn = new();
+    private readonly List<Vector2Int> tilesJumpedInto = new();
+    private readonly List<Vector2Int> tilesHitSide = new();
+
+    // Previous Tick Variables
+    private bool previousTickIsOnGround;
+    public Vector2 previousTickVelocity, previousTickPosition;
+
+    // Misc
     private TrackIcon icon;
-
     public PlayerData data;
-    public Vector2 giantSavedVelocity, previousFrameVelocity, previousFramePosition;
-
-
 
     #endregion
 
@@ -309,8 +311,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     }
 
     public void BeforeTick() {
-        previousFramePosition = body.position;
-        previousFrameVelocity = body.velocity;
+        previousTickPosition = body.position;
+        previousTickVelocity = body.velocity;
+        previousTickIsOnGround = IsOnGround;
     }
 
     public override void Spawned() {
@@ -433,7 +436,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
             // TODO: remove groundpoundLastFrame? Do we even need this anymore?
             groundpoundLastFrame = IsGroundpounding;
-            WasGroundedLastFrame = IsOnGround;
 
             //HandleBlockSnapping();
             CheckForEntityCollision();
@@ -442,7 +444,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             if (IsOnGround)
                 IgnoreCoyoteTime = false;
 
-            if (WasGroundedLastFrame) {
+            if (previousTickIsOnGround) {
                 IsOnGround |= GroundSnapCheck();
 
                 if (!IsOnGround) {
@@ -495,9 +497,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
     #region -- COLLISIONS --
     private void HandleGroundCollision() {
-        TilesJumpedInto.Clear();
-        TilesStandingOn.Clear();
-        TilesHitSide.Clear();
+        tilesJumpedInto.Clear();
+        tilesStandingOn.Clear();
+        tilesHitSide.Clear();
 
         int down = 0, left = 0, right = 0, up = 0;
 
@@ -530,22 +532,22 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                     if (go.CompareTag("spinner"))
                         OnSpinner = go.GetComponentInParent<SpinnerAnimator>();
 
-                    if (!TilesStandingOn.Contains(vec))
-                        TilesStandingOn.Add(vec);
+                    if (!tilesStandingOn.Contains(vec))
+                        tilesStandingOn.Add(vec);
 
                 } else if (((1 << contact.collider.gameObject.layer) & Layers.MaskSolidGround) != 0) {
                     if (Vector2.Dot(n, Vector2.down) > .9f) {
                         up++;
-                        if (!TilesJumpedInto.Contains(vec))
-                            TilesJumpedInto.Add(vec);
+                        if (!tilesJumpedInto.Contains(vec))
+                            tilesJumpedInto.Add(vec);
                     } else {
                         if (n.x < 0) {
                             right++;
                         } else {
                             left++;
                         }
-                        if (!TilesHitSide.Contains(vec))
-                            TilesHitSide.Add(vec);
+                        if (!tilesHitSide.Contains(vec))
+                            tilesHitSide.Add(vec);
                     }
                 }
             }
@@ -561,7 +563,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         OnIce = false;
         footstepSound = Enums.Sounds.Player_Walk_Grass;
         footstepParticle = Enums.Particle.None;
-        foreach (Vector2Int pos in TilesStandingOn) {
+        foreach (Vector2Int pos in tilesStandingOn) {
             if (GameManager.Instance.tileManager.GetTile(pos, out TileWithProperties propTile)) {
                 footstepSound = propTile.footstepSound;
                 footstepParticle = propTile.footstepParticle;
@@ -741,7 +743,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 if (other.State == Enums.PowerupState.MiniMushroom)
                     other.DoKnockback(!fromRight, dropStars ? 1 : 0, false, Object);
 
-            } else if (Mathf.Abs(previousFrameVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousFrameVelocity.x) > WalkingMaxSpeed) {
+            } else if (Mathf.Abs(previousTickVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousTickVelocity.x) > WalkingMaxSpeed) {
                 // Bump
                 if (IsOnGround)
                     DoKnockback(fromRight, dropStars ? 1 : 0, true, other.Object);
@@ -1082,6 +1084,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             return;
 
         IsDead = true;
+        FireDeath = fire;
         PreRespawnTimer = TickTimer.CreateFromSeconds(Runner, 3f);
         RespawnTimer = TickTimer.CreateFromSeconds(Runner, 4.3f);
 
@@ -1114,9 +1117,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         WallSlideLeft = false;
         IsSwimming = false;
         IsWaterWalking = false;
-        animator.SetBool("knockback", false);
-        animator.SetBool("flying", false);
-        animator.SetBool("firedeath", fire);
 
         body.velocity = Vector2.zero;
         body.isKinematic = false;
@@ -1286,7 +1286,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
         Vector2 checkSize = WorldHitboxSize * 1.1f;
 
-        bool grounded = previousFrameVelocity.y < -8f && IsOnGround;
+        bool grounded = previousTickVelocity.y < -8f && IsOnGround;
         Vector2 offset = Vector2.zero;
         if (grounded)
             offset = Vector2.down * 0.5f;
@@ -1386,7 +1386,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         IsWeakKnockback = weak;
         IsForwardsKnockback = FacingRight != fromRight;
         KnockbackAttacker = attacker;
-        initialKnockbackFacingRight = FacingRight;
+        KnockbackWasOriginallyFacingRight = FacingRight;
         KnockbackTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
 
         body.velocity = new Vector2(
@@ -1398,11 +1398,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             (weak ? 0.5f : 1f),
 
             // don't go upwards if we got hit by a fireball
-            attacker.TryGetComponent(out FireballMover _) ? 0 : 4.5f
+            (attacker && attacker.TryGetComponent(out FireballMover _)) ? 0 : 4.5f
         );
 
         IsOnGround = false;
-        WasGroundedLastFrame = false;
+        previousTickIsOnGround = false;
         IsInShell = false;
         IsGroundpounding = false;
         IsSpinnerFlying = false;
@@ -1432,7 +1432,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         DoEntityBounce = false;
         IsInKnockback = false;
         body.velocity = new(0, body.velocity.y);
-        FacingRight = initialKnockbackFacingRight;
+        FacingRight = KnockbackWasOriginallyFacingRight;
     }
     #endregion
 
@@ -1523,14 +1523,14 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             if (Mathf.Abs(angle) > 89)
                 return;
 
-            float x = Mathf.Abs(FloorAngle - angle) > 1f ? previousFrameVelocity.x : body.velocity.x;
+            float x = Mathf.Abs(FloorAngle - angle) > 1f ? previousTickVelocity.x : body.velocity.x;
 
             FloorAngle = angle;
 
             float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.1f;
             body.velocity = new Vector2(x, change);
             IsOnGround = true;
-            WasGroundedLastFrame = true;
+            previousTickIsOnGround = true;
         } else if (IsOnGround) {
             hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, Layers.MaskAnyGround);
             if (hit) {
@@ -1538,13 +1538,13 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 if (Mathf.Abs(angle) > 89)
                     return;
 
-                float x = Mathf.Abs(FloorAngle - angle) > 1f ? previousFrameVelocity.x : body.velocity.x;
+                float x = Mathf.Abs(FloorAngle - angle) > 1f ? previousTickVelocity.x : body.velocity.x;
                 FloorAngle = angle;
 
                 float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.1f;
                 body.velocity = new(x, change);
                 IsOnGround = true;
-                WasGroundedLastFrame = true;
+                previousTickIsOnGround = true;
             } else {
                 FloorAngle = 0;
             }
@@ -1655,7 +1655,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (!IsCrouching && IsSwimming && Mathf.Abs(body.velocity.x) > 0.03f)
             return;
 
-        IsCrouching = ((IsOnGround && crouchInput && !IsGroundpounding) || (!IsOnGround && (crouchInput || body.velocity.y > 0) && IsCrouching && !IsSwimming) || (IsCrouching && ForceCrouchCheck())) && !HeldEntity;
+        IsCrouching = ((IsOnGround && crouchInput && !IsGroundpounding) || (!IsOnGround && (crouchInput || (body.velocity.y > 0 && State != Enums.PowerupState.BlueShell)) && IsCrouching && !IsSwimming) || (IsCrouching && ForceCrouchCheck())) && !HeldEntity;
     }
 
     public bool ForceCrouchCheck() {
@@ -1784,7 +1784,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             IsSpinnerFlying = true;
             SpinnerLaunchAnimCounter = true;
             IsOnGround = false;
-            WasGroundedLastFrame = false;
+            previousTickIsOnGround = false;
             IsCrouching = false;
             IsInShell = false;
             IsSkidding = false;
@@ -2078,7 +2078,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         }
 
         IsInShell |= State == Enums.PowerupState.BlueShell && !IsSliding && IsOnGround && IsFunctionallyRunning && !HeldEntity && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
-        if (IsOnGround || WasGroundedLastFrame)
+        if (IsOnGround || previousTickIsOnGround)
             body.velocity = new(body.velocity.x, 0);
     }
 
@@ -2114,7 +2114,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             // Code for mario to instantly teleport to the closest free position when he gets stuck
 
             //prevent mario from clipping to the floor if we got pushed in via our hitbox changing (shell on ice, for example)
-            transform.position = body.position = previousFramePosition;
+            transform.position = body.position = previousTickPosition;
             checkPos = transform.position + (Vector3) (Vector2.up * checkSize * 0.5f);
 
             float distanceInterval = 0.025f;
@@ -2157,10 +2157,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 checkPos += new Vector2(Mathf.Cos(radAngle) * travelDistance, Mathf.Sin(radAngle) * travelDistance);
                 transform.position = body.position = new(checkPos.x, body.position.y + (checkPos.y - lastPos.y));
                 IsStuckInBlock = false;
-                Debug.Log("A");
                 return true;
             } else {
-                body.position = previousFramePosition;
+                body.position = previousTickPosition;
             }
         }
 
@@ -2173,7 +2172,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             PlaySoundEverywhere(Enums.Sounds.Player_Voice_MegaMushroom);
         } else {
             //hit a ceiling, cancel
-            giantSavedVelocity = Vector2.zero;
             State = Enums.PowerupState.Mushroom;
             GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime - GiantStartTimer.RemainingTime(Runner) ?? 0f);
             animator.enabled = true;
@@ -2335,11 +2333,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (GiantEndTimer.IsRunning && stationaryGiantEnd) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
-            transform.position = body.position = previousFramePosition;
+            transform.position = body.position = previousTickPosition;
 
             if (GiantEndTimer.Expired(Runner)) {
                 DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
-                body.velocity = giantSavedVelocity;
+                body.velocity = Vector2.zero;
                 animator.enabled = true;
                 body.isKinematic = false;
                 State = PreviousState;
@@ -2428,7 +2426,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (!IsProxy && hitRoof && !IsStuckInBlock) {
             bool tempHitBlock = false;
             bool interactedAny = false;
-            foreach (Vector2Int tile in TilesJumpedInto) {
+            bool set = false;
+            foreach (Vector2Int tile in tilesJumpedInto) {
                 tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
                 if (bumpSound)
                     BlockBumpSoundCounter++;
@@ -2492,7 +2491,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
                 if (hitLeft || hitRight) {
                     bool interactedAny = false;
-                    foreach (var tile in TilesHitSide) {
+                    foreach (var tile in tilesHitSide) {
                         InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
                         if (bumpSound)
                             BlockBumpSoundCounter++;
@@ -2640,7 +2639,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             WallSlideRight = false;
         }
 
-        if (WasGroundedLastFrame && !IsOnGround && !ProperJump && IsCrouching && !IsInShell && !IsGroundpounding)
+        if (previousTickIsOnGround && !IsOnGround && !ProperJump && IsCrouching && !IsInShell && !IsGroundpounding)
             body.velocity = new(body.velocity.x, -3.75f);
     }
 
@@ -2833,7 +2832,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             GroundpoundAnimCounter++;
 
         ContinueGroundpound = false;
-        foreach (Vector2Int tile in TilesStandingOn) {
+        foreach (Vector2Int tile in tilesStandingOn) {
             ContinueGroundpound |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down, out bool _, out bool bumpSound);
             if (bumpSound)
                 BlockBumpSoundCounter++;
@@ -2912,6 +2911,9 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
                 return;
 
             player.animator.Play("deadstart");
+            player.animator.SetBool("knockback", false);
+            player.animator.SetBool("flying", false);
+            player.animator.SetBool("firedeath", player.FireDeath);
             player.PlaySound(player.cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
 
             if (player.Object.HasInputAuthority)

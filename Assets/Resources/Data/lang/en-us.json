@@ -91,6 +91,8 @@
   "ui.options.controls.debug.togglehud": "Toggle HUD",
   "ui.options.controls.rebind.header": "Rebinding {control} ({device})",
   "ui.options.controls.rebind.body": "Press any {device} button / key\nTo cancel, wait for the countdown to expire:",
+  "ui.options.controls.rebind.device.keyboard": "Keyboard",
+  "ui.options.controls.rebind.device.gamepad": "Gamepad",
   "ui.rooms.header": "Rooms",
   "ui.rooms.connecting": "Connecting...",
   "ui.rooms.username.label": "Username:",
