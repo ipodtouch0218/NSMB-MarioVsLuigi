@@ -4,6 +4,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Utils;
 
 [OrderAfter(typeof(PlayerController))]
@@ -81,7 +82,7 @@ public class PlayerAnimationController : NetworkBehaviour {
     }
 
     public override void Render() {
-        if (GameManager.Instance.GameStartTimer.IsRunning) {
+        if (GameData.Instance.GameStartTimer.IsRunning) {
             DisableAllModels();
             return;
         }
@@ -110,7 +111,7 @@ public class PlayerAnimationController : NetworkBehaviour {
     }
 
     public void HandleAnimations() {
-        if (GameManager.Instance.GameEnded) {
+        if (GameData.Instance.GameEnded) {
             models.SetActive(true);
 
             // Disable Particles
@@ -168,7 +169,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         //TODO: refactor
 
-        if (GameManager.Instance.GameEnded || controller.IsFrozen)
+        if (GameData.Instance.GameEnded || controller.IsFrozen)
             return;
 
         //rotChangeTarget = models.transform.rotation.eulerAngles;
@@ -223,7 +224,7 @@ public class PlayerAnimationController : NetworkBehaviour {
     }
 
     private void InterpolateFacingDirection() {
-        if (GameManager.Instance.GameEnded || controller.IsFrozen)
+        if (GameData.Instance.GameEnded || controller.IsFrozen)
             return;
 
         propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
@@ -350,7 +351,7 @@ public class PlayerAnimationController : NetworkBehaviour {
 
         //hit flash
         float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingRenderTime(Runner) ?? 0f;
-        models.SetActive(!controller.IsRespawning && (GameManager.Instance.GameEnded || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
+        models.SetActive(!controller.IsRespawning && (GameData.Instance.GameEnded || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
 
         //Model changing
         bool large = controller.State >= Enums.PowerupState.Mushroom;

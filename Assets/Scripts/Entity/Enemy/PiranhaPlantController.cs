@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class PiranhaPlantController : KillableEntity {
@@ -34,7 +35,7 @@ public class PiranhaPlantController : KillableEntity {
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
-        GameManager gm = GameManager.Instance;
+        GameData gm = GameData.Instance;
         if (gm) {
             if (gm.GameEnded) {
                 animator.enabled = false;
@@ -137,7 +138,7 @@ public class PiranhaPlantController : KillableEntity {
     }
 
     public override void OnIsDeadChanged() {
-        if (IsDead && GameManager.Instance.GameState == Enums.GameState.Playing) {
+        if (IsDead && GameData.Instance.GameState == Enums.GameState.Playing) {
             PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
             PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
             GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + Vector3.up * 0.5f);

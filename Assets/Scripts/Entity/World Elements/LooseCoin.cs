@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class LooseCoin : Coin {
@@ -30,12 +31,12 @@ public class LooseCoin : Coin {
         CollectableTick = (int) (Runner.Tick + (0.2f / Runner.DeltaTime));
         DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
-        body.velocity = Vector2.up * GameManager.Instance.Random.RangeInclusive(5.5f, 6f);
+        body.velocity = Vector2.up * GameData.Instance.Random.RangeInclusive(5.5f, 6f);
     }
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
-        if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        if (GameData.Instance && GameData.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             spriteAnimation.enabled = false;
             body.isKinematic = true;

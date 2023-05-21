@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class BulletBillLauncher : NetworkBehaviour {
@@ -35,7 +36,7 @@ public class BulletBillLauncher : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance.GameEnded)
+        if (GameData.Instance.GameEnded)
             return;
 
         if (ShootTimer.Expired(Runner)) {

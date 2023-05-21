@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+using NSMB.Game;
 using NSMB.Utils;
 
 public class CameraController : MonoBehaviour {
@@ -78,17 +79,17 @@ public class CameraController : MonoBehaviour {
         float vOrtho = targetCamera.orthographicSize;
         float xOrtho = vOrtho * targetCamera.aspect;
 
-        // instant camera movements. we dont want to lag behind in these cases
+        // Instant camera movements. we dont want to lag behind in these cases
 
         float cameraBottomMax = Mathf.Max(3.5f - transform.lossyScale.y, 1.5f);
-        //bottom camera clip
+        // Bottom camera clip
         if (playerPos.y - (currentPosition.y - vOrtho) < cameraBottomMax)
             currentPosition.y = playerPos.y + vOrtho - cameraBottomMax;
 
         float playerHeight = controller.WorldHitboxSize.y;
         float cameraTopMax = Mathf.Min(1.5f + playerHeight, 4f);
 
-        //top camera clip
+        // Top camera clip
         if (playerPos.y - (currentPosition.y + vOrtho) + cameraTopMax > 0)
             currentPosition.y = playerPos.y - vOrtho + cameraTopMax;
 
@@ -107,13 +108,13 @@ public class CameraController : MonoBehaviour {
         if (xDifference > 0.25f)
             currentPosition.x += (0.25f - xDifference - 0.01f) * (right ? 1 : -1);
 
-        // lagging camera movements
+        // Lagging camera movements
         Vector3 targetPosition = currentPosition;
         if (controller.IsOnGround)
             lastFloor = playerPos.y;
         bool validFloor = controller.IsOnGround || lastFloor < playerPos.y;
 
-        //top camera clip ON GROUND. slowly pan up, dont do it instantly.
+        // Top camera clip ON GROUND. slowly pan up, dont do it instantly.
         if (validFloor && lastFloor - (currentPosition.y + vOrtho) + cameraTopMax + 2f > 0)
             targetPosition.y = playerPos.y - vOrtho + cameraTopMax + 2f;
 
@@ -126,14 +127,18 @@ public class CameraController : MonoBehaviour {
         targetPosition.y = Mathf.Clamp(targetPosition.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
 
         // Z preservation
-
-        //targetPosition = AntiJitter(targetPosition);
         targetPosition.z = startingZ;
 
         return targetPosition;
     }
 
-    //---DEBUG
+    //---Helpers
+    private static Vector2 AntiJitter(Vector3 vec) {
+        vec.y = ((int) (vec.y * 100)) * 0.01f;
+        return vec;
+    }
+
+    //---Debug
 #if UNITY_EDITOR
     private static Vector3 HalfRight = Vector3.right * 0.5f;
     public void OnDrawGizmos() {
@@ -148,8 +153,4 @@ public class CameraController : MonoBehaviour {
     }
 #endif
 
-    private static Vector2 AntiJitter(Vector3 vec) {
-        vec.y = ((int) (vec.y * 100)) * 0.01f;
-        return vec;
-    }
 }

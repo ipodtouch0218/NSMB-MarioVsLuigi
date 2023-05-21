@@ -2,6 +2,7 @@
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -74,7 +75,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         fireGraphics.SetActive(false);
 
         transform.SetParent(GameManager.Instance.objectPoolParent.transform);
-        GameManager.Instance.PooledFireballs.Add(this);
+        GameData.Instance.PooledFireballs.Add(this);
     }
 
     public override void FixedUpdateNetwork() {
@@ -84,7 +85,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         if (!IsActive)
             return;
 
-        if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        if (GameData.Instance && GameData.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             foreach (Animation anim in GetComponentsInChildren<Animation>())
                 anim.enabled = false;
@@ -174,13 +175,12 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
         IsActive = false;
         body.velocity = Vector2.zero;
-        //body.simulated = false;
         body.isKinematic = true;
     }
 
     public override void OnIsActiveChanged() {
         if (IsActive) {
-            //activate graphics and particles
+            // Activate graphics and particles
             bool ice = IsIceball;
 
             if (ice) {
@@ -193,7 +193,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
             iceGraphics.SetActive(ice);
             fireGraphics.SetActive(!ice);
         } else {
-            //disable graphics & trail, but play poof fx
+            // Disable graphics & trail, but play poof fx
             iceGraphics.SetActive(false);
             fireGraphics.SetActive(false);
             iceTrail.Stop();
@@ -245,7 +245,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
             // Collision is a GO
             if (IsIceball) {
-                // iceball
+                // Iceball
                 if (!player.IsFrozen) {
                     Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
                         FrozenCube cube = obj.GetComponent<FrozenCube>();
@@ -253,7 +253,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
                     });
                 }
             } else {
-                // fireball
+                // Fireball
                 player.DoKnockback(!FacingRight, sameTeam ? 0 : 1, true, Object);
             }
         }
@@ -267,7 +267,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         if (!IsActive || !fireball.IsActive)
             return false;
 
-        //fire + ice = both destroy
+        // Fire + ice = both destroy
         if (IsIceball) {
             fireball.DespawnEntity();
             return true;
@@ -279,7 +279,7 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
         if (!IsActive || !iceball.IsActive)
             return false;
 
-        //fire + ice = both destroy
+        // Fire + ice = both destroy
         if (!IsIceball) {
             iceball.DespawnEntity();
             return true;
@@ -289,19 +289,19 @@ public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteract
 
     //---IBlockBumpable overrides
     public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
-        //do nothing when bumped
+        // Do nothing when bumped
     }
 
     //---OnChangeds
     public static void OnBreakEffectAnimCounterChanged(Changed<FireballMover> changed) {
         FireballMover fireball = changed.Behaviour;
 
-        //dont play particles below the killplane
+        // Don't play particles below the killplane
         if (fireball.body.position.y < GameManager.Instance.LevelMinY)
             return;
 
-        //or if the game is over
-        if (GameManager.Instance.GameState == Enums.GameState.Ended)
+        // Or if the game is over
+        if (GameData.Instance.GameState == Enums.GameState.Ended)
             return;
 
         if (fireball.IsIceball) {

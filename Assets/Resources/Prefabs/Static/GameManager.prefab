@@ -4149,8 +4149,6 @@ MonoBehaviour:
   nameText: {fileID: 797520857410300177}
   valuesText: {fileID: 6338451756509380755}
   background: {fileID: 7949764034340995915}
-  normalWidth: 230
-  controllerWidth: 250
   target: {fileID: 0}
 --- !u!1 &4870953021787574524
 GameObject:
@@ -4543,13 +4541,11 @@ GameObject:
   m_Component:
   - component: {fileID: 5500062339093502141}
   - component: {fileID: 5500062339093502114}
-  - component: {fileID: 6418608900138254647}
   - component: {fileID: 1965679957714577119}
   - component: {fileID: 3058852347368318539}
   - component: {fileID: 3063105634746227037}
   - component: {fileID: 8814515203468784576}
   - component: {fileID: 6161724238288570319}
-  - component: {fileID: 6411750294929853123}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -4592,14 +4588,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faa509be0aa8ac641ad4ddf6c01d26db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  _AlivePlayers: []
-  _PooledFireballs: []
-  _GameStartTime: -1
-  _RealPlayerCount: 0
-  _IsMusicEnabled:
-    _value: 0
-  _GameState: 0
   mainMusic: {fileID: 11400000, guid: 488f1c737d498714c951d86c1a790bcc, type: 2}
   invincibleMusic: {fileID: 11400000, guid: fb397722d9ffbb145a088ac9ce60908c, type: 2}
   megaMushroomMusic: {fileID: 11400000, guid: 3fb519076901a294493ae6e0c10c979b, type: 2}
@@ -4612,7 +4600,7 @@ MonoBehaviour:
   spawnVerticalPowerups: 1
   levelDesigner: 
   richPresenceId: 
-  levelName: Unknown
+  levelTranslationKey: 
   spawnpoint: {x: 0, y: 0, z: 0}
   spawnCircleWidth: 1.39
   spawnCircleHeight: 0.8
@@ -4629,8 +4617,8 @@ MonoBehaviour:
   objectPoolParent: {fileID: 7998357169434227364}
   winText: {fileID: 3474641543873908501}
   winTextAnimator: {fileID: 8395432290395498094}
+  starSpawns: []
   particleManager: {fileID: 59179525922714105}
-  rpcs: {fileID: 6418608900138254647}
   nametagCanvas: {fileID: 5453462452561088483}
   localPlayer: {fileID: 0}
   gameStartTimestamp: 0
@@ -4641,19 +4629,6 @@ MonoBehaviour:
   musicManager: {fileID: 1965679957714577119}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
---- !u!114 &6418608900138254647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5500062339093502118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e634c13992bdf394596c9973645ad96b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!114 &1965679957714577119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4888,33 +4863,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a62b79df5160ecf44b403e14b896fe1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6411750294929853123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5500062339093502118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObjectInterest: 0
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
-  Flags: 67841
-  NetworkGuid:
-    RawGuidValue: 43d56bd18d06e9b4abe323618a20a228
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 5500062339093502114}
-  - {fileID: 6418608900138254647}
-  - {fileID: 7156616037079317633}
-  - {fileID: 1814937730606994308}
-  SimulationBehaviours: []
 --- !u!1 &5549907166122049973
 GameObject:
   m_ObjectHideFlags: 0

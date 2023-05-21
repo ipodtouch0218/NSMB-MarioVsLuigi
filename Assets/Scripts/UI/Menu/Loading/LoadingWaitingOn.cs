@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-using NSMB.Extensions;
-using NSMB.Translation;
 using Fusion;
+using NSMB.Extensions;
+using NSMB.Game;
+using NSMB.Translation;
 
 namespace NSMB.Loading {
 
@@ -31,7 +32,7 @@ namespace NSMB.Loading {
         }
 
         public void Update() {
-            if (!GameManager.Instance || !(GameManager.Instance.Object?.IsValid ?? false))
+            if (!GameData.Instance || !(GameData.Instance.Object?.IsValid ?? false))
                 return;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
@@ -45,21 +46,21 @@ namespace NSMB.Loading {
             }
 
             // Still loading
-            if (!GameManager.Instance.Object.IsValid) {
+            if (!GameData.Instance.Object.IsValid) {
                 text.text = tm.GetTranslation("ui.loading.loading");
                 playerListParent.SetActive(false);
                 return;
             }
 
             // Game starting
-            if (GameManager.Instance.GameStartTimer.IsRunning) {
+            if (GameData.Instance.GameStartTimer.IsRunning) {
                 text.text = tm.GetTranslation("ui.loading.starting");
                 playerListParent.SetActive(false);
                 return;
             }
 
             HashSet<string> waitingFor = new();
-            NetworkRunner runner = GameManager.Instance.Runner;
+            NetworkRunner runner = GameData.Instance.Runner;
             foreach (PlayerRef player in runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(runner);
                 if (!data || data.IsCurrentlySpectating)

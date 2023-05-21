@@ -7,6 +7,7 @@ using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class PlayerData : NetworkBehaviour {
@@ -176,8 +177,8 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnLoadStateChanged(Changed<PlayerData> changed) {
-        if (changed.Behaviour.IsLoaded && GameManager.Instance)
-            GameManager.Instance.CheckIfAllPlayersLoaded();
+        if (changed.Behaviour.IsLoaded && GameData.Instance)
+            GameData.Instance.CheckIfAllPlayersLoaded();
     }
 
     public static void OnSettingChanged(Changed<PlayerData> changed) {

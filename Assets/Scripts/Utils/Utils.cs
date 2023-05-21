@@ -6,13 +6,18 @@ using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Tiles;
 
 namespace NSMB.Utils {
     public class Utils {
 
         public static bool BitTest(long v, int index) {
-            return (v & (1 << index)) != 0;
+            return (v & (1L << index)) != 0;
+        }
+
+        public static bool BitTest(ulong v, int index) {
+            return (v & ((ulong) 1 << index)) != 0;
         }
 
         public static void BitSet(ref byte v, int index, bool value) {
@@ -21,6 +26,21 @@ namespace NSMB.Utils {
             else
                 v &= (byte) ~(1 << index);
         }
+
+        public static void BitSet(ref long v, int index, bool value) {
+            if (value)
+                v |= (1L << index);
+            else
+                v &= ~(1L << index);
+        }
+
+        public static void BitSet(ref ulong v, int index, bool value) {
+            if (value)
+                v |= ((ulong) 1 << index);
+            else
+                v &= ~((ulong) 1 << index);
+        }
+
 
         public static Vector2Int WorldToTilemapPosition(Vector2 worldVec, GameManager manager = null, bool wrap = true) {
             if (!manager)
@@ -459,7 +479,7 @@ namespace NSMB.Utils {
             bool big = gm.spawnBigPowerups;
             bool vertical = gm.spawnVerticalPowerups;
 
-            bool canSpawnMega = !gm.AlivePlayers.Any(pc => pc.State == Enums.PowerupState.MegaMushroom);
+            bool canSpawnMega = !GameData.Instance.AlivePlayers.Any(pc => pc.State == Enums.PowerupState.MegaMushroom);
 
             float totalChance = 0;
             foreach (Powerup powerup in powerups) {
@@ -471,7 +491,7 @@ namespace NSMB.Utils {
                 totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
             }
 
-            float rand = GameManager.Instance.Random.NextSingleExclusive() * totalChance;
+            float rand = GameData.Instance.Random.NextSingleExclusive() * totalChance;
             foreach (Powerup powerup in powerups) {
                 if (powerup.state == Enums.PowerupState.MegaMushroom && canSpawnMega)
                     continue;

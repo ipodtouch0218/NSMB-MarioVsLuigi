@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -14,7 +15,7 @@ public class PropellerPowerup : MovingPowerup {
     [SerializeField] private AnimationCurve flyingPathX, flyingPathY;
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        if (GameData.Instance && GameData.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
             return;

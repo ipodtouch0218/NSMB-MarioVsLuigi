@@ -6,8 +6,9 @@ using TMPro;
 
 using Fusion;
 using NSMB.Extensions;
-using NSMB.Utils;
+using NSMB.Game;
 using NSMB.Translation;
+using NSMB.Utils;
 
 public class UIUpdater : NetworkBehaviour {
 
@@ -127,7 +128,7 @@ public class UIUpdater : NetworkBehaviour {
     }
 
     private void UpdateTextUI() {
-        if (!player || GameManager.Instance.GameEnded)
+        if (!player || GameData.Instance.GameEnded)
             return;
 
         if (teams) {
@@ -158,7 +159,7 @@ public class UIUpdater : NetworkBehaviour {
         }
 
         if (SessionData.Instance.Timer > 0) {
-            float? timeRemaining = GameManager.Instance.GameEndTimer.RemainingRenderTime(Runner);
+            float? timeRemaining = GameData.Instance.GameEndTimer.RemainingRenderTime(Runner);
 
             if (timeRemaining != null) {
                 int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);

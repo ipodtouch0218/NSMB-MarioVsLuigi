@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Game;
 
 namespace NSMB.Tiles {
 
@@ -46,7 +47,7 @@ namespace NSMB.Tiles {
             Bump(interacter, direction, worldLocation);
 
             bool downwards = direction == InteractionDirection.Down;
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+            GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 resultTile, downwards, topSpawnOffset, false, spawnResult);
 
             return false;

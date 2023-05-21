@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, IHaveTileDependencies {
@@ -55,7 +56,7 @@ public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, I
         Vector3 location = Utils.TilemapToWorldPosition(tileLocation) + BlockOffset;
         Coin.GivePlayerCoin(player, location);
 
-        GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
+        GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
             resultTile, false, SpawnOffset, true, NetworkPrefabRef.Empty);
     }
 

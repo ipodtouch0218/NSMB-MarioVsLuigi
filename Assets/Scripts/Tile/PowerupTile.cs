@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Game;
 
 namespace NSMB.Tiles {
 
@@ -33,8 +34,7 @@ namespace NSMB.Tiles {
 
                     //Particle
                     //TODO:
-                    //object[] parametersParticle = new object[]{tileLocation.x, tileLocation.y, "BrickBreak", new Vector3(particleColor.r, particleColor.g, particleColor.b)};
-                    //GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.SpawnParticle, parametersParticle, ExitGames.Client.Photon.SendOptions.SendUnreliable);
+                    GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f, particleColor);
 
                     interacter.PlaySound(Enums.Sounds.World_Block_Break);
                     return true;
@@ -46,7 +46,7 @@ namespace NSMB.Tiles {
 
             Bump(interacter, direction, worldLocation);
             bool downwards = direction == InteractionDirection.Down;
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+            GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 resultTile, downwards, SpawnOffset, false, spawnResult);
             return false;
         }

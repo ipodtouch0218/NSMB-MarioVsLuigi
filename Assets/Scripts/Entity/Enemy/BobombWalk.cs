@@ -4,9 +4,9 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using System;
 
 public class BobombWalk : HoldableEntity {
 
@@ -54,7 +54,7 @@ public class BobombWalk : HoldableEntity {
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
-        if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        if (GameData.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             animator.enabled = false;

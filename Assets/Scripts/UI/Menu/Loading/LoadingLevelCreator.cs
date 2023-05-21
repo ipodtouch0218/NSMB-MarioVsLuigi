@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 
+using NSMB.Game;
+
 namespace NSMB.Loading {
 
     public class LoadingLevelCreator : MonoBehaviour {

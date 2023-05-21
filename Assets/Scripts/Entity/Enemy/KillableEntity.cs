@@ -2,6 +2,7 @@
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -68,7 +69,7 @@ public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFi
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
-        if (!GameManager.Instance || !Object || !body || IsFrozen)
+        if (!GameData.Instance || !Object || !body || IsFrozen)
             return;
 
         if (!IsActive) {

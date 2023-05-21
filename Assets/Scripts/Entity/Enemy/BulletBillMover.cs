@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -27,7 +28,7 @@ public class BulletBillMover : KillableEntity {
 
     public override void FixedUpdateNetwork() {
 
-        if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        if (GameData.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             legacyAnimation.enabled = false;
@@ -66,7 +67,7 @@ public class BulletBillMover : KillableEntity {
     }
 
     private void DespawnCheck() {
-        foreach (PlayerController player in GameManager.Instance.AlivePlayers) {
+        foreach (PlayerController player in GameData.Instance.AlivePlayers) {
             if (!player)
                 continue;
 

@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using NSMB.Game;
+
 public class WrappingHitbox : MonoBehaviour {
 
     private Rigidbody2D body;

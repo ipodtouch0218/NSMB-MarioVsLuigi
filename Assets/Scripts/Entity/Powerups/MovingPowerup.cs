@@ -3,6 +3,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -170,7 +171,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
     public override void FixedUpdateNetwork() {
         base.FixedUpdateNetwork();
-        if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        if (GameData.Instance && GameData.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.isKinematic = true;
             return;
@@ -226,7 +227,7 @@ public class MovingPowerup : CollectableEntity, IBlockBumpable {
         }
 
         if (avoidPlayers && physics.Data.OnGround) {
-            PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
+            PlayerController closest = GameData.Instance.AlivePlayers.OrderBy(player => Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
             if (closest) {
                 float dist = closest.body.position.x - body.position.x;
                 FacingRight = dist < 0 || dist > GameManager.Instance.LevelWidth;

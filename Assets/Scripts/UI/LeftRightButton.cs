@@ -3,6 +3,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+using NSMB.Game;
+
 public class LeftRightButton : Selectable {
 
     //---Serialized Variables

@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class GoombaWalk : KillableEntity {
@@ -24,7 +25,7 @@ public class GoombaWalk : KillableEntity {
             return;
         }
 
-        if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        if (GameData.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             legacyAnimation.enabled = false;

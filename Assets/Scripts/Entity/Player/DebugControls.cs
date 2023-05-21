@@ -2,16 +2,23 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class DebugControls : MonoBehaviour {
 
-//#if UNITY_EDITOR
+#if !UNITY_EDITOR
+
     public void Start() {
-        //if (!Debug.isDebugBuild && !Application.isEditor) {
-        //    enabled = false;
-        //    return;
-        //}
+        enabled = false;
+    }
+
+#else
+    public void Start() {
+        if (!Debug.isDebugBuild && !Application.isEditor) {
+            enabled = false;
+            return;
+        }
     }
 
     public void Update() {
@@ -87,5 +94,5 @@ public class DebugControls : MonoBehaviour {
         NetworkHandler.Instance.runner.Spawn(enemy, pos, onBeforeSpawned: spawned);
 
     }
-//#endif
+#endif
 }

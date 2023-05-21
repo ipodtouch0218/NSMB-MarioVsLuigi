@@ -1,5 +1,6 @@
 using UnityEngine;
 
+using NSMB.Game;
 using NSMB.Utils;
 
 public class VolumeWithDistance : MonoBehaviour {

@@ -3,6 +3,7 @@ using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -64,7 +65,7 @@ public class KoopaWalk : HoldableEntity {
         if (!Object)
             return;
 
-        if (GameManager.Instance && GameManager.Instance.GameEnded) {
+        if (GameData.Instance && GameData.Instance.GameEnded) {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             animator.enabled = false;

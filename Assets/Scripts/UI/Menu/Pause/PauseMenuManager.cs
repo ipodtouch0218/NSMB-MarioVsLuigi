@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Translation;
 
 namespace NSMB.UI.Pause {

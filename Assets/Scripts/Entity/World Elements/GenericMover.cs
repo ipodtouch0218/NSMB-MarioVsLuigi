@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 
 public class GenericMover : NetworkBehaviour {
 
@@ -28,7 +29,7 @@ public class GenericMover : NetworkBehaviour {
         if (!target)
             target = transform;
 
-        float secondsElapsed = simulationTime - GameManager.Instance.GameStartTime;
+        float secondsElapsed = simulationTime - GameData.Instance.GameStartTime;
         float xOffset = EvaluateCurve(x, animationOffset, secondsElapsed);
         float yOffset = EvaluateCurve(y, animationOffset, secondsElapsed);
 

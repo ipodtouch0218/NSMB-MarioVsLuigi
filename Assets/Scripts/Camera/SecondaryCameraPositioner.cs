@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using NSMB.Game;
+
 public class SecondaryCameraPositioner : MonoBehaviour {
 
     //---Serialized Variables

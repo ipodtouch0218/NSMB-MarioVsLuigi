@@ -31,7 +31,7 @@
             "a": 0.5
         }
     },
-    "SceneLoadSpawnMode": 0,
+    "SceneLoadSpawnMode": 2,
     "DeltaCompressor": 0,
     "InvokeRenderInBatchMode": true,
     "MaxNetworkedObjectCount": 8192,

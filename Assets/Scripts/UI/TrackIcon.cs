@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+using NSMB.Game;
+
 public class TrackIcon : MonoBehaviour {
 
     //---Public Variables

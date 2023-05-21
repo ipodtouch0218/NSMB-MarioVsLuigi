@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 
 namespace NSMB.Tiles {
 
@@ -68,7 +69,7 @@ namespace NSMB.Tiles {
 
             //Bump
             bool downwards = direction == InteractionDirection.Down;
-            GameManager.Instance.rpcs.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+            GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 this, downwards, downwards ? -SpawnOffset : SpawnOffset, false, NetworkPrefabRef.Empty);
         }
 

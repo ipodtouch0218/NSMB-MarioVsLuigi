@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Utils;
 
 [RequireComponent(typeof(NetworkRigidbody2D))]

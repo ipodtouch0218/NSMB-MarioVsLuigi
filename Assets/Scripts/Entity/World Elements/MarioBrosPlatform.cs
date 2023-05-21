@@ -2,6 +2,7 @@ using System.Linq;
 using UnityEngine;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Tiles;
 
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]

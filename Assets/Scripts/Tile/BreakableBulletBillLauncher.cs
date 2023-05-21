@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using NSMB.Game;
+
 namespace NSMB.Tiles {
 
     [CreateAssetMenu(fileName = "BreakableBulletBillLauncher", menuName = "ScriptableObjects/Tiles/BreakableBulletBillLauncher")]

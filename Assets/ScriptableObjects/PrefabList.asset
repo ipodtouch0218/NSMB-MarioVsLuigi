@@ -16,6 +16,8 @@ MonoBehaviour:
     RawGuidValue: cf98b2b907b9bc74ab8c14624e3c5575
   SessionDataHolder:
     RawGuidValue: 6fe1d2f7545d144468b4dbaf10fabd89
+  GameDataHolder:
+    RawGuidValue: 6f681abe0b48a534cb6d0c74c31b3a5f
   Obj_Fireball:
     RawGuidValue: 00a2ef66a322a694c837b29404f2af49
   Obj_LooseCoin:

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Game;
 
 namespace NSMB.Tiles {
     public class TilemapChunkPopulator : AssetModificationProcessor {

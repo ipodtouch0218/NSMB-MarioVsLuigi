@@ -8,6 +8,7 @@ using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
 
@@ -139,7 +140,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
     public BoxCollider2D MainHitbox => hitboxes[0];
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
-    public Vector3 Spawnpoint => GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
+    public Vector3 Spawnpoint => GameData.Instance.GetSpawnpoint(SpawnpointIndex);
     private int MovementStage {
         get {
             float xVel = Mathf.Abs(body.velocity.x);
@@ -343,11 +344,11 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         //use |= as the spectate manager sets it first
         cameraController.IsControllingCamera = Object.HasInputAuthority;
 
-        Vector3 spawnpoint = GameManager.Instance.GetSpawnpoint(0, 1);
+        Vector3 spawnpoint = GameData.Instance.GetSpawnpoint(0, 1);
         networkRigidbody.TeleportToPosition(spawnpoint);
         cameraController.Recenter(spawnpoint);
 
-        GameManager.Instance.AlivePlayers.Add(this);
+        GameData.Instance.AlivePlayers.Add(this);
         GameManager.Instance.teamManager.AddPlayer(this);
 
         ControlSystem.controls.Enable();
@@ -357,8 +358,8 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         NetworkHandler.OnInput -= OnInput;
         NetworkHandler.OnInputMissing -= OnInputMissing;
 
-        if (GameManager.Instance && hasState)
-            GameManager.Instance.AlivePlayers.Remove(this);
+        if (GameData.Instance && hasState)
+            GameData.Instance.AlivePlayers.Remove(this);
 
         if (icon)
             Destroy(icon.gameObject);
@@ -404,12 +405,12 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance.GameState < Enums.GameState.Playing) {
+        if (GameData.Instance.GameState < Enums.GameState.Playing) {
             models.SetActive(false);
             return;
         }
 
-        if (GameManager.Instance.GameEnded) {
+        if (GameData.Instance.GameEnded) {
             //game ended, freeze.
             body.velocity = Vector2.zero;
             animator.enabled = false;
@@ -793,7 +794,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
 
     #region -- CONTROLLER FUNCTIONS --
     private void ActivatePowerupAction() {
-        if (IsDead || IsFrozen || IsInKnockback || CurrentPipe || GameManager.Instance.GameEnded || HeldEntity)
+        if (IsDead || IsFrozen || IsInKnockback || CurrentPipe || GameData.Instance.GameEnded || HeldEntity)
             return;
 
         switch (State) {
@@ -805,7 +806,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             if (FireballDelayTimer.IsActive(Runner))
                 return;
 
-            int activeFireballs = GameManager.Instance.PooledFireballs.Count(fm => fm.Owner == this && fm.IsActive);
+            int activeFireballs = GameData.Instance.PooledFireballs.Count(fm => fm.Owner == this && fm.IsActive);
             if (activeFireballs <= 1) {
                 FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
                 CanShootAdditionalFireball = activeFireballs == 0;
@@ -822,7 +823,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
             Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
 
-            FireballMover inactiveFireball = GameManager.Instance.PooledFireballs.First(fm => !fm.IsActive);
+            FireballMover inactiveFireball = GameData.Instance.PooledFireballs.First(fm => !fm.IsActive);
             inactiveFireball.Initialize(this, spawnPos, ice, right);
 
             FireballDelayTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
@@ -864,7 +865,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     }
 
     public void OnReserveItem(InputAction.CallbackContext context) {
-        if (!Object.HasInputAuthority || GameManager.Instance.paused || GameManager.Instance.GameEnded)
+        if (!Runner.IsServer || GameManager.Instance.paused || GameData.Instance.GameEnded)
             return;
 
         if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead) {
@@ -1071,7 +1072,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
             Stars--;
             amount--;
         }
-        gm.CheckForWinner();
+        GameData.Instance.CheckForWinner();
     }
     #endregion
 
@@ -1089,7 +1090,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         RespawnTimer = TickTimer.CreateFromSeconds(Runner, 4.3f);
 
         if (Lives > 0 && --Lives == 0) {
-            GameManager.Instance.CheckForWinner();
+            GameData.Instance.CheckForWinner();
 
             //spawn all stars
             SpawnStars(Stars, deathplane);
@@ -1147,7 +1148,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         RespawnTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
         if (Lives == 0) {
-            GameManager.Instance.CheckForWinner();
+            GameData.Instance.CheckForWinner();
 
             if (Object.HasInputAuthority)
                 GameManager.Instance.spectationManager.Spectating = true;
@@ -1370,7 +1371,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if ((weak && IsWeakKnockback && IsInKnockback) || (IsInKnockback && !IsWeakKnockback))
             return;
 
-        if (GameManager.Instance.GameState != Enums.GameState.Playing || DamageInvincibilityTimer.IsActive(Runner) || CurrentPipe || IsFrozen || IsDead || GiantStartTimer.IsActive(Runner) || GiantEndTimer.IsActive(Runner))
+        if (GameData.Instance.GameState != Enums.GameState.Playing || DamageInvincibilityTimer.IsActive(Runner) || CurrentPipe || IsFrozen || IsDead || GiantStartTimer.IsActive(Runner) || GiantEndTimer.IsActive(Runner))
             return;
 
         if (State == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -2426,7 +2427,6 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         if (!IsProxy && hitRoof && !IsStuckInBlock) {
             bool tempHitBlock = false;
             bool interactedAny = false;
-            bool set = false;
             foreach (Vector2Int tile in tilesJumpedInto) {
                 tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
                 if (bumpSound)
@@ -2895,7 +2895,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         offset.x *= changed.Behaviour.WallSlideLeft ? -1 : 1;
 
         player.PlaySound(Enums.Sounds.Player_Sound_WallJump);
-        player.PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
+        player.PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameData.Instance.Random.RangeExclusive(1, 3));
         player.SpawnParticle(PrefabList.Instance.Particle_Walljump, player.body.position + offset, player.WallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
 
         player.animator.SetTrigger("walljump");
@@ -2907,7 +2907,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
     public static void OnIsDeadChanged(Changed<PlayerController> changed) {
         PlayerController player = changed.Behaviour;
         if (player.IsDead) {
-            if (GameManager.Instance.GameState < Enums.GameState.Playing)
+            if (GameData.Instance.GameState < Enums.GameState.Playing)
                 return;
 
             player.animator.Play("deadstart");
@@ -3012,7 +3012,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         // Voice SFX
         switch (player.JumpState) {
         case PlayerJumpState.DoubleJump:
-            player.PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameManager.Instance.Random.RangeExclusive(1, 3));
+            player.PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameData.Instance.Random.RangeExclusive(1, 3));
             break;
         case PlayerJumpState.TripleJump:
             player.PlaySound(Enums.Sounds.Player_Voice_TripleJump);

@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+using NSMB.Game;
+
 namespace NSMB.Tiles {
     /// <summary>
     /// A RuleTile that can match with both itself, and other defined "sibling" tiles.

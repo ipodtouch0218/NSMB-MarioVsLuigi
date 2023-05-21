@@ -1,11 +1,12 @@
 using System;
+using System.Linq;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
-
-using NSMB.Utils;
-using System.Linq;
 using UnityEngine.InputSystem;
-using System.IO;
+
+using NSMB.Game;
+using NSMB.Utils;
 
 public class Settings : Singleton<Settings> {
 

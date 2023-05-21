@@ -2,8 +2,9 @@
 using UnityEngine.Tilemaps;
 
 using Fusion;
-using NSMB.Tiles;
 using NSMB.Extensions;
+using NSMB.Game;
+using NSMB.Tiles;
 
 public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
 

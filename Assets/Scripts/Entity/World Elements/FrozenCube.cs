@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class FrozenCube : HoldableEntity {

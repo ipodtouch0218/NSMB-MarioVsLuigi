@@ -1,12 +1,12 @@
 using System;
 using System.IO;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 using Discord;
 using Fusion;
-using NSMB.Utils;
+using NSMB.Game;
 using NSMB.Translation;
+using NSMB.Utils;
 
 public class DiscordController : MonoBehaviour {
 

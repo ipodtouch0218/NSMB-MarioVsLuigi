@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using NSMB.Game;
 using NSMB.Extensions;
 
 public class VisualizedBlocks : MonoBehaviour {
@@ -31,7 +32,6 @@ public class VisualizedBlocks : MonoBehaviour {
 
         if ((blocks?.Length ?? 0) != count) {
             for (int i = 0; i < transform.childCount; i++) {
-                Debug.Log("A");
                 DestroyImmediate(transform.GetChild(i).gameObject);
             }
             blocks = new GameObject[count];

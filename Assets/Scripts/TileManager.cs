@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Game;
 using NSMB.Utils;
 
 namespace NSMB.Tiles {
@@ -46,7 +47,7 @@ namespace NSMB.Tiles {
                 enemy.RespawnEntity();
             }
 
-            gm.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - gm.RealPlayerCount * 0.2f);
+            GameData.Instance.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - GameData.Instance.RealPlayerCount * 0.2f);
         }
 
         public TileBase GetTile(int x, int y) {
