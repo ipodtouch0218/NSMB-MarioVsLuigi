@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -6,38 +7,48 @@ using NSMB.Game;
 using NSMB.Utils;
 
 namespace NSMB.Tiles {
+
     [OrderBefore(typeof(PlayerController))]
     public class TileManager : NetworkBehaviour {
 
         //---Properties
-        public int ChunksX => Mathf.CeilToInt(gm.levelWidthTile / 16f);
-        public int ChunksY => Mathf.CeilToInt(gm.levelHeightTile / 16f);
-        public int WorldOriginX => gm.levelMinTileX;
-        public int WorldOriginY => gm.levelMinTileY;
+        public int ChunksX => Mathf.CeilToInt(GameManager.levelWidthTile / 16f);
+        public int ChunksY => Mathf.CeilToInt(GameManager.levelHeightTile / 16f);
+        public int WorldOriginX => GameManager.levelMinTileX;
+        public int WorldOriginY => GameManager.levelMinTileY;
+        private GameManager GameManager => GameManager.Instance;
 
         //---Public Variables
-        public TileBase[] sceneTiles;
-        public TilemapChunk[] chunks;
+        public List<TilemapChunk> chunks;
 
-        //---Serialized Variables
-        [SerializeField, HideInInspector] private GameManager gm;
-
-        public void OnValidate() {
-            if (!gm) gm = GetComponentInParent<GameManager>();
+        public void Awake() {
+            GameManager.Instance.tileManager = this;
+            Debug.Log("TileManager Awake");
         }
 
-        public override void FixedUpdateNetwork() {
-            base.FixedUpdateNetwork();
+        public void Start() {
+            int chunkmapWidth = Mathf.CeilToInt(GameManager.levelWidthTile / 16f);
+            int chunkmapHeight = Mathf.CeilToInt(GameManager.levelHeightTile / 16f);
+            int requiredChunks = chunkmapWidth * chunkmapHeight;
+
+            for (int i = 0; i < requiredChunks; i++) {
+                Runner.Spawn(PrefabList.Instance.TilemapChunk, onBeforeSpawned: (runner, obj) => {
+                    obj.GetComponent<TilemapChunk>().OnBeforeSpawned(
+                        (ushort) (i % chunkmapWidth),
+                        (ushort) (i / chunkmapWidth)
+                    );
+                });
+            }
         }
 
         public void ResetMap() {
             foreach (TilemapChunk chunk in chunks)
                 chunk.ResetMap();
 
-            foreach (FloatingCoin coin in gm.coins)
+            foreach (FloatingCoin coin in GameManager.coins)
                 coin.ResetCoin();
 
-            foreach (KillableEntity enemy in gm.enemies) {
+            foreach (KillableEntity enemy in GameManager.enemies) {
                 if (enemy.checkForNearbyPlayersWhenRespawning) {
                     if (Runner.GetPhysicsScene2D().OverlapCircle(enemy.body.position, 1.5f, Layers.MaskOnlyPlayers)) {
                         continue;
@@ -57,7 +68,7 @@ namespace NSMB.Tiles {
                 return null;
 
             ushort tileId = chunk.GetTile(TileLocationToChunkIndex(x, y));
-            return GetTileInstanceFromTileId(tileId);
+            return GameManager.GetTileInstanceFromTileId(tileId);
         }
 
         public TileBase GetTile(Vector2Int loc) {
@@ -90,7 +101,7 @@ namespace NSMB.Tiles {
         public void SetTilesBlock(int x, int y, int width, int height, TileBase[] tiles) {
             ushort[] tileIds = new ushort[tiles.Length];
             for (int i = 0; i < tiles.Length; i++)
-                tileIds[i] = GetTileIdFromTileInstance(tiles[i]);
+                tileIds[i] = GameManager.GetTileIdFromTileInstance(tiles[i]);
 
             SetTilesBlock(x, y, width, height, tileIds);
         }
@@ -112,11 +123,11 @@ namespace NSMB.Tiles {
         }
 
         public void SetTile(int x, int y, TileBase tile) {
-            SetTile(x, y, GetTileIdFromTileInstance(tile));
+            SetTile(x, y, GameManager.GetTileIdFromTileInstance(tile));
         }
 
         public void SetTile(int x, int y, ushort tileId) {
-            if (tileId > sceneTiles.Length)
+            if (tileId > GameManager.sceneTiles.Length)
                 return;
 
             TilemapChunk chunk = GetChunkAtTileLocation(x, y);
@@ -124,23 +135,6 @@ namespace NSMB.Tiles {
                 return;
 
             chunk.SetTile(TileLocationToChunkIndex(x, y), tileId);
-        }
-
-        public ushort GetTileIdFromTileInstance(TileBase tile) {
-            if (!tile)
-                return 0;
-
-            for (ushort i = 0; i < sceneTiles.Length; i++) {
-                if (sceneTiles[i] == tile) {
-                    return i;
-                }
-            }
-
-            return 0;
-        }
-
-        public TileBase GetTileInstanceFromTileId(ushort id) {
-            return sceneTiles[id];
         }
 
         private int TileLocationToChunkIndex(int x, int y) {
@@ -163,13 +157,13 @@ namespace NSMB.Tiles {
 #if UNITY_EDITOR
         private static Vector3 ChunkSize = new(8, 8, 0);
         public void OnDrawGizmos() {
-            if (!gm.tilemap)
+            if (!GameManager.tilemap)
                 return;
 
             Gizmos.color = Color.black;
             for (int x = 0; x < ChunksX; x++) {
                 for (int y = 0; y < ChunksY; y++) {
-                    Gizmos.DrawWireCube(new(gm.LevelMinX + 4 + (x * 8), gm.LevelMinY + 4 + (y * 8)), ChunkSize);
+                    Gizmos.DrawWireCube(new(GameManager.LevelMinX + 4 + (x * 8), GameManager.LevelMinY + 4 + (y * 8)), ChunkSize);
                 }
             }
         }

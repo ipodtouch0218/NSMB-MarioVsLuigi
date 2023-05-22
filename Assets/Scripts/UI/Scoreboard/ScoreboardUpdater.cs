@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 using NSMB.Extensions;
+using NSMB.Game;
 
 public class ScoreboardUpdater : MonoBehaviour {
 
@@ -20,10 +21,12 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     public void OnEnable() {
         ControlSystem.controls.UI.Scoreboard.performed += OnToggleScoreboard;
+        GameData.OnAllPlayersLoaded += OnAllPlayersLoaded;
     }
 
     public void OnDisable() {
         ControlSystem.controls.UI.Scoreboard.performed -= OnToggleScoreboard;
+        GameData.OnAllPlayersLoaded -= OnAllPlayersLoaded;
     }
 
     public void Awake() {
@@ -32,10 +35,6 @@ public class ScoreboardUpdater : MonoBehaviour {
         entryComparer ??= new ScoreboardEntry.EntryComparer();
 
         teamsHeader.SetActive(SessionData.Instance ? SessionData.Instance.Teams : false);
-    }
-
-    private void OnToggleScoreboard(InputAction.CallbackContext context) {
-        ManualToggle();
     }
 
     public void SetEnabled() {
@@ -99,5 +98,18 @@ public class ScoreboardUpdater : MonoBehaviour {
         }
 
         RepositionEntries();
+    }
+
+    //---Callbacks
+
+    private void OnToggleScoreboard(InputAction.CallbackContext context) {
+        ManualToggle();
+    }
+
+    private void OnAllPlayersLoaded() {
+        CreateEntries(GameData.Instance.AlivePlayers);
+
+        if (Settings.Instance.genericScoreboardAlways)
+            SetEnabled();
     }
 }

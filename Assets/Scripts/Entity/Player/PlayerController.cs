@@ -557,7 +557,7 @@ public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTic
         IsOnGround = down >= 1 && PropellerLaunchTimer.ExpiredOrNotRunning(Runner);
         hitLeft = left >= 1;
         hitRight = right >= 1;
-        hitRoof = up >= 1;
+        hitRoof = up >= 1 && body.velocity.y > -0.1f;
     }
 
     private void UpdateTileProperties() {

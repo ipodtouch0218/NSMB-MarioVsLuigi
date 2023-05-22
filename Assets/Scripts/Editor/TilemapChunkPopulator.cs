@@ -49,38 +49,20 @@ namespace NSMB.Tiles {
             }
             uniqueTilesList = uniqueTilesList.Distinct().ToList();
             uniqueTilesList.Sort(new TileBaseSorter());
-            gm.tileManager.sceneTiles = uniqueTilesList.ToArray();
+            gm.sceneTiles = uniqueTilesList.ToArray();
 
-            int chunkmapWidth = Mathf.CeilToInt(gm.levelWidthTile / 16f);
-            int chunkmapHeight = Mathf.CeilToInt(gm.levelHeightTile / 16f);
-            int requiredChunks = chunkmapWidth * chunkmapHeight;
+            BoundsInt bounds = new(gm.levelMinTileX, gm.levelMinTileY , 0, gm.levelWidthTile, gm.levelHeightTile, 1);
+            TileBase[] tileBases = tilemap.GetTilesBlock(bounds);
+            ushort[] tileIds = new ushort[tileBases.Length];
 
-            Transform parent = gm.transform.Find("Chunks");
-            List<TilemapChunk> chunks = new(gm.GetComponentsInChildren<TilemapChunk>());
-            while (chunks.Count < requiredChunks) {
-                GameObject newObject = new();
-                newObject.transform.SetParent(parent);
-                TilemapChunk newChunk = newObject.AddComponent<TilemapChunk>();
-                newObject.AddComponent<NetworkObject>();
-                chunks.Add(newChunk);
+            for (int i = 0; i < tileBases.Length; i++) {
+                tileIds[i] = gm.GetTileIdFromTileInstance(tileBases[i]);
             }
 
-            for (int i = 0; i < requiredChunks; i++) {
-                TilemapChunk chunk = chunks[i];
-                ushort x = (ushort) (i % chunkmapWidth);
-                ushort y = (ushort) (i / chunkmapWidth);
+            gm.originalTiles = tileIds;
 
-                chunk.name = $"TilemapChunk ({x},{y})";
-                chunk.chunkX = x;
-                chunk.chunkY = y;
-                chunk.LoadState();
-            }
-
-
-            gm.tileManager.chunks = chunks.ToArray();
-
-            Debug.Log($"Successfully saved level data. {uniqueTilesList.Count} unique tiles, {requiredChunks} chunks ({gm.levelWidthTile} x {gm.levelHeightTile}).");
-            EditorUtility.SetDirty(gm.tileManager);
+            Debug.Log($"Successfully saved level data. {uniqueTilesList.Count} unique tiles ({gm.levelWidthTile} x {gm.levelHeightTile}).");
+            EditorUtility.SetDirty(gm);
         }
 
         private static void GetDependenciesRecursively(IHaveTileDependencies td, List<TileBase> results, List<IHaveTileDependencies> alreadyChecked) {

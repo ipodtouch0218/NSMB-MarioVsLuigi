@@ -14,9 +14,14 @@ public struct NetworkBitArray : INetworkStruct
         }
     }
 
-    public void Set(ulong value) {
+    public void RawSet(ulong value) {
         bits = value;
     }
+
+    public ulong RawGet() {
+        return bits;
+    }
+
 
     public int Count => 64;
 
@@ -24,7 +29,7 @@ public struct NetworkBitArray : INetworkStruct
         int count = 0;
         ulong n = bits;
         while (n != 0) {
-            n &= n-1;
+            n = n & (n-1);
             count ++;
         }
         return count;

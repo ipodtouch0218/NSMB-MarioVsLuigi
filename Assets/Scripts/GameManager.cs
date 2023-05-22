@@ -78,6 +78,7 @@ namespace NSMB.Game {
         //---Public Variables
         public readonly HashSet<NetworkObject> networkObjects = new();
         public GameObject[] starSpawns;
+        public TileManager tileManager;
         public SingleParticleManager particleManager;
         public TeamManager teamManager = new();
         public Canvas nametagCanvas;
@@ -87,12 +88,13 @@ namespace NSMB.Game {
 
         [NonSerialized] public KillableEntity[] enemies;
         [NonSerialized] public FloatingCoin[] coins;
+        [HideInInspector] public TileBase[] sceneTiles;
+        [HideInInspector] public ushort[] originalTiles;
 
         //---Private Variables
         private bool pauseStateLastFrame, optionsWereOpenLastFrame;
 
         //---Components
-        [SerializeField] public TileManager tileManager;
         [SerializeField] public SpectationManager spectationManager;
         [SerializeField] public LoopingMusicPlayer musicManager;
         [SerializeField] public AudioSource music, sfx;
@@ -153,6 +155,7 @@ namespace NSMB.Game {
             // Spawn a GameDataHolder, if one doesn't already exist.
             if (!GameData.Instance) {
                 NetworkHandler.Instance.runner.Spawn(PrefabList.Instance.GameDataHolder);
+                NetworkHandler.Instance.runner.Spawn(PrefabList.Instance.TileManager);
             }
         }
 
@@ -168,7 +171,20 @@ namespace NSMB.Game {
             nametag.SetActive(true);
         }
 
+        public ushort GetTileIdFromTileInstance(TileBase tile) {
+            if (!tile)
+                return 0;
 
+            int index = Array.IndexOf(sceneTiles, tile);
+            if (index == -1)
+                return 0;
+
+            return (ushort) index;
+        }
+
+        public TileBase GetTileInstanceFromTileId(ushort id) {
+            return sceneTiles[id];
+        }
 
 
         public void OnToggleHud(InputAction.CallbackContext context) {
@@ -217,6 +233,10 @@ namespace NSMB.Game {
         public void OnDrawGizmos() {
             if (!tilemap)
                 return;
+
+
+            BoundsInt bounds = new(levelMinTileX, levelMinTileY + levelHeightTile / 2, 0, levelWidthTile, levelHeightTile, 1);
+            Debug.DrawLine((Vector3) (bounds.min) / 2f, (Vector3) (bounds.max) / 2f, Color.red);
 
             Vector3 size = new(LevelWidth, LevelHeight);
             Vector3 origin = new(LevelMinX + (LevelWidth * 0.5f), LevelMinY + (LevelHeight * 0.5f), 1);

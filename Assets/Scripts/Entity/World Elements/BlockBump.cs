@@ -128,9 +128,9 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
     }
 
     public void OnBeforeSpawned(Vector2Int tileLocation, TileBase bumpTile, TileBase resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
-        TileManager tm = GameManager.Instance.tileManager;
-        ushort bumpTileId = tm.GetTileIdFromTileInstance(bumpTile);
-        ushort resultTileId = tm.GetTileIdFromTileInstance(resultTile);
+        GameManager gm = GameManager.Instance;
+        ushort bumpTileId = gm.GetTileIdFromTileInstance(bumpTile);
+        ushort resultTileId = gm.GetTileIdFromTileInstance(resultTile);
 
         OnBeforeSpawned(tileLocation, bumpTileId, resultTileId, spawnPrefab, downwards, spawnCoin, spawnOffset);
     }
@@ -143,7 +143,7 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
         }
 
         //graphics bs
-        TileBase tile = GameManager.Instance.tileManager.GetTileInstanceFromTileId(BumpTile);
+        TileBase tile = GameManager.Instance.GetTileInstanceFromTileId(BumpTile);
         Sprite sprite;
         if (tile is TileWithProperties tp) {
             sprite = tp.m_DefaultSprite;

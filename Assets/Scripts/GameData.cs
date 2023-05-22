@@ -10,10 +10,12 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
+using NSMB.Tiles;
 
 namespace NSMB.Game {
     public class GameData : NetworkBehaviour {
 
+        //---Static Variables
         private static readonly Vector3 OneFourth = new(0.25f, 0.25f, 0f);
         private static GameData _instance;
         public static GameData Instance {
@@ -29,6 +31,7 @@ namespace NSMB.Game {
             private set => _instance = value;
         }
         private static GameManager GameManager => GameManager.Instance;
+        public static event Action OnAllPlayersLoaded;
 
         //---Networked Variables
         [Networked] public TickTimer BigStarRespawnTimer { get; set; }
@@ -328,7 +331,7 @@ namespace NSMB.Game {
                 obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, offset);
             }, predictionKey: new() { Byte1 = (byte) Runner.Tick, Byte0 = PredictionCounter++ });
 
-            GameManager.tileManager.SetTile(loc, null);
+            GameManager.Instance.tileManager.SetTile(loc, null);
         }
 
 
@@ -366,11 +369,8 @@ namespace NSMB.Game {
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_LoadingComplete() {
             // Populate scoreboard
-            ScoreboardUpdater.Instance.CreateEntries(AlivePlayers);
-            if (Settings.Instance.genericScoreboardAlways)
-                ScoreboardUpdater.Instance.SetEnabled();
-
             GlobalController.Instance.loadingCanvas.EndLoading();
+            OnAllPlayersLoaded?.Invoke();
         }
 
         //---Helpers
@@ -524,7 +524,7 @@ namespace NSMB.Game {
         private bool AttemptSpawnBigStar() {
 
             GameObject[] starSpawns = GameManager.starSpawns;
-            int validSpawns = AvailableStarSpawns.SetBitCount();
+            int validSpawns = starSpawns.Length - AvailableStarSpawns.UnsetBitCount();
 
             if (validSpawns <= 0) {
                 ResetAvailableStarSpawns();
@@ -532,6 +532,7 @@ namespace NSMB.Game {
             }
 
             int nthSpawn = Random.RangeExclusive(0, validSpawns);
+            AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int im);
             if (AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int index)) {
 
                 Vector3 spawnPos = starSpawns[index].transform.position;
@@ -546,6 +547,7 @@ namespace NSMB.Game {
                 Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
                     obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
                 });
+                return true;
             }
 
             // This should never happen...
@@ -553,7 +555,7 @@ namespace NSMB.Game {
         }
 
         private void ResetAvailableStarSpawns() {
-            AvailableStarSpawns.Set(unchecked((ulong) ~0L));
+            AvailableStarSpawns.RawSet(unchecked((ulong) ~0L));
         }
 
         /// <summary>

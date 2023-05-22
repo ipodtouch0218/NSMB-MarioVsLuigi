@@ -5,24 +5,26 @@ using Fusion;
 using NSMB.Game;
 
 namespace NSMB.Tiles {
+
+    [OrderAfter(typeof(TileManager))]
     public class TilemapChunk : NetworkBehaviour, IBeforeTick, IAfterTick {
 
         //---Static Variables
         private static readonly TileBase[] TileBuffer = new TileBase[256];
 
-        //---Public Variables
-        public ushort chunkX, chunkY;
-        public ushort[] originalTiles = new ushort[256];
-        public BoundsInt ourBounds;
-
         //---Networked Variables
         [Networked] public byte DirtyCounter { get; set; }
+        [Networked] public ushort ChunkX { get; set; }
+        [Networked] public ushort ChunkY { get; set; }
         [Networked, Capacity(256)] public NetworkArray<ushort> Tiles => default;
 
         //---Private Variables
+        private readonly ushort[] originalTiles = new ushort[256];
+        private BoundsInt bounds;
+        private TilemapCollider2D tilemapCollider;
         private byte latestDirtyCounter;
         private bool updatedDirtyCounterThisTick;
-        private TilemapCollider2D tilemapCollider;
+        private bool initialized;
 
         public void BeforeTick() {
             updatedDirtyCounterThisTick = false;
@@ -33,14 +35,13 @@ namespace NSMB.Tiles {
             if (latestDirtyCounter == DirtyCounter)
                 return;
 
-            // the the tilemap is different from it's current state.
+            // The the tilemap is different from it's current state.
             UpdateTilemapState();
             latestDirtyCounter = DirtyCounter;
         }
 
         public void AfterTick() {
-
-            // the tilemap was updated via the dirty counter
+            // The tilemap was updated via the dirty counter
             if (updatedDirtyCounterThisTick || (latestDirtyCounter != DirtyCounter)) {
                 UpdateTilemapState();
                 updatedDirtyCounterThisTick = false;
@@ -49,24 +50,57 @@ namespace NSMB.Tiles {
             latestDirtyCounter = DirtyCounter;
         }
 
+        public void OnBeforeSpawned(ushort x, ushort y) {
+            ChunkX = x;
+            ChunkY = y;
+        }
+
         public override void Spawned() {
+            if (initialized)
+                return;
+
+            Debug.Log($"TilemapChunk Spawned on tick {Runner.Tick}: {GameManager.Instance.tileManager}");
+            GameManager.Instance.tileManager.chunks.Add(this);
+            transform.SetParent(GameManager.Instance.tileManager.transform, true);
+            LoadState();
+
             if (Runner.IsServer)
                 Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
 
             tilemapCollider = GameManager.Instance.tilemap.GetComponent<TilemapCollider2D>();
             UpdateTilemapState();
+
+            initialized = true;
+        }
+
+        public override void FixedUpdateNetwork() {
+            if (initialized)
+                return;
+
+            if (!GameManager.Instance)
+                return;
+
+            initialized = true;
         }
 
         public void LoadState() {
             GameManager gm = GameManager.Instance;
-            Tilemap tilemap = gm.tilemap;
-            ourBounds = new(gm.levelMinTileX + (chunkX * 16), gm.levelMinTileY + (chunkY * 16), 0, 16, 16, 1);
-            tilemap.GetTilesBlockNonAlloc(ourBounds, TileBuffer);
 
-            TileManager tm = gm.tileManager;
-            for (int i = 0; i < TileBuffer.Length; i++) {
-                originalTiles[i] = tm.GetTileIdFromTileInstance(TileBuffer[i]);
+            int chunkOriginIndex = (ChunkX * 16) + (ChunkY * GameManager.Instance.tileManager.ChunksX * 256);
+
+            for (int i = 0; i < 256; i++) {
+
+                int x = i % 16;
+                int y = i / 16;
+
+                int index = chunkOriginIndex + x + (y * 16 * GameManager.Instance.tileManager.ChunksX);
+                if (index < gm.originalTiles.Length) {
+                    originalTiles[i] = gm.originalTiles[index];
+                }
             }
+
+            bounds = new(gm.levelMinTileX + (ChunkX * 16), gm.levelMinTileY + (ChunkY * 16), 0, 16, 16, 1);
+            name = $"TilemapChunk ({ChunkX},{ChunkY})";
         }
 
         public void ResetMap() {
@@ -87,21 +121,20 @@ namespace NSMB.Tiles {
         public void UpdateTilemapState() {
             Tilemap tilemap = GameManager.Instance.tilemap;
             LoadTileBuffer();
-            tilemap.SetTilesBlock(ourBounds, TileBuffer);
+            tilemap.SetTilesBlock(bounds, TileBuffer);
             tilemapCollider.ProcessTilemapChanges();
         }
 
         private void LoadTileBuffer(ushort[] src = null) {
             GameManager gm = GameManager.Instance;
-            TileManager tm = gm.tileManager;
 
             if (src == null) {
                 for (int i = 0; i < TileBuffer.Length; i++) {
-                    TileBuffer[i] = tm.sceneTiles[Tiles[i]];
+                    TileBuffer[i] = gm.GetTileInstanceFromTileId(Tiles[i]);
                 }
             } else {
                 for (int i = 0; i < TileBuffer.Length; i++) {
-                    TileBuffer[i] = tm.sceneTiles[src[i]];
+                    TileBuffer[i] = gm.GetTileInstanceFromTileId(src[i]);
                 }
             }
         }
@@ -135,7 +168,7 @@ namespace NSMB.Tiles {
         public void OnDrawGizmosSelected() {
             Gizmos.color = SelectedColor;
             GameManager gm = GameManager.Instance;
-            Gizmos.DrawCube(new(gm.LevelMinX + 4 + (chunkX * 8), gm.LevelMinY + 4 + (chunkY * 8)), ChunkSize);
+            Gizmos.DrawCube(new(gm.LevelMinX + 4 + (ChunkX * 8), gm.LevelMinY + 4 + (ChunkY * 8)), ChunkSize);
         }
 #endif
     }

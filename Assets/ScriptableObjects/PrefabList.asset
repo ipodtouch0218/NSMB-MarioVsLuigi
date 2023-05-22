@@ -18,6 +18,10 @@ MonoBehaviour:
     RawGuidValue: 6fe1d2f7545d144468b4dbaf10fabd89
   GameDataHolder:
     RawGuidValue: 6f681abe0b48a534cb6d0c74c31b3a5f
+  TileManager:
+    RawGuidValue: 51fc8b1fda1033b4f97419526359da76
+  TilemapChunk:
+    RawGuidValue: 455c9006a61c18c42b6f40bbcc702e68
   Obj_Fireball:
     RawGuidValue: 00a2ef66a322a694c837b29404f2af49
   Obj_LooseCoin:

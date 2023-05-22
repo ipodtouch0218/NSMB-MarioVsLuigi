@@ -3494,54 +3494,6 @@ MonoBehaviour:
   target: {fileID: 0}
   trackMinX: -269
   trackMaxX: 269
---- !u!1 &4263618157110387846
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2095196110265286081}
-  - component: {fileID: 1814937730606994308}
-  m_Layer: 0
-  m_Name: Chunks
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2095196110265286081
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4263618157110387846}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5500062339093502141}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1814937730606994308
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4263618157110387846}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64a158b8178117f4ab99f51f91ded8c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  sceneTiles: []
-  chunks: []
-  gm: {fileID: 5500062339093502114}
 --- !u!1 &4290463620930338631
 GameObject:
   m_ObjectHideFlags: 0
@@ -4572,7 +4524,6 @@ Transform:
   - {fileID: 6688153604999533797}
   - {fileID: 6190145402886522113}
   - {fileID: 4435157000410621849}
-  - {fileID: 2095196110265286081}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4624,7 +4575,7 @@ MonoBehaviour:
   gameStartTimestamp: 0
   gameEndTimestamp: 0
   paused: 0
-  tileManager: {fileID: 1814937730606994308}
+  tileManager: {fileID: 0}
   spectationManager: {fileID: 3058852347368318539}
   musicManager: {fileID: 1965679957714577119}
   music: {fileID: 3063105634746227037}

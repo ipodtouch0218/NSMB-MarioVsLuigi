@@ -10,7 +10,7 @@ using NSMB.Game;
 using NSMB.Translation;
 using NSMB.Utils;
 
-public class UIUpdater : NetworkBehaviour {
+public class UIUpdater : MonoBehaviour {
 
     public static UIUpdater Instance { get; set; }
 
@@ -22,6 +22,9 @@ public class UIUpdater : NetworkBehaviour {
     [SerializeField] private Sprite storedItemNull;
     [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     [SerializeField] private Image itemReserve, itemColor;
+
+    //---Properties
+    private NetworkRunner Runner => NetworkHandler.Runner;
 
     //---Private Variables
     private readonly List<Image> backgrounds = new();
@@ -39,16 +42,14 @@ public class UIUpdater : NetworkBehaviour {
     }
 
     public void OnEnable() {
+        GameData.OnAllPlayersLoaded += OnAllPlayersLoaded;
         GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     public void OnDisable() {
+        GameData.OnAllPlayersLoaded -= OnAllPlayersLoaded;
         GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
-    }
-
-    private void OnLanguageChanged(TranslationManager obj) {
-        UpdatePingText();
     }
 
     public void Start() {
@@ -65,30 +66,7 @@ public class UIUpdater : NetworkBehaviour {
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
     }
 
-    public override void Spawned() {
-        teams = SessionData.Instance.Teams;
-        teamManager = GameManager.Instance.teamManager;
-
-        localPlayer = Runner.LocalPlayer;
-
-        foreach (Image bg in backgrounds)
-            bg.color = GameManager.Instance.levelUIColor;
-
-        Color uiColor = GameManager.Instance.levelUIColor;
-        uiColor.r -= 0.2f;
-        uiColor.g -= 0.2f;
-        uiColor.b -= 0.2f;
-        itemColor.color = uiColor;
-
-        teamsParent.SetActive(teams);
-
-        if (!Runner.IsServer)
-            StartCoroutine(UpdatePingTextCoroutine());
-
-        UpdatePingText();
-    }
-
-    public override void Render() {
+    public void Update() {
 
         if (!player) {
             if (!uiHidden)
@@ -224,6 +202,34 @@ public class UIUpdater : NetworkBehaviour {
             int ping = GetCurrentPing();
             uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
         }
+    }
+
+    //---Callbacks
+    private void OnLanguageChanged(TranslationManager obj) {
+        UpdatePingText();
+    }
+
+    private void OnAllPlayersLoaded() {
+        teams = SessionData.Instance.Teams;
+        teamManager = GameManager.Instance.teamManager;
+
+        localPlayer = Runner.LocalPlayer;
+
+        foreach (Image bg in backgrounds)
+            bg.color = GameManager.Instance.levelUIColor;
+
+        Color uiColor = GameManager.Instance.levelUIColor;
+        uiColor.r -= 0.2f;
+        uiColor.g -= 0.2f;
+        uiColor.b -= 0.2f;
+        itemColor.color = uiColor;
+
+        teamsParent.SetActive(teams);
+
+        if (!Runner.IsServer)
+            StartCoroutine(UpdatePingTextCoroutine());
+
+        UpdatePingText();
     }
 
     public void OnReserveItemIconClicked() {
