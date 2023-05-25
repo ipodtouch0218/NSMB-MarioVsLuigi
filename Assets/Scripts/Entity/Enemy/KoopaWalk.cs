@@ -269,6 +269,10 @@ namespace NSMB.Entities.Enemies {
                         Kick(player, player.body.position.x < body.position.x, 1f, true);
                         PreviousHolder = player;
                     }
+                    if (player.IsDrilling) {
+                        player.IsDrilling = false;
+                        player.DoEntityBounce = true;
+                    }
                     return;
                 }
 

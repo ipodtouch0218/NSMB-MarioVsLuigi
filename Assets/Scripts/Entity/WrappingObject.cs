@@ -39,9 +39,9 @@ public class WrappingObject : SimulationBehaviour, IAfterUpdate {
 
     public override void FixedUpdateNetwork() {
         if (nrb.Rigidbody.position.x < GameManager.Instance.LevelMinX) {
-            nrb.TeleportToPosition(nrb.Rigidbody.position + width, interpolateBackwards: false);
+            nrb.TeleportToPosition(nrb.Rigidbody.position + width);
         } else if (nrb.Rigidbody.position.x > GameManager.Instance.LevelMaxX) {
-            nrb.TeleportToPosition(nrb.Rigidbody.position - width, interpolateBackwards: false);
+            nrb.TeleportToPosition(nrb.Rigidbody.position - width);
         }
     }
 }

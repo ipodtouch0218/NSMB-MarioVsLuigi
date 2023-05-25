@@ -26,14 +26,16 @@ MonoBehaviour:
     m_Output: 0
     m_ColliderType: 1
     m_RandomTransform: 0
-    m_Neighbors: 0200000001000000
+    m_Neighbors: 0100000002000000
     m_NeighborPositions:
+    - {x: 1, y: 0, z: 0}
     - {x: -1, y: 0, z: 0}
-    - {x: -2, y: 0, z: 0}
     m_RuleTransform: 2
   siblings:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 4c2ac97eb99a4754990584e8c9bf5ea7, type: 2}
+  - {fileID: 11400000, guid: 843b27987e908ea499d454f660d4a7c5, type: 2}
   isBackgroundTile: 0
   iceSkidding: 0
+  isSlope: 1
   footstepSound: 93
   footstepParticle: 4

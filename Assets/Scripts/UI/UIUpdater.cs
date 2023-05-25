@@ -108,7 +108,7 @@ public class UIUpdater : MonoBehaviour {
     }
 
     private void UpdateTextUI() {
-        if (!player || GameData.Instance.GameEnded)
+        if (!player)
             return;
 
         if (teams) {
@@ -140,6 +140,9 @@ public class UIUpdater : MonoBehaviour {
 
         if (SessionData.Instance.Timer > 0) {
             float? timeRemaining = GameData.Instance.GameEndTimer.RemainingRenderTime(Runner);
+
+            if ((GameData.Instance.IsMusicEnabled || GameData.Instance.GameEnded) && timeRemaining == null)
+                timeRemaining = 0;
 
             if (timeRemaining != null) {
                 int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);

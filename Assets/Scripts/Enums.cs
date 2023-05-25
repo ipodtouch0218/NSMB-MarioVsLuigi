@@ -18,10 +18,10 @@ public static class Enums {
     }
 
     public enum GameState : byte {
-        Loading,  // Waiting for all players to finish loading the game
-        Starting, // All players are loaded, starting animation is playing
-        Playing,  // Game is actively playing
-        Ended     // Game ended, returning to the room menu soon
+        Loading = 0,  // Waiting for all players to finish loading the game
+        Starting = 1, // All players are loaded, starting animation is playing
+        Playing = 2,  // Game is actively playing
+        Ended = 3     // Game ended, returning to the room menu soon
     }
 
     #region ANIMATION & MUSIC

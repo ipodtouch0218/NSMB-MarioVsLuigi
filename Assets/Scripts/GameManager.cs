@@ -74,7 +74,7 @@ namespace NSMB.Game {
         [SerializeField] internal TeamScoreboard teamScoreboardElement;
         [SerializeField] private GameObject pauseUI;
         [SerializeField] private GameObject nametagPrefab;
-        [SerializeField] public Tilemap tilemap;
+        [SerializeField] public Tilemap tilemap, semisolidTilemap;
         [SerializeField] public GameObject objectPoolParent;
         [SerializeField] public TMP_Text winText;
         [SerializeField] public Animator winTextAnimator;
@@ -213,11 +213,12 @@ namespace NSMB.Game {
 
         //---UI Callbacks
         public void PauseEndMatch() {
+            if (!NetworkHandler.Runner.IsServer)
+                return;
+
             pauseUI.SetActive(false);
             sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-
-            if (NetworkHandler.Runner.IsServer)
-                GameData.Instance.Rpc_EndGame(PlayerRef.None);
+            GameData.Instance.Rpc_EndGame(PlayerRef.None);
         }
 
         public void PauseQuitGame() {
@@ -232,11 +233,17 @@ namespace NSMB.Game {
 
         //---Debug
 #if UNITY_EDITOR
+        private static int DebugSpawns = 10;
         private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f), StarSpawnBox = new(1f, 0.9f, 0.2f, 0.2f);
         private static readonly Vector3 OneFourth = new(0.25f, 0.25f);
         public void OnDrawGizmos() {
             if (!tilemap)
                 return;
+
+            for (int i = 0; i < DebugSpawns; i++) {
+                Gizmos.color = new Color((float) i / DebugSpawns, 0, 0, 0.75f);
+                Gizmos.DrawCube(GetSpawnpoint(i, DebugSpawns) + Vector3.down * 0.25f, Vector2.one * 0.5f);
+            }
 
             Vector3 size = new(LevelWidth, LevelHeight);
             Vector3 origin = new(LevelMinX + (LevelWidth * 0.5f), LevelMinY + (LevelHeight * 0.5f), 1);
@@ -266,6 +273,16 @@ namespace NSMB.Game {
                 Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
                 Gizmos.DrawIcon(starSpawn.transform.position, "star", true, StarSpawnTint);
             }
+        }
+
+        private Vector3 GetSpawnpoint(int playerIndex, int players) {
+
+            float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI / (2 * players));
+            float scale = (2f - (players + 1f) / players) * spawnCircleWidth;
+
+            Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * spawnCircleHeight : 0), 0);
+            Utils.Utils.WrapWorldLocation(ref spawn);
+            return spawn;
         }
 #endif
     }

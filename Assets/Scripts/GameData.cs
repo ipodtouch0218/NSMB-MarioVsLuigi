@@ -50,6 +50,7 @@ namespace NSMB.Game {
 
         //---Public Variables
         public NetworkRNG Random;
+        public float gameEndTime;
 
         //---Private Variables
         private readonly HashSet<NetworkObject> networkObjects = new();
@@ -169,13 +170,12 @@ namespace NSMB.Game {
                             //60 second warning
                             hurryUpSoundPlayed = true;
                             AudioSfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
-                        } else if (remainingTicks < (10 * tickrate)) {
+                        } else if (remainingTicks <= (10 * tickrate)) {
                             //10 second "dings"
                             if (remainingTicks % tickrate == 0)
                                 AudioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
-
                             //at 3 seconds, double speed
-                            if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
+                            else if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
                                 AudioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
                         }
                     }
@@ -202,7 +202,7 @@ namespace NSMB.Game {
 
             bool hasFirstPlace = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
             int aliveTeams = teamManager.GetAliveTeamCount();
-            bool timeUp = GameEndTimer.Expired(Runner);
+            bool timeUp = GameEndTimer.ExpiredOrNotRunning(Runner);
 
             if (aliveTeams == 0) {
                 // All teams dead, draw?
@@ -365,6 +365,7 @@ namespace NSMB.Game {
 
             // TODO: don't use a coroutine?
             // eh, it should be alrite, since it's an RPC and isn't predictive.
+            gameEndTime = Runner.SimulationTime;
             StartCoroutine(EndGame(team));
         }
 
@@ -583,16 +584,5 @@ namespace NSMB.Game {
         public static void OnGameStartTimerChanged(Changed<GameData> changed) {
             GameManager.teamScoreboardElement.OnTeamsFinalized(GameManager.teamManager);
         }
-
-        //---Debug
-#if UNITY_EDITOR
-        private static readonly int DebugSpawns = 10;
-        public void OnDrawGizmos() {
-            for (int i = 0; i < DebugSpawns; i++) {
-                Gizmos.color = new Color((float) i / DebugSpawns, 0, 0, 0.75f);
-                Gizmos.DrawCube(GetSpawnpoint(i, DebugSpawns) + Vector3.down * 0.25f, Vector2.one * 0.5f);
-            }
-        }
-#endif
     }
 }

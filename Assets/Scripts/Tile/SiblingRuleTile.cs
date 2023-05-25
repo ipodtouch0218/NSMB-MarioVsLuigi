@@ -13,7 +13,7 @@ namespace NSMB.Tiles {
     public class SiblingRuleTile : RuleTile {
 
         //---Serialized Variables
-        [SerializeField] private List<TileBase> siblings;
+        [SerializeField] protected List<TileBase> siblings;
 
         public override bool RuleMatch(int neighbor, TileBase other) {
             return neighbor switch {

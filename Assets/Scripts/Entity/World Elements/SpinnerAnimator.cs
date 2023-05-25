@@ -5,7 +5,7 @@ using NSMB.Entities.Player;
 
 namespace NSMB.Entities.World {
 
-    [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
+    [OrderBefore(typeof(PlayerController))]
     public class SpinnerAnimator : NetworkBehaviour {
 
         //---Static Variables

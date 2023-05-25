@@ -480,11 +480,11 @@ namespace NSMB.Utils {
             bool big = gm.spawnBigPowerups;
             bool vertical = gm.spawnVerticalPowerups;
 
-            bool canSpawnMega = !GameData.Instance.AlivePlayers.Any(pc => pc.State == Enums.PowerupState.MegaMushroom);
+            bool cantSpawnMega = GameData.Instance.AlivePlayers.Any(pc => pc.State == Enums.PowerupState.MegaMushroom);
 
             float totalChance = 0;
             foreach (Powerup powerup in powerups) {
-                if (powerup.state == Enums.PowerupState.MegaMushroom && canSpawnMega)
+                if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega)
                     continue;
                 if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
                     continue;
@@ -494,7 +494,7 @@ namespace NSMB.Utils {
 
             float rand = GameData.Instance.Random.NextSingleExclusive() * totalChance;
             foreach (Powerup powerup in powerups) {
-                if (powerup.state == Enums.PowerupState.MegaMushroom && canSpawnMega)
+                if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega)
                     continue;
                 if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
                     continue;

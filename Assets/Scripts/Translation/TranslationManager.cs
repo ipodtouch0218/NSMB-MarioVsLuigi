@@ -29,19 +29,6 @@ namespace NSMB.Translation {
             // Load default (english, unmodified) translations as a fallback
             defaultTranslations = LoadLocaleFromJson(defaultLocale.text);
             defaultLocales = Resources.LoadAll<TextAsset>("Data/lang");
-
-            /*
-            // (NON-WEBGL / NON-MOBILE) Copy all languages from assets to streaming assets
-            if (IsDesktopPlatform()) {
-                Directory.CreateDirectory(Application.streamingAssetsPath + "/lang");
-                foreach (TextAsset locale in locales) {
-                    string path = Path.Combine(Application.streamingAssetsPath, "lang", locale.name + ".json");
-                    if (!File.Exists(path)) {
-                        File.WriteAllText(path, locale.text);
-                    }
-                }
-            }
-            */
             instantiated = true;
         }
 
@@ -58,16 +45,18 @@ namespace NSMB.Translation {
 
             bool foundTranslations = false;
 
-            if (IsDesktopPlatform()) {
-                // Find the language file from the filesystem
-                string path = Path.Combine(Application.streamingAssetsPath, "lang", newLocale + ".json");
-                if (File.Exists(path)) {
-                    StreamReader file = File.OpenText(path);
-                    string json = file.ReadToEnd();
-                    translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                    foundTranslations = true;
+            try {
+                if (IsDesktopPlatform()) {
+                    // Find the language file from the filesystem
+                    string path = Path.Combine(Application.streamingAssetsPath, "lang", newLocale + ".json");
+                    if (File.Exists(path)) {
+                        StreamReader file = File.OpenText(path);
+                        string json = file.ReadToEnd();
+                        translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                        foundTranslations = true;
+                    }
                 }
-            }
+            } catch { }
 
             if (!foundTranslations) {
                 // Load the new language file from the resources (since we can't read from the filesystem)

@@ -51,7 +51,10 @@ namespace NSMB.Tiles {
             uniqueTilesList.Sort(new TileBaseSorter());
             gm.sceneTiles = uniqueTilesList.ToArray();
 
-            BoundsInt bounds = new(gm.levelMinTileX, gm.levelMinTileY , 0, gm.levelWidthTile, gm.levelHeightTile, 1);
+            int requiredChunksX = (int) Mathf.Ceil(gm.levelWidthTile / 16f);
+            int requiredChunksY = (int) Mathf.Ceil(gm.levelHeightTile / 16f);
+
+            BoundsInt bounds = new(gm.levelMinTileX, gm.levelMinTileY , 0, requiredChunksX * 16, requiredChunksY * 16, 1);
             TileBase[] tileBases = tilemap.GetTilesBlock(bounds);
             ushort[] tileIds = new ushort[tileBases.Length];
 
@@ -61,7 +64,7 @@ namespace NSMB.Tiles {
 
             gm.originalTiles = tileIds;
 
-            Debug.Log($"Successfully saved level data. {uniqueTilesList.Count} unique tiles ({gm.levelWidthTile} x {gm.levelHeightTile}).");
+            Debug.Log($"Successfully saved level data. {uniqueTilesList.Count} unique tiles ({gm.levelWidthTile} x {gm.levelHeightTile}, {requiredChunksX} x {requiredChunksY}).");
             EditorUtility.SetDirty(gm);
         }
 

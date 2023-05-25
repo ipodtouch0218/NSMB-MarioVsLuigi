@@ -19,5 +19,6 @@ MonoBehaviour:
   siblings: []
   isBackgroundTile: 0
   iceSkidding: 0
+  isSlope: 1
   footstepSound: 93
   footstepParticle: 4

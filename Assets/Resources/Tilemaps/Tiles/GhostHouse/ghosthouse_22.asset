@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 31 Volcano (yellow)_32
+  m_Name: ghosthouse_22
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 111970168, guid: 34660a1de22c6a34aac084333e781433, type: 3}
+  m_Sprite: {fileID: -1362688617, guid: 01739c641144da24c80d500fb492af79, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

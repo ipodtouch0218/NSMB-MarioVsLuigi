@@ -318,10 +318,12 @@ namespace NSMB.Entities.Collectable.Powerups {
         public override void OnCollectedChanged() {
             sRenderer.enabled = !Collector;
 
-            if (Collector) {
-                particles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-            } else {
-                particles.Play(true);
+            if (particles) {
+                if (Collector) {
+                    particles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                } else {
+                    particles.Play(true);
+                }
             }
         }
 

@@ -10549,6 +10549,8 @@ MonoBehaviour:
   _IgnoreCoyoteTime:
     _value: 0
   _FloorAngle: 0
+  _OnSlope:
+    _value: 0
   _OnIce:
     _value: 0
   _IsJumping:
@@ -10565,10 +10567,10 @@ MonoBehaviour:
     _value: 0
   _IsWeakKnockback:
     _value: 0
+  _IsForwardsKnockback:
+    _value: 0
   _KnockbackAttacker: {fileID: 0}
   _IsGroundpounding:
-    _value: 0
-  _WasGroundedLastFrame:
     _value: 0
   _OnSpinner: {fileID: 0}
   _IsSpinnerFlying:
@@ -10597,6 +10599,8 @@ MonoBehaviour:
   _IsDead:
     _value: 1
   _IsRespawning:
+    _value: 0
+  _FireDeath:
     _value: 0
   _HeldEntity: {fileID: 0}
   _HoldStartTime: 0
@@ -10643,10 +10647,9 @@ MonoBehaviour:
   hitRight: 0
   stationaryGiantEnd: 0
   powerupFlash: 0
+  previousTickVelocity: {x: 0, y: 0}
+  previousTickPosition: {x: 0, y: 0}
   data: {fileID: 0}
-  giantSavedVelocity: {x: 0, y: 0}
-  previousFrameVelocity: {x: 0, y: 0}
-  previousFramePosition: {x: 0, y: 0}
 --- !u!114 &79918617084146557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10704,7 +10707,7 @@ Rigidbody2D:
   m_Mass: 0.147
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
