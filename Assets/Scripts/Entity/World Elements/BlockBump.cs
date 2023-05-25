@@ -2,6 +2,7 @@
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Entities.Collectable.Powerups;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;

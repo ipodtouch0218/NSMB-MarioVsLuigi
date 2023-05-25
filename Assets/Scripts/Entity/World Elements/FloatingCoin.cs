@@ -1,20 +1,22 @@
 using UnityEngine;
 
-public class FloatingCoin : Coin {
+namespace NSMB.Entities.Collectable {
+    public class FloatingCoin : Coin {
 
-    //---Components
-    [SerializeField] private BoxCollider2D hitbox;
+        //---Components
+        [SerializeField] private BoxCollider2D hitbox;
 
-    public override void OnValidate() {
-        base.OnValidate();
-        if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
-    }
+        public override void OnValidate() {
+            base.OnValidate();
+            if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
+        }
 
-    public override void FixedUpdateNetwork() {
-        hitbox.enabled = !Collector;
-    }
+        public override void FixedUpdateNetwork() {
+            hitbox.enabled = !Collector;
+        }
 
-    public void ResetCoin() {
-        Collector = null;
+        public void ResetCoin() {
+            Collector = null;
+        }
     }
 }

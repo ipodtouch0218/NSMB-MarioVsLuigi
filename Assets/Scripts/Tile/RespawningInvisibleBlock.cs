@@ -2,71 +2,76 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Entities.Player;
+using NSMB.Entities.Collectable;
 using NSMB.Game;
-using NSMB.Utils;
+using NSMB.Tiles;
 
-public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, IHaveTileDependencies {
+namespace NSMB.Entities.World {
 
-    //---Static Variables
-    private static readonly Vector3 BlockOffset = new(0.25f, 0.25f);
-    private static readonly Color GizmoColor = new(1, 1, 1, 0.5f);
-    private static readonly Vector2 SpawnOffset = new(0, -0.25f);
+    public class RespawningInvisibleBlock : NetworkBehaviour, IPlayerInteractable, IHaveTileDependencies {
 
-    //---Networked Variables
-    [Networked] private TickTimer BumpTimer { get; set; }
+        //---Static Variables
+        private static readonly Vector3 BlockOffset = new(0.25f, 0.25f);
+        private static readonly Color GizmoColor = new(1, 1, 1, 0.5f);
+        private static readonly Vector2 SpawnOffset = new(0, -0.25f);
 
-    //---Serialized Variables
-    [SerializeField] private TileBase bumpTile;
-    [SerializeField] private TileBase resultTile;
+        //---Networked Variables
+        [Networked] private TickTimer BumpTimer { get; set; }
 
-    public void OnValidate() {
-        Start();
-    }
+        //---Serialized Variables
+        [SerializeField] private TileBase bumpTile;
+        [SerializeField] private TileBase resultTile;
 
-    public void Start() {
-        transform.position = new Vector3(Mathf.FloorToInt(transform.position.x * 2) / 2f, Mathf.FloorToInt(transform.position.y * 2) / 2f, transform.position.z) + BlockOffset;
-    }
+        public void OnValidate() {
+            Start();
+        }
 
-    public void InteractWithPlayer(PlayerController player) {
-        if (!BumpTimer.ExpiredOrNotRunning(Runner))
-            return;
+        public void Start() {
+            transform.position = new Vector3(Mathf.FloorToInt(transform.position.x * 2) / 2f, Mathf.FloorToInt(transform.position.y * 2) / 2f, transform.position.z) + BlockOffset;
+        }
 
-        //no block can be at our location
-        Vector2Int tileLocation = Utils.WorldToTilemapPosition(transform.position);
-        if (Utils.GetTileAtTileLocation(tileLocation))
-            return;
+        public void InteractWithPlayer(PlayerController player) {
+            if (!BumpTimer.ExpiredOrNotRunning(Runner))
+                return;
 
-        //player has to be moving upwards
-        if (player.body.velocity.y < 0.1f)
-            return;
+            //no block can be at our location
+            Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(transform.position);
+            if (Utils.Utils.GetTileAtTileLocation(tileLocation))
+                return;
 
-        //player has to bump us from below
-        if (player.body.position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.body.velocity.y * Runner.DeltaTime) > transform.position.y)
-            return;
+            //player has to be moving upwards
+            if (player.body.velocity.y < 0.1f)
+                return;
 
-        BumpTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
-        DoBump(tileLocation, player);
-        player.BlockBumpSoundCounter++;
+            //player has to bump us from below
+            if (player.body.position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.body.velocity.y * Runner.DeltaTime) > transform.position.y)
+                return;
 
-        //stop player velocity
-        player.body.velocity = new(player.body.velocity.x, 0);
-    }
+            BumpTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+            DoBump(tileLocation, player);
+            player.BlockBumpSoundCounter++;
 
-    public void DoBump(Vector2Int tileLocation, PlayerController player) {
-        Vector3 location = Utils.TilemapToWorldPosition(tileLocation) + BlockOffset;
-        Coin.GivePlayerCoin(player, location);
+            //stop player velocity
+            player.body.velocity = new(player.body.velocity.x, 0);
+        }
 
-        GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
-            resultTile, false, SpawnOffset, true, NetworkPrefabRef.Empty);
-    }
+        public void DoBump(Vector2Int tileLocation, PlayerController player) {
+            Vector3 location = Utils.Utils.TilemapToWorldPosition(tileLocation) + BlockOffset;
+            Coin.GivePlayerCoin(player, location);
+
+            GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
+                resultTile, false, SpawnOffset, true, NetworkPrefabRef.Empty);
+        }
 
 #if UNITY_EDITOR
-    public void OnDrawGizmos() {
-        Gizmos.DrawIcon(new Vector3(Mathf.FloorToInt(transform.position.x * 2) / 2f, Mathf.FloorToInt(transform.position.y * 2) / 2f, transform.position.z) + BlockOffset, "HiddenBlock", true, GizmoColor);
-    }
+        public void OnDrawGizmos() {
+            Gizmos.DrawIcon(new Vector3(Mathf.FloorToInt(transform.position.x * 2) / 2f, Mathf.FloorToInt(transform.position.y * 2) / 2f, transform.position.z) + BlockOffset, "HiddenBlock", true, GizmoColor);
+        }
 #endif
 
-    public TileBase[] GetTileDependencies() {
-        return new TileBase[] { bumpTile, resultTile };
+        public TileBase[] GetTileDependencies() {
+            return new TileBase[] { bumpTile, resultTile };
+        }
     }
 }

@@ -5,110 +5,112 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 
-[OrderAfter(typeof(NetworkPhysicsSimulation2D))]
-public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
+namespace NSMB.Entities {
+    [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
+    public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
-    //---Networked Variables
-    [Networked(OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
-    [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
-    [Networked] public TickTimer DespawnTimer { get; set; }
+        //---Networked Variables
+        [Networked(OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
+        [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
+        [Networked] public TickTimer DespawnTimer { get; set; }
 
-    //---Components
-    [SerializeField] public Rigidbody2D body;
-    [SerializeField] public AudioSource sfx;
+        //---Components
+        [SerializeField] public Rigidbody2D body;
+        [SerializeField] public AudioSource sfx;
 
-    //---Properties
-    public bool IsRespawningEntity => Object.IsSceneObject;
+        //---Properties
+        public bool IsRespawningEntity => Object.IsSceneObject;
 
-    //---Public Variables
-    public bool checkForNearbyPlayersWhenRespawning = true;
+        //---Public Variables
+        public bool checkForNearbyPlayersWhenRespawning = true;
 
-    //---Private Variables
-    private bool brickBreakSound;
-    protected Vector2 spawnLocation;
+        //---Private Variables
+        private bool brickBreakSound;
+        protected Vector2 spawnLocation;
 
-    public virtual void OnValidate() {
-        if (!body) body = GetComponent<Rigidbody2D>();
-        if (!sfx) sfx = GetComponent<AudioSource>();
-    }
-
-    public virtual void Start() {
-        if (body)
-            spawnLocation = body.position;
-    }
-
-    public override void Spawned() {
-        GameManager.Instance.networkObjects.Add(Object);
-        if (IsRespawningEntity)
-            DespawnEntity();
-        OnFacingRightChanged();
-    }
-
-    public override void FixedUpdateNetwork() {
-        if (DespawnTimer.Expired(Runner)) {
-            DespawnTimer = TickTimer.None;
-            DespawnEntity();
-            return;
+        public virtual void OnValidate() {
+            if (!body) body = GetComponent<Rigidbody2D>();
+            if (!sfx) sfx = GetComponent<AudioSource>();
         }
-    }
 
-    public void Update() {
-        brickBreakSound = false;
-    }
+        public virtual void Start() {
+            if (body)
+                spawnLocation = body.position;
+        }
 
-    public void PlaySound(Enums.Sounds sound, CharacterData character = null, byte variant = 0, float volume = 1f) {
-        if (sound == Enums.Sounds.World_Block_Break) {
-            if (brickBreakSound)
+        public override void Spawned() {
+            GameManager.Instance.networkObjects.Add(Object);
+            if (IsRespawningEntity)
+                DespawnEntity();
+            OnFacingRightChanged();
+        }
+
+        public override void FixedUpdateNetwork() {
+            if (DespawnTimer.Expired(Runner)) {
+                DespawnTimer = TickTimer.None;
+                DespawnEntity();
+                return;
+            }
+        }
+
+        public void Update() {
+            brickBreakSound = false;
+        }
+
+        public void PlaySound(Enums.Sounds sound, CharacterData character = null, byte variant = 0, float volume = 1f) {
+            if (sound == Enums.Sounds.World_Block_Break) {
+                if (brickBreakSound)
+                    return;
+
+                brickBreakSound = true;
+            }
+
+            sfx.PlayOneShot(sound, character, variant, volume);
+        }
+
+        public virtual void RespawnEntity() {
+            if (IsActive)
                 return;
 
-            brickBreakSound = true;
+            if (body) {
+                body.position = spawnLocation;
+                body.velocity = Vector2.zero;
+                body.rotation = 0;
+            }
+            IsActive = true;
         }
 
-        sfx.PlayOneShot(sound, character, variant, volume);
-    }
+        public virtual void DespawnEntity(object data = null) {
+            if (!IsRespawningEntity) {
+                Runner.Despawn(Object);
+                return;
+            }
 
-    public virtual void RespawnEntity() {
-        if (IsActive)
-            return;
+            if (!IsActive)
+                return;
 
-        if (body) {
-            body.position = spawnLocation;
-            body.velocity = Vector2.zero;
-            body.rotation = 0;
-        }
-        IsActive = true;
-    }
-
-    public virtual void DespawnEntity(object data = null) {
-        if (!IsRespawningEntity) {
-            Runner.Despawn(Object);
-            return;
+            if (body) {
+                body.position = spawnLocation;
+                body.velocity = Vector2.zero;
+                body.rotation = 0;
+            }
+            IsActive = false;
         }
 
-        if (!IsActive)
-            return;
+        public virtual void OnIsActiveChanged() { }
 
-        if (body) {
-            body.position = spawnLocation;
-            body.velocity = Vector2.zero;
-            body.rotation = 0;
+        public virtual void OnFacingRightChanged() { }
+
+        //---IBlockBumpable overrides
+        public abstract void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction);
+
+        //---OnChangeds
+        public static void OnFacingRightChanged(Changed<BasicEntity> changed) {
+            changed.Behaviour.OnFacingRightChanged();
         }
-        IsActive = false;
-    }
 
-    public virtual void OnIsActiveChanged() { }
-
-    public virtual void OnFacingRightChanged() { }
-
-    //---IBlockBumpable overrides
-    public abstract void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction);
-
-    //---OnChangeds
-    public static void OnFacingRightChanged(Changed<BasicEntity> changed) {
-        changed.Behaviour.OnFacingRightChanged();
-    }
-
-    public static void OnIsActiveChanged(Changed<BasicEntity> changed) {
-        changed.Behaviour.OnIsActiveChanged();
+        public static void OnIsActiveChanged(Changed<BasicEntity> changed) {
+            changed.Behaviour.OnIsActiveChanged();
+        }
     }
 }

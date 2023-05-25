@@ -1,5 +1,7 @@
-public interface IPlayerInteractable {
+namespace NSMB.Entities.Player {
+    public interface IPlayerInteractable {
 
-    public void InteractWithPlayer(PlayerController player);
+        public void InteractWithPlayer(PlayerController player);
 
+    }
 }

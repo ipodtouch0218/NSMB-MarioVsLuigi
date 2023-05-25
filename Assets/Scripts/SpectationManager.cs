@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 
 using Fusion;
+using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Translation;

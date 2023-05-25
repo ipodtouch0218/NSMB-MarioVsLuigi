@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+using NSMB.Entities;
+
 namespace NSMB.Tiles {
     public abstract class InteractableTile : AnimatedTile {
 

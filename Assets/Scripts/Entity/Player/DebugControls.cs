@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 using Fusion;
+using NSMB.Entities;
+using NSMB.Entities.Collectable;
+using NSMB.Entities.Collectable.Powerups;
+using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 

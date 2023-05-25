@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
+using NSMB.Entities.Player;
+
 public class PlayerTrackIcon : TrackIcon {
 
     //---Static Variables

@@ -1,38 +1,45 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Entities.Player;
 
-public class PowerupCollectMegaMushroom : MonoBehaviour, IPowerupCollect {
+namespace NSMB.Entities.Collectable.Powerups {
+    public class PowerupCollectMegaMushroom : MonoBehaviour, IPowerupCollect {
 
-    public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
-        if (player.State == Enums.PowerupState.MegaMushroom)
-            return PowerupReserveResult.ReserveNewPowerup;
+        private GameObject particle;
 
-        NetworkRunner runner = player.Runner;
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
+            if (player.State == Enums.PowerupState.MegaMushroom)
+                return PowerupReserveResult.ReserveNewPowerup;
 
-        player.PreviousState = player.State;
-        player.State = Enums.PowerupState.MegaMushroom;
-        player.powerupFlash = 2;
-        player.IsCrouching |= player.ForceCrouchCheck();
-        player.IsPropellerFlying = false;
-        player.UsedPropellerThisJump = false;
-        player.IsDrilling &= player.IsSpinnerFlying;
-        player.PropellerLaunchTimer = TickTimer.None;
+            NetworkRunner runner = player.Runner;
 
-        player.GiantStartTimer = TickTimer.CreateFromSeconds(runner, player.giantStartTime);
-        player.GiantTimer = TickTimer.CreateFromSeconds(runner, 15f + player.giantStartTime);
-        player.IsInKnockback = false;
-        player.IsGroundpounding = false;
-        player.IsCrouching = false;
-        player.IsPropellerFlying = false;
-        player.UsedPropellerThisJump = false;
-        player.IsSpinnerFlying = false;
-        player.IsDrilling = false;
-        player.IsInShell = false;
-        transform.localScale = Vector3.one;
-        Instantiate(PrefabList.Instance.Particle_Giant, player.transform.position, Quaternion.identity);
+            player.PreviousState = player.State;
+            player.State = Enums.PowerupState.MegaMushroom;
+            player.powerupFlash = 2;
+            player.IsCrouching |= player.ForceCrouchCheck();
+            player.IsPropellerFlying = false;
+            player.UsedPropellerThisJump = false;
+            player.IsDrilling &= player.IsSpinnerFlying;
+            player.PropellerLaunchTimer = TickTimer.None;
 
-        player.PlaySoundEverywhere(powerup.powerupScriptable.soundEffect);
-        return PowerupReserveResult.ReserveOldPowerup;
+            player.GiantStartTimer = TickTimer.CreateFromSeconds(runner, player.giantStartTime);
+            player.GiantTimer = TickTimer.CreateFromSeconds(runner, 15f + player.giantStartTime);
+            player.IsInKnockback = false;
+            player.IsGroundpounding = false;
+            player.IsCrouching = false;
+            player.IsPropellerFlying = false;
+            player.UsedPropellerThisJump = false;
+            player.IsSpinnerFlying = false;
+            player.IsDrilling = false;
+            player.IsInShell = false;
+            transform.localScale = Vector3.one;
+
+            if (!particle)
+                particle = Instantiate(PrefabList.Instance.Particle_Giant, player.transform.position, Quaternion.identity);
+
+            player.PlaySoundEverywhere(powerup.powerupScriptable.soundEffect);
+            return PowerupReserveResult.ReserveOldPowerup;
+        }
     }
 }

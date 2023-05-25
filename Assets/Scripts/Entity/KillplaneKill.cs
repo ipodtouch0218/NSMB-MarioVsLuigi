@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Entities;
 using NSMB.Game;
 
 public class KillplaneKill : SimulationBehaviour {

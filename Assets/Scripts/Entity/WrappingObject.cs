@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Entities;
+using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 

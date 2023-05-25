@@ -1,7 +1,9 @@
 using UnityEngine.Tilemaps;
 
-public interface IHaveTileDependencies {
+namespace NSMB.Tiles {
+    public interface IHaveTileDependencies {
 
-    TileBase[] GetTileDependencies();
+        TileBase[] GetTileDependencies();
 
+    }
 }

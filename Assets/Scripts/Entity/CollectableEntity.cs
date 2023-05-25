@@ -1,16 +1,20 @@
 using Fusion;
 
-public abstract class CollectableEntity : BasicEntity, IPlayerInteractable {
+using NSMB.Entities.Player;
 
-    //---Networked Variables
-    [Networked(OnChanged = nameof(OnCollectedChanged))] public PlayerController Collector { get; set; }
+namespace NSMB.Entities.Collectable {
+    public abstract class CollectableEntity : BasicEntity, IPlayerInteractable {
 
-    public virtual void OnCollectedChanged() {}
+        //---Networked Variables
+        [Networked(OnChanged = nameof(OnCollectedChanged))] public PlayerController Collector { get; set; }
 
-    public static void OnCollectedChanged(Changed<CollectableEntity> changed) {
-        changed.Behaviour.OnCollectedChanged();
+        public virtual void OnCollectedChanged() { }
+
+        public static void OnCollectedChanged(Changed<CollectableEntity> changed) {
+            changed.Behaviour.OnCollectedChanged();
+        }
+
+        //---IPlayerInteractable overrides
+        public abstract void InteractWithPlayer(PlayerController player);
     }
-
-    //---IPlayerInteractable overrides
-    public abstract void InteractWithPlayer(PlayerController player);
 }

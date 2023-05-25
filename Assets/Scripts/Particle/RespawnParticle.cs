@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using NSMB.Entities.Player;
+
 public class RespawnParticle : MonoBehaviour {
 
     public PlayerController player;

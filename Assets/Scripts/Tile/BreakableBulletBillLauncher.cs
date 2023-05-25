@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using NSMB.Entities;
+using NSMB.Entities.Player;
 using NSMB.Game;
 
 namespace NSMB.Tiles {

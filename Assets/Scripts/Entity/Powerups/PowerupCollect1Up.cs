@@ -1,13 +1,19 @@
 using UnityEngine;
 
-public class PowerupCollect1Up : MonoBehaviour, IPowerupCollect {
+using NSMB.Entities.Player;
 
-    private GameObject particle;
-    public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
-        player.Lives++;
+namespace NSMB.Entities.Collectable.Powerups {
+    public class PowerupCollect1Up : MonoBehaviour, IPowerupCollect {
 
-        particle = Instantiate(PrefabList.Instance.Particle_1Up, transform.position, Quaternion.identity);
+        private GameObject particle;
 
-        return PowerupReserveResult.None;
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
+            player.Lives++;
+
+            if (!particle)
+                particle = Instantiate(PrefabList.Instance.Particle_1Up, transform.position, Quaternion.identity);
+
+            return PowerupReserveResult.None;
+        }
     }
 }

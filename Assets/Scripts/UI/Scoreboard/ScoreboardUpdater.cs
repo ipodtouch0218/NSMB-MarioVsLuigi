@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 

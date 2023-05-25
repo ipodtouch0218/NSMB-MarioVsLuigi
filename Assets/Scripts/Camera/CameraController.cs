@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 

@@ -1,24 +1,27 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Entities.Player;
 
-public class PowerupCollectStarman : MonoBehaviour, IPowerupCollect {
+namespace NSMB.Entities.Collectable.Powerups {
+    public class PowerupCollectStarman : MonoBehaviour, IPowerupCollect {
 
-    public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
 
-        NetworkRunner runner = player.Runner;
+            NetworkRunner runner = player.Runner;
 
-        if (!player.IsStarmanInvincible)
-            player.StarCombo = 0;
+            if (!player.IsStarmanInvincible)
+                player.StarCombo = 0;
 
-        player.StarmanTimer = TickTimer.CreateFromSeconds(runner, 10f);
-        //player.PlaySound(powerup.powerupScriptable.soundEffect);
+            player.StarmanTimer = TickTimer.CreateFromSeconds(runner, 10f);
+            //player.PlaySound(powerup.powerupScriptable.soundEffect);
 
-        if (player.HeldEntity) {
-            player.HeldEntity.SpecialKill(player.FacingRight, false, 0);
-            player.SetHeldEntity(null);
+            if (player.HeldEntity) {
+                player.HeldEntity.SpecialKill(player.FacingRight, false, 0);
+                player.SetHeldEntity(null);
+            }
+
+            return PowerupReserveResult.NoneButPlaySound;
         }
-
-        return PowerupReserveResult.NoneButPlaySound;
     }
 }

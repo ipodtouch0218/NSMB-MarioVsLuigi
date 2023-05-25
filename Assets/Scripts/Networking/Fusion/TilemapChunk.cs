@@ -59,8 +59,7 @@ namespace NSMB.Tiles {
             if (initialized)
                 return;
 
-            Debug.Log($"TilemapChunk Spawned on tick {Runner.Tick}: {GameManager.Instance.tileManager}");
-            GameManager.Instance.tileManager.chunks.Add(this);
+            GameManager.Instance.tileManager.AddChunk(this);
             transform.SetParent(GameManager.Instance.tileManager.transform, true);
             LoadState();
 

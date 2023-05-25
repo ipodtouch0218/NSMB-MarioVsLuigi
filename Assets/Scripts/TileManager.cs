@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Entities;
+using NSMB.Entities.Collectable;
+using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 
@@ -23,7 +26,6 @@ namespace NSMB.Tiles {
 
         public void Awake() {
             GameManager.Instance.tileManager = this;
-            Debug.Log("TileManager Awake");
         }
 
         public void Start() {
@@ -39,6 +41,19 @@ namespace NSMB.Tiles {
                     );
                 });
             }
+        }
+
+        public void AddChunk(TilemapChunk chunk) {
+            if (chunks.Contains(chunk))
+                return;
+
+            chunks.Add(chunk);
+            chunks.Sort((chunkA, chunkB) => {
+                if (chunkA.ChunkY == chunkB.ChunkY)
+                    return chunkA.ChunkX - chunkB.ChunkX;
+
+                return chunkA.ChunkY - chunkB.ChunkY;
+            });
         }
 
         public void ResetMap() {

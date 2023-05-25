@@ -9,6 +9,10 @@ using UnityEngine.Tilemaps;
 using TMPro;
 
 using Fusion;
+using NSMB.Entities;
+using NSMB.Entities.Enemies;
+using NSMB.Entities.Collectable;
+using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Tiles;
 
@@ -233,10 +237,6 @@ namespace NSMB.Game {
         public void OnDrawGizmos() {
             if (!tilemap)
                 return;
-
-
-            BoundsInt bounds = new(levelMinTileX, levelMinTileY + levelHeightTile / 2, 0, levelWidthTile, levelHeightTile, 1);
-            Debug.DrawLine((Vector3) (bounds.min) / 2f, (Vector3) (bounds.max) / 2f, Color.red);
 
             Vector3 size = new(LevelWidth, LevelHeight);
             Vector3 origin = new(LevelMinX + (LevelWidth * 0.5f), LevelMinY + (LevelHeight * 0.5f), 1);

@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using NSMB.Entities.Collectable;
+
 public class StarTrackIcon : TrackIcon {
 
     //---Static Variables

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
+using NSMB.Entities.Collectable;
+using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Translation;

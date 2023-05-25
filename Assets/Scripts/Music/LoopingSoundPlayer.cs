@@ -56,4 +56,8 @@ public class LoopingSoundPlayer : MonoBehaviour {
     public void Pause() {
         audioSource.Pause();
     }
+
+    public void Stop() {
+        audioSource.Stop();
+    }
 }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using NSMB.Entities.Player;
+
 public class TeamManager {
 
     //---Private Variables

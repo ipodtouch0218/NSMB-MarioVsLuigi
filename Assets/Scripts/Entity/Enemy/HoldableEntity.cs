@@ -1,139 +1,141 @@
 ﻿using UnityEngine;
 
 using Fusion;
-using NSMB.Utils;
+using NSMB.Entities.Player;
 
-[OrderAfter(typeof(PlayerController))]
-[OrderBefore(typeof(WrappingObject))]
-public abstract class HoldableEntity : KillableEntity, IBeforeTick {
+namespace NSMB.Entities {
+    [OrderAfter(typeof(PlayerController))]
+    [OrderBefore(typeof(WrappingObject))]
+    public abstract class HoldableEntity : KillableEntity, IBeforeTick {
 
-    //---Networked Variables
-    [Networked] public PlayerController Holder { get; set; }
-    [Networked] public PlayerController PreviousHolder { get; set; }
-    [Networked] protected TickTimer ThrowInvincibility { get; set; }
-    [Networked] protected float CurrentKickSpeed { get; set; }
-    [Networked(OnChanged = nameof(OnKickedAnimCounterChanged))] protected byte KickedAnimCounter { get; set; }
+        //---Networked Variables
+        [Networked] public PlayerController Holder { get; set; }
+        [Networked] public PlayerController PreviousHolder { get; set; }
+        [Networked] protected TickTimer ThrowInvincibility { get; set; }
+        [Networked] protected float CurrentKickSpeed { get; set; }
+        [Networked(OnChanged = nameof(OnKickedAnimCounterChanged))] protected byte KickedAnimCounter { get; set; }
 
-    //---Serailized Variables
-    [SerializeField] protected float throwSpeed = 4.5f;
-    [SerializeField] protected NetworkRigidbody2D nrb;
+        //---Serailized Variables
+        [SerializeField] protected float throwSpeed = 4.5f;
+        [SerializeField] protected NetworkRigidbody2D nrb;
 
-    //--Misc Variables
-    public Vector3 holderOffset;
-    public bool canPlace = true, canKick = true;
-    private bool wasHeldLastTick;
+        //--Misc Variables
+        public Vector3 holderOffset;
+        public bool canPlace = true, canKick = true;
+        private bool wasHeldLastTick;
 
-    public override void OnValidate() {
-        base.OnValidate();
-        if (!nrb) nrb = GetComponentInParent<NetworkRigidbody2D>();
-    }
+        public override void OnValidate() {
+            base.OnValidate();
+            if (!nrb) nrb = GetComponentInParent<NetworkRigidbody2D>();
+        }
 
-    public override void Render() {
-        if (Holder)
-            transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
-    }
+        public override void Render() {
+            if (Holder)
+                transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
+        }
 
-    public override void FixedUpdateNetwork() {
-        if (Holder) {
-            body.velocity = Holder.body.velocity;
-            transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
-            //body.velocity = Vector2.zero;
+        public override void FixedUpdateNetwork() {
+            if (Holder) {
+                body.velocity = Holder.body.velocity;
+                transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
+                //body.velocity = Vector2.zero;
 
-            // Teleport check
-            Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
-            Vector2 diff = newPosition - body.position;
-            Utils.WrapWorldLocation(ref newPosition);
+                // Teleport check
+                Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
+                Vector2 diff = newPosition - body.position;
+                Utils.Utils.WrapWorldLocation(ref newPosition);
 
-            if (!wasHeldLastTick || Mathf.Abs(newPosition.x - body.position.x) > 2) {
-                nrb.TeleportToPosition(newPosition, diff);
+                if (!wasHeldLastTick || Mathf.Abs(newPosition.x - body.position.x) > 2) {
+                    nrb.TeleportToPosition(newPosition, diff);
+                } else {
+                    body.position = newPosition;
+                }
+
+                hitbox.enabled = false;
+                CheckForEntityCollisions();
             } else {
-                body.position = newPosition;
+                hitbox.enabled = true;
+                base.FixedUpdateNetwork();
             }
-
-            hitbox.enabled = false;
-            CheckForEntityCollisions();
-        } else {
-            hitbox.enabled = true;
-            base.FixedUpdateNetwork();
         }
-    }
 
-    public void BeforeTick() {
-        wasHeldLastTick = Holder;
-    }
-
-    public virtual void Kick(PlayerController kicker, bool toRight, float kickFactor, bool groundpound) {
-        if (Holder)
-            return;
-
-        if (kicker) {
-            ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
-            PreviousHolder = kicker;
+        public void BeforeTick() {
+            wasHeldLastTick = Holder;
         }
-        FacingRight = toRight;
-        KickedAnimCounter++;
-        CurrentKickSpeed = throwSpeed + 1.5f * kickFactor;
-        body.velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
-    }
 
-    public virtual void Throw(bool toRight, bool crouching) {
-        if (!Holder)
-            return;
+        public virtual void Kick(PlayerController kicker, bool toRight, float kickFactor, bool groundpound) {
+            if (Holder)
+                return;
 
-        if (Utils.IsTileSolidAtWorldLocation(body.position))
-            transform.position = body.position = new(Holder.transform.position.x, body.position.y);
+            if (kicker) {
+                ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
+                PreviousHolder = kicker;
+            }
+            FacingRight = toRight;
+            KickedAnimCounter++;
+            CurrentKickSpeed = throwSpeed + 1.5f * kickFactor;
+            body.velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
+        }
 
-        ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, crouching ? 0.6f : 0.35f);
-        PreviousHolder = Holder;
-        Holder = null;
-        FacingRight = toRight;
+        public virtual void Throw(bool toRight, bool crouching) {
+            if (!Holder)
+                return;
 
-        body.velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), 0);
-    }
+            if (Utils.Utils.IsTileSolidAtWorldLocation(body.position))
+                transform.position = body.position = new(Holder.transform.position.x, body.position.y);
 
-    public virtual void Pickup(PlayerController player) {
-        if (Holder)
-            return;
+            ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, crouching ? 0.6f : 0.35f);
+            PreviousHolder = Holder;
+            Holder = null;
+            FacingRight = toRight;
 
-        player.SetHeldEntity(this);
-    }
+            body.velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), 0);
+        }
 
-    //---IPlayerInteractable overrides
-    public override void InteractWithPlayer(PlayerController player) {
-        //don't interact with our lovely holder
-        if (Holder == player)
-            return;
+        public virtual void Pickup(PlayerController player) {
+            if (Holder)
+                return;
 
-        //temporary invincibility
-        if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
-            return;
+            player.SetHeldEntity(this);
+        }
 
-        base.InteractWithPlayer(player);
-    }
+        //---IPlayerInteractable overrides
+        public override void InteractWithPlayer(PlayerController player) {
+            //don't interact with our lovely holder
+            if (Holder == player)
+                return;
 
-    //---KillableEntity overrides
-    public override void Kill() {
-        if (IsDead)
-            return;
+            //temporary invincibility
+            if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+                return;
 
-        if (Holder)
-            Holder.SetHeldEntity(null);
+            base.InteractWithPlayer(player);
+        }
 
-        base.Kill();
-    }
+        //---KillableEntity overrides
+        public override void Kill() {
+            if (IsDead)
+                return;
 
-    public override void SpecialKill(bool right, bool groundpound, int combo) {
-        if (IsDead)
-            return;
+            if (Holder)
+                Holder.SetHeldEntity(null);
 
-        if (Holder)
-            Holder.SetHeldEntity(null);
+            base.Kill();
+        }
 
-        base.SpecialKill(right, groundpound, combo);
-    }
+        public override void SpecialKill(bool right, bool groundpound, int combo) {
+            if (IsDead)
+                return;
 
-    //---OnChanged
-    public static void OnKickedAnimCounterChanged(Changed<HoldableEntity> changed) {
-        changed.Behaviour.PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+            if (Holder)
+                Holder.SetHeldEntity(null);
+
+            base.SpecialKill(right, groundpound, combo);
+        }
+
+        //---OnChanged
+        public static void OnKickedAnimCounterChanged(Changed<HoldableEntity> changed) {
+            changed.Behaviour.PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+        }
     }
 }

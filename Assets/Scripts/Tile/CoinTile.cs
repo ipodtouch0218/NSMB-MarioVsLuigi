@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Entities;
+using NSMB.Entities.Collectable;
+using NSMB.Entities.Enemies;
+using NSMB.Entities.Player;
 using NSMB.Game;
 
 namespace NSMB.Tiles {

@@ -1,11 +1,15 @@
-public interface IPowerupCollect {
+using NSMB.Entities.Player;
 
-    public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup);
-}
+namespace NSMB.Entities.Collectable.Powerups {
+    public interface IPowerupCollect {
 
-public enum PowerupReserveResult {
-    None,
-    NoneButPlaySound,
-    ReserveOldPowerup,
-    ReserveNewPowerup,
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup);
+    }
+
+    public enum PowerupReserveResult {
+        None,
+        NoneButPlaySound,
+        ReserveOldPowerup,
+        ReserveNewPowerup,
+    }
 }

@@ -7,10 +7,12 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 using Fusion;
+using NSMB.Entities;
+using NSMB.Entities.Collectable;
+using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
-using NSMB.Tiles;
 
 namespace NSMB.Game {
     public class GameData : NetworkBehaviour {
@@ -411,11 +413,10 @@ namespace NSMB.Game {
             //TODO: Clean this up, massively.
 
             GameState = Enums.GameState.Ended;
-            SessionData.Instance.SetGameStarted(false);
-            SessionData.Instance.GameStartTimer = TickTimer.None;
+            IsMusicEnabled = false;
 
             GameManager.Pause(false);
-            GameManager.musicManager.Pause();
+            GameManager.musicManager.Stop();
 
             yield return new WaitForSecondsRealtime(1);
 
@@ -484,6 +485,8 @@ namespace NSMB.Game {
 
             // Return back to the main menu
             yield return new WaitForSecondsRealtime(secondsUntilMenu);
+            SessionData.Instance.SetGameStarted(false);
+            SessionData.Instance.GameStartTimer = TickTimer.None;
             Runner.SetActiveScene(0);
         }
 

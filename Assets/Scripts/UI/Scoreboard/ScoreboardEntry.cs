@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Utils;
 

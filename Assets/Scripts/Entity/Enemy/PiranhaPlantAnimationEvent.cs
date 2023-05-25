@@ -1,15 +1,17 @@
 using UnityEngine;
 
-public class PiranhaPlantAnimationEvent : MonoBehaviour {
+namespace NSMB.Entities.Enemies {
+    public class PiranhaPlantAnimationEvent : MonoBehaviour {
 
-    //---Serialized Variables
-    [SerializeField] private PiranhaPlantController controller;
+        //---Serialized Variables
+        [SerializeField] private PiranhaPlantController controller;
 
-    public void OnValidate() {
-        if (!controller) controller = GetComponentInParent<PiranhaPlantController>();
-    }
+        public void OnValidate() {
+            if (!controller) controller = GetComponentInParent<PiranhaPlantController>();
+        }
 
-    public void PlayChompSound() {
-        controller.PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Chomp);
+        public void PlayChompSound() {
+            controller.PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Chomp);
+        }
     }
 }
