@@ -51,7 +51,8 @@ public class BackgroundLoop : MonoBehaviour {
     public void Reposition() {
         for (int i = 0; i < children.Length; i++) {
             GameObject obj = children[i];
-            float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(lastPosition.z / obj.transform.position.z));
+            float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(-10f / obj.transform.position.z));
+
             Utils.WrappedDistance(transform.position, lastPosition, out float xDifference);
             float difference = xDifference + (obj.transform.position.x - truePositions[i].x);
 
@@ -59,10 +60,11 @@ public class BackgroundLoop : MonoBehaviour {
                 truePositions[i].x += ((transform.position.x > GameManager.Instance.LevelMiddleX) ? 1 : -1) * GameManager.Instance.LevelWidth;
             }
 
-            Vector3 newPosition = truePositions[i] + difference * parallaxSpeed * Vector3.right;
-            truePositions[i] = newPosition;
-            obj.transform.position = newPosition;
-
+            if (parallaxSpeed > 0) {
+                Vector3 newPosition = truePositions[i] + difference * parallaxSpeed * Vector3.right;
+                truePositions[i] = newPosition;
+                obj.transform.position = newPosition;
+            }
 
             RepositionChildObjects(obj);
         }
@@ -98,12 +100,17 @@ public class BackgroundLoop : MonoBehaviour {
             float halfObjectWidth = halfWidths[Array.IndexOf(children, obj)];
             Debug.DrawRay(transform.position + Vector3.right.Multiply(ScreenBounds), Vector2.up, Color.green);
             Debug.DrawRay(transform.position - Vector3.right.Multiply(ScreenBounds), Vector2.up, Color.green);
-            if (transform.position.x + ScreenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
+            while (transform.position.x + ScreenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
                 firstChild.transform.SetAsLastSibling();
                 firstChild.transform.position = new Vector3(lastChild.transform.position.x + halfObjectWidth * 2, lastChild.transform.position.y, lastChild.transform.position.z);
-            } else if (transform.position.x - ScreenBounds.x < firstChild.transform.position.x - halfObjectWidth) {
+                firstChild = parent.GetChild(0).gameObject;
+                lastChild = parent.GetChild(parent.childCount - 1).gameObject;
+            }
+            while (transform.position.x - ScreenBounds.x < firstChild.transform.position.x - halfObjectWidth) {
                 lastChild.transform.SetAsFirstSibling();
                 lastChild.transform.position = new Vector3(firstChild.transform.position.x - halfObjectWidth * 2, firstChild.transform.position.y, firstChild.transform.position.z);
+                firstChild = parent.GetChild(0).gameObject;
+                lastChild = parent.GetChild(parent.childCount - 1).gameObject;
             }
         }
     }

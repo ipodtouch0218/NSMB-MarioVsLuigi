@@ -335,6 +335,7 @@ namespace NSMB.Entities.Player {
             data = Object.InputAuthority.GetPlayerData(Runner);
             if (Object.HasInputAuthority) {
                 networkRigidbody.InterpolationDataSource = InterpolationDataSources.Predicted;
+                networkRigidbody.InterpolateErrorCorrection = false;
 
                 GameManager.Instance.localPlayer = this;
                 GameManager.Instance.spectationManager.Spectating = false;
@@ -704,7 +705,7 @@ namespace NSMB.Entities.Player {
                     return;
                 }
             }
-            if (State == Enums.PowerupState.BlueShell && otherAbove && !other.IsGroundpounding && !other.IsDrilling && (IsCrouching || IsGroundpounding))
+            if (State == Enums.PowerupState.BlueShell && otherAbove && !other.IsGroundpounding && !other.IsDrilling && (IsCrouching || IsGroundpounding) && IsOnGround)
                 body.velocity = new(SPEED_STAGE_MAX[RUN_STAGE] * 0.9f * (other.body.position.x < body.position.x ? 1 : -1), body.velocity.y);
 
             if (other.IsInShell && !above)
@@ -1528,7 +1529,6 @@ namespace NSMB.Entities.Player {
                 //hit ground
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
                 hit.point += Vector2.down * 0.1f;
-                Debug.DrawRay(hit.point, hit.normal, Color.red);
                 if (Mathf.Abs(angle) > 89)
                     return;
 
@@ -1545,12 +1545,11 @@ namespace NSMB.Entities.Player {
                 IsOnGround = true;
                 previousTickIsOnGround = true;
                 OnSlope = tile ? tile.isSlope : false;
-            } else if (IsOnGround) {
+            } else {
                 hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, Layers.MaskAnyGround);
                 if (hit) {
                     float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
                     hit.point += Vector2.down * 0.1f;
-                    Debug.DrawRay(hit.point, hit.normal, Color.red);
                     if (Mathf.Abs(angle) > 89)
                         return;
 

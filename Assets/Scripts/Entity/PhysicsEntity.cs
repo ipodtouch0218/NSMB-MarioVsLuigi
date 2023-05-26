@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Utils;
+using UnityEditor;
 
 public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
 
@@ -40,6 +41,8 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
         int hitRightCount = 0, hitLeftCount = 0;
         float previousHeightY = float.MaxValue;
 
+        bool previousOnGround = Data.OnGround;
+
         Data.CrushableGround = false;
         Data.OnGround = false;
         Data.HitRoof = false;
@@ -58,13 +61,15 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
                 // touching floor
                 // If we're moving upwards, don't touch the floor.
                 // Most likely, we're inside a semisolid.
-                if (previousTickVelocity.y > 0.1f)
+                if (!previousOnGround && previousTickVelocity.y > 0.1f) {
                     continue;
+                }
 
                 // Make sure that we're also above the floor, so we don't
                 // get crushed when inside a semisolid.
-                if (point.point.y > currentCollider.bounds.min.y + 0.01f)
+                if (point.point.y > currentCollider.bounds.min.y + 0.1f) {
                     continue;
+                }
 
                 Data.OnGround = true;
                 Data.CrushableGround |= !point.collider.gameObject.CompareTag("platform");
@@ -119,6 +124,10 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
         public bool HitRight {
             get => Utils.BitTest(Flags, 4);
             set => Utils.BitSet(ref Flags, 4, value);
+        }
+
+        public override string ToString() {
+            return $"FloorAngle: {FloorAngle} OnGround: {OnGround}, CrushableGround: {CrushableGround}, HitRoof: {HitRoof}, HitLeft: {HitLeft}, HitRight: {HitRight}";
         }
     }
 }

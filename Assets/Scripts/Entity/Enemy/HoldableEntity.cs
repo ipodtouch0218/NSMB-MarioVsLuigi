@@ -5,7 +5,6 @@ using NSMB.Entities.Player;
 
 namespace NSMB.Entities {
     [OrderAfter(typeof(PlayerController))]
-    [OrderBefore(typeof(WrappingObject))]
     public abstract class HoldableEntity : KillableEntity, IBeforeTick {
 
         //---Networked Variables

@@ -25,6 +25,7 @@ namespace NSMB.Translation {
 
         private void OnLanguageChanged(TranslationManager tm) {
             text.text = tm.GetTranslation(key);
+            text.isRightToLeftText = tm.RightToLeft;
         }
     }
 }

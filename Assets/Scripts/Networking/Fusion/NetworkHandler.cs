@@ -11,6 +11,7 @@ using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
+using UnityEngine.SceneManagement;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
@@ -403,6 +404,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #endregion
 
     private void HostMigrationResume(NetworkRunner runner) {
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
         foreach (var resumeNO in runner.GetResumeSnapshotNetworkObjects()) {
 
             if (resumeNO.TryGetComponent(out PlayerData data) && resumeNO.InputAuthority == runner.SessionInfo.MaxPlayers - 1) {

@@ -3,6 +3,7 @@ using TMPro;
 
 using NSMB.Translation;
 using NSMB.UI.Pause.Loaders;
+using NSMB.Game;
 
 namespace NSMB.UI.Pause.Options {
     public class PauseOption : MonoBehaviour {
@@ -49,11 +50,13 @@ namespace NSMB.UI.Pause.Options {
 
         public virtual void Selected() {
             label.text = "» " + GetTranslatedString();
+            label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             selected = true;
         }
 
         public virtual void Deselected() {
             label.text = GetTranslatedString();
+            label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             selected = false;
         }
 
@@ -62,7 +65,6 @@ namespace NSMB.UI.Pause.Options {
         public virtual void OnLeftHeld() { }
         public virtual void OnRightPress() { }
         public virtual void OnRightHeld() { }
-
 
         private string GetTranslatedString() {
             return GlobalController.Instance.translationManager.GetTranslation(translationKey);

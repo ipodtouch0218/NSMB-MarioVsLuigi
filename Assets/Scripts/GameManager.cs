@@ -168,7 +168,6 @@ namespace NSMB.Game {
             optionsWereOpenLastFrame = GlobalController.Instance.optionsManager.gameObject.activeSelf;
         }
 
-
         public void CreateNametag(PlayerController controller) {
             GameObject nametag = Instantiate(nametagPrefab, nametagPrefab.transform.parent);
             nametag.GetComponent<UserNametag>().parent = controller;
@@ -189,7 +188,6 @@ namespace NSMB.Game {
         public TileBase GetTileInstanceFromTileId(ushort id) {
             return sceneTiles[id];
         }
-
 
         public void OnToggleHud(InputAction.CallbackContext context) {
             hud.SetActive(!hud.activeSelf);

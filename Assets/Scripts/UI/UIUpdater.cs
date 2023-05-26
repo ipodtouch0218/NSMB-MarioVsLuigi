@@ -207,10 +207,11 @@ public class UIUpdater : MonoBehaviour {
             int ping = GetCurrentPing();
             uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
         }
+        uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
     }
 
     //---Callbacks
-    private void OnLanguageChanged(TranslationManager obj) {
+    private void OnLanguageChanged(TranslationManager tm) {
         UpdatePingText();
     }
 

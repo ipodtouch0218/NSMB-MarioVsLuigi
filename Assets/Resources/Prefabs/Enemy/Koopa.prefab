@@ -193,10 +193,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _FacingRight:
+    _value: 0
   _IsActive:
     _value: 0
   body: {fileID: 8836298984178612591}
   sfx: {fileID: 3399800873378663516}
+  checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
     _value: 0
   _IsDead:
@@ -210,7 +213,6 @@ MonoBehaviour:
   animator: {fileID: 3696720750550087088}
   legacyAnimation: {fileID: 0}
   sRenderer: {fileID: 8133877121043965814}
-  audioSource: {fileID: 3399800873378663516}
   physics: {fileID: 818487035572622980}
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
@@ -373,6 +375,7 @@ MonoBehaviour:
   soundOrigin: {fileID: 8836298984178612587}
   soundRange: 12
   maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!82 &3399800873378663516
 AudioSource:
   m_ObjectHideFlags: 0

@@ -202,7 +202,7 @@ namespace NSMB.Game {
 
             bool hasFirstPlace = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
             int aliveTeams = teamManager.GetAliveTeamCount();
-            bool timeUp = GameEndTimer.ExpiredOrNotRunning(Runner);
+            bool timeUp = SessionData.Instance.Timer > 0 && GameEndTimer.ExpiredOrNotRunning(Runner);
 
             if (aliveTeams == 0) {
                 // All teams dead, draw?

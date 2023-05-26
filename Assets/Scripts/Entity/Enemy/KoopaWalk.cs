@@ -11,6 +11,8 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Enemies {
+
+    [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
     public class KoopaWalk : HoldableEntity {
 
         //---Static Variables
@@ -119,8 +121,16 @@ namespace NSMB.Entities.Enemies {
                     Turnaround(!FacingRight, physics.previousTickVelocity.x);
             }
 
-            if (!IsStationary)
-                body.velocity = new((IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+            if (!IsStationary) {
+                float x = (IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1);
+                float y = body.velocity.y;
+                if (data.OnGround) {
+                    y = x * Mathf.Sin(data.FloorAngle * Mathf.Deg2Rad);
+                }
+                body.velocity = new(x, y);
+            } else if (data.OnGround) {
+                body.velocity = Vector2.zero;
+            }
 
             HandleTile();
         }

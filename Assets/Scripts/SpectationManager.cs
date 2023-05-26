@@ -76,7 +76,10 @@ public class SpectationManager : MonoBehaviour {
             return;
 
         string username = TargetPlayer.Object.InputAuthority.GetPlayerData(TargetPlayer.Runner).GetNickname();
-        spectatingText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
+
+        TranslationManager tm = GlobalController.Instance.translationManager;
+        spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
+        spectatingText.isRightToLeftText = tm.RightToLeft;
     }
 
     public void SpectateNextPlayer() {

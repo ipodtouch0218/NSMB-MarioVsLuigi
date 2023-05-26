@@ -737,10 +737,13 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
         levelDropdown.SetValueWithoutNotify(selectedLevel);
 
+        //TODO: RTL FONT
+
         if (Runner && Runner.SessionInfo) {
             SessionInfo session = Runner.SessionInfo;
             Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
             lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
+            lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
 
             CountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
         }

@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 
 public class ParallaxMover : MonoBehaviour {
+
+    //---Serialized Variables
     [SerializeField] private float speed;
+
+    //---Private Variables
     private Vector3 moveBy;
 
     public void Start() {

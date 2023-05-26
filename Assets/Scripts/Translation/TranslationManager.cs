@@ -15,6 +15,7 @@ namespace NSMB.Translation {
 
         //---Properties
         public string CurrentLocale { get; private set; }
+        public bool RightToLeft { get; private set; }
 
         //---Serialized Variables
         [SerializeField] private TextAsset defaultLocale;
@@ -76,6 +77,7 @@ namespace NSMB.Translation {
             }
 
             CurrentLocale = newLocale;
+            RightToLeft = GetTranslation("rtl") == "true";
             // Call the change event
             OnLanguageChanged?.Invoke(this);
         }
@@ -91,16 +93,18 @@ namespace NSMB.Translation {
                 })
             );
 
-            if (IsDesktopPlatform()) {
-                // Any new language can be added, so we need to check the filesystem
-                string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "lang"), "*.json");
-                results.AddRange(
-                    files.Select(path => new LocaleData() {
-                        Name = File.ReadAllText(path),
-                        Locale = Path.GetFileNameWithoutExtension(path),
-                    })
-                );
-            }
+            try {
+                if (IsDesktopPlatform()) {
+                    // Any new language can be added, so we need to check the filesystem
+                    string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "lang"), "*.json");
+                    results.AddRange(
+                        files.Select(path => new LocaleData() {
+                            Name = File.ReadAllText(path),
+                            Locale = Path.GetFileNameWithoutExtension(path),
+                        })
+                    );
+                }
+            } catch { }
 
             // Open the files and get the locale name from the "lang" key
             foreach (LocaleData data in results) {

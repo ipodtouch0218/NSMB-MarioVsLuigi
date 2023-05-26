@@ -31,8 +31,9 @@ public class ChatMessage : MonoBehaviour {
         GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
-    private void OnLanguageChanged(TranslationManager translationManager) {
-        chatText.text = translationManager.GetTranslationWithReplacements(key, replacements);
+    private void OnLanguageChanged(TranslationManager tm) {
+        chatText.text = tm.GetTranslationWithReplacements(key, replacements);
+        chatText.isRightToLeftText = tm.RightToLeft;
     }
 
     public void Initialize(string message, PlayerRef player, Color? color = null) {
