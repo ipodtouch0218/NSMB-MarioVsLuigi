@@ -218,7 +218,7 @@ namespace NSMB.Game {
 
             if (hasFirstPlace) {
                 // We have a team that's clearly in first...
-                if (starGame && firstPlaceStars >= requiredStars) {
+                if (starGame && (firstPlaceStars >= requiredStars || timeUp)) {
                     // And they have enough stars.
                     Rpc_EndGame(firstPlaceTeam);
                     return;

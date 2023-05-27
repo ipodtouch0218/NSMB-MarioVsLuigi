@@ -1,9 +1,8 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
-
 using TMPro;
 
-[CreateAssetMenu(fileName = "WholeStringRegexValidator", menuName = "ScriptableObjects/WholeStringRegexValidator")]
+[CreateAssetMenu(fileName = "WholeStringRegexValidator", menuName = "ScriptableObjects/Input Validators/WholeStringRegexValidator")]
 public class WholeStringRegexValidator : TMP_InputValidator {
 
     public string pattern;

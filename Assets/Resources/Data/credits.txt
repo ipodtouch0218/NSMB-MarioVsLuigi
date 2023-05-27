@@ -56,6 +56,7 @@ Shadow_Walker13
 TheCyVap
 
 <color=yellow>{ui.about.credits.leveldesign}</color>
+AutumnLeaf
 mindnomad
 Skarph
 TheCyVap
@@ -87,7 +88,7 @@ Poudink (Tiles)
 Ragey (Enemies)
 Skarph (Models/Sound)
 Someone (Tiles)
-Symbolcom (Enemies)
+Symbolcom (Tiles/Enemies)
 Techokami (Enemies)
 TeridaxXD001 (Models)
 Treeki (UI)

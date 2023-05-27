@@ -101,6 +101,7 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool IsSwimming { get; set; }
         [Networked(OnChanged = nameof(OnIsWaterWalkingChanged))] public NetworkBool IsWaterWalking { get; set; }
         //-Death & Respawning
+        [Networked] private NetworkBool Disconnected { get; set; }
         [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
         [Networked(OnChanged = nameof(OnIsRespawningChanged))] public NetworkBool IsRespawning { get; set; }
         [Networked] public NetworkBool FireDeath { get; set; }
@@ -1096,7 +1097,7 @@ namespace NSMB.Entities.Player {
             PreRespawnTimer = TickTimer.CreateFromSeconds(Runner, 3f);
             RespawnTimer = TickTimer.CreateFromSeconds(Runner, 4.3f);
 
-            if (Lives > 0 && --Lives == 0) {
+            if ((Lives > 0 && --Lives == 0) || Disconnected) {
                 GameData.Instance.CheckForWinner();
 
                 //spawn all stars
@@ -1136,7 +1137,8 @@ namespace NSMB.Entities.Player {
             if (IsDead)
                 return;
 
-            Lives = 1;
+            Disconnected = true;
+            Lives = 0;
             Death(false, false);
         }
 
@@ -3110,7 +3112,7 @@ namespace NSMB.Entities.Player {
         public static void OnLivesChanged(Changed<PlayerController> changed) {
             PlayerController player = changed.Behaviour;
 
-            if (GameData.Instance.GameState < Enums.GameState.Playing)
+            if (GameData.Instance.GameState < Enums.GameState.Playing || player.Disconnected)
                 return;
 
             changed.LoadOld();

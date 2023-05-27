@@ -1,5 +1,6 @@
 {
   "lang": "English (US)",
+  "rtl": false,
   "ui.generic.cancel": "Cancel",
   "ui.generic.confirm": "Confirm",
   "ui.generic.ignore": "Ignore",
@@ -205,7 +206,7 @@
   "skin.strawberry": "Strawberry Pink",
   "skin.orange": "Orange n' Lime",
   "skin.deluxe": "SMB Deluxe",
-  "skin.black": "Dark Theme",
+  "skin.cubbyleafy": "Cubby Crazes / AutumnLeaf",
   "discord.mainmenu": "Browsing the Main Menu...",
   "discord.public": "In a Public Game",
   "discord.private": "In a Private Game",

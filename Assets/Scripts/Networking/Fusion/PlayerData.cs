@@ -32,6 +32,7 @@ public class PlayerData : NetworkBehaviour {
     [Networked(OnChanged = nameof(OnSkinChanged))]               public byte SkinIndex { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))]            public int Ping { get; set; }
     [Networked]                                                  public NetworkBool Initialized { get; set; }
+    [Networked]                                                  public int JoinTick { get; set; }
 
     //---Private Variables
     private Tick lastUpdatedTick;
@@ -46,6 +47,7 @@ public class PlayerData : NetworkBehaviour {
         // Keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
+        JoinTick = Runner.Tick;
         PlayerId = -1;
         if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1)
             Team = 0;

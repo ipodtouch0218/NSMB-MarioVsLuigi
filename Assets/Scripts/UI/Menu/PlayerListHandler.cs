@@ -103,7 +103,7 @@ public class PlayerListHandler : MonoBehaviour {
     }
 
     public void ReorderEntries() {
-        foreach (PlayerRef player in Runner.ActivePlayers.OrderBy(pr => (int) pr)) {
+        foreach (PlayerRef player in Runner.ActivePlayers.OrderByDescending(pr => pr.GetPlayerData(NetworkHandler.Runner).JoinTick)) {
 
             if (!playerListEntries.ContainsKey(player))
                 continue;

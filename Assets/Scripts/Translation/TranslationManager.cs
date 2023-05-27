@@ -46,9 +46,9 @@ namespace NSMB.Translation {
 
             bool foundTranslations = false;
 
-            try {
-                if (IsDesktopPlatform()) {
-                    // Find the language file from the filesystem
+            if (IsDesktopPlatform()) {
+                try {
+                    // Find the language files from the streaming assets
                     string path = Path.Combine(Application.streamingAssetsPath, "lang", newLocale + ".json");
                     if (File.Exists(path)) {
                         StreamReader file = File.OpenText(path);
@@ -56,8 +56,22 @@ namespace NSMB.Translation {
                         translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                         foundTranslations = true;
                     }
+                } catch { }
+
+                if (!foundTranslations) {
+                    try {
+                        // Find the language files from the appdata folder
+                        string path2 = Path.Combine(Application.persistentDataPath, "lang", newLocale + ".json");
+                        if (File.Exists(path2)) {
+                            StreamReader file = File.OpenText(path2);
+                            string json = file.ReadToEnd();
+                            translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                            foundTranslations = true;
+                        }
+
+                    } catch { }
                 }
-            } catch { }
+            }
 
             if (!foundTranslations) {
                 // Load the new language file from the resources (since we can't read from the filesystem)
@@ -93,18 +107,30 @@ namespace NSMB.Translation {
                 })
             );
 
-            try {
-                if (IsDesktopPlatform()) {
+            if (IsDesktopPlatform()) {
+                try {
                     // Any new language can be added, so we need to check the filesystem
-                    string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "lang"), "*.json");
+                    string path = Path.Combine(Application.streamingAssetsPath, "lang");
+                    string[] files = Directory.GetFiles(path, "*.json");
                     results.AddRange(
-                        files.Select(path => new LocaleData() {
-                            Name = File.ReadAllText(path),
-                            Locale = Path.GetFileNameWithoutExtension(path),
+                        files.Select(ld => new LocaleData() {
+                            Name = File.ReadAllText(ld),
+                            Locale = Path.GetFileNameWithoutExtension(ld).ToLower(),
                         })
                     );
-                }
-            } catch { }
+                } catch { }
+
+                try {
+                    string path2 = Path.Combine(Application.persistentDataPath, "lang");
+                    string[] files = Directory.GetFiles(path2, "*.json");
+                    results.AddRange(
+                        files.Select(ld => new LocaleData() {
+                            Name = File.ReadAllText(ld),
+                            Locale = Path.GetFileNameWithoutExtension(ld).ToLower(),
+                        })
+                    );
+                } catch { }
+            }
 
             // Open the files and get the locale name from the "lang" key
             foreach (LocaleData data in results) {
@@ -113,8 +139,10 @@ namespace NSMB.Translation {
                 data.Name = keys["lang"];
             }
 
-            results.Sort((a, b) => a.Locale.CompareTo(b.Locale));
-            return results.ToArray();
+            return results
+                .Distinct()
+                .OrderBy(ld => ld.Locale)
+                .ToArray();
         }
 
         public string[] GetLocaleCodes() {
@@ -174,8 +202,24 @@ namespace NSMB.Translation {
 #endif
         }
 
-        public class LocaleData {
+        public class LocaleData : IEquatable<LocaleData> {
             public string Name, Locale;
+
+            public bool Equals(LocaleData other) {
+                return Locale == other.Locale;
+            }
+
+            public override bool Equals(object obj) {
+                if (obj == null || GetType() != obj.GetType()) {
+                    return false;
+                }
+
+                return Locale == ((LocaleData) obj).Locale;
+            }
+
+            public override int GetHashCode() {
+                return Locale.GetHashCode();
+            }
         }
     }
 }

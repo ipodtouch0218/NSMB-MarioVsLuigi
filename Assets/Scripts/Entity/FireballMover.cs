@@ -8,7 +8,7 @@ using NSMB.Tiles;
 
 namespace NSMB.Entities {
     [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
-    [OrderAfter(typeof(PlayerController))]
+    [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
     public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
         //---Static Variables
@@ -62,7 +62,7 @@ namespace NSMB.Entities {
 
             //physics
             nrb.TeleportToPosition(spawnpoint, Vector3.zero);
-            nrb.Rigidbody.position = spawnpoint;
+            //nrb.Rigidbody.position = spawnpoint;
             //body.simulated = true;
             body.isKinematic = false;
             body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);

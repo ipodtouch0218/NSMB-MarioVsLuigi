@@ -104,6 +104,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * TheCyVap
 
 ### Level Design:
+* AutumnLeaf
 * mindnomad
 * Skarph
 * TheCyVap
@@ -129,7 +130,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Ragey (Enemies)
 * Skarph (Models/Sound)
 * Someone (Tiles)
-* Symbolcom (Enemies)
+* Symbolcom (Tiles/Enemies)
 * Techokami (Enemies)
 * TeridaxXD001 (Models)
 * Treeki (UI)

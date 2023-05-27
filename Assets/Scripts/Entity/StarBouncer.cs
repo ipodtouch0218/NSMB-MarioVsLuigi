@@ -142,7 +142,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
 
-            if (GameData.Instance && (!GameData.Instance.GameEnded || GameData.Instance.gameEndTime + 3 > Runner.SimulationTime)) {
+            if (GameData.Instance && GameData.Instance.Object && (!GameData.Instance.GameEnded || GameData.Instance.gameEndTime + 3 > Runner.SimulationTime)) {
                 if (!Collector) {
                     GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
                 } else {

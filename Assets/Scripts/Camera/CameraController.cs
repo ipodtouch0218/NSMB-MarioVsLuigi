@@ -30,12 +30,11 @@ public class CameraController : MonoBehaviour {
     private PlayerController controller;
     private Vector3 smoothDampVel, playerPos;
     private Camera targetCamera;
-    private float startingZ, lastFloor;
+    private float lastFloor;
 
     public void Awake() {
         //only control the camera if we're the local player.
         targetCamera = Camera.main;
-        startingZ = targetCamera.transform.position.z;
         controller = GetComponentInParent<PlayerController>();
         targetCamera.GetComponentsInChildren(secondaryPositioners);
     }
@@ -128,7 +127,7 @@ public class CameraController : MonoBehaviour {
         targetPosition.y = Mathf.Clamp(targetPosition.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
 
         // Z preservation
-        targetPosition.z = startingZ;
+        targetPosition.z = -10;
 
         return targetPosition;
     }
