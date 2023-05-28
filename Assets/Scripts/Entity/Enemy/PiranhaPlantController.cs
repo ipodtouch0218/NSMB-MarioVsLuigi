@@ -29,6 +29,9 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void Render() {
+            if (IsFrozen)
+                return;
+
             interpolationTarget.localPosition = new(0, (popupAnimationTimeInterpolator.Value - 1) * popupDistance, 0);
             animator.SetBool("active", ChompTimer.IsRunning);
             animator.SetBool("chomping", PopupAnimationTime > 0.99f);
@@ -60,6 +63,9 @@ namespace NSMB.Entities.Enemies {
                 Kill();
                 return;
             }
+
+            if (IsFrozen)
+                return;
 
             bool chomping = ChompTimer.IsRunning;
             if (chomping) {

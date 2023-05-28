@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Entities.Player;
+using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Utils;
 
@@ -36,6 +37,11 @@ namespace NSMB.Entities.Collectable {
             body.velocity = Vector2.up * GameData.Instance.Random.RangeInclusive(5.5f, 6f);
         }
 
+        public override void Render() {
+            float despawnTimeRemaining = DespawnTimer.RemainingRenderTime(Runner) ?? 0f;
+            spriteRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
+        }
+
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
             if (GameData.Instance && GameData.Instance.GameEnded) {
@@ -64,9 +70,6 @@ namespace NSMB.Entities.Collectable {
                 if (Runner.IsForward && physics.previousTickVelocity.y < -0.5f * (Mathf.Sin(physics.Data.FloorAngle) + 1f))
                     PlaySound(Enums.Sounds.World_Coin_Drop);
             }
-
-            float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
-            spriteRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
         }
 
         //---IPlayerInteractable overrides

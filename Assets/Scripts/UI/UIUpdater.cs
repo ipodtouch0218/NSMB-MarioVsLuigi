@@ -66,6 +66,8 @@ public class UIUpdater : MonoBehaviour {
         backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
+
+        ApplyUIColor();
     }
 
     public void Update() {
@@ -115,6 +117,7 @@ public class UIUpdater : MonoBehaviour {
             int team = player.data.Team;
             teamStars = teamManager.GetTeamStars(team);
             uiTeamStars.text = ScriptableManager.Instance.teams[team].textSprite + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
+            ApplyUIColor();
         }
         if (player.Stars != stars) {
             stars = player.Stars;
@@ -210,6 +213,14 @@ public class UIUpdater : MonoBehaviour {
         uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
     }
 
+    private void ApplyUIColor() {
+        Color color = SessionData.Instance.Teams ? Utils.GetTeamColor(player.data.Team, 0.8f, 1f) : GameManager.Instance.levelUIColor;
+
+        foreach (Image bg in backgrounds)
+            bg.color = color;
+        itemColor.color = color;
+    }
+
     //---Callbacks
     private void OnLanguageChanged(TranslationManager tm) {
         UpdatePingText();
@@ -221,15 +232,7 @@ public class UIUpdater : MonoBehaviour {
 
         localPlayer = Runner.LocalPlayer;
 
-        foreach (Image bg in backgrounds)
-            bg.color = GameManager.Instance.levelUIColor;
-
-        Color uiColor = GameManager.Instance.levelUIColor;
-        uiColor.r -= 0.2f;
-        uiColor.g -= 0.2f;
-        uiColor.b -= 0.2f;
-        itemColor.color = uiColor;
-
+        ApplyUIColor();
         teamsParent.SetActive(teams);
 
         if (!Runner.IsServer)

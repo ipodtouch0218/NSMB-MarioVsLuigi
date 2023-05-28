@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors:
   - player: {fileID: 0}
-    shirtColor: {r: 0.27058825, g: 0.5921569, b: 0.9803922, a: 1}
+    shirtColor: {r: 0.10849059, g: 0.5123789, b: 1, a: 1}
     overallsColor: {r: 0.17254902, g: 0.17254902, b: 0.17254902, a: 1}
     hatUsesOverallsColor: 0
   translationKey: skin.gba

@@ -109,7 +109,7 @@ namespace NSMB.Entities.Player {
         [Networked] public TickTimer PreRespawnTimer { get; set; }
 
         //-Entity Interactions
-        [Networked] public HoldableEntity HeldEntity { get; set; }
+        [Networked(OnChanged = nameof(OnHeldEntityChanged))] public HoldableEntity HeldEntity { get; set; }
         [Networked(OnChanged = nameof(OnThrowAnimCounterChanged))] public byte ThrowAnimCounter { get; set; }
         [Networked] public float HoldStartTime { get; set; }
         [Networked] public TickTimer ShellSlowdownTimer { get; set; }
@@ -127,8 +127,9 @@ namespace NSMB.Entities.Player {
         [Networked(OnChanged = nameof(OnPropellerSpinTimerChanged))] public TickTimer PropellerSpinTimer { get; set; }
         [Networked] public NetworkBool UsedPropellerThisJump { get; set; }
         [Networked] public TickTimer GiantStartTimer { get; set; }
-        [Networked] public TickTimer GiantTimer { get; set; }
+        [Networked(OnChanged = nameof(OnGiantTimerChanged))] public TickTimer GiantTimer { get; set; }
         [Networked] public TickTimer GiantEndTimer { get; set; }
+        [Networked(OnChanged = nameof(OnIsStationaryGiantShrinkChanged))] private bool IsStationaryGiantShrink { get; set; }
         [Networked] public NetworkBool IsInShell { get; set; }
         [Networked] public FrozenCube FrozenCube { get; set; }
 
@@ -207,7 +208,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] public GameObject models;
         [SerializeField] public CharacterData character;
 
-        public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight, stationaryGiantEnd;
+        public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight;
         public float powerupFlash;
 
         #region // MOVEMENT STAGES & CONSTANTS
@@ -762,7 +763,7 @@ namespace NSMB.Entities.Player {
                     if (other.IsOnGround)
                         other.DoKnockback(!fromRight, dropStars ? 1 : 0, true, Object);
                     else
-                        AirBonk(!fromRight);
+                        other.AirBonk(!fromRight);
 
                 } else {
                     // Collide
@@ -970,8 +971,6 @@ namespace NSMB.Entities.Player {
             if (FrozenCube) {
                 if (FrozenCube.Holder)
                     FrozenCube.Holder.DoKnockback(FrozenCube.Holder.FacingRight, 1, true, Object);
-
-                FrozenCube.Kill();
             }
 
             if (knockbackStars > 0) {
@@ -1458,14 +1457,6 @@ namespace NSMB.Entities.Player {
                 HeldEntity.PreviousHolder = null;
                 HoldStartTime = Runner.SimulationTime;
 
-                if (HeldEntity is FrozenCube) {
-                    animator.Play("head-pickup");
-                    animator.ResetTrigger("fireball");
-                    PlaySound(Enums.Sounds.Player_Voice_DoubleJump, 2);
-                }
-                animator.ResetTrigger("throw");
-                animator.SetBool("holding", true);
-
                 SetHoldingOffset();
             }
         }
@@ -1579,7 +1570,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void HandleLayerState() {
-            bool hitsNothing = CurrentPipe || IsDead || IsStuckInBlock || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && stationaryGiantEnd);
+            bool hitsNothing = CurrentPipe || IsDead || IsStuckInBlock || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && IsStationaryGiantShrink);
 
             gameObject.layer = hitsNothing ? Layers.LayerHitsNothing : Layers.LayerPlayer;
         }
@@ -2190,18 +2181,15 @@ namespace NSMB.Entities.Player {
 
         public void FinishMegaMario(bool success) {
             if (success) {
-                PlaySoundEverywhere(Enums.Sounds.Player_Voice_MegaMushroom);
+                GiantTimer = TickTimer.CreateFromSeconds(Runner, 15f);
             } else {
-                //hit a ceiling, cancel
+                // Hit a ceiling, cancel
                 State = Enums.PowerupState.Mushroom;
                 GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime - GiantStartTimer.RemainingTime(Runner) ?? 0f);
-                animator.enabled = true;
-                animator.Play("mega-cancel", 0, 1f - (GiantEndTimer.RemainingTime(Runner) ?? 0f / giantStartTime));
                 GiantStartTimer = TickTimer.None;
-                stationaryGiantEnd = true;
-                StoredPowerup = Enums.PowerupState.MegaMushroom;
                 GiantTimer = TickTimer.None;
-                PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
+                IsStationaryGiantShrink = true;
+                StoredPowerup = Enums.PowerupState.MegaMushroom;
             }
             body.isKinematic = false;
         }
@@ -2232,7 +2220,7 @@ namespace NSMB.Entities.Player {
 
             State = Enums.PowerupState.Mushroom;
             GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime * 0.5f);
-            stationaryGiantEnd = false;
+            IsStationaryGiantShrink = false;
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
             PlaySoundEverywhere(Enums.Sounds.Powerup_MegaMushroom_End);
 
@@ -2351,7 +2339,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (GiantEndTimer.IsRunning && stationaryGiantEnd) {
+            if (GiantEndTimer.IsRunning && IsStationaryGiantShrink) {
                 body.velocity = Vector2.zero;
                 body.isKinematic = true;
                 transform.position = body.position = previousTickPosition;
@@ -2383,7 +2371,7 @@ namespace NSMB.Entities.Player {
             }
 
             //pipes > stuck in block, else the animation gets janked.
-            if (CurrentPipe || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && stationaryGiantEnd) || animator.GetBool("pipe"))
+            if (CurrentPipe || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && IsStationaryGiantShrink) || animator.GetBool("pipe"))
                 return;
 
             //don't do anything if we're stuck in a block
@@ -3129,6 +3117,44 @@ namespace NSMB.Entities.Player {
 
             player.PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);
             player.animator.SetTrigger("throw");
+        }
+
+        public static void OnGiantTimerChanged(Changed<PlayerController> changed) {
+            PlayerController player = changed.Behaviour;
+
+            if (!player.GiantTimer.IsRunning)
+                return;
+
+            player.PlaySoundEverywhere(Enums.Sounds.Player_Voice_MegaMushroom);
+        }
+
+        public static void OnIsStationaryGiantShrinkChanged(Changed<PlayerController> changed) {
+            PlayerController player = changed.Behaviour;
+
+            if (!player.IsStationaryGiantShrink)
+                return;
+
+            player.animator.enabled = true;
+            player.animator.Play("mega-cancel", 0, 1f - ((player.GiantEndTimer.RemainingTime(player.Runner) ?? 0f) / player.giantStartTime));
+            player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
+        }
+
+        public override void OnIsFrozenChanged() {
+            animator.enabled = !IsFrozen;
+        }
+
+        public static void OnHeldEntityChanged(Changed<PlayerController> changed) {
+            PlayerController player = changed.Behaviour;
+
+            if (!player.HeldEntity)
+                return;
+
+            if (player.HeldEntity is FrozenCube) {
+                player.animator.Play("head-pickup");
+                player.animator.ResetTrigger("fireball");
+                player.PlaySound(Enums.Sounds.Player_Voice_DoubleJump, 2);
+            }
+            player.animator.ResetTrigger("throw");
         }
 
         //---Debug

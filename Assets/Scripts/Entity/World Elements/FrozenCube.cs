@@ -53,11 +53,11 @@ namespace NSMB.Entities {
             }
 
             hitbox.size = sRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size;
-            hitbox.offset = Vector2.up * hitbox.size / 2;
+            hitbox.offset = Vector2.up * hitbox.size * 0.5f;
 
             entityPositionOffset = -(bounds.center - Vector3.up.Multiply(bounds.size * 0.5f) - rendererObject.transform.position);
 
-            transform.position -= (Vector3) entityPositionOffset - Vector3.down * 0.1f;
+            body.position -= entityPositionOffset - Vector2.down * 0.1f;
 
             AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
             flying = FrozenEntity.IsFlying;
@@ -69,6 +69,8 @@ namespace NSMB.Entities {
             if (FrozenEntity.IsCarryable) {
                 FrozenEntity.transform.SetParent(transform);
                 FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
+            } else {
+                dieWhenInsideBlock = false;
             }
         }
 
@@ -77,6 +79,20 @@ namespace NSMB.Entities {
 
             if (FrozenEntity)
                 FrozenEntity.transform.SetParent(null);
+        }
+
+        public override void Render() {
+
+            // Handle interactions with tiles
+            if (FrozenEntity.IsCarryable) {
+                if (!HandleTile())
+                    return;
+
+                // Move the entity to be inside us.
+                Vector2 entityPos = (Vector2) transform.position + entityPositionOffset;
+                Utils.Utils.WrapWorldLocation(ref entityPos);
+                FrozenEntity.transform.position = entityPos;
+            }
         }
 
         public override void FixedUpdateNetwork() {
@@ -138,41 +154,6 @@ namespace NSMB.Entities {
                 return;
             }
 
-            if (Holder)
-                return;
-
-            if (!FastSlide && !Holder) {
-                float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
-                if (remainingTime < 1f)
-                    body.position = new(body.position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
-            }
-
-            //our entity despawned. remove.
-            if (!FrozenEntity) {
-                Runner.Despawn(Object);
-                return;
-            }
-
-            //handle interactions with tiles
-            if (FrozenEntity.IsCarryable) {
-                if (!HandleTile())
-                    return;
-
-                //be inside us, entity. cmaaahn~
-                FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
-            }
-
-            if (FastSlide && physics.Data.OnGround && physics.Data.FloorAngle != 0) {
-                RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size * 0.5f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
-                if (ray) {
-                    body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
-                    if (ray.distance < 0.1f)
-                        body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
-                }
-            }
-
-            body.velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.velocity.y);
-
             if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {
 
                 if (AutoBreakTimer.Expired(Runner)) {
@@ -187,6 +168,40 @@ namespace NSMB.Entities {
                     }
                 }
             }
+
+            if (Holder)
+                return;
+
+            if (!FastSlide) {
+                float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
+                if (remainingTime < 1f)
+                    body.position = new(body.position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
+            }
+
+
+            // Our entity despawned. remove.
+            if (!FrozenEntity) {
+                Runner.Despawn(Object);
+                return;
+            }
+
+            // Handle interactions with tiles
+            if (FrozenEntity.IsCarryable) {
+                if (!HandleTile())
+                    return;
+            }
+
+            if (FastSlide && physics.Data.OnGround && physics.Data.FloorAngle != 0) {
+                RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size * 0.5f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
+                if (ray) {
+                    body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
+                    if (ray.distance < 0.1f)
+                        body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
+                }
+            }
+
+            body.velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.velocity.y);
+
 
             ApplyConstraints();
         }
@@ -348,7 +363,9 @@ namespace NSMB.Entities {
             if (Holder)
                 Holder.SetHeldEntity(null);
 
-            FrozenEntity?.Unfreeze(unfreezeReason);
+            if (FrozenEntity)
+                FrozenEntity.Unfreeze(unfreezeReason);
+
             Runner.Despawn(Object);
         }
 

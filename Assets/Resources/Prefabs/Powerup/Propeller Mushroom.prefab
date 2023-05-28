@@ -140,6 +140,7 @@ MonoBehaviour:
   - {fileID: 1339308990, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   - {fileID: 2093605636, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   sRenderer: {fileID: 5475970293224446295}
+  image: {fileID: 0}
 --- !u!1 &5334425534174023786
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,10 +197,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
-  _IsActive:
+  _FacingRight:
     _value: 0
+  _IsActive:
+    _value: 1
   body: {fileID: 5334425534174023790}
   sfx: {fileID: -6891361109405082350}
+  checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}
   powerupScriptable: {fileID: 11400000, guid: 797462c66e600c04dbd7898d6d95bd38, type: 2}
   speed: 0
@@ -214,6 +218,7 @@ MonoBehaviour:
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 0}
   hitbox: {fileID: 5334425534174023789}
+  particles: {fileID: 0}
   flyingPathX:
     serializedVersion: 2
     m_Curve:

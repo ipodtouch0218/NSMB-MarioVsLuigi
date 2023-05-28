@@ -33,28 +33,12 @@ namespace NSMB.UI.Pause.Loaders {
             this.option = option;
             spo.options.Clear();
 
-            if (validModes == null) {
-                switch (Application.platform) {
-                case RuntimePlatform.WindowsPlayer:
-                case RuntimePlatform.WindowsEditor:
-                    validModes = new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow, FullScreenMode.ExclusiveFullScreen };
-                    break;
-
-                case RuntimePlatform.OSXPlayer:
-                case RuntimePlatform.OSXEditor:
-                    validModes = new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow, FullScreenMode.MaximizedWindow };
-                    break;
-
-                case RuntimePlatform.LinuxPlayer:
-                case RuntimePlatform.LinuxEditor:
-                    validModes = new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow };
-                    break;
-
-                default:
-                    validModes = new[] { FullScreenMode.FullScreenWindow };
-                    break;
-                }
-            }
+            validModes ??= Application.platform switch {
+                    RuntimePlatform.WindowsPlayer or RuntimePlatform.WindowsEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow, FullScreenMode.ExclusiveFullScreen },
+                    RuntimePlatform.OSXPlayer or RuntimePlatform.OSXEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow, FullScreenMode.MaximizedWindow },
+                    RuntimePlatform.LinuxPlayer or RuntimePlatform.LinuxEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow },
+                    _ => new[] { FullScreenMode.FullScreenWindow },
+                };
 
             spo.options.AddRange(validModes.Select(fsm => FullscreenDisplayKeys[(int) fsm]).Select(GlobalController.Instance.translationManager.GetTranslation));
 

@@ -587,7 +587,7 @@ namespace NSMB.Utils {
             //then id based color
             int result = -1;
             int count = 0;
-            foreach (PlayerRef pl in runner.ActivePlayers.OrderByDescending(pr => pr.RawEncoded)) {
+            foreach (PlayerRef pl in runner.ActivePlayers.OrderByDescending(pr => pr.GetPlayerData(runner).JoinTick)) {
                 //skip spectators in color calculations
                 PlayerData playerData = pl.GetPlayerData(runner);
                 if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating)
@@ -636,6 +636,7 @@ namespace NSMB.Utils {
 
         public static Color GetRainbowColor(NetworkRunner runner) {
             //four seconds per revolution
+            if (!runner) return Color.white;
             double time = runner.SimulationTime * 0.25d;
             time %= 1;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);

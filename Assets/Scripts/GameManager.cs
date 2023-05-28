@@ -110,7 +110,7 @@ namespace NSMB.Game {
             SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
             sr.size = size;
 
-            Rigidbody2D body = particle.GetComponent<Rigidbody2D>();
+            SimplePhysicsMover body = particle.GetComponent<SimplePhysicsMover>();
             body.velocity = new Vector2(right ? 7 : -7, 6);
             body.angularVelocity = right ^ flip ? -300 : 300;
 

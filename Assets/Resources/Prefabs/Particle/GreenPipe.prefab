@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6460915104767337924}
   - component: {fileID: 3545332386736821867}
-  - component: {fileID: 2536965306057111103}
+  - component: {fileID: 6090458509712813838}
   - component: {fileID: 1164111855989132747}
   - component: {fileID: -1843595439736670929}
   - component: {fileID: 5957365481354593459}
@@ -88,33 +88,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!50 &2536965306057111103
-Rigidbody2D:
-  serializedVersion: 4
+--- !u!114 &6090458509712813838
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4966771921777507886}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0
-  m_GravityScale: 2.2
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9ffe477773b2ce47882a11923954e6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  velocity: {x: 0, y: 0}
+  angularVelocity: 0
+  gravityScale: 2.2
+  minVelocity: {x: -3.4028235e+38, y: -3.4028235e+38}
+  maxVelocity: {x: 3.4028235e+38, y: 3.4028235e+38}
 --- !u!114 &1164111855989132747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,3 +232,4 @@ MonoBehaviour:
   soundOrigin: {fileID: 6460915104767337924}
   soundRange: 12
   maxPanning: 0.8
+  useDistanceToCamera: 0

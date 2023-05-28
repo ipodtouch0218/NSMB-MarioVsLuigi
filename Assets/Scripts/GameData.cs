@@ -524,37 +524,40 @@ namespace NSMB.Game {
         /// <summary>
         /// Spawns a Big Star, if we can find a valid spawnpoint.
         /// </summary>
-        /// <returns>If the start is successfully spawned</returns>
+        /// <returns>If the star successfully spawned</returns>
         private bool AttemptSpawnBigStar() {
 
             GameObject[] starSpawns = GameManager.starSpawns;
-            int validSpawns = starSpawns.Length - AvailableStarSpawns.UnsetBitCount();
 
-            if (validSpawns <= 0) {
-                ResetAvailableStarSpawns();
-                validSpawns = starSpawns.Length;
-            }
+            for (int attempt = 0; attempt < starSpawns.Length; attempt++) {
+                int validSpawns = starSpawns.Length - AvailableStarSpawns.UnsetBitCount();
 
-            int nthSpawn = Random.RangeExclusive(0, validSpawns);
-            AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int im);
-            if (AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int index)) {
-
-                Vector3 spawnPos = starSpawns[index].transform.position;
-                AvailableStarSpawns[index] = false;
-
-                if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 3, Layers.MaskOnlyPlayers)) {
-                    // A player is too close to this spawn. Don't spawn.
-                    return false;
+                if (validSpawns <= 0) {
+                    ResetAvailableStarSpawns();
+                    validSpawns = starSpawns.Length;
                 }
 
-                // Valid spawn
-                Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
-                    obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
-                });
-                return true;
+                int nthSpawn = Random.RangeExclusive(0, validSpawns);
+                AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int im);
+                if (AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int index)) {
+
+                    Vector3 spawnPos = starSpawns[index].transform.position;
+                    AvailableStarSpawns[index] = false;
+
+                    if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 3, Layers.MaskOnlyPlayers)) {
+                        // A player is too close to this spawn. Don't spawn.
+                        continue;
+                    }
+
+                    // Valid spawn
+                    Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
+                        obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
+                    });
+                    return true;
+                }
             }
 
-            // This should never happen...
+            // This should hopefully never happen...
             return false;
         }
 

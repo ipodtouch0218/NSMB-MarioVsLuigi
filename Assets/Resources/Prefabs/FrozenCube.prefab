@@ -356,16 +356,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
-  InterpolationSpace: 0
+  InterpolationSpace: 1
   InterpolationTarget: {fileID: 3560772426833456990}
-  InterpolateErrorCorrection: 0
+  InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
+    MinRate: 5
+    MaxRate: 45
+    PosBlendStart: 0.1
+    PosBlendEnd: 0.75
     PosMinCorrection: 0.025
-    PosTeleportDistance: 2
+    PosTeleportDistance: 3
     RotBlendStart: 0.1
     RotBlendEnd: 0.5
     RotTeleportRadians: 1.5

@@ -45,7 +45,7 @@ public class ScoreboardEntry : MonoBehaviour {
         CheckForTextUpdate();
 
         if (rainbowEnabled)
-            nameText.color = Utils.GetRainbowColor(target.Runner);
+            nameText.color = Utils.GetRainbowColor(NetworkHandler.Runner);
     }
 
     private void CheckForTextUpdate() {

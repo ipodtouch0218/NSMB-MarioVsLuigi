@@ -23,7 +23,7 @@ MonoBehaviour:
   leftOfPipe: 0
   leftBrokenHatTile: {fileID: 11400000, guid: 90e5e29f818b6ff49aa335da0756c2ae, type: 2}
   rightBrokenHatTile: {fileID: 11400000, guid: cae31bff8fa773c43becc049834debc5, type: 2}
-  pipeParticle: {fileID: 4966771921777507886, guid: 0fdbb7abcf51e8e4481a78d2fac80bb5,
+  pipeParticle: {fileID: 2704222840459863154, guid: 6e3e7f710935b8346a88c02c4b1a3b1a,
     type: 3}
-  destroyedPipeParticle: {fileID: 8187660937656757357, guid: b23e12b21373f7845a082fd8ad065c18,
+  destroyedPipeParticle: {fileID: 7963907006073653413, guid: be079b3bed01c0640897dda4ce2aa37e,
     type: 3}

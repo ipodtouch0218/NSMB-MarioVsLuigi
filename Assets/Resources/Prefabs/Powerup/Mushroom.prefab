@@ -56,10 +56,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
-  _IsActive:
+  _FacingRight:
     _value: 0
+  _IsActive:
+    _value: 1
   body: {fileID: 1017215213198693187}
   sfx: {fileID: 4207910641862185911}
+  checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}
   powerupScriptable: {fileID: 11400000, guid: a3c6d7fa6c939be4ead398f0d82b5eb9, type: 2}
   speed: 2
@@ -74,6 +77,7 @@ MonoBehaviour:
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 0}
   hitbox: {fileID: 1017215213198693184}
+  particles: {fileID: 0}
 --- !u!50 &1017215213198693187
 Rigidbody2D:
   serializedVersion: 4

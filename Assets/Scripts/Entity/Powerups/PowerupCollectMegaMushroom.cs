@@ -24,7 +24,6 @@ namespace NSMB.Entities.Collectable.Powerups {
             player.PropellerLaunchTimer = TickTimer.None;
 
             player.GiantStartTimer = TickTimer.CreateFromSeconds(runner, player.giantStartTime);
-            player.GiantTimer = TickTimer.CreateFromSeconds(runner, 15f + player.giantStartTime);
             player.IsInKnockback = false;
             player.IsGroundpounding = false;
             player.IsCrouching = false;

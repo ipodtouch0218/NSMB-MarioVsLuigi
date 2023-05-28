@@ -62,10 +62,11 @@ namespace NSMB.Entities {
 
             //physics
             nrb.TeleportToPosition(spawnpoint, Vector3.zero);
-            //nrb.Rigidbody.position = spawnpoint;
+            nrb.Rigidbody.position = spawnpoint;
             //body.simulated = true;
             body.isKinematic = false;
             body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
+            Object.AssignInputAuthority(owner.Object.InputAuthority);
         }
 
         public override void Spawned() {

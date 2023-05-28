@@ -75,9 +75,6 @@ namespace NSMB.Entities.Player {
             enableGlow = SessionData.Instance.Teams || !Object.HasInputAuthority;
             GlowColor = Utils.Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
 
-            if (SessionData.Instance.Teams)
-                GameManager.Instance.levelUIColor = GlowColor;
-
             if (blinkRoutine == null)
                 blinkRoutine = StartCoroutine(BlinkRoutine());
         }

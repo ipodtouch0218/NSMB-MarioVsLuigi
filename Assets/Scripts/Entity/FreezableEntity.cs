@@ -15,6 +15,10 @@ public abstract class FreezableEntity : BasicEntity {
 
     public abstract void Unfreeze(UnfreezeReason reasonByte);
 
+    public virtual void OnIsFrozenChanged() {
+
+    }
+
     public enum UnfreezeReason : byte {
         Other,
         Timer,
@@ -27,9 +31,9 @@ public abstract class FreezableEntity : BasicEntity {
     public static void OnIsFrozenChanged(Changed<FreezableEntity> changed) {
         FreezableEntity entity = changed.Behaviour;
 
-        if (!entity.IsFrozen)
-            return;
+        if (entity.IsFrozen)
+            entity.PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
 
-        entity.PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
+        entity.OnIsFrozenChanged();
     }
 }
