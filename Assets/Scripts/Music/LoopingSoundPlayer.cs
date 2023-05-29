@@ -4,6 +4,7 @@ using UnityEngine.Serialization;
 public class LoopingSoundPlayer : MonoBehaviour {
 
     //---Properties
+    public bool IsPlaying => audioSource.isPlaying;
     protected virtual float AudioStart => currentAudio.loopStartSeconds;
     protected virtual float AudioEnd => currentAudio.loopEndSeconds;
 
@@ -31,6 +32,13 @@ public class LoopingSoundPlayer : MonoBehaviour {
     public virtual void SetSoundData(LoopingSoundData data) {
         currentAudio = data;
         audioSource.clip = data.clip;
+    }
+
+    public virtual void Play(bool restartIfAlreadyPlaying = true) {
+        if (!currentAudio)
+            return;
+
+        Play(currentAudio, restartIfAlreadyPlaying);
     }
 
     public virtual void Play(LoopingSoundData song, bool restartIfAlreadyPlaying = false) {

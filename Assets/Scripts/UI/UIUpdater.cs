@@ -214,7 +214,7 @@ public class UIUpdater : MonoBehaviour {
     }
 
     private void ApplyUIColor() {
-        Color color = SessionData.Instance.Teams ? Utils.GetTeamColor(player.data.Team, 0.8f, 1f) : GameManager.Instance.levelUIColor;
+        Color color = (SessionData.Instance.Object && SessionData.Instance.Teams) ? Utils.GetTeamColor(player.data.Team, 0.8f, 1f) : GameManager.Instance.levelUIColor;
 
         foreach (Image bg in backgrounds)
             bg.color = color;

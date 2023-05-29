@@ -111,7 +111,6 @@ namespace NSMB.Entities.Collectable.Powerups {
                     gameObject.layer = Layers.LayerHitsNothing;
                     sRenderer.sortingOrder = -1000;
 
-
                     if (childAnimation)
                         childAnimation.Play();
 
@@ -206,6 +205,12 @@ namespace NSMB.Entities.Collectable.Powerups {
                 body.position = Vector2.Lerp(BlockSpawnOrigin, BlockSpawnDestination, t);
 
                 if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
+
+                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.position)) {
+                        Runner.Despawn(Object);
+                        return;
+                    }
+
                     SpawnAnimationTimer = TickTimer.None;
                     BlockSpawn = false;
                     sRenderer.sortingOrder = OriginalSortingOrder;
@@ -232,8 +237,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             if (avoidPlayers && physics.Data.OnGround) {
                 PlayerController closest = GameData.Instance.AlivePlayers.OrderBy(player => Utils.Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
                 if (closest) {
-                    float dist = closest.body.position.x - body.position.x;
-                    FacingRight = dist < 0 || dist > GameManager.Instance.LevelWidth;
+                    FacingRight = Utils.Utils.WrappedDirectionSign(closest.body.position, body.position) == -1;
                 }
             }
 
@@ -274,26 +278,26 @@ namespace NSMB.Entities.Collectable.Powerups {
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player) {
 
-            //fixes players hitting multiple colliders at once (propeller)
+            // Fixes players hitting multiple colliders at once (propeller)
             if (!Object || !Object.IsValid)
                 return;
 
-            //don't be collectable if someone already collected us
+            // Don't be collectable if someone already collected us
             if (Collector)
                 return;
 
-            //don't be collectable if we're following a player / spawning
-            if (SpawnAnimationTimer.IsActive(Runner))
+            // Don't be collectable if we're following a player / spawning
+            if (BlockSpawn && (SpawnAnimationTimer.RemainingTime(Runner) ?? 0f) > 0.1f)
                 return;
 
-            //don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,
+            // Don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,
             // so we dont collect it instantly)
             if (IgnorePlayerTimer.IsActive(Runner))
                 return;
 
             Collector = player;
 
-            //change the player's powerup state
+            // Change the player's powerup state
             Enums.PowerupState oldState = player.State;
             Powerup newPowerup = powerupScriptable;
             Enums.PowerupState newState = newPowerup.state;

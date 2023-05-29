@@ -258,7 +258,7 @@ namespace NSMB.Entities.Enemies {
         public override void OnIsDeadChanged() {
             base.OnIsDeadChanged();
 
-            if (!IsDead) {
+            if (IsDead) {
                 sfx.Stop();
             }
         }
@@ -266,7 +266,7 @@ namespace NSMB.Entities.Enemies {
         public override void SpecialKill(bool right, bool groundpound, int combo) {
             base.SpecialKill(right, groundpound, combo);
 
-            //stop the fuse sound if we were killed early (by shell, for example).
+            // Stop the fuse sound if we were killed early (by shell, for example).
             sfx.Stop();
         }
 

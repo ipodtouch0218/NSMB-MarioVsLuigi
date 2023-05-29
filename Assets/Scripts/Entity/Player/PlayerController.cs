@@ -567,6 +567,8 @@ namespace NSMB.Entities.Player {
             hitLeft = left >= 1;
             hitRight = right >= 1;
             hitRoof = up >= 1 && body.velocity.y > -0.1f;
+
+            crushGround &= IsOnGround;
         }
 
         private void UpdateTileProperties() {
@@ -2204,7 +2206,7 @@ namespace NSMB.Entities.Player {
                 if (right ^ left)
                     FacingRight = right;
             } else if (GiantStartTimer.ExpiredOrNotRunning(Runner) && GiantEndTimer.ExpiredOrNotRunning(Runner) && !IsSkidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || IsTurnaround)) {
-                if (IsInKnockback || (IsOnGround && State != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f)) {
+                if (IsInKnockback || (IsOnGround && State != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f && !IsCrouching)) {
                     FacingRight = body.velocity.x > 0;
                 } else if ((!IsInShell || GiantStartTimer.IsActive(Runner)) && (right || left)) {
                     FacingRight = right;
@@ -2523,7 +2525,7 @@ namespace NSMB.Entities.Player {
                 if (Runner.SimulationTime - TimeGrounded > 0.15f)
                     JumpState = PlayerJumpState.None;
 
-                if (hitRoof && crushGround && body.velocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
+                if (hitRoof && IsOnGround && crushGround && body.velocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
                     //Crushed.
                     Powerdown(true);
                 }

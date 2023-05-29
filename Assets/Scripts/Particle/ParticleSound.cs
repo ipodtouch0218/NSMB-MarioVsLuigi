@@ -4,11 +4,11 @@ public class ParticleSound : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private ParticleSystem system;
-    [SerializeField] private AudioSource sfx;
+    [SerializeField] private LoopingSoundPlayer sfx;
 
     public void OnValidate() {
         if (!system) system = GetComponent<ParticleSystem>();
-        if (!sfx) sfx = GetComponent<AudioSource>();
+        if (!sfx) sfx = GetComponent<LoopingSoundPlayer>();
     }
 
     public void Awake() {
@@ -21,9 +21,9 @@ public class ParticleSound : MonoBehaviour {
             return;
         }
 
-        if (system.isEmitting && !sfx.isPlaying)
+        if (system.isEmitting && !sfx.IsPlaying)
             sfx.Play();
-        if (!system.isEmitting && sfx.isPlaying)
+        if (!system.isEmitting && sfx.IsPlaying)
             sfx.Stop();
     }
 }

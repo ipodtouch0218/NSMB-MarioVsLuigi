@@ -83,6 +83,7 @@ namespace NSMB.Tiles {
             bumpSound = !broken;
             if (interacter is PlayerController player) {
                 bumpSound &= !player.IsGroundpounding;
+                bumpSound &= !player.IsDrilling;
             }
 
             return broken;
