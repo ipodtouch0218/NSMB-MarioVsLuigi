@@ -271,6 +271,13 @@ namespace NSMB.Game {
                 Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
                 Gizmos.DrawIcon(starSpawn.transform.position, "star", true, StarSpawnTint);
             }
+
+            Gizmos.color = Color.black;
+            for (int x = 0; x < Mathf.CeilToInt(levelWidthTile / 16f); x++) {
+                for (int y = 0; y < Mathf.CeilToInt(levelHeightTile / 16f); y++) {
+                    Gizmos.DrawWireCube(new(LevelMinX + (x * 8f) + 4f, LevelMinY + (y * 8f) + 4f), new(8, 8, 0));
+                }
+            }
         }
 
         private Vector3 GetSpawnpoint(int playerIndex, int players) {

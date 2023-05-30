@@ -2092,7 +2092,9 @@ namespace NSMB.Entities.Player {
                     FacingRight = newX > 0;
             }
 
-            IsInShell |= State == Enums.PowerupState.BlueShell && !IsSliding && IsOnGround && IsFunctionallyRunning && !HeldEntity && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f;
+            IsInShell |= State == Enums.PowerupState.BlueShell && !IsSliding && IsOnGround && IsFunctionallyRunning
+                && !HeldEntity && Mathf.Abs(body.velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f
+                && (body.velocity.x > 0) == FacingRight;
             if (IsOnGround || previousTickIsOnGround)
                 body.velocity = new(body.velocity.x, 0);
         }

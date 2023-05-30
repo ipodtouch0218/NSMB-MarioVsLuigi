@@ -3,7 +3,7 @@ guid: 01839fef0452b15468db88f4a03aec16
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -25,7 +25,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -65,13 +65,14 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -92,6 +93,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -982,27 +995,6 @@ TextureImporter:
       bones: []
       spriteID: cbc53a2a5b04bc04fa151627cb8ea715
       internalID: 743117822
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 3 Underground (with ice)_41
-      rect:
-        serializedVersion: 2
-        x: 176
-        y: 112
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a11a061d5ac3bd34a917e3bcad97ec25
-      internalID: -239290361
       vertices: []
       indices: 
       edges: []
@@ -2511,27 +2503,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 3 Underground (with ice)_113
-      rect:
-        serializedVersion: 2
-        x: 176
-        y: 0
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0fa48b209290ed94da8c94f777f4926c
-      internalID: -1709330113
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: 3 Underground (with ice)_114
       rect:
         serializedVersion: 2
@@ -2626,125 +2597,125 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      3 Underground (with ice)_111: -427065309
-      3 Underground (with ice)_50: -344956718
+      3 Underground (with ice)_0: 463809184
+      3 Underground (with ice)_1: 325486831
+      3 Underground (with ice)_10: 2091259377
       3 Underground (with ice)_100: -1995542441
-      3 Underground (with ice)_13: 87036784
-      3 Underground (with ice)_18: 1983387905
-      3 Underground (with ice)_30: -787280121
-      3 Underground (with ice)_71: 961262464
-      3 Underground (with ice)_53: -1802843246
-      3 Underground (with ice)_92: -723111888
-      3 Underground (with ice)_41: -239290361
-      3 Underground (with ice)_109: -2094477913
-      3 Underground (with ice)_29: -1136732391
-      3 Underground (with ice)_112: 1995464715
-      3 Underground (with ice)_27: 296482806
-      3 Underground (with ice)_93: -1080658415
-      3 Underground (with ice)_62: 1631711316
-      3 Underground (with ice)_114: 16723349
-      3 Underground (with ice)_9: 1340487323
-      3 Underground (with ice)_61: 1563545303
-      3 Underground (with ice)_108: -2086893022
-      3 Underground (with ice)_106: -201558872
-      3 Underground (with ice)_115: 1362273114
-      3 Underground (with ice)_12: -538031467
-      3 Underground (with ice)_83: -1640321327
-      3 Underground (with ice)_16: -1643039743
-      3 Underground (with ice)_98: 1667658990
-      3 Underground (with ice)_87: -1376620964
-      3 Underground (with ice)_73: 855222251
-      3 Underground (with ice)_74: -1639087377
-      3 Underground (with ice)_43: -1353460376
-      3 Underground (with ice)_72: 254852209
-      3 Underground (with ice)_113: -1709330113
-      3 Underground (with ice)_55: -400949098
-      3 Underground (with ice)_86: -316592218
-      3 Underground (with ice)_11: 856840119
-      3 Underground (with ice)_66: 1147946805
-      3 Underground (with ice)_32: -1175886305
-      3 Underground (with ice)_105: -1009802395
-      3 Underground (with ice)_96: -1355717053
-      3 Underground (with ice)_79: -157346301
-      3 Underground (with ice)_42: 1974585458
-      3 Underground (with ice)_26: -1957236435
-      3 Underground (with ice)_34: -1677972099
-      3 Underground (with ice)_91: 985484135
-      3 Underground (with ice)_104: -799335067
-      3 Underground (with ice)_40: 743117822
-      3 Underground (with ice)_25: -917101869
-      3 Underground (with ice)_99: 607493285
-      3 Underground (with ice)_21: -685679844
-      3 Underground (with ice)_76: -1409147368
-      3 Underground (with ice)_70: -2098142537
-      3 Underground (with ice)_89: -58566002
-      3 Underground (with ice)_82: 292522200
+      3 Underground (with ice)_101: 2052163422
+      3 Underground (with ice)_102: 1943163528
       3 Underground (with ice)_103: -965575270
-      3 Underground (with ice)_19: -92413078
+      3 Underground (with ice)_104: -799335067
+      3 Underground (with ice)_105: -1009802395
+      3 Underground (with ice)_106: -201558872
       3 Underground (with ice)_107: -796505880
+      3 Underground (with ice)_108: -2086893022
+      3 Underground (with ice)_109: -2094477913
+      3 Underground (with ice)_11: 856840119
+      3 Underground (with ice)_110: -202953586
+      3 Underground (with ice)_111: -427065309
+      3 Underground (with ice)_112: 1995464715
+      3 Underground (with ice)_113: -1709330113
+      3 Underground (with ice)_114: 16723349
+      3 Underground (with ice)_115: 1362273114
+      3 Underground (with ice)_116: 1825248712
+      3 Underground (with ice)_117: -867649710
+      3 Underground (with ice)_12: -538031467
+      3 Underground (with ice)_13: 87036784
+      3 Underground (with ice)_14: -1221418917
+      3 Underground (with ice)_15: 1716062659
+      3 Underground (with ice)_16: -1643039743
+      3 Underground (with ice)_17: -577440902
+      3 Underground (with ice)_18: 1983387905
+      3 Underground (with ice)_19: -92413078
+      3 Underground (with ice)_2: 1937237230
+      3 Underground (with ice)_20: -261850464
+      3 Underground (with ice)_21: -685679844
+      3 Underground (with ice)_22: -1485042285
+      3 Underground (with ice)_23: -1188272702
+      3 Underground (with ice)_24: 360079188
+      3 Underground (with ice)_25: -917101869
+      3 Underground (with ice)_26: -1957236435
+      3 Underground (with ice)_27: 296482806
+      3 Underground (with ice)_28: -1659759578
+      3 Underground (with ice)_29: -1136732391
+      3 Underground (with ice)_3: 619478096
+      3 Underground (with ice)_30: -787280121
+      3 Underground (with ice)_31: -549852286
+      3 Underground (with ice)_32: -1175886305
+      3 Underground (with ice)_33: 47157380
+      3 Underground (with ice)_34: -1677972099
+      3 Underground (with ice)_35: 1387261641
+      3 Underground (with ice)_36: -1309429046
+      3 Underground (with ice)_37: -1664875874
+      3 Underground (with ice)_38: 356796582
+      3 Underground (with ice)_39: 1276049933
+      3 Underground (with ice)_4: 636810788
+      3 Underground (with ice)_40: 743117822
+      3 Underground (with ice)_41: -239290361
+      3 Underground (with ice)_42: 1974585458
+      3 Underground (with ice)_43: -1353460376
+      3 Underground (with ice)_44: 333686192
+      3 Underground (with ice)_45: -458542444
+      3 Underground (with ice)_46: -1908917194
+      3 Underground (with ice)_47: -1491199469
+      3 Underground (with ice)_48: 133767324
       3 Underground (with ice)_49: 1489514347
       3 Underground (with ice)_5: -1070347293
-      3 Underground (with ice)_69: 1509991562
-      3 Underground (with ice)_0: 463809184
-      3 Underground (with ice)_35: 1387261641
-      3 Underground (with ice)_31: -549852286
-      3 Underground (with ice)_52: 871765413
-      3 Underground (with ice)_78: -1563331230
-      3 Underground (with ice)_117: -867649710
-      3 Underground (with ice)_65: 827780985
-      3 Underground (with ice)_60: 568350351
-      3 Underground (with ice)_56: -1614517812
-      3 Underground (with ice)_3: 619478096
-      3 Underground (with ice)_63: -1642087317
-      3 Underground (with ice)_77: 1217244738
-      3 Underground (with ice)_67: -1921118511
-      3 Underground (with ice)_59: 1218086515
+      3 Underground (with ice)_50: -344956718
       3 Underground (with ice)_51: -1745068658
-      3 Underground (with ice)_45: -458542444
-      3 Underground (with ice)_97: 272073249
-      3 Underground (with ice)_2: 1937237230
-      3 Underground (with ice)_84: 504469314
-      3 Underground (with ice)_22: -1485042285
-      3 Underground (with ice)_38: 356796582
-      3 Underground (with ice)_17: -577440902
-      3 Underground (with ice)_101: 2052163422
-      3 Underground (with ice)_90: -2024177684
-      3 Underground (with ice)_37: -1664875874
-      3 Underground (with ice)_20: -261850464
-      3 Underground (with ice)_4: 636810788
-      3 Underground (with ice)_85: 703965403
-      3 Underground (with ice)_36: -1309429046
-      3 Underground (with ice)_8: 1215439359
-      3 Underground (with ice)_47: -1491199469
-      3 Underground (with ice)_33: 47157380
-      3 Underground (with ice)_39: 1276049933
-      3 Underground (with ice)_14: -1221418917
-      3 Underground (with ice)_95: -1571235654
+      3 Underground (with ice)_52: 871765413
+      3 Underground (with ice)_53: -1802843246
       3 Underground (with ice)_54: 468021706
-      3 Underground (with ice)_10: 2091259377
-      3 Underground (with ice)_64: -1760306849
-      3 Underground (with ice)_46: -1908917194
-      3 Underground (with ice)_94: -1822325160
-      3 Underground (with ice)_81: -2091762632
-      3 Underground (with ice)_7: -133253764
-      3 Underground (with ice)_28: -1659759578
-      3 Underground (with ice)_58: -1174729399
-      3 Underground (with ice)_44: 333686192
-      3 Underground (with ice)_68: -1776997018
-      3 Underground (with ice)_110: -202953586
-      3 Underground (with ice)_116: 1825248712
-      3 Underground (with ice)_23: -1188272702
-      3 Underground (with ice)_6: 1725730266
-      3 Underground (with ice)_75: -1462849298
-      3 Underground (with ice)_88: -1405762201
-      3 Underground (with ice)_48: 133767324
-      3 Underground (with ice)_102: 1943163528
-      3 Underground (with ice)_24: 360079188
+      3 Underground (with ice)_55: -400949098
+      3 Underground (with ice)_56: -1614517812
       3 Underground (with ice)_57: -905701682
+      3 Underground (with ice)_58: -1174729399
+      3 Underground (with ice)_59: 1218086515
+      3 Underground (with ice)_6: 1725730266
+      3 Underground (with ice)_60: 568350351
+      3 Underground (with ice)_61: 1563545303
+      3 Underground (with ice)_62: 1631711316
+      3 Underground (with ice)_63: -1642087317
+      3 Underground (with ice)_64: -1760306849
+      3 Underground (with ice)_65: 827780985
+      3 Underground (with ice)_66: 1147946805
+      3 Underground (with ice)_67: -1921118511
+      3 Underground (with ice)_68: -1776997018
+      3 Underground (with ice)_69: 1509991562
+      3 Underground (with ice)_7: -133253764
+      3 Underground (with ice)_70: -2098142537
+      3 Underground (with ice)_71: 961262464
+      3 Underground (with ice)_72: 254852209
+      3 Underground (with ice)_73: 855222251
+      3 Underground (with ice)_74: -1639087377
+      3 Underground (with ice)_75: -1462849298
+      3 Underground (with ice)_76: -1409147368
+      3 Underground (with ice)_77: 1217244738
+      3 Underground (with ice)_78: -1563331230
+      3 Underground (with ice)_79: -157346301
+      3 Underground (with ice)_8: 1215439359
       3 Underground (with ice)_80: 419646196
-      3 Underground (with ice)_15: 1716062659
-      3 Underground (with ice)_1: 325486831
-  spritePackingTag: 
+      3 Underground (with ice)_81: -2091762632
+      3 Underground (with ice)_82: 292522200
+      3 Underground (with ice)_83: -1640321327
+      3 Underground (with ice)_84: 504469314
+      3 Underground (with ice)_85: 703965403
+      3 Underground (with ice)_86: -316592218
+      3 Underground (with ice)_87: -1376620964
+      3 Underground (with ice)_88: -1405762201
+      3 Underground (with ice)_89: -58566002
+      3 Underground (with ice)_9: 1340487323
+      3 Underground (with ice)_90: -2024177684
+      3 Underground (with ice)_91: 985484135
+      3 Underground (with ice)_92: -723111888
+      3 Underground (with ice)_93: -1080658415
+      3 Underground (with ice)_94: -1822325160
+      3 Underground (with ice)_95: -1571235654
+      3 Underground (with ice)_96: -1355717053
+      3 Underground (with ice)_97: 272073249
+      3 Underground (with ice)_98: 1667658990
+      3 Underground (with ice)_99: 607493285
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
   assetBundleName: 
