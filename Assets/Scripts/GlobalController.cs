@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -58,6 +59,7 @@ public class GlobalController : Singleton<GlobalController> {
         ControlSystem.controls.Debug.FPSMonitor.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
+        UnityEngine.Random.InitState((int) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalMilliseconds);
     }
 
     public void Update() {

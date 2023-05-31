@@ -270,8 +270,8 @@ namespace NSMB.Entities.Player {
             animator.SetBool("flying", controller.IsSpinnerFlying);
             animator.SetBool("drill", controller.IsDrilling);
             animator.SetFloat("velocityY", body.velocity.y);
-            animator.SetBool("doublejump", controller.JumpState == PlayerController.PlayerJumpState.DoubleJump);
-            animator.SetBool("triplejump", controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
+            animator.SetBool("doublejump", controller.ProperJump && controller.JumpState == PlayerController.PlayerJumpState.DoubleJump);
+            animator.SetBool("triplejump", controller.ProperJump && controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
             animator.SetBool("holding", controller.HeldEntity);
             animator.SetBool("head carry", controller.HeldEntity && controller.HeldEntity is FrozenCube);
             animator.SetBool("carry_start", controller.HeldEntity && controller.HeldEntity is FrozenCube && (Runner.SimulationTime - controller.HoldStartTime) < controller.pickupTime);

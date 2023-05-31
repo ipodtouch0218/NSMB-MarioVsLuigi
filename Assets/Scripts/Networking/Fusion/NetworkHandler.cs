@@ -84,6 +84,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public static event OnJoinSessionFailedDelegate OnJoinSessionFailed;
 
     public NetworkRunner runner;
+    private static bool reattemptCreate;
 
     #region NetworkRunner Callbacks
     void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {
@@ -230,6 +231,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (shutdownReason == ShutdownReason.HostMigration)
             return;
 
+        if (shutdownReason == ShutdownReason.ServerInRoom && reattemptCreate) {
+            reattemptCreate = false;
+            return;
+        } else {
+            reattemptCreate = false;
+        }
+
         OnShutdown?.Invoke(runner, shutdownReason);
         RecreateInstance();
     }
@@ -334,6 +342,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         int attempts = 3;
 
         while (attempts-- > 0) {
+            if (attempts != 0)
+                reattemptCreate = true;
+
             // Create a random room id.
             StringBuilder idBuilder = new();
 
@@ -346,6 +357,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
 
             Debug.Log($"[Network] Creating a game in {CurrentRegion} with the ID {idBuilder}");
+            args.AuthValues = await Authenticate();
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
             args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname);
@@ -359,7 +371,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             if (results.Ok)
                 return results;
 
-            if (results.ShutdownReason != ShutdownReason.GameIdAlreadyExists)
+            if (results.ShutdownReason != ShutdownReason.GameIdAlreadyExists && results.ShutdownReason != ShutdownReason.ServerInRoom)
                 return null;
 
             Debug.Log($"[Network] Failed to create a game with the ID {idBuilder} (the id already exists.) Trying {attempts} more time(s)...");

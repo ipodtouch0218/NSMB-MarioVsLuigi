@@ -206,7 +206,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
                 if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
 
-                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.position)) {
+                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.position + new Vector2(0, hitbox.size.y * 0.5f))) {
                         Runner.Despawn(Object);
                         return;
                     }
@@ -288,6 +288,9 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             // Don't be collectable if we're following a player / spawning
             if (BlockSpawn && (SpawnAnimationTimer.RemainingTime(Runner) ?? 0f) > 0.1f)
+                return;
+
+            if (!BlockSpawn && SpawnAnimationTimer.IsActive(Runner))
                 return;
 
             // Don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,

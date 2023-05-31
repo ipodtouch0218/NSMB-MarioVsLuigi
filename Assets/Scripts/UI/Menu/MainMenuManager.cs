@@ -51,6 +51,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     [SerializeField] private TMP_Text errorText, lobbyHeaderText, updateText, startGameButtonText;
     [SerializeField] private ScrollRect settingsScroll;
     [SerializeField] private Slider lobbyPlayersSlider;
+    [SerializeField] private CanvasGroup copyRoomIdCanvasGroup;
 
     [SerializeField, FormerlySerializedAs("ColorBar")] private Image colorBar;
     [SerializeField] private Image overallsColorImage, shirtColorImage;
@@ -133,7 +134,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         // Version Checking
 #if PLATFORM_WEBGL
-        fullscreenToggle.interactable = false;
+        copyRoomIdCanvasGroup.interactable = false;
 #else
         if (!GlobalController.Instance.checkedForVersion) {
             UpdateChecker.IsUpToDate((upToDate, latestVersion) => {

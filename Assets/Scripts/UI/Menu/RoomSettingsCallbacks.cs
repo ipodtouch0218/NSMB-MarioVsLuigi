@@ -3,13 +3,14 @@ using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
+using NSMB.Translation;
 
 public class RoomSettingsCallbacks : MonoBehaviour {
 
     //---Serailized Variables
     [SerializeField] private TMP_Dropdown levelDropdown;
     [SerializeField] private TMP_InputField starsInputField, coinsInputField, livesInputField, timerInputField;
-    [SerializeField] private TMP_Text playersCount;
+    [SerializeField] private TMP_Text playersCount, roomIdText, roomIdToggleButtonText;
     [SerializeField] private Slider playersSlider;
     [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle;
     [SerializeField] private TeamChooser teamSelectorButton;
@@ -17,6 +18,17 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Runner;
     private SessionData Room => SessionData.Instance;
+
+    //---Private Variables
+    private bool isRoomCodeVisible;
+
+    public void OnEnable() {
+        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+    }
+
+    public void OnDisable() {
+        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
 
     public void UpdateAllSettings(SessionData roomData, bool level) {
         if (!roomData.Object.IsValid)
@@ -32,6 +44,7 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         ChangeTime(roomData.Timer);
         ChangeDrawOnTimeUp(roomData.DrawOnTimeUp);
         ChangeCustomPowerups(roomData.CustomPowerups);
+        SetRoomIdVisibility(isRoomCodeVisible);
 
         if (MainMenuManager.Instance is MainMenuManager mm) {
             mm.playerList.UpdateAllPlayerEntries();
@@ -282,4 +295,21 @@ public class RoomSettingsCallbacks : MonoBehaviour {
         te.Copy();
     }
     #endregion
+
+    #region Room ID
+    public void ToggleRoomIdVisibility() {
+        SetRoomIdVisibility(!isRoomCodeVisible);
+    }
+
+    public void SetRoomIdVisibility(bool newValue) {
+        isRoomCodeVisible = newValue;
+        roomIdToggleButtonText.text = GlobalController.Instance.translationManager.GetTranslation(isRoomCodeVisible ? "ui.generic.hide" : "ui.generic.show");
+        roomIdText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.inroom.settings.room.roomid", "id", isRoomCodeVisible ? Runner.SessionInfo.Name : "ui.inroom.settings.room.roomidhidden");
+    }
+    #endregion
+
+    //---Callbacks
+    private void OnLanguageChanged(TranslationManager tm) {
+        SetRoomIdVisibility(isRoomCodeVisible);
+    }
 }
