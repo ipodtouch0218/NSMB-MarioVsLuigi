@@ -5,13 +5,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using Fusion;
 using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
-using UnityEngine.SceneManagement;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 

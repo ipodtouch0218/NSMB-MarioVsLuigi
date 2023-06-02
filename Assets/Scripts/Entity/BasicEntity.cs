@@ -16,6 +16,7 @@ namespace NSMB.Entities {
 
         //---Components
         [SerializeField] public Rigidbody2D body;
+        [SerializeField] public NetworkRigidbody2D nrb;
         [SerializeField] public AudioSource sfx;
 
         //---Properties
@@ -30,6 +31,7 @@ namespace NSMB.Entities {
 
         public virtual void OnValidate() {
             if (!body) body = GetComponent<Rigidbody2D>();
+            if (!nrb) nrb = GetComponent<NetworkRigidbody2D>();
             if (!sfx) sfx = GetComponent<AudioSource>();
         }
 

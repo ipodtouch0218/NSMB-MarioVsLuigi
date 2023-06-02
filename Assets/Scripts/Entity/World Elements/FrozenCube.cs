@@ -8,21 +8,23 @@ using NSMB.Game;
 using NSMB.Utils;
 
 namespace NSMB.Entities {
+
+    [OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity), typeof(FreezableEntity))]
     public class FrozenCube : HoldableEntity {
 
         //---Networked Variables
-        [Networked] public TickTimer AutoBreakTimer { get; set; }
         [Networked] private FreezableEntity FrozenEntity { get; set; }
+        [Networked] private Vector2 EntityPositionOffset { get; set; }
         [Networked] private NetworkBool FastSlide { get; set; }
+        [Networked] public TickTimer AutoBreakTimer { get; set; }
+        [Networked] private byte Combo { get; set; }
+        [Networked] private NetworkBool Fallen { get; set; }
 
         //---Serialized Variables
         [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, autoBreak = 3f;
 
         //---Private Variables
         public UnfreezeReason unfreezeReason = UnfreezeReason.Other;
-        private Vector2 entityPositionOffset;
-        private int combo;
-        private bool fallen;
 
         public void OnBeforeSpawned(FreezableEntity entityToFreeze) {
             FrozenEntity = entityToFreeze;
@@ -55,9 +57,9 @@ namespace NSMB.Entities {
             hitbox.size = sRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size;
             hitbox.offset = Vector2.up * hitbox.size * 0.5f;
 
-            entityPositionOffset = -(bounds.center - Vector3.up.Multiply(bounds.size * 0.5f) - rendererObject.transform.position);
+            EntityPositionOffset = -(bounds.center - Vector3.up.Multiply(bounds.size * 0.5f) - rendererObject.transform.position);
 
-            body.position -= entityPositionOffset - Vector2.down * 0.1f;
+            body.position -= EntityPositionOffset - Vector2.down * 0.1f;
 
             AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
             flying = FrozenEntity.IsFlying;
@@ -65,11 +67,8 @@ namespace NSMB.Entities {
 
             FrozenEntity.Freeze(this);
 
-            //move entity inside us
-            if (FrozenEntity.IsCarryable) {
-                FrozenEntity.transform.SetParent(transform);
-                FrozenEntity.transform.position = (Vector2) transform.position + entityPositionOffset;
-            } else {
+            // Move entity inside us
+            if (!FrozenEntity.IsCarryable) {
                 dieWhenInsideBlock = false;
             }
         }
@@ -82,61 +81,18 @@ namespace NSMB.Entities {
         }
 
         public override void Render() {
+            base.Render();
 
-            // Handle interactions with tiles
-            if (FrozenEntity.IsCarryable) {
-                if (!HandleTile())
-                    return;
-
-                // Move the entity to be inside us.
-                Vector2 entityPos = (Vector2) transform.position + entityPositionOffset;
-                Utils.Utils.WrapWorldLocation(ref entityPos);
-                FrozenEntity.transform.position = entityPos;
+            if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.nrb.InterpolationTarget && nrb.InterpolationTarget) {
+                Transform target = FrozenEntity.nrb.InterpolationTarget.transform;
+                Vector3 newPos = nrb.InterpolationTarget.position + (Vector3) EntityPositionOffset + (Vector3.forward * -0.1f);
+                Utils.Utils.WrapWorldLocation(ref newPos);
+                target.position = newPos;
             }
         }
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            //if (Holder) {
-            //    body.velocity = Vector2.zero;
-            //    transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
-            //    body.position = Holder.body.position + (Vector2) holderOffset;
-            //    hitbox.enabled = false;
-            //    sRenderer.flipX = !FacingRight;
-            //} else {
-            //    if (GameManager.Instance && GameManager.Instance.GameEnded) {
-            //        body.velocity = Vector2.zero;
-            //        body.angularVelocity = 0;
-            //        if (animator)
-            //            animator.enabled = false;
-
-            //        body.isKinematic = true;
-            //        return;
-            //    }
-
-            //    if (IsDead) {
-            //        hitbox.enabled = false;
-            //        gameObject.layer = Layers.LayerHitsNothing;
-
-            //        if (WasSpecialKilled) {
-            //            body.angularVelocity = 400f * (FacingRight ? 1 : -1);
-            //            body.constraints = RigidbodyConstraints2D.None;
-            //        }
-            //    } else {
-            //        hitbox.enabled = true;
-            //        gameObject.layer = Holder || FastSlide ? Layers.LayerEntity : Layers.LayerGroundEntity;
-            //        body.constraints = RigidbodyConstraints2D.FreezeRotation;
-            //    }
-
-            //    CheckForEntityCollisions();
-
-            //    Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-            //    if (!body.isKinematic && Utils.IsTileSolidAtWorldLocation(loc)) {
-            //        SpecialKill(FacingRight, false, 0);
-            //        return;
-            //    }
-            //    hitbox.enabled = true;
-            //}
 
             if (Holder || FastSlide) {
                 gameObject.layer = Layers.LayerEntity;
@@ -154,6 +110,14 @@ namespace NSMB.Entities {
                 return;
             }
 
+            // Handle interactions with tiles
+            if (FrozenEntity.IsCarryable) {
+                if (!HandleTile())
+                    return;
+
+                FrozenEntity.body.position = body.position + EntityPositionOffset;
+            }
+
             if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {
 
                 if (AutoBreakTimer.Expired(Runner)) {
@@ -161,7 +125,7 @@ namespace NSMB.Entities {
                         unfreezeReason = UnfreezeReason.Timer;
 
                     if (flying)
-                        fallen = true;
+                        Fallen = true;
                     else {
                         KillWithReason(UnfreezeReason.Timer);
                         return;
@@ -210,7 +174,7 @@ namespace NSMB.Entities {
             physics.UpdateCollisions();
 
             if ((FastSlide && (physics.Data.HitLeft || physics.Data.HitRight))
-                || (flying && fallen && physics.Data.OnGround && !Holder)
+                || (flying && Fallen && physics.Data.OnGround && !Holder)
                 || ((Holder || physics.Data.OnGround) && physics.Data.HitRoof)) {
 
                 Kill();
@@ -229,7 +193,7 @@ namespace NSMB.Entities {
                 if (!FastSlide)
                     body.constraints |= RigidbodyConstraints2D.FreezePositionX;
 
-                if (flying && !fallen)
+                if (flying && !Fallen)
                     body.constraints |= RigidbodyConstraints2D.FreezePositionY;
             }
         }
@@ -242,11 +206,11 @@ namespace NSMB.Entities {
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player) {
 
-            //don't interact with our lovely holder
+            // Don't interact with our lovely holder
             if (Holder == player)
                 return;
 
-            //temporary invincibility
+            // Temporary invincibility
             if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
                 return;
 
@@ -260,7 +224,7 @@ namespace NSMB.Entities {
                 Kill();
                 return;
             }
-            if (fallen || player.IsFrozen)
+            if (Fallen || player.IsFrozen)
                 return;
 
             if ((player.IsGroundpounding || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
@@ -277,7 +241,7 @@ namespace NSMB.Entities {
                 return;
             }
             if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround && !player.IsSwimming) {
-                fallen = true;
+                Fallen = true;
                 Pickup(player);
             }
         }
@@ -305,19 +269,19 @@ namespace NSMB.Entities {
         public override void Throw(bool toRight, bool crouch) {
             base.Throw(toRight, false);
 
-            fallen = false;
+            Fallen = false;
             flying = false;
             FastSlide = true;
 
             if (FrozenEntity.IsFlying) {
-                fallen = true;
+                Fallen = true;
                 body.isKinematic = false;
             }
             ApplyConstraints();
         }
 
         public override void Kick(PlayerController kicker, bool fromLeft, float kickFactor, bool groundpound) {
-            //kicking does nothing.
+            // Kicking does nothing.
         }
 
         //---IKillableEntity overrides
@@ -325,8 +289,7 @@ namespace NSMB.Entities {
             if (Holder || !FastSlide)
                 return;
 
-            //only run when fastsliding...
-
+            // Only run when fastsliding...
             int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
             for (int i = 0; i < count; i++) {
@@ -347,10 +310,10 @@ namespace NSMB.Entities {
                     if (Holder == killable || PreviousHolder == killable || FrozenEntity == killable)
                         continue;
 
-                    //kill entity we ran into
-                    killable.SpecialKill(killable.body.position.x > body.position.x, false, combo++);
+                    // Kill entity we ran into
+                    killable.SpecialKill(killable.body.position.x > body.position.x, false, Combo++);
 
-                    //kill ourselves if we're being held too
+                    // Kill ourselves if we're being held too
                     if (Holder)
                         SpecialKill(killable.body.position.x < body.position.x, false, 0);
 
@@ -363,8 +326,9 @@ namespace NSMB.Entities {
             if (Holder)
                 Holder.SetHeldEntity(null);
 
-            if (FrozenEntity)
+            if (FrozenEntity) {
                 FrozenEntity.Unfreeze(unfreezeReason);
+            }
 
             Runner.Despawn(Object);
         }

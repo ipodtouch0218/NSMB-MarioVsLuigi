@@ -13,9 +13,6 @@ namespace NSMB.Entities.Enemies {
         [SerializeField] private float speed, playerSearchRadius = 4, despawnDistance = 8;
         [SerializeField] private ParticleSystem shootParticles, trailParticles;
 
-        //---Components
-        [SerializeField] public NetworkRigidbody2D nrb;
-
         //---Private Variables
         private Vector2 searchVector;
 

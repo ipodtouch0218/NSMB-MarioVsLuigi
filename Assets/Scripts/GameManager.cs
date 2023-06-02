@@ -201,7 +201,7 @@ namespace NSMB.Game {
         }
 
         public void Pause(bool newState) {
-            if (paused == newState || GameData.GameState < Enums.GameState.Playing)
+            if (paused == newState || GameData.GameState != Enums.GameState.Playing)
                 return;
 
             paused = newState;

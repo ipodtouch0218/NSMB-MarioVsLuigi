@@ -358,7 +358,7 @@ MonoBehaviour:
   _interpolationDataSource: 2
   InterpolationSpace: 1
   InterpolationTarget: {fileID: 3560772426833456990}
-  InterpolateErrorCorrection: 1
+  InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 5
     MaxRate: 45

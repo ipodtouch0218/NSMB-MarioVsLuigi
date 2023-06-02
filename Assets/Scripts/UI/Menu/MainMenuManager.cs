@@ -279,8 +279,11 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         bg.SetActive(true);
         lobbyMenu.SetActive(true);
 
-        if (NetworkHandler.Disconnected)
+        Debug.Log(NetworkHandler.Connecting);
+        Debug.Log(NetworkHandler.Disconnected);
+        if (NetworkHandler.Disconnected) {
             Reconnect();
+        }
 
         roomManager.RefreshRooms();
 
@@ -369,8 +372,9 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         _ = NetworkHandler.ConnectToRegion(targetRegion);
     }
 
-    public void Reconnect() {
-        _ = NetworkHandler.ConnectToSameRegion();
+    public async void Reconnect() {
+        Debug.Log("[Network] Reconnecting to the master server");
+        await NetworkHandler.ConnectToSameRegion();
     }
 
     public async void QuitRoom() {

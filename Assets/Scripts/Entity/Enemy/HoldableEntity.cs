@@ -16,21 +16,19 @@ namespace NSMB.Entities {
 
         //---Serailized Variables
         [SerializeField] protected float throwSpeed = 4.5f;
-        [SerializeField] protected NetworkRigidbody2D nrb;
 
         //--Misc Variables
         public Vector3 holderOffset;
         public bool canPlace = true, canKick = true;
         private bool wasHeldLastTick;
 
-        public override void OnValidate() {
-            base.OnValidate();
-            if (!nrb) nrb = GetComponentInParent<NetworkRigidbody2D>();
-        }
-
         public override void Render() {
-            if (Holder)
-                transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
+            if (Holder && nrb.InterpolationTarget) {
+                Transform target = nrb.InterpolationTarget.transform;
+                Vector3 newPos = Holder.networkRigidbody.InterpolationTarget.transform.position + new Vector3(holderOffset.x, holderOffset.y, -0.1f);
+                Utils.Utils.WrapWorldLocation(ref newPos);
+                target.position = newPos;
+            }
         }
 
         public override void FixedUpdateNetwork() {
@@ -42,9 +40,9 @@ namespace NSMB.Entities {
                 // Teleport check
                 Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
                 Vector2 diff = newPosition - body.position;
-                Utils.Utils.WrapWorldLocation(ref newPosition);
+                bool wrapped = Utils.Utils.WrapWorldLocation(ref newPosition);
 
-                if (!wasHeldLastTick || Mathf.Abs(newPosition.x - body.position.x) > 2) {
+                if (!wasHeldLastTick || wrapped) {
                     nrb.TeleportToPosition(newPosition, diff);
                 } else {
                     body.position = newPosition;

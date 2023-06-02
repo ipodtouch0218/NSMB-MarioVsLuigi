@@ -7,6 +7,7 @@ using NSMB.Game;
 using NSMB.Tiles;
 
 namespace NSMB.Entities {
+
     [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
     [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
     public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
@@ -29,7 +30,6 @@ namespace NSMB.Entities {
 
         //---Components
         [SerializeField] private PhysicsEntity physics;
-        [SerializeField] private NetworkRigidbody2D nrb;
         [SerializeField] private SpriteRenderer[] renderers;
         [SerializeField] private BoxCollider2D hitbox;
 

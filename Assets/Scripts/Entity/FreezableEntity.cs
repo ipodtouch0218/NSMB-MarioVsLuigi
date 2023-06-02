@@ -15,9 +15,7 @@ public abstract class FreezableEntity : BasicEntity {
 
     public abstract void Unfreeze(UnfreezeReason reasonByte);
 
-    public virtual void OnIsFrozenChanged() {
-
-    }
+    public virtual void OnIsFrozenChanged() { }
 
     public enum UnfreezeReason : byte {
         Other,

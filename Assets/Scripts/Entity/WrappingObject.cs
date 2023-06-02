@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 
 using Fusion;
-using NSMB.Entities;
-using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 
 [RequireComponent(typeof(NetworkRigidbody2D))]
 [OrderBefore(typeof(NetworkPhysicsSimulation2D))]
-public class WrappingObject : SimulationBehaviour/*, IAfterUpdate */{
+public class WrappingObject : SimulationBehaviour {
 
     //---Serialized Variables
     [SerializeField] private NetworkRigidbody2D nrb;
@@ -29,17 +27,14 @@ public class WrappingObject : SimulationBehaviour/*, IAfterUpdate */{
         width = new(GameManager.Instance.LevelWidth, 0);
     }
 
-    //public void AfterUpdate() {
-    //    if (nrb.InterpolationTarget) {
-    //        Vector3 pos = nrb.InterpolationTarget.position;
-
-    //        if (pos.x < GameManager.Instance.LevelMinX || pos.x > GameManager.Instance.LevelMaxX) {
-    //            Debug.Log("Wrapped me ");
-    //            Utils.WrapWorldLocation(ref pos);
-    //            //nrb.InterpolationTarget.position = pos;
-    //        }
-    //    }
-    //}
+    public void LateUpdate() {
+        if (nrb.InterpolationTarget) {
+            Vector3 pos = nrb.InterpolationTarget.position;
+            if (Utils.WrapWorldLocation(ref pos)) {
+                nrb.InterpolationTarget.position = pos;
+            }
+        }
+    }
 
     public override void FixedUpdateNetwork() {
         if (nrb.Rigidbody.position.x < GameManager.Instance.LevelMinX) {

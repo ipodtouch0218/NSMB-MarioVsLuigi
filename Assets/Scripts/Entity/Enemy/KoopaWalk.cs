@@ -41,6 +41,7 @@ namespace NSMB.Entities.Enemies {
         private float dampVelocity;
 
         public override void Render() {
+            base.Render();
             if (IsFrozen || IsDead)
                 return;
 
