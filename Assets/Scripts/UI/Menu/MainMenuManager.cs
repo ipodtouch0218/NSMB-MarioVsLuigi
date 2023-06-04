@@ -34,24 +34,25 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public byte currentSkin;
 
     //---Serialized Fields
+    [Header("Managers")]
     [SerializeField] public PlayerListHandler playerList;
     [SerializeField] public RoomListManager roomManager;
     [SerializeField] private ColorChooser colorManager;
     [SerializeField] public ChatManager chat;
     [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
-    [SerializeField] private CanvasGroup hostControlsGroup;
-    [SerializeField] private NetworkErrorPrompt networkErrorPrompt;
 
-    [SerializeField] private GameObject title, bg, mainMenu, lobbyMenu, createLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox, connecting;
+    [Header("UI Elements")]
+    [SerializeField] private GameObject title;
+    [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox, connecting;
     [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
-    [SerializeField] private GameObject errorBox, errorButton;
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
     [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
     [SerializeField] private TMP_InputField nicknameField, chatTextField;
-    [SerializeField] private TMP_Text errorText, lobbyHeaderText, updateText, startGameButtonText;
+    [SerializeField] private TMP_Text lobbyHeaderText, updateText, startGameButtonText;
     [SerializeField] private ScrollRect settingsScroll;
     [SerializeField] private Slider lobbyPlayersSlider;
-    [SerializeField] private CanvasGroup copyRoomIdCanvasGroup;
+    [SerializeField] private CanvasGroup hostControlsGroup, copyRoomIdCanvasGroup;
+    [SerializeField] private ErrorPrompt errorPrompt, networkErrorPrompt;
 
     [SerializeField, FormerlySerializedAs("ColorBar")] private Image colorBar;
     [SerializeField] private Image overallsColorImage, shirtColorImage;
@@ -272,15 +273,12 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         mainMenu.SetActive(true);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
-
     }
     public void OpenRoomListMenu() {
         DisableAllMenus();
         bg.SetActive(true);
         lobbyMenu.SetActive(true);
 
-        Debug.Log(NetworkHandler.Connecting);
-        Debug.Log(NetworkHandler.Disconnected);
         if (NetworkHandler.Disconnected) {
             Reconnect();
         }
@@ -314,21 +312,25 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void OpenErrorBox(Enum cause) {
-        if (!errorBox.activeSelf)
-            sfx.PlayOneShot(Enums.Sounds.UI_Error);
+        OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
 
-        errorBox.SetActive(true);
-        errorText.text = GlobalController.Instance.translationManager.GetTranslation(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
-        EventSystem.current.SetSelectedGameObject(errorButton);
+        //if (!errorBox.activeSelf)
+        //    sfx.PlayOneShot(Enums.Sounds.UI_Error);
+
+        //errorBox.SetActive(true);
+        //errorText.text = GlobalController.Instance.translationManager.GetTranslation(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
+        //EventSystem.current.SetSelectedGameObject(errorButton);
     }
 
     public void OpenErrorBox(string key) {
-        if (!errorBox.activeSelf)
-            sfx.PlayOneShot(Enums.Sounds.UI_Error);
+        errorPrompt.OpenWithText(key);
 
-        errorBox.SetActive(true);
-        errorText.text = GlobalController.Instance.translationManager.GetTranslation(key);
-        EventSystem.current.SetSelectedGameObject(errorButton);
+        //if (!errorBox.activeSelf)
+        //    sfx.PlayOneShot(Enums.Sounds.UI_Error);
+
+        //errorBox.SetActive(true);
+        //errorText.text = GlobalController.Instance.translationManager.GetTranslation(key);
+        //EventSystem.current.SetSelectedGameObject(errorButton);
         nonNetworkShutdown = false;
     }
 
@@ -373,7 +375,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public async void Reconnect() {
-        Debug.Log("[Network] Reconnecting to the master server");
+        Debug.Log("[Network] (Re)connecting to the master server");
         await NetworkHandler.ConnectToSameRegion();
     }
 

@@ -1,8 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 using NSMB.Extensions;
-using System.Collections;
 
 namespace NSMB.Loading {
     public class LoadingCanvas : MonoBehaviour {
@@ -17,6 +17,7 @@ namespace NSMB.Loading {
 
         //---Private Variables
         private bool initialized;
+        private Coroutine fadeCoroutine;
 
         public void Initialize() {
             if (initialized)
@@ -32,7 +33,14 @@ namespace NSMB.Loading {
             readyBackground.color = Color.clear;
 
             animator.Play("waiting");
+
+            audioSource.volume = 0;
             audioSource.Play();
+
+            if (fadeCoroutine != null)
+                StopCoroutine(fadeCoroutine);
+            fadeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
+
             audioListener.enabled = true;
         }
 
@@ -43,13 +51,36 @@ namespace NSMB.Loading {
 
             initialized = false;
 
-            audioSource.Stop();
+            if (fadeCoroutine != null)
+                StopCoroutine(fadeCoroutine);
+
+            fadeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
             audioListener.enabled = false;
         }
 
         public void EndAnimation() {
             gameObject.SetActive(false);
             initialized = false;
+        }
+
+        private IEnumerator FadeVolume(float fadeTime, bool fadeIn) {
+            float currentVolume = audioSource.volume;
+            float fadeRate = 1f / fadeTime;
+
+            while (true) {
+                currentVolume += fadeRate * Time.deltaTime * (fadeIn ? 1 : -1);
+
+                if (currentVolume < 0 || currentVolume > 1) {
+                    audioSource.volume = Mathf.Clamp01(currentVolume);
+                    break;
+                }
+
+                audioSource.volume = currentVolume;
+                yield return null;
+            }
+
+            if (!fadeIn)
+                audioSource.Stop();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace NSMB.Entities.Collectable {
     public class StarBouncer : CollectableEntity {
 
         //---Static Variables
-        private static LayerMask GroundAndPassthroughMask;
+        private static ContactFilter2D GroundFilter;
 
         //---Networked Variables
         [Networked] public NetworkBool IsStationary { get; set; }
@@ -87,8 +87,10 @@ namespace NSMB.Entities.Collectable {
             if (GameData.Instance.GameState == Enums.GameState.Playing)
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
 
-            if (GroundAndPassthroughMask == default)
-                GroundAndPassthroughMask = 1 << Layers.LayerGround | 1 << Layers.LayerPassthrough;
+            if (!GroundFilter.useTriggers) {
+                GroundFilter.SetLayerMask((1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough));
+                GroundFilter.useTriggers = true;
+            }
         }
 
         public override void Render() {
@@ -121,7 +123,7 @@ namespace NSMB.Entities.Collectable {
             if (HandleCollision())
                 return;
 
-            if (Passthrough && Collectable && body.velocity.y <= 0 && !Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Physics2D.OverlapBox(body.position, Vector2.one / 3, 0, GroundAndPassthroughMask)) {
+            if (Passthrough && Collectable && body.velocity.y <= 0 && !Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Runner.GetPhysicsScene2D().OverlapBox(body.position, Vector3.one * 0.33f, 0, GroundFilter)) {
                 Passthrough = false;
                 gameObject.layer = Layers.LayerEntity;
             }

@@ -24,10 +24,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     //---Properties
     public static string CurrentRegion { get; set; }
     public static NetworkRunner Runner => Instance.runner;
-    public static bool Connecting => AuthenticationHandler.IsAuthenticating || (Runner && Runner.State == NetworkRunner.States.Starting && !Runner.IsCloudReady) || (Runner && Runner.State == NetworkRunner.States.Running && !Runner.IsConnectedToServer);
+    public static bool Connecting => connecting || AuthenticationHandler.IsAuthenticating || (Runner && Runner.State == NetworkRunner.States.Starting && !Runner.IsCloudReady) || (Runner && Runner.State == NetworkRunner.States.Running && !Runner.IsConnectedToServer && !Runner.IsServer);
     public static bool Connected => !Connecting && Runner && (Runner.State == NetworkRunner.States.Running || Runner.IsCloudReady);
     public static bool Disconnected => !Connecting && !Connected;
 
+    #region Events
     //---Exposed callbacks for Events
     public delegate void OnConnectedToServerDelegate(NetworkRunner runner);
     public static event OnConnectedToServerDelegate OnConnectedToServer;
@@ -82,9 +83,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public delegate void OnJoinSessionFailedDelegate(NetworkRunner runner, ShutdownReason reason);
     public static event OnJoinSessionFailedDelegate OnJoinSessionFailed;
+    #endregion
 
     public NetworkRunner runner;
     private static bool reattemptCreate;
+    private static bool connecting;
 
     #region NetworkRunner Callbacks
     void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {
@@ -108,7 +111,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
         Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress}");
 
-        if (runner.SessionInfo.PlayerCount >= SessionData.Instance.MaxPlayers) {
+        if (runner.SessionInfo.PlayerCount > SessionData.Instance.MaxPlayers) {
             request.Refuse();
             return;
         }
@@ -148,8 +151,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             HostMigrationToken = hostMigrationToken,
             HostMigrationResume = HostMigrationResume,
             ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname),
-            DisableClientSessionCreation = true,
-
+            DisableClientSessionCreation = false,
         });
 
         OnHostMigration?.Invoke(runner, hostMigrationToken);
@@ -333,7 +335,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             OnShutdown?.Invoke(Runner, result.ShutdownReason);
         }
 
-        AuthenticationHandler.IsAuthenticating = false;
         return result;
     }
 

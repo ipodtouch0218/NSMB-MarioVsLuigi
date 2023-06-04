@@ -12,7 +12,7 @@ namespace NSMB.Entities.Collectable.Powerups {
     public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
         //---Static Variables
-        private static LayerMask GroundMask;
+        private static ContactFilter2D GroundFilter;
         private static readonly int OriginalSortingOrder = 10;
 
         //---Networked Variables
@@ -58,8 +58,10 @@ namespace NSMB.Entities.Collectable.Powerups {
         public void Awake() {
             collectScript = GetComponent<IPowerupCollect>();
 
-            if (GroundMask == 0)
-                GroundMask = (1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough);
+            if (!GroundFilter.useTriggers) {
+                GroundFilter.SetLayerMask((1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough));
+                GroundFilter.useTriggers = true;
+            }
         }
 
         public void OnBeforeSpawned(float pickupDelay) {
@@ -206,7 +208,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
                 if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
 
-                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.position + new Vector2(0, hitbox.size.y * 0.5f))) {
+                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.position + hitbox.size.y * 0.25f * Vector2.up)) {
                         Runner.Despawn(Object);
                         return;
                     }
@@ -226,7 +228,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
             Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
-            if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
+            if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundFilter)) {
                 gameObject.layer = Layers.LayerHitsNothing;
                 return;
             } else {
@@ -255,7 +257,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             if (data.OnGround) {
                 body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(body.velocity.y, bouncePower));
 
-                if (data.HitRoof || (data.HitLeft && data.HitRight)) {
+                if (data.HitRoof /*|| (data.HitLeft && data.HitRight)*/) {
                     DespawnEntity();
                     return;
                 }

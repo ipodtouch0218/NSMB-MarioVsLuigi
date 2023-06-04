@@ -21,9 +21,11 @@ public class SpectationManager : MonoBehaviour {
         get => _spectating;
         set {
             _spectating = value;
-            if (TargetPlayer == null)
+            if (!_spectating) {
+                TargetPlayer = null;
+            } else if (TargetPlayer == null) {
                 SpectateNextPlayer();
-
+            }
             UpdateSpectateUI();
         }
     }
@@ -36,8 +38,8 @@ public class SpectationManager : MonoBehaviour {
 
             _targetPlayer = value;
             if (value != null) {
-                UpdateSpectateUI();
                 value.cameraController.IsControllingCamera = true;
+                UpdateSpectateUI();
             }
         }
     }

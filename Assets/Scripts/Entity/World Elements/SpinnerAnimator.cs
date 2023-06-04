@@ -6,6 +6,7 @@ using NSMB.Entities.Player;
 namespace NSMB.Entities.World {
 
     [OrderBefore(typeof(PlayerController))]
+    [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
     public class SpinnerAnimator : NetworkBehaviour {
 
         //---Static Variables

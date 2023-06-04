@@ -364,7 +364,15 @@ namespace NSMB.Entities.Player {
             animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
 
 
-            transform.position = new(transform.position.x, transform.position.y, controller.IsDead ? -6 : (controller.CurrentPipe ? 1 : -4));
+            float newZ = -4;
+            if (controller.IsDead)
+                newZ = -6;
+            else if (controller.CurrentPipe)
+                newZ = 1;
+            else if (controller.FrozenCube)
+                newZ = 3;
+
+            transform.position = new(transform.position.x, transform.position.y, newZ);
         }
 
         public void HandleDeathAnimation() {

@@ -19,12 +19,12 @@ namespace NSMB.Entities {
         [Networked] public TickTimer AutoBreakTimer { get; set; }
         [Networked] private byte Combo { get; set; }
         [Networked] private NetworkBool Fallen { get; set; }
+        [Networked] public UnfreezeReason KillReason { get; set; }
 
         //---Serialized Variables
         [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, autoBreak = 3f;
 
         //---Private Variables
-        public UnfreezeReason unfreezeReason = UnfreezeReason.Other;
 
         public void OnBeforeSpawned(FreezableEntity entityToFreeze) {
             FrozenEntity = entityToFreeze;
@@ -75,9 +75,6 @@ namespace NSMB.Entities {
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
             Instantiate(PrefabList.Instance.Particle_IceBreak, transform.position, Quaternion.identity);
-
-            if (FrozenEntity)
-                FrozenEntity.transform.SetParent(null);
         }
 
         public override void Render() {
@@ -94,11 +91,10 @@ namespace NSMB.Entities {
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
 
-            if (Holder || FastSlide) {
-                gameObject.layer = Layers.LayerEntity;
-            } else {
-                gameObject.layer = Layers.LayerGroundEntity;
-            }
+            if (!Object)
+                return;
+
+            gameObject.layer = (Holder || FastSlide) ? Layers.LayerEntity : Layers.LayerGroundEntity;
 
             if (body.position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
                 Kill();
@@ -122,7 +118,7 @@ namespace NSMB.Entities {
 
                 if (AutoBreakTimer.Expired(Runner)) {
                     if (!FastSlide)
-                        unfreezeReason = UnfreezeReason.Timer;
+                        KillReason = UnfreezeReason.Timer;
 
                     if (flying)
                         Fallen = true;
@@ -199,7 +195,7 @@ namespace NSMB.Entities {
         }
 
         public void KillWithReason(UnfreezeReason reason) {
-            unfreezeReason = reason;
+            KillReason = reason;
             Kill();
         }
 
@@ -327,14 +323,21 @@ namespace NSMB.Entities {
                 Holder.SetHeldEntity(null);
 
             if (FrozenEntity) {
-                FrozenEntity.Unfreeze(unfreezeReason);
+                FrozenEntity.Unfreeze(KillReason);
             }
 
+            IsDead = true;
             Runner.Despawn(Object);
         }
 
         public override void SpecialKill(bool right, bool groundpound, int combo) {
             Kill();
+        }
+
+        public override void OnIsDeadChanged() {
+            base.OnIsDeadChanged();
+
+            sRenderer.enabled = !IsDead;
         }
     }
 }

@@ -669,7 +669,11 @@ namespace NSMB.Entities.Player {
                     return;
                 }
 
-                other.Powerdown(false);
+                if (dropStars) {
+                    other.Powerdown(false);
+                } else {
+                    other.DoKnockback(!fromRight, 0, true, Object);
+                }
                 return;
             }
 
@@ -687,7 +691,11 @@ namespace NSMB.Entities.Player {
                     }
                 } else if (State == Enums.PowerupState.MegaMushroom) {
                     // Only we are giant
-                    other.Powerdown(false);
+                    if (dropStars) {
+                        other.Powerdown(false);
+                    } else {
+                        other.DoKnockback(!fromRight, 0, true, Object);
+                    }
                 }
                 return;
             }
@@ -702,7 +710,11 @@ namespace NSMB.Entities.Player {
                         DoKnockback(fromRight, dropStars ? 1 : 0, true, other.Object);
                         other.DoKnockback(!fromRight, dropStars ? 1 : 0, true, Object);
                     } else {
-                        other.Powerdown(false);
+                        if (dropStars) {
+                            other.Powerdown(false);
+                        } else {
+                            other.DoKnockback(!fromRight, 0, true, Object);
+                        }
                     }
                     float dotRight = Vector2.Dot((body.position - other.body.position).normalized, Vector2.right);
                     FacingRight = dotRight > 0;
@@ -943,7 +955,6 @@ namespace NSMB.Entities.Player {
             FrozenCube.AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, 1.75f);
             animator.enabled = false;
             body.isKinematic = true;
-            body.simulated = false;
             IsInKnockback = false;
             IsSkidding = false;
             IsDrilling = false;
@@ -961,7 +972,6 @@ namespace NSMB.Entities.Player {
 
             IsFrozen = false;
             animator.enabled = true;
-            body.simulated = true;
             body.isKinematic = false;
 
             int knockbackStars = reason switch {
