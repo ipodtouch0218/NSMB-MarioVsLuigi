@@ -77,7 +77,9 @@ namespace NSMB.Entities {
             fireGraphics.SetActive(false);
 
             transform.SetParent(GameManager.Instance.objectPoolParent.transform);
-            GameData.Instance.PooledFireballs.Add(this);
+
+            if (!GameData.Instance.PooledFireballs.Contains(this))
+                GameData.Instance.PooledFireballs.Add(this);
         }
 
         public override void FixedUpdateNetwork() {

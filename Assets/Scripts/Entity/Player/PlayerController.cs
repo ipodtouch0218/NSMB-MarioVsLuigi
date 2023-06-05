@@ -358,7 +358,9 @@ namespace NSMB.Entities.Player {
             networkRigidbody.TeleportToPosition(spawnpoint);
             cameraController.Recenter(spawnpoint);
 
-            GameData.Instance.AlivePlayers.Add(this);
+            if (!GameData.Instance.AlivePlayers.Contains(this)) {
+                GameData.Instance.AlivePlayers.Add(this);
+            }
             GameManager.Instance.teamManager.AddPlayer(this);
 
             ControlSystem.controls.Enable();

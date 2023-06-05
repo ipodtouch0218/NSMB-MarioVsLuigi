@@ -41,7 +41,7 @@ namespace NSMB.Tiles {
             }
             if (!leftOfPipe && direction == InteractionDirection.Right) {
                 if (Utils.Utils.GetTileAtTileLocation(ourLocation + Vector2Int.left) is InteractableTile otherPipe) {
-                    return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.left* 0.5f), out bumpSound);
+                    return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.left * 0.5f), out bumpSound);
                 }
             }
 
@@ -50,7 +50,7 @@ namespace NSMB.Tiles {
             Vector2Int pipeDirection = upsideDownPipe ? Vector2Int.up : Vector2Int.down;
             Vector2Int hat = origin - (pipeDirection * (height - 1));
 
-            if (ourLocation.y <= GameManager.Instance.levelMinTileY + 1)
+            if (ourLocation.y == GameManager.Instance.levelMinTileY + 1)
                 // Exception: dont break out of bounds.
                 return false;
 

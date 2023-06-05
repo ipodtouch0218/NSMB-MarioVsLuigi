@@ -15,6 +15,11 @@ public class TeamScoreboard : MonoBehaviour {
     private TeamManager teamManager;
 
     public void OnTeamsFinalized(TeamManager manager) {
+        if (!SessionData.Instance.Teams) {
+            enabled = false;
+            return;
+        }
+
         if (teamManager != null)
             return;
 

@@ -272,10 +272,13 @@ namespace NSMB.Game {
             GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0.2f : 5.7f);
 
             // Find out how many players we have
-            RealPlayerCount = (byte) Runner.ActivePlayers
-                .Select(pl => pl.GetPlayerData(Runner))
-                .Where(pd => pd && !pd.IsCurrentlySpectating)
-                .Count();
+            foreach (PlayerRef client in Runner.ActivePlayers) {
+                PlayerData data = client.GetPlayerData(Runner);
+                if (!data || data.IsCurrentlySpectating)
+                    continue;
+
+                RealPlayerCount++;
+            }
 
             List<int> spawnpoints = Enumerable.Range(0, RealPlayerCount).ToList();
 
@@ -293,9 +296,9 @@ namespace NSMB.Game {
                     // Set the spawnpoint that they should spawn at
                     int index = UnityEngine.Random.Range(0, spawnpoints.Count);
                     int spawnpoint = spawnpoints[index];
-                    obj.GetComponent<PlayerController>().OnBeforeSpawned(spawnpoint);
-
                     spawnpoints.RemoveAt(index);
+
+                    obj.GetComponent<PlayerController>().OnBeforeSpawned(spawnpoint);
                 });
             }
 
