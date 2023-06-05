@@ -319,8 +319,11 @@ namespace NSMB.Entities {
         }
 
         public override void Kill() {
-            if (Holder)
+            if (Holder) {
+                bool dropStars = !(FrozenEntity is PlayerController pc && pc.data.Team == Holder.data.Team);
+                Holder.DoKnockback(Holder.FacingRight, dropStars ? 1 : 0, false, FrozenEntity.Object);
                 Holder.SetHeldEntity(null);
+            }
 
             if (FrozenEntity) {
                 FrozenEntity.Unfreeze(KillReason);

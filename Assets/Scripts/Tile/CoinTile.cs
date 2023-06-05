@@ -34,20 +34,6 @@ namespace NSMB.Tiles {
                 player = koopa.PreviousHolder;
 
             if (player) {
-                if (player.State == Enums.PowerupState.MegaMushroom) {
-                    //Break
-
-                    //Tilemap
-                    GameManager.Instance.tileManager.SetTile(tileLocation, null);
-
-                    //Particle
-                    //TODO:
-                    GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f, particleColor);
-
-                    player.PlaySound(Enums.Sounds.World_Block_Break);
-                    return true;
-                }
-
                 //Give coin to player
                 Coin.GivePlayerCoin(player, worldLocation + (Vector3) (Vector2.one / 4f));
             } else {

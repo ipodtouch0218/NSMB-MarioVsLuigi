@@ -61,6 +61,7 @@ MonoBehaviour:
   _IsActive:
     _value: 1
   body: {fileID: 1017215213198693187}
+  nrb: {fileID: 2258520988097781654}
   sfx: {fileID: 4207910641862185911}
   checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}
@@ -137,7 +138,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.225}
+  m_Offset: {x: 0, y: 0.22}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}

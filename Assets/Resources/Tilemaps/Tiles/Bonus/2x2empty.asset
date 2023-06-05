@@ -27,3 +27,4 @@ MonoBehaviour:
   breakableByBombs: 0
   bumpIfNotBroken: 0
   bumpIfBroken: 0
+  tileSize: {x: 2, y: 2}

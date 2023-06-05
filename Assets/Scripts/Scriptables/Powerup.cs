@@ -7,6 +7,7 @@ public class Powerup : ScriptableObject {
 
     public Enums.PowerupState state;
     public NetworkPrefabRef prefab;
+    public bool soundPlaysEverywhere;
     public Enums.Sounds soundEffect = Enums.Sounds.Player_Sound_PowerupCollect;
     public Enums.Sounds powerupBlockEffect = Enums.Sounds.World_Block_Powerup;
     public float spawnChance = 0.1f, losingSpawnBonus = 0f;

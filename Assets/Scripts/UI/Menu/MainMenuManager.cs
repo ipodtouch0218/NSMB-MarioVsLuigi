@@ -120,7 +120,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             // Initial connection to the game
             OpenTitleScreen();
 
-        } else if (Runner.SessionInfo.IsValid) {
+        } else if (Runner.IsServer || Runner.IsConnectedToServer) {
             // Call enterroom callback
             EnterRoom();
         }

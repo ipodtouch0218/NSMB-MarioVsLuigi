@@ -140,11 +140,11 @@ namespace NSMB.Game {
             levelUIColor.a = .7f;
         }
 
-        public void Start() {
+        public async void Start() {
             // Handles spawning in editor
             if (!NetworkHandler.Runner.SessionInfo.IsValid) {
                 // Join a singleplayer room if we're not in one
-                _ = NetworkHandler.CreateRoom(new() {
+                _ = await NetworkHandler.CreateRoom(new() {
                     Scene = SceneManager.GetActiveScene().buildIndex,
                 }, GameMode.Single);
             }
@@ -158,8 +158,8 @@ namespace NSMB.Game {
 
             // Spawn a GameDataHolder, if one doesn't already exist.
             if (!GameData.Instance) {
-                NetworkHandler.Instance.runner.Spawn(PrefabList.Instance.GameDataHolder);
                 NetworkHandler.Instance.runner.Spawn(PrefabList.Instance.TileManager);
+                NetworkHandler.Instance.runner.Spawn(PrefabList.Instance.GameDataHolder);
             }
         }
 

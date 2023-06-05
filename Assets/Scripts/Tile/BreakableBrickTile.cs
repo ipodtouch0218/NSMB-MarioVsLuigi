@@ -17,6 +17,7 @@ namespace NSMB.Tiles {
         //---Serialized Variables
         [SerializeField] protected Color particleColor;
         [SerializeField] public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
+        [SerializeField] private Vector2Int tileSize = Vector2Int.one;
 
         protected bool BreakBlockCheck(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             bool doBump = false, doBreak = false, giantBreak = false;
@@ -53,14 +54,19 @@ namespace NSMB.Tiles {
         public void Break(BasicEntity interacter, Vector3 worldLocation, Enums.Sounds sound) {
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
-            //Tilemap
+            // Tilemap
             GameManager.Instance.tileManager.SetTile(tileLocation, null);
 
             if (interacter && interacter.Runner.IsForward) {
-                //Particle
-                GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f, particleColor);
+                // Particle
+                for (int x = 0; x < tileSize.x; x++) {
+                    for (int y = 0; y < tileSize.y; y++) {
+                        Vector2Int offset = new(x, y);
+                        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.Utils.TilemapToWorldPosition(tileLocation + offset) + Vector3.one * 0.25f, particleColor);
+                    }
+                }
 
-                //Sound
+                // Sound
                 if (interacter)
                     interacter.PlaySound(sound);
             }
@@ -70,14 +76,14 @@ namespace NSMB.Tiles {
             Bump(interacter, direction, worldLocation);
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
-            //Bump
+            // Bump
             bool downwards = direction == InteractionDirection.Down;
             GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 this, downwards, downwards ? -SpawnOffset : SpawnOffset, false, NetworkPrefabRef.Empty);
         }
 
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
-            //Breaking block check.
+            // Breaking block check.
             bool broken = BreakBlockCheck(interacter, direction, worldLocation);
 
             bumpSound = !broken;

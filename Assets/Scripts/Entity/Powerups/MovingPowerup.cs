@@ -12,7 +12,7 @@ namespace NSMB.Entities.Collectable.Powerups {
     public class MovingPowerup : CollectableEntity, IBlockBumpable {
 
         //---Static Variables
-        private static ContactFilter2D GroundFilter;
+        private static LayerMask GroundMask;
         private static readonly int OriginalSortingOrder = 10;
 
         //---Networked Variables
@@ -58,9 +58,8 @@ namespace NSMB.Entities.Collectable.Powerups {
         public void Awake() {
             collectScript = GetComponent<IPowerupCollect>();
 
-            if (!GroundFilter.useTriggers) {
-                GroundFilter.SetLayerMask((1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough));
-                GroundFilter.useTriggers = true;
+            if (GroundMask == 0) {
+                GroundMask = (1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough);
             }
         }
 
@@ -208,8 +207,8 @@ namespace NSMB.Entities.Collectable.Powerups {
 
                 if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
 
-                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.position + hitbox.size.y * 0.25f * Vector2.up)) {
-                        Runner.Despawn(Object);
+                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset)) {
+                        DespawnEntity();
                         return;
                     }
 
@@ -225,10 +224,10 @@ namespace NSMB.Entities.Collectable.Powerups {
                 return;
             }
 
-            Vector2 size = hitbox.size * transform.lossyScale * 0.8f;
+            Vector2 size = hitbox.size * transform.lossyScale * 0.7f;
             Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
-            if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundFilter)) {
+            if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
                 gameObject.layer = Layers.LayerHitsNothing;
                 return;
             } else {
@@ -257,7 +256,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             if (data.OnGround) {
                 body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(body.velocity.y, bouncePower));
 
-                if (data.HitRoof /*|| (data.HitLeft && data.HitRight)*/) {
+                if (data.HitRoof || (data.HitLeft && data.HitRight)) {
                     DespawnEntity();
                     return;
                 }
@@ -342,24 +341,20 @@ namespace NSMB.Entities.Collectable.Powerups {
             PlayerController collector = powerup.Collector;
 
             Powerup newPowerup = powerup.powerupScriptable;
-            Enums.PowerupState newState = newPowerup.state;
 
             switch (powerup.ReserveResult) {
+            case PowerupReserveResult.ReserveOldPowerup:
             case PowerupReserveResult.NoneButPlaySound: {
-                //just play the collect sound
-                collector.PlaySound(newPowerup.soundEffect);
-                break;
-            }
-            case PowerupReserveResult.ReserveOldPowerup: {
-                //reserve the powerup we just had
-                if (newState == Enums.PowerupState.MegaMushroom)
-                    break;
-
-                collector.PlaySound(newPowerup.soundEffect);
+                // Just play the collect sound
+                if (newPowerup.soundPlaysEverywhere) {
+                    collector.PlaySoundEverywhere(newPowerup.soundEffect);
+                } else {
+                    collector.PlaySound(newPowerup.soundEffect);
+                }
                 break;
             }
             case PowerupReserveResult.ReserveNewPowerup: {
-                //reserve the new powerup
+                // Reserve the new powerup
                 collector.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
                 break;
             }

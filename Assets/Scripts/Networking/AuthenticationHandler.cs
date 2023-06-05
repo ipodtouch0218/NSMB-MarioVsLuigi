@@ -34,7 +34,7 @@ public class AuthenticationHandler {
 
         if (client.result != UnityWebRequest.Result.Success) {
             if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode);
+                //MainMenuManager.Instance.OpenNetworkErrorBox(client.error + " - " + client.responseCode);
                 //MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
             }
             IsAuthenticating = false;

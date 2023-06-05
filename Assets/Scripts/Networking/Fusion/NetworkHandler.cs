@@ -24,7 +24,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     //---Properties
     public static string CurrentRegion { get; set; }
     public static NetworkRunner Runner => Instance.runner;
-    public static bool Connecting => connecting || AuthenticationHandler.IsAuthenticating || (Runner && Runner.State == NetworkRunner.States.Starting && !Runner.IsCloudReady) || (Runner && Runner.State == NetworkRunner.States.Running && !Runner.IsConnectedToServer && !Runner.IsServer);
+    public static bool Connecting => connecting > 0 || AuthenticationHandler.IsAuthenticating || (Runner && Runner.State == NetworkRunner.States.Starting && !Runner.IsCloudReady) || (Runner && Runner.State == NetworkRunner.States.Running && !Runner.IsConnectedToServer && !Runner.IsServer);
     public static bool Connected => !Connecting && Runner && (Runner.State == NetworkRunner.States.Running || Runner.IsCloudReady);
     public static bool Disconnected => !Connecting && !Connected;
 
@@ -87,7 +87,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public NetworkRunner runner;
     private static bool reattemptCreate;
-    private static bool connecting;
+    private static int connecting;
 
     #region NetworkRunner Callbacks
     void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {
@@ -281,10 +281,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     #region Room-Related Methods
     private static async Task<AuthenticationValues> Authenticate() {
+        connecting++;
         string id = PlayerPrefs.GetString("id", null);
         string token = PlayerPrefs.GetString("token", null);
 
-        return await AuthenticationHandler.Authenticate(id, token);
+        AuthenticationValues authValues = await AuthenticationHandler.Authenticate(id, token);
+        connecting--;
+        return authValues;
     }
 
     public static async Task<StartGameResult> ConnectToSameRegion() {
@@ -292,6 +295,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     public static async Task<StartGameResult> ConnectToRegion(string region = "") {
+        connecting++;
+
         // Exit if we're already in a room
         if ((Runner.SessionInfo.IsValid || Runner.LobbyInfo.IsValid) && !Runner.IsShutdown) {
             await Runner.Shutdown();
@@ -318,6 +323,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         // Authenticate
         AuthenticationValues authValues = await Authenticate();
+        if (authValues == null) {
+            OnShutdown?.Invoke(Runner, ShutdownReason.CustomAuthenticationFailed);
+            return null;
+        }
 
         // And join lobby
         StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues, customAppSettings: appSettings);
@@ -335,11 +344,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             OnShutdown?.Invoke(Runner, result.ShutdownReason);
         }
 
+        connecting--;
         return result;
     }
 
     public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host, int players = 10) {
 
+        connecting++;
         int attempts = 3;
 
         while (attempts-- > 0) {
@@ -354,11 +365,18 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             idBuilder.Append(RoomIdValidChars[index >= 0 ? index : 0]);
 
             // Fill rest of the string with random chars
+            UnityEngine.Random.InitState(unchecked((int) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds));
             for (int i = 1; i < RoomIdLength; i++)
                 idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
 
+            AuthenticationValues authValues = await Authenticate();
+            if (authValues == null) {
+                OnShutdown?.Invoke(Runner, ShutdownReason.CustomAuthenticationFailed);
+                return null;
+            }
+
             Debug.Log($"[Network] Creating a game in {CurrentRegion} with the ID {idBuilder}");
-            args.AuthValues = await Authenticate();
+            args.AuthValues = authValues;
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
             args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname);
@@ -369,25 +387,32 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             // Attempt to create the room
             StartGameResult results = await Runner.StartGame(args);
-            if (results.Ok)
+            if (results.Ok) {
+                connecting--;
                 return results;
+            }
 
-            if (results.ShutdownReason != ShutdownReason.GameIdAlreadyExists && results.ShutdownReason != ShutdownReason.ServerInRoom)
+            if (results.ShutdownReason != ShutdownReason.GameIdAlreadyExists && results.ShutdownReason != ShutdownReason.ServerInRoom) {
+                connecting--;
                 return null;
+            }
 
             Debug.Log($"[Network] Failed to create a game with the ID {idBuilder} (the id already exists.) Trying {attempts} more time(s)...");
         }
 
+        connecting--;
         return null;
     }
 
     public static async Task<StartGameResult> JoinRoom(string roomId) {
-        //make sure that we're on the right region...
+        connecting++;
+
+        // Make sure that we're on the right region...
         string originalRegion = CurrentRegion;
         string targetRegion = Regions[RoomIdValidChars.IndexOf(roomId[0])];
 
         if (CurrentRegion != targetRegion) {
-            //change regions
+            // Change regions
             await ConnectToRegion(targetRegion);
         }
 
@@ -412,6 +437,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.nonNetworkShutdown = false;
 
+        connecting--;
         return result;
     }
     #endregion

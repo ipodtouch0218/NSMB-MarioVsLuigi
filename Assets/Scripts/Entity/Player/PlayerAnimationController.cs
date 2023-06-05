@@ -256,7 +256,7 @@ namespace NSMB.Entities.Player {
 
             animator.SetBool("onLeft", controller.WallSlideLeft);
             animator.SetBool("onRight", controller.WallSlideRight);
-            animator.SetBool("onGround", controller.IsOnGround || (Runner.SimulationTime <= controller.CoyoteTime - 0.05f));
+            animator.SetBool("onGround", controller.IsOnGround || controller.IsStuckInBlock || (Runner.SimulationTime <= controller.CoyoteTime - 0.05f));
             animator.SetBool("invincible", controller.IsStarmanInvincible);
             animator.SetBool("skidding", controller.IsSkidding);
             animator.SetBool("propeller", controller.IsPropellerFlying);

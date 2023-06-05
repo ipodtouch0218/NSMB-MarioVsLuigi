@@ -253,7 +253,7 @@ namespace NSMB.Utils {
         }
 
         public static bool IsTileSolidAtWorldLocation(Vector2 worldLocation) {
-            Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
+            Collider2D collision = NetworkHandler.Runner.GetPhysicsScene2D().OverlapPoint(worldLocation, Layers.MaskSolidGround);
             if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
                 return true;
 

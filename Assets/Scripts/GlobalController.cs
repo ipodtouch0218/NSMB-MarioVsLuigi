@@ -49,7 +49,6 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void Awake() => Set(this);
-    public void OnDestroy() => Release();
 
     public void Start() {
         if (!Application.isFocused) {
@@ -59,7 +58,6 @@ public class GlobalController : Singleton<GlobalController> {
         ControlSystem.controls.Debug.FPSMonitor.performed += (context) => {
             graphy.SetActive(!graphy.activeSelf);
         };
-        UnityEngine.Random.InitState((int) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalMilliseconds);
     }
 
     public void Update() {
