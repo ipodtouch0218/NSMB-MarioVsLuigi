@@ -310,7 +310,8 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             switch (ReserveResult) {
             case PowerupReserveResult.ReserveOldPowerup: {
-                Collector.SetReserveItem(oldState);
+                if (oldState != Enums.PowerupState.NoPowerup)
+                    Collector.SetReserveItem(oldState);
                 break;
             }
             case PowerupReserveResult.ReserveNewPowerup: {

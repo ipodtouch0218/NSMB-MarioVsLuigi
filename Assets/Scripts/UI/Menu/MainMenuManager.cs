@@ -58,6 +58,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     [SerializeField] private Image overallsColorImage, shirtColorImage;
     [SerializeField] private GameObject playerColorPaletteIcon, playerColorDisabledIcon;
 
+    [Header("Misc")]
     [SerializeField] public List<MapData> maps;
 
     //---Private Variables
@@ -66,7 +67,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     private bool wasSettingsOpen;
 
     public void Awake() => Set(this, false);
-    public void OnDestroy() => Release();
 
     public void OnEnable() {
         // Register callbacks
@@ -294,6 +294,9 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         createLobbyPrompt.SetActive(true);
     }
     public void OpenOptions() {
+        if (wasSettingsOpen)
+            return;
+
         GlobalController.Instance.optionsManager.OpenMenu();
     }
     public void OpenCredits() {

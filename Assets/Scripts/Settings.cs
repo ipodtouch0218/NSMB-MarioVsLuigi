@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -134,7 +133,6 @@ public class Settings : Singleton<Settings> {
     [SerializeField] private AudioMixer mixer;
 
     public void Awake() => Set(this);
-    public void OnDestroy() => Release();
 
     public void Start() {
         VersionUpdaters = new Action[] { LoadFromVersion0, LoadFromVersion1 };
@@ -187,7 +185,7 @@ public class Settings : Singleton<Settings> {
     }
 
     public void LoadSettings() {
-        for (int i = 0; i < VersionUpdaters.Count(); i++) {
+        for (int i = 0; i < VersionUpdaters.Length; i++) {
             VersionUpdaters[i]();
         }
         SaveSettings();
@@ -246,7 +244,7 @@ public class Settings : Singleton<Settings> {
             "NDS4by3", "VSync", "volumeMaster", "volumeMusic", "volumeSFX", "FireballFromSprint");
     }
 
-    public void LoadFromVersion1() {
+    private void LoadFromVersion1() {
         //Generic
         GetIfExists("Generic_Nickname", out genericNickname);
         GetIfExists("Generic_ScoreboardAlwaysVisible", out genericScoreboardAlways);

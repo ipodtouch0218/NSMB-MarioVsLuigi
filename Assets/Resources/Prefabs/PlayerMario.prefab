@@ -10523,6 +10523,7 @@ MonoBehaviour:
   _IsActive:
     _value: 1
   body: {fileID: 4824223341387914443}
+  nrb: {fileID: 2433599474194652050}
   sfx: {fileID: 5377451828833222271}
   checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
@@ -16009,6 +16010,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 8020350199704251203}
   currentAudio: {fileID: 11400000, guid: e2dbe5f1a0e0d8941852390d7da5e601, type: 2}
+  playOnAwake: 0
 --- !u!1 &5037544308120838001
 GameObject:
   m_ObjectHideFlags: 0
@@ -21543,7 +21545,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 6648400330319602470}
-  currentAudio: {fileID: 11400000, guid: c74256c46183cf14ab95e81152a2d8d9, type: 2}
+  currentAudio: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
+  playOnAwake: 0
 --- !u!1 &8080987513463232339
 GameObject:
   m_ObjectHideFlags: 0

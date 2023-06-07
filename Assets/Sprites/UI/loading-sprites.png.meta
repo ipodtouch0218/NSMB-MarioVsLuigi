@@ -194,7 +194,7 @@ TextureImporter:
       name: loading-sprites_1
       rect:
         serializedVersion: 2
-        x: 16
+        x: 17
         y: 0
         width: 16
         height: 32
@@ -215,7 +215,7 @@ TextureImporter:
       name: loading-sprites_2
       rect:
         serializedVersion: 2
-        x: 32
+        x: 34
         y: 0
         width: 16
         height: 24
@@ -236,7 +236,7 @@ TextureImporter:
       name: loading-sprites_3
       rect:
         serializedVersion: 2
-        x: 48
+        x: 51
         y: 0
         width: 16
         height: 16
@@ -257,7 +257,7 @@ TextureImporter:
       name: loading-sprites_4
       rect:
         serializedVersion: 2
-        x: 64
+        x: 68
         y: 0
         width: 16
         height: 16
@@ -278,7 +278,7 @@ TextureImporter:
       name: loading-sprites_5
       rect:
         serializedVersion: 2
-        x: 80
+        x: 85
         y: 0
         width: 16
         height: 16
@@ -299,7 +299,7 @@ TextureImporter:
       name: loading-sprites_6
       rect:
         serializedVersion: 2
-        x: 96
+        x: 102
         y: 0
         width: 16
         height: 16
@@ -320,7 +320,7 @@ TextureImporter:
       name: loading-sprites_7
       rect:
         serializedVersion: 2
-        x: 112
+        x: 119
         y: 0
         width: 16
         height: 32
@@ -341,7 +341,7 @@ TextureImporter:
       name: loading-sprites_8
       rect:
         serializedVersion: 2
-        x: 128
+        x: 136
         y: 0
         width: 16
         height: 32

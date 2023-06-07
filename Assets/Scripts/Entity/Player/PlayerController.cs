@@ -14,7 +14,6 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using UnityEngine.Rendering;
 
 namespace NSMB.Entities.Player {
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
@@ -23,7 +22,7 @@ namespace NSMB.Entities.Player {
 
         //---Static Variables
         private static readonly Collider2D[] CollisionBuffer = new Collider2D[64];
-        private static readonly Collider2D[] TempCollisionBuffer = new Collider2D[64];
+        private static readonly Collider2D[] TempCollisionBuffer = new Collider2D[32];
         private static readonly ContactPoint2D[] TileContactBuffer = new ContactPoint2D[32];
         private static ContactFilter2D CollisionFilter;
 
@@ -519,11 +518,14 @@ namespace NSMB.Entities.Player {
             tilesJumpedInto.Clear();
             tilesStandingOn.Clear();
             tilesHitSide.Clear();
+            crushGround = false;
+            OnSpinner = null;
+
+            if (IsStuckInBlock)
+                return;
 
             int down = 0, left = 0, right = 0, up = 0;
 
-            crushGround = false;
-            OnSpinner = null;
             foreach (BoxCollider2D hitbox in hitboxes) {
                 int collisionCount = hitbox.GetContacts(TileContactBuffer);
 
@@ -646,10 +648,10 @@ namespace NSMB.Entities.Player {
 
         public void InteractWithPlayer(PlayerController other) {
 
-            if (DamageInvincibilityTimer.IsActive(Runner))
+            if (DamageInvincibilityTimer.IsActive(Runner) || other.DamageInvincibilityTimer.IsActive(Runner))
                 return;
 
-            if (other.DamageInvincibilityTimer.IsActive(Runner))
+            if (GiantStartTimer.IsActive(Runner) || other.GiantStartTimer.IsActive(Runner))
                 return;
 
             // Hit players
@@ -945,6 +947,7 @@ namespace NSMB.Entities.Player {
             }
             }
             IsPropellerFlying = false;
+            IsInShell = false;
             PropellerLaunchTimer = TickTimer.None;
             PropellerSpinTimer = TickTimer.None;
             UsedPropellerThisJump = false;
@@ -1595,7 +1598,7 @@ namespace NSMB.Entities.Player {
         private void HandleLayerState() {
             bool hitsNothing = CurrentPipe || IsDead || IsStuckInBlock || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && IsStationaryGiantShrink);
 
-            gameObject.layer = hitsNothing ? Layers.LayerHitsNothing : Layers.LayerPlayer;
+            MainHitbox.gameObject.layer = hitsNothing ? Layers.LayerHitsNothing : Layers.LayerPlayer;
         }
 
         private bool GroundSnapCheck() {
@@ -1688,7 +1691,7 @@ namespace NSMB.Entities.Player {
 
         private void HandleCrouching(bool crouchInput) {
             // Can't crouch while sliding, flying, or mega.
-            if (IsSliding || IsPropellerFlying || IsInKnockback || State == Enums.PowerupState.MegaMushroom) {
+            if (IsSliding || IsPropellerFlying || IsSpinnerFlying || IsInKnockback || State == Enums.PowerupState.MegaMushroom) {
                 IsCrouching = false;
                 return;
             }
@@ -1884,6 +1887,7 @@ namespace NSMB.Entities.Player {
             IsJumping = true;
             JumpAnimCounter++;
             JumpBufferTime = -1;
+            IsInKnockback = false;
 
             BounceJump = DoEntityBounce;
             DoEntityBounce = false;
@@ -2145,7 +2149,6 @@ namespace NSMB.Entities.Player {
 
             bool wasStuckLastTick = IsStuckInBlock;
             IsStuckInBlock = true;
-            body.velocity = Vector2.zero;
             IsGroundpounding = false;
             IsPropellerFlying = false;
             IsDrilling = false;
@@ -2186,11 +2189,10 @@ namespace NSMB.Entities.Player {
                     }
                 }
 
-                gameObject.layer = Layers.LayerHitsNothing;
                 body.position = previousTickPosition;
             }
 
-            body.velocity = Vector2.right * 2;
+            body.velocity = Vector2.right * 2f;
             return true;
         }
 

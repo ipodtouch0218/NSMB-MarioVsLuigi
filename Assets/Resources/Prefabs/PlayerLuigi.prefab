@@ -21168,7 +21168,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   system: {fileID: 4430736674483794918}
-  sfx: {fileID: 7596518164324340154}
+  sfx: {fileID: 4428134276930819344}
 --- !u!114 &4428134276930819344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21182,7 +21182,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 7596518164324340154}
-  currentAudio: {fileID: 0}
+  currentAudio: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
+  playOnAwake: 0
 --- !u!1 &6933185090643879978
 GameObject:
   m_ObjectHideFlags: 0
@@ -21632,6 +21633,7 @@ MonoBehaviour:
   _IsActive:
     _value: 1
   body: {fileID: 8636928217783201367}
+  nrb: {fileID: 5594443215964999487}
   sfx: {fileID: 9191589652819086563}
   checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
@@ -21712,6 +21714,7 @@ MonoBehaviour:
   _FireDeath:
     _value: 0
   _HeldEntity: {fileID: 0}
+  _ThrowAnimCounter: 0
   _HoldStartTime: 0
   _CanShootAdditionalFireball:
     _value: 0
@@ -21754,7 +21757,6 @@ MonoBehaviour:
   groundpoundLastFrame: 0
   hitLeft: 0
   hitRight: 0
-  stationaryGiantEnd: 0
   powerupFlash: 0
   previousTickVelocity: {x: 0, y: 0}
   previousTickPosition: {x: 0, y: 0}
@@ -27103,7 +27105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   system: {fileID: 8636928219237579149}
-  sfx: {fileID: 6512662349643127263}
+  sfx: {fileID: 116862096906636254}
 --- !u!114 &116862096906636254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27117,7 +27119,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 6512662349643127263}
-  currentAudio: {fileID: 0}
+  currentAudio: {fileID: 11400000, guid: e2dbe5f1a0e0d8941852390d7da5e601, type: 2}
+  playOnAwake: 0
 --- !u!1 &8730947203993462797
 GameObject:
   m_ObjectHideFlags: 0

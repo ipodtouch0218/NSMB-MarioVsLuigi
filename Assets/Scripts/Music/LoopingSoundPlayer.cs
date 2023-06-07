@@ -11,9 +11,10 @@ public class LoopingSoundPlayer : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] protected AudioSource audioSource;
     [SerializeField, FormerlySerializedAs("currentSong")] protected LoopingSoundData currentAudio;
+    [SerializeField] private bool playOnAwake = true;
 
     public void Start() {
-        if (currentAudio)
+        if (playOnAwake && currentAudio)
             Play(currentAudio, true);
     }
 

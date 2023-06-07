@@ -8,5 +8,4 @@ public class ScriptableManager : Singleton<ScriptableManager> {
     public LoopingMusicData[] alternatingStageMusic;
 
     public void Awake() => Set(this);
-    public void OnDestroy() => Release();
 }
