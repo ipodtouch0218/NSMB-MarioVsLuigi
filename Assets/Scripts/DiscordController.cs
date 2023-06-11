@@ -35,7 +35,7 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void Start() {
-#if UNITY_WEBGL
+#if UNITY_WEBGL || UNITY_WSA
         enabled = false;
         return;
 #endif
@@ -81,7 +81,7 @@ public class DiscordController : MonoBehaviour {
     }
 
     public void UpdateActivity(SessionInfo session = null) {
-#if UNITY_WEBGL
+#if UNITY_WEBGL || UNITY_WSA
         return;
 #endif
         if (discord == null || activityManager == null || !Application.isPlaying)
