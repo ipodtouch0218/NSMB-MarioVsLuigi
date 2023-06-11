@@ -9,6 +9,7 @@ using NSMB.Game;
 using NSMB.Translation;
 
 namespace NSMB.UI.Pause {
+
     public class PauseMenuManager : MonoBehaviour {
 
         //---Serialized Variables

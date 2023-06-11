@@ -48,5 +48,12 @@ namespace NSMB.UI.Pause.Options {
         public void Unhighlighted() {
             text.color = deselectedTextColor;
         }
+
+        public virtual bool OnLeftPress(bool held) => false;
+        public virtual bool OnRightPress(bool held) => false;
+        public virtual bool OnUpPress(bool held) => false;
+        public virtual bool OnDownPress(bool held) => false;
+        public virtual bool OnSubmit() => false;
+        public virtual bool OnCancel() => false;
     }
 }

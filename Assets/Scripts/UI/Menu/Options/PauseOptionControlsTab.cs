@@ -6,6 +6,7 @@ using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 using TMPro;
 
 using NSMB.Translation;
+using NSMB.UI.Prompts;
 
 namespace NSMB.UI.Pause.Options {
 
@@ -15,6 +16,7 @@ namespace NSMB.UI.Pause.Options {
         private static readonly WaitForSeconds WaitForOneSecond = new(1f);
 
         //---Serialized Variables
+        [SerializeField] private PauseOptionMenuManager manager;
         [SerializeField] private Transform scrollPaneContent;
 
         [Header("Templates")]
@@ -28,7 +30,7 @@ namespace NSMB.UI.Pause.Options {
         [SerializeField] private TMP_Text rebindPromptCountdownText;
 
         [Header("Composite Prompt")]
-        [SerializeField] private GameObject rebindCompositePrompt;
+        [SerializeField] private CompositeRebindPrompt rebindCompositePrompt;
         [SerializeField] private Transform rebindCompositeContent;
         [SerializeField] private TMP_Text rebindCompositeText;
         [SerializeField] private RebindCompositeOption rebindCompositeTemplate;
@@ -44,6 +46,7 @@ namespace NSMB.UI.Pause.Options {
 
         //---Properties
         public InputActionAsset Controls => ControlSystem.controls.asset;
+        private bool IsCompositeRebind => rebindCompositePrompt.gameObject.activeSelf;
 
         public override void Selected() {
             if (!initialized) {
@@ -100,7 +103,7 @@ namespace NSMB.UI.Pause.Options {
                 }
 
                 if (i == 0) {
-                    // move the default existing settings to be below me.
+                    // Move the default existing settings to be below me.
                     foreach (PauseOption option in options) {
                         option.transform.SetAsLastSibling();
                         newOptions.Add(option);
@@ -130,6 +133,7 @@ namespace NSMB.UI.Pause.Options {
             if (currentRebinding != null)
                 DisposeRebind(currentRebinding);
 
+            PauseOptionMenuManager.Instance.SetCurrentOption(option.parent);
             GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
 
             //if (manager.IsUnbinding) {
@@ -139,18 +143,18 @@ namespace NSMB.UI.Pause.Options {
             //    return;
             //}
 
-
             InputAction targetAction = option.action;
             InputBinding targetBinding = option.Binding;
 
             if (index == -1) {
                 if (targetBinding.isComposite) {
                     // Open composite prompt.
-                    OpenCompositePrompt(option);
+                    rebindCompositePrompt.Open(this, option);
+                    currentRebindingButton = option;
                     return;
                 } else {
                     index = option.bindingIndex;
-                    rebindCompositePrompt.SetActive(false);
+                    rebindCompositePrompt.gameObject.SetActive(false);
                 }
             }
 
@@ -165,8 +169,9 @@ namespace NSMB.UI.Pause.Options {
             tm.TryGetTranslation($"ui.generic.{targetAction.bindings[index].name}", out string binding);
             binding ??= "";
             string device = tm.GetTranslation($"ui.options.controls.rebind.device.{targetBinding.groups}");
+            string deviceSlot = tm.GetTranslation($"ui.options.controls.header.{targetBinding.groups}{(index % 2 == 0 ? "primary" : "secondary")}");
 
-            string header = tm.GetTranslationWithReplacements("ui.options.controls.rebind.header", "control", control + binding, "device", device);
+            string header = tm.GetTranslationWithReplacements("ui.options.controls.rebind.header", "control", control + binding, "device", deviceSlot);
             string body = tm.GetTranslationWithReplacements("ui.options.controls.rebind.body", "device", device);
             rebindPromptText.text = $"{header}\n\n{body}";
 
@@ -187,42 +192,6 @@ namespace NSMB.UI.Pause.Options {
             countdown = StartCoroutine(TimeoutCountdown());
         }
 
-        public void OpenCompositePrompt(RebindPauseOptionButton option) {
-            currentRebindingButton = option;
-            InputAction action = option.action;
-            int compositeIndex = option.bindingIndex;
-
-            rebindCompositePrompt.SetActive(true);
-
-            TranslationManager tm = GlobalController.Instance.translationManager;
-            string control = tm.GetTranslation($"ui.options.controls.{action.actionMap.name}.{action.name}");
-            string device = tm.GetTranslation($"ui.options.controls.rebind.device.{action.bindings[compositeIndex + 1].groups}");
-            string header = tm.GetTranslationWithReplacements("ui.options.controls.rebind.header", "control", control, "device", device);
-            rebindCompositeText.text = header;
-
-            // Destroy existing children except for the template
-            for (int i = rebindCompositeContent.childCount - 1; i >= 1; i--) {
-                Destroy(rebindCompositeContent.GetChild(i).gameObject);
-            }
-
-            while (action.bindings[++compositeIndex].isPartOfComposite) {
-                InputBinding binding = action.bindings[compositeIndex];
-                RebindCompositeOption newOption = Instantiate(rebindCompositeTemplate);
-                newOption.name = "CompositeButton (" + action.name + ", " + binding.name + ")";
-                newOption.transform.SetParent(rebindCompositeContent, false);
-                newOption.Instantiate(this, option, action, compositeIndex);
-                newOption.gameObject.SetActive(true);
-            }
-
-            PauseOptionMenuManager.Instance.EnableInput = false;
-        }
-
-        public void CloseCompositePrompt() {
-            rebindCompositePrompt.SetActive(false);
-            PauseOptionMenuManager.Instance.EnableInput = false;
-            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
-        }
-
         private IEnumerator TimeoutCountdown() {
             for (int i = timeoutTime; i > 0; i--) {
                 rebindPromptCountdownText.text = i.ToString();
@@ -235,7 +204,7 @@ namespace NSMB.UI.Pause.Options {
             DisposeRebind(operation);
             SaveRebindings();
 
-            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Decide);
         }
 
         private void DisposeRebind(RebindingOperation operation) {
@@ -249,6 +218,48 @@ namespace NSMB.UI.Pause.Options {
             }
 
             PauseOptionMenuManager.Instance.EnableInput = true;
+        }
+
+        public override bool OnLeftPress(bool held) {
+            if (!IsCompositeRebind)
+                return false;
+
+            return true;
+        }
+
+        public override bool OnRightPress(bool held) {
+            if (!IsCompositeRebind)
+                return false;
+
+            return true;
+        }
+
+        public override bool OnUpPress(bool held) {
+            if (!IsCompositeRebind)
+                return false;
+
+            return true;
+        }
+
+        public override bool OnDownPress(bool held) {
+            if (!IsCompositeRebind)
+                return false;
+
+            return true;
+        }
+
+        public override bool OnSubmit() {
+            if (!IsCompositeRebind)
+                return false;
+
+            return true;
+        }
+
+        public override bool OnCancel() {
+            if (!IsCompositeRebind)
+                return false;
+
+            return true;
         }
     }
 }

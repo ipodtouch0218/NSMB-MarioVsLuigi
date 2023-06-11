@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using TMPro;
 
 namespace NSMB.UI.Pause.Options {
+
     public class RebindPauseOptionButton : MonoBehaviour {
 
         //---Public Variables
@@ -11,18 +13,33 @@ namespace NSMB.UI.Pause.Options {
         public InputBinding Binding => action.bindings[bindingIndex];
 
         //---Serialized Variables
+        [SerializeField] public RebindPauseOption parent;
         [SerializeField] private TMP_Text label;
+        [SerializeField] private Image image;
+        [SerializeField] private Sprite selectedSprite, deselectedSprite;
 
         public void OnEnable() {
             UpdateLabel();
         }
 
         public void Selected() {
-
+            label.color = Color.black;
+            image.sprite = selectedSprite;
         }
 
         public void Deselected() {
+            label.color = Color.white;
+            image.sprite = deselectedSprite;
+        }
 
+        public void Hover() {
+            if (Mouse.current.delta.value != Vector2.zero)
+                parent.SetCurrentOption(this);
+        }
+
+        public void Dehover() {
+            if (!parent.IsSelected)
+                Deselected();
         }
 
         public void UpdateLabel() {
@@ -38,9 +55,7 @@ namespace NSMB.UI.Pause.Options {
 
                     combined += addition + ",";
                 }
-                if (combined == "Up Arrow,Down Arrow,Left Arrow,Right Arrow,") {
-                    combined = "Arrow Keys,";
-                }
+                combined = combined.Replace("Up Arrow", "↑").Replace("Down Arrow", "↓").Replace("Left Arrow", "←").Replace("Right Arrow", "→");
                 if (combined.Length > 11)
                     combined = "....";
 

@@ -3,7 +3,6 @@ using TMPro;
 
 using NSMB.Translation;
 using NSMB.UI.Pause.Loaders;
-using NSMB.Game;
 
 namespace NSMB.UI.Pause.Options {
     public class PauseOption : MonoBehaviour {
@@ -17,8 +16,8 @@ namespace NSMB.UI.Pause.Options {
         [SerializeField] protected PauseOptionLoader loader;
         [SerializeField] public string translationKey;
 
-        //---Private Variables
-        private bool selected;
+        //---Properties
+        public bool IsSelected { get; private set; }
 
         public virtual void OnValidate() {
             if (!manager) manager = GetComponentInParent<PauseOptionMenuManager>();
@@ -37,12 +36,12 @@ namespace NSMB.UI.Pause.Options {
             OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
-        public void OnDisable() {
+        public virtual void OnDisable() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
-            if (selected)
+            if (IsSelected)
                 Selected();
             else
                 Deselected();
@@ -51,13 +50,13 @@ namespace NSMB.UI.Pause.Options {
         public virtual void Selected() {
             label.text = "» " + GetTranslatedString();
             label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
-            selected = true;
+            IsSelected = true;
         }
 
         public virtual void Deselected() {
             label.text = GetTranslatedString();
             label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
-            selected = false;
+            IsSelected = false;
         }
 
         public virtual void OnClick() { }

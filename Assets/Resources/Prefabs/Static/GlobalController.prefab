@@ -1396,7 +1396,7 @@ MonoBehaviour:
   rebindPrompt: {fileID: 8249780498785128273}
   rebindPromptText: {fileID: 5847107935983321748}
   rebindPromptCountdownText: {fileID: 9122948607492651170}
-  rebindCompositePrompt: {fileID: 5499923454619130630}
+  rebindCompositePrompt: {fileID: 1664125321855538409}
   rebindCompositeContent: {fileID: 6149352607787677306}
   rebindCompositeText: {fileID: 2836151662201916214}
   rebindCompositeTemplate: {fileID: 1668913377052817894}
@@ -9237,9 +9237,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5959717405637932217}
   - component: {fileID: 3123940691282302036}
+  - component: {fileID: 2643907462178127144}
   - component: {fileID: 1752169946842705351}
   - component: {fileID: 8913226524318922970}
-  - component: {fileID: 2643907462178127144}
+  - component: {fileID: 2127393355669653721}
   m_Layer: 0
   m_Name: KeyboardSecondary
   m_TagString: Untagged
@@ -9276,6 +9277,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1808130435954231567}
   m_CullTransparentMesh: 1
+--- !u!114 &2643907462178127144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808130435954231567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba84fa952fa64c74a93b1e2fa3d72bcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: f9a3b004-c408-474d-a543-251b4fc37468
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  bindingIndex: 0
+  parent: {fileID: 6769179400359917634}
+  label: {fileID: 3068487528147100146}
+  image: {fileID: 1752169946842705351}
+  selectedSprite: {fileID: -592591461, guid: 4953af3e17ea87e4586d634426e4eb01, type: 3}
+  deselectedSprite: {fileID: 332771783, guid: 4953af3e17ea87e4586d634426e4eb01, type: 3}
 --- !u!114 &1752169946842705351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9363,7 +9391,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &2643907462178127144
+--- !u!114 &2127393355669653721
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9372,20 +9400,44 @@ MonoBehaviour:
   m_GameObject: {fileID: 1808130435954231567}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba84fa952fa64c74a93b1e2fa3d72bcb, type: 3}
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action:
-    m_Name: Action
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: f9a3b004-c408-474d-a543-251b4fc37468
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  bindingIndex: 0
-  label: {fileID: 3068487528147100146}
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2643907462178127144}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+            Assembly-CSharp
+          m_MethodName: Hover
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2643907462178127144}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+            Assembly-CSharp
+          m_MethodName: Dehover
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1818351838209615514
 GameObject:
   m_ObjectHideFlags: 0
@@ -10526,7 +10578,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 586, y: -182.8}
+  m_AnchoredPosition: {x: 586, y: -15}
   m_SizeDelta: {x: 1172, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3339317306750256394
@@ -25951,6 +26003,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4615242542328176738}
   - component: {fileID: 7964284882216539546}
+  - component: {fileID: 1664125321855538409}
   - component: {fileID: 8879828888609696934}
   m_Layer: 0
   m_Name: CompositeRebind
@@ -25988,6 +26041,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5499923454619130630}
   m_CullTransparentMesh: 1
+--- !u!114 &1664125321855538409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5499923454619130630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 397e9690a7e44584288fd2f25a47a772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultSelectedObject: {fileID: 0}
+  optionTemplate: {fileID: 1668913377052817894}
+  header: {fileID: 2836151662201916214}
+  content: {fileID: 6149352607787677306}
 --- !u!114 &8879828888609696934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32207,9 +32276,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8634802506384269222}
   - component: {fileID: 4825888125670776747}
+  - component: {fileID: 8834399607858255435}
   - component: {fileID: 5817579198527735339}
   - component: {fileID: 5292298646524528534}
-  - component: {fileID: 8834399607858255435}
+  - component: {fileID: 1448390951832667680}
   m_Layer: 0
   m_Name: KeyboardPrimary
   m_TagString: Untagged
@@ -32246,6 +32316,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6570588058419346217}
   m_CullTransparentMesh: 1
+--- !u!114 &8834399607858255435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6570588058419346217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba84fa952fa64c74a93b1e2fa3d72bcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: f9a3b004-c408-474d-a543-251b4fc37468
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  bindingIndex: 0
+  parent: {fileID: 6769179400359917634}
+  label: {fileID: 1539705581840817396}
+  image: {fileID: 5817579198527735339}
+  selectedSprite: {fileID: -592591461, guid: 4953af3e17ea87e4586d634426e4eb01, type: 3}
+  deselectedSprite: {fileID: 332771783, guid: 4953af3e17ea87e4586d634426e4eb01, type: 3}
 --- !u!114 &5817579198527735339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32333,7 +32430,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &8834399607858255435
+--- !u!114 &1448390951832667680
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -32342,20 +32439,44 @@ MonoBehaviour:
   m_GameObject: {fileID: 6570588058419346217}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba84fa952fa64c74a93b1e2fa3d72bcb, type: 3}
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action:
-    m_Name: Action
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: f9a3b004-c408-474d-a543-251b4fc37468
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  bindingIndex: 0
-  label: {fileID: 1539705581840817396}
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8834399607858255435}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+            Assembly-CSharp
+          m_MethodName: Hover
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8834399607858255435}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+            Assembly-CSharp
+          m_MethodName: Dehover
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &6570642885993893462
 GameObject:
   m_ObjectHideFlags: 0
@@ -33411,9 +33532,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2511314952578723309}
   - component: {fileID: 3529816182621620893}
+  - component: {fileID: 4103025416302492971}
   - component: {fileID: 3062321373087069751}
   - component: {fileID: 988518617467362808}
-  - component: {fileID: 4103025416302492971}
+  - component: {fileID: 4620517462060472700}
   m_Layer: 0
   m_Name: GamepadSecondary
   m_TagString: Untagged
@@ -33450,6 +33572,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6901636218736124963}
   m_CullTransparentMesh: 1
+--- !u!114 &4103025416302492971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6901636218736124963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba84fa952fa64c74a93b1e2fa3d72bcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: f9a3b004-c408-474d-a543-251b4fc37468
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  bindingIndex: 0
+  parent: {fileID: 6769179400359917634}
+  label: {fileID: 2026319761228047339}
+  image: {fileID: 3062321373087069751}
+  selectedSprite: {fileID: -592591461, guid: 4953af3e17ea87e4586d634426e4eb01, type: 3}
+  deselectedSprite: {fileID: 332771783, guid: 4953af3e17ea87e4586d634426e4eb01, type: 3}
 --- !u!114 &3062321373087069751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33537,7 +33686,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &4103025416302492971
+--- !u!114 &4620517462060472700
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -33546,20 +33695,44 @@ MonoBehaviour:
   m_GameObject: {fileID: 6901636218736124963}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba84fa952fa64c74a93b1e2fa3d72bcb, type: 3}
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action:
-    m_Name: Action
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: f9a3b004-c408-474d-a543-251b4fc37468
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  bindingIndex: 0
-  label: {fileID: 2026319761228047339}
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4103025416302492971}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+            Assembly-CSharp
+          m_MethodName: Hover
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4103025416302492971}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+            Assembly-CSharp
+          m_MethodName: Dehover
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &6907017664413623245
 GameObject:
   m_ObjectHideFlags: 0
@@ -35823,10 +35996,9 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 6443842155806894466}
-          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionControlsTab,
-            Assembly-CSharp
-          m_MethodName: CloseCompositePrompt
+        - m_Target: {fileID: 1664125321855538409}
+          m_TargetAssemblyTypeName: NSMB.UI.Prompts.CompositeRebindPrompt, Assembly-CSharp
+          m_MethodName: Close
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -43666,9 +43838,10 @@ GameObject:
   m_Component:
   - component: {fileID: 309240268898723368}
   - component: {fileID: 7597740123724266071}
+  - component: {fileID: 300782714774329609}
   - component: {fileID: 282017912004681400}
   - component: {fileID: 1443459144963076389}
-  - component: {fileID: 300782714774329609}
+  - component: {fileID: 5737545681108940956}
   m_Layer: 0
   m_Name: GamepadPrimary
   m_TagString: Untagged
@@ -43705,6 +43878,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9203653002424470959}
   m_CullTransparentMesh: 1
+--- !u!114 &300782714774329609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9203653002424470959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba84fa952fa64c74a93b1e2fa3d72bcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: f9a3b004-c408-474d-a543-251b4fc37468
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  bindingIndex: 0
+  parent: {fileID: 6769179400359917634}
+  label: {fileID: 3320218183491210940}
+  image: {fileID: 282017912004681400}
+  selectedSprite: {fileID: -592591461, guid: 4953af3e17ea87e4586d634426e4eb01, type: 3}
+  deselectedSprite: {fileID: 332771783, guid: 4953af3e17ea87e4586d634426e4eb01, type: 3}
 --- !u!114 &282017912004681400
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43792,7 +43992,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &300782714774329609
+--- !u!114 &5737545681108940956
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43801,20 +44001,44 @@ MonoBehaviour:
   m_GameObject: {fileID: 9203653002424470959}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba84fa952fa64c74a93b1e2fa3d72bcb, type: 3}
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action:
-    m_Name: Action
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: f9a3b004-c408-474d-a543-251b4fc37468
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  bindingIndex: 0
-  label: {fileID: 3320218183491210940}
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 300782714774329609}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+            Assembly-CSharp
+          m_MethodName: Hover
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 300782714774329609}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+            Assembly-CSharp
+          m_MethodName: Dehover
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1001 &8895848656788791858
 PrefabInstance:
   m_ObjectHideFlags: 0

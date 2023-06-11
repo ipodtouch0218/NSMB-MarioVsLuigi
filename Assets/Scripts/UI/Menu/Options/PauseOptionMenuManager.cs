@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,6 +8,7 @@ using UnityEngine.UI;
 using NSMB.Extensions;
 
 namespace NSMB.UI.Pause.Options {
+
     public class PauseOptionMenuManager : Selectable {
 
         //---Static Variables
@@ -21,7 +23,7 @@ namespace NSMB.UI.Pause.Options {
 
         //---Private Variables
         [SerializeField] private int currentTabIndex;
-        [SerializeField] private int currentOptionIndex; //-1 = tabs are selected
+        [SerializeField] private int currentOptionIndex; // -1 = tabs are selected
         private bool inputted;
         private GameObject previouslySelected;
 
@@ -45,8 +47,6 @@ namespace NSMB.UI.Pause.Options {
 
         protected override void OnEnable() {
             base.OnEnable();
-            if (!Application.isPlaying)
-                return;
 
             ControlSystem.controls.UI.Navigate.performed += OnNavigate;
             ControlSystem.controls.UI.Navigate.canceled += OnNavigate;
@@ -61,8 +61,6 @@ namespace NSMB.UI.Pause.Options {
 
         protected override void OnDisable() {
             base.OnDisable();
-            if (!Application.isPlaying)
-                return;
 
             ControlSystem.controls.UI.Navigate.performed -= OnNavigate;
             ControlSystem.controls.UI.Navigate.canceled -= OnNavigate;
@@ -81,10 +79,6 @@ namespace NSMB.UI.Pause.Options {
             if (!EnableInput)
                 return;
 
-            if (!SelectedOption)
-                return;
-
-
             Vector2 direction = ControlSystem.controls.UI.Navigate.ReadValue<Vector2>();
             direction = direction.normalized;
             float u = Vector2.Dot(direction, Vector2.up);
@@ -96,6 +90,26 @@ namespace NSMB.UI.Pause.Options {
             bool left = !up && !down && l > u && l > d && l > r;
             bool right = !up && !down && !left && r > u && r > d && r > l;
 
+
+            if (SelectedTab) {
+                Func<bool, bool> func;
+                if (up) {
+                    func = SelectedTab.OnUpPress;
+                } else if (down) {
+                    func = SelectedTab.OnDownPress;
+                } else if (left) {
+                    func = SelectedTab.OnLeftPress;
+                } else {
+                    func = SelectedTab.OnRightPress;
+                }
+
+                if (func(true))
+                    return;
+            }
+
+            if (!SelectedOption)
+                return;
+
             if (left)
                 SelectedOption.OnLeftHeld();
             else if (right)
@@ -104,6 +118,9 @@ namespace NSMB.UI.Pause.Options {
 
         private void OnCancel(InputAction.CallbackContext context) {
             if (!EnableInput)
+                return;
+
+            if (SelectedTab && SelectedTab.OnCancel())
                 return;
 
             if (Back) {
@@ -119,6 +136,9 @@ namespace NSMB.UI.Pause.Options {
 
         private void OnSubmit(InputAction.CallbackContext context) {
             if (!EnableInput)
+                return;
+
+            if (SelectedTab && SelectedTab.OnSubmit())
                 return;
 
             if (Back) {
@@ -155,6 +175,23 @@ namespace NSMB.UI.Pause.Options {
             bool down = !up && d > u && d > l && d > r;
             bool left = !up && !down && l > u && l > d && l > r;
             bool right = !up && !down && !left && r > u && r > d && r > l;
+
+
+            if (SelectedTab) {
+                Func<bool, bool> func;
+                if (up) {
+                    func = SelectedTab.OnUpPress;
+                } else if (down) {
+                    func = SelectedTab.OnDownPress;
+                } else if (left) {
+                    func = SelectedTab.OnLeftPress;
+                } else {
+                    func = SelectedTab.OnRightPress;
+                }
+
+                if (func(false))
+                    return;
+            }
 
             if (Back && (down || right)) {
                 Back = false;
