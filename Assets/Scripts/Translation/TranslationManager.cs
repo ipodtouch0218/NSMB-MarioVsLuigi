@@ -10,8 +10,8 @@ namespace NSMB.Translation {
 
     public class TranslationManager : MonoBehaviour {
 
-        //---Public Events
-        public event Action<TranslationManager> OnLanguageChanged;
+        //---Events
+        public static event Action<TranslationManager> OnLanguageChanged;
 
         //---Properties
         public string CurrentLocale { get; private set; }

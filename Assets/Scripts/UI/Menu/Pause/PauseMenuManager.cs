@@ -26,7 +26,7 @@ namespace NSMB.UI.Pause {
             ControlSystem.controls.UI.Navigate.canceled += OnNavigate;
             ControlSystem.controls.UI.Submit.performed += OnSubmit;
             ControlSystem.controls.UI.Cancel.performed += OnCancel;
-            GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
 
             skipSound = true;
@@ -40,7 +40,7 @@ namespace NSMB.UI.Pause {
             ControlSystem.controls.UI.Navigate.canceled -= OnNavigate;
             ControlSystem.controls.UI.Submit.performed -= OnSubmit;
             ControlSystem.controls.UI.Cancel.performed -= OnCancel;
-            GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         public void OnNavigate(InputAction.CallbackContext context) {

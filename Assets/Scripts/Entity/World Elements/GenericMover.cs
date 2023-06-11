@@ -12,28 +12,41 @@ public class GenericMover : NetworkBehaviour {
     [SerializeField] private AnimationCurve x, y;
     [SerializeField] private float animationOffset = 0;
     [SerializeField] private Transform interpolationTarget;
+    [SerializeField] private bool notNetworked;
+
+    //---Private Variables
+    private Vector3 origin;
+
+    public void Start() {
+        if (notNetworked)
+            origin = transform.position;
+    }
 
     public override void Spawned() {
         Origin = transform.position;
     }
 
+    public void Update() {
+        if (notNetworked)
+            SetPosition(interpolationTarget, origin, Time.time);
+    }
+
     public override void Render() {
-        SetPosition(interpolationTarget, Runner.SimulationRenderTime);
+        SetPosition(interpolationTarget, Origin, Runner.SimulationRenderTime - GameData.Instance.GameStartTime);
     }
 
     public override void FixedUpdateNetwork() {
-        SetPosition(transform, Runner.SimulationTime);
+        SetPosition(transform, Origin, Runner.SimulationTime - GameData.Instance.GameStartTime);
     }
 
-    private void SetPosition(Transform target, float simulationTime) {
+    private void SetPosition(Transform target, Vector3 origin, float secondsElapsed) {
         if (!target)
             target = transform;
 
-        float secondsElapsed = simulationTime - GameData.Instance.GameStartTime;
         float xOffset = EvaluateCurve(x, animationOffset, secondsElapsed);
         float yOffset = EvaluateCurve(y, animationOffset, secondsElapsed);
 
-        target.position = Origin + new Vector3(xOffset, yOffset, 0);
+        target.position = origin + new Vector3(xOffset, yOffset, 0);
     }
 
     private static float EvaluateCurve(AnimationCurve curve, double offset, double time) {

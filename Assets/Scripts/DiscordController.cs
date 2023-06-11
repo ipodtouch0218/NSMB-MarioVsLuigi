@@ -18,11 +18,11 @@ public class DiscordController : MonoBehaviour {
     private ActivityManager activityManager;
 
     public void OnEnable() {
-        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        TranslationManager.OnLanguageChanged += OnLanguageChanged;
     }
 
     public void OnDisable() {
-        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         discord?.Dispose();
     }
 

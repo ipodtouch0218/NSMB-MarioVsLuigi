@@ -324,6 +324,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         // Authenticate
         AuthenticationValues authValues = await Authenticate();
         if (authValues == null) {
+            connecting--;
             OnShutdown?.Invoke(Runner, ShutdownReason.CustomAuthenticationFailed);
             return null;
         }
@@ -371,6 +372,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             AuthenticationValues authValues = await Authenticate();
             if (authValues == null) {
+                connecting--;
                 OnShutdown?.Invoke(Runner, ShutdownReason.CustomAuthenticationFailed);
                 return null;
             }

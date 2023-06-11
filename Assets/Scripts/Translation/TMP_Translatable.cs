@@ -15,12 +15,12 @@ namespace NSMB.Translation {
         }
 
         public void OnEnable() {
-            GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
         public void OnDisable() {
-            GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

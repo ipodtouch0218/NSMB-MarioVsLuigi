@@ -28,7 +28,7 @@ public class ChatMessage : MonoBehaviour {
     }
 
     public void OnDestroy() {
-        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
     private void OnLanguageChanged(TranslationManager tm) {
@@ -49,7 +49,7 @@ public class ChatMessage : MonoBehaviour {
         this.replacements = replacements;
         chatText.color = color ?? Color.black;
 
-        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
 
         UpdatePlayerColor();

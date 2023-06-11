@@ -49,13 +49,13 @@ public class SpectationManager : MonoBehaviour {
 
     public void OnEnable() {
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
-        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     public void OnDisable() {
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
-        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
     public void Update() {

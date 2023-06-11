@@ -23,11 +23,11 @@ public class RoomSettingsCallbacks : MonoBehaviour {
     private bool isRoomCodeVisible;
 
     public void OnEnable() {
-        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        TranslationManager.OnLanguageChanged += OnLanguageChanged;
     }
 
     public void OnDisable() {
-        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
     public void UpdateAllSettings(SessionData roomData, bool level) {

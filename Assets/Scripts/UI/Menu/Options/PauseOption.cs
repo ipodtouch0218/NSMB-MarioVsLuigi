@@ -33,12 +33,12 @@ namespace NSMB.UI.Pause.Options {
             if (loader)
                 loader.LoadOptions(this);
 
-            GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
         public void OnDisable() {
-            GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

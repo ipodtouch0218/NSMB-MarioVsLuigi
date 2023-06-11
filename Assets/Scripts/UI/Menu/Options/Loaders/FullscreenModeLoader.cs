@@ -19,11 +19,11 @@ namespace NSMB.UI.Pause.Loaders {
         private PauseOption option;
 
         public void OnEnable() {
-            GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
         public void OnDisable() {
-            GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         public override void LoadOptions(PauseOption option) {

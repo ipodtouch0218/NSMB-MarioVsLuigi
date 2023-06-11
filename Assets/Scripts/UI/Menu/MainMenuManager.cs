@@ -79,7 +79,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         NetworkHandler.OnConnectFailed +=          OnConnectFailed;
 
         ControlSystem.controls.UI.Pause.performed += OnPause;
-        GlobalController.Instance.translationManager.OnLanguageChanged += OnLanguageChanged;
+        TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
@@ -94,7 +94,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         NetworkHandler.OnConnectFailed -=          OnConnectFailed;
 
         ControlSystem.controls.UI.Pause.performed -= OnPause;
-        GlobalController.Instance.translationManager.OnLanguageChanged -= OnLanguageChanged;
+        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
     public void Start() {
