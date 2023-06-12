@@ -30,7 +30,7 @@ namespace NSMB.UI.Pause.Options {
         [SerializeField] private TMP_Text rebindPromptCountdownText;
 
         [Header("Composite Prompt")]
-        [SerializeField] private CompositeRebindPrompt rebindCompositePrompt;
+        [SerializeField] public CompositeRebindPrompt rebindCompositePrompt;
         [SerializeField] private Transform rebindCompositeContent;
         [SerializeField] private TMP_Text rebindCompositeText;
         [SerializeField] private RebindCompositeOption rebindCompositeTemplate;
@@ -41,6 +41,7 @@ namespace NSMB.UI.Pause.Options {
         //---Private Variables
         private RebindPauseOptionButton currentRebindingButton;
         private RebindingOperation currentRebinding;
+        private int currentRebindingIndex;
         private Coroutine countdown;
         private bool initialized;
 
@@ -146,19 +147,22 @@ namespace NSMB.UI.Pause.Options {
             InputAction targetAction = option.action;
             InputBinding targetBinding = option.Binding;
 
-            if (index == -1) {
-                if (targetBinding.isComposite) {
+            if (targetBinding.isComposite) {
+                if (index == -1) {
                     // Open composite prompt.
                     rebindCompositePrompt.Open(this, option);
                     currentRebindingButton = option;
                     return;
                 } else {
-                    index = option.bindingIndex;
+                    targetBinding = targetAction.bindings[index];
                     rebindCompositePrompt.gameObject.SetActive(false);
                 }
+            } else if (index == -1) {
+                index = option.bindingIndex;
             }
 
             currentRebindingButton = option;
+            currentRebindingIndex = index;
             targetAction.actionMap.Disable();
             PauseOptionMenuManager.Instance.EnableInput = false;
 
@@ -169,9 +173,9 @@ namespace NSMB.UI.Pause.Options {
             tm.TryGetTranslation($"ui.generic.{targetAction.bindings[index].name}", out string binding);
             binding ??= "";
             string device = tm.GetTranslation($"ui.options.controls.rebind.device.{targetBinding.groups}");
-            string deviceSlot = tm.GetTranslation($"ui.options.controls.header.{targetBinding.groups}{(index % 2 == 0 ? "primary" : "secondary")}");
+            string deviceSlot = tm.GetTranslation($"ui.options.controls.header.{targetBinding.groups}{((option.bindingIndex % 2 == 0) ? "primary" : "secondary")}");
 
-            string header = tm.GetTranslationWithReplacements("ui.options.controls.rebind.header", "control", control + binding, "device", deviceSlot);
+            string header = tm.GetTranslationWithReplacements("ui.options.controls.rebind.header", "control", control + (string.IsNullOrWhiteSpace(binding) ? "" : " " + binding), "device", deviceSlot);
             string body = tm.GetTranslationWithReplacements("ui.options.controls.rebind.body", "device", device);
             rebindPromptText.text = $"{header}\n\n{body}";
 
@@ -208,8 +212,10 @@ namespace NSMB.UI.Pause.Options {
         }
 
         private void DisposeRebind(RebindingOperation operation) {
+
             currentRebindingButton.action.actionMap.Enable();
             operation.Dispose();
+            currentRebinding = null;
             rebindPrompt.SetActive(false);
 
             if (countdown != null) {
@@ -218,6 +224,14 @@ namespace NSMB.UI.Pause.Options {
             }
 
             PauseOptionMenuManager.Instance.EnableInput = true;
+
+            if (currentRebindingButton.Binding.isComposite) {
+                // Re-open the composite screen
+                rebindCompositePrompt.Open(this, currentRebindingButton, currentRebindingIndex - currentRebindingButton.bindingIndex - 1);
+            } else {
+                currentRebindingButton = null;
+                currentRebindingIndex = -1;
+            }
         }
 
         public override bool OnLeftPress(bool held) {
@@ -238,12 +252,18 @@ namespace NSMB.UI.Pause.Options {
             if (!IsCompositeRebind)
                 return false;
 
+            if (!held)
+                rebindCompositePrompt.OnUpPress();
+
             return true;
         }
 
         public override bool OnDownPress(bool held) {
             if (!IsCompositeRebind)
                 return false;
+
+            if (!held)
+                rebindCompositePrompt.OnDownPress();
 
             return true;
         }
@@ -252,6 +272,7 @@ namespace NSMB.UI.Pause.Options {
             if (!IsCompositeRebind)
                 return false;
 
+            rebindCompositePrompt.OnSubmit();
             return true;
         }
 
@@ -259,6 +280,7 @@ namespace NSMB.UI.Pause.Options {
             if (!IsCompositeRebind)
                 return false;
 
+            rebindCompositePrompt.OnCancel();
             return true;
         }
     }

@@ -12,17 +12,17 @@ namespace NSMB.UI.Prompts {
 
         //---Serialized Variables
         [SerializeField] private RebindCompositeOption optionTemplate;
-        [SerializeField] private TMP_Text header;
+        [SerializeField] private TMP_Text header, backText;
         [SerializeField] private Transform content;
 
         //---Properties
-        private int MaxIndex => options.Count + 1;
+        private int MaxIndex => options.Count;
 
         //---Private Variables
         private readonly List<RebindCompositeOption> options = new();
         private int selectedIndex;
 
-        public void Open(PauseOptionControlsTab tab, RebindPauseOptionButton option) {
+        public void Open(PauseOptionControlsTab tab, RebindPauseOptionButton option, int initialIndex = 0) {
             InputAction action = option.action;
             int compositeIndex = option.bindingIndex;
 
@@ -42,13 +42,15 @@ namespace NSMB.UI.Prompts {
                 options.Add(newOption);
             }
 
-            SetSelectedIndex(0, false);
+            SetSelectedIndex(initialIndex, true);
             gameObject.SetActive(true);
         }
 
-        public void Close() {
+        public void Close(bool playSound = true) {
             gameObject.SetActive(false);
-            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
+
+            if (playSound)
+                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
 
             foreach (RebindCompositeOption option in options)
                 Destroy(option.gameObject);
@@ -64,7 +66,12 @@ namespace NSMB.UI.Prompts {
         }
 
         public void OnSubmit() {
+            if (selectedIndex >= MaxIndex) {
+                Close();
+                return;
+            }
 
+            options[selectedIndex].OnClick();
         }
 
         public void OnCancel() {
@@ -73,25 +80,41 @@ namespace NSMB.UI.Prompts {
                 return;
             }
 
+            SelectBackOption();
+            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+        }
+
+        public void SelectBackOption() {
             SetSelectedIndex(MaxIndex);
         }
 
-        private void ChangeSelectedIndex(int amount, bool playSound = true) {
-            int oldIndex = selectedIndex;
-            selectedIndex = Mathf.Clamp(selectedIndex + amount, 0, MaxIndex);
-
-            if (playSound && selectedIndex != oldIndex)
-                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
+        private void ChangeSelectedIndex(int amount) {
+            SetSelectedIndex(Mathf.Clamp(selectedIndex + amount, 0, MaxIndex));
         }
 
-        private void SetSelectedIndex(int index, bool playSound = true) {
-            if (selectedIndex == index)
+        private void SetSelectedIndex(int index, bool forceSelect = false) {
+            if (!forceSelect && selectedIndex == index)
                 return;
 
+            DeselectOption(selectedIndex);
             selectedIndex = index;
+            SelectOption(selectedIndex);
+        }
 
-            if (playSound)
-                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
+        private void SelectOption(int index) {
+            if (index >= options.Count) {
+                backText.text = "» " + GlobalController.Instance.translationManager.GetTranslation("ui.generic.back") + " «";
+            } else {
+                options[index].Selected();
+            }
+        }
+
+        private void DeselectOption(int index) {
+            if (index >= options.Count) {
+                backText.text = GlobalController.Instance.translationManager.GetTranslation("ui.generic.back");
+            } else {
+                options[index].Deselected();
+            }
         }
     }
 }

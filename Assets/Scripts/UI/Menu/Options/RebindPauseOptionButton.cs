@@ -33,8 +33,14 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void Hover() {
-            if (Mouse.current.delta.value != Vector2.zero)
+            if (Mouse.current.delta.value == Vector2.zero)
+                return;
+
+            if (parent.IsSelected) {
                 parent.SetCurrentOption(this);
+            } else {
+                Selected();
+            }
         }
 
         public void Dehover() {

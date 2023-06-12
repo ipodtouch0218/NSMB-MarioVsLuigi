@@ -15,9 +15,11 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-public partial class @Controls : IInputActionCollection2, IDisposable {
+public partial class @Controls: IInputActionCollection2, IDisposable
+{
     public InputActionAsset asset { get; }
-    public @Controls() {
+    public @Controls()
+    {
         asset = InputActionAsset.FromJson(@"{
     ""name"": ""Controls"",
     ""maps"": [
@@ -1193,49 +1195,59 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
         m_Debug_ToggleHUD = m_Debug.FindAction("Toggle HUD", throwIfNotFound: true);
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         UnityEngine.Object.Destroy(asset);
     }
 
-    public InputBinding? bindingMask {
+    public InputBinding? bindingMask
+    {
         get => asset.bindingMask;
         set => asset.bindingMask = value;
     }
 
-    public ReadOnlyArray<InputDevice>? devices {
+    public ReadOnlyArray<InputDevice>? devices
+    {
         get => asset.devices;
         set => asset.devices = value;
     }
 
     public ReadOnlyArray<InputControlScheme> controlSchemes => asset.controlSchemes;
 
-    public bool Contains(InputAction action) {
+    public bool Contains(InputAction action)
+    {
         return asset.Contains(action);
     }
 
-    public IEnumerator<InputAction> GetEnumerator() {
+    public IEnumerator<InputAction> GetEnumerator()
+    {
         return asset.GetEnumerator();
     }
 
-    IEnumerator IEnumerable.GetEnumerator() {
+    IEnumerator IEnumerable.GetEnumerator()
+    {
         return GetEnumerator();
     }
 
-    public void Enable() {
+    public void Enable()
+    {
         asset.Enable();
     }
 
-    public void Disable() {
+    public void Disable()
+    {
         asset.Disable();
     }
 
     public IEnumerable<InputBinding> bindings => asset.bindings;
 
-    public InputAction FindAction(string actionNameOrId, bool throwIfNotFound = false) {
+    public InputAction FindAction(string actionNameOrId, bool throwIfNotFound = false)
+    {
         return asset.FindAction(actionNameOrId, throwIfNotFound);
     }
 
-    public int FindBinding(InputBinding bindingMask, out InputAction action) {
+    public int FindBinding(InputBinding bindingMask, out InputAction action)
+    {
         return asset.FindBinding(bindingMask, out action);
     }
 
@@ -1247,7 +1259,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_PowerupAction;
     private readonly InputAction m_Player_ReserveItem;
-    public struct PlayerActions {
+    public struct PlayerActions
+    {
         private @Controls m_Wrapper;
         public PlayerActions(@Controls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Player_Movement;
@@ -1260,7 +1273,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
         public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
-        public void AddCallbacks(IPlayerActions instance) {
+        public void AddCallbacks(IPlayerActions instance)
+        {
             if (instance == null || m_Wrapper.m_PlayerActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_PlayerActionsCallbackInterfaces.Add(instance);
             @Movement.started += instance.OnMovement;
@@ -1280,7 +1294,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
             @ReserveItem.canceled += instance.OnReserveItem;
         }
 
-        private void UnregisterCallbacks(IPlayerActions instance) {
+        private void UnregisterCallbacks(IPlayerActions instance)
+        {
             @Movement.started -= instance.OnMovement;
             @Movement.performed -= instance.OnMovement;
             @Movement.canceled -= instance.OnMovement;
@@ -1298,12 +1313,14 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
             @ReserveItem.canceled -= instance.OnReserveItem;
         }
 
-        public void RemoveCallbacks(IPlayerActions instance) {
+        public void RemoveCallbacks(IPlayerActions instance)
+        {
             if (m_Wrapper.m_PlayerActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IPlayerActions instance) {
+        public void SetCallbacks(IPlayerActions instance)
+        {
             foreach (var item in m_Wrapper.m_PlayerActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
             m_Wrapper.m_PlayerActionsCallbackInterfaces.Clear();
@@ -1326,7 +1343,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
     private readonly InputAction m_UI_ScrollWheel;
     private readonly InputAction m_UI_MiddleClick;
     private readonly InputAction m_UI_RightClick;
-    public struct UIActions {
+    public struct UIActions
+    {
         private @Controls m_Wrapper;
         public UIActions(@Controls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Navigate => m_Wrapper.m_UI_Navigate;
@@ -1345,7 +1363,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
         public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
-        public void AddCallbacks(IUIActions instance) {
+        public void AddCallbacks(IUIActions instance)
+        {
             if (instance == null || m_Wrapper.m_UIActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_UIActionsCallbackInterfaces.Add(instance);
             @Navigate.started += instance.OnNavigate;
@@ -1383,7 +1402,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
             @RightClick.canceled += instance.OnRightClick;
         }
 
-        private void UnregisterCallbacks(IUIActions instance) {
+        private void UnregisterCallbacks(IUIActions instance)
+        {
             @Navigate.started -= instance.OnNavigate;
             @Navigate.performed -= instance.OnNavigate;
             @Navigate.canceled -= instance.OnNavigate;
@@ -1419,12 +1439,14 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
             @RightClick.canceled -= instance.OnRightClick;
         }
 
-        public void RemoveCallbacks(IUIActions instance) {
+        public void RemoveCallbacks(IUIActions instance)
+        {
             if (m_Wrapper.m_UIActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IUIActions instance) {
+        public void SetCallbacks(IUIActions instance)
+        {
             foreach (var item in m_Wrapper.m_UIActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
             m_Wrapper.m_UIActionsCallbackInterfaces.Clear();
@@ -1438,7 +1460,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
     private List<IDebugActions> m_DebugActionsCallbackInterfaces = new List<IDebugActions>();
     private readonly InputAction m_Debug_FPSMonitor;
     private readonly InputAction m_Debug_ToggleHUD;
-    public struct DebugActions {
+    public struct DebugActions
+    {
         private @Controls m_Wrapper;
         public DebugActions(@Controls wrapper) { m_Wrapper = wrapper; }
         public InputAction @FPSMonitor => m_Wrapper.m_Debug_FPSMonitor;
@@ -1448,7 +1471,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
         public static implicit operator InputActionMap(DebugActions set) { return set.Get(); }
-        public void AddCallbacks(IDebugActions instance) {
+        public void AddCallbacks(IDebugActions instance)
+        {
             if (instance == null || m_Wrapper.m_DebugActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_DebugActionsCallbackInterfaces.Add(instance);
             @FPSMonitor.started += instance.OnFPSMonitor;
@@ -1459,7 +1483,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
             @ToggleHUD.canceled += instance.OnToggleHUD;
         }
 
-        private void UnregisterCallbacks(IDebugActions instance) {
+        private void UnregisterCallbacks(IDebugActions instance)
+        {
             @FPSMonitor.started -= instance.OnFPSMonitor;
             @FPSMonitor.performed -= instance.OnFPSMonitor;
             @FPSMonitor.canceled -= instance.OnFPSMonitor;
@@ -1468,12 +1493,14 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
             @ToggleHUD.canceled -= instance.OnToggleHUD;
         }
 
-        public void RemoveCallbacks(IDebugActions instance) {
+        public void RemoveCallbacks(IDebugActions instance)
+        {
             if (m_Wrapper.m_DebugActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IDebugActions instance) {
+        public void SetCallbacks(IDebugActions instance)
+        {
             foreach (var item in m_Wrapper.m_DebugActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
             m_Wrapper.m_DebugActionsCallbackInterfaces.Clear();
@@ -1482,27 +1509,33 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
     }
     public DebugActions @Debug => new DebugActions(this);
     private int m_KeyboardSchemeIndex = -1;
-    public InputControlScheme KeyboardScheme {
-        get {
+    public InputControlScheme KeyboardScheme
+    {
+        get
+        {
             if (m_KeyboardSchemeIndex == -1) m_KeyboardSchemeIndex = asset.FindControlSchemeIndex("Keyboard");
             return asset.controlSchemes[m_KeyboardSchemeIndex];
         }
     }
     private int m_GamepadSchemeIndex = -1;
-    public InputControlScheme GamepadScheme {
-        get {
+    public InputControlScheme GamepadScheme
+    {
+        get
+        {
             if (m_GamepadSchemeIndex == -1) m_GamepadSchemeIndex = asset.FindControlSchemeIndex("Gamepad");
             return asset.controlSchemes[m_GamepadSchemeIndex];
         }
     }
-    public interface IPlayerActions {
+    public interface IPlayerActions
+    {
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnPowerupAction(InputAction.CallbackContext context);
         void OnReserveItem(InputAction.CallbackContext context);
     }
-    public interface IUIActions {
+    public interface IUIActions
+    {
         void OnNavigate(InputAction.CallbackContext context);
         void OnSubmit(InputAction.CallbackContext context);
         void OnCancel(InputAction.CallbackContext context);
@@ -1515,7 +1548,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable {
         void OnMiddleClick(InputAction.CallbackContext context);
         void OnRightClick(InputAction.CallbackContext context);
     }
-    public interface IDebugActions {
+    public interface IDebugActions
+    {
         void OnFPSMonitor(InputAction.CallbackContext context);
         void OnToggleHUD(InputAction.CallbackContext context);
     }

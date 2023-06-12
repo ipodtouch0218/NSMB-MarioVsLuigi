@@ -1,5 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using TMPro;
 
 using NSMB.Translation;
@@ -10,12 +11,15 @@ namespace NSMB.UI.Pause.Options {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text label, buttonLabel;
+        [SerializeField] private Image image;
+        [SerializeField] private Sprite selectedSprite, deselectedSprite;
 
         //---Private Variables
         private PauseOptionControlsTab tab;
         private RebindPauseOptionButton button;
         private InputAction action;
         private int bindingIndex;
+        private bool selected;
 
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -25,8 +29,29 @@ namespace NSMB.UI.Pause.Options {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
+        public void Selected() {
+            selected = true;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
+        }
+
+        public void Hover() {
+            image.sprite = selectedSprite;
+            buttonLabel.color = Color.black;
+        }
+
+        public void Deselected() {
+            selected = false;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
+        }
+
+        public void Dehover() {
+            image.sprite = deselectedSprite;
+            buttonLabel.color = Color.white;
+        }
+
         public void OnClick() {
             tab.StartRebind(button, bindingIndex);
+            tab.rebindCompositePrompt.Close(false);
         }
 
         public void Instantiate(PauseOptionControlsTab tab, RebindPauseOptionButton button, InputAction action, int bindingIndex) {
@@ -38,6 +63,8 @@ namespace NSMB.UI.Pause.Options {
             string key = InputControlPath.ToHumanReadableString(
                             action.bindings[bindingIndex].effectivePath,
                             InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
+            key = key.Replace("Up Arrow", "↑").Replace("Down Arrow", "↓").Replace("Left Arrow", "←").Replace("Right Arrow", "→");
+
             buttonLabel.text = key;
 
             OnLanguageChanged(GlobalController.Instance.translationManager);
@@ -50,6 +77,10 @@ namespace NSMB.UI.Pause.Options {
                 label.text = translation;
             } else {
                 label.text = name;
+            }
+
+            if (selected) {
+                label.text = "» " + label.text;
             }
         }
     }
