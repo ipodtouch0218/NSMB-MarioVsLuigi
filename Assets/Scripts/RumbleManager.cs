@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,17 +20,17 @@ public class RumbleManager : MonoBehaviour {
 
     private void OnDeviceChange(InputDevice device, InputDeviceChange change)
     {
-        if (device is Gamepad) pad = (Gamepad)device;
+        if (device is Gamepad gamepad) pad = gamepad;
     }
 
-    public void RumbleForSeconds(float lowStrength, float highStrength, float duration) {
-        if (strengthMultiplier <= 0) return;
+    public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration) {
+        if (strengthMultiplier <= 0 || pad == null) return;
         if (currentlyRumbling != null) StopCoroutine(currentlyRumbling);
-        currentlyRumbling = StartCoroutine(Rumble(lowStrength, highStrength, duration));
+        currentlyRumbling = StartCoroutine(Rumble(bassStrength, trebleStrength, duration));
     }
 
-    private IEnumerator Rumble(float lowStrength, float highStrength, float duration) {
-        pad.SetMotorSpeeds(lowStrength * strengthMultiplier, highStrength * strengthMultiplier);
+    private IEnumerator Rumble(float lowFreq, float highFreq, float duration) {
+        pad.SetMotorSpeeds(lowFreq * strengthMultiplier, highFreq * strengthMultiplier);
         yield return new WaitForSeconds(duration);
         pad.SetMotorSpeeds(0f, 0f);
     }

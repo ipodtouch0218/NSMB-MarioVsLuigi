@@ -395,8 +395,10 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void OnGameStartChanged() {
-        if (SessionData.Instance.GameStarted)
+        if (SessionData.Instance.GameStarted) {
             GlobalController.Instance.loadingCanvas.Initialize();
+            GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.3f, 0.5f);
+        }
     }
 
     public void StartCountdown() {

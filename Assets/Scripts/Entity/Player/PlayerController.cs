@@ -1023,6 +1023,7 @@ namespace NSMB.Entities.Player {
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_SpawnCoinEffects(Vector3 position, byte coins, bool final) {
             PlaySound(Enums.Sounds.World_Coin_Collect);
+            GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.1f, 0.05f);
             NumberParticle num = Instantiate(PrefabList.Instance.Particle_CoinNumber, position, Quaternion.identity).GetComponentInChildren<NumberParticle>();
             num.ApplyColorAndText(Utils.Utils.GetSymbolString(coins.ToString(), Utils.Utils.numberSymbols), animationController.GlowColor, final);
         }
@@ -1282,6 +1283,7 @@ namespace NSMB.Entities.Player {
             CameraController.ScreenShake = 0.15f;
             SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position + new Vector2(FacingRight ? 0.5f : -0.5f, 0));
             PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte) (footstepVariant ? 1 : 2));
+            GlobalController.Instance.rumbleManager.RumbleForSeconds(0.5f, 0f, 0.1f);
             footstepVariant = !footstepVariant;
         }
 
@@ -2903,6 +2905,7 @@ namespace NSMB.Entities.Player {
                 };
                 player.PlaySound(sound);
                 player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f);
             } else {
                 CameraController.ScreenShake = 0.15f;
             }
@@ -2910,6 +2913,7 @@ namespace NSMB.Entities.Player {
                 player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
                 player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
                 CameraController.ScreenShake = 0.35f;
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f);
             }
         }
 
@@ -3079,6 +3083,7 @@ namespace NSMB.Entities.Player {
                 player.SpawnParticle("Prefabs/Particle/PlayerBounce", player.KnockbackAttacker.transform.position);
 
             player.PlaySound(player.IsWeakKnockback ? Enums.Sounds.Player_Sound_Collision_Fireball : Enums.Sounds.Player_Sound_Collision, 0, 3);
+            GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, player.IsWeakKnockback ? 0.3f : 0.5f);
         }
 
         public static void OnPowerupStateChanged(Changed<PlayerController> changed) {
@@ -3157,6 +3162,7 @@ namespace NSMB.Entities.Player {
 
         public override void OnIsFrozenChanged() {
             animator.enabled = !IsFrozen;
+            if (!IsFrozen) GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.2f, 0.3f);
         }
 
         public static void OnHeldEntityChanged(Changed<PlayerController> changed) {
