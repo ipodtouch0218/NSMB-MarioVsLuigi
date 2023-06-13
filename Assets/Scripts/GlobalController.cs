@@ -16,6 +16,7 @@ public class GlobalController : Singleton<GlobalController> {
     //---Public Variables
     public TranslationManager translationManager;
     public DiscordController discordController;
+    public RumbleManager rumbleManager;
     public Gradient rainbowGradient;
 
     public PauseOptionMenuManager optionsManager;
