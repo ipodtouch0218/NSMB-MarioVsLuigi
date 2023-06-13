@@ -8849,6 +8849,7 @@ GameObject:
   - component: {fileID: 1776850482587567145}
   - component: {fileID: 4164633649054386327}
   - component: {fileID: 3073743129255606538}
+  - component: {fileID: 4970983752568173116}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -8889,6 +8890,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   translationManager: {fileID: 5071617039196214955}
   discordController: {fileID: 4164633649054386327}
+  rumbleManager: {fileID: 4970983752568173116}
   rainbowGradient:
     serializedVersion: 2
     key0: {r: 1, g: 0.13913044, b: 0.11304349, a: 1}
@@ -9154,6 +9156,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3833d4fd28fcf2443b18644b341e86bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4970983752568173116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776850482587567141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77553d616e02e1c10ab52b8d40180df9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  strengthMultiplier: 1
 --- !u!1 &1802097837658764903
 GameObject:
   m_ObjectHideFlags: 0
