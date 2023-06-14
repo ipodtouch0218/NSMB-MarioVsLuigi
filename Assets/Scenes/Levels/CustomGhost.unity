@@ -254,8 +254,18 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+      objectReference: {fileID: -1532177184, guid: 3b74d79c93c18cc458cbaa066afa628d,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -320,6 +330,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516101862555970818, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: dottedCoin
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -5788,8 +5813,18 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+      objectReference: {fileID: -1532177184, guid: 3b74d79c93c18cc458cbaa066afa628d,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -5855,6 +5890,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516101862555970818, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: dottedCoin
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: Flags
@@ -5901,6 +5951,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -5966,6 +6021,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: Flags
@@ -6000,6 +6060,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -6063,6 +6128,16 @@ PrefabInstance:
     - target: {fileID: 5780648777663731100, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516101862555970818, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: dottedCoin
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
@@ -6329,8 +6404,18 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+      objectReference: {fileID: -1532177184, guid: 3b74d79c93c18cc458cbaa066afa628d,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -6395,6 +6480,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516101862555970818, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: dottedCoin
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -6490,8 +6590,18 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+      objectReference: {fileID: -1532177184, guid: 3b74d79c93c18cc458cbaa066afa628d,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -6556,6 +6666,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516101862555970818, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: dottedCoin
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -8194,6 +8319,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -8259,6 +8389,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516101862555970818, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: dottedCoin
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: Flags
@@ -8299,6 +8439,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -8363,6 +8508,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -16381,6 +16531,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -16445,6 +16600,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -17033,6 +17193,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -17097,6 +17262,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -17221,6 +17391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0.67114323
   fps: 6
@@ -17274,8 +17445,18 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+      objectReference: {fileID: -1532177184, guid: 3b74d79c93c18cc458cbaa066afa628d,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -17340,6 +17521,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516101862555970818, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: dottedCoin
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -17567,8 +17763,18 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
+      objectReference: {fileID: -1532177184, guid: 3b74d79c93c18cc458cbaa066afa628d,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -17634,6 +17840,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: isDisplaying
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516101862555970818, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: dottedCoin
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: Flags
@@ -17674,6 +17895,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
         type: 3}
+    - target: {fileID: 1541163589079276198, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3189120333888935913, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
       propertyPath: sceneViewId
@@ -17738,6 +17964,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153461050534851498, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}

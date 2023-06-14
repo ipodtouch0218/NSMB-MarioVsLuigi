@@ -150,7 +150,8 @@ namespace NSMB.Entities.Collectable {
                 } else {
                     bool sameTeam = Collector.data.Team == runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
                     Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
-                    if (sameTeam) GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.8f, 0.1f);
+                    if (Collector.cameraController.IsControllingCamera)
+                        GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.8f, 0.1f);
 
                     Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
                 }

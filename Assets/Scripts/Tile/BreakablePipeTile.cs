@@ -22,7 +22,7 @@ namespace NSMB.Tiles {
             if (interacter is not PlayerController player)
                 return false;
 
-            bumpSound = !player.IsGroundpounding;
+            bumpSound = !player.IsGroundpounding && !player.IsDrilling;
 
             if (player.State != Enums.PowerupState.MegaMushroom)
                 return false;

@@ -390,14 +390,20 @@ namespace NSMB.Entities.Player {
             bool powerup = ControlSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
             bool sprint = ControlSystem.controls.Player.Sprint.ReadValue<float>() >= 0.5f;
 
+            Vector2 normalizedJoystick = joystick.normalized;
             //TODO: changeable deadzone?
-            newInput.buttons.Set(PlayerControls.Up, joystick.y > 0.25f);
-            newInput.buttons.Set(PlayerControls.Down, joystick.y < -0.25f);
-            newInput.buttons.Set(PlayerControls.Left, joystick.x < -0.25f);
-            newInput.buttons.Set(PlayerControls.Right, joystick.x > 0.25f);
+            bool up = Vector2.Dot(normalizedJoystick, Vector2.up) > 0.6f;
+            bool down = Vector2.Dot(normalizedJoystick, Vector2.down) > 0.6f;
+            bool left = Vector2.Dot(normalizedJoystick, Vector2.left) > 0.4f;
+            bool right = Vector2.Dot(normalizedJoystick, Vector2.right) > 0.4f;
+
+            newInput.buttons.Set(PlayerControls.Up, up);
+            newInput.buttons.Set(PlayerControls.Down, down);
+            newInput.buttons.Set(PlayerControls.Left, left);
+            newInput.buttons.Set(PlayerControls.Right, right);
             newInput.buttons.Set(PlayerControls.Jump, jump);
             newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
-            newInput.buttons.Set(PlayerControls.Sprint, sprint || Settings.Instance.controlsAutoSprint);
+            newInput.buttons.Set(PlayerControls.Sprint, sprint ^ Settings.Instance.controlsAutoSprint);
             newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprint && Settings.Instance.controlsFireballSprint);
 
             input.Set(newInput);
@@ -836,7 +842,7 @@ namespace NSMB.Entities.Player {
             switch (State) {
             case Enums.PowerupState.IceFlower:
             case Enums.PowerupState.FireFlower: {
-                if (WallSliding || IsGroundpounding || JumpState == PlayerJumpState.TripleJump || IsSpinnerFlying || IsDrilling || IsCrouching || IsSliding)
+                if (WallSliding || IsGroundpounding || JumpState == PlayerJumpState.TripleJump || IsSpinnerFlying || IsDrilling || IsCrouching || IsSliding || IsSkidding || IsTurnaround)
                     return;
 
                 if (FireballDelayTimer.IsActive(Runner))
@@ -1023,7 +1029,10 @@ namespace NSMB.Entities.Player {
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_SpawnCoinEffects(Vector3 position, byte coins, bool final) {
             PlaySound(Enums.Sounds.World_Coin_Collect);
-            GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.1f, 0.05f);
+
+            if (cameraController.IsControllingCamera)
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.1f, 0.05f);
+
             NumberParticle num = Instantiate(PrefabList.Instance.Particle_CoinNumber, position, Quaternion.identity).GetComponentInChildren<NumberParticle>();
             num.ApplyColorAndText(Utils.Utils.GetSymbolString(coins.ToString(), Utils.Utils.numberSymbols), animationController.GlowColor, final);
         }
@@ -2905,7 +2914,9 @@ namespace NSMB.Entities.Player {
                 };
                 player.PlaySound(sound);
                 player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f);
+
+                if (player.cameraController.IsControllingCamera)
+                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f);
             } else {
                 CameraController.ScreenShake = 0.15f;
             }
@@ -2913,7 +2924,9 @@ namespace NSMB.Entities.Player {
                 player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
                 player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
                 CameraController.ScreenShake = 0.35f;
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f);
+
+                if (player.cameraController.IsControllingCamera)
+                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f);
             }
         }
 
@@ -3083,7 +3096,9 @@ namespace NSMB.Entities.Player {
                 player.SpawnParticle("Prefabs/Particle/PlayerBounce", player.KnockbackAttacker.transform.position);
 
             player.PlaySound(player.IsWeakKnockback ? Enums.Sounds.Player_Sound_Collision_Fireball : Enums.Sounds.Player_Sound_Collision, 0, 3);
-            GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, player.IsWeakKnockback ? 0.3f : 0.5f);
+
+            if (player.cameraController.IsControllingCamera)
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, player.IsWeakKnockback ? 0.3f : 0.5f);
         }
 
         public static void OnPowerupStateChanged(Changed<PlayerController> changed) {
@@ -3146,6 +3161,9 @@ namespace NSMB.Entities.Player {
         public static void OnGiantTimerChanged(Changed<PlayerController> changed) {
             PlayerController player = changed.Behaviour;
 
+            if (player.IsDead)
+                return;
+
             player.PlaySoundEverywhere(player.GiantTimer.IsRunning ? Enums.Sounds.Player_Voice_MegaMushroom : Enums.Sounds.Powerup_MegaMushroom_End);
         }
 
@@ -3162,7 +3180,9 @@ namespace NSMB.Entities.Player {
 
         public override void OnIsFrozenChanged() {
             animator.enabled = !IsFrozen;
-            if (!IsFrozen) GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.2f, 0.3f);
+
+            if (!IsFrozen && cameraController.IsControllingCamera)
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.2f, 0.3f);
         }
 
         public static void OnHeldEntityChanged(Changed<PlayerController> changed) {

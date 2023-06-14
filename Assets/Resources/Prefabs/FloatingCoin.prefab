@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1414799463671012512}
   - component: {fileID: 388009723025345444}
   - component: {fileID: 6153461050534851498}
+  - component: {fileID: 1541163589079276198}
   m_Layer: 10
   m_Name: Graphics
   m_TagString: Untagged
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.875, y: 1}
+  m_Size: {x: 0.5, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -98,6 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0
   fps: 6
@@ -107,6 +109,36 @@ MonoBehaviour:
   - {fileID: -2074995507315294404, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   sRenderer: {fileID: 388009723025345444}
+  image: {fileID: 0}
+--- !u!114 &1541163589079276198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200548328367023309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDisplaying: 0
+  runInEditor: 0
+  frame: 0
+  fps: 9
+  frames:
+  - {fileID: -1532177184, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: 446454979, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: -629719212, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: 1730718890, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: -363108830, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: -427016890, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: 1059473910, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: -2147016090, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: -1407919888, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  - {fileID: 1590919697, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  sRenderer: {fileID: 388009723025345444}
+  image: {fileID: 0}
 --- !u!1 &5780648777663731097
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,6 +151,8 @@ GameObject:
   - component: {fileID: 8516101862555970818}
   - component: {fileID: -4656064841297145525}
   - component: {fileID: 8712797713821691440}
+  - component: {fileID: 6321124393289553252}
+  - component: {fileID: 7985815766470249507}
   m_Layer: 10
   m_Name: FloatingCoin
   m_TagString: Untagged
@@ -140,7 +174,7 @@ Transform:
   m_Children:
   - {fileID: 1414799463671012512}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8516101862555970818
 MonoBehaviour:
@@ -155,13 +189,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  _FacingRight:
+    _value: 0
   _IsActive:
     _value: 0
-  isRespawningEntity: 0
   body: {fileID: 0}
-  sfx: {fileID: 0}
+  nrb: {fileID: 0}
+  sfx: {fileID: 6321124393289553252}
+  checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}
   sRenderer: {fileID: 388009723025345444}
+  dottedCoin: 0
+  defaultCoinAnimate: {fileID: 6153461050534851498}
+  dottedCoinAnimate: {fileID: 1541163589079276198}
   hitbox: {fileID: -4656064841297145525}
 --- !u!61 &-4656064841297145525
 BoxCollider2D:
@@ -232,3 +272,117 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 8516101862555970818}
   SimulationBehaviours: []
+--- !u!82 &6321124393289553252
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780648777663731097}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &7985815766470249507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780648777663731097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSources:
+  - {fileID: 6321124393289553252}
+  soundOrigin: {fileID: 5780648777663731100}
+  soundRange: 12
+  maxPanning: 0.8
+  useDistanceToCamera: 0

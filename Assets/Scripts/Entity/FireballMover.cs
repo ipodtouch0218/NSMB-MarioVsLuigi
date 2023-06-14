@@ -242,8 +242,9 @@ namespace NSMB.Entities {
                     return;
                 }
                 case Enums.PowerupState.BlueShell: {
-                    if (IsIceball && (player.IsInShell || player.IsCrouching || player.IsGroundpounding)) {
-                        player.ShellSlowdownTimer = TickTimer.CreateFromSeconds(Runner, 0.65f);
+                    if (player.IsInShell || player.IsCrouching || player.IsGroundpounding) {
+                        if (IsIceball)
+                            player.ShellSlowdownTimer = TickTimer.CreateFromSeconds(Runner, 0.65f);
                         DespawnEntity();
                         return;
                     }

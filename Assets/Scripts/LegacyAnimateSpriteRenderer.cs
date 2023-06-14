@@ -4,11 +4,14 @@ using UnityEngine.UI;
 [ExecuteInEditMode]
 public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
+    //---Public Variables
+    public bool isDisplaying = true;
+
     //---Serialized Variables
     [SerializeField] private bool runInEditor = false;
     [SerializeField] private float frame; // Must be a float because legacy animators dont support ints, apparently?
     [SerializeField] private float fps = 8;
-    [SerializeField] private Sprite[] frames;
+    [SerializeField] public Sprite[] frames;
 
     //---Components
     [SerializeField] private SpriteRenderer sRenderer;
@@ -36,12 +39,13 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
     private void SetSprite() {
 
-        if (frames.Length == 0)
+        if (!isDisplaying || frames.Length == 0)
             return;
 
         frame = Mathf.Repeat(frame, frames.Length);
         int currentFrame = Mathf.FloorToInt(frame);
         Sprite currentSprite = frames[currentFrame];
+
 
         if (sRenderer && currentSprite != sRenderer.sprite) {
             sRenderer.sprite = currentSprite;

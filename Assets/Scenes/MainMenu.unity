@@ -1604,6 +1604,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 3.9836726
   fps: 8
@@ -6660,6 +6661,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0
   fps: 12
@@ -22950,15 +22952,24 @@ MonoBehaviour:
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
-  m_ActionsAsset: {fileID: 0}
-  m_PointAction: {fileID: 0}
-  m_MoveAction: {fileID: 0}
-  m_SubmitAction: {fileID: 0}
-  m_CancelAction: {fileID: 0}
-  m_LeftClickAction: {fileID: 0}
-  m_MiddleClickAction: {fileID: 0}
-  m_RightClickAction: {fileID: 0}
-  m_ScrollWheelAction: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_PointAction: {fileID: -957078602764158190, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_MoveAction: {fileID: -2280188770139267552, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_SubmitAction: {fileID: -2929160565094855328, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_CancelAction: {fileID: -7483438081576239459, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_LeftClickAction: {fileID: -7412529399114446247, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_MiddleClickAction: {fileID: -6195510380187873990, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_RightClickAction: {fileID: -7130282723873141467, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
+  m_ScrollWheelAction: {fileID: 8867507808444555289, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
   m_TrackedDevicePositionAction: {fileID: 0}
   m_TrackedDeviceOrientationAction: {fileID: 0}
   m_DeselectOnBackgroundClick: 1
@@ -42216,6 +42227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0
   fps: 6
@@ -46571,6 +46583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 6.983677
   fps: 8
@@ -47445,6 +47458,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 6.983677
   fps: 8

@@ -8,8 +8,12 @@ using NSMB.Tiles;
 namespace NSMB.Entities.Collectable {
     public abstract class Coin : CollectableEntity {
 
-        //---Serialized Variables
-        [SerializeField] private SpriteRenderer sRenderer;
+        //---Components
+        [SerializeField] protected SpriteRenderer sRenderer;
+
+        public override void OnValidate() {
+            if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
+        }
 
         public static void GivePlayerCoin(PlayerController player, Vector3 position) {
             byte newCoins = (byte) (player.Coins + 1);

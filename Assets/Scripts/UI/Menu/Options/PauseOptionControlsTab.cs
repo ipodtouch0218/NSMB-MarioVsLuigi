@@ -169,7 +169,7 @@ namespace NSMB.UI.Pause.Options {
             rebindPrompt.SetActive(true);
             TranslationManager tm = GlobalController.Instance.translationManager;
 
-            string control = tm.GetTranslation($"ui.options.controls.{targetAction.actionMap.name}.{targetAction.name}");
+            string control = tm.GetTranslation($"ui.options.controls.{targetAction.actionMap.name}.{targetAction.name.Replace(" ", "")}");
             tm.TryGetTranslation($"ui.generic.{targetAction.bindings[index].name}", out string binding);
             binding ??= "";
             string device = tm.GetTranslation($"ui.options.controls.rebind.device.{targetBinding.groups}");

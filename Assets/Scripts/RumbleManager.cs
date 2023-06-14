@@ -3,24 +3,28 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class RumbleManager : MonoBehaviour {
+
+    //---Serialized Variables
+    [SerializeField, Range(0,2)] private int strengthMultiplier = 1;
+
+    //---Private Variables
     private Gamepad pad;
     private Coroutine currentlyRumbling;
 
-    [SerializeField][Range(0,2)] private int strengthMultiplier = 1; 
-    
-    private void OnEnable()
-    {
+    private void OnEnable() {
         InputSystem.onDeviceChange += OnDeviceChange;
+        pad = Gamepad.current;
     }
 
-    private void OnDisable()
-    {
+    private void OnDisable() {
         InputSystem.onDeviceChange -= OnDeviceChange;
     }
 
-    private void OnDeviceChange(InputDevice device, InputDeviceChange change)
-    {
-        if (device is Gamepad gamepad) pad = gamepad;
+    private void OnDeviceChange(InputDevice device, InputDeviceChange change) {
+        if (device is Gamepad gamepad) {
+            pad?.ResetHaptics();
+            pad = gamepad;
+        }
     }
 
     public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration) {
@@ -32,6 +36,6 @@ public class RumbleManager : MonoBehaviour {
     private IEnumerator Rumble(float lowFreq, float highFreq, float duration) {
         pad.SetMotorSpeeds(lowFreq * strengthMultiplier, highFreq * strengthMultiplier);
         yield return new WaitForSeconds(duration);
-        pad.SetMotorSpeeds(0f, 0f);
+        pad.ResetHaptics();
     }
 }

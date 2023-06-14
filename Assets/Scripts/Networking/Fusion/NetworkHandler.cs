@@ -158,7 +158,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input) {
-        OnInput?.Invoke(runner, input);
+        try {
+            OnInput?.Invoke(runner, input);
+        } catch (Exception e) {
+            Debug.LogError($"Caught an exception while handling OnInput: {e.Message}");
+        }
     }
 
     void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {
@@ -188,6 +192,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 runner.SessionInfo.UpdateCustomProperties(new() {
                     [Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname,
                 });
+                ourData.JoinTick = -1;
             }
 
             runner.PushHostMigrationSnapshot();
