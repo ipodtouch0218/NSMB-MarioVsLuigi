@@ -27,9 +27,11 @@ public class RumbleManager : MonoBehaviour {
         }
     }
 
-    public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration) {
+    public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration, RumbleSetting setting) {
         if (strengthMultiplier <= 0 || pad == null) return;
         if (currentlyRumbling != null) StopCoroutine(currentlyRumbling);
+
+        if (setting == RumbleSetting.None || setting < Settings.Instance.controlsRumble) return;
         currentlyRumbling = StartCoroutine(Rumble(bassStrength, trebleStrength, duration));
     }
 
@@ -37,5 +39,11 @@ public class RumbleManager : MonoBehaviour {
         pad.SetMotorSpeeds(lowFreq * strengthMultiplier, highFreq * strengthMultiplier);
         yield return new WaitForSeconds(duration);
         pad.ResetHaptics();
+    }
+
+    public enum RumbleSetting : int {
+        None,
+        Low,
+        High
     }
 }

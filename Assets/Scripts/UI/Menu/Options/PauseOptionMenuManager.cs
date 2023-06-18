@@ -57,6 +57,8 @@ namespace NSMB.UI.Pause.Options {
                 previouslySelected = EventSystem.current.currentSelectedGameObject;
                 EventSystem.current.SetSelectedGameObject(gameObject);
             }
+
+            EnableInput = true;
         }
 
         protected override void OnDisable() {
@@ -154,7 +156,7 @@ namespace NSMB.UI.Pause.Options {
 
         private void OnNavigate(InputAction.CallbackContext context) {
 
-            if (context.canceled) {
+            if (context.canceled || context.ReadValue<Vector2>() == Vector2.zero) {
                 inputted = false;
                 return;
             }
@@ -175,7 +177,6 @@ namespace NSMB.UI.Pause.Options {
             bool down = !up && d > u && d > l && d > r;
             bool left = !up && !down && l > u && l > d && l > r;
             bool right = !up && !down && !left && r > u && r > d && r > l;
-
 
             if (SelectedTab) {
                 Func<bool, bool> func;

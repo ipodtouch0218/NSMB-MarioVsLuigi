@@ -90,6 +90,8 @@ public class PlayerData : NetworkBehaviour {
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (hasState)
             SessionData.Instance.SaveWins(this);
+
+        runner.SetPlayerObject(Object.InputAuthority, null);
     }
 
     public string GetNickname(bool filter = true) {

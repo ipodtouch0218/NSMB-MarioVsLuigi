@@ -30,7 +30,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public AudioSource sfx, music;
     public Toggle spectateToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public GameObject mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
+    public GameObject titleSelected, mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
     public byte currentSkin;
 
     //---Serialized Fields
@@ -265,7 +265,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         DisableAllMenus();
         title.SetActive(true);
 
-        EventSystem.current.SetSelectedGameObject(mainMenuSelected);
+        EventSystem.current.SetSelectedGameObject(titleSelected);
     }
     public void OpenMainMenu() {
         DisableAllMenus();
@@ -749,6 +749,14 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         levelDropdown.ClearOptions();
         levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
         levelDropdown.SetValueWithoutNotify(selectedLevel);
+
+        int selectedCharacter = characterDropdown.value;
+        characterDropdown.ClearOptions();
+        foreach (CharacterData character in ScriptableManager.Instance.characters) {
+            string name = tm.GetTranslation(character.translationString);
+            characterDropdown.options.Add(new TMP_Dropdown.OptionData(name, character.readySprite));
+        }
+        characterDropdown.SetValueWithoutNotify(selectedCharacter);
 
         //TODO: RTL FONT
 

@@ -213,7 +213,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         GlobalController.Instance.discordController.UpdateActivity();
         runner.Despawn(data.Object);
-        runner.SetPlayerObject(player, null);
     }
 
     void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) {

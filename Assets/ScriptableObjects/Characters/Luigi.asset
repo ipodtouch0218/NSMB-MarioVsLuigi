@@ -16,6 +16,7 @@ MonoBehaviour:
     RawGuidValue: 92862b2047f6921418a44a88d54c9a3f
   soundFolder: luigi
   uistring: <sprite=4>
+  translationString: character.luigi
   loadingSmallSprite: {fileID: -3599161207798135845, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
   loadingBigSprite: {fileID: -309644342959843524, guid: a7245cae141f3ee449147539ebd2a2c9,

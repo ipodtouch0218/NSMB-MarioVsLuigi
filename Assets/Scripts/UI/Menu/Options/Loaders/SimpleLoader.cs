@@ -1,9 +1,9 @@
 using System.Reflection;
 using UnityEngine;
 
-using NSMB.UI.Pause.Loaders;
+using NSMB.UI.Pause.Options;
 
-namespace NSMB.UI.Pause.Options {
+namespace NSMB.UI.Pause.Loaders {
     public abstract class SimpleLoader<O, V> : PauseOptionLoader where O : PauseOption {
 
         //---Serialized Variables

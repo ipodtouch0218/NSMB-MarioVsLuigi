@@ -63,7 +63,8 @@ namespace NSMB.Entities.Player {
         [Networked] public TickTimer JumpLandingTimer { get; set; }
         [Networked(OnChanged = nameof(OnBlockBumpSoundCounterChanged))] public byte BlockBumpSoundCounter { get; set; }
         //Knockback
-        [Networked(OnChanged = nameof(OnIsInKnockbackChanged))] public NetworkBool IsInKnockback { get; set; }
+        [Networked] public NetworkBool IsInKnockback { get; set; }
+        [Networked(OnChanged = nameof(OnKnockbackAnimCounterChanged))] private byte KnockbackAnimCounter { get; set; }
         [Networked] public NetworkBool IsWeakKnockback { get; set; }
         [Networked] public NetworkBool IsForwardsKnockback { get; set; }
         [Networked] private NetworkBool KnockbackWasOriginallyFacingRight { get; set; }
@@ -1031,7 +1032,7 @@ namespace NSMB.Entities.Player {
             PlaySound(Enums.Sounds.World_Coin_Collect);
 
             if (cameraController.IsControllingCamera)
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.1f, 0.05f);
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.1f, 0.05f, RumbleManager.RumbleSetting.High);
 
             NumberParticle num = Instantiate(PrefabList.Instance.Particle_CoinNumber, position, Quaternion.identity).GetComponentInChildren<NumberParticle>();
             num.ApplyColorAndText(Utils.Utils.GetSymbolString(coins.ToString(), Utils.Utils.numberSymbols), animationController.GlowColor, final);
@@ -1292,7 +1293,7 @@ namespace NSMB.Entities.Player {
             CameraController.ScreenShake = 0.15f;
             SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position + new Vector2(FacingRight ? 0.5f : -0.5f, 0));
             PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte) (footstepVariant ? 1 : 2));
-            GlobalController.Instance.rumbleManager.RumbleForSeconds(0.5f, 0f, 0.1f);
+            GlobalController.Instance.rumbleManager.RumbleForSeconds(0.5f, 0f, 0.1f, RumbleManager.RumbleSetting.High);
             footstepVariant = !footstepVariant;
         }
 
@@ -1431,6 +1432,7 @@ namespace NSMB.Entities.Player {
                 starsToDrop = Mathf.Min(1, starsToDrop);
 
             IsInKnockback = true;
+            KnockbackAnimCounter++;
             IsWeakKnockback = weak;
             IsForwardsKnockback = FacingRight != fromRight;
             KnockbackAttacker = attacker;
@@ -2536,6 +2538,7 @@ namespace NSMB.Entities.Player {
                         if (!interactedAny) {
                             BlockBumpSoundCounter++;
                         }
+                        GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f, RumbleManager.RumbleSetting.Low);
                         FacingRight = hitLeft;
                     }
                 }
@@ -2896,16 +2899,10 @@ namespace NSMB.Entities.Player {
             player.PlaySound(Enums.Sounds.Player_Sound_GroundpoundStart);
         }
 
-        private byte previousGroundpoundCounter;
         public static void OnGroundpoundAnimCounterChanged(Changed<PlayerController> changed) {
             PlayerController player = changed.Behaviour;
 
-            //if (player.previousGroundpoundCounter - 1 >= player.GroundpoundAnimCounter) {
-            //    return;
-            //}
-            //player.previousGroundpoundCounter = player.GroundpoundAnimCounter;
-
-            //groundpound
+            // Groundpound
             if (player.State != Enums.PowerupState.MegaMushroom) {
                 //GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
                 Enums.Sounds sound = player.State switch {
@@ -2916,7 +2913,7 @@ namespace NSMB.Entities.Player {
                 player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
 
                 if (player.cameraController.IsControllingCamera)
-                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f);
+                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f, RumbleManager.RumbleSetting.Low);
             } else {
                 CameraController.ScreenShake = 0.15f;
             }
@@ -2926,7 +2923,7 @@ namespace NSMB.Entities.Player {
                 CameraController.ScreenShake = 0.35f;
 
                 if (player.cameraController.IsControllingCamera)
-                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f);
+                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f, RumbleManager.RumbleSetting.Low);
             }
         }
 
@@ -3067,6 +3064,9 @@ namespace NSMB.Entities.Player {
 
             if (player.BounceJump) {
                 player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+
+                if (player.cameraController.IsControllingCamera)
+                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.4f, 0.15f, RumbleManager.RumbleSetting.Low);
                 return;
             }
 
@@ -3087,7 +3087,7 @@ namespace NSMB.Entities.Player {
             player.PlaySound(Enums.Sounds.Powerup_MiniMushroom_WaterWalk);
         }
 
-        public static void OnIsInKnockbackChanged(Changed<PlayerController> changed) {
+        public static void OnKnockbackAnimCounterChanged(Changed<PlayerController> changed) {
             PlayerController player = changed.Behaviour;
             if (!player.IsInKnockback)
                 return;
@@ -3098,7 +3098,7 @@ namespace NSMB.Entities.Player {
             player.PlaySound(player.IsWeakKnockback ? Enums.Sounds.Player_Sound_Collision_Fireball : Enums.Sounds.Player_Sound_Collision, 0, 3);
 
             if (player.cameraController.IsControllingCamera)
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, player.IsWeakKnockback ? 0.3f : 0.5f);
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, player.IsWeakKnockback ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
         }
 
         public static void OnPowerupStateChanged(Changed<PlayerController> changed) {
@@ -3182,7 +3182,7 @@ namespace NSMB.Entities.Player {
             animator.enabled = !IsFrozen;
 
             if (!IsFrozen && cameraController.IsControllingCamera)
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.2f, 0.3f);
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.2f, 0.3f, RumbleManager.RumbleSetting.High);
         }
 
         public static void OnHeldEntityChanged(Changed<PlayerController> changed) {

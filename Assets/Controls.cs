@@ -615,7 +615,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""id"": ""3094aac2-8609-468a-b0ff-beadb0bea409"",
                     ""path"": ""<Gamepad>/dpad"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
