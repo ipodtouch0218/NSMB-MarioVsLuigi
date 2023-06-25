@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -13,12 +14,12 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
 
 namespace Fusion {
-  
+
   public class NetworkSceneManagerDefault : NetworkSceneManagerBase {
 
     [Header("Single Peer Options")]
     public int PostLoadDelayFrames = 1;
-    
+
     protected virtual YieldInstruction LoadSceneAsync(SceneRef sceneRef, LoadSceneParameters parameters, Action<Scene> loaded) {
 
       if (!TryGetScenePath(sceneRef, out var scenePath)) {
@@ -37,9 +38,9 @@ namespace Fusion {
             loaded(op.Result.Scene);
           }
         };
-        
+
         return StartCoroutine(op);
-      } else 
+      } else
 #endif
       {
 
@@ -143,6 +144,7 @@ namespace Fusion {
       Scene activeScene = SceneManager.GetActiveScene();
 
       bool canTakeOverActiveScene = prevScene == default && IsScenePathOrNameEqual(activeScene, newScene);
+      //bool canTakeOverActiveScene = false;
 
       if (canTakeOverActiveScene) {
         LogTrace($"Not going to load initial scene {newScene} as this is the currently active scene");
@@ -171,9 +173,9 @@ namespace Fusion {
       var sceneObjects = FindNetworkObjects(loadedScene, disable: true);
       finished(sceneObjects);
     }
-    
+
 #if FUSION_USE_ADDRESSABLES
-    
+
     /// <summary>
     /// SceneRefs for scenes in <see cref="AddressableScenes"/> are equal to their index in the array plus this offset.
     /// </summary>
@@ -182,7 +184,7 @@ namespace Fusion {
     public int AddressableSceneRefOffset = 1000;
     [ScenePath]
     public string[] AddressableScenes;
-    
+
     public override bool TryGetScenePath(SceneRef sceneRef, out string path) {
       if (base.TryGetScenePath(sceneRef, out path)) {
         return true;
@@ -199,7 +201,7 @@ namespace Fusion {
       if (base.TryGetSceneRef(nameOrPath, out sceneRef)) {
         return true;
       }
-      
+
       var index = FusionUnitySceneManagerUtils.GetSceneIndex(AddressableScenes, nameOrPath);
       if (index >= 0) {
         sceneRef = AddressableSceneRefOffset + index;
@@ -208,7 +210,7 @@ namespace Fusion {
 
       return false;
     }
-    
+
     private bool TryFindAddress(SceneRef sceneRef, out string address) {
       var index = (int)sceneRef;
       if (index < AddressableSceneRefOffset || index >= AddressableSceneRefOffset + AddressableScenes.Length) {

@@ -1,4 +1,3 @@
-using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -91,6 +90,14 @@ namespace NSMB.Extensions {
             foreach ((K key, V value) in adder) {
                 dict[key] = value;
             }
+        }
+
+        public static bool ContainsLayer(this LayerMask mask, int layer) {
+            return (mask & (1 << layer)) != 0;
+        }
+
+        public static bool ContainsLayer(this LayerMask mask, string layerName) {
+            return ContainsLayer(mask, LayerMask.NameToLayer(layerName));
         }
     }
 }

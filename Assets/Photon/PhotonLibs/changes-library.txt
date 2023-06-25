@@ -3,6 +3,16 @@ Photon C# Client Library - Changelog
 Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
+Version 4.1.6.23 (15. March 2023 - rev6743)
+    Fixed: Handling of unknown command types in Initialize(EnetPeer peer, byte[] inBuff, ref int readingOffset). Reading offset is set by Size value.
+    Fixed: ReadCustomType() and ReadCustomTypeArray() to check if DeserializeStreamFunction is null, before using it. There was a check which prevented issues but it wasn't correct.
+
+Version 4.1.6.22 (21. December 2022 - rev6637)
+    Note: No notable changes. Only Reatime API changed.
+
+Version 4.1.6.21 (14. December 2022 - rev6623)
+    Note: No notable changes.
+
 Version 4.1.6.20 (09. November 2022 - rev6568)
     Changed: EnetPeer.Disconnect() will no longer Sleep for a minimum of time. Instead the Socket might want to "linger" on close, if needs be.
     Fixed: Discarded unreliable commands did not return memory that was pooled (causing additional allocations).
@@ -10,7 +20,7 @@ Version 4.1.6.20 (09. November 2022 - rev6568)
 
 Version 4.1.6.19 (12. October 2022 - rev6519)
     Changed: Handling of incorrect stream data.
-	
+
 Version 4.1.6.18 (20. September 2022 - rev6501)
     Changed: WebSocket.jslib (in Unity related SDKs) to use stringToUTF8 instead of writeStringToMemory (which is obsolete).
 

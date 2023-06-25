@@ -105,6 +105,11 @@
             Signal if some room property has changed
             </summary>
         </member>
+        <member name="P:Fusion.Photon.Realtime.FusionRelayClient.UseDefaultPorts">
+            <summary>
+            Set if the Client should use the Default or Alternative Photon Cloud Ports
+            </summary>
+        </member>
         <member name="M:Fusion.Photon.Realtime.FusionRelayClient.UpdateRoomProperties(System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty})">
             <summary>
             Change the Custom Properties of the current Room
@@ -3662,6 +3667,36 @@
             Abstract implementation of PhotonPing, ase for pinging servers to find the "Best Region".
             </summary>
         </member>
+        <member name="F:Fusion.Photon.Realtime.PhotonPing.DebugString">
+            <summary>Caches the last exception/error message, if any.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.PhotonPing.Successful">
+            <summary>True of the ping was successful.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.PhotonPing.GotResult">
+            <summary>True if there was any result.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.PhotonPing.PingLength">
+            <summary>Length of a ping.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.PhotonPing.PingBytes">
+            <summary>Bytes to send in a (Photon UDP) ping.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.PhotonPing.PingId">
+            <summary>Randomized number to identify a ping.</summary>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.PhotonPing.StartPing(System.String)">
+            <summary>Begins sending a ping.</summary>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.PhotonPing.Done">
+            <summary>Check if done.</summary>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.PhotonPing.Dispose">
+            <summary>Dispose of this ping.</summary>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.PhotonPing.Init">
+            <summary>Initialize this ping (GotResult, Successful, PingId).</summary>
+        </member>
         <member name="T:Fusion.Photon.Realtime.PingMono">
             <summary>Uses C# Socket class from System.Net.Sockets (as Unity usually does).</summary>
             <remarks>Incompatible with Windows 8 Store/Phone API.</remarks>
@@ -3672,6 +3707,12 @@
             </summary>
             <param name="ip">Address in IPv4 or IPv6 format. An address containing a '.' will be interpreted as IPv4.</param>
             <returns>True if the Photon Ping could be sent.</returns>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.PingMono.Done">
+            <summary>Check if done.</summary>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.PingMono.Dispose">
+            <summary>Dispose of this ping.</summary>
         </member>
         <member name="T:Fusion.Photon.Realtime.Player">
             <summary>
@@ -3927,14 +3968,61 @@
             When connecting again, use it as previous summary to speed up pinging regions and to make the best region sticky for the client.
             </remarks>
         </member>
+        <member name="M:Fusion.Photon.Realtime.RegionHandler.GetResults">
+            <summary>Provides a list of regions and their pings as string.</summary>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.RegionHandler.SetRegions(ExitGames.Client.Photon.OperationResponse)">
+            <summary>Initializes the regions of this RegionHandler with values provided from the Name Server (as OperationResponse for OpGetRegions).</summary>
+        </member>
+        <member name="P:Fusion.Photon.Realtime.RegionHandler.IsPinging">
+            <summary>True if the available regions are being pinged currently.</summary>
+        </member>
+        <member name="P:Fusion.Photon.Realtime.RegionHandler.Aborted">
+            <summary>True if the pinging of regions is being aborted.</summary>
+            <see cref="M:Fusion.Photon.Realtime.RegionHandler.Abort"/>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.RegionHandler.#ctor(System.UInt16)">
+            <summary>Creates a new RegionHandler.</summary>
+            <param name="masterServerPortOverride">If non-zero, this port will be used to ping Master Servers on.</param>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.RegionHandler.PingMinimumOfRegions(System.Action{Fusion.Photon.Realtime.RegionHandler},System.String)">
+            <summary>Starts the process of pinging of all available regions.</summary>
+            <param name="onCompleteCallback">Provide a method to call when all ping results are available. Aborting the pings will also cancel the callback.</param>
+            <param name="previousSummary">A BestRegionSummary from an earlier RegionHandler run. This makes a selected best region "sticky" and keeps ping times lower.</param>
+            <returns>If pining the regions gets started now. False if the current state prevent this.</returns>
+        </member>
         <member name="M:Fusion.Photon.Realtime.RegionHandler.Abort">
             <summary>Calling this will stop pinging the regions and suppress the onComplete callback.</summary>
+        </member>
+        <member name="T:Fusion.Photon.Realtime.RegionPinger">
+            <summary>Wraps the ping attempts and workflow for a single region.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.RegionPinger.Attempts">
+            <summary>How often to ping a region.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.RegionPinger.MaxMilliseconsPerPing">
+            <summary>How long to wait maximum for a response.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.RegionPinger.PingWhenFailed">
+            <summary>Ping result when pinging failed.</summary>
+        </member>
+        <member name="F:Fusion.Photon.Realtime.RegionPinger.CurrentAttempt">
+            <summary>Current ping attempt count.</summary>
+        </member>
+        <member name="P:Fusion.Photon.Realtime.RegionPinger.Done">
+            <summary>True if all attempts are done or timed out.</summary>
+        </member>
+        <member name="P:Fusion.Photon.Realtime.RegionPinger.Aborted">
+            <summary>Set to true to abort pining this region.</summary>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.RegionPinger.#ctor(Fusion.Photon.Realtime.Region,System.Action{Fusion.Photon.Realtime.Region})">
+            <summary>Initializes a RegionPinger for the given region.</summary>
         </member>
         <member name="M:Fusion.Photon.Realtime.RegionPinger.GetPingImplementation">
             <summary>Selects the best fitting ping implementation or uses the one set in RegionHandler.PingImplementation.</summary>
             <returns>PhotonPing instance to use.</returns>
         </member>
-        <member name="M:Fusion.Photon.Realtime.RegionPinger.Start(UnityEngine.MonoBehaviour)">
+        <member name="M:Fusion.Photon.Realtime.RegionPinger.Start">
             <summary>
             Starts the ping routine for the assigned region.
             </summary>
@@ -3944,10 +4032,19 @@
             </remarks>
             <returns>True unless Aborted.</returns>
         </member>
+        <member name="M:Fusion.Photon.Realtime.RegionPinger.Abort">
+            <summary>Calling this will stop pinging the regions and cancel the onComplete callback.</summary>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.RegionPinger.RegionPingThreaded">
+            <summary>Pings the region. To be called by a thread.</summary>
+        </member>
         <member name="M:Fusion.Photon.Realtime.RegionPinger.RegionPingCoroutine">
             <remarks>
             Affected by frame-rate of app, as this Coroutine checks the socket for a result once per frame.
             </remarks>
+        </member>
+        <member name="M:Fusion.Photon.Realtime.RegionPinger.GetResults">
+            <summary>Gets this region's results as string summary.</summary>
         </member>
         <member name="M:Fusion.Photon.Realtime.RegionPinger.ResolveHost(System.String)">
             <summary>
@@ -4056,16 +4153,16 @@
             <remarks>You could name properties that are not set from the beginning. Those will be synced with the lobby when added later on.</remarks>
         </member>
         <member name="P:Fusion.Photon.Realtime.Room.AutoCleanUp">
-            <summary>
-            Gets if this room cleans up the event cache when a player (actor) leaves. 
-            </summary>
-            <remarks>
-            This affects which events joining players get.
+             <summary>
+             Gets if this room cleans up the event cache when a player (actor) leaves.
+             </summary>
+             <remarks>
+             This affects which events joining players get.
             
-            Set in room creation via RoomOptions.CleanupCacheOnLeave.
+             Set in room creation via RoomOptions.CleanupCacheOnLeave.
             
-            Within PUN, auto cleanup of events means that cached RPCs and instantiated networked objects are deleted from the room.
-            </remarks>
+             Within PUN, auto cleanup of events means that cached RPCs and instantiated networked objects are deleted from the room.
+             </remarks>
         </member>
         <member name="P:Fusion.Photon.Realtime.Room.BroadcastPropertiesChangeToAll">
             <summary>Define if the client who calls SetProperties should receive the properties update event or not. </summary>

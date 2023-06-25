@@ -257,10 +257,7 @@ namespace NSMB.Entities {
                 if (IsIceball && dropStars) {
                     // Iceball
                     if (!player.IsFrozen) {
-                        Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
-                            FrozenCube cube = obj.GetComponent<FrozenCube>();
-                            cube.OnBeforeSpawned(player);
-                        });
+                        FrozenCube.FreezeEntity(Runner, player);
                     }
                 } else {
                     // Fireball

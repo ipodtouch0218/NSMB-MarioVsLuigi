@@ -70,15 +70,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _IsNicknameSet:
-    _value: 0
-  _IsMuted:
-    _value: 0
+  _Nickname: noname
+  _DisplayNickname: noname
+  _PlayerId: 0
+  _Wins: 0
+  _Team: 0
   _IsManualSpectator:
     _value: 0
   _IsCurrentlySpectating:
     _value: 1
+  _IsRoomOwner:
+    _value: 0
   _IsLoaded:
+    _value: 0
+  _IsMuted:
     _value: 0
   _CharacterIndex: 0
   _SkinIndex: 0
+  _Ping: 0
+  _Initialized:
+    _value: 0
+  _JoinTick: 0

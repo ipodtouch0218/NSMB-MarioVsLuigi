@@ -171,16 +171,9 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
     }
 
-    //TODO: refactor, wtf?
-    private readonly List<PlayerRef> waitingForJoinMessage = new();
-    public IEnumerator OnPlayerDataValidated(PlayerRef player) {
-        yield return null; //wait a frame because reasons
-        if (waitingForJoinMessage.Remove(player)) {
-            chat.AddSystemMessage("ui.inroom.chat.player.joined", "playername", player.GetPlayerData(Runner).GetNickname());
-            sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
-        }
-
-        //playerList.AddPlayerEntry(player);
+    public void OnPlayerDataValidated(PlayerData data) {
+        chat.AddSystemMessage("ui.inroom.chat.player.joined", "playername", data.GetNickname());
+        sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
     }
 
     public void EnterRoom() {
@@ -695,7 +688,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     // ROOM CALLBACKS
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        waitingForJoinMessage.Add(player);
         UpdateStartGameButton();
     }
 

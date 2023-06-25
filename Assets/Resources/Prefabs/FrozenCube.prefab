@@ -59,6 +59,7 @@ MonoBehaviour:
   _IsActive:
     _value: 0
   body: {fileID: -1029166702606754831}
+  nrb: {fileID: 224056960718892709}
   sfx: {fileID: -4211955845073762521}
   checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
@@ -78,14 +79,13 @@ MonoBehaviour:
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
   throwSpeed: 7.25
-  nrb: {fileID: 224056960718892709}
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 0
   canKick: 1
+  _KillReason: 0
   shakeSpeed: 80
   shakeAmount: 2
   autoBreak: 3
-  unfreezeReason: 0
 --- !u!50 &-1029166702606754831
 Rigidbody2D:
   serializedVersion: 4
@@ -195,8 +195,9 @@ MonoBehaviour:
   currentCollider: {fileID: 7126150137336674110}
   previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
+  getCrushedByGroundEntities: 0
   floorAndRoofCutoff: 0.2
-  body: {fileID: 0}
+  body: {fileID: -1029166702606754831}
 --- !u!114 &472015331249174581
 MonoBehaviour:
   m_ObjectHideFlags: 0

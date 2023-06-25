@@ -38,7 +38,7 @@ TagManager:
   - Semisolids
   - PassthroughInvalid
   - GroundEntity
-  - 
+  - EntityNoGroundEntity
   - 
   - 
   - 

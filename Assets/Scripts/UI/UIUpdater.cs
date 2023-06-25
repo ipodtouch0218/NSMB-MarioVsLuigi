@@ -97,7 +97,7 @@ public class UIUpdater : MonoBehaviour {
     }
 
     private void UpdateStoredItemUI() {
-        if (!player)
+        if (!player || !player.Object)
             return;
 
         Powerup powerup = player.StoredPowerup.GetPowerupScriptable();
@@ -110,7 +110,7 @@ public class UIUpdater : MonoBehaviour {
     }
 
     private void UpdateTextUI() {
-        if (!player)
+        if (!player || !player.Object)
             return;
 
         if (teams) {

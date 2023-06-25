@@ -118,7 +118,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 } else {
                     // Spawned by any other means (blue koopa, usually.)
                     body.isKinematic = false;
-                    gameObject.layer = Layers.LayerEntity;
+                    gameObject.layer = Layers.LayerEntityNoGroundEntity;
                     sRenderer.sortingOrder = OriginalSortingOrder;
                 }
 
@@ -231,7 +231,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 gameObject.layer = Layers.LayerHitsNothing;
                 return;
             } else {
-                gameObject.layer = Layers.LayerEntity;
+                gameObject.layer = Layers.LayerEntityNoGroundEntity;
                 HandleCollision();
             }
 

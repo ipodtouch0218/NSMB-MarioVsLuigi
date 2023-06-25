@@ -272,6 +272,9 @@ namespace NSMB.Entities.Player {
         private static readonly float[] GRAVITY_SWIM_ACC = { -4.833984375f, -3.076171875f };
         #endregion
 
+        // Input stuff
+        private Tick lastInputTick;
+
         // Footstep Variables
         private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
         private Enums.Particle footstepParticle = Enums.Particle.None;
@@ -301,18 +304,13 @@ namespace NSMB.Entities.Player {
             networkRigidbody = GetComponent<NetworkRigidbody2D>();
         }
 
-        public override void Start() {
+        public void Start() {
             fadeOut = GameObject.FindGameObjectWithTag("FadeUI").GetComponent<FadeOutManager>();
-        }
-
-        public void OnEnable() {
-            NetworkHandler.OnInputMissing += OnInputMissing;
         }
 
         public void OnDisable() {
             ControlSystem.controls.Player.ReserveItem.performed -= OnReserveItem;
             NetworkHandler.OnInput -= OnInput;
-            NetworkHandler.OnInputMissing -= OnInputMissing;
         }
 
         public void OnBeforeSpawned(int spawnpoint) {
@@ -326,14 +324,11 @@ namespace NSMB.Entities.Player {
         }
 
         public override void Spawned() {
-            base.Spawned();
 
             hitboxes = GetComponentsInChildren<BoxCollider2D>();
             icon = UIUpdater.Instance.CreateTrackIcon(this);
-            transform.position = body.position = GameManager.Instance.spawnpoint;
 
             body.isKinematic = true;
-            MainHitbox.isTrigger = false;
 
             data = Object.InputAuthority.GetPlayerData(Runner);
             if (Object.HasInputAuthority) {
@@ -345,18 +340,17 @@ namespace NSMB.Entities.Player {
                 ControlSystem.controls.Player.ReserveItem.performed += OnReserveItem;
                 NetworkHandler.OnInput += OnInput;
             }
-            /* else if (IsProxy) {
-                networkRigidbody.InterpolationDataSource = InterpolationDataSources.Snapshots;
-            }*/
 
-            Lives = SessionData.Instance.Lives;
+            if (FirstSpawn) {
+                Lives = SessionData.Instance.Lives;
 
-            //use |= as the spectate manager sets it first
+                transform.position = body.position = GameManager.Instance.spawnpoint;
+                Vector3 spawn = GameData.Instance.GetSpawnpoint(0, 1);
+                networkRigidbody.TeleportToPosition(spawn);
+                cameraController.Recenter(spawn);
+            }
+
             cameraController.IsControllingCamera = Object.HasInputAuthority;
-
-            Vector3 spawnpoint = GameData.Instance.GetSpawnpoint(0, 1);
-            networkRigidbody.TeleportToPosition(spawnpoint);
-            cameraController.Recenter(spawnpoint);
 
             if (!GameData.Instance.AlivePlayers.Contains(this)) {
                 GameData.Instance.AlivePlayers.Add(this);
@@ -364,11 +358,12 @@ namespace NSMB.Entities.Player {
             GameManager.Instance.teamManager.AddPlayer(this);
 
             ControlSystem.controls.Enable();
+
+            base.Spawned();
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
             NetworkHandler.OnInput -= OnInput;
-            NetworkHandler.OnInputMissing -= OnInputMissing;
 
             if (GameData.Instance && hasState)
                 GameData.Instance.AlivePlayers.Remove(this);
@@ -410,16 +405,11 @@ namespace NSMB.Entities.Player {
             input.Set(newInput);
         }
 
-        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {
-            if (Object.InputAuthority != player)
-                return;
-
-            // When we drop inputs, continue predicting the previous set of inputs.
-            input.Set(PreviousInputs);
-        }
-
         public override void Render() {
             HandleLayerState();
+
+            if (HeldEntity)
+                SetHoldingOffset(true);
         }
 
         public override void FixedUpdateNetwork() {
@@ -441,13 +431,16 @@ namespace NSMB.Entities.Player {
             if (IsDead) {
                 HandleRespawnTimers();
             } else if (!IsFrozen) {
-
                 // If we can't get inputs from the player, just go based on their previous networked input state.
                 PlayerNetworkInput input;
                 if (GetInput(out PlayerNetworkInput currentInputs)) {
                     input = currentInputs;
+                    lastInputTick = Runner.Tick;
                 } else {
-                    input = PreviousInputs;
+                    if ((Runner.Tick - lastInputTick) > Runner.Simulation.Config.TickRate * 0.2f)
+                        input = PreviousInputs;
+                    else
+                        input = default;
                 }
 
                 NetworkButtons heldButtons = input.buttons;
@@ -565,11 +558,13 @@ namespace NSMB.Entities.Player {
                         if (!tilesStandingOn.Contains(vec))
                             tilesStandingOn.Add(vec);
 
-                    } else if (((1 << contact.collider.gameObject.layer) & Layers.MaskSolidGround) != 0) {
+                    } else if (Layers.MaskSolidGround.ContainsLayer(contact.collider.gameObject.layer)) {
                         if (Vector2.Dot(n, Vector2.down) > .9f) {
-                            up++;
-                            if (!tilesJumpedInto.Contains(vec))
-                                tilesJumpedInto.Add(vec);
+                            if (contact.collider.gameObject.layer == Layers.LayerGround) {
+                                up++;
+                                if (!tilesJumpedInto.Contains(vec))
+                                    tilesJumpedInto.Add(vec);
+                            }
                         } else {
                             if (n.x < 0) {
                                 right++;
@@ -982,6 +977,7 @@ namespace NSMB.Entities.Player {
             WallSlideLeft = false;
             WallSlideRight = false;
             IsPropellerFlying = false;
+            body.velocity = Vector2.zero;
 
             AttemptThrowHeldItem();
 
@@ -1263,6 +1259,7 @@ namespace NSMB.Entities.Player {
             models.transform.rotation = Quaternion.Euler(0, 180, 0);
             body.isKinematic = false;
             body.velocity = Vector2.zero;
+            body.gravityScale = 0;
 
             if (Object.HasInputAuthority)
                 ScoreboardUpdater.Instance.OnRespawnToggle();
@@ -1439,6 +1436,11 @@ namespace NSMB.Entities.Player {
             KnockbackWasOriginallyFacingRight = FacingRight;
             KnockbackTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
 
+            Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.position);
+            TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
+            if (tile)
+                fromRight = !fromRight;
+
             body.velocity = new Vector2(
                 (fromRight ? -1 : 1) *
                 ((starsToDrop + 1) / 2f) *
@@ -1609,7 +1611,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void HandleLayerState() {
-            bool hitsNothing = CurrentPipe || IsDead || IsStuckInBlock || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && IsStationaryGiantShrink);
+            bool hitsNothing = CurrentPipe || IsFrozen || IsDead || IsStuckInBlock || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && IsStationaryGiantShrink);
 
             MainHitbox.gameObject.layer = hitsNothing ? Layers.LayerHitsNothing : Layers.LayerPlayer;
         }
@@ -2149,7 +2151,7 @@ namespace NSMB.Entities.Player {
 
         private static readonly Vector2 StuckInBlockSizeCheck = new(1f, 0.95f);
         private bool HandleStuckInBlock() {
-            if (!body || State == Enums.PowerupState.MegaMushroom)
+            if (!body || State == Enums.PowerupState.MegaMushroom || CurrentPipe)
                 return false;
 
             Vector2 checkSize = WorldHitboxSize * StuckInBlockSizeCheck;
@@ -2306,15 +2308,6 @@ namespace NSMB.Entities.Player {
             if (body.position.y + transform.lossyScale.y < GameManager.Instance.LevelMinY) {
                 Death(true, false);
                 return;
-            }
-
-            if (IsFrozen) {
-                if (!FrozenCube) {
-                    Unfreeze(UnfreezeReason.Other);
-                } else {
-                    body.velocity = Vector2.zero;
-                    return;
-                }
             }
 
             if (HeldEntity && (IsFrozen || HeldEntity.IsDead || HeldEntity.IsFrozen))
@@ -2781,9 +2774,9 @@ namespace NSMB.Entities.Player {
                 body.velocity = new(body.velocity.x, Mathf.Clamp(body.velocity.y, jumpHeld ? SWIM_TERMINAL_VELOCITY_AHELD : SWIM_TERMINAL_VELOCITY, SWIM_MAX_VSPEED));
         }
 
-        private void SetHoldingOffset() {
+        private void SetHoldingOffset(bool renderTime = false) {
             if (HeldEntity is FrozenCube) {
-                float time = Mathf.Clamp01((Runner.SimulationTime - HoldStartTime) / pickupTime);
+                float time = Mathf.Clamp01(((renderTime ? Runner.SimulationRenderTime : Runner.SimulationTime) - HoldStartTime) / pickupTime);
                 HeldEntity.holderOffset = new(0, MainHitbox.size.y * (1f - Utils.Utils.QuadraticEaseOut(1f - time)), -2);
             } else {
                 HeldEntity.holderOffset = new((FacingRight ? 1 : -1) * 0.25f, (State >= Enums.PowerupState.Mushroom ? 0.3f : 0.075f) - HeldEntity.sRenderer.localBounds.min.y, !FacingRight ? -0.09f : 0f);

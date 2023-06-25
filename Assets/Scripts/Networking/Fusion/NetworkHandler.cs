@@ -152,6 +152,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             HostMigrationResume = HostMigrationResume,
             ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname),
             DisableClientSessionCreation = false,
+            Scene = 0,
         });
 
         OnHostMigration?.Invoke(runner, hostMigrationToken);
@@ -194,8 +195,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 });
                 ourData.JoinTick = -1;
             }
-
-            runner.PushHostMigrationSnapshot();
         }
 
         if (player != runner.LocalPlayer)
@@ -450,28 +449,40 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     private void HostMigrationResume(NetworkRunner runner) {
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
         foreach (var resumeNO in runner.GetResumeSnapshotNetworkObjects()) {
 
-            if (resumeNO.TryGetComponent(out PlayerData data) && resumeNO.InputAuthority == runner.SessionInfo.MaxPlayers - 1) {
-                // Don't bring over the old host's data.
-                continue;
+            if (resumeNO.TryGetComponent(out PlayerData data)) {
+                if (resumeNO.InputAuthority == runner.SessionInfo.MaxPlayers - 1)
+                    continue;
+
+                PlayerRef newAuthority = resumeNO.InputAuthority;
+                if (newAuthority != PlayerRef.None) {
+                    if (newAuthority == runner.SessionInfo.MaxPlayers - 1)
+                        newAuthority = PlayerRef.None;
+                    else if (newAuthority == 0)
+                        newAuthority = runner.SessionInfo.MaxPlayers - 1;
+                    else
+                        newAuthority -= 1;
+                }
+
+                runner.Spawn(resumeNO, inputAuthority: newAuthority, onBeforeSpawned: (runner, newNO) => {
+                    newNO.CopyStateFrom(resumeNO);
+                });
             }
 
-            PlayerRef newAuthority = resumeNO.InputAuthority;
-            if (newAuthority != PlayerRef.None) {
-                if (newAuthority == runner.SessionInfo.MaxPlayers - 1)
-                    newAuthority = PlayerRef.None;
-                else if (newAuthority == 0)
-                    newAuthority = runner.SessionInfo.MaxPlayers - 1;
-                else
-                    newAuthority -= 1;
-            }
+            //if (resumeNO.TryGetComponent(out PlayerData data) && resumeNO.InputAuthority == runner.SessionInfo.MaxPlayers - 1) {
+            //    // Don't bring over the old host's data.
+            //    continue;
+            //}
 
-            runner.Spawn(resumeNO, inputAuthority: newAuthority, onBeforeSpawned: (runner, newNO) => {
-                newNO.CopyStateFrom(resumeNO);
-            });
+            //runner.Spawn(resumeNO, inputAuthority: newAuthority, onBeforeSpawned: (runner, newNO) => {
+            //    newNO.CopyStateFrom(resumeNO);
+            //});
         }
+
+        //foreach ((var resumeNO, NetworkObjectHeaderPtr pointer) in runner.GetResumeSnapshotNetworkSceneObjects()) {
+        //    Debug.Log(resumeNO.Name + " - " + pointer);
+        //    resumeNO.CopyStateFromSceneObject(pointer);
+        //}
     }
 }

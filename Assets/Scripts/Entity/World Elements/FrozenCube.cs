@@ -9,12 +9,13 @@ using NSMB.Utils;
 
 namespace NSMB.Entities {
 
-    [OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity), typeof(FreezableEntity))]
+    [OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity), typeof(FreezableEntity), typeof(PlayerController))]
     public class FrozenCube : HoldableEntity {
 
         //---Networked Variables
         [Networked] private FreezableEntity FrozenEntity { get; set; }
         [Networked] private Vector2 EntityPositionOffset { get; set; }
+        [Networked] private Vector2 CubeSize { get; set; }
         [Networked] private NetworkBool FastSlide { get; set; }
         [Networked] public TickTimer AutoBreakTimer { get; set; }
         [Networked] private byte Combo { get; set; }
@@ -26,8 +27,10 @@ namespace NSMB.Entities {
 
         //---Private Variables
 
-        public void OnBeforeSpawned(FreezableEntity entityToFreeze) {
+        public void OnBeforeSpawned(FreezableEntity entityToFreeze, Vector2 size, Vector2 offset) {
             FrozenEntity = entityToFreeze;
+            CubeSize = size;
+            EntityPositionOffset = offset;
         }
 
         public override void Spawned() {
@@ -39,27 +42,9 @@ namespace NSMB.Entities {
                 return;
             }
 
-            Bounds bounds = default;
-            GameObject rendererObject = FrozenEntity.gameObject;
-            Renderer[] renderers = FrozenEntity.GetComponentsInChildren<Renderer>();
-            foreach (Renderer renderer in renderers) {
-                if (!renderer.enabled || renderer is ParticleSystemRenderer)
-                    continue;
-
-                renderer.ResetBounds();
-
-                if (bounds == default)
-                    bounds = new(renderer.bounds.center, renderer.bounds.size);
-                else
-                    bounds.Encapsulate(renderer.bounds);
-            }
-
-            hitbox.size = sRenderer.size = GetComponent<BoxCollider2D>().size = bounds.size;
-            hitbox.offset = Vector2.up * hitbox.size * 0.5f;
-
-            EntityPositionOffset = -(bounds.center - Vector3.up.Multiply(bounds.size * 0.5f) - rendererObject.transform.position);
-
-            body.position -= EntityPositionOffset - Vector2.down * 0.1f;
+            sRenderer.size = CubeSize;
+            hitbox.size = CubeSize - (Vector2.one * 0.1f);
+            hitbox.offset = CubeSize * Vector2.up * 0.5f;
 
             AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
             flying = FrozenEntity.IsFlying;
@@ -82,7 +67,8 @@ namespace NSMB.Entities {
 
             if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.nrb.InterpolationTarget && nrb.InterpolationTarget) {
                 Transform target = FrozenEntity.nrb.InterpolationTarget.transform;
-                Vector3 newPos = nrb.InterpolationTarget.position + (Vector3) EntityPositionOffset + (Vector3.forward * -0.1f);
+                Vector3 newPos = nrb.InterpolationTarget.position + (Vector3) EntityPositionOffset;
+                newPos.z = FrozenEntity.nrb.InterpolationTarget.position.z;
                 Utils.Utils.WrapWorldLocation(ref newPos);
                 target.position = newPos;
             }
@@ -211,7 +197,8 @@ namespace NSMB.Entities {
                 return;
 
             Vector2 damageDirection = (player.body.position - body.position).normalized;
-            bool attackedFromAbove = damageDirection.y > -0.4f;
+            bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.4f;
+            bool attackedFromBelow = Vector2.Dot(damageDirection, Vector2.down) > 0.3f;
 
             //if (PreviousHolder == player)
             //    return;
@@ -220,7 +207,7 @@ namespace NSMB.Entities {
                 Kill();
                 return;
             }
-            if (Fallen || player.IsFrozen)
+            if (player.IsFrozen)
                 return;
 
             if ((player.IsGroundpounding || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
@@ -231,14 +218,16 @@ namespace NSMB.Entities {
                 KillWithReason(UnfreezeReason.BlockBump);
                 return;
 
-            } else if (FastSlide) {
-                player.DoKnockback(body.position.x > player.body.position.x, 1, false, Object);
-                Kill();
-                return;
-            }
-            if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround && !player.IsSwimming) {
-                Fallen = true;
-                Pickup(player);
+            } else if (!Fallen) {
+                if (FastSlide) {
+                    player.DoKnockback(body.position.x > player.body.position.x, 1, false, Object);
+                    Kill();
+                    return;
+                }
+                if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround && !player.IsSwimming) {
+                    Fallen = true;
+                    Pickup(player);
+                }
             }
         }
 
@@ -320,8 +309,10 @@ namespace NSMB.Entities {
 
         public override void Kill() {
             if (Holder) {
-                bool dropStars = !(FrozenEntity is PlayerController pc && pc.data.Team == Holder.data.Team);
-                Holder.DoKnockback(Holder.FacingRight, dropStars ? 1 : 0, false, FrozenEntity.Object);
+                if (FrozenEntity is PlayerController pc) {
+                    bool dropStars = pc.data.Team != Holder.data.Team;
+                    Holder.DoKnockback(Holder.FacingRight, dropStars ? 1 : 0, false, FrozenEntity.Object);
+                }
                 Holder.SetHeldEntity(null);
             }
 
@@ -337,10 +328,39 @@ namespace NSMB.Entities {
             Kill();
         }
 
+        //---OnChangeds
         public override void OnIsDeadChanged() {
             base.OnIsDeadChanged();
 
             sRenderer.enabled = !IsDead;
+        }
+
+        //---Static
+        public static void FreezeEntity(NetworkRunner runner, FreezableEntity entity) {
+
+            Bounds bounds = default;
+            Vector2 entityPosition = entity.body ? entity.body.position : entity.transform.position;
+            Renderer[] renderers = entity.GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in renderers) {
+                if (!renderer.enabled || renderer is ParticleSystemRenderer)
+                    continue;
+
+                renderer.ResetBounds();
+
+                if (bounds == default)
+                    bounds = new(renderer.bounds.center, renderer.bounds.size);
+                else
+                    bounds.Encapsulate(renderer.bounds);
+            }
+
+            Vector2 size = bounds.size;
+            Vector2 position = new(bounds.center.x, bounds.min.y);
+            Vector2 offset = entityPosition - position;
+
+            runner.Spawn(PrefabList.Instance.Obj_FrozenCube, position, onBeforeSpawned: (runner, obj) => {
+                FrozenCube cube = obj.GetComponent<FrozenCube>();
+                cube.OnBeforeSpawned(entity, size, offset);
+            });
         }
     }
 }

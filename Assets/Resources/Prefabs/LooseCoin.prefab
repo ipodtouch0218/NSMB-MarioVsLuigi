@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7313813804966619559}
   - component: {fileID: 7440053010099547169}
   - component: {fileID: 1917642254078187410}
-  m_Layer: 9
+  m_Layer: 15
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0
   fps: 6
@@ -107,6 +108,7 @@ MonoBehaviour:
   - {fileID: -2074995507315294404, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   sRenderer: {fileID: 7440053010099547169}
+  image: {fileID: 0}
 --- !u!1 &786289218142832788
 GameObject:
   m_ObjectHideFlags: 0
@@ -126,7 +128,7 @@ GameObject:
   - component: {fileID: 5943513950730874965}
   - component: {fileID: 826556521306155776}
   - component: {fileID: 2965949114585547753}
-  m_Layer: 9
+  m_Layer: 15
   m_Name: LooseCoin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,11 +164,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _FacingRight:
+    _value: 0
   _IsActive:
     _value: 0
-  isRespawningEntity: 0
   body: {fileID: 1694848990786736830}
+  nrb: {fileID: 0}
   sfx: {fileID: 6080179494260564542}
+  checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}
   sRenderer: {fileID: 7440053010099547169}
   despawn: 8
@@ -360,6 +365,7 @@ MonoBehaviour:
   soundOrigin: {fileID: 786289218142832796}
   soundRange: 12
   maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!114 &786289218142832794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,10 +406,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _PreviousTickVelocity: {x: 0, y: 0}
   currentCollider: {fileID: 786289218142832792}
+  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
   floorAndRoofCutoff: 0.3
+  body: {fileID: 0}
 --- !u!114 &826556521306155776
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -350,6 +350,14 @@
             MaximumTransferUnit bits. (ipv6 header: 40 bytes, udp header: 8 bytes)
             </summary>
         </member>
+        <member name="M:Fusion.Sockets.NetPeerGroup.LostEnvelope(Fusion.Sockets.NetSendEnvelope,Fusion.Sockets.INetPeerGroupCallbacks,Fusion.Sockets.NetConnection*)">
+            <summary>
+            Treat an envolpe as lost
+            </summary>
+            <param name="envelope">Lost envelope</param>
+            <param name="cb">Callback to be fired</param>
+            <param name="c">To which this envolopes relates to</param>
+        </member>
         <member name="M:Fusion.Sockets.NetSequencer.Distance(System.UInt64,System.UInt64)">
             <summary>
             if from is LARGER than to, result is positive

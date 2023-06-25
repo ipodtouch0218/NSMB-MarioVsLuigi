@@ -137,10 +137,7 @@ namespace NSMB.Entities.Enemies {
                 return false;
 
             if (!IsFrozen) {
-                Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, transform.position, onBeforeSpawned: (runner, obj) => {
-                    FrozenCube cube = obj.GetComponent<FrozenCube>();
-                    cube.OnBeforeSpawned(this);
-                });
+                FrozenCube.FreezeEntity(Runner, this);
             }
             return true;
         }

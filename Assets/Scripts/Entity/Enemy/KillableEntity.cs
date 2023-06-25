@@ -59,15 +59,19 @@ namespace NSMB.Entities {
         }
 
         public override void Spawned() {
-            base.Spawned();
-            if (IsRespawningEntity) {
-                DespawnEntity();
-            } else {
-                spawnLocation = body.position;
-                RespawnEntity();
-            }
+            if (FirstSpawn) {
+                SpawnLocation = body ? body.position : transform.position;
 
+                if (IsRespawningEntity)
+                    DespawnEntity();
+                else
+                    RespawnEntity();
+            }
+            GameManager.Instance.networkObjects.Add(Object);
+            OnFacingRightChanged();
             OnIsActiveChanged();
+
+            FirstSpawn = false;
         }
 
         public override void FixedUpdateNetwork() {
@@ -277,10 +281,7 @@ namespace NSMB.Entities {
                 return false;
 
             if (!IsFrozen) {
-                Runner.Spawn(PrefabList.Instance.Obj_FrozenCube, body.position, onBeforeSpawned: (runner, obj) => {
-                    FrozenCube cube = obj.GetComponent<FrozenCube>();
-                    cube.OnBeforeSpawned(this);
-                });
+                FrozenCube.FreezeEntity(Runner, this);
             }
             return true;
         }

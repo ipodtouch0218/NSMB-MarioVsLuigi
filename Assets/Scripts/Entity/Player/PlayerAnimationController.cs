@@ -5,7 +5,6 @@ using UnityEngine;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Game;
-using NSMB.Utils;
 
 namespace NSMB.Entities.Player {
     [OrderAfter(typeof(PlayerController))]

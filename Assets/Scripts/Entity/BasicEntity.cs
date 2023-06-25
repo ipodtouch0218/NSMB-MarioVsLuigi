@@ -13,6 +13,8 @@ namespace NSMB.Entities {
         [Networked(OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
         [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
         [Networked] public TickTimer DespawnTimer { get; set; }
+        [Networked] protected NetworkBool FirstSpawn { get; set; } = true;
+        [Networked] protected Vector2 SpawnLocation { get; set; }
 
         //---Components
         [SerializeField] public Rigidbody2D body;
@@ -27,7 +29,6 @@ namespace NSMB.Entities {
 
         //---Private Variables
         private bool brickBreakSound;
-        protected Vector2 spawnLocation;
 
         public virtual void OnValidate() {
             if (!body) body = GetComponent<Rigidbody2D>();
@@ -35,16 +36,17 @@ namespace NSMB.Entities {
             if (!sfx) sfx = GetComponent<AudioSource>();
         }
 
-        public virtual void Start() {
-            if (body)
-                spawnLocation = body.position;
-        }
-
         public override void Spawned() {
+            if (FirstSpawn) {
+                SpawnLocation = body.position;
+
+                if (IsRespawningEntity)
+                    DespawnEntity();
+            }
             GameManager.Instance.networkObjects.Add(Object);
-            if (IsRespawningEntity)
-                DespawnEntity();
             OnFacingRightChanged();
+
+            FirstSpawn = false;
         }
 
         public override void FixedUpdateNetwork() {
@@ -75,7 +77,7 @@ namespace NSMB.Entities {
                 return;
 
             if (body) {
-                body.position = spawnLocation;
+                body.position = SpawnLocation;
                 body.velocity = Vector2.zero;
                 body.rotation = 0;
             }
@@ -92,7 +94,7 @@ namespace NSMB.Entities {
                 return;
 
             if (body) {
-                body.position = spawnLocation;
+                body.position = SpawnLocation;
                 body.velocity = Vector2.zero;
                 body.rotation = 0;
             }

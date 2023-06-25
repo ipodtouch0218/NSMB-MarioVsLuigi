@@ -8,14 +8,14 @@ using UnityEngine.SceneManagement;
 
 
 namespace Fusion {
- 
+
 
   public abstract class NetworkSceneManagerBase : Fusion.Behaviour, INetworkSceneManager {
 
     private static WeakReference<NetworkSceneManagerBase> s_currentlyLoading = new WeakReference<NetworkSceneManagerBase>(null);
 
     /// <summary>
-    /// When enabled, a small info button overlays will be added to the Hierarchy Window 
+    /// When enabled, a small info button overlays will be added to the Hierarchy Window
     /// for each active <see cref="NetworkRunner"/> and for its associated scene.
     /// </summary>
     [InlineHelp]
@@ -97,7 +97,7 @@ namespace Fusion {
     public virtual bool TryGetScenePath(SceneRef sceneRef, out string path) {
       return TryGetScenePathFromBuildSettings(sceneRef, out path);
     }
-    
+
     public virtual bool TryGetSceneRef(string nameOrPath, out SceneRef sceneRef) {
       var buildIndex = FusionUnitySceneManagerUtils.GetSceneBuildIndex(nameOrPath);
       if (buildIndex >= 0) {
@@ -107,7 +107,7 @@ namespace Fusion {
       sceneRef = default;
       return false;
     }
-    
+
     public bool IsScenePathOrNameEqual(Scene scene, SceneRef sceneRef) {
       if (TryGetScenePath(sceneRef, out var path)) {
         return IsScenePathOrNameEqual(scene, path);

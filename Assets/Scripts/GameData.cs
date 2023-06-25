@@ -82,14 +82,14 @@ namespace NSMB.Game {
             // Enable player controls
             Runner.ProvideInput = true;
 
-            if (Runner.IsServer && Runner.IsSinglePlayer) {
+            if (Runner.IsServer && Runner.IsSinglePlayer && !Runner.IsResume) {
                 // Handle spawning in editor by spawning the room + player data objects
                 Runner.Spawn(PrefabList.Instance.SessionDataHolder);
                 NetworkObject localData = Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
                 Runner.SetPlayerObject(Runner.LocalPlayer, localData);
             }
 
-            if (GameStartTime <= 0) {
+            if (GameStartTime <= 0 && !Runner.IsResume) {
                 // The game hasn't started.
                 // Tell our host that we're done loading
                 PlayerData localData = Runner.GetLocalPlayerData();
@@ -315,6 +315,8 @@ namespace NSMB.Game {
                 players = RealPlayerCount;
             if (players == 0)
                 players = 1;
+
+            Debug.Log($"spawning {playerIndex}/{players}");
 
             float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI / (2 * players));
             float scale = (2f - (players + 1f) / players) * GameManager.spawnCircleWidth;

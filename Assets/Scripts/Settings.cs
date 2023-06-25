@@ -238,7 +238,7 @@ public class Settings : Singleton<Settings> {
             ControlsBindings = File.ReadAllText(bindingsFile.FullName);
             bindingsFile.Delete();
         }
-        controlsRumble = RumbleManager.RumbleSetting.Low;
+        controlsRumble = RumbleManager.RumbleSetting.None;
         controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         controlsAutoSprint = false;
         controlsPropellerJump = false;

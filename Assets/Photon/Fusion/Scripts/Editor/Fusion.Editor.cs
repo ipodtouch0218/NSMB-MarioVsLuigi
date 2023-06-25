@@ -6078,7 +6078,7 @@ namespace Fusion.Editor {
     internal const string UrlKarts = "https://doc.photonengine.com/fusion/current/samples/fusion-karts";
     internal const string UrlDragonHuntersVR = "https://doc.photonengine.com/fusion/current/samples/fusion-dragonhunters-vr";
 
-    internal const string UrlFusionDocApi = "https://doc-api.photonengine.com/en/fusion/current/annotated.html";
+    internal const string UrlFusionDocApi = "https://doc-api.photonengine.com/en/fusion/current/classes.html";
 
     internal const string WINDOW_TITLE = "Photon Fusion Hub";
     internal const string SUPPORT = "You can contact the Photon Team using one of the following links. You can also go to Photon Documentation in order to get started.";
@@ -8174,7 +8174,7 @@ namespace Fusion.Editor {
       RuntimeAnimatorController rac = a.runtimeAnimatorController;
       AnimatorOverrideController overrideController = rac as AnimatorOverrideController;
 
-      /// recurse until no override controller is found
+      // recurse until no override controller is found
       while (overrideController != null) {
         rac = overrideController.runtimeAnimatorController;
         overrideController = rac as AnimatorOverrideController;
@@ -8204,7 +8204,7 @@ namespace Fusion.Editor {
         }
     }
 
-    /// ------------------------------ STATES --------------------------------------
+    // ------------------------------ STATES --------------------------------------
 
     public static void GetStatesNames(this AnimatorController ctr, List<string> namelist) {
       namelist.Clear();
@@ -8341,7 +8341,7 @@ namespace Fusion.Editor {
     
     // This method is a near copy of the code used in NMA for determining WordCount, but uses GetController instead.
     internal static (int paramCount, int boolCount, int layerCount, int words) GetWordCount(this NetworkMecanimAnimator netAnim) {
-      /// always get new Animator in case it has changed.
+      // always get new Animator in case it has changed.
       Animator animator = netAnim.Animator;
       if (animator == null) {
         animator = netAnim.GetComponent<Animator>();
@@ -8413,7 +8413,7 @@ namespace Fusion.Editor {
         //ref double lastRebuildTime
         ) {
 
-      /// always get new Animator in case it has changed.
+      // always get new Animator in case it has changed.
       Animator animator = netAnim.Animator;
       if (animator == null)
         animator = netAnim.GetComponent<Animator>();

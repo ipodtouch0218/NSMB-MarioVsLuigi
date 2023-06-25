@@ -146,6 +146,7 @@ namespace NSMB.Entities.Enemies {
                 }
             } else {
                 sRenderer.enabled = true;
+                legacyAnimation.enabled = true;
                 trailParticles.Play();
             }
         }
@@ -168,6 +169,7 @@ namespace NSMB.Entities.Enemies {
             if (IsActive) {
                 shootParticles.Play();
                 sfx.Play();
+                legacyAnimation.enabled = true;
             }
         }
 

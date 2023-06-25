@@ -47,17 +47,6 @@ namespace Fusion.StatsInternal {
       }
     }
 
-    static Font _font;
-    public static Font Font {
-      get {
-        if (_font == null) {
-          _font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-         
-        }
-        return _font;
-      }
-    }
-
     const int METER_TEXTURE_WIDTH = 512;
     static Texture2D _meterTexture;
     static Texture2D MeterTexture {
@@ -248,15 +237,14 @@ namespace Fusion.StatsInternal {
 
     public static UI.Text AddText(this RectTransform rt, string label, TextAnchor anchor, Color FontColor) {
       var text = rt.gameObject.AddComponent<UI.Text>();
-      text.text = label;
-      text.color = FontColor;
-      text.font = Font;
-      text.alignment = anchor;
-      text.fontSize = FONT_SIZE;
+      text.text          = label;
+      text.color         = FontColor;
+      text.alignment     = anchor;
+      text.fontSize      = FONT_SIZE;
       text.raycastTarget = false;
       //text.alignByGeometry   = true;
-      text.resizeTextMinSize = FONT_SIZE_MIN;
-      text.resizeTextMaxSize = FONT_SIZE_MAX;
+      text.resizeTextMinSize    = FONT_SIZE_MIN;
+      text.resizeTextMaxSize    = FONT_SIZE_MAX;
       text.resizeTextForBestFit = true;
       return text;
     }
@@ -277,41 +265,40 @@ namespace Fusion.StatsInternal {
 
       icon = iconRt.gameObject.AddComponent<UI.Text>();
       button.targetGraphic = icon;
-      icon.font = FusionStatsUtilities.Font;
-      icon.text = iconText;
-      icon.alignment = TextAnchor.MiddleCenter;
-      icon.fontStyle = FontStyle.Bold;
-      icon.fontSize = BTTN_FONT_SIZE_MAX;
-      icon.resizeTextMinSize = 0;
-      icon.resizeTextMaxSize = BTTN_FONT_SIZE_MAX;
-      icon.alignByGeometry = true;
+      
+      icon.text                 = iconText;
+      icon.alignment            = TextAnchor.MiddleCenter;
+      icon.fontStyle            = FontStyle.Bold;
+      icon.fontSize             = BTTN_FONT_SIZE_MAX;
+      icon.resizeTextMinSize    = 0;
+      icon.resizeTextMaxSize    = BTTN_FONT_SIZE_MAX;
+      icon.alignByGeometry      = true;
       icon.resizeTextForBestFit = true;
 
       var textRt = rt.CreateRectTransform("Label", true);
-      textRt.anchorMin = new Vector2(0, 0);
-      textRt.anchorMax = new Vector2(1, BTTN_LBL_NORM_HGHT);
-      textRt.pivot = new Vector2(.5f, BTTN_LBL_NORM_HGHT * .5f);
-      textRt.offsetMin = new Vector2(0, 0);
-      textRt.offsetMax = new Vector2(0, 0);
+      textRt.anchorMin = new Vector2(0,   0);
+      textRt.anchorMax = new Vector2(1,   BTTN_LBL_NORM_HGHT);
+      textRt.pivot     = new Vector2(.5f, BTTN_LBL_NORM_HGHT * .5f);
+      textRt.offsetMin = new Vector2(0,   0);
+      textRt.offsetMax = new Vector2(0,   0);
 
-      text = textRt.gameObject.AddComponent<UI.Text>();
-      text.color = Color.black;
-      text.font = FusionStatsUtilities.Font;
-      text.text = labelText;
-      text.alignment = TextAnchor.MiddleCenter;
-      text.fontStyle = FontStyle.Bold;
-      text.fontSize = 0;
-      text.resizeTextMinSize = 0;
-      text.resizeTextMaxSize = BTTN_FONT_SIZE_MAX;
+      text                      = textRt.gameObject.AddComponent<UI.Text>();
+      text.color                = Color.black;
+      text.text                 = labelText;
+      text.alignment            = TextAnchor.MiddleCenter;
+      text.fontStyle            = FontStyle.Bold;
+      text.fontSize             = 0;
+      text.resizeTextMinSize    = 0;
+      text.resizeTextMaxSize    = BTTN_FONT_SIZE_MAX;
       text.resizeTextForBestFit = true;
-      text.horizontalOverflow = HorizontalWrapMode.Overflow;
+      text.horizontalOverflow   = HorizontalWrapMode.Overflow;
 
       UI.ColorBlock colors = button.colors;
-      colors.normalColor = new Color(.0f, .0f, .0f, BTTN_ALPHA);
-      colors.pressedColor = new Color(.5f, .5f, .5f, BTTN_ALPHA);
+      colors.normalColor      = new Color(.0f, .0f, .0f, BTTN_ALPHA);
+      colors.pressedColor     = new Color(.5f, .5f, .5f, BTTN_ALPHA);
       colors.highlightedColor = new Color(.3f, .3f, .3f, BTTN_ALPHA);
-      colors.selectedColor = new Color(.0f, .0f, .0f, BTTN_ALPHA);
-      button.colors = colors;
+      colors.selectedColor    = new Color(.0f, .0f, .0f, BTTN_ALPHA);
+      button.colors           = colors;
 
       button.onClick.AddListener(action);
     }
@@ -335,24 +322,12 @@ namespace Fusion.StatsInternal {
       group.childControlHeight = true;
       group.childControlWidth = true;
       group.spacing = spacing;
-      //group.padding = new RectOffset(
-      //  rgtPad.HasValue ? rgtPad.Value : 0,
-      //  lftPad.HasValue ? lftPad.Value : 0,
-      //  topPad.HasValue ? topPad.Value : 0,
-      //  botPad.HasValue ? botPad.Value : 0
-      //  );
       return rt;
     }
 
     public static UI.GridLayoutGroup AddGridlLayoutGroup(this RectTransform rt, float spacing, int? rgtPad = null, int? lftPad = null, int? topPad = null, int? botPad = null) {
       var group = rt.gameObject.AddComponent<UI.GridLayoutGroup>();
       group.spacing = new Vector2( spacing, spacing);
-      //group.padding = new RectOffset(
-      //  rgtPad.HasValue ? rgtPad.Value : 0,
-      //  lftPad.HasValue ? lftPad.Value : 0,
-      //  topPad.HasValue ? topPad.Value : 0,
-      //  botPad.HasValue ? botPad.Value : 0
-      //  );
       return group;
     }
 
@@ -376,7 +351,6 @@ namespace Fusion.StatsInternal {
       image.color = color;
       image.raycastTarget = false;
       return rt;
-
     }
 
     public static RectTransform ExpandAnchor(this RectTransform rt, float? padding = null) {
@@ -479,8 +453,6 @@ namespace Fusion.StatsInternal {
 
       return rect;
     }
-
-    
   }
 }
 

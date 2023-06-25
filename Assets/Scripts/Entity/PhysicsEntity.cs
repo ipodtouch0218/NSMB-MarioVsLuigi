@@ -1,13 +1,12 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Utils;
-using UnityEditor;
 
 public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
 
     //---Staic Variables
-    private static LayerMask GroundMask = default;
     private static readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
     //---Networked Variables
@@ -18,7 +17,7 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
     public Vector2 previousTickVelocity;
 
     //---Serialized Variables
-    [SerializeField] private bool goUpSlopes;
+    [SerializeField] private bool goUpSlopes, getCrushedByGroundEntities = true;
     [SerializeField] private float floorAndRoofCutoff = 0.5f;
 
     //---Components
@@ -26,11 +25,6 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
 
     public void Awake() {
         if (!body) body = GetComponent<Rigidbody2D>();
-    }
-
-    public void Start() {
-        if (GroundMask == default)
-            GroundMask = 1 << Layers.LayerGround | 1 << Layers.LayerGroundEntity;
     }
 
     public void BeforeTick() {
@@ -54,11 +48,16 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
         int c = currentCollider.GetContacts(ContactBuffer);
         for (int i = 0; i < c; i++) {
             ContactPoint2D point = ContactBuffer[i];
-            if (point.collider.gameObject == gameObject)
+            GameObject obj = point.collider.gameObject;
+            if (obj == gameObject)
+                continue;
+
+            // Has to at least collide with the AnyGround layer...
+            if (!Layers.MaskAnyGround.ContainsLayer(obj.layer))
                 continue;
 
             if (Vector2.Dot(point.normal, Vector2.up) > floorAndRoofCutoff) {
-                // touching floor
+                // Touching floor
                 // If we're moving upwards, don't touch the floor.
                 // Most likely, we're inside a semisolid.
                 if (!previousOnGround && previousTickVelocity.y > 0.1f) {
@@ -72,15 +71,17 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
                 }
 
                 Data.OnGround = true;
-                Data.CrushableGround |= !point.collider.gameObject.CompareTag("platform");
+                Data.CrushableGround |= !obj.CompareTag("platform");
                 Data.FloorAngle = Vector2.SignedAngle(Vector2.up, point.normal);
 
-            } else if (GroundMask == (GroundMask | (1 << point.collider.gameObject.layer))) {
+            } else if (Layers.MaskSolidGround.ContainsLayer(obj.layer)) {
                 if (Vector2.Dot(point.normal, Vector2.down) > floorAndRoofCutoff) {
-                    // touching roof
-                    Data.HitRoof = true;
+                    if (getCrushedByGroundEntities || obj.layer != Layers.LayerGroundEntity) {
+                        // Touching roof
+                        Data.HitRoof = true;
+                    }
                 } else {
-                    // touching a wall
+                    // Touching a wall
                     if (Mathf.Abs(previousHeightY - point.point.y) < 0.2f)
                         continue;
 

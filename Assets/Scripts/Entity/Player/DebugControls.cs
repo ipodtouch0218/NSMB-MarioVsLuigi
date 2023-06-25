@@ -8,6 +8,7 @@ using NSMB.Entities.Collectable.Powerups;
 using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
+using static Unity.Collections.Unicode;
 
 public class DebugControls : MonoBehaviour {
 
@@ -69,11 +70,8 @@ public class DebugControls : MonoBehaviour {
             return;
 
         PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
-        if (!p.IsFrozen && !p.FrozenCube && p.State != Enums.PowerupState.MegaMushroom && !p.CurrentPipe && !p.IsInKnockback && !p.IsDamageable) {
-            NetworkHandler.Instance.runner.Spawn(PrefabList.Instance.Obj_FrozenCube, p.body.position, onBeforeSpawned: (runner, obj) => {
-                FrozenCube cube = obj.GetComponent<FrozenCube>();
-                cube.OnBeforeSpawned(p);
-            });
+        if (!p.IsFrozen && !p.FrozenCube && p.State != Enums.PowerupState.MegaMushroom && !p.CurrentPipe && !p.IsInKnockback && p.IsDamageable) {
+            FrozenCube.FreezeEntity(NetworkHandler.Runner, p);
         }
     }
 

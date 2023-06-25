@@ -1,3 +1,33 @@
+# 1.1.7
+
+## F
+
+### Build 709 (Jun 15, 2023)
+
+**What's New**
+
+- `HitboxRoot.DeRegister` method to manually de-register the root colliders from the lag-compensation system
+- Allow to subclass NetworkPhysicsSimulation2D and NetworkPhysicsSimulation3D to override PhysicsSimulationDeltaTime, which defines the delta-time used to update the physics simulation. By default, set to be Runner.Simulation.DeltaTime
+- StartGameArgs.UseDefaultPhotonCloudPorts
+
+**Changes**
+
+- Photon Realtime SDK to v4.1.6.23
+- JoinSessionLobby to include `useDefaultCloudPorts` argument
+
+**Bug Fixes**
+
+- Fixed: Minor alloc in `NetSocketHybrid.Receive` in Debug build
+- Fixed: An alloc each frame in `NetworkRunner.RegisterNetworkCallbacks` if it contains no callbacks
+- Fixed: Added fallback for Arial.ttf font. New Unity 2022 for Mac uses LegacyRuntime.ttf instead
+- Fixed: NotifyWindowFull does not respect Connection Timeout
+- Fixed: "Assembly already referenced" warning emit by ILWeaver (XBoxOne)
+- Fixed: Ensure that RigidBody's isKinematic value stays always to true on clients with server only physics
+- Fixed: Reeze after long pause
+- Fixed: Ensure that parent NetworkTransform move before their children, to avoid problems for children that do not move often (the offset to the parent could otherwise be applied erroneously by Unity, due to its parent move, after a child moved first to its world position)
+- Fixed: Ensure that, in shared topology, the NetworkTransform moves stays smooth during initialization even if the scene startup induces some frame freezes
+- Fixed: NetworkMecanimAnimator now caches hashes for parameters, eliminating AnimatorControllerParameter.nameHash calls in hotpaths
+
 # 1.1.6
 
 ## F
@@ -514,7 +544,7 @@
 **Changes**
 
 - Renamed `Fusion/Rebuild Object Table` to `Fusion/Rebuild Prefab Table`
-- Renamed `Rebuild Object Table (slow)` button label in config inspector to `Rebuild Prefab Table`.  
+- Renamed `Rebuild Object Table (slow)` button label in config inspector to `Rebuild Prefab Table`.
 Rename: `NetworkProjectConfigUtilities.RebuildObjectTable` to `NetworkProjectConfigUtilities.RebuildPrefabTable`
 - `Prefabs` list in the config inspector is read-only
 
@@ -688,7 +718,7 @@ Rename: `NetworkProjectConfigUtilities.RebuildObjectTable` to `NetworkProjectCon
 
 **Bug Fixes**
 
-- Fixed: `INetworkStruct`, `SimulationBehaviour` and `NetworkBehaviour` not being weaved/weaved incorrectly if they are generic types. Note that it is still impossible to use generic parameters in `[Networked]` properties 
+- Fixed: `INetworkStruct`, `SimulationBehaviour` and `NetworkBehaviour` not being weaved/weaved incorrectly if they are generic types. Note that it is still impossible to use generic parameters in `[Networked]` properties
 - Fixed: Accessing `[Networked]` `string` properties in `NetworkBehaviours` throwing `InvalidProgramException`
 - Fixed: "'' does not exist"  warning when reimporting prefabs using `NetworkObjectEditor` inspector
 
@@ -741,8 +771,8 @@ Rename: `NetworkProjectConfigUtilities.RebuildObjectTable` to `NetworkProjectCon
 **Bug Fixes**
 
 - Fixed: Inactive scene objects not being unregistered in case they never get attached to
-- Fixed: Self-activating unattached scene objects attaching twice  
-Tests: Task-based tests seem to have to do their own timeout, otherwise the editor hangs  
+- Fixed: Self-activating unattached scene objects attaching twice
+Tests: Task-based tests seem to have to do their own timeout, otherwise the editor hangs
 Tests: Added more RPC tests
 - Fixed: Occasional editor crash when client switches a scene
 
@@ -750,25 +780,25 @@ Tests: Added more RPC tests
 
 **What's New**
 
-- ILWeaver: support for Wrapping/Unwrapping without a `NetworkRunner`. There are three constructs Fusion supports:  
-```  
-    public struct Wrapper : INetworkStruct {  
-       ...  
-    }  
-    public class WrappedByValue {  
-      [NetworkSerializeMethod]   public static Wrapper Wrap(WrappedByValue obj) { ... };  
-      [NetworkDeserializeMethod] public static WrappedByValue Unwrap(Wrapper wrapper) { ... }  
-    }  
-    public class WrappedByRef {  
-      [NetworkSerializeMethod]   public static Wrapper Wrap(WrappedByRef obj) { ... }  
-      [NetworkDeserializeMethod] public static void Unwrap(Wrapper wrapper, ref WrappedByRef result) { ... }  
-    }  
-    // both methods return number of bytes read/written  
-    public class WrappedRaw {  
-      [NetworkSerializeMethod(MaxSize = ...)] public static int Wrap(WrappedRaw obj, byte* data) { ... }  
-      [NetworkDeserializeMethod] public static int Unwrap(byte* data, ref WrappedRaw result) { ... }  
-    }  
-```  
+- ILWeaver: support for Wrapping/Unwrapping without a `NetworkRunner`. There are three constructs Fusion supports:
+```
+    public struct Wrapper : INetworkStruct {
+       ...
+    }
+    public class WrappedByValue {
+      [NetworkSerializeMethod]   public static Wrapper Wrap(WrappedByValue obj) { ... };
+      [NetworkDeserializeMethod] public static WrappedByValue Unwrap(Wrapper wrapper) { ... }
+    }
+    public class WrappedByRef {
+      [NetworkSerializeMethod]   public static Wrapper Wrap(WrappedByRef obj) { ... }
+      [NetworkDeserializeMethod] public static void Unwrap(Wrapper wrapper, ref WrappedByRef result) { ... }
+    }
+    // both methods return number of bytes read/written
+    public class WrappedRaw {
+      [NetworkSerializeMethod(MaxSize = ...)] public static int Wrap(WrappedRaw obj, byte* data) { ... }
+      [NetworkDeserializeMethod] public static int Unwrap(byte* data, ref WrappedRaw result) { ... }
+    }
+```
 Such wrapped types (`WrappedByValue`, `WrappedByRef` and `WrappedRaw`) can be used in any `[Networked]` property (both in structs and `NetworkBehaviours`) and RPC
 
 **Improvements**
@@ -830,7 +860,7 @@ Such wrapped types (`WrappedByValue`, `WrappedByRef` and `WrappedRaw`) can be us
 
 - Fixed: Inactive Prefabs/scene objects not having their state objects released on being destroyed
 - Fixed: Not being able to load and unload a scene repeatedly on a client
-- Fixed: `NullReferenceException` occasionally thrown when a runner was shutdown shortly after it has been started  
+- Fixed: `NullReferenceException` occasionally thrown when a runner was shutdown shortly after it has been started
 Tests: More additive scene loading tests
 
 ### Build 483 (May 24, 2022)
@@ -858,7 +888,7 @@ Tests: More additive scene loading tests
 **Changes**
 
 - Shared/Client StartGame only returns after connection or error
-- Host/Server always create new Sessions  
+- Host/Server always create new Sessions
 It will not try to join a Random Session if no Session Name is passed, but always create a new one with a Random name
 
 **Bug Fixes**
@@ -934,7 +964,7 @@ It will not try to join a Random Session if no Session Name is passed, but alway
 
 **Bug Fixes**
 
-- Fixed: `PhotonAppSetting` inspector throwing `ArgumentNullException` on Unity 2021.x  
+- Fixed: `PhotonAppSetting` inspector throwing `ArgumentNullException` on Unity 2021.x
 Turns out ScriptAttributeUtility.GetFieldAttributes returns nulls if there are no attributes
 
 ### Build 467 (May 04, 2022)
@@ -945,7 +975,7 @@ Turns out ScriptAttributeUtility.GetFieldAttributes returns nulls if there are n
 
 **Bug Fixes**
 
-- Fixed: Runner Shutdown Procedure  
+- Fixed: Runner Shutdown Procedure
 Most of the process is sync now, only the MultiScene unload and the Photon Cloud disconnect are async
 - Fixed: Order of Fusion property drawers is now consistent across Unity versions
 
@@ -1029,7 +1059,7 @@ Most of the process is sync now, only the MultiScene unload and the Photon Cloud
 **Bug Fixes**
 
 - Fixed: Ignore zero Delta Time
-- Fixed: Warnings when forcing a client NRB to be kinematic and its collision mode was set to Continuous or Continuous Dynamic.  
+- Fixed: Warnings when forcing a client NRB to be kinematic and its collision mode was set to Continuous or Continuous Dynamic.
 This only affects clients in Server-only physics mode or clients without state authority in Shared Mode
 - Fixed: `NullReferenceException` when trying to spawn a `NetworkObject` with an inactive child that has a `NetworkTransform` component
 
@@ -1112,7 +1142,7 @@ This only affects clients in Server-only physics mode or clients without state a
 **What's New**
 
 - `NetworkRunner.Instances` - a read only list of all the active runners
-- Arrays of `NetworkString` support for RPC  
+- Arrays of `NetworkString` support for RPC
 Test: Basic RPC codegen tests. Turns out bools are a bit problematic
 
 ### Build 442 (Mar 22, 2022)
@@ -1162,7 +1192,7 @@ Test: Basic RPC codegen tests. Turns out bools are a bit problematic
 
 **Bug Fixes**
 
-- Fixed: `NetworkRunner.IsShutdown` being false when exiting play mode / handling `OnApplicationQuit`.  
+- Fixed: `NetworkRunner.IsShutdown` being false when exiting play mode / handling `OnApplicationQuit`.
 Test: More tests. Added `CreateSimplePrefab` and `CreateRunner`
 - Fixed: NRB now normalizes the networked quaternion before setting it to the `Rigidbody.rotation` field, avoiding issues with values considered as not having unit length
 - Fixed: Codegen: `NetworkString<>` raising an assertion if used in ref and pointer properties
@@ -1302,7 +1332,7 @@ Test: More tests. Added `CreateSimplePrefab` and `CreateRunner`
 
 **What's New**
 
-- `NetworkTransform` now implements `IPredictedSpawnBehaviour` and provides built-in support to interpolated rendering and prediction error correction.  
+- `NetworkTransform` now implements `IPredictedSpawnBehaviour` and provides built-in support to interpolated rendering and prediction error correction.
  Behaviours that change the Transform state of the predict-spawned object should either be ordered before NT or call `PredictedSpawnCacheTransformState` after doing so
 
 ### Build 426 (Feb 28, 2022)
@@ -1344,22 +1374,22 @@ Test: More tests. Added `CreateSimplePrefab` and `CreateRunner`
 - Support DisableSessionCreation in SharedMode
 - Reworked transform behaviours: `NetworkTransform`, `NetworkRigidbody` and `NetworkCharacterController`.
     This build brings an important rework to all core transform behaviours. Here is a summary of why we needed those modifications, what to expect and the most important changes.
-	
+
 	**Why:**
-    - The previously available behaviours (NT/NRB/NCC) aimed to solve a very broad range of problems and scenarios, which led to a complex and hard to maintain codebase that sometimes misbehaved on core use-cases.  
-    - While possible, user extension of these default functionalities and options provided by those behaviours was not easy. This prevented users from customizing them to their needs, often relying on modifications of the core implementation.  
-    - NCC was unstable even when steering over simple scene colliders. The release of the new advanced KCC package further reduced its value even as a prototyping tool.  
-    
-	**What to expect:**  
-    - New behaviours are easier to configure and are expected to be more stable in most common use-cases.  
-    - They are also easier to extend and adjust for game specific needs. A new prototype component exemplifies exactly that (more below).  
-    
-	**Important changes:**  
-    - All previously existing core transform behaviours are marked as obsolete and renamed, but were kept in the core libraries. Although their usage is no longer encouraged and provided support for them will be limited, they are still available if you want to upgrade but need more time to switch to the new behaviours.  
-    - All new behaviours have the same name as the previous ones (e.g. `NetworkTransform`), except for `NetworkCharacterController` and `NetworkTransformAnchor`, which don't have a counterpart on new behaviours. To make this possible, old behaviours were renamed and have Obsolete added at the end of the class name: e.g. old `NetworkRigidbody` will be available as `NetworkRigidbodyObsolete` (the class is also marked as obsolete). Keeping the same name on the new behaviours also means that your existing prefabs and scene objects will automatically upgrade to use the new ones.  
-    - There is no longer a core NCC behaviour (existing one is kept, but marked as obsolete). Instead, a new `NetworkCharacterControllerPrototype` is provided in source code on the SDK: it uses Unity's Character Controller and exemplifies how the base `NetworkTransform` behaviour can be extended. With this new prototype behaviour we aim to provide a simple, yet stable prototyping tool, while the KCC package remains the recommended one for production and more complex use-cases.  
-    - Transform data is now always synchronized in world space. This is important to ensure Area of Interest (AOI) management works as expected. However, a configurable Interpolation Space will be available for all transform behaviours, so that the view (interpolation target) can be interpolated as if the networked data is in local space, allowing nested transforms to visually behave as expected. Interpolated prediction error correction is still always performed in world space and more complex hierarchies might require thoughtful control of the interpolation source, space and targets' hierarchies.  
-    - There is no synchronization of neither scale nor parenting/hierarchy on the transform behaviours. If you need to synchronize these types of data/relations, the suggested approach is to extend the core behaviours, synchronizing scale in local space and controlling a decoupled hierarchy of the interpolation targets.  
+    - The previously available behaviours (NT/NRB/NCC) aimed to solve a very broad range of problems and scenarios, which led to a complex and hard to maintain codebase that sometimes misbehaved on core use-cases.
+    - While possible, user extension of these default functionalities and options provided by those behaviours was not easy. This prevented users from customizing them to their needs, often relying on modifications of the core implementation.
+    - NCC was unstable even when steering over simple scene colliders. The release of the new advanced KCC package further reduced its value even as a prototyping tool.
+
+	**What to expect:**
+    - New behaviours are easier to configure and are expected to be more stable in most common use-cases.
+    - They are also easier to extend and adjust for game specific needs. A new prototype component exemplifies exactly that (more below).
+
+	**Important changes:**
+    - All previously existing core transform behaviours are marked as obsolete and renamed, but were kept in the core libraries. Although their usage is no longer encouraged and provided support for them will be limited, they are still available if you want to upgrade but need more time to switch to the new behaviours.
+    - All new behaviours have the same name as the previous ones (e.g. `NetworkTransform`), except for `NetworkCharacterController` and `NetworkTransformAnchor`, which don't have a counterpart on new behaviours. To make this possible, old behaviours were renamed and have Obsolete added at the end of the class name: e.g. old `NetworkRigidbody` will be available as `NetworkRigidbodyObsolete` (the class is also marked as obsolete). Keeping the same name on the new behaviours also means that your existing prefabs and scene objects will automatically upgrade to use the new ones.
+    - There is no longer a core NCC behaviour (existing one is kept, but marked as obsolete). Instead, a new `NetworkCharacterControllerPrototype` is provided in source code on the SDK: it uses Unity's Character Controller and exemplifies how the base `NetworkTransform` behaviour can be extended. With this new prototype behaviour we aim to provide a simple, yet stable prototyping tool, while the KCC package remains the recommended one for production and more complex use-cases.
+    - Transform data is now always synchronized in world space. This is important to ensure Area of Interest (AOI) management works as expected. However, a configurable Interpolation Space will be available for all transform behaviours, so that the view (interpolation target) can be interpolated as if the networked data is in local space, allowing nested transforms to visually behave as expected. Interpolated prediction error correction is still always performed in world space and more complex hierarchies might require thoughtful control of the interpolation source, space and targets' hierarchies.
+    - There is no synchronization of neither scale nor parenting/hierarchy on the transform behaviours. If you need to synchronize these types of data/relations, the suggested approach is to extend the core behaviours, synchronizing scale in local space and controlling a decoupled hierarchy of the interpolation targets.
     - Performing non-interpolated teleports no longer requires pre-steps. Optional interpolation velocities can be provided in order to smooth the transition. Check the new teleport API documentation for more details
 
 **Improvements**
@@ -1849,7 +1879,7 @@ Test: More tests. Added `CreateSimplePrefab` and `CreateRunner`
 - Added NetworkDictionary<K, V>.Remap to allow easy access to raw interpolator data for dictionaries
 - Added NetworkArray<T>.Remap to give easy access to raw interpolator arrays
 - Support to specifying the tick 'from' and 'to' and the interpolation alpha when performing lag-compensated queries
-- Can now add FusionStats at runtime to a gameobject or scene simply with FusionStats.Create(). Will detect if a NetworkObject is on the supplied parent, and enable Object stats if so.  
+- Can now add FusionStats at runtime to a gameobject or scene simply with FusionStats.Create(). Will detect if a NetworkObject is on the supplied parent, and enable Object stats if so.
 Added more explicit control over graph stats display modes with the enum description
 - Added SimulationCount stat to FusionStats
 - `NetworkBehaviour.Id` property
@@ -1952,7 +1982,7 @@ Added more explicit control over graph stats display modes with the enum descrip
 - Added pre-built NetworkButtons struct to represent 32 buttons as a single int, including detecting pressed/released evnts
 - Limited support for `[Networked]` properties for `INetworkStructs`. Currently there's no inspector for such properties. Also, `NetworkObject`/`NetworkBehaviour` properties are not supported
 - `NetworkArray<T>` and `NetworkDictionary<K, V>` support for managed types (e.g. `NetworkBehaviour`, `NetworkObject`). Initializing from the inspector half-works, because referenced objects may not have been spawned yet by the runner
-- `NetworkArray<T>` and `NetworkDictionary<T>` properties can now use `NetworkBehaviour` and `NetworkObject` types as well. Not that initializing from the inspector half-works, because some objects may not yet have been spawned, so their id is 0.  
+- `NetworkArray<T>` and `NetworkDictionary<T>` properties can now use `NetworkBehaviour` and `NetworkObject` types as well. Not that initializing from the inspector half-works, because some objects may not yet have been spawned, so their id is 0.
 Remove: `ElementReader<T>` and `ElementWriter<T>`
 - `IElemenetReaderWriter<T>` (used internally by `NetworkArray<T>` and `NetworkDictionary<T>`)
 - [Networked] array and dictionary support for structs
@@ -2064,7 +2094,7 @@ Remove: `ElementReader<T>` and `ElementWriter<T>`
 
 - RunnerVisibilityControls now work with vary narrow window sizes (allowing for docking to the left side of windows)
 - RunnerVisibilityControls now uses icons rather than default toggles for 'Visibility' and 'Provide Input', allowing for more condensed window sizes
-- Runner names in RunnerVisibilityControls now are clickable, and will ping/select their associated runner gameobject.  
+- Runner names in RunnerVisibilityControls now are clickable, and will ping/select their associated runner gameobject.
 Changed GUIStyle statics to use Lazy<>
 - Runner overlays on the hierarchy now act as buttons and will ping/select the associated NetworkRunner gameobject
 
@@ -2513,7 +2543,7 @@ Changed GUIStyle statics to use Lazy<>
 
 **What's New**
 
-- `[NetworkPrefab]` attribute. When added to a `NetworkObject` field, the object picker will only show prefabs with `FusionPrefab` label.  
+- `[NetworkPrefab]` attribute. When added to a `NetworkObject` field, the object picker will only show prefabs with `FusionPrefab` label.
 Remove: `NetworkProjectConfig.PrefabSources`: prefab source information is now stored in config's hidden nested assets and is generated based on prefabs marked with `FusionPrefab` label. This means that serialized config is now a lot smaller as it does not contain prefab information directly
 
 **Changes**
@@ -2591,7 +2621,7 @@ Remove: `NetworkProjectConfig.PrefabSources`: prefab source information is now s
 
 **What's New**
 
-- Tanknarok Demo link added to Fusion Hub Window  
+- Tanknarok Demo link added to Fusion Hub Window
 Refactored styles in Fusion hub to a single GuiSkin and unified light and dark themes for easier future maintenance
 - Links to Fusion and Photon settings added to Fusion Hub Window
 
@@ -2858,7 +2888,7 @@ Refactored styles in Fusion hub to a single GuiSkin and unified light and dark t
 **Bug Fixes**
 
 - Fixed: PredictionKey does not end up in game state when running in client auth mode anymore
-- Fixed: Empty Room Name when starting Server  
+- Fixed: Empty Room Name when starting Server
 Now, if no Room Name is specified, a Server peer will always create a Room with a random name
 - Fixed: `NetworkDebugStart` not adding the current scene to `NetworkProjectConfig` correctly
 - Fixed: Corrected error message about missing compiler define to show correct constant FUSION_BURST
@@ -2868,8 +2898,8 @@ Now, if no Room Name is specified, a Server peer will always create a Room with 
 
 **What's New**
 
-- Improved 'Lite' theme handling for inline-help and headers.  
-Simplified inline-help skin to just use basic GUIStyles  
+- Improved 'Lite' theme handling for inline-help and headers.
+Simplified inline-help skin to just use basic GUIStyles
 Added graphic source for gui styles/icons
 
 **Changes**
@@ -2883,10 +2913,10 @@ Added graphic source for gui styles/icons
 - Fixed: An issue in the lag-compensated ray-cast queries against sphere objects when the ray length was set to `Mathf.Infinity`, `float.MaxValue` or very large values, causing the hit point to be set at infinity
 - Fixed: Rpcs not being invoked for client authority objects
 - Fixed: Rpc with source=RpcSources.StateAuthority not being invokable in Shared mode
-- Fixed: Inspector handling with inline-help and component headers on Retina/hi-res type displays  
-Changed header skins to use basic styles and single textures for simpiler reskinning.  
-Saved make files for headers to project  
-Added more header color/icon options  
+- Fixed: Inspector handling with inline-help and component headers on Retina/hi-res type displays
+Changed header skins to use basic styles and single textures for simpiler reskinning.
+Saved make files for headers to project
+Added more header color/icon options
 Added Fusion styles to make eventual skinning/look changes later easier
 
 ### Build 258 (Aug 08, 2021)
@@ -2907,7 +2937,7 @@ Added Fusion styles to make eventual skinning/look changes later easier
 **What's New**
 
 - `Fusion/Run Weaver` menu item. Can be run in case of `Type Foo has not been weaved` runtime error messages
-- Improvements in layout/help on the HitboxRoot component.  
+- Improvements in layout/help on the HitboxRoot component.
 Moved button UI code out of editor and into HitRoot class (trying to avoid editor scripts unless absolutely needed)
 
 **Bug Fixes**
@@ -2922,7 +2952,7 @@ Moved button UI code out of editor and into HitRoot class (trying to avoid edito
 - Added TickTimer.RemainingTime to get the remaining time in seconds
 - Inline-help support for inspector buttons using BehaviourButtonActionAttribute
 - XMLDocumentation added support for tooltip/summary handling for all member types (to allow inline buttons etc to make use of inline help/tooltips)
-- `HitboxRoot.SetMinBoundingRadius` method that resets the root `BroadRadius` to be the minimum bounding radius for the current hitboxes.  
+- `HitboxRoot.SetMinBoundingRadius` method that resets the root `BroadRadius` to be the minimum bounding radius for the current hitboxes.
 The method can be triggered from a new button on the component editor and is automatically called if the root is initialized with a zeroed broad radius
 
 **Changes**
@@ -2998,9 +3028,9 @@ The method can be triggered from a new button on the component editor and is aut
 **Bug Fixes**
 
 - Fixed: NetworkTransformAnchor treats a null parent and a parent which is the MultiPeer root scene object both as null. Fixes teleport hitch when reparenting an object which has the MultiPeer root as its parent the first time
-- Fixed: NetworkCharacterController now uses same Defaults() handling as NetworkTransform, which resolves a teleport from origin occurring on Spawn.  
+- Fixed: NetworkCharacterController now uses same Defaults() handling as NetworkTransform, which resolves a teleport from origin occurring on Spawn.
 Renamed SharedInstance to MultiPeer in a few places there were missed
-- Fixed: Spawning position issues related to Defaults() handling in NT/NRB/NCC classes.  
+- Fixed: Spawning position issues related to Defaults() handling in NT/NRB/NCC classes.
 Changed Before/AfterAllTicks from explicit to implicit interface implementations
 - Fixed: Assembly resolve when building using IL2CPP and .NET 4.x on Unity 2021.1+
 - Fixed: Issue with ILWeaver trying to reference mscorelib when netstandard is being used
@@ -3094,7 +3124,7 @@ Changed Before/AfterAllTicks from explicit to implicit interface implementations
 
 **Changes**
 
-- Realtime Client Conn Timeout to 30secs  
+- Realtime Client Conn Timeout to 30secs
 This aims to prevent unwanted disconnects for long-running sessions
 - Removing `NetworkProjectConfig.asset` and `PhotonAppSettings.asset` from the SDK packages
 
@@ -3118,7 +3148,7 @@ This aims to prevent unwanted disconnects for long-running sessions
 
 **What's New**
 
-- Runner.GameInfo  
+- Runner.GameInfo
 This property exposes some Photon Cloud metadata like Room Name and current connected Region
 - RpcAttribute.TickAligned - if set to false the Rpc will be handled without waiting for a target's tick to catch up, if there are not any tick aligned Rpcs waiting (order is preserved)
 
@@ -3169,7 +3199,7 @@ This property exposes some Photon Cloud metadata like Room Name and current conn
 
 **Breaking Changes**
 
-- Added ShutdownReason to OnShutdown Event  
+- Added ShutdownReason to OnShutdown Event
 You must modify any INetworkRunnerCallbacks to include the extra param on the OnShutdown callback
 
 **What's New**

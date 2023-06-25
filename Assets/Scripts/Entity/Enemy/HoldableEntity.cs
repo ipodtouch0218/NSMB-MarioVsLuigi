@@ -25,7 +25,7 @@ namespace NSMB.Entities {
         public override void Render() {
             if (Holder && nrb.InterpolationTarget) {
                 Transform target = nrb.InterpolationTarget.transform;
-                Vector3 newPos = Holder.networkRigidbody.InterpolationTarget.transform.position + new Vector3(holderOffset.x, holderOffset.y, -0.1f);
+                Vector3 newPos = Holder.networkRigidbody.InterpolationTarget.position + holderOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
                 target.position = newPos;
             }
@@ -34,8 +34,6 @@ namespace NSMB.Entities {
         public override void FixedUpdateNetwork() {
             if (Holder) {
                 body.velocity = Holder.body.velocity;
-                transform.position = new(transform.position.x, transform.position.y, Holder.transform.position.z - 0.1f);
-                //body.velocity = Vector2.zero;
 
                 // Teleport check
                 Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;

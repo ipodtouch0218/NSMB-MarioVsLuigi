@@ -84,7 +84,7 @@ public class PlayerData : NetworkBehaviour {
         }
 
         if (MainMenuManager.Instance)
-            StartCoroutine(MainMenuManager.Instance.OnPlayerDataValidated(Object.InputAuthority));
+            MainMenuManager.Instance.OnPlayerDataValidated(this);
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
