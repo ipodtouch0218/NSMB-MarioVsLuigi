@@ -99,5 +99,12 @@ namespace NSMB.Extensions {
         public static bool ContainsLayer(this LayerMask mask, string layerName) {
             return ContainsLayer(mask, LayerMask.NameToLayer(layerName));
         }
+
+        public static void SetLossyScale(this Transform transform, Vector3 lossyScale) {
+            if (transform.parent)
+                lossyScale = lossyScale.Divide(transform.parent.lossyScale);
+
+            transform.localScale = lossyScale;
+        }
     }
 }

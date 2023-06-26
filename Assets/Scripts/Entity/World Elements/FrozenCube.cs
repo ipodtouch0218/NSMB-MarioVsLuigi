@@ -67,11 +67,12 @@ namespace NSMB.Entities {
 
             if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.nrb.InterpolationTarget && nrb.InterpolationTarget) {
                 Transform target = FrozenEntity.nrb.InterpolationTarget.transform;
-                Vector3 newPos = nrb.InterpolationTarget.position + (Vector3) EntityPositionOffset;
-                newPos.z = FrozenEntity.nrb.InterpolationTarget.position.z;
+                Vector2 newPos = (Vector2) nrb.InterpolationTarget.position + EntityPositionOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
-                target.position = newPos;
+                target.position = new(newPos.x, newPos.y, target.position.z);
             }
+
+            transform.position = new(transform.position.x, transform.position.y, -5);
         }
 
         public override void FixedUpdateNetwork() {
@@ -196,9 +197,12 @@ namespace NSMB.Entities {
             if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
                 return;
 
-            Vector2 damageDirection = (player.body.position - body.position).normalized;
-            bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.4f;
-            bool attackedFromBelow = Vector2.Dot(damageDirection, Vector2.down) > 0.3f;
+            Utils.Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 playerPos);
+
+            bool attackedFromAbove = Vector2.Dot((playerPos - ourPos).normalized, Vector2.up) > 0.4f;
+            bool attackedFromBelow = playerPos.y < ourPos.y
+                && playerPos.x - (player.MainHitbox.size.x * 0.5f) < (ourPos.x + hitbox.size.x * 0.5f)
+                && playerPos.x + (player.MainHitbox.size.x * 0.5f) > (ourPos.x - hitbox.size.x * 0.5f);
 
             //if (PreviousHolder == player)
             //    return;
@@ -211,10 +215,12 @@ namespace NSMB.Entities {
                 return;
 
             if ((player.IsGroundpounding || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
+                player.body.velocity = new(0, 38.671875f * Runner.DeltaTime);
+                player.GroundpoundAnimCounter++;
                 KillWithReason(UnfreezeReason.Groundpounded);
                 return;
 
-            } else if (!attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
+            } else if (attackedFromBelow && player.State != Enums.PowerupState.MiniMushroom) {
                 KillWithReason(UnfreezeReason.BlockBump);
                 return;
 
@@ -338,6 +344,7 @@ namespace NSMB.Entities {
         //---Static
         public static void FreezeEntity(NetworkRunner runner, FreezableEntity entity) {
 
+
             Bounds bounds = default;
             Vector2 entityPosition = entity.body ? entity.body.position : entity.transform.position;
             Renderer[] renderers = entity.GetComponentsInChildren<Renderer>();
@@ -353,9 +360,14 @@ namespace NSMB.Entities {
                     bounds.Encapsulate(renderer.bounds);
             }
 
+            Vector2 interpolationOffset = Vector2.zero;
+            if (entity.nrb && entity.nrb.InterpolationTarget) {
+                interpolationOffset = entityPosition - (Vector2) entity.nrb.InterpolationTarget.position;
+            }
+
             Vector2 size = bounds.size;
             Vector2 position = new(bounds.center.x, bounds.min.y);
-            Vector2 offset = entityPosition - position;
+            Vector2 offset = entityPosition - position - interpolationOffset;
 
             runner.Spawn(PrefabList.Instance.Obj_FrozenCube, position, onBeforeSpawned: (runner, obj) => {
                 FrozenCube cube = obj.GetComponent<FrozenCube>();

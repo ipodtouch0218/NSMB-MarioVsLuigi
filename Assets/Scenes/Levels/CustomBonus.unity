@@ -7091,6 +7091,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RespawningInvisibleBlock (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4425110965538168565, guid: 52fa37521c30ebb40ab4cac4ef31be57,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4425110965538168567, guid: 52fa37521c30ebb40ab4cac4ef31be57,
         type: 3}
       propertyPath: m_RootOrder

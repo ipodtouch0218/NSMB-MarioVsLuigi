@@ -96,12 +96,12 @@ namespace NSMB.Entities.Player {
         }
 
         private void HandleMegaScale() {
-            if (controller.GiantEndTimer.IsActive(Runner)) {
-                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingTime(Runner) ?? 0f) / (controller.giantStartTime * 0.5f)) * 2.6f));
+            if (controller.MegaEndTimer.IsActive(Runner)) {
+                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.MegaEndTimer.RemainingTime(Runner) ?? 0f) / (controller.megaStartTime * 0.5f)) * 2.6f));
             } else {
                 transform.localScale = controller.State switch {
                     Enums.PowerupState.MiniMushroom => ZeroPointFive,
-                    Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingTime(Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
+                    Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.MegaStartTimer.RemainingTime(Runner) ?? 0f) / controller.megaStartTime)) * 2.6f)),
                     _ => Vector3.one,
                 };
             }
@@ -127,7 +127,7 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(drillParticle, !controller.IsDead && controller.IsDrilling);
             SetParticleEmission(sparkles, !controller.IsDead && controller.IsStarmanInvincible);
             SetParticleEmission(dust, !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && body.velocity.sqrMagnitude > 0.25f))) || (((controller.IsSliding && body.velocity.sqrMagnitude > 0.25f) || controller.IsInShell) && controller.IsOnGround)) && !controller.CurrentPipe);
-            SetParticleEmission(giantParticle, !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.GiantStartTimer.ExpiredOrNotRunning(Runner));
+            SetParticleEmission(giantParticle, !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.MegaStartTimer.ExpiredOrNotRunning(Runner));
             SetParticleEmission(fireParticle, !controller.IsRespawning && controller.FireDeath && controller.IsDead && deathTimer > deathUpTime);
             SetParticleEmission(bubblesParticle, controller.IsSwimming);
 
@@ -301,17 +301,15 @@ namespace NSMB.Entities.Player {
         }
 
         private void HandleMiscStates() {
-            if (controller.GiantEndTimer.IsActive(Runner)) {
-                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.GiantEndTimer.RemainingRenderTime(Runner) ?? 0f) / (controller.giantStartTime * 0.5f)) * 2.6f));
-            } else {
-                transform.localScale = controller.State switch {
-                    Enums.PowerupState.MiniMushroom => ZeroPointFive,
-                    Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.GiantStartTimer.RemainingRenderTime(Runner) ?? 0f) / controller.giantStartTime)) * 2.6f)),
-                    _ => Vector3.one,
-                };
+            if (controller.MegaStartTimer.IsActive(Runner)) {
+                if (animator.GetCurrentAnimatorClipInfo(0).Length <= 0 || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "mega-scale")
+                    animator.Play("mega-scale");
             }
 
-            //Shader effects
+            // Scale
+            models.transform.SetLossyScale(controller.CalculateScale(true));
+
+            // Shader effects
             if (materialBlock == null) {
                 materialBlock = new();
 
@@ -323,7 +321,6 @@ namespace NSMB.Entities.Player {
                 if (enableGlow)
                     materialBlock.SetColor("GlowColor", GlowColor);
             }
-
             materialBlock.SetFloat("RainbowEnabled", controller.IsStarmanInvincible ? 1f : 0f);
             int ps = controller.State switch {
                 Enums.PowerupState.FireFlower => 1,
@@ -336,8 +333,8 @@ namespace NSMB.Entities.Player {
             materialBlock.SetFloat("ModelScale", transform.lossyScale.x);
 
             Vector3 giantMultiply = Vector3.one;
-            float giantTimeRemaining = controller.GiantTimer.RemainingTime(Runner) ?? 0f;
-            if (controller.State == Enums.PowerupState.MegaMushroom && controller.GiantTimer.IsRunning && giantTimeRemaining < 4) {
+            float giantTimeRemaining = controller.MegaTimer.RemainingTime(Runner) ?? 0f;
+            if (controller.State == Enums.PowerupState.MegaMushroom && controller.MegaTimer.IsRunning && giantTimeRemaining < 4) {
                 float v = ((Mathf.Sin(giantTimeRemaining * 20f) + 1f) * 0.45f) + 0.1f;
                 giantMultiply = new Vector3(v, 1, v);
             }
@@ -346,11 +343,11 @@ namespace NSMB.Entities.Player {
             foreach (Renderer r in renderers)
                 r.SetPropertyBlock(materialBlock);
 
-            //hit flash
+            // Hit flash
             float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingRenderTime(Runner) ?? 0f;
             models.SetActive(!controller.IsRespawning && (GameData.Instance.GameEnded || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
 
-            //Model changing
+            // Model changing
             bool large = controller.State >= Enums.PowerupState.Mushroom;
 
             largeModel.SetActive(large);
@@ -368,8 +365,6 @@ namespace NSMB.Entities.Player {
                 newZ = -6;
             else if (controller.CurrentPipe)
                 newZ = 1;
-            else if (controller.FrozenCube)
-                newZ = 3;
 
             transform.position = new(transform.position.x, transform.position.y, newZ);
         }

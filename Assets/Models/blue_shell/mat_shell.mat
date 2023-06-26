@@ -76,6 +76,18 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TextureRecolorerWithMask_6bbf880355714ebfbae89779016b832b_Texture_3193008599:
+        m_Texture: {fileID: 2800000, guid: fd1684127f4f8264183691353ad282fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureRecolorerWithMask_8ed6b2c214344ef49e03ff0b5c2b5602_Texture_3193008599:
+        m_Texture: {fileID: 2800000, guid: fd1684127f4f8264183691353ad282fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureRecolorerWithMask_ac52f6065827448ba36c6f5fd9dcd0ee_Texture_3193008599:
+        m_Texture: {fileID: 2800000, guid: fd1684127f4f8264183691353ad282fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Textures:
         m_Texture: {fileID: 18700000, guid: de07a01239bc839479c9ccd4c40cff77, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -94,6 +106,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - HatUsesOverallsColor: 0
     - IsEyeTexture: 0
     - OutlineSize: 0.02
     - PowerupState: 0

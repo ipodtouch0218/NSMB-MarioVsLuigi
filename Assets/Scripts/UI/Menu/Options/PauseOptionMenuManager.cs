@@ -20,10 +20,11 @@ namespace NSMB.UI.Pause.Options {
 
         [SerializeField] private Image backButton;
         [SerializeField] private Sprite backSelectedSprite, backDeselectedSprite;
+        [SerializeField] private Canvas canvas;
 
         //---Private Variables
-        [SerializeField] private int currentTabIndex;
-        [SerializeField] private int currentOptionIndex; // -1 = tabs are selected
+        private int currentTabIndex;
+        private int currentOptionIndex; // -1 = tabs are selected
         private bool inputted;
         private GameObject previouslySelected;
 
@@ -336,6 +337,7 @@ namespace NSMB.UI.Pause.Options {
                 GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
 
             scroll.verticalNormalizedPosition = 0;
+            Canvas.ForceUpdateCanvases();
         }
 
         public void SetTab(PauseOptionTab tab) {

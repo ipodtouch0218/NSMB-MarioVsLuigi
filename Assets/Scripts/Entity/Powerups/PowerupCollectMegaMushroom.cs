@@ -23,7 +23,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             player.IsDrilling &= player.IsSpinnerFlying;
             player.PropellerLaunchTimer = TickTimer.None;
 
-            player.GiantStartTimer = TickTimer.CreateFromSeconds(runner, player.giantStartTime);
+            player.MegaStartTimer = TickTimer.CreateFromSeconds(runner, player.megaStartTime);
             player.IsInKnockback = false;
             player.IsGroundpounding = false;
             player.IsCrouching = false;
@@ -37,7 +37,6 @@ namespace NSMB.Entities.Collectable.Powerups {
             if (!particle)
                 particle = Instantiate(PrefabList.Instance.Particle_Giant, player.transform.position, Quaternion.identity);
 
-            player.PlaySoundEverywhere(powerup.powerupScriptable.soundEffect);
             return PowerupReserveResult.ReserveOldPowerup;
         }
     }

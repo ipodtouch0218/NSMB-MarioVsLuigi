@@ -76,6 +76,22 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TextureRecolorerWithMask_6bbf880355714ebfbae89779016b832b_Texture_3193008599:
+        m_Texture: {fileID: 2800000, guid: fd1684127f4f8264183691353ad282fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureRecolorerWithMask_8ed6b2c214344ef49e03ff0b5c2b5602_Texture_3193008599:
+        m_Texture: {fileID: 2800000, guid: fd1684127f4f8264183691353ad282fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureRecolorerWithMask_ac52f6065827448ba36c6f5fd9dcd0ee_Texture_3193008599:
+        m_Texture: {fileID: 2800000, guid: fd1684127f4f8264183691353ad282fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Textures:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -90,8 +106,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - HatUsesOverallsColor: 0
     - IsEyeTexture: 1
     - OutlineSize: 0.01
+    - PowerupState: 0
+    - RainbowEnabled: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -108,6 +127,7 @@ Material:
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
+    - _MultiPowerupMaterial: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _QueueControl: 1
@@ -122,7 +142,10 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - MultiplyColor: {r: 1, g: 1, b: 1, a: 0}
     - OutlineColor: {r: 0, g: 0, b: 0, a: 0}
+    - OverallsColor: {r: 1, g: 1, b: 1, a: 1}
+    - ShirtColor: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
     - _Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

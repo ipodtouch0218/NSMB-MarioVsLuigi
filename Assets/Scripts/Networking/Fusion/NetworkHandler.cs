@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 using Fusion;
 using Fusion.Photon.Realtime;
@@ -176,24 +175,26 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (runner.IsServer && !runner.IsSinglePlayer) {
             // Create player data
             PlayerData[] dataObjects = FindObjectsOfType<PlayerData>();
-            PlayerData ourData = FindObjectsOfType<PlayerData>().Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player)).SingleOrDefault();
+            PlayerData existingData = FindObjectsOfType<PlayerData>().Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player)).SingleOrDefault();
 
-            if (!ourData) {
-                runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
+            if (existingData) {
+                runner.SetPlayerObject(player, existingData.Object);
+                existingData.JoinTick = -1;
             } else {
-                runner.SetPlayerObject(player, ourData.Object);
+                runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
             }
 
-            if (player == Runner.LocalPlayer && !SessionData.Instance) {
-                // Create room data
-                NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
-                SessionData.Instance = session.GetComponent<SessionData>();
-            } else {
-                // Inherited room data, change the host name to ours.
-                runner.SessionInfo.UpdateCustomProperties(new() {
-                    [Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname,
-                });
-                ourData.JoinTick = -1;
+            if (player == runner.LocalPlayer) {
+                if (SessionData.Instance) {
+                    // Inherited room data, change the host name to ours.
+                    runner.SessionInfo.UpdateCustomProperties(new() {
+                        [Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname,
+                    });
+                } else {
+                    // Create room data
+                    NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
+                    SessionData.Instance = session.GetComponent<SessionData>();
+                }
             }
         }
 

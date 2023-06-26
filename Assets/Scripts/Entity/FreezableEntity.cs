@@ -1,5 +1,4 @@
 using Fusion;
-
 using NSMB.Entities;
 
 public abstract class FreezableEntity : BasicEntity {

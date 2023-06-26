@@ -370,7 +370,7 @@ namespace NSMB.Entities.Enemies {
                     if (obj == gameObject)
                         continue;
 
-                    //killable entities
+                    // Killable entities
                     if (obj.GetComponentInParent<KillableEntity>() is KillableEntity killable) {
                         if (killable.IsDead)
                             continue;
@@ -390,7 +390,7 @@ namespace NSMB.Entities.Enemies {
                         continue;
                     }
 
-                    //coins
+                    // Coins
                     if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
                         coin.InteractWithPlayer(PreviousHolder);
                         continue;

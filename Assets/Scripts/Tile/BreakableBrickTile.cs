@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 using Fusion;
 using NSMB.Entities;
@@ -16,7 +17,8 @@ namespace NSMB.Tiles {
 
         //---Serialized Variables
         [SerializeField] protected Color particleColor;
-        [SerializeField] public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByGiantMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
+        [SerializeField] public bool breakableBySmallMario = false, breakableByLargeMario = true, breakableByShells = true, breakableByBombs = true, bumpIfNotBroken = true, bumpIfBroken = true;
+        [SerializeField, FormerlySerializedAs("breakableByGiantMario")] public bool breakableByMegaMario = true;
         [SerializeField] private Vector2Int tileSize = Vector2Int.one;
 
         protected bool BreakBlockCheck(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
@@ -26,7 +28,7 @@ namespace NSMB.Tiles {
                     doBreak = breakableBySmallMario;
                     doBump = true;
                 } else if (pl.State == Enums.PowerupState.MegaMushroom) {
-                    doBreak = breakableByGiantMario;
+                    doBreak = breakableByMegaMario;
                     giantBreak = true;
                     doBump = false;
                 } else if (pl.State >= Enums.PowerupState.Mushroom || pl.IsDrilling) {

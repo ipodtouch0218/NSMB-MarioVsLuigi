@@ -293,16 +293,8 @@ namespace NSMB.Entities {
 
         //---FreezableEntity overrides
         public override void Freeze(FrozenCube cube) {
-            sfx.Stop();
             IsFrozen = true;
-            if (animator)
-                animator.enabled = false;
-            if (legacyAnimation)
-                legacyAnimation.enabled = false;
 
-            foreach (BoxCollider2D hitboxes in GetComponentsInChildren<BoxCollider2D>()) {
-                hitboxes.enabled = false;
-            }
             if (body) {
                 body.velocity = Vector2.zero;
                 body.angularVelocity = 0;
@@ -312,14 +304,19 @@ namespace NSMB.Entities {
 
         public override void Unfreeze(UnfreezeReason reasonByte) {
             IsFrozen = false;
-            if (animator)
-                animator.enabled = true;
-            if (body)
-                body.isKinematic = false;
             hitbox.enabled = true;
-            sfx.enabled = true;
 
             SpecialKill(false, false, 0);
+        }
+
+        public override void OnIsFrozenChanged() {
+            if (IsFrozen)
+                sfx.Stop();
+
+            if (animator)
+                animator.enabled = !IsFrozen;
+            if (legacyAnimation)
+                legacyAnimation.enabled = !IsFrozen;
         }
 
         //---OnChangeds

@@ -129,9 +129,14 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void SpecialKill(bool right, bool groundpound, int combo) {
+            if (IsFrozen) {
+                Kill();
+                return;
+            }
+
             IsDead = true;
             WasSpecialKilled = true;
-            WasGroundpounded = groundpound;
+            WasGroundpounded = true;
             body.velocity = Vector2.zero;
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
         }
@@ -151,6 +156,15 @@ namespace NSMB.Entities.Enemies {
             }
         }
 
+        public override void OnIsFrozenChanged() {
+            base.OnIsFrozenChanged();
+
+            if (IsFrozen) {
+                trailParticles.Stop();
+            } else if (!IsDead && IsActive) {
+                trailParticles.Play();
+            }
+        }
 
         //---BasicEntity overrides
         public override void OnFacingRightChanged() {

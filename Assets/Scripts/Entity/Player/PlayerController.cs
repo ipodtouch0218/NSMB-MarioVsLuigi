@@ -14,6 +14,8 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
+using UnityEngine.InputSystem.XR;
+using UnityEngine.Serialization;
 
 namespace NSMB.Entities.Player {
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
@@ -71,7 +73,7 @@ namespace NSMB.Entities.Player {
         [Networked] public TickTimer KnockbackTimer { get; set; }
         [Networked] public NetworkObject KnockbackAttacker { get; set; }
         //Groundpound
-        [Networked(OnChanged = nameof(OnGroundpoundAnimCounterChanged))] private byte GroundpoundAnimCounter { get; set; }
+        [Networked(OnChanged = nameof(OnGroundpoundAnimCounterChanged))] public byte GroundpoundAnimCounter { get; set; }
         [Networked(OnChanged = nameof(OnGroundpoundingChanged))] public NetworkBool IsGroundpounding { get; set; }
         [Networked] public TickTimer GroundpoundStartTimer { get; set; }
         [Networked] public TickTimer GroundpoundCooldownTimer { get; set; }
@@ -127,10 +129,10 @@ namespace NSMB.Entities.Player {
         [Networked(OnChanged = nameof(OnPropellerLaunchTimerChanged))] public TickTimer PropellerLaunchTimer { get; set; }
         [Networked(OnChanged = nameof(OnPropellerSpinTimerChanged))] public TickTimer PropellerSpinTimer { get; set; }
         [Networked] public NetworkBool UsedPropellerThisJump { get; set; }
-        [Networked] public TickTimer GiantStartTimer { get; set; }
-        [Networked(OnChanged = nameof(OnGiantTimerChanged))] public TickTimer GiantTimer { get; set; }
-        [Networked] public TickTimer GiantEndTimer { get; set; }
-        [Networked(OnChanged = nameof(OnIsStationaryGiantShrinkChanged))] private bool IsStationaryGiantShrink { get; set; }
+        [Networked(OnChanged = nameof(OnMegaStartTimerChanged))] public TickTimer MegaStartTimer { get; set; }
+        [Networked(OnChanged = nameof(OnMegaTimerChanged))] public TickTimer MegaTimer { get; set; }
+        [Networked] public TickTimer MegaEndTimer { get; set; }
+        [Networked(OnChanged = nameof(OnIsStationaryMegaShrinkChanged))] private bool IsStationaryMegaShrink { get; set; }
         [Networked] public NetworkBool IsInShell { get; set; }
         [Networked] public FrozenCube FrozenCube { get; set; }
 
@@ -204,7 +206,8 @@ namespace NSMB.Entities.Player {
 
 
 
-        [SerializeField] public float flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, launchVelocity = 12f, wallslideSpeed = -4.25f, giantStartTime = 1.5f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
+        [SerializeField] public float flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, launchVelocity = 12f, wallslideSpeed = -4.25f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
+        [SerializeField, FormerlySerializedAs("giantStartTime")] public float megaStartTime = 1.5f;
         [SerializeField] public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, propellerDrillBuffer, heightSmallModel = 0.42f, heightLargeModel = 0.82f;
         [SerializeField] public GameObject models;
         [SerializeField] public CharacterData character;
@@ -484,8 +487,26 @@ namespace NSMB.Entities.Player {
             // We can become stuck in a block after uncrouching
             if (!IsDead)
                 HandleStuckInBlock();
+            HandleScale();
         }
         #endregion
+
+        private static Vector3 ZeroPointFive = Vector3.one * 0.5f;
+        private void HandleScale() {
+            transform.localScale = CalculateScale(false);
+        }
+
+        internal Vector3 CalculateScale(bool render) {
+            if (MegaEndTimer.IsActive(Runner)) {
+                return Vector3.one + (Vector3.one * (Mathf.Min(1, ((render ? MegaEndTimer.RemainingRenderTime(Runner) : MegaEndTimer.RemainingTime(Runner)) ?? 0f) / (megaStartTime * 0.5f)) * 2.6f));
+            } else {
+                return State switch {
+                    Enums.PowerupState.MiniMushroom => ZeroPointFive,
+                    Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (((render ? MegaStartTimer.RemainingRenderTime(Runner) : MegaStartTimer.RemainingTime(Runner)) ?? 0f) / megaStartTime)) * 2.6f)),
+                    _ => Vector3.one,
+                };
+            }
+        }
 
         private void HandleRespawnTimers() {
             if (PreRespawnTimer.Expired(Runner)) {
@@ -653,7 +674,7 @@ namespace NSMB.Entities.Player {
             if (DamageInvincibilityTimer.IsActive(Runner) || other.DamageInvincibilityTimer.IsActive(Runner))
                 return;
 
-            if (GiantStartTimer.IsActive(Runner) || other.GiantStartTimer.IsActive(Runner))
+            if (MegaStartTimer.IsActive(Runner) || other.MegaStartTimer.IsActive(Runner))
                 return;
 
             // Hit players
@@ -695,7 +716,7 @@ namespace NSMB.Entities.Player {
             // Mega mushroom cases
             if (State == Enums.PowerupState.MegaMushroom || other.State == Enums.PowerupState.MegaMushroom) {
                 if (State == Enums.PowerupState.MegaMushroom && other.State == Enums.PowerupState.MegaMushroom) {
-                    // Both giant
+                    // Both mega
                     if (above) {
                         DoEntityBounce = true;
                         IsGroundpounding = false;
@@ -705,7 +726,7 @@ namespace NSMB.Entities.Player {
                         other.DoKnockback(!fromRight, 0, true, Object);
                     }
                 } else if (State == Enums.PowerupState.MegaMushroom) {
-                    // Only we are giant
+                    // Only we are mega
                     if (dropStars) {
                         other.Powerdown(false);
                     } else {
@@ -1211,9 +1232,9 @@ namespace NSMB.Entities.Player {
             animationController.DisableAllModels();
             animator.SetTrigger("respawn");
             StarmanTimer = TickTimer.None;
-            GiantTimer = TickTimer.None;
-            GiantEndTimer = TickTimer.None;
-            GiantStartTimer = TickTimer.None;
+            MegaTimer = TickTimer.None;
+            MegaEndTimer = TickTimer.None;
+            MegaStartTimer = TickTimer.None;
             IsGroundpounding = false;
             body.isKinematic = true;
             body.velocity = Vector2.zero;
@@ -1243,9 +1264,9 @@ namespace NSMB.Entities.Player {
             IsOnGround = false;
             IsSliding = false;
             StarmanTimer = TickTimer.None;
-            GiantStartTimer = TickTimer.None;
-            GiantEndTimer = TickTimer.None;
-            GiantTimer = TickTimer.None;
+            MegaStartTimer = TickTimer.None;
+            MegaEndTimer = TickTimer.None;
+            MegaTimer = TickTimer.None;
             JumpState = PlayerJumpState.None;
             IsTurnaround = false;
             IsInKnockback = false;
@@ -1286,7 +1307,7 @@ namespace NSMB.Entities.Player {
             return Instantiate(particle, worldPos, rot ?? Quaternion.identity);
         }
 
-        protected void GiantFootstep() {
+        protected void PlayMegaFootstep() {
             CameraController.ScreenShake = 0.15f;
             SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position + new Vector2(FacingRight ? 0.5f : -0.5f, 0));
             PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte) (footstepVariant ? 1 : 2));
@@ -1325,9 +1346,9 @@ namespace NSMB.Entities.Player {
         #endregion
 
         #region -- TILE COLLISIONS --
-        private void HandleGiantTiles(bool pipes) {
+        private void HandleMegaTiles(bool pipes) {
             //TODO?
-            if (State != Enums.PowerupState.MegaMushroom || GiantStartTimer.IsActive(Runner))
+            if (State != Enums.PowerupState.MegaMushroom || MegaStartTimer.IsActive(Runner))
                 return;
 
             Vector2 checkSize = WorldHitboxSize * 1.1f;
@@ -1416,7 +1437,7 @@ namespace NSMB.Entities.Player {
             if ((weak && IsWeakKnockback && IsInKnockback) || (IsInKnockback && !IsWeakKnockback))
                 return;
 
-            if (GameData.Instance.GameState != Enums.GameState.Playing || DamageInvincibilityTimer.IsActive(Runner) || CurrentPipe || IsFrozen || IsDead || GiantStartTimer.IsActive(Runner) || GiantEndTimer.IsActive(Runner))
+            if (GameData.Instance.GameState != Enums.GameState.Playing || DamageInvincibilityTimer.IsActive(Runner) || CurrentPipe || IsFrozen || IsDead || MegaStartTimer.IsActive(Runner) || MegaEndTimer.IsActive(Runner))
                 return;
 
             if (State == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -1611,7 +1632,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void HandleLayerState() {
-            bool hitsNothing = CurrentPipe || IsFrozen || IsDead || IsStuckInBlock || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && IsStationaryGiantShrink);
+            bool hitsNothing = CurrentPipe || IsFrozen || IsDead || IsStuckInBlock || MegaStartTimer.IsActive(Runner) || (MegaEndTimer.IsActive(Runner) && IsStationaryMegaShrink);
 
             MainHitbox.gameObject.layer = hitsNothing ? Layers.LayerHitsNothing : Layers.LayerPlayer;
         }
@@ -1831,10 +1852,8 @@ namespace NSMB.Entities.Player {
         }
 
         private void HandleJumping(bool jumpHeld, bool doJump, bool down) {
-            if (IsInKnockback || IsDrilling || (State == Enums.PowerupState.MegaMushroom && JumpState == PlayerJumpState.SingleJump) || WallSliding)
-                return;
 
-            if (!DoEntityBounce && !doJump)
+            if (!DoEntityBounce && (!doJump || IsInKnockback || (State == Enums.PowerupState.MegaMushroom && JumpState == PlayerJumpState.SingleJump) || WallSliding))
                 return;
 
             if (!DoEntityBounce && OnSpinner && IsOnGround && !HeldEntity) {
@@ -1878,7 +1897,11 @@ namespace NSMB.Entities.Player {
             IsOnGround = false;
 
             float t = Mathf.Clamp01(Mathf.Abs(body.velocity.x) - SPEED_STAGE_MAX[1] + (SPEED_STAGE_MAX[1] * 0.5f));
-            float vel = State switch {
+            Enums.PowerupState effectiveState = State;
+            if (effectiveState == Enums.PowerupState.MegaMushroom && DoEntityBounce)
+                effectiveState = Enums.PowerupState.NoPowerup;
+
+            float vel = effectiveState switch {
                 Enums.PowerupState.MegaMushroom => 12.1875f + Mathf.Lerp(0, 0.52734375f, t),
                 Enums.PowerupState.MiniMushroom => 5.408935546875f + Mathf.Lerp(0, 0.428466796875f, t),
                 _ => 6.62109375f + Mathf.Lerp(0, 0.46875f, t),
@@ -2213,14 +2236,14 @@ namespace NSMB.Entities.Player {
 
         public void FinishMegaMario(bool success) {
             if (success) {
-                GiantTimer = TickTimer.CreateFromSeconds(Runner, 15f);
+                MegaTimer = TickTimer.CreateFromSeconds(Runner, 15f);
             } else {
                 // Hit a ceiling, cancel
                 State = Enums.PowerupState.Mushroom;
-                GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime - GiantStartTimer.RemainingTime(Runner) ?? 0f);
-                GiantStartTimer = TickTimer.None;
-                GiantTimer = TickTimer.None;
-                IsStationaryGiantShrink = true;
+                MegaEndTimer = TickTimer.CreateFromSeconds(Runner, megaStartTime - MegaStartTimer.RemainingTime(Runner) ?? 0f);
+                MegaStartTimer = TickTimer.None;
+                MegaTimer = TickTimer.None;
+                IsStationaryMegaShrink = true;
                 StoredPowerup = Enums.PowerupState.MegaMushroom;
             }
             body.isKinematic = false;
@@ -2235,10 +2258,10 @@ namespace NSMB.Entities.Player {
             } else if (!IsInShell && !IsSliding && !IsSkidding && !IsInKnockback && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || IsTurnaround)) {
                 if (right ^ left)
                     FacingRight = right;
-            } else if (GiantStartTimer.ExpiredOrNotRunning(Runner) && GiantEndTimer.ExpiredOrNotRunning(Runner) && !IsSkidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || IsTurnaround)) {
+            } else if (MegaStartTimer.ExpiredOrNotRunning(Runner) && MegaEndTimer.ExpiredOrNotRunning(Runner) && !IsSkidding && !(animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || IsTurnaround)) {
                 if (IsInKnockback || (IsOnGround && State != Enums.PowerupState.MegaMushroom && Mathf.Abs(body.velocity.x) > 0.05f && !IsCrouching)) {
                     FacingRight = body.velocity.x > 0;
-                } else if ((!IsInShell || GiantStartTimer.IsActive(Runner)) && (right || left)) {
+                } else if ((!IsInShell || MegaStartTimer.IsActive(Runner)) && (right || left)) {
                     FacingRight = right;
                 }
                 if (!IsInShell && ((Mathf.Abs(body.velocity.x) < 0.5f && IsCrouching) || OnIce) && (right || left))
@@ -2250,9 +2273,10 @@ namespace NSMB.Entities.Player {
             if (State != Enums.PowerupState.MegaMushroom)
                 return;
 
+            PreviousState = Enums.PowerupState.MegaMushroom;
             State = Enums.PowerupState.Mushroom;
-            GiantEndTimer = TickTimer.CreateFromSeconds(Runner, giantStartTime * 0.5f);
-            IsStationaryGiantShrink = false;
+            MegaEndTimer = TickTimer.CreateFromSeconds(Runner, megaStartTime * 0.5f);
+            IsStationaryMegaShrink = false;
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
 
             if (body.velocity.y > 0)
@@ -2313,30 +2337,19 @@ namespace NSMB.Entities.Player {
             if (HeldEntity && (IsFrozen || HeldEntity.IsDead || HeldEntity.IsFrozen))
                 SetHeldEntity(null);
 
-            if (GiantStartTimer.IsRunning) {
+            if (MegaStartTimer.IsRunning) {
 
                 body.isKinematic = true;
                 body.velocity = Vector2.zero;
 
-                if (GiantStartTimer.Expired(Runner)) {
+                if (MegaStartTimer.Expired(Runner)) {
                     FinishMegaMario(true);
-                    GiantStartTimer = TickTimer.None;
+                    MegaStartTimer = TickTimer.None;
                 } else {
                     body.isKinematic = true;
-                    if (animator.GetCurrentAnimatorClipInfo(0).Length <= 0 || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "mega-scale")
-                        animator.Play("mega-scale");
-
 
                     Vector2 checkExtents = WorldHitboxSize * new Vector2(0.375f, 0.55f);
-                    Vector2 normalizedVelocity = body.velocity;
-                    if (!IsGroundpounding)
-                        normalizedVelocity.y = Mathf.Max(0, body.velocity.y);
-
-                    Vector2 offset = Vector2.zero;
-                    if (JumpState == PlayerJumpState.SingleJump && IsOnGround)
-                        offset = Vector2.down / 2f;
-
-                    Vector2 checkPosition = body.position + Vector2.up * checkExtents + offset;
+                    Vector2 checkPosition = body.position + Vector2.up * checkExtents;
 
                     Vector2Int minPos = Utils.Utils.WorldToTilemapPosition(checkPosition - checkExtents, wrap: false);
                     Vector2Int size = Utils.Utils.WorldToTilemapPosition(checkPosition + checkExtents, wrap: false) - minPos;
@@ -2348,7 +2361,7 @@ namespace NSMB.Entities.Player {
 
                         bool cancelMega;
                         if (tile is BreakableBrickTile bbt)
-                            cancelMega = !bbt.breakableByGiantMario;
+                            cancelMega = !bbt.breakableByMegaMario;
                         else
                             cancelMega = Utils.Utils.IsTileSolidAtTileLocation(tileLocation);
 
@@ -2361,24 +2374,25 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (GiantEndTimer.IsRunning && IsStationaryGiantShrink) {
+            if (MegaEndTimer.IsRunning && IsStationaryMegaShrink) {
                 body.velocity = Vector2.zero;
                 body.isKinematic = true;
                 transform.position = body.position = previousTickPosition;
 
-                if (GiantEndTimer.Expired(Runner)) {
+                if (MegaEndTimer.Expired(Runner)) {
                     DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
                     body.velocity = Vector2.zero;
                     animator.enabled = true;
                     body.isKinematic = false;
                     State = PreviousState;
-                    GiantEndTimer = TickTimer.None;
+                    MegaEndTimer = TickTimer.None;
+                    IsStationaryMegaShrink = false;
                 }
                 return;
             }
 
             if (State == Enums.PowerupState.MegaMushroom) {
-                HandleGiantTiles(true);
+                HandleMegaTiles(true);
                 if (IsOnGround && JumpState == PlayerJumpState.SingleJump) {
                     SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
                     CameraController.ScreenShake = 0.15f;
@@ -2387,13 +2401,13 @@ namespace NSMB.Entities.Player {
                 StarmanTimer = TickTimer.None;
             }
 
-            if (GiantTimer.Expired(Runner)) {
+            if (State == Enums.PowerupState.MegaMushroom && MegaTimer.ExpiredOrNotRunning(Runner)) {
                 EndMega();
-                GiantTimer = TickTimer.None;
+                MegaTimer = TickTimer.None;
             }
 
             //pipes > stuck in block, else the animation gets janked.
-            if (CurrentPipe || GiantStartTimer.IsActive(Runner) || (GiantEndTimer.IsActive(Runner) && IsStationaryGiantShrink) || animator.GetBool("pipe"))
+            if (CurrentPipe || MegaStartTimer.IsActive(Runner) || (MegaEndTimer.IsActive(Runner) && IsStationaryMegaShrink) || animator.GetBool("pipe"))
                 return;
 
             //don't do anything if we're stuck in a block
@@ -2676,16 +2690,15 @@ namespace NSMB.Entities.Player {
 
         private void HandleGravity(bool jumpHeld) {
 
-            if ((IsGroundpounding || IsDrilling) && IsSwimming) {
+            if ((IsGroundpounding || IsDrilling) && IsSwimming)
                 return;
-            }
 
             if (IsOnGround)
                 return;
 
-            float gravity = 0;
+            float gravity;
 
-            //slow-rise check
+            // Slow-rise check
             if (IsSpinnerFlying || IsPropellerFlying) {
                 gravity = flyingGravity * Physics2D.gravity.y;
             } else {
@@ -2713,7 +2726,7 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            body.velocity += Vector2.up * gravity * Runner.DeltaTime;
+            body.velocity += (gravity * Runner.DeltaTime) * Vector2.up;
         }
 
         private void HandleSwimming(bool left, bool right, bool down, bool jumpPressed, bool jumpHeld) {
@@ -3104,8 +3117,9 @@ namespace NSMB.Entities.Player {
             Enums.PowerupState current = player.State;
 
             // Don't worry about Mega Mushrooms.
-            if (previous == Enums.PowerupState.MegaMushroom)
+            if (previous == Enums.PowerupState.MegaMushroom || player.MegaEndTimer.IsActive(player.Runner))
                 return;
+
 
             // We've taken damage when we go from > mushroom to mushroom, or mushroom to no powerup
             if ((previous > Enums.PowerupState.Mushroom && current == Enums.PowerupState.Mushroom)
@@ -3151,23 +3165,32 @@ namespace NSMB.Entities.Player {
             player.animator.SetTrigger("throw");
         }
 
-        public static void OnGiantTimerChanged(Changed<PlayerController> changed) {
+        public static void OnMegaTimerChanged(Changed<PlayerController> changed) {
             PlayerController player = changed.Behaviour;
 
             if (player.IsDead)
                 return;
 
-            player.PlaySoundEverywhere(player.GiantTimer.IsRunning ? Enums.Sounds.Player_Voice_MegaMushroom : Enums.Sounds.Powerup_MegaMushroom_End);
+            player.PlaySoundEverywhere(player.MegaTimer.IsRunning ? Enums.Sounds.Player_Voice_MegaMushroom : Enums.Sounds.Powerup_MegaMushroom_End);
         }
 
-        public static void OnIsStationaryGiantShrinkChanged(Changed<PlayerController> changed) {
+        public static void OnMegaStartTimerChanged(Changed<PlayerController> changed) {
             PlayerController player = changed.Behaviour;
 
-            if (!player.IsStationaryGiantShrink)
+            if (player.MegaStartTimer.ExpiredOrNotRunning(player.Runner))
+                return;
+
+            player.animator.Play("mega-scale");
+        }
+
+        public static void OnIsStationaryMegaShrinkChanged(Changed<PlayerController> changed) {
+            PlayerController player = changed.Behaviour;
+
+            if (!player.IsStationaryMegaShrink)
                 return;
 
             player.animator.enabled = true;
-            player.animator.Play("mega-cancel", 0, 1f - ((player.GiantEndTimer.RemainingTime(player.Runner) ?? 0f) / player.giantStartTime));
+            player.animator.Play("mega-cancel", 0, 1f - ((player.MegaEndTimer.RemainingTime(player.Runner) ?? 0f) / player.megaStartTime));
             player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         }
 

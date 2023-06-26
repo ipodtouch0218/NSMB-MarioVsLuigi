@@ -502,7 +502,7 @@ namespace NSMB.Game {
                 if (!player)
                     continue;
 
-                mega |= player.State == Enums.PowerupState.MegaMushroom && player.GiantStartTimer.ExpiredOrNotRunning(Runner);
+                mega |= player.State == Enums.PowerupState.MegaMushroom && player.MegaStartTimer.ExpiredOrNotRunning(Runner);
                 invincible |= player.IsStarmanInvincible;
             }
 

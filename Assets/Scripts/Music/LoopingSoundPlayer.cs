@@ -19,7 +19,7 @@ public class LoopingSoundPlayer : MonoBehaviour {
     }
 
     public void Update() {
-        if (!audioSource.isPlaying)
+        if (!audioSource.isPlaying || !currentAudio)
             return;
 
         if (currentAudio.loopEndSeconds != -1) {

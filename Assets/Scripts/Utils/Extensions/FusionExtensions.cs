@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using UnityEngine;
 
 using Fusion;
 
@@ -24,7 +25,7 @@ namespace NSMB.Extensions {
             if (!timeRemaining.HasValue)
                 return null;
 
-            return timeRemaining - (runner.Simulation.StateAlpha * runner.DeltaTime);
+            return Mathf.Max(0, (float) timeRemaining - (runner.Simulation.StateAlpha * runner.DeltaTime));
         }
 
         public static bool HasRainbowName(this PlayerRef player) {
