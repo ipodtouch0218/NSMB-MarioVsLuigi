@@ -29,7 +29,9 @@ RENREN
 River J
 
 <color=yellow>{ui.about.credits.translation}</color>
+3UP
 Akselai
+AtwerJ
 Bilhal
 Cecilia
 Davo
@@ -39,11 +41,17 @@ Flandre Scarlet
 Flichka
 Freeze
 HatsuneMiku
+HD Erick Games
 Hyruyoshi
-Joris
-Mark 19
-Mr-STF
+Iketarou
+Kate Karui
+Lyroy The Toad
+marbo
+Mark19
+MasterMindo
 miyavmeow
+Mr-STF
+ossdekasaihassei
 Shadow_Walker13
 Snick, It's Him.
 Tombuntu

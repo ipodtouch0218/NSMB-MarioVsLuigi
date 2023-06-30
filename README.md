@@ -78,7 +78,9 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * River J
 
 ### Translators:
+* 3UP
 * Akselai
+* AtwerJ
 * Bilhal
 * Cecilia
 * Davo
@@ -88,11 +90,17 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Flichka
 * Freeze
 * HatsuneMiku
+* HD Erick Games
 * Hyruyoshi
-* Joris
-* Mark 19
-* Mr-STF
+* Iketarou
+* Kate Karui
+* Lyroy The Toad
+* marbo
+* Mark19
+* MasterMindo
 * miyavmeow
+* Mr-STF
+* ossdekasaihassei
 * Shadow_Walker13
 * Snick, It's Him.
 * Tombuntu
