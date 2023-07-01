@@ -61,7 +61,7 @@ public class ScoreboardEntry : MonoBehaviour {
             nameText.text = Utils.GetPingSymbol(currentPing) + data.GetNickname();
         }
 
-        if (!target || disconnected) {
+        if (!target || !target.Object || disconnected) {
             // our target lost all lives (or dc'd)
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
             deathTick = NetworkHandler.Runner.Tick;

@@ -1374,6 +1374,11 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
+      propertyPath: DebugSpawns
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
       propertyPath: loopingLevel
       value: 1
       objectReference: {fileID: 0}

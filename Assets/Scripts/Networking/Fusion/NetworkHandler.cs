@@ -206,13 +206,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         PlayerData data = player.GetPlayerData(runner);
-        if (data)
-            Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
 
         OnPlayerLeft(runner, player);
+        if (data) {
+            Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
+            runner.Despawn(data.Object);
+        }
 
         GlobalController.Instance.discordController.UpdateActivity();
-        runner.Despawn(data.Object);
     }
 
     void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) {

@@ -42,7 +42,7 @@ public class TeamManager {
         int stars = 0;
         bool hasAtLeastOnePlayer = false;
         foreach (PlayerController player in team) {
-            if (!player || player.Lives == 0)
+            if (!player || !player.Object || player.Lives == 0)
                 continue;
 
             stars += player.Stars;

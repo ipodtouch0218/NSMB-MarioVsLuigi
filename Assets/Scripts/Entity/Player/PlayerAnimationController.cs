@@ -91,22 +91,6 @@ namespace NSMB.Entities.Player {
             HandleMiscStates();
         }
 
-        public override void FixedUpdateNetwork() {
-            HandleMegaScale();
-        }
-
-        private void HandleMegaScale() {
-            if (controller.MegaEndTimer.IsActive(Runner)) {
-                transform.localScale = Vector3.one + (Vector3.one * (Mathf.Min(1, (controller.MegaEndTimer.RemainingTime(Runner) ?? 0f) / (controller.megaStartTime * 0.5f)) * 2.6f));
-            } else {
-                transform.localScale = controller.State switch {
-                    Enums.PowerupState.MiniMushroom => ZeroPointFive,
-                    Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - ((controller.MegaStartTimer.RemainingTime(Runner) ?? 0f) / controller.megaStartTime)) * 2.6f)),
-                    _ => Vector3.one,
-                };
-            }
-        }
-
         public void HandleAnimations() {
             if (GameData.Instance.GameEnded) {
                 models.SetActive(true);

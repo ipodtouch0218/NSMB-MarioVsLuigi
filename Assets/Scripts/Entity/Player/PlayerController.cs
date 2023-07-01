@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using UnityEngine.Serialization;
 
 using Fusion;
 using NSMB.Entities.Collectable;
@@ -14,8 +15,6 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.Serialization;
 
 namespace NSMB.Entities.Player {
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
@@ -40,6 +39,7 @@ namespace NSMB.Entities.Player {
         //-Player Movement
         //Generic
         [Networked] public PlayerNetworkInput PreviousInputs { get; set; }
+        [Networked] private Tick LastInputTick { get; set; }
         [Networked] public NetworkBool IsFunctionallyRunning { get; set; }
         [Networked] public NetworkBool IsOnGround { get; set; }
         [Networked(OnChanged = nameof(OnIsCrouchingChanged))] public NetworkBool IsCrouching { get; set; }
@@ -275,9 +275,6 @@ namespace NSMB.Entities.Player {
         private static readonly float[] GRAVITY_SWIM_ACC = { -4.833984375f, -3.076171875f };
         #endregion
 
-        // Input stuff
-        private Tick lastInputTick;
-
         // Footstep Variables
         private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
         private Enums.Particle footstepParticle = Enums.Particle.None;
@@ -438,9 +435,9 @@ namespace NSMB.Entities.Player {
                 PlayerNetworkInput input;
                 if (GetInput(out PlayerNetworkInput currentInputs)) {
                     input = currentInputs;
-                    lastInputTick = Runner.Tick;
+                    LastInputTick = Runner.Tick;
                 } else {
-                    if ((Runner.Tick - lastInputTick) > Runner.Simulation.Config.TickRate * 0.2f)
+                    if ((Runner.Tick - LastInputTick) < Runner.Simulation.Config.TickRate * 0.2f)
                         input = PreviousInputs;
                     else
                         input = default;

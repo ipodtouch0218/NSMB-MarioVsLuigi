@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 717523893114735357}
   - component: {fileID: 717523893114735296}
   - component: {fileID: 1610279813323714423}
-  m_Layer: 14
+  m_Layer: 8
   m_Name: MarioBrosPlatform
   m_TagString: MarioBrosPlatform
   m_Icon: {fileID: 0}

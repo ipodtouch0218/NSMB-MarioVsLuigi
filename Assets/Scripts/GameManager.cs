@@ -231,7 +231,7 @@ namespace NSMB.Game {
 
         //---Debug
 #if UNITY_EDITOR
-        private static int DebugSpawns = 10;
+        [SerializeField] private int DebugSpawns = 10;
         private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f), StarSpawnBox = new(1f, 0.9f, 0.2f, 0.2f);
         private static readonly Vector3 OneFourth = new(0.25f, 0.25f);
         public void OnDrawGizmos() {
@@ -282,8 +282,8 @@ namespace NSMB.Game {
 
         private Vector3 GetSpawnpoint(int playerIndex, int players) {
 
-            float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI / (2 * players));
-            float scale = (2f - (players + 1f) / players) * spawnCircleWidth;
+            float comp = (float) playerIndex / players * 2 * Mathf.PI + (Mathf.PI / 2f) + (Mathf.PI / (2 * players));
+            float scale = (2 - (players + 1f) / players) * spawnCircleWidth;
 
             Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * spawnCircleHeight : 0), 0);
             Utils.Utils.WrapWorldLocation(ref spawn);

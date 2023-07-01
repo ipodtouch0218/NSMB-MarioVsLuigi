@@ -222,6 +222,12 @@ namespace NSMB.Entities {
             if (player.DamageInvincibilityTimer.IsActive(Runner))
                 return;
 
+            // Iceball combo exception
+            if (IsIceball && player.IsInKnockback) {
+                DespawnEntity();
+                return;
+            }
+
             // Should do damage checks
             if (!player.IsStarmanInvincible) {
 
