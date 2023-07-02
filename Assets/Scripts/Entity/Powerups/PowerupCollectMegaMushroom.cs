@@ -8,7 +8,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         private GameObject particle;
 
-        public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, Powerup powerup) {
             if (player.State == Enums.PowerupState.MegaMushroom)
                 return PowerupReserveResult.ReserveNewPowerup;
 
@@ -32,7 +32,8 @@ namespace NSMB.Entities.Collectable.Powerups {
             player.IsSpinnerFlying = false;
             player.IsDrilling = false;
             player.IsInShell = false;
-            transform.localScale = Vector3.one;
+
+            player.AttemptThrowHeldItem();
 
             if (!particle)
                 particle = Instantiate(PrefabList.Instance.Particle_Giant, player.transform.position, Quaternion.identity);

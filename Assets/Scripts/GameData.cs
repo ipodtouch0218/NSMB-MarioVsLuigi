@@ -316,14 +316,7 @@ namespace NSMB.Game {
             if (players == 0)
                 players = 1;
 
-            Debug.Log($"spawning {playerIndex}/{players}");
-
-            float comp = (float) playerIndex / players * 2.5f * Mathf.PI + (Mathf.PI / (2 * players));
-            float scale = (2f - (players + 1f) / players) * GameManager.spawnCircleWidth;
-
-            Vector3 spawn = GameManager.spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * GameManager.spawnCircleHeight : 0), 0);
-            Utils.Utils.WrapWorldLocation(ref spawn);
-            return spawn;
+            return GameManager.Instance.GetSpawnpoint(playerIndex, players);
         }
 
         public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab) {

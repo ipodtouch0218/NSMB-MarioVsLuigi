@@ -7,7 +7,7 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Enemies {
-    public class BulletBillMover : KillableEntity {
+    public class BulletBill : KillableEntity {
 
         //---Serialized Variables
         [SerializeField] private float speed, playerSearchRadius = 4, despawnDistance = 8;

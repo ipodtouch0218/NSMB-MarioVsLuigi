@@ -47,7 +47,7 @@ namespace NSMB.Entities.Collectable {
             PlayerController target = null;
             if (bumper is PlayerController player)
                 target = player;
-            else if (bumper is KoopaWalk koopa)
+            else if (bumper is Koopa koopa)
                 target = koopa.PreviousHolder;
 
             if (!target)

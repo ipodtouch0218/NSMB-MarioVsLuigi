@@ -6,7 +6,7 @@ using NSMB.Game;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Enemies {
-    public class PiranhaPlantController : KillableEntity {
+    public class PiranhaPlant : KillableEntity {
 
         //---Networked Variables
         [Networked] public TickTimer PopupCountdownTimer { get; set; }

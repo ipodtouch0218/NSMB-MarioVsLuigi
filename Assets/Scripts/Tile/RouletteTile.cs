@@ -25,8 +25,8 @@ namespace NSMB.Tiles {
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
             NetworkPrefabRef spawnResult = PrefabList.Instance.Powerup_Mushroom;
 
-            if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.PreviousHolder != null)) {
-                PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk) interacter).PreviousHolder;
+            if ((interacter is PlayerController) || (interacter is Koopa koopa && koopa.PreviousHolder != null)) {
+                PlayerController player = interacter is PlayerController controller ? controller : ((Koopa) interacter).PreviousHolder;
                 spawnResult = Utils.Utils.GetRandomItem(player).prefab;
             }
 

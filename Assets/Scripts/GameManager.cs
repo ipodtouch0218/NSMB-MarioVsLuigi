@@ -151,7 +151,7 @@ namespace NSMB.Game {
 
             // Find objects in the scene
             starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-            enemies = FindObjectsOfType<KillableEntity>().Where(ke => ke is not BulletBillMover).ToArray();
+            enemies = FindObjectsOfType<KillableEntity>().Where(ke => ke is not BulletBill).ToArray();
             coins = FindObjectsOfType<FloatingCoin>();
 
             nametagCanvas.gameObject.SetActive(Settings.Instance.GraphicsPlayerNametags);
@@ -229,6 +229,15 @@ namespace NSMB.Game {
             sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         }
 
+        public Vector3 GetSpawnpoint(int playerIndex, int players) {
+            float comp = (float) playerIndex / players * 2 * Mathf.PI + (Mathf.PI / 2f) + (Mathf.PI / (2 * players));
+            float scale = (2 - (players + 1f) / players) * spawnCircleWidth;
+
+            Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * spawnCircleHeight : 0), 0);
+            Utils.Utils.WrapWorldLocation(ref spawn);
+            return spawn;
+        }
+
         //---Debug
 #if UNITY_EDITOR
         [SerializeField] private int DebugSpawns = 10;
@@ -278,16 +287,6 @@ namespace NSMB.Game {
                     Gizmos.DrawWireCube(new(LevelMinX + (x * 8f) + 4f, LevelMinY + (y * 8f) + 4f), new(8, 8, 0));
                 }
             }
-        }
-
-        private Vector3 GetSpawnpoint(int playerIndex, int players) {
-
-            float comp = (float) playerIndex / players * 2 * Mathf.PI + (Mathf.PI / 2f) + (Mathf.PI / (2 * players));
-            float scale = (2 - (players + 1f) / players) * spawnCircleWidth;
-
-            Vector3 spawn = spawnpoint + new Vector3(Mathf.Sin(comp) * scale, Mathf.Cos(comp) * (players > 2f ? scale * spawnCircleHeight : 0), 0);
-            Utils.Utils.WrapWorldLocation(ref spawn);
-            return spawn;
         }
 #endif
     }

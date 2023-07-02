@@ -130,6 +130,8 @@ namespace NSMB.Entities {
 
         //---OnChanged
         public static void OnKickedAnimCounterChanged(Changed<HoldableEntity> changed) {
+            if (!changed.Behaviour.IsActive) return;
+
             changed.Behaviour.PlaySound(Enums.Sounds.Enemy_Shell_Kick);
         }
     }

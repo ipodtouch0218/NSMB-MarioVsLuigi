@@ -30,7 +30,7 @@ namespace NSMB.Tiles {
             PlayerController player = null;
             if (interacter is PlayerController controller)
                 player = controller;
-            else if (interacter is KoopaWalk koopa)
+            else if (interacter is Koopa koopa)
                 player = koopa.PreviousHolder;
 
             if (player) {

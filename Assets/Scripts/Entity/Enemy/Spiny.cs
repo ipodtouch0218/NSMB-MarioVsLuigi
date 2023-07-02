@@ -4,7 +4,7 @@ using NSMB.Entities.Player;
 
 namespace NSMB.Entities.Enemies {
     //This is pretty much just the koopawalk script but it causes damage when you stand on it.
-    public class SpinyWalk : KoopaWalk {
+    public class Spiny : Koopa {
 
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player) {
@@ -12,7 +12,7 @@ namespace NSMB.Entities.Enemies {
             if (Holder)
                 return;
 
-            //temporary invincibility, we dont want to spam the kick sound
+            // Temporary invincibility, we dont want to spam the kick sound
             if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
                 return;
 
@@ -21,14 +21,16 @@ namespace NSMB.Entities.Enemies {
             Vector2 damageDirection = (theirPos - ourPos).normalized;
             bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
 
-            // Special kill
+            // Do knockback to players in shells
+            if (player.IsInShell && !player.IsStarmanInvincible && IsInShell && !IsStationary) {
+                player.DoKnockback(!fromRight, 0, true, Object);
+                SpecialKill(!fromRight, false, player.StarCombo++);
+                return;
+            }
+
+            // Always damage exceptions
             if (player.InstakillsEnemies) {
                 SpecialKill(!player.FacingRight, false, player.StarCombo++);
-
-                if (player.IsInShell && IsInShell && !IsStationary && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                    // Do knockback to player, colliding with us in shell going opposite ways
-                    player.DoKnockback(!fromRight, 0, false, Object);
-
                 return;
             }
 
@@ -38,7 +40,7 @@ namespace NSMB.Entities.Enemies {
 
             // Don't interact with crouched blue shell players
             if (!attackedFromAbove && player.IsCrouchedInShell) {
-                FacingRight = damageDirection.x < 0;
+                FacingRight = !fromRight;
                 return;
             }
 
@@ -61,23 +63,23 @@ namespace NSMB.Entities.Enemies {
                 if (attackedFromAbove) {
                     // Stomped.
                     if (player.State == Enums.PowerupState.MiniMushroom) {
-                        //mini mario interactions
+                        // Mini mario interactions
                         if (player.IsGroundpounding) {
-                            //mini mario is groundpounding, cancel their groundpound & stop moving
+                            // Mini mario is groundpounding, cancel their groundpound & stop moving
                             EnterShell(true, player);
                             player.IsGroundpounding = false;
                         }
                         player.DoEntityBounce = true;
                     } else {
-                        //normal mario interactions
+                        // Normal mario interactions
                         if (player.IsGroundpounding) {
                             //normal mario is groundpounding, we get kick'd
                             Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                         } else {
-                            //normal mario isnt groundpounding, we get stopped
+                            // Normal mario isnt groundpounding, we get stopped
                             EnterShell(true, player);
                             player.DoEntityBounce = true;
-                            FacingRight = damageDirection.x > 0;
+                            FacingRight = fromRight;
                         }
                     }
                     return;
@@ -86,13 +88,13 @@ namespace NSMB.Entities.Enemies {
                 // Not being stomped on. just do damage.
                 if (player.IsDamageable) {
                     player.Powerdown(false);
-                    FacingRight = damageDirection.x > 0;
+                    FacingRight = fromRight;
                 }
             } else {
                 // Not in shell, we can't be stomped on. Always damage.
                 if (player.IsDamageable) {
                     player.Powerdown(false);
-                    FacingRight = damageDirection.x > 0;
+                    FacingRight = fromRight;
                     return;
                 }
             }
@@ -103,6 +105,12 @@ namespace NSMB.Entities.Enemies {
 
             if (IsActive)
                 animator.Play("walk");
+        }
+
+        public override void OnIsDeadChanged() {
+            base.OnIsDeadChanged();
+
+            sRenderer.flipY = IsDead && IsInShell;
         }
     }
 }

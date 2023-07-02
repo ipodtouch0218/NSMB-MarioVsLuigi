@@ -6,7 +6,7 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Collectable.Powerups {
-    public class PropellerPowerup : MovingPowerup {
+    public class PropellerPowerup : Powerup {
 
         //---Networked Variables
         [Networked] private float TimeFlyingStarted { get; set; }

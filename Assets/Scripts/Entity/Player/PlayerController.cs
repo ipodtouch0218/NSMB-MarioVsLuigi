@@ -106,8 +106,10 @@ namespace NSMB.Entities.Player {
         //-Death & Respawning
         [Networked] private NetworkBool Disconnected { get; set; }
         [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
+        [Networked(OnChanged = nameof(OnDeathAnimationTimerChanged))] public TickTimer DeathAnimationTimer { get; set; }
         [Networked(OnChanged = nameof(OnIsRespawningChanged))] public NetworkBool IsRespawning { get; set; }
         [Networked] public NetworkBool FireDeath { get; set; }
+        [Networked] public NetworkBool DeathplaneDeath { get; set; }
         [Networked] public TickTimer RespawnTimer { get; set; }
         [Networked] public TickTimer PreRespawnTimer { get; set; }
 
@@ -429,7 +431,7 @@ namespace NSMB.Entities.Player {
             SpinnerLaunchAnimCounter = false;
 
             if (IsDead) {
-                HandleRespawnTimers();
+                HandleDeathTimers();
             } else if (!IsFrozen) {
                 // If we can't get inputs from the player, just go based on their previous networked input state.
                 PlayerNetworkInput input;
@@ -452,31 +454,33 @@ namespace NSMB.Entities.Player {
                 //HandleBlockSnapping();
                 CheckForEntityCollision();
 
-                HandleGroundCollision();
-                if (IsOnGround)
-                    IgnoreCoyoteTime = false;
-
-                if (previousTickIsOnGround) {
-                    if (!IsOnGround) {
-                        IsOnGround = GroundSnapCheck();
-                    }
-
-                    if (!IsOnGround) {
-                        if (!IgnoreCoyoteTime)
-                            CoyoteTime = Runner.SimulationTime + 0.05f;
-
+                if (!IsDead) {
+                    HandleGroundCollision();
+                    if (IsOnGround)
                         IgnoreCoyoteTime = false;
-                    }
-                }
 
-                UpdateTileProperties();
-                CheckForPowerupActions(pressedButtons);
-                HandleMovement(heldButtons, pressedButtons);
+                    if (previousTickIsOnGround) {
+                        if (!IsOnGround) {
+                            IsOnGround = GroundSnapCheck();
+                        }
+
+                        if (!IsOnGround) {
+                            if (!IgnoreCoyoteTime)
+                                CoyoteTime = Runner.SimulationTime + 0.05f;
+
+                            IgnoreCoyoteTime = false;
+                        }
+                    }
+
+                    UpdateTileProperties();
+                    CheckForPowerupActions(pressedButtons);
+                    HandleMovement(heldButtons, pressedButtons);
+                }
 
                 PreviousInputs = input;
             }
 
-            animationController.HandleDeathAnimation();
+            //animationController.HandleDeathAnimation();
             animationController.HandlePipeAnimation();
 
             UpdateHitbox();
@@ -505,7 +509,22 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        private void HandleRespawnTimers() {
+        private void HandleDeathTimers() {
+
+            if (DeathAnimationTimer.Expired(Runner)) {
+                if ((Lives == 0 || Disconnected) && Stars > 0) {
+                    // Try to drop more stars.
+                    SpawnStars(4, DeathplaneDeath);
+                    DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, 1f);
+                } else {
+                    // Play the animation as normal
+                    body.gravityScale = 1.2f;
+                    body.velocity += Vector2.up * 7f;
+                    DeathAnimationTimer = TickTimer.None;
+                }
+            }
+
+
             if (PreRespawnTimer.Expired(Runner)) {
                 PreRespawn();
                 PreRespawnTimer = TickTimer.None;
@@ -1062,14 +1081,14 @@ namespace NSMB.Entities.Player {
         }
 
         public void SetReserveItem(Enums.PowerupState newItem) {
-            Powerup currentReserve = StoredPowerup.GetPowerupScriptable();
+            PowerupScriptable currentReserve = StoredPowerup.GetPowerupScriptable();
             if (!currentReserve) {
                 // We don't have a reserve item, so we can just set it
                 StoredPowerup = newItem;
                 return;
             }
 
-            Powerup newReserve = newItem.GetPowerupScriptable();
+            PowerupScriptable newReserve = newItem.GetPowerupScriptable();
             if (!newReserve) {
                 // Not a valid powerup, so just clear our reserve item instead
                 StoredPowerup = Enums.PowerupState.NoPowerup;
@@ -1093,7 +1112,7 @@ namespace NSMB.Entities.Player {
                 prefab = Utils.Utils.GetRandomItem(this).prefab;
 
             Runner.Spawn(prefab, new(body.position.x, cameraController.currentPosition.y + 1.68f, 0), onBeforeSpawned: (runner, obj) => {
-                obj.GetComponent<MovingPowerup>().OnBeforeSpawned(this);
+                obj.GetComponent<Powerup>().OnBeforeSpawned(this);
             });
         }
 
@@ -1145,19 +1164,23 @@ namespace NSMB.Entities.Player {
                 return;
 
             IsDead = true;
+            DeathplaneDeath = deathplane;
             FireDeath = fire;
+
             PreRespawnTimer = TickTimer.CreateFromSeconds(Runner, 3f);
             RespawnTimer = TickTimer.CreateFromSeconds(Runner, 4.3f);
 
             if ((Lives > 0 && --Lives == 0) || Disconnected) {
+                // Last death - drop all stars in 4-star waves.
                 GameData.Instance.CheckForWinner();
 
-                //spawn all stars
-                SpawnStars(Stars, deathplane);
+                SpawnStars(4, DeathplaneDeath);
+                PreRespawnTimer = TickTimer.None;
                 RespawnTimer = TickTimer.None;
-
+                DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, (Stars > 0) ? 1f : 0.6f);
             } else {
-                SpawnStars(1, deathplane);
+                SpawnStars(1, DeathplaneDeath);
+                DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, 0.6f);
             }
 
             OnSpinner = null;
@@ -1194,7 +1217,7 @@ namespace NSMB.Entities.Player {
             Death(false, false);
         }
 
-        private void AttemptThrowHeldItem(bool? right = null, bool crouch = false) {
+        public void AttemptThrowHeldItem(bool? right = null, bool crouch = false) {
             right ??= FacingRight;
 
             if (HeldEntity) {
@@ -1227,7 +1250,6 @@ namespace NSMB.Entities.Player {
             transform.localScale = Vector2.one;
             PreviousState = State = Enums.PowerupState.NoPowerup;
             animationController.DisableAllModels();
-            animator.SetTrigger("respawn");
             StarmanTimer = TickTimer.None;
             MegaTimer = TickTimer.None;
             MegaEndTimer = TickTimer.None;
@@ -2965,13 +2987,31 @@ namespace NSMB.Entities.Player {
                 if (player.Object.HasInputAuthority)
                     ScoreboardUpdater.Instance.OnDeathToggle();
             } else {
-                //respawn poof particle
+                // Respawn poof particle
                 if (Mathf.Abs(player.lastRespawnParticle - player.Runner.SimulationTime) > 2) {
                     GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, player.Spawnpoint);
                     player.lastRespawnParticle = player.Runner.SimulationTime;
                 }
 
                 player.animator.SetTrigger("respawn");
+            }
+        }
+
+        public static void OnDeathAnimationTimerChanged(Changed<PlayerController> changed) {
+            PlayerController player = changed.Behaviour;
+
+            if (player.DeathAnimationTimer.IsRunning) {
+                // Player initial death animation
+                player.animator.Play("deadstart");
+
+            } else if (player.DeathplaneDeath) {
+                // Play second half of death animation
+                player.animator.SetTrigger("deathup");
+
+                if (player.FireDeath) {
+                    player.PlaySound(Enums.Sounds.Player_Voice_LavaDeath);
+                    player.PlaySound(Enums.Sounds.Player_Sound_LavaHiss);
+                }
             }
         }
 

@@ -9,7 +9,8 @@ using NSMB.Tiles;
 namespace NSMB.Entities {
 
     [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
-    [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
+    [OrderBefore(typeof(NetworkPhysicsSimulation2D))]
+    //[OrderAfter(typeof(PlayerController))]
     public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
         //---Static Variables

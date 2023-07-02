@@ -3,7 +3,7 @@ using UnityEngine;
 using Fusion;
 
 [CreateAssetMenu(fileName = "Powerup", menuName = "ScriptableObjects/Powerup", order = 0)]
-public class Powerup : ScriptableObject {
+public class PowerupScriptable : ScriptableObject {
 
     public Enums.PowerupState state;
     public NetworkPrefabRef prefab;

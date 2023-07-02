@@ -12,7 +12,6 @@ namespace NSMB.Entities.Player {
 
         //---Static Variables
         private static readonly WaitForSeconds BlinkDelay = new(0.1f);
-        private static readonly Vector3 ZeroPointFive = new(0.5f, 0.5f, 0.5f);
 
         //---Public Variables
         public bool deathUp, wasTurnaround, enableGlow;
@@ -371,10 +370,6 @@ namespace NSMB.Entities.Player {
                 if (!deathUp && body.position.y > GameManager.Instance.LevelMinY) {
                     body.velocity = new Vector2(0, deathForce);
                     deathUp = true;
-                    if (animator.GetBool("firedeath") && Runner.IsForward) {
-                        controller.PlaySound(Enums.Sounds.Player_Voice_LavaDeath);
-                        controller.PlaySound(Enums.Sounds.Player_Sound_LavaHiss);
-                    }
                     animator.SetTrigger("deathup");
                 }
                 body.gravityScale = 1.2f;

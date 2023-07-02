@@ -4,10 +4,10 @@ namespace NSMB.Entities.Enemies {
     public class PiranhaPlantAnimationEvent : MonoBehaviour {
 
         //---Serialized Variables
-        [SerializeField] private PiranhaPlantController controller;
+        [SerializeField] private PiranhaPlant controller;
 
         public void OnValidate() {
-            if (!controller) controller = GetComponentInParent<PiranhaPlantController>();
+            if (!controller) controller = GetComponentInParent<PiranhaPlant>();
         }
 
         public void PlayChompSound() {

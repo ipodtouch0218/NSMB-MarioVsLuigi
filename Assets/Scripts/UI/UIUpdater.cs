@@ -100,7 +100,7 @@ public class UIUpdater : MonoBehaviour {
         if (!player || !player.Object)
             return;
 
-        Powerup powerup = player.StoredPowerup.GetPowerupScriptable();
+        PowerupScriptable powerup = player.StoredPowerup.GetPowerupScriptable();
         if (!powerup) {
             itemReserve.sprite = storedItemNull;
             return;
@@ -142,28 +142,30 @@ public class UIUpdater : MonoBehaviour {
         }
 
         if (SessionData.Instance.Timer > 0) {
-            float? timeRemaining = GameData.Instance.GameEndTimer.RemainingRenderTime(Runner);
+            if (!GameData.Instance.GameEnded) {
+                float? timeRemaining = GameData.Instance.GameEndTimer.RemainingRenderTime(Runner);
 
-            if ((GameData.Instance.IsMusicEnabled || GameData.Instance.GameEnded) && timeRemaining == null)
-                timeRemaining = 0;
+                if ((GameData.Instance.IsMusicEnabled || GameData.Instance.GameEnded) && timeRemaining == null)
+                    timeRemaining = 0;
 
-            if (timeRemaining != null) {
-                int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);
-                seconds = Mathf.Clamp(seconds, 0, SessionData.Instance.Timer * 60);
+                if (timeRemaining != null) {
+                    int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);
+                    seconds = Mathf.Clamp(seconds, 0, SessionData.Instance.Timer * 60);
 
-                if (seconds != timer) {
-                    timer = seconds;
-                    uiCountdown.text = Utils.GetSymbolString("cx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
-                    timerParent.SetActive(true);
+                    if (seconds != timer) {
+                        timer = seconds;
+                        uiCountdown.text = Utils.GetSymbolString("cx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
+                        timerParent.SetActive(true);
+                    }
+
+                    if (timeRemaining <= 0 && !timerMaterial) {
+                        CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
+                        cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
+                        timerMaterial.SetColor("_Color", new Color32(255, 0, 0, 255));
+                    }
+                } else {
+                    uiCountdown.text = Utils.GetSymbolString("cx" + SessionData.Instance.Timer + ":00");
                 }
-
-                if (timeRemaining <= 0 && !timerMaterial) {
-                    CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
-                    cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
-                    timerMaterial.SetColor("_Color", new Color32(255, 0, 0, 255));
-                }
-            } else {
-                uiCountdown.text = Utils.GetSymbolString("cx" + SessionData.Instance.Timer + ":00");
             }
         } else {
             timerParent.SetActive(false);

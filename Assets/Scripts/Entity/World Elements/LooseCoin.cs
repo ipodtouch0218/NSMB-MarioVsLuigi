@@ -11,6 +11,7 @@ namespace NSMB.Entities.Collectable {
 
         //---Networked Variables
         [Networked] private int CollectableTick { get; set; }
+        [Networked(OnChanged = nameof(OnCoinBounceAnimCounterChanged))] private byte CoinBounceAnimCounter { get; set; }
 
         //---Serialized Variables
         [SerializeField] private float despawn = 8;
@@ -67,8 +68,8 @@ namespace NSMB.Entities.Collectable {
 
                 // TODO: doesn't always trigger, even for host. Strange.
                 // IsForward is ok, the sound isnt top priority
-                if (Runner.IsForward && physics.previousTickVelocity.y < -0.5f * (Mathf.Sin(physics.Data.FloorAngle) + 1f))
-                    PlaySound(Enums.Sounds.World_Coin_Drop);
+                if (physics.previousTickVelocity.y < -0.5f * (Mathf.Sin(physics.Data.FloorAngle) + 1f))
+                    CoinBounceAnimCounter++;
             }
         }
 
@@ -79,6 +80,11 @@ namespace NSMB.Entities.Collectable {
 
             base.InteractWithPlayer(player);
             Runner.Despawn(Object);
+        }
+
+        //---OnChangeds
+        public static void OnCoinBounceAnimCounterChanged(Changed<LooseCoin> changed) {
+            changed.Behaviour.PlaySound(Enums.Sounds.World_Coin_Drop);
         }
     }
 }

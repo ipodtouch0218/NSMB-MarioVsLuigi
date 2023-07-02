@@ -5,7 +5,7 @@ using NSMB.Game;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Enemies {
-    public class GoombaWalk : KillableEntity {
+    public class Goomba : KillableEntity {
 
         //---Serialized Variables
         [SerializeField] private Sprite deadSprite;

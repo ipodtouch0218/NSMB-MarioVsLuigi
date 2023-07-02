@@ -464,8 +464,8 @@ namespace NSMB.Utils {
         }
 
         // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
-        public static Powerup GetRandomItem(PlayerController player) {
-            Powerup[] powerups = ScriptableManager.Instance.powerups;
+        public static PowerupScriptable GetRandomItem(PlayerController player) {
+            PowerupScriptable[] powerups = ScriptableManager.Instance.powerups;
             GameManager gm = GameManager.Instance;
 
             // "losing" variable based on ln(x+1), x being the # of stars we're behind
@@ -483,7 +483,7 @@ namespace NSMB.Utils {
             bool cantSpawnMega = GameData.Instance.AlivePlayers.Any(pc => pc.State == Enums.PowerupState.MegaMushroom);
 
             float totalChance = 0;
-            foreach (Powerup powerup in powerups) {
+            foreach (PowerupScriptable powerup in powerups) {
                 if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega)
                     continue;
                 if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
@@ -493,7 +493,7 @@ namespace NSMB.Utils {
             }
 
             float rand = GameData.Instance.Random.NextSingleExclusive() * totalChance;
-            foreach (Powerup powerup in powerups) {
+            foreach (PowerupScriptable powerup in powerups) {
                 if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega)
                     continue;
                 if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))

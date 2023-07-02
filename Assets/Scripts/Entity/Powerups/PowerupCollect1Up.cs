@@ -7,7 +7,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         private GameObject particle;
 
-        public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, Powerup powerup) {
             player.Lives++;
 
             if (!particle)

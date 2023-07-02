@@ -6,7 +6,7 @@ using NSMB.Entities.Player;
 namespace NSMB.Entities.Collectable.Powerups {
     public class PowerupCollectStarman : MonoBehaviour, IPowerupCollect {
 
-        public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, Powerup powerup) {
 
             NetworkRunner runner = player.Runner;
 

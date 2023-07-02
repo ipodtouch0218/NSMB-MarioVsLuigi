@@ -27,8 +27,8 @@ namespace NSMB.Tiles {
 
             NetworkPrefabRef spawnResult = PrefabList.Instance.Powerup_Mushroom;
 
-            if ((interacter is PlayerController) || (interacter is KoopaWalk koopa && koopa.PreviousHolder != null)) {
-                PlayerController player = interacter is PlayerController controller ? controller : ((KoopaWalk) interacter).PreviousHolder;
+            if ((interacter is PlayerController) || (interacter is Koopa koopa && koopa.PreviousHolder != null)) {
+                PlayerController player = interacter is PlayerController controller ? controller : ((Koopa) interacter).PreviousHolder;
 
                 if (player.State >= Enums.PowerupState.Mushroom)
                     spawnResult = PrefabList.Instance.Powerup_FireFlower;

@@ -14,7 +14,7 @@ namespace NSMB.Entities.World {
 
         //---Serialized Variables
         [SerializeField] private float playerSearchRadius = 7, playerCloseCutoff = 1, initialShootTimer = 5;
-        [SerializeField] private BulletBillMover[] bulletBills;
+        [SerializeField] private BulletBill[] bulletBills;
 
         //---Private Variables
         private Vector2 searchBox, closeSearchPosition, closeSearchBox = new(1.5f, 1f);
@@ -52,7 +52,7 @@ namespace NSMB.Entities.World {
             if (!Utils.Utils.IsTileSolidAtWorldLocation(transform.position))
                 return;
 
-            BulletBillMover bill = FindInactiveBill();
+            BulletBill bill = FindInactiveBill();
             if (!bill)
                 return;
 
@@ -73,7 +73,7 @@ namespace NSMB.Entities.World {
             }
         }
 
-        private void SpawnBill(BulletBillMover bill, Vector2 spawnpoint, bool facingRight) {
+        private void SpawnBill(BulletBill bill, Vector2 spawnpoint, bool facingRight) {
 
             if (!bill)
                 return;
@@ -87,8 +87,8 @@ namespace NSMB.Entities.World {
             return Runner.GetPhysicsScene2D().OverlapBox(origin, searchBox, 0, Layers.MaskOnlyPlayers);
         }
 
-        private BulletBillMover FindInactiveBill() {
-            foreach (BulletBillMover b in bulletBills) {
+        private BulletBill FindInactiveBill() {
+            foreach (BulletBill b in bulletBills) {
                 if (!b.IsActive)
                     return b;
             }

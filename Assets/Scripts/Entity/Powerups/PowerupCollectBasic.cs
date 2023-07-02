@@ -7,7 +7,7 @@ using NSMB.Utils;
 namespace NSMB.Entities.Collectable.Powerups {
     public class PowerupCollectBasic : MonoBehaviour, IPowerupCollect {
 
-        public PowerupReserveResult OnPowerupCollect(PlayerController player, MovingPowerup powerup) {
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, Powerup powerup) {
 
             Enums.PowerupState newState = powerup.powerupScriptable.state;
 
@@ -21,8 +21,8 @@ namespace NSMB.Entities.Collectable.Powerups {
             if (player.State == Enums.PowerupState.MiniMushroom && player.IsOnGround && runner.GetPhysicsScene2D().Raycast(player.body.position, Vector2.up, 0.3f, Layers.MaskSolidGround))
                 return PowerupReserveResult.ReserveNewPowerup;
 
-            Powerup currentPowerup = player.State.GetPowerupScriptable();
-            Powerup newPowerup = powerup.powerupScriptable;
+            PowerupScriptable currentPowerup = player.State.GetPowerupScriptable();
+            PowerupScriptable newPowerup = powerup.powerupScriptable;
 
             sbyte currentPowerupStatePriority = currentPowerup ? currentPowerup.statePriority : (sbyte) -1;
             sbyte newPowerupItemPriority = newPowerup ? newPowerup.itemPriority : (sbyte) -1;

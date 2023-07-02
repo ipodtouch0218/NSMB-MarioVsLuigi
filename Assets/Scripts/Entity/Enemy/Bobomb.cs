@@ -9,7 +9,7 @@ using NSMB.Game;
 using NSMB.Tiles;
 
 namespace NSMB.Entities.Enemies {
-    public class BobombWalk : HoldableEntity {
+    public class Bobomb : HoldableEntity {
 
         //---Static Variables
         private static readonly List<Collider2D> DetonationHits = new();
@@ -183,30 +183,31 @@ namespace NSMB.Entities.Enemies {
                 return;
             }
 
-            Utils.Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+            Utils.Utils.UnwrapLocations(body.position + Vector2.up * 0.1f, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
             bool fromRight = ourPos.x < theirPos.x;
 
             Vector2 damageDirection = (theirPos - ourPos).normalized;
-            bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.2f;
+            bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.3f;
 
             // Normal interactions
             if (Lit) {
                 if (!Holder && player.CanPickupItem) {
-                    // pickup by player
+                    // Pickup by player
                     Pickup(player);
                 } else {
-                    // kicked by player
+                    // Kicked by player
                     Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                 }
             } else {
                 if (attackedFromAbove) {
-                    // light
+                    // Light
                     bool mini = player.State == Enums.PowerupState.MiniMushroom;
                     if (!mini || player.IsGroundpounding)
                         Light();
 
                     if (!mini && player.IsGroundpounding) {
                         Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+
                     } else {
                         player.DoEntityBounce = true;
                         player.IsGroundpounding = false;
@@ -216,9 +217,11 @@ namespace NSMB.Entities.Enemies {
                 } else if (player.IsCrouchedInShell) {
                     // Bounce off blue shell crouched player
                     FacingRight = damageDirection.x < 0;
+                    player.body.velocity = new(0, player.body.velocity.y);
                     return;
+
                 } else if (player.IsDamageable) {
-                    // damage
+                    // Damage
                     player.Powerdown(false);
                     FacingRight = damageDirection.x > 0;
                 }
@@ -308,8 +311,8 @@ namespace NSMB.Entities.Enemies {
 
         //---OnChangeds
         private GameObject explosion;
-        public static void OnIsDetonatedChanged(Changed<BobombWalk> changed) {
-            BobombWalk bomb = changed.Behaviour;
+        public static void OnIsDetonatedChanged(Changed<Bobomb> changed) {
+            Bobomb bomb = changed.Behaviour;
 
             if (bomb.IsDetonated) {
                 //spawn explosion
@@ -324,8 +327,8 @@ namespace NSMB.Entities.Enemies {
             }
         }
 
-        public static void OnDetonationTimerChanged(Changed<BobombWalk> changed) {
-            BobombWalk bomb = changed.Behaviour;
+        public static void OnDetonationTimerChanged(Changed<Bobomb> changed) {
+            Bobomb bomb = changed.Behaviour;
             bool lit = bomb.Lit;
             bomb.animator.SetBool("lit", lit);
 

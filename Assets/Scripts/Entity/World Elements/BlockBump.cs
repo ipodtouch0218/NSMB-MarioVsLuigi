@@ -214,7 +214,7 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
         }
 
         Runner.Spawn(SpawnPrefab, animOrigin, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(pickupDelay, animOrigin, animDestination);
+            obj.GetComponent<Powerup>().OnBeforeSpawned(pickupDelay, animOrigin, animDestination);
         });
         Runner.Despawn(Object);
     }

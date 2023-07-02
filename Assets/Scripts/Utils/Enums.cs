@@ -10,7 +10,7 @@ public static class Enums {
         NoPowerup, MiniMushroom, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
     }
 
-    public static Powerup GetPowerupScriptable(this PowerupState state) {
+    public static PowerupScriptable GetPowerupScriptable(this PowerupState state) {
         if (state == PowerupState.NoPowerup)
             return null;
 

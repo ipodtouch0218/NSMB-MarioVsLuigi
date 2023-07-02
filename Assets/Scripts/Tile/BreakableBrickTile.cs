@@ -35,10 +35,10 @@ namespace NSMB.Tiles {
                     doBreak = breakableByLargeMario;
                     doBump = true;
                 }
-            } else if (interacter is KoopaWalk) {
+            } else if (interacter is Koopa) {
                 doBump = true;
                 doBreak = breakableByShells;
-            } else if (interacter is BobombWalk) {
+            } else if (interacter is Bobomb) {
                 doBump = false;
                 doBreak = breakableByBombs;
             }

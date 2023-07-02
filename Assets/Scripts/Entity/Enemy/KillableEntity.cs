@@ -13,15 +13,15 @@ namespace NSMB.Entities {
 
         //---Static Variables
         private static readonly Enums.Sounds[] COMBOS = {
-        Enums.Sounds.Enemy_Shell_Kick,
-        Enums.Sounds.Enemy_Shell_Combo1,
-        Enums.Sounds.Enemy_Shell_Combo2,
-        Enums.Sounds.Enemy_Shell_Combo3,
-        Enums.Sounds.Enemy_Shell_Combo4,
-        Enums.Sounds.Enemy_Shell_Combo5,
-        Enums.Sounds.Enemy_Shell_Combo6,
-        Enums.Sounds.Enemy_Shell_Combo7,
-    };
+            Enums.Sounds.Enemy_Shell_Kick,
+            Enums.Sounds.Enemy_Shell_Combo1,
+            Enums.Sounds.Enemy_Shell_Combo2,
+            Enums.Sounds.Enemy_Shell_Combo3,
+            Enums.Sounds.Enemy_Shell_Combo4,
+            Enums.Sounds.Enemy_Shell_Combo5,
+            Enums.Sounds.Enemy_Shell_Combo6,
+            Enums.Sounds.Enemy_Shell_Combo7,
+        };
         protected readonly Collider2D[] CollisionBuffer = new Collider2D[32];
         protected readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
@@ -125,7 +125,7 @@ namespace NSMB.Entities {
                     continue;
 
                 if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
-                    if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlantController)
+                    if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant)
                         continue;
 
                     bool goRight = body.position.x > killable.body.position.x;
@@ -234,9 +234,9 @@ namespace NSMB.Entities {
         //---IPlayerInteractable overrides
         public virtual void InteractWithPlayer(PlayerController player) {
 
-            Utils.Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+            Utils.Utils.UnwrapLocations(body.position + Vector2.up * 0.1f, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
             Vector2 damageDirection = (theirPos - ourPos).normalized;
-            bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.5f;
+            bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.3f;
 
             bool groundpounded = attackedFromAbove && player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom;
             if (player.InstakillsEnemies || groundpounded) {
@@ -260,6 +260,7 @@ namespace NSMB.Entities {
 
             } else if (player.IsCrouchedInShell) {
                 FacingRight = damageDirection.x < 0;
+                player.body.velocity = new(0, player.body.velocity.y);
 
             } else if (player.IsDamageable) {
                 player.Powerdown(false);

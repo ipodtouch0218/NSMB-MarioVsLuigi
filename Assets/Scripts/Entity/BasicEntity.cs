@@ -6,6 +6,7 @@ using NSMB.Game;
 using NSMB.Tiles;
 
 namespace NSMB.Entities {
+
     [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
     public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 

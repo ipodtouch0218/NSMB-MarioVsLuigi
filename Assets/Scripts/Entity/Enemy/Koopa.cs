@@ -9,11 +9,12 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
+using static UnityEngine.UI.Image;
 
 namespace NSMB.Entities.Enemies {
 
     [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
-    public class KoopaWalk : HoldableEntity {
+    public class Koopa : HoldableEntity {
 
         //---Static Variables
         private static readonly Vector2 BlockOffset = new(0, 0.05f);
@@ -202,7 +203,7 @@ namespace NSMB.Entities.Enemies {
                 BlueShellCollector = player;
             } else {
                 Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
-                    obj.GetComponent<MovingPowerup>().OnBeforeSpawned(0.1f);
+                    obj.GetComponent<Powerup>().OnBeforeSpawned(0.1f);
                 });
             }
             DespawnEntity();
@@ -236,34 +237,39 @@ namespace NSMB.Entities.Enemies {
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player) {
 
-            // don't interact with our lovely holder
+            // Don't interact with our lovely holder
             if (Holder == player)
                 return;
 
-            // temporary invincibility
+            // Temporary invincibility
             if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
                 return;
 
-            Vector2 damageDirection = (player.body.position - body.position).normalized;
+            Utils.Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+            bool fromRight = ourPos.x < theirPos.x;
+            Vector2 damageDirection = (theirPos - ourPos).normalized;
             bool attackedFromAbove = damageDirection.y > 0;
 
-            // always damage exceptions
-            if (player.InstakillsEnemies) {
-                bool originalFacing = player.FacingRight;
-                if (IsInShell && !IsStationary && player.IsInShell && Mathf.Sign(body.velocity.x) != Mathf.Sign(player.body.velocity.x))
-                    player.DoKnockback(player.body.position.x < body.position.x, 0, true, Object);
-
-                SpecialKill(!originalFacing, false, player.StarCombo++);
+            // Do knockback to players in shells
+            if (player.IsInShell && !player.IsStarmanInvincible && IsInShell && !IsStationary) {
+                player.DoKnockback(!fromRight, 0, true, Object);
+                SpecialKill(!fromRight, false, player.StarCombo++);
                 return;
             }
 
-            // attempt to be picked up (or kick)
+            // Always damage exceptions
+            if (player.InstakillsEnemies) {
+                SpecialKill(!player.FacingRight, false, player.StarCombo++);
+                return;
+            }
+
+            // Attempt to be picked up (or kicked)
             if (IsInShell && IsActuallyStationary) {
                 if (!Holder) {
                     if (player.CanPickupItem) {
                         Pickup(player);
                     } else {
-                        Kick(player, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                        Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                         PreviousHolder = player;
                     }
                 }
@@ -271,13 +277,13 @@ namespace NSMB.Entities.Enemies {
             }
 
             if (attackedFromAbove) {
-                // get hit by player
+                // Get hit by player
 
-                // groundpound by big mario: shell & kick
+                // Groundpound by big mario: shell & kick
                 if (player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom) {
                     EnterShell(true, player);
                     if (!blue) {
-                        Kick(player, player.body.position.x < body.position.x, 1f, true);
+                        Kick(player, !fromRight, 1f, true);
                         PreviousHolder = player;
                     }
                     if (player.IsDrilling) {
@@ -287,7 +293,7 @@ namespace NSMB.Entities.Enemies {
                     return;
                 }
 
-                // bounced on
+                // Bounced on
                 if (player.State == Enums.PowerupState.MiniMushroom) {
                     if (player.HasGroundpoundHitbox) {
                         player.IsGroundpounding = false;
@@ -295,7 +301,7 @@ namespace NSMB.Entities.Enemies {
                     }
                     player.DoEntityBounce = true;
                 } else {
-                    // blue koopa: check to become a blue shell item
+                    // Blue Koopa: check to become a blue shell item
                     if (blue && IsInShell && player.HasGroundpoundHitbox) {
                         BlueBecomeItem(player);
                         player.DoEntityBounce = !player.IsGroundpounding;
@@ -309,20 +315,20 @@ namespace NSMB.Entities.Enemies {
                 player.IsDrilling = false;
 
             } else {
-                // damage player
+                // Damage player
 
-                // turn around when hitting a crouching blue shell player
-                if (player.State == Enums.PowerupState.BlueShell && player.IsCrouching && !player.IsInShell) {
+                // Turn around when hitting a crouching blue shell player
+                if (!IsInShell && player.IsCrouchedInShell) {
                     player.body.velocity = new(0, player.body.velocity.y);
-                    FacingRight = damageDirection.x < 0;
+                    FacingRight = !fromRight;
                     return;
                 }
 
-                // finally attempt to damage player
+                // Finally attempt to damage player
                 bool damageable = player.IsDamageable;
                 player.Powerdown(false);
                 if (damageable && !IsInShell)
-                    FacingRight = damageDirection.x > 0;
+                    FacingRight = fromRight;
             }
         }
 
@@ -382,7 +388,7 @@ namespace NSMB.Entities.Enemies {
                         killable.SpecialKill(fromRight, false, ComboCounter++);
 
                         // If we hit another moving shell (or we're being held), we both die.
-                        if (Holder || (killable is KoopaWalk kw && kw.IsInShell && !kw.IsActuallyStationary)) {
+                        if (Holder || (killable is Koopa kw && kw.IsInShell && !kw.IsActuallyStationary)) {
                             SpecialKill(!fromRight, false, 0);
                             return;
                         }
@@ -432,7 +438,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---OnChangeds
-        private static void OnBlueShellCollectorChanged(Changed<KoopaWalk> changed) {
+        private static void OnBlueShellCollectorChanged(Changed<Koopa> changed) {
             if (changed.Behaviour.BlueShellCollector)
                 changed.Behaviour.BlueShellCollector.PlaySound(Enums.Sounds.Player_Sound_PowerupCollect);
         }

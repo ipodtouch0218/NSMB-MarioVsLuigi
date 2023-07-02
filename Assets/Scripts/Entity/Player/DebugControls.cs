@@ -84,7 +84,7 @@ public class DebugControls : MonoBehaviour {
             item = Utils.GetRandomItem(GameManager.Instance.localPlayer).prefab;
 
         NetworkHandler.Instance.runner.Spawn(item, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<MovingPowerup>().OnBeforeSpawned(GameManager.Instance.localPlayer);
+            obj.GetComponent<Powerup>().OnBeforeSpawned(GameManager.Instance.localPlayer);
         });
     }
 

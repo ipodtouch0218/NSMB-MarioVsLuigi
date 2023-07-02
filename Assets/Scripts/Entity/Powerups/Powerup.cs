@@ -9,7 +9,7 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Collectable.Powerups {
-    public class MovingPowerup : CollectableEntity, IBlockBumpable {
+    public class Powerup : CollectableEntity, IBlockBumpable {
 
         //---Static Variables
         private static LayerMask GroundMask;
@@ -28,7 +28,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         [Networked] private TickTimer SpawnAnimationTimer { get; set; }
 
         //---Public Variables
-        public Powerup powerupScriptable;
+        public PowerupScriptable powerupScriptable;
 
         //---Serialized Variables
         [SerializeField] private float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4, scaleSize = 0.5f, scaleRate = 30f/4f;
@@ -303,7 +303,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             // Change the player's powerup state
             Enums.PowerupState oldState = player.State;
-            Powerup newPowerup = powerupScriptable;
+            PowerupScriptable newPowerup = powerupScriptable;
             Enums.PowerupState newState = newPowerup.state;
 
             ReserveResult = collectScript.OnPowerupCollect(player, this);
@@ -337,11 +337,11 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         //---OnChangeds
-        public static void OnReserveResultChanged(Changed<MovingPowerup> changed) {
-            MovingPowerup powerup = changed.Behaviour;
+        public static void OnReserveResultChanged(Changed<Powerup> changed) {
+            Powerup powerup = changed.Behaviour;
             PlayerController collector = powerup.Collector;
 
-            Powerup newPowerup = powerup.powerupScriptable;
+            PowerupScriptable newPowerup = powerup.powerupScriptable;
 
             switch (powerup.ReserveResult) {
             case PowerupReserveResult.ReserveOldPowerup:
