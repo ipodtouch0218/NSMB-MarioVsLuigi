@@ -78,6 +78,7 @@ namespace NSMB.Game {
         [SerializeField] public GameObject objectPoolParent;
         [SerializeField] public TMP_Text winText;
         [SerializeField] public Animator winTextAnimator;
+        [SerializeField] public FadeOutManager fadeManager;
 
         //---Public Variables
         public readonly HashSet<NetworkObject> networkObjects = new();

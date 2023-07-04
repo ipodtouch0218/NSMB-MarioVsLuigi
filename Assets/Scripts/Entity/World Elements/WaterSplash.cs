@@ -183,7 +183,7 @@ namespace NSMB.Entities.World {
                 return;
 
             // Don't splash stationary stars
-            if (entity is StarBouncer sb && sb.IsStationary)
+            if (entity is BigStar sb && sb.IsStationary)
                 return;
 
             // Don't splash stationary coins
@@ -225,7 +225,7 @@ namespace NSMB.Entities.World {
                         if (fm.body.position.y < SurfaceHeight - 0.2f) {
                             fm.DespawnEntity(false);
                         }
-                    } else if (entity is not StarBouncer) {
+                    } else if (entity is not BigStar) {
                         if (!entity.DespawnTimer.IsRunning)
                             entity.DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
                         //entity.DespawnEntity();

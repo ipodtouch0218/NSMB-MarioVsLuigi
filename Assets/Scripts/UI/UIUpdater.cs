@@ -176,7 +176,7 @@ public class UIUpdater : MonoBehaviour {
         TrackIcon icon;
         if (comp is PlayerController)
             icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
-        else if (comp is StarBouncer)
+        else if (comp is BigStar)
             icon = Instantiate(starTrackTemplate, starTrackTemplate.transform.parent);
         else
             return null;

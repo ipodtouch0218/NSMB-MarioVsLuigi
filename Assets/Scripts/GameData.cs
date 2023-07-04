@@ -546,7 +546,7 @@ namespace NSMB.Game {
 
                     // Valid spawn
                     Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
-                        obj.GetComponent<StarBouncer>().OnBeforeSpawned(0, true, false);
+                        obj.GetComponent<BigStar>().OnBeforeSpawned(0, true, false);
                     });
                     return true;
                 }

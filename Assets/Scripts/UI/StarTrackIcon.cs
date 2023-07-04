@@ -11,10 +11,10 @@ public class StarTrackIcon : TrackIcon {
     [SerializeField] private Sprite starSprite;
 
     //---Private Variables
-    private StarBouncer starTarget;
+    private BigStar starTarget;
 
     public void Start() {
-        starTarget = target.GetComponent<StarBouncer>();
+        starTarget = target.GetComponent<BigStar>();
         if (!starTarget) {
             Destroy(gameObject);
             return;

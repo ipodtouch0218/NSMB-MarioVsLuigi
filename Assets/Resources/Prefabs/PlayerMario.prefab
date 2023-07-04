@@ -83,7 +83,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentPosition: {x: 0, y: 0, z: 0}
+  _interpolationDataSource: 0
+  _CurrentPosition: {x: 0, y: 0, z: 0}
+  controller: {fileID: 4824223341387914485}
 --- !u!1 &330813882706712469
 GameObject:
   m_ObjectHideFlags: 0
@@ -10571,13 +10573,13 @@ MonoBehaviour:
   _IsForwardsKnockback:
     _value: 0
   _KnockbackAttacker: {fileID: 0}
+  _GroundpoundAnimCounter: 0
   _IsGroundpounding:
     _value: 0
   _OnSpinner: {fileID: 0}
   _IsSpinnerFlying:
     _value: 0
-  _SpinnerLaunchAnimCounter:
-    _value: 0
+  _SpinnerLaunchAnimCounter: 0
   _IsDrilling:
     _value: 0
   _PipeDirection: {x: 0, y: 0}
@@ -10602,6 +10604,8 @@ MonoBehaviour:
   _IsRespawning:
     _value: 0
   _FireDeath:
+    _value: 0
+  _DeathplaneDeath:
     _value: 0
   _HeldEntity: {fileID: 0}
   _ThrowAnimCounter: 0
@@ -10629,15 +10633,14 @@ MonoBehaviour:
   terminalVelocity: -7.5
   launchVelocity: 12
   wallslideSpeed: -4.6875
-  giantStartTime: 1.5
   soundRange: 10
   slopeSlidingAngle: 12.5
   pickupTime: 0.45
+  megaStartTime: 1.5
   propellerLaunchVelocity: 6
   propellerFallSpeed: 2
   propellerSpinFallSpeed: 1.5
   propellerSpinTime: 0.5
-  propellerDrillBuffer: 0
   heightSmallModel: 0.42
   heightLargeModel: 0.82
   models: {fileID: 8422425992379838812}
@@ -11012,6 +11015,7 @@ MonoBehaviour:
   - {fileID: 4824223341387914485}
   - {fileID: 79918617084146557}
   - {fileID: 2433599474194652050}
+  - {fileID: 8020175873997104482}
   SimulationBehaviours:
   - {fileID: 4824223341387914442}
 --- !u!114 &2433599474194652050

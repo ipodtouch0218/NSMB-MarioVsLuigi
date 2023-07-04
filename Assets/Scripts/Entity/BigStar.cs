@@ -9,7 +9,7 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Collectable {
-    public class StarBouncer : CollectableEntity {
+    public class BigStar : CollectableEntity {
 
         //---Static Variables
         private static ContactFilter2D GroundFilter;

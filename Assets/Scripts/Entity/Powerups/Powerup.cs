@@ -72,7 +72,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             OnBeforeSpawned(1);
 
             FollowPlayer = playerToFollow;
-            transform.position = body.position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.currentPosition.y + 1.68f);
+            transform.position = body.position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.CurrentPosition.y + 1.68f);
         }
 
         public void OnBeforeSpawned(float pickupDelay, Vector2 spawnOrigin, Vector2 spawnDestination) {
@@ -185,7 +185,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             if (FollowPlayer) {
                 // Attached to a player. Don't interact, and follow the player.
-                body.position = new(FollowPlayer.body.position.x, FollowPlayer.cameraController.currentPosition.y + 1.68f);
+                body.position = new(FollowPlayer.body.position.x, FollowPlayer.cameraController.CurrentPosition.y + 1.68f);
 
                 if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
                     SpawnAnimationTimer = TickTimer.None;

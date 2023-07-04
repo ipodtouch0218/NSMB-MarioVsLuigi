@@ -352,39 +352,6 @@ namespace NSMB.Entities.Player {
             transform.position = new(transform.position.x, transform.position.y, newZ);
         }
 
-        public void HandleDeathAnimation() {
-            if (!controller.IsDead || controller.IsRespawning)
-                return;
-
-            float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
-
-            if (deathTimer < deathUpTime) {
-                deathUp = false;
-                body.gravityScale = 0;
-                body.velocity = Vector2.zero;
-                if (deathTimer < (deathUpTime * 0.5f)) {
-                    animator.Play("deadstart");
-                    animator.ResetTrigger("respawn");
-                }
-            } else {
-                if (!deathUp && body.position.y > GameManager.Instance.LevelMinY) {
-                    body.velocity = new Vector2(0, deathForce);
-                    deathUp = true;
-                    animator.SetTrigger("deathup");
-                }
-                body.gravityScale = 1.2f;
-                body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
-            }
-            if (Runner.IsForward && Object.HasInputAuthority && deathTimer + Runner.DeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f))
-                controller.fadeOut.FadeOutAndIn(0.33f, .1f);
-
-            if (body.position.y < GameManager.Instance.LevelMinY - transform.lossyScale.y) {
-                //models.SetActive(false);
-                body.velocity = Vector2.zero;
-                body.gravityScale = 0;
-            }
-        }
-
         public void HandlePipeAnimation() {
             if (!controller.CurrentPipe)
                 return;

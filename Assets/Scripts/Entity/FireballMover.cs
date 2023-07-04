@@ -9,8 +9,7 @@ using NSMB.Tiles;
 namespace NSMB.Entities {
 
     [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
-    [OrderBefore(typeof(NetworkPhysicsSimulation2D))]
-    //[OrderAfter(typeof(PlayerController))]
+    [OrderAfter(typeof(PlayerController))]
     public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
         //---Static Variables
@@ -43,7 +42,7 @@ namespace NSMB.Entities {
         }
 
         public void Initialize(PlayerController owner, Vector2 spawnpoint, bool ice, bool right) {
-            //vars
+            // Vars
             IsActive = true;
             IsIceball = ice;
             FacingRight = right;
@@ -53,7 +52,7 @@ namespace NSMB.Entities {
             foreach (SpriteRenderer r in renderers)
                 r.flipX = FacingRight;
 
-            //speed
+            // Speed
             body.gravityScale = IsIceball ? 2.2f : 4.4f;
             if (IsIceball) {
                 CurrentSpeed = iceSpeed + Mathf.Abs(owner.body.velocity.x / 3f);
@@ -61,13 +60,13 @@ namespace NSMB.Entities {
                 CurrentSpeed = fireSpeed;
             }
 
-            //physics
+            // Physics
             nrb.TeleportToPosition(spawnpoint, Vector3.zero);
             nrb.Rigidbody.position = spawnpoint;
             //body.simulated = true;
             body.isKinematic = false;
             body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
-            Object.AssignInputAuthority(owner.Object.InputAuthority);
+            //Object.AssignInputAuthority(owner.Object.InputAuthority);
         }
 
         public override void Spawned() {
@@ -152,18 +151,18 @@ namespace NSMB.Entities {
             for (int i = 0; i < count; i++) {
                 GameObject collidedObject = CollisionBuffer[i].gameObject;
 
-                //don't interact with ourselves.
+                // Don't interact with ourselves.
                 if (CollisionBuffer[i].attachedRigidbody == body)
                     continue;
 
                 if (collidedObject.GetComponentInParent<IFireballInteractable>() is IFireballInteractable interactable) {
-                    //don't interact with our owner
+                    // Don't interact with our owner
                     if (interactable is PlayerController player && player == Owner)
                         continue;
 
                     bool result = IsIceball ? interactable.InteractWithIceball(this) : interactable.InteractWithFireball(this);
                     if (result) {
-                        //true = interacted & destroy.
+                        // True = interacted & destroy.
                         DespawnEntity();
                         return false;
                     }

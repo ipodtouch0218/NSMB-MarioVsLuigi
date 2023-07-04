@@ -46,7 +46,7 @@ public class DebugControls : MonoBehaviour {
         DebugEntity(Key.F6, PrefabList.Instance.Enemy_BulletBill);
         DebugEntity(Key.F7, PrefabList.Instance.Enemy_Spiny);
         DebugEntity(Key.F8, PrefabList.Instance.Obj_BigStar, (runner, obj) => {
-            obj.GetComponent<StarBouncer>().OnBeforeSpawned(2, false, false);
+            obj.GetComponent<BigStar>().OnBeforeSpawned(2, false, false);
         });
 
         FreezePlayer(Key.F9);
