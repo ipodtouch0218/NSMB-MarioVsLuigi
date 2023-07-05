@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 using NSMB.Extensions;
-using NSMB.Utils;
 
 public class TeamChooser : MonoBehaviour {
 
@@ -12,7 +11,7 @@ public class TeamChooser : MonoBehaviour {
     [SerializeField] private GameObject blockerTemplate, content, disabledIcon, normalIcon;
     [SerializeField] private TeamButton[] buttons;
     [SerializeField] private Button button;
-    [SerializeField] private Image flagColor;
+    [SerializeField] private Image flag;
 
     //---Private Variables
     private GameObject blockerInstance;
@@ -24,7 +23,8 @@ public class TeamChooser : MonoBehaviour {
 
         if (value) {
             int selected = NetworkHandler.Runner.GetLocalPlayerData().Team % 5;
-            flagColor.color = Utils.GetTeamColor(selected);
+            Team teamScriptable = ScriptableManager.Instance.teams[selected];
+            flag.sprite = Settings.Instance.graphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
         } else {
             Close(true);
         }
@@ -36,7 +36,8 @@ public class TeamChooser : MonoBehaviour {
         PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
         data.Rpc_SetTeamNumber((sbyte) selected);
         Close(false);
-        flagColor.color = Utils.GetTeamColor(selected);
+        Team teamScriptable = ScriptableManager.Instance.teams[selected];
+        flag.sprite = Settings.Instance.graphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
 
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);

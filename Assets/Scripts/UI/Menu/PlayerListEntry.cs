@@ -56,12 +56,12 @@ public class PlayerListEntry : MonoBehaviour {
         if (data.Wins == 0) {
             winsText.text = "";
         } else {
-            winsText.text = "<sprite=55>" + data.Wins;
+            winsText.text = "<sprite name=room_wins>" + data.Wins;
         }
 
         string permissionSymbol = "";
         if (data.IsRoomOwner) {
-            permissionSymbol += "<sprite=5>";
+            permissionSymbol += "<sprite name=room_host>";
             pingText.text = "";
         } else {
             int ping = data.Ping;

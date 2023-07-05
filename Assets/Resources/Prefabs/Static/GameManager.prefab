@@ -743,7 +743,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f26481b5f0a012a42aa5bfb9cfaa9939, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  teleportedThisFrame: 0
 --- !u!1 &822117453544283978
 GameObject:
   m_ObjectHideFlags: 0
@@ -848,7 +847,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <mark=#000000b0 padding="16,16,10,10"><font="MarioFont"><sprite=60>Hosting
+  m_text: <mark=#000000b0 padding="16,16,10,10"><font="MarioFont"><sprite name=connection_host>Hosting
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -984,7 +983,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite=6><sprite=21><sprite=11><sprite=11><sprite=25><sprite=11><sprite=14>
+  m_text: <sprite name=room_timer><sprite name=hudnumber_x><sprite name=hudnumber_9><sprite
+    name=hudnumber_9><sprite name=hudnumber_colon><sprite name=hudnumber_0><sprite
+    name=hudnumber_0>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1065,7 +1066,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4da19227e0454d94a8d2d35c7ef75c74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slopeAmount: -3.5
+  slopeAmount: -3
   firstChar: 4
   secondChar: 2
 --- !u!1 &1038786741219637242
@@ -2464,6 +2465,82 @@ MonoBehaviour:
   fadeTime: 0
   blackTime: 0
   totalTime: 0
+--- !u!1 &2828354059837009825
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3838535455915601843}
+  - component: {fileID: 1222659326829535828}
+  - component: {fileID: 3951679436892590790}
+  m_Layer: 5
+  m_Name: Team
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3838535455915601843
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2828354059837009825}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595409777389826989}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 15}
+  m_SizeDelta: {x: 13, y: 13}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!222 &1222659326829535828
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2828354059837009825}
+  m_CullTransparentMesh: 1
+--- !u!114 &3951679436892590790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2828354059837009825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 240843622, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &2934122842234400586
 GameObject:
   m_ObjectHideFlags: 0
@@ -2607,7 +2684,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite=23><sprite=21><sprite=11><sprite=11>
+  m_text: <sprite name=hudnumber_star><sprite name=hudnumber_x><sprite name=hudnumber_9><sprite
+    name=hudnumber_9>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3539,7 +3617,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 76.65
+  m_fontSize: 76.7
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3632,15 +3710,16 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3838535455915601843}
   m_Father: {fileID: 4754722929323754623}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -269, y: -17.5}
+  m_AnchoredPosition: {x: -269, y: -17}
   m_SizeDelta: {x: 16, y: 16}
-  m_Pivot: {x: 0.5, y: -0.33}
+  m_Pivot: {x: 0.5, y: -0.1}
 --- !u!222 &5444111194937001549
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3695,6 +3774,7 @@ MonoBehaviour:
   target: {fileID: 0}
   trackMinX: -269
   trackMaxX: 269
+  teamIcon: {fileID: 3951679436892590790}
 --- !u!1 &4188071052532932574
 GameObject:
   m_ObjectHideFlags: 0
@@ -4909,6 +4989,7 @@ MonoBehaviour:
   objectPoolParent: {fileID: 7998357169434227364}
   winText: {fileID: 3474641543873908501}
   winTextAnimator: {fileID: 8395432290395498094}
+  fadeManager: {fileID: 8303334505018391514}
   starSpawns: []
   tileManager: {fileID: 0}
   particleManager: {fileID: 59179525922714105}
@@ -4923,6 +5004,7 @@ MonoBehaviour:
   musicManager: {fileID: 1965679957714577119}
   music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
+  DebugSpawns: 10
 --- !u!114 &1965679957714577119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5225,7 +5307,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite=52><sprite=21><sprite=11><sprite=11><sprite=24><sprite=12><sprite=11>
+  m_text: <sprite name=team_red><sprite name=hudnumber_x><sprite name=hudnumber_0><sprite
+    name=hudnumber_0><sprite name=hudnumber_slash><sprite name=hudnumber_1><sprite
+    name=hudnumber_0>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5475,7 +5559,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -14}
+  m_AnchoredPosition: {x: 0, y: -18}
   m_SizeDelta: {x: 223, y: 8}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &9002417279611933599
@@ -5750,7 +5834,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite=22><sprite=21><sprite=11><sprite=24><sprite=19>
+  m_text: <sprite name=hudnumber_coin><sprite name=hudnumber_x><sprite name=hudnumber_0><sprite
+    name=hudnumber_slash><sprite name=hudnumber_9><sprite name=hudnumber_9>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5831,7 +5916,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4da19227e0454d94a8d2d35c7ef75c74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slopeAmount: -3.5
+  slopeAmount: -3
   firstChar: 3
   secondChar: 2
 --- !u!1 &6799126528562166899
@@ -5906,7 +5991,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -7}
+  m_AnchoredPosition: {x: 0, y: -11}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &7415339347767386034
@@ -6379,7 +6464,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite=3><sprite=21><sprite=12><sprite=12><sprite=12><sprite=12>
+  m_text: <sprite name=hud_mario><sprite name=hudnumber_x><sprite name=hudnumber_9><sprite
+    name=hudnumber_9>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6664,9 +6750,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite=50><sprite=21><sprite=20><sprite=20> <sprite=51><sprite=21><sprite=20><sprite=20>
-    <sprite=52><sprite=21><sprite=20><sprite=20> <sprite=53><sprite=21><sprite=20><sprite=20>
-    <sprite=54><sprite=21><sprite=20><sprite=20>
+  m_text: <sprite name=team_red><sprite name=hudnumber_x><sprite name=hudnumber_9><sprite
+    name=hudnumber_9><sprite name=team_blue><sprite name=hudnumber_x><sprite name=hudnumber_9><sprite
+    name=hudnumber_9><sprite name=team_green><sprite name=hudnumber_x><sprite name=hudnumber_9><sprite
+    name=hudnumber_9><sprite name=team_yellow><sprite name=hudnumber_x><sprite name=hudnumber_9><sprite
+    name=hudnumber_9><sprite name=team_magenta><sprite name=hudnumber_x><sprite name=hudnumber_9><sprite
+    name=hudnumber_9>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 5ade88ee859873b4882004e755013bf7, type: 2}
@@ -6693,7 +6782,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 13.15
+  m_fontSize: 14.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

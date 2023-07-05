@@ -35,7 +35,7 @@ namespace NSMB.Entities.Collectable {
             CollectableTick = (int) (Runner.Tick + (0.2f / Runner.DeltaTime));
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
-            body.velocity = Vector2.up * GameData.Instance.Random.RangeInclusive(5.5f, 6f);
+            body.velocity = Vector2.up * GameData.Instance.random.RangeInclusive(5.5f, 6f);
         }
 
         public override void Render() {

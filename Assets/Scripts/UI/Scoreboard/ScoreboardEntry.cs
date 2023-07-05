@@ -33,7 +33,7 @@ public class ScoreboardEntry : MonoBehaviour {
         data = target.Object.InputAuthority.GetPlayerData(target.Runner);
 
         playerId = target.PlayerId;
-        nameText.text = (data.IsRoomOwner ? "<sprite=60>" : "<sprite=56>") + data.GetNickname();
+        nameText.text = (data.IsRoomOwner ? "<sprite name=connection_host>" : "<sprite name=connection_great>") + data.GetNickname();
 
         Color c = target.animationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);
@@ -54,7 +54,7 @@ public class ScoreboardEntry : MonoBehaviour {
 
         if (!data || !data.Object || !data.Object.IsValid) {
             disconnected = true;
-            nameText.text = Regex.Replace(nameText.text, "<sprite=\\d*>", "<sprite=61>");
+            nameText.text = Regex.Replace(nameText.text, "<sprite name=.*>", "<sprite name=connection_disconnected>");
 
         } else if (!data.IsRoomOwner && currentPing != data.Ping) {
             currentPing = data.Ping;

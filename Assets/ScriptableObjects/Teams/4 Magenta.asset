@@ -14,5 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 4
   displayName: Magenta Team
-  textSprite: <sprite=54>
+  textSpriteNormal: <sprite name=team_magenta>
+  textSpriteColorblind: <sprite name=team_magenta_alt>
   color: {r: 1, g: 0, b: 1, a: 0}
+  spriteNormal: {fileID: -98979085, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}
+  spriteColorblind: {fileID: -1408554566, guid: 94f77c37e4043774192b995a80f2ceec,
+    type: 3}

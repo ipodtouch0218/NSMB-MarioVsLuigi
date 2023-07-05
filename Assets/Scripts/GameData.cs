@@ -15,7 +15,7 @@ using NSMB.Translation;
 using NSMB.Utils;
 
 namespace NSMB.Game {
-    public class GameData : NetworkBehaviour {
+    public class GameData : NetworkBehaviour, IBeforeTick {
 
         //---Static Variables
         private static readonly Vector3 OneFourth = new(0.25f, 0.25f, 0f);
@@ -49,7 +49,7 @@ namespace NSMB.Game {
         [Networked] private byte PredictionCounter { get; set; }
 
         //---Public Variables
-        public NetworkRNG Random;
+        public NetworkRNG random;
         public float gameEndTime;
 
         //---Private Variables
@@ -119,10 +119,12 @@ namespace NSMB.Game {
             networkObjects.Clear();
         }
 
-        public override void FixedUpdateNetwork() {
-            // Seed RNG for this tick
-            Random = new(Runner.Simulation.Tick);
+        public void BeforeTick() {
+            // Seed RNG
+            random = new(Runner.Simulation.Tick);
+        }
 
+        public override void FixedUpdateNetwork() {
             if (GameEnded)
                 return;
 
@@ -532,7 +534,7 @@ namespace NSMB.Game {
                     validSpawns = starSpawns.Length;
                 }
 
-                int nthSpawn = Random.RangeExclusive(0, validSpawns);
+                int nthSpawn = random.RangeExclusive(0, validSpawns);
                 AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int im);
                 if (AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int index)) {
 

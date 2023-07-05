@@ -67,6 +67,9 @@ public class UIUpdater : MonoBehaviour {
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
 
+        if (SessionData.Instance)
+            teams = SessionData.Instance.Teams;
+
         ApplyUIColor();
     }
 
@@ -114,9 +117,10 @@ public class UIUpdater : MonoBehaviour {
             return;
 
         if (teams) {
-            int team = player.data.Team;
-            teamStars = teamManager.GetTeamStars(team);
-            uiTeamStars.text = ScriptableManager.Instance.teams[team].textSprite + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
+            int teamIndex = player.data.Team;
+            teamStars = teamManager?.GetTeamStars(teamIndex) ?? 0;
+            Team team = ScriptableManager.Instance.teams[teamIndex];
+            uiTeamStars.text = (Settings.Instance.graphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
             ApplyUIColor();
         }
         if (player.Stars != stars) {
@@ -154,7 +158,7 @@ public class UIUpdater : MonoBehaviour {
 
                     if (seconds != timer) {
                         timer = seconds;
-                        uiCountdown.text = Utils.GetSymbolString("cx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
+                        uiCountdown.text = Utils.GetSymbolString("Tx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
                         timerParent.SetActive(true);
                     }
 
@@ -164,7 +168,7 @@ public class UIUpdater : MonoBehaviour {
                         timerMaterial.SetColor("_Color", new Color32(255, 0, 0, 255));
                     }
                 } else {
-                    uiCountdown.text = Utils.GetSymbolString("cx" + SessionData.Instance.Timer + ":00");
+                    uiCountdown.text = Utils.GetSymbolString("Tx" + SessionData.Instance.Timer + ":00");
                 }
             }
         } else {
@@ -207,7 +211,7 @@ public class UIUpdater : MonoBehaviour {
             return;
 
         if (Runner.IsServer) {
-            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\"> <sprite=60>" + GlobalController.Instance.translationManager.GetTranslation("ui.game.ping.hosting");
+            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\"> <sprite name=connection_host>" + GlobalController.Instance.translationManager.GetTranslation("ui.game.ping.hosting");
         } else {
             int ping = GetCurrentPing();
             uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;

@@ -15,7 +15,7 @@ MonoBehaviour:
   prefab:
     RawGuidValue: 7624e7a260085f5409f044e3d21ae8d5
   soundFolder: mario
-  uistring: <sprite=3>
+  uistring: <sprite name=hud_mario>
   translationString: character.mario
   loadingSmallSprite: {fileID: 1040450253486601905, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}

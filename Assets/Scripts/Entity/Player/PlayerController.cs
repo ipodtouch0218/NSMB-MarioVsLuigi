@@ -342,7 +342,7 @@ namespace NSMB.Entities.Player {
                 Lives = SessionData.Instance.Lives;
 
                 transform.position = body.position = GameManager.Instance.spawnpoint;
-                Vector3 spawn = GameData.Instance.GetSpawnpoint(0, 1);
+                Vector3 spawn = GameData.Instance.GetSpawnpoint(SpawnpointIndex);
                 networkRigidbody.TeleportToPosition(spawn);
                 cameraController.Recenter(spawn);
             }
@@ -1101,10 +1101,10 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            sbyte newStatePriority = newReserve ? newReserve.statePriority : (sbyte) -1;
-            sbyte currentStatePriority = currentReserve ? currentReserve.statePriority : (sbyte) -1;
+            sbyte newItemPriority = newReserve ? newReserve.itemPriority : (sbyte) -1;
+            sbyte currentItemPriority = currentReserve ? currentReserve.itemPriority : (sbyte) -1;
 
-            if (newStatePriority < currentStatePriority) {
+            if (newItemPriority < currentItemPriority) {
                 // New item is less important than our current reserve item, so we don't want to replace it
                 return;
             }
@@ -1306,6 +1306,8 @@ namespace NSMB.Entities.Player {
             body.isKinematic = false;
             body.velocity = Vector2.zero;
             body.gravityScale = 0;
+
+            DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
 
             if (Object.HasInputAuthority)
                 ScoreboardUpdater.Instance.OnRespawnToggle();
@@ -1526,7 +1528,7 @@ namespace NSMB.Entities.Player {
         private void ResetKnockback() {
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1f);
             KnockbackTimer = TickTimer.None;
-            DoEntityBounce = false;
+            //DoEntityBounce = false;
             IsInKnockback = false;
             body.velocity = new(0, body.velocity.y);
             FacingRight = KnockbackWasOriginallyFacingRight;
@@ -2974,7 +2976,7 @@ namespace NSMB.Entities.Player {
             offset.x *= changed.Behaviour.WallSlideLeft ? -1 : 1;
 
             player.PlaySound(Enums.Sounds.Player_Sound_WallJump);
-            player.PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameData.Instance.Random.RangeExclusive(1, 3));
+            player.PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
             player.SpawnParticle(PrefabList.Instance.Particle_Walljump, player.body.position + offset, player.WallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
 
             player.animator.SetTrigger("walljump");
@@ -3108,7 +3110,7 @@ namespace NSMB.Entities.Player {
             // Voice SFX
             switch (player.JumpState) {
             case PlayerJumpState.DoubleJump:
-                player.PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameData.Instance.Random.RangeExclusive(1, 3));
+                player.PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
                 break;
             case PlayerJumpState.TripleJump:
                 player.PlaySound(Enums.Sounds.Player_Voice_TripleJump);

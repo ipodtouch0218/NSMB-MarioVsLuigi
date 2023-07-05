@@ -11,6 +11,7 @@ public class Settings : Singleton<Settings> {
 
     //---Static Variables
     private Action[] VersionUpdaters;
+    public static event Action OnColorblindModeChanged;
 
     //---Properties
 
@@ -111,6 +112,18 @@ public class Settings : Singleton<Settings> {
         }
     }
 
+    private bool _graphicsColorblind;
+    public bool GraphicsColorblind {
+        get => _graphicsColorblind;
+        set {
+            bool oldValue = _graphicsColorblind;
+            _graphicsColorblind = value;
+
+            if (oldValue != value)
+                OnColorblindModeChanged?.Invoke();
+        }
+    }
+
     public string ControlsBindings {
         get => ControlSystem.controls.asset.SaveBindingOverridesAsJson();
         set => ControlSystem.controls.asset.LoadBindingOverridesFromJson(value);
@@ -123,7 +136,7 @@ public class Settings : Singleton<Settings> {
     public int genericCharacter, genericSkin;
     public bool genericScoreboardAlways, genericChatFiltering;
 
-    public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNametags;
+    public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNametags, ;
 
     public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning;
 
@@ -140,7 +153,7 @@ public class Settings : Singleton<Settings> {
         LoadSettings();
 
         // Potential duplicate bindings not activating fix?
-        //InputSystem.settings.SetInternalFeatureFlag("DISABLE_SHORTCUT_SUPPORT", true);
+        InputSystem.settings.SetInternalFeatureFlag("DISABLE_SHORTCUT_SUPPORT", true);
     }
 
     public void SaveSettings() {
@@ -161,6 +174,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Graphics_MaxFPS", GraphicsMaxFps);
         PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_Nametags", GraphicsPlayerNametags ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_Colorblind", graphicsColorblind ? 1 : 0);
 
         // Audio
         PlayerPrefs.SetFloat("Audio_MasterVolume", AudioMasterVolume);
@@ -225,6 +239,7 @@ public class Settings : Singleton<Settings> {
         GraphicsMaxFps = 0;
         GraphicsPlayerOutlines = true;
         GraphicsPlayerNametags = true;
+        graphicsColorblind = false;
 
         AudioMasterVolume = PlayerPrefs.GetFloat("volumeMaster", 0.75f);
         AudioMusicVolume = PlayerPrefs.GetFloat("volumeMusic", 0.5f);
@@ -265,6 +280,7 @@ public class Settings : Singleton<Settings> {
         if (GetIfExists("Graphics_VSync", out bool tempVsync)) GraphicsVsync = tempVsync;
         if (GetIfExists("Graphics_PlayerOutlines", out bool tempOutlines)) GraphicsPlayerOutlines = tempOutlines;
         if (GetIfExists("Graphics_PlayerNametags", out bool tempNametags)) GraphicsPlayerNametags = tempNametags;
+        GetIfExists("Graphics_Colorblind", out graphicsColorblind);
 
         //Audio
         if (GetIfExists("Audio_MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;

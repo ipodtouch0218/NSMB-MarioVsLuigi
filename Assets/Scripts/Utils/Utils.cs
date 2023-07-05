@@ -492,7 +492,7 @@ namespace NSMB.Utils {
                 totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
             }
 
-            float rand = GameData.Instance.Random.NextSingleExclusive() * totalChance;
+            float rand = GameData.Instance.random.NextSingleExclusive() * totalChance;
             foreach (PowerupScriptable powerup in powerups) {
                 if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega)
                     continue;
@@ -513,55 +513,55 @@ namespace NSMB.Utils {
             return -1 * v * (v - 2);
         }
 
-        private static readonly Dictionary<char, byte> uiSymbols = new() {
-            ['c'] = 6,
-            ['0'] = 11,
-            ['1'] = 12,
-            ['2'] = 13,
-            ['3'] = 14,
-            ['4'] = 15,
-            ['5'] = 16,
-            ['6'] = 17,
-            ['7'] = 18,
-            ['8'] = 19,
-            ['9'] = 20,
-            ['x'] = 21,
-            ['C'] = 22,
-            ['S'] = 23,
-            ['/'] = 24,
-            [':'] = 25,
+        private static readonly Dictionary<char, string> uiSymbols = new() {
+            ['0'] = "hudnumber_0",
+            ['1'] = "hudnumber_1",
+            ['2'] = "hudnumber_2",
+            ['3'] = "hudnumber_3",
+            ['4'] = "hudnumber_4",
+            ['5'] = "hudnumber_5",
+            ['6'] = "hudnumber_6",
+            ['7'] = "hudnumber_7",
+            ['8'] = "hudnumber_8",
+            ['9'] = "hudnumber_9",
+            ['x'] = "hudnumber_x",
+            ['C'] = "hudnumber_coin",
+            ['S'] = "hudnumber_star",
+            ['T'] = "room_timer",
+            ['/'] = "hudnumber_slash",
+            [':'] = "hudnumber_colon",
         };
-        public static readonly Dictionary<char, byte> numberSymbols = new() {
-            ['0'] = 27,
-            ['1'] = 28,
-            ['2'] = 29,
-            ['3'] = 30,
-            ['4'] = 31,
-            ['5'] = 32,
-            ['6'] = 33,
-            ['7'] = 34,
-            ['8'] = 35,
-            ['9'] = 36,
+        public static readonly Dictionary<char, string> numberSymbols = new() {
+            ['0'] = "coinnumber_0",
+            ['1'] = "coinnumber_1",
+            ['2'] = "coinnumber_2",
+            ['3'] = "coinnumber_3",
+            ['4'] = "coinnumber_4",
+            ['5'] = "coinnumber_5",
+            ['6'] = "coinnumber_6",
+            ['7'] = "coinnumber_7",
+            ['8'] = "coinnumber_8",
+            ['9'] = "coinnumber_9",
         };
-        public static readonly Dictionary<char, byte> smallSymbols = new() {
-            ['0'] = 48,
-            ['1'] = 39,
-            ['2'] = 40,
-            ['3'] = 41,
-            ['4'] = 42,
-            ['5'] = 43,
-            ['6'] = 44,
-            ['7'] = 45,
-            ['8'] = 46,
-            ['9'] = 47,
+        public static readonly Dictionary<char, string> smallSymbols = new() {
+            ['0'] = "room_smallnumber_0",
+            ['1'] = "room_smallnumber_1",
+            ['2'] = "room_smallnumber_2",
+            ['3'] = "room_smallnumber_3",
+            ['4'] = "room_smallnumber_4",
+            ['5'] = "room_smallnumber_5",
+            ['6'] = "room_smallnumber_6",
+            ['7'] = "room_smallnumber_7",
+            ['8'] = "room_smallnumber_8",
+            ['9'] = "room_smallnumber_9",
         };
-        public static string GetSymbolString(string str, Dictionary<char, byte> dict = null) {
+        public static string GetSymbolString(string str, Dictionary<char, string> dict = null) {
             dict ??= uiSymbols;
 
             StringBuilder ret = new();
             foreach (char c in str) {
-                if (dict.TryGetValue(c, out byte index)) {
-                    ret.Append("<sprite=").Append(index).Append(">");
+                if (dict.TryGetValue(c, out string name)) {
+                    ret.Append("<sprite name=").Append(name).Append(">");
                 } else {
                     ret.Append(c);
                 }
@@ -617,15 +617,15 @@ namespace NSMB.Utils {
         public static string GetPingSymbol(int ping) {
             string pingSymbol;
             if (ping <= 0) {
-                pingSymbol = "<sprite=60>";
+                pingSymbol = "<sprite name=connection_host>";
             } else if (ping < 60) {
-                pingSymbol = "<sprite=56>";
+                pingSymbol = "<sprite name=connection_great>";
             } else if (ping < 110) {
-                pingSymbol = "<sprite=57>";
+                pingSymbol = "<sprite name=connection_good>";
             } else if (ping < 150) {
-                pingSymbol = "<sprite=58>";
+                pingSymbol = "<sprite name=connection_fine>";
             } else {
-                pingSymbol = "<sprite=59>";
+                pingSymbol = "<sprite name=connection_bad>";
             }
             return pingSymbol;
         }

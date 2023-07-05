@@ -193,6 +193,10 @@ namespace NSMB.Entities {
             if (Holder == player)
                 return;
 
+            // Don't interact with other frozen players
+            if (player.IsFrozen)
+                return;
+
             // Temporary invincibility
             if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
                 return;
@@ -204,33 +208,33 @@ namespace NSMB.Entities {
                 && playerPos.x - (player.MainHitbox.size.x * 0.5f) < (ourPos.x + hitbox.size.x * 0.5f)
                 && playerPos.x + (player.MainHitbox.size.x * 0.5f) > (ourPos.x - hitbox.size.x * 0.5f);
 
-            //if (PreviousHolder == player)
-            //    return;
-
-            if (!Holder && (player.IsStarmanInvincible || player.State == Enums.PowerupState.MegaMushroom || player.IsInShell)) {
+            // Player should instakill
+            if (!Holder && player.InstakillsEnemies) {
                 Kill();
                 return;
             }
-            if (player.IsFrozen)
-                return;
 
             if ((player.IsGroundpounding || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
+                // Groundpounded by player
                 player.body.velocity = new(0, 38.671875f * Runner.DeltaTime);
                 player.GroundpoundAnimCounter++;
                 KillWithReason(UnfreezeReason.Groundpounded);
                 return;
 
             } else if (attackedFromBelow && player.State != Enums.PowerupState.MiniMushroom) {
+                // Bumped from below
                 KillWithReason(UnfreezeReason.BlockBump);
                 return;
 
+            } else if (FastSlide) {
+                // Do damage
+                player.DoKnockback(ourPos.x > playerPos.x, 1, false, Object);
+                Kill();
+                return;
+
             } else if (!Fallen) {
-                if (FastSlide) {
-                    player.DoKnockback(body.position.x > player.body.position.x, 1, false, Object);
-                    Kill();
-                    return;
-                }
                 if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround && !player.IsSwimming) {
+                    // Pickup
                     Fallen = true;
                     Pickup(player);
                 }

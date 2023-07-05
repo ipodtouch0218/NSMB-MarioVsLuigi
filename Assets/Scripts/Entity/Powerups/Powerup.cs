@@ -227,6 +227,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             Vector2 size = hitbox.size * transform.lossyScale * 0.7f;
             Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
 
+            // TODO: bug here somewhere. Client powerups jitter
             if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
                 gameObject.layer = Layers.LayerHitsNothing;
                 return;

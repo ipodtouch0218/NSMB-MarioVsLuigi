@@ -6,13 +6,23 @@ using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 
-//[SimulationBehaviour(Stages = SimulationStages.Forward)]
 public class CameraController : NetworkBehaviour {
 
     //---Static Variables
     private static readonly Vector2 AirOffset = new(0, .65f);
     private static readonly Vector2 AirThreshold = new(0.6f, 1.3f), GroundedThreshold = new(0.6f, 0f);
-    public static float ScreenShake = 0;
+    private static CameraController CurrentController;
+
+    private static float _screenShake;
+    public static float ScreenShake {
+        get => _screenShake;
+        set {
+            if (CurrentController && !CurrentController.controller.IsOnGround)
+                return;
+
+            _screenShake = value;
+        }
+    }
 
     //---Networked Variables
     [Networked] public Vector3 CurrentPosition { get; set; }
@@ -20,16 +30,16 @@ public class CameraController : NetworkBehaviour {
     [Networked] private Vector3 PlayerPos { get; set; }
     [Networked] private float LastFloorHeight { get; set; }
 
-    //---Public Variables
-    //public Vector3 currentPosition;
-
+    //---Properties
     private bool _isControllingCamera;
     public bool IsControllingCamera {
         get => _isControllingCamera;
         set {
             _isControllingCamera = value;
-            if (value)
+            if (value) {
                 UIUpdater.Instance.player = controller;
+                CurrentController = this;
+            }
         }
     }
 
@@ -39,6 +49,7 @@ public class CameraController : NetworkBehaviour {
     //---Private Variables
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
     private Camera targetCamera;
+    private Interpolator<Vector3> positionInterpolator;
 
     public void OnValidate() {
         if (!controller) controller = GetComponentInParent<PlayerController>();
@@ -49,21 +60,31 @@ public class CameraController : NetworkBehaviour {
         targetCamera.GetComponentsInChildren(secondaryPositioners);
     }
 
-    public override void FixedUpdateNetwork() {
-        CurrentPosition = CalculateNewPosition(false);
+    public override void Spawned() {
+        positionInterpolator = GetInterpolator<Vector3>(nameof(CurrentPosition));
     }
 
     public void LateUpdate() {
         if (!IsControllingCamera)
             return;
 
-        Vector3 position = CalculateNewPosition(true);
+        Vector3 position;
+        if (GetInterpolationData(out InterpolationData data)) {
+            // Get extrapolated position.
+            position = CalculateNewPosition(data.Alpha);
+        } else {
+            position = positionInterpolator.Value;
+        }
 
         Vector3 shakeOffset = Vector3.zero;
-        if ((ScreenShake -= Time.deltaTime) > 0 && controller.IsOnGround)
-            shakeOffset = new Vector3((Random.value - 0.5f) * ScreenShake, (Random.value - 0.5f) * ScreenShake);
+        if ((_screenShake -= Time.deltaTime) > 0)
+            shakeOffset = new Vector3((Random.value - 0.5f) * _screenShake, (Random.value - 0.5f) * _screenShake);
 
         SetPosition(position + shakeOffset);
+    }
+
+    public override void FixedUpdateNetwork() {
+        CurrentPosition = CalculateNewPosition();
     }
 
     public void Recenter(Vector2 pos) {
@@ -84,7 +105,7 @@ public class CameraController : NetworkBehaviour {
         secondaryPositioners.ForEach(scp => scp.UpdatePosition());
     }
 
-    private Vector3 CalculateNewPosition(bool render) {
+    private Vector3 CalculateNewPosition(float delta = 1) {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
@@ -115,12 +136,10 @@ public class CameraController : NetworkBehaviour {
         float xDifference = Vector2.Distance(Vector2.right * newCameraPosition.x, Vector2.right * PlayerPos.x);
         bool right = newCameraPosition.x > PlayerPos.x;
 
-        if (xDifference >= 8) {
+        if (xDifference >= 2) {
             newCameraPosition.x += (right ? -1 : 1) * GameManager.Instance.LevelWidth;
             xDifference = Vector2.Distance(Vector2.right * newCameraPosition.x, Vector2.right * PlayerPos.x);
             right = newCameraPosition.x > PlayerPos.x;
-            if (IsControllingCamera)
-                BackgroundLoop.Instance.teleportedThisFrame = true;
         }
 
         if (xDifference > 0.25f)
@@ -138,7 +157,7 @@ public class CameraController : NetworkBehaviour {
 
         // Smoothing
         Vector3 smoothDamp = SmoothDampVel;
-        targetPosition = Vector3.SmoothDamp(newCameraPosition, targetPosition, ref smoothDamp, 0.5f, float.MaxValue, render ? Time.deltaTime : Runner.DeltaTime);
+        targetPosition = Vector3.SmoothDamp(newCameraPosition, targetPosition, ref smoothDamp, 0.5f, float.MaxValue, Runner.DeltaTime * delta);
         SmoothDampVel = smoothDamp;
 
         // Clamping to within level bounds

@@ -43,7 +43,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     [Header("UI Elements")]
     [SerializeField] private GameObject title;
-    [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox, connecting;
+    [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox, connecting;
     [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
     [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
     [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
@@ -248,6 +248,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         mainMenu.SetActive(false);
         lobbyMenu.SetActive(false);
         createLobbyPrompt.SetActive(false);
+        webglCreateLobbyPrompt.SetActive(false);
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
         privateRoomIdPrompt.SetActive(false);
@@ -280,6 +281,18 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         EventSystem.current.SetSelectedGameObject(lobbySelected);
     }
+
+    public void TryOpenCreateRoomPrompt() {
+#if PLATFORM_WEBGL
+        DisableAllMenus();
+        bg.SetActive(true);
+        lobbyMenu.SetActive(true);
+        webglCreateLobbyPrompt.SetActive(true);
+#else
+        OpenCreateRoomPrompt();
+#endif
+    }
+
     public void OpenCreateRoomPrompt() {
         DisableAllMenus();
         bg.SetActive(true);

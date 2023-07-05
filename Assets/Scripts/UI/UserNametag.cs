@@ -73,7 +73,10 @@ public class UserNametag : MonoBehaviour {
 
         cachedNickname ??= data.GetNickname();
 
-        text.text = (data.IsRoomOwner ? "<sprite=5>" : "") + cachedNickname + "\n";
+        Team team = ScriptableManager.Instance.teams[data.Team];
+        text.text = (data.IsRoomOwner ? "<sprite name=room_host>" : "")
+            + (SessionData.Instance.Teams ? (Settings.Instance.graphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) : "")
+            + cachedNickname + "\n";
 
         if (parent.Lives >= 0)
             text.text += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");

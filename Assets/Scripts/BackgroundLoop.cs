@@ -11,9 +11,6 @@ public class BackgroundLoop : MonoBehaviour {
     public static BackgroundLoop Instance { get; private set; }
     private static readonly Vector2 ScreenBounds = new(7.5f, 5f);
 
-    //---Public Variables
-    public bool teleportedThisFrame;
-
     //---Misc Variables
     private GameObject[] children;
     private Vector3[] truePositions;
@@ -49,14 +46,16 @@ public class BackgroundLoop : MonoBehaviour {
     }
 
     public void Reposition() {
+        Utils.WrappedDistance(transform.position, lastPosition, out float xDifference);
+        float absoluteDifference = transform.position.x - lastPosition.x;
+
         for (int i = 0; i < children.Length; i++) {
             GameObject obj = children[i];
             float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(-10f / obj.transform.position.z));
 
-            Utils.WrappedDistance(transform.position, lastPosition, out float xDifference);
             float difference = xDifference + (obj.transform.position.x - truePositions[i].x);
 
-            if (teleportedThisFrame) {
+            if (Mathf.Abs(absoluteDifference) > 2) {
                 truePositions[i].x += ((transform.position.x > GameManager.Instance.LevelMiddleX) ? 1 : -1) * GameManager.Instance.LevelWidth;
             }
 
@@ -68,7 +67,6 @@ public class BackgroundLoop : MonoBehaviour {
 
             RepositionChildObjects(obj);
         }
-        teleportedThisFrame = false;
         lastPosition = transform.position;
     }
 

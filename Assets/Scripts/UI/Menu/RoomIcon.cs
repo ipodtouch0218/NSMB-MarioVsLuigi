@@ -46,17 +46,17 @@ public class RoomIcon : MonoBehaviour {
         string symbols = "";
 
         if (powerups)
-            symbols += "<sprite=8>";
+            symbols += "<sprite name=room_powerups>";
         if (teams)
-            symbols += "<sprite=49>";
+            symbols += "<sprite name=room_teams>";
         if (timer > 0)
-            symbols += "<sprite=63>" + Utils.GetSymbolString(timer.ToString(), Utils.smallSymbols);
+            symbols += "<sprite name=room_timer>" + Utils.GetSymbolString(timer.ToString(), Utils.smallSymbols);
 
         if (lives > 0)
-            symbols += "<sprite=9>" + Utils.GetSymbolString(lives.ToString(), Utils.smallSymbols);
+            symbols += "<sprite name=room_lives>" + Utils.GetSymbolString(lives.ToString(), Utils.smallSymbols);
 
-        symbols += "<sprite=38>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);
-        symbols += "<sprite=37>" + Utils.GetSymbolString(coins.ToString(), Utils.smallSymbols);
+        symbols += "<sprite name=room_stars>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);
+        symbols += "<sprite name=room_coins>" + Utils.GetSymbolString(coins.ToString(), Utils.smallSymbols);
 
         symbolsText.text = symbols;
     }

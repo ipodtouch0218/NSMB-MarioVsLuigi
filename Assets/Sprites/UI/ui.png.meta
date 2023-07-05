@@ -161,53 +161,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ui_1
-      rect:
-        serializedVersion: 2
-        x: 13
-        y: 56
-        width: 11
-        height: 13
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b86016dcd681a5130800000000000000
-      internalID: 3556181715638617739
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_2
-      rect:
-        serializedVersion: 2
-        x: 26
-        y: 56
-        width: 11
-        height: 13
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: df1f7afbf3a27a580800000000000000
-      internalID: -8816031292267695619
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_3
+      name: hud_mario
       rect:
         serializedVersion: 2
         x: 0
-        y: 36
+        y: 220
         width: 20
         height: 20
       alignment: 0
@@ -224,11 +182,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_4
+      name: hud_luigi
       rect:
         serializedVersion: 2
         x: 20
-        y: 36
+        y: 220
         width: 20
         height: 20
       alignment: 0
@@ -245,13 +203,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: host
+      name: room_host
       rect:
         serializedVersion: 2
         x: 40
-        y: 34
+        y: 220
         width: 21
-        height: 21
+        height: 19
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -266,32 +224,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_0
+      name: room_timer
       rect:
         serializedVersion: 2
-        x: 0
-        y: 56
-        width: 13
-        height: 13
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b5af27452eed7dc46b15db4ac096cf8e
-      internalID: 5707218116961789024
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_5
-      rect:
-        serializedVersion: 2
-        x: 39
-        y: 56
+        x: 1
+        y: 243
         width: 13
         height: 13
       alignment: 0
@@ -308,11 +245,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_6
+      name: room_private
       rect:
         serializedVersion: 2
-        x: 52
-        y: 56
+        x: 15
+        y: 243
         width: 13
         height: 13
       alignment: 0
@@ -329,11 +266,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_7
+      name: room_powerups
       rect:
         serializedVersion: 2
-        x: 65
-        y: 56
+        x: 29
+        y: 243
         width: 13
         height: 13
       alignment: 0
@@ -350,11 +287,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_8
+      name: room_lives
       rect:
         serializedVersion: 2
-        x: 78
-        y: 56
+        x: 43
+        y: 243
         width: 13
         height: 13
       alignment: 0
@@ -371,11 +308,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_9
+      name: hud_star
       rect:
         serializedVersion: 2
         x: 65
-        y: 33
+        y: 219
         width: 23
         height: 23
       alignment: 0
@@ -392,11 +329,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_10
+      name: hudnumber_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -413,11 +350,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_11
+      name: hudnumber_1
       rect:
         serializedVersion: 2
         x: 15
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -434,11 +371,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_12
+      name: hudnumber_2
       rect:
         serializedVersion: 2
         x: 30
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -455,11 +392,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_13
+      name: hudnumber_3
       rect:
         serializedVersion: 2
         x: 45
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -476,11 +413,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_14
+      name: hudnumber_4
       rect:
         serializedVersion: 2
         x: 60
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -497,11 +434,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_15
+      name: hudnumber_5
       rect:
         serializedVersion: 2
         x: 75
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -518,11 +455,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_16
+      name: hudnumber_6
       rect:
         serializedVersion: 2
         x: 90
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -539,11 +476,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_17
+      name: hudnumber_7
       rect:
         serializedVersion: 2
         x: 105
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -560,11 +497,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_18
+      name: hudnumber_8
       rect:
         serializedVersion: 2
         x: 120
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -581,11 +518,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_19
+      name: hudnumber_9
       rect:
         serializedVersion: 2
         x: 135
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -602,11 +539,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_20
+      name: hudnumber_x
       rect:
         serializedVersion: 2
         x: 150
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -623,11 +560,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_21
+      name: hudnumber_coin
       rect:
         serializedVersion: 2
         x: 165
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -644,11 +581,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_22
+      name: hudnumber_star
       rect:
         serializedVersion: 2
         x: 180
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -665,11 +602,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_23
+      name: hudnumber_slash
       rect:
         serializedVersion: 2
         x: 195
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 7
@@ -686,11 +623,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_24
+      name: hudnumber_colon
       rect:
         serializedVersion: 2
         x: 210
-        y: 16
+        y: 202
         width: 15
         height: 16
       alignment: 0
@@ -707,13 +644,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_25
+      name: team_blue_alt
       rect:
         serializedVersion: 2
-        x: 92
-        y: 33
-        width: 24
-        height: 23
+        x: 17
+        y: 135
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -728,11 +665,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_26
+      name: coinnumber_0
       rect:
         serializedVersion: 2
         x: 1
-        y: 0
+        y: 186
         width: 12
         height: 14
       alignment: 0
@@ -749,11 +686,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_27
+      name: coinnumber_1
       rect:
         serializedVersion: 2
         x: 14
-        y: 0
+        y: 186
         width: 8
         height: 14
       alignment: 0
@@ -770,11 +707,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_28
+      name: coinnumber_2
       rect:
         serializedVersion: 2
         x: 23
-        y: 0
+        y: 186
         width: 13
         height: 14
       alignment: 0
@@ -791,11 +728,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_29
+      name: coinnumber_3
       rect:
         serializedVersion: 2
         x: 37
-        y: 0
+        y: 186
         width: 12
         height: 14
       alignment: 0
@@ -812,11 +749,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_30
+      name: coinnumber_4
       rect:
         serializedVersion: 2
         x: 50
-        y: 0
+        y: 186
         width: 14
         height: 14
       alignment: 0
@@ -833,11 +770,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_31
+      name: coinnumber_5
       rect:
         serializedVersion: 2
         x: 65
-        y: 0
+        y: 186
         width: 13
         height: 14
       alignment: 0
@@ -854,11 +791,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_32
+      name: coinnumber_6
       rect:
         serializedVersion: 2
         x: 79
-        y: 0
+        y: 186
         width: 14
         height: 14
       alignment: 0
@@ -875,11 +812,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_33
+      name: coinnumber_7
       rect:
         serializedVersion: 2
         x: 94
-        y: 0
+        y: 186
         width: 14
         height: 14
       alignment: 0
@@ -896,11 +833,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_34
+      name: coinnumber_8
       rect:
         serializedVersion: 2
         x: 109
-        y: 0
+        y: 186
         width: 15
         height: 14
       alignment: 0
@@ -917,11 +854,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_35
+      name: coinnumber_9
       rect:
         serializedVersion: 2
         x: 125
-        y: 0
+        y: 186
         width: 14
         height: 14
       alignment: 0
@@ -938,11 +875,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_36
+      name: room_coins
       rect:
         serializedVersion: 2
-        x: 92
-        y: 56
+        x: 57
+        y: 243
         width: 12
         height: 13
       alignment: 0
@@ -959,11 +896,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_37
+      name: room_stars
       rect:
         serializedVersion: 2
-        x: 104
-        y: 56
+        x: 70
+        y: 243
         width: 13
         height: 13
       alignment: 0
@@ -980,11 +917,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_38
+      name: room_smallnumber_1
       rect:
         serializedVersion: 2
-        x: 120
-        y: 56
+        x: 113
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1001,11 +938,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_39
+      name: room_smallnumber_2
       rect:
         serializedVersion: 2
-        x: 125
-        y: 56
+        x: 119
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1022,11 +959,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_40
+      name: room_smallnumber_3
       rect:
         serializedVersion: 2
-        x: 130
-        y: 56
+        x: 125
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1043,11 +980,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_41
+      name: room_smallnumber_4
       rect:
         serializedVersion: 2
-        x: 135
-        y: 56
+        x: 131
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1064,11 +1001,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_42
+      name: room_smallnumber_5
       rect:
         serializedVersion: 2
-        x: 140
-        y: 56
+        x: 137
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1085,11 +1022,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_43
+      name: room_smallnumber_6
       rect:
         serializedVersion: 2
-        x: 145
-        y: 56
+        x: 143
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1106,11 +1043,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_44
+      name: room_smallnumber_7
       rect:
         serializedVersion: 2
-        x: 150
-        y: 56
+        x: 149
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1127,11 +1064,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_45
+      name: room_smallnumber_8
       rect:
         serializedVersion: 2
         x: 155
-        y: 56
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1148,11 +1085,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_46
+      name: room_smallnumber_9
       rect:
         serializedVersion: 2
-        x: 160
-        y: 56
+        x: 161
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1169,11 +1106,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_47
+      name: room_smallnumber_0
       rect:
         serializedVersion: 2
-        x: 165
-        y: 56
+        x: 167
+        y: 243
         width: 5
         height: 7
       alignment: 0
@@ -1190,11 +1127,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_48
+      name: room_teams
       rect:
         serializedVersion: 2
-        x: 172
-        y: 56
+        x: 84
+        y: 243
         width: 13
         height: 13
       alignment: 0
@@ -1211,11 +1148,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_49
+      name: team_red
       rect:
         serializedVersion: 2
-        x: 150
-        y: 0
+        x: 1
+        y: 169
         width: 15
         height: 16
       alignment: 0
@@ -1232,11 +1169,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_50
+      name: team_green
       rect:
         serializedVersion: 2
-        x: 165
-        y: 0
+        x: 1
+        y: 152
         width: 15
         height: 16
       alignment: 0
@@ -1253,11 +1190,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_51
+      name: team_blue
       rect:
         serializedVersion: 2
-        x: 180
-        y: 0
+        x: 1
+        y: 135
         width: 15
         height: 16
       alignment: 0
@@ -1274,11 +1211,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_52
+      name: team_yellow
       rect:
         serializedVersion: 2
-        x: 195
-        y: 0
+        x: 1
+        y: 118
         width: 15
         height: 16
       alignment: 0
@@ -1295,11 +1232,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_53
+      name: team_magenta
       rect:
         serializedVersion: 2
-        x: 210
-        y: 0
+        x: 1
+        y: 101
         width: 15
         height: 16
       alignment: 0
@@ -1316,11 +1253,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_54
+      name: room_win
       rect:
         serializedVersion: 2
-        x: 188
-        y: 56
+        x: 191
+        y: 220
         width: 11
         height: 11
       alignment: 0
@@ -1337,11 +1274,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_55
+      name: connection_great
       rect:
         serializedVersion: 2
-        x: 117
-        y: 36
+        x: 89
+        y: 220
         width: 16
         height: 16
       alignment: 0
@@ -1358,11 +1295,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_56
+      name: connection_good
       rect:
         serializedVersion: 2
-        x: 134
-        y: 36
+        x: 106
+        y: 220
         width: 16
         height: 16
       alignment: 0
@@ -1379,11 +1316,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_57
+      name: connection_fair
       rect:
         serializedVersion: 2
-        x: 151
-        y: 36
+        x: 123
+        y: 220
         width: 16
         height: 16
       alignment: 0
@@ -1400,11 +1337,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_58
+      name: connection_bad
       rect:
         serializedVersion: 2
-        x: 168
-        y: 36
+        x: 140
+        y: 220
         width: 16
         height: 16
       alignment: 0
@@ -1421,11 +1358,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_59
+      name: connection_host
       rect:
         serializedVersion: 2
-        x: 185
-        y: 36
+        x: 157
+        y: 220
         width: 16
         height: 16
       alignment: 0
@@ -1442,11 +1379,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_60
+      name: connection_disconnected
       rect:
         serializedVersion: 2
-        x: 202
-        y: 36
+        x: 174
+        y: 220
         width: 16
         height: 16
       alignment: 0
@@ -1463,11 +1400,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_61
+      name: room_reconnect
       rect:
         serializedVersion: 2
-        x: 200
-        y: 56
+        x: 98
+        y: 243
         width: 13
         height: 13
       alignment: 0
@@ -1483,6 +1420,90 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: team_red_alt
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 169
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e2437c83e9197646831e76060391aa4
+      internalID: 3556181715638617739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: team_green_alt
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 152
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f856931f2c4e16c429c648a0c4df0a26
+      internalID: -8816031292267695619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: team_yellow_alt
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 118
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9becd0804892a54485d4705ba15b6ee
+      internalID: 712068762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: team_magenta_alt
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 101
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb44b934f1cc1a0429a67197e03bcb7c
+      internalID: 458381231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1494,70 +1515,71 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      host: -9005941153719796207
+      coinnumber_0: -878907871
+      coinnumber_1: -1760457897
+      coinnumber_2: 1081746599
+      coinnumber_3: -1525402044
+      coinnumber_4: -1548187890
+      coinnumber_5: -2138142152
+      coinnumber_6: -695869007
+      coinnumber_7: -1247146109
+      coinnumber_8: 1239800451
+      coinnumber_9: -53618040
+      connection_bad: 116447381
+      connection_disconnected: 762531918
+      connection_fair: 1021722474
+      connection_good: -1507071055
+      connection_great: 1763873500
+      connection_host: -1762235557
+      hud_luigi: -7975249404588759376
+      hud_mario: 7263181891274304025
+      hud_star: 1346584908
+      hudnumber_0: -56961979
+      hudnumber_1: -146918758
+      hudnumber_2: -1355574207
+      hudnumber_3: 1989843761
+      hudnumber_4: 593802006
+      hudnumber_5: -1455545889
+      hudnumber_6: -1617229830
+      hudnumber_7: -1187201629
+      hudnumber_8: -1301614389
+      hudnumber_9: -140438321
+      hudnumber_coin: -1972445275
+      hudnumber_colon: 1420784344
+      hudnumber_slash: -688806156
+      hudnumber_star: 861810113
+      hudnumber_x: -1713447182
+      room_coins: 1534273505
+      room_host: -9005941153719796207
+      room_lives: 1261997413
+      room_powerups: 268930356
+      room_private: -1683070159
+      room_reconnect: 124917301
+      room_smallnumber_0: -733638968
+      room_smallnumber_1: 1109955768
+      room_smallnumber_2: 918184948
+      room_smallnumber_3: 1283854863
+      room_smallnumber_4: 459308681
+      room_smallnumber_5: 1644416621
+      room_smallnumber_6: 635142360
+      room_smallnumber_7: 2001480390
+      room_smallnumber_8: 442522640
+      room_smallnumber_9: -1616819778
+      room_stars: -846454927
+      room_teams: 314515511
+      room_timer: 309482482
+      room_win: 1471587138
+      team_blue: 1551341904
+      team_blue_alt: 286214285
+      team_green: -1628061930
+      team_green_alt: -8816031292267695619
+      team_magenta: -1676610151
+      team_magenta_alt: 458381231
+      team_red: -377791532
+      team_red_alt: 3556181715638617739
+      team_yellow: -769868482
+      team_yellow_alt: 712068762
       ui_0: 5707218116961789024
-      ui_1: 3556181715638617739
-      ui_10: -56961979
-      ui_11: -146918758
-      ui_12: -1355574207
-      ui_13: 1989843761
-      ui_14: 593802006
-      ui_15: -1455545889
-      ui_16: -1617229830
-      ui_17: -1187201629
-      ui_18: -1301614389
-      ui_19: -140438321
-      ui_2: -8816031292267695619
-      ui_20: -1713447182
-      ui_21: -1972445275
-      ui_22: 861810113
-      ui_23: -688806156
-      ui_24: 1420784344
-      ui_25: 286214285
-      ui_26: -878907871
-      ui_27: -1760457897
-      ui_28: 1081746599
-      ui_29: -1525402044
-      ui_3: 7263181891274304025
-      ui_30: -1548187890
-      ui_31: -2138142152
-      ui_32: -695869007
-      ui_33: -1247146109
-      ui_34: 1239800451
-      ui_35: -53618040
-      ui_36: 1534273505
-      ui_37: -846454927
-      ui_38: 1109955768
-      ui_39: 918184948
-      ui_4: -7975249404588759376
-      ui_40: 1283854863
-      ui_41: 459308681
-      ui_42: 1644416621
-      ui_43: 635142360
-      ui_44: 2001480390
-      ui_45: 442522640
-      ui_46: -1616819778
-      ui_47: -733638968
-      ui_48: 314515511
-      ui_49: -377791532
-      ui_5: 309482482
-      ui_50: -1628061930
-      ui_51: 1551341904
-      ui_52: -769868482
-      ui_53: -1676610151
-      ui_54: 1471587138
-      ui_55: 1763873500
-      ui_56: -1507071055
-      ui_57: 1021722474
-      ui_58: 116447381
-      ui_59: -1762235557
-      ui_6: -1683070159
-      ui_60: 762531918
-      ui_61: 124917301
-      ui_62: 712068762
-      ui_7: 268930356
-      ui_8: 1261997413
-      ui_9: 1346584908
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

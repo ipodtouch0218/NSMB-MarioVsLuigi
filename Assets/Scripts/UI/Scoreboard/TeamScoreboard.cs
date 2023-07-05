@@ -51,8 +51,10 @@ public class TeamScoreboard : MonoBehaviour {
 
     private void UpdateText() {
         string newString = "";
-        foreach ((int index, int stars) in teamStars)
-            newString += ScriptableManager.Instance.teams[index].textSprite + Utils.GetSymbolString(stars.ToString()) + " ";
+        foreach ((int index, int stars) in teamStars) {
+            Team team = ScriptableManager.Instance.teams[index];
+            newString += (Settings.Instance.graphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString(stars.ToString()) + " ";
+        }
 
         text.text = newString.Trim();
     }
