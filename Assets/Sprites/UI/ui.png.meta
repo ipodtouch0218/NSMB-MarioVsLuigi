@@ -1504,6 +1504,111 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: team_red_alt_big
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 163
+        width: 20
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c2315c83bf8ed44cb1558b2149a447f
+      internalID: 1468428986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: team_green_alt_big
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 139
+        width: 20
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6f69d081c1f78746b6a1db901fd524c
+      internalID: 68036940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: team_blue_alt_big
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 116
+        width: 20
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55884db0221eed4458c82ce601dc5d25
+      internalID: 1646669882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: team_yellow_alt_big
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 93
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5978f1204cc4d924294fd931c2a49e16
+      internalID: 1936513099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: team_magenta_alt_big
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 67
+        width: 20
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 56ba1f22565c4d84b99ae6ee099b4b5f
+      internalID: 1220030899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1571,15 +1676,19 @@ TextureImporter:
       room_win: 1471587138
       team_blue: 1551341904
       team_blue_alt: 286214285
+      team_blue_alt_big: 1646669882
       team_green: -1628061930
       team_green_alt: -8816031292267695619
+      team_green_alt_big: 68036940
       team_magenta: -1676610151
       team_magenta_alt: 458381231
+      team_magenta_alt_big: 1220030899
       team_red: -377791532
       team_red_alt: 3556181715638617739
+      team_red_alt_big: 5707218116961789024
       team_yellow: -769868482
       team_yellow_alt: 712068762
-      ui_0: 5707218116961789024
+      team_yellow_alt_big: 1936513099
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -16,15 +16,21 @@ public class TeamChooser : MonoBehaviour {
     //---Private Variables
     private GameObject blockerInstance;
 
+    public void OnEnable() {
+        Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+    }
+
+    public void OnDisable() {
+        Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
+    }
+
     public void SetEnabled(bool value) {
         button.interactable = value;
         normalIcon.SetActive(value);
         disabledIcon.SetActive(!value);
 
         if (value) {
-            int selected = NetworkHandler.Runner.GetLocalPlayerData().Team % 5;
-            Team teamScriptable = ScriptableManager.Instance.teams[selected];
-            flag.sprite = Settings.Instance.graphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
+            OnColorblindModeChanged();
         } else {
             Close(true);
         }
@@ -37,7 +43,7 @@ public class TeamChooser : MonoBehaviour {
         data.Rpc_SetTeamNumber((sbyte) selected);
         Close(false);
         Team teamScriptable = ScriptableManager.Instance.teams[selected];
-        flag.sprite = Settings.Instance.graphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
+        flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
 
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);
@@ -69,5 +75,13 @@ public class TeamChooser : MonoBehaviour {
 
         if (playSound && MainMenuManager.Instance)
             MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Back);
+    }
+
+    private void OnColorblindModeChanged() {
+        if (!button.interactable) return;
+
+        int selected = NetworkHandler.Runner.GetLocalPlayerData().Team % 5;
+        Team teamScriptable = ScriptableManager.Instance.teams[selected];
+        flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
     }
 }

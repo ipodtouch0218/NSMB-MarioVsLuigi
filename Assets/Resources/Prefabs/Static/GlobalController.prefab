@@ -9154,7 +9154,6 @@ MonoBehaviour:
   graphicsNdsEnabled: 0
   graphicsNdsForceAspect: 0
   graphicsNametags: 0
-  graphicsColorblind: 0
   audioMuteMusicOnUnfocus: 0
   audioMuteSFXOnUnfocus: 0
   audioPanning: 0
@@ -44036,7 +44035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4e112e117f2f0e43894cd0050bda463, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fieldName: graphicsColorblind
+  fieldName: GraphicsColorblind
 --- !u!1 &9023605000954240834
 GameObject:
   m_ObjectHideFlags: 0

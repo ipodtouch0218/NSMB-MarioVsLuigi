@@ -120,7 +120,7 @@ public class UIUpdater : MonoBehaviour {
             int teamIndex = player.data.Team;
             teamStars = teamManager?.GetTeamStars(teamIndex) ?? 0;
             Team team = ScriptableManager.Instance.teams[teamIndex];
-            uiTeamStars.text = (Settings.Instance.graphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
+            uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
             ApplyUIColor();
         }
         if (player.Stars != stars) {

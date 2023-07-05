@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Blue Team
   textSpriteNormal: <sprite name=team_blue>
   textSpriteColorblind: <sprite name=team_blue_alt>
+  textSpriteColorblindBig: <sprite name=team_blue_alt_big>
   color: {r: 0, g: 0.5833335, b: 1, a: 0}
   spriteNormal: {fileID: -96458051, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}
   spriteColorblind: {fileID: 983047248, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}

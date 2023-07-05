@@ -16,7 +16,7 @@ public class TeamButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
         overlay.enabled = (Mathf.Clamp(data.Team, 0, 4) == index);
 
         Team team = ScriptableManager.Instance.teams[index];
-        flag.sprite = Settings.Instance.graphicsColorblind ? team.spriteColorblind : team.spriteNormal;
+        flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
     }
 
     public void OnSelect(BaseEventData eventData) {

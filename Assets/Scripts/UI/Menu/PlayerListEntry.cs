@@ -6,6 +6,7 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using System.Configuration;
 
 public class PlayerListEntry : MonoBehaviour {
 
@@ -26,7 +27,15 @@ public class PlayerListEntry : MonoBehaviour {
     private GameObject blockerInstance;
     private bool rainbow;
 
-    private void OnDestroy() {
+    public void OnEnable() {
+        Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+    }
+
+    public void OnDisable() {
+        Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
+    }
+
+    public void OnDestroy() {
         if (blockerInstance)
             Destroy(blockerInstance);
     }
@@ -69,7 +78,15 @@ public class PlayerListEntry : MonoBehaviour {
         }
 
         string characterSymbol = data.GetCharacterData().uistring;
-        nameText.text = permissionSymbol + characterSymbol + data.GetNickname();
+
+        string teamSymbol;
+        if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
+            Team team = ScriptableManager.Instance.teams[data.Team];
+            teamSymbol = team.textSpriteColorblindBig;
+        } else {
+            teamSymbol = "";
+        }
+        nameText.text = permissionSymbol + characterSymbol + teamSymbol + data.GetNickname();
 
         Transform parent = transform.parent;
         int childIndex = 0;
@@ -138,10 +155,15 @@ public class PlayerListEntry : MonoBehaviour {
     }
 
     public void CopyPlayerId() {
-        TextEditor te = new();
-        te.text = player.GetPlayerData(NetworkHandler.Instance.runner).GetUserIdString();
+        TextEditor te = new() {
+            text = player.GetPlayerData(NetworkHandler.Instance.runner).GetUserIdString()
+        };
         te.SelectAll();
         te.Copy();
         HideDropdown(true);
+    }
+
+    private void OnColorblindModeChanged() {
+        UpdateText();
     }
 }

@@ -49,7 +49,7 @@ public class UserNametag : MonoBehaviour {
         screenPoint.z = 0;
 
         if (Settings.Instance.graphicsNdsEnabled && Settings.Instance.graphicsNdsForceAspect) {
-            // handle black borders
+            // Handle black borders
             float screenW = Screen.width;
             float screenH = Screen.height;
             float screenAspect = screenW / screenH;
@@ -59,12 +59,12 @@ public class UserNametag : MonoBehaviour {
                 float widthPercentage = availableWidth / screenW;
 
                 screenPoint.x *= widthPercentage;
-                screenPoint.x += (screenW - availableWidth) / 2;
+                screenPoint.x += (screenW - availableWidth) * 0.5f;
             } else {
                 float availableHeight = screenW * (1f / cam.aspect);
                 float heightPercentage = availableHeight / screenH;
                 screenPoint.y *= heightPercentage;
-                screenPoint.y += (screenH - availableHeight) / 2;
+                screenPoint.y += (screenH - availableHeight) * 0.5f;
 
                 screenPoint.x *= heightPercentage;
             }
@@ -75,7 +75,7 @@ public class UserNametag : MonoBehaviour {
 
         Team team = ScriptableManager.Instance.teams[data.Team];
         text.text = (data.IsRoomOwner ? "<sprite name=room_host>" : "")
-            + (SessionData.Instance.Teams ? (Settings.Instance.graphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) : "")
+            + (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind ? team.textSpriteColorblindBig : "")
             + cachedNickname + "\n";
 
         if (parent.Lives >= 0)

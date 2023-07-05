@@ -136,7 +136,7 @@ public class Settings : Singleton<Settings> {
     public int genericCharacter, genericSkin;
     public bool genericScoreboardAlways, genericChatFiltering;
 
-    public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNametags, ;
+    public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNametags;
 
     public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning;
 
@@ -174,7 +174,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Graphics_MaxFPS", GraphicsMaxFps);
         PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_Nametags", GraphicsPlayerNametags ? 1 : 0);
-        PlayerPrefs.SetInt("Graphics_Colorblind", graphicsColorblind ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_Colorblind", GraphicsColorblind ? 1 : 0);
 
         // Audio
         PlayerPrefs.SetFloat("Audio_MasterVolume", AudioMasterVolume);
@@ -239,7 +239,7 @@ public class Settings : Singleton<Settings> {
         GraphicsMaxFps = 0;
         GraphicsPlayerOutlines = true;
         GraphicsPlayerNametags = true;
-        graphicsColorblind = false;
+        GraphicsColorblind = false;
 
         AudioMasterVolume = PlayerPrefs.GetFloat("volumeMaster", 0.75f);
         AudioMusicVolume = PlayerPrefs.GetFloat("volumeMusic", 0.5f);
@@ -280,7 +280,7 @@ public class Settings : Singleton<Settings> {
         if (GetIfExists("Graphics_VSync", out bool tempVsync)) GraphicsVsync = tempVsync;
         if (GetIfExists("Graphics_PlayerOutlines", out bool tempOutlines)) GraphicsPlayerOutlines = tempOutlines;
         if (GetIfExists("Graphics_PlayerNametags", out bool tempNametags)) GraphicsPlayerNametags = tempNametags;
-        GetIfExists("Graphics_Colorblind", out graphicsColorblind);
+        if (GetIfExists("Graphics_Colorblind", out bool tempColorblind)) GraphicsColorblind = tempColorblind;
 
         //Audio
         if (GetIfExists("Audio_MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;

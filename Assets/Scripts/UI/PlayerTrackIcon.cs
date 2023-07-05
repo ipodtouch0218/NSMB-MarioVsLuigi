@@ -34,7 +34,7 @@ public class PlayerTrackIcon : TrackIcon {
     public override void LateUpdate() {
         base.LateUpdate();
         transform.localScale = playerTarget.cameraController.IsControllingCamera ? FlipY : TwoThirds;
-        teamIcon.gameObject.SetActive(Settings.Instance.graphicsColorblind && SessionData.Instance.Teams && !playerTarget.cameraController.IsControllingCamera);
+        teamIcon.gameObject.SetActive(Settings.Instance.GraphicsColorblind && SessionData.Instance.Teams && !playerTarget.cameraController.IsControllingCamera);
 
         if (flashRoutine == null && playerTarget.IsDead)
             flashRoutine = StartCoroutine(Flash());
