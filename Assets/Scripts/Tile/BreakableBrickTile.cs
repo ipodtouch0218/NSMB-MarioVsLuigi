@@ -59,7 +59,7 @@ namespace NSMB.Tiles {
             // Tilemap
             GameManager.Instance.tileManager.SetTile(tileLocation, null);
 
-            if (interacter && interacter.Runner.IsForward) {
+            if ((!interacter.IsProxy && interacter.Runner.IsForward) || interacter.Runner.Simulation.SnapshotHistory.Latest.Tick == interacter.Runner.Tick - 1) {
                 // Particle
                 for (int x = 0; x < tileSize.x; x++) {
                     for (int y = 0; y < tileSize.y; y++) {

@@ -448,7 +448,7 @@ namespace NSMB.Entities.Player {
                     input = currentInputs;
                     LastInputTick = Runner.Tick;
                 } else {
-                    if ((Runner.Tick - LastInputTick) < Runner.Simulation.Config.TickRate * 0.2f)
+                    if ((Runner.Tick - LastInputTick) < Runner.Simulation.Config.TickRate * 1f)
                         input = PreviousInputs;
                     else
                         input = default;

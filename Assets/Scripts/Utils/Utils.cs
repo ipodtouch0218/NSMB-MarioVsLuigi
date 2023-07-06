@@ -623,7 +623,7 @@ namespace NSMB.Utils {
             } else if (ping < 110) {
                 pingSymbol = "<sprite name=connection_good>";
             } else if (ping < 150) {
-                pingSymbol = "<sprite name=connection_fine>";
+                pingSymbol = "<sprite name=connection_fair>";
             } else {
                 pingSymbol = "<sprite name=connection_bad>";
             }
