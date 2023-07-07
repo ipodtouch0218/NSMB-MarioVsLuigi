@@ -39,6 +39,7 @@ public class ChatMessage : MonoBehaviour {
     public void Initialize(string message, PlayerRef player, Color? color = null) {
         chatText.text = message;
         chatText.color = color ?? Color.black;
+        chatText.richText = false;
         this.player = player;
 
         UpdatePlayerColor();

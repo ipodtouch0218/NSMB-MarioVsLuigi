@@ -143,11 +143,11 @@ public class ChatManager : MonoBehaviour {
         if (data.IsMuted)
             return;
 
-        //format message, in case we can't trust the host to do it for us.
+        // Format message, in case we can't trust the host to do it for us.
         message = message[..Mathf.Min(128, message.Length)];
         message = message.Replace("\n", " ").Trim();
 
-        //add username
+        // Add username
         message = data.GetNickname() + ": " + message.Filter();
 
         AddChatMessage(message, source);

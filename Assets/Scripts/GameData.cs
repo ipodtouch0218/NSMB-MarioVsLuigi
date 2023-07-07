@@ -193,9 +193,9 @@ namespace NSMB.Game {
         /// <summary>
         /// Checks if a team has won, and calls Rpc_EndGame if one has.
         /// </summary>
-        public void CheckForWinner() {
+        public bool CheckForWinner() {
             if (GameState != Enums.GameState.Playing || !Runner.IsServer)
-                return;
+                return false;
 
             TeamManager teamManager = GameManager.teamManager;
 
@@ -209,13 +209,13 @@ namespace NSMB.Game {
             if (aliveTeams == 0) {
                 // All teams dead, draw?
                 Rpc_EndGame(PlayerRef.None);
-                return;
+                return true;
             }
 
             if (aliveTeams == 1 && RealPlayerCount > 1) {
                 // One team left alive (and it's not a solo game), they win immediately.
                 Rpc_EndGame(firstPlaceTeam);
-                return;
+                return true;
             }
 
             if (hasFirstPlace) {
@@ -223,7 +223,7 @@ namespace NSMB.Game {
                 if (starGame && (firstPlaceStars >= requiredStars || timeUp)) {
                     // And they have enough stars.
                     Rpc_EndGame(firstPlaceTeam);
-                    return;
+                    return true;
                 }
                 // They don't have enough stars. wait 'till later
             }
@@ -233,19 +233,20 @@ namespace NSMB.Game {
                 if (SessionData.Instance.DrawOnTimeUp) {
                     // No one wins
                     Rpc_EndGame(PlayerRef.None);
-                    return;
+                    return true;
                 }
 
                 if (RealPlayerCount <= 1) {
                     // One player, no overtime.
                     Rpc_EndGame(firstPlaceTeam);
-                    return;
+                    return true;
                 }
 
                 // Keep playing into overtime.
             }
 
             // No winner, Keep playing
+            return false;
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ public class AuthenticationHandler {
     //---Static Variables
     private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
 
-    public static bool IsAuthenticating { get; private set; }
+    public static bool IsAuthenticating { get; set; }
 
     public async static Task<AuthenticationValues> Authenticate(string userid, string token) {
 

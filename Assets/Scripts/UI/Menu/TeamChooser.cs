@@ -78,7 +78,7 @@ public class TeamChooser : MonoBehaviour {
     }
 
     private void OnColorblindModeChanged() {
-        if (!button.interactable) return;
+        if (!button.interactable || !NetworkHandler.Runner.GetLocalPlayerData()) return;
 
         int selected = NetworkHandler.Runner.GetLocalPlayerData().Team % 5;
         Team teamScriptable = ScriptableManager.Instance.teams[selected];

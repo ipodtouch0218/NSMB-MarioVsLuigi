@@ -216,6 +216,8 @@ namespace NSMB.Entities.Player {
         public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight;
         public float powerupFlash;
 
+        private int noLivesStarSpawnDirection;
+
         #region // MOVEMENT STAGES & CONSTANTS
         private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
         private static readonly float[] SPEED_STAGE_MAX = { 0.9375f, 2.8125f, 4.21875f, 5.625f, 8.4375f };
@@ -523,12 +525,14 @@ namespace NSMB.Entities.Player {
             if (DeathAnimationTimer.Expired(Runner)) {
                 if ((Lives == 0 || Disconnected) && Stars > 0) {
                     // Try to drop more stars.
-                    SpawnStars(4, DeathplaneDeath);
-                    DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, 1f);
+                    SpawnStars(1, DeathplaneDeath);
+                    DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
                 } else {
                     // Play the animation as normal
-                    body.gravityScale = 1.2f;
-                    body.velocity += Vector2.up * 7f;
+                    if (!DeathplaneDeath) {
+                        body.gravityScale = 1.2f;
+                        body.velocity += Vector2.up * 7f;
+                    }
                     DeathAnimationTimer = TickTimer.None;
                 }
             }
@@ -692,6 +696,9 @@ namespace NSMB.Entities.Player {
         }
 
         public void InteractWithPlayer(PlayerController other) {
+
+            if (IsDead || other.IsDead)
+                return;
 
             if (DamageInvincibilityTimer.IsActive(Runner) || other.DamageInvincibilityTimer.IsActive(Runner))
                 return;
@@ -1137,6 +1144,10 @@ namespace NSMB.Entities.Player {
                 }
             }
 
+            if (noLivesStarSpawnDirection == 0)
+                noLivesStarSpawnDirection = starDirection;
+            starDirection = noLivesStarSpawnDirection++ % 4;
+
             while (amount > 0) {
                 if (Stars <= 0)
                     break;
@@ -1157,7 +1168,7 @@ namespace NSMB.Entities.Player {
                 Stars--;
                 amount--;
             }
-            GameData.Instance.CheckForWinner();
+            //GameData.Instance.CheckForWinner();
         }
         #endregion
 
@@ -1178,12 +1189,12 @@ namespace NSMB.Entities.Player {
 
             if ((Lives > 0 && --Lives == 0) || Disconnected) {
                 // Last death - drop all stars in 4-star waves.
-                GameData.Instance.CheckForWinner();
+                //if (!GameData.Instance.CheckForWinner())
+                    SpawnStars(1, DeathplaneDeath);
 
-                SpawnStars(4, DeathplaneDeath);
                 PreRespawnTimer = TickTimer.None;
                 RespawnTimer = TickTimer.None;
-                DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, (Stars > 0) ? 1f : 0.6f);
+                DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, (Stars > 0) ? 0.5f : 0.6f);
             } else {
                 SpawnStars(1, DeathplaneDeath);
                 DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, 0.6f);
@@ -1238,7 +1249,7 @@ namespace NSMB.Entities.Player {
             RespawnTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
             if (Lives == 0) {
-                GameData.Instance.CheckForWinner();
+                //GameData.Instance.CheckForWinner();
 
                 if (Object.HasInputAuthority)
                     GameManager.Instance.spectationManager.Spectating = true;

@@ -48,16 +48,27 @@ public class GlobalController : Singleton<GlobalController> {
         if (!discordController) discordController = GetComponent<DiscordController>();
     }
 
+    public void OnEnable() {
+        ControlSystem.controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
+    }
+
+    public void OnDisable() {
+        ControlSystem.controls.Debug.FPSMonitor.performed -= ToggleFpsMonitor;
+    }
+
     public void Awake() => Set(this);
 
     public void Start() {
+        AuthenticationHandler.IsAuthenticating = false;
+
         if (!Application.isFocused) {
             if (Settings.Instance.audioMuteMusicOnUnfocus) mixer.SetFloat("MusicVolume", -80f);
             if (Settings.Instance.audioMuteSFXOnUnfocus) mixer.SetFloat("SoundVolume", -80f);
         }
-        ControlSystem.controls.Debug.FPSMonitor.performed += (context) => {
-            graphy.SetActive(!graphy.activeSelf);
-        };
+    }
+
+    private void ToggleFpsMonitor(InputAction.CallbackContext obj) {
+        graphy.SetActive(!graphy.activeSelf);
     }
 
     public void Update() {
