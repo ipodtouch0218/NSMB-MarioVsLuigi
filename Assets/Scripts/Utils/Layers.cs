@@ -21,15 +21,21 @@ namespace NSMB.Utils {
         public static int LayerPlayer               => LazyLoadLayer(ref _layerPlayer, "Player");
         public static int LayerGroundEntity         => LazyLoadLayer(ref _layerGroundEntity, "GroundEntity");
 
-        private static LayerMask LazyLoadMask(ref LayerMask? variable, params int[] layers) {
+        private static LayerMask LazyLoadMask(ref LayerMask? variable, int? layer1 = null, int? layer2 = null, int? layer3 = null) {
             if (variable != null)
                 return (LayerMask) variable;
 
             variable = 0;
-            foreach (int layer in layers)
-                variable |= (1 << layer);
+            ApplyLayerMask(ref variable, layer1);
+            ApplyLayerMask(ref variable, layer2);
+            ApplyLayerMask(ref variable, layer3);
 
             return (LayerMask) variable;
+        }
+
+        private static void ApplyLayerMask(ref LayerMask? variable, int? layer) {
+            if (layer.HasValue)
+                variable |= 1 << layer;
         }
 
         private static int LazyLoadLayer(ref int? variable, string layer) {

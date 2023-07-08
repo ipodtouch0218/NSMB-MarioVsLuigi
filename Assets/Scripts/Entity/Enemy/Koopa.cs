@@ -39,7 +39,12 @@ namespace NSMB.Entities.Enemies {
         public bool IsActuallyStationary => !Holder && IsStationary;
 
         //---Private Variables
+        private IPowerupCollect powerupCollect;
         private float dampVelocity;
+
+        public void Start() {
+            powerupCollect = GetComponent<IPowerupCollect>();
+        }
 
         public override void Render() {
             base.Render();
@@ -81,8 +86,12 @@ namespace NSMB.Entities.Enemies {
                 return;
             }
 
-            if (IsFrozen || IsDead)
+            if (IsFrozen || IsDead) {
+                hitbox.enabled = false;
                 return;
+            } else {
+                hitbox.enabled = true;
+            }
 
             if (Holder)
                 FacingRight = Holder.FacingRight;
@@ -199,10 +208,10 @@ namespace NSMB.Entities.Enemies {
 
         public void BlueBecomeItem(PlayerController player) {
             if (player.HasGroundpoundHitbox) {
-                player.State = Enums.PowerupState.BlueShell;
                 BlueShellCollector = player;
+                powerupCollect.OnPowerupCollect(player, Enums.GetPowerupScriptable(Enums.PowerupState.BlueShell));
             } else {
-                Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position, onBeforeSpawned: (runner, obj) => {
+                Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position + Vector3.down * 0.15f, onBeforeSpawned: (runner, obj) => {
                     obj.GetComponent<Powerup>().OnBeforeSpawned(0.1f);
                 });
             }

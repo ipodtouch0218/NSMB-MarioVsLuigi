@@ -13,14 +13,14 @@ namespace NSMB.Tiles {
         [SerializeField] private GameObject breakParticle;
 
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
-            bumpSound = true;
-            if (interacter is not PlayerController)
+            if (interacter is not PlayerController) {
+                bumpSound = true;
                 return false;
+            }
+            bumpSound = false;
 
             PlayerController player = (PlayerController) interacter;
-            if (player.State != Enums.PowerupState.MegaMushroom)
-                return false;
-            if (direction == InteractionDirection.Down || direction == InteractionDirection.Up)
+            if (player.State != Enums.PowerupState.MegaMushroom || direction == InteractionDirection.Down || direction == InteractionDirection.Up)
                 return false;
 
             Vector2Int ourLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
@@ -29,9 +29,10 @@ namespace NSMB.Tiles {
 
             ushort[] emptyTiles = new ushort[height];
 
-            GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
+            if ((!player.IsProxy && player.Runner.IsForward) || player.Runner.Simulation.SnapshotHistory.Latest.Tick == player.Runner.Tick - 1)
+                GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
+
             GameManager.Instance.tileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
-            bumpSound = false;
             return true;
         }
 

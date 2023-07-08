@@ -6,6 +6,7 @@ using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 
+
 public class CameraController : NetworkBehaviour {
 
     //---Static Variables
@@ -119,13 +120,14 @@ public class CameraController : NetworkBehaviour {
         Vector3 newCameraPosition = CurrentPosition;
 
         // Bottom camera clip
-        float cameraBottomMax = Mathf.Max(3.5f - transform.lossyScale.y, 1.5f);
-        if (PlayerPos.y - (newCameraPosition.y - vOrtho) < cameraBottomMax)
-            newCameraPosition.y = PlayerPos.y + vOrtho - cameraBottomMax;
+        float cameraBottomDistanceToPlayer = PlayerPos.y - (newCameraPosition.y - vOrtho);
+        float cameraBottomMinDistance = Mathf.Max(3.5f - controller.models.transform.lossyScale.y, 1.5f);
+        if (cameraBottomDistanceToPlayer < cameraBottomMinDistance)
+            newCameraPosition.y -= (cameraBottomMinDistance - cameraBottomDistanceToPlayer);
 
         // Top camera clip
-        float playerHeight = controller.WorldHitboxSize.y;
-        float cameraTopMax = Mathf.Min(1.5f + playerHeight, 4f);
+        float playerHeight = controller.models.transform.lossyScale.y;
+        float cameraTopMax = Mathf.Min(1.5f + playerHeight, 3.5f);
         if (PlayerPos.y - (newCameraPosition.y + vOrtho) + cameraTopMax > 0)
             newCameraPosition.y = PlayerPos.y - vOrtho + cameraTopMax;
 
@@ -152,8 +154,8 @@ public class CameraController : NetworkBehaviour {
         bool validFloor = controller.IsOnGround || LastFloorHeight < PlayerPos.y;
 
         // Top camera clip ON GROUND. slowly pan up, dont do it instantly.
-        if (validFloor && LastFloorHeight - (newCameraPosition.y + vOrtho) + cameraTopMax + 2f > 0)
-            targetPosition.y = PlayerPos.y - vOrtho + cameraTopMax + 2f;
+        if (validFloor && LastFloorHeight - (newCameraPosition.y + vOrtho) + cameraTopMax + 1.5f > 0)
+            targetPosition.y = PlayerPos.y - vOrtho + cameraTopMax + 1.5f;
 
         // Smoothing
         Vector3 smoothDamp = SmoothDampVel;

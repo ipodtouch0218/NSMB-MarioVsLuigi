@@ -504,7 +504,19 @@ namespace NSMB.Game {
 
             speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
             speedup |= GameManager.teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
-            speedup |= AlivePlayers.Count <= 2 && AlivePlayers.All(pl => !pl || pl.Lives == 1 || pl.Lives == 0);
+
+            if (!speedup && AlivePlayers.Count <= 2) {
+                // Also speed up the music if all remaining players have one life.
+                bool allPlayersCritical = true;
+                foreach (var player in AlivePlayers) {
+                    if (!player) continue;
+                    if (player.Lives == 1 || player.Lives == 0) continue;
+
+                    allPlayersCritical = false;
+                    break;
+                }
+                speedup |= allPlayersCritical;
+            }
 
             LoopingMusicPlayer musicManager = GameManager.musicManager;
 

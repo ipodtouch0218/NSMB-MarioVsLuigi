@@ -32,7 +32,6 @@ namespace NSMB.Entities.Player {
         private Animator animator;
         private Rigidbody2D body;
         private MaterialPropertyBlock materialBlock;
-        private AudioSource drillParticleAudio;
 
         //---Properties
         public Color GlowColor { get; set; }
@@ -45,11 +44,14 @@ namespace NSMB.Entities.Player {
         private Coroutine blinkRoutine;
         private PlayerColors skin;
 
+        #region State Hashes
+
+        #endregion
+
         public void Awake() {
             controller = GetComponent<PlayerController>();
             animator = GetComponent<Animator>();
             body = GetComponent<Rigidbody2D>();
-            drillParticleAudio = drillParticle.GetComponent<AudioSource>();
         }
 
         public override void Spawned() {
@@ -114,9 +116,6 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(fireParticle, !controller.IsRespawning && controller.FireDeath && controller.IsDead && deathTimer > deathUpTime);
             SetParticleEmission(bubblesParticle, controller.IsSwimming);
 
-            if (controller.IsDrilling)
-                drillParticleAudio.clip = controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill;
-
             if (controller.IsCrouching || controller.IsSliding || controller.IsSkidding) {
                 dust.transform.localPosition = Vector2.zero;
             } else if (controller.WallSlideLeft || controller.WallSlideRight) {
@@ -124,7 +123,7 @@ namespace NSMB.Entities.Player {
             }
 
             dustPlayer.SetSoundData((controller.IsInShell || controller.IsSliding || controller.IsCrouchedInShell) ? shellSlideData : wallSlideData);
-            drillPlayer.SetSoundData(controller.State == Enums.PowerupState.PropellerMushroom ? propellerDrillData : spinnerDrillData);
+            drillPlayer.SetSoundData(controller.IsPropellerFlying ? propellerDrillData : spinnerDrillData);
 
             bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, controller.WorldHitboxSize.y);
 
@@ -251,7 +250,6 @@ namespace NSMB.Entities.Player {
             animator.SetBool("facingRight", (left ^ right) ? right : controller.FacingRight);
             animator.SetBool("flying", controller.IsSpinnerFlying);
             animator.SetBool("drill", controller.IsDrilling);
-            animator.SetFloat("velocityY", body.velocity.y);
             animator.SetBool("doublejump", controller.ProperJump && controller.JumpState == PlayerController.PlayerJumpState.DoubleJump);
             animator.SetBool("triplejump", controller.ProperJump && controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
             animator.SetBool("holding", controller.HeldEntity);
@@ -281,6 +279,7 @@ namespace NSMB.Entities.Player {
                 animatedVelocity = 0;
             }
             animator.SetFloat("velocityX", animatedVelocity);
+            animator.SetFloat("velocityY", body.velocity.y);
         }
 
         private void HandleMiscStates() {

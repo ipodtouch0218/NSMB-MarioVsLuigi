@@ -13,6 +13,10 @@ using NSMB.Tiles;
 namespace NSMB.Utils {
     public class Utils {
 
+        //---Buffers
+        private static readonly List<Vector2> PhysicsShapeBuffer = new(16);
+        private static readonly Vector2[] BoxPointsBuffer = new Vector2[4];
+
         public static bool BitTest(long v, int index) {
             return (v & (1L << index)) != 0;
         }
@@ -182,8 +186,12 @@ namespace NSMB.Utils {
 
         public static bool IsTileSolidBetweenWorldBox(Vector2Int tileLocation, Vector2 worldLocation, Vector2 worldBox, bool boxcast = true) {
             if (boxcast) {
-                Collider2D collision = Physics2D.OverlapPoint(worldLocation, LayerMask.GetMask("Ground"));
-                if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
+                bool hitTriggers = Physics2D.queriesHitTriggers;
+                Physics2D.queriesHitTriggers = false;
+                Collider2D collision = Physics2D.OverlapPoint(worldLocation, Layers.MaskSolidGround);
+                Physics2D.queriesHitTriggers = hitTriggers;
+
+                if (collision)
                     return true;
             }
 
@@ -196,12 +204,11 @@ namespace NSMB.Utils {
             Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix((Vector3Int) tileLocation);
 
             Vector2 halfBox = worldBox * 0.5f;
-            List<Vector2> boxPoints = new() {
-                ogWorldLocation + Vector2.up * halfBox + Vector2.right * halfBox,   // ++
-                ogWorldLocation + Vector2.up * halfBox + Vector2.left * halfBox,    // +-
-                ogWorldLocation + Vector2.down * halfBox + Vector2.left * halfBox,  // --
-                ogWorldLocation + Vector2.down * halfBox + Vector2.right * halfBox  // -+
-            };
+
+            BoxPointsBuffer[0] = ogWorldLocation + Vector2.up * halfBox + Vector2.right * halfBox;   // ++
+            BoxPointsBuffer[1] = ogWorldLocation + Vector2.up * halfBox + Vector2.left * halfBox;    // +-
+            BoxPointsBuffer[2] = ogWorldLocation + Vector2.down * halfBox + Vector2.left * halfBox;  // --
+            BoxPointsBuffer[3] = ogWorldLocation + Vector2.down * halfBox + Vector2.right * halfBox; // -+
 
             Sprite sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) tileLocation);
             switch (GetColliderType(tileLocation)) {
@@ -212,20 +219,19 @@ namespace NSMB.Utils {
             case Tile.ColliderType.Sprite:
 
                 for (int i = 0; i < sprite.GetPhysicsShapeCount(); i++) {
-                    List<Vector2> points = new();
-                    sprite.GetPhysicsShape(i, points);
+                    sprite.GetPhysicsShape(i, PhysicsShapeBuffer);
 
-                    for (int j = 0; j < points.Count; j++) {
-                        Vector2 point = points[j];
+                    for (int j = 0; j < PhysicsShapeBuffer.Count; j++) {
+                        Vector2 point = PhysicsShapeBuffer[j];
                         point *= 0.5f;
                         point = tileTransform.MultiplyPoint(point);
                         point += (Vector2) tileLocation * 0.5f;
                         point += (Vector2) GameManager.Instance.tilemap.transform.position;
                         point += Vector2.one * 0.25f;
-                        points[j] = point;
+                        PhysicsShapeBuffer[j] = point;
                     }
 
-                    if (PolygonsOverlap(points, boxPoints))
+                    if (PolygonsOverlap(PhysicsShapeBuffer, BoxPointsBuffer))
                         return true;
                 }
                 return false;
@@ -234,7 +240,7 @@ namespace NSMB.Utils {
             return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
         }
 
-        public static bool PolygonsOverlap(List<Vector2> polygonA, List<Vector2> polygonB) {
+        public static bool PolygonsOverlap(IList<Vector2> polygonA, IList<Vector2> polygonB) {
             int edgeCountA = polygonA.Count;
             int edgeCountB = polygonB.Count;
 
@@ -271,20 +277,19 @@ namespace NSMB.Utils {
                 return false;
             case Tile.ColliderType.Sprite:
                 for (int i = 0; i < sprite.GetPhysicsShapeCount(); i++) {
-                    List<Vector2> points = new();
-                    sprite.GetPhysicsShape(i, points);
+                    sprite.GetPhysicsShape(i, PhysicsShapeBuffer);
 
-                    for (int j = 0; j < points.Count; j++) {
-                        Vector2 point = points[j];
+                    for (int j = 0; j < PhysicsShapeBuffer.Count; j++) {
+                        Vector2 point = PhysicsShapeBuffer[j];
                         point *= 0.5f;
                         point = tileTransform.MultiplyPoint(point);
                         point += (Vector2) tileLocation * 0.5f;
                         point += (Vector2) GameManager.Instance.tilemap.transform.position;
                         point += Vector2.one * 0.25f;
-                        points[j] = point;
+                        PhysicsShapeBuffer[j] = point;
                     }
 
-                    if (IsInside(points, worldLocation))
+                    if (IsInside(PhysicsShapeBuffer, worldLocation))
                         return true;
                 }
                 return false;
@@ -368,7 +373,7 @@ namespace NSMB.Utils {
 
         // Returns true if the point p lies
         // inside the polygon[] with n vertices
-        private static bool IsInside(List<Vector2> polygon, Vector2 p) {
+        private static bool IsInside(IList<Vector2> polygon, Vector2 p) {
             // There must be at least 3 vertices in polygon[]
             if (polygon.Count < 3) {
                 return false;
@@ -386,14 +391,12 @@ namespace NSMB.Utils {
                 // Check if the line segment from 'p' to
                 // 'extreme' intersects with the line
                 // segment from 'polygon[i]' to 'polygon[next]'
-                if (DoIntersect(polygon[i],
-                                polygon[next], p, extreme)) {
+                if (DoIntersect(polygon[i], polygon[next], p, extreme)) {
                     // If the point 'p' is collinear with line
                     // segment 'i-next', then check if it lies
                     // on segment. If it lies, return true, otherwise false
                     if (Orientation(polygon[i], p, polygon[next]) == 0) {
-                        return OnSegment(polygon[i], p,
-                                        polygon[next]);
+                        return OnSegment(polygon[i], p, polygon[next]);
                     }
                     count++;
                 }

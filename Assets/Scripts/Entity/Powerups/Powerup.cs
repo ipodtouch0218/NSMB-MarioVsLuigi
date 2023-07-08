@@ -307,7 +307,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             PowerupScriptable newPowerup = powerupScriptable;
             Enums.PowerupState newState = newPowerup.state;
 
-            ReserveResult = collectScript.OnPowerupCollect(player, this);
+            ReserveResult = collectScript.OnPowerupCollect(player, newPowerup);
 
             switch (ReserveResult) {
             case PowerupReserveResult.ReserveOldPowerup: {

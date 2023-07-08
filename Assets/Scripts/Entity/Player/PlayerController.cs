@@ -998,6 +998,7 @@ namespace NSMB.Entities.Player {
                 break;
             }
             }
+            IsDrilling &= !IsPropellerFlying;
             IsPropellerFlying = false;
             IsInShell = false;
             PropellerLaunchTimer = TickTimer.None;
@@ -1318,7 +1319,7 @@ namespace NSMB.Entities.Player {
             body.velocity = Vector2.zero;
             body.gravityScale = 0;
 
-            DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+            DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
 
             if (Object.HasInputAuthority)
                 ScoreboardUpdater.Instance.OnRespawnToggle();
@@ -2879,7 +2880,7 @@ namespace NSMB.Entities.Player {
             } else if (IsPropellerFlying) {
                 // Start propeller drill
                 float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
-                if (remainingTime < 0.6f && body.velocity.y < 4 && PropellerDrillCooldown.ExpiredOrNotRunning(Runner)) {
+                if (remainingTime < 0.2f && body.velocity.y < 0 && PropellerDrillCooldown.ExpiredOrNotRunning(Runner)) {
                     IsDrilling = true;
                     PropellerLaunchTimer = TickTimer.None;
                     ContinueGroundpound = true;

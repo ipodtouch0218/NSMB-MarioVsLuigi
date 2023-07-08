@@ -76,7 +76,7 @@ namespace NSMB.Entities {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (!GameData.Instance || !Object || !body || IsFrozen)
+            if (!GameData.Instance || !Object || !body)
                 return;
 
             if (!IsActive) {
@@ -87,7 +87,7 @@ namespace NSMB.Entities {
                 body.isKinematic = true;
                 return;
 
-            } else if (IsDead) {
+            } else if (IsDead || IsFrozen) {
                 gameObject.layer = Layers.LayerHitsNothing;
                 body.isKinematic = false;
 
@@ -128,12 +128,14 @@ namespace NSMB.Entities {
                     if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant)
                         continue;
 
-                    bool goRight = body.position.x > killable.body.position.x;
-                    if (Mathf.Abs(body.position.x - killable.body.position.x) < 0.015f) {
-                        if (Mathf.Abs(body.position.y - killable.body.position.y) < 0.015f) {
+                    Utils.Utils.UnwrapLocations(body.position, killable.body.position, out Vector2 ourPos, out Vector2 theirPos);
+                    bool goRight = ourPos.x > theirPos.x;
+
+                    if (Mathf.Abs(ourPos.x - theirPos.x) < 0.015f) {
+                        if (Mathf.Abs(ourPos.y - theirPos.y) < 0.015f) {
                             goRight = Object.Id.Raw < killable.Object.Id.Raw;
                         } else {
-                            goRight = body.position.y < killable.body.position.y;
+                            goRight = ourPos.y < theirPos.y;
                         }
                     }
 
@@ -240,7 +242,12 @@ namespace NSMB.Entities {
 
             bool groundpounded = attackedFromAbove && player.HasGroundpoundHitbox && player.State != Enums.PowerupState.MiniMushroom;
             if (player.InstakillsEnemies || groundpounded) {
-                SpecialKill(player.body.velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
+                if (player.IsDrilling) {
+                    Kill();
+                    player.DoEntityBounce = true;
+                } else {
+                    SpecialKill(player.body.velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
+                }
                 return;
             }
 

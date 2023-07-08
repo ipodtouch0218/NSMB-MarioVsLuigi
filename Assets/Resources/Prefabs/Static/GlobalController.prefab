@@ -32631,7 +32631,7 @@ GameObject:
   - component: {fileID: 2787644447864356596}
   - component: {fileID: 3780800340838940033}
   - component: {fileID: 4146473291881586278}
-  - component: {fileID: 395400566598555363}
+  - component: {fileID: 6244345678960353379}
   m_Layer: 5
   m_Name: loading-anim
   m_TagString: Untagged
@@ -32698,27 +32698,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!95 &395400566598555363
-Animator:
-  serializedVersion: 5
+--- !u!114 &6244345678960353379
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6331517114102691139}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b73b33f4e88ca4142b7a1f5666259cf0, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDisplaying: 1
+  runInEditor: 0
+  frame: 0
+  fps: 12
+  frames:
+  - {fileID: -2914503216214332612, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  - {fileID: -3243969905789220278, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  - {fileID: -2240947139059371774, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  - {fileID: -9038400482918282348, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  - {fileID: 3541541065571182360, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  - {fileID: -6469537607060608100, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  - {fileID: -6746097347225962745, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  - {fileID: -176354558837914207, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  sRenderer: {fileID: 0}
+  image: {fileID: 4146473291881586278}
 --- !u!1 &6360181789700789776
 GameObject:
   m_ObjectHideFlags: 0

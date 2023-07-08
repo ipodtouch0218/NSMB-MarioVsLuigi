@@ -99,6 +99,8 @@ namespace NSMB.Entities {
                     return;
 
                 FrozenEntity.body.position = body.position + EntityPositionOffset;
+                FrozenEntity.body.velocity = Vector2.zero;
+                FrozenEntity.body.isKinematic = true;
             }
 
             if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {

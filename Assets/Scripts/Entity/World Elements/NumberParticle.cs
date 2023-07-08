@@ -3,46 +3,51 @@ using TMPro;
 
 public class NumberParticle : MonoBehaviour {
 
-    public TMP_Text text;
-    public Vector3 colorOffset;
-    public Color overlay;
+    //---Serialized Variables
+    [SerializeField] private TMP_Text text;
+    [SerializeField] private Vector3 colorOffset;
+    [SerializeField] private Color overlay;
 
+    //---Components
+    [SerializeField] private AnimationCurve yMovement;
+    [SerializeField] private new Animation animation;
+
+    //---Private Variables
     private MaterialPropertyBlock mpb;
     private MeshRenderer mr;
-    private bool ignoreKill;
+
+    private float spawnTime;
+    private bool final;
+
+    public void OnValidate() {
+        if (!text) text = GetComponentInChildren<TMP_Text>();
+        if (!animation) animation = GetComponentInChildren<Animation>();
+    }
 
     public void Update() {
-        if (mr) {
+        if (final) {
             mpb.SetVector("_ColorOffset", colorOffset);
             mpb.SetColor("_Overlay", overlay);
             mr.SetPropertyBlock(mpb);
         }
+
+        transform.localPosition = Vector3.up * yMovement.Evaluate(Time.time - spawnTime);
     }
 
     public void ApplyColorAndText(string newText, Color color, bool final) {
-        if (!text)
-            text = GetComponentInChildren<TMP_Text>();
+        this.final = final;
 
         text.text = newText;
         text.ForceMeshUpdate();
         mr = GetComponentsInChildren<MeshRenderer>()[1];
+
         mpb = new();
         mpb.SetColor("_Color", color);
         mr.SetPropertyBlock(mpb);
 
-        Animator anim = GetComponent<Animator>();
-        anim.SetBool("final", final);
+        animation.enabled = final;
 
-        enabled = final;
-        ignoreKill = final;
-    }
-
-    public void Kill() {
-        if (ignoreKill) {
-            ignoreKill = false;
-            return;
-        }
-
-        Destroy(gameObject.transform.parent.gameObject);
+        spawnTime = Time.time;
+        Destroy(gameObject.transform.parent.gameObject, final ? 1.42f : 0.666f);
     }
 }

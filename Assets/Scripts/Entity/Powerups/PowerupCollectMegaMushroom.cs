@@ -8,7 +8,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         private GameObject particle;
 
-        public PowerupReserveResult OnPowerupCollect(PlayerController player, Powerup powerup) {
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, PowerupScriptable powerup) {
             if (player.State == Enums.PowerupState.MegaMushroom)
                 return PowerupReserveResult.ReserveNewPowerup;
 

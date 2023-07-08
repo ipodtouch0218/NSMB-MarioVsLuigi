@@ -7,9 +7,9 @@ using NSMB.Utils;
 namespace NSMB.Entities.Collectable.Powerups {
     public class PowerupCollectBasic : MonoBehaviour, IPowerupCollect {
 
-        public PowerupReserveResult OnPowerupCollect(PlayerController player, Powerup powerup) {
+        public PowerupReserveResult OnPowerupCollect(PlayerController player, PowerupScriptable powerup) {
 
-            Enums.PowerupState newState = powerup.powerupScriptable.state;
+            Enums.PowerupState newState = powerup.state;
 
             NetworkRunner runner = player.Runner;
 
@@ -22,7 +22,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 return PowerupReserveResult.ReserveNewPowerup;
 
             PowerupScriptable currentPowerup = player.State.GetPowerupScriptable();
-            PowerupScriptable newPowerup = powerup.powerupScriptable;
+            PowerupScriptable newPowerup = powerup;
 
             sbyte currentPowerupStatePriority = currentPowerup ? currentPowerup.statePriority : (sbyte) -1;
             sbyte newPowerupItemPriority = newPowerup ? newPowerup.itemPriority : (sbyte) -1;

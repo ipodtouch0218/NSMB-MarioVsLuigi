@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -14,7 +13,11 @@ public static class Enums {
         if (state == PowerupState.NoPowerup)
             return null;
 
-        return ScriptableManager.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
+        foreach (var powerup in ScriptableManager.Instance.powerups) {
+            if (powerup.state == state)
+                return powerup;
+        }
+        return null;
     }
 
     public enum GameState : byte {
