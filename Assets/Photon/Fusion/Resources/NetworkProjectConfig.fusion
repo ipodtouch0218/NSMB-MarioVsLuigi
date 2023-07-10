@@ -50,11 +50,11 @@
         "ClientPacketInterval": 1
     },
     "Interpolation": {
-        "DeltaAdjustment": 10,
+        "DeltaAdjustment": 2,
         "AllowedJitter": 25,
-        "SnapLimit": 654,
-        "MultiplierMin": 1.5,
-        "MultiplierMax": 1.75
+        "SnapLimit": 500,
+        "MultiplierMin": 2.0,
+        "MultiplierMax": 2.5
     },
     "Network": {
         "SocketSendBufferSize": 256,

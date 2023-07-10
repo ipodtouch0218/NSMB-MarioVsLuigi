@@ -7,6 +7,7 @@ using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
+using NSMB.Utils;
 
 namespace NSMB.Entities.Enemies {
     public class Bobomb : HoldableEntity {
@@ -278,12 +279,12 @@ namespace NSMB.Entities.Enemies {
             if (IsDead || !Lit || Mathf.Abs(body.velocity.x) < 1f)
                 return;
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
 
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
 
-                if (obj == gameObject)
+                if (obj.transform.IsChildOf(transform))
                     continue;
 
                 //killable entities

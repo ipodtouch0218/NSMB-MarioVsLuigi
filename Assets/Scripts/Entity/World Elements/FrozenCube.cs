@@ -43,7 +43,7 @@ namespace NSMB.Entities {
             }
 
             sRenderer.size = CubeSize;
-            hitbox.size = CubeSize - (Vector2.one * 0.1f);
+            hitbox.size = CubeSize - (Vector2.one * 0.05f);
             hitbox.offset = CubeSize * Vector2.up * 0.5f;
 
             AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
@@ -287,12 +287,12 @@ namespace NSMB.Entities {
                 return;
 
             // Only run when fastsliding...
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
 
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
 
-                if (obj == gameObject)
+                if (obj.transform.IsChildOf(transform))
                     continue;
 
                 if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {

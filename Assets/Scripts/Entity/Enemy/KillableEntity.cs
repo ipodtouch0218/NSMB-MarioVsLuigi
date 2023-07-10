@@ -22,8 +22,9 @@ namespace NSMB.Entities {
             Enums.Sounds.Enemy_Shell_Combo6,
             Enums.Sounds.Enemy_Shell_Combo7,
         };
-        protected readonly Collider2D[] CollisionBuffer = new Collider2D[32];
-        protected readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
+        protected static readonly Collider2D[] CollisionBuffer = new Collider2D[32];
+        protected static readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
+        protected static ContactFilter2D EntityFilter;
 
         //---Networked Variables
         [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
@@ -38,7 +39,7 @@ namespace NSMB.Entities {
         //---Serialized Variables
         [SerializeField] protected bool iceCarryable = true;
         [SerializeField] protected bool flying = false;
-        [SerializeField] protected bool collideWithOtherEnemies = true;
+        [SerializeField] public bool collideWithOtherEnemies = true;
         [SerializeField] protected bool dieWhenInsideBlock = true;
         [SerializeField] protected bool flipSpriteRenderer = false;
 
@@ -56,6 +57,10 @@ namespace NSMB.Entities {
             if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
             if (!legacyAnimation) legacyAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
             if (!physics) physics = GetComponent<PhysicsEntity>();
+        }
+
+        public void Start() {
+            EntityFilter.SetLayerMask(Layers.MaskEntities);
         }
 
         public override void Spawned() {
@@ -116,12 +121,12 @@ namespace NSMB.Entities {
 
         protected virtual void CheckForEntityCollisions() {
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
 
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
 
-                if (obj == gameObject)
+                if (obj.transform.IsChildOf(transform))
                     continue;
 
                 if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {

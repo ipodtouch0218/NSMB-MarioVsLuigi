@@ -139,7 +139,7 @@ public class FusionGraph : FusionGraphBase {
 
 #if UNITY_EDITOR
 
-  
+
   protected override void OnValidate() {
     base.OnValidate();
     if (Application.isPlaying == false) {
@@ -169,10 +169,10 @@ public class FusionGraph : FusionGraphBase {
       DropdownLookup.Clear();
       _viewDropdown.ClearOptions();
       for (int i = 0; i < 16; ++i) {
-        if (((int)flags & (1 << i)) != 0) {
+        if (((int) flags & (1 << i)) != 0) {
           DropdownLookup.Add(1 << i);
           _viewDropdown.options.Add(new UI.Dropdown.OptionData(FusionStatsUtilities.CachedTelemetryNames[i + 1]));
-          if ((1 << i & (int)_statsBuffer.DefaultVisualization) != 0) {
+          if ((1 << i & (int) _statsBuffer.DefaultVisualization) != 0) {
             _viewDropdown.value = i - 1;
           }
         }
@@ -220,7 +220,7 @@ public class FusionGraph : FusionGraphBase {
   public override void Initialize() {
 
     _viewDropdown?.onValueChanged.AddListener(OnDropdownChanged);
-    _avgBttn?.onClick.AddListener(CyclePer);
+    //_avgBttn?.onClick.AddListener(CyclePer);
   }
 
   public void OnDropdownChanged(int value) {
@@ -245,7 +245,7 @@ public class FusionGraph : FusionGraphBase {
   }
 
   ShaderType _currentShader;
-  
+
   void ResetGraphShader() {
     if (GraphImg) {
       ShaderType desiredShader = LocateParentFusionStats() != null ? (_fusionStats.CanvasType == FusionStats.StatCanvasTypes.GameObject ? ShaderType.GameObject : ShaderType.Overlay) : ShaderType.None;
@@ -340,7 +340,7 @@ public class FusionGraph : FusionGraphBase {
     }
   }
 
-  void UpdateContinuousTick(ref IStatsBuffer data) 
+  void UpdateContinuousTick(ref IStatsBuffer data)
     {
     var min = float.MaxValue;
     var max = float.MinValue;
@@ -394,7 +394,7 @@ public class FusionGraph : FusionGraphBase {
     for (int i = 0; i < data.Count; ++i) {
       var sample = data.GetSampleAtIndex(i);
       var sampleTick = sample.TickValue;
-      
+
       // sample on buffer is older than the range we are displaying.
       if (sampleTick < oldestAllowedBufferedTick) {
         gapcheck = sampleTick;
@@ -407,7 +407,7 @@ public class FusionGraph : FusionGraphBase {
         continue;
       }
 
-      // Fill any gaps in the buffer data 
+      // Fill any gaps in the buffer data
       var gap = sampleTick - gapcheck;
       for (int g = gapcheck + 1; g < sampleTick; ++g) {
         _cachedValues[g % INTERMITTENT_DATA_ARRAYSIZE] = (g, 0);
@@ -562,7 +562,7 @@ public class FusionGraph : FusionGraphBase {
     var latestServerState = _fusionStats.Runner.Simulation.LatestServerState;
     var usingTick = mostCurrentTick > 0;
     double latestServerStateTickTime;
-    
+
     if (usingTick) {
       latestServerStateTickTime = latestServerState.Tick;
       double mostCurrentSampleTickTime = mostCurrentTick;
@@ -605,10 +605,10 @@ public class FusionGraph : FusionGraphBase {
       else if (val == histoMaxValue) {
         bucketIndex = histoBucketCount;
 
-      } 
+      }
       else if (val > histoMaxValue) {
         bucketIndex = histoBucketCount + 1;
-      }      
+      }
       else {
         bucketIndex = (int)(val * _histoStepInverse) + 1;
       }
@@ -616,7 +616,7 @@ public class FusionGraph : FusionGraphBase {
       _histoAvg = (_histoAvg * _histoAvgSampleCount + val) / (++_histoAvgSampleCount);
 
       var newval = _histogram[bucketIndex] + 1;
-      
+
       if (newval > _max) {
         _max = newval;
       }
@@ -672,7 +672,7 @@ public class FusionGraph : FusionGraphBase {
   /// Creates a new GameObject with <see cref="FusionGraph"/> and attaches it to the specified parent.
   /// </summary>
   public static FusionGraph Create(FusionStats iFusionStats, Stats.StatSourceTypes statSourceType, int statId, RectTransform parentRT) {
-    
+
     var statInfo = Stats.GetDescription(statSourceType, statId);
 
     var rootRT = parentRT.CreateRectTransform(statInfo.LongName);
@@ -689,9 +689,9 @@ public class FusionGraph : FusionGraphBase {
   public void Generate(Stats.StatSourceTypes type, int statId, RectTransform root) {
 
     _statSourceType = type;
-    
+
     var rt = GetComponent<RectTransform>();
-    
+
     _statId = statId;
 
     root.anchorMin = new Vector2(0.5f, 0.5f);
@@ -812,7 +812,7 @@ public class FusionGraph : FusionGraphBase {
 
     var height = rt.rect.height;
     var width  = rt.rect.width;
-    
+
     Layouts layout;
     if (_layout != Layouts.Auto) {
       layout = _layout;
@@ -842,7 +842,7 @@ public class FusionGraph : FusionGraphBase {
     var graphRT = GraphImg.rectTransform;
     if (graphRT) {
       graphRT.gameObject.SetActive(showGraph);
-      
+
       if (expandGraph) {
         graphRT.SetAnchors(0, 1, 0, 1);
       } else {

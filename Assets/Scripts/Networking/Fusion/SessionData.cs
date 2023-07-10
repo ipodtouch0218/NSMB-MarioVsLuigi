@@ -56,9 +56,11 @@ public class SessionData : NetworkBehaviour {
     }
 
     public override void Spawned() {
-        Instance = this;
-        if (MainMenuManager.Instance)
-            MainMenuManager.Instance.EnterRoom();
+        if (Instance != this) {
+            Instance = this;
+            if (MainMenuManager.Instance)
+                MainMenuManager.Instance.EnterRoom();
+        }
 
         PrivateRoom = !Runner.SessionInfo.IsVisible;
         if (MaxPlayers == 0) {

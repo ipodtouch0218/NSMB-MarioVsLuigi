@@ -894,7 +894,12 @@ namespace NSMB.Entities.Player {
                 if (FireballDelayTimer.IsActive(Runner))
                     return;
 
-                int activeFireballs = GameData.Instance.PooledFireballs.Count(fm => fm.Owner == this && fm.IsActive);
+                int activeFireballs = 0;
+                foreach (var fireball in GameData.Instance.PooledFireballs) {
+                    if (fireball.IsActive && fireball.Owner == this)
+                        activeFireballs++;
+                }
+
                 if (activeFireballs <= 1) {
                     FireballShootTimer = TickTimer.CreateFromSeconds(Runner, 1.25f);
                     CanShootAdditionalFireball = activeFireballs == 0;
@@ -911,8 +916,18 @@ namespace NSMB.Entities.Player {
                 bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
                 Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
 
-                FireballMover inactiveFireball = GameData.Instance.PooledFireballs.First(fm => !fm.IsActive);
-                inactiveFireball.Initialize(this, spawnPos, ice, right);
+                FireballMover inactiveFireball = null;
+                foreach (var fireball in GameData.Instance.PooledFireballs) {
+                    if (fireball.IsActive)
+                        continue;
+
+                    inactiveFireball = fireball;
+                    break;
+                }
+                if (inactiveFireball) {
+                    Debug.Log("predicting use of " + inactiveFireball.Object.Id);
+                    inactiveFireball.Initialize(this, spawnPos, ice, right);
+                }
 
                 FireballDelayTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
                 FireballAnimCounter++;
@@ -1588,7 +1603,7 @@ namespace NSMB.Entities.Player {
                 if (up && !GroundpoundStartTimer.IsActive(Runner)) {
                     IsGroundpounding = false;
                     body.velocity = Vector2.down * groundpoundVelocity;
-                    GroundpoundCooldownTimer = TickTimer.CreateFromSeconds(Runner, 0.125f);
+                    GroundpoundCooldownTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
                 }
             }
             if (OnSlope && (!((FacingRight && hitRight) || (!FacingRight && hitLeft)) && IsCrouching && Mathf.Abs(FloorAngle) >= slopeSlidingAngle && !IsInShell && State != Enums.PowerupState.MegaMushroom)) {

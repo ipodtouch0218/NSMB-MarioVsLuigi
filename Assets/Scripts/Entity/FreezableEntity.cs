@@ -28,9 +28,9 @@ public abstract class FreezableEntity : BasicEntity {
     public static void OnIsFrozenChanged(Changed<FreezableEntity> changed) {
         FreezableEntity entity = changed.Behaviour;
 
+        entity.OnIsFrozenChanged();
+
         if (entity.IsFrozen)
             entity.PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
-
-        entity.OnIsFrozenChanged();
     }
 }

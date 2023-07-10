@@ -18,6 +18,7 @@ namespace NSMB.Game {
     public class GameData : NetworkBehaviour, IBeforeTick {
 
         //---Static Variables
+        public static event Action OnAllPlayersLoaded;
         private static readonly Vector3 OneFourth = new(0.25f, 0.25f, 0f);
         private static GameData _instance;
         public static GameData Instance {
@@ -32,8 +33,6 @@ namespace NSMB.Game {
             }
             private set => _instance = value;
         }
-        private static GameManager GameManager => GameManager.Instance;
-        public static event Action OnAllPlayersLoaded;
 
         //---Networked Variables
         [Networked] public TickTimer BigStarRespawnTimer { get; set; }
@@ -54,13 +53,16 @@ namespace NSMB.Game {
 
         //---Private Variables
         private readonly HashSet<NetworkObject> networkObjects = new();
+
+        private GameManager gm;
+        private AudioSource audioSfx;
+        private AudioSource audioMusic;
+
         private TickTimer StartMusicTimer;
         private bool hurryUpSoundPlayed, endSoundPlayed;
 
         //---Properties
         public bool GameEnded => GameState == Enums.GameState.Ended;
-        public AudioSource AudioSfx => GameManager.sfx;
-        public AudioSource AudioMusic => GameManager.music;
 
         //---Lifetime
         public void OnEnable() {
@@ -73,11 +75,17 @@ namespace NSMB.Game {
             NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
         }
 
+        public void Awake() {
+            gm = GameManager.Instance;
+            audioSfx = gm.sfx;
+            audioMusic = gm.music;
+        }
+
         public override void Spawned() {
             Instance = this;
 
             // By default, spectate. when we get assigned a player object, we disable it there.
-            GameManager.spectationManager.Spectating = true;
+            gm.spectationManager.Spectating = true;
 
             // Enable player controls
             Runner.ProvideInput = true;
@@ -100,10 +108,10 @@ namespace NSMB.Game {
             }
 
             // Set up alternating music for the default stages
-            if (!GameManager.mainMusic) {
+            if (!gm.mainMusic) {
                 byte musicIndex = SessionData.Instance.AlternatingMusicIndex;
                 int songs = ScriptableManager.Instance.alternatingStageMusic.Length;
-                GameManager.mainMusic = ScriptableManager.Instance.alternatingStageMusic[musicIndex % songs];
+                gm.mainMusic = ScriptableManager.Instance.alternatingStageMusic[musicIndex % songs];
             }
         }
 
@@ -162,7 +170,7 @@ namespace NSMB.Game {
                 if (GameEndTimer.IsRunning) {
                     if (GameEndTimer.Expired(Runner)) {
                         if (!endSoundPlayed)
-                            AudioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
+                            audioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
                         endSoundPlayed = true;
                     } else {
                         int tickrate = Runner.Config.Simulation.TickRate;
@@ -171,14 +179,14 @@ namespace NSMB.Game {
                         if (!hurryUpSoundPlayed && remainingTicks < 61 * tickrate) {
                             //60 second warning
                             hurryUpSoundPlayed = true;
-                            AudioSfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
+                            audioSfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
                         } else if (remainingTicks <= (10 * tickrate)) {
                             //10 second "dings"
                             if (remainingTicks % tickrate == 0)
-                                AudioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+                                audioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
                             //at 3 seconds, double speed
                             else if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
-                                AudioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+                                audioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
                         }
                     }
                 }
@@ -197,7 +205,7 @@ namespace NSMB.Game {
             if (GameState != Enums.GameState.Playing || !Runner.IsServer)
                 return false;
 
-            TeamManager teamManager = GameManager.teamManager;
+            TeamManager teamManager = gm.teamManager;
 
             int requiredStars = SessionData.Instance.StarRequirement;
             bool starGame = requiredStars != -1;
@@ -295,7 +303,7 @@ namespace NSMB.Game {
                 if (data.IsCurrentlySpectating)
                     continue;
 
-                Runner.Spawn(data.GetCharacterData().prefab, GameManager.spawnpoint, inputAuthority: player, onBeforeSpawned: (runner, obj) => {
+                Runner.Spawn(data.GetCharacterData().prefab, gm.spawnpoint, inputAuthority: player, onBeforeSpawned: (runner, obj) => {
                     // Set the spawnpoint that they should spawn at
                     int index = UnityEngine.Random.Range(0, spawnpoints.Count);
                     int spawnpoint = spawnpoints[index];
@@ -384,12 +392,12 @@ namespace NSMB.Game {
 
             // Play start jingle
             if (Runner.IsForward)
-                AudioSfx.PlayOneShot(Enums.Sounds.UI_StartGame);
+                audioSfx.PlayOneShot(Enums.Sounds.UI_StartGame);
 
             StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
             // Respawn enemies
-            foreach (KillableEntity enemy in GameManager.enemies)
+            foreach (KillableEntity enemy in gm.enemies)
                 enemy.RespawnEntity();
 
             // Start "WaitForGameStart" objects
@@ -414,12 +422,12 @@ namespace NSMB.Game {
             GameState = Enums.GameState.Ended;
             IsMusicEnabled = false;
 
-            GameManager.Pause(false);
-            GameManager.musicManager.Stop();
+            gm.Pause(false);
+            gm.musicManager.Stop();
 
             yield return new WaitForSecondsRealtime(1);
 
-            TeamManager teamManager = GameManager.teamManager;
+            TeamManager teamManager = gm.teamManager;
             TranslationManager tm = GlobalController.Instance.translationManager;
             bool draw = winningTeam == -1;
             string resultText;
@@ -440,7 +448,7 @@ namespace NSMB.Game {
                     }
                 }
             }
-            GameManager.winText.text = resultText;
+            gm.winText.text = resultText;
 
             PlayerData local = Runner.GetLocalPlayerData();
             bool win = !draw && (winningTeam == local.Team || local.IsCurrentlySpectating);
@@ -460,8 +468,8 @@ namespace NSMB.Game {
                 resultTrigger = "startNegative";
             }
 
-            AudioMusic.PlayOneShot(resultSound);
-            GameManager.winTextAnimator.SetTrigger(resultTrigger);
+            audioMusic.PlayOneShot(resultSound);
+            gm.winTextAnimator.SetTrigger(resultTrigger);
 
             if (Runner.IsServer) {
                 // Handle resetting player states for the next game
@@ -503,7 +511,7 @@ namespace NSMB.Game {
             }
 
             speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
-            speedup |= GameManager.teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
+            speedup |= gm.teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
 
             if (!speedup && AlivePlayers.Count <= 2) {
                 // Also speed up the music if all remaining players have one life.
@@ -518,14 +526,14 @@ namespace NSMB.Game {
                 speedup |= allPlayersCritical;
             }
 
-            LoopingMusicPlayer musicManager = GameManager.musicManager;
+            LoopingMusicPlayer musicManager = gm.musicManager;
 
             if (mega) {
-                musicManager.Play(GameManager.megaMushroomMusic);
+                musicManager.Play(gm.megaMushroomMusic);
             } else if (invincible) {
-                musicManager.Play(GameManager.invincibleMusic);
+                musicManager.Play(gm.invincibleMusic);
             } else {
-                musicManager.Play(GameManager.mainMusic);
+                musicManager.Play(gm.mainMusic);
             }
 
             musicManager.FastMusic = speedup;
@@ -537,7 +545,7 @@ namespace NSMB.Game {
         /// <returns>If the star successfully spawned</returns>
         private bool AttemptSpawnBigStar() {
 
-            GameObject[] starSpawns = GameManager.starSpawns;
+            GameObject[] starSpawns = gm.starSpawns;
 
             for (int attempt = 0; attempt < starSpawns.Length; attempt++) {
                 int validSpawns = starSpawns.Length - AvailableStarSpawns.UnsetBitCount();
@@ -581,11 +589,11 @@ namespace NSMB.Game {
         private void SetGameTimestamps() {
             double now = DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
             float secondsSinceStart = Runner.SimulationTime - GameStartTime;
-            GameManager.gameStartTimestamp = now - secondsSinceStart;
+            gm.gameStartTimestamp = now - secondsSinceStart;
 
             int timer = SessionData.Instance.Timer;
             if (timer > 0)
-                GameManager.gameEndTimestamp = GameManager.gameStartTimestamp + (timer * 60);
+                gm.gameEndTimestamp = gm.gameStartTimestamp + (timer * 60);
         }
 
         private IEnumerator CallLoadingComplete(float seconds) {
@@ -595,7 +603,7 @@ namespace NSMB.Game {
 
         //---OnChangeds
         public static void OnGameStartTimerChanged(Changed<GameData> changed) {
-            GameManager.teamScoreboardElement.OnTeamsFinalized(GameManager.teamManager);
+            changed.Behaviour.gm.teamScoreboardElement.OnTeamsFinalized(changed.Behaviour.gm.teamManager);
         }
     }
 }

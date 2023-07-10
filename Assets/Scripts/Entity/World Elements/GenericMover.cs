@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Game;
+using UnityEngine.Rendering.UI;
 
 public class GenericMover : NetworkBehaviour {
 
@@ -16,6 +17,7 @@ public class GenericMover : NetworkBehaviour {
 
     //---Private Variables
     private Vector3 origin;
+    private float? xCurveLength, yCurveLength;
 
     public void Start() {
         if (notNetworked)
@@ -43,17 +45,18 @@ public class GenericMover : NetworkBehaviour {
         if (!target)
             target = transform;
 
-        float xOffset = EvaluateCurve(x, animationOffset, secondsElapsed);
-        float yOffset = EvaluateCurve(y, animationOffset, secondsElapsed);
+        float xOffset = EvaluateCurve(x, ref xCurveLength, animationOffset, secondsElapsed);
+        float yOffset = EvaluateCurve(y, ref yCurveLength, animationOffset, secondsElapsed);
 
         target.position = origin + new Vector3(xOffset, yOffset, 0);
     }
 
-    private static float EvaluateCurve(AnimationCurve curve, double offset, double time) {
+    private static float EvaluateCurve(AnimationCurve curve, ref float? length, double offset, double time) {
         if (curve.length <= 0)
             return 0;
 
-        float end = curve.keys[^1].time;
-        return curve.Evaluate((float) ((time + (offset * end)) % end));
+        length ??= curve.keys[^1].time;
+
+        return curve.Evaluate((float) ((time + (offset * length)) % length));
     }
 }

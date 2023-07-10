@@ -2,6 +2,7 @@
 
 using Fusion;
 using NSMB.Entities.Player;
+using NSMB.Entities.Enemies;
 
 namespace NSMB.Entities {
     [OrderAfter(typeof(PlayerController))]
@@ -21,6 +22,10 @@ namespace NSMB.Entities {
         public Vector3 holderOffset;
         public bool canPlace = true, canKick = true;
         private bool wasHeldLastTick;
+
+        public void BeforeTick() {
+            wasHeldLastTick = Holder;
+        }
 
         public override void Render() {
             if (Holder && nrb.InterpolationTarget) {
@@ -52,10 +57,6 @@ namespace NSMB.Entities {
                 hitbox.enabled = true;
                 base.FixedUpdateNetwork();
             }
-        }
-
-        public void BeforeTick() {
-            wasHeldLastTick = Holder;
         }
 
         public virtual void Kick(PlayerController kicker, bool toRight, float kickFactor, bool groundpound) {
@@ -126,6 +127,39 @@ namespace NSMB.Entities {
                 Holder.SetHeldEntity(null);
 
             base.SpecialKill(right, groundpound, combo);
+        }
+
+        protected override void CheckForEntityCollisions() {
+
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, EntityFilter, CollisionBuffer);
+
+            for (int i = 0; i < count; i++) {
+                GameObject obj = CollisionBuffer[i].gameObject;
+
+                if (obj.transform.IsChildOf(transform))
+                    continue;
+
+                if (Holder && obj.transform.IsChildOf(Holder.transform))
+                    continue;
+
+                if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
+                    if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant)
+                        continue;
+
+                    Utils.Utils.UnwrapLocations(body.position, killable.body.position, out Vector2 ourPos, out Vector2 theirPos);
+                    bool goRight = ourPos.x > theirPos.x;
+
+                    if (Mathf.Abs(ourPos.x - theirPos.x) < 0.015f) {
+                        if (Mathf.Abs(ourPos.y - theirPos.y) < 0.015f) {
+                            goRight = Object.Id.Raw < killable.Object.Id.Raw;
+                        } else {
+                            goRight = ourPos.y < theirPos.y;
+                        }
+                    }
+
+                    FacingRight = goRight;
+                }
+            }
         }
 
         //---OnChanged

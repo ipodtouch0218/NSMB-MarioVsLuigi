@@ -47,56 +47,52 @@ namespace NSMB.Utils {
         }
 
 
-        public static Vector2Int WorldToTilemapPosition(Vector2 worldVec, GameManager manager = null, bool wrap = true) {
-            if (!manager)
-                manager = GameManager.Instance;
+        public static Vector2Int WorldToTilemapPosition(Vector2 worldVec, GameManager gm = null, bool wrap = true) {
+            if (!gm) gm = GameManager.Instance;
 
-            Vector2Int tileLocation = (Vector2Int) manager.tilemap.WorldToCell(worldVec);
+            Vector2Int tileLocation = (Vector2Int) gm.tilemap.WorldToCell(worldVec);
             if (wrap)
-                WrapTileLocation(ref tileLocation, manager);
+                WrapTileLocation(ref tileLocation, gm);
 
             return tileLocation;
         }
 
-        public static bool WrapWorldLocation(ref Vector2 location, GameManager manager = null) {
-            if (!manager)
-                manager = GameManager.Instance;
+        public static bool WrapWorldLocation(ref Vector2 location, GameManager gm = null) {
+            if (!gm) gm = GameManager.Instance;
 
-            if (!manager || !manager.loopingLevel)
+            if (!gm.loopingLevel)
                 return false;
 
-            if (location.x < manager.LevelMinX) {
-                location.x += manager.LevelWidth;
+            if (location.x < gm.LevelMinX) {
+                location.x += gm.LevelWidth;
                 return true;
-            } else if (location.x >= manager.LevelMaxX) {
-                location.x -= manager.LevelWidth;
+            } else if (location.x >= gm.LevelMaxX) {
+                location.x -= gm.LevelWidth;
                 return true;
             }
             return false;
         }
 
-        public static bool WrapWorldLocation(ref Vector3 location, GameManager manager = null) {
-            if (!manager)
-                manager = GameManager.Instance;
+        public static bool WrapWorldLocation(ref Vector3 location, GameManager gm = null) {
+            if (!gm) gm = GameManager.Instance;
 
-            if (!manager || !manager.loopingLevel)
+            if (!gm || !gm.loopingLevel)
                 return false;
 
-            if (location.x < manager.LevelMinX) {
-                location.x += manager.LevelWidth;
+            if (location.x < gm.LevelMinX) {
+                location.x += gm.LevelWidth;
                 return true;
-            } else if (location.x >= manager.LevelMaxX) {
-                location.x -= manager.LevelWidth;
+            } else if (location.x >= gm.LevelMaxX) {
+                location.x -= gm.LevelWidth;
                 return true;
             }
             return false;
         }
 
-        public static int WrappedDirectionSign(Vector2 a, Vector2 b, GameManager manager = null) {
-            if (!manager)
-                manager = GameManager.Instance;
+        public static int WrappedDirectionSign(Vector2 a, Vector2 b, GameManager gm = null) {
+            if (!gm) gm = GameManager.Instance;
 
-            if (!manager.loopingLevel)
+            if (!gm.loopingLevel)
                 return a.x > b.x ? 1 : -1;
 
             if (Mathf.Abs(a.x - b.x) > GameManager.Instance.LevelWidth * 0.5f) {
@@ -106,32 +102,30 @@ namespace NSMB.Utils {
             }
         }
 
-        public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager manager = null) {
-            if (!manager)
-                manager = GameManager.Instance;
+        public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager gm = null) {
+            if (!gm) gm = GameManager.Instance;
 
-            if (!manager.loopingLevel)
+            if (!gm.loopingLevel)
                 return;
 
-            if (tileLocation.x < manager.levelMinTileX) {
-                tileLocation.x += manager.levelWidthTile;
-            } else if (tileLocation.x >= manager.levelMinTileX + manager.levelWidthTile) {
-                tileLocation.x -= manager.levelWidthTile;
+            if (tileLocation.x < gm.levelMinTileX) {
+                tileLocation.x += gm.levelWidthTile;
+            } else if (tileLocation.x >= gm.levelMinTileX + gm.levelWidthTile) {
+                tileLocation.x -= gm.levelWidthTile;
             }
         }
 
-        public static void UnwrapLocations(Vector2 a, Vector2 b, out Vector2 newA, out Vector2 newB, GameManager manager = null) {
-            if (!manager)
-                manager = GameManager.Instance;
+        public static void UnwrapLocations(Vector2 a, Vector2 b, out Vector2 newA, out Vector2 newB, GameManager gm = null) {
+            if (!gm) gm = GameManager.Instance;
 
             newA = a;
             newB = b;
 
-            if (!manager.loopingLevel)
+            if (!gm.loopingLevel)
                 return;
 
-            if (Mathf.Abs(newA.x - newB.x) > manager.LevelWidth * 0.5f)
-                newB.x += manager.LevelWidth * (newB.x > manager.LevelMiddleX ? -1 : 1);
+            if (Mathf.Abs(newA.x - newB.x) > gm.LevelWidth * 0.5f)
+                newB.x += gm.LevelWidth * (newB.x > gm.LevelMiddleX ? -1 : 1);
         }
 
         public static void WrapTileLocation(ref Vector2Int tileLocation, GameManager manager = null) {
@@ -184,7 +178,7 @@ namespace NSMB.Utils {
             return Tile.ColliderType.None;
         }
 
-        public static bool IsTileSolidBetweenWorldBox(Vector2Int tileLocation, Vector2 worldLocation, Vector2 worldBox, bool boxcast = true) {
+        public static bool IsTileSolidBetweenWorldBox(Vector2Int tileLocation, Vector2 worldLocation, Vector2 worldBox, bool boxcast = true, GameManager gm = null) {
             if (boxcast) {
                 bool hitTriggers = Physics2D.queriesHitTriggers;
                 Physics2D.queriesHitTriggers = false;
@@ -195,13 +189,14 @@ namespace NSMB.Utils {
                     return true;
             }
 
+            if (!gm) gm = GameManager.Instance;
             Vector2 ogWorldLocation = worldLocation;
             while (GetTileAtTileLocation(tileLocation) is TileInteractionRelocator it) {
                 worldLocation += (Vector2) it.offset * 0.5f;
                 tileLocation += it.offset;
             }
 
-            Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix((Vector3Int) tileLocation);
+            Matrix4x4 tileTransform = gm.tilemap.GetTransformMatrix((Vector3Int) tileLocation);
 
             Vector2 halfBox = worldBox * 0.5f;
 
@@ -210,7 +205,7 @@ namespace NSMB.Utils {
             BoxPointsBuffer[2] = ogWorldLocation + Vector2.down * halfBox + Vector2.left * halfBox;  // --
             BoxPointsBuffer[3] = ogWorldLocation + Vector2.down * halfBox + Vector2.right * halfBox; // -+
 
-            Sprite sprite = GameManager.Instance.tilemap.GetSprite((Vector3Int) tileLocation);
+            Sprite sprite = gm.tilemap.GetSprite((Vector3Int) tileLocation);
             switch (GetColliderType(tileLocation)) {
             case Tile.ColliderType.Grid:
                 return true;
@@ -226,7 +221,7 @@ namespace NSMB.Utils {
                         point *= 0.5f;
                         point = tileTransform.MultiplyPoint(point);
                         point += (Vector2) tileLocation * 0.5f;
-                        point += (Vector2) GameManager.Instance.tilemap.transform.position;
+                        point += (Vector2) gm.tilemap.transform.position;
                         point += Vector2.one * 0.25f;
                         PhysicsShapeBuffer[j] = point;
                     }

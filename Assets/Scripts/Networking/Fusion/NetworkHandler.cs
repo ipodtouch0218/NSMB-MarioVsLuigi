@@ -19,6 +19,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
     private static GameObject prefab;
+    public NetworkRunner runner;
+    private static bool reattemptCreate;
+    public static int connecting;
 
     //---Properties
     public static string CurrentRegion { get; set; }
@@ -84,9 +87,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public static event OnJoinSessionFailedDelegate OnJoinSessionFailed;
     #endregion
 
-    public NetworkRunner runner;
-    private static bool reattemptCreate;
-    private static int connecting;
 
     #region NetworkRunner Callbacks
     void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {

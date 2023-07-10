@@ -9,7 +9,6 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using static UnityEngine.UI.Image;
 
 namespace NSMB.Entities.Enemies {
 
@@ -127,7 +126,7 @@ namespace NSMB.Entities.Enemies {
                 if (GameManager.Instance)
                     Utils.Utils.WrapWorldLocation(ref redCheckPos);
 
-                //turn around if no ground
+                // Turn around if no ground
                 if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
                     Turnaround(!FacingRight, physics.previousTickVelocity.x);
             }
@@ -140,7 +139,7 @@ namespace NSMB.Entities.Enemies {
                 }
                 body.velocity = new(x, y);
             } else if (data.OnGround) {
-                body.velocity = Vector2.zero;
+                //body.velocity = Vector2.zero;
             }
 
             HandleTile();
@@ -348,10 +347,10 @@ namespace NSMB.Entities.Enemies {
 
             if (!IsInShell) {
                 EnterShell(false, bumper as PlayerController);
-                IsUpsideDown = canBeFlipped;
                 IsStationary = true;
                 Putdown = true;
             }
+            IsUpsideDown = canBeFlipped;
 
             body.velocity = new(body.velocity.x, 5.5f);
 
@@ -377,12 +376,15 @@ namespace NSMB.Entities.Enemies {
 
             if (!((!IsInShell && !Holder) || IsActuallyStationary || Putdown || IsDead)) {
 
-                int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
+                int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, EntityFilter, CollisionBuffer);
 
                 for (int i = 0; i < count; i++) {
                     GameObject obj = CollisionBuffer[i].gameObject;
 
-                    if (obj == gameObject)
+                    if (obj.transform.IsChildOf(transform))
+                        continue;
+
+                    if (Holder && obj.transform.IsChildOf(Holder.transform))
                         continue;
 
                     // Killable entities
