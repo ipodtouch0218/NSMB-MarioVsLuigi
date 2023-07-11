@@ -34,10 +34,16 @@ public class GenericMover : NetworkBehaviour {
     }
 
     public override void Render() {
+        if (GameData.Instance.GameEnded)
+            return;
+
         SetPosition(interpolationTarget, Origin, Runner.SimulationRenderTime - GameData.Instance.GameStartTime);
     }
 
     public override void FixedUpdateNetwork() {
+        if (GameData.Instance.GameEnded)
+            return;
+
         SetPosition(transform, Origin, Runner.SimulationTime - GameData.Instance.GameStartTime);
     }
 

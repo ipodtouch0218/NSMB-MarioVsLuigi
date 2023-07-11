@@ -116,9 +116,9 @@ namespace NSMB.Entities.Enemies {
 
 
             if (data.HitRight && FacingRight) {
-                Turnaround(false, physics.previousTickVelocity.x);
+                Turnaround(false, physics.PreviousTickVelocity.x);
             } else if (data.HitLeft && !FacingRight) {
-                Turnaround(true, physics.previousTickVelocity.x);
+                Turnaround(true, physics.PreviousTickVelocity.x);
             }
 
             if (data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
@@ -128,7 +128,7 @@ namespace NSMB.Entities.Enemies {
 
                 // Turn around if no ground
                 if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
-                    Turnaround(!FacingRight, physics.previousTickVelocity.x);
+                    Turnaround(!FacingRight, physics.PreviousTickVelocity.x);
             }
 
             if (!IsStationary) {

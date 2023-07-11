@@ -203,14 +203,12 @@ namespace NSMB.Entities.Player {
         }
 
         private void InterpolateFacingDirection() {
-            if (GameData.Instance.GameEnded || controller.IsFrozen)
+            if (controller.IsFrozen)
                 return;
-
-            propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
 
             if (modelRotateInstantly || wasTurnaround) {
                 models.transform.rotation = Quaternion.Euler(modelRotationTarget);
-            } else {
+            } else if (!GameData.Instance.GameEnded) {
                 float maxRotation = 2000f * Time.deltaTime;
                 float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
                 x += Mathf.Clamp(modelRotationTarget.x - x, -maxRotation, maxRotation);
@@ -218,6 +216,11 @@ namespace NSMB.Entities.Player {
                 z += Mathf.Clamp(modelRotationTarget.z - z, -maxRotation, maxRotation);
                 models.transform.rotation = Quaternion.Euler(x, y, z);
             }
+
+            if (GameData.Instance.GameEnded)
+                return;
+
+            propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
         }
 
         private void SetParticleEmission(ParticleSystem particle, bool value) {

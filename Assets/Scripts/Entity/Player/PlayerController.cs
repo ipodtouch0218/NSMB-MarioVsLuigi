@@ -924,11 +924,12 @@ namespace NSMB.Entities.Player {
                     inactiveFireball = fireball;
                     break;
                 }
-                if (inactiveFireball) {
-                    Debug.Log("predicting use of " + inactiveFireball.Object.Id);
-                    inactiveFireball.Initialize(this, spawnPos, ice, right);
-                }
 
+                if (!inactiveFireball)
+                    // No available fireball. This should never happen :tm:
+                    break;
+
+                inactiveFireball.Initialize(this, spawnPos, ice, right);
                 FireballDelayTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
                 FireballAnimCounter++;
 
@@ -2110,14 +2111,14 @@ namespace NSMB.Entities.Player {
                 body.velocity = new(newX, body.velocity.y);
 
             } else if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !IsSliding) {
-                //we can walk here
+                // We can walk here
 
                 float speed = Mathf.Abs(body.velocity.x);
                 bool reverse = body.velocity.x != 0 && ((left ? 1 : -1) == sign);
 
-                //check that we're not going above our limit
+                // Check that we're not going above our limit
                 float max = maxArray[maxStage] + CalculateSlopeMaxSpeedOffset(Mathf.Abs(FloorAngle) * (uphill ? 1 : -1));
-                //floating point & network accuracy bs means -0.01
+                // Floating point & network accuracy bs means -0.01
                 if (speed - 0.01f > max) {
                     acc = -acc;
                 }
@@ -2162,12 +2163,12 @@ namespace NSMB.Entities.Player {
                 float newX = body.velocity.x + acc * Runner.DeltaTime * direction;
 
                 if (Mathf.Abs(newX) - speed > 0) {
-                    //clamp only if accelerating
+                    // Clamp only if accelerating
                     newX = Mathf.Clamp(newX, -max, max);
                 }
 
                 if (IsSkidding && !IsTurnaround && (Mathf.Sign(newX) != sign || speed < 0.05f)) {
-                    //turnaround
+                    // Turnaround
                     TurnaroundBoostTime = 0.1667f;
                     newX = 0;
                 }
@@ -2175,7 +2176,7 @@ namespace NSMB.Entities.Player {
                 body.velocity = new(newX, body.velocity.y);
 
             } else if (IsOnGround || IsSwimming) {
-                //not holding anything, sliding, or holding both directions. decelerate
+                // Not holding anything, sliding, or holding both directions. decelerate
                 IsSkidding = false;
                 IsTurnaround = false;
 
@@ -2184,10 +2185,10 @@ namespace NSMB.Entities.Player {
                     acc = -SWIM_BUTTON_RELEASE_DEC;
                 else if (IsSliding) {
                     if (angle > slopeSlidingAngle) {
-                        //uphill / downhill
+                        // Uphill / downhill
                         acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * (uphill ? -1 : 1);
                     } else {
-                        //flat ground
+                        // Flat ground
                         acc = -SPEED_STAGE_ACC[0];
                     }
                 } else if (OnIce)

@@ -4,17 +4,17 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
 
-public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
+public class PhysicsEntity : NetworkBehaviour {
 
     //---Staic Variables
     private static readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[32];
 
     //---Networked Variables
     [Networked] public ref PhysicsDataStruct Data => ref MakeRef<PhysicsDataStruct>();
+    [Networked] public Vector3 PreviousTickVelocity { get; set; }
 
     //---Public Variables
     public Collider2D currentCollider;
-    public Vector2 previousTickVelocity;
 
     //---Serialized Variables
     [SerializeField] private bool goUpSlopes, getCrushedByGroundEntities = true;
@@ -25,10 +25,6 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
 
     public void Awake() {
         if (!body) body = GetComponent<Rigidbody2D>();
-    }
-
-    public void BeforeTick() {
-        previousTickVelocity = body.velocity;
     }
 
     public PhysicsDataStruct UpdateCollisions() {
@@ -60,7 +56,7 @@ public class PhysicsEntity : NetworkBehaviour, IBeforeTick {
                 // Touching floor
                 // If we're moving upwards, don't touch the floor.
                 // Most likely, we're inside a semisolid.
-                if (!previousOnGround && previousTickVelocity.y > 0.1f) {
+                if (!previousOnGround && PreviousTickVelocity.y > 0.1f) {
                     continue;
                 }
 

@@ -165,7 +165,7 @@ namespace NSMB.Entities.Enemies {
 
         public void Turnaround(bool hitWallOnLeft) {
             FacingRight = hitWallOnLeft;
-            body.velocity = new((Lit ? Mathf.Abs(physics.previousTickVelocity.x) : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+            body.velocity = new((Lit ? Mathf.Abs(physics.PreviousTickVelocity.x) : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
 
             if (Runner.IsForward)
                 animator.SetTrigger("turnaround");

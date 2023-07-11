@@ -4949,7 +4949,9 @@ MonoBehaviour:
   _IsActive:
     _value: 0
   body: {fileID: 1186833380152900418}
+  nrb: {fileID: 2914323514277592658}
   sfx: {fileID: 3843124130648117525}
+  checkForNearbyPlayersWhenRespawning: 1
   _Owner: {fileID: 0}
   _AlreadyBounced:
     _value: 0
@@ -4967,7 +4969,6 @@ MonoBehaviour:
   bounceHeight: 6.75
   terminalVelocity: 6.25
   physics: {fileID: 376300006025663058}
-  nrb: {fileID: 2914323514277592658}
   renderers:
   - {fileID: 4710279457085823811}
   - {fileID: 7450112483459336877}
@@ -5175,6 +5176,7 @@ MonoBehaviour:
   currentCollider: {fileID: -1769135492019179076}
   previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
+  getCrushedByGroundEntities: 1
   floorAndRoofCutoff: 0.3
   body: {fileID: 0}
 --- !u!114 &1011982274984717417
@@ -5232,7 +5234,7 @@ MonoBehaviour:
   _interpolationDataSource: 2
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 3150262645453679834}
-  InterpolateErrorCorrection: 1
+  InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 5
     MaxRate: 45
@@ -5343,6 +5345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0
   fps: 8
@@ -5451,6 +5454,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0
   fps: 8

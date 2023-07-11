@@ -9,7 +9,7 @@ using NSMB.Tiles;
 namespace NSMB.Entities {
 
     [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
-    [OrderAfter(typeof(PlayerController))]
+    [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
     public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
         //---Static Variables
@@ -82,17 +82,24 @@ namespace NSMB.Entities {
                 GameData.Instance.PooledFireballs.Add(this);
         }
 
+        public override void Render() {
+            if (GameData.Instance.GameEnded) {
+                foreach (var anim in GetComponentsInChildren<LegacyAnimateSpriteRenderer>())
+                    anim.enabled = false;
+            }
+        }
+
         public override void FixedUpdateNetwork() {
             body.isKinematic = !IsActive;
             hitbox.enabled = IsActive;
 
-            if (!IsActive)
+            if (!IsActive) {
+                body.velocity = Vector2.zero;
                 return;
+            }
 
             if (GameData.Instance && GameData.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
-                foreach (Animation anim in GetComponentsInChildren<Animation>())
-                    anim.enabled = false;
                 body.isKinematic = true;
                 //body.simulated = false;
                 return;
@@ -174,7 +181,7 @@ namespace NSMB.Entities {
 
         //---BasicEntity overrides
         public override void DespawnEntity(object data = null) {
-            if (IsActive && (data is not bool playEffect || playEffect))
+            if (data is not bool playEffect || playEffect)
                 BreakEffectAnimCounter++;
 
             IsActive = false;

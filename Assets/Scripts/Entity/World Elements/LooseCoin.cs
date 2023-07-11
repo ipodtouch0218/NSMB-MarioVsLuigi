@@ -19,20 +19,20 @@ namespace NSMB.Entities.Collectable {
         //---Components
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private PhysicsEntity physics;
-        [SerializeField] private Animation spriteAnimation;
+        [SerializeField] private LegacyAnimateSpriteRenderer spriteAnimation;
         [SerializeField] private BoxCollider2D hitbox;
 
         public override void OnValidate() {
             base.OnValidate();
             if (!spriteRenderer) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             if (!physics) physics = GetComponent<PhysicsEntity>();
-            if (!spriteAnimation) spriteAnimation = GetComponentInChildren<Animation>();
+            if (!spriteAnimation) spriteAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
             if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
         }
 
         public override void Spawned() {
             base.Spawned();
-            CollectableTick = (int) (Runner.Tick + (0.2f / Runner.DeltaTime));
+            CollectableTick = (int) (Runner.Tick + (0.2f * Runner.Simulation.Config.TickRate));
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
             body.velocity = Vector2.up * GameData.Instance.random.RangeInclusive(5.5f, 6f);
@@ -68,7 +68,7 @@ namespace NSMB.Entities.Collectable {
 
                 // TODO: doesn't always trigger, even for host. Strange.
                 // IsForward is ok, the sound isnt top priority
-                if (physics.previousTickVelocity.y < -0.5f * (Mathf.Sin(physics.Data.FloorAngle) + 1f))
+                if (physics.PreviousTickVelocity.y < -0.5f * (Mathf.Sin(physics.Data.FloorAngle) + 1f))
                     CoinBounceAnimCounter++;
             }
         }
