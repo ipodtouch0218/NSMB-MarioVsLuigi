@@ -88,6 +88,12 @@ MonoBehaviour:
   m_SpriteCharacterTable:
   - m_ElementType: 2
     m_Unicode: 65534
+    m_GlyphIndex: 39
+    m_Scale: 1
+    m_Name: hudnumber_x
+    m_HashCode: -148913443
+  - m_ElementType: 2
+    m_Unicode: 65534
     m_GlyphIndex: 0
     m_Scale: 1
     m_Name: room_timer
@@ -137,61 +143,61 @@ MonoBehaviour:
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 8
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_1
     m_HashCode: -657421294
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 9
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_2
     m_HashCode: -657421295
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 10
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_3
     m_HashCode: -657421296
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 11
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_4
     m_HashCode: -657421289
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 12
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_5
     m_HashCode: -657421290
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 13
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_6
     m_HashCode: -657421291
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 14
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_7
     m_HashCode: -657421292
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 15
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_8
     m_HashCode: -657421285
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 16
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_9
     m_HashCode: -657421286
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 17
-    m_Scale: 1
+    m_Scale: 0.75
     m_Name: room_smallnumber_0
     m_HashCode: -657421293
   - m_ElementType: 2
@@ -320,12 +326,6 @@ MonoBehaviour:
     m_Scale: 1
     m_Name: hudnumber_9
     m_HashCode: -148913508
-  - m_ElementType: 2
-    m_Unicode: 65534
-    m_GlyphIndex: 39
-    m_Scale: 1
-    m_Name: hudnumber_x
-    m_HashCode: -148913443
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 40

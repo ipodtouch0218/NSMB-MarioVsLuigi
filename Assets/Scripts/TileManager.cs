@@ -26,15 +26,12 @@ namespace NSMB.Tiles {
         //---Private Variables
         private GameManager gm;
 
-        public override void Spawned() {
-            if (!gm)
-                Initialize(GameManager.Instance);
+        public void Awake() {
+            gm = GameManager.Instance;
+            GameManager.Instance.tileManager = this;
         }
 
-        public void Initialize(GameManager gm) {
-            this.gm = gm;
-            gm.tileManager = this;
-
+        public override void Spawned() {
             ChunksX = Mathf.CeilToInt(gm.levelWidthTile / 16f);
             ChunksY = Mathf.CeilToInt(gm.levelHeightTile / 16f);
             WorldOriginX = gm.levelMinTileX;

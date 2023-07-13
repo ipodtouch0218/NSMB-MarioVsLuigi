@@ -245,8 +245,8 @@ namespace NSMB.Entities.Enemies {
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player) {
 
-            // Don't interact with our lovely holder
-            if (Holder == player)
+            // Don't interact with anyone if we're being held.
+            if (Holder)
                 return;
 
             // Temporary invincibility

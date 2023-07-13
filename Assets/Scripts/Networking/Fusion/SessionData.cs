@@ -216,7 +216,7 @@ public class SessionData : NetworkBehaviour {
     public void Rpc_UpdateTypingCounter(RpcInfo info = default) => Chat.SetTypingIndicator(info.Source);
 
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, TickAligned = false)]
     public void Rpc_StartGame() {
 
         // Set PlayerIDs and spectator values for players

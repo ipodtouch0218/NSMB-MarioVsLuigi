@@ -471,6 +471,9 @@ namespace NSMB.Game {
             audioMusic.PlayOneShot(resultSound);
             gm.winTextAnimator.SetTrigger(resultTrigger);
 
+            // Return back to the main menu
+            yield return new WaitForSecondsRealtime(secondsUntilMenu);
+
             if (Runner.IsServer) {
                 // Handle resetting player states for the next game
                 foreach (PlayerRef player in Runner.ActivePlayers) {
@@ -490,8 +493,6 @@ namespace NSMB.Game {
                 SessionData.Instance.AlternatingMusicIndex++;
             }
 
-            // Return back to the main menu
-            yield return new WaitForSecondsRealtime(secondsUntilMenu);
             SessionData.Instance.SetGameStarted(false);
             SessionData.Instance.GameStartTimer = TickTimer.None;
             Runner.SetActiveScene(0);

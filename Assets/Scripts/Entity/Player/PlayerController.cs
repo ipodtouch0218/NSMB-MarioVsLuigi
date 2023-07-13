@@ -534,6 +534,9 @@ namespace NSMB.Entities.Player {
                         body.velocity += Vector2.up * 7f;
                     }
                     DeathAnimationTimer = TickTimer.None;
+                    if (Lives == 0) {
+                        PreRespawnTimer = TickTimer.CreateFromSeconds(Runner, 2.4f);
+                    }
                 }
             }
 
@@ -972,7 +975,7 @@ namespace NSMB.Entities.Player {
             if (GameManager.Instance.paused || GameData.Instance.GameEnded)
                 return;
 
-            if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead) {
+            if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead || MegaStartTimer.IsActive(Runner)) {
                 PlaySound(Enums.Sounds.UI_Error);
                 return;
             }
@@ -1103,7 +1106,7 @@ namespace NSMB.Entities.Player {
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         public void RPC_SpawnReserveItem() {
-            if (StoredPowerup == Enums.PowerupState.NoPowerup)
+            if (StoredPowerup == Enums.PowerupState.NoPowerup || MegaStartTimer.IsActive(Runner))
                 return;
 
             SpawnItem(StoredPowerup.GetPowerupScriptable().prefab);
@@ -1161,9 +1164,15 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            if (noLivesStarSpawnDirection == 0)
-                noLivesStarSpawnDirection = starDirection;
-            starDirection = noLivesStarSpawnDirection++ % 4;
+            if (Lives == 0) {
+                fastStars = true;
+                starDirection = noLivesStarSpawnDirection++ % 4;
+
+                if (starDirection == 2)
+                    starDirection = 1;
+                else if (starDirection == 1)
+                    starDirection = 2;
+            }
 
             while (amount > 0) {
                 if (Stars <= 0)
@@ -1185,7 +1194,7 @@ namespace NSMB.Entities.Player {
                 Stars--;
                 amount--;
             }
-            //GameData.Instance.CheckForWinner();
+            GameData.Instance.CheckForWinner();
         }
         #endregion
 
@@ -1205,8 +1214,8 @@ namespace NSMB.Entities.Player {
             RespawnTimer = TickTimer.CreateFromSeconds(Runner, 4.3f);
 
             if ((Lives > 0 && --Lives == 0) || Disconnected) {
-                // Last death - drop all stars in 4-star waves.
-                //if (!GameData.Instance.CheckForWinner())
+                // Last death - drop all stars at 0.5s each
+                if (!GameData.Instance.CheckForWinner())
                     SpawnStars(1, DeathplaneDeath);
 
                 PreRespawnTimer = TickTimer.None;
@@ -1235,6 +1244,11 @@ namespace NSMB.Entities.Player {
             WallSlideLeft = false;
             IsSwimming = false;
             IsWaterWalking = false;
+
+            if (FrozenCube) {
+                Runner.Despawn(FrozenCube.Object);
+                IsFrozen = false;
+            }
 
             body.velocity = Vector2.zero;
             body.isKinematic = false;
@@ -1266,7 +1280,7 @@ namespace NSMB.Entities.Player {
             RespawnTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
             if (Lives == 0) {
-                //GameData.Instance.CheckForWinner();
+                GameData.Instance.CheckForWinner();
 
                 if (Object.HasInputAuthority)
                     GameManager.Instance.spectationManager.Spectating = true;
@@ -1279,6 +1293,7 @@ namespace NSMB.Entities.Player {
             networkRigidbody.TeleportToPosition(spawnpoint);
             cameraController.Recenter(spawnpoint);
 
+            IsFrozen = false;
             IsRespawning = true;
             FacingRight = true;
             transform.localScale = Vector2.one;
@@ -1296,6 +1311,7 @@ namespace NSMB.Entities.Player {
         public void Respawn() {
 
             //gameObject.SetActive(true);
+            IsFrozen = false;
             IsDead = false;
             IsRespawning = false;
             State = Enums.PowerupState.NoPowerup;
@@ -2504,7 +2520,7 @@ namespace NSMB.Entities.Player {
             bool canJump = jumpPressed || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
             bool doJump = (canJump && (IsOnGround || Runner.SimulationTime <= CoyoteTime)) || (!IsSwimming && SwimJump);
             bool doWalljump = canJump && !IsOnGround && WallSliding;
-            bool doGroundpound = down;
+            bool doGroundpound = pressedButtons.IsSet(PlayerControls.Down);
 
             /*
             //GROUNDPOUND BUFFERING
@@ -2652,7 +2668,7 @@ namespace NSMB.Entities.Player {
 
             HandleSlopes();
 
-            if (down) {
+            if (doGroundpound) {
                 HandleGroundpoundStart(left, right);
             }
 

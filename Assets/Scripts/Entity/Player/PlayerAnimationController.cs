@@ -145,15 +145,17 @@ namespace NSMB.Entities.Player {
         }
 
         private void SetFacingDirection() {
-
             //TODO: refactor
-
-            if (GameData.Instance.GameEnded || controller.IsFrozen)
+            if (GameData.Instance.GameEnded || controller.IsFrozen) {
+                if (controller.IsDead) {
+                    modelRotationTarget.Set(0, 180, 0);
+                    modelRotateInstantly = true;
+                }
                 return;
+            }
 
             //rotChangeTarget = models.transform.rotation.eulerAngles;
             float delta = Time.deltaTime;
-            float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
 
             bool rotChangeFacingDirection = false;
             modelRotateInstantly = false;
@@ -163,7 +165,7 @@ namespace NSMB.Entities.Player {
                 modelRotateInstantly = true;
 
             } else if (controller.IsDead) {
-                if (animator.GetBool("firedeath") && deathTimer > deathUpTime) {
+                if (controller.FireDeath && !controller.DeathAnimationTimer.IsRunning) {
                     modelRotationTarget.Set(-15, controller.FacingRight ? 110 : 250, 0);
                 } else {
                     modelRotationTarget.Set(0, 180, 0);
