@@ -139,7 +139,7 @@ namespace NSMB.Entities.Enemies {
                 }
                 body.velocity = new(x, y);
             } else if (data.OnGround) {
-                //body.velocity = Vector2.zero;
+                body.velocity = Vector2.zero;
             }
 
             HandleTile();

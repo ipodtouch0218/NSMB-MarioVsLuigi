@@ -9,6 +9,8 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Collectable.Powerups {
+
+    [OrderAfter(typeof(PlayerController))]
     public class Powerup : CollectableEntity, IBlockBumpable {
 
         //---Static Variables
@@ -142,7 +144,6 @@ namespace NSMB.Entities.Collectable.Powerups {
         private void HandleSpawningAnimation() {
 
             if (FollowPlayer && SpawnAnimationTimer.IsActive(Runner)) {
-
 
                 float timeRemaining = SpawnAnimationTimer.RemainingRenderTime(Runner) ?? 0f;
                 float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;

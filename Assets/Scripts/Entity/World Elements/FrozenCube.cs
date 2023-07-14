@@ -269,6 +269,7 @@ namespace NSMB.Entities {
             Fallen = false;
             flying = false;
             FastSlide = true;
+            ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 3f);
 
             if (FrozenEntity.IsFlying) {
                 Fallen = true;
