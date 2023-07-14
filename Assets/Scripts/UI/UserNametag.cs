@@ -73,16 +73,21 @@ public class UserNametag : MonoBehaviour {
 
         cachedNickname ??= data.GetNickname();
 
-        Team team = ScriptableManager.Instance.teams[data.Team];
-        text.text = (data.IsRoomOwner ? "<sprite name=room_host>" : "")
-            + (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind ? team.textSpriteColorblindBig : "")
-            + cachedNickname + "\n";
+        // TODO: this allocates every frame.
+
+        string newText = (data.IsRoomOwner ? "<sprite name=room_host>" : "");
+        if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
+            Team team = ScriptableManager.Instance.teams[data.Team];
+            newText += team.textSpriteColorblindBig;
+        }
+        newText += cachedNickname + "\n";
 
         if (parent.Lives >= 0)
-            text.text += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
+            newText += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
 
-        text.text += Utils.GetSymbolString("Sx" + parent.Stars);
+        newText += Utils.GetSymbolString("Sx" + parent.Stars);
 
+        text.text = newText;
         if (rainbowName)
             text.color = Utils.GetRainbowColor(parent.Runner);
     }

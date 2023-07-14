@@ -64,7 +64,7 @@ public class SessionData : NetworkBehaviour {
 
         PrivateRoom = !Runner.SessionInfo.IsVisible;
         if (MaxPlayers == 0) {
-            Utils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
+            NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
             MaxPlayers = (byte) players;
         }
 

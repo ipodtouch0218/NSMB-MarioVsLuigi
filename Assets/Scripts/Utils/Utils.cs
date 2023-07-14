@@ -14,7 +14,7 @@ namespace NSMB.Utils {
     public class Utils {
 
         //---Buffers
-        private static readonly List<Vector2> PhysicsShapeBuffer = new(16);
+        private static readonly List<Vector2> PhysicsShapeBuffer = new(8);
         private static readonly Vector2[] BoxPointsBuffer = new Vector2[4];
 
         public static bool BitTest(long v, int index) {
@@ -436,37 +436,12 @@ namespace NSMB.Utils {
             return Vector2.Distance(a, b);
         }
 
-        public static bool GetSessionProperty(SessionInfo session, string key, out int value) {
-            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
-                value = property;
-                return true;
-            }
-            value = default;
-            return false;
-        }
-        public static bool GetSessionProperty(SessionInfo session, string key, out string value) {
-            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
-                value = property;
-                return true;
-            }
-            value = default;
-            return false;
-        }
-        public static bool GetSessionProperty(SessionInfo session, string key, out bool value) {
-            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
-                value = property == 1;
-                return true;
-            }
-            value = default;
-            return false;
-        }
-
         // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
         public static PowerupScriptable GetRandomItem(PlayerController player) {
             PowerupScriptable[] powerups = ScriptableManager.Instance.powerups;
             GameManager gm = GameManager.Instance;
 
-            // "losing" variable based on ln(x+1), x being the # of stars we're behind
+            // "Losing" variable based on ln(x+1), x being the # of stars we're behind
             int ourStars = gm.teamManager.GetTeamStars(player.data.Team);
             int leaderStars = gm.teamManager.GetFirstPlaceStars();
 
@@ -574,15 +549,15 @@ namespace NSMB.Utils {
                 return spectatorColor;
 
             PlayerData data = player.GetPlayerData(runner);
-            //prioritize spectator status
+            // Prioritize spectator status
             if (!data || data.IsManualSpectator || data.IsCurrentlySpectating)
                 return spectatorColor;
 
-            //then teams
+            // Then teams
             if (SessionData.Instance && SessionData.Instance.Teams && data.Team >= 0 && data.Team < ScriptableManager.Instance.teams.Length)
                 return GetTeamColor(data.Team, s, v);
 
-            //then id based color
+            // Then id based color
             int result = -1;
             int count = 0;
             foreach (PlayerRef pl in runner.ActivePlayers.OrderBy(pr => pr.GetPlayerData(runner).JoinTick)) {
@@ -628,12 +603,8 @@ namespace NSMB.Utils {
             return pingSymbol;
         }
 
-        public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {
-            counter = Mathf.Clamp(counter - delta, min, max);
-        }
-
         public static Color GetRainbowColor(NetworkRunner runner) {
-            //four seconds per revolution
+            // Four seconds per revolution
             if (!runner) return Color.white;
             double time = runner.SimulationTime * 0.25d;
             time %= 1;
@@ -661,6 +632,22 @@ namespace NSMB.Utils {
             seconds = minutes * 60 + seconds;
 
             return seconds;
+        }
+
+        public static bool BufferContains<T>(T[] buffer, int bufferLength, T element) {
+            for (int i = 0; i < bufferLength; i++) {
+                if (element.Equals(buffer[i]))
+                    return true;
+            }
+            return false;
+        }
+
+        public static void IntersectWithBuffer<T>(IList<T> collection, T[] buffer, int bufferLength) {
+            for (int i = collection.Count - 1; i >= 0; i--) {
+                if (!BufferContains(buffer, bufferLength, collection[i])) {
+                    collection.RemoveAt(i);
+                }
+            }
         }
     }
 }

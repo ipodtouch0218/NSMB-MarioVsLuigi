@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 using Fusion;
+using NSMB.Utils;
 
 public class CloudPlatform : SimulationBehaviour {
 
@@ -66,7 +67,7 @@ public class CloudPlatform : SimulationBehaviour {
     public override void Render() {
 
         // Update collisions
-        int collisionCount = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + trigger.offset, trigger.size, 0, CollisionBuffer);
+        int collisionCount = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + trigger.offset, trigger.size, 0, CollisionBuffer, Layers.MaskEntities);
         for (int i = 0; i < collisionCount; i++) {
             var obj = CollisionBuffer[i];
 
@@ -75,7 +76,7 @@ public class CloudPlatform : SimulationBehaviour {
 
         // Update collision timers
         foreach (CloudContact contact in positions) {
-            if (!contact.exit && (!contact.collider || contact.rb.velocity.y > 0.2f))
+            if (!contact.exit && (!contact.collider || contact.rb.velocity.y > 0.2f || !CollisionBuffer.Contains(contact.collider)))
                 contact.exit = true;
 
             if (contact.exit) {
@@ -86,11 +87,11 @@ public class CloudPlatform : SimulationBehaviour {
         }
 
         // Purge old collisions
-        positions.RemoveAll(cc => !cc.collider || cc.exit && cc.timer >= time);
-
-        IEnumerable<Collider2D> currentCollisions = CollisionBuffer.Take(collisionCount);
-        foreach (CloudContact contact in positions.Where(contact => !contact.exit && !currentCollisions.Contains(contact.collider))) {
-            contact.exit = true;
+        for (int i = positions.Count - 1; i >= 0; i--) {
+            CloudContact contact = positions[i];
+            if (!contact.collider || (contact.exit && contact.timer >= time)) {
+                positions.RemoveAt(i);
+            }
         }
 
         // Handle graphics
@@ -129,11 +130,12 @@ public class CloudPlatform : SimulationBehaviour {
 
     private void HandleTrigger(Collider2D collision) {
         Rigidbody2D rb = collision.attachedRigidbody;
-        if (!rb || rb.isKinematic || rb.velocity.y > 0.2f || rb.position.y < transform.position.y)
+        if (!rb || rb.isKinematic || rb.velocity.y > 0.2f || rb.position.y < ground.transform.position.y)
             return;
 
-        if (GetContact(collision) == null)
+        if (GetContact(collision) == null) {
             positions.Add(new(this, collision.attachedRigidbody, collision as BoxCollider2D));
+        }
     }
 
     private CloudContact GetContact(Collider2D collider) {

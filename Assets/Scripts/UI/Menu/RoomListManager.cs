@@ -97,11 +97,11 @@ public class RoomListManager : MonoBehaviour {
 
         foreach (SessionInfo session in sessionList) {
 
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.Lives, out int lives);
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string host);
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int players);
+            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.Lives, out int lives);
+            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
+            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
+            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string host);
+            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int players);
 
             bool valid = true;
             valid &= session.IsVisible && session.IsOpen;

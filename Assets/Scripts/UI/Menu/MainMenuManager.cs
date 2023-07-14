@@ -218,7 +218,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         // Update the room header text
         SessionInfo session = Runner.SessionInfo;
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
         lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
 
         // Discord RPC
@@ -767,7 +767,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         if (Runner && Runner.SessionInfo) {
             SessionInfo session = Runner.SessionInfo;
-            Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
+            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
             lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
             lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
 

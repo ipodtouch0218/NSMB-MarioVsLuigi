@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class HorizontalCamera : MonoBehaviour {
 
     //---Static Variables
-    private static readonly float BaseSize = 3.5f;
+    private static readonly float BaseSize = 2.53125f;
 
     public static float SizeIncreaseTarget = 0f, SizeIncreaseCurrent = 0f;
     private static float SizeIncreaseVelocity;

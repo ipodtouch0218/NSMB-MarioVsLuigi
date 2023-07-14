@@ -53,8 +53,8 @@
         "DeltaAdjustment": 2,
         "AllowedJitter": 25,
         "SnapLimit": 500,
-        "MultiplierMin": 2.0,
-        "MultiplierMax": 2.5
+        "MultiplierMin": 2.25,
+        "MultiplierMax": 2.75
     },
     "Network": {
         "SocketSendBufferSize": 256,

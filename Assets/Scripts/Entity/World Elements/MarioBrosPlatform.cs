@@ -96,8 +96,8 @@ namespace NSMB.Entities.World {
         }
 
         public override void FixedUpdateNetwork() {
-            // TODO: don't use linq
-            foreach (BumpInfo bump in Bumps.ToList()) {
+            for (int i = Bumps.Count - 1; i >= 0; i--) {
+                BumpInfo bump = Bumps[i];
                 if (bump.spawnTick + (bumpDuration / Runner.DeltaTime) < Runner.Tick)
                     Bumps.Remove(bump);
             }

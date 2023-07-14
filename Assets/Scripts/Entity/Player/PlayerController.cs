@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -716,8 +715,8 @@ namespace NSMB.Entities.Player {
             bool fromRight = ours.x < theirs.x;
 
             float dot = Vector2.Dot((ours - theirs).normalized, Vector2.up);
-            bool above = dot > 0.7f;
-            bool otherAbove = dot < -0.7f;
+            bool above = dot > 0.6f;
+            bool otherAbove = dot < -0.6f;
 
             if (other.IsStarmanInvincible) {
                 // They are invincible. let them decide if they've hit us.
@@ -801,11 +800,10 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-
-            if (other.IsDamageable && above/* && (body.velocity.y < 0.1f || other.IsInShell)*/) {
+            if (other.IsDamageable && above) {
                 // Hit them from above
                 DoEntityBounce = !IsGroundpounding && !IsDrilling;
-                bool groundpounded = HasGroundpoundHitbox || IsDrilling;
+                bool groundpounded = HasGroundpoundHitbox;
 
                 if (State == Enums.PowerupState.MiniMushroom && other.State != Enums.PowerupState.MiniMushroom) {
                     // We are mini, they arent. special rules.
@@ -825,10 +823,13 @@ namespace NSMB.Entities.Player {
                         other.DoKnockback(!fromRight, dropStars ? (groundpounded ? 3 : 1) : 0, false, Object);
                     }
                 }
+                Debug.Log($"Damaged {other.data.Nickname}. Groundpounding? {groundpounded}");
                 return;
-            } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove) {
-                if (State == Enums.PowerupState.MiniMushroom || other.State == Enums.PowerupState.MiniMushroom) {
 
+            } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove) {
+                // Collided with them
+                if (State == Enums.PowerupState.MiniMushroom || other.State == Enums.PowerupState.MiniMushroom) {
+                    // Minis
                     if (State == Enums.PowerupState.MiniMushroom)
                         DoKnockback(fromRight, dropStars ? 1 : 0, false, other.Object);
 
@@ -1654,7 +1655,7 @@ namespace NSMB.Entities.Player {
 
             RaycastHit2D hit = Runner.GetPhysicsScene2D().BoxCast(body.position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x - Physics2D.defaultContactOffset * 2f) * transform.lossyScale.x, 0.1f), 0, body.velocity.normalized, (body.velocity * Runner.DeltaTime).magnitude, Layers.MaskAnyGround);
             if (hit) {
-                //hit ground
+                // Hit ground
                 float angle = Vector2.SignedAngle(Vector2.up, hit.normal);
                 if (Mathf.Abs(angle) > 89)
                     return;
@@ -2666,26 +2667,7 @@ namespace NSMB.Entities.Player {
 
             HandleWallslide(left, right, doWalljump);
 
-            HandleSlopes();
-
-            if (doGroundpound) {
-                HandleGroundpoundStart(left, right);
-            }
-
-            HandleGroundpound();
-
-            HandleSliding(up, down, left, right);
-
             if (IsOnGround) {
-                if (IsPropellerFlying) {
-                    float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
-                    if (remainingTime < 0.5f) {
-                        IsPropellerFlying = false;
-                        PropellerLaunchTimer = TickTimer.None;
-                    }
-                }
-                IsSpinnerFlying = false;
-                IsDrilling = false;
                 if ((TimeGrounded == Runner.SimulationTime) && !IsGroundpounding && !IsCrouching && !IsInShell && !HeldEntity && State != Enums.PowerupState.MegaMushroom) {
                     bool edge = !Runner.GetPhysicsScene2D().BoxCast(body.position, MainHitbox.size * 0.75f, 0, Vector2.down, 0, Layers.MaskAnyGround);
                     bool edgeLanding = false;
@@ -2710,21 +2692,40 @@ namespace NSMB.Entities.Player {
                 }
             }
 
+
             if (!(IsGroundpounding && !IsOnGround)) {
                 // Normal walking/running
                 HandleWalkingRunning(left, right);
             }
+
+            HandleSlopes();
 
             if (!(IsGroundpounding && !IsOnGround && !DoEntityBounce)) {
                 // Jumping
                 HandleJumping(jumpHeld, doJump, down);
             }
 
-            HandleSlopes();
+            //HandleSlopes();
+
+            HandleGroundpound(doGroundpound, left, right);
+
+            HandleSliding(up, down, left, right);
 
             HandleFacingDirection(left, right);
 
             HandleGravity(jumpHeld);
+
+            if (IsOnGround) {
+                if (IsPropellerFlying) {
+                    float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
+                    if (remainingTime < 0.2f) {
+                        IsPropellerFlying = false;
+                        PropellerLaunchTimer = TickTimer.None;
+                    }
+                }
+                IsSpinnerFlying = false;
+                IsDrilling = false;
+            }
 
             // Terminal velocity
             float terminalVelocityModifier = State switch {
@@ -2892,7 +2893,15 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        private void HandleGroundpoundStart(bool left, bool right) {
+        private void HandleGroundpound(bool groundpoundInputted, bool left, bool right) {
+            if (groundpoundInputted)
+                TryStartGroundpound(left, right);
+
+            HandleGroundpoundStartAnimation();
+            HandleGroundpoundBlockCollision();
+        }
+
+        private void TryStartGroundpound(bool left, bool right) {
 
             if (IsOnGround || IsInKnockback || IsGroundpounding || IsDrilling
                 || HeldEntity || IsCrouching || IsSliding || IsInShell
@@ -2936,19 +2945,26 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        private void HandleGroundpound() {
-            if (IsGroundpounding && GroundpoundStartTimer.IsActive(Runner)) {
-                if (GroundpoundStartTimer.RemainingTime(Runner) <= .066f) {
-                    body.velocity = Vector2.zero;
-                } else {
-                    body.velocity = Vector2.up * 1.5f;
-                }
-            }
+        private static readonly Vector2 GroundpoundStartUpwardsVelocity = Vector2.up * 1.5f;
+        private void HandleGroundpoundStartAnimation() {
 
-            if (IsGroundpounding && GroundpoundStartTimer.Expired(Runner)) {
+            if (!IsGroundpounding || !GroundpoundStartTimer.IsRunning)
+                return;
+
+            if (GroundpoundStartTimer.Expired(Runner)) {
                 body.velocity = Vector2.down * groundpoundVelocity;
                 GroundpoundStartTimer = TickTimer.None;
+                return;
             }
+
+            if (GroundpoundStartTimer.RemainingTime(Runner) > .066f) {
+                body.velocity = GroundpoundStartUpwardsVelocity;
+            } else {
+                body.velocity = Vector2.zero;
+            }
+        }
+
+        private void HandleGroundpoundBlockCollision() {
 
             if (!(IsOnGround && (IsGroundpounding || IsDrilling) && ContinueGroundpound))
                 return;

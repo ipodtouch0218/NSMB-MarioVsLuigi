@@ -96,7 +96,7 @@ public class DiscordController : MonoBehaviour {
 
             activity.Details = NetworkHandler.Runner.IsSinglePlayer ? tm.GetTranslation("discord.offline") : tm.GetTranslation("discord.online");
             if (!NetworkHandler.Runner.IsSinglePlayer) {
-                Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxSize);
+                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxSize);
                 activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = maxSize }, Id = session.Name + "1" };
             }
             activity.State = session.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
@@ -111,7 +111,7 @@ public class DiscordController : MonoBehaviour {
                     assets.LargeImage = "level-" + gm.richPresenceId;
                 else
                     assets.LargeImage = "mainmenu";
-                assets.LargeText = tm.GetTranslation(gm.levelTranslationKey);
+                assets.LargeText = tm.GetTranslation(gm.levelTranslationKey).Replace("<sprite name=room_customlevel>", "");
 
                 activity.Assets = assets;
 

@@ -28,15 +28,15 @@ public class RoomIcon : MonoBehaviour {
 
         TranslationManager tm = GlobalController.Instance.translationManager;
 
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxPlayers);
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string hostname);
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.Lives, out int lives);
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.Time, out int timer);
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.CustomPowerups, out bool powerups);
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool gameStarted);
-        Utils.GetSessionProperty(session, Enums.NetRoomProperties.Teams, out bool teams);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxPlayers);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string hostname);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.Lives, out int lives);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.Time, out int timer);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.CustomPowerups, out bool powerups);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.GameStarted, out bool gameStarted);
+        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.Teams, out bool teams);
 
 
         nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());

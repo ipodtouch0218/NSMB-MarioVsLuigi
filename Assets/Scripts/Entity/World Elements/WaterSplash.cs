@@ -18,8 +18,8 @@ namespace NSMB.Entities.World {
         //---Serialized Variables
         [SerializeField] private GameObject splashPrefab, splashExitPrefab;
         [SerializeField] private SpriteMask mask;
-        [Delayed][SerializeField] private int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
-        [Delayed][SerializeField] private float heightTiles = 1;
+        [SerializeField, Delayed] private int widthTiles = 64, pointsPerTile = 8, splashWidth = 2;
+        [SerializeField, Delayed] private float heightTiles = 1;
         [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, animationSpeed = 1f;
         [SerializeField] private LiquidType liquidType;
 
@@ -27,7 +27,7 @@ namespace NSMB.Entities.World {
         private float SurfaceHeight => transform.position.y + heightTiles * 0.5f - 0.1f;
 
         //---Private Variables
-        private readonly HashSet<Collider2D> splashedEntities = new();
+        private readonly List<Collider2D> splashedEntities = new();
         private Texture2D heightTex;
         private SpriteRenderer spriteRenderer;
         private MaterialPropertyBlock properties;
@@ -61,7 +61,7 @@ namespace NSMB.Entities.World {
             heightTex = new Texture2D(totalPoints, 1, TextureFormat.RGBA32, false);
 
             // TODO: eventually, change to a customrendertexture.
-            //texture = new CustomRenderTexture(totalPoints, 1, RenderTextureFormat.RInt);
+            // texture = new CustomRenderTexture(totalPoints, 1, RenderTextureFormat.RInt);
 
             Color32 gray = new Color(0.5f, 0.5f, 0.5f, 1);
             colors = new Color32[totalPoints];
@@ -106,8 +106,8 @@ namespace NSMB.Entities.World {
             for (int i = 0; i < totalPoints; i++) {
                 float height = pointHeights[i];
 
-                pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints - 1) % totalPoints]); //left
-                pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); //right
+                pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints - 1) % totalPoints]); // Left
+                pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); // Right
             }
             for (int i = 0; i < totalPoints; i++) {
                 byte newR = (byte) (Mathf.Clamp01((pointHeights[i] / 20f) + 0.5f) * 255f);
@@ -135,11 +135,9 @@ namespace NSMB.Entities.World {
                 HandleEntityCollision(obj);
             }
 
-            IEnumerable<Collider2D> currentCollisions = CollisionBuffer.Take(collisionCount);
-
             foreach (var obj in splashedEntities) {
 
-                if (!obj || currentCollisions.Contains(obj))
+                if (!obj || Utils.Utils.BufferContains(CollisionBuffer, collisionCount, obj))
                     continue;
 
                 BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
@@ -151,10 +149,10 @@ namespace NSMB.Entities.World {
                     bool underwater = height <= SurfaceHeight;
 
                     if (underwater || player.body.velocity.y < 0) {
-                        // swam out the side of the water
+                        // Swam out the side of the water
                         player.IsSwimming = true;
                     } else {
-                        // jumped out of the water
+                        // Jumped out of the water
                         if (player.IsSwimming) {
                             player.IsSwimming = false;
                             player.SwimJump = true;
@@ -175,7 +173,7 @@ namespace NSMB.Entities.World {
 
             }
 
-            splashedEntities.IntersectWith(CollisionBuffer.Take(collisionCount));
+            Utils.Utils.IntersectWithBuffer(splashedEntities, CollisionBuffer, collisionCount);
         }
 
         private void HandleEntityCollision(Collider2D obj) {
@@ -192,7 +190,7 @@ namespace NSMB.Entities.World {
 
             if (liquidType == LiquidType.Water && entity is PlayerController player && player.State == Enums.PowerupState.MiniMushroom) {
                 if (!player.IsSwimming && Mathf.Abs(player.body.velocity.x) > 0.3f && player.body.velocity.y < 0) {
-                    // player is running on the water
+                    // Player is running on the water
                     player.body.position = new(player.body.position.x, hitbox.bounds.max.y);
                     player.IsOnGround = true;
                     player.IsWaterWalking = true;
@@ -289,9 +287,9 @@ namespace NSMB.Entities.World {
 
         //---Helpers
         public enum LiquidType {
-            Water,
-            Poison,
-            Lava,
+            Water = 0,
+            Poison = 1,
+            Lava = 2,
         }
 
         public enum ParticleType : byte {

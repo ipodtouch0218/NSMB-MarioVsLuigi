@@ -8,7 +8,6 @@ namespace NSMB.Utils {
     public static class NetworkUtils {
 
         public static Dictionary<Enum, string> disconnectMessages = new() {
-
             [ShutdownReason.MaxCcuReached] = "ui.error.ccu",
             [ShutdownReason.CustomAuthenticationFailed] = "ui.error.authentication",
             [ShutdownReason.DisconnectedByPluginLogic] = "ui.error.hosttimeout",
@@ -37,5 +36,33 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.MaxPlayers] = 10,
             [Enums.NetRoomProperties.HostName] = "noname",
         };
+
+
+        public static bool GetSessionProperty(SessionInfo session, string key, out int value) {
+            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
+                value = property;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public static bool GetSessionProperty(SessionInfo session, string key, out string value) {
+            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
+                value = property;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public static bool GetSessionProperty(SessionInfo session, string key, out bool value) {
+            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
+                value = property == 1;
+                return true;
+            }
+            value = default;
+            return false;
+        }
     }
 }
