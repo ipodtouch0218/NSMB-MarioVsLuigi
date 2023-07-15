@@ -55,30 +55,22 @@ namespace NSMB.Tiles {
             ChunkY = y;
         }
 
+        public void Awake() {
+            transform.SetParent(GameManager.Instance.tileManager.transform, true);
+            tilemapCollider = GameManager.Instance.tilemap.GetComponent<TilemapCollider2D>();
+        }
+
         public override void Spawned() {
             if (initialized)
                 return;
 
             GameManager.Instance.tileManager.AddChunk(this);
-            transform.SetParent(GameManager.Instance.tileManager.transform, true);
             LoadState();
 
             if (Runner.IsServer)
                 Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
 
-            tilemapCollider = GameManager.Instance.tilemap.GetComponent<TilemapCollider2D>();
             UpdateTilemapState();
-
-            initialized = true;
-        }
-
-        public override void FixedUpdateNetwork() {
-            if (initialized)
-                return;
-
-            if (!GameManager.Instance)
-                return;
-
             initialized = true;
         }
 
