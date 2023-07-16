@@ -186,7 +186,7 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
     }
 
     public void Kill() {
-        GameManager.Instance.tileManager.SetTile(TileLocation, ResultTile);
+        GameManager.Instance.TileManager.SetTile(TileLocation, ResultTile);
 
         if (SpawnPrefab == NetworkPrefabRef.Empty) {
             Runner.Despawn(Object);
@@ -226,7 +226,7 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
 
     public void PredictedSpawnUpdate() {
         FixedUpdateNetwork();
-        GameManager.Instance.tileManager.SetTile(TileLocation, null);
+        GameManager.Instance.TileManager.SetTile(TileLocation, null);
     }
 
     public void PredictedSpawnRender() {

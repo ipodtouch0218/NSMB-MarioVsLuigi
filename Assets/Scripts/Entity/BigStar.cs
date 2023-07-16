@@ -209,7 +209,7 @@ namespace NSMB.Entities.Collectable {
 
             // Game mechanics
             if (IsStationary && Runner.IsServer)
-                GameManager.Instance.tileManager.ResetMap();
+                GameManager.Instance.TileManager.ResetMap();
 
             GameData.Instance.CheckForWinner();
 

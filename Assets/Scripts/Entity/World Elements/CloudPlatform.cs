@@ -76,7 +76,7 @@ public class CloudPlatform : SimulationBehaviour {
 
         // Update collision timers
         foreach (CloudContact contact in positions) {
-            if (!contact.exit && (!contact.collider || contact.rb.velocity.y > 0.2f || !CollisionBuffer.Contains(contact.collider)))
+            if (!contact.exit && (!contact.collider || contact.rb.velocity.y > 0.2f || !Utils.BufferContains(CollisionBuffer, collisionCount, contact.collider)))
                 contact.exit = true;
 
             if (contact.exit) {

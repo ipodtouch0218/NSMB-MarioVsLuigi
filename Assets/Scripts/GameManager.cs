@@ -45,6 +45,16 @@ namespace NSMB.Game {
         public float LevelMinY => minY ??= (levelMinTileY * tilemap.transform.localScale.y * tilemap.cellSize.y) + tilemap.transform.position.y;
         public float LevelMaxY => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y * tilemap.cellSize.y) + tilemap.transform.position.y;
 
+        private TileManager _tileManager;
+        public TileManager TileManager {
+            get {
+                if (!_tileManager)
+                    _tileManager = FindObjectOfType<TileManager>();
+
+                return _tileManager;
+            }
+        }
+
         //---Serialized Variables
         [Header("Music")]
         [SerializeField] public LoopingMusicData mainMusic;
@@ -83,7 +93,6 @@ namespace NSMB.Game {
         //---Public Variables
         public readonly HashSet<NetworkObject> networkObjects = new();
         public GameObject[] starSpawns;
-        public TileManager tileManager;
         public SingleParticleManager particleManager;
         public TeamManager teamManager = new();
         public Canvas nametagCanvas;

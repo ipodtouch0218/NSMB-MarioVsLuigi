@@ -156,7 +156,7 @@ namespace NSMB.Entities.Enemies {
                 if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
                     if (!Putdown && IsInShell && !IsStationary) {
                         Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(p + BlockOffset);
-                        TileBase tile = GameManager.Instance.tileManager.GetTile(tileLoc);
+                        TileBase tile = GameManager.Instance.TileManager.GetTile(tileLoc);
                         if (!tile || !IsInShell)
                             continue;
 

@@ -28,7 +28,6 @@ namespace NSMB.Tiles {
 
         public void Awake() {
             gm = GameManager.Instance;
-            GameManager.Instance.tileManager = this;
         }
 
         public override void Spawned() {
@@ -86,7 +85,7 @@ namespace NSMB.Tiles {
 
             TilemapChunk chunk = GetChunkAtTileLocation(x, y);
             if (!chunk)
-                return null;
+                return gm.tilemap.GetTile(new(x, y));
 
             ushort tileId = chunk.GetTile(TileLocationToChunkIndex(x, y));
             return gm.GetTileInstanceFromTileId(tileId);

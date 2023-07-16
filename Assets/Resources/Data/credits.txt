@@ -26,7 +26,7 @@ Zest
 <color=yellow>{ui.about.credits.music}</color>
 CubbyCrazes
 RENREN
-River J
+LiamNayru
 
 <color=yellow>{ui.about.credits.translation}</color>
 3UP
@@ -58,12 +58,16 @@ Tombuntu
 vlco_o
 
 <color=yellow>{ui.about.credits.qa}</color>
+AutumnLeaf
+CubbyCrazes
 Fawndue
+Grape
 mindnomad
 Shadow_Walker13
 TheCyVap
 
 <color=yellow>{ui.about.credits.leveldesign}</color>
+AtwerJ
 AutumnLeaf
 mindnomad
 Skarph

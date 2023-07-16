@@ -55,16 +55,13 @@ namespace NSMB.Tiles {
             ChunkY = y;
         }
 
-        public void Awake() {
-            transform.SetParent(GameManager.Instance.tileManager.transform, true);
-            tilemapCollider = GameManager.Instance.tilemap.GetComponent<TilemapCollider2D>();
-        }
-
         public override void Spawned() {
             if (initialized)
                 return;
 
-            GameManager.Instance.tileManager.AddChunk(this);
+            transform.SetParent(GameManager.Instance.TileManager.transform, true);
+            tilemapCollider = GameManager.Instance.tilemap.GetComponent<TilemapCollider2D>();
+            GameManager.Instance.TileManager.AddChunk(this);
             LoadState();
 
             if (Runner.IsServer)
@@ -77,14 +74,14 @@ namespace NSMB.Tiles {
         public void LoadState() {
             GameManager gm = GameManager.Instance;
 
-            int chunkOriginIndex = (ChunkX * 16) + (ChunkY * GameManager.Instance.tileManager.ChunksX * 256);
+            int chunkOriginIndex = (ChunkX * 16) + (ChunkY * GameManager.Instance.TileManager.ChunksX * 256);
 
             for (int i = 0; i < 256; i++) {
 
                 int x = i % 16;
                 int y = i / 16;
 
-                int index = chunkOriginIndex + x + (y * 16 * GameManager.Instance.tileManager.ChunksX);
+                int index = chunkOriginIndex + x + (y * 16 * GameManager.Instance.TileManager.ChunksX);
                 if (index < gm.originalTiles.Length) {
                     originalTiles[i] = gm.originalTiles[index];
                 }

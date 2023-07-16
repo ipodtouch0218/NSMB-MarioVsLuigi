@@ -32,7 +32,7 @@ namespace NSMB.Tiles {
             if ((upsideDownPipe && direction == InteractionDirection.Down) || (!upsideDownPipe && direction == InteractionDirection.Up))
                 return false;
 
-            TileManager tilemap = GameManager.Instance.tileManager;
+            TileManager tilemap = GameManager.Instance.TileManager;
             Vector2Int ourLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
             if (leftOfPipe && direction == InteractionDirection.Left) {
@@ -124,14 +124,14 @@ namespace NSMB.Tiles {
             Vector2Int offset = upsideDownPipe ? Vector2Int.zero : pipeDirection * (tileHeight-1);
             Vector2Int finalPosition = hat + offset + (leftOfPipe ? Vector2Int.zero : Vector2Int.left);
 
-            GameManager.Instance.tileManager.SetTilesBlock(finalPosition.x, finalPosition.y, 2, tileHeight, tiles);
+            GameManager.Instance.TileManager.SetTilesBlock(finalPosition.x, finalPosition.y, 2, tileHeight, tiles);
 
             bumpSound = false;
             return true;
         }
 
         private Vector2Int GetPipeOrigin(Vector2Int ourLocation) {
-            TileManager tm = GameManager.Instance.tileManager;
+            TileManager tm = GameManager.Instance.TileManager;
             Vector2Int searchDirection = upsideDownPipe ? Vector2Int.up : Vector2Int.down;
             Vector2Int searchVector = searchDirection;
 
@@ -143,7 +143,7 @@ namespace NSMB.Tiles {
 
         private int GetPipeHeight(Vector2Int ourLocation) {
             int height = 1;
-            TileManager tm = GameManager.Instance.tileManager;
+            TileManager tm = GameManager.Instance.TileManager;
             Vector2Int searchVector = Vector2Int.up;
             while (tm.GetTile(ourLocation + searchVector) is BreakablePipeTile) {
                 height++;

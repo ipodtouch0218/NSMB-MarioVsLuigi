@@ -643,7 +643,7 @@ namespace NSMB.Entities.Player {
             footstepSound = Enums.Sounds.Player_Walk_Grass;
             footstepParticle = Enums.Particle.None;
             foreach (Vector2Int pos in tilesStandingOn) {
-                if (GameManager.Instance.tileManager.GetTile(pos, out TileWithProperties propTile)) {
+                if (GameManager.Instance.TileManager.GetTile(pos, out TileWithProperties propTile)) {
                     footstepSound = propTile.footstepSound;
                     footstepParticle = propTile.footstepParticle;
                     OnIce = propTile.iceSkidding;
@@ -1455,7 +1455,7 @@ namespace NSMB.Entities.Player {
                         dir = InteractableTile.InteractionDirection.Right;
                     }
 
-                    if (GameManager.Instance.tileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
+                    if (GameManager.Instance.TileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
                         if (pipe.upsideDownPipe || !pipes || IsGroundpounding)
                             continue;
                     }
@@ -1482,7 +1482,7 @@ namespace NSMB.Entities.Player {
                             dir = InteractableTile.InteractionDirection.Right;
                         }
 
-                        if (GameManager.Instance.tileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
+                        if (GameManager.Instance.TileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
                             if (!pipe.upsideDownPipe || dir == InteractableTile.InteractionDirection.Up)
                                 continue;
                         }
@@ -1495,7 +1495,7 @@ namespace NSMB.Entities.Player {
 
         private bool InteractWithTile(Vector2Int tilePos, InteractableTile.InteractionDirection direction, out bool interacted, out bool bumpSound) {
 
-            if (interacted = GameManager.Instance.tileManager.GetTile(tilePos, out InteractableTile tile)) {
+            if (interacted = GameManager.Instance.TileManager.GetTile(tilePos, out InteractableTile tile)) {
                 return tile.Interact(this, direction, Utils.Utils.TilemapToWorldPosition(tilePos), out bumpSound);
             }
 
@@ -1664,7 +1664,7 @@ namespace NSMB.Entities.Player {
                 if (!tile && GameManager.Instance.semisolidTilemap)
                     tile = GameManager.Instance.semisolidTilemap.GetTile<TileWithProperties>((Vector3Int) Utils.Utils.WorldToTilemapPosition(hit.point));
 
-                float x = Mathf.Abs(FloorAngle - angle) > 1f ? previousTickVelocity.x : body.velocity.x;
+                float x = Mathf.Abs(FloorAngle - angle) > 1f && Mathf.Abs(angle) > 1f ? previousTickVelocity.x : body.velocity.x;
 
                 FloorAngle = angle;
 
@@ -1684,7 +1684,7 @@ namespace NSMB.Entities.Player {
                     if (!tile && GameManager.Instance.semisolidTilemap)
                         tile = GameManager.Instance.semisolidTilemap.GetTile<TileWithProperties>((Vector3Int) Utils.Utils.WorldToTilemapPosition(hit.point));
 
-                    float x = Mathf.Abs(FloorAngle - angle) > 1f ? previousTickVelocity.x : body.velocity.x;
+                    float x = Mathf.Abs(FloorAngle - angle) > 1f && Mathf.Abs(angle) > 1f ? previousTickVelocity.x : body.velocity.x;
 
                     FloorAngle = angle;
 
@@ -2137,7 +2137,8 @@ namespace NSMB.Entities.Player {
                 float max = maxArray[maxStage] + CalculateSlopeMaxSpeedOffset(Mathf.Abs(FloorAngle) * (uphill ? 1 : -1));
                 // Floating point & network accuracy bs means -0.01
                 if (speed - 0.01f > max) {
-                    acc = -acc;
+                    float maxDeceleration = (speed - max) * Runner.Config.Simulation.TickRate;
+                    acc = Mathf.Clamp(-acc, -maxDeceleration, maxDeceleration);
                 }
 
                 if (reverse) {
@@ -2692,24 +2693,21 @@ namespace NSMB.Entities.Player {
                 }
             }
 
+            HandleSlopes();
+
+            HandleGroundpound(doGroundpound, left, right);
+
+            HandleSliding(up, down, left, right);
 
             if (!(IsGroundpounding && !IsOnGround)) {
                 // Normal walking/running
                 HandleWalkingRunning(left, right);
             }
 
-            HandleSlopes();
-
             if (!(IsGroundpounding && !IsOnGround && !DoEntityBounce)) {
                 // Jumping
                 HandleJumping(jumpHeld, doJump, down);
             }
-
-            //HandleSlopes();
-
-            HandleGroundpound(doGroundpound, left, right);
-
-            HandleSliding(up, down, left, right);
 
             HandleFacingDirection(left, right);
 

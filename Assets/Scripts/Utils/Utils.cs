@@ -151,7 +151,7 @@ namespace NSMB.Utils {
 
         public static TileBase GetTileAtTileLocation(Vector2Int tileLocation) {
             WrapTileLocation(ref tileLocation);
-            return GameManager.Instance.tileManager.GetTile(tileLocation);
+            return GameManager.Instance.TileManager.GetTile(tileLocation);
         }
         public static TileBase GetTileAtWorldLocation(Vector2 worldLocation) {
             return GetTileAtTileLocation(WorldToTilemapPosition(worldLocation));

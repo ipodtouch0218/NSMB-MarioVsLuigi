@@ -144,7 +144,7 @@ namespace NSMB.Entities.Enemies {
 
             // (sort or) 'splode tiles in range.
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(body.position);
-            TileManager tm = GameManager.Instance.tileManager;
+            TileManager tm = GameManager.Instance.TileManager;
             for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
                 for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
                     // Use taxi-cab distance to make a somewhat circular explosion

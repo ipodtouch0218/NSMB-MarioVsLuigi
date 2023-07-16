@@ -57,7 +57,7 @@ namespace NSMB.Tiles {
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
             // Tilemap
-            GameManager.Instance.tileManager.SetTile(tileLocation, null);
+            GameManager.Instance.TileManager.SetTile(tileLocation, null);
 
             if ((!interacter.IsProxy && interacter.Runner.IsForward) || interacter.Runner.Simulation.SnapshotHistory.Latest.Tick == interacter.Runner.Tick - 1) {
                 // Particle

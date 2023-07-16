@@ -339,7 +339,7 @@ namespace NSMB.Game {
                 obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, offset);
             }, predictionKey: new() { Byte1 = (byte) Runner.Tick, Byte0 = PredictionCounter++ });
 
-            GameManager.Instance.tileManager.SetTile(loc, null);
+            GameManager.Instance.TileManager.SetTile(loc, null);
         }
 
 
@@ -514,17 +514,19 @@ namespace NSMB.Game {
             speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
             speedup |= gm.teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
 
-            if (!speedup && AlivePlayers.Count <= 2) {
-                // Also speed up the music if all remaining players have one life.
-                bool allPlayersCritical = true;
+            if (!speedup) {
+                // Also speed up the music if:
+                // A: two players left, at least one has one life
+                // B: three+ players left, all have one life
+                int playersWithOneLife = 0;
+                int playerCount = 0;
                 foreach (var player in AlivePlayers) {
                     if (!player) continue;
-                    if (player.Lives == 1 || player.Lives == 0) continue;
+                    if (player.Lives == 1 || player.Lives == 0) playersWithOneLife++;
 
-                    allPlayersCritical = false;
-                    break;
+                    playerCount++;
                 }
-                speedup |= allPlayersCritical;
+                speedup |= (playersWithOneLife <= 2 && playersWithOneLife != 0) || playersWithOneLife >= playerCount;
             }
 
             LoopingMusicPlayer musicManager = gm.musicManager;

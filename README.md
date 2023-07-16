@@ -75,7 +75,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 ### Music:
 * CubbyCrazes
 * [RENREN](https://mistajub.bandcamp.com/)
-* River J
+* LiamNayru
 
 ### Translators:
 * 3UP
@@ -107,11 +107,16 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * vlco_o
 
 ### QA Testing:
+* AutumnLeaf
+* CubbyCrazes
 * Fawndue
+* Grape
+* mindnomad
 * Shadow_Walker13
 * TheCyVap
 
 ### Level Design:
+* AtwerJ
 * AutumnLeaf
 * mindnomad
 * Skarph
