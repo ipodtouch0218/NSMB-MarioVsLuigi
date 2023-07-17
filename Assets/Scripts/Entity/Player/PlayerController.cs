@@ -55,6 +55,7 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool OnIce { get; set; }
         //Jumping
         [Networked(OnChanged = nameof(OnJumpAnimCounterChanged))] private byte JumpAnimCounter { get; set; }
+        [Networked(OnChanged = nameof(OnJumpLandingAnimCounterChanged))] private byte JumpLandingAnimCounter { get; set; }
         [Networked] public NetworkBool IsJumping { get; set; }
         [Networked] public PlayerJumpState JumpState { get; set; }
         [Networked] public NetworkBool ProperJump { get; set; }
@@ -147,7 +148,7 @@ namespace NSMB.Entities.Player {
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
         public int PlayerId => data.PlayerId;
         public bool CanPickupItem => !FrozenCube && State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && JumpState < PlayerJumpState.DoubleJump && !IsGroundpounding && !(!HeldEntity && IsSwimming && PreviousInputs.buttons.IsSet(PlayerControls.Jump));
-        public bool HasGroundpoundHitbox => (IsDrilling || (IsGroundpounding && GroundpoundStartTimer.ExpiredOrNotRunning(Runner))) && !IsOnGround;
+        public bool HasGroundpoundHitbox => (IsDrilling || (IsGroundpounding && GroundpoundStartTimer.ExpiredOrNotRunning(Runner))) && (!IsOnGround || (Runner.SimulationTime - TimeGrounded < 0.15f));
         public float RunningMaxSpeed => SPEED_STAGE_MAX[RUN_STAGE];
         public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
         public BoxCollider2D MainHitbox => hitboxes[0];
@@ -2685,8 +2686,8 @@ namespace NSMB.Entities.Player {
                         if (!OnIce)
                             body.velocity = Vector2.zero;
 
-                        // TODO: change.
-                        animator.Play("jumplanding" + (edgeLanding ? "-edge" : ""));
+                        JumpLandingAnimCounter++;
+
                         if (edgeLanding)
                             JumpLandingTimer = TickTimer.CreateFromSeconds(Runner, 0.15f);
                     }
@@ -3190,6 +3191,12 @@ namespace NSMB.Entities.Player {
                 _ => Enums.Sounds.Player_Sound_Jump,
             };
             player.PlaySound(sound);
+        }
+
+        public static void OnJumpLandingAnimCounterChanged(Changed<PlayerController> changed) {
+            PlayerController player = changed.Behaviour;
+
+            player.animator.Play("jumplanding" + (player.JumpLandingTimer.IsActive(player.Runner) ? "-edge" : ""));
         }
 
         public static void OnIsWaterWalkingChanged(Changed<PlayerController> changed) {

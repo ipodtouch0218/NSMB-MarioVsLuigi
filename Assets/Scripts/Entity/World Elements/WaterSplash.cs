@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 using Fusion;
@@ -170,7 +169,6 @@ namespace NSMB.Entities.World {
                         Rpc_Splash(entity.body.position, Mathf.Abs(Mathf.Max(5, entity.body.velocity.y)), ParticleType.Exit);
                     }
                 }
-
             }
 
             Utils.Utils.IntersectWithBuffer(splashedEntities, CollisionBuffer, collisionCount);

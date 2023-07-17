@@ -70,13 +70,13 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void OnEnable() {
         // Register callbacks
-        NetworkHandler.OnPlayerJoined +=           OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft +=             OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect +=           OnLobbyConnect;
-        NetworkHandler.OnShutdown +=               OnShutdown;
-        NetworkHandler.OnJoinSessionFailed +=      OnShutdown;
+        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect += OnLobbyConnect;
+        NetworkHandler.OnShutdown += OnShutdown;
+        NetworkHandler.OnJoinSessionFailed += OnShutdown;
         NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
-        NetworkHandler.OnConnectFailed +=          OnConnectFailed;
+        NetworkHandler.OnConnectFailed += OnConnectFailed;
 
         ControlSystem.controls.UI.Pause.performed += OnPause;
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -85,13 +85,13 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void OnDisable() {
         // Unregister callbacks
-        NetworkHandler.OnPlayerJoined -=           OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft -=             OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect -=           OnLobbyConnect;
-        NetworkHandler.OnShutdown -=               OnShutdown;
-        NetworkHandler.OnJoinSessionFailed -=      OnShutdown;
+        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
+        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+        NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
+        NetworkHandler.OnShutdown -= OnShutdown;
+        NetworkHandler.OnJoinSessionFailed -= OnShutdown;
         NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
-        NetworkHandler.OnConnectFailed -=          OnConnectFailed;
+        NetworkHandler.OnConnectFailed -= OnConnectFailed;
 
         ControlSystem.controls.UI.Pause.performed -= OnPause;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;

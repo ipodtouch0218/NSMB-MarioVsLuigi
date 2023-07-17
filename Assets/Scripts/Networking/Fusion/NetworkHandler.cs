@@ -11,6 +11,7 @@ using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
+using System.Collections;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
@@ -205,15 +206,23 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        PlayerData data = player.GetPlayerData(runner);
 
-        OnPlayerLeft(runner, player);
+        OnPlayerLeft?.Invoke(runner, player);
+
+        PlayerData data = player.GetPlayerData(runner);
         if (data) {
             Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
-            runner.Despawn(data.Object);
+            if (Runner.IsServer) {
+                DestroyPlayerDataLater(data);
+            }
         }
 
         GlobalController.Instance.discordController.UpdateActivity();
+    }
+
+    private IEnumerable DestroyPlayerDataLater(PlayerData data) {
+        yield return new WaitForSecondsRealtime(3);
+        runner.Despawn(data.Object);
     }
 
     void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) {

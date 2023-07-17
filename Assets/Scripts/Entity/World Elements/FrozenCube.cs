@@ -216,7 +216,7 @@ namespace NSMB.Entities {
                 return;
             }
 
-            if ((player.IsGroundpounding || player.groundpoundLastFrame) && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
+            if (player.HasGroundpoundHitbox && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
                 // Groundpounded by player
                 player.body.velocity = new(0, 38.671875f * Runner.DeltaTime);
                 player.GroundpoundAnimCounter++;

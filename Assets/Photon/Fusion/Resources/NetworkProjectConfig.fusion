@@ -50,7 +50,7 @@
         "ClientPacketInterval": 1
     },
     "Interpolation": {
-        "DeltaAdjustment": 2,
+        "DeltaAdjustment": 4,
         "AllowedJitter": 25,
         "SnapLimit": 500,
         "MultiplierMin": 2.25,

@@ -323,6 +323,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             }
 
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
+            IsActive = false;
         }
 
         //---CollectableEntity overrides

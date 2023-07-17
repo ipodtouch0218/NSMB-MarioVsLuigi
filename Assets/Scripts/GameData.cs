@@ -50,6 +50,10 @@ namespace NSMB.Game {
         //---Public Variables
         public NetworkRNG random;
         public float gameEndTime;
+        public bool dontPlaySounds;
+
+        //---Properties
+        public bool GameEnded => GameState == Enums.GameState.Ended;
 
         //---Private Variables
         private readonly HashSet<NetworkObject> networkObjects = new();
@@ -58,11 +62,9 @@ namespace NSMB.Game {
         private AudioSource audioSfx;
         private AudioSource audioMusic;
 
-        private TickTimer StartMusicTimer;
+        private TickTimer startMusicTimer;
         private bool hurryUpSoundPlayed, endSoundPlayed;
 
-        //---Properties
-        public bool GameEnded => GameState == Enums.GameState.Ended;
 
         //---Lifetime
         public void OnEnable() {
@@ -120,9 +122,10 @@ namespace NSMB.Game {
                 return;
 
             // Remove all networked objects. Fusion doesn't do this for us, unlike PUN.
-            foreach (var obj in networkObjects)
+            foreach (var obj in networkObjects) {
                 if (obj)
                     runner.Despawn(obj);
+            }
 
             networkObjects.Clear();
         }
@@ -152,8 +155,8 @@ namespace NSMB.Game {
                 StartGame();
             }
 
-            if (StartMusicTimer.Expired(Runner)) {
-                StartMusicTimer = TickTimer.None;
+            if (startMusicTimer.Expired(Runner)) {
+                startMusicTimer = TickTimer.None;
                 IsMusicEnabled = true;
 
                 // Start timer
@@ -366,11 +369,6 @@ namespace NSMB.Game {
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_EndGame(int team) {
-            //if (gm.GameEnded)
-            //    return;
-
-            // TODO: don't use a coroutine?
-            // eh, it should be alrite, since it's an RPC and isn't predictive.
             gameEndTime = Runner.SimulationTime;
             StartCoroutine(EndGame(team));
         }
@@ -394,7 +392,7 @@ namespace NSMB.Game {
             if (Runner.IsForward)
                 audioSfx.PlayOneShot(Enums.Sounds.UI_StartGame);
 
-            StartMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
+            startMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
             // Respawn enemies
             foreach (KillableEntity enemy in gm.enemies)
@@ -426,6 +424,8 @@ namespace NSMB.Game {
             gm.musicManager.Stop();
 
             yield return new WaitForSecondsRealtime(1);
+
+            dontPlaySounds = true;
 
             TeamManager teamManager = gm.teamManager;
             TranslationManager tm = GlobalController.Instance.translationManager;

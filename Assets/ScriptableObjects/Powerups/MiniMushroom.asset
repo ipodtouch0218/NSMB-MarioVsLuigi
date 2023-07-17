@@ -19,7 +19,7 @@ MonoBehaviour:
   soundEffect: 45
   powerupBlockEffect: 69
   spawnChance: 2
-  losingSpawnBonus: -4
+  losingSpawnBonus: -10
   big: 0
   vertical: 0
   custom: 0

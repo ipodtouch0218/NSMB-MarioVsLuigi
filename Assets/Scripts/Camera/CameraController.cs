@@ -6,7 +6,7 @@ using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 
-
+[OrderAfter(typeof(NetworkRigidbody2D))]
 public class CameraController : NetworkBehaviour {
 
     //---Static Variables
@@ -51,6 +51,7 @@ public class CameraController : NetworkBehaviour {
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
     private Camera targetCamera;
     private Interpolator<Vector3> positionInterpolator;
+    private float currentExtrapolationValue;
 
     public void OnValidate() {
         if (!controller) controller = GetComponentInParent<PlayerController>();
@@ -70,9 +71,12 @@ public class CameraController : NetworkBehaviour {
             return;
 
         Vector3 position;
-        if (GetInterpolationData(out InterpolationData data)) {
-            // Get extrapolated position.
-            position = CalculateNewPosition(data.Alpha);
+        if (!IsProxy) {
+            float delta = (Runner.SimulationRenderTime - Runner.SimulationTime) * Runner.Simulation.Config.TickRate;
+            float difference = delta - currentExtrapolationValue;
+            CurrentPosition = CalculateNewPosition(Runner.DeltaTime * difference);
+            currentExtrapolationValue = delta;
+            position = CurrentPosition;
         } else {
             position = positionInterpolator.Value;
         }
@@ -85,7 +89,8 @@ public class CameraController : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        CurrentPosition = CalculateNewPosition();
+        CurrentPosition = CalculateNewPosition(Runner.DeltaTime);
+        currentExtrapolationValue = 0;
     }
 
     public void Recenter(Vector2 pos) {
@@ -106,7 +111,7 @@ public class CameraController : NetworkBehaviour {
         secondaryPositioners.ForEach(scp => scp.UpdatePosition());
     }
 
-    private Vector3 CalculateNewPosition(float delta = 1) {
+    private Vector3 CalculateNewPosition(float delta) {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
@@ -159,7 +164,7 @@ public class CameraController : NetworkBehaviour {
 
         // Smoothing
         Vector3 smoothDamp = SmoothDampVel;
-        targetPosition = Vector3.SmoothDamp(newCameraPosition, targetPosition, ref smoothDamp, 0.5f, float.MaxValue, Runner.DeltaTime * delta);
+        targetPosition = Vector3.SmoothDamp(newCameraPosition, targetPosition, ref smoothDamp, 0.5f, float.MaxValue, delta);
         SmoothDampVel = smoothDamp;
 
         // Clamping to within level bounds

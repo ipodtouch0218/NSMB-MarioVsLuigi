@@ -4847,7 +4847,6 @@ MonoBehaviour:
   winTextAnimator: {fileID: 8395432290395498094}
   fadeManager: {fileID: 8303334505018391514}
   starSpawns: []
-  tileManager: {fileID: 0}
   particleManager: {fileID: 59179525922714105}
   nametagCanvas: {fileID: 5453462452561088483}
   localPlayer: {fileID: 0}
@@ -6536,7 +6535,7 @@ MonoBehaviour:
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 1
+  m_enableKerning: 0
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
