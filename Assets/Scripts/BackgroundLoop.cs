@@ -4,6 +4,7 @@ using UnityEngine;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Utils;
+using Fusion;
 
 public class BackgroundLoop : MonoBehaviour {
 

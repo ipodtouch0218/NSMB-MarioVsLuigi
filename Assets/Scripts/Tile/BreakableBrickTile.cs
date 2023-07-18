@@ -6,6 +6,7 @@ using NSMB.Entities;
 using NSMB.Entities.Enemies;
 using NSMB.Entities.Player;
 using NSMB.Game;
+using UnityEngine.Rendering.Universal;
 
 namespace NSMB.Tiles {
 
@@ -14,6 +15,7 @@ namespace NSMB.Tiles {
 
         //---Static Variables
         private static readonly Vector2 SpawnOffset = new(0, 0.25f);
+        private static readonly Vector2 OneFourth = new(0.25f, 0.25f);
 
         //---Serialized Variables
         [SerializeField] protected Color particleColor;
@@ -59,15 +61,17 @@ namespace NSMB.Tiles {
             // Tilemap
             GameManager.Instance.TileManager.SetTile(tileLocation, null);
 
-            if ((!interacter.IsProxy && interacter.Runner.IsForward) || interacter.Runner.Simulation.SnapshotHistory.Latest.Tick == interacter.Runner.Tick - 1) {
-                // Particle
-                for (int x = 0; x < tileSize.x; x++) {
-                    for (int y = 0; y < tileSize.y; y++) {
-                        Vector2Int offset = new(x, y);
-                        GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, Utils.Utils.TilemapToWorldPosition(tileLocation + offset) + Vector3.one * 0.25f, particleColor);
-                    }
+            // Particle
+            for (int x = 0; x < tileSize.x; x++) {
+                for (int y = 0; y < tileSize.y; y++) {
+                    Vector2Int offset = new(x, y);
+                    Vector2 pos = (Vector2) Utils.Utils.TilemapToWorldPosition(tileLocation + offset) + OneFourth;
+                    interacter.SpawnTileBreakParticle(pos, particleColor);
                 }
+            }
 
+            if ((!interacter.IsProxy && interacter.Runner.IsForward) || interacter.Runner.Simulation.SnapshotHistory.Latest.Tick == interacter.Runner.Tick - 1) {
+                // TODO:::::
                 // Sound
                 if (interacter)
                     interacter.PlaySound(sound);

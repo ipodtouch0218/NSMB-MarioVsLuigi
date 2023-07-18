@@ -281,7 +281,7 @@ namespace NSMB.Entities {
         }
 
         //---IFireballInteractable overrides
-        public virtual bool InteractWithFireball(FireballMover fireball) {
+        public virtual bool InteractWithFireball(Fireball fireball) {
             if (IsDead)
                 return false;
 
@@ -289,7 +289,7 @@ namespace NSMB.Entities {
             return true;
         }
 
-        public virtual bool InteractWithIceball(FireballMover iceball) {
+        public virtual bool InteractWithIceball(Fireball iceball) {
             if (IsDead)
                 return false;
 

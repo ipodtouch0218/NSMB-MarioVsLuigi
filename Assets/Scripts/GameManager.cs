@@ -113,20 +113,6 @@ namespace NSMB.Game {
         [SerializeField] public LoopingMusicPlayer musicManager;
         [SerializeField] public AudioSource music, sfx;
 
-        // TODO: convert to RPC...?
-        public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, GameObject prefab) {
-            GameObject particle = Instantiate(prefab, pos, Quaternion.Euler(0, 0, flip ? 180 : 0));
-
-            SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
-            sr.size = size;
-
-            SimplePhysicsMover body = particle.GetComponent<SimplePhysicsMover>();
-            body.velocity = new Vector2(right ? 7 : -7, 6);
-            body.angularVelocity = right ^ flip ? -300 : 300;
-
-            particle.transform.position += new Vector3(sr.size.x * 0.25f, size.y * 0.25f * (flip ? -1 : 1));
-        }
-
         public void OnEnable() {
             ControlSystem.controls.UI.Pause.performed += OnPause;
             ControlSystem.controls.Debug.ToggleHUD.performed += OnToggleHud;

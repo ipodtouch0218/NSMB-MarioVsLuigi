@@ -1,12 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
+using System.Runtime.Serialization.Json;
 using UnityEngine;
 
 public static class Enums {
 
     public enum PowerupState : byte {
-        NoPowerup, MiniMushroom, Mushroom, FireFlower, IceFlower, PropellerMushroom, BlueShell, MegaMushroom
+        NoPowerup,
+        MiniMushroom,
+        Mushroom,
+        FireFlower,
+        IceFlower,
+        PropellerMushroom,
+        BlueShell,
+        MegaMushroom
     }
 
     public static PowerupScriptable GetPowerupScriptable(this PowerupState state) {
@@ -28,12 +37,12 @@ public static class Enums {
     }
 
     #region ANIMATION & MUSIC
-    // Animation enums
+    //---Animation enums
     public enum PlayerEyeState {
         Normal, HalfBlink, FullBlink, Death
     }
 
-    //Sound effects
+    //---Sound effects
     public enum Sounds : byte {
         //CURRENT HIGHEST NUMBER: 100
         //Enemy
@@ -162,6 +171,17 @@ public static class Enums {
         Walk_Snow_Right = 7,
     }
 
+    public enum PrefabParticle : byte {
+        [PrefabParticleData("Prefabs/Particle/GreenPipe")] Pipe_Break_Green,
+        [PrefabParticleData("Prefabs/Particle/GreenPipe-D")] Pipe_Break_Green_Broken,
+        [PrefabParticleData("Prefabs/Particle/BluePipe")] Pipe_Break_Blue,
+        [PrefabParticleData("Prefabs/Particle/BluePipe-D")] Pipe_Break_Blue_Broken,
+        [PrefabParticleData("Prefabs/Particle/RedPipe")] Pipe_Break_Red,
+        [PrefabParticleData("Prefabs/Particle/RedPipe-D")] Pipe_Break_Red_Broken,
+
+        [PrefabParticleData("Prefabs/Particle/BulletBillLauncher")] BulletBillLauncher_Break,
+    }
+
     #endregion
     #region NETWORKING
     // Networking Enums
@@ -187,10 +207,18 @@ public class SoundData : Attribute {
     }
 }
 
-public static class SoundDataExtensions {
+public class PrefabParticleData : Attribute {
+    public string Path { get; private set; }
+    internal PrefabParticleData(string path) {
+        Path = path;
+    }
+}
+
+public static class AttributeExtensions {
 
     private readonly static Dictionary<Enums.Sounds, string> cachedStrings = new();
     private readonly static Dictionary<string, AudioClip> cachedClips = new();
+    private readonly static Dictionary<Enums.PrefabParticle, GameObject> cachedParticles = new();
 
     public static AudioClip GetClip(this Enums.Sounds sound, CharacterData player = null, int variant = 0) {
         string name = "Sound/" + GetClipString(sound) + (variant > 0 ? "_" + variant : "");
@@ -210,8 +238,13 @@ public static class SoundDataExtensions {
         if (cachedStrings.ContainsKey(sound))
             return cachedStrings[sound];
 
-        string str = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound;
-        cachedStrings[sound] = str;
-        return str;
+        return cachedStrings[sound] = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound; ;
+    }
+
+    public static GameObject GetGameObject(this Enums.PrefabParticle particle) {
+        if (cachedParticles.ContainsKey(particle))
+            return cachedParticles[particle];
+
+        return cachedParticles[particle] = Resources.Load(particle.GetType().GetMember(particle.ToString())[0].GetCustomAttribute<PrefabParticleData>().Path) as GameObject;
     }
 }

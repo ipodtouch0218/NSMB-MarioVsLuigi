@@ -10619,7 +10619,6 @@ MonoBehaviour:
   _IsInShell:
     _value: 0
   _FrozenCube: {fileID: 0}
-  fadeOut: {fileID: 0}
   sfxBrick: {fileID: 3452636116809643534}
   networkRigidbody: {fileID: 2433599474194652050}
   cameraController: {fileID: 8020175873997104482}
@@ -11033,7 +11032,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   InterpolationSpace: 1
   InterpolationTarget: {fileID: 8279152070748857899}
-  InterpolateErrorCorrection: 1
+  InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 5
     MaxRate: 45

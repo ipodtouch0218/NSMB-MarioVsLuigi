@@ -39,7 +39,7 @@ namespace NSMB.Game {
         [Networked(OnChanged = nameof(OnGameStartTimerChanged))] public TickTimer GameStartTimer { get; set; }
         [Networked] public TickTimer GameEndTimer { get; set; }
         [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
-        [Networked, Capacity(60)] public NetworkLinkedList<FireballMover> PooledFireballs => default;
+        [Networked, Capacity(60)] public NetworkLinkedList<Fireball> PooledFireballs => default;
         [Networked] public float GameStartTime { get; set; } = -1;
         [Networked] public byte RealPlayerCount { get; set; }
         [Networked] public NetworkBool IsMusicEnabled { get; set; }

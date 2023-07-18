@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 9123768904352643365}
   - component: {fileID: -3908719065662077790}
   m_Layer: 11
-  m_Name: DestructableBulletBillLauncher
+  m_Name: BulletBillLauncher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

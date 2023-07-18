@@ -132,7 +132,7 @@ namespace NSMB.Entities.Enemies {
             Kill();
         }
 
-        public override bool InteractWithIceball(FireballMover iceball) {
+        public override bool InteractWithIceball(Fireball iceball) {
             if (IsDead)
                 return false;
 

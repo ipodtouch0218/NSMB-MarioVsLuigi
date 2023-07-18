@@ -4,7 +4,6 @@ using UnityEngine.Tilemaps;
 using NSMB.Entities;
 using NSMB.Entities.Player;
 using NSMB.Game;
-using Fusion.Editor;
 
 namespace NSMB.Tiles {
 
@@ -16,7 +15,7 @@ namespace NSMB.Tiles {
 
         //---Serialized Variables
         [SerializeField] private TileBase leftBrokenHatTile, rightBrokenHatTile;
-        [SerializeField] private GameObject pipeParticle, destroyedPipeParticle;
+        [SerializeField] private Enums.PrefabParticle pipeParticle, destroyedPipeParticle;
 
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             bumpSound = true;
@@ -98,8 +97,7 @@ namespace NSMB.Tiles {
                         world += Vector2.up * 0.5f;
                 }
 
-                if ((!player.IsProxy && player.Runner.IsForward) || player.Runner.Simulation.SnapshotHistory.Latest.Tick == player.Runner.Tick - 1)
-                    GameManager.Instance.SpawnResizableParticle(world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), alreadyDestroyed ? destroyedPipeParticle : pipeParticle);
+                player.SpawnResizableParticle(world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), alreadyDestroyed ? destroyedPipeParticle : pipeParticle);
             }
             TileBase[] tiles = new TileBase[tileHeight*2];
 

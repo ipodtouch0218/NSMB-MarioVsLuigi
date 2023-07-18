@@ -244,14 +244,14 @@ namespace NSMB.Entities {
         }
 
         //---IFireballInteractable overrides
-        public override bool InteractWithFireball(FireballMover fireball) {
+        public override bool InteractWithFireball(Fireball fireball) {
             if (!fireball.IsIceball)
                 Kill();
 
             return true;
         }
 
-        public override bool InteractWithIceball(FireballMover iceball) {
+        public override bool InteractWithIceball(Fireball iceball) {
             return true;
         }
 

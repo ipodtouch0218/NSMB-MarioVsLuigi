@@ -2,8 +2,8 @@ using NSMB.Entities;
 
 public interface IFireballInteractable {
 
-    bool InteractWithFireball(FireballMover fireball);
+    bool InteractWithFireball(Fireball fireball);
 
-    bool InteractWithIceball(FireballMover iceball);
+    bool InteractWithIceball(Fireball iceball);
 
 }

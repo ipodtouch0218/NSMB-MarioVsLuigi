@@ -108,7 +108,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IFireballInteractable overrides
-        public override bool InteractWithFireball(FireballMover fireball) {
+        public override bool InteractWithFireball(Fireball fireball) {
             //don't die to fireballs, but still destroy them.
             return true;
         }

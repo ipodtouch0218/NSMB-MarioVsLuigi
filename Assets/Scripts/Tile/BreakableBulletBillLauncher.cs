@@ -10,7 +10,7 @@ namespace NSMB.Tiles {
     public class BreakableBulletBillLauncher : InteractableTile {
 
         //---Serialized Variables
-        [SerializeField] private GameObject breakParticle;
+        [SerializeField] private Enums.PrefabParticle breakParticle;
 
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             if (interacter is not PlayerController) {
@@ -29,8 +29,7 @@ namespace NSMB.Tiles {
 
             ushort[] emptyTiles = new ushort[height];
 
-            if ((!player.IsProxy && player.Runner.IsForward) || player.Runner.Simulation.SnapshotHistory.Latest.Tick == player.Runner.Tick - 1)
-                GameManager.Instance.SpawnResizableParticle((Vector2) worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
+            interacter.SpawnResizableParticle(worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
 
             GameManager.Instance.TileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
             return true;

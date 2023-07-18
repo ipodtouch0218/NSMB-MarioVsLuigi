@@ -10,7 +10,7 @@ namespace NSMB.Entities {
 
     [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
     [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
-    public class FireballMover : BasicEntity, IPlayerInteractable, IFireballInteractable {
+    public class Fireball : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
         //---Static Variables
         private static readonly Collider2D[] CollisionBuffer = new Collider2D[16];
@@ -283,7 +283,7 @@ namespace NSMB.Entities {
         }
 
         //---IFireballInteractable overrides
-        public bool InteractWithFireball(FireballMover fireball) {
+        public bool InteractWithFireball(Fireball fireball) {
             if (!IsActive || !fireball.IsActive)
                 return false;
 
@@ -296,7 +296,7 @@ namespace NSMB.Entities {
             return false;
         }
 
-        public bool InteractWithIceball(FireballMover iceball) {
+        public bool InteractWithIceball(Fireball iceball) {
             if (!IsActive || !iceball.IsActive)
                 return false;
 
@@ -315,8 +315,8 @@ namespace NSMB.Entities {
         }
 
         //---OnChangeds
-        public static void OnBreakEffectAnimCounterChanged(Changed<FireballMover> changed) {
-            FireballMover fireball = changed.Behaviour;
+        public static void OnBreakEffectAnimCounterChanged(Changed<Fireball> changed) {
+            Fireball fireball = changed.Behaviour;
 
             // Don't play particles below the killplane
             if (fireball.body.position.y < GameManager.Instance.LevelMinY)

@@ -109,6 +109,71 @@ namespace NSMB.Entities {
         //---IBlockBumpable overrides
         public abstract void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction);
 
+        //---RPCs
+        public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, Enums.PrefabParticle prefab) {
+            if (!Runner.IsForward || IsProxy) return;
+
+            if (HasStateAuthority)
+                Rpc_SpawnResizableParticle(pos, right, flip, size, prefab);
+            else
+                SpawnResizableParticleInternal(pos, right, flip, size, prefab);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
+        private void Rpc_SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, Enums.PrefabParticle prefab) {
+            SpawnResizableParticleInternal(pos, right, flip, size, prefab);
+        }
+
+        private void SpawnResizableParticleInternal(Vector2 pos, bool right, bool flip, Vector2 size, Enums.PrefabParticle prefab) {
+            GameObject particle = Instantiate(prefab.GetGameObject(), pos, Quaternion.Euler(0, 0, flip ? 180 : 0));
+
+            SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
+            sr.size = size;
+
+            SimplePhysicsMover body = particle.GetComponent<SimplePhysicsMover>();
+            body.velocity = new Vector2(right ? 7 : -7, 6);
+            body.angularVelocity = right ^ flip ? -300 : 300;
+
+            particle.transform.position += new Vector3(sr.size.x * 0.25f, size.y * 0.25f * (flip ? -1 : 1));
+        }
+
+        public void SpawnParticle(Vector2 pos, Enums.PrefabParticle prefab) {
+            if (!Runner.IsForward || IsProxy) return;
+
+            if (HasStateAuthority)
+                Rpc_SpawnParticle(pos, prefab);
+            else
+                SpawnParticleInternal(pos, prefab);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
+        private void Rpc_SpawnParticle(Vector2 pos, Enums.PrefabParticle prefab) {
+            SpawnParticleInternal(pos, prefab);
+        }
+
+        private void SpawnParticleInternal(Vector2 pos, Enums.PrefabParticle prefab) {
+            Instantiate(prefab.GetGameObject(), pos, Quaternion.identity);
+        }
+
+        public void SpawnTileBreakParticle(Vector2 pos, Color color, float rot = 0) {
+            if (!Runner.IsForward || IsProxy) return;
+
+            if (HasStateAuthority)
+                Rpc_SpawnTileBreakParticle(pos, color, rot);
+            else
+                SpawnTileBreakParticleInternal(pos, color, rot);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
+        private void Rpc_SpawnTileBreakParticle(Vector2 pos, Color color, float rot) {
+            SpawnTileBreakParticleInternal(pos, color, rot);
+        }
+
+        private void SpawnTileBreakParticleInternal(Vector2 pos, Color color, float rot) {
+            GameManager.Instance.particleManager.Play(Enums.Particle.Entity_BrickBreak, pos, color, rot);
+        }
+
+
         //---OnChangeds
         public static void OnFacingRightChanged(Changed<BasicEntity> changed) {
             changed.Behaviour.OnFacingRightChanged();

@@ -217,7 +217,7 @@ namespace NSMB.Entities.World {
                 bool underSurface = entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
                 if (underSurface) {
                     // Don't let fireballs "poof"
-                    if (entity is FireballMover fm) {
+                    if (entity is Fireball fm) {
                         if (fm.body.position.y < SurfaceHeight - 0.2f) {
                             fm.DespawnEntity(false);
                         }

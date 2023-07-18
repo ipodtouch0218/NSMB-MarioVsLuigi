@@ -236,7 +236,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IFireballInteractable overrides
-        public override bool InteractWithFireball(FireballMover fireball) {
+        public override bool InteractWithFireball(Fireball fireball) {
             if (!Lit) {
                 Light();
             } else {

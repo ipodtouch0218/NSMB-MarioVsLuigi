@@ -921,7 +921,7 @@ namespace NSMB.Entities.Player {
                 bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
                 Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
 
-                FireballMover inactiveFireball = null;
+                Fireball inactiveFireball = null;
                 foreach (var fireball in GameData.Instance.PooledFireballs) {
                     if (fireball.IsActive)
                         continue;
@@ -982,7 +982,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            RPC_SpawnReserveItem();
+            Rpc_SpawnReserveItem();
         }
         #endregion
 
@@ -1107,7 +1107,7 @@ namespace NSMB.Entities.Player {
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        public void RPC_SpawnReserveItem() {
+        public void Rpc_SpawnReserveItem() {
             if (StoredPowerup == Enums.PowerupState.NoPowerup || MegaStartTimer.IsActive(Runner))
                 return;
 
@@ -1544,7 +1544,7 @@ namespace NSMB.Entities.Player {
                 (weak ? 0.5f : 1f),
 
                 // don't go upwards if we got hit by a fireball
-                (attacker && attacker.TryGetComponent(out FireballMover _)) ? 0 : 4.5f
+                (attacker && attacker.TryGetComponent(out Fireball _)) ? 0 : 4.5f
             );
 
             IsOnGround = false;
