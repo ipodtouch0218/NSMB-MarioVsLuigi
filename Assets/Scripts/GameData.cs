@@ -95,7 +95,7 @@ namespace NSMB.Game {
             if (Runner.IsServer && Runner.IsSinglePlayer && !Runner.IsResume) {
                 // Handle spawning in editor by spawning the room + player data objects
                 Runner.Spawn(PrefabList.Instance.SessionDataHolder);
-                NetworkObject localData = Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer);
+                NetworkObject localData = Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
                 Runner.SetPlayerObject(Runner.LocalPlayer, localData);
             }
 

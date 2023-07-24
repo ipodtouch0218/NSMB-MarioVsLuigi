@@ -66,7 +66,7 @@ namespace NSMB.Loading {
         }
 
         public void Initialize() {
-            data = NetworkHandler.Instance.runner.GetLocalPlayerData().GetCharacterData();
+            data = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
             Scale = 0;
             previousScale = 0;
             image.sprite = data.loadingSmallSprite;

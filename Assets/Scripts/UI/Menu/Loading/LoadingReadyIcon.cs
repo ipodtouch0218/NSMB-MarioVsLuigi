@@ -10,7 +10,7 @@ namespace NSMB.Loading {
         [SerializeField] private Image image;
 
         public void OnEnable() {
-            CharacterData character = NetworkHandler.Instance.runner.GetLocalPlayerData().GetCharacterData();
+            CharacterData character = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
             image.sprite = character.readySprite;
         }
     }

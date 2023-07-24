@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
+using Fusion;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
@@ -14,6 +16,7 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private GameObject entryTemplate, teamsHeader;
+    [SerializeField] private TMP_Text spectatorText;
 
     //---Private Variables
     private readonly List<ScoreboardEntry> entries = new();
@@ -36,6 +39,30 @@ public class ScoreboardUpdater : MonoBehaviour {
         entryComparer ??= new ScoreboardEntry.EntryComparer();
 
         teamsHeader.SetActive(SessionData.Instance ? SessionData.Instance.Teams : false);
+
+        NetworkHandler.OnPlayerJoined += OnPlayerListChanged;
+        NetworkHandler.OnPlayerLeft += OnPlayerListChanged;
+        UpdateSpectatorCount();
+    }
+
+    public void OnDestroy() {
+        NetworkHandler.OnPlayerJoined -= OnPlayerListChanged;
+        NetworkHandler.OnPlayerLeft -= OnPlayerListChanged;
+    }
+
+    public void UpdateSpectatorCount() {
+        int count = 0;
+        foreach (var player in NetworkHandler.Runner.ActivePlayers) {
+            PlayerData data = player.GetPlayerData(NetworkHandler.Runner);
+            if (!data)
+                continue;
+
+            if (!data.IsCurrentlySpectating)
+                continue;
+
+            count++;
+        }
+        spectatorText.text = (count == 0) ? "" : "<sprite name=room_spectator> <sprite name=hudnumber_" + count + ">";
     }
 
     public void SetEnabled() {
@@ -112,5 +139,9 @@ public class ScoreboardUpdater : MonoBehaviour {
 
         if (Settings.Instance.genericScoreboardAlways)
             SetEnabled();
+    }
+
+    private void OnPlayerListChanged(NetworkRunner runner, PlayerRef player) {
+        UpdateSpectatorCount();
     }
 }

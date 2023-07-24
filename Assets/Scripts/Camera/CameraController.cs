@@ -2,11 +2,13 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Entities.Collectable.Powerups;
 using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 
-[OrderAfter(typeof(NetworkRigidbody2D))]
+[OrderBefore(typeof(Powerup))]
+//[OrderAfter(typeof(NetworkRigidbody2D), typeof(PlayerController))]
 public class CameraController : NetworkBehaviour {
 
     //---Static Variables
@@ -85,6 +87,7 @@ public class CameraController : NetworkBehaviour {
         if ((_screenShake -= Time.deltaTime) > 0)
             shakeOffset = new Vector3((Random.value - 0.5f) * _screenShake, (Random.value - 0.5f) * _screenShake);
 
+        Debug.DrawRay(PlayerPos, Vector3.right, Color.white);
         SetPosition(position + shakeOffset);
     }
 
@@ -116,7 +119,7 @@ public class CameraController : NetworkBehaviour {
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
         if (!controller.IsDead && !controller.IsRespawning)
-            PlayerPos = AntiJitter(transform.position);
+            PlayerPos = AntiJitter(controller.nrb.InterpolationTarget.position);
 
         float vOrtho = targetCamera.orthographicSize;
         float xOrtho = vOrtho * targetCamera.aspect;
@@ -125,16 +128,21 @@ public class CameraController : NetworkBehaviour {
         Vector3 newCameraPosition = CurrentPosition;
 
         // Bottom camera clip
-        float cameraBottomDistanceToPlayer = PlayerPos.y - (newCameraPosition.y - vOrtho);
-        float cameraBottomMinDistance = Mathf.Max(3.5f - controller.models.transform.lossyScale.y, 1.5f);
+        float cameraBottom = newCameraPosition.y - vOrtho;
+        float cameraBottomDistanceToPlayer = PlayerPos.y - cameraBottom;
+        float cameraBottomMinDistance = 2f;
+
         if (cameraBottomDistanceToPlayer < cameraBottomMinDistance)
             newCameraPosition.y -= (cameraBottomMinDistance - cameraBottomDistanceToPlayer);
 
         // Top camera clip
-        float playerHeight = controller.models.transform.lossyScale.y;
-        float cameraTopMax = Mathf.Min(1.5f + playerHeight, 3.5f);
-        if (PlayerPos.y - (newCameraPosition.y + vOrtho) + cameraTopMax > 0)
-            newCameraPosition.y = PlayerPos.y - vOrtho + cameraTopMax;
+        float playerHeight = controller.transform.localScale.y;
+        float cameraTop = newCameraPosition.y + vOrtho;
+        float cameraTopDistanceToPlayer = cameraTop - (PlayerPos.y + playerHeight);
+        float cameraTopMinDistance = 2f;
+
+        if (cameraTopDistanceToPlayer < cameraTopMinDistance)
+            newCameraPosition.y += (cameraTopMinDistance - cameraTopDistanceToPlayer);
 
         Vector3 wrappedPos = PlayerPos;
         Utils.WrapWorldLocation(ref wrappedPos);
@@ -158,9 +166,9 @@ public class CameraController : NetworkBehaviour {
             LastFloorHeight = PlayerPos.y;
         bool validFloor = controller.IsOnGround || LastFloorHeight < PlayerPos.y;
 
-        // Top camera clip ON GROUND. slowly pan up, dont do it instantly.
-        if (validFloor && LastFloorHeight - (newCameraPosition.y + vOrtho) + cameraTopMax + 1.5f > 0)
-            targetPosition.y = PlayerPos.y - vOrtho + cameraTopMax + 1.5f;
+        // Floor height
+        if (validFloor && LastFloorHeight - (newCameraPosition.y + vOrtho) + cameraBottomMinDistance + 1.5f > 0)
+            targetPosition.y = PlayerPos.y - vOrtho + cameraBottomMinDistance + 1.5f;
 
         // Smoothing
         Vector3 smoothDamp = SmoothDampVel;

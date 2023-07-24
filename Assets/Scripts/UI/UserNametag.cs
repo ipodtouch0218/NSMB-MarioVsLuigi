@@ -21,13 +21,15 @@ public class UserNametag : MonoBehaviour {
 
     //---Private Variables
     private string cachedNickname;
-    private bool rainbowName;
+    private NicknameColor nicknameColor;
 
     public void Start() {
-        rainbowName = parent.Object.InputAuthority.HasRainbowName();
         data = parent.Object.InputAuthority.GetPlayerData(parent.Runner);
         character = data.GetCharacterData();
         arrow.color = parent.animationController.GlowColor;
+
+        nicknameColor = data.NicknameColor;
+        text.color = nicknameColor.color;
     }
 
     public void LateUpdate() {
@@ -88,7 +90,7 @@ public class UserNametag : MonoBehaviour {
         newText += Utils.GetSymbolString("Sx" + parent.Stars);
 
         text.text = newText;
-        if (rainbowName)
+        if (nicknameColor.isRainbow)
             text.color = Utils.GetRainbowColor(parent.Runner);
     }
 }

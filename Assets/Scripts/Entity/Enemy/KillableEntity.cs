@@ -12,7 +12,7 @@ namespace NSMB.Entities {
     public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFireballInteractable {
 
         //---Static Variables
-        private static readonly Enums.Sounds[] COMBOS = {
+        private static readonly Enums.Sounds[] ComboSounds = {
             Enums.Sounds.Enemy_Shell_Kick,
             Enums.Sounds.Enemy_Shell_Combo1,
             Enums.Sounds.Enemy_Shell_Combo2,
@@ -59,8 +59,9 @@ namespace NSMB.Entities {
             if (!physics) physics = GetComponent<PhysicsEntity>();
         }
 
-        public void Start() {
-            EntityFilter.SetLayerMask(Layers.MaskEntities);
+        public virtual void Start() {
+            if (!EntityFilter.useLayerMask)
+                EntityFilter.SetLayerMask(Layers.MaskEntities);
         }
 
         public override void Spawned() {
@@ -182,7 +183,7 @@ namespace NSMB.Entities {
                 sfx.enabled = true;
 
                 if (WasSpecialKilled)
-                    PlaySound(!IsFrozen ? COMBOS[Mathf.Min(COMBOS.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
+                    PlaySound(!IsFrozen ? ComboSounds[Mathf.Min(ComboSounds.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
 
                 if (WasGroundpounded)
                     Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.position + hitbox.offset, Quaternion.identity);

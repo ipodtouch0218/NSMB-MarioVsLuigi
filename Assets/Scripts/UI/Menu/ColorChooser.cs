@@ -65,7 +65,7 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
             buttons[i].navigation = navigations[i];
         }
 
-        CharacterData character = NetworkHandler.Instance.runner.LocalPlayer.GetCharacterData(NetworkHandler.Instance.runner);
+        CharacterData character = NetworkHandler.Runner.LocalPlayer.GetCharacterData(NetworkHandler.Runner);
         ChangeCharacter(character);
     }
 

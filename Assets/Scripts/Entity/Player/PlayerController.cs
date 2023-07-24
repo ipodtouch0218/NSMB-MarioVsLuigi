@@ -24,6 +24,7 @@ namespace NSMB.Entities.Player {
         private static readonly Collider2D[] CollisionBuffer = new Collider2D[64];
         private static readonly Collider2D[] TempCollisionBuffer = new Collider2D[32];
         private static readonly ContactPoint2D[] TileContactBuffer = new ContactPoint2D[32];
+        private static readonly Vector3 ZeroPointFive = Vector3.one * 0.5f;
 
         //---Networked Variables
         //-Player State
@@ -503,7 +504,6 @@ namespace NSMB.Entities.Player {
         }
         #endregion
 
-        private static Vector3 ZeroPointFive = Vector3.one * 0.5f;
         private void HandleScale() {
             transform.localScale = CalculateScale(false);
         }
@@ -1905,7 +1905,7 @@ namespace NSMB.Entities.Player {
 
         private static readonly Vector2 WallSlideLowerHeightOffset = new(0f, 0.2f);
         private void HandleWallSlideStopChecks(Vector2 wallDirection, bool right, bool left) {
-            bool floorCheck = !Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.3f, Layers.MaskAnyGround);
+            bool floorCheck = !Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.1f, Layers.MaskAnyGround);
             bool moveDownCheck = body.velocity.y < 0;
             bool heightLowerCheck = Runner.GetPhysicsScene2D().Raycast(body.position + WallSlideLowerHeightOffset, wallDirection, MainHitbox.size.x * 2, Layers.MaskSolidGround);
             if (!floorCheck || !moveDownCheck || !heightLowerCheck) {
@@ -2704,6 +2704,8 @@ namespace NSMB.Entities.Player {
                 // Normal walking/running
                 HandleWalkingRunning(left, right);
             }
+
+            HandleSlopes();
 
             if (!(IsGroundpounding && !IsOnGround && !DoEntityBounce)) {
                 // Jumping

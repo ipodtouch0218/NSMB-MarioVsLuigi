@@ -13,8 +13,8 @@ namespace NSMB.Tiles {
         public abstract bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool playBumpSound);
 
         public static void Bump(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
-            //check for entities above to bump
-            int count = NetworkHandler.Instance.runner.GetPhysicsScene2D().OverlapBox(worldLocation + BumpOffset, BumpSize, 0, CollisionBuffer);
+            // Check for entities above to bump
+            int count = NetworkHandler.Runner.GetPhysicsScene2D().OverlapBox(worldLocation + BumpOffset, BumpSize, 0, CollisionBuffer);
             for (int i = 0; i < count; i++) {
                 Collider2D collider = CollisionBuffer[i];
                 GameObject obj = collider.gameObject;

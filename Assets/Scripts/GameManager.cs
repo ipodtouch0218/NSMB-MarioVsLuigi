@@ -154,8 +154,8 @@ namespace NSMB.Game {
 
             // Spawn a GameDataHolder, if one doesn't already exist.
             if (!GameData.Instance) {
-                NetworkHandler.Instance.runner.Spawn(PrefabList.Instance.GameDataHolder);
-                NetworkHandler.Instance.runner.Spawn(PrefabList.Instance.TileManager);
+                NetworkHandler.Runner.Spawn(PrefabList.Instance.GameDataHolder);
+                NetworkHandler.Runner.Spawn(PrefabList.Instance.TileManager);
             }
         }
 

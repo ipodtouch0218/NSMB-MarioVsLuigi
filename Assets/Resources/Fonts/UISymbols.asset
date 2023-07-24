@@ -506,6 +506,12 @@ MonoBehaviour:
     m_Scale: 1
     m_Name: room_customlevel
     m_HashCode: -736204123
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 70
+    m_Scale: 1
+    m_Name: room_spectator
+    m_HashCode: 870276505
   m_SpriteGlyphTable:
   - m_Index: 0
     m_Metrics:
@@ -1206,7 +1212,7 @@ MonoBehaviour:
       m_HorizontalBearingY: 16
       m_HorizontalAdvance: 10
     m_GlyphRect:
-      m_X: 209
+      m_X: 210
       m_Y: 202
       m_Width: 15
       m_Height: 16
@@ -1379,8 +1385,8 @@ MonoBehaviour:
       m_Width: 15
       m_Height: 16
       m_HorizontalBearingX: -2
-      m_HorizontalBearingY: 16
-      m_HorizontalAdvance: 22
+      m_HorizontalBearingY: 15
+      m_HorizontalAdvance: 21
     m_GlyphRect:
       m_X: 1
       m_Y: 169
@@ -1412,8 +1418,8 @@ MonoBehaviour:
       m_Width: 15
       m_Height: 16
       m_HorizontalBearingX: -2
-      m_HorizontalBearingY: 16
-      m_HorizontalAdvance: 22
+      m_HorizontalBearingY: 15
+      m_HorizontalAdvance: 21
     m_GlyphRect:
       m_X: 1
       m_Y: 152
@@ -1445,8 +1451,8 @@ MonoBehaviour:
       m_Width: 15
       m_Height: 16
       m_HorizontalBearingX: -2
-      m_HorizontalBearingY: 16
-      m_HorizontalAdvance: 22
+      m_HorizontalBearingY: 15
+      m_HorizontalAdvance: 21
     m_GlyphRect:
       m_X: 1
       m_Y: 135
@@ -1477,8 +1483,8 @@ MonoBehaviour:
       m_Width: 15
       m_Height: 16
       m_HorizontalBearingX: -2
-      m_HorizontalBearingY: 16
-      m_HorizontalAdvance: 22
+      m_HorizontalBearingY: 15
+      m_HorizontalAdvance: 21
     m_GlyphRect:
       m_X: 1
       m_Y: 118
@@ -1509,8 +1515,8 @@ MonoBehaviour:
       m_Width: 15
       m_Height: 16
       m_HorizontalBearingX: -2
-      m_HorizontalBearingY: 16
-      m_HorizontalAdvance: 22
+      m_HorizontalBearingY: 15
+      m_HorizontalAdvance: 21
     m_GlyphRect:
       m_X: 1
       m_Y: 101
@@ -1632,5 +1638,21 @@ MonoBehaviour:
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
     sprite: {fileID: -971827560, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 70
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: 0
+      m_HorizontalBearingY: 13
+      m_HorizontalAdvance: 17
+    m_GlyphRect:
+      m_X: 188
+      m_Y: 243
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: -2077949175, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   spriteInfoList: []
   fallbackSpriteAssets: []

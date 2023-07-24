@@ -15,6 +15,7 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
+using static NetworkHandler;
 
 public class MainMenuManager : Singleton<MainMenuManager> {
 
@@ -22,7 +23,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public static readonly int NicknameMin = 2, NicknameMax = 20;
 
     //---Properties
-    private NetworkRunner Runner => NetworkHandler.Instance.runner;
     private PlayerData LocalData => Runner.GetLocalPlayerData();
 
     //---Public Variables
@@ -481,17 +481,15 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void Kick(PlayerRef target) {
-        NetworkRunner runner = NetworkHandler.Instance.runner;
-        if (target == runner.LocalPlayer)
+        if (target == Runner.LocalPlayer)
             return;
 
-        chat.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetPlayerData(runner).GetNickname());
-        runner.Disconnect(target);
+        chat.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetPlayerData(Runner).GetNickname());
+        Runner.Disconnect(target);
     }
 
     public void Promote(PlayerRef target) {
-        NetworkRunner runner = NetworkHandler.Instance.runner;
-        if (target == runner.LocalPlayer)
+        if (target == Runner.LocalPlayer)
             return;
 
         //PhotonNetwork.SetMasterClient(target);
@@ -501,12 +499,11 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void Mute(PlayerRef target) {
-        NetworkRunner runner = NetworkHandler.Instance.runner;
-        if (target == runner.LocalPlayer)
+        if (target == Runner.LocalPlayer)
             return;
 
 
-        PlayerData data = target.GetPlayerData(runner);
+        PlayerData data = target.GetPlayerData(Runner);
         bool newMuteState = !data.IsMuted;
         data.IsMuted = newMuteState;
         chat.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", "playername", data.GetNickname());
@@ -536,45 +533,12 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void Ban(PlayerRef target) {
-        NetworkRunner runner = NetworkHandler.Instance.runner;
-        if (target == runner.LocalPlayer)
+        if (target == Runner.LocalPlayer)
             return;
 
         SessionData.Instance.AddBan(target);
-        chat.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetPlayerData(runner).GetNickname());
+        chat.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetPlayerData(Runner).GetNickname());
         Runner.Disconnect(target);
-
-        //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
-        //List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
-
-        //NameIdPair newPair = new() {
-        //    name = target.NickName,
-        //    userId = target.UserId
-        //};
-
-        //pairs.Add(newPair);
-
-        //Hashtable table = new() {
-        //    [Enums.NetRoomProperties.Bans] = pairs.ToArray(),
-        //};
-        //PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
-
-        //Runner.Disconnect(target);
-        //LocalChatMessage($"Successfully banned {target.GetUniqueNickname()}", Color.red);
-    }
-
-    private void Unban() {
-        //TODO:
-        //Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
-        //List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
-
-        //pairs.Remove(targetPair);
-
-        //Hashtable table = new() {
-            //[Enums.NetRoomProperties.Bans] = pairs.ToArray(),
-        //};
-        //PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
-        //LocalChatMessage($"Successfully unbanned {targetPair.name}", Color.red);
     }
 
     public void UI_CharacterDropdownChanged() {
@@ -762,6 +726,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             characterDropdown.options.Add(new TMP_Dropdown.OptionData(name, character.readySprite));
         }
         characterDropdown.SetValueWithoutNotify(selectedCharacter);
+        characterDropdown.RefreshShownValue();
 
         //TODO: RTL FONT
 

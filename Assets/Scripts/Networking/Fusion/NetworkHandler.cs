@@ -1,4 +1,6 @@
+using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +13,7 @@ using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
-using System.Collections;
+using static ConnectionToken;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
@@ -20,7 +22,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
     private static GameObject prefab;
-    public NetworkRunner runner;
     private static bool reattemptCreate;
     public static int connecting;
 
@@ -30,6 +31,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public static bool Connecting => connecting > 0 || AuthenticationHandler.IsAuthenticating || (Runner && Runner.State == NetworkRunner.States.Starting && !Runner.IsCloudReady) || (Runner && Runner.State == NetworkRunner.States.Running && !Runner.IsConnectedToServer && !Runner.IsServer);
     public static bool Connected => !Connecting && Runner && (Runner.State == NetworkRunner.States.Running || Runner.IsCloudReady);
     public static bool Disconnected => !Connecting && !Connected;
+
+    //---Public
+    public NetworkRunner runner;
 
     #region Events
     //---Exposed callbacks for Events
@@ -131,11 +135,28 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {
-        Debug.Log("[Network] Authentication Successful");
+        Debug.Log("[Network] Authentication response received");
 
-        if (data.ContainsKey("Token")) {
+        if (data.ContainsKey("Token") && data["Token"] != null) {
             PlayerPrefs.SetString("token", (string) data["Token"]);
             PlayerPrefs.Save();
+        }
+
+        if (data.ContainsKey("SignedData")) {
+            SignedResultData signedData = JsonConvert.DeserializeObject<SignedResultData>((string) data["SignedData"]);
+            ConnectionToken connectionToken = new() {
+                signedData = signedData,
+                signature = (string) data["Signature"],
+            };
+            if (connectionToken.HasValidSignature()) {
+                // Good to go :)
+                Debug.Log($"[Network] Authenication successful ({signedData.UserId}), server signature verified");
+                GlobalController.Instance.connectionToken = connectionToken;
+            } else {
+                Debug.LogWarning("[Network] Authentication server responded with signed data, but it had an invalid signature");
+            }
+        } else {
+            Debug.LogWarning("[Network] Authentication server did not respond with any signed data, ID Spoofing is possible");
         }
 
         OnCustomAuthenticationResponse?.Invoke(runner, data);
@@ -150,7 +171,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         StartGameResult result = await Runner.StartGame(new() {
             HostMigrationToken = hostMigrationToken,
             HostMigrationResume = HostMigrationResume,
-            ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname),
+            ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             DisableClientSessionCreation = false,
             Scene = 0,
         });
@@ -182,7 +203,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 runner.SetPlayerObject(player, existingData.Object);
                 existingData.JoinTick = -1;
             } else {
-                runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player);
+                runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
             }
 
             if (player == runner.LocalPlayer) {
@@ -213,15 +234,15 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (data) {
             Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
             if (Runner.IsServer) {
-                DestroyPlayerDataLater(data);
+                StartCoroutine(DestroyPlayerDataLater(data));
             }
         }
 
         GlobalController.Instance.discordController.UpdateActivity();
     }
 
-    private IEnumerable DestroyPlayerDataLater(PlayerData data) {
-        yield return new WaitForSecondsRealtime(3);
+    private IEnumerator DestroyPlayerDataLater(PlayerData data) {
+        yield return new WaitForSecondsRealtime(1);
         runner.Despawn(data.Object);
     }
 
@@ -364,6 +385,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host, int players = 10) {
+        GlobalController.Instance.connectionToken.nickname = Settings.Instance.genericNickname;
 
         connecting++;
         int attempts = 3;
@@ -395,7 +417,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.AuthValues = authValues;
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
-            args.ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname);
+            args.ConnectionToken = GlobalController.Instance.connectionToken.Serialize();
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
             args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname;
@@ -421,6 +443,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     public static async Task<StartGameResult> JoinRoom(string roomId) {
+        GlobalController.Instance.connectionToken.nickname = Settings.Instance.genericNickname;
+
         connecting++;
 
         // Make sure that we're on the right region...
@@ -436,17 +460,16 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             MainMenuManager.Instance.nonNetworkShutdown = true;
 
         Debug.Log($"[Network] Attempting to join game with ID: {roomId}");
-        //attempt to join the room
+        // Attempt to join the room
         StartGameResult result = await Runner.StartGame(new() {
             GameMode = GameMode.Client,
             SessionName = roomId,
-            ConnectionToken = Encoding.UTF8.GetBytes(Settings.Instance.genericNickname),
+            ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             DisableClientSessionCreation = true,
         });
         Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
         if (!result.Ok) {
-            //OnJoinSessionFailed?.Invoke(Runner, result.ShutdownReason);
-            //automatically go back to the lobby.
+            // Automatically go back to the lobby.
             await ConnectToRegion(originalRegion);
         }
 

@@ -6,7 +6,6 @@ using TMPro;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
-using System.Configuration;
 
 public class PlayerListEntry : MonoBehaviour {
 
@@ -25,7 +24,7 @@ public class PlayerListEntry : MonoBehaviour {
 
     //---Private Variables
     private GameObject blockerInstance;
-    private bool rainbow;
+    private NicknameColor nicknameColor;
 
     public void OnEnable() {
         Settings.OnColorblindModeChanged += OnColorblindModeChanged;
@@ -40,8 +39,13 @@ public class PlayerListEntry : MonoBehaviour {
             Destroy(blockerInstance);
     }
 
+    public void Start() {
+        nicknameColor = player.GetPlayerData(NetworkHandler.Instance.runner).NicknameColor;
+        nameText.color = nicknameColor.color;
+    }
+
     public void Update() {
-        if (rainbow) {
+        if (nicknameColor.isRainbow) {
             nameText.color = Utils.GetRainbowColor(NetworkHandler.Instance.runner);
         }
 
@@ -57,8 +61,6 @@ public class PlayerListEntry : MonoBehaviour {
     public void UpdateText() {
         NetworkRunner runner = NetworkHandler.Instance.runner;
         PlayerData data = player.GetPlayerData(runner);
-
-        rainbow = player.HasRainbowName();
 
         colorStrip.color = Utils.GetPlayerColor(runner, player);
 

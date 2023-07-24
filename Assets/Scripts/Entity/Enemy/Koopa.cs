@@ -41,7 +41,7 @@ namespace NSMB.Entities.Enemies {
         private IPowerupCollect powerupCollect;
         private float dampVelocity;
 
-        public void Start() {
+        public override void Start() {
             powerupCollect = GetComponent<IPowerupCollect>();
         }
 

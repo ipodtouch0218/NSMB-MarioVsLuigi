@@ -83,7 +83,7 @@ public class DebugControls : MonoBehaviour {
         if (item == NetworkPrefabRef.Empty)
             item = Utils.GetRandomItem(GameManager.Instance.localPlayer).prefab;
 
-        NetworkHandler.Instance.runner.Spawn(item, onBeforeSpawned: (runner, obj) => {
+        NetworkHandler.Runner.Spawn(item, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<Powerup>().OnBeforeSpawned(GameManager.Instance.localPlayer);
         });
     }
@@ -93,7 +93,7 @@ public class DebugControls : MonoBehaviour {
             return;
 
         Vector3 pos = GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().FacingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0);
-        NetworkHandler.Instance.runner.Spawn(enemy, pos, onBeforeSpawned: spawned);
+        NetworkHandler.Runner.Spawn(enemy, pos, onBeforeSpawned: spawned);
 
     }
 #endif

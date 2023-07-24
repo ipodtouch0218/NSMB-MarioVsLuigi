@@ -9,7 +9,7 @@ using Fusion.Photon.Realtime;
 public class AuthenticationHandler {
 
     //---Static Variables
-    private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
+    private static readonly string URL = "https://mariovsluigi2.azurewebsites.net/auth/init";
 
     public static bool IsAuthenticating { get; set; }
 
@@ -41,10 +41,11 @@ public class AuthenticationHandler {
             return null;
         }
 
+
         AuthenticationValues values = new();
         values.AuthType = CustomAuthenticationType.Custom;
         values.UserId = userid;
-        values.AddAuthParameter("data", client.downloadHandler.text.Trim());
+        values.AddAuthParameter("data", client.downloadHandler.text.Trim().Replace("\"", ""));
 
         client.Dispose();
 

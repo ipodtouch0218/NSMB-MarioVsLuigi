@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Fusion;
-using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
+using NanoSockets;
+using System.Linq;
+using Newtonsoft.Json;
+using System.Text;
 
 public class SessionData : NetworkBehaviour {
 
@@ -40,10 +43,8 @@ public class SessionData : NetworkBehaviour {
 
     //---Private Variables
     private readonly Dictionary<Guid, uint> wins = new();
-    private readonly Dictionary<int, NetAddress> playerAddresses = new();
+    private HashSet<Guid> bannedIds;
     private Tick lastUpdatedTick;
-    private HashSet<NetAddress> bannedIps;
-    private HashSet<string> bannedIds;
     private float lastStartCancelTime = -10f;
     private bool playedStartSound;
     private Coroutine pingUpdaterCorotuine;
@@ -70,7 +71,6 @@ public class SessionData : NetworkBehaviour {
 
         if (Runner.IsServer) {
             bannedIds = new();
-            bannedIps = new();
             NetworkHandler.OnConnectRequest += OnConnectRequest;
 
             pingUpdaterCorotuine = StartCoroutine(UpdatePings());
@@ -122,11 +122,36 @@ public class SessionData : NetworkBehaviour {
     }
 
     private bool OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
-        if (bannedIps.Contains(request.RemoteAddress))
-            return false;
+        try {
+            ConnectionToken connectionToken = ConnectionToken.Deserialize(token);
 
-        playerAddresses[request.RemoteAddress.ActorId] = request.RemoteAddress;
-        return true;
+            // Connection token not signed by the auth server
+            if (!connectionToken.HasValidSignature()) {
+                Debug.Log($"[Network] Received an unsigned connection token from an incoming connection: {request.RemoteAddress}");
+                return false;
+            }
+
+            if (bannedIds.Contains(connectionToken.signedData.UserId)) {
+                Debug.Log($"[Network] Rejecting join from a banned userid ({connectionToken.signedData.UserId})");
+                return false;
+            }
+
+            return true;
+        } catch {
+            // Malformed connection token.
+            Debug.Log($"[Network] Received a malformed connection token from an incoming connection: {request.RemoteAddress}");
+            return false;
+        }
+    }
+
+    private class AddressComparer : IEqualityComparer<Address> {
+        public bool Equals(Address x, Address y) {
+            return x._address0 == y._address0 && x._address1 == y._address1;
+        }
+
+        public int GetHashCode(Address obj) {
+            return obj.GetHashCode();
+        }
     }
 
     public void SaveWins(PlayerData data) {
@@ -139,10 +164,8 @@ public class SessionData : NetworkBehaviour {
     }
 
     public void AddBan(PlayerRef player) {
-        if (playerAddresses.TryGetValue(player, out NetAddress address)) {
-            bannedIps.Add(address);
-            playerAddresses.Remove(player);
-        }
+        PlayerData data = player.GetPlayerData(Runner);
+        bannedIds.Add(data.UserId);
     }
 
     public void SetMaxPlayers(byte value) {

@@ -19,8 +19,9 @@ public class ScoreboardEntry : MonoBehaviour {
 
     //---Private Variables
     private PlayerData data;
+    private NicknameColor nicknameColor;
     private int playerId, currentLives, currentStars, currentPing;
-    private bool rainbowEnabled, disconnected;
+    private bool disconnected;
     private int deathTick;
 
     public void Start() {
@@ -38,13 +39,14 @@ public class ScoreboardEntry : MonoBehaviour {
         Color c = target.animationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);
 
-        rainbowEnabled = target.Object.InputAuthority.HasRainbowName();
+        nicknameColor = data.NicknameColor;
+        nameText.color = nicknameColor.color;
     }
 
     public void Update() {
         CheckForTextUpdate();
 
-        if (rainbowEnabled)
+        if (nicknameColor.isRainbow)
             nameText.color = Utils.GetRainbowColor(NetworkHandler.Runner);
     }
 

@@ -31,6 +31,8 @@ public class GlobalController : Singleton<GlobalController> {
     public ShutdownReason? disconnectCause = null;
     public int windowWidth = 1280, windowHeight = 720;
 
+    public ConnectionToken connectionToken;
+
     //---Serialized Variables
     [SerializeField] private AudioMixer mixer;
     [SerializeField] private AudioSource sfx;

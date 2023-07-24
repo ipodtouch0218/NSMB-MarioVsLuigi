@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Text;
@@ -5,7 +6,6 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 
 using Fusion;
-using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Utils;
@@ -13,12 +13,12 @@ using NSMB.Utils;
 public class PlayerData : NetworkBehaviour {
 
     //---Static stuffs
-    public static bool Locked => SessionData.Instance && SessionData.Instance.GameStarted;
+    public bool Locked => SessionData.Instance && SessionData.Instance.GameStarted && !IsCurrentlySpectating;
 
     //---Networked Variables
     [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] public string Nickname { get; set; } = "noname";
-    [Networked, Capacity(28), SerializeField]                    private string DisplayNickname { get; set; } = "noname";
-    [Networked]                                                  public Guid UserId { get; set; }
+    [Networked, Capacity(28)]                                    private string DisplayNickname { get; set; } = "noname";
+    [Networked]                                                  public ConnectionToken ConnectionToken { get; set; }
     [Networked]                                                  public sbyte PlayerId { get; set; }
     [Networked]                                                  public uint Wins { get; set; }
     [Networked(OnChanged = nameof(OnStartSettingChanged))]       public sbyte Team { get; set; }
@@ -34,13 +34,46 @@ public class PlayerData : NetworkBehaviour {
     [Networked]                                                  public NetworkBool Initialized { get; set; }
     [Networked]                                                  public int JoinTick { get; set; }
 
+    public Guid UserId => ConnectionToken.signedData.UserId;
+    public NicknameColor NicknameColor => nicknameColor;
+
     //---Private Variables
+    private NicknameColor nicknameColor;
     private Tick lastUpdatedTick;
-    private NetAddress address;
     private string filteredNickname;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
+    }
+
+    public void OnBeforeSpawned() {
+        if (!Initialized) {
+            // Expose their connection token :flushed:
+            byte[] token = Runner.GetPlayerConnectionToken(Object.InputAuthority);
+            try {
+                ConnectionToken = ConnectionToken.Deserialize(token);
+                if (!ConnectionToken.HasValidSignature()) {
+                    // Invalid signature, nice try guy
+                    throw new Exception();
+                }
+                if (ConnectionToken.signedData.UserId != Guid.Parse(Runner.GetPlayerUserId(Object.InputAuthority))) {
+                    // Attempted to steal from another user???
+                    throw new Exception();
+                }
+                // Successful :D
+                SetNickname(ConnectionToken.nickname.Value);
+            } catch {
+                Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Object.InputAuthority)}'. If you're directly booting the game within a level in the Unity Editor, this is not a bug.");
+                SetNickname(ConnectionToken.nickname.Value);
+                ConnectionToken = new();
+            }
+
+            IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
+
+            Initialized = true;
+        } else {
+            SetNickname(Nickname);
+        }
     }
 
     public override void Spawned() {
@@ -66,25 +99,10 @@ public class PlayerData : NetworkBehaviour {
                 IsRoomOwner = true;
         }
 
-        if (Runner.IsServer) {
-            if (!Initialized) {
-                string nickname = Encoding.UTF8.GetString(Runner.GetPlayerConnectionToken(Object.InputAuthority) ?? Encoding.UTF8.GetBytes("noname"));
-                SetNickname(nickname);
-
-                // Expose their userid
-                Guid.TryParse(Runner.GetPlayerUserId(Object.InputAuthority), out Guid id);
-                UserId = id;
-
-                IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
-
-                Initialized = true;
-            } else {
-                SetNickname(Nickname);
-            }
-        }
-
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.OnPlayerDataValidated(this);
+
+        nicknameColor = NicknameColor.FromConnectionToken(ConnectionToken);
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -157,11 +175,11 @@ public class PlayerData : NetworkBehaviour {
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetSkinIndex(byte index) {
-        //not accepting changes at this time
+        // Not accepting changes at this time
         if (Locked)
             return;
 
-        //invalid skin...
+        // Invalid skin...
         if (index >= ScriptableManager.Instance.skins.Length)
             return;
 
@@ -170,10 +188,11 @@ public class PlayerData : NetworkBehaviour {
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetTeamNumber(sbyte team) {
-        //not accepting changes at this time
+        // Not accepting changes at this time
         if (Locked)
             return;
 
+        // Invalid team...
         if (team < 0 || team > 4)
             return;
 

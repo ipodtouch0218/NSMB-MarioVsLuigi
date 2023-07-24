@@ -36,7 +36,7 @@ namespace NSMB.Loading {
                 return;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
-            PlayerData ourData = NetworkHandler.Instance.runner.LocalPlayer.GetPlayerData(NetworkHandler.Instance.runner);
+            PlayerData ourData = NetworkHandler.Runner.LocalPlayer.GetPlayerData(NetworkHandler.Runner);
 
             // Loading (as spectator)
             if (ourData.IsCurrentlySpectating) {
