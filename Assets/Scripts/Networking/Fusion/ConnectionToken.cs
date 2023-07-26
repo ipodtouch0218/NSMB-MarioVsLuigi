@@ -53,6 +53,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbVXeDZyyeb+ptn7HEjg0vtIL+jUV
 
     public static ConnectionToken Deserialize(byte[] input) {
 
+        // Remove signature padding (isn't always 72 bytes for whatever reason).
         int signatureLength = 115 - 43;
         while (input[43 + signatureLength - 1] == 0)
             signatureLength--;

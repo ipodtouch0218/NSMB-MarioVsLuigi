@@ -4,12 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Fusion;
+using NanoSockets;
 using NSMB.Extensions;
 using NSMB.Utils;
-using NanoSockets;
-using System.Linq;
-using Newtonsoft.Json;
-using System.Text;
 
 public class SessionData : NetworkBehaviour {
 
@@ -44,6 +41,7 @@ public class SessionData : NetworkBehaviour {
     //---Private Variables
     private readonly Dictionary<Guid, uint> wins = new();
     private HashSet<Guid> bannedIds;
+    private HashSet<string> bannedIps;
     private Tick lastUpdatedTick;
     private float lastStartCancelTime = -10f;
     private bool playedStartSound;
@@ -71,6 +69,7 @@ public class SessionData : NetworkBehaviour {
 
         if (Runner.IsServer) {
             bannedIds = new();
+            bannedIps = new();
             NetworkHandler.OnConnectRequest += OnConnectRequest;
 
             pingUpdaterCorotuine = StartCoroutine(UpdatePings());
@@ -97,7 +96,7 @@ public class SessionData : NetworkBehaviour {
                 if (ticksLeft % Runner.Config.Simulation.TickRate == 0) {
                     // Send countdown
                     int seconds = ticksLeft / Runner.Config.Simulation.TickRate;
-                    MainMenuManager.Instance.CountdownTick(seconds);
+                    MainMenuManager.Instance.OnCountdownTick(seconds);
                 }
             }
         }
@@ -144,16 +143,6 @@ public class SessionData : NetworkBehaviour {
         }
     }
 
-    private class AddressComparer : IEqualityComparer<Address> {
-        public bool Equals(Address x, Address y) {
-            return x._address0 == y._address0 && x._address1 == y._address1;
-        }
-
-        public int GetHashCode(Address obj) {
-            return obj.GetHashCode();
-        }
-    }
-
     public void SaveWins(PlayerData data) {
         wins[data.UserId] = data.Wins;
     }
@@ -163,8 +152,7 @@ public class SessionData : NetworkBehaviour {
             data.Wins = wins[data.UserId];
     }
 
-    public void AddBan(PlayerRef player) {
-        PlayerData data = player.GetPlayerData(Runner);
+    public void AddBan(PlayerData data) {
         bannedIds.Add(data.UserId);
     }
 
@@ -312,7 +300,7 @@ public class SessionData : NetworkBehaviour {
                 MainMenuManager.Instance.chat.AddSystemMessage("ui.inroom.chat.server.startcancelled");
             }
             sd.lastStartCancelTime = sd.Runner.SimulationTime;
-            MainMenuManager.Instance.CountdownTick(-1);
+            MainMenuManager.Instance.OnCountdownTick(-1);
             sd.playedStartSound = false;
         } else {
             if (sd.lastStartCancelTime + 3f < time || sd.Runner.GetLocalPlayerData().IsRoomOwner) {
@@ -320,7 +308,7 @@ public class SessionData : NetworkBehaviour {
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
                 sd.playedStartSound = true;
             }
-            MainMenuManager.Instance.CountdownTick(3);
+            MainMenuManager.Instance.OnCountdownTick(3);
         }
     }
 }

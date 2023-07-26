@@ -1,7 +1,5 @@
-using Newtonsoft.Json;
 using System;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -69,6 +67,7 @@ public class PlayerData : NetworkBehaviour {
             }
 
             IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
+            JoinTick = Runner.Tick;
 
             Initialized = true;
         } else {
@@ -80,7 +79,6 @@ public class PlayerData : NetworkBehaviour {
         // Keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
-        JoinTick = Runner.Tick;
         PlayerId = -1;
         if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1)
             Team = 0;

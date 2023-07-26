@@ -62,7 +62,7 @@ public class PlayerListHandler : MonoBehaviour {
             go.name = $"{data.GetNickname()} ({data.GetUserIdString()})";
             go.SetActive(true);
             playerListEntries[player] = go.GetComponent<PlayerListEntry>();
-            playerListEntries[player].player = player;
+            playerListEntries[player].player = data;
         }
 
         UpdatePlayerEntry(player);

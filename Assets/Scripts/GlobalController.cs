@@ -27,7 +27,7 @@ public class GlobalController : Singleton<GlobalController> {
 
     public RenderTexture ndsTexture;
 
-    public bool checkedForVersion;
+    public bool checkedForVersion, firstConnection;
     public ShutdownReason? disconnectCause = null;
     public int windowWidth = 1280, windowHeight = 720;
 

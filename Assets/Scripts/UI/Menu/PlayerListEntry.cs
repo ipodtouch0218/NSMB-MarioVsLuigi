@@ -10,7 +10,7 @@ using NSMB.Utils;
 public class PlayerListEntry : MonoBehaviour {
 
     //---Public Variables
-    public PlayerRef player;
+    public PlayerData player;
     public float typingCounter;
 
     //---Serialized Variables
@@ -40,16 +40,16 @@ public class PlayerListEntry : MonoBehaviour {
     }
 
     public void Start() {
-        nicknameColor = player.GetPlayerData(NetworkHandler.Instance.runner).NicknameColor;
+        nicknameColor = player.NicknameColor;
         nameText.color = nicknameColor.color;
     }
 
     public void Update() {
         if (nicknameColor.isRainbow) {
-            nameText.color = Utils.GetRainbowColor(NetworkHandler.Instance.runner);
+            nameText.color = Utils.GetRainbowColor(NetworkHandler.Runner);
         }
 
-        if (typingCounter > 0) {
+        if (typingCounter > 0 && !player.IsMuted) {
             chattingIcon.SetActive(true);
             typingCounter -= Time.deltaTime;
         } else {
@@ -60,35 +60,34 @@ public class PlayerListEntry : MonoBehaviour {
 
     public void UpdateText() {
         NetworkRunner runner = NetworkHandler.Instance.runner;
-        PlayerData data = player.GetPlayerData(runner);
 
         colorStrip.color = Utils.GetPlayerColor(runner, player);
 
-        if (data.Wins == 0) {
+        if (player.Wins == 0) {
             winsText.text = "";
         } else {
-            winsText.text = "<sprite name=room_wins>" + data.Wins;
+            winsText.text = "<sprite name=room_wins>" + player.Wins;
         }
 
         string permissionSymbol = "";
-        if (data.IsRoomOwner) {
+        if (player.IsRoomOwner) {
             permissionSymbol += "<sprite name=room_host>";
             pingText.text = "";
         } else {
-            int ping = data.Ping;
+            int ping = player.Ping;
             pingText.text = ping + " " + Utils.GetPingSymbol(ping);
         }
 
-        string characterSymbol = data.GetCharacterData().uistring;
+        string characterSymbol = player.GetCharacterData().uistring;
 
         string teamSymbol;
         if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
-            Team team = ScriptableManager.Instance.teams[data.Team];
+            Team team = ScriptableManager.Instance.teams[player.Team];
             teamSymbol = team.textSpriteColorblindBig;
         } else {
             teamSymbol = "";
         }
-        nameText.text = permissionSymbol + characterSymbol + teamSymbol + data.GetNickname();
+        nameText.text = permissionSymbol + characterSymbol + teamSymbol + player.GetNickname();
 
         Transform parent = transform.parent;
         int childIndex = 0;
@@ -108,7 +107,7 @@ public class PlayerListEntry : MonoBehaviour {
         if (blockerInstance)
             Destroy(blockerInstance);
 
-        bool admin = runner.IsServer && runner.LocalPlayer != player;
+        bool admin = runner.IsServer && runner.LocalPlayer != player.Object.InputAuthority;
         foreach (GameObject option in adminOnlyOptions) {
             option.SetActive(admin);
         }
@@ -158,13 +157,14 @@ public class PlayerListEntry : MonoBehaviour {
 
     public void CopyPlayerId() {
         TextEditor te = new() {
-            text = player.GetPlayerData(NetworkHandler.Instance.runner).GetUserIdString()
+            text = player.GetUserIdString()
         };
         te.SelectAll();
         te.Copy();
         HideDropdown(true);
     }
 
+    //---Callbacks
     private void OnColorblindModeChanged() {
         UpdateText();
     }

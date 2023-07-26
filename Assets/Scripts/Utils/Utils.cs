@@ -549,14 +549,18 @@ namespace NSMB.Utils {
             if (player == -1 || player == PlayerRef.None)
                 return spectatorColor;
 
-            PlayerData data = player.GetPlayerData(runner);
+            return GetPlayerColor(runner, player.GetPlayerData(runner), s, v);
+        }
+
+        public static Color GetPlayerColor(NetworkRunner runner, PlayerData player, float s = 1, float v = 1) {
+
             // Prioritize spectator status
-            if (!data || data.IsManualSpectator || data.IsCurrentlySpectating)
+            if (!player || player.IsManualSpectator || player.IsCurrentlySpectating)
                 return spectatorColor;
 
             // Then teams
-            if (SessionData.Instance && SessionData.Instance.Teams && data.Team >= 0 && data.Team < ScriptableManager.Instance.teams.Length)
-                return GetTeamColor(data.Team, s, v);
+            if (SessionData.Instance && SessionData.Instance.Teams && player.Team >= 0 && player.Team < ScriptableManager.Instance.teams.Length)
+                return GetTeamColor(player.Team, s, v);
 
             // Then id based color
             int result = -1;
@@ -567,7 +571,7 @@ namespace NSMB.Utils {
                 if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating)
                     continue;
 
-                if (pl == player)
+                if (playerData == player)
                     result = count;
 
                 count++;

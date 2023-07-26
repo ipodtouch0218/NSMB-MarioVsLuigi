@@ -15,7 +15,6 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
-using static NetworkHandler;
 
 public class MainMenuManager : Singleton<MainMenuManager> {
 
@@ -23,7 +22,9 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     public static readonly int NicknameMin = 2, NicknameMax = 20;
 
     //---Properties
+    private NetworkRunner Runner => NetworkHandler.Runner;
     private PlayerData LocalData => Runner.GetLocalPlayerData();
+
 
     //---Public Variables
     public bool nonNetworkShutdown;
@@ -77,6 +78,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         NetworkHandler.OnJoinSessionFailed += OnShutdown;
         NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
         NetworkHandler.OnConnectFailed += OnConnectFailed;
+        NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
 
         ControlSystem.controls.UI.Pause.performed += OnPause;
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -92,6 +94,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         NetworkHandler.OnJoinSessionFailed -= OnShutdown;
         NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
         NetworkHandler.OnConnectFailed -= OnConnectFailed;
+        NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
 
         ControlSystem.controls.UI.Pause.performed -= OnPause;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
@@ -110,10 +113,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         }
 
         PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
-
-        // Region Dropdown
-        regionDropdown.ClearOptions();
-        regionDropdown.AddOptions(NetworkHandler.Regions.ToList());
+        UpdateRegionDropdown();
 
         // Photon stuff.
         if (!Runner.IsCloudReady) {
@@ -171,9 +171,31 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
     }
 
-    public void OnPlayerDataValidated(PlayerData data) {
-        chat.AddSystemMessage("ui.inroom.chat.player.joined", "playername", data.GetNickname());
-        sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
+    public void UpdateRegionDropdown() {
+
+        if (regionDropdown.options.Count == 0) {
+            // Create brand-new options
+            for (int i = 0; i < NetworkHandler.Regions.Length; i++) {
+                string region = NetworkHandler.Regions[i];
+                int ping = 0;
+                if (NetworkHandler.RegionPings != null)
+                    ping = NetworkHandler.RegionPings[i];
+
+                regionDropdown.options.Add(new RegionOption(region, ping));
+            }
+            regionDropdown.options.Sort();
+        } else {
+            // Update existing options
+            RegionOption selected = (RegionOption) regionDropdown.options[regionDropdown.value];
+
+            foreach (RegionOption option in regionDropdown.options) {
+                if (NetworkHandler.RegionPings != null)
+                    option.Ping = NetworkHandler.RegionPings[Array.IndexOf(NetworkHandler.Regions, option.Region)];
+            }
+
+            regionDropdown.options.Sort();
+            regionDropdown.SetValueWithoutNotify(regionDropdown.options.IndexOf(selected));
+        }
     }
 
     public void EnterRoom() {
@@ -210,7 +232,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         chatTextField.SetTextWithoutNotify("");
 
         // Reset the "Game start" button counting down
-        CountdownTick(-1);
+        OnCountdownTick(-1);
 
         // Host chat notification
         if (Runner.IsServer)
@@ -299,12 +321,14 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         lobbyMenu.SetActive(true);
         createLobbyPrompt.SetActive(true);
     }
+
     public void OpenOptions() {
         if (wasSettingsOpen)
             return;
 
         GlobalController.Instance.optionsManager.OpenMenu();
     }
+
     public void OpenCredits() {
         DisableAllMenus();
         bg.SetActive(true);
@@ -312,6 +336,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         EventSystem.current.SetSelectedGameObject(creditsSelected);
     }
+
     public void OpenInRoomMenu() {
         DisableAllMenus();
         bg.SetActive(true);
@@ -322,24 +347,10 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public void OpenErrorBox(Enum cause) {
         OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
-
-        //if (!errorBox.activeSelf)
-        //    sfx.PlayOneShot(Enums.Sounds.UI_Error);
-
-        //errorBox.SetActive(true);
-        //errorText.text = GlobalController.Instance.translationManager.GetTranslation(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
-        //EventSystem.current.SetSelectedGameObject(errorButton);
     }
 
     public void OpenErrorBox(string key) {
         errorPrompt.OpenWithText(key);
-
-        //if (!errorBox.activeSelf)
-        //    sfx.PlayOneShot(Enums.Sounds.UI_Error);
-
-        //errorBox.SetActive(true);
-        //errorText.text = GlobalController.Instance.translationManager.GetTranslation(key);
-        //EventSystem.current.SetSelectedGameObject(errorButton);
         nonNetworkShutdown = false;
     }
 
@@ -373,7 +384,8 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     public void ConnectToDropdownRegion() {
-        string targetRegion = NetworkHandler.Regions[regionDropdown.value];
+        RegionOption selectedRegion = (RegionOption) regionDropdown.options[regionDropdown.value];
+        string targetRegion = selectedRegion.Region;
         if (NetworkHandler.CurrentRegion == targetRegion)
             return;
 
@@ -400,13 +412,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         GlobalController.Instance.discordController.UpdateActivity();
     }
 
-    public void OnGameStartChanged() {
-        if (SessionData.Instance.GameStarted) {
-            GlobalController.Instance.loadingCanvas.Initialize();
-            //GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.3f, 0.5f);
-        }
-    }
-
     public void StartCountdown() {
 
         // We can't start the game if we're not the server.
@@ -425,25 +430,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
             // Actually start the game.
             SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, 3f);
-        }
-    }
-
-    public void CountdownTick(int time) {
-        TranslationManager tm = GlobalController.Instance.translationManager;
-        if (time > 0) {
-            startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
-            hostControlsGroup.interactable = false;
-            if (time == 1 && fadeMusicCoroutine == null)
-                fadeMusicCoroutine = StartCoroutine(FadeMusic());
-        } else {
-            startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
-            PlayerData data = Runner.GetLocalPlayerData();
-            hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
-            if (fadeMusicCoroutine != null) {
-                StopCoroutine(fadeMusicCoroutine);
-                fadeMusicCoroutine = null;
-            }
-            music.volume = 1;
         }
     }
 
@@ -471,7 +457,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         int realPlayers = nonSpectators.Count();
         validRoomConfig &= realPlayers >= 1;
 
-        //only do team checks if there's more than one player
+        // Only do team checks if there's more than one player
         if (SessionData.Instance.Teams && realPlayers > 1) {
             int teams = nonSpectators.Select(pd => pd.Team).Distinct().Count();
             validRoomConfig &= teams > 1;
@@ -480,65 +466,40 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         return validRoomConfig;
     }
 
-    public void Kick(PlayerRef target) {
-        if (target == Runner.LocalPlayer)
+    public void Kick(PlayerData target) {
+        if (target.HasInputAuthority)
             return;
 
-        chat.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetPlayerData(Runner).GetNickname());
-        Runner.Disconnect(target);
+        chat.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetNickname());
+        Runner.Disconnect(target.Object.InputAuthority);
     }
 
-    public void Promote(PlayerRef target) {
-        if (target == Runner.LocalPlayer)
+    public void Promote(PlayerData target) {
+        if (target.HasInputAuthority)
             return;
 
         //PhotonNetwork.SetMasterClient(target);
         //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
-        //chat.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
+        chat.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
         //runner.set
     }
 
-    public void Mute(PlayerRef target) {
-        if (target == Runner.LocalPlayer)
+    public void Mute(PlayerData target) {
+        if (target.HasInputAuthority)
             return;
 
-
-        PlayerData data = target.GetPlayerData(Runner);
-        bool newMuteState = !data.IsMuted;
-        data.IsMuted = newMuteState;
-        chat.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", "playername", data.GetNickname());
+        bool newMuteState = !target.IsMuted;
+        target.IsMuted = newMuteState;
+        chat.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", "playername", target.GetNickname());
     }
 
-    public void BanOrUnban(string playername) {
-        //Player onlineTarget = PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.GetUniqueNickname().ToLower() == playername);
-        //if (onlineTarget != null) {
-        //    //player is in room, ban them
-        //    Ban(onlineTarget);
-        //    return;
-        //}
-
-        //Utils.GetSessionProperty(Enums.NetRoomProperties.Bans, out object[] bans);
-        //List<NameIdPair> pairs = bans.Cast<NameIdPair>().ToList();
-
-        //playername = playername.ToLower();
-
-        //NameIdPair targetPair = pairs.FirstOrDefault(nip => nip.name.ToLower() == playername);
-        //if (targetPair != null) {
-        //    //player is banned, unban them
-        //    Unban(targetPair);
-        //    return;
-        //}
-
-        //LocalChatMessage($"Error: Unknown player {playername}", Color.red);
-    }
-
-    public void Ban(PlayerRef target) {
-        if (target == Runner.LocalPlayer)
+    public void Ban(PlayerData target) {
+        if (target.HasInputAuthority)
             return;
 
         SessionData.Instance.AddBan(target);
-        chat.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetPlayerData(Runner).GetNickname());
-        Runner.Disconnect(target);
+        chat.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetNickname());
+        Runner.Disconnect(target.Object.InputAuthority);
     }
 
     public void UI_CharacterDropdownChanged() {
@@ -736,12 +697,48 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
             lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
 
-            CountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
+            OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
         }
     }
 
-    //---Debug
+    //---Callbacks
+    public void OnGameStartChanged() {
+        if (SessionData.Instance.GameStarted) {
+            GlobalController.Instance.loadingCanvas.Initialize();
+            //GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.3f, 0.5f);
+        }
+    }
+
+    public void OnCountdownTick(int time) {
+        TranslationManager tm = GlobalController.Instance.translationManager;
+        if (time > 0) {
+            startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
+            hostControlsGroup.interactable = false;
+            if (time == 1 && fadeMusicCoroutine == null)
+                fadeMusicCoroutine = StartCoroutine(FadeMusic());
+        } else {
+            startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
+            PlayerData data = Runner.GetLocalPlayerData();
+            hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
+            if (fadeMusicCoroutine != null) {
+                StopCoroutine(fadeMusicCoroutine);
+                fadeMusicCoroutine = null;
+            }
+            music.volume = 1;
+        }
+    }
+
+    public void OnPlayerDataValidated(PlayerData data) {
+        chat.AddSystemMessage("ui.inroom.chat.player.joined", "playername", data.GetNickname());
+        sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
+    }
+
+    public void OnRegionPingsUpdated() {
+        UpdateRegionDropdown();
+    }
+
 #if UNITY_EDITOR
+    //---Debug
     private static readonly Vector3 MaxCameraSize = new(16f/9f * 7f, 7f);
 
     public void OnDrawGizmos() {
@@ -759,5 +756,32 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         public string translationKey;
         public GameObject levelPreviewPosition;
         public int buildIndex;
+    }
+
+    public class RegionOption : TMP_Dropdown.OptionData, IComparable {
+        public string Region { get; private set; }
+        private int _ping;
+        public int Ping {
+            get => _ping;
+            set {
+                _ping = value;
+                text = Region + (Ping > 0 ? $" <color=#ababab>({Ping}ms)" : "");
+            }
+        }
+        public RegionOption(string region, int ping) {
+            Region = region;
+            Ping = ping;
+        }
+        public int CompareTo(object other) {
+            if (other is not RegionOption ro)
+                return -1;
+
+            if (Ping == 0)
+                return 1;
+            if (ro.Ping == 0)
+                return -1;
+
+            return Ping.CompareTo(ro.Ping);
+        }
     }
 }

@@ -18,9 +18,13 @@ using static ConnectionToken;
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
     //---Static Variables
-    public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us" };
+    public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us", "usw" };
+    public static readonly string[] RegionIps = { "15.235.132.46", "192.36.27.39", "139.162.127.196", "15.164.24.62", "200.25.36.72", "45.86.230.227", "45.145.148.21" };
+    public static int[] RegionPings;
+
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
+
     private static GameObject prefab;
     private static bool reattemptCreate;
     public static int connecting;
@@ -90,6 +94,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     public delegate void OnJoinSessionFailedDelegate(NetworkRunner runner, ShutdownReason reason);
     public static event OnJoinSessionFailedDelegate OnJoinSessionFailed;
+
+    //---Custom Events
+    public static event Action OnRegionPingsUpdated;
     #endregion
 
 
@@ -356,6 +363,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             FixedRegion = region,
         };
 
+        // We can ping regions here, why not
+        Runner.StartCoroutine(PingRegions());
+
         // Authenticate
         AuthenticationValues authValues = await Authenticate();
         if (authValues == null) {
@@ -480,6 +490,46 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return result;
     }
     #endregion
+
+    private static float pingStartTime;
+    private static IEnumerator PingRegions() {
+        RegionPings ??= new int[Regions.Length];
+        for (int i = 0; i < RegionPings.Length; i++) {
+            RegionPings[i] = 0;
+        }
+
+        pingStartTime = Time.time;
+        Ping[] pingers = new Ping[Regions.Length];
+
+        for (int i = 0; i < Regions.Length; i++) {
+            string ip = RegionIps[i];
+            pingers[i] = new Ping(ip);
+        }
+
+        bool anyRemaining = true;
+        while (anyRemaining && Time.time - pingStartTime < 4) {
+            anyRemaining = false;
+
+            for (int i = 0; i < pingers.Length; i++) {
+                Ping pinger = pingers[i];
+                if (pinger == null)
+                    continue;
+
+                if (!pinger.isDone) {
+                    anyRemaining = true;
+                    continue;
+                }
+
+                // Ping done.
+                RegionPings[i] = pinger.time;
+                pinger.DestroyPing();
+                pingers[i] = null;
+            }
+            yield return null;
+        }
+
+        OnRegionPingsUpdated?.Invoke();
+    }
 
     private void HostMigrationResume(NetworkRunner runner) {
 
