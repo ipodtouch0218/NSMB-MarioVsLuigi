@@ -594,7 +594,9 @@ namespace NSMB.Utils {
 
         public static string GetPingSymbol(int ping) {
             string pingSymbol;
-            if (ping <= 0) {
+            if (ping < 0) {
+                pingSymbol = "<sprite name=connection_disconnected>";
+            } else if (ping == 0) {
                 pingSymbol = "<sprite name=connection_host>";
             } else if (ping < 60) {
                 pingSymbol = "<sprite name=connection_great>";

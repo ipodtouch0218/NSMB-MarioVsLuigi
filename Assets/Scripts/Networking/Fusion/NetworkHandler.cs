@@ -19,7 +19,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     //---Static Variables
     public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us", "usw" };
-    public static readonly string[] RegionIps = { "15.235.132.46", "192.36.27.39", "139.162.127.196", "15.164.24.62", "200.25.36.72", "45.86.230.227", "45.145.148.21" };
+    public static readonly string[] RegionIps = { "15.235.132.46", "192.36.27.39", "139.162.127.196", "158.247.198.230", "200.25.36.72", "45.86.230.227", "45.145.148.21" };
     public static int[] RegionPings;
 
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
@@ -363,9 +363,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             FixedRegion = region,
         };
 
-        // We can ping regions here, why not
-        Runner.StartCoroutine(PingRegions());
-
         // Authenticate
         AuthenticationValues authValues = await Authenticate();
         if (authValues == null) {
@@ -492,7 +489,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #endregion
 
     private static float pingStartTime;
-    private static IEnumerator PingRegions() {
+    public static IEnumerator PingRegions() {
         RegionPings ??= new int[Regions.Length];
         for (int i = 0; i < RegionPings.Length; i++) {
             RegionPings[i] = 0;

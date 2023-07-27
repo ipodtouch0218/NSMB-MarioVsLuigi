@@ -114,6 +114,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
         UpdateRegionDropdown();
+        StartCoroutine(NetworkHandler.PingRegions());
 
         // Photon stuff.
         if (!Runner.IsCloudReady) {
@@ -188,9 +189,10 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             // Update existing options
             RegionOption selected = (RegionOption) regionDropdown.options[regionDropdown.value];
 
-            foreach (RegionOption option in regionDropdown.options) {
-                if (NetworkHandler.RegionPings != null)
+            if (NetworkHandler.RegionPings != null) {
+                foreach (RegionOption option in regionDropdown.options) {
                     option.Ping = NetworkHandler.RegionPings[Array.IndexOf(NetworkHandler.Regions, option.Region)];
+                }
             }
 
             regionDropdown.options.Sort();
@@ -618,10 +620,13 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     // Network callbacks
     // LOBBY CALLBACKS
     public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
-        int index = Array.IndexOf(NetworkHandler.Regions, info.Region);
-
-        if (index != -1)
-            regionDropdown.SetValueWithoutNotify(index);
+        for (int i = 0; i < regionDropdown.options.Count; i++) {
+            RegionOption option = (RegionOption) regionDropdown.options[i];
+            if (option.Region == info.Region) {
+                regionDropdown.SetValueWithoutNotify(i);
+                return;
+            }
+        }
     }
 
     // ROOM CALLBACKS
@@ -760,18 +765,20 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
     public class RegionOption : TMP_Dropdown.OptionData, IComparable {
         public string Region { get; private set; }
-        private int _ping;
+        private int _ping = -1;
         public int Ping {
             get => _ping;
             set {
                 _ping = value;
-                text = Region + (Ping > 0 ? $" <color=#ababab>({Ping}ms)" : "");
+                text = "<align=left>" + Region + "<line-height=0>\n<align=right>" + Utils.GetPingSymbol(_ping);
             }
         }
+
         public RegionOption(string region, int ping) {
             Region = region;
             Ping = ping;
         }
+
         public int CompareTo(object other) {
             if (other is not RegionOption ro)
                 return -1;
