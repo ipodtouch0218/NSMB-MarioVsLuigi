@@ -76,6 +76,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * CubbyCrazes
 * [RENREN](https://mistajub.bandcamp.com/)
 * LiamNayru
+* vincells
 
 ### Translators:
 * 3UP

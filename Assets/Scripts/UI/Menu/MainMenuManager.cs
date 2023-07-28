@@ -123,7 +123,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         } else if (Runner.IsServer || Runner.IsConnectedToServer) {
             // Call enterroom callback
-            EnterRoom();
+            EnterRoom(true);
         }
 
         // Controls & Settings
@@ -200,10 +200,18 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         }
     }
 
-    public void EnterRoom() {
+    public void EnterRoom(bool inSameRoom) {
 
-        // Clear the chat
-        chat.ClearChat();
+        // Chat
+        if (inSameRoom) {
+            chat.ReplayChatMessages();
+        } else {
+            chat.ClearChat();
+
+            // Host chat notification
+            if (Runner.IsServer)
+                chat.AddSystemMessage("ui.inroom.chat.hostreminder");
+        }
 
         // If the game is already started, we want to immediately load in.
         if (SessionData.Instance.GameStarted) {
@@ -235,10 +243,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
 
         // Reset the "Game start" button counting down
         OnCountdownTick(-1);
-
-        // Host chat notification
-        if (Runner.IsServer)
-            chat.AddSystemMessage("ui.inroom.chat.hostreminder");
 
         // Update the room header text
         SessionInfo session = Runner.SessionInfo;
@@ -769,6 +773,9 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         public int Ping {
             get => _ping;
             set {
+                if (value <= 0)
+                    value = -1;
+
                 _ping = value;
                 text = "<align=left>" + Region + "<line-height=0>\n<align=right>" + Utils.GetPingSymbol(_ping);
             }

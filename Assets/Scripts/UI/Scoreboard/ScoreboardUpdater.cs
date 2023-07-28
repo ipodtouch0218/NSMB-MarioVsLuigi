@@ -7,12 +7,12 @@ using Fusion;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
+using System.Linq;
 
 public class ScoreboardUpdater : MonoBehaviour {
 
     //---Static Variables
     public static ScoreboardUpdater Instance { get; private set; }
-    private static IComparer<ScoreboardEntry> entryComparer;
 
     //---Serialized Variables
     [SerializeField] private GameObject entryTemplate, teamsHeader;
@@ -36,7 +36,6 @@ public class ScoreboardUpdater : MonoBehaviour {
     public void Awake() {
         Instance = this;
         animator = GetComponent<Animator>();
-        entryComparer ??= new ScoreboardEntry.EntryComparer();
 
         teamsHeader.SetActive(SessionData.Instance ? SessionData.Instance.Teams : false);
 
@@ -105,22 +104,21 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     public void RepositionEntries() {
         // Order the scoreboard entries by stars, lives, then id
-        entries.Sort(entryComparer);
+        entries.Sort();
         entries.ForEach(se => se.transform.SetAsLastSibling());
     }
 
-    public void CreateEntries(IEnumerable<PlayerController> players) {
-        foreach (PlayerController player in players) {
-            if (!player)
-                continue;
+    public void CreateEntries(NetworkRunner runner) {
 
-            PlayerData data = player.Object.InputAuthority.GetPlayerData(player.Runner);
+        List<PlayerData> actualPlayers = runner.ActivePlayers.Select(pr => pr.GetPlayerData(runner)).Where(pd => !pd.IsCurrentlySpectating).ToList();
+
+        foreach (PlayerData player in actualPlayers) {
 
             GameObject entryObj = Instantiate(entryTemplate, entryTemplate.transform.parent);
             entryObj.SetActive(true);
-            entryObj.name = data.GetNickname();
+            entryObj.name = player.GetNickname();
             ScoreboardEntry entry = entryObj.GetComponent<ScoreboardEntry>();
-            entry.target = player;
+            entry.target = GameData.Instance.AlivePlayers.FirstOrDefault(pc => pc.data == player);
 
             entries.Add(entry);
         }

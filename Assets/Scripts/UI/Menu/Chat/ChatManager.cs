@@ -10,6 +10,9 @@ using NSMB.Utils;
 
 public class ChatManager : MonoBehaviour {
 
+    //---Static Variables
+    public static readonly List<ChatMessage.ChatMessageData> chatHistory = new();
+
     //---Serialized Variables
     [SerializeField] private ChatMessage messagePrefab;
     [SerializeField] private TMP_InputField chatbox;
@@ -29,8 +32,8 @@ public class ChatManager : MonoBehaviour {
 
     private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         foreach (ChatMessage message in chatMessages) {
-            if (message.player == player)
-                message.player = PlayerRef.None;
+            if (message.data.player == player)
+                message.data.player = PlayerRef.None;
         }
     }
 
@@ -40,33 +43,53 @@ public class ChatManager : MonoBehaviour {
         }
     }
 
-    public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
+    public void ReplayChatMessages() {
+        foreach (ChatMessage.ChatMessageData message in chatHistory) {
+            AddChatMessage(message, false);
+        }
+        Canvas.ForceUpdateCanvases();
+    }
 
+    public void AddChatMessage(ChatMessage.ChatMessageData data, bool updateCanvas = true) {
         ChatMessage chat = Instantiate(messagePrefab, chatWindow.transform);
         chat.gameObject.SetActive(true);
+        chat.Initialize(data);
+        chatMessages.Add(chat);
+
+        if (updateCanvas)
+            Canvas.ForceUpdateCanvases();
+    }
+
+    public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
 
         if (filter)
             message = message.Filter();
 
-        chat.Initialize(message, player, color);
-        chatMessages.Add(chat);
-        Canvas.ForceUpdateCanvases();
+        ChatMessage.ChatMessageData data = new() {
+            isSystemMessage = false,
+            player = player,
+            color = color ?? Color.black,
+            message = message,
+        };
+        chatHistory.Add(data);
+        AddChatMessage(data);
     }
 
     public void AddSystemMessage(string key, params string[] replacements) {
         AddSystemMessage(key, null, replacements);
     }
 
+    private static readonly Color DarkerRed = new(0.8f, 0, 0, 1);
     public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
 
-        ChatMessage chat = Instantiate(messagePrefab, chatWindow.transform);
-        chat.gameObject.SetActive(true);
-
-        color ??= Color.red;
-
-        chat.InitializeSystem(key, replacements, color);
-        chatMessages.Add(chat);
-        Canvas.ForceUpdateCanvases();
+        ChatMessage.ChatMessageData data = new() {
+            isSystemMessage = true,
+            color = color ?? DarkerRed,
+            message = key,
+            replacements = replacements,
+        };
+        chatHistory.Add(data);
+        AddChatMessage(data);
     }
 
     public void OnTextboxChanged() {
@@ -122,6 +145,7 @@ public class ChatManager : MonoBehaviour {
             Destroy(message.gameObject);
 
         chatMessages.Clear();
+        chatHistory.Clear();
     }
 
     private IEnumerator SelectTextboxNextFrame() {

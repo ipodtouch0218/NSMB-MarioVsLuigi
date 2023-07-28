@@ -144,7 +144,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
 
-            if (!GameData.Instance.dontPlaySounds) {
+            if (GameData.Instance && !GameData.Instance.dontPlaySounds) {
                 if (!Collector) {
                     GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
                 } else {

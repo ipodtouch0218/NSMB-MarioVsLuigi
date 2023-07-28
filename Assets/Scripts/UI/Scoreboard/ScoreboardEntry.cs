@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +8,7 @@ using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Utils;
 
-public class ScoreboardEntry : MonoBehaviour {
+public class ScoreboardEntry : MonoBehaviour, IComparable {
 
     //---Serialized Variables
     [SerializeField] private TMP_Text nameText, valuesText;
@@ -88,22 +88,24 @@ public class ScoreboardEntry : MonoBehaviour {
         valuesText.text = txt;
     }
 
-    public class EntryComparer : IComparer<ScoreboardEntry> {
-        public int Compare(ScoreboardEntry x, ScoreboardEntry y) {
-            if (!x.target && !y.target)
-                return y.deathTick - x.deathTick;
+    public int CompareTo(object obj) {
+        if (obj is not ScoreboardEntry other)
+            return -1;
 
-            if (!x.target ^ !y.target)
-                return !x.target ? 1 : -1;
 
-            if (x.currentStars == y.currentStars || x.currentLives == 0 || y.currentLives == 0) {
-                if (Mathf.Max(0, x.currentLives) == Mathf.Max(0, y.currentLives))
-                    return x.playerId - y.playerId;
+        if (!target && !other.target)
+            return other.deathTick - deathTick;
 
-                return y.currentLives - x.currentLives;
-            }
+        if (!target ^ !other.target)
+            return !target ? 1 : -1;
 
-            return y.currentStars - x.currentStars;
+        if (currentStars == other.currentStars || currentLives == 0 || other.currentLives == 0) {
+            if (Mathf.Max(0, currentLives) == Mathf.Max(0, other.currentLives))
+                return playerId - other.playerId;
+
+            return other.currentLives - currentLives;
         }
+
+        return other.currentStars - currentStars;
     }
 }

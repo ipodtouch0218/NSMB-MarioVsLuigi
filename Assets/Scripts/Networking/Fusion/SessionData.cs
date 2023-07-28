@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Fusion;
-using NanoSockets;
 using NSMB.Extensions;
 using NSMB.Utils;
 
@@ -58,7 +57,7 @@ public class SessionData : NetworkBehaviour {
         if (Instance != this) {
             Instance = this;
             if (MainMenuManager.Instance)
-                MainMenuManager.Instance.EnterRoom();
+                MainMenuManager.Instance.EnterRoom(false);
         }
 
         PrivateRoom = !Runner.SessionInfo.IsVisible;

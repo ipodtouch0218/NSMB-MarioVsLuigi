@@ -27,6 +27,7 @@ Zest
 CubbyCrazes
 RENREN
 LiamNayru
+vincells
 
 <color=yellow>{ui.about.credits.translation}</color>
 3UP

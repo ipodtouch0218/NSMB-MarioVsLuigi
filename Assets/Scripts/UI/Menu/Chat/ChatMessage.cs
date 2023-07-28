@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -8,19 +9,12 @@ using NSMB.Translation;
 
 public class ChatMessage : MonoBehaviour {
 
+    //---Public Variables
+    [NonSerialized] public ChatMessageData data;
+
     //---Serialized Variables
     [SerializeField] private TMP_Text chatText;
     [SerializeField] private Image image;
-
-    //---Properties
-    public bool IsSystemMessage => key != null;
-
-    //---Public Variables
-    public PlayerRef player;
-
-    //---Private Variables
-    private string key;
-    private string[] replacements;
 
     public void OnValidate() {
         if (!chatText) chatText = GetComponent<TMP_Text>();
@@ -32,35 +26,37 @@ public class ChatMessage : MonoBehaviour {
     }
 
     private void OnLanguageChanged(TranslationManager tm) {
-        chatText.text = tm.GetTranslationWithReplacements(key, replacements);
+        chatText.text = tm.GetTranslationWithReplacements(data.message, data.replacements);
         chatText.isRightToLeftText = tm.RightToLeft;
     }
 
-    public void Initialize(string message, PlayerRef player, Color? color = null) {
-        chatText.text = message;
-        chatText.color = color ?? Color.black;
-        chatText.richText = false;
-        this.player = player;
+    public void Initialize(ChatMessageData data) {
+        this.data = data;
+        chatText.color = data.color;
 
-        UpdatePlayerColor();
-    }
-
-    public void InitializeSystem(string key, string[] replacements, Color? color = null) {
-        this.key = key;
-        this.replacements = replacements;
-        chatText.color = color ?? Color.black;
-
-        TranslationManager.OnLanguageChanged += OnLanguageChanged;
-        OnLanguageChanged(GlobalController.Instance.translationManager);
+        if (data.isSystemMessage) {
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
+        } else {
+            chatText.richText = false;
+            chatText.text = data.message;
+        }
 
         UpdatePlayerColor();
     }
 
     public void UpdatePlayerColor() {
-        if (IsSystemMessage) {
-            image.color = Color.white;
-        } else {
-            image.color = Utils.GetPlayerColor(NetworkHandler.Runner, player, 0.15f);
-        }
+        if (data.isSystemMessage)
+            return;
+
+        image.color = Utils.GetPlayerColor(NetworkHandler.Runner, data.player, 0.15f);
+    }
+
+    public class ChatMessageData {
+        public PlayerRef player;
+        public Color color;
+        public bool isSystemMessage;
+        public string message;
+        public string[] replacements;
     }
 }
