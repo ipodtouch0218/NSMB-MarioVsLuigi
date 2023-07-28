@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using NSMB.Extensions;
+using NSMB.Game;
 
 namespace NSMB.Loading {
     public class LoadingCanvas : MonoBehaviour {
@@ -18,6 +19,14 @@ namespace NSMB.Loading {
         //---Private Variables
         private bool initialized;
         private Coroutine fadeCoroutine;
+
+        public void Awake() {
+            GameData.OnAllPlayersLoaded += EndLoading;
+        }
+
+        public void OnDestroy() {
+            GameData.OnAllPlayersLoaded -= EndLoading;
+        }
 
         public void Initialize() {
             if (initialized)

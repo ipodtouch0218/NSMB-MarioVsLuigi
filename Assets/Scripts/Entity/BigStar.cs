@@ -84,7 +84,7 @@ namespace NSMB.Entities.Collectable {
             }
 
             // Don't make a spawn sound if we're spawned before the game starts
-            if (GameData.Instance.GameState == Enums.GameState.Playing)
+            if (GameData.Instance.PlaySounds && GameData.Instance.GameState == Enums.GameState.Playing)
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
 
             if (!GroundFilter.useTriggers) {

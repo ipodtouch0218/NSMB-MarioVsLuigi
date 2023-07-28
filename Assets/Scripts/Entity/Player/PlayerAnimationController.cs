@@ -43,10 +43,15 @@ namespace NSMB.Entities.Player {
         private bool modelRotateInstantly;
         private Coroutine blinkRoutine;
         private PlayerColors skin;
+        private TrackIcon icon;
 
-        #region State Hashes
+        public void OnEnable() {
+            GameData.OnAllPlayersLoaded += OnAllPlayersLoaded;
+        }
 
-        #endregion
+        public void OnDisable() {
+            GameData.OnAllPlayersLoaded -= OnAllPlayersLoaded;
+        }
 
         public void Awake() {
             controller = GetComponent<PlayerController>();
@@ -57,9 +62,6 @@ namespace NSMB.Entities.Player {
         public override void Spawned() {
 
             DisableAllModels();
-
-            if (!controller.Object.HasInputAuthority)
-                GameManager.Instance.CreateNametag(controller);
 
             PlayerData data = Object.InputAuthority.GetPlayerData(Runner);
 
@@ -72,11 +74,13 @@ namespace NSMB.Entities.Player {
 
             modelRotationTarget = models.transform.rotation.eulerAngles;
 
-            enableGlow = SessionData.Instance.Teams || !Object.HasInputAuthority;
-            GlowColor = Utils.Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
-
             if (blinkRoutine == null)
                 blinkRoutine = StartCoroutine(BlinkRoutine());
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState) {
+            if (icon)
+                Destroy(icon.gameObject);
         }
 
         public override void Render() {
@@ -304,9 +308,6 @@ namespace NSMB.Entities.Player {
                 materialBlock.SetVector("OverallsColor", skin?.overallsColor.linear ?? Color.clear);
                 materialBlock.SetVector("ShirtColor", skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
                 materialBlock.SetFloat("HatUsesOverallsColor", (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
-
-                if (enableGlow)
-                    materialBlock.SetColor("GlowColor", GlowColor);
             }
             materialBlock.SetFloat("RainbowEnabled", controller.IsStarmanInvincible ? 1f : 0f);
             int ps = controller.State switch {
@@ -404,6 +405,19 @@ namespace NSMB.Entities.Player {
             blueShell.SetActive(false);
             propellerHelmet.SetActive(false);
             animator.avatar = smallAvatar;
+        }
+
+        private void OnAllPlayersLoaded() {
+            enableGlow = SessionData.Instance.Teams || !Object.HasInputAuthority;
+            GlowColor = Utils.Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
+
+            if (!controller.Object.HasInputAuthority)
+                GameManager.Instance.CreateNametag(controller);
+
+            icon = UIUpdater.Instance.CreateTrackIcon(controller);
+
+            if (enableGlow)
+                materialBlock.SetColor("GlowColor", GlowColor);
         }
     }
 }

@@ -14,6 +14,7 @@ using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
 using static ConnectionToken;
+using UnityEngine.SceneManagement;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
@@ -180,6 +181,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             HostMigrationResume = HostMigrationResume,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             DisableClientSessionCreation = false,
+            SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
             Scene = 0,
         });
 
@@ -225,6 +227,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                     SessionData.Instance = session.GetComponent<SessionData>();
                 }
             }
+            Runner.PushHostMigrationSnapshot();
         }
 
         if (player != runner.LocalPlayer)
@@ -425,6 +428,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
             args.ConnectionToken = GlobalController.Instance.connectionToken.Serialize();
+            args.SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>();
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
             args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname;
@@ -473,9 +477,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             SessionName = roomId,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             DisableClientSessionCreation = true,
+            SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
         });
-        Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
         if (!result.Ok) {
+            Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
             // Automatically go back to the lobby.
             await ConnectToRegion(originalRegion);
         }

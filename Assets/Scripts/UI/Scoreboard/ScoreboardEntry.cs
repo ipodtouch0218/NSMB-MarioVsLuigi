@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+using Fusion;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Utils;
@@ -41,6 +42,12 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
 
         nicknameColor = data.NicknameColor;
         nameText.color = nicknameColor.color;
+
+        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+    }
+
+    public void OnDestroy() {
+        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
     }
 
     public void Update() {
@@ -92,7 +99,6 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
         if (obj is not ScoreboardEntry other)
             return -1;
 
-
         if (!target && !other.target)
             return other.deathTick - deathTick;
 
@@ -107,5 +113,11 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
         }
 
         return other.currentStars - currentStars;
+    }
+
+    //---Callbacks
+    private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        if (target.Object.InputAuthority == player)
+            ScoreboardUpdater.Instance.DestroyEntry(this);
     }
 }

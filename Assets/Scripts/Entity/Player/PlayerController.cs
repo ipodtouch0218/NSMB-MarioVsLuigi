@@ -14,6 +14,7 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
+using UnityEngine.Rendering.UI;
 
 namespace NSMB.Entities.Player {
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
@@ -326,7 +327,6 @@ namespace NSMB.Entities.Player {
         public override void Spawned() {
 
             hitboxes = GetComponentsInChildren<BoxCollider2D>();
-            icon = UIUpdater.Instance.CreateTrackIcon(this);
 
             body.isKinematic = true;
 
@@ -339,6 +339,7 @@ namespace NSMB.Entities.Player {
                 GameManager.Instance.spectationManager.Spectating = false;
                 ControlSystem.controls.Player.ReserveItem.performed += OnReserveItem;
                 NetworkHandler.OnInput += OnInput;
+                NetworkHandler.Runner.ProvideInput = true;
             }
 
             if (FirstSpawn) {
@@ -355,7 +356,6 @@ namespace NSMB.Entities.Player {
             if (!GameData.Instance.AlivePlayers.Contains(this)) {
                 GameData.Instance.AlivePlayers.Add(this);
             }
-            GameManager.Instance.teamManager.AddPlayer(this);
 
             ControlSystem.controls.Enable();
 
@@ -363,7 +363,10 @@ namespace NSMB.Entities.Player {
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            NetworkHandler.OnInput -= OnInput;
+            if (HasInputAuthority) {
+                NetworkHandler.OnInput -= OnInput;
+                NetworkHandler.Runner.ProvideInput = false;
+            }
 
             if (GameData.Instance && hasState)
                 GameData.Instance.AlivePlayers.Remove(this);
@@ -824,7 +827,6 @@ namespace NSMB.Entities.Player {
                         other.DoKnockback(!fromRight, dropStars ? (groundpounded ? 3 : 1) : 0, false, Object);
                     }
                 }
-                Debug.Log($"Damaged {other.data.Nickname}. Groundpounding? {groundpounded}");
                 return;
 
             } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove) {
@@ -2991,6 +2993,9 @@ namespace NSMB.Entities.Player {
 
         //---OnChangeds
         public static void OnGroundpoundingChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (!player.IsGroundpounding)
                 return;
@@ -2999,6 +3004,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnGroundpoundAnimCounterChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             // Groundpound
@@ -3027,6 +3035,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnWallJumpTimerChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             if (!player.WallJumpTimer.IsRunning)
@@ -3047,6 +3058,9 @@ namespace NSMB.Entities.Player {
 
         private float lastRespawnParticle;
         public static void OnIsDeadChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             player.animator.SetBool("dead", player.IsDead);
@@ -3073,6 +3087,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnDeathAnimationTimerChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             if (player.DeathAnimationTimer.IsRunning) {
@@ -3101,12 +3118,18 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnFireballAnimCounterChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             player.animator.SetTrigger("fireball");
             player.sfx.PlayOneShot(player.State == Enums.PowerupState.IceFlower ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot);
         }
 
         public static void OnIsSlidingChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (player.IsSliding)
                 return;
@@ -3118,6 +3141,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnIsCrouchingChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (!player.IsCrouching)
                 return;
@@ -3126,6 +3152,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnPipeTimerChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (!player.PipeTimer.IsRunning)
                 return;
@@ -3134,6 +3163,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnPropellerLaunchTimerChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (!player.PropellerLaunchTimer.IsRunning)
                 return;
@@ -3142,6 +3174,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnPropellerSpinTimerChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (!player.PropellerSpinTimer.IsRunning)
                 return;
@@ -3150,6 +3185,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnSpinnerLaunchAnimCounterChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             player.PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
@@ -3157,6 +3195,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnJumpAnimCounterChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (player.IsSwimming) {
                 // Paddle
@@ -3202,6 +3243,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnIsWaterWalkingChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (!player.IsWaterWalking)
                 return;
@@ -3210,6 +3254,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnKnockbackAnimCounterChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
             if (!player.IsInKnockback)
                 return;
@@ -3224,6 +3271,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnPowerupStateChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             if (player.IsDead || player.IsRespawning)
@@ -3235,7 +3285,6 @@ namespace NSMB.Entities.Player {
             // Don't worry about Mega Mushrooms.
             if (previous == Enums.PowerupState.MegaMushroom || player.MegaEndTimer.IsActive(player.Runner))
                 return;
-
 
             // We've taken damage when we go from > mushroom to mushroom, or mushroom to no powerup
             if ((previous > Enums.PowerupState.Mushroom && current == Enums.PowerupState.Mushroom)
@@ -3250,6 +3299,9 @@ namespace NSMB.Entities.Player {
 
         private float timeSinceLastBumpSound;
         public static void OnBlockBumpSoundCounterChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             if (player.timeSinceLastBumpSound + 0.2f > player.Runner.SimulationRenderTime)
@@ -3275,6 +3327,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnThrowAnimCounterChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             player.PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);
@@ -3282,6 +3337,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnMegaTimerChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             if (player.IsDead)
@@ -3291,6 +3349,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnMegaStartTimerChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             if (player.MegaStartTimer.ExpiredOrNotRunning(player.Runner))
@@ -3300,6 +3361,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnIsStationaryMegaShrinkChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             if (!player.IsStationaryMegaShrink)
@@ -3318,6 +3382,9 @@ namespace NSMB.Entities.Player {
         }
 
         public static void OnHeldEntityChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             PlayerController player = changed.Behaviour;
 
             if (!player.HeldEntity)

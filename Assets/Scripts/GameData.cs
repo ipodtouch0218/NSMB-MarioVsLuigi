@@ -36,7 +36,7 @@ namespace NSMB.Game {
 
         //---Networked Variables
         [Networked] public TickTimer BigStarRespawnTimer { get; set; }
-        [Networked(OnChanged = nameof(OnGameStartTimerChanged))] public TickTimer GameStartTimer { get; set; }
+        [Networked] public TickTimer GameStartTimer { get; set; }
         [Networked] public TickTimer GameEndTimer { get; set; }
         [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
         [Networked, Capacity(60)] public NetworkLinkedList<Fireball> PooledFireballs => default;
@@ -54,6 +54,7 @@ namespace NSMB.Game {
 
         //---Properties
         public bool GameEnded => GameState == Enums.GameState.Ended;
+        public bool PlaySounds => startMusicTimer.ExpiredOrNotRunning(Runner);
 
         //---Private Variables
         private readonly HashSet<NetworkObject> networkObjects = new();
@@ -64,17 +65,19 @@ namespace NSMB.Game {
 
         private TickTimer startMusicTimer;
         private bool hurryUpSoundPlayed, endSoundPlayed;
-
+        private bool calledAllPlayersLoaded;
 
         //---Lifetime
         public void OnEnable() {
             NetworkHandler.OnShutdown += OnShutdown;
             NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+            OnAllPlayersLoaded += OurOnAllPlayersLoaded;
         }
 
         public void OnDisable() {
             NetworkHandler.OnShutdown -= OnShutdown;
             NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+            OnAllPlayersLoaded -= OurOnAllPlayersLoaded;
         }
 
         public void Awake() {
@@ -89,9 +92,6 @@ namespace NSMB.Game {
             // By default, spectate. when we get assigned a player object, we disable it there.
             gm.spectationManager.Spectating = true;
 
-            // Enable player controls
-            Runner.ProvideInput = true;
-
             if (Runner.IsServer && Runner.IsSinglePlayer && !Runner.IsResume) {
                 // Handle spawning in editor by spawning the room + player data objects
                 Runner.Spawn(PrefabList.Instance.SessionDataHolder);
@@ -99,7 +99,7 @@ namespace NSMB.Game {
                 Runner.SetPlayerObject(Runner.LocalPlayer, localData);
             }
 
-            if (GameStartTime <= 0 && !Runner.IsResume) {
+            if (GameStartTime <= 0 && !Runner.IsResume && !GameStartTimer.IsRunning) {
                 // The game hasn't started.
                 // Tell our host that we're done loading
                 PlayerData localData = Runner.GetLocalPlayerData();
@@ -107,6 +107,8 @@ namespace NSMB.Game {
             } else {
                 // The game HAS already started.
                 SetGameTimestamps();
+                StartCoroutine(CallAllPlayersLoaded());
+                startMusicTimer = TickTimer.CreateFromSeconds(Runner, 1.8f);
             }
 
             // Set up alternating music for the default stages
@@ -165,7 +167,7 @@ namespace NSMB.Game {
                     GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer * 60 + 1);
             }
 
-            if (IsMusicEnabled)
+            if (IsMusicEnabled && startMusicTimer.ExpiredOrNotRunning(Runner))
                 HandleMusic();
 
             if (Runner.IsForward) {
@@ -375,9 +377,9 @@ namespace NSMB.Game {
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_LoadingComplete() {
-            // Populate scoreboard
-            GlobalController.Instance.loadingCanvas.EndLoading();
-            OnAllPlayersLoaded?.Invoke();
+            if (!calledAllPlayersLoaded)
+                OnAllPlayersLoaded?.Invoke();
+            calledAllPlayersLoaded = true;
         }
 
         //---Helpers
@@ -604,9 +606,16 @@ namespace NSMB.Game {
             Rpc_LoadingComplete();
         }
 
-        //---OnChangeds
-        public static void OnGameStartTimerChanged(Changed<GameData> changed) {
-            changed.Behaviour.gm.teamScoreboardElement.OnTeamsFinalized(changed.Behaviour.gm.teamManager);
+        private IEnumerator CallAllPlayersLoaded() {
+            yield return new WaitForSeconds(1f);
+            if (!calledAllPlayersLoaded)
+                OnAllPlayersLoaded?.Invoke();
+            calledAllPlayersLoaded = true;
+        }
+
+        private void OurOnAllPlayersLoaded() {
+            foreach (var player in AlivePlayers)
+                GameManager.Instance.teamManager.AddPlayer(player);
         }
     }
 }

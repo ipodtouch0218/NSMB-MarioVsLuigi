@@ -28,7 +28,7 @@ namespace NSMB.Loading {
 
         public void OnEnable() {
             playerListParent.SetActive(false);
-            ourNickname = NetworkHandler.Runner.GetLocalPlayerData().GetNickname();
+            ourNickname = NetworkHandler.Runner.GetLocalPlayerData()?.GetNickname();
         }
 
         public void Update() {

@@ -316,6 +316,9 @@ namespace NSMB.Entities {
 
         //---OnChangeds
         public static void OnBreakEffectAnimCounterChanged(Changed<Fireball> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             Fireball fireball = changed.Behaviour;
 
             // Don't play particles below the killplane

@@ -15,6 +15,7 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
+using UnityEngine.SceneManagement;
 
 public class MainMenuManager : Singleton<MainMenuManager> {
 
@@ -79,10 +80,15 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
         NetworkHandler.OnConnectFailed += OnConnectFailed;
         NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
+        MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
 
         ControlSystem.controls.UI.Pause.performed += OnPause;
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
+    }
+
+    private void OnSceneLoadStart() {
+        GlobalController.Instance.loadingCanvas.Initialize();
     }
 
     public void OnDisable() {
@@ -95,6 +101,7 @@ public class MainMenuManager : Singleton<MainMenuManager> {
         NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
         NetworkHandler.OnConnectFailed -= OnConnectFailed;
         NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
+        MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
 
         ControlSystem.controls.UI.Pause.performed -= OnPause;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
@@ -211,12 +218,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
             // Host chat notification
             if (Runner.IsServer)
                 chat.AddSystemMessage("ui.inroom.chat.hostreminder");
-        }
-
-        // If the game is already started, we want to immediately load in.
-        if (SessionData.Instance.GameStarted) {
-            OnGameStartChanged();
-            return;
         }
 
         // Open the in-room menu
@@ -711,13 +712,6 @@ public class MainMenuManager : Singleton<MainMenuManager> {
     }
 
     //---Callbacks
-    public void OnGameStartChanged() {
-        if (SessionData.Instance.GameStarted) {
-            GlobalController.Instance.loadingCanvas.Initialize();
-            //GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.3f, 0.5f);
-        }
-    }
-
     public void OnCountdownTick(int time) {
         TranslationManager tm = GlobalController.Instance.translationManager;
         if (time > 0) {

@@ -16,14 +16,6 @@ public class TeamManager {
         team.Add(player);
     }
 
-    public int GetTotalPlayers() {
-        int count = 0;
-        foreach (HashSet<PlayerController> team in teams.Values)
-            count += team.Count;
-
-        return count;
-    }
-
     public HashSet<PlayerController> GetTeamMembers(int team) {
         if (teams.TryGetValue(team, out HashSet<PlayerController> teamMembers))
             return teamMembers;

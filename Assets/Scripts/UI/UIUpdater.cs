@@ -66,11 +66,6 @@ public class UIUpdater : MonoBehaviour {
         backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
-
-        if (SessionData.Instance)
-            teams = SessionData.Instance.Teams;
-
-        ApplyUIColor();
     }
 
     public void Update() {
@@ -121,7 +116,6 @@ public class UIUpdater : MonoBehaviour {
             teamStars = teamManager?.GetTeamStars(teamIndex) ?? 0;
             Team team = ScriptableManager.Instance.teams[teamIndex];
             uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
-            ApplyUIColor();
         }
         if (player.Stars != stars) {
             stars = player.Stars;
@@ -242,11 +236,12 @@ public class UIUpdater : MonoBehaviour {
 
         ApplyUIColor();
         teamsParent.SetActive(teams);
+        GameManager.Instance.teamScoreboardElement.gameObject.SetActive(teams);
 
         if (!Runner.IsServer)
             StartCoroutine(UpdatePingTextCoroutine());
 
-        UpdatePingText();
+        UpdateTextUI();
     }
 
     public void OnReserveItemIconClicked() {

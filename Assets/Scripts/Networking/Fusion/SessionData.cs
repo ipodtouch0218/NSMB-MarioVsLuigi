@@ -26,7 +26,7 @@ public class SessionData : NetworkBehaviour {
     [Networked(OnChanged = nameof(SettingChanged))]                                           public byte MaxPlayers { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool PrivateRoom { get; set; }
     [Networked(OnChanged = nameof(GameStartTimerChanged))]                                    public TickTimer GameStartTimer { get; set; }
-    [Networked(OnChanged = nameof(StartChanged))]                                             public NetworkBool GameStarted { get; set; }
+    [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool GameStarted { get; set; }
     [Networked(OnChanged = nameof(SettingChanged))]                                           public byte Level { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
     [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
@@ -262,13 +262,6 @@ public class SessionData : NetworkBehaviour {
     }
 
     //---OnChangeds
-    public static void StartChanged(Changed<SessionData> data) {
-        if (MainMenuManager.Instance)
-            MainMenuManager.Instance.OnGameStartChanged();
-
-        SettingChanged(data);
-    }
-
     public static void SettingChanged(Changed<SessionData> data) {
         SessionData lobby = data.Behaviour;
         Tick currentTick = lobby.Object.Runner.Tick;

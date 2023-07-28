@@ -3,6 +3,7 @@
 using Fusion;
 using NSMB.Entities.Player;
 using NSMB.Entities.Enemies;
+using NSMB.Game;
 
 namespace NSMB.Entities {
     [OrderAfter(typeof(PlayerController))]
@@ -164,6 +165,9 @@ namespace NSMB.Entities {
 
         //---OnChanged
         public static void OnKickedAnimCounterChanged(Changed<HoldableEntity> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
             if (!changed.Behaviour.IsActive) return;
 
             changed.Behaviour.PlaySound(Enums.Sounds.Enemy_Shell_Kick);

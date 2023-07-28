@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  _interpolationDataSource: 2
   _CurrentPosition: {x: 0, y: 0, z: 0}
   controller: {fileID: 8636928217783201385}
 --- !u!1 &1451829972066525507

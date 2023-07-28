@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 
 using NSMB.Utils;
+using NSMB.Game;
 
 public class TeamScoreboard : MonoBehaviour {
 
@@ -14,16 +15,8 @@ public class TeamScoreboard : MonoBehaviour {
     private readonly Dictionary<int, int> teamStars = new();
     private TeamManager teamManager;
 
-    public void OnTeamsFinalized(TeamManager manager) {
-        if (!SessionData.Instance.Teams) {
-            enabled = false;
-            return;
-        }
-
-        if (teamManager != null)
-            return;
-
-        teamManager = manager;
+    public void OnEnable() {
+        teamManager = GameManager.Instance.teamManager;
         foreach (int teamIndex in teamManager.GetValidTeams())
             teamStars[teamIndex] = 0;
 

@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 using TMPro;
 
 using Fusion;
-using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using System.Linq;
@@ -61,7 +60,7 @@ public class ScoreboardUpdater : MonoBehaviour {
 
             count++;
         }
-        spectatorText.text = (count == 0) ? "" : "<sprite name=room_spectator> <sprite name=hudnumber_" + count + ">";
+        spectatorText.text = (count == 0) ? "" : "<sprite name=room_spectator><sprite name=hudnumber_x><sprite name=hudnumber_" + count + ">";
     }
 
     public void SetEnabled() {
@@ -106,10 +105,12 @@ public class ScoreboardUpdater : MonoBehaviour {
         // Order the scoreboard entries by stars, lives, then id
         entries.Sort();
         entries.ForEach(se => se.transform.SetAsLastSibling());
+        spectatorText.transform.SetAsLastSibling();
     }
 
-    public void CreateEntries(NetworkRunner runner) {
+    public void CreateEntries() {
 
+        NetworkRunner runner = NetworkHandler.Runner;
         List<PlayerData> actualPlayers = runner.ActivePlayers.Select(pr => pr.GetPlayerData(runner)).Where(pd => !pd.IsCurrentlySpectating).ToList();
 
         foreach (PlayerData player in actualPlayers) {
@@ -126,14 +127,18 @@ public class ScoreboardUpdater : MonoBehaviour {
         RepositionEntries();
     }
 
-    //---Callbacks
+    public void DestroyEntry(ScoreboardEntry entry) {
+        entries.Remove(entry);
+        Destroy(entry.gameObject);
+    }
 
+    //---Callbacks
     private void OnToggleScoreboard(InputAction.CallbackContext context) {
         ManualToggle();
     }
 
     private void OnAllPlayersLoaded() {
-        CreateEntries(GameData.Instance.AlivePlayers);
+        CreateEntries();
 
         if (Settings.Instance.genericScoreboardAlways)
             SetEnabled();

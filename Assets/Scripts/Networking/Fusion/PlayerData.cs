@@ -14,8 +14,8 @@ public class PlayerData : NetworkBehaviour {
     public bool Locked => SessionData.Instance && SessionData.Instance.GameStarted && !IsCurrentlySpectating;
 
     //---Networked Variables
-    [Networked(OnChanged = nameof(OnNameChanged)), Capacity(20)] public string Nickname { get; set; } = "noname";
-    [Networked, Capacity(28)]                                    private string DisplayNickname { get; set; } = "noname";
+    [Networked, Capacity(20)]                                    public string RawNickname { get; set; } = "noname";
+    [Networked(OnChanged = nameof(OnNameChanged)), Capacity(28)] private string DisplayNickname { get; set; } = "noname";
     [Networked]                                                  public ConnectionToken ConnectionToken { get; set; }
     [Networked]                                                  public sbyte PlayerId { get; set; }
     [Networked]                                                  public uint Wins { get; set; }
@@ -66,12 +66,11 @@ public class PlayerData : NetworkBehaviour {
                 ConnectionToken = new();
             }
 
-            IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
             JoinTick = Runner.Tick;
 
             Initialized = true;
         } else {
-            SetNickname(Nickname);
+            SetNickname(RawNickname);
         }
     }
 
@@ -96,6 +95,8 @@ public class PlayerData : NetworkBehaviour {
             if (Runner.IsServer)
                 IsRoomOwner = true;
         }
+
+        IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
 
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.OnPlayerDataValidated(this);
@@ -129,14 +130,14 @@ public class PlayerData : NetworkBehaviour {
         if (name.Length < MainMenuManager.NicknameMin)
             name = "noname";
 
-        Nickname = name;
+        RawNickname = name;
 
         // Check for players with duplicate names, and add (1), (2), etc
         int count = Runner.ActivePlayers
             .Select(pr => pr.GetPlayerData(Runner))
             .Where(pd => pd && pd.Object)
-            .Where(pd => pd.Nickname.ToString().Filter() == name)
-            .Count() - 1;
+            .Where(pd => pd.RawNickname.ToString().Filter() == name)
+            .Count();
 
         if (count > 0)
             name += " (" + count + ")";
@@ -219,7 +220,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public static void OnNameChanged(Changed<PlayerData> changed) {
-        changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.Nickname + ", " + changed.Behaviour.UserId.ToString() + ")";
+        changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.DisplayNickname + ", " + changed.Behaviour.UserId.ToString() + ")";
     }
 
     public static void OnCharacterChanged(Changed<PlayerData> changed) {
