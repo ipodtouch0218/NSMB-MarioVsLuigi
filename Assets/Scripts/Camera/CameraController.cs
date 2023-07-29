@@ -130,7 +130,7 @@ public class CameraController : NetworkBehaviour {
         // Bottom camera clip
         float cameraBottom = newCameraPosition.y - vOrtho;
         float cameraBottomDistanceToPlayer = PlayerPos.y - cameraBottom;
-        float cameraBottomMinDistance = 2f;
+        float cameraBottomMinDistance = (2f/3.5f) * vOrtho;
 
         if (cameraBottomDistanceToPlayer < cameraBottomMinDistance)
             newCameraPosition.y -= (cameraBottomMinDistance - cameraBottomDistanceToPlayer);
@@ -139,7 +139,7 @@ public class CameraController : NetworkBehaviour {
         float playerHeight = controller.transform.localScale.y;
         float cameraTop = newCameraPosition.y + vOrtho;
         float cameraTopDistanceToPlayer = cameraTop - (PlayerPos.y + playerHeight);
-        float cameraTopMinDistance = 2f;
+        float cameraTopMinDistance = (2f/3.5f) * vOrtho;
 
         if (cameraTopDistanceToPlayer < cameraTopMinDistance)
             newCameraPosition.y += (cameraTopMinDistance - cameraTopDistanceToPlayer);

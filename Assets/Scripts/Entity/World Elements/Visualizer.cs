@@ -15,6 +15,7 @@ public class VisualizedBlocks : MonoBehaviour {
     [SerializeField] [Delayed] private int count = 21, sampleCount = 1024, sampleWidth = 10;
     [SerializeField] private float minHeight = 0.5f, maxHeight = 2f, width = 0.3f, spacing = 0.1f, decayRate = 50f;
     [SerializeField] private FFTWindow window;
+    [SerializeField] private float maxHertz = 20050f, bonusHeight = 1f;
 
     //---Private Variables
     private float[] samples;
@@ -46,23 +47,31 @@ public class VisualizedBlocks : MonoBehaviour {
 
     public void Update() {
         music.GetSpectrumData(samples, 0, window);
-        int prev = 0;
         for (int i = 0; i < count; i++) {
 
-            float mel = ((float) (i + 1) / (count + 1)) * 1713;
-            float hz = 700 * (Mathf.Pow(10, mel / 2595f) - 1);
-            int index = (int) (hz / 20050f * sampleCount);
+            int index = CalculateIndex(i, count);
+            int lowerBound = index + (index - ((i > 0) ? CalculateIndex(i - 1, count) : 0)) / 2;
+            int upperBound = index + (((i < count - 1) ? CalculateIndex(i + 1, count) : sampleCount) - index) / 2;
 
             float currentHeight = blocks[i].transform.localScale.y;
+            float newHeight = 0;
+            if (upperBound - lowerBound <= 1) {
+                newHeight = samples[lowerBound];
+            } else {
+                for (int j = lowerBound + 1; j < upperBound; j++) {
+                    newHeight = Mathf.Max(newHeight, samples[j]);
+                }
+            }
 
-            float newHeight;
-            if (index != prev)
-                newHeight = samples[index];
-            else
-                newHeight = samples[prev] + samples[index] * 0.5f;
+            //float newHeight;
+            //if (index != prev)
+            //    newHeight = samples[index];
+            //else
+            //    newHeight = samples[prev] + samples[index] * 0.5f;
 
             newHeight *= maxHeight;
-            newHeight *= Mathf.Log10(index + 1) * 0.75f + 0.15f;
+            newHeight *= Mathf.Log10(lowerBound + 1) * 0.75f + 0.15f;
+            //newHeight += newHeight * (Mathf.Clamp01(Mathf.Log10((float) index / samples.Length) + 1)) * bonusHeight;
             newHeight += minHeight;
 
             if (newHeight > currentHeight)
@@ -72,8 +81,13 @@ public class VisualizedBlocks : MonoBehaviour {
 
             blocks[i].transform.localPosition = new((width + spacing) * (i-(count/2)), 0);
 
-            prev = index;
         }
+    }
+
+    private int CalculateIndex(int i , int count) {
+        float mel = ((float) (i + 1) / (count + 1)) * 1713;
+        float hz = 700 * (Mathf.Pow(10, mel / 2595f) - 1);
+        return (int) (hz / maxHertz * sampleCount);
     }
 
 #if UNITY_EDITOR
