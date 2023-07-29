@@ -17,6 +17,7 @@ namespace NSMB.Tiles {
 
         //---Serialized Variables
         [SerializeField] private TileBase resultTile;
+
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             if (base.Interact(interacter, direction, worldLocation, out bumpSound))
                 return true;
@@ -36,6 +37,10 @@ namespace NSMB.Tiles {
 
             Bump(interacter, direction, worldLocation);
             bool downwards = direction == InteractionDirection.Down;
+
+            // Don't spawn downwards if the tile below us is solid
+            downwards &= !GameManager.Instance.TileManager.GetTile(tileLocation + Vector2Int.down);
+
             GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 resultTile, downwards, SpawnOffset, false, spawnResult);
             return false;

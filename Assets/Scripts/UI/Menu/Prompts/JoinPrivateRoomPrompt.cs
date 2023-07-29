@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 
+using NSMB.UI.MainMenu;
+
 namespace NSMB.UI.Prompts {
     public class JoinPrivateRoomPrompt : UIPrompt {
 

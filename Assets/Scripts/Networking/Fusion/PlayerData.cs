@@ -7,6 +7,7 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Utils;
+using NSMB.UI.MainMenu;
 
 public class PlayerData : NetworkBehaviour {
 
@@ -99,7 +100,9 @@ public class PlayerData : NetworkBehaviour {
         IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
 
         if (MainMenuManager.Instance)
-            MainMenuManager.Instance.OnPlayerDataValidated(this);
+            MainMenuManager.Instance.OnPlayerDataValidated();
+
+        ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
 
         nicknameColor = NicknameColor.FromConnectionToken(ConnectionToken);
     }

@@ -241,6 +241,10 @@ public class UIUpdater : MonoBehaviour {
         if (!Runner.IsServer)
             StartCoroutine(UpdatePingTextCoroutine());
 
+        stars = -1;
+        lives = -1;
+        teamStars = -1;
+        coins = -1;
         UpdateTextUI();
     }
 

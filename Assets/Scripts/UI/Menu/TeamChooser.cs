@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 using NSMB.Extensions;
+using NSMB.UI.MainMenu;
 
 public class TeamChooser : MonoBehaviour {
 

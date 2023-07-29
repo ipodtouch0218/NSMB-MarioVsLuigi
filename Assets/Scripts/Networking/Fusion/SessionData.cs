@@ -6,6 +6,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using NSMB.UI.MainMenu;
 
 public class SessionData : NetworkBehaviour {
 
@@ -37,6 +38,15 @@ public class SessionData : NetworkBehaviour {
     [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool Teams { get; set; }
     [Networked]                                                                               public byte AlternatingMusicIndex { get; set; }
 
+    //---Properties
+    private MainMenuChat Chat {
+        get {
+            if (MainMenuManager.Instance)
+                return MainMenuManager.Instance.chat;
+            return null;
+        }
+    }
+
     //---Private Variables
     private readonly Dictionary<Guid, uint> wins = new();
     private HashSet<Guid> bannedIds;
@@ -45,9 +55,6 @@ public class SessionData : NetworkBehaviour {
     private float lastStartCancelTime = -10f;
     private bool playedStartSound;
     private Coroutine pingUpdaterCorotuine;
-
-    //---Properties
-    private ChatManager Chat => MainMenuManager.Instance.chat;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -216,15 +223,18 @@ public class SessionData : NetworkBehaviour {
         });
     }
 
-
+    //---RPCs
     [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
-    public void Rpc_ChatIncomingMessage(string message, RpcInfo info = default) => Chat.IncomingPlayerMessage(message, info);
+    public void Rpc_ChatIncomingMessage(string message, RpcInfo info = default) => ChatManager.Instance.IncomingPlayerMessage(message, info);
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_ChatDisplayMessage(string message, PlayerRef player) => Chat.DisplayPlayerMessage(message, player);
-    [Rpc(RpcSources.All, RpcTargets.All, HostMode = RpcHostMode.SourceIsHostPlayer)]
-    public void Rpc_UpdateTypingCounter(RpcInfo info = default) => Chat.SetTypingIndicator(info.Source);
+    public void Rpc_ChatDisplayMessage(string message, PlayerRef player) => ChatManager.Instance.DisplayPlayerMessage(message, player);
 
+    [Rpc(RpcSources.All, RpcTargets.All, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void Rpc_UpdateTypingCounter(RpcInfo info = default) {
+        if (Chat)
+            Chat.SetTypingIndicator(info.Source);
+    }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, TickAligned = false)]
     public void Rpc_StartGame() {
@@ -255,6 +265,7 @@ public class SessionData : NetworkBehaviour {
             count++;
         }
 
+        ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.started");
         SetGameStarted(true);
 
         // Load the correct scene
@@ -289,14 +300,14 @@ public class SessionData : NetworkBehaviour {
 
         if (!sd.GameStartTimer.IsRunning) {
             if (sd.playedStartSound) {
-                MainMenuManager.Instance.chat.AddSystemMessage("ui.inroom.chat.server.startcancelled");
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled");
             }
             sd.lastStartCancelTime = sd.Runner.SimulationTime;
             MainMenuManager.Instance.OnCountdownTick(-1);
             sd.playedStartSound = false;
         } else {
             if (sd.lastStartCancelTime + 3f < time || sd.Runner.GetLocalPlayerData().IsRoomOwner) {
-                MainMenuManager.Instance.chat.AddSystemMessage("ui.inroom.chat.server.starting", "countdown", Mathf.CeilToInt(sd.GameStartTimer.RemainingTime(sd.Runner) ?? 0).ToString());
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", "countdown", Mathf.CeilToInt(sd.GameStartTimer.RemainingTime(sd.Runner) ?? 0).ToString());
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
                 sd.playedStartSound = true;
             }

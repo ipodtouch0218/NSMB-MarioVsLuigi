@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 
 using NSMB.Extensions;
+using NSMB.UI.MainMenu;
 
 namespace NSMB.UI.Prompts {
     public class ErrorPrompt : UIPrompt {

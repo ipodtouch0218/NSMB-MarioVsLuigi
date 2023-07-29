@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
+using static ConnectionToken;
 using Fusion;
 using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
-using static ConnectionToken;
-using UnityEngine.SceneManagement;
+using NSMB.UI.MainMenu;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
@@ -109,6 +109,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         } else if (runner.SessionInfo.IsValid) {
             // Connected to a session
             Debug.Log($"[Network] Successfully connected to a Room ({runner.SessionInfo.Name}, {runner.SessionInfo.Region})");
+            ChatManager.Instance.ClearChat();
         }
 
         OnConnectedToServer?.Invoke(runner);
@@ -243,6 +244,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         PlayerData data = player.GetPlayerData(runner);
         if (data) {
             Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.quit", "playername", data.GetNickname());
             if (Runner.IsServer) {
                 StartCoroutine(DestroyPlayerDataLater(data));
             }

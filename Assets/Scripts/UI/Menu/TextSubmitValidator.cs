@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 
+using NSMB.UI.MainMenu;
+
 [CreateAssetMenu(fileName = "TextSubmitValidator", menuName = "ScriptableObjects/Input Validators/TextSubmitValidator")]
 public class TextSubmitValidator : TMP_InputValidator {
 

@@ -54,7 +54,7 @@ namespace NSMB.Game {
 
         //---Properties
         public bool GameEnded => GameState == Enums.GameState.Ended;
-        public bool PlaySounds => startMusicTimer.ExpiredOrNotRunning(Runner);
+        public bool PlaySounds { get; private set; } = false;
 
         //---Private Variables
         private readonly HashSet<NetworkObject> networkObjects = new();
@@ -160,6 +160,7 @@ namespace NSMB.Game {
             if (startMusicTimer.Expired(Runner)) {
                 startMusicTimer = TickTimer.None;
                 IsMusicEnabled = true;
+                PlaySounds = true;
 
                 // Start timer
                 int timer = SessionData.Instance.Timer;
@@ -433,15 +434,18 @@ namespace NSMB.Game {
             TranslationManager tm = GlobalController.Instance.translationManager;
             bool draw = winningTeam == -1;
             string resultText;
+            string winner = null;
             if (draw) {
                 resultText = tm.GetTranslation("ui.result.draw");
             } else {
                 if (SessionData.Instance.Teams) {
                     Team team = ScriptableManager.Instance.teams[winningTeam];
-                    resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", team.displayName);
+                    winner = team.displayName;
+                    resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
                 } else {
                     string username = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname();
-                    resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", username);
+                    winner = username;
+                    resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);
                 }
 
                 if (Runner.IsServer) {
@@ -472,6 +476,14 @@ namespace NSMB.Game {
 
             audioMusic.PlayOneShot(resultSound);
             gm.winTextAnimator.SetTrigger(resultTrigger);
+
+            if (draw) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw");
+            } else if (SessionData.Instance.Teams) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", "team", winner);
+            } else {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", "playername", winner);
+            }
 
             // Return back to the main menu
             yield return new WaitForSecondsRealtime(secondsUntilMenu);

@@ -1,63 +1,33 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using TMPro;
 
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Utils;
+using NSMB.UI.MainMenu;
 
 public class ChatManager : MonoBehaviour {
 
     //---Static Variables
-    public static readonly List<ChatMessage.ChatMessageData> chatHistory = new();
+    public static ChatManager Instance { get; private set; }
+    public static event Action<ChatMessage.ChatMessageData> OnChatMessage;
 
-    //---Serialized Variables
-    [SerializeField] private ChatMessage messagePrefab;
-    [SerializeField] private TMP_InputField chatbox;
-    [SerializeField] private GameObject chatWindow;
+    //---Public Variables
+    public readonly List<ChatMessage.ChatMessageData> chatHistory = new();
 
-    //---Private Variables
-    private readonly List<ChatMessage> chatMessages = new();
-    private int previousTextSize;
+    public void Awake() {
+        Instance = this;
+    }
 
     public void OnEnable() {
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+        OnChatMessage += OnChatMessageCallback;
     }
 
     public void OnDisable() {
         NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
-    }
-
-    private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        foreach (ChatMessage message in chatMessages) {
-            if (message.data.player == player)
-                message.data.player = PlayerRef.None;
-        }
-    }
-
-    public void UpdatePlayerColors() {
-        foreach (ChatMessage message in chatMessages) {
-            message.UpdatePlayerColor();
-        }
-    }
-
-    public void ReplayChatMessages() {
-        foreach (ChatMessage.ChatMessageData message in chatHistory) {
-            AddChatMessage(message, false);
-        }
-        Canvas.ForceUpdateCanvases();
-    }
-
-    public void AddChatMessage(ChatMessage.ChatMessageData data, bool updateCanvas = true) {
-        ChatMessage chat = Instantiate(messagePrefab, chatWindow.transform);
-        chat.gameObject.SetActive(true);
-        chat.Initialize(data);
-        chatMessages.Add(chat);
-
-        if (updateCanvas)
-            Canvas.ForceUpdateCanvases();
+        OnChatMessage -= OnChatMessageCallback;
     }
 
     public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
@@ -72,7 +42,7 @@ public class ChatManager : MonoBehaviour {
             message = message,
         };
         chatHistory.Add(data);
-        AddChatMessage(data);
+        OnChatMessage?.Invoke(data);
     }
 
     public void AddSystemMessage(string key, params string[] replacements) {
@@ -89,73 +59,11 @@ public class ChatManager : MonoBehaviour {
             replacements = replacements,
         };
         chatHistory.Add(data);
-        AddChatMessage(data);
-    }
-
-    public void OnTextboxChanged() {
-        if (!MainMenuManager.Instance)
-            return;
-
-        int size = chatbox.text.Length;
-        if (size == previousTextSize)
-            return;
-
-        previousTextSize = size;
-
-        PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(NetworkHandler.Runner.LocalPlayer);
-        if (!ple || ple.typingCounter > 2)
-            return;
-
-        SessionData.Instance.Rpc_UpdateTypingCounter();
-    }
-
-    public void SetTypingIndicator(PlayerRef player) {
-        if (!MainMenuManager.Instance)
-            return;
-
-        PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(player);
-        if (ple) {
-            ple.typingCounter = 4;
-        }
-    }
-
-    public void SendChat() {
-        NetworkRunner runner = NetworkHandler.Runner;
-        PlayerData data = runner.GetLocalPlayerData();
-        if (data.MessageCooldownTimer.IsActive(runner)) {
-            // Can't send a message yet.
-            return;
-        }
-
-        string text = chatbox.text.Replace("\n", " ").Trim();
-        if (string.IsNullOrWhiteSpace(text))
-            return;
-
-        if (text.StartsWith("/")) {
-            AddSystemMessage("ui.inroom.chat.command");
-            return;
-        }
-
-        SessionData.Instance.Rpc_ChatIncomingMessage(text);
-        StartCoroutine(SelectTextboxNextFrame());
-    }
-
-    public void ClearChat() {
-        foreach (ChatMessage message in chatMessages)
-            Destroy(message.gameObject);
-
-        chatMessages.Clear();
-        chatHistory.Clear();
-    }
-
-    private IEnumerator SelectTextboxNextFrame() {
-        yield return null;
-        chatbox.SetTextWithoutNotify("");
-        EventSystem.current.SetSelectedGameObject(chatbox.gameObject);
+        OnChatMessage?.Invoke(data);
     }
 
     public void DisplayPlayerMessage(string message, PlayerRef source) {
-        //what
+        // What
         if (!source.IsValid)
             return;
 
@@ -195,21 +103,44 @@ public class ChatManager : MonoBehaviour {
         if (!data || !data.Object.IsValid)
             return;
 
-        //spam prevention.
+        // Spam prevention & Muted
         if (data.IsMuted || data.MessageCooldownTimer.IsActive(runner))
             return;
 
-        //validate message format
+        // Validate message format
         message = message[..Mathf.Min(128, message.Length)];
         message = message.Replace("\n", " ").Trim();
 
-        //empty message
+        // Empty message
         if (string.IsNullOrWhiteSpace(message))
             return;
 
         data.MessageCooldownTimer = TickTimer.CreateFromSeconds(runner, 0.5f);
 
-        //message seems fine, send to rest of lobby.
+        // Message seems fine, send to rest of lobby.
         SessionData.Instance.Rpc_ChatDisplayMessage(message, player);
+    }
+
+    public void ClearChat() {
+        chatHistory.Clear();
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.chat.ClearChat();
+    }
+
+    //---Callbacks
+    private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+        foreach (ChatMessage.ChatMessageData data in chatHistory) {
+            if (data.player == player)
+                data.player = PlayerRef.None;
+        }
+    }
+
+    private void OnChatMessageCallback(ChatMessage.ChatMessageData data) {
+        if (data.isSystemMessage) {
+            Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");
+        } else {
+            PlayerData pd = data.player.GetPlayerData(NetworkHandler.Runner);
+            Debug.Log($"[Chat] ({pd.GetUserIdString()}) {data.message}");
+        }
     }
 }

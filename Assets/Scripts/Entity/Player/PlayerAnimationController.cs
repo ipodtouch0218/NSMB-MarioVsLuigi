@@ -34,7 +34,7 @@ namespace NSMB.Entities.Player {
         private MaterialPropertyBlock materialBlock;
 
         //---Properties
-        public Color GlowColor { get; set; }
+        public Color GlowColor { get; private set; }
 
         //---Private Variables
         private Enums.PlayerEyeState eyeState;
@@ -301,14 +301,7 @@ namespace NSMB.Entities.Player {
             models.transform.SetLossyScale(controller.CalculateScale(true));
 
             // Shader effects
-            if (materialBlock == null) {
-                materialBlock = new();
-
-                // Customizable player color
-                materialBlock.SetVector("OverallsColor", skin?.overallsColor.linear ?? Color.clear);
-                materialBlock.SetVector("ShirtColor", skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
-                materialBlock.SetFloat("HatUsesOverallsColor", (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
-            }
+            TryCreateMaterialBlock();
             materialBlock.SetFloat("RainbowEnabled", controller.IsStarmanInvincible ? 1f : 0f);
             int ps = controller.State switch {
                 Enums.PowerupState.FireFlower => 1,
@@ -407,6 +400,22 @@ namespace NSMB.Entities.Player {
             animator.avatar = smallAvatar;
         }
 
+        private void TryCreateMaterialBlock() {
+            if (materialBlock != null)
+                return;
+
+            materialBlock = new();
+
+            // Customizable player color
+            materialBlock.SetVector("OverallsColor", skin?.overallsColor.linear ?? Color.clear);
+            materialBlock.SetVector("ShirtColor", skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
+            materialBlock.SetFloat("HatUsesOverallsColor", (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
+
+            // Glow Color
+            if (enableGlow)
+                materialBlock.SetColor("GlowColor", GlowColor);
+        }
+
         private void OnAllPlayersLoaded() {
             enableGlow = SessionData.Instance.Teams || !Object.HasInputAuthority;
             GlowColor = Utils.Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
@@ -415,9 +424,7 @@ namespace NSMB.Entities.Player {
                 GameManager.Instance.CreateNametag(controller);
 
             icon = UIUpdater.Instance.CreateTrackIcon(controller);
-
-            if (enableGlow)
-                materialBlock.SetColor("GlowColor", GlowColor);
+            TryCreateMaterialBlock();
         }
     }
 }

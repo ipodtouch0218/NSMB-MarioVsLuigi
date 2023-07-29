@@ -1,6 +1,8 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
 
+using NSMB.UI.MainMenu;
+
 namespace NSMB.Utils {
     public static class StringExtensions {
 

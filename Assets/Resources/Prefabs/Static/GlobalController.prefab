@@ -10780,6 +10780,7 @@ GameObject:
   - component: {fileID: 4164633649054386327}
   - component: {fileID: 3073743129255606538}
   - component: {fileID: 4970983752568173116}
+  - component: {fileID: 4951675287291052517}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -10861,6 +10862,7 @@ MonoBehaviour:
   loadingCanvas: {fileID: 4559077638615233841}
   ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
   checkedForVersion: 0
+  firstConnection: 0
   windowWidth: 0
   windowHeight: 0
   mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
@@ -11100,6 +11102,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   strengthMultiplier: 1
+--- !u!114 &4951675287291052517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776850482587567141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c4220a57fb14b7478ef8c716bc64eb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1802097837658764903
 GameObject:
   m_ObjectHideFlags: 0

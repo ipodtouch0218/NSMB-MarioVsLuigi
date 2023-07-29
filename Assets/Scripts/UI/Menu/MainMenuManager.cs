@@ -15,781 +15,780 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
-using UnityEngine.SceneManagement;
 
-public class MainMenuManager : Singleton<MainMenuManager> {
+namespace NSMB.UI.MainMenu {
+    public class MainMenuManager : Singleton<MainMenuManager> {
 
-    //---Static Variables
-    public static readonly int NicknameMin = 2, NicknameMax = 20;
+        //---Static Variables
+        public static readonly int NicknameMin = 2, NicknameMax = 20;
 
-    //---Properties
-    private NetworkRunner Runner => NetworkHandler.Runner;
-    private PlayerData LocalData => Runner.GetLocalPlayerData();
+        //---Properties
+        private NetworkRunner Runner => NetworkHandler.Runner;
+        private PlayerData LocalData => Runner.GetLocalPlayerData();
 
 
-    //---Public Variables
-    public bool nonNetworkShutdown;
-    public AudioSource sfx, music;
-    public Toggle spectateToggle;
-    public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public GameObject titleSelected, mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
-    public byte currentSkin;
+        //---Public Variables
+        public bool nonNetworkShutdown;
+        public AudioSource sfx, music;
+        public Toggle spectateToggle;
+        public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
+        public GameObject titleSelected, mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
+        public byte currentSkin;
 
-    //---Serialized Fields
-    [Header("Managers")]
-    [SerializeField] public PlayerListHandler playerList;
-    [SerializeField] public RoomListManager roomManager;
-    [SerializeField] private ColorChooser colorManager;
-    [SerializeField] public ChatManager chat;
-    [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
+        //---Serialized Fields
+        [Header("Managers")]
+        [SerializeField] public PlayerListHandler playerList;
+        [SerializeField] public RoomListManager roomManager;
+        [SerializeField] private ColorChooser colorManager;
+        [SerializeField] public MainMenuChat chat;
+        [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
 
-    [Header("UI Elements")]
-    [SerializeField] private GameObject title;
-    [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox, connecting;
-    [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
-    [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
-    [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
-    [SerializeField] private TMP_InputField nicknameField, chatTextField;
-    [SerializeField] private TMP_Text lobbyHeaderText, updateText, startGameButtonText;
-    [SerializeField] private ScrollRect settingsScroll;
-    [SerializeField] private Slider lobbyPlayersSlider;
-    [SerializeField] private CanvasGroup hostControlsGroup, copyRoomIdCanvasGroup;
-    [SerializeField] private ErrorPrompt errorPrompt, networkErrorPrompt;
+        [Header("UI Elements")]
+        [SerializeField] private GameObject title;
+        [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox, connecting;
+        [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
+        [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
+        [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
+        [SerializeField] private TMP_InputField nicknameField, chatTextField;
+        [SerializeField] private TMP_Text lobbyHeaderText, updateText, startGameButtonText;
+        [SerializeField] private ScrollRect settingsScroll;
+        [SerializeField] private Slider lobbyPlayersSlider;
+        [SerializeField] private CanvasGroup hostControlsGroup, copyRoomIdCanvasGroup;
+        [SerializeField] private ErrorPrompt errorPrompt, networkErrorPrompt;
 
-    [SerializeField, FormerlySerializedAs("ColorBar")] private Image colorBar;
-    [SerializeField] private Image overallsColorImage, shirtColorImage;
-    [SerializeField] private GameObject playerColorPaletteIcon, playerColorDisabledIcon;
+        [SerializeField, FormerlySerializedAs("ColorBar")] private Image colorBar;
+        [SerializeField] private Image overallsColorImage, shirtColorImage;
+        [SerializeField] private GameObject playerColorPaletteIcon, playerColorDisabledIcon;
 
-    [Header("Misc")]
-    [SerializeField] public List<MapData> maps;
+        [Header("Misc")]
+        [SerializeField] public List<MapData> maps;
 
-    //---Private Variables
-    private Coroutine playerPingUpdateCoroutine, quitCoroutine, fadeMusicCoroutine;
-    private bool validName;
-    private bool wasSettingsOpen;
+        //---Private Variables
+        private Coroutine playerPingUpdateCoroutine, quitCoroutine, fadeMusicCoroutine;
+        private bool validName;
+        private bool wasSettingsOpen;
 
-    public void Awake() => Set(this, false);
+        public void Awake() => Set(this, false);
 
-    public void OnEnable() {
-        // Register callbacks
-        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect += OnLobbyConnect;
-        NetworkHandler.OnShutdown += OnShutdown;
-        NetworkHandler.OnJoinSessionFailed += OnShutdown;
-        NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
-        NetworkHandler.OnConnectFailed += OnConnectFailed;
-        NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
-        MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
+        public void OnEnable() {
+            // Register callbacks
+            NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+            NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+            NetworkHandler.OnLobbyConnect += OnLobbyConnect;
+            NetworkHandler.OnShutdown += OnShutdown;
+            NetworkHandler.OnJoinSessionFailed += OnShutdown;
+            NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
+            NetworkHandler.OnConnectFailed += OnConnectFailed;
+            NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
+            MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
 
-        ControlSystem.controls.UI.Pause.performed += OnPause;
-        TranslationManager.OnLanguageChanged += OnLanguageChanged;
-        OnLanguageChanged(GlobalController.Instance.translationManager);
-    }
-
-    private void OnSceneLoadStart() {
-        GlobalController.Instance.loadingCanvas.Initialize();
-    }
-
-    public void OnDisable() {
-        // Unregister callbacks
-        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
-        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
-        NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
-        NetworkHandler.OnShutdown -= OnShutdown;
-        NetworkHandler.OnJoinSessionFailed -= OnShutdown;
-        NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
-        NetworkHandler.OnConnectFailed -= OnConnectFailed;
-        NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
-        MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
-
-        ControlSystem.controls.UI.Pause.performed -= OnPause;
-        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
-    }
-
-    public void Start() {
-        // Clear game-specific settings so they don't carry over
-        HorizontalCamera.SizeIncreaseTarget = 0;
-        HorizontalCamera.SizeIncreaseCurrent = 0;
-
-        if (GlobalController.Instance.disconnectCause != null) {
-            if (GlobalController.Instance.disconnectCause != ShutdownReason.Ok)
-                OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
-
-            GlobalController.Instance.disconnectCause = null;
+            ControlSystem.controls.UI.Pause.performed += OnPause;
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
-        PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
-        UpdateRegionDropdown();
-        StartCoroutine(NetworkHandler.PingRegions());
-
-        // Photon stuff.
-        if (!Runner.IsCloudReady) {
-            // Initial connection to the game
-            OpenTitleScreen();
-
-        } else if (Runner.IsServer || Runner.IsConnectedToServer) {
-            // Call enterroom callback
-            EnterRoom(true);
+        private void OnSceneLoadStart() {
+            GlobalController.Instance.loadingCanvas.Initialize();
         }
 
-        // Controls & Settings
-        nicknameField.text = Settings.Instance.genericNickname;
-        nicknameField.characterLimit = NicknameMax;
-        UpdateNickname();
+        public void OnDisable() {
+            // Unregister callbacks
+            NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
+            NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+            NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
+            NetworkHandler.OnShutdown -= OnShutdown;
+            NetworkHandler.OnJoinSessionFailed -= OnShutdown;
+            NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
+            NetworkHandler.OnConnectFailed -= OnConnectFailed;
+            NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
+            MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
 
-        // Discord RPC
-        GlobalController.Instance.discordController.UpdateActivity();
+            ControlSystem.controls.UI.Pause.performed -= OnPause;
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
 
-        // Version Checking
+        public void Start() {
+            // Clear game-specific settings so they don't carry over
+            HorizontalCamera.SizeIncreaseTarget = 0;
+            HorizontalCamera.SizeIncreaseCurrent = 0;
+
+            if (GlobalController.Instance.disconnectCause != null) {
+                if (GlobalController.Instance.disconnectCause != ShutdownReason.Ok)
+                    OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
+
+                GlobalController.Instance.disconnectCause = null;
+            }
+
+            PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
+            UpdateRegionDropdown();
+            StartCoroutine(NetworkHandler.PingRegions());
+
+            // Photon stuff.
+            if (!Runner.IsCloudReady) {
+                // Initial connection to the game
+                OpenTitleScreen();
+
+            } else if (Runner.IsServer || Runner.IsConnectedToServer) {
+                // Call enterroom callback
+                EnterRoom(true);
+            }
+
+            // Controls & Settings
+            nicknameField.text = Settings.Instance.genericNickname;
+            nicknameField.characterLimit = NicknameMax;
+            UpdateNickname();
+
+            // Discord RPC
+            GlobalController.Instance.discordController.UpdateActivity();
+
+            // Version Checking
 #if PLATFORM_WEBGL
         copyRoomIdCanvasGroup.interactable = false;
 #else
-        if (!GlobalController.Instance.checkedForVersion) {
-            UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
-                if (upToDate)
-                    return;
+            if (!GlobalController.Instance.checkedForVersion) {
+                UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
+                    if (upToDate)
+                        return;
 
-                updateText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.update.prompt", "newversion", latestVersion, "currentversion", Application.version);
-                updateBox.SetActive(true);
-                EventSystem.current.SetSelectedGameObject(updateBoxSelected);
-            });
-            GlobalController.Instance.checkedForVersion = true;
-        }
+                    updateText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.update.prompt", "newversion", latestVersion, "currentversion", Application.version);
+                    updateBox.SetActive(true);
+                    EventSystem.current.SetSelectedGameObject(updateBoxSelected);
+                });
+                GlobalController.Instance.checkedForVersion = true;
+            }
 #endif
 
-        EventSystem.current.SetSelectedGameObject(title);
-    }
+            EventSystem.current.SetSelectedGameObject(title);
+        }
 
-    public void Update() {
+        public void Update() {
 
-        bool connectedToNetwork = NetworkHandler.Connected && !Runner.SessionInfo;
-        bool connectingToNetwork = NetworkHandler.Connecting || Runner.SessionInfo;
+            bool connectedToNetwork = NetworkHandler.Connected && !Runner.SessionInfo;
+            bool connectingToNetwork = NetworkHandler.Connecting || Runner.SessionInfo;
 
-        connecting.SetActive(connectingToNetwork && lobbyMenu.activeInHierarchy);
+            connecting.SetActive(connectingToNetwork && lobbyMenu.activeInHierarchy);
 
 
-        joinRoomBtn.interactable = connectedToNetwork && roomManager.SelectedRoom != null;
-        createRoomBtn.interactable = connectedToNetwork && validName;
-        //regionDropdown.interactable = connectedToNetwork;
+            joinRoomBtn.interactable = connectedToNetwork && roomManager.SelectedRoom != null;
+            createRoomBtn.interactable = connectedToNetwork && validName;
+            //regionDropdown.interactable = connectedToNetwork;
 
-        reconnectBtn.gameObject.SetActive(NetworkHandler.Disconnected);
-        joinPrivateRoomBtn.gameObject.SetActive(connectedToNetwork);
+            reconnectBtn.gameObject.SetActive(NetworkHandler.Disconnected);
+            joinPrivateRoomBtn.gameObject.SetActive(connectedToNetwork);
 
-        wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
-    }
+            wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
+        }
 
-    public void UpdateRegionDropdown() {
+        public void UpdateRegionDropdown() {
 
-        if (regionDropdown.options.Count == 0) {
-            // Create brand-new options
-            for (int i = 0; i < NetworkHandler.Regions.Length; i++) {
-                string region = NetworkHandler.Regions[i];
-                int ping = 0;
-                if (NetworkHandler.RegionPings != null)
-                    ping = NetworkHandler.RegionPings[i];
+            if (regionDropdown.options.Count == 0) {
+                // Create brand-new options
+                for (int i = 0; i < NetworkHandler.Regions.Length; i++) {
+                    string region = NetworkHandler.Regions[i];
+                    int ping = 0;
+                    if (NetworkHandler.RegionPings != null)
+                        ping = NetworkHandler.RegionPings[i];
 
-                regionDropdown.options.Add(new RegionOption(region, ping));
-            }
-            regionDropdown.options.Sort();
-        } else {
-            // Update existing options
-            RegionOption selected = (RegionOption) regionDropdown.options[regionDropdown.value];
-
-            if (NetworkHandler.RegionPings != null) {
-                foreach (RegionOption option in regionDropdown.options) {
-                    option.Ping = NetworkHandler.RegionPings[Array.IndexOf(NetworkHandler.Regions, option.Region)];
+                    regionDropdown.options.Add(new RegionOption(region, ping));
                 }
+                regionDropdown.options.Sort();
+            } else {
+                // Update existing options
+                RegionOption selected = (RegionOption) regionDropdown.options[regionDropdown.value];
+
+                if (NetworkHandler.RegionPings != null) {
+                    foreach (RegionOption option in regionDropdown.options) {
+                        option.Ping = NetworkHandler.RegionPings[Array.IndexOf(NetworkHandler.Regions, option.Region)];
+                    }
+                }
+
+                regionDropdown.options.Sort();
+                regionDropdown.SetValueWithoutNotify(regionDropdown.options.IndexOf(selected));
+            }
+        }
+
+        public void EnterRoom(bool inSameRoom) {
+
+            // Chat
+            if (inSameRoom) {
+                chat.ReplayChatMessages();
+            } else {
+                chat.ClearChat();
+
+                // Host chat notification
+                if (Runner.IsServer)
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
             }
 
-            regionDropdown.options.Sort();
-            regionDropdown.SetValueWithoutNotify(regionDropdown.options.IndexOf(selected));
-        }
-    }
+            // Open the in-room menu
+            OpenInRoomMenu();
+            StartCoroutine(ResetRoomSettingScrollPosition());
 
-    public void EnterRoom(bool inSameRoom) {
+            playerList.RemoveAllPlayerEntries();
 
-        // Chat
-        if (inSameRoom) {
-            chat.ReplayChatMessages();
-        } else {
-            chat.ClearChat();
+            // Set the player settings
+            PlayerData data = Runner.GetLocalPlayerData();
+            characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.genericCharacter);
+            SwapPlayerSkin(data ? data.SkinIndex : (byte) Settings.Instance.genericSkin, false);
+            spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
-            // Host chat notification
-            if (Runner.IsServer)
-                chat.AddSystemMessage("ui.inroom.chat.hostreminder");
-        }
+            // Set the room settings
+            hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
+            roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
 
-        // Open the in-room menu
-        OpenInRoomMenu();
-        StartCoroutine(ResetRoomSettingScrollPosition());
+            // Preview the current level
+            PreviewLevel(SessionData.Instance.Level);
 
-        playerList.RemoveAllPlayerEntries();
+            // Reset chat input field
+            chatTextField.SetTextWithoutNotify("");
 
-        // Set the player settings
-        PlayerData data = Runner.GetLocalPlayerData();
-        characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.genericCharacter);
-        SwapPlayerSkin(data ? data.SkinIndex : (byte) Settings.Instance.genericSkin, false);
-        spectateToggle.isOn = data ? data.IsManualSpectator : false;
+            // Reset the "Game start" button counting down
+            OnCountdownTick(-1);
 
-        // Set the room settings
-        hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
-        roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
+            // Update the room header text
+            SessionInfo session = Runner.SessionInfo;
+            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
+            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
 
-        // Preview the current level
-        PreviewLevel(SessionData.Instance.Level);
+            // Discord RPC
+            GlobalController.Instance.discordController.UpdateActivity(session);
 
-        // Reset chat input field
-        chatTextField.SetTextWithoutNotify("");
-
-        // Reset the "Game start" button counting down
-        OnCountdownTick(-1);
-
-        // Update the room header text
-        SessionInfo session = Runner.SessionInfo;
-        NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
-        lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
-
-        // Discord RPC
-        GlobalController.Instance.discordController.UpdateActivity(session);
-
-        // Host-based header color
-        UnityEngine.Random.InitState(name.GetHashCode() + 2035767);
-        colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
-    }
-
-    public void PreviewLevel(int levelIndex) {
-        if (levelIndex < 0 || levelIndex >= maps.Count)
-            levelIndex = 0;
-
-        Camera.main.transform.position = maps[levelIndex].levelPreviewPosition.transform.position;
-    }
-
-    private IEnumerator ResetRoomSettingScrollPosition() {
-        settingsScroll.verticalNormalizedPosition = 1;
-        yield return null;
-        settingsScroll.verticalNormalizedPosition = 1;
-    }
-
-    private void DisableAllMenus() {
-        title.SetActive(false);
-        bg.SetActive(false);
-        mainMenu.SetActive(false);
-        lobbyMenu.SetActive(false);
-        createLobbyPrompt.SetActive(false);
-        webglCreateLobbyPrompt.SetActive(false);
-        inLobbyMenu.SetActive(false);
-        creditsMenu.SetActive(false);
-        privateRoomIdPrompt.SetActive(false);
-        updateBox.SetActive(false);
-    }
-
-    public void OpenTitleScreen() {
-        DisableAllMenus();
-        title.SetActive(true);
-
-        EventSystem.current.SetSelectedGameObject(titleSelected);
-    }
-    public void OpenMainMenu() {
-        DisableAllMenus();
-        bg.SetActive(true);
-        mainMenu.SetActive(true);
-
-        EventSystem.current.SetSelectedGameObject(mainMenuSelected);
-    }
-    public void OpenRoomListMenu() {
-        DisableAllMenus();
-        bg.SetActive(true);
-        lobbyMenu.SetActive(true);
-
-        if (NetworkHandler.Disconnected) {
-            Reconnect();
+            // Host-based header color
+            UnityEngine.Random.InitState(name.GetHashCode() + 2035767);
+            colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
         }
 
-        roomManager.RefreshRooms();
+        public void PreviewLevel(int levelIndex) {
+            if (levelIndex < 0 || levelIndex >= maps.Count)
+                levelIndex = 0;
 
-        EventSystem.current.SetSelectedGameObject(lobbySelected);
-    }
+            Camera.main.transform.position = maps[levelIndex].levelPreviewPosition.transform.position;
+        }
 
-    public void TryOpenCreateRoomPrompt() {
+        private IEnumerator ResetRoomSettingScrollPosition() {
+            settingsScroll.verticalNormalizedPosition = 1;
+            yield return null;
+            settingsScroll.verticalNormalizedPosition = 1;
+        }
+
+        private void DisableAllMenus() {
+            title.SetActive(false);
+            bg.SetActive(false);
+            mainMenu.SetActive(false);
+            lobbyMenu.SetActive(false);
+            createLobbyPrompt.SetActive(false);
+            webglCreateLobbyPrompt.SetActive(false);
+            inLobbyMenu.SetActive(false);
+            creditsMenu.SetActive(false);
+            privateRoomIdPrompt.SetActive(false);
+            updateBox.SetActive(false);
+        }
+
+        public void OpenTitleScreen() {
+            DisableAllMenus();
+            title.SetActive(true);
+
+            EventSystem.current.SetSelectedGameObject(titleSelected);
+        }
+        public void OpenMainMenu() {
+            DisableAllMenus();
+            bg.SetActive(true);
+            mainMenu.SetActive(true);
+
+            EventSystem.current.SetSelectedGameObject(mainMenuSelected);
+        }
+        public void OpenRoomListMenu() {
+            DisableAllMenus();
+            bg.SetActive(true);
+            lobbyMenu.SetActive(true);
+
+            if (NetworkHandler.Disconnected) {
+                Reconnect();
+            }
+
+            roomManager.RefreshRooms();
+
+            EventSystem.current.SetSelectedGameObject(lobbySelected);
+        }
+
+        public void TryOpenCreateRoomPrompt() {
 #if PLATFORM_WEBGL
         DisableAllMenus();
         bg.SetActive(true);
         lobbyMenu.SetActive(true);
         webglCreateLobbyPrompt.SetActive(true);
 #else
-        OpenCreateRoomPrompt();
+            OpenCreateRoomPrompt();
 #endif
-    }
-
-    public void OpenCreateRoomPrompt() {
-        DisableAllMenus();
-        bg.SetActive(true);
-        lobbyMenu.SetActive(true);
-        createLobbyPrompt.SetActive(true);
-    }
-
-    public void OpenOptions() {
-        if (wasSettingsOpen)
-            return;
-
-        GlobalController.Instance.optionsManager.OpenMenu();
-    }
-
-    public void OpenCredits() {
-        DisableAllMenus();
-        bg.SetActive(true);
-        creditsMenu.SetActive(true);
-
-        EventSystem.current.SetSelectedGameObject(creditsSelected);
-    }
-
-    public void OpenInRoomMenu() {
-        DisableAllMenus();
-        bg.SetActive(true);
-        inLobbyMenu.SetActive(true);
-
-        EventSystem.current.SetSelectedGameObject(currentLobbySelected);
-    }
-
-    public void OpenErrorBox(Enum cause) {
-        OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
-    }
-
-    public void OpenErrorBox(string key) {
-        errorPrompt.OpenWithText(key);
-        nonNetworkShutdown = false;
-    }
-
-    public void OpenNetworkErrorBox(string key) {
-        networkErrorPrompt.OpenWithText(key);
-    }
-
-    public void OpenNetworkErrorBox(ShutdownReason reason) {
-        if (nonNetworkShutdown) {
-            OpenErrorBox(reason);
-            return;
         }
 
-        OpenNetworkErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(reason, reason.ToString()));
-    }
-
-    public void BackSound() {
-        sfx.PlayOneShot(Enums.Sounds.UI_Back);
-    }
-
-    public void ConfirmSound() {
-        sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-    }
-
-    public void CursorSound() {
-        sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
-    }
-
-    public void StartSound() {
-        sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
-    }
-
-    public void ConnectToDropdownRegion() {
-        RegionOption selectedRegion = (RegionOption) regionDropdown.options[regionDropdown.value];
-        string targetRegion = selectedRegion.Region;
-        if (NetworkHandler.CurrentRegion == targetRegion)
-            return;
-
-        roomManager.ClearRooms();
-        NetworkHandler.CurrentRegion = targetRegion;
-
-        _ = NetworkHandler.ConnectToRegion(targetRegion);
-    }
-
-    public async void Reconnect() {
-        Debug.Log("[Network] (Re)connecting to the master server");
-        await NetworkHandler.ConnectToSameRegion();
-    }
-
-    public async void QuitRoom() {
-        OpenRoomListMenu();
-
-        if (playerPingUpdateCoroutine != null) {
-            StopCoroutine(playerPingUpdateCoroutine);
-            playerPingUpdateCoroutine = null;
+        public void OpenCreateRoomPrompt() {
+            DisableAllMenus();
+            bg.SetActive(true);
+            lobbyMenu.SetActive(true);
+            createLobbyPrompt.SetActive(true);
         }
 
-        await NetworkHandler.ConnectToRegion();
-        GlobalController.Instance.discordController.UpdateActivity();
-    }
-
-    public void StartCountdown() {
-
-        // We can't start the game if we're not the server.
-        if (!Runner.IsServer)
-            return;
-
-        if (SessionData.Instance.GameStartTimer.IsRunning) {
-            // Cancel early.
-            SessionData.Instance.GameStartTimer = TickTimer.None;
-            sfx.PlayOneShot(Enums.Sounds.UI_Back);
-
-        } else {
-            // Make sure we can actually start the game
-            if (!IsRoomConfigurationValid())
+        public void OpenOptions() {
+            if (wasSettingsOpen)
                 return;
 
-            // Actually start the game.
-            SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, 3f);
-        }
-    }
-
-    private IEnumerator FadeMusic() {
-        while (music.volume > 0) {
-            music.volume -= Time.deltaTime;
-            yield return null;
-        }
-    }
-
-    public void UpdateStartGameButton() {
-        PlayerData data = Runner.GetLocalPlayerData();
-        if (!data || !data.IsRoomOwner) {
-            startGameBtn.interactable = false;
-            return;
+            GlobalController.Instance.optionsManager.OpenMenu();
         }
 
-        startGameBtn.interactable = IsRoomConfigurationValid();
-    }
+        public void OpenCredits() {
+            DisableAllMenus();
+            bg.SetActive(true);
+            creditsMenu.SetActive(true);
 
-    public bool IsRoomConfigurationValid() {
-        List<PlayerData> nonSpectators = Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner)).Where(pd => !pd.IsManualSpectator).ToList();
-        bool validRoomConfig = true;
-
-        int realPlayers = nonSpectators.Count();
-        validRoomConfig &= realPlayers >= 1;
-
-        // Only do team checks if there's more than one player
-        if (SessionData.Instance.Teams && realPlayers > 1) {
-            int teams = nonSpectators.Select(pd => pd.Team).Distinct().Count();
-            validRoomConfig &= teams > 1;
+            EventSystem.current.SetSelectedGameObject(creditsSelected);
         }
 
-        return validRoomConfig;
-    }
+        public void OpenInRoomMenu() {
+            DisableAllMenus();
+            bg.SetActive(true);
+            inLobbyMenu.SetActive(true);
 
-    public void Kick(PlayerData target) {
-        if (target.HasInputAuthority)
-            return;
-
-        chat.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetNickname());
-        Runner.Disconnect(target.Object.InputAuthority);
-    }
-
-    public void Promote(PlayerData target) {
-        if (target.HasInputAuthority)
-            return;
-
-        //PhotonNetwork.SetMasterClient(target);
-        //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
-        chat.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
-        //runner.set
-    }
-
-    public void Mute(PlayerData target) {
-        if (target.HasInputAuthority)
-            return;
-
-        bool newMuteState = !target.IsMuted;
-        target.IsMuted = newMuteState;
-        chat.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", "playername", target.GetNickname());
-    }
-
-    public void Ban(PlayerData target) {
-        if (target.HasInputAuthority)
-            return;
-
-        SessionData.Instance.AddBan(target);
-        chat.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetNickname());
-        Runner.Disconnect(target.Object.InputAuthority);
-    }
-
-    public void UI_CharacterDropdownChanged() {
-        byte value = (byte) characterDropdown.value;
-        SwapCharacter(value, true);
-
-        CharacterData data = ScriptableManager.Instance.characters[value];
-        sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected, data);
-    }
-
-    public void SwapCharacter(byte character, bool callback) {
-        if (callback) {
-            LocalData.Rpc_SetCharacterIndex(character);
-        } else {
-            characterDropdown.SetValueWithoutNotify(character);
+            EventSystem.current.SetSelectedGameObject(currentLobbySelected);
         }
 
-        Settings.Instance.genericCharacter = character;
-        Settings.Instance.SaveSettings();
-
-        CharacterData data = ScriptableManager.Instance.characters[character];
-        colorManager.ChangeCharacter(data);
-        SwapPlayerSkin(currentSkin, false);
-    }
-
-    public void SwapPlayerSkin(byte index, bool callback) {
-
-        bool disabled = index == 0;
-
-        if (!disabled) {
-            playerColorDisabledIcon.SetActive(false);
-            playerColorPaletteIcon.SetActive(true);
-
-            CharacterData character = Runner.GetLocalPlayerData().GetCharacterData();
-            PlayerColorSet set = ScriptableManager.Instance.skins[index];
-            PlayerColors colors = set.GetPlayerColors(character);
-            overallsColorImage.color = colors.overallsColor;
-            shirtColorImage.color = colors.shirtColor;
-            ColorName.GetComponent<TMP_Text>().text = set.Name;
+        public void OpenErrorBox(Enum cause) {
+            OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
         }
 
-        playerColorDisabledIcon.SetActive(disabled);
-        playerColorPaletteIcon.SetActive(!disabled);
+        public void OpenErrorBox(string key) {
+            errorPrompt.OpenWithText(key);
+            nonNetworkShutdown = false;
+        }
 
-        if (callback) {
-            LocalData.Rpc_SetSkinIndex(index);
-            Settings.Instance.genericSkin = index;
+        public void OpenNetworkErrorBox(string key) {
+            networkErrorPrompt.OpenWithText(key);
+        }
+
+        public void OpenNetworkErrorBox(ShutdownReason reason) {
+            if (nonNetworkShutdown) {
+                OpenErrorBox(reason);
+                return;
+            }
+
+            OpenNetworkErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(reason, reason.ToString()));
+        }
+
+        public void BackSound() {
+            sfx.PlayOneShot(Enums.Sounds.UI_Back);
+        }
+
+        public void ConfirmSound() {
+            sfx.PlayOneShot(Enums.Sounds.UI_Decide);
+        }
+
+        public void CursorSound() {
+            sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
+        }
+
+        public void StartSound() {
+            sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
+        }
+
+        public void ConnectToDropdownRegion() {
+            RegionOption selectedRegion = (RegionOption) regionDropdown.options[regionDropdown.value];
+            string targetRegion = selectedRegion.Region;
+            if (NetworkHandler.CurrentRegion == targetRegion)
+                return;
+
+            roomManager.ClearRooms();
+            NetworkHandler.CurrentRegion = targetRegion;
+
+            _ = NetworkHandler.ConnectToRegion(targetRegion);
+        }
+
+        public async void Reconnect() {
+            Debug.Log("[Network] (Re)connecting to the master server");
+            await NetworkHandler.ConnectToSameRegion();
+        }
+
+        public async void QuitRoom() {
+            OpenRoomListMenu();
+
+            if (playerPingUpdateCoroutine != null) {
+                StopCoroutine(playerPingUpdateCoroutine);
+                playerPingUpdateCoroutine = null;
+            }
+
+            await NetworkHandler.ConnectToRegion();
+            GlobalController.Instance.discordController.UpdateActivity();
+        }
+
+        public void StartCountdown() {
+
+            // We can't start the game if we're not the server.
+            if (!Runner.IsServer)
+                return;
+
+            if (SessionData.Instance.GameStartTimer.IsRunning) {
+                // Cancel early.
+                SessionData.Instance.GameStartTimer = TickTimer.None;
+                sfx.PlayOneShot(Enums.Sounds.UI_Back);
+
+            } else {
+                // Make sure we can actually start the game
+                if (!IsRoomConfigurationValid())
+                    return;
+
+                // Actually start the game.
+                SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+            }
+        }
+
+        private IEnumerator FadeMusic() {
+            while (music.volume > 0) {
+                music.volume -= Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        public void UpdateStartGameButton() {
+            PlayerData data = Runner.GetLocalPlayerData();
+            if (!data || !data.IsRoomOwner) {
+                startGameBtn.interactable = false;
+                return;
+            }
+
+            startGameBtn.interactable = IsRoomConfigurationValid();
+        }
+
+        public bool IsRoomConfigurationValid() {
+            List<PlayerData> nonSpectators = Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner)).Where(pd => !pd.IsManualSpectator).ToList();
+            bool validRoomConfig = true;
+
+            int realPlayers = nonSpectators.Count();
+            validRoomConfig &= realPlayers >= 1;
+
+            // Only do team checks if there's more than one player
+            if (SessionData.Instance.Teams && realPlayers > 1) {
+                int teams = nonSpectators.Select(pd => pd.Team).Distinct().Count();
+                validRoomConfig &= teams > 1;
+            }
+
+            return validRoomConfig;
+        }
+
+        public void Kick(PlayerData target) {
+            if (target.HasInputAuthority)
+                return;
+
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetNickname());
+            Runner.Disconnect(target.Object.InputAuthority);
+        }
+
+        public void Promote(PlayerData target) {
+            if (target.HasInputAuthority)
+                return;
+
+            //PhotonNetwork.SetMasterClient(target);
+            //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
+            ChatManager.Instance.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
+            //runner.set
+        }
+
+        public void Mute(PlayerData target) {
+            if (target.HasInputAuthority)
+                return;
+
+            bool newMuteState = !target.IsMuted;
+            target.IsMuted = newMuteState;
+            ChatManager.Instance.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", "playername", target.GetNickname());
+        }
+
+        public void Ban(PlayerData target) {
+            if (target.HasInputAuthority)
+                return;
+
+            SessionData.Instance.AddBan(target);
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetNickname());
+            Runner.Disconnect(target.Object.InputAuthority);
+        }
+
+        public void UI_CharacterDropdownChanged() {
+            byte value = (byte) characterDropdown.value;
+            SwapCharacter(value, true);
+
+            CharacterData data = ScriptableManager.Instance.characters[value];
+            sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected, data);
+        }
+
+        public void SwapCharacter(byte character, bool callback) {
+            if (callback) {
+                LocalData.Rpc_SetCharacterIndex(character);
+            } else {
+                characterDropdown.SetValueWithoutNotify(character);
+            }
+
+            Settings.Instance.genericCharacter = character;
+            Settings.Instance.SaveSettings();
+
+            CharacterData data = ScriptableManager.Instance.characters[character];
+            colorManager.ChangeCharacter(data);
+            SwapPlayerSkin(currentSkin, false);
+        }
+
+        public void SwapPlayerSkin(byte index, bool callback) {
+
+            bool disabled = index == 0;
+
+            if (!disabled) {
+                playerColorDisabledIcon.SetActive(false);
+                playerColorPaletteIcon.SetActive(true);
+
+                CharacterData character = Runner.GetLocalPlayerData().GetCharacterData();
+                PlayerColorSet set = ScriptableManager.Instance.skins[index];
+                PlayerColors colors = set.GetPlayerColors(character);
+                overallsColorImage.color = colors.overallsColor;
+                shirtColorImage.color = colors.shirtColor;
+                ColorName.GetComponent<TMP_Text>().text = set.Name;
+            }
+
+            playerColorDisabledIcon.SetActive(disabled);
+            playerColorPaletteIcon.SetActive(!disabled);
+
+            if (callback) {
+                LocalData.Rpc_SetSkinIndex(index);
+                Settings.Instance.genericSkin = index;
+                Settings.Instance.SaveSettings();
+            }
+
+            currentSkin = index;
+        }
+
+        private void UpdateNickname() {
+            validName = Settings.Instance.genericNickname.IsValidUsername();
+            if (!validName) {
+                ColorBlock colors = nicknameField.colors;
+                colors.normalColor = new(1, 0.7f, 0.7f, 1);
+                colors.highlightedColor = new(1, 0.55f, 0.55f, 1);
+                nicknameField.colors = colors;
+            } else {
+                ColorBlock colors = nicknameField.colors;
+                colors.normalColor = Color.white;
+                colors.highlightedColor = new(0.7f, 0.7f, 0.7f, 1);
+                nicknameField.colors = colors;
+            }
+        }
+
+        public void SetUsername(TMP_InputField field) {
+            Settings.Instance.genericNickname = field.text;
+            UpdateNickname();
+
             Settings.Instance.SaveSettings();
         }
 
-        currentSkin = index;
-    }
-
-    private void UpdateNickname() {
-        validName = Settings.Instance.genericNickname.IsValidUsername();
-        if (!validName) {
-            ColorBlock colors = nicknameField.colors;
-            colors.normalColor = new(1, 0.7f, 0.7f, 1);
-            colors.highlightedColor = new(1, 0.55f, 0.55f, 1);
-            nicknameField.colors = colors;
-        } else {
-            ColorBlock colors = nicknameField.colors;
-            colors.normalColor = Color.white;
-            colors.highlightedColor = new(0.7f, 0.7f, 0.7f, 1);
-            nicknameField.colors = colors;
+        public void OpenLinks() {
+            Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/blob/master/LINKS.md");
         }
-    }
 
-    public void SetUsername(TMP_InputField field) {
-        Settings.Instance.genericNickname = field.text;
-        UpdateNickname();
+        public void Quit() {
+            if (quitCoroutine == null)
+                quitCoroutine = StartCoroutine(FinishQuitting());
+        }
 
-        Settings.Instance.SaveSettings();
-    }
-
-    public void OpenLinks() {
-        Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/blob/master/LINKS.md");
-    }
-
-    public void Quit() {
-        if (quitCoroutine == null)
-            quitCoroutine = StartCoroutine(FinishQuitting());
-    }
-
-    private IEnumerator FinishQuitting() {
-        AudioClip clip = Enums.Sounds.UI_Quit.GetClip();
-        sfx.PlayOneShot(clip);
-        yield return new WaitForSeconds(clip.length);
+        private IEnumerator FinishQuitting() {
+            AudioClip clip = Enums.Sounds.UI_Quit.GetClip();
+            sfx.PlayOneShot(clip);
+            yield return new WaitForSeconds(clip.length);
 
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+            UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif
-    }
-
-    public void OpenDownloadsPage() {
-        Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest");
-        OpenMainMenu();
-    }
-
-    public void EnableSpectator(Toggle toggle) {
-        PlayerData data = Runner.GetLocalPlayerData();
-
-        data.Rpc_SetPermanentSpectator(toggle.isOn);
-    }
-
-    public SceneRef GetCurrentSceneRef() {
-        if (!SessionData.Instance)
-            return SceneRef.None;
-
-        byte index = SessionData.Instance.Level;
-        return maps[index].buildIndex;
-    }
-
-    // Network callbacks
-    // LOBBY CALLBACKS
-    public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
-        for (int i = 0; i < regionDropdown.options.Count; i++) {
-            RegionOption option = (RegionOption) regionDropdown.options[i];
-            if (option.Region == info.Region) {
-                regionDropdown.SetValueWithoutNotify(i);
-                return;
-            }
-        }
-    }
-
-    // ROOM CALLBACKS
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        UpdateStartGameButton();
-    }
-
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        chat.AddSystemMessage("ui.inroom.chat.player.quit", "playername", player.GetPlayerData(runner).GetNickname());
-        sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
-        UpdateStartGameButton();
-        GlobalController.Instance.discordController.UpdateActivity();
-    }
-
-    // CONNECTION CALLBACKS
-    public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
-        if (cause != ShutdownReason.Ok)
-            OpenNetworkErrorBox(cause);
-
-        if (inLobbyMenu.activeSelf) {
-            OpenRoomListMenu();
         }
 
-        GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
-    }
-
-    public void OnDisconnect(NetworkRunner runner) {
-        OpenNetworkErrorBox(ShutdownReason.ConnectionRefused);
-
-        if (inLobbyMenu.activeSelf) {
-            OpenRoomListMenu();
+        public void OpenDownloadsPage() {
+            Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest");
+            OpenMainMenu();
         }
 
-        GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
-    }
-
-    public void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
-        OpenErrorBox(cause);
-
-        if (!runner.IsCloudReady) {
-            roomManager.ClearRooms();
-        }
-    }
-
-    private void OnPause(InputAction.CallbackContext context) {
-        if (NetworkHandler.Runner.SessionInfo.IsValid && !wasSettingsOpen) {
-            // Open the settings menu if we're inside a room (so we dont have to leave)
-            ConfirmSound();
-            OpenOptions();
-        }
-    }
-
-    private void OnLanguageChanged(TranslationManager tm) {
-        int selectedLevel = levelDropdown.value;
-        levelDropdown.ClearOptions();
-        levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
-        levelDropdown.SetValueWithoutNotify(selectedLevel);
-
-        int selectedCharacter = characterDropdown.value;
-        characterDropdown.ClearOptions();
-        foreach (CharacterData character in ScriptableManager.Instance.characters) {
-            string name = tm.GetTranslation(character.translationString);
-            characterDropdown.options.Add(new TMP_Dropdown.OptionData(name, character.readySprite));
-        }
-        characterDropdown.SetValueWithoutNotify(selectedCharacter);
-        characterDropdown.RefreshShownValue();
-
-        //TODO: RTL FONT
-
-        if (Runner && Runner.SessionInfo) {
-            SessionInfo session = Runner.SessionInfo;
-            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
-            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
-            lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
-
-            OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
-        }
-    }
-
-    //---Callbacks
-    public void OnCountdownTick(int time) {
-        TranslationManager tm = GlobalController.Instance.translationManager;
-        if (time > 0) {
-            startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
-            hostControlsGroup.interactable = false;
-            if (time == 1 && fadeMusicCoroutine == null)
-                fadeMusicCoroutine = StartCoroutine(FadeMusic());
-        } else {
-            startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
+        public void EnableSpectator(Toggle toggle) {
             PlayerData data = Runner.GetLocalPlayerData();
-            hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
-            if (fadeMusicCoroutine != null) {
-                StopCoroutine(fadeMusicCoroutine);
-                fadeMusicCoroutine = null;
-            }
-            music.volume = 1;
+
+            data.Rpc_SetPermanentSpectator(toggle.isOn);
         }
-    }
 
-    public void OnPlayerDataValidated(PlayerData data) {
-        chat.AddSystemMessage("ui.inroom.chat.player.joined", "playername", data.GetNickname());
-        sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
-    }
+        public SceneRef GetCurrentSceneRef() {
+            if (!SessionData.Instance)
+                return SceneRef.None;
 
-    public void OnRegionPingsUpdated() {
-        UpdateRegionDropdown();
-    }
+            byte index = SessionData.Instance.Level;
+            return maps[index].buildIndex;
+        }
+
+        // Network callbacks
+        // LOBBY CALLBACKS
+        public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
+            for (int i = 0; i < regionDropdown.options.Count; i++) {
+                RegionOption option = (RegionOption) regionDropdown.options[i];
+                if (option.Region == info.Region) {
+                    regionDropdown.SetValueWithoutNotify(i);
+                    return;
+                }
+            }
+        }
+
+        // ROOM CALLBACKS
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+            UpdateStartGameButton();
+        }
+
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+            sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
+            UpdateStartGameButton();
+            GlobalController.Instance.discordController.UpdateActivity();
+        }
+
+        // CONNECTION CALLBACKS
+        public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
+            if (cause != ShutdownReason.Ok)
+                OpenNetworkErrorBox(cause);
+
+            if (inLobbyMenu.activeSelf) {
+                OpenRoomListMenu();
+            }
+
+            GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
+        }
+
+        public void OnDisconnect(NetworkRunner runner) {
+            OpenNetworkErrorBox(ShutdownReason.ConnectionRefused);
+
+            if (inLobbyMenu.activeSelf) {
+                OpenRoomListMenu();
+            }
+
+            GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
+        }
+
+        public void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
+            OpenErrorBox(cause);
+
+            if (!runner.IsCloudReady) {
+                roomManager.ClearRooms();
+            }
+        }
+
+        private void OnPause(InputAction.CallbackContext context) {
+            if (NetworkHandler.Runner.SessionInfo.IsValid && !wasSettingsOpen) {
+                // Open the settings menu if we're inside a room (so we dont have to leave)
+                ConfirmSound();
+                OpenOptions();
+            }
+        }
+
+        private void OnLanguageChanged(TranslationManager tm) {
+            int selectedLevel = levelDropdown.value;
+            levelDropdown.ClearOptions();
+            levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
+            levelDropdown.SetValueWithoutNotify(selectedLevel);
+
+            int selectedCharacter = characterDropdown.value;
+            characterDropdown.ClearOptions();
+            foreach (CharacterData character in ScriptableManager.Instance.characters) {
+                string name = tm.GetTranslation(character.translationString);
+                characterDropdown.options.Add(new TMP_Dropdown.OptionData(name, character.readySprite));
+            }
+            characterDropdown.SetValueWithoutNotify(selectedCharacter);
+            characterDropdown.RefreshShownValue();
+
+            //TODO: RTL FONT
+
+            if (Runner && Runner.SessionInfo) {
+                SessionInfo session = Runner.SessionInfo;
+                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
+                lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
+                lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
+
+                OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
+            }
+        }
+
+        //---Callbacks
+        public void OnCountdownTick(int time) {
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            if (time > 0) {
+                startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
+                hostControlsGroup.interactable = false;
+                if (time == 1 && fadeMusicCoroutine == null)
+                    fadeMusicCoroutine = StartCoroutine(FadeMusic());
+            } else {
+                startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
+                PlayerData data = Runner.GetLocalPlayerData();
+                hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
+                if (fadeMusicCoroutine != null) {
+                    StopCoroutine(fadeMusicCoroutine);
+                    fadeMusicCoroutine = null;
+                }
+                music.volume = 1;
+            }
+        }
+
+        public void OnPlayerDataValidated() {
+            sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
+        }
+
+        public void OnRegionPingsUpdated() {
+            UpdateRegionDropdown();
+        }
 
 #if UNITY_EDITOR
-    //---Debug
-    private static readonly Vector3 MaxCameraSize = new(16f/9f * 7f, 7f);
+        //---Debug
+        private static readonly Vector3 MaxCameraSize = new(16f/9f * 7f, 7f);
 
-    public void OnDrawGizmos() {
-        Gizmos.color = Color.red;
-        foreach (MapData map in maps) {
-            if (map.levelPreviewPosition)
-                Gizmos.DrawWireCube(map.levelPreviewPosition.transform.position, MaxCameraSize);
-        }
-    }
-#endif
-
-    //---Helpers
-    [Serializable]
-    public class MapData {
-        public string translationKey;
-        public GameObject levelPreviewPosition;
-        public int buildIndex;
-    }
-
-    public class RegionOption : TMP_Dropdown.OptionData, IComparable {
-        public string Region { get; private set; }
-        private int _ping = -1;
-        public int Ping {
-            get => _ping;
-            set {
-                if (value <= 0)
-                    value = -1;
-
-                _ping = value;
-                text = "<align=left>" + Region + "<line-height=0>\n<align=right>" + Utils.GetPingSymbol(_ping);
+        public void OnDrawGizmos() {
+            Gizmos.color = Color.red;
+            foreach (MapData map in maps) {
+                if (map.levelPreviewPosition)
+                    Gizmos.DrawWireCube(map.levelPreviewPosition.transform.position, MaxCameraSize);
             }
         }
+#endif
 
-        public RegionOption(string region, int ping) {
-            Region = region;
-            Ping = ping;
+        //---Helpers
+        [Serializable]
+        public class MapData {
+            public string translationKey;
+            public GameObject levelPreviewPosition;
+            public int buildIndex;
         }
 
-        public int CompareTo(object other) {
-            if (other is not RegionOption ro)
-                return -1;
+        public class RegionOption : TMP_Dropdown.OptionData, IComparable {
+            public string Region { get; private set; }
+            private int _ping = -1;
+            public int Ping {
+                get => _ping;
+                set {
+                    if (value <= 0)
+                        value = -1;
 
-            if (Ping == 0)
-                return 1;
-            if (ro.Ping == 0)
-                return -1;
+                    _ping = value;
+                    text = "<align=left>" + Region + "<line-height=0>\n<align=right>" + Utils.Utils.GetPingSymbol(_ping);
+                }
+            }
 
-            return Ping.CompareTo(ro.Ping);
+            public RegionOption(string region, int ping) {
+                Region = region;
+                Ping = ping;
+            }
+
+            public int CompareTo(object other) {
+                if (other is not RegionOption ro)
+                    return -1;
+
+                if (Ping == 0)
+                    return 1;
+                if (ro.Ping == 0)
+                    return -1;
+
+                return Ping.CompareTo(ro.Ping);
+            }
         }
     }
 }
