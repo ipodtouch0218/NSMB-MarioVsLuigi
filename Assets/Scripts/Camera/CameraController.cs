@@ -27,6 +27,9 @@ public class CameraController : NetworkBehaviour {
         }
     }
 
+    //---Serialized Variables
+    [SerializeField] private float floorOffset = 1f;
+
     //---Networked Variables
     [Networked] public Vector3 CurrentPosition { get; set; }
     [Networked] private Vector3 SmoothDampVel { get; set; }
@@ -130,7 +133,7 @@ public class CameraController : NetworkBehaviour {
         // Bottom camera clip
         float cameraBottom = newCameraPosition.y - vOrtho;
         float cameraBottomDistanceToPlayer = PlayerPos.y - cameraBottom;
-        float cameraBottomMinDistance = (2f/3.5f) * vOrtho;
+        float cameraBottomMinDistance = (2.5f/3.5f) * vOrtho;
 
         if (cameraBottomDistanceToPlayer < cameraBottomMinDistance)
             newCameraPosition.y -= (cameraBottomMinDistance - cameraBottomDistanceToPlayer);
@@ -139,7 +142,7 @@ public class CameraController : NetworkBehaviour {
         float playerHeight = controller.transform.localScale.y;
         float cameraTop = newCameraPosition.y + vOrtho;
         float cameraTopDistanceToPlayer = cameraTop - (PlayerPos.y + playerHeight);
-        float cameraTopMinDistance = (2f/3.5f) * vOrtho;
+        float cameraTopMinDistance = (1.25f/3.5f) * vOrtho;
 
         if (cameraTopDistanceToPlayer < cameraTopMinDistance)
             newCameraPosition.y += (cameraTopMinDistance - cameraTopDistanceToPlayer);
@@ -167,8 +170,8 @@ public class CameraController : NetworkBehaviour {
         bool validFloor = controller.IsOnGround || LastFloorHeight < PlayerPos.y;
 
         // Floor height
-        if (validFloor && LastFloorHeight - (newCameraPosition.y + vOrtho) + cameraBottomMinDistance + 1.5f > 0)
-            targetPosition.y = PlayerPos.y - vOrtho + cameraBottomMinDistance + 1.5f;
+        if (validFloor)
+            targetPosition.y = Mathf.Max(targetPosition.y, LastFloorHeight + floorOffset);
 
         // Smoothing
         Vector3 smoothDamp = SmoothDampVel;
@@ -176,8 +179,12 @@ public class CameraController : NetworkBehaviour {
         SmoothDampVel = smoothDamp;
 
         // Clamping to within level bounds
+        float maxY = heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho);
+        if (targetPosition.y > maxY)
+            SmoothDampVel = Vector3.zero;
+
         targetPosition.x = Mathf.Clamp(targetPosition.x, minX + xOrtho, maxX - xOrtho);
-        targetPosition.y = Mathf.Clamp(targetPosition.y, minY + vOrtho, heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho));
+        targetPosition.y = Mathf.Clamp(targetPosition.y, minY + vOrtho, maxY);
 
         // Z preservation
         targetPosition.z = -10;

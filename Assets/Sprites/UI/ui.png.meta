@@ -1645,7 +1645,7 @@ TextureImporter:
         width: 13
         height: 13
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1653,6 +1653,27 @@ TextureImporter:
       bones: []
       spriteID: 0fbe5088a09f594429ac89539e20fe25
       internalID: -2077949175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hudnumbers_timer
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 243
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78a2c269121fcce488a5696f219616dc
+      internalID: 932749408
       vertices: []
       indices: 
       edges: []
@@ -1702,6 +1723,7 @@ TextureImporter:
       hudnumber_slash: -688806156
       hudnumber_star: 861810113
       hudnumber_x: -1713447182
+      hudnumbers_timer: 932749408
       room_coins: 1534273505
       room_customlevel: -971827560
       room_host: -9005941153719796207

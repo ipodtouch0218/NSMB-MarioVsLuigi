@@ -1,10 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using TMPro;
+
 using Fusion;
 using NSMB.Extensions;
-using System.Collections;
-using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuChat : MonoBehaviour

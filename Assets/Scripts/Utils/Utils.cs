@@ -501,7 +501,7 @@ namespace NSMB.Utils {
             ['x'] = "hudnumber_x",
             ['C'] = "hudnumber_coin",
             ['S'] = "hudnumber_star",
-            ['T'] = "room_timer",
+            ['T'] = "hudnumber_timer",
             ['/'] = "hudnumber_slash",
             [':'] = "hudnumber_colon",
         };
@@ -683,7 +683,7 @@ namespace NSMB.Utils {
                 byte r = Convert.ToByte(colorStringValue[1..3], 16);
                 byte g = Convert.ToByte(colorStringValue[3..5], 16);
                 byte b = Convert.ToByte(colorStringValue[5..7], 16);
-                ret = new(color: new Color(r, g, b, 255));
+                ret = new(color: new Color32(r, g, b, 255));
             } else if (colorString.Equals("rainbow")) {
                 ret = new(isRainbow: true);
             } else {

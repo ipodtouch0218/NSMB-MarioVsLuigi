@@ -240,6 +240,7 @@ public class UIUpdater : MonoBehaviour {
 
         if (!Runner.IsServer)
             StartCoroutine(UpdatePingTextCoroutine());
+        UpdatePingText();
 
         stars = -1;
         lives = -1;

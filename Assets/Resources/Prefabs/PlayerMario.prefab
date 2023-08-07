@@ -84,6 +84,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  floorOffset: 0.25
   _CurrentPosition: {x: 0, y: 0, z: 0}
   controller: {fileID: 4824223341387914485}
 --- !u!1 &330813882706712469

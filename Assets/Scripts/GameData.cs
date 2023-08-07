@@ -13,6 +13,7 @@ using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
+using static Unity.Collections.Unicode;
 
 namespace NSMB.Game {
     public class GameData : NetworkBehaviour, IBeforeTick {
@@ -123,13 +124,7 @@ namespace NSMB.Game {
             if (!runner.IsServer || !hasState)
                 return;
 
-            // Remove all networked objects. Fusion doesn't do this for us, unlike PUN.
-            foreach (var obj in networkObjects) {
-                if (obj)
-                    runner.Despawn(obj);
-            }
-
-            networkObjects.Clear();
+            DestroyNetworkObjects(runner);
         }
 
         public void BeforeTick() {
@@ -418,7 +413,7 @@ namespace NSMB.Game {
         }
 
         private IEnumerator EndGame(int winningTeam) {
-            //TODO: Clean this up, massively.
+            // TODO: Clean this up, massively.
 
             GameState = Enums.GameState.Ended;
             IsMusicEnabled = false;
@@ -441,7 +436,7 @@ namespace NSMB.Game {
                 if (SessionData.Instance.Teams) {
                     Team team = ScriptableManager.Instance.teams[winningTeam];
                     winner = team.displayName;
-                    resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
+                    resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "teamname", winner);
                 } else {
                     string username = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname();
                     winner = username;
@@ -488,6 +483,8 @@ namespace NSMB.Game {
             // Return back to the main menu
             yield return new WaitForSecondsRealtime(secondsUntilMenu);
 
+            DestroyNetworkObjects(Runner);
+
             if (Runner.IsServer) {
                 // Handle resetting player states for the next game
                 foreach (PlayerRef player in Runner.ActivePlayers) {
@@ -509,6 +506,9 @@ namespace NSMB.Game {
 
             SessionData.Instance.SetGameStarted(false);
             SessionData.Instance.GameStartTimer = TickTimer.None;
+
+            yield return new WaitForSecondsRealtime(0.25f);
+
             Runner.SetActiveScene(0);
         }
 
@@ -623,6 +623,14 @@ namespace NSMB.Game {
             if (!calledAllPlayersLoaded)
                 OnAllPlayersLoaded?.Invoke();
             calledAllPlayersLoaded = true;
+        }
+
+        private void DestroyNetworkObjects(NetworkRunner runner) {
+            // Remove all networked objects. Fusion doesn't do this for us, unlike PUN.
+            foreach (var obj in networkObjects) {
+                if (obj)
+                    runner.Despawn(obj);
+            }
         }
 
         private void OurOnAllPlayersLoaded() {

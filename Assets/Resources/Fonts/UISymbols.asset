@@ -512,6 +512,12 @@ MonoBehaviour:
     m_Scale: 1
     m_Name: room_spectator
     m_HashCode: 870276505
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 71
+    m_Scale: 1
+    m_Name: hudnumbers_timer
+    m_HashCode: -1534639119
   m_SpriteGlyphTable:
   - m_Index: 0
     m_Metrics:
@@ -1210,7 +1216,7 @@ MonoBehaviour:
       m_Height: 16
       m_HorizontalBearingX: -7.5
       m_HorizontalBearingY: 16
-      m_HorizontalAdvance: 10
+      m_HorizontalAdvance: 8
     m_GlyphRect:
       m_X: 210
       m_Y: 202
@@ -1654,5 +1660,21 @@ MonoBehaviour:
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
     sprite: {fileID: -2077949175, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 71
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -6.5
+      m_HorizontalBearingY: 13
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 1
+      m_Y: 243
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: 932749408, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   spriteInfoList: []
   fallbackSpriteAssets: []

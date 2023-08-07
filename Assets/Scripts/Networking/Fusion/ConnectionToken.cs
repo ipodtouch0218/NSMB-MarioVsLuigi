@@ -36,7 +36,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbVXeDZyyeb+ptn7HEjg0vtIL+jUV
 
         byte[] buffer = new byte[128];
 
-        byte[] nicknameBytes = Encoding.UTF8.GetBytes(nickname.Value);
+        byte[] nicknameBytes = Encoding.ASCII.GetBytes(nickname.Value);
         Array.Copy(nicknameBytes, 0, buffer, 0, Mathf.Min(nicknameBytes.Length, 20));
 
         byte[] userIdBytes = signedData.UserId.ToByteArray();
@@ -59,7 +59,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbVXeDZyyeb+ptn7HEjg0vtIL+jUV
             signatureLength--;
 
         ConnectionToken newToken = new() {
-            nickname = Encoding.UTF8.GetString(input[0..20]).TrimEnd('\0'),
+            nickname = Encoding.ASCII.GetString(input[0..20]).TrimEnd('\0'),
             signedData = new() {
                 UserId = new Guid(input[20..36]),
                 NicknameColor = Encoding.UTF8.GetString(input[36..43]).TrimEnd('\0'),

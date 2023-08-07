@@ -287,15 +287,15 @@ namespace NSMB.Entities.Enemies {
                 if (obj.transform.IsChildOf(transform))
                     continue;
 
-                //killable entities
+                // Killable entities
                 if (obj.TryGetComponent(out KillableEntity killable)) {
                     if (killable.IsDead)
                         continue;
 
-                    //kill entity we ran into
+                    // Kill entity we ran into
                     killable.SpecialKill(killable.body.position.x > body.position.x, false, ComboCounter++);
 
-                    //kill ourselves if we're being held too
+                    // Kill ourselves if we're being held too
                     if (Holder)
                         SpecialKill(killable.body.position.x < body.position.x, false, 0);
 

@@ -32,8 +32,6 @@ namespace NSMB.Loading {
         }
 
         public void Update() {
-            if (!GameData.Instance || !(GameData.Instance.Object?.IsValid ?? false))
-                return;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
             PlayerData ourData = NetworkHandler.Runner.LocalPlayer.GetPlayerData(NetworkHandler.Runner);
@@ -46,7 +44,7 @@ namespace NSMB.Loading {
             }
 
             // Still loading
-            if (!GameData.Instance.Object.IsValid) {
+            if (!GameData.Instance || !GameData.Instance.Object.IsValid) {
                 text.text = tm.GetTranslation("ui.loading.loading");
                 playerListParent.SetActive(false);
                 return;

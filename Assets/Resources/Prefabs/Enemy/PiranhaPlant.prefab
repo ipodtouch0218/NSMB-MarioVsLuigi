@@ -325,7 +325,7 @@ GameObject:
   - component: {fileID: 526604015599624815}
   - component: {fileID: 3689884099564413062}
   - component: {fileID: 597171190669668077}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: PiranhaPlant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -367,6 +367,7 @@ MonoBehaviour:
   _IsActive:
     _value: 0
   body: {fileID: 0}
+  nrb: {fileID: 0}
   sfx: {fileID: 7558042822839980312}
   checkForNearbyPlayersWhenRespawning: 0
   _IsFrozen:

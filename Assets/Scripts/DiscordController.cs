@@ -130,9 +130,6 @@ public class DiscordController : MonoBehaviour {
             activity.Assets = new() { LargeImage = "mainmenu" };
         }
 
-        activityManager.UpdateActivity(activity, (res) => {
-            //head empty.
-            Debug.Log($"[Discord] Rich Presence Update: {res}");
-        });
+        activityManager.UpdateActivity(activity, (res) => { });
     }
 }
