@@ -85,6 +85,9 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectateNextPlayer() {
+        if (!GameData.Instance)
+            return;
+
         NetworkLinkedList<PlayerController> players = GameData.Instance.AlivePlayers;
         int count = players.Count;
         if (count <= 0)
@@ -102,6 +105,9 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectatePreviousPlayer() {
+        if (!GameData.Instance)
+            return;
+
         NetworkLinkedList<PlayerController> players = GameData.Instance.AlivePlayers;
         int count = players.Count;
         if (count <= 0)

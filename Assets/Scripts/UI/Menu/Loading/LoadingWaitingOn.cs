@@ -37,7 +37,7 @@ namespace NSMB.Loading {
             PlayerData ourData = NetworkHandler.Runner.LocalPlayer.GetPlayerData(NetworkHandler.Runner);
 
             // Loading (as spectator)
-            if (ourData.IsCurrentlySpectating) {
+            if (!ourData || ourData.IsCurrentlySpectating) {
                 text.text = tm.GetTranslation("ui.loading.spectator");
                 playerListParent.SetActive(false);
                 return;

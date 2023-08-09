@@ -1,3 +1,5 @@
+using UnityEngine;
+
 using Fusion;
 using NSMB.Entities;
 
@@ -9,6 +11,8 @@ public abstract class FreezableEntity : BasicEntity {
     //---Properties
     public abstract bool IsCarryable { get; }
     public abstract bool IsFlying { get; }
+    public abstract Vector2 FrozenSize { get; }
+    public abstract Vector2 FrozenOffset { get; }
 
     public abstract void Freeze(FrozenCube cube);
 

@@ -35,6 +35,66 @@ namespace NSMB.Entities {
         //---Properties
         public override bool IsCarryable => iceCarryable;
         public override bool IsFlying => flying;
+        public override Vector2 FrozenSize {
+            get {
+
+                Vector2 entityPosition = body ? body.position : transform.position;
+                Bounds bounds = default;
+                Renderer[] renderers = GetComponentsInChildren<Renderer>();
+                foreach (Renderer renderer in renderers) {
+                    if (!renderer.enabled || renderer is ParticleSystemRenderer)
+                        continue;
+
+                    renderer.ResetBounds();
+
+                    if (bounds == default)
+                        bounds = new(renderer.bounds.center, renderer.bounds.size);
+                    else
+                        bounds.Encapsulate(renderer.bounds);
+                }
+
+                Vector2 interpolationOffset = Vector2.zero;
+                if (nrb && nrb.InterpolationTarget) {
+                    interpolationOffset = entityPosition - (Vector2) nrb.InterpolationTarget.position;
+                }
+
+                Vector2 size = bounds.size;
+                Vector2 position = new(bounds.center.x, bounds.min.y);
+                Vector2 offset = entityPosition - position - interpolationOffset;
+
+                return size;
+            }
+        }
+        public override Vector2 FrozenOffset {
+            get {
+
+                Vector2 entityPosition = body ? body.position : transform.position;
+                Bounds bounds = default;
+                Renderer[] renderers = GetComponentsInChildren<Renderer>();
+                foreach (Renderer renderer in renderers) {
+                    if (!renderer.enabled || renderer is ParticleSystemRenderer)
+                        continue;
+
+                    renderer.ResetBounds();
+
+                    if (bounds == default)
+                        bounds = new(renderer.bounds.center, renderer.bounds.size);
+                    else
+                        bounds.Encapsulate(renderer.bounds);
+                }
+
+                Vector2 interpolationOffset = Vector2.zero;
+                if (nrb && nrb.InterpolationTarget) {
+                    interpolationOffset = entityPosition - (Vector2) nrb.InterpolationTarget.position;
+                }
+
+                Vector2 size = bounds.size;
+                Vector2 position = new(bounds.center.x, bounds.min.y);
+                Vector2 offset = entityPosition - position - interpolationOffset;
+
+                return offset;
+            }
+        }
 
         //---Serialized Variables
         [SerializeField] protected bool iceCarryable = true;

@@ -79,7 +79,7 @@ public class PlayerData : NetworkBehaviour {
         // Keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
-        PlayerId = -1;
+        //PlayerId = -1;
         if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1)
             Team = 0;
         else

@@ -25,8 +25,6 @@ namespace NSMB.Entities {
         //---Serialized Variables
         [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, autoBreak = 3f;
 
-        //---Private Variables
-
         public void OnBeforeSpawned(FreezableEntity entityToFreeze, Vector2 size, Vector2 offset) {
             FrozenEntity = entityToFreeze;
             CubeSize = size;
@@ -350,35 +348,12 @@ namespace NSMB.Entities {
 
         //---Static
         public static void FreezeEntity(NetworkRunner runner, FreezableEntity entity) {
-
-
-            Bounds bounds = default;
             Vector2 entityPosition = entity.body ? entity.body.position : entity.transform.position;
-            Renderer[] renderers = entity.GetComponentsInChildren<Renderer>();
-            foreach (Renderer renderer in renderers) {
-                if (!renderer.enabled || renderer is ParticleSystemRenderer)
-                    continue;
+            Vector2 spawnPosition = entityPosition - entity.FrozenOffset;
 
-                renderer.ResetBounds();
-
-                if (bounds == default)
-                    bounds = new(renderer.bounds.center, renderer.bounds.size);
-                else
-                    bounds.Encapsulate(renderer.bounds);
-            }
-
-            Vector2 interpolationOffset = Vector2.zero;
-            if (entity.nrb && entity.nrb.InterpolationTarget) {
-                interpolationOffset = entityPosition - (Vector2) entity.nrb.InterpolationTarget.position;
-            }
-
-            Vector2 size = bounds.size;
-            Vector2 position = new(bounds.center.x, bounds.min.y);
-            Vector2 offset = entityPosition - position - interpolationOffset;
-
-            runner.Spawn(PrefabList.Instance.Obj_FrozenCube, position, onBeforeSpawned: (runner, obj) => {
+            runner.Spawn(PrefabList.Instance.Obj_FrozenCube, spawnPosition, onBeforeSpawned: (runner, obj) => {
                 FrozenCube cube = obj.GetComponent<FrozenCube>();
-                cube.OnBeforeSpawned(entity, size, offset);
+                cube.OnBeforeSpawned(entity, entity.FrozenSize, entity.FrozenOffset);
             });
         }
     }

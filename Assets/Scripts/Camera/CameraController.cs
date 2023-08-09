@@ -27,11 +27,8 @@ public class CameraController : NetworkBehaviour {
         }
     }
 
-    //---Serialized Variables
-    [SerializeField] private float floorOffset = 1f;
-
     //---Networked Variables
-    [Networked] public Vector3 CurrentPosition { get; set; }
+    [Networked, HideInInspector] public Vector3 CurrentPosition { get; set; }
     [Networked] private Vector3 SmoothDampVel { get; set; }
     [Networked] private Vector3 PlayerPos { get; set; }
     [Networked] private float LastFloorHeight { get; set; }
@@ -50,6 +47,7 @@ public class CameraController : NetworkBehaviour {
     }
 
     //---Serialized Variables
+    [SerializeField] private float floorOffset = 1f;
     [SerializeField] private PlayerController controller;
 
     //---Private Variables
@@ -75,23 +73,16 @@ public class CameraController : NetworkBehaviour {
         if (!IsControllingCamera)
             return;
 
-        Vector3 position;
-        if (!IsProxy) {
-            float delta = (Runner.SimulationRenderTime - Runner.SimulationTime) * Runner.Simulation.Config.TickRate;
-            float difference = delta - currentExtrapolationValue;
-            CurrentPosition = CalculateNewPosition(Runner.DeltaTime * difference);
-            currentExtrapolationValue = delta;
-            position = CurrentPosition;
-        } else {
-            position = positionInterpolator.Value;
-        }
+        float delta = (Runner.SimulationRenderTime - Runner.SimulationTime) * Runner.Simulation.Config.TickRate;
+        float difference = delta - currentExtrapolationValue;
+        CurrentPosition = CalculateNewPosition(Runner.DeltaTime * difference);
+        currentExtrapolationValue = delta;
 
         Vector3 shakeOffset = Vector3.zero;
         if ((_screenShake -= Time.deltaTime) > 0)
             shakeOffset = new Vector3((Random.value - 0.5f) * _screenShake, (Random.value - 0.5f) * _screenShake);
 
-        Debug.DrawRay(PlayerPos, Vector3.right, Color.white);
-        SetPosition(position + shakeOffset);
+        SetPosition(CurrentPosition + shakeOffset);
     }
 
     public override void FixedUpdateNetwork() {

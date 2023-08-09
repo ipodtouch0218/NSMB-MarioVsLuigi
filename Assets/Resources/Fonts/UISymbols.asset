@@ -525,7 +525,7 @@ MonoBehaviour:
       m_Height: 13
       m_HorizontalBearingX: -2
       m_HorizontalBearingY: 13
-      m_HorizontalAdvance: 13
+      m_HorizontalAdvance: 10
     m_GlyphRect:
       m_X: 1
       m_Y: 243

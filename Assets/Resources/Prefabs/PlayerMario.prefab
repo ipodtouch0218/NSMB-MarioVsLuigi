@@ -84,8 +84,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
-  floorOffset: 0.25
   _CurrentPosition: {x: 0, y: 0, z: 0}
+  floorOffset: 0.75
   controller: {fileID: 4824223341387914485}
 --- !u!1 &330813882706712469
 GameObject:
@@ -10645,6 +10645,8 @@ MonoBehaviour:
   heightLargeModel: 0.82
   models: {fileID: 8422425992379838812}
   character: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
+  smallFrozenCubeSize: {x: 0.5, y: 0.7}
+  largeFrozenCubeSize: {x: 0.65, y: 1.1}
   crushGround: 0
   hitRoof: 0
   groundpoundLastFrame: 0

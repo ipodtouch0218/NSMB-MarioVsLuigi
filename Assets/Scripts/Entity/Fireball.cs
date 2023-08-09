@@ -5,6 +5,7 @@ using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
+using static Unity.Collections.Unicode;
 
 namespace NSMB.Entities {
 
@@ -25,6 +26,7 @@ namespace NSMB.Entities {
         //---Serialized Variables
         [SerializeField] private ParticleSystem iceBreak, fireBreak, iceTrail, fireTrail;
         [SerializeField] private GameObject iceGraphics, fireGraphics;
+        [SerializeField] private Color ourTeamColor = new(0.6f, 0.6f, 0.6f), enemyTeamColor = Color.white;
         [SerializeField] private float fireSpeed = 6.25f, iceSpeed = 4.25f;
         [SerializeField] private float bounceHeight = 6.75f, terminalVelocity = 6.25f;
 
@@ -48,9 +50,6 @@ namespace NSMB.Entities {
             FacingRight = right;
             AlreadyBounced = false;
             Owner = owner;
-
-            foreach (SpriteRenderer r in renderers)
-                r.flipX = FacingRight;
 
             // Speed
             body.gravityScale = IsIceball ? 2.2f : 4.4f;
@@ -203,6 +202,13 @@ namespace NSMB.Entities {
                 }
                 iceGraphics.SetActive(ice);
                 fireGraphics.SetActive(!ice);
+
+                bool sameTeam = Owner.data.Team == Runner.GetLocalPlayerData().Team || Owner.cameraController.IsControllingCamera;
+                foreach (SpriteRenderer r in renderers) {
+                    r.flipX = FacingRight;
+                    r.color = sameTeam ? ourTeamColor : enemyTeamColor;
+                }
+
             } else {
                 // Disable graphics & trail, but play poof fx
                 iceGraphics.SetActive(false);

@@ -15,6 +15,7 @@ using NSMB.Entities.Collectable;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Tiles;
+using UnityEditor;
 
 namespace NSMB.Game {
     public class GameManager : MonoBehaviour {
@@ -201,8 +202,13 @@ namespace NSMB.Game {
                 return;
 
             paused = newState;
-            sfx.PlayOneShot(Enums.Sounds.UI_Pause);
             pauseUI.SetActive(paused);
+            sfx.PlayOneShot(Enums.Sounds.UI_Pause);
+        }
+
+        public void ForceUnpause() {
+            paused = false;
+            pauseUI.SetActive(false);
         }
 
         //---UI Callbacks

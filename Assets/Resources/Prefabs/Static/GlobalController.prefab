@@ -45014,10 +45014,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 9155803442350498194}
   m_HandleRect: {fileID: 4295192869377493318}
   m_Direction: 0
-  m_MinValue: 1
+  m_MinValue: 6
   m_MaxValue: 49
   m_WholeNumbers: 1
-  m_Value: 1
+  m_Value: 6
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:

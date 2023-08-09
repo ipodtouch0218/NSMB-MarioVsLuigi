@@ -15,14 +15,6 @@ public class TeamScoreboard : MonoBehaviour {
     private readonly Dictionary<int, int> teamStars = new();
     private TeamManager teamManager;
 
-    public void OnEnable() {
-        teamManager = GameManager.Instance.teamManager;
-        foreach (int teamIndex in teamManager.GetValidTeams())
-            teamStars[teamIndex] = 0;
-
-        UpdateText();
-    }
-
     public void Update() {
         if (CheckForStarCountUpdates())
             UpdateText();
@@ -30,10 +22,11 @@ public class TeamScoreboard : MonoBehaviour {
 
     private bool CheckForStarCountUpdates() {
         bool updated = false;
-        foreach (int index in teamStars.Keys.ToList()) {
-            int currStars = teamStars[index];
+        // Ew... Linq, but needed to avoid concurrent modification
+        foreach (int index in teamStars.Keys.ToArray()) {
+            int stars = teamStars[index];
             int newStars = teamManager.GetTeamStars(index);
-            if (currStars == newStars)
+            if (stars == newStars)
                 continue;
 
             teamStars[index] = newStars;
@@ -50,5 +43,13 @@ public class TeamScoreboard : MonoBehaviour {
         }
 
         text.text = newString.Trim();
+    }
+
+    public void OnAllPlayersLoaded() {
+        teamManager = GameManager.Instance.teamManager;
+        foreach (int teamIndex in teamManager.GetValidTeams())
+            teamStars[teamIndex] = 0;
+
+        UpdateText();
     }
 }

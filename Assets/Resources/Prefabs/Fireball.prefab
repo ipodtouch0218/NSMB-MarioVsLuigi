@@ -4964,6 +4964,8 @@ MonoBehaviour:
   fireTrail: {fileID: 5044812112945403417}
   iceGraphics: {fileID: 2135618848759859508}
   fireGraphics: {fileID: 5079778509045743664}
+  ourTeamColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+  enemyTeamColor: {r: 1, g: 1, b: 1, a: 1}
   fireSpeed: 6.25
   iceSpeed: 4.25
   bounceHeight: 6.75
@@ -5173,8 +5175,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  _PreviousTickVelocity: {x: 0, y: 0, z: 0}
   currentCollider: {fileID: -1769135492019179076}
-  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
   getCrushedByGroundEntities: 1
   floorAndRoofCutoff: 0.3
@@ -5348,7 +5350,7 @@ MonoBehaviour:
   isDisplaying: 1
   runInEditor: 0
   frame: 0
-  fps: 8
+  fps: 12
   frames:
   - {fileID: 5353841184698615464, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
   - {fileID: 750297706712597742, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
@@ -5457,7 +5459,7 @@ MonoBehaviour:
   isDisplaying: 1
   runInEditor: 0
   frame: 0
-  fps: 8
+  fps: 12
   frames:
   - {fileID: 5353841184698615464, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
   - {fileID: 750297706712597742, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}

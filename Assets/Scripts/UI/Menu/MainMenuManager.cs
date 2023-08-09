@@ -783,9 +783,9 @@ namespace NSMB.UI.MainMenu {
                     return -1;
 
                 if (Ping == 0)
-                    return 1;
-                if (ro.Ping == 0)
                     return -1;
+                if (ro.Ping == 0)
+                    return 1;
 
                 return Ping.CompareTo(ro.Ping);
             }

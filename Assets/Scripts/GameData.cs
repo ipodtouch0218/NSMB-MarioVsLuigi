@@ -13,7 +13,6 @@ using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
-using static Unity.Collections.Unicode;
 
 namespace NSMB.Game {
     public class GameData : NetworkBehaviour, IBeforeTick {
@@ -418,7 +417,7 @@ namespace NSMB.Game {
             GameState = Enums.GameState.Ended;
             IsMusicEnabled = false;
 
-            gm.Pause(false);
+            gm.ForceUnpause();
             gm.musicManager.Stop();
 
             yield return new WaitForSecondsRealtime(1);
@@ -529,18 +528,19 @@ namespace NSMB.Game {
             speedup |= gm.teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
 
             if (!speedup) {
-                // Also speed up the music if:
-                // A: two players left, at least one has one life
-                // B: three+ players left, all have one life
                 int playersWithOneLife = 0;
                 int playerCount = 0;
                 foreach (var player in AlivePlayers) {
-                    if (!player) continue;
-                    if (player.Lives == 1 || player.Lives == 0) playersWithOneLife++;
+                    if (!player || player.Lives == 0) continue;
+                    if (player.Lives == 1) playersWithOneLife++;
 
                     playerCount++;
                 }
-                speedup |= (playersWithOneLife <= 2 && playersWithOneLife != 0) || playersWithOneLife >= playerCount;
+
+                // Also speed up the music if:
+                // A: two players left, at least one has one life
+                // B: three+ players left, all have one life
+                speedup |= (playerCount <= 2 && playersWithOneLife > 0) || (playersWithOneLife >= playerCount);
             }
 
             LoopingMusicPlayer musicManager = gm.musicManager;
@@ -636,6 +636,8 @@ namespace NSMB.Game {
         private void OurOnAllPlayersLoaded() {
             foreach (var player in AlivePlayers)
                 GameManager.Instance.teamManager.AddPlayer(player);
+
+            GameManager.Instance.teamScoreboardElement.OnAllPlayersLoaded();
         }
     }
 }

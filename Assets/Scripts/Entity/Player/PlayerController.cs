@@ -14,7 +14,6 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using UnityEngine.Rendering.UI;
 
 namespace NSMB.Entities.Player {
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
@@ -143,6 +142,8 @@ namespace NSMB.Entities.Player {
         //---Properties
         public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
         public override bool IsCarryable => true;
+        public override Vector2 FrozenSize => State < Enums.PowerupState.Mushroom ? smallFrozenCubeSize : largeFrozenCubeSize;
+        public override Vector2 FrozenOffset => Vector2.up * 0.1f;
         public bool WallSliding => WallSlideLeft || WallSlideRight;
         public bool InstakillsEnemies => IsStarmanInvincible || IsInShell || (IsSliding && Mathf.Abs(body.velocity.x) > 0.1f) || State == Enums.PowerupState.MegaMushroom;
         public bool IsCrouchedInShell => State == Enums.PowerupState.BlueShell && IsCrouching && !IsInShell;
@@ -214,6 +215,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, heightSmallModel = 0.42f, heightLargeModel = 0.82f;
         [SerializeField] public GameObject models;
         [SerializeField] public CharacterData character;
+        [SerializeField] private Vector2 smallFrozenCubeSize, largeFrozenCubeSize;
 
         public bool crushGround, hitRoof, groundpoundLastFrame, hitLeft, hitRight;
         public float powerupFlash;
@@ -792,13 +794,26 @@ namespace NSMB.Entities.Player {
                     return;
                 }
             }
-            if (State == Enums.PowerupState.BlueShell && otherAbove && !other.IsGroundpounding && !other.IsDrilling && (IsCrouching || IsGroundpounding) && IsOnGround)
-                body.velocity = new(SPEED_STAGE_MAX[RUN_STAGE] * 0.9f * (other.body.position.x < body.position.x ? 1 : -1), body.velocity.y);
+            if (State == Enums.PowerupState.BlueShell && otherAbove && !other.IsGroundpounding && !other.IsDrilling && (IsCrouching || IsGroundpounding) && IsOnGround) {
+                IsGroundpounding = false;
+
+                bool goLeft = fromRight;
+                Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(body.position);
+                if (Utils.Utils.IsTileSolidAtTileLocation(tileLocation + Vector2Int.right)) {
+                    // Tile to the right. Force go left.
+                    goLeft = true;
+                } else if (Utils.Utils.IsTileSolidAtTileLocation(tileLocation + Vector2Int.left)) {
+                    // Tile to the left. Force go right.
+                    goLeft = false;
+                }
+
+                body.velocity = new(SPEED_STAGE_MAX[RUN_STAGE] * 0.9f * (goLeft ? -1 : 1), body.velocity.y);
+            }
 
             if (other.IsInShell && !above)
                 return;
 
-            if (!above && other.State == Enums.PowerupState.BlueShell && !other.IsInShell && other.IsCrouching && !IsGroundpounding && !IsDrilling) {
+            if (above && other.State == Enums.PowerupState.BlueShell && !other.IsInShell && (other.IsCrouching || other.IsGroundpounding) && IsOnGround && !IsGroundpounding && !IsDrilling) {
                 // They are blue shell
                 DoEntityBounce = true;
                 return;
@@ -924,7 +939,8 @@ namespace NSMB.Entities.Player {
                 Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
 
                 Fireball inactiveFireball = null;
-                foreach (var fireball in GameData.Instance.PooledFireballs) {
+                for (int i = PlayerId * 6; i < (PlayerId + 1) * 6; i++) {
+                    Fireball fireball = GameData.Instance.PooledFireballs[i];
                     if (fireball.IsActive)
                         continue;
 
@@ -933,7 +949,7 @@ namespace NSMB.Entities.Player {
                 }
 
                 if (!inactiveFireball)
-                    // No available fireball. This should never happen :tm:
+                    // No available fireball. This should never happen... so uh.....
                     break;
 
                 inactiveFireball.Initialize(this, spawnPos, ice, right);
@@ -1052,6 +1068,10 @@ namespace NSMB.Entities.Player {
             WallSlideRight = false;
             IsPropellerFlying = false;
             body.velocity = Vector2.zero;
+
+            // This is ok.
+            animator.Play("falling");
+            animator.Update(0f);
 
             AttemptThrowHeldItem();
 
@@ -3375,6 +3395,8 @@ namespace NSMB.Entities.Player {
         }
 
         public override void OnIsFrozenChanged() {
+            animator.Play("falling");
+            animator.Update(0f);
             animator.enabled = !IsFrozen;
 
             if (!IsFrozen && cameraController.IsControllingCamera)
