@@ -13,6 +13,7 @@ namespace NSMB.UI.Pause.Options {
 
         //---Static Variables
         public static PauseOptionMenuManager Instance;
+        public static event Action<bool> OnOptionsOpenedToggled;
 
         //---Serialzied Variables
         [SerializeField] private List<PauseOptionTab> tabs;
@@ -60,6 +61,7 @@ namespace NSMB.UI.Pause.Options {
             }
 
             EnableInput = true;
+            OnOptionsOpenedToggled?.Invoke(true);
         }
 
         protected override void OnDisable() {
@@ -73,6 +75,7 @@ namespace NSMB.UI.Pause.Options {
             if (EventSystem.current) {
                 EventSystem.current.SetSelectedGameObject(previouslySelected);
             }
+            OnOptionsOpenedToggled?.Invoke(false);
         }
 
         public void Update() {

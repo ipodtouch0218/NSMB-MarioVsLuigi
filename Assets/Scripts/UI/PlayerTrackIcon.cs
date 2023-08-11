@@ -18,6 +18,17 @@ public class PlayerTrackIcon : TrackIcon {
     private PlayerController playerTarget;
     private Coroutine flashRoutine;
 
+    public void OnEnable() {
+        image.enabled = true;
+    }
+
+    public void OnDisable() {
+        if (flashRoutine != null) {
+            StopCoroutine(flashRoutine);
+            flashRoutine = null;
+        }
+    }
+
     public void Start() {
         playerTarget = target.GetComponent<PlayerController>();
         if (!playerTarget) {

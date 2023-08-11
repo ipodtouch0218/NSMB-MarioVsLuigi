@@ -18,7 +18,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private TMP_Text nameText, pingText, winsText;
         [SerializeField] private Image colorStrip;
         [SerializeField] private RectTransform background, options;
-        [SerializeField] private GameObject blockerTemplate, firstButton, chattingIcon;
+        [SerializeField] private GameObject blockerTemplate, firstButton, chattingIcon, settingsIcon;
         [SerializeField] private Canvas rootCanvas;
         [SerializeField] private LayoutElement layout;
         [SerializeField] private GameObject[] adminOnlyOptions;
@@ -29,10 +29,14 @@ namespace NSMB.UI.MainMenu {
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+            player.OnInOptionsChangedEvent += OnInSettingsChanged;
+
+            OnInSettingsChanged(player.IsInOptions);
         }
 
         public void OnDisable() {
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
+            player.OnInOptionsChangedEvent -= OnInSettingsChanged;
         }
 
         public void OnDestroy() {
@@ -168,6 +172,10 @@ namespace NSMB.UI.MainMenu {
         //---Callbacks
         private void OnColorblindModeChanged() {
             UpdateText();
+        }
+
+        private void OnInSettingsChanged(bool inSettings) {
+            settingsIcon.SetActive(inSettings);
         }
     }
 }

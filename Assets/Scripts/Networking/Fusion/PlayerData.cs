@@ -8,11 +8,15 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Utils;
 using NSMB.UI.MainMenu;
+using NSMB.UI.Pause.Options;
 
 public class PlayerData : NetworkBehaviour {
 
     //---Static stuffs
     public bool Locked => SessionData.Instance && SessionData.Instance.GameStarted && !IsCurrentlySpectating;
+
+    //---Events
+    public event Action<bool> OnInOptionsChangedEvent;
 
     //---Networked Variables
     [Networked, Capacity(20)]                                    public string RawNickname { get; set; } = "noname";
@@ -26,6 +30,7 @@ public class PlayerData : NetworkBehaviour {
     [Networked]                                                  public NetworkBool IsRoomOwner { get; set; }
     [Networked(OnChanged = nameof(OnLoadStateChanged))]          public NetworkBool IsLoaded { get; set; }
     [Networked]                                                  public NetworkBool IsMuted { get; set; }
+    [Networked(OnChanged = nameof(OnInOptionsChanged))]         public NetworkBool IsInOptions { get; set; }
     [Networked]                                                  public TickTimer MessageCooldownTimer { get; set; }
     [Networked(OnChanged = nameof(OnCharacterChanged))]          public byte CharacterIndex { get; set; }
     [Networked(OnChanged = nameof(OnSkinChanged))]               public byte SkinIndex { get; set; }
@@ -79,7 +84,6 @@ public class PlayerData : NetworkBehaviour {
         // Keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
-        //PlayerId = -1;
         if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1)
             Team = 0;
         else
@@ -88,13 +92,15 @@ public class PlayerData : NetworkBehaviour {
         if (SessionData.Instance)
             SessionData.Instance.LoadWins(this);
 
-        if (Object.HasInputAuthority) {
+        if (HasInputAuthority) {
             // We're the client. update with our data.
             Rpc_SetCharacterIndex((byte) Settings.Instance.genericCharacter);
             Rpc_SetSkinIndex((byte) Settings.Instance.genericSkin);
 
             if (Runner.IsServer)
                 IsRoomOwner = true;
+
+            PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenToggled;
         }
 
         IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
@@ -110,6 +116,10 @@ public class PlayerData : NetworkBehaviour {
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (hasState)
             SessionData.Instance.SaveWins(this);
+
+        if (HasInputAuthority) {
+            PauseOptionMenuManager.OnOptionsOpenedToggled -= OnOptionsOpenToggled;
+        }
 
         runner.SetPlayerObject(Object.InputAuthority, null);
     }
@@ -201,6 +211,15 @@ public class PlayerData : NetworkBehaviour {
         Team = team;
     }
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void Rpc_SetOptionsOpen(bool open) {
+        IsInOptions = open;
+    }
+
+    private void OnOptionsOpenToggled(bool isOpen) {
+        Rpc_SetOptionsOpen(isOpen);
+    }
+
     public static void OnLoadStateChanged(Changed<PlayerData> changed) {
         if (changed.Behaviour.IsLoaded && GameData.Instance)
             GameData.Instance.CheckIfAllPlayersLoaded();
@@ -239,5 +258,9 @@ public class PlayerData : NetworkBehaviour {
             return;
 
         MainMenuManager.Instance.SwapPlayerSkin(changed.Behaviour.SkinIndex, false);
+    }
+
+    public static void OnInOptionsChanged(Changed<PlayerData> changed) {
+        changed.Behaviour.OnInOptionsChangedEvent?.Invoke(changed.Behaviour.IsInOptions);
     }
 }
