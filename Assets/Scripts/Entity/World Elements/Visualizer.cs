@@ -12,10 +12,10 @@ public class VisualizedBlocks : MonoBehaviour {
 
     [Header("Settings")]
     [SerializeField] private GameObject blockPrefab;
-    [SerializeField] [Delayed] private int count = 21, sampleCount = 1024, sampleWidth = 10;
+    [SerializeField] [Delayed] private int count = 21, sampleCount = 1024;
     [SerializeField] private float minHeight = 0.5f, maxHeight = 2f, width = 0.3f, spacing = 0.1f, decayRate = 50f;
     [SerializeField] private FFTWindow window;
-    [SerializeField] private float maxHertz = 20050f, bonusHeight = 1f;
+    [SerializeField] private float maxHertz = 20050f;
 
     //---Private Variables
     private float[] samples;

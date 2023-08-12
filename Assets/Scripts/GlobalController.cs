@@ -22,7 +22,7 @@ public class GlobalController : Singleton<GlobalController> {
     public PauseOptionMenuManager optionsManager;
 
     public ScriptableRendererFeature outlineFeature;
-    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
+    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, connecting;
     public LoadingCanvas loadingCanvas;
 
     public RenderTexture ndsTexture;

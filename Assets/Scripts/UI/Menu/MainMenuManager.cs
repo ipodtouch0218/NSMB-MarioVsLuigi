@@ -21,6 +21,7 @@ namespace NSMB.UI.MainMenu {
 
         //---Static Variables
         public static readonly int NicknameMin = 2, NicknameMax = 20;
+        public static bool WasHostMigration;
 
         //---Properties
         private NetworkRunner Runner => NetworkHandler.Runner;
@@ -45,7 +46,7 @@ namespace NSMB.UI.MainMenu {
 
         [Header("UI Elements")]
         [SerializeField] private GameObject title;
-        [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox, connecting;
+        [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox;
         [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
         [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
         [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
@@ -166,8 +167,7 @@ namespace NSMB.UI.MainMenu {
             bool connectedToNetwork = NetworkHandler.Connected && !Runner.SessionInfo;
             bool connectingToNetwork = NetworkHandler.Connecting || Runner.SessionInfo;
 
-            connecting.SetActive(connectingToNetwork && lobbyMenu.activeInHierarchy);
-
+            GlobalController.Instance.connecting.SetActive(connectingToNetwork && lobbyMenu.activeInHierarchy);
 
             joinRoomBtn.interactable = connectedToNetwork && roomManager.SelectedRoom != null;
             createRoomBtn.interactable = connectedToNetwork && validName;
@@ -212,6 +212,14 @@ namespace NSMB.UI.MainMenu {
             // Chat
             if (inSameRoom) {
                 chat.ReplayChatMessages();
+
+            } else if (WasHostMigration) {
+                WasHostMigration = false;
+
+                // Host chat notification
+                if (Runner.IsServer)
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+
             } else {
                 chat.ClearChat();
 
@@ -706,7 +714,9 @@ namespace NSMB.UI.MainMenu {
                 lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
                 lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
 
-                OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
+                if (SessionData.Instance.Object) {
+                    OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
+                }
             }
         }
 

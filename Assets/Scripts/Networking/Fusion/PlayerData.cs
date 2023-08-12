@@ -30,12 +30,11 @@ public class PlayerData : NetworkBehaviour {
     [Networked]                                                  public NetworkBool IsRoomOwner { get; set; }
     [Networked(OnChanged = nameof(OnLoadStateChanged))]          public NetworkBool IsLoaded { get; set; }
     [Networked]                                                  public NetworkBool IsMuted { get; set; }
-    [Networked(OnChanged = nameof(OnInOptionsChanged))]         public NetworkBool IsInOptions { get; set; }
+    [Networked(OnChanged = nameof(OnInOptionsChanged))]          public NetworkBool IsInOptions { get; set; }
     [Networked]                                                  public TickTimer MessageCooldownTimer { get; set; }
     [Networked(OnChanged = nameof(OnCharacterChanged))]          public byte CharacterIndex { get; set; }
     [Networked(OnChanged = nameof(OnSkinChanged))]               public byte SkinIndex { get; set; }
     [Networked(OnChanged = nameof(OnSettingChanged))]            public int Ping { get; set; }
-    [Networked]                                                  public NetworkBool Initialized { get; set; }
     [Networked]                                                  public int JoinTick { get; set; }
 
     public Guid UserId => ConnectionToken.signedData.UserId;
@@ -51,43 +50,43 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public void OnBeforeSpawned() {
-        if (!Initialized) {
-            // Expose their connection token :flushed:
-            byte[] token = Runner.GetPlayerConnectionToken(Object.InputAuthority);
-            try {
-                ConnectionToken = ConnectionToken.Deserialize(token);
-                if (!ConnectionToken.HasValidSignature()) {
-                    // Invalid signature, nice try guy
-                    throw new Exception();
-                }
-                if (ConnectionToken.signedData.UserId != Guid.Parse(Runner.GetPlayerUserId(Object.InputAuthority))) {
-                    // Attempted to steal from another user???
-                    throw new Exception();
-                }
-                // Successful :D
-                SetNickname(ConnectionToken.nickname.Value);
-            } catch {
-                Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Object.InputAuthority)}'. If you're directly booting the game within a level in the Unity Editor, this is not a bug.");
-                SetNickname(ConnectionToken.nickname.Value);
-                ConnectionToken = new();
+        // Expose their connection token :flushed:
+        byte[] token = Runner.GetPlayerConnectionToken(Object.InputAuthority);
+        try {
+            ConnectionToken = ConnectionToken.Deserialize(token);
+            if (!ConnectionToken.HasValidSignature()) {
+                // Invalid signature, nice try guy
+                throw new Exception();
             }
-
-            JoinTick = Runner.Tick;
-
-            Initialized = true;
-        } else {
-            SetNickname(RawNickname);
+            if (ConnectionToken.signedData.UserId != Guid.Parse(Runner.GetPlayerUserId(Object.InputAuthority))) {
+                // Attempted to steal from another user???
+                throw new Exception();
+            }
+            // Successful :D
+            SetNickname(ConnectionToken.nickname.Value);
+        } catch {
+            Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Object.InputAuthority)}'. If you're directly booting the game within a level in the Unity Editor, this is not a bug.");
+            SetNickname(ConnectionToken.nickname.Value);
+            ConnectionToken = new();
         }
-    }
 
-    public override void Spawned() {
-        // Keep track of our data, pls kthx
-        Runner.SetPlayerObject(Object.InputAuthority, Object);
+        if (Runner.IsResume) {
+            if (Runner.IsServer) {
+                JoinTick = -1;
+            }
+        } else {
+            JoinTick = Runner.Tick;
+        }
 
         if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1)
             Team = 0;
         else
             Team = (sbyte) ((Object.InputAuthority + 1) % 5);
+    }
+
+    public override void Spawned() {
+        // Keep track of our data, pls kthx
+        Runner.SetPlayerObject(Object.InputAuthority, Object);
 
         if (SessionData.Instance)
             SessionData.Instance.LoadWins(this);

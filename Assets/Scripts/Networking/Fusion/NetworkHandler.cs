@@ -15,6 +15,7 @@ using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Utils;
 using NSMB.UI.MainMenu;
+using NSMB.Game;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
@@ -109,7 +110,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         } else if (runner.SessionInfo.IsValid) {
             // Connected to a session
             Debug.Log($"[Network] Successfully connected to a Room ({runner.SessionInfo.Name}, {runner.SessionInfo.Region})");
-            ChatManager.Instance.ClearChat();
         }
 
         OnConnectedToServer?.Invoke(runner);
@@ -173,6 +173,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     async void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {
         Debug.Log($"[Network] Receive host migration signal, we will become a {hostMigrationToken.GameMode}");
+        MainMenuManager.WasHostMigration = true;
+        GlobalController.Instance.connecting.SetActive(true);
+
+        if (GameManager.Instance)
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.hostdc");
 
         await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
         RecreateInstance();
@@ -331,6 +336,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         connecting++;
         string id = PlayerPrefs.GetString("id", null);
         string token = PlayerPrefs.GetString("token", null);
+        //string id = null;
+        //string token = null;
 
         AuthenticationValues authValues = await AuthenticationHandler.Authenticate(id, token);
         connecting--;

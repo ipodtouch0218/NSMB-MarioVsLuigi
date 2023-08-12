@@ -32,7 +32,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateAllSettings(SessionData roomData, bool level) {
-            if (!roomData.Object.IsValid)
+            if (!roomData.Object)
                 return;
 
             ChangePrivate(roomData.PrivateRoom);
