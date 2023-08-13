@@ -35,6 +35,7 @@ namespace NSMB.Entities.Player {
 
         //---Properties
         public Color GlowColor { get; private set; }
+        private bool IsSpinningOnSpinner => controller.OnSpinner && controller.IsOnGround && controller.FireballDelayTimer.ExpiredOrNotRunning(Runner) && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity;
 
         //---Private Variables
         private Enums.PlayerEyeState eyeState;
@@ -94,6 +95,11 @@ namespace NSMB.Entities.Player {
             SetFacingDirection();
             InterpolateFacingDirection();
             HandleMiscStates();
+        }
+
+        public override void FixedUpdateNetwork() {
+            if (IsSpinningOnSpinner)
+                controller.FacingRight = models.transform.eulerAngles.y < 180;
         }
 
         public void HandleAnimations() {
@@ -161,7 +167,6 @@ namespace NSMB.Entities.Player {
             //rotChangeTarget = models.transform.rotation.eulerAngles;
             float delta = Time.deltaTime;
 
-            bool rotChangeFacingDirection = false;
             modelRotateInstantly = false;
 
             if (controller.IsInKnockback) {
@@ -186,10 +191,9 @@ namespace NSMB.Entities.Player {
                 modelRotateInstantly = true;
 
             } else {
-                if (controller.OnSpinner && controller.IsOnGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity) {
+                if (IsSpinningOnSpinner && !animator.GetCurrentAnimatorStateInfo(0).IsName("fireball")) {
                     modelRotationTarget += controller.OnSpinner.spinSpeed * delta * Vector3.up;
                     modelRotateInstantly = true;
-                    rotChangeFacingDirection = true;
                 } else if (controller.IsSpinnerFlying || controller.IsPropellerFlying) {
                     modelRotationTarget += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(Runner) ?? 0f) * 1400) - (controller.IsDrilling ? 900 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.ExpiredOrNotRunning(Runner) && body.velocity.y < 0 ? 700 : 0), 0) * delta;
                     modelRotateInstantly = true;
@@ -201,9 +205,6 @@ namespace NSMB.Entities.Player {
             }
 
             propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((controller.IsSpinnerFlying || controller.IsPropellerFlying || controller.UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
-
-            if (rotChangeFacingDirection)
-                controller.FacingRight = models.transform.eulerAngles.y < 180;
 
             wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
         }

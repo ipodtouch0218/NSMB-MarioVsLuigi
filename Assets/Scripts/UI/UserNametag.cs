@@ -33,18 +33,25 @@ public class UserNametag : MonoBehaviour {
     }
 
     public void LateUpdate() {
-        if (!parent || !data) {
+        if (!parent || parent.Disconnected || !data || !data.Object) {
             Destroy(gameObject);
             return;
         }
 
         nametag.SetActive(!(parent.IsDead && parent.IsRespawning) && GameData.Instance.GameState >= Enums.GameState.Playing);
 
+        if (!nametag.activeSelf)
+            return;
+
         Vector2 worldPos = parent.animationController.models.transform.position;
         worldPos.y += parent.WorldHitboxSize.y * 1.2f + 0.5f;
 
-        if (GameManager.Instance.loopingLevel && Mathf.Abs(cam.transform.position.x - worldPos.x) > GameManager.Instance.levelWidthTile * 0.25f)
-            worldPos.x += Mathf.Sign(cam.transform.position.x) * GameManager.Instance.LevelWidth;
+        if (GameManager.Instance.loopingLevel) {
+            // Wrapping
+            if (Mathf.Abs(worldPos.x - cam.transform.position.x) > GameManager.Instance.LevelWidth * 0.5f) {
+                worldPos.x += (cam.transform.position.x > GameManager.Instance.LevelMiddleX ? 1 : -1) * GameManager.Instance.LevelWidth;
+            }
+        }
 
         Vector2 size = new(Screen.width, Screen.height);
         Vector3 screenPoint = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;

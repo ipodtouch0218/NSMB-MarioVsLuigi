@@ -104,7 +104,7 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool IsSwimming { get; set; }
         [Networked(OnChanged = nameof(OnIsWaterWalkingChanged))] public NetworkBool IsWaterWalking { get; set; }
         //-Death & Respawning
-        [Networked] private NetworkBool Disconnected { get; set; }
+        [Networked] public NetworkBool Disconnected { get; set; }
         [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
         [Networked(OnChanged = nameof(OnDeathAnimationTimerChanged))] public TickTimer DeathAnimationTimer { get; set; }
         [Networked(OnChanged = nameof(OnIsRespawningChanged))] public NetworkBool IsRespawning { get; set; }
