@@ -27,7 +27,9 @@ public class ChatMessage : MonoBehaviour {
 
     private void OnLanguageChanged(TranslationManager tm) {
         chatText.text = tm.GetTranslationWithReplacements(data.message, data.replacements);
-        chatText.isRightToLeftText = tm.RightToLeft;
+        //chatText.isRightToLeftText = tm.RightToLeft;
+
+        chatText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
     }
 
     public void Initialize(ChatMessageData data) {

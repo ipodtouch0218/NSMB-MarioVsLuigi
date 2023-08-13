@@ -17,7 +17,9 @@ namespace NSMB.UI.Pause.Loaders {
 
             spo.options.Clear();
             locales = GlobalController.Instance.translationManager.GetLocaleData();
-            spo.options.AddRange(locales.Select(ld => ld.Name));
+            spo.options.AddRange(locales.Select(ld => {
+                return ld.Locale.ToLower().StartsWith("ar") ? ArabicSupport.ArabicFixer.Fix(ld.Name, false) : ld.Name;
+            }));
 
             string current = GlobalController.Instance.translationManager.CurrentLocale;
             int currentIndex = Array.IndexOf(locales.Select(ld => ld.Locale).ToArray(), current);

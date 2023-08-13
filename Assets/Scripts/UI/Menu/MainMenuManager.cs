@@ -712,7 +712,7 @@ namespace NSMB.UI.MainMenu {
                 SessionInfo session = Runner.SessionInfo;
                 NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
                 lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
-                lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
+                //lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
 
                 if (SessionData.Instance.Object) {
                     OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
@@ -738,6 +738,8 @@ namespace NSMB.UI.MainMenu {
                 }
                 music.volume = 1;
             }
+
+            startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
         public void OnPlayerDataValidated() {

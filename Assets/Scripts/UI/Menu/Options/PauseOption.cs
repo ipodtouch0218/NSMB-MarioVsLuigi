@@ -49,13 +49,13 @@ namespace NSMB.UI.Pause.Options {
 
         public virtual void Selected() {
             label.text = "» " + GetTranslatedString();
-            label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
+            //label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             IsSelected = true;
         }
 
         public virtual void Deselected() {
             label.text = GetTranslatedString();
-            label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
+            //label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             IsSelected = false;
         }
 

@@ -67,8 +67,8 @@ MonoBehaviour:
   m_SourceFontFileGUID: c74c9a1c3443a8f4f94b8b8fdcc41125
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: c74c9a1c3443a8f4f94b8b8fdcc41125,
     type: 3}
-  m_SourceFontFile: {fileID: 12800000, guid: c74c9a1c3443a8f4f94b8b8fdcc41125, type: 3}
-  m_AtlasPopulationMode: 1
+  m_SourceFontFile: {fileID: 0}
+  m_AtlasPopulationMode: 0
   m_FaceInfo:
     m_FaceIndex: 0
     m_FamilyName: Super Mario DS

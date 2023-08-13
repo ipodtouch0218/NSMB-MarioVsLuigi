@@ -196,7 +196,7 @@ namespace NSMB.UI.Pause {
             for (int i = 0; i < options.Length; i++) {
                 PauseMenuOptionWrapper option = options[i];
                 option.text.text = (selected == i) ? ("» " + option.originalText + " «") : option.originalText;
-                option.text.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
+                //option.text.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             }
         }
 

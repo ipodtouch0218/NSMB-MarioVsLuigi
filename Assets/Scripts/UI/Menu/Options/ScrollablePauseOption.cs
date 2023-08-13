@@ -43,7 +43,7 @@ namespace NSMB.UI.Pause.Options {
             value = Mathf.Clamp(newIndex, 0, options.Count - 1);
 
             display.text = options.Count > 0 ? options[value] : GlobalController.Instance.translationManager.GetTranslation("ui.generic.none");
-            display.isRightToLeftText = options.Count > 0 ? GlobalController.Instance.translationManager.RightToLeft : false;
+            //display.isRightToLeftText = options.Count > 0 ? GlobalController.Instance.translationManager.RightToLeft : false;
             leftButton.interactable = value != 0;
             rightButton.interactable = value != options.Count - 1;
 

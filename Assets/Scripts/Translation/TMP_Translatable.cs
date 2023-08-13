@@ -10,6 +10,13 @@ namespace NSMB.Translation {
         [SerializeField] private string key;
         [SerializeField] private TMP_Text text;
 
+        //---Private Variables
+        private HorizontalAlignmentOptions originalTextAlignment;
+
+        public void Awake() {
+            originalTextAlignment = text.horizontalAlignment;
+        }
+
         public void OnValidate() {
             if (!text) text = GetComponent<TMP_Text>();
         }
@@ -25,7 +32,12 @@ namespace NSMB.Translation {
 
         private void OnLanguageChanged(TranslationManager tm) {
             text.text = tm.GetTranslation(key);
-            text.isRightToLeftText = tm.RightToLeft;
+
+            if (originalTextAlignment == HorizontalAlignmentOptions.Left) {
+                text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            } else if (originalTextAlignment == HorizontalAlignmentOptions.Right) {
+                text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
+            }
         }
     }
 }

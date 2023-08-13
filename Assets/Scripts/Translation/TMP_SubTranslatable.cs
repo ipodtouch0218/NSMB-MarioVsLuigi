@@ -1,5 +1,5 @@
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 namespace NSMB.Translation {
 
@@ -11,6 +11,7 @@ namespace NSMB.Translation {
 
         //---Private Variables
         private string originalText;
+        private HorizontalAlignmentOptions originalTextAlignment;
 
         public void OnValidate() {
             if (!text) text = GetComponent<TMP_Text>();
@@ -18,6 +19,7 @@ namespace NSMB.Translation {
 
         public void Awake() {
             originalText = text.text;
+            originalTextAlignment = text.horizontalAlignment;
         }
 
         public void OnEnable() {
@@ -31,7 +33,12 @@ namespace NSMB.Translation {
 
         private void OnLanguageChanged(TranslationManager tm) {
             text.text = tm.GetSubTranslations(originalText);
-            text.isRightToLeftText = tm.RightToLeft;
+
+            if (originalTextAlignment == HorizontalAlignmentOptions.Left) {
+                text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            } else if (originalTextAlignment == HorizontalAlignmentOptions.Right) {
+                text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
+            }
         }
     }
 }

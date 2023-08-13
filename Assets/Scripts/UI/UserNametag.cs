@@ -33,6 +33,7 @@ public class UserNametag : MonoBehaviour {
     }
 
     public void LateUpdate() {
+
         if (!parent || parent.Disconnected || !data || !data.Object) {
             Destroy(gameObject);
             return;
@@ -97,7 +98,9 @@ public class UserNametag : MonoBehaviour {
         newText += Utils.GetSymbolString("Sx" + parent.Stars);
 
         text.text = newText;
-        if (nicknameColor.isRainbow)
+
+        nicknameColor ??= data.NicknameColor;
+        if (nicknameColor != null && nicknameColor.isRainbow)
             text.color = Utils.GetRainbowColor(parent.Runner);
     }
 }

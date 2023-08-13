@@ -90,6 +90,16 @@ namespace NSMB.Translation {
                 return;
             }
 
+            if (newLocale.ToLower().StartsWith("ar")) {
+                // Arabic. Needs special case.
+                foreach (string key in translations.Keys.ToList()) {
+                    if (key == "rtl") continue;
+                    try {
+                        translations[key] = ArabicSupport.ArabicFixer.Fix(translations[key], true);
+                    } catch { }
+                }
+            }
+
             CurrentLocale = newLocale;
             RightToLeft = GetTranslation("rtl") == "true";
             // Call the change event

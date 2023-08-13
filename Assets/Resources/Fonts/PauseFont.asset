@@ -19,8 +19,8 @@ MonoBehaviour:
   m_SourceFontFileGUID: 89d07c8cf60619240a2f96f984ad6836
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 89d07c8cf60619240a2f96f984ad6836,
     type: 3}
-  m_SourceFontFile: {fileID: 12800000, guid: 87e5f3739105e7b4c8276343b933d7d0, type: 3}
-  m_AtlasPopulationMode: 1
+  m_SourceFontFile: {fileID: 0}
+  m_AtlasPopulationMode: 0
   m_FaceInfo:
     m_FaceIndex: 0
     m_FamilyName: 'DS Font: New Super Mario Bros.'

@@ -312,6 +312,7 @@ namespace NSMB.UI.MainMenu {
         //---Callbacks
         private void OnLanguageChanged(TranslationManager tm) {
             SetRoomIdVisibility(isRoomCodeVisible);
+            roomIdText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
     }
 }

@@ -81,7 +81,7 @@ public class SpectationManager : MonoBehaviour {
 
         TranslationManager tm = GlobalController.Instance.translationManager;
         spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
-        spectatingText.isRightToLeftText = tm.RightToLeft;
+        //spectatingText.isRightToLeftText = tm.RightToLeft;
     }
 
     public void SpectateNextPlayer() {
