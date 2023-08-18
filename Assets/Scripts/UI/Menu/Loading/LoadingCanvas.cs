@@ -50,7 +50,7 @@ namespace NSMB.Loading {
                 StopCoroutine(fadeCoroutine);
             fadeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
 
-            audioListener.enabled = true;
+            //audioListener.enabled = true;
         }
 
         public void EndLoading() {
@@ -64,7 +64,7 @@ namespace NSMB.Loading {
                 StopCoroutine(fadeCoroutine);
 
             fadeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
-            audioListener.enabled = false;
+            //audioListener.enabled = false;
         }
 
         public void EndAnimation() {

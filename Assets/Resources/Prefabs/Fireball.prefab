@@ -4896,14 +4896,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1011982274984717416}
   - component: {fileID: 1164692562165207756}
-  - component: {fileID: 1186833380152900418}
   - component: {fileID: -1769135492019179076}
   - component: {fileID: 3843124130648117525}
   - component: {fileID: 844320328102276428}
   - component: {fileID: 376300006025663058}
-  - component: {fileID: 1011982274984717417}
   - component: {fileID: 2644380969240041381}
-  - component: {fileID: 2914323514277592658}
+  - component: {fileID: 5158080774805734746}
   m_Layer: 9
   m_Name: Fireball
   m_TagString: Untagged
@@ -4948,8 +4946,8 @@ MonoBehaviour:
     _value: 0
   _IsActive:
     _value: 0
-  body: {fileID: 1186833380152900418}
-  nrb: {fileID: 2914323514277592658}
+  body: {fileID: 0}
+  nrb: {fileID: 0}
   sfx: {fileID: 3843124130648117525}
   checkForNearbyPlayersWhenRespawning: 1
   _Owner: {fileID: 0}
@@ -4975,33 +4973,7 @@ MonoBehaviour:
   - {fileID: 4710279457085823811}
   - {fileID: 7450112483459336877}
   hitbox: {fileID: -1769135492019179076}
---- !u!50 &1186833380152900418
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1011982274984717421}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 0.075625
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 4.4
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
+  bodyy: {fileID: 5158080774805734746}
 --- !u!61 &-1769135492019179076
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5180,20 +5152,6 @@ MonoBehaviour:
   goUpSlopes: 0
   getCrushedByGroundEntities: 1
   floorAndRoofCutoff: 0.3
-  body: {fileID: 0}
---- !u!114 &1011982274984717417
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1011982274984717421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nrb: {fileID: 2914323514277592658}
 --- !u!114 &2644380969240041381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5218,10 +5176,9 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1164692562165207756}
   - {fileID: 376300006025663058}
-  - {fileID: 2914323514277592658}
-  SimulationBehaviours:
-  - {fileID: 1011982274984717417}
---- !u!114 &2914323514277592658
+  - {fileID: 5158080774805734746}
+  SimulationBehaviours: []
+--- !u!114 &5158080774805734746
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5230,25 +5187,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1011982274984717421}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a384a75a1c0645459861c223ac33652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 2
-  InterpolationSpace: 0
-  InterpolationTarget: {fileID: 3150262645453679834}
-  InterpolateErrorCorrection: 0
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 5
-    MaxRate: 45
-    PosBlendStart: 0.1
-    PosBlendEnd: 0.75
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 3
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
+  _interpolationDataSource: 0
+  _velocity: {x: 0, y: 0}
+  _position: {x: 0, y: 0}
+  _isKinematic:
+    _value: 0
+  _gravity: {x: 0, y: 0}
+  interpolationTarget: {fileID: 1011982274984717416}
+  collider: {fileID: -1769135492019179076}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 20736
+  maxIterations: 3
 --- !u!1 &2135618848759859508
 GameObject:
   m_ObjectHideFlags: 0
@@ -5349,7 +5302,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isDisplaying: 1
   runInEditor: 0
-  frame: 0
+  frame: 0.5826652
   fps: 12
   frames:
   - {fileID: 5353841184698615464, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
@@ -5458,7 +5411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isDisplaying: 1
   runInEditor: 0
-  frame: 0
+  frame: 0.5826652
   fps: 12
   frames:
   - {fileID: 5353841184698615464, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}

@@ -20,13 +20,6 @@ public class PhysicsEntity : NetworkBehaviour {
     [SerializeField] private bool goUpSlopes, getCrushedByGroundEntities = true;
     [SerializeField] private float floorAndRoofCutoff = 0.5f;
 
-    //---Components
-    [SerializeField] private Rigidbody2D body;
-
-    public void Awake() {
-        if (!body) body = GetComponent<Rigidbody2D>();
-    }
-
     public PhysicsDataStruct UpdateCollisions() {
         int hitRightCount = 0, hitLeftCount = 0;
         float previousHeightY = float.MaxValue;

@@ -42,7 +42,7 @@
     "Simulation": {
         "InputDataWordCount": 0,
         "TickRate": 30,
-        "MaxPrediction": 60,
+        "MaxPrediction": 30,
         "DefaultPlayers": 10,
         "ReplicationMode": 0,
         "ObjectInterest": false,
@@ -53,8 +53,8 @@
         "DeltaAdjustment": 4,
         "AllowedJitter": 25,
         "SnapLimit": 500,
-        "MultiplierMin": 2.25,
-        "MultiplierMax": 2.75
+        "MultiplierMin": 1.5,
+        "MultiplierMax": 1.75
     },
     "Network": {
         "SocketSendBufferSize": 256,

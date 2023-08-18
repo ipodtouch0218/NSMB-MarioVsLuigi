@@ -26,6 +26,8 @@ namespace NSMB.Entities.Player {
         private static readonly ContactPoint2D[] TileContactBuffer = new ContactPoint2D[32];
         private static readonly Vector3 ZeroPointFive = Vector3.one * 0.5f;
 
+        private static readonly Vector2 GroundpoundStartUpwardsVelocity = Vector2.up * 1.5f;
+
         //---Networked Variables
         //-Player State
         [Networked(OnChanged = nameof(OnPowerupStateChanged))] public Enums.PowerupState State { get; set; }
@@ -33,7 +35,7 @@ namespace NSMB.Entities.Player {
         [Networked] public Enums.PowerupState StoredPowerup { get; set; }
         [Networked] public byte Stars { get; set; }
         [Networked] public byte Coins { get; set; }
-        [Networked(OnChanged = nameof(OnLivesChanged))] public sbyte Lives { get; set; }
+        [Networked] public sbyte Lives { get; set; }
         [Networked] private sbyte SpawnpointIndex { get; set; }
         //-Player Movement
         //Generic
@@ -353,7 +355,7 @@ namespace NSMB.Entities.Player {
                 cameraController.Recenter(spawn);
             }
 
-            cameraController.IsControllingCamera = Object.HasInputAuthority;
+            cameraController.IsControllingCamera = HasInputAuthority;
 
             if (!GameData.Instance.AlivePlayers.Contains(this)) {
                 GameData.Instance.AlivePlayers.Add(this);
@@ -375,39 +377,6 @@ namespace NSMB.Entities.Player {
 
             if (icon)
                 Destroy(icon.gameObject);
-        }
-
-        public void OnInput(NetworkRunner runner, NetworkInput input) {
-            PlayerNetworkInput newInput = new();
-
-            //input nothing when paused
-            if (GameManager.Instance.paused) {
-                input.Set(newInput);
-                return;
-            }
-
-            Vector2 joystick = ControlSystem.controls.Player.Movement.ReadValue<Vector2>();
-            bool jump = ControlSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
-            bool powerup = ControlSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
-            bool sprint = ControlSystem.controls.Player.Sprint.ReadValue<float>() >= 0.5f;
-
-            Vector2 normalizedJoystick = joystick.normalized;
-            //TODO: changeable deadzone?
-            bool up = Vector2.Dot(normalizedJoystick, Vector2.up) > 0.6f;
-            bool down = Vector2.Dot(normalizedJoystick, Vector2.down) > 0.6f;
-            bool left = Vector2.Dot(normalizedJoystick, Vector2.left) > 0.4f;
-            bool right = Vector2.Dot(normalizedJoystick, Vector2.right) > 0.4f;
-
-            newInput.buttons.Set(PlayerControls.Up, up);
-            newInput.buttons.Set(PlayerControls.Down, down);
-            newInput.buttons.Set(PlayerControls.Left, left);
-            newInput.buttons.Set(PlayerControls.Right, right);
-            newInput.buttons.Set(PlayerControls.Jump, jump);
-            newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
-            newInput.buttons.Set(PlayerControls.Sprint, sprint ^ Settings.Instance.controlsAutoSprint);
-            newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprint && Settings.Instance.controlsFireballSprint);
-
-            input.Set(newInput);
         }
 
         public override void Render() {
@@ -497,7 +466,6 @@ namespace NSMB.Entities.Player {
                 PreviousInputs = input;
             }
 
-            //animationController.HandleDeathAnimation();
             animationController.HandlePipeAnimation();
 
             UpdateHitbox();
@@ -545,6 +513,7 @@ namespace NSMB.Entities.Player {
                 }
             }
 
+            // Respawn timers
 
             if (PreRespawnTimer.Expired(Runner)) {
                 PreRespawn();
@@ -554,20 +523,6 @@ namespace NSMB.Entities.Player {
             if (RespawnTimer.Expired(Runner)) {
                 Respawn();
                 RespawnTimer = TickTimer.None;
-            }
-        }
-
-        private void CheckForPowerupActions(NetworkButtons pressedButtons) {
-            //powerup action button check
-            bool checkSprintButton = State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower;
-            if (pressedButtons.IsSet(PlayerControls.PowerupAction)
-                || (pressedButtons.IsSet(PlayerControls.SprintPowerupAction) && checkSprintButton)) {
-
-                ActivatePowerupAction();
-            }
-
-            if (Settings.Instance.controlsPropellerJump && pressedButtons.IsSet(PlayerControls.Jump) && !IsOnGround) {
-                StartPropeller();
             }
         }
 
@@ -903,6 +858,53 @@ namespace NSMB.Entities.Player {
         #endregion
 
         #region -- CONTROLLER FUNCTIONS --
+        public void OnInput(NetworkRunner runner, NetworkInput input) {
+            PlayerNetworkInput newInput = new();
+
+            //input nothing when paused
+            if (GameManager.Instance.paused) {
+                input.Set(newInput);
+                return;
+            }
+
+            Vector2 joystick = ControlSystem.controls.Player.Movement.ReadValue<Vector2>();
+            bool jump = ControlSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
+            bool powerup = ControlSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
+            bool sprint = ControlSystem.controls.Player.Sprint.ReadValue<float>() >= 0.5f;
+
+            Vector2 normalizedJoystick = joystick.normalized;
+            //TODO: changeable deadzone?
+            bool up = Vector2.Dot(normalizedJoystick, Vector2.up) > 0.6f;
+            bool down = Vector2.Dot(normalizedJoystick, Vector2.down) > 0.6f;
+            bool left = Vector2.Dot(normalizedJoystick, Vector2.left) > 0.4f;
+            bool right = Vector2.Dot(normalizedJoystick, Vector2.right) > 0.4f;
+
+            newInput.buttons.Set(PlayerControls.Up, up);
+            newInput.buttons.Set(PlayerControls.Down, down);
+            newInput.buttons.Set(PlayerControls.Left, left);
+            newInput.buttons.Set(PlayerControls.Right, right);
+            newInput.buttons.Set(PlayerControls.Jump, jump);
+            newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
+            newInput.buttons.Set(PlayerControls.Sprint, sprint ^ Settings.Instance.controlsAutoSprint);
+            newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprint && Settings.Instance.controlsFireballSprint);
+
+            input.Set(newInput);
+        }
+
+        private void CheckForPowerupActions(NetworkButtons pressedButtons) {
+            // Powerup action button check
+            bool checkSprintButton = State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower;
+            if (pressedButtons.IsSet(PlayerControls.PowerupAction)
+                || (pressedButtons.IsSet(PlayerControls.SprintPowerupAction) && checkSprintButton)) {
+
+                ActivatePowerupAction();
+            }
+
+            if (Settings.Instance.controlsPropellerJump && pressedButtons.IsSet(PlayerControls.Jump) && !IsOnGround) {
+                StartPropeller();
+            }
+        }
+
         private void ActivatePowerupAction() {
             if (IsDead || IsFrozen || IsInKnockback || CurrentPipe || GameData.Instance.GameEnded || HeldEntity)
                 return;
@@ -2383,40 +2385,39 @@ namespace NSMB.Entities.Player {
             if (CurrentPipe || IsDrilling)
                 return;
 
-            //if we're about to be in the top 2 pixels of a block, snap up to it, (if we can fit)
-
             if (body.velocity.y > 0)
+                // If we're about to be in the top 2 pixels of a block, snap up to it, (if we can fit)
                 return;
 
             Vector2 nextPos = body.position + Runner.DeltaTime * 2f * body.velocity;
 
             if (!Utils.Utils.IsAnyTileSolidBetweenWorldBox(nextPos + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize))
-                //we are not going to be inside a block next fixed update
+                // We are not going to be inside a block next fixed update
                 return;
 
-            //we ARE inside a block. figure out the height of the contact
+            // We ARE inside a block. figure out the height of the contact
             // 32 pixels per unit
             RaycastHit2D contact = Runner.GetPhysicsScene2D().BoxCast(nextPos + 3f / 32f * Vector2.up, new(WorldHitboxSize.y, 1f / 32f), 0, Vector2.down, 3f / 32f, Layers.MaskAnyGround);
 
             if (!contact || contact.normal.y < 0.1f) {
-                //we didn't hit the ground, we must've hit a ceiling or something.
+                // We didn't hit the ground, we must've hit a ceiling or something.
                 return;
             }
 
             float point = contact.point.y + Physics2D.defaultContactOffset;
             if (body.position.y > point + Physics2D.defaultContactOffset) {
-                //dont snap when we're above the block
+                // Dont snap when we're above the block
                 return;
             }
 
             Vector2 newPosition = new(body.position.x, point);
 
             if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(newPosition + WorldHitboxSize.y * 0.5f * Vector2.up, WorldHitboxSize)) {
-                //it's an invalid position anyway, we'd be inside something.
+                // It's an invalid position anyway, we'd be inside something.
                 return;
             }
 
-            //valid position, snap upwards
+            // Valid position, snap upwards
             body.position = newPosition;
         }
 
@@ -2433,7 +2434,7 @@ namespace NSMB.Entities.Player {
             if (HeldEntity && (IsFrozen || HeldEntity.IsDead || HeldEntity.IsFrozen))
                 SetHeldEntity(null);
 
-            #region MEGA MUSHROOM START / END TIMERS
+            #region // -- MEGA MUSHROOM START / END TIMERS
             if (MegaStartTimer.IsRunning) {
 
                 body.isKinematic = true;
@@ -2669,7 +2670,7 @@ namespace NSMB.Entities.Player {
                 WallSlideRight = false;
                 IsJumping = false;
                 if (IsDrilling)
-                    SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
+                    SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position);
 
                 if (OnSpinner && Mathf.Abs(body.velocity.x) < 0.3f && !HeldEntity) {
                     Transform spnr = OnSpinner.transform;
@@ -2968,7 +2969,6 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        private static readonly Vector2 GroundpoundStartUpwardsVelocity = Vector2.up * 1.5f;
         private void HandleGroundpoundStartAnimation() {
 
             if (!IsGroundpounding || !GroundpoundStartTimer.IsRunning)
@@ -3031,7 +3031,6 @@ namespace NSMB.Entities.Player {
 
             // Groundpound
             if (player.State != Enums.PowerupState.MegaMushroom) {
-                //GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, 0.2f);
                 Enums.Sounds sound = player.State switch {
                     Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Groundpound,
                     _ => Enums.Sounds.Player_Sound_GroundpoundLanding,
@@ -3044,6 +3043,7 @@ namespace NSMB.Entities.Player {
             } else {
                 CameraController.ScreenShake = 0.15f;
             }
+
             if (!player.ContinueGroundpound && player.State == Enums.PowerupState.MegaMushroom) {
                 player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
                 player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.position);
@@ -3154,7 +3154,7 @@ namespace NSMB.Entities.Player {
             if (player.IsSliding)
                 return;
 
-            if (!player.IsOnGround || Mathf.Abs(player.body.velocity.x) > 0.1f)
+            if (!player.IsOnGround || Mathf.Abs(player.body.velocity.x) > 0.2f)
                 return;
 
             player.PlaySound(Enums.Sounds.Player_Sound_SlideEnd);
@@ -3329,21 +3329,6 @@ namespace NSMB.Entities.Player {
 
             player.PlaySound(Enums.Sounds.World_Block_Bump);
             player.timeSinceLastBumpSound = player.Runner.SimulationRenderTime;
-        }
-
-        public static void OnLivesChanged(Changed<PlayerController> changed) {
-            PlayerController player = changed.Behaviour;
-
-            if (GameData.Instance.GameState < Enums.GameState.Playing || player.Disconnected)
-                return;
-
-            changed.LoadOld();
-            sbyte previous = player.Lives;
-            changed.LoadNew();
-
-            //if (player.Lives > previous) {
-            //    player.PlaySound(Enums.Sounds.Powerup_Sound_1UP);
-            //}
         }
 
         public static void OnThrowAnimCounterChanged(Changed<PlayerController> changed) {

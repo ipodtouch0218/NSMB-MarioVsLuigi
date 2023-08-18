@@ -5,11 +5,10 @@ using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
-using static Unity.Collections.Unicode;
 
 namespace NSMB.Entities {
 
-    [RequireComponent(typeof(NetworkRigidbody2D), typeof(PhysicsEntity))]
+    [RequireComponent(typeof(PhysicsEntity))]
     [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
     public class Fireball : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
@@ -35,6 +34,8 @@ namespace NSMB.Entities {
         [SerializeField] private SpriteRenderer[] renderers;
         [SerializeField] private BoxCollider2D hitbox;
 
+        [SerializeField] private EntityMover bodyy;
+
         public override void OnValidate() {
             base.OnValidate();
             if (!physics) physics = GetComponent<PhysicsEntity>();
@@ -52,7 +53,7 @@ namespace NSMB.Entities {
             Owner = owner;
 
             // Speed
-            body.gravityScale = IsIceball ? 2.2f : 4.4f;
+            bodyy.gravity = 9.81f * (IsIceball ? 2.2f : 4.4f) * Vector2.down;
             if (IsIceball) {
                 CurrentSpeed = iceSpeed + Mathf.Abs(owner.body.velocity.x / 3f);
             } else {
@@ -60,18 +61,17 @@ namespace NSMB.Entities {
             }
 
             // Physics
-            nrb.TeleportToPosition(spawnpoint, Vector3.zero);
-            nrb.Rigidbody.position = spawnpoint;
-            //body.simulated = true;
-            body.isKinematic = false;
-            body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
-            //Object.AssignInputAuthority(owner.Object.InputAuthority);
+            bodyy.position = spawnpoint;
+            //nrb.TeleportToPosition(spawnpoint, Vector3.zero);
+            //nrb.Rigidbody.position = spawnpoint;
+            bodyy.freeze = false;
+            bodyy.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
         }
 
         public override void Spawned() {
             base.Spawned();
 
-            body.isKinematic = true;
+            bodyy.freeze = true;
             iceGraphics.SetActive(false);
             fireGraphics.SetActive(false);
 
@@ -89,33 +89,31 @@ namespace NSMB.Entities {
         }
 
         public override void FixedUpdateNetwork() {
-            body.isKinematic = !IsActive;
+            bodyy.freeze = !IsActive;
             hitbox.enabled = IsActive;
 
             if (!IsActive) {
-                body.velocity = Vector2.zero;
+                bodyy.velocity = Vector2.zero;
                 return;
             }
 
             if (GameData.Instance && GameData.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
-                body.isKinematic = true;
-                //body.simulated = false;
+                bodyy.freeze = true;
                 return;
             }
 
-            if (body.position.y < GameManager.Instance.LevelMinY) {
+            if (bodyy.position.y < GameManager.Instance.LevelMinY) {
                 DespawnEntity();
                 return;
             }
 
-            if (!HandleCollision())
-                return;
+            //if (!HandleCollision())
+            //    return;
 
             if (!CheckForEntityCollision())
                 return;
 
-            body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
+            bodyy.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, bodyy.velocity.y));
         }
 
         //---Helper Methods
@@ -127,20 +125,20 @@ namespace NSMB.Entities {
 
             if (data.OnGround && !AlreadyBounced) {
                 float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.Data.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
-                if (Mathf.Sign(data.FloorAngle) != Mathf.Sign(body.velocity.x))
+                if (Mathf.Sign(data.FloorAngle) != Mathf.Sign(bodyy.velocity.x))
                     boost = 0;
 
-                body.velocity = new(body.velocity.x, bounceHeight + boost);
-            } else if (IsIceball && body.velocity.y > 0.1f) {
+                bodyy.velocity = new(bodyy.velocity.x, bounceHeight + boost);
+            } else if (IsIceball && bodyy.velocity.y > 0.1f) {
                 AlreadyBounced = true;
             }
-            bool breaking = data.HitLeft || data.HitRight || data.HitRoof || (data.OnGround && AlreadyBounced && body.velocity.y < 1f);
+            bool breaking = data.HitLeft || data.HitRight || data.HitRoof || (data.OnGround && AlreadyBounced && bodyy.velocity.y < 1f);
             if (breaking) {
                 DespawnEntity();
                 return false;
             }
 
-            if (Utils.Utils.IsTileSolidAtWorldLocation(body.position)) {
+            if (Utils.Utils.IsTileSolidAtWorldLocation(bodyy.position)) {
                 DespawnEntity();
                 return false;
             }
@@ -152,13 +150,13 @@ namespace NSMB.Entities {
             if (!IsActive)
                 return false;
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + physics.currentCollider.offset, ((BoxCollider2D) physics.currentCollider).size, 0, default, CollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(bodyy.position + physics.currentCollider.offset, ((BoxCollider2D) physics.currentCollider).size, 0, default, CollisionBuffer);
 
             for (int i = 0; i < count; i++) {
                 GameObject collidedObject = CollisionBuffer[i].gameObject;
 
                 // Don't interact with ourselves.
-                if (CollisionBuffer[i].attachedRigidbody == body)
+                if (CollisionBuffer[i].attachedRigidbody == bodyy)
                     continue;
 
                 if (collidedObject.GetComponentInParent<IFireballInteractable>() is IFireballInteractable interactable) {
@@ -184,8 +182,7 @@ namespace NSMB.Entities {
                 BreakEffectAnimCounter++;
 
             IsActive = false;
-            body.velocity = Vector2.zero;
-            body.isKinematic = true;
+            bodyy.freeze = true;
         }
 
         public override void OnIsActiveChanged() {
@@ -328,7 +325,7 @@ namespace NSMB.Entities {
             Fireball fireball = changed.Behaviour;
 
             // Don't play particles below the killplane
-            if (fireball.body.position.y < GameManager.Instance.LevelMinY)
+            if (fireball.bodyy.position.y < GameManager.Instance.LevelMinY)
                 return;
 
             // Or if the game is over

@@ -5382,6 +5382,8 @@ MonoBehaviour:
     _value: 0
   _IsWaterWalking:
     _value: 0
+  _Disconnected:
+    _value: 0
   _IsDead:
     _value: 1
   _IsRespawning:

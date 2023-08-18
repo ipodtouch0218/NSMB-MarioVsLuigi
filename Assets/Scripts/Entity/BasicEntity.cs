@@ -39,7 +39,7 @@ namespace NSMB.Entities {
 
         public override void Spawned() {
             if (FirstSpawn) {
-                SpawnLocation = body.position;
+                SpawnLocation = body ? body.position : transform.position;
 
                 if (IsRespawningEntity)
                     DespawnEntity();

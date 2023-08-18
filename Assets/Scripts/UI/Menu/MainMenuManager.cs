@@ -144,7 +144,7 @@ namespace NSMB.UI.MainMenu {
 
             // Version Checking
 #if PLATFORM_WEBGL
-        copyRoomIdCanvasGroup.interactable = false;
+            copyRoomIdCanvasGroup.interactable = false;
 #else
             if (!GlobalController.Instance.checkedForVersion) {
                 UpdateChecker.IsUpToDate((upToDate, latestVersion) => {

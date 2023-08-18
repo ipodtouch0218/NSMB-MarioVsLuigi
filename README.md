@@ -99,11 +99,13 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * marbo
 * Mark19
 * MasterMindo
+* Med Animations
 * miyavmeow
 * Mr-STF
 * ossdekasaihassei
 * Shadow_Walker13
 * Snick, It's Him.
+* Thebababois369
 * Tombuntu
 * vlco_o
 

@@ -3176,7 +3176,6 @@ GameObject:
   - component: {fileID: 2239720947781399540}
   - component: {fileID: 7736130533744580698}
   - component: {fileID: 4068457237609990628}
-  - component: {fileID: 5063321644330613871}
   m_Layer: 5
   m_Name: LoadingCanvas
   m_TagString: LoadingCanvas
@@ -3218,7 +3217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d58278364962a4aae36829243ad8de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioListener: {fileID: 5063321644330613871}
+  audioListener: {fileID: 0}
   audioSource: {fileID: 7736130533744580698}
   animator: {fileID: 4068457237609990628}
   loadingGroup: {fileID: 5958951687455989865}
@@ -3405,14 +3404,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!81 &5063321644330613871
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 440222930750488320}
-  m_Enabled: 1
 --- !u!1 &448784459620591449
 GameObject:
   m_ObjectHideFlags: 0
@@ -20733,7 +20724,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &9028412169281946205
 RectTransform:
   m_ObjectHideFlags: 0
@@ -36388,7 +36379,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3510072643937208116}
-  - component: {fileID: 1370473194669270528}
   - component: {fileID: 1125937421317809672}
   m_Layer: 0
   m_Name: FusionStats
@@ -36413,19 +36403,6 @@ Transform:
   m_Father: {fileID: 3796527870854254880}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1370473194669270528
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6113396266618169604}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25acde9209338d24d83cc1c826297be4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Camera: {fileID: 0}
 --- !u!114 &1125937421317809672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36473,7 +36450,7 @@ MonoBehaviour:
   _includedNetStats: 7
   _includedSimStats: 23838
   AutoDestroy: 0
-  EnforceSingle: 1
+  EnforceSingle: 0
   Guid: 3010424a-ef59
   _modifyColors: 1
   _graphColorGood: {r: 0.1, g: 0.5, b: 0.1, a: 0.2509804}
