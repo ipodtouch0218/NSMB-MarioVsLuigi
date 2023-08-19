@@ -83,7 +83,7 @@ namespace NSMB.Entities.Enemies {
             if (Holder)
                 return false;
 
-            PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+            PhysicsDataStruct data = physics.UpdateCollisions();
 
             if (Lit && data.OnGround) {
                 //apply friction

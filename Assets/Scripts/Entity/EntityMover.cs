@@ -1,96 +1,141 @@
 using UnityEngine;
 
 using Fusion;
-using NSMB.Entities.Enemies;
 using NSMB.Utils;
 
-namespace NSMB.Entities {
+public class EntityMover : NetworkBehaviour {
 
-    [OrderAfter(typeof(Koopa))]
-    public class EntityMover : NetworkBehaviour {
+    //---Static Variables
+    private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
+    private static readonly float skin = 0.03f;
 
-        //---Static Variables
-        private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
-        private static readonly float skin = 0.03f;
+    //---Networked Variables
+    [Networked] public Vector2 velocity { get; set; }
+    [Networked] public Vector2 positionnn { get; set; }
+    [Networked] public NetworkBool freeze { get; set; }
+    [Networked] public Vector2 gravity { get; set; }
 
-        //---Networked Variables
-        [Networked] public Vector2 velocity { get; set; }
-        [Networked] public Vector2 position { get; set; }
-        [Networked] public NetworkBool freeze { get; set; }
-        [Networked] public Vector2 gravity { get; set; }
+    [Networked] public ref PhysicsDataStruct data => ref MakeRef<PhysicsDataStruct>();
 
-        //---Properties
-        private Vector2 ColliderOffset => transform.lossyScale * collider.offset;
-        private Vector2 ColliderSize => transform.lossyScale * collider.size;
+    //---Properties
+    private Vector2 ColliderOffset => transform.lossyScale * collider.offset;
+    private Vector2 ColliderSize => transform.lossyScale * collider.size;
 
-        //---Serialized Variables
-        [SerializeField] private Transform interpolationTarget;
-        [SerializeField] private BoxCollider2D collider;
-        [SerializeField] private LayerMask layerMask;
-        [SerializeField] private int maxIterations = 3;
+    //---Serialized Variables
+    [SerializeField] private Transform interpolationTarget;
+    [SerializeField] private BoxCollider2D collider;
+    [SerializeField] private LayerMask layerMask;
+    [SerializeField] private int maxIterations = 3;
+    [SerializeField] private float maxFloorAngle = 70, interpolationTeleportDistance = 1f;
+    [SerializeField] private bool bounceOnImpacts;
 
-        public override void Spawned() {
-            position = transform.position;
-        }
+    //---Private Variables
+    private RawInterpolator positionInterpolator;
 
-        public void LateUpdate() {
+    public override void Spawned() {
+        positionnn = transform.position;
+        positionInterpolator = GetInterpolator(nameof(positionnn));
+    }
 
-            if (!interpolationTarget)
-                interpolationTarget = transform;
+    public void LateUpdate() {
+        if (!interpolationTarget)
+            interpolationTarget = transform;
 
-            interpolationTarget.position = position;
+        unsafe {
+            if (freeze || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
+                interpolationTarget.position = positionnn;
 
-        }
+            } else {
+                Vector2 fromValue = *(Vector2*) from;
+                Vector2 toValue = *(Vector2*) to;
 
-        public override void FixedUpdateNetwork() {
-            if (freeze)
-                return;
-
-            Vector2 movement;
-            movement = CollideAndSlide(position + ColliderOffset, velocity * Runner.DeltaTime) / Runner.DeltaTime;
-            movement += CollideAndSlide(position + ColliderOffset + (movement * Runner.DeltaTime), gravity * Runner.DeltaTime);
-
-            velocity = movement;
-            position += velocity * Runner.DeltaTime;
-        }
-
-        private Vector2 CollideAndSlide(Vector2 position, Vector2 velocity, int depth = 0) {
-            if (depth >= maxIterations)
-                return Vector2.zero;
-
-            float distance = velocity.magnitude + skin;
-            Vector2 direction = velocity.normalized;
-
-            int hits = Runner.GetPhysicsScene2D().BoxCast(position, ColliderSize, 0, direction, distance, RaycastBuffer, layerMask);
-            for (int i = 0; i < hits; i++) {
-                RaycastHit2D hit = RaycastBuffer[i];
-
-                // Semisolid check.
-                if (hit.collider.gameObject.layer == Layers.LayerSemisolid) {
-                    if (
-                        (direction.y > 0) || // We are moving upwards, impossible to collide.
-                        (position.y - (ColliderSize.y * 0.5f) < hit.point.y) // Lower bound of hitbox is BELOW the semisolid hit
-                       ) {
-                        continue;
-                    }
+                if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromValue, toValue) > interpolationTeleportDistance) {
+                    // Teleport over large distances
+                    interpolationTarget.position = Utils.WrapWorldLocation(toValue);
+                } else {
+                    // Normal interpolation (over level seams, too)...
+                    interpolationTarget.position = Utils.WrapWorldLocation(Vector2.Lerp(fromValue, toValue, alpha));
                 }
+            }
+        }
 
-                Vector2 surfaceDistance = direction * (hit.distance - skin);
-                Vector2 leftover = velocity - surfaceDistance;
+        //interpolationTarget.position = position;
+    }
 
-                if (surfaceDistance.sqrMagnitude <= skin * skin)
-                    surfaceDistance = Vector2.zero;
+    public override void FixedUpdateNetwork() {
+        ResetPhysicsData();
 
-                float leftoverDistance = leftover.magnitude;
-                leftover = Vector3.ProjectOnPlane(leftover, hit.normal).normalized;
-                leftover *= leftoverDistance;
+        if (freeze)
+            return;
 
-                return surfaceDistance + CollideAndSlide(position + surfaceDistance, leftover, depth + 1);
+        Vector2 movement = CollideAndSlide(positionnn + ColliderOffset, ((gravity * Runner.DeltaTime) + velocity) * Runner.DeltaTime) * Runner.Config.Simulation.TickRate;
+        velocity = movement;
+        positionnn = Utils.WrapWorldLocation(positionnn + (velocity * Runner.DeltaTime));
+
+        transform.position = positionnn;
+    }
+
+    private void ResetPhysicsData() {
+        data.FloorAngle = 0;
+        data.OnGround = false;
+        data.CrushableGround = false;
+        data.HitRoof = false;
+        data.HitRight = false;
+        data.HitLeft = false;
+    }
+
+    private Vector2 CollideAndSlide(Vector2 position, Vector2 velocity, int depth = 0) {
+        if (depth >= maxIterations)
+            return Vector2.zero;
+
+        float distance = velocity.magnitude + skin;
+        Vector2 direction = velocity.normalized;
+
+        int hits = Physics2D.BoxCastNonAlloc(position, ColliderSize, 0, direction, RaycastBuffer, distance, layerMask);
+        for (int i = 0; i < hits; i++) {
+            RaycastHit2D hit = RaycastBuffer[i];
+
+            // Semisolid check.
+            if (hit.collider.gameObject.layer == Layers.LayerSemisolid) {
+                if (
+                    (direction.y > 0) || // We are moving upwards, impossible to collide.
+                    (position.y - (ColliderSize.y * 0.5f) < hit.point.y) // Lower bound of hitbox is BELOW the semisolid hit
+                   ) {
+                    continue;
+                }
             }
 
+            float angle = Vector2.SignedAngle(hit.normal, Vector2.up);
+            if (Mathf.Abs(angle) < maxFloorAngle) {
+                // Up
+                data.OnGround = true;
+                data.CrushableGround |= !hit.collider.CompareTag("platform");
+                data.FloorAngle = angle;
 
-            return velocity;
+            } else if (Mathf.Abs(angle) > (90 - maxFloorAngle) + maxFloorAngle) {
+                // Down
+                data.HitRoof = true;
+            } else if (angle > 0) {
+                // Left
+                data.HitLeft = true;
+            } else {
+                // Right
+                data.HitRight = true;
+            }
+
+            Vector2 surfaceDistance = direction * (hit.distance - skin);
+            Vector2 leftover = velocity - surfaceDistance;
+
+            if (surfaceDistance.sqrMagnitude <= skin * skin)
+                surfaceDistance = Vector2.zero;
+
+            float leftoverDistance = leftover.magnitude;
+            leftover = bounceOnImpacts ? Vector2.Reflect(leftover, hit.normal).normalized : Vector3.ProjectOnPlane(leftover, hit.normal).normalized;
+            leftover *= leftoverDistance;
+
+            return surfaceDistance + CollideAndSlide(position + surfaceDistance, leftover, depth + 1);
         }
 
+        return velocity;
     }
 }

@@ -938,7 +938,7 @@ namespace NSMB.Entities.Player {
 
                 bool ice = State == Enums.PowerupState.IceFlower;
                 bool right = FacingRight ^ animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
-                Vector2 spawnPos = body.position + new Vector2(right ? 0.5f : -0.5f, 0.3f);
+                Vector2 spawnPos = body.position + new Vector2(right ? 0.4f : -0.4f, 0.35f);
 
                 Fireball inactiveFireball = null;
                 for (int i = PlayerId * 6; i < (PlayerId + 1) * 6; i++) {

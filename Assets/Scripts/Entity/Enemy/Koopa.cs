@@ -95,7 +95,7 @@ namespace NSMB.Entities.Enemies {
             if (Holder)
                 FacingRight = Holder.FacingRight;
 
-            PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+            PhysicsDataStruct data = physics.UpdateCollisions();
             if (IsInShell) {
                 hitbox.size = inShellHitboxSize;
                 hitbox.offset = inShellHitboxOffset;

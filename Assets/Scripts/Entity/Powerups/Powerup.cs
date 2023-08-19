@@ -248,7 +248,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         public void HandleCollision() {
-            PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+            PhysicsDataStruct data = physics.UpdateCollisions();
 
             if (data.HitLeft || data.HitRight) {
                 FacingRight = data.HitLeft;

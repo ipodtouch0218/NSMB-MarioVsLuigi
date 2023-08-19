@@ -30,7 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1011982274984717416}
+  m_Father: {fileID: 3150262645453679834}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &6930344890943084446
@@ -4921,10 +4921,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6147013916618370303}
-  - {fileID: 8254471918769390731}
-  - {fileID: 5059717370905105433}
-  - {fileID: 101126463348194867}
   - {fileID: 3150262645453679834}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -4968,7 +4964,6 @@ MonoBehaviour:
   iceSpeed: 4.25
   bounceHeight: 6.75
   terminalVelocity: 6.25
-  physics: {fileID: 376300006025663058}
   renderers:
   - {fileID: 4710279457085823811}
   - {fileID: 7450112483459336877}
@@ -5147,6 +5142,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 2
+  _Data:
+    Flags: 0
+    FloorAngle: 0
   _PreviousTickVelocity: {x: 0, y: 0, z: 0}
   currentCollider: {fileID: -1769135492019179076}
   goUpSlopes: 0
@@ -5193,15 +5191,21 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _velocity: {x: 0, y: 0}
   _position: {x: 0, y: 0}
-  _isKinematic:
+  _freeze:
     _value: 0
   _gravity: {x: 0, y: 0}
-  interpolationTarget: {fileID: 1011982274984717416}
+  _data:
+    Flags: 0
+    FloorAngle: 0
+  interpolationTarget: {fileID: 3150262645453679834}
   collider: {fileID: -1769135492019179076}
   layerMask:
     serializedVersion: 2
     m_Bits: 20736
   maxIterations: 3
+  maxFloorAngle: 70
+  interpolationTeleportDistance: 1
+  bounceOnImpacts: 0
 --- !u!1 &2135618848759859508
 GameObject:
   m_ObjectHideFlags: 0
@@ -5450,6 +5454,10 @@ Transform:
   m_Children:
   - {fileID: 3427681855993351045}
   - {fileID: 3913916938386061855}
+  - {fileID: 6147013916618370303}
+  - {fileID: 8254471918769390731}
+  - {fileID: 5059717370905105433}
+  - {fileID: 101126463348194867}
   m_Father: {fileID: 1011982274984717416}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5483,7 +5491,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1011982274984717416}
+  m_Father: {fileID: 3150262645453679834}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &9011454779400335023
@@ -10320,13 +10328,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8143467996169431833}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.1375, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1011982274984717416}
-  m_RootOrder: 1
+  m_Father: {fileID: 3150262645453679834}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &5044812112945403417
 ParticleSystem:
@@ -15167,7 +15175,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1011982274984717416}
+  m_Father: {fileID: 3150262645453679834}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &1425112719999528230

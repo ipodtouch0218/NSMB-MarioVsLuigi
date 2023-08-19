@@ -58,7 +58,7 @@ namespace NSMB.Entities.Collectable {
             bool inWall = Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f);
             gameObject.layer = inWall ? Layers.LayerHitsNothing : Layers.LayerEntityNoGroundEntity;
 
-            PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+            PhysicsDataStruct data = physics.UpdateCollisions();
             if (data.OnGround) {
                 body.velocity -= body.velocity * Runner.DeltaTime;
                 if (data.HitRoof) {

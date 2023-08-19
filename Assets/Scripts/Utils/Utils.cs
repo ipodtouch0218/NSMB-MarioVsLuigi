@@ -58,6 +58,22 @@ namespace NSMB.Utils {
             return tileLocation;
         }
 
+        public static Vector2 WrapWorldLocation(Vector2 location, GameManager gm = null) {
+            if (!gm) gm = GameManager.Instance;
+
+            if (!gm.loopingLevel)
+                return location;
+
+            if (location.x < gm.LevelMinX) {
+                location.x += gm.LevelWidth;
+                return location;
+            } else if (location.x >= gm.LevelMaxX) {
+                location.x -= gm.LevelWidth;
+                return location;
+            }
+            return location;
+        }
+
         public static bool WrapWorldLocation(ref Vector2 location, GameManager gm = null) {
             if (!gm) gm = GameManager.Instance;
 

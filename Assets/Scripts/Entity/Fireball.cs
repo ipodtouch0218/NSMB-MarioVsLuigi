@@ -30,7 +30,6 @@ namespace NSMB.Entities {
         [SerializeField] private float bounceHeight = 6.75f, terminalVelocity = 6.25f;
 
         //---Components
-        [SerializeField] private PhysicsEntity physics;
         [SerializeField] private SpriteRenderer[] renderers;
         [SerializeField] private BoxCollider2D hitbox;
 
@@ -38,7 +37,6 @@ namespace NSMB.Entities {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!physics) physics = GetComponent<PhysicsEntity>();
             if (!nrb) nrb = GetComponent<NetworkRigidbody2D>();
             if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
             if ((renderers?.Length ?? 0) == 0) renderers = GetComponentsInChildren<SpriteRenderer>();
@@ -61,7 +59,7 @@ namespace NSMB.Entities {
             }
 
             // Physics
-            bodyy.position = spawnpoint;
+            bodyy.positionnn = spawnpoint;
             //nrb.TeleportToPosition(spawnpoint, Vector3.zero);
             //nrb.Rigidbody.position = spawnpoint;
             bodyy.freeze = false;
@@ -102,13 +100,13 @@ namespace NSMB.Entities {
                 return;
             }
 
-            if (bodyy.position.y < GameManager.Instance.LevelMinY) {
+            if (bodyy.positionnn.y < GameManager.Instance.LevelMinY) {
                 DespawnEntity();
                 return;
             }
 
-            //if (!HandleCollision())
-            //    return;
+            if (!HandleCollision())
+                return;
 
             if (!CheckForEntityCollision())
                 return;
@@ -121,24 +119,24 @@ namespace NSMB.Entities {
             if (!IsActive)
                 return false;
 
-            PhysicsEntity.PhysicsDataStruct data = physics.UpdateCollisions();
+            PhysicsDataStruct data = bodyy.data;
 
             if (data.OnGround && !AlreadyBounced) {
-                float boost = bounceHeight * Mathf.Abs(Mathf.Sin(physics.Data.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
-                if (Mathf.Sign(data.FloorAngle) != Mathf.Sign(bodyy.velocity.x))
+                float boost = bounceHeight * Mathf.Abs(Mathf.Sin(data.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
+                if ((data.FloorAngle > 0) == FacingRight)
                     boost = 0;
 
                 bodyy.velocity = new(bodyy.velocity.x, bounceHeight + boost);
             } else if (IsIceball && bodyy.velocity.y > 0.1f) {
                 AlreadyBounced = true;
             }
-            bool breaking = data.HitLeft || data.HitRight || data.HitRoof || (data.OnGround && AlreadyBounced && bodyy.velocity.y < 1f);
+            bool breaking = data.HitLeft || data.HitRight || data.HitRoof || (data.OnGround && AlreadyBounced);
             if (breaking) {
                 DespawnEntity();
                 return false;
             }
 
-            if (Utils.Utils.IsTileSolidAtWorldLocation(bodyy.position)) {
+            if (Utils.Utils.IsTileSolidAtWorldLocation(bodyy.positionnn)) {
                 DespawnEntity();
                 return false;
             }
@@ -150,7 +148,7 @@ namespace NSMB.Entities {
             if (!IsActive)
                 return false;
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(bodyy.position + physics.currentCollider.offset, ((BoxCollider2D) physics.currentCollider).size, 0, default, CollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(bodyy.positionnn + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
             for (int i = 0; i < count; i++) {
                 GameObject collidedObject = CollisionBuffer[i].gameObject;
@@ -325,7 +323,7 @@ namespace NSMB.Entities {
             Fireball fireball = changed.Behaviour;
 
             // Don't play particles below the killplane
-            if (fireball.bodyy.position.y < GameManager.Instance.LevelMinY)
+            if (fireball.bodyy.positionnn.y < GameManager.Instance.LevelMinY)
                 return;
 
             // Or if the game is over
