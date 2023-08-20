@@ -5258,14 +5258,12 @@ GameObject:
   - component: {fileID: 1846975264628763826}
   - component: {fileID: 7377892374110989097}
   - component: {fileID: 2180046975010359444}
-  - component: {fileID: 5041306341650813147}
   - component: {fileID: 8381825096985925608}
-  - component: {fileID: 7491750012241672504}
   - component: {fileID: 1429995765573229209}
   - component: {fileID: 6495227853826858529}
   - component: {fileID: 9107002982141255155}
   - component: {fileID: 953209091979993243}
-  - component: {fileID: 944144360472731691}
+  - component: {fileID: 3351902527667160351}
   m_Layer: 10
   m_Name: PlayerLuigi
   m_TagString: Player
@@ -5307,8 +5305,7 @@ MonoBehaviour:
     _value: 0
   _IsActive:
     _value: 1
-  body: {fileID: 5041306341650813147}
-  nrb: {fileID: 944144360472731691}
+  body: {fileID: 3351902527667160351}
   sfx: {fileID: 6495227853826858529}
   checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
@@ -5405,7 +5402,7 @@ MonoBehaviour:
     _value: 0
   _FrozenCube: {fileID: 0}
   sfxBrick: {fileID: 9107002982141255155}
-  networkRigidbody: {fileID: 944144360472731691}
+  networkRigidbody: {fileID: 0}
   cameraController: {fileID: 1901558055240820225}
   animationController: {fileID: 2180046975010359444}
   flyingGravity: 0.8
@@ -5482,33 +5479,6 @@ MonoBehaviour:
   shellSlideData: {fileID: 11400000, guid: c74256c46183cf14ab95e81152a2d8d9, type: 2}
   spinnerDrillData: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
   propellerDrillData: {fileID: 11400000, guid: eef8bb198b37ff940a8a8de713e95481, type: 2}
---- !u!50 &5041306341650813147
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2181019809140498225}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 1
-  m_UseAutoMass: 0
-  m_Mass: 0.147
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
 --- !u!95 &8381825096985925608
 Animator:
   serializedVersion: 5
@@ -5530,19 +5500,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7491750012241672504
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2181019809140498225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nrb: {fileID: 944144360472731691}
 --- !u!114 &1429995765573229209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5800,11 +5757,11 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 7377892374110989097}
   - {fileID: 2180046975010359444}
-  - {fileID: 944144360472731691}
+  - {fileID: 3351902527667160351}
   - {fileID: 1901558055240820225}
-  SimulationBehaviours:
-  - {fileID: 7491750012241672504}
---- !u!114 &944144360472731691
+  - {fileID: 2116533022846307699}
+  SimulationBehaviours: []
+--- !u!114 &3351902527667160351
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5813,25 +5770,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 2181019809140498225}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a384a75a1c0645459861c223ac33652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  InterpolationSpace: 1
-  InterpolationTarget: {fileID: 6025917885811452960}
-  InterpolateErrorCorrection: 0
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 5
-    MaxRate: 45
-    PosBlendStart: 0.1
-    PosBlendEnd: 0.75
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 3
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
+  _position: {x: 0, y: 0}
+  _velocity: {x: 0, y: 0}
+  _freeze:
+    _value: 0
+  _gravity: {x: 0, y: 0}
+  _data:
+    Flags: 0
+    FloorAngle: 0
+  interpolationTarget: {fileID: 6025917885811452960}
+  collider: {fileID: 3456740859313375963}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 20736
+  maxIterations: 3
+  maxFloorAngle: 70
+  interpolationTeleportDistance: 1
+  bounceOnImpacts: 0
 --- !u!1 &2401959563455402246
 GameObject:
   m_ObjectHideFlags: 0
@@ -21995,6 +21954,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe023cea6fd5f842af136c8824b0710, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!1 &8100970774645509540
 GameObject:
   m_ObjectHideFlags: 0

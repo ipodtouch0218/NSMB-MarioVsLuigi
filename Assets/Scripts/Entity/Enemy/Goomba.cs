@@ -28,9 +28,9 @@ namespace NSMB.Entities.Enemies {
 
             if (GameData.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
-                body.angularVelocity = 0;
+                //body.angularVelocity = 0;
                 legacyAnimation.enabled = false;
-                body.isKinematic = true;
+                body.freeze = true;
                 return;
             }
 
@@ -56,7 +56,7 @@ namespace NSMB.Entities.Enemies {
             IsDead = true;
 
             body.velocity = Vector2.zero;
-            body.isKinematic = true;
+            body.freeze = true;
 
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
         }

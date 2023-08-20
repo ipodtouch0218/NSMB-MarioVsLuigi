@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0
   fps: 12
@@ -111,6 +112,7 @@ MonoBehaviour:
   - {fileID: 2147156700845412417, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
   - {fileID: -1837141360104208851, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
   sRenderer: {fileID: 7821411591339125535}
+  image: {fileID: 0}
 --- !u!1 &7523289063499453450
 GameObject:
   m_ObjectHideFlags: 0
@@ -121,15 +123,13 @@ GameObject:
   m_Component:
   - component: {fileID: 7523289063499453456}
   - component: {fileID: 7523289063499453453}
-  - component: {fileID: 7523289063499453455}
   - component: {fileID: 7523289063499453452}
   - component: {fileID: 7551600738196628425}
-  - component: {fileID: 4710538364186427609}
   - component: {fileID: 2884479414836889194}
   - component: {fileID: 7415037304459295726}
   - component: {fileID: 5674404523704379184}
   - component: {fileID: 8059900885248764230}
-  - component: {fileID: 217785053388766539}
+  - component: {fileID: 4636113223263193814}
   m_Layer: 9
   m_Name: Goomba
   m_TagString: Untagged
@@ -166,10 +166,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _FacingRight:
+    _value: 0
   _IsActive:
     _value: 0
-  body: {fileID: 7523289063499453455}
+  body: {fileID: 4636113223263193814}
   sfx: {fileID: 5674404523704379184}
+  checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
     _value: 0
   _IsDead:
@@ -188,33 +191,6 @@ MonoBehaviour:
     type: 3}
   speed: 0.875
   terminalVelocity: -8
---- !u!50 &7523289063499453455
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7523289063499453450}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 0.091181055
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 3
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
 --- !u!61 &7523289063499453452
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -273,24 +249,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _Data:
+    Flags: 0
+    FloorAngle: 0
+  _PreviousTickVelocity: {x: 0, y: 0, z: 0}
   currentCollider: {fileID: 7523289063499453452}
-  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
+  getCrushedByGroundEntities: 1
   floorAndRoofCutoff: 0.2
-  body: {fileID: 0}
---- !u!114 &4710538364186427609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7523289063499453450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nrb: {fileID: 217785053388766539}
 --- !u!114 &2884479414836889194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,11 +419,10 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 7523289063499453453}
   - {fileID: 7551600738196628425}
-  - {fileID: 217785053388766539}
+  - {fileID: 4636113223263193814}
   SimulationBehaviours:
-  - {fileID: 4710538364186427609}
   - {fileID: 2884479414836889194}
---- !u!114 &217785053388766539
+--- !u!114 &4636113223263193814
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -466,22 +431,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 7523289063499453450}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a384a75a1c0645459861c223ac33652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  InterpolationSpace: 1
-  InterpolationTarget: {fileID: 3591845850498963736}
-  InterpolateErrorCorrection: 0
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 2
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
+  _position: {x: 0, y: 0}
+  _velocity: {x: 0, y: 0}
+  _freeze:
+    _value: 0
+  _gravity: {x: 0, y: 0}
+  _data:
+    Flags: 0
+    FloorAngle: 0
+  interpolationTarget: {fileID: 3591845850498963736}
+  collider: {fileID: 7523289063499453452}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 20736
+  maxIterations: 3
+  maxFloorAngle: 70
+  interpolationTeleportDistance: 1
+  bounceOnImpacts: 0

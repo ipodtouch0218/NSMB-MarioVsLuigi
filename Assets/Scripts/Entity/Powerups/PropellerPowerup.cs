@@ -18,7 +18,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         public override void FixedUpdateNetwork() {
             if (GameData.Instance && GameData.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
-                body.isKinematic = true;
+                body.freeze = true;
                 return;
             }
 
@@ -35,7 +35,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 if (!Object)
                     return;
 
-                if (physics.Data.OnGround) {
+                if (body.data.OnGround) {
                     // Start flying
                     TimeFlyingStarted = Runner.SimulationTime;
                     FlightOrigin = body.position;
@@ -46,7 +46,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 float x = flyingPathX.Evaluate(elapsedTime);
                 float y = flyingPathY.Evaluate(elapsedTime);
 
-                body.isKinematic = true;
+                body.freeze = true;
                 gameObject.layer = Layers.LayerHitsNothing;
                 body.position = FlightOrigin + new Vector2(x, y);
 

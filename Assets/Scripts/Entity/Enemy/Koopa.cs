@@ -79,9 +79,9 @@ namespace NSMB.Entities.Enemies {
 
             if (GameData.Instance && GameData.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
-                body.angularVelocity = 0;
+                //body.angularVelocity = 0;
                 animator.enabled = false;
-                body.isKinematic = true;
+                body.freeze = true;
                 return;
             }
 

@@ -38,7 +38,6 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         //---Components
         [SerializeField] private SpriteRenderer sRenderer;
-        [SerializeField] protected PhysicsEntity physics;
         [SerializeField] private Animator childAnimator;
         [SerializeField] private Animation childAnimation;
         [SerializeField] private BoxCollider2D hitbox;
@@ -52,7 +51,6 @@ namespace NSMB.Entities.Collectable.Powerups {
         public override void OnValidate() {
             base.OnValidate();
             if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (!physics) physics = GetComponent<PhysicsEntity>();
             if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
             if (!childAnimator) childAnimator = GetComponentInChildren<Animator>();
         }
@@ -97,7 +95,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             if (FollowPlayer) {
                 // Spawned following a player.
-                body.isKinematic = true;
+                body.freeze = true;
                 gameObject.layer = Layers.LayerHitsNothing;
                 sRenderer.sortingOrder = 15;
                 if (childAnimator)
@@ -110,7 +108,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             } else {
                 if (BlockSpawn) {
                     // Spawned from a block.
-                    body.isKinematic = true;
+                    body.freeze = true;
                     gameObject.layer = Layers.LayerHitsNothing;
                     sRenderer.sortingOrder = -1000;
 
@@ -119,7 +117,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
                 } else {
                     // Spawned by any other means (blue koopa, usually.)
-                    body.isKinematic = false;
+                    body.freeze = false;
                     gameObject.layer = Layers.LayerEntityNoGroundEntity;
                     sRenderer.sortingOrder = OriginalSortingOrder;
                 }
@@ -135,7 +133,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 return;
 
             if (childAnimator)
-                childAnimator.SetBool("onGround", physics.Data.OnGround);
+                childAnimator.SetBool("onGround", body.data.OnGround);
 
             HandleSpawningAnimation();
             HandleDespawningBlinking();
@@ -177,7 +175,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             base.FixedUpdateNetwork();
             if (GameData.Instance && GameData.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
-                body.isKinematic = true;
+                body.freeze = true;
                 return;
             }
 
@@ -191,7 +189,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
                     SpawnAnimationTimer = TickTimer.None;
                     FollowPlayer = null;
-                    body.isKinematic = false;
+                    body.freeze = false;
                     sRenderer.sortingOrder = OriginalSortingOrder;
                     sRenderer.gameObject.transform.localScale = Vector3.one;
                     if (childAnimator)
@@ -216,7 +214,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                     SpawnAnimationTimer = TickTimer.None;
                     BlockSpawn = false;
                     sRenderer.sortingOrder = OriginalSortingOrder;
-                    body.isKinematic = false;
+                    body.freeze = false;
                 } else {
                     //sRenderer.enabled = true;
                     return;
@@ -237,7 +235,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 HandleCollision();
             }
 
-            if (avoidPlayers && physics.Data.OnGround) {
+            if (avoidPlayers && body.data.OnGround) {
                 PlayerController closest = GameData.Instance.AlivePlayers.OrderBy(player => Utils.Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
                 if (closest) {
                     FacingRight = Utils.Utils.WrappedDirectionSign(closest.body.position, body.position) == -1;
@@ -248,7 +246,8 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         public void HandleCollision() {
-            PhysicsDataStruct data = physics.UpdateCollisions();
+
+            PhysicsDataStruct data = body.data;
 
             if (data.HitLeft || data.HitRight) {
                 FacingRight = data.HitLeft;

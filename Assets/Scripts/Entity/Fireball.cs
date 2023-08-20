@@ -33,11 +33,8 @@ namespace NSMB.Entities {
         [SerializeField] private SpriteRenderer[] renderers;
         [SerializeField] private BoxCollider2D hitbox;
 
-        [SerializeField] private EntityMover bodyy;
-
         public override void OnValidate() {
             base.OnValidate();
-            if (!nrb) nrb = GetComponent<NetworkRigidbody2D>();
             if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
             if ((renderers?.Length ?? 0) == 0) renderers = GetComponentsInChildren<SpriteRenderer>();
         }
@@ -51,7 +48,7 @@ namespace NSMB.Entities {
             Owner = owner;
 
             // Speed
-            bodyy.gravity = 9.81f * (IsIceball ? 2.2f : 4.4f) * Vector2.down;
+            body.gravity = 9.81f * (IsIceball ? 2.2f : 4.4f) * Vector2.down;
             if (IsIceball) {
                 CurrentSpeed = iceSpeed + Mathf.Abs(owner.body.velocity.x / 3f);
             } else {
@@ -59,17 +56,17 @@ namespace NSMB.Entities {
             }
 
             // Physics
-            bodyy.positionnn = spawnpoint;
+            body.position = spawnpoint;
             //nrb.TeleportToPosition(spawnpoint, Vector3.zero);
             //nrb.Rigidbody.position = spawnpoint;
-            bodyy.freeze = false;
-            bodyy.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
+            body.freeze = false;
+            body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
         }
 
         public override void Spawned() {
             base.Spawned();
 
-            bodyy.freeze = true;
+            body.freeze = true;
             iceGraphics.SetActive(false);
             fireGraphics.SetActive(false);
 
@@ -87,20 +84,20 @@ namespace NSMB.Entities {
         }
 
         public override void FixedUpdateNetwork() {
-            bodyy.freeze = !IsActive;
+            body.freeze = !IsActive;
             hitbox.enabled = IsActive;
 
             if (!IsActive) {
-                bodyy.velocity = Vector2.zero;
+                body.velocity = Vector2.zero;
                 return;
             }
 
             if (GameData.Instance && GameData.Instance.GameEnded) {
-                bodyy.freeze = true;
+                body.freeze = true;
                 return;
             }
 
-            if (bodyy.positionnn.y < GameManager.Instance.LevelMinY) {
+            if (body.position.y < GameManager.Instance.LevelMinY) {
                 DespawnEntity();
                 return;
             }
@@ -111,7 +108,7 @@ namespace NSMB.Entities {
             if (!CheckForEntityCollision())
                 return;
 
-            bodyy.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, bodyy.velocity.y));
+            body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
         }
 
         //---Helper Methods
@@ -119,15 +116,15 @@ namespace NSMB.Entities {
             if (!IsActive)
                 return false;
 
-            PhysicsDataStruct data = bodyy.data;
+            PhysicsDataStruct data = body.data;
 
             if (data.OnGround && !AlreadyBounced) {
                 float boost = bounceHeight * Mathf.Abs(Mathf.Sin(data.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
                 if ((data.FloorAngle > 0) == FacingRight)
                     boost = 0;
 
-                bodyy.velocity = new(bodyy.velocity.x, bounceHeight + boost);
-            } else if (IsIceball && bodyy.velocity.y > 0.1f) {
+                body.velocity = new(body.velocity.x, bounceHeight + boost);
+            } else if (IsIceball && body.velocity.y > 0.1f) {
                 AlreadyBounced = true;
             }
             bool breaking = data.HitLeft || data.HitRight || data.HitRoof || (data.OnGround && AlreadyBounced);
@@ -136,7 +133,7 @@ namespace NSMB.Entities {
                 return false;
             }
 
-            if (Utils.Utils.IsTileSolidAtWorldLocation(bodyy.positionnn)) {
+            if (Utils.Utils.IsTileSolidAtWorldLocation(body.position)) {
                 DespawnEntity();
                 return false;
             }
@@ -148,13 +145,13 @@ namespace NSMB.Entities {
             if (!IsActive)
                 return false;
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(bodyy.positionnn + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
             for (int i = 0; i < count; i++) {
                 GameObject collidedObject = CollisionBuffer[i].gameObject;
 
                 // Don't interact with ourselves.
-                if (CollisionBuffer[i].attachedRigidbody == bodyy)
+                if (CollisionBuffer[i].attachedRigidbody == body)
                     continue;
 
                 if (collidedObject.GetComponentInParent<IFireballInteractable>() is IFireballInteractable interactable) {
@@ -180,7 +177,7 @@ namespace NSMB.Entities {
                 BreakEffectAnimCounter++;
 
             IsActive = false;
-            bodyy.freeze = true;
+            body.freeze = true;
         }
 
         public override void OnIsActiveChanged() {
@@ -323,7 +320,7 @@ namespace NSMB.Entities {
             Fireball fireball = changed.Behaviour;
 
             // Don't play particles below the killplane
-            if (fireball.bodyy.positionnn.y < GameManager.Instance.LevelMinY)
+            if (fireball.body.position.y < GameManager.Instance.LevelMinY)
                 return;
 
             // Or if the game is over

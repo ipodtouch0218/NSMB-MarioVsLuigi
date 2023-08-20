@@ -37,8 +37,6 @@ namespace NSMB.Entities {
         public override bool IsFlying => flying;
         public override Vector2 FrozenSize {
             get {
-
-                Vector2 entityPosition = body ? body.position : transform.position;
                 Bounds bounds = default;
                 Renderer[] renderers = GetComponentsInChildren<Renderer>();
                 foreach (Renderer renderer in renderers) {
@@ -53,15 +51,7 @@ namespace NSMB.Entities {
                         bounds.Encapsulate(renderer.bounds);
                 }
 
-                Vector2 interpolationOffset = Vector2.zero;
-                if (nrb && nrb.InterpolationTarget) {
-                    interpolationOffset = entityPosition - (Vector2) nrb.InterpolationTarget.position;
-                }
-
                 Vector2 size = bounds.size;
-                Vector2 position = new(bounds.center.x, bounds.min.y);
-                Vector2 offset = entityPosition - position - interpolationOffset;
-
                 return size;
             }
         }
@@ -84,8 +74,8 @@ namespace NSMB.Entities {
                 }
 
                 Vector2 interpolationOffset = Vector2.zero;
-                if (nrb && nrb.InterpolationTarget) {
-                    interpolationOffset = entityPosition - (Vector2) nrb.InterpolationTarget.position;
+                if (body && body.interpolationTarget) {
+                    interpolationOffset = entityPosition - (Vector2) body.interpolationTarget.position;
                 }
 
                 Vector2 size = bounds.size;
@@ -147,25 +137,22 @@ namespace NSMB.Entities {
 
             if (!IsActive) {
                 gameObject.layer = Layers.LayerHitsNothing;
-                body.angularVelocity = 0;
-                body.constraints = RigidbodyConstraints2D.FreezeRotation;
+                //body.angularVelocity = 0;
                 body.velocity = Vector2.zero;
-                body.isKinematic = true;
+                body.freeze = true;
                 return;
 
             } else if (IsDead || IsFrozen) {
                 gameObject.layer = Layers.LayerHitsNothing;
-                body.isKinematic = false;
+                body.freeze = false;
 
                 if (WasSpecialKilled) {
-                    body.angularVelocity = 400f * (FacingRight ? 1 : -1);
-                    body.constraints = RigidbodyConstraints2D.None;
+                    //body.angularVelocity = 400f * (FacingRight ? 1 : -1);
                 }
                 return;
             } else {
                 gameObject.layer = Layers.LayerEntity;
-                body.isKinematic = false;
-                body.constraints = RigidbodyConstraints2D.FreezeRotation;
+                body.freeze = false;
             }
 
             if (collideWithOtherEnemies) {
@@ -174,7 +161,7 @@ namespace NSMB.Entities {
 
             if (dieWhenInsideBlock) {
                 Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-                if (!body.isKinematic && Utils.Utils.IsTileSolidAtWorldLocation(loc)) {
+                if (!body.freeze && Utils.Utils.IsTileSolidAtWorldLocation(loc)) {
                     SpecialKill(FacingRight, false, 0);
                 }
             }
@@ -227,10 +214,9 @@ namespace NSMB.Entities {
             ComboCounter = (byte) combo;
             FacingRight = right;
 
-            body.constraints = RigidbodyConstraints2D.None;
             body.velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
-            body.angularVelocity = 400f * (FacingRight ? 1 : -1);
-            body.gravityScale = 1.5f;
+            //body.angularVelocity = 400f * (FacingRight ? 1 : -1);
+            body.gravity = Vector2.down * 14.75f;
 
             Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.position + hitbox.offset);
         }
@@ -287,7 +273,7 @@ namespace NSMB.Entities {
             ComboCounter = 0;
 
             if (body)
-                body.gravityScale = 2.2f;
+                body.gravity = Vector2.down * 21.5f;
             //gameObject.layer = Layers.LayerEntity;
         }
 
@@ -371,8 +357,7 @@ namespace NSMB.Entities {
 
             if (body) {
                 body.velocity = Vector2.zero;
-                body.angularVelocity = 0;
-                body.isKinematic = true;
+                body.freeze = true;
             }
         }
 

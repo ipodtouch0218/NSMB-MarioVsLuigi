@@ -63,9 +63,9 @@ namespace NSMB.Entities {
         public override void Render() {
             base.Render();
 
-            if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.nrb.InterpolationTarget && nrb.InterpolationTarget) {
-                Transform target = FrozenEntity.nrb.InterpolationTarget.transform;
-                Vector2 newPos = (Vector2) nrb.InterpolationTarget.position + EntityPositionOffset;
+            if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.body.interpolationTarget && body.interpolationTarget) {
+                Transform target = FrozenEntity.body.interpolationTarget.transform;
+                Vector2 newPos = (Vector2) body.interpolationTarget.position + EntityPositionOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
                 target.position = new(newPos.x, newPos.y, target.position.z);
             }
@@ -98,7 +98,7 @@ namespace NSMB.Entities {
 
                 FrozenEntity.body.position = body.position + EntityPositionOffset;
                 FrozenEntity.body.velocity = Vector2.zero;
-                FrozenEntity.body.isKinematic = true;
+                FrozenEntity.body.freeze = true;
             }
 
             if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {
@@ -168,16 +168,15 @@ namespace NSMB.Entities {
         }
 
         private void ApplyConstraints() {
-            body.constraints = RigidbodyConstraints2D.FreezeRotation;
-            body.mass = Holder ? 0 : 1;
-            body.isKinematic = !FrozenEntity.IsCarryable;
+            //body.mass = Holder ? 0 : 1;
+            body.freeze = !FrozenEntity.IsCarryable;
 
             if (!Holder) {
-                if (!FastSlide)
-                    body.constraints |= RigidbodyConstraints2D.FreezePositionX;
+                //if (!FastSlide)
+                //    body.constraints |= RigidbodyConstraints2D.FreezePositionX;
 
-                if (flying && !Fallen)
-                    body.constraints |= RigidbodyConstraints2D.FreezePositionY;
+                //if (flying && !Fallen)
+                //    body.constraints |= RigidbodyConstraints2D.FreezePositionY;
             }
         }
 
@@ -271,7 +270,7 @@ namespace NSMB.Entities {
 
             if (FrozenEntity.IsFlying) {
                 Fallen = true;
-                body.isKinematic = false;
+                body.freeze = false;
             }
             ApplyConstraints();
         }

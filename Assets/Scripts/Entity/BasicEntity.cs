@@ -7,7 +7,7 @@ using NSMB.Tiles;
 
 namespace NSMB.Entities {
 
-    [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
+    [OrderAfter(typeof(EntityMover))]
     public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
         //---Networked Variables
@@ -18,8 +18,7 @@ namespace NSMB.Entities {
         [Networked] protected Vector2 SpawnLocation { get; set; }
 
         //---Components
-        [SerializeField] public Rigidbody2D body;
-        [SerializeField] public NetworkRigidbody2D nrb;
+        [SerializeField] public EntityMover body;
         [SerializeField] public AudioSource sfx;
 
         //---Properties
@@ -32,8 +31,7 @@ namespace NSMB.Entities {
         private bool brickBreakSound;
 
         public virtual void OnValidate() {
-            if (!body) body = GetComponent<Rigidbody2D>();
-            if (!nrb) nrb = GetComponent<NetworkRigidbody2D>();
+            if (!body) body = GetComponent<EntityMover>();
             if (!sfx) sfx = GetComponent<AudioSource>();
         }
 
@@ -80,7 +78,6 @@ namespace NSMB.Entities {
             if (body) {
                 body.position = SpawnLocation;
                 body.velocity = Vector2.zero;
-                body.rotation = 0;
             }
             IsActive = true;
         }
@@ -97,7 +94,6 @@ namespace NSMB.Entities {
             if (body) {
                 body.position = SpawnLocation;
                 body.velocity = Vector2.zero;
-                body.rotation = 0;
             }
             IsActive = false;
         }

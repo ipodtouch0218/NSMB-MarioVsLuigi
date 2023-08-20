@@ -48,7 +48,7 @@ namespace NSMB.Entities.Collectable {
             if (GameData.Instance && GameData.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
                 spriteAnimation.enabled = false;
-                body.isKinematic = true;
+                body.freeze = true;
                 return;
             }
 

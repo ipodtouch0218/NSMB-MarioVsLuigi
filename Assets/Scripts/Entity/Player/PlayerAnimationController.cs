@@ -30,11 +30,11 @@ namespace NSMB.Entities.Player {
         private readonly List<Renderer> renderers = new();
         private PlayerController controller;
         private Animator animator;
-        private Rigidbody2D body;
         private MaterialPropertyBlock materialBlock;
 
         //---Properties
         public Color GlowColor { get; private set; }
+        public EntityMover body => controller.body;
         private bool IsSpinningOnSpinner => controller.OnSpinner && controller.IsOnGround && controller.FireballDelayTimer.ExpiredOrNotRunning(Runner) && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity;
 
         //---Private Variables
@@ -57,7 +57,6 @@ namespace NSMB.Entities.Player {
         public void Awake() {
             controller = GetComponent<PlayerController>();
             animator = GetComponent<Animator>();
-            body = GetComponent<Rigidbody2D>();
         }
 
         public override void Spawned() {
@@ -283,7 +282,7 @@ namespace NSMB.Entities.Player {
                 animatedVelocity = 2f;
             } else if (controller.State == Enums.PowerupState.MegaMushroom && (left || right)) {
                 animatedVelocity = 4.5f;
-            } else if (left ^ right && !controller.hitRight && !controller.hitLeft) {
+            } else if (left ^ right && !controller.HitRight && !controller.HitLeft) {
                 animatedVelocity = Mathf.Max(controller.OnIce ? 2.7f : 2f, animatedVelocity);
             } else if (controller.OnIce) {
                 animatedVelocity = 0;
@@ -359,7 +358,7 @@ namespace NSMB.Entities.Player {
 
             PipeManager pe = controller.CurrentPipe;
 
-            body.isKinematic = true;
+            body.freeze = true;
             body.velocity = controller.PipeDirection;
 
             if (controller.PipeTimer.Expired(Runner)) {
@@ -375,7 +374,7 @@ namespace NSMB.Entities.Player {
                         offset.y += size;
                     }
                     Vector3 tpPos = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
-                    controller.networkRigidbody.TeleportToPosition(tpPos);
+                    controller.body.position = tpPos;
                     controller.cameraController.Recenter(tpPos + (Vector3) offset);
                     controller.PipeTimer = TickTimer.CreateFromSeconds(Runner, pipeDuration * 0.5f);
                     controller.PipeEntering = false;
@@ -383,7 +382,7 @@ namespace NSMB.Entities.Player {
                 } else {
                     //end pipe animation
                     controller.CurrentPipe = null;
-                    body.isKinematic = false;
+                    body.freeze = false;
                     controller.IsOnGround = false;
                     controller.JumpState = PlayerController.PlayerJumpState.None;
                     controller.IsCrouching = false;

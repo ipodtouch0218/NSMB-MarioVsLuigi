@@ -113,7 +113,7 @@ public class CameraController : NetworkBehaviour {
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
         if (!controller.IsDead && !controller.IsRespawning)
-            PlayerPos = AntiJitter(controller.nrb.InterpolationTarget.position);
+            PlayerPos = AntiJitter(controller.body.interpolationTarget.position);
 
         float vOrtho = targetCamera.orthographicSize;
         float xOrtho = vOrtho * targetCamera.aspect;

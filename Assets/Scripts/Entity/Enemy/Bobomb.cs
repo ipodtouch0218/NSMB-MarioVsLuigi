@@ -58,9 +58,9 @@ namespace NSMB.Entities.Enemies {
             base.FixedUpdateNetwork();
             if (GameData.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
-                body.angularVelocity = 0;
+                body.freeze = true;
+                //body.angularVelocity = 0;
                 animator.enabled = false;
-                body.isKinematic = true;
                 return;
             }
 

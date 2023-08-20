@@ -4926,6 +4926,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisplaying: 1
   runInEditor: 0
   frame: 0
   fps: 24
@@ -4971,6 +4972,7 @@ MonoBehaviour:
   - {fileID: -519060384786953374, guid: 6a8295a206a133847aa7c4b37eaa0337, type: 3}
   - {fileID: -3085684383362731524, guid: 6a8295a206a133847aa7c4b37eaa0337, type: 3}
   sRenderer: {fileID: 4540435544182297773}
+  image: {fileID: 0}
 --- !u!1 &2627485830306083579
 GameObject:
   m_ObjectHideFlags: 0
@@ -4981,14 +4983,12 @@ GameObject:
   m_Component:
   - component: {fileID: 2627485830306083583}
   - component: {fileID: 2721581803245764244}
-  - component: {fileID: 3091356493132500068}
   - component: {fileID: 2627485830306083576}
-  - component: {fileID: 473391894580253470}
   - component: {fileID: 3529903825791625940}
   - component: {fileID: 6793168269546059589}
   - component: {fileID: 5407584048357268515}
   - component: {fileID: 6213839771229971201}
-  - component: {fileID: 8651934288568289201}
+  - component: {fileID: 2108662388035762444}
   m_Layer: 10
   m_Name: BulletBill
   m_TagString: Untagged
@@ -5012,7 +5012,7 @@ Transform:
   - {fileID: 552913906689110687}
   - {fileID: 4914380577473150768}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2721581803245764244
 MonoBehaviour:
@@ -5027,10 +5027,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _FacingRight:
+    _value: 0
   _IsActive:
     _value: 0
-  body: {fileID: 3091356493132500068}
+  body: {fileID: 2108662388035762444}
   sfx: {fileID: 5407584048357268515}
+  checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
     _value: 0
   _IsDead:
@@ -5044,41 +5047,12 @@ MonoBehaviour:
   animator: {fileID: 0}
   legacyAnimation: {fileID: 5184426367989315057}
   sRenderer: {fileID: 4540435544182297773}
-  audioSource: {fileID: 5407584048357268515}
   physics: {fileID: 0}
   speed: 1.5
   playerSearchRadius: 12
   despawnDistance: 10
   shootParticles: {fileID: 7693979224894144423}
   trailParticles: {fileID: 1566471443926189886}
-  nrb: {fileID: 8651934288568289201}
---- !u!50 &3091356493132500068
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2627485830306083579}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
 --- !u!61 &2627485830306083576
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5124,19 +5098,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.51, y: 0.3}
   m_EdgeRadius: 0
---- !u!114 &473391894580253470
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2627485830306083579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nrb: {fileID: 8651934288568289201}
 --- !u!114 &3529903825791625940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5168,6 +5129,7 @@ MonoBehaviour:
   soundOrigin: {fileID: 2627485830306083583}
   soundRange: 12
   maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!82 &5407584048357268515
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5288,11 +5250,10 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2721581803245764244}
-  - {fileID: 8651934288568289201}
+  - {fileID: 2108662388035762444}
   SimulationBehaviours:
-  - {fileID: 473391894580253470}
   - {fileID: 3529903825791625940}
---- !u!114 &8651934288568289201
+--- !u!114 &2108662388035762444
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5301,25 +5262,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 2627485830306083579}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a384a75a1c0645459861c223ac33652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  InterpolationSpace: 0
-  InterpolationTarget: {fileID: 464766525613347646}
-  InterpolateErrorCorrection: 0
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 2
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
+  _position: {x: 0, y: 0}
+  _velocity: {x: 0, y: 0}
+  _freeze:
+    _value: 0
+  _gravity: {x: 0, y: 0}
+  _data:
+    Flags: 0
+    FloorAngle: 0
+  interpolationTarget: {fileID: 464766525613347646}
+  collider: {fileID: 2627485830306083576}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 20736
+  maxIterations: 3
+  maxFloorAngle: 70
+  interpolationTeleportDistance: 1
+  bounceOnImpacts: 0
 --- !u!1 &2855663874240651994
 GameObject:
   m_ObjectHideFlags: 0

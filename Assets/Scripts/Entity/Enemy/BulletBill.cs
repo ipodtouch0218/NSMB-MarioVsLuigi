@@ -16,11 +16,6 @@ namespace NSMB.Entities.Enemies {
         //---Private Variables
         private Vector2 searchVector;
 
-        public override void OnValidate() {
-            base.OnValidate();
-            if (!nrb) nrb = GetComponent<NetworkRigidbody2D>();
-        }
-
         public void Awake() {
             searchVector = new(playerSearchRadius * 2, playerSearchRadius * 4);
         }
@@ -29,9 +24,8 @@ namespace NSMB.Entities.Enemies {
 
             if (GameData.Instance.GameEnded) {
                 body.velocity = Vector2.zero;
-                body.angularVelocity = 0;
+                body.freeze = true;
                 legacyAnimation.enabled = false;
-                body.isKinematic = true;
                 return;
             }
 
@@ -40,22 +34,23 @@ namespace NSMB.Entities.Enemies {
                 DespawnEntity();
             }
 
+            body.freeze = !IsActive || IsFrozen;
+
             if (IsDead || !IsActive) {
                 gameObject.layer = Layers.LayerHitsNothing;
-                body.isKinematic = false;
                 if (!IsActive) {
-                    body.rotation = 0;
-                    body.angularVelocity = 0;
-                    body.gravityScale = 0;
+                    //body.rotation = 0;
+                    //body.angularVelocity = 0;
+                    body.gravity = Vector2.zero;
                 }
 
             } else {
                 gameObject.layer = Layers.LayerEntityHitbox;
-                body.isKinematic = true;
-                body.freezeRotation = true;
-                body.rotation = 0;
-                body.angularVelocity = 0;
-                body.gravityScale = 0;
+                //body.freeze = true;
+                //body.freezeRotation = true;
+                //body.rotation = 0;
+                //body.angularVelocity = 0;
+                body.gravity = Vector2.zero;
             }
 
             if (IsFrozen || IsDead)
@@ -122,10 +117,10 @@ namespace NSMB.Entities.Enemies {
         public override void Kill() {
             IsDead = true;
             body.velocity = Vector2.zero;
-            body.constraints = RigidbodyConstraints2D.None;
-            body.angularVelocity = 400f * (FacingRight ? -1 : 1);
-            body.gravityScale = 1.5f;
-            body.isKinematic = false;
+            body.freeze = false;
+            //body.constraints = RigidbodyConstraints2D.None;
+            //body.angularVelocity = 400f * (FacingRight ? -1 : 1);
+            body.gravity = Vector2.down * 14.75f;
         }
 
         public override void SpecialKill(bool right, bool groundpound, int combo) {

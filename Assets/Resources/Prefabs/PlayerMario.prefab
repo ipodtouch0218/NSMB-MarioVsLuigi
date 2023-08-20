@@ -275,6 +275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe023cea6fd5f842af136c8824b0710, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!1 &1136710984746719041
 GameObject:
   m_ObjectHideFlags: 0
@@ -10476,14 +10477,12 @@ GameObject:
   - component: {fileID: 4824223341387914440}
   - component: {fileID: 4824223341387914485}
   - component: {fileID: 79918617084146557}
-  - component: {fileID: 4824223341387914443}
   - component: {fileID: 2254935152879088866}
-  - component: {fileID: 4824223341387914442}
   - component: {fileID: 2102992499848127643}
   - component: {fileID: 5377451828833222271}
   - component: {fileID: 3452636116809643534}
   - component: {fileID: 453221688236677073}
-  - component: {fileID: 2433599474194652050}
+  - component: {fileID: 7021228977528019271}
   m_Layer: 10
   m_Name: PlayerMario
   m_TagString: Player
@@ -10525,8 +10524,7 @@ MonoBehaviour:
     _value: 0
   _IsActive:
     _value: 1
-  body: {fileID: 4824223341387914443}
-  nrb: {fileID: 2433599474194652050}
+  body: {fileID: 7021228977528019271}
   sfx: {fileID: 5377451828833222271}
   checkForNearbyPlayersWhenRespawning: 1
   _IsFrozen:
@@ -10623,7 +10621,6 @@ MonoBehaviour:
     _value: 0
   _FrozenCube: {fileID: 0}
   sfxBrick: {fileID: 3452636116809643534}
-  networkRigidbody: {fileID: 2433599474194652050}
   cameraController: {fileID: 8020175873997104482}
   animationController: {fileID: 79918617084146557}
   flyingGravity: 0.8
@@ -10700,33 +10697,6 @@ MonoBehaviour:
   shellSlideData: {fileID: 11400000, guid: c74256c46183cf14ab95e81152a2d8d9, type: 2}
   spinnerDrillData: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
   propellerDrillData: {fileID: 11400000, guid: eef8bb198b37ff940a8a8de713e95481, type: 2}
---- !u!50 &4824223341387914443
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824223341387914446}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 1
-  m_UseAutoMass: 0
-  m_Mass: 0.147
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
 --- !u!95 &2254935152879088866
 Animator:
   serializedVersion: 5
@@ -10748,19 +10718,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &4824223341387914442
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824223341387914446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nrb: {fileID: 2433599474194652050}
 --- !u!114 &2102992499848127643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11018,11 +10975,11 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 4824223341387914485}
   - {fileID: 79918617084146557}
-  - {fileID: 2433599474194652050}
+  - {fileID: 7021228977528019271}
   - {fileID: 8020175873997104482}
-  SimulationBehaviours:
-  - {fileID: 4824223341387914442}
---- !u!114 &2433599474194652050
+  - {fileID: 1541702763616586234}
+  SimulationBehaviours: []
+--- !u!114 &7021228977528019271
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -11031,25 +10988,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 4824223341387914446}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a384a75a1c0645459861c223ac33652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  InterpolationSpace: 1
-  InterpolationTarget: {fileID: 8279152070748857899}
-  InterpolateErrorCorrection: 0
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 5
-    MaxRate: 45
-    PosBlendStart: 0.1
-    PosBlendEnd: 0.75
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 3
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
+  _position: {x: 0, y: 0}
+  _velocity: {x: 0, y: 0}
+  _freeze:
+    _value: 0
+  _gravity: {x: 0, y: 0}
+  _data:
+    Flags: 0
+    FloorAngle: 0
+  interpolationTarget: {fileID: 8279152070748857899}
+  collider: {fileID: 4685273836918269365}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 20736
+  maxIterations: 3
+  maxFloorAngle: 70
+  interpolationTeleportDistance: 1
+  bounceOnImpacts: 0
 --- !u!1 &4824223342336871188
 GameObject:
   m_ObjectHideFlags: 0

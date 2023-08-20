@@ -29,9 +29,9 @@ namespace NSMB.Entities {
         }
 
         public override void Render() {
-            if (Holder && nrb.InterpolationTarget) {
-                Transform target = nrb.InterpolationTarget.transform;
-                Vector3 newPos = Holder.networkRigidbody.InterpolationTarget.position + holderOffset;
+            if (Holder && body.interpolationTarget) {
+                Transform target = body.interpolationTarget.transform;
+                Vector3 newPos = Holder.body.interpolationTarget.position + holderOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
                 target.position = newPos;
             }
@@ -41,16 +41,17 @@ namespace NSMB.Entities {
             if (Holder) {
                 body.velocity = Holder.body.velocity;
 
-                // Teleport check
                 Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
-                Vector2 diff = newPosition - body.position;
-                bool wrapped = Utils.Utils.WrapWorldLocation(ref newPosition);
+                body.position = newPosition;
 
-                if (!wasHeldLastTick || wrapped) {
-                    nrb.TeleportToPosition(newPosition, diff);
-                } else {
-                    body.position = newPosition;
-                }
+                //Vector2 diff = newPosition - body.position;
+                //bool wrapped = Utils.Utils.WrapWorldLocation(ref newPosition);
+
+                //if (!wasHeldLastTick || wrapped) {
+                //    nrb.TeleportToPosition(newPosition, diff);
+                //} else {
+
+                //}
 
                 hitbox.enabled = false;
                 CheckForEntityCollisions();

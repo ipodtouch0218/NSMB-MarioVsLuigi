@@ -30,7 +30,6 @@ namespace NSMB.Entities.Collectable {
 
         //---Components
         [SerializeField] public SpriteRenderer sRenderer;
-        [SerializeField] private PhysicsEntity physics;
         [SerializeField] private BoxCollider2D worldCollider;
         [SerializeField] private Animator animator;
 
@@ -40,7 +39,6 @@ namespace NSMB.Entities.Collectable {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!physics) physics = GetComponent<PhysicsEntity>();
             if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
             if (!worldCollider) worldCollider = GetComponent<BoxCollider2D>();
             if (!animator) animator = GetComponent<Animator>();
@@ -64,7 +62,7 @@ namespace NSMB.Entities.Collectable {
             if (IsStationary) {
                 // Main star: use the "spawn-in" animation
                 animator.enabled = true;
-                body.isKinematic = true;
+                body.freeze = true;
                 body.velocity = Vector2.zero;
                 StartCoroutine(PulseEffect());
 
@@ -79,7 +77,7 @@ namespace NSMB.Entities.Collectable {
                 if (DroppedByPit)
                     body.velocity += Vector2.up * 3;
 
-                body.isKinematic = false;
+                body.freeze = false;
                 worldCollider.enabled = true;
             }
 
@@ -107,7 +105,7 @@ namespace NSMB.Entities.Collectable {
             base.FixedUpdateNetwork();
             if (GameData.Instance?.GameEnded ?? false) {
                 body.velocity = Vector2.zero;
-                body.isKinematic = true;
+                body.freeze = true;
                 return;
             }
 
@@ -172,16 +170,17 @@ namespace NSMB.Entities.Collectable {
         }
 
         private bool HandleCollision() {
-            physics.UpdateCollisions();
 
-            if (physics.Data.HitLeft || physics.Data.HitRight) {
-                FacingRight = physics.Data.HitLeft;
+            PhysicsDataStruct data = body.data;
+
+            if (data.HitLeft || data.HitRight) {
+                FacingRight = data.HitLeft;
                 body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
             }
 
-            if (physics.Data.OnGround && Collectable) {
+            if (data.OnGround && Collectable) {
                 body.velocity = new(body.velocity.x, bounceAmount);
-                if (physics.Data.HitRoof) {
+                if (data.HitRoof) {
                     DespawnEntity();
                     return true;
                 }

@@ -1,20 +1,21 @@
 using UnityEngine;
 
+using Fusion;
 using NSMB.Game;
 
-public class WrappingHitbox : MonoBehaviour {
+public class WrappingHitbox : NetworkBehaviour {
 
-    private Rigidbody2D body;
+    private EntityMover body;
     private BoxCollider2D[] ourColliders, childColliders;
     private Vector2 offset;
 
     public void Awake() {
-        body = GetComponent<Rigidbody2D>();
+        body = GetComponent<EntityMover>();
         if (!body)
-            body = GetComponentInParent<Rigidbody2D>();
+            body = GetComponentInParent<EntityMover>();
         ourColliders = GetComponents<BoxCollider2D>();
 
-        // null propagation is ok w/ GameManager.Instance
+        // Null propagation is ok w/ GameManager.Instance
         if (!(GameManager.Instance?.loopingLevel ?? false)) {
             enabled = false;
             return;
@@ -24,11 +25,9 @@ public class WrappingHitbox : MonoBehaviour {
         for (int i = 0; i < ourColliders.Length; i++)
             childColliders[i] = gameObject.AddComponent<BoxCollider2D>();
         offset = new(GameManager.Instance.LevelWidth, 0);
-
-        LateUpdate();
     }
 
-    public void LateUpdate() {
+    public override void FixedUpdateNetwork() {
         for (int i = 0; i < ourColliders.Length; i++)
             UpdateChildColliders(i);
     }

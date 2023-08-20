@@ -1,14 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace NSMB.Utils {
     public static class Layers {
 
+        // Layer Masks
         private static LayerMask? _maskAnyGround, _maskSolidGround, _maskOnlyPlayer, _maskEntities;
         public static LayerMask MaskAnyGround       => LazyLoadMask(ref _maskAnyGround, LayerGround, LayerSemisolid, LayerGroundEntity);
         public static LayerMask MaskSolidGround     => LazyLoadMask(ref _maskSolidGround, LayerGround, LayerGroundEntity);
         public static LayerMask MaskOnlyPlayers     => LazyLoadMask(ref _maskOnlyPlayer, LayerPlayer);
         public static LayerMask MaskEntities        => LazyLoadMask(ref _maskEntities, LayerPlayer, LayerGroundEntity, LayerEntity, LayerEntityHitbox, LayerEntityNoGroundEntity);
 
+        // Collision Matrix Masks
+        private static readonly Dictionary<int, LayerMask> CollisionMatrixMasks = new();
+
+        // Layer Ints
         private static int? _layerGround, _layerSemisolid, _layerHitsNothing, _layerPassthrough, _layerEntity, _layerEntityHitbox, _layerEntityNoGroundEntity, _layerPlayer, _layerGroundEntity;
         public static int LayerGround               => LazyLoadLayer(ref _layerGround, "Ground");
         public static int LayerSemisolid            => LazyLoadLayer(ref _layerSemisolid, "Semisolids");
@@ -19,6 +25,19 @@ namespace NSMB.Utils {
         public static int LayerEntityHitbox         => LazyLoadLayer(ref _layerEntityHitbox, "EntityHitbox");
         public static int LayerPlayer               => LazyLoadLayer(ref _layerPlayer, "Player");
         public static int LayerGroundEntity         => LazyLoadLayer(ref _layerGroundEntity, "GroundEntity");
+
+        public static LayerMask GetCollisionMask(int layer) {
+            if (CollisionMatrixMasks.ContainsKey(layer))
+                return CollisionMatrixMasks[layer];
+
+            int mask = 0;
+            for (int j = 0; j < 32; j++) {
+                if (!Physics2D.GetIgnoreLayerCollision(layer, j)) {
+                    mask |= 1 << j;
+                }
+            }
+            return CollisionMatrixMasks[layer] = mask;
+        }
 
         private static LayerMask LazyLoadMask(ref LayerMask? variable, int? layer1 = null, int? layer2 = null, int? layer3 = null, int? layer4 = null, int? layer5 = null) {
             if (variable != null)
@@ -40,7 +59,7 @@ namespace NSMB.Utils {
         }
 
         private static int LazyLoadLayer(ref int? variable, string layer) {
-            if (variable != null)
+            if (variable.HasValue)
                 return (int) variable;
 
             return (int) (variable = LayerMask.NameToLayer(layer));

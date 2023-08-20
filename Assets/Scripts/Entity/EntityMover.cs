@@ -10,8 +10,8 @@ public class EntityMover : NetworkBehaviour {
     private static readonly float skin = 0.03f;
 
     //---Networked Variables
+    [Networked] public Vector2 position { get; set; }
     [Networked] public Vector2 velocity { get; set; }
-    [Networked] public Vector2 positionnn { get; set; }
     [Networked] public NetworkBool freeze { get; set; }
     [Networked] public Vector2 gravity { get; set; }
 
@@ -22,9 +22,9 @@ public class EntityMover : NetworkBehaviour {
     private Vector2 ColliderSize => transform.lossyScale * collider.size;
 
     //---Serialized Variables
-    [SerializeField] private Transform interpolationTarget;
+    [Header("Serialized")]
+    [SerializeField] public Transform interpolationTarget;
     [SerializeField] private BoxCollider2D collider;
-    [SerializeField] private LayerMask layerMask;
     [SerializeField] private int maxIterations = 3;
     [SerializeField] private float maxFloorAngle = 70, interpolationTeleportDistance = 1f;
     [SerializeField] private bool bounceOnImpacts;
@@ -33,46 +33,61 @@ public class EntityMover : NetworkBehaviour {
     private RawInterpolator positionInterpolator;
 
     public override void Spawned() {
-        positionnn = transform.position;
-        positionInterpolator = GetInterpolator(nameof(positionnn));
+        position = transform.position;
+        positionInterpolator = GetInterpolator(nameof(position));
     }
 
-    public void LateUpdate() {
+    public override void Render() {
         if (!interpolationTarget)
             interpolationTarget = transform;
 
         unsafe {
+            Vector3 newPosition;
             if (freeze || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
-                interpolationTarget.position = positionnn;
+                newPosition = position;
 
             } else {
-                Vector2 fromValue = *(Vector2*) from;
-                Vector2 toValue = *(Vector2*) to;
+                Vector2Int fromInt = *(Vector2Int*) from;
+                Vector2 fromFloat = (Vector2) fromInt * 0.001f;
 
-                if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromValue, toValue) > interpolationTeleportDistance) {
+                Vector2Int toInt = *(Vector2Int*) to;
+                Vector2 toFloat = (Vector2) toInt * 0.001f;
+
+                if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromFloat, toFloat) > interpolationTeleportDistance) {
                     // Teleport over large distances
-                    interpolationTarget.position = Utils.WrapWorldLocation(toValue);
+                    newPosition = Utils.WrapWorldLocation(toFloat);
                 } else {
                     // Normal interpolation (over level seams, too)...
-                    interpolationTarget.position = Utils.WrapWorldLocation(Vector2.Lerp(fromValue, toValue, alpha));
+                    Utils.UnwrapLocations(fromFloat, toFloat, out Vector2 fromFloatRelative, out Vector2 toFloatRelative);
+                    Vector2 difference = toFloatRelative - fromFloatRelative;
+                    newPosition = Utils.WrapWorldLocation(Vector2.Lerp(fromFloat, fromFloat + difference, alpha));
                 }
             }
-        }
 
-        //interpolationTarget.position = position;
+            newPosition.z = interpolationTarget.position.z;
+            interpolationTarget.position = newPosition;
+        }
     }
 
     public override void FixedUpdateNetwork() {
         ResetPhysicsData();
 
-        if (freeze)
-            return;
+        if (!freeze) {
+            bool original = Physics2D.queriesStartInColliders;
+            Physics2D.queriesStartInColliders = false;
 
-        Vector2 movement = CollideAndSlide(positionnn + ColliderOffset, ((gravity * Runner.DeltaTime) + velocity) * Runner.DeltaTime) * Runner.Config.Simulation.TickRate;
-        velocity = movement;
-        positionnn = Utils.WrapWorldLocation(positionnn + (velocity * Runner.DeltaTime));
+            Vector2 movement;
+            movement = CollideAndSlide(position + ColliderOffset, velocity * Runner.DeltaTime, false);
+            movement += CollideAndSlide(position + ColliderOffset + movement, gravity * (Runner.DeltaTime * Runner.DeltaTime), true);
+            movement *= Runner.Config.Simulation.TickRate;
 
-        transform.position = positionnn;
+            velocity = movement;
+            position = Utils.WrapWorldLocation(position + (velocity * Runner.DeltaTime));
+
+            Physics2D.queriesStartInColliders = original;
+        }
+
+        transform.position = position;
     }
 
     private void ResetPhysicsData() {
@@ -84,14 +99,14 @@ public class EntityMover : NetworkBehaviour {
         data.HitLeft = false;
     }
 
-    private Vector2 CollideAndSlide(Vector2 position, Vector2 velocity, int depth = 0) {
+    private Vector2 CollideAndSlide(Vector2 position, Vector2 velocity, bool gravityPass, int depth = 0) {
         if (depth >= maxIterations)
             return Vector2.zero;
 
         float distance = velocity.magnitude + skin;
         Vector2 direction = velocity.normalized;
 
-        int hits = Physics2D.BoxCastNonAlloc(position, ColliderSize, 0, direction, RaycastBuffer, distance, layerMask);
+        int hits = Physics2D.BoxCastNonAlloc(position, ColliderSize, 0, direction, RaycastBuffer, distance, Layers.GetCollisionMask(collider.gameObject.layer));
         for (int i = 0; i < hits; i++) {
             RaycastHit2D hit = RaycastBuffer[i];
 
@@ -129,11 +144,14 @@ public class EntityMover : NetworkBehaviour {
             if (surfaceDistance.sqrMagnitude <= skin * skin)
                 surfaceDistance = Vector2.zero;
 
-            float leftoverDistance = leftover.magnitude;
-            leftover = bounceOnImpacts ? Vector2.Reflect(leftover, hit.normal).normalized : Vector3.ProjectOnPlane(leftover, hit.normal).normalized;
-            leftover *= leftoverDistance;
+            if (data.OnGround && gravityPass)
+                return surfaceDistance;
 
-            return surfaceDistance + CollideAndSlide(position + surfaceDistance, leftover, depth + 1);
+            float leftoverDistance = leftover.magnitude;
+            leftover = bounceOnImpacts ? Vector2.Reflect(leftover, hit.normal) : Vector3.ProjectOnPlane(leftover, hit.normal);
+            //leftover = leftover.normalized * leftoverDistance;
+
+            return surfaceDistance + CollideAndSlide(position + surfaceDistance, leftover, gravityPass, depth + 1);
         }
 
         return velocity;
