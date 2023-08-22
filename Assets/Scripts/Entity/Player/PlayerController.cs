@@ -148,6 +148,8 @@ namespace NSMB.Entities.Player {
         public override Vector2 FrozenOffset => Vector2.up * 0.1f;
         public bool HitLeft => body.data.HitLeft;
         public bool HitRight => body.data.HitRight;
+        public bool CrushGround => body.data.CrushableGround;
+        public bool HitRoof => body.data.HitRoof;
         public bool WallSliding => WallSlideLeft || WallSlideRight;
         public bool InstakillsEnemies => IsStarmanInvincible || IsInShell || (IsSliding && Mathf.Abs(body.velocity.x) > 0.1f) || State == Enums.PowerupState.MegaMushroom;
         public bool IsCrouchedInShell => State == Enums.PowerupState.BlueShell && IsCrouching && !IsInShell;
@@ -220,7 +222,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] public CharacterData character;
         [SerializeField] private Vector2 smallFrozenCubeSize, largeFrozenCubeSize;
 
-        public bool crushGround, hitRoof, groundpoundLastFrame;
+        public bool groundpoundLastFrame;
         public float powerupFlash;
 
         private int noLivesStarSpawnDirection;
@@ -291,9 +293,9 @@ namespace NSMB.Entities.Player {
         private bool footstepVariant;
 
         // Tile data
-        private readonly List<Vector2Int> tilesStandingOn = new();
-        private readonly List<Vector2Int> tilesJumpedInto = new();
-        private readonly List<Vector2Int> tilesHitSide = new();
+        private IEnumerable<Vector2Int> tilesStandingOn => body.data.TilesStandingOn;
+        private IEnumerable<Vector2Int> tilesJumpedInto => body.data.TilesHitRoof;
+        private IEnumerable<Vector2Int> tilesHitSide => body.data.TilesHitSide;
 
         // Previous Tick Variables
         private bool previousTickIsOnGround;
@@ -528,10 +530,7 @@ namespace NSMB.Entities.Player {
         #region -- COLLISIONS --
         private void HandleGroundCollision() {
 
-            IsOnGround = body.data.OnGround;
-
             IsOnGround = body.data.OnGround && PropellerLaunchTimer.ExpiredOrNotRunning(Runner);
-            crushGround &= IsOnGround;
 
             /*
             tilesJumpedInto.Clear();
@@ -1791,7 +1790,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void UpwardsPipeCheck(bool up) {
-            if (!up || IsGroundpounding || !hitRoof || State == Enums.PowerupState.MegaMushroom || IsInKnockback || HeldEntity)
+            if (!up || IsGroundpounding || !HitRoof || State == Enums.PowerupState.MegaMushroom || IsInKnockback || HeldEntity)
                 return;
 
             // Todo: change to nonalloc?
@@ -2573,7 +2572,7 @@ namespace NSMB.Entities.Player {
             }
 
             // Activate blocks jumped into
-            if (hitRoof && !IsStuckInBlock) {
+            if (HitRoof && !IsStuckInBlock) {
                 bool tempHitBlock = false;
                 if (!IsProxy) {
                     bool interactedAny = false;
@@ -2664,7 +2663,7 @@ namespace NSMB.Entities.Player {
                 if (Runner.SimulationTime - TimeGrounded > 0.15f)
                     JumpState = PlayerJumpState.None;
 
-                if (hitRoof && IsOnGround && crushGround && body.velocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
+                if (HitRoof && IsOnGround && CrushGround && body.velocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
                     // Crushed.
                     Powerdown(true);
                 }

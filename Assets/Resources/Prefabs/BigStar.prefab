@@ -5159,15 +5159,12 @@ MonoBehaviour:
   _velocity: {x: 0, y: 0}
   _freeze:
     _value: 0
-  _gravity: {x: 0, y: 0}
+  _gravity: {x: 0, y: -12.753}
   _data:
     Flags: 0
     FloorAngle: 0
   interpolationTarget: {fileID: 8519953457714558423}
   collider: {fileID: 1973747262660636111}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 20736
   maxIterations: 3
   maxFloorAngle: 70
   interpolationTeleportDistance: 1

@@ -98,7 +98,6 @@ namespace NSMB.Entities {
         [SerializeField] protected Animator animator;
         [SerializeField] protected LegacyAnimateSpriteRenderer legacyAnimation;
         [SerializeField] public SpriteRenderer sRenderer;
-        [SerializeField] protected PhysicsEntity physics;
 
         public override void OnValidate() {
             base.OnValidate();
@@ -106,7 +105,6 @@ namespace NSMB.Entities {
             if (!animator) animator = GetComponentInChildren<Animator>();
             if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
             if (!legacyAnimation) legacyAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
-            if (!physics) physics = GetComponent<PhysicsEntity>();
         }
 
         public virtual void Start() {

@@ -138,7 +138,7 @@ namespace NSMB.Entities {
                     return;
             }
 
-            if (FastSlide && physics.Data.OnGround && physics.Data.FloorAngle != 0) {
+            if (FastSlide && body.data.OnGround && body.data.FloorAngle != 0) {
                 RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size * 0.5f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
                 if (ray) {
                     body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
@@ -154,11 +154,10 @@ namespace NSMB.Entities {
         }
 
         private bool HandleTile() {
-            physics.UpdateCollisions();
 
-            if ((FastSlide && (physics.Data.HitLeft || physics.Data.HitRight))
-                || (flying && Fallen && physics.Data.OnGround && !Holder)
-                || ((Holder || physics.Data.OnGround) && physics.Data.HitRoof)) {
+            if ((FastSlide && (body.data.HitLeft || body.data.HitRight))
+                || (flying && Fallen && body.data.OnGround && !Holder)
+                || ((Holder || body.data.OnGround) && body.data.HitRoof)) {
 
                 Kill();
                 return false;

@@ -7,14 +7,13 @@ public class EntityMover : NetworkBehaviour {
 
     //---Static Variables
     private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
-    private static readonly float skin = 0.03f;
+    private static readonly float skin = 0.005f;
 
     //---Networked Variables
     [Networked] public Vector2 position { get; set; }
     [Networked] public Vector2 velocity { get; set; }
     [Networked] public NetworkBool freeze { get; set; }
     [Networked] public Vector2 gravity { get; set; }
-
     [Networked] public ref PhysicsDataStruct data => ref MakeRef<PhysicsDataStruct>();
 
     //---Properties
@@ -71,10 +70,12 @@ public class EntityMover : NetworkBehaviour {
 
     public override void FixedUpdateNetwork() {
         ResetPhysicsData();
+        //if (Runner.IsForward)
+        //    position = transform.position;
 
         if (!freeze) {
-            bool original = Physics2D.queriesStartInColliders;
-            Physics2D.queriesStartInColliders = false;
+            //bool original = Physics2D.queriesStartInColliders;
+            //Physics2D.queriesStartInColliders = false;
 
             Vector2 movement;
             movement = CollideAndSlide(position + ColliderOffset, velocity * Runner.DeltaTime, false);
@@ -84,7 +85,7 @@ public class EntityMover : NetworkBehaviour {
             velocity = movement;
             position = Utils.WrapWorldLocation(position + (velocity * Runner.DeltaTime));
 
-            Physics2D.queriesStartInColliders = original;
+            //Physics2D.queriesStartInColliders = original;
         }
 
         transform.position = position;
@@ -97,6 +98,10 @@ public class EntityMover : NetworkBehaviour {
         data.HitRoof = false;
         data.HitRight = false;
         data.HitLeft = false;
+
+        data.TilesStandingOn.Clear();
+        data.TilesHitSide.Clear();
+        data.TilesHitRoof.Clear();
     }
 
     private Vector2 CollideAndSlide(Vector2 position, Vector2 velocity, bool gravityPass, int depth = 0) {
@@ -110,6 +115,10 @@ public class EntityMover : NetworkBehaviour {
         for (int i = 0; i < hits; i++) {
             RaycastHit2D hit = RaycastBuffer[i];
 
+            // Exception
+            if (Vector2.Dot(direction, hit.normal) > 0.1f)
+                continue;
+
             // Semisolid check.
             if (hit.collider.gameObject.layer == Layers.LayerSemisolid) {
                 if (
@@ -120,6 +129,7 @@ public class EntityMover : NetworkBehaviour {
                 }
             }
 
+            bool isTilemap = hit.collider is CompositeCollider2D;
             float angle = Vector2.SignedAngle(hit.normal, Vector2.up);
             if (Mathf.Abs(angle) < maxFloorAngle) {
                 // Up
@@ -127,31 +137,75 @@ public class EntityMover : NetworkBehaviour {
                 data.CrushableGround |= !hit.collider.CompareTag("platform");
                 data.FloorAngle = angle;
 
+                if (isTilemap) {
+                    float lowerBound = position.x - (ColliderSize.x * 0.5f);
+                    float upperBound = position.x + (ColliderSize.x * 0.5f);
+                    float y = hit.point.y + hit.normal.y * -0.1f;
+
+                    for (float x = Mathf.FloorToInt(lowerBound * 2) * 0.5f; x <= Mathf.FloorToInt(upperBound * 2) * 0.5f; x += 0.5f) {
+                        Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));
+                        if (!data.TilesStandingOn.Contains(loc)) {
+                            data.TilesStandingOn.Add(loc);
+                        }
+                    }
+                }
+
             } else if (Mathf.Abs(angle) > (90 - maxFloorAngle) + maxFloorAngle) {
                 // Down
                 data.HitRoof = true;
-            } else if (angle > 0) {
-                // Left
-                data.HitLeft = true;
+
+                if (isTilemap) {
+                    float lowerBound = position.x - ColliderSize.x * 0.5f - 0.005f;
+                    float upperBound = position.x + ColliderSize.x * 0.5f + 0.005f;
+                    float y = hit.point.y + hit.normal.y * -0.1f;
+
+                    for (float x = Mathf.FloorToInt(lowerBound * 2) * 0.5f; x <= Mathf.FloorToInt(upperBound * 2) * 0.5f; x += 0.5f) {
+                        Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));
+                        if (!data.TilesHitRoof.Contains(loc)) {
+                            data.TilesHitRoof.Add(loc);
+                        }
+                    }
+                }
+
             } else {
-                // Right
-                data.HitRight = true;
+                if (angle > 0) {
+                    // Left
+                    data.HitLeft = true;
+                } else {
+                    // Right
+                    data.HitRight = true;
+                }
+
+                if (isTilemap) {
+                    float lowerBound = position.y - ColliderSize.y * 0.5f - 0.005f;
+                    float upperBound = position.y + ColliderSize.y * 0.5f + 0.005f;
+                    float x = hit.point.x + hit.normal.x * -0.1f;
+
+                    for (float y = Mathf.FloorToInt(lowerBound * 2) * 0.5f; y <= Mathf.FloorToInt(upperBound * 2) * 0.5f; y += 0.5f) {
+                        Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));
+                        if (!data.TilesHitSide.Contains(loc)) {
+                            data.TilesHitSide.Add(loc);
+                        }
+                    }
+                }
             }
 
-            Vector2 surfaceDistance = direction * (hit.distance - skin);
-            Vector2 leftover = velocity - surfaceDistance;
+            Vector2 positionToSurfacePoint = (direction * hit.distance) + (hit.normal * skin);
 
-            if (surfaceDistance.sqrMagnitude <= skin * skin)
-                surfaceDistance = Vector2.zero;
+            if (Vector2.Dot(positionToSurfacePoint, hit.normal) > 0) {
+                // Hit normal pushing us away from the wall
+                this.position += (Vector2) Vector3.Project(positionToSurfacePoint, hit.normal);
+                direction = ((Vector2) Vector3.ProjectOnPlane(direction, hit.normal)).normalized;
+                positionToSurfacePoint = direction * hit.distance;
+            }
 
             if (data.OnGround && gravityPass)
-                return surfaceDistance;
+                return positionToSurfacePoint;
 
-            float leftoverDistance = leftover.magnitude;
+            Vector2 leftover = velocity - positionToSurfacePoint;
             leftover = bounceOnImpacts ? Vector2.Reflect(leftover, hit.normal) : Vector3.ProjectOnPlane(leftover, hit.normal);
-            //leftover = leftover.normalized * leftoverDistance;
 
-            return surfaceDistance + CollideAndSlide(position + surfaceDistance, leftover, gravityPass, depth + 1);
+            return positionToSurfacePoint + CollideAndSlide(position + positionToSurfacePoint, leftover, gravityPass, depth + 1);
         }
 
         return velocity;

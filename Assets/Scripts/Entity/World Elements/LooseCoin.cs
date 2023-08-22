@@ -18,14 +18,12 @@ namespace NSMB.Entities.Collectable {
 
         //---Components
         [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private PhysicsEntity physics;
         [SerializeField] private LegacyAnimateSpriteRenderer spriteAnimation;
         [SerializeField] private BoxCollider2D hitbox;
 
         public override void OnValidate() {
             base.OnValidate();
             if (!spriteRenderer) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (!physics) physics = GetComponent<PhysicsEntity>();
             if (!spriteAnimation) spriteAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
             if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
         }
@@ -58,7 +56,7 @@ namespace NSMB.Entities.Collectable {
             bool inWall = Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f);
             gameObject.layer = inWall ? Layers.LayerHitsNothing : Layers.LayerEntityNoGroundEntity;
 
-            PhysicsDataStruct data = physics.UpdateCollisions();
+            PhysicsDataStruct data = body.data;
             if (data.OnGround) {
                 body.velocity -= body.velocity * Runner.DeltaTime;
                 if (data.HitRoof) {
@@ -68,7 +66,7 @@ namespace NSMB.Entities.Collectable {
 
                 // TODO: doesn't always trigger, even for host. Strange.
                 // IsForward is ok, the sound isnt top priority
-                if (physics.PreviousTickVelocity.y < -0.5f * (Mathf.Sin(physics.Data.FloorAngle) + 1f))
+                if (body.velocity.y < -0.5f * (Mathf.Sin(data.FloorAngle) + 1f))
                     CoinBounceAnimCounter++;
             }
         }

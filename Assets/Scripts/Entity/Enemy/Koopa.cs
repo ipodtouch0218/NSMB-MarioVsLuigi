@@ -9,6 +9,7 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
+using UnityEngine.WSA;
 
 namespace NSMB.Entities.Enemies {
 
@@ -95,7 +96,7 @@ namespace NSMB.Entities.Enemies {
             if (Holder)
                 FacingRight = Holder.FacingRight;
 
-            PhysicsDataStruct data = physics.UpdateCollisions();
+            PhysicsDataStruct data = body.data;
             if (IsInShell) {
                 hitbox.size = inShellHitboxSize;
                 hitbox.offset = inShellHitboxOffset;
@@ -114,11 +115,12 @@ namespace NSMB.Entities.Enemies {
                 hitbox.offset = outShellHitboxOffset;
             }
 
-
-            if (data.HitRight && FacingRight) {
-                Turnaround(false, physics.PreviousTickVelocity.x);
-            } else if (data.HitLeft && !FacingRight) {
-                Turnaround(true, physics.PreviousTickVelocity.x);
+            if (!Holder && !IsStationary) {
+                if (data.HitRight && FacingRight) {
+                    Turnaround(false, body.velocity.x);
+                } else if (data.HitLeft && !FacingRight) {
+                    Turnaround(true, body.velocity.x);
+                }
             }
 
             if (data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
@@ -128,18 +130,12 @@ namespace NSMB.Entities.Enemies {
 
                 // Turn around if no ground
                 if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
-                    Turnaround(!FacingRight, physics.PreviousTickVelocity.x);
+                    Turnaround(!FacingRight, body.velocity.x);
             }
 
             if (!IsStationary) {
                 float x = (IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1);
-                float y = body.velocity.y;
-                if (data.OnGround) {
-                    y = x * Mathf.Sin(data.FloorAngle * Mathf.Deg2Rad);
-                }
-                body.velocity = new(x, y);
-            } else if (data.OnGround) {
-                //body.velocity = Vector2.zero;
+                body.velocity = new(x, body.velocity.y);
             }
 
             HandleTile();
@@ -149,23 +145,18 @@ namespace NSMB.Entities.Enemies {
             if (Holder)
                 return;
 
-            int collisionAmount = hitbox.GetContacts(ContactBuffer);
-            for (int i = 0; i < collisionAmount; i++) {
-                ContactPoint2D point = ContactBuffer[i];
-                Vector2 p = point.point + (point.normal * -0.15f);
-                if (Mathf.Abs(point.normal.x) == 1 && point.collider.gameObject.layer == Layers.LayerGround) {
-                    if (!Putdown && IsInShell && !IsStationary) {
-                        Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(p + BlockOffset);
-                        TileBase tile = GameManager.Instance.TileManager.GetTile(tileLoc);
-                        if (!tile || !IsInShell)
-                            continue;
+            PhysicsDataStruct data = body.data;
 
-                        if (tile is InteractableTile it)
-                            it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(tileLoc), out bool _);
-                    }
-                } else if (point.normal.y > 0 && Putdown) {
-                    body.velocity = new Vector2(0, body.velocity.y);
+            if (Putdown) {
+                if (data.OnGround) {
+                    body.velocity = new(0, body.velocity.y);
                     Putdown = false;
+                }
+
+            } else if (IsInShell && !IsStationary && (data.HitLeft || data.HitRight)) {
+                foreach (Vector2Int loc in data.TilesHitSide) {
+                    if (GameManager.Instance.TileManager.GetTile(loc, out InteractableTile it))
+                        it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(loc), out bool _);
                 }
             }
         }
@@ -359,7 +350,7 @@ namespace NSMB.Entities.Enemies {
 
             if (IsStationary) {
                 body.velocity = new(bumper.body.position.x < body.position.x ? 1f : -1f, body.velocity.y);
-                physics.Data.OnGround = false;
+                body.data.OnGround = false;
             }
 
             KickedAnimCounter++;

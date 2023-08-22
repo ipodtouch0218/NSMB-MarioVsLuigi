@@ -26,7 +26,7 @@ namespace NSMB.Entities.World {
             searchBox = new(playerSearchRadius, playerSearchRadius);
             closeSearchPosition = transform.position + new Vector3(0, 0.25f);
 
-            Vector2 searchOffset = new(playerSearchRadius / 2 + playerCloseCutoff, 0);
+            Vector2 searchOffset = new(playerSearchRadius * 0.5f + playerCloseCutoff, 0);
             leftSearchPosition = (Vector2) transform.position - searchOffset;
             rightSearchPosition = (Vector2) transform.position + searchOffset;
 
@@ -56,17 +56,17 @@ namespace NSMB.Entities.World {
             if (!bill)
                 return;
 
-            //Check for close players
+            // Check for close players
             if (IntersectsPlayer(closeSearchPosition, closeSearchBox))
                 return;
 
-            //Shoot left
+            // Shoot left
             if (IntersectsPlayer(leftSearchPosition, searchBox)) {
                 SpawnBill(bill, leftSpawnPosition, false);
                 return;
             }
 
-            //Shoot right
+            // Shoot right
             if (IntersectsPlayer(rightSearchPosition, searchBox)) {
                 SpawnBill(bill, rightSpawnPosition, true);
                 return;
@@ -88,6 +88,7 @@ namespace NSMB.Entities.World {
         }
 
         private BulletBill FindInactiveBill() {
+            // Pick out a Bullet Bill that we didnt fire yet.
             foreach (BulletBill b in bulletBills) {
                 if (!b.IsActive)
                     return b;

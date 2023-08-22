@@ -1,3 +1,5 @@
+using UnityEngine;
+
 using Fusion;
 using NSMB.Utils;
 
@@ -6,6 +8,10 @@ public struct PhysicsDataStruct : INetworkStruct {
 
     public byte Flags;
     public float FloorAngle;
+
+    [Networked, Capacity(8)] public NetworkLinkedList<Vector2Int> TilesStandingOn => default;
+    [Networked, Capacity(8)] public NetworkLinkedList<Vector2Int> TilesHitSide => default;
+    [Networked, Capacity(8)] public NetworkLinkedList<Vector2Int> TilesHitRoof => default;
 
     public bool OnGround {
         get => Utils.BitTest(Flags, 0);

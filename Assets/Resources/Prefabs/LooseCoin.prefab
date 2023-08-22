@@ -100,7 +100,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isDisplaying: 1
   runInEditor: 0
-  frame: 0
+  frame: 0.81885767
   fps: 6
   frames:
   - {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
@@ -119,15 +119,13 @@ GameObject:
   m_Component:
   - component: {fileID: 786289218142832796}
   - component: {fileID: 786289218142832793}
-  - component: {fileID: 1694848990786736830}
   - component: {fileID: 786289218142832792}
   - component: {fileID: 6080179494260564542}
   - component: {fileID: 6397312747677551350}
-  - component: {fileID: 786289218142832794}
   - component: {fileID: 786289218142832795}
   - component: {fileID: 5943513950730874965}
   - component: {fileID: 826556521306155776}
-  - component: {fileID: 2965949114585547753}
+  - component: {fileID: 7443465631215426398}
   m_Layer: 15
   m_Name: LooseCoin
   m_TagString: Untagged
@@ -168,8 +166,7 @@ MonoBehaviour:
     _value: 0
   _IsActive:
     _value: 0
-  body: {fileID: 1694848990786736830}
-  nrb: {fileID: 0}
+  body: {fileID: 7443465631215426398}
   sfx: {fileID: 6080179494260564542}
   checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}
@@ -177,35 +174,8 @@ MonoBehaviour:
   despawn: 8
   spriteRenderer: {fileID: 7440053010099547169}
   physics: {fileID: 5943513950730874965}
-  spriteAnimation: {fileID: 0}
+  spriteAnimation: {fileID: 1917642254078187410}
   hitbox: {fileID: 786289218142832792}
---- !u!50 &1694848990786736830
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 786289218142832788}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1.55
-  m_Material: {fileID: 6200000, guid: 6339c618a49b1c44d8c044c6b67f319f, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
 --- !u!61 &786289218142832792
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -366,19 +336,6 @@ MonoBehaviour:
   soundRange: 12
   maxPanning: 0.8
   useDistanceToCamera: 0
---- !u!114 &786289218142832794
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 786289218142832788}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nrb: {fileID: 2965949114585547753}
 --- !u!114 &786289218142832795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -406,11 +363,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _Data:
+    Flags: 0
+    FloorAngle: 0
+  _PreviousTickVelocity: {x: 0, y: 0, z: 0}
   currentCollider: {fileID: 786289218142832792}
-  previousTickVelocity: {x: 0, y: 0}
   goUpSlopes: 0
+  getCrushedByGroundEntities: 1
   floorAndRoofCutoff: 0.3
-  body: {fileID: 0}
 --- !u!114 &826556521306155776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435,11 +395,10 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 786289218142832793}
   - {fileID: 5943513950730874965}
-  - {fileID: 2965949114585547753}
+  - {fileID: 7443465631215426398}
   SimulationBehaviours:
-  - {fileID: 786289218142832794}
   - {fileID: 786289218142832795}
---- !u!114 &2965949114585547753
+--- !u!114 &7443465631215426398
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -448,22 +407,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 786289218142832788}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a384a75a1c0645459861c223ac33652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  InterpolationSpace: 0
-  InterpolationTarget: {fileID: 7313813804966619559}
-  InterpolateErrorCorrection: 0
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 2
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
+  _position: {x: 0, y: 0}
+  _velocity: {x: 0, y: 0}
+  _freeze:
+    _value: 0
+  _gravity: {x: 0, y: -15.2055}
+  _data:
+    Flags: 0
+    FloorAngle: 0
+  interpolationTarget: {fileID: 7313813804966619559}
+  collider: {fileID: 786289218142832792}
+  maxIterations: 3
+  maxFloorAngle: 70
+  interpolationTeleportDistance: 1
+  bounceOnImpacts: 0

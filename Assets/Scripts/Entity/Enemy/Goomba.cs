@@ -45,7 +45,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         private void HandleWallCollisions() {
-            PhysicsDataStruct data = physics.UpdateCollisions();
+            PhysicsDataStruct data = body.data;
 
             if (data.HitLeft || data.HitRight)
                 FacingRight = data.HitLeft;
