@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Tilemaps;
 
 using Fusion;
 using NSMB.Entities.Player;
@@ -9,7 +8,6 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using UnityEngine.WSA;
 
 namespace NSMB.Entities.Enemies {
 

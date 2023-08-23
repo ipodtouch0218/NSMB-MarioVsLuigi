@@ -10,7 +10,7 @@ using NSMB.Utils;
 
 namespace NSMB.Entities.Collectable.Powerups {
 
-    [OrderAfter(typeof(PlayerController))]
+    [OrderAfter(typeof(PlayerController), typeof(EntityMover))]
     public class Powerup : CollectableEntity, IBlockBumpable {
 
         //---Static Variables

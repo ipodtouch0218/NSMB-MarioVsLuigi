@@ -70,12 +70,7 @@ namespace NSMB.Tiles {
                 }
             }
 
-            if ((!interacter.IsProxy && interacter.Runner.IsForward) || interacter.Runner.Simulation.SnapshotHistory.Latest.Tick == interacter.Runner.Tick - 1) {
-                // TODO:::::
-                // Sound
-                if (interacter)
-                    interacter.PlaySound(sound);
-            }
+            interacter.PlayNetworkedSound(sound);
         }
 
         public void BumpWithAnimation(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {

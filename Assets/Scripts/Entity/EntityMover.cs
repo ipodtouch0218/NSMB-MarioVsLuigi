@@ -3,7 +3,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Utils;
 
-public class EntityMover : NetworkBehaviour {
+public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
 
     //---Static Variables
     private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
@@ -26,14 +26,26 @@ public class EntityMover : NetworkBehaviour {
     [SerializeField] private BoxCollider2D collider;
     [SerializeField] private int maxIterations = 3;
     [SerializeField] private float maxFloorAngle = 70, interpolationTeleportDistance = 1f;
+    [SerializeField, Range(0, 1)] private float lerpInterpValue = 0.8f;
     [SerializeField] private bool bounceOnImpacts;
 
     //---Private Variables
     private RawInterpolator positionInterpolator;
+    private Vector2 previousRenderPosition;
 
     public override void Spawned() {
         position = transform.position;
         positionInterpolator = GetInterpolator(nameof(position));
+
+        InterpolationDataSource = InterpolationDataSources.Predicted;
+    }
+
+    public void BeforeTick() {
+        transform.position = position;
+    }
+
+    public void AfterTick() {
+        transform.position = position;
     }
 
     public override void Render() {
@@ -42,10 +54,27 @@ public class EntityMover : NetworkBehaviour {
 
         unsafe {
             Vector3 newPosition;
-            if (freeze || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
-                newPosition = position;
 
+            if (freeze) {
+                newPosition = position;
+            } else if (IsProxy || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
+
+                // Proxy interpolation with some smoothing:
+
+                if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, position) > interpolationTeleportDistance) {
+                    // Teleport over large distances
+                    newPosition = Utils.WrapWorldLocation(position);
+                } else {
+                    // Interpolate from where we are to the next point.
+                    Utils.UnwrapLocations(previousRenderPosition, position, out Vector2 fromRelative, out Vector2 toRelative);
+                    Vector2 difference = toRelative - fromRelative;
+                    newPosition = Vector2.Lerp(previousRenderPosition, previousRenderPosition + difference, Mathf.Clamp01(lerpInterpValue - Time.deltaTime));
+                    newPosition = Utils.WrapWorldLocation(newPosition);
+                }
             } else {
+
+                // Non-Proxy interpolation with no smoothing:
+
                 Vector2Int fromInt = *(Vector2Int*) from;
                 Vector2 fromFloat = (Vector2) fromInt * 0.001f;
 
@@ -59,24 +88,20 @@ public class EntityMover : NetworkBehaviour {
                     // Normal interpolation (over level seams, too)...
                     Utils.UnwrapLocations(fromFloat, toFloat, out Vector2 fromFloatRelative, out Vector2 toFloatRelative);
                     Vector2 difference = toFloatRelative - fromFloatRelative;
-                    newPosition = Utils.WrapWorldLocation(Vector2.Lerp(fromFloat, fromFloat + difference, alpha));
+                    newPosition = Vector2.Lerp(fromFloat, fromFloat + difference, alpha);
+                    newPosition = Utils.WrapWorldLocation(newPosition);
                 }
             }
 
             newPosition.z = interpolationTarget.position.z;
-            interpolationTarget.position = newPosition;
+            previousRenderPosition = interpolationTarget.position = newPosition;
         }
     }
 
     public override void FixedUpdateNetwork() {
         ResetPhysicsData();
-        //if (Runner.IsForward)
-        //    position = transform.position;
 
         if (!freeze) {
-            //bool original = Physics2D.queriesStartInColliders;
-            //Physics2D.queriesStartInColliders = false;
-
             Vector2 movement;
             movement = CollideAndSlide(position + ColliderOffset, velocity * Runner.DeltaTime, false);
             movement += CollideAndSlide(position + ColliderOffset + movement, gravity * (Runner.DeltaTime * Runner.DeltaTime), true);
@@ -84,8 +109,6 @@ public class EntityMover : NetworkBehaviour {
 
             velocity = movement;
             position = Utils.WrapWorldLocation(position + (velocity * Runner.DeltaTime));
-
-            //Physics2D.queriesStartInColliders = original;
         }
 
         transform.position = position;
@@ -111,7 +134,7 @@ public class EntityMover : NetworkBehaviour {
         float distance = velocity.magnitude + skin;
         Vector2 direction = velocity.normalized;
 
-        int hits = Physics2D.BoxCastNonAlloc(position, ColliderSize, 0, direction, RaycastBuffer, distance, Layers.GetCollisionMask(collider.gameObject.layer));
+        int hits = Runner.GetPhysicsScene2D().BoxCast(position, ColliderSize, 0, direction, distance, RaycastBuffer, Layers.GetCollisionMask(collider.gameObject.layer));
         for (int i = 0; i < hits; i++) {
             RaycastHit2D hit = RaycastBuffer[i];
 
@@ -132,15 +155,15 @@ public class EntityMover : NetworkBehaviour {
             bool isTilemap = hit.collider is CompositeCollider2D;
             float angle = Vector2.SignedAngle(hit.normal, Vector2.up);
             if (Mathf.Abs(angle) < maxFloorAngle) {
-                // Up
+                // Floor
                 data.OnGround = true;
                 data.CrushableGround |= !hit.collider.CompareTag("platform");
                 data.FloorAngle = angle;
 
                 if (isTilemap) {
-                    float lowerBound = position.x - (ColliderSize.x * 0.5f);
-                    float upperBound = position.x + (ColliderSize.x * 0.5f);
-                    float y = hit.point.y + hit.normal.y * -0.1f;
+                    float lowerBound = position.x - (ColliderSize.x * 0.5f) - 0.015f;
+                    float upperBound = position.x + (ColliderSize.x * 0.5f) + 0.015f;
+                    float y = hit.point.y + hit.normal.y * -0.2f;
 
                     for (float x = Mathf.FloorToInt(lowerBound * 2) * 0.5f; x <= Mathf.FloorToInt(upperBound * 2) * 0.5f; x += 0.5f) {
                         Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));
@@ -150,14 +173,14 @@ public class EntityMover : NetworkBehaviour {
                     }
                 }
 
-            } else if (Mathf.Abs(angle) > (90 - maxFloorAngle) + maxFloorAngle) {
-                // Down
+            } else if (Mathf.Abs(angle) > 180 - maxFloorAngle) {
+                // Roof
                 data.HitRoof = true;
 
                 if (isTilemap) {
-                    float lowerBound = position.x - ColliderSize.x * 0.5f - 0.005f;
-                    float upperBound = position.x + ColliderSize.x * 0.5f + 0.005f;
-                    float y = hit.point.y + hit.normal.y * -0.1f;
+                    float lowerBound = position.x - (ColliderSize.x * 0.5f) - 0.015f;
+                    float upperBound = position.x + (ColliderSize.x * 0.5f) + 0.015f;
+                    float y = hit.point.y + hit.normal.y * -0.2f;
 
                     for (float x = Mathf.FloorToInt(lowerBound * 2) * 0.5f; x <= Mathf.FloorToInt(upperBound * 2) * 0.5f; x += 0.5f) {
                         Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));
@@ -177,9 +200,9 @@ public class EntityMover : NetworkBehaviour {
                 }
 
                 if (isTilemap) {
-                    float lowerBound = position.y - ColliderSize.y * 0.5f - 0.005f;
-                    float upperBound = position.y + ColliderSize.y * 0.5f + 0.005f;
-                    float x = hit.point.x + hit.normal.x * -0.1f;
+                    float lowerBound = position.y - (ColliderSize.y * 0.5f) - 0.015f;
+                    float upperBound = position.y + (ColliderSize.y * 0.5f) + 0.015f;
+                    float x = hit.point.x + hit.normal.x * -0.2f;
 
                     for (float y = Mathf.FloorToInt(lowerBound * 2) * 0.5f; y <= Mathf.FloorToInt(upperBound * 2) * 0.5f; y += 0.5f) {
                         Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));

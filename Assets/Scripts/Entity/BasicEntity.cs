@@ -170,6 +170,29 @@ namespace NSMB.Entities {
         }
 
 
+        private Tick lastPlayedSoundTick;
+
+        public void PlayNetworkedSound(Enums.Sounds sound) {
+            if (!Runner.IsForward || IsProxy) return;
+            if (lastPlayedSoundTick >= Runner.Tick) return;
+
+            lastPlayedSoundTick = Runner.Tick;
+
+            if (HasStateAuthority)
+                Rpc_PlayNetworkedSound(sound);
+            else
+                PlayNetworkedSoundInternal(sound);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
+        private void Rpc_PlayNetworkedSound(Enums.Sounds sound) {
+            PlayNetworkedSoundInternal(sound);
+        }
+
+        private void PlayNetworkedSoundInternal(Enums.Sounds sound) {
+            PlaySound(sound);
+        }
+
         //---OnChangeds
         public static void OnFacingRightChanged(Changed<BasicEntity> changed) {
             changed.Behaviour.OnFacingRightChanged();

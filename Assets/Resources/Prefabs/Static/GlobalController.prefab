@@ -36444,13 +36444,13 @@ MonoBehaviour:
   _objectIdsHeight: 60
   _objectMetersHeight: 90
   _runner: {fileID: 0}
-  InitializeAllGraphs: 0
+  InitializeAllGraphs: 1
   ConnectTo: 7
   _includedObjStats: 0
   _includedNetStats: 7
   _includedSimStats: 23838
   AutoDestroy: 0
-  EnforceSingle: 0
+  EnforceSingle: 1
   Guid: 3010424a-ef59
   _modifyColors: 1
   _graphColorGood: {r: 0.1, g: 0.5, b: 0.1, a: 0.2509804}

@@ -16,11 +16,13 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Player {
+    [OrderAfter(typeof(EntityMover))]
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
 
         #region Variables
 
         //---Static Variables
+        private static readonly List<GameObject> CollidedObjects = new(16);
         private static readonly Collider2D[] CollisionBuffer = new Collider2D[64];
         private static readonly Collider2D[] TempCollisionBuffer = new Collider2D[32];
         private static readonly ContactPoint2D[] TileContactBuffer = new ContactPoint2D[32];
@@ -293,9 +295,9 @@ namespace NSMB.Entities.Player {
         private bool footstepVariant;
 
         // Tile data
-        private IEnumerable<Vector2Int> tilesStandingOn => body.data.TilesStandingOn;
-        private IEnumerable<Vector2Int> tilesJumpedInto => body.data.TilesHitRoof;
-        private IEnumerable<Vector2Int> tilesHitSide => body.data.TilesHitSide;
+        private IEnumerable<Vector2Int> TilesStandingOn => body.data.TilesStandingOn;
+        private IEnumerable<Vector2Int> TilesJumpedInto => body.data.TilesHitRoof;
+        private IEnumerable<Vector2Int> TilesHitSide => body.data.TilesHitSide;
 
         // Previous Tick Variables
         private bool previousTickIsOnGround;
@@ -328,6 +330,8 @@ namespace NSMB.Entities.Player {
             previousTickPosition = body.position;
             previousTickVelocity = body.velocity;
             previousTickIsOnGround = IsOnGround;
+
+            HandleLayerState();
         }
 
         public override void Spawned() {
@@ -405,6 +409,58 @@ namespace NSMB.Entities.Player {
             }
         }
 
+        [Networked] private Tick UpHeldStart { get; set; }
+        [Networked] private Tick DownHeldStart { get; set; }
+        [Networked] private Tick LeftHeldStart { get; set; }
+        [Networked] private Tick RightHeldStart { get; set; }
+        [Networked] private Tick JumpHeldStart { get; set; }
+
+        private void HandleButtonHolding(PlayerNetworkInput newInputs) {
+            if (newInputs.buttons.WasPressed(PreviousInputs.buttons, PlayerControls.Up)) {
+                UpHeldStart = Runner.Tick;
+            } else if (!newInputs.buttons.IsSet(PlayerControls.Up)) {
+                UpHeldStart = -1;
+            }
+
+            if (newInputs.buttons.WasPressed(PreviousInputs.buttons, PlayerControls.Down)) {
+                DownHeldStart = Runner.Tick;
+            } else if (!newInputs.buttons.IsSet(PlayerControls.Down)) {
+                DownHeldStart = -1;
+            }
+
+            if (newInputs.buttons.WasPressed(PreviousInputs.buttons, PlayerControls.Left)) {
+                LeftHeldStart = Runner.Tick;
+            } else if (!newInputs.buttons.IsSet(PlayerControls.Left)) {
+                LeftHeldStart = -1;
+            }
+
+            if (newInputs.buttons.WasPressed(PreviousInputs.buttons, PlayerControls.Right)) {
+                RightHeldStart = Runner.Tick;
+            } else if (!newInputs.buttons.IsSet(PlayerControls.Right)) {
+                RightHeldStart = -1;
+            }
+
+            if (newInputs.buttons.WasPressed(PreviousInputs.buttons, PlayerControls.Jump)) {
+                JumpHeldStart = Runner.Tick;
+            } else if (!newInputs.buttons.IsSet(PlayerControls.Jump)) {
+                JumpHeldStart = -1;
+            }
+        }
+
+        private PlayerNetworkInput HandleMissingInputs() {
+            if ((Runner.Tick - LastInputTick) > Runner.Simulation.Config.TickRate * 1f)
+                return default;
+
+            PlayerNetworkInput inputs = PreviousInputs;
+            inputs.buttons.Set(PlayerControls.Up, inputs.buttons.IsSet(PlayerControls.Up) && UpHeldStart != -1 && (UpHeldStart == Runner.Tick || (Runner.Tick - UpHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Down, inputs.buttons.IsSet(PlayerControls.Down) && DownHeldStart != -1 && (DownHeldStart == Runner.Tick || (Runner.Tick - DownHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Left, inputs.buttons.IsSet(PlayerControls.Left) && LeftHeldStart != -1 && (LeftHeldStart == Runner.Tick || (Runner.Tick - LeftHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Right, inputs.buttons.IsSet(PlayerControls.Right) && RightHeldStart != -1 && (RightHeldStart == Runner.Tick || (Runner.Tick - RightHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Jump, inputs.buttons.IsSet(PlayerControls.Jump) && JumpHeldStart != -1 && (JumpHeldStart == Runner.Tick || (Runner.Tick - JumpHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
+
+            return inputs;
+        }
+
         public override void FixedUpdateNetwork() {
             if (GameData.Instance.GameState < Enums.GameState.Playing) {
                 return;
@@ -424,12 +480,11 @@ namespace NSMB.Entities.Player {
                 PlayerNetworkInput input;
                 if (GetInput(out PlayerNetworkInput currentInputs)) {
                     input = currentInputs;
+                    HandleButtonHolding(input);
                     LastInputTick = Runner.Tick;
+
                 } else {
-                    if ((Runner.Tick - LastInputTick) < Runner.Simulation.Config.TickRate * 1f)
-                        input = PreviousInputs;
-                    else
-                        input = default;
+                    input = HandleMissingInputs();
                 }
 
                 NetworkButtons heldButtons = input.buttons;
@@ -437,9 +492,6 @@ namespace NSMB.Entities.Player {
 
                 // TODO: remove groundpoundLastFrame? Do we even need this anymore?
                 groundpoundLastFrame = IsGroundpounding;
-
-                //HandleBlockSnapping();
-                CheckForEntityCollision();
 
                 if (!IsDead) {
                     HandleGroundCollision();
@@ -463,6 +515,9 @@ namespace NSMB.Entities.Player {
                     CheckForPowerupActions(pressedButtons);
                     HandleMovement(heldButtons, pressedButtons);
                 }
+
+                //HandleBlockSnapping();
+                CheckForEntityCollision();
 
                 PreviousInputs = input;
             }
@@ -609,7 +664,7 @@ namespace NSMB.Entities.Player {
             OnIce = false;
             footstepSound = Enums.Sounds.Player_Walk_Grass;
             footstepParticle = Enums.Particle.None;
-            foreach (Vector2Int pos in tilesStandingOn) {
+            foreach (Vector2Int pos in TilesStandingOn) {
                 if (GameManager.Instance.TileManager.GetTile(pos, out TileWithProperties propTile)) {
                     footstepSound = propTile.footstepSound;
                     footstepParticle = propTile.footstepParticle;
@@ -626,13 +681,20 @@ namespace NSMB.Entities.Player {
 
             int collisions = 0;
             foreach (BoxCollider2D hitbox in hitboxes) {
-                int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + (body.velocity * Runner.DeltaTime) + hitbox.offset * transform.localScale, hitbox.size * transform.localScale, 0, TempCollisionBuffer);
+                int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + (body.velocity * Runner.DeltaTime) + (hitbox.offset * transform.localScale), hitbox.size * transform.localScale, 0, TempCollisionBuffer);
                 Array.Copy(TempCollisionBuffer, 0, CollisionBuffer, collisions, count);
                 collisions += count;
+
             }
 
+            CollidedObjects.Clear();
             for (int i = 0; i < collisions; i++) {
                 GameObject collidedObject = CollisionBuffer[i].gameObject;
+
+                if (CollidedObjects.Contains(collidedObject))
+                    continue;
+
+                CollidedObjects.Add(collidedObject);
 
                 // Don't interact with ourselves.
                 if (CollisionBuffer[i].transform.IsChildOf(transform))
@@ -659,7 +721,11 @@ namespace NSMB.Entities.Player {
                     if (interactable is CollectableEntity && IsProxy)
                         continue;
 
-                    interactable.InteractWithPlayer(this);
+                    if (interactable is PlayerController pl) {
+                        InteractWithPlayer(pl);
+                    } else {
+                        interactable.InteractWithPlayer(this);
+                    }
                 }
             }
         }
@@ -780,7 +846,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (other.IsDamageable && above) {
+            if (above && other.IsDamageable) {
                 // Hit them from above
                 DoEntityBounce = !IsGroundpounding && !IsDrilling;
                 bool groundpounded = HasGroundpoundHitbox;
@@ -804,7 +870,6 @@ namespace NSMB.Entities.Player {
                     }
                 }
                 return;
-
             } else if (!IsInKnockback && !other.IsInKnockback && !otherAbove) {
                 // Collided with them
                 if (State == Enums.PowerupState.MiniMushroom || other.State == Enums.PowerupState.MiniMushroom) {
@@ -830,7 +895,7 @@ namespace NSMB.Entities.Player {
                 } else {
                     // Collide
                     int directionToOtherPlayer = fromRight ? -1 : 1;
-                    float overlap = ((WorldHitboxSize.x * 0.5f) + (other.WorldHitboxSize.x * 0.5f) - Mathf.Abs(ours.x - theirs.x)) * 0.5f + 0.05f;
+                    float overlap = ((WorldHitboxSize.x * 0.5f) + (other.WorldHitboxSize.x * 0.5f) - Mathf.Abs(ours.x - theirs.x)) * 0.5f;
 
                     if (overlap > 0.02f) {
                         Vector2 ourNewPosition = new(body.position.x + (overlap * directionToOtherPlayer), body.position.y);
@@ -1289,9 +1354,6 @@ namespace NSMB.Entities.Player {
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_DisconnectDeath() {
-            if (IsDead)
-                return;
-
             Disconnected = true;
             Lives = 0;
             Death(false, false);
@@ -2496,7 +2558,7 @@ namespace NSMB.Entities.Player {
             if (State == Enums.PowerupState.MegaMushroom) {
                 HandleMegaTiles(true);
                 if (IsOnGround && JumpState == PlayerJumpState.SingleJump) {
-                    SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
+                    SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.position);
                     CameraController.ScreenShake = 0.15f;
                     JumpState = PlayerJumpState.None;
                 }
@@ -2574,18 +2636,16 @@ namespace NSMB.Entities.Player {
             // Activate blocks jumped into
             if (HitRoof && !IsStuckInBlock) {
                 bool tempHitBlock = false;
-                if (!IsProxy) {
-                    bool interactedAny = false;
-                    foreach (Vector2Int tile in tilesJumpedInto) {
-                        tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
-                        if (bumpSound)
-                            BlockBumpSoundCounter++;
-
-                        interactedAny |= interacted;
-                    }
-                    if (!interactedAny) {
+                bool interactedAny = false;
+                foreach (Vector2Int tile in TilesJumpedInto) {
+                    tempHitBlock |= InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
+                    if (bumpSound)
                         BlockBumpSoundCounter++;
-                    }
+
+                    interactedAny |= interacted;
+                }
+                if (!interactedAny) {
+                    BlockBumpSoundCounter++;
                 }
 
                 body.velocity = new(body.velocity.x, Mathf.Min(body.velocity.y, IsSwimming && !tempHitBlock ? -2f : -0.1f));
@@ -2638,7 +2698,7 @@ namespace NSMB.Entities.Player {
 
                     if (HitLeft || HitRight) {
                         bool interactedAny = false;
-                        foreach (var tile in tilesHitSide) {
+                        foreach (var tile in TilesHitSide) {
                             InteractWithTile(tile, InteractableTile.InteractionDirection.Up, out bool interacted, out bool bumpSound);
                             if (bumpSound)
                                 BlockBumpSoundCounter++;
@@ -2999,7 +3059,7 @@ namespace NSMB.Entities.Player {
                 GroundpoundAnimCounter++;
 
             ContinueGroundpound = false;
-            foreach (Vector2Int tile in tilesStandingOn) {
+            foreach (Vector2Int tile in TilesStandingOn) {
                 ContinueGroundpound |= InteractWithTile(tile, InteractableTile.InteractionDirection.Down, out bool _, out bool bumpSound);
                 if (bumpSound)
                     BlockBumpSoundCounter++;
