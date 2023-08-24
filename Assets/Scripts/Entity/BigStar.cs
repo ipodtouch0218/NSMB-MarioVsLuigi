@@ -146,7 +146,7 @@ namespace NSMB.Entities.Collectable {
                 if (!Collector) {
                     GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
                 } else {
-                    bool sameTeam = Collector.data.Team == runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
+                    bool sameTeam = Collector.Data.Team == runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
                     Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
                     if (Collector.cameraController.IsControllingCamera)
                         GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.8f, 0.1f, RumbleManager.RumbleSetting.High);

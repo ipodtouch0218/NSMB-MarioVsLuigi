@@ -38,7 +38,7 @@ public class PlayerTrackIcon : TrackIcon {
 
         image.color = playerTarget.animationController.GlowColor;
         if (SessionData.Instance.Teams)
-            teamIcon.sprite = ScriptableManager.Instance.teams[playerTarget.data.Team].spriteColorblind;
+            teamIcon.sprite = ScriptableManager.Instance.teams[playerTarget.Data.Team].spriteColorblind;
         target = playerTarget.models;
     }
 

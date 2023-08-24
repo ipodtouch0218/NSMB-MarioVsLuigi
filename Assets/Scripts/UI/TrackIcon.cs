@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 using NSMB.Game;
 
-public class TrackIcon : MonoBehaviour {
+public abstract class TrackIcon : MonoBehaviour {
 
     //---Public Variables
     public GameObject target;

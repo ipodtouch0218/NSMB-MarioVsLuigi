@@ -8,7 +8,7 @@ public class TeamManager {
     private readonly Dictionary<int, HashSet<PlayerController>> teams = new();
 
     public void AddPlayer(PlayerController player) {
-        sbyte teamid = player.data.Team;
+        sbyte teamid = player.Data.Team;
 
         if (!teams.TryGetValue(teamid, out HashSet<PlayerController> team))
             teams[teamid] = team = new();

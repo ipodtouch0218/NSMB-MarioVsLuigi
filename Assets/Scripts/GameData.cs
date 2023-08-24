@@ -437,14 +437,14 @@ namespace NSMB.Game {
                     winner = team.displayName;
                     resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "teamname", winner);
                 } else {
-                    string username = teamManager.GetTeamMembers(winningTeam).First().data.GetNickname();
+                    string username = teamManager.GetTeamMembers(winningTeam).First().Data.GetNickname();
                     winner = username;
                     resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);
                 }
 
                 if (Runner.IsServer) {
                     foreach (PlayerController player in teamManager.GetTeamMembers(winningTeam)) {
-                        player.data.Wins++;
+                        player.Data.Wins++;
                     }
                 }
             }

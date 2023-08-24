@@ -22,7 +22,7 @@ public class GlobalController : Singleton<GlobalController> {
     public PauseOptionMenuManager optionsManager;
 
     public ScriptableRendererFeature outlineFeature;
-    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, connecting;
+    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, connecting, fusionStatsTemplate;
     public LoadingCanvas loadingCanvas;
 
     public RenderTexture ndsTexture;
@@ -40,6 +40,7 @@ public class GlobalController : Singleton<GlobalController> {
     //---Private Variables
     private Coroutine fadeMusicRoutine;
     private Coroutine fadeSfxRoutine;
+    private GameObject fusionStats;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
@@ -64,15 +65,17 @@ public class GlobalController : Singleton<GlobalController> {
         }
         ControlSystem.controls.Enable();
         ControlSystem.controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
+        NetworkHandler.OnShutdown += OnShutdown;
+        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+
+        CreateFusionStatsInstance();
     }
 
     public void OnDestroy() {
         ControlSystem.controls.Debug.FPSMonitor.performed -= ToggleFpsMonitor;
         ControlSystem.controls.Disable();
-    }
-
-    private void ToggleFpsMonitor(InputAction.CallbackContext obj) {
-        graphy.SetActive(!graphy.activeSelf);
+        NetworkHandler.OnShutdown -= OnShutdown;
+        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
     }
 
     public void Update() {
@@ -150,5 +153,32 @@ public class GlobalController : Singleton<GlobalController> {
 
     private static float ToLogScale(float x) {
         return 20 * Mathf.Log10(x);
+    }
+
+    private void CreateFusionStatsInstance() {
+        if (fusionStats)
+            DestroyImmediate(fusionStats);
+
+        fusionStats = Instantiate(fusionStatsTemplate, fusionStatsTemplate.transform.parent);
+        fusionStats.SetActive(true);
+    }
+
+    private void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
+        CreateFusionStatsInstance();
+    }
+
+    private void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+        if (runner.LocalPlayer != player)
+            return;
+
+        // Fixed bugged layout if the graph was already open.
+        foreach (FusionGraph graph in fusionStats.GetComponentsInChildren<FusionGraph>()) {
+            graph.CalculateLayout();
+        }
+    }
+
+
+    private void ToggleFpsMonitor(InputAction.CallbackContext obj) {
+        graphy.SetActive(!graphy.activeSelf);
     }
 }

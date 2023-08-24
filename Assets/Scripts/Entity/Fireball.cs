@@ -195,7 +195,7 @@ namespace NSMB.Entities {
                 iceGraphics.SetActive(ice);
                 fireGraphics.SetActive(!ice);
 
-                bool sameTeam = Owner.data.Team == Runner.GetLocalPlayerData().Team || Owner.cameraController.IsControllingCamera;
+                bool sameTeam = Owner.Data.Team == Runner.GetLocalPlayerData().Team || Owner.cameraController.IsControllingCamera;
                 foreach (SpriteRenderer r in renderers) {
                     r.flipX = FacingRight;
                     r.color = sameTeam ? ourTeamColor : enemyTeamColor;
@@ -236,7 +236,7 @@ namespace NSMB.Entities {
             // Should do damage checks
             if (!player.IsStarmanInvincible) {
 
-                bool dropStars = player.data.Team != Owner.data.Team;
+                bool dropStars = player.Data.Team != Owner.Data.Team;
 
                 // Player state checks
                 switch (player.State) {

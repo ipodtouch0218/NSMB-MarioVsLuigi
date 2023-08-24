@@ -89,7 +89,7 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
     private void UpdateScoreText() {
         string txt = "";
         if (currentLives >= 0)
-            txt += target.data.GetCharacterData().uistring + Utils.GetSymbolString(currentLives.ToString());
+            txt += target.Data.GetCharacterData().uistring + Utils.GetSymbolString(currentLives.ToString());
         txt += Utils.GetSymbolString("S" + currentStars);
 
         valuesText.text = txt;

@@ -139,38 +139,6 @@ namespace NSMB.Entities.Collectable.Powerups {
             HandleDespawningBlinking();
         }
 
-        private void HandleSpawningAnimation() {
-
-            if (FollowPlayer && SpawnAnimationTimer.IsActive(Runner)) {
-
-                float timeRemaining = SpawnAnimationTimer.RemainingRenderTime(Runner) ?? 0f;
-                float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
-                sRenderer.transform.localScale = Vector3.one * (1 + adjustment);
-
-                if (!disableSpawnAnimation) {
-                    mpb.SetFloat("WaveEnabled", 0);
-                    sRenderer.SetPropertyBlock(mpb);
-
-                    disableSpawnAnimation = true;
-                }
-
-            } else if (disableSpawnAnimation) {
-
-                sRenderer.transform.localScale = Vector3.one;
-                disableSpawnAnimation = false;
-
-                mpb.SetFloat("WaveEnabled", 1);
-                sRenderer.SetPropertyBlock(mpb);
-            }
-        }
-
-        private void HandleDespawningBlinking() {
-            float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
-            if (despawnTimeRemaining < 1) {
-                sRenderer.enabled = despawnTimeRemaining * blinkingRate % 1 > 0.5f;
-            }
-        }
-
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
             if (GameData.Instance && GameData.Instance.GameEnded) {
@@ -243,6 +211,39 @@ namespace NSMB.Entities.Collectable.Powerups {
             }
 
             body.velocity = new(body.velocity.x, Mathf.Max(-terminalVelocity, body.velocity.y));
+        }
+
+        private void HandleSpawningAnimation() {
+
+            if (FollowPlayer && SpawnAnimationTimer.IsActive(Runner)) {
+
+                float timeRemaining = SpawnAnimationTimer.RemainingRenderTime(Runner) ?? 0f;
+                float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
+                sRenderer.transform.localScale = Vector3.one * (1 + adjustment);
+                body.interpolationTarget.position = new(FollowPlayer.body.interpolationTarget.position.x, FollowPlayer.cameraController.CurrentPosition.y + 1.68f);
+
+                if (!disableSpawnAnimation) {
+                    mpb.SetFloat("WaveEnabled", 0);
+                    sRenderer.SetPropertyBlock(mpb);
+
+                    disableSpawnAnimation = true;
+                }
+
+            } else if (disableSpawnAnimation) {
+
+                sRenderer.transform.localScale = Vector3.one;
+                disableSpawnAnimation = false;
+
+                mpb.SetFloat("WaveEnabled", 1);
+                sRenderer.SetPropertyBlock(mpb);
+            }
+        }
+
+        private void HandleDespawningBlinking() {
+            float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
+            if (despawnTimeRemaining < 1) {
+                sRenderer.enabled = despawnTimeRemaining * blinkingRate % 1 > 0.5f;
+            }
         }
 
         public void HandleCollision() {

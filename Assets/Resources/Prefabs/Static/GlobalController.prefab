@@ -10928,6 +10928,7 @@ MonoBehaviour:
   anyAspectImage: {fileID: 0}
   graphy: {fileID: 65175768685879623}
   connecting: {fileID: 3461526970985687573}
+  fusionStatsTemplate: {fileID: 6113396266618169604}
   loadingCanvas: {fileID: 4559077638615233841}
   ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
   checkedForVersion: 0
@@ -36386,7 +36387,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3510072643937208116
 Transform:
   m_ObjectHideFlags: 0

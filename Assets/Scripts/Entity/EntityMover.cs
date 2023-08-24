@@ -7,7 +7,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
 
     //---Static Variables
     private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
-    private static readonly float skin = 0.005f;
+    private static readonly float Skin = 0.005f, LerpInterpValue = 0.33f;
 
     //---Networked Variables
     [Networked] public Vector2 position { get; set; }
@@ -26,7 +26,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
     [SerializeField] private BoxCollider2D collider;
     [SerializeField] private int maxIterations = 3;
     [SerializeField] private float maxFloorAngle = 70, interpolationTeleportDistance = 1f;
-    [SerializeField, Range(0, 1)] private float lerpInterpValue = 0.8f;
     [SerializeField] private bool bounceOnImpacts;
 
     //---Private Variables
@@ -68,7 +67,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
                     // Interpolate from where we are to the next point.
                     Utils.UnwrapLocations(previousRenderPosition, position, out Vector2 fromRelative, out Vector2 toRelative);
                     Vector2 difference = toRelative - fromRelative;
-                    newPosition = Vector2.Lerp(previousRenderPosition, previousRenderPosition + difference, Mathf.Clamp01(lerpInterpValue - Time.deltaTime));
+                    newPosition = Vector2.Lerp(previousRenderPosition, previousRenderPosition + difference, Mathf.Clamp01(LerpInterpValue - Time.deltaTime));
                     newPosition = Utils.WrapWorldLocation(newPosition);
                 }
             } else {
@@ -131,7 +130,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
         if (depth >= maxIterations)
             return Vector2.zero;
 
-        float distance = velocity.magnitude + skin;
+        float distance = velocity.magnitude + Skin;
         Vector2 direction = velocity.normalized;
 
         int hits = Runner.GetPhysicsScene2D().BoxCast(position, ColliderSize, 0, direction, distance, RaycastBuffer, Layers.GetCollisionMask(collider.gameObject.layer));
@@ -213,7 +212,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
                 }
             }
 
-            Vector2 positionToSurfacePoint = (direction * hit.distance) + (hit.normal * skin);
+            Vector2 positionToSurfacePoint = (direction * hit.distance) + (hit.normal * Skin);
 
             if (Vector2.Dot(positionToSurfacePoint, hit.normal) > 0) {
                 // Hit normal pushing us away from the wall

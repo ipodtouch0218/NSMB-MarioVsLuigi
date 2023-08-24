@@ -178,6 +178,8 @@ public static class Enums {
         [PrefabParticleData("Prefabs/Particle/RedPipe-D")] Pipe_Break_Red_Broken,
 
         [PrefabParticleData("Prefabs/Particle/BulletBillLauncher")] BulletBillLauncher_Break,
+
+        [PrefabParticleData("Prefabs/Particle/WalljumpParticle")] Player_WallJump,
     }
 
     #endregion

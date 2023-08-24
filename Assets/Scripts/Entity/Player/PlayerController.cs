@@ -157,7 +157,7 @@ namespace NSMB.Entities.Player {
         public bool IsCrouchedInShell => State == Enums.PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsStarmanInvincible => StarmanTimer.IsActive(Runner);
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
-        public int PlayerId => data.PlayerId;
+        public int PlayerId => Data.PlayerId;
         public bool CanPickupItem => !FrozenCube && State != Enums.PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !HeldEntity && PreviousInputs.buttons.IsSet(PlayerControls.Sprint) && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallSlideLeft && !WallSlideRight && JumpState < PlayerJumpState.DoubleJump && !IsGroundpounding && !(!HeldEntity && IsSwimming && PreviousInputs.buttons.IsSet(PlayerControls.Jump));
         public bool HasGroundpoundHitbox => (IsDrilling || (IsGroundpounding && GroundpoundStartTimer.ExpiredOrNotRunning(Runner))) && (!IsOnGround || (Runner.SimulationTime - TimeGrounded < 0.15f));
         public float RunningMaxSpeed => SPEED_STAGE_MAX[RUN_STAGE];
@@ -207,29 +207,41 @@ namespace NSMB.Entities.Player {
             get => IsStarmanInvincible ? _StarCombo : (byte) 0;
             set => _StarCombo = IsStarmanInvincible ? value : (byte) 0;
         }
+        public PlayerData Data { get; private set; }
+        // Tile data
+        private IEnumerable<Vector2Int> TilesStandingOn => body.data.TilesStandingOn;
+        private IEnumerable<Vector2Int> TilesJumpedInto => body.data.TilesHitRoof;
+        private IEnumerable<Vector2Int> TilesHitSide => body.data.TilesHitSide;
 
         //---Components
+        [SerializeField] public CameraController cameraController;
+        [SerializeField] public PlayerAnimationController animationController;
+        [SerializeField] private Animator animator;
         private BoxCollider2D[] hitboxes;
-        public AudioSource sfxBrick;
-        private Animator animator;
-        public CameraController cameraController;
-        public PlayerAnimationController animationController;
 
+        //---Public Variables
+        [HideInInspector] public bool groundpoundLastFrame;
+        [HideInInspector] public float powerupFlash;
 
-
+        //---Serialized Variables
+        [SerializeField] private Vector2 smallFrozenCubeSize, largeFrozenCubeSize;
         [SerializeField] public float flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, launchVelocity = 12f, wallslideSpeed = -4.25f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
         [SerializeField, FormerlySerializedAs("giantStartTime")] public float megaStartTime = 1.5f;
         [SerializeField] public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, heightSmallModel = 0.42f, heightLargeModel = 0.82f;
         [SerializeField] public GameObject models;
         [SerializeField] public CharacterData character;
-        [SerializeField] private Vector2 smallFrozenCubeSize, largeFrozenCubeSize;
 
-        public bool groundpoundLastFrame;
-        public float powerupFlash;
+        //---Private Variables
+        private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
+        private Enums.Particle footstepParticle = Enums.Particle.None;
+        private bool footstepVariant;
+
+        private bool previousTickIsOnGround;
+        public Vector2 previousTickVelocity, previousTickPosition;
 
         private int noLivesStarSpawnDirection;
 
-        #region // MOVEMENT STAGES & CONSTANTS
+        #region //---MOVEMENT STAGES & CONSTANTS
         private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
         private static readonly float[] SPEED_STAGE_MAX = { 0.9375f, 2.8125f, 4.21875f, 5.625f, 8.4375f };
         private static readonly float SPEED_SLIDE_MAX = 7.5f;
@@ -289,31 +301,15 @@ namespace NSMB.Entities.Player {
         private static readonly float[] GRAVITY_SWIM_ACC = { -4.833984375f, -3.076171875f };
         #endregion
 
-        // Footstep Variables
-        private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
-        private Enums.Particle footstepParticle = Enums.Particle.None;
-        private bool footstepVariant;
-
-        // Tile data
-        private IEnumerable<Vector2Int> TilesStandingOn => body.data.TilesStandingOn;
-        private IEnumerable<Vector2Int> TilesJumpedInto => body.data.TilesHitRoof;
-        private IEnumerable<Vector2Int> TilesHitSide => body.data.TilesHitSide;
-
-        // Previous Tick Variables
-        private bool previousTickIsOnGround;
-        public Vector2 previousTickVelocity, previousTickPosition;
-
-        // Misc
-        private TrackIcon icon;
-        public PlayerData data;
-
         #endregion
 
         #region Unity Methods
-        public void Awake() {
+
+        public override void OnValidate() {
+            base.OnValidate();
+
             cameraController = GetComponentInChildren<CameraController>();
             animator = GetComponentInChildren<Animator>();
-            sfxBrick = GetComponents<AudioSource>()[1];
             animationController = GetComponent<PlayerAnimationController>();
         }
 
@@ -340,7 +336,7 @@ namespace NSMB.Entities.Player {
 
             body.freeze = true;
 
-            data = Object.InputAuthority.GetPlayerData(Runner);
+            Data = Object.InputAuthority.GetPlayerData(Runner);
             if (Object.HasInputAuthority) {
                 body.InterpolationDataSource = InterpolationDataSources.Predicted;
 
@@ -379,9 +375,6 @@ namespace NSMB.Entities.Player {
 
             if (GameData.Instance && hasState)
                 GameData.Instance.AlivePlayers.Remove(this);
-
-            if (icon)
-                Destroy(icon.gameObject);
         }
 
         public override void Render() {
@@ -561,6 +554,7 @@ namespace NSMB.Entities.Player {
                     if (!DeathplaneDeath) {
                         body.gravity = Vector2.down * 11.75f;
                         body.velocity += Vector2.up * 7f;
+                        body.freeze = false;
                     }
                     DeathAnimationTimer = TickTimer.None;
                     if (Lives == 0) {
@@ -742,7 +736,7 @@ namespace NSMB.Entities.Player {
                 return;
 
             // Hit players
-            bool dropStars = data.Team != other.data.Team;
+            bool dropStars = Data.Team != other.Data.Team;
 
             Utils.Utils.UnwrapLocations(body.position, other.body.position, out Vector2 ours, out Vector2 theirs);
             bool fromRight = ours.x < theirs.x;
@@ -1456,13 +1450,7 @@ namespace NSMB.Entities.Player {
             GameManager.Instance.sfx.PlayOneShot(sound, character);
         }
         public void PlaySound(Enums.Sounds sound, byte variant = 0, float volume = 1) {
-            if (sound == Enums.Sounds.Powerup_MegaMushroom_Break_Block) {
-                sfxBrick.Stop();
-                sfxBrick.clip = sound.GetClip(character, variant);
-                sfxBrick.Play();
-            } else {
-                PlaySound(sound, character, variant, volume);
-            }
+            PlaySound(sound, character, variant, volume);
         }
         protected GameObject SpawnParticle(string particle, Vector2 worldPos, Quaternion? rot = null) {
             return Instantiate(Resources.Load(particle), worldPos, rot ?? Quaternion.identity) as GameObject;
@@ -1951,6 +1939,16 @@ namespace NSMB.Entities.Player {
                     IsOnGround = false;
                     DoEntityBounce = false;
                     timeSinceLastBumpSound = 0;
+
+                    Vector2 particleOffset = WorldHitboxSize * 0.5f;
+                    Quaternion rot = Quaternion.identity;
+                    if (WallSlideRight) {
+                        rot = Quaternion.Euler(0, 180, 0);
+                    } else {
+                        particleOffset.x *= -1;
+                    }
+
+                    SpawnParticle(body.position + particleOffset, Enums.PrefabParticle.Player_WallJump, rot);
 
                     WallJumpTimer = TickTimer.CreateFromSeconds(Runner, 16f / 60f);
                     WallSlideRight = false;
@@ -3132,7 +3130,6 @@ namespace NSMB.Entities.Player {
 
             player.PlaySound(Enums.Sounds.Player_Sound_WallJump);
             player.PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
-            player.SpawnParticle(PrefabList.Instance.Particle_Walljump, player.body.position + offset, player.WallSlideLeft ? Quaternion.identity : Quaternion.Euler(0, 180, 0));
 
             player.animator.SetTrigger("walljump");
 

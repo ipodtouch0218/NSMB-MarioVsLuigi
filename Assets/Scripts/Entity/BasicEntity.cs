@@ -133,22 +133,24 @@ namespace NSMB.Entities {
             particle.transform.position += new Vector3(sr.size.x * 0.25f, size.y * 0.25f * (flip ? -1 : 1));
         }
 
-        public void SpawnParticle(Vector2 pos, Enums.PrefabParticle prefab) {
+        public void SpawnParticle(Vector2 pos, Enums.PrefabParticle prefab, Quaternion? rot = null) {
             if (!Runner.IsForward || IsProxy) return;
 
+            rot ??= Quaternion.identity;
+
             if (HasStateAuthority)
-                Rpc_SpawnParticle(pos, prefab);
+                Rpc_SpawnParticle(pos, prefab, rot.Value);
             else
-                SpawnParticleInternal(pos, prefab);
+                SpawnParticleInternal(pos, prefab, rot.Value);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
-        private void Rpc_SpawnParticle(Vector2 pos, Enums.PrefabParticle prefab) {
-            SpawnParticleInternal(pos, prefab);
+        private void Rpc_SpawnParticle(Vector2 pos, Enums.PrefabParticle prefab, Quaternion rot) {
+            SpawnParticleInternal(pos, prefab, rot);
         }
 
-        private void SpawnParticleInternal(Vector2 pos, Enums.PrefabParticle prefab) {
-            Instantiate(prefab.GetGameObject(), pos, Quaternion.identity);
+        private void SpawnParticleInternal(Vector2 pos, Enums.PrefabParticle prefab, Quaternion rot) {
+            Instantiate(prefab.GetGameObject(), pos, rot);
         }
 
         public void SpawnTileBreakParticle(Vector2 pos, Color color, float rot = 0) {

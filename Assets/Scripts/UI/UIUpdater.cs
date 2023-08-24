@@ -112,7 +112,7 @@ public class UIUpdater : MonoBehaviour {
             return;
 
         if (teams) {
-            int teamIndex = player.data.Team;
+            int teamIndex = player.Data.Team;
             teamStars = teamManager?.GetTeamStars(teamIndex) ?? 0;
             Team team = ScriptableManager.Instance.teams[teamIndex];
             uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
@@ -133,7 +133,7 @@ public class UIUpdater : MonoBehaviour {
         if (player.Lives >= 0) {
             if (player.Lives != lives) {
                 lives = player.Lives;
-                uiLives.text = player.data.GetCharacterData().uistring + Utils.GetSymbolString("x" + lives);
+                uiLives.text = player.Data.GetCharacterData().uistring + Utils.GetSymbolString("x" + lives);
             }
         } else {
             livesParent.SetActive(false);
@@ -215,7 +215,7 @@ public class UIUpdater : MonoBehaviour {
 
     private void ApplyUIColor() {
         Color color = (SessionData.Instance && SessionData.Instance.Object && SessionData.Instance.Teams)
-            ? Utils.GetTeamColor(player.data.Team, 0.8f, 1f)
+            ? Utils.GetTeamColor(player.Data.Team, 0.8f, 1f)
             : GameManager.Instance.levelUIColor;
 
         foreach (Image bg in backgrounds)

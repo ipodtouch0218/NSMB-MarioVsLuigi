@@ -119,7 +119,7 @@ public class ScoreboardUpdater : MonoBehaviour {
             entryObj.SetActive(true);
             entryObj.name = player.GetNickname();
             ScoreboardEntry entry = entryObj.GetComponent<ScoreboardEntry>();
-            entry.target = GameData.Instance.AlivePlayers.FirstOrDefault(pc => pc.data == player);
+            entry.target = GameData.Instance.AlivePlayers.FirstOrDefault(pc => pc.Data == player);
 
             entries.Add(entry);
         }
