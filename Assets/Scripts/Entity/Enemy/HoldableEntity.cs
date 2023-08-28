@@ -29,7 +29,14 @@ namespace NSMB.Entities {
         }
 
         public override void Render() {
-            if (Holder && body.interpolationTarget) {
+            base.Render();
+            if (!body.interpolationTarget)
+                return;
+
+            if (IsDead)
+                return;
+
+            if (Holder) {
                 Transform target = body.interpolationTarget.transform;
                 Vector3 newPos = Holder.body.interpolationTarget.position + holderOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
@@ -40,18 +47,7 @@ namespace NSMB.Entities {
         public override void FixedUpdateNetwork() {
             if (Holder) {
                 body.velocity = Holder.body.velocity;
-
-                Vector2 newPosition = Holder.body.position + (Vector2) holderOffset;
-                body.position = newPosition;
-
-                //Vector2 diff = newPosition - body.position;
-                //bool wrapped = Utils.Utils.WrapWorldLocation(ref newPosition);
-
-                //if (!wasHeldLastTick || wrapped) {
-                //    nrb.TeleportToPosition(newPosition, diff);
-                //} else {
-
-                //}
+                body.position = Holder.body.position + (Vector2) holderOffset;
 
                 hitbox.enabled = false;
                 CheckForEntityCollisions();

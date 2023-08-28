@@ -76,7 +76,7 @@ public class CloudPlatform : SimulationBehaviour {
 
         // Update collision timers
         foreach (CloudContact contact in positions) {
-            if (!contact.exit && (!contact.collider || contact.rb.velocity.y > 0.2f || !Utils.BufferContains(CollisionBuffer, collisionCount, contact.collider)))
+            if (!contact.exit && (!contact.collider || !contact.mover.data.OnGround || !Utils.BufferContains(CollisionBuffer, collisionCount, contact.collider)))
                 contact.exit = true;
 
             if (contact.exit) {
@@ -129,13 +129,12 @@ public class CloudPlatform : SimulationBehaviour {
     }
 
     private void HandleTrigger(Collider2D collision) {
-        Rigidbody2D rb = collision.attachedRigidbody;
-        if (!rb || rb.isKinematic || rb.velocity.y > 0.2f || rb.position.y < ground.transform.position.y)
+        EntityMover mover = collision.GetComponentInParent<EntityMover>();
+        if (!mover.data.OnGround)
             return;
 
-        if (GetContact(collision) == null) {
-            positions.Add(new(this, collision.attachedRigidbody, collision as BoxCollider2D));
-        }
+        if (GetContact(collision) == null)
+            positions.Add(new(this, mover, collision as BoxCollider2D));
     }
 
     private CloudContact GetContact(Collider2D collider) {
@@ -150,7 +149,7 @@ public class CloudPlatform : SimulationBehaviour {
     }
 
     public class CloudContact {
-        public Rigidbody2D rb;
+        public EntityMover mover;
         public CloudPlatform platform;
         public float timer;
         public bool exit;
@@ -159,7 +158,7 @@ public class CloudPlatform : SimulationBehaviour {
             get {
                 if (exit)
                     return lastPoint;
-                return lastPoint = (int) (platform.transform.InverseTransformPoint(rb.transform.position).x * platform.samplesPerTile);
+                return lastPoint = (int) (platform.transform.InverseTransformPoint(collider.transform.position).x * platform.samplesPerTile);
             }
         }
         public BoxCollider2D collider;
@@ -170,9 +169,9 @@ public class CloudPlatform : SimulationBehaviour {
                 return (int) (1.75f * platform.samplesPerTile);
             }
         }
-        public CloudContact(CloudPlatform platform, Rigidbody2D rb, BoxCollider2D collider) {
-            this.rb = rb;
+        public CloudContact(CloudPlatform platform, EntityMover mover, BoxCollider2D collider) {
             this.platform = platform;
+            this.mover = mover;
             this.collider = collider;
             timer = 0.05f;
         }

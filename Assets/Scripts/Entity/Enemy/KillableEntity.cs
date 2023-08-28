@@ -30,6 +30,7 @@ namespace NSMB.Entities {
         [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
         [Networked] protected NetworkBool WasSpecialKilled { get; set; }
         [Networked] protected NetworkBool WasGroundpounded { get; set; }
+        [Networked] protected float AngularVelocity { get; set; }
         [Networked] protected byte ComboCounter { get; set; }
 
         //---Properties
@@ -128,6 +129,15 @@ namespace NSMB.Entities {
             FirstSpawn = false;
         }
 
+        public override void Render() {
+            base.Render();
+            if (!IsActive || !body.interpolationTarget)
+                return;
+
+            if (IsDead)
+                body.interpolationTarget.rotation *= Quaternion.Euler(0, 0, AngularVelocity * Time.deltaTime);
+        }
+
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
             if (!GameData.Instance || !Object || !body)
@@ -135,7 +145,7 @@ namespace NSMB.Entities {
 
             if (!IsActive) {
                 gameObject.layer = Layers.LayerHitsNothing;
-                //body.angularVelocity = 0;
+                AngularVelocity = 0;
                 body.velocity = Vector2.zero;
                 body.freeze = true;
                 return;
@@ -145,7 +155,7 @@ namespace NSMB.Entities {
                 body.freeze = false;
 
                 if (WasSpecialKilled) {
-                    //body.angularVelocity = 400f * (FacingRight ? 1 : -1);
+                    AngularVelocity = 400f * (FacingRight ? 1 : -1);
                 }
                 return;
             } else {
@@ -213,7 +223,7 @@ namespace NSMB.Entities {
             FacingRight = right;
 
             body.velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
-            //body.angularVelocity = 400f * (FacingRight ? 1 : -1);
+            AngularVelocity = 400f * (FacingRight ? 1 : -1);
             body.gravity = Vector2.down * 14.75f;
 
             Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.position + hitbox.offset);

@@ -87,9 +87,15 @@ namespace NSMB.Tiles {
                     if (bottom && ourLocation == origin && (tileHeight != 1 || alreadyDestroyed))
                         return false;
 
+                    if (tileHeight < 0)
+                        return false;
+
                 } else {
                     addHat = bottom;
                     tileHeight = GetPipeHeight(ourLocation);
+
+                    if (tileHeight < 0)
+                        return false;
 
                     world -= (Vector2) (ourLocation - origin) * 0.5f;
 

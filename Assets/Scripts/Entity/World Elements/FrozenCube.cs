@@ -60,17 +60,13 @@ namespace NSMB.Entities {
             Instantiate(PrefabList.Instance.Particle_IceBreak, transform.position, Quaternion.identity);
         }
 
-        public override void Render() {
-            base.Render();
-
+        public void LateUpdate() {
             if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.body.interpolationTarget && body.interpolationTarget) {
                 Transform target = FrozenEntity.body.interpolationTarget.transform;
                 Vector2 newPos = (Vector2) body.interpolationTarget.position + EntityPositionOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
                 target.position = new(newPos.x, newPos.y, target.position.z);
             }
-
-            transform.position = new(transform.position.x, transform.position.y, -5);
         }
 
         public override void FixedUpdateNetwork() {
@@ -138,17 +134,18 @@ namespace NSMB.Entities {
                     return;
             }
 
-            if (FastSlide && body.data.OnGround && body.data.FloorAngle != 0) {
-                RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size * 0.5f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
-                if (ray) {
-                    body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
-                    if (ray.distance < 0.1f)
-                        body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
-                }
+            if (FastSlide) {
+                //if (body.data.OnGround && body.data.FloorAngle != 0) {
+                //    RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size * 0.5f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
+                //    if (ray) {
+                //        body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
+                //        if (ray.distance < 0.1f)
+                //            body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
+                //    }
+                //}
+
+                body.velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.velocity.y);
             }
-
-            body.velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.velocity.y);
-
 
             ApplyConstraints();
         }

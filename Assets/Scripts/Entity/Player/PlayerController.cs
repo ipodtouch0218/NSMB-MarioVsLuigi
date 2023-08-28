@@ -492,9 +492,7 @@ namespace NSMB.Entities.Player {
                         IgnoreCoyoteTime = false;
 
                     if (previousTickIsOnGround) {
-                        if (!IsOnGround) {
-                            IsOnGround = GroundSnapCheck();
-                        }
+                        IsOnGround = GroundSnapCheck();
 
                         if (!IsOnGround) {
                             if (!IgnoreCoyoteTime)
@@ -1790,6 +1788,7 @@ namespace NSMB.Entities.Player {
         }
 
         private bool GroundSnapCheck() {
+            OnSpinner = null;
             if (IsDead || (body.velocity.y > 0.1f && FloorAngle == 0) || PropellerLaunchTimer.IsActive(Runner) || CurrentPipe)
                 return false;
 

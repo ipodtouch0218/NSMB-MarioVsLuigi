@@ -137,22 +137,30 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
         for (int i = 0; i < hits; i++) {
             RaycastHit2D hit = RaycastBuffer[i];
 
-            // Exception
-            if (Vector2.Dot(direction, hit.normal) > 0.1f)
+            // Exception: dont hit our own hitboxes
+            if (hit.collider.transform == transform || hit.collider.transform.IsChildOf(transform)) {
                 continue;
+            }
+
+            // Exception: dont hit objects if we're moving away from them
+            if (Vector2.Dot(direction, hit.normal) > 0.1f) {
+                continue;
+            }
+
+            float angle = Vector2.SignedAngle(hit.normal, Vector2.up);
 
             // Semisolid check.
             if (hit.collider.gameObject.layer == Layers.LayerSemisolid) {
                 if (
                     (direction.y > 0) || // We are moving upwards, impossible to collide.
-                    (position.y - (ColliderSize.y * 0.5f) < hit.point.y) // Lower bound of hitbox is BELOW the semisolid hit
+                    (position.y - (ColliderSize.y * 0.5f) < hit.point.y - 0.03f) || // Lower bound of hitbox is BELOW the semisolid hit
+                    (Mathf.Abs(angle) > maxFloorAngle) // Didn't hit upwards...
                    ) {
                     continue;
                 }
             }
 
             bool isTilemap = hit.collider is CompositeCollider2D;
-            float angle = Vector2.SignedAngle(hit.normal, Vector2.up);
             if (Mathf.Abs(angle) < maxFloorAngle) {
                 // Floor
                 data.OnGround = true;
@@ -222,7 +230,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
             }
 
             if (data.OnGround && gravityPass)
-                return positionToSurfacePoint;
+                return Vector2.zero;
 
             Vector2 leftover = velocity - positionToSurfacePoint;
             leftover = bounceOnImpacts ? Vector2.Reflect(leftover, hit.normal) : Vector3.ProjectOnPlane(leftover, hit.normal);

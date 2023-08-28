@@ -38,19 +38,12 @@ namespace NSMB.Entities.Enemies {
 
             if (IsDead || !IsActive) {
                 gameObject.layer = Layers.LayerHitsNothing;
-                if (!IsActive) {
-                    //body.rotation = 0;
-                    //body.angularVelocity = 0;
-                    body.gravity = Vector2.zero;
-                }
-
+                body.gravity = Vector2.zero;
+                body.freeze = true;
             } else {
                 gameObject.layer = Layers.LayerEntityHitbox;
-                //body.freeze = true;
-                //body.freezeRotation = true;
-                //body.rotation = 0;
-                //body.angularVelocity = 0;
                 body.gravity = Vector2.zero;
+                body.freeze = false;
             }
 
             if (IsFrozen || IsDead)
@@ -116,10 +109,9 @@ namespace NSMB.Entities.Enemies {
         //---KillableEntity overrides
         public override void Kill() {
             IsDead = true;
+            AngularVelocity = 400f * (FacingRight ? -1 : 1);
             body.velocity = Vector2.zero;
             body.freeze = false;
-            //body.constraints = RigidbodyConstraints2D.None;
-            //body.angularVelocity = 400f * (FacingRight ? -1 : 1);
             body.gravity = Vector2.down * 14.75f;
         }
 

@@ -51,8 +51,8 @@
     },
     "Interpolation": {
         "DeltaAdjustment": 4,
-        "AllowedJitter": 25,
-        "SnapLimit": 500,
+        "AllowedJitter": 35,
+        "SnapLimit": 400,
         "MultiplierMin": 1.5,
         "MultiplierMax": 1.75
     },
