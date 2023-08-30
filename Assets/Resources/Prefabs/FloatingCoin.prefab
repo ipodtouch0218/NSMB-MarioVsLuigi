@@ -194,7 +194,6 @@ MonoBehaviour:
   _IsActive:
     _value: 0
   body: {fileID: 0}
-  nrb: {fileID: 0}
   sfx: {fileID: 6321124393289553252}
   checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}

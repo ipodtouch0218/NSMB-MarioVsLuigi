@@ -280,9 +280,12 @@ namespace NSMB.Entities {
             WasGroundpounded = false;
             ComboCounter = 0;
 
-            if (body)
+            if (body) {
+                if (body.interpolationTarget)
+                    body.interpolationTarget.rotation = Quaternion.identity;
+
                 body.gravity = Vector2.down * 21.5f;
-            //gameObject.layer = Layers.LayerEntity;
+            }
         }
 
         public override void DespawnEntity(object data = null) {

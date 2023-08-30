@@ -93,6 +93,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   animationOffset: 0
   interpolationTarget: {fileID: 4813915802632404675}
+  notNetworked: 0
 --- !u!50 &549419135642806223
 Rigidbody2D:
   serializedVersion: 4
@@ -367,7 +368,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 3009764857649989862, guid: 08ca7a03beeec1645846fedb6498ed5c,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -452,7 +453,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 3009764857649989862, guid: 08ca7a03beeec1645846fedb6498ed5c,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

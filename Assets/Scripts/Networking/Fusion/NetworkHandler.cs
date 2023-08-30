@@ -94,9 +94,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public delegate void OnLobbyConnectDelegate(NetworkRunner runner, LobbyInfo lobby);
     public static event OnLobbyConnectDelegate OnLobbyConnect;
 
-    public delegate void OnJoinSessionFailedDelegate(NetworkRunner runner, ShutdownReason reason);
-    public static event OnJoinSessionFailedDelegate OnJoinSessionFailed;
-
     //---Custom Events
     public static event Action OnRegionPingsUpdated;
     #endregion

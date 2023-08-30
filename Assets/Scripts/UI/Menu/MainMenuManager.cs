@@ -77,7 +77,6 @@ namespace NSMB.UI.MainMenu {
             NetworkHandler.OnPlayerLeft += OnPlayerLeft;
             NetworkHandler.OnLobbyConnect += OnLobbyConnect;
             NetworkHandler.OnShutdown += OnShutdown;
-            NetworkHandler.OnJoinSessionFailed += OnShutdown;
             NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
             NetworkHandler.OnConnectFailed += OnConnectFailed;
             NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
@@ -98,7 +97,6 @@ namespace NSMB.UI.MainMenu {
             NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
             NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
             NetworkHandler.OnShutdown -= OnShutdown;
-            NetworkHandler.OnJoinSessionFailed -= OnShutdown;
             NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
             NetworkHandler.OnConnectFailed -= OnConnectFailed;
             NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;

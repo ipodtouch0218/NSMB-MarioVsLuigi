@@ -4899,7 +4899,6 @@ GameObject:
   - component: {fileID: -1769135492019179076}
   - component: {fileID: 3843124130648117525}
   - component: {fileID: 844320328102276428}
-  - component: {fileID: 376300006025663058}
   - component: {fileID: 2644380969240041381}
   - component: {fileID: 5158080774805734746}
   m_Layer: 9
@@ -4942,8 +4941,7 @@ MonoBehaviour:
     _value: 0
   _IsActive:
     _value: 0
-  body: {fileID: 0}
-  nrb: {fileID: 0}
+  body: {fileID: 5158080774805734746}
   sfx: {fileID: 3843124130648117525}
   checkForNearbyPlayersWhenRespawning: 1
   _Owner: {fileID: 0}
@@ -4968,7 +4966,6 @@ MonoBehaviour:
   - {fileID: 4710279457085823811}
   - {fileID: 7450112483459336877}
   hitbox: {fileID: -1769135492019179076}
-  bodyy: {fileID: 5158080774805734746}
 --- !u!61 &-1769135492019179076
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5129,27 +5126,6 @@ MonoBehaviour:
   soundRange: 12
   maxPanning: 0.8
   useDistanceToCamera: 0
---- !u!114 &376300006025663058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1011982274984717421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 2
-  _Data:
-    Flags: 0
-    FloorAngle: 0
-  _PreviousTickVelocity: {x: 0, y: 0, z: 0}
-  currentCollider: {fileID: -1769135492019179076}
-  goUpSlopes: 0
-  getCrushedByGroundEntities: 1
-  floorAndRoofCutoff: 0.3
 --- !u!114 &2644380969240041381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5173,7 +5149,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1164692562165207756}
-  - {fileID: 376300006025663058}
   - {fileID: 5158080774805734746}
   SimulationBehaviours: []
 --- !u!114 &5158080774805734746
@@ -5189,20 +5164,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _velocity: {x: 0, y: 0}
   _position: {x: 0, y: 0}
+  _velocity: {x: 0, y: 0}
   _freeze:
     _value: 0
   _gravity: {x: 0, y: 0}
   _data:
     Flags: 0
     FloorAngle: 0
+    _TilesStandingOn:
+      Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    _TilesHitSide:
+      Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    _TilesHitRoof:
+      Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   interpolationTarget: {fileID: 3150262645453679834}
   collider: {fileID: -1769135492019179076}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 20736
-  maxIterations: 3
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0

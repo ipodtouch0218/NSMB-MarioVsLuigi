@@ -34,17 +34,7 @@ namespace NSMB.Entities.Enemies {
                 DespawnEntity();
             }
 
-            body.freeze = !IsActive || IsFrozen;
-
-            if (IsDead || !IsActive) {
-                gameObject.layer = Layers.LayerHitsNothing;
-                body.gravity = Vector2.zero;
-                body.freeze = true;
-            } else {
-                gameObject.layer = Layers.LayerEntityHitbox;
-                body.gravity = Vector2.zero;
-                body.freeze = false;
-            }
+            gameObject.layer = (IsDead || !IsActive) ? Layers.LayerHitsNothing : Layers.LayerEntityHitbox;
 
             if (IsFrozen || IsDead)
                 return;
@@ -107,11 +97,17 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---KillableEntity overrides
+        public override void RespawnEntity() {
+            base.RespawnEntity();
+
+            body.gravity = Vector2.zero;
+            body.freeze = false;
+        }
+
         public override void Kill() {
             IsDead = true;
             AngularVelocity = 400f * (FacingRight ? -1 : 1);
             body.velocity = Vector2.zero;
-            body.freeze = false;
             body.gravity = Vector2.down * 14.75f;
         }
 
@@ -179,7 +175,7 @@ namespace NSMB.Entities.Enemies {
         private static readonly Color RedHalfAlpha = new(1f, 0f, 0f, 0.5f);
         private Vector2? boxOffset;
         public void OnDrawGizmosSelected() {
-            if (!GameManager.Instance)
+            if (!GameManager.Instance || !body.Object)
                 return;
 
             boxOffset ??= new Vector2(GameManager.Instance.LevelWidth, 0f);

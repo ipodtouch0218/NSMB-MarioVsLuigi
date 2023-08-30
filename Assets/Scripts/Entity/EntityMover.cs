@@ -7,7 +7,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
 
     //---Static Variables
     private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
-    private static readonly float Skin = 0.005f, LerpInterpValue = 0.33f;
+    private static readonly float Skin = 0.01f, LerpInterpValue = 0.33f;
+    private static readonly int MaxIterations = 5;
 
     //---Networked Variables
     [Networked] public Vector2 position { get; set; }
@@ -24,7 +25,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
     [Header("Serialized")]
     [SerializeField] public Transform interpolationTarget;
     [SerializeField] private BoxCollider2D collider;
-    [SerializeField] private int maxIterations = 3;
     [SerializeField] private float maxFloorAngle = 70, interpolationTeleportDistance = 1f;
     [SerializeField] private bool bounceOnImpacts;
 
@@ -47,54 +47,52 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
         transform.position = position;
     }
 
-    public override void Render() {
+    public unsafe override void Render() {
         if (!interpolationTarget)
             interpolationTarget = transform;
 
-        unsafe {
-            Vector3 newPosition;
+        Vector3 newPosition;
 
-            if (freeze) {
-                newPosition = position;
-            } else if (IsProxy || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
+        if (freeze) {
+            newPosition = position;
+        } else if (IsProxy || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
 
-                // Proxy interpolation with some smoothing:
+            // Proxy interpolation with some smoothing:
 
-                if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, position) > interpolationTeleportDistance) {
-                    // Teleport over large distances
-                    newPosition = Utils.WrapWorldLocation(position);
-                } else {
-                    // Interpolate from where we are to the next point.
-                    Utils.UnwrapLocations(previousRenderPosition, position, out Vector2 fromRelative, out Vector2 toRelative);
-                    Vector2 difference = toRelative - fromRelative;
-                    newPosition = Vector2.Lerp(previousRenderPosition, previousRenderPosition + difference, Mathf.Clamp01(LerpInterpValue - Time.deltaTime));
-                    newPosition = Utils.WrapWorldLocation(newPosition);
-                }
+            if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, position) > interpolationTeleportDistance) {
+                // Teleport over large distances
+                newPosition = Utils.WrapWorldLocation(position);
             } else {
-
-                // Non-Proxy interpolation with no smoothing:
-
-                Vector2Int fromInt = *(Vector2Int*) from;
-                Vector2 fromFloat = (Vector2) fromInt * 0.001f;
-
-                Vector2Int toInt = *(Vector2Int*) to;
-                Vector2 toFloat = (Vector2) toInt * 0.001f;
-
-                if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromFloat, toFloat) > interpolationTeleportDistance) {
-                    // Teleport over large distances
-                    newPosition = Utils.WrapWorldLocation(toFloat);
-                } else {
-                    // Normal interpolation (over level seams, too)...
-                    Utils.UnwrapLocations(fromFloat, toFloat, out Vector2 fromFloatRelative, out Vector2 toFloatRelative);
-                    Vector2 difference = toFloatRelative - fromFloatRelative;
-                    newPosition = Vector2.Lerp(fromFloat, fromFloat + difference, alpha);
-                    newPosition = Utils.WrapWorldLocation(newPosition);
-                }
+                // Interpolate from where we are to the next point.
+                Utils.UnwrapLocations(previousRenderPosition, position, out Vector2 fromRelative, out Vector2 toRelative);
+                Vector2 difference = toRelative - fromRelative;
+                newPosition = Vector2.Lerp(previousRenderPosition, previousRenderPosition + difference, Mathf.Clamp01(LerpInterpValue - Time.deltaTime));
+                newPosition = Utils.WrapWorldLocation(newPosition);
             }
+        } else {
 
-            newPosition.z = interpolationTarget.position.z;
-            previousRenderPosition = interpolationTarget.position = newPosition;
+            // State/Input Authority interpolation with no smoothing:
+
+            Vector2Int fromInt = *(Vector2Int*) from;
+            Vector2 fromFloat = (Vector2) fromInt * 0.001f;
+
+            Vector2Int toInt = *(Vector2Int*) to;
+            Vector2 toFloat = (Vector2) toInt * 0.001f;
+
+            if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromFloat, toFloat) > interpolationTeleportDistance) {
+                // Teleport over large distances
+                newPosition = Utils.WrapWorldLocation(toFloat);
+            } else {
+                // Normal interpolation (over level seams, too)...
+                Utils.UnwrapLocations(fromFloat, toFloat, out Vector2 fromFloatRelative, out Vector2 toFloatRelative);
+                Vector2 difference = toFloatRelative - fromFloatRelative;
+                newPosition = Vector2.Lerp(fromFloat, fromFloat + difference, alpha);
+                newPosition = Utils.WrapWorldLocation(newPosition);
+            }
         }
+
+        newPosition.z = interpolationTarget.position.z;
+        previousRenderPosition = interpolationTarget.position = newPosition;
     }
 
     public override void FixedUpdateNetwork() {
@@ -127,13 +125,15 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
     }
 
     private Vector2 CollideAndSlide(Vector2 position, Vector2 velocity, bool gravityPass, int depth = 0) {
-        if (depth >= maxIterations)
+        if (depth >= MaxIterations)
             return Vector2.zero;
 
         float distance = velocity.magnitude + Skin;
         Vector2 direction = velocity.normalized;
+        Vector2 size = ColliderSize;
+        int filter = Layers.GetCollisionMask(collider.gameObject.layer);
 
-        int hits = Runner.GetPhysicsScene2D().BoxCast(position, ColliderSize, 0, direction, distance, RaycastBuffer, Layers.GetCollisionMask(collider.gameObject.layer));
+        int hits = Runner.GetPhysicsScene2D().BoxCast(position, size, 0, direction, distance, RaycastBuffer, filter);
         for (int i = 0; i < hits; i++) {
             RaycastHit2D hit = RaycastBuffer[i];
 
@@ -222,9 +222,25 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
 
             Vector2 positionToSurfacePoint = (direction * hit.distance) + (hit.normal * Skin);
 
+            // Started inside an object
+            if (hit.distance <= 0) {
+                RaycastHit2D stuckHit = Runner.GetPhysicsScene2D().Raycast(position, (hit.point - position), Mathf.Max(size.x, size.y), filter);
+                if (stuckHit) {
+
+                    Vector2 offset = stuckHit.normal * (Vector2.Distance(hit.point, stuckHit.point) + Skin + Skin + Skin);
+                    this.position += offset;
+                    position += offset;
+
+                    return CollideAndSlide(position, velocity, gravityPass, depth + 1);
+                }
+            }
+
+            // Eject from walls
             if (Vector2.Dot(positionToSurfacePoint, hit.normal) > 0) {
                 // Hit normal pushing us away from the wall
-                this.position += (Vector2) Vector3.Project(positionToSurfacePoint, hit.normal);
+                Vector2 offset = (Vector2) Vector3.Project(positionToSurfacePoint, hit.normal);
+                this.position += offset;
+                position += offset;
                 direction = ((Vector2) Vector3.ProjectOnPlane(direction, hit.normal)).normalized;
                 positionToSurfacePoint = direction * hit.distance;
             }

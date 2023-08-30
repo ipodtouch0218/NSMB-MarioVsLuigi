@@ -2,9 +2,9 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Game;
-using UnityEngine.Rendering.UI;
 
-public class GenericMover : NetworkBehaviour {
+[OrderBefore(typeof(EntityMover))]
+public class GenericMover : NetworkBehaviour, IBeforeTick {
 
     //---Networked Variables
     [Networked] private Vector3 Origin { get; set; }
@@ -28,13 +28,20 @@ public class GenericMover : NetworkBehaviour {
         Origin = transform.position;
     }
 
+    public void BeforeTick() {
+        if (GameData.Instance.GameEnded)
+            return;
+
+        SetPosition(transform, Origin, Runner.SimulationTime - Runner.DeltaTime - GameData.Instance.GameStartTime);
+    }
+
     public void Update() {
         if (notNetworked)
             SetPosition(interpolationTarget, origin, Time.time);
     }
 
     public override void Render() {
-        if (GameData.Instance.GameEnded)
+        if (!GameData.Instance || GameData.Instance.GameEnded)
             return;
 
         SetPosition(interpolationTarget, Origin, Runner.SimulationRenderTime - GameData.Instance.GameStartTime);

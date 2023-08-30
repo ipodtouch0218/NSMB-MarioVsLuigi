@@ -8,7 +8,6 @@ using NSMB.Tiles;
 
 namespace NSMB.Entities {
 
-    [RequireComponent(typeof(PhysicsEntity))]
     [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
     public class Fireball : BasicEntity, IPlayerInteractable, IFireballInteractable {
 

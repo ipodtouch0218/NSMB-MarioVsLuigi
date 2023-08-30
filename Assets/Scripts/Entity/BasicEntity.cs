@@ -94,6 +94,7 @@ namespace NSMB.Entities {
             if (body) {
                 body.position = SpawnLocation;
                 body.velocity = Vector2.zero;
+                body.freeze = true;
             }
             IsActive = false;
         }
