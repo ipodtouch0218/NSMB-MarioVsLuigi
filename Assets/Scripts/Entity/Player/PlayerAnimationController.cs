@@ -35,7 +35,7 @@ namespace NSMB.Entities.Player {
         //---Properties
         public Color GlowColor { get; private set; }
         public EntityMover body => controller.body;
-        private bool IsSpinningOnSpinner => controller.OnSpinner && controller.IsOnGround && controller.FireballDelayTimer.ExpiredOrNotRunning(Runner) && Mathf.Abs(body.velocity.x) < 0.3f && !controller.HeldEntity;
+        private bool IsSpinningOnSpinner => controller.OnSpinner && controller.IsOnGround && controller.FireballDelayTimer.ExpiredOrNotRunning(Runner) && Mathf.Abs(body.Velocity.x) < 0.3f && !controller.HeldEntity;
 
         //---Private Variables
         private Enums.PlayerEyeState eyeState;
@@ -120,7 +120,7 @@ namespace NSMB.Entities.Player {
             // Particles
             SetParticleEmission(drillParticle, !controller.IsDead && controller.IsDrilling);
             SetParticleEmission(sparkles, !controller.IsDead && controller.IsStarmanInvincible);
-            SetParticleEmission(dust, !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && body.velocity.sqrMagnitude > 0.25f))) || (((controller.IsSliding && body.velocity.sqrMagnitude > 0.25f) || controller.IsInShell) && controller.IsOnGround)) && !controller.CurrentPipe);
+            SetParticleEmission(dust, !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && body.Velocity.sqrMagnitude > 0.25f))) || (((controller.IsSliding && body.Velocity.sqrMagnitude > 0.25f) || controller.IsInShell) && controller.IsOnGround)) && !controller.CurrentPipe);
             SetParticleEmission(giantParticle, !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.MegaStartTimer.ExpiredOrNotRunning(Runner));
             SetParticleEmission(fireParticle, !controller.IsRespawning && controller.FireDeath && controller.IsDead && deathTimer > deathUpTime);
             SetParticleEmission(bubblesParticle, controller.IsSwimming);
@@ -180,8 +180,8 @@ namespace NSMB.Entities.Player {
                 }
                 modelRotateInstantly = true;
 
-            } else if (animator.GetBool("inShell") && (!controller.OnSpinner || Mathf.Abs(body.velocity.x) > 0.3f)) {
-                modelRotationTarget += Mathf.Abs(body.velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1400 * (controller.FacingRight ? -1 : 1));
+            } else if (animator.GetBool("inShell") && (!controller.OnSpinner || Mathf.Abs(body.Velocity.x) > 0.3f)) {
+                modelRotationTarget += Mathf.Abs(body.Velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1400 * (controller.FacingRight ? -1 : 1));
                 modelRotateInstantly = true;
 
             } else if (wasTurnaround || controller.IsSkidding || controller.IsTurnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
@@ -194,7 +194,7 @@ namespace NSMB.Entities.Player {
                     modelRotationTarget += controller.OnSpinner.spinSpeed * delta * Vector3.up;
                     modelRotateInstantly = true;
                 } else if (controller.IsSpinnerFlying || controller.IsPropellerFlying) {
-                    modelRotationTarget += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(Runner) ?? 0f) * 1400) - (controller.IsDrilling ? 900 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.ExpiredOrNotRunning(Runner) && body.velocity.y < 0 ? 700 : 0), 0) * delta;
+                    modelRotationTarget += new Vector3(0, -1200 - ((controller.PropellerLaunchTimer.RemainingTime(Runner) ?? 0f) * 1400) - (controller.IsDrilling ? 900 : 0) + (controller.IsPropellerFlying && controller.PropellerSpinTimer.ExpiredOrNotRunning(Runner) && body.Velocity.y < 0 ? 700 : 0), 0) * delta;
                     modelRotateInstantly = true;
                 } else if (controller.WallSlideLeft || controller.WallSlideRight) {
                     modelRotationTarget.Set(0, controller.WallSlideRight ? 110 : 250, 0);
@@ -275,7 +275,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool("fireballKnockback", controller.IsWeakKnockback);
             animator.SetBool("knockforwards", controller.IsForwardsKnockback);
 
-            float animatedVelocity = body.velocity.magnitude;
+            float animatedVelocity = body.Velocity.magnitude;
             if (controller.IsStuckInBlock) {
                 animatedVelocity = 0;
             } else if (controller.IsPropellerFlying) {
@@ -288,7 +288,7 @@ namespace NSMB.Entities.Player {
                 animatedVelocity = 0;
             }
             animator.SetFloat("velocityX", animatedVelocity);
-            animator.SetFloat("velocityY", body.velocity.y);
+            animator.SetFloat("velocityY", body.Velocity.y);
         }
 
         private void HandleMiscStates() {
@@ -358,8 +358,8 @@ namespace NSMB.Entities.Player {
 
             PipeManager pe = controller.CurrentPipe;
 
-            body.freeze = true;
-            body.velocity = controller.PipeDirection;
+            body.Freeze = true;
+            body.Velocity = controller.PipeDirection;
 
             if (controller.PipeTimer.Expired(Runner)) {
                 if (controller.PipeEntering) {
@@ -374,7 +374,7 @@ namespace NSMB.Entities.Player {
                         offset.y += size;
                     }
                     Vector3 tpPos = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
-                    controller.body.position = tpPos;
+                    controller.body.Position = tpPos;
                     controller.cameraController.Recenter(tpPos + (Vector3) offset);
                     controller.PipeTimer = TickTimer.CreateFromSeconds(Runner, pipeDuration * 0.5f);
                     controller.PipeEntering = false;
@@ -382,12 +382,12 @@ namespace NSMB.Entities.Player {
                 } else {
                     //end pipe animation
                     controller.CurrentPipe = null;
-                    body.freeze = false;
+                    body.Freeze = false;
                     controller.IsOnGround = false;
                     controller.JumpState = PlayerController.PlayerJumpState.None;
                     controller.IsCrouching = false;
                     controller.PipeReentryTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
-                    body.velocity = Vector2.zero;
+                    body.Velocity = Vector2.zero;
                 }
             }
         }

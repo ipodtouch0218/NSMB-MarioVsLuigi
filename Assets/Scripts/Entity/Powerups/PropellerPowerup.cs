@@ -17,8 +17,8 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void FixedUpdateNetwork() {
             if (GameData.Instance && GameData.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
-                body.freeze = true;
+                body.Velocity = Vector2.zero;
+                body.Freeze = true;
                 return;
             }
 
@@ -27,7 +27,6 @@ namespace NSMB.Entities.Collectable.Powerups {
                 return;
             }
 
-
             if (TimeFlyingStarted <= 0) {
                 gameObject.layer = Layers.LayerEntity;
                 base.FixedUpdateNetwork();
@@ -35,10 +34,10 @@ namespace NSMB.Entities.Collectable.Powerups {
                 if (!Object)
                     return;
 
-                if (body.data.OnGround) {
+                if (body.Data.OnGround) {
                     // Start flying
                     TimeFlyingStarted = Runner.SimulationTime;
-                    FlightOrigin = body.position;
+                    FlightOrigin = body.Position;
                 }
             } else {
                 // We are flying. follow the curve.
@@ -46,10 +45,9 @@ namespace NSMB.Entities.Collectable.Powerups {
                 float x = flyingPathX.Evaluate(elapsedTime);
                 float y = flyingPathY.Evaluate(elapsedTime);
 
-                body.freeze = true;
+                body.Position = FlightOrigin + new Vector2(x, y);
+                body.Gravity = Vector2.zero;
                 gameObject.layer = Layers.LayerHitsNothing;
-                body.position = FlightOrigin + new Vector2(x, y);
-
             }
 
             if (DespawnTimer.Expired(Runner)) {
@@ -59,7 +57,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
             // Do nothing when bumped. We're flying, remember?
         }
     }

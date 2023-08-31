@@ -51,7 +51,7 @@ namespace NSMB.Entities.Enemies {
 
             // Animation
             animator.SetBool("shell", IsInShell || Holder != null);
-            animator.SetFloat("xVel", IsStationary ? 0 : Mathf.Abs(body.velocity.x));
+            animator.SetFloat("xVel", IsStationary ? 0 : Mathf.Abs(body.Velocity.x));
             animator.SetBool("dead", !IsActive);
 
             // "Flip" rotation
@@ -77,9 +77,9 @@ namespace NSMB.Entities.Enemies {
                 return;
 
             if (GameData.Instance && GameData.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
+                body.Velocity = Vector2.zero;
                 animator.enabled = false;
-                body.freeze = true;
+                body.Freeze = true;
                 return;
             }
 
@@ -93,14 +93,14 @@ namespace NSMB.Entities.Enemies {
             if (Holder)
                 FacingRight = Holder.FacingRight;
 
-            PhysicsDataStruct data = body.data;
+            PhysicsDataStruct data = body.Data;
             if (IsInShell) {
                 hitbox.size = inShellHitboxSize;
                 hitbox.offset = inShellHitboxOffset;
 
                 if (IsStationary) {
-                    if (data.OnGround && body.velocity.y < 1)
-                        body.velocity = new(0, body.velocity.y);
+                    if (data.OnGround && body.Velocity.y < 1)
+                        body.Velocity = new(0, body.Velocity.y);
 
                     if (WakeupTimer.Expired(Runner)) {
                         WakeUp();
@@ -114,25 +114,25 @@ namespace NSMB.Entities.Enemies {
 
             if (!Holder && !IsStationary) {
                 if (data.HitRight && FacingRight) {
-                    Turnaround(false, body.velocity.x);
+                    Turnaround(false, body.Velocity.x);
                 } else if (data.HitLeft && !FacingRight) {
-                    Turnaround(true, body.velocity.x);
+                    Turnaround(true, body.Velocity.x);
                 }
             }
 
-            if (data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
-                Vector3 redCheckPos = body.position + new Vector2(0.1f * (FacingRight ? 1 : -1), 0);
+            if (data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.Position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
+                Vector3 redCheckPos = body.Position + new Vector2(0.1f * (FacingRight ? 1 : -1), 0);
                 if (GameManager.Instance)
                     Utils.Utils.WrapWorldLocation(ref redCheckPos);
 
                 // Turn around if no ground
                 if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
-                    Turnaround(!FacingRight, body.velocity.x);
+                    Turnaround(!FacingRight, body.Velocity.x);
             }
 
             if (!IsStationary) {
                 float x = (IsInShell ? CurrentKickSpeed : walkSpeed) * (FacingRight ? 1 : -1);
-                body.velocity = new(x, body.velocity.y);
+                body.Velocity = new(x, body.Velocity.y);
             }
 
             HandleTile();
@@ -142,25 +142,25 @@ namespace NSMB.Entities.Enemies {
             if (Holder)
                 return;
 
-            PhysicsDataStruct data = body.data;
+            PhysicsDataStruct data = body.Data;
 
             if (Putdown) {
                 if (data.OnGround) {
-                    body.velocity = new(0, body.velocity.y);
+                    body.Velocity = new(0, body.Velocity.y);
                     Putdown = false;
                 }
 
             } else if (IsInShell && !IsStationary && (data.HitLeft || data.HitRight)) {
-                foreach (Vector2Int loc in data.TilesHitSide) {
-                    if (GameManager.Instance.TileManager.GetTile(loc, out InteractableTile it))
-                        it.Interact(this, InteractableTile.InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(loc), out bool _);
+                foreach (PhysicsDataStruct.TileContact tile in data.TilesHitSide) {
+                    if (GameManager.Instance.TileManager.GetTile(tile.location, out InteractableTile it))
+                        it.Interact(this, TileInteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(tile.location), out bool _);
                 }
             }
         }
 
         public void WakeUp() {
             IsInShell = false;
-            body.velocity = new(-walkSpeed, 0);
+            body.Velocity = new(-walkSpeed, 0);
             FacingRight = false;
             IsUpsideDown = false;
             IsStationary = false;
@@ -180,7 +180,7 @@ namespace NSMB.Entities.Enemies {
                 BlueBecomeItem(player);
                 return;
             }
-            body.velocity = Vector2.zero;
+            body.Velocity = Vector2.zero;
             WakeupTimer = TickTimer.CreateFromSeconds(Runner, wakeup);
             ComboCounter = 0;
             IsInShell = true;
@@ -194,7 +194,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         public void BlueBecomeItem(PlayerController player) {
-            if (player.HasGroundpoundHitbox) {
+            if (player.HasGroundpoundHitbox && !player.IsDrilling) {
                 BlueShellCollector = player;
                 powerupCollect.OnPowerupCollect(player, Enums.GetPowerupScriptable(Enums.PowerupState.BlueShell));
             } else {
@@ -213,7 +213,7 @@ namespace NSMB.Entities.Enemies {
                 PlaySound(Enums.Sounds.World_Block_Bump);
 
             FacingRight = hitWallOnLeft;
-            body.velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+            body.Velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.Velocity.y);
         }
 
         //---BasicEntity overrides
@@ -241,7 +241,7 @@ namespace NSMB.Entities.Enemies {
             if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
                 return;
 
-            Utils.Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+            Utils.Utils.UnwrapLocations(body.Position, player.body.Position, out Vector2 ourPos, out Vector2 theirPos);
             bool fromRight = ourPos.x < theirPos.x;
             Vector2 damageDirection = (theirPos - ourPos).normalized;
             bool attackedFromAbove = damageDirection.y > 0;
@@ -265,7 +265,7 @@ namespace NSMB.Entities.Enemies {
                     if (player.CanPickupItem) {
                         Pickup(player);
                     } else {
-                        Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                        Kick(player, !fromRight, Mathf.Abs(player.body.Velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                         PreviousHolder = player;
                     }
                 }
@@ -315,7 +315,7 @@ namespace NSMB.Entities.Enemies {
 
                 // Turn around when hitting a crouching blue shell player
                 if (!IsInShell && player.IsCrouchedInShell) {
-                    player.body.velocity = new(0, player.body.velocity.y);
+                    player.body.Velocity = new(0, player.body.Velocity.y);
                     FacingRight = !fromRight;
                     return;
                 }
@@ -329,7 +329,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
             if (IsDead)
                 return;
 
@@ -340,14 +340,14 @@ namespace NSMB.Entities.Enemies {
             }
             IsUpsideDown = canBeFlipped;
 
-            body.velocity = new(body.velocity.x, 5.5f);
+            body.Velocity = new(body.Velocity.x, 5.5f);
 
             if (Holder)
                 Holder.SetHeldEntity(null);
 
             if (IsStationary) {
-                body.velocity = new(bumper.body.position.x < body.position.x ? 1f : -1f, body.velocity.y);
-                body.data.OnGround = false;
+                body.Velocity = new(bumper.body.Position.x < body.Position.x ? 1f : -1f, body.Velocity.y);
+                body.Data.OnGround = false;
             }
 
             KickedAnimCounter++;
@@ -364,7 +364,7 @@ namespace NSMB.Entities.Enemies {
 
             if (!((!IsInShell && !Holder) || IsActuallyStationary || Putdown || IsDead)) {
 
-                int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, EntityFilter, CollisionBuffer);
+                int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, EntityFilter, CollisionBuffer);
 
                 for (int i = 0; i < count; i++) {
                     GameObject obj = CollisionBuffer[i].gameObject;
@@ -380,7 +380,7 @@ namespace NSMB.Entities.Enemies {
                         if (killable.IsDead)
                             continue;
 
-                        Utils.Utils.UnwrapLocations(body.position, killable.body ? killable.body.position : killable.transform.position, out Vector2 ourPos, out Vector2 theirPos);
+                        Utils.Utils.UnwrapLocations(body.Position, killable.body ? killable.body.Position : killable.transform.position, out Vector2 ourPos, out Vector2 theirPos);
                         bool fromRight = ourPos.x < theirPos.x;
 
                         // Kill entity we ran into
@@ -426,7 +426,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void Throw(bool toRight, bool crouch) {
-            throwSpeed = CurrentKickSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.velocity.x) / Holder.RunningMaxSpeed);
+            throwSpeed = CurrentKickSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.Velocity.x) / Holder.RunningMaxSpeed);
             base.Throw(toRight, crouch);
 
             IsStationary = crouch;

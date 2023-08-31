@@ -41,11 +41,11 @@ namespace NSMB.Entities.World {
                 return;
 
             //player has to be moving upwards
-            if (player.body.velocity.y < 0.1f)
+            if (player.body.Velocity.y < 0.1f)
                 return;
 
             //player has to bump us from below
-            if (player.body.position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.body.velocity.y * Runner.DeltaTime) > transform.position.y)
+            if (player.body.Position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.body.Velocity.y * Runner.DeltaTime) > transform.position.y)
                 return;
 
             BumpTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
@@ -53,7 +53,7 @@ namespace NSMB.Entities.World {
             player.BlockBumpSoundCounter++;
 
             //stop player velocity
-            player.body.velocity = new(player.body.velocity.x, 0);
+            player.body.Velocity = new(player.body.Velocity.x, 0);
         }
 
         public void DoBump(Vector2Int tileLocation, PlayerController player) {

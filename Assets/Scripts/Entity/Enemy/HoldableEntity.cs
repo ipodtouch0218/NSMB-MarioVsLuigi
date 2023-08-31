@@ -46,8 +46,8 @@ namespace NSMB.Entities {
 
         public override void FixedUpdateNetwork() {
             if (Holder) {
-                body.velocity = Holder.body.velocity;
-                body.position = Holder.body.position + (Vector2) holderOffset;
+                body.Velocity = Holder.body.Velocity;
+                body.Position = Holder.body.Position + (Vector2) holderOffset;
 
                 hitbox.enabled = false;
                 CheckForEntityCollisions();
@@ -68,22 +68,22 @@ namespace NSMB.Entities {
             FacingRight = toRight;
             KickedAnimCounter++;
             CurrentKickSpeed = throwSpeed + 1.5f * kickFactor;
-            body.velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
+            body.Velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), groundpound ? 3.5f : 0);
         }
 
         public virtual void Throw(bool toRight, bool crouching) {
             if (!Holder)
                 return;
 
-            if (Utils.Utils.IsTileSolidAtWorldLocation(body.position))
-                transform.position = body.position = new(Holder.transform.position.x, body.position.y);
+            if (Utils.Utils.IsTileSolidAtWorldLocation(body.Position))
+                transform.position = body.Position = new(Holder.transform.position.x, body.Position.y);
 
             ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, crouching ? 0.6f : 0.35f);
             PreviousHolder = Holder;
             Holder = null;
             FacingRight = toRight;
 
-            body.velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), 0);
+            body.Velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), 0);
         }
 
         public virtual void Pickup(PlayerController player) {
@@ -129,7 +129,7 @@ namespace NSMB.Entities {
 
         protected override void CheckForEntityCollisions() {
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, EntityFilter, CollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, EntityFilter, CollisionBuffer);
 
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
@@ -144,7 +144,7 @@ namespace NSMB.Entities {
                     if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant)
                         continue;
 
-                    Utils.Utils.UnwrapLocations(body.position, killable.body.position, out Vector2 ourPos, out Vector2 theirPos);
+                    Utils.Utils.UnwrapLocations(body.Position, killable.body.Position, out Vector2 ourPos, out Vector2 theirPos);
                     bool goRight = ourPos.x > theirPos.x;
 
                     if (Mathf.Abs(ourPos.x - theirPos.x) < 0.015f) {

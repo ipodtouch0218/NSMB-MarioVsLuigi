@@ -12,7 +12,7 @@ using NSMB.Utils;
 public class CameraController : NetworkBehaviour {
 
     //---Static Variables
-    private static readonly Vector2 AirOffset = new(0, .65f);
+    private static readonly Vector2 AirOffset = new(0, 0.65f);
     private static readonly Vector2 AirThreshold = new(0.6f, 1.3f), GroundedThreshold = new(0.6f, 0f);
     private static CameraController CurrentController;
 

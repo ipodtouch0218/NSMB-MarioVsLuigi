@@ -40,7 +40,7 @@ public class WrappingHitbox : NetworkBehaviour {
         childCollider.edgeRadius = ourCollider.edgeRadius;
         childCollider.enabled = ourCollider.enabled;
         childCollider.isTrigger = ourCollider.isTrigger;
-        childCollider.offset = ourCollider.offset + (((body.position.x < GameManager.Instance.LevelMiddleX) ? offset : -offset) / body.transform.lossyScale);
+        childCollider.offset = ourCollider.offset + (((body.Position.x < GameManager.Instance.LevelMiddleX) ? offset : -offset) / body.transform.lossyScale);
         childCollider.sharedMaterial = ourCollider.sharedMaterial;
         childCollider.size = ourCollider.size;
         childCollider.usedByComposite = ourCollider.usedByComposite;

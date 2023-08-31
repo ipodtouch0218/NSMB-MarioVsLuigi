@@ -23,8 +23,8 @@ namespace NSMB.Entities.Enemies {
         public override void FixedUpdateNetwork() {
 
             if (GameData.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
-                body.freeze = true;
+                body.Velocity = Vector2.zero;
+                body.Freeze = true;
                 legacyAnimation.enabled = false;
                 return;
             }
@@ -39,7 +39,7 @@ namespace NSMB.Entities.Enemies {
             if (IsFrozen || IsDead)
                 return;
 
-            body.velocity = new(speed * (FacingRight ? 1 : -1), 0);
+            body.Velocity = new(speed * (FacingRight ? 1 : -1), 0);
             DespawnCheck();
         }
 
@@ -48,7 +48,7 @@ namespace NSMB.Entities.Enemies {
                 if (!player)
                     continue;
 
-                if (Utils.Utils.WrappedDistance(player.body.position, body.position) < despawnDistance)
+                if (Utils.Utils.WrappedDistance(player.body.Position, body.Position) < despawnDistance)
                     return;
             }
 
@@ -57,10 +57,10 @@ namespace NSMB.Entities.Enemies {
 
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player) {
-            if (IsDead || IsFrozen || player.IsFrozen || (player.State == Enums.PowerupState.BlueShell && player.IsCrouchedInShell))
+            if (IsDead || IsFrozen || player.IsFrozen)
                 return;
 
-            Vector2 damageDirection = (player.body.position - body.position).normalized;
+            Vector2 damageDirection = (player.body.Position - body.Position).normalized;
             bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
 
             if (player.InstakillsEnemies || ((player.IsGroundpounding || player.IsDrilling) && player.State != Enums.PowerupState.MiniMushroom && attackedFromAbove)) {
@@ -87,28 +87,28 @@ namespace NSMB.Entities.Enemies {
 
         //---IFireballInteractable overrides
         public override bool InteractWithFireball(Fireball fireball) {
-            //don't die to fireballs, but still destroy them.
+            // Don't die to fireballs, but still destroy them.
             return true;
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
-            //do nothing
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
+            // Do nothing
         }
 
         //---KillableEntity overrides
         public override void RespawnEntity() {
             base.RespawnEntity();
 
-            body.gravity = Vector2.zero;
-            body.freeze = false;
+            body.Gravity = Vector2.zero;
+            body.Freeze = false;
         }
 
         public override void Kill() {
             IsDead = true;
             AngularVelocity = 400f * (FacingRight ? -1 : 1);
-            body.velocity = Vector2.zero;
-            body.gravity = Vector2.down * 14.75f;
+            body.Velocity = Vector2.zero;
+            body.Gravity = Vector2.down * 14.75f;
         }
 
         public override void SpecialKill(bool right, bool groundpound, int combo) {
@@ -120,7 +120,7 @@ namespace NSMB.Entities.Enemies {
             IsDead = true;
             WasSpecialKilled = true;
             WasGroundpounded = true;
-            body.velocity = Vector2.zero;
+            body.Velocity = Vector2.zero;
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
         }
 
@@ -181,13 +181,13 @@ namespace NSMB.Entities.Enemies {
             boxOffset ??= new Vector2(GameManager.Instance.LevelWidth, 0f);
 
             Gizmos.color = RedHalfAlpha;
-            Gizmos.DrawCube(body.position, searchVector);
+            Gizmos.DrawCube(body.Position, searchVector);
             // Left border check
-            if (body.position.x - playerSearchRadius < GameManager.Instance.LevelMinX)
-                Gizmos.DrawCube(body.position + boxOffset.Value, searchVector);
+            if (body.Position.x - playerSearchRadius < GameManager.Instance.LevelMinX)
+                Gizmos.DrawCube(body.Position + boxOffset.Value, searchVector);
             // Right border check
-            if (body.position.x + playerSearchRadius > GameManager.Instance.LevelMaxX)
-                Gizmos.DrawCube(body.position - boxOffset.Value, searchVector);
+            if (body.Position.x + playerSearchRadius > GameManager.Instance.LevelMaxX)
+                Gizmos.DrawCube(body.Position - boxOffset.Value, searchVector);
         }
 #endif
     }

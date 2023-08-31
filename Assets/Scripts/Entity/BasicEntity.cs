@@ -37,7 +37,7 @@ namespace NSMB.Entities {
 
         public override void Spawned() {
             if (FirstSpawn) {
-                SpawnLocation = body ? body.position : transform.position;
+                SpawnLocation = body ? body.Position : transform.position;
 
                 if (IsRespawningEntity)
                     DespawnEntity();
@@ -76,8 +76,8 @@ namespace NSMB.Entities {
                 return;
 
             if (body) {
-                body.position = SpawnLocation;
-                body.velocity = Vector2.zero;
+                body.Position = SpawnLocation;
+                body.Velocity = Vector2.zero;
             }
             IsActive = true;
         }
@@ -92,9 +92,9 @@ namespace NSMB.Entities {
                 return;
 
             if (body) {
-                body.position = SpawnLocation;
-                body.velocity = Vector2.zero;
-                body.freeze = true;
+                body.Position = SpawnLocation;
+                body.Velocity = Vector2.zero;
+                body.Freeze = true;
             }
             IsActive = false;
         }
@@ -104,7 +104,7 @@ namespace NSMB.Entities {
         public virtual void OnFacingRightChanged() { }
 
         //---IBlockBumpable overrides
-        public abstract void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction);
+        public abstract void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction);
 
         //---RPCs
         public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, Enums.PrefabParticle prefab) {

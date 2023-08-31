@@ -13,7 +13,7 @@ namespace NSMB.Entities.Enemies {
 
         public override void Spawned() {
             base.Spawned();
-            body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
+            body.Velocity = new(speed * (FacingRight ? 1 : -1), body.Velocity.y);
         }
 
         public override void FixedUpdateNetwork() {
@@ -22,15 +22,15 @@ namespace NSMB.Entities.Enemies {
                 return;
 
             if (!IsActive) {
-                body.velocity = Vector2.zero;
+                body.Velocity = Vector2.zero;
                 return;
             }
 
             if (GameData.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
+                body.Velocity = Vector2.zero;
                 AngularVelocity = 0;
                 legacyAnimation.enabled = false;
-                body.freeze = true;
+                body.Freeze = true;
                 return;
             }
 
@@ -41,11 +41,11 @@ namespace NSMB.Entities.Enemies {
 
             HandleWallCollisions();
 
-            body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(terminalVelocity, body.velocity.y));
+            body.Velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(terminalVelocity, body.Velocity.y));
         }
 
         private void HandleWallCollisions() {
-            PhysicsDataStruct data = body.data;
+            PhysicsDataStruct data = body.Data;
 
             if (data.HitLeft || data.HitRight)
                 FacingRight = data.HitLeft;
@@ -55,8 +55,8 @@ namespace NSMB.Entities.Enemies {
         public override void Kill() {
             IsDead = true;
 
-            body.velocity = Vector2.zero;
-            body.freeze = true;
+            body.Velocity = Vector2.zero;
+            body.Freeze = true;
 
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
         }

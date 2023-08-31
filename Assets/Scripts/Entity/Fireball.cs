@@ -47,25 +47,25 @@ namespace NSMB.Entities {
             Owner = owner;
 
             // Speed
-            body.gravity = 9.81f * (IsIceball ? 2.2f : 4.4f) * Vector2.down;
+            body.Gravity = 9.81f * (IsIceball ? 2.2f : 4.4f) * Vector2.down;
             if (IsIceball) {
-                CurrentSpeed = iceSpeed + Mathf.Abs(owner.body.velocity.x / 3f);
+                CurrentSpeed = iceSpeed + Mathf.Abs(owner.body.Velocity.x / 3f);
             } else {
                 CurrentSpeed = fireSpeed;
             }
 
             // Physics
-            body.position = spawnpoint;
+            body.Position = spawnpoint;
             //nrb.TeleportToPosition(spawnpoint, Vector3.zero);
             //nrb.Rigidbody.position = spawnpoint;
-            body.freeze = false;
-            body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
+            body.Freeze = false;
+            body.Velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
         }
 
         public override void Spawned() {
             base.Spawned();
 
-            body.freeze = true;
+            body.Freeze = true;
             iceGraphics.SetActive(false);
             fireGraphics.SetActive(false);
 
@@ -83,20 +83,20 @@ namespace NSMB.Entities {
         }
 
         public override void FixedUpdateNetwork() {
-            body.freeze = !IsActive;
+            body.Freeze = !IsActive;
             hitbox.enabled = IsActive;
 
             if (!IsActive) {
-                body.velocity = Vector2.zero;
+                body.Velocity = Vector2.zero;
                 return;
             }
 
             if (GameData.Instance && GameData.Instance.GameEnded) {
-                body.freeze = true;
+                body.Freeze = true;
                 return;
             }
 
-            if (body.position.y < GameManager.Instance.LevelMinY) {
+            if (body.Position.y < GameManager.Instance.LevelMinY) {
                 DespawnEntity();
                 return;
             }
@@ -107,7 +107,7 @@ namespace NSMB.Entities {
             if (!CheckForEntityCollision())
                 return;
 
-            body.velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.velocity.y));
+            body.Velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.Velocity.y));
         }
 
         //---Helper Methods
@@ -115,15 +115,15 @@ namespace NSMB.Entities {
             if (!IsActive)
                 return false;
 
-            PhysicsDataStruct data = body.data;
+            PhysicsDataStruct data = body.Data;
 
             if (data.OnGround && !AlreadyBounced) {
                 float boost = bounceHeight * Mathf.Abs(Mathf.Sin(data.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
                 if ((data.FloorAngle > 0) == FacingRight)
                     boost = 0;
 
-                body.velocity = new(body.velocity.x, bounceHeight + boost);
-            } else if (IsIceball && body.velocity.y > 0.1f) {
+                body.Velocity = new(body.Velocity.x, bounceHeight + boost);
+            } else if (IsIceball && body.Velocity.y > 0.1f) {
                 AlreadyBounced = true;
             }
             bool breaking = data.HitLeft || data.HitRight || data.HitRoof || (data.OnGround && AlreadyBounced);
@@ -132,7 +132,7 @@ namespace NSMB.Entities {
                 return false;
             }
 
-            if (Utils.Utils.IsTileSolidAtWorldLocation(body.position)) {
+            if (Utils.Utils.IsTileSolidAtWorldLocation(body.Position)) {
                 DespawnEntity();
                 return false;
             }
@@ -144,7 +144,7 @@ namespace NSMB.Entities {
             if (!IsActive)
                 return false;
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
             for (int i = 0; i < count; i++) {
                 GameObject collidedObject = CollisionBuffer[i].gameObject;
@@ -176,7 +176,9 @@ namespace NSMB.Entities {
                 BreakEffectAnimCounter++;
 
             IsActive = false;
-            body.freeze = true;
+            body.Freeze = true;
+
+            Debug.Log($"Destroyed on tick {Runner.Tick} at {body.Position}");
         }
 
         public override void OnIsActiveChanged() {
@@ -307,7 +309,7 @@ namespace NSMB.Entities {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
             // Do nothing when bumped
         }
 
@@ -319,7 +321,7 @@ namespace NSMB.Entities {
             Fireball fireball = changed.Behaviour;
 
             // Don't play particles below the killplane
-            if (fireball.body.position.y < GameManager.Instance.LevelMinY)
+            if (fireball.body.Position.y < GameManager.Instance.LevelMinY)
                 return;
 
             // Or if the game is over

@@ -80,7 +80,7 @@ namespace NSMB.Entities.World {
 
             bill.RespawnEntity();
             bill.FacingRight = facingRight;
-            bill.body.position = spawnpoint;
+            bill.body.Position = spawnpoint;
         }
 
         private bool IntersectsPlayer(Vector2 origin, Vector2 searchBox) {

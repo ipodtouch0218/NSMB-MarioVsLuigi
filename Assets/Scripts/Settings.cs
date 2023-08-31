@@ -12,6 +12,7 @@ public class Settings : Singleton<Settings> {
     //---Static Variables
     private Action[] VersionUpdaters;
     public static event Action OnColorblindModeChanged;
+    public static event Action OnNdsBorderChanged;
 
     //---Properties
 
@@ -87,6 +88,19 @@ public class Settings : Singleton<Settings> {
         }
     }
 
+    private int _graphicsNdsBorder = -1;
+    public int GraphicsNdsBorder {
+        get => _graphicsNdsBorder;
+        set {
+            int previous = _graphicsNdsBorder;
+            _graphicsNdsBorder = value;
+
+            if (previous != value) {
+                OnNdsBorderChanged?.Invoke();
+            }
+        }
+    }
+
     public bool GraphicsVsync {
         get => QualitySettings.vSyncCount == 1;
         set => QualitySettings.vSyncCount = (value ? 1 : 0);
@@ -136,7 +150,7 @@ public class Settings : Singleton<Settings> {
     public int genericCharacter, genericSkin;
     public bool genericScoreboardAlways, genericChatFiltering;
 
-    public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNametags;
+    public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
 
     public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning;
 
@@ -170,6 +184,8 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Graphics_FullscreenMode", GraphicsFullscreenMode);
         PlayerPrefs.SetInt("Graphics_NDS_Enabled", graphicsNdsEnabled ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_NDS_ForceAspect", graphicsNdsForceAspect ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_NDS_PixelPerfect", graphicsNdsPixelPerfect ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_NDS_Border", GraphicsNdsBorder);
         PlayerPrefs.SetInt("Graphics_VSync", GraphicsVsync ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_MaxFPS", GraphicsMaxFps);
         PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
@@ -235,6 +251,8 @@ public class Settings : Singleton<Settings> {
         GraphicsFullscreenMode = (int) Screen.fullScreenMode;
         graphicsNdsEnabled = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
         graphicsNdsForceAspect = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
+        graphicsNdsPixelPerfect = false;
+        GraphicsNdsBorder = 1;
         GraphicsVsync = PlayerPrefs.GetInt("VSync", 0) == 1;
         GraphicsMaxFps = 0;
         GraphicsPlayerOutlines = true;
@@ -264,41 +282,43 @@ public class Settings : Singleton<Settings> {
 
     private void LoadFromVersion1() {
         //Generic
-        GetIfExists("Generic_Nickname", out genericNickname);
-        GetIfExists("Generic_ScoreboardAlwaysVisible", out genericScoreboardAlways);
-        GetIfExists("Generic_ChatFilter", out genericChatFiltering);
-        GetIfExists("Generic_Character", out genericCharacter);
-        GetIfExists("Generic_Skin", out genericSkin);
-        if (GetIfExists("Generic_Locale", out string tempLocale)) GenericLocale = tempLocale;
+        TryGetSetting("Generic_Nickname", out genericNickname);
+        TryGetSetting("Generic_ScoreboardAlwaysVisible", out genericScoreboardAlways);
+        TryGetSetting("Generic_ChatFilter", out genericChatFiltering);
+        TryGetSetting("Generic_Character", out genericCharacter);
+        TryGetSetting("Generic_Skin", out genericSkin);
+        if (TryGetSetting("Generic_Locale", out string tempLocale)) GenericLocale = tempLocale;
 
         //Graphics
-        if (GetIfExists("Graphics_FullscreenMode", out int tempFullscreenMode)) GraphicsFullscreenMode = tempFullscreenMode;
-        if (GetIfExists("Graphics_FullscreenResolution", out string tempFullscreenResolution)) GraphicsFullscreenResolution = tempFullscreenResolution;
-        GetIfExists("Graphics_NDS_Enabled", out graphicsNdsEnabled);
-        GetIfExists("Graphics_NDS_ForceAspect", out graphicsNdsForceAspect);
-        if (GetIfExists("Graphics_MaxFPS", out int tempMaxFps)) GraphicsMaxFps = tempMaxFps;
-        if (GetIfExists("Graphics_VSync", out bool tempVsync)) GraphicsVsync = tempVsync;
-        if (GetIfExists("Graphics_PlayerOutlines", out bool tempOutlines)) GraphicsPlayerOutlines = tempOutlines;
-        if (GetIfExists("Graphics_PlayerNametags", out bool tempNametags)) GraphicsPlayerNametags = tempNametags;
-        if (GetIfExists("Graphics_Colorblind", out bool tempColorblind)) GraphicsColorblind = tempColorblind;
+        if (TryGetSetting("Graphics_FullscreenMode", out int tempFullscreenMode)) GraphicsFullscreenMode = tempFullscreenMode;
+        if (TryGetSetting("Graphics_FullscreenResolution", out string tempFullscreenResolution)) GraphicsFullscreenResolution = tempFullscreenResolution;
+        TryGetSetting("Graphics_NDS_Enabled", out graphicsNdsEnabled);
+        TryGetSetting("Graphics_NDS_ForceAspect", out graphicsNdsForceAspect);
+        TryGetSetting("Graphics_NDS_PixelPerfect", out graphicsNdsPixelPerfect);
+        if (TryGetSetting("Graphics_NDS_Border", out int tempNdsBorder)) GraphicsNdsBorder = tempNdsBorder;
+        if (TryGetSetting("Graphics_MaxFPS", out int tempMaxFps)) GraphicsMaxFps = tempMaxFps;
+        if (TryGetSetting("Graphics_VSync", out bool tempVsync)) GraphicsVsync = tempVsync;
+        if (TryGetSetting("Graphics_PlayerOutlines", out bool tempOutlines)) GraphicsPlayerOutlines = tempOutlines;
+        if (TryGetSetting("Graphics_PlayerNametags", out bool tempNametags)) GraphicsPlayerNametags = tempNametags;
+        if (TryGetSetting("Graphics_Colorblind", out bool tempColorblind)) GraphicsColorblind = tempColorblind;
 
         //Audio
         if (GetIfExists("Audio_MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;
         if (GetIfExists("Audio_MusicVolume", out float tempMusicVolume)) AudioMusicVolume = tempMusicVolume;
         if (GetIfExists("Audio_SFXVolume", out float tempSFXVolume)) AudioSFXVolume = tempSFXVolume;
-        GetIfExists("Audio_MuteMusicOnUnfocus", out audioMuteMusicOnUnfocus);
-        GetIfExists("Audio_MuteSFXOnUnfocus", out audioMuteSFXOnUnfocus);
-        GetIfExists("Audio_Panning", out audioPanning);
+        TryGetSetting("Audio_MuteMusicOnUnfocus", out audioMuteMusicOnUnfocus);
+        TryGetSetting("Audio_MuteSFXOnUnfocus", out audioMuteSFXOnUnfocus);
+        TryGetSetting("Audio_Panning", out audioPanning);
 
         //Controls
-        if (GetIfExists("Controls_Rumble", out int tempRumble)) controlsRumble = (RumbleManager.RumbleSetting) tempRumble;
-        GetIfExists("Controls_FireballFromSprint", out controlsFireballSprint);
-        GetIfExists("Controls_AutoSprint", out controlsAutoSprint);
-        GetIfExists("Controls_PropellerJump", out controlsPropellerJump);
-        if (GetIfExists("Controls_Bindings", out string tempBindings)) ControlsBindings = tempBindings;
+        if (TryGetSetting("Controls_Rumble", out int tempRumble)) controlsRumble = (RumbleManager.RumbleSetting) tempRumble;
+        TryGetSetting("Controls_FireballFromSprint", out controlsFireballSprint);
+        TryGetSetting("Controls_AutoSprint", out controlsAutoSprint);
+        TryGetSetting("Controls_PropellerJump", out controlsPropellerJump);
+        if (TryGetSetting("Controls_Bindings", out string tempBindings)) ControlsBindings = tempBindings;
     }
 
-    private bool GetIfExists(string key, out string value) {
+    private bool TryGetSetting(string key, out string value) {
         if (!PlayerPrefs.HasKey(key)) {
             value = default;
             return false;
@@ -308,7 +328,7 @@ public class Settings : Singleton<Settings> {
         return true;
     }
 
-    private bool GetIfExists(string key, out int value) {
+    private bool TryGetSetting(string key, out int value) {
         if (!PlayerPrefs.HasKey(key)) {
             value = default;
             return false;
@@ -328,7 +348,7 @@ public class Settings : Singleton<Settings> {
         return true;
     }
 
-    private bool GetIfExists(string key, out bool value) {
+    private bool TryGetSetting(string key, out bool value) {
         if (!PlayerPrefs.HasKey(key)) {
             value = default;
             return false;

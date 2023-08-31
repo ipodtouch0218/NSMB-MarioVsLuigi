@@ -70,7 +70,7 @@ namespace NSMB.Tiles {
 
             foreach (KillableEntity enemy in gm.enemies) {
                 if (enemy.checkForNearbyPlayersWhenRespawning) {
-                    if (Runner.GetPhysicsScene2D().OverlapCircle(enemy.body.position, 2.5f, Layers.MaskOnlyPlayers)) {
+                    if (Runner.GetPhysicsScene2D().OverlapCircle(enemy.body.Position, 2.5f, Layers.MaskOnlyPlayers)) {
                         continue;
                     }
                 }

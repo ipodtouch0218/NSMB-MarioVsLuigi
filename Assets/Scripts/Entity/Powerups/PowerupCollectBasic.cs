@@ -18,7 +18,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 return PowerupReserveResult.ReserveNewPowerup;
 
             //reserve if we cant fit with our new hitbox
-            if (player.State == Enums.PowerupState.MiniMushroom && player.IsOnGround && runner.GetPhysicsScene2D().Raycast(player.body.position, Vector2.up, 0.3f, Layers.MaskSolidGround))
+            if (player.State == Enums.PowerupState.MiniMushroom && player.IsOnGround && runner.GetPhysicsScene2D().Raycast(player.body.Position, Vector2.up, 0.3f, Layers.MaskSolidGround))
                 return PowerupReserveResult.ReserveNewPowerup;
 
             PowerupScriptable currentPowerup = player.State.GetPowerupScriptable();

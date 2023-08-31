@@ -72,7 +72,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             OnBeforeSpawned(1);
 
             FollowPlayer = playerToFollow;
-            transform.position = body.position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.CurrentPosition.y + 1.68f);
+            transform.position = body.Position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.CurrentPosition.y + 1.68f);
         }
 
         public void OnBeforeSpawned(float pickupDelay, Vector2 spawnOrigin, Vector2 spawnDestination) {
@@ -82,7 +82,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             BlockSpawnOrigin = spawnOrigin;
             BlockSpawnDestination = spawnDestination;
             BlockSpawnAnimationLength = pickupDelay;
-            body.position = spawnOrigin;
+            body.Position = spawnOrigin;
 
             if (BlockSpawnDestination.y < BlockSpawnOrigin.y) {
                 // Downwards powerup, adjust based on the powerup's height.
@@ -95,7 +95,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             if (FollowPlayer) {
                 // Spawned following a player.
-                body.freeze = true;
+                body.Freeze = true;
                 gameObject.layer = Layers.LayerHitsNothing;
                 sRenderer.sortingOrder = 15;
                 if (childAnimator)
@@ -108,7 +108,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             } else {
                 if (BlockSpawn) {
                     // Spawned from a block.
-                    body.freeze = true;
+                    body.Freeze = true;
                     gameObject.layer = Layers.LayerHitsNothing;
                     sRenderer.sortingOrder = -1000;
 
@@ -117,7 +117,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
                 } else {
                     // Spawned by any other means (blue koopa, usually.)
-                    body.freeze = false;
+                    body.Freeze = false;
                     gameObject.layer = Layers.LayerEntityNoGroundEntity;
                     sRenderer.sortingOrder = OriginalSortingOrder;
                 }
@@ -133,7 +133,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 return;
 
             if (childAnimator)
-                childAnimator.SetBool("onGround", body.data.OnGround);
+                childAnimator.SetBool("onGround", body.Data.OnGround);
 
             HandleSpawningAnimation();
             HandleDespawningBlinking();
@@ -142,8 +142,8 @@ namespace NSMB.Entities.Collectable.Powerups {
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
             if (GameData.Instance && GameData.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
-                body.freeze = true;
+                body.Velocity = Vector2.zero;
+                body.Freeze = true;
                 return;
             }
 
@@ -152,12 +152,12 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             if (FollowPlayer) {
                 // Attached to a player. Don't interact, and follow the player.
-                body.position = new(FollowPlayer.body.position.x, FollowPlayer.cameraController.CurrentPosition.y + 1.68f);
+                body.Position = new(FollowPlayer.body.Position.x, FollowPlayer.cameraController.CurrentPosition.y + 1.68f);
 
                 if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
                     SpawnAnimationTimer = TickTimer.None;
                     FollowPlayer = null;
-                    body.freeze = false;
+                    body.Freeze = false;
                     sRenderer.sortingOrder = OriginalSortingOrder;
                     sRenderer.gameObject.transform.localScale = Vector3.one;
                     if (childAnimator)
@@ -170,11 +170,11 @@ namespace NSMB.Entities.Collectable.Powerups {
                 // Spawning from a block. Lerp between origin & destination.
                 float remaining = SpawnAnimationTimer.RemainingTime(Runner) ?? 0f;
                 float t = 1f - (remaining / BlockSpawnAnimationLength);
-                body.position = Vector2.Lerp(BlockSpawnOrigin, BlockSpawnDestination, t);
+                body.Position = Vector2.Lerp(BlockSpawnOrigin, BlockSpawnDestination, t);
 
                 if (SpawnAnimationTimer.ExpiredOrNotRunning(Runner)) {
 
-                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.position + hitbox.offset)) {
+                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.Position + hitbox.offset)) {
                         DespawnEntity();
                         return;
                     }
@@ -182,7 +182,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                     SpawnAnimationTimer = TickTimer.None;
                     BlockSpawn = false;
                     sRenderer.sortingOrder = OriginalSortingOrder;
-                    body.freeze = false;
+                    body.Freeze = false;
                 } else {
                     //sRenderer.enabled = true;
                     return;
@@ -192,7 +192,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             }
 
             Vector2 size = hitbox.size * transform.lossyScale * 0.7f;
-            Vector2 origin = body.position + hitbox.offset * transform.lossyScale;
+            Vector2 origin = body.Position + hitbox.offset * transform.lossyScale;
 
             // TODO: bug here somewhere. Client powerups jitter
             if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
@@ -203,14 +203,14 @@ namespace NSMB.Entities.Collectable.Powerups {
                 HandleCollision();
             }
 
-            if (avoidPlayers && body.data.OnGround) {
-                PlayerController closest = GameData.Instance.AlivePlayers.OrderBy(player => Utils.Utils.WrappedDistance(body.position, player.body.position)).FirstOrDefault();
+            if (avoidPlayers && body.Data.OnGround) {
+                PlayerController closest = GameData.Instance.AlivePlayers.OrderBy(player => Utils.Utils.WrappedDistance(body.Position, player.body.Position)).FirstOrDefault();
                 if (closest) {
-                    FacingRight = Utils.Utils.WrappedDirectionSign(closest.body.position, body.position) == -1;
+                    FacingRight = Utils.Utils.WrappedDirectionSign(closest.body.Position, body.Position) == -1;
                 }
             }
 
-            body.velocity = new(body.velocity.x, Mathf.Max(-terminalVelocity, body.velocity.y));
+            body.Velocity = new(body.Velocity.x, Mathf.Max(-terminalVelocity, body.Velocity.y));
         }
 
         private void HandleSpawningAnimation() {
@@ -248,15 +248,15 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public void HandleCollision() {
 
-            PhysicsDataStruct data = body.data;
+            PhysicsDataStruct data = body.Data;
 
             if (data.HitLeft || data.HitRight) {
                 FacingRight = data.HitLeft;
-                body.velocity = new(speed * (FacingRight ? 1 : -1), body.velocity.y);
+                body.Velocity = new(speed * (FacingRight ? 1 : -1), body.Velocity.y);
             }
 
             if (data.OnGround) {
-                body.velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(body.velocity.y, bouncePower));
+                body.Velocity = new(speed * (FacingRight ? 1 : -1), Mathf.Max(body.Velocity.y, bouncePower));
 
                 if (data.HitRoof || (data.HitLeft && data.HitRight)) {
                     DespawnEntity();
@@ -267,15 +267,15 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
             if (!Collector)
-                GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, body.position + hitbox.offset);
+                GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, body.Position + hitbox.offset);
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
-            if (direction == InteractableTile.InteractionDirection.Down || FollowPlayer)
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
+            if (direction == TileInteractionDirection.Down || FollowPlayer)
                 return;
 
-            body.velocity = new(body.velocity.x, 5f);
+            body.Velocity = new(body.Velocity.x, 5f);
         }
 
         //---IPlayerInteractable overrides

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -12,6 +13,9 @@ using NSMB.Translation;
 using NSMB.UI.Pause.Options;
 
 public class GlobalController : Singleton<GlobalController> {
+
+    //---Events
+    public event Action<RenderTexture> RenderTextureChanged;
 
     //---Public Variables
     public TranslationManager translationManager;
@@ -85,13 +89,14 @@ public class GlobalController : Singleton<GlobalController> {
         if (Settings.Instance.graphicsNdsEnabled && SceneManager.GetActiveScene().buildIndex != 0) {
             float aspect = (float) currentWidth / currentHeight;
             int targetHeight = 224;
-            int targetWidth = Mathf.CeilToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : aspect));
-            if (ndsTexture == null || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
-                if (ndsTexture != null)
+            int targetWidth = Mathf.FloorToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : aspect));
+            if (!ndsTexture || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
+                if (ndsTexture)
                     ndsTexture.Release();
                 ndsTexture = RenderTexture.GetTemporary(targetWidth, targetHeight);
                 ndsTexture.filterMode = FilterMode.Point;
                 ndsTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32;
+                RenderTextureChanged?.Invoke(ndsTexture);
             }
             ndsCanvas.SetActive(true);
         } else {

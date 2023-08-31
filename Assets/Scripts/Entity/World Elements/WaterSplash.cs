@@ -144,10 +144,10 @@ namespace NSMB.Entities.World {
                     continue;
 
                 if (entity is PlayerController player) {
-                    float height = player.body.position.y + player.WorldHitboxSize.y;
+                    float height = player.body.Position.y + player.WorldHitboxSize.y;
                     bool underwater = height <= SurfaceHeight;
 
-                    if (underwater || player.body.velocity.y < 0) {
+                    if (underwater || player.body.Velocity.y < 0) {
                         // Swam out the side of the water
                         player.IsSwimming = true;
                     } else {
@@ -157,16 +157,16 @@ namespace NSMB.Entities.World {
                             player.SwimJump = true;
                             player.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
                             if (Runner.IsServer)
-                                Rpc_Splash(new(player.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player.body.velocity.y)), ParticleType.Exit);
+                                Rpc_Splash(new(player.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player.body.Velocity.y)), ParticleType.Exit);
                         }
                     }
                     continue;
                 }
 
                 if (Runner.IsServer) {
-                    float heightAboveWater = (entity.body?.position.y ?? entity.transform.position.y) - SurfaceHeight;
+                    float heightAboveWater = (entity.body?.Position.y ?? entity.transform.position.y) - SurfaceHeight;
                     if (heightAboveWater > 0 && heightAboveWater < 0) {
-                        Rpc_Splash(entity.body.position, Mathf.Abs(Mathf.Max(5, entity.body.velocity.y)), ParticleType.Exit);
+                        Rpc_Splash(entity.body.Position, Mathf.Abs(Mathf.Max(5, entity.body.Velocity.y)), ParticleType.Exit);
                     }
                 }
             }
@@ -187,9 +187,9 @@ namespace NSMB.Entities.World {
                 return;
 
             if (liquidType == LiquidType.Water && entity is PlayerController player && player.State == Enums.PowerupState.MiniMushroom) {
-                if (!player.IsSwimming && Mathf.Abs(player.body.velocity.x) > 0.3f && player.body.velocity.y < 0) {
+                if (!player.IsSwimming && Mathf.Abs(player.body.Velocity.x) > 0.3f && player.body.Velocity.y < 0) {
                     // Player is running on the water
-                    player.body.position = new(player.body.position.x, hitbox.bounds.max.y);
+                    player.body.Position = new(player.body.Position.x, hitbox.bounds.max.y);
                     player.IsOnGround = true;
                     player.IsWaterWalking = true;
                     return;
@@ -198,15 +198,15 @@ namespace NSMB.Entities.World {
 
             bool contains = splashedEntities.Contains(obj);
             if (Runner.IsServer && !contains) {
-                bool splash = entity.body.position.y > SurfaceHeight - 0.5f;
+                bool splash = entity.body.Position.y > SurfaceHeight - 0.5f;
                 if (entity is PlayerController pl) {
                     splash &= !pl.IsDead;
                     splash &= liquidType == LiquidType.Water;
-                    splash &= pl.State != Enums.PowerupState.MiniMushroom || pl.body.velocity.y < -2f;
+                    splash &= pl.State != Enums.PowerupState.MiniMushroom || pl.body.Velocity.y < -2f;
                 }
 
                 if (splash && entity.IsActive)
-                    Rpc_Splash(new(entity.body.position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.velocity.y)), ParticleType.Enter);
+                    Rpc_Splash(new(entity.body.Position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.Velocity.y)), ParticleType.Enter);
             }
 
             if (!contains)
@@ -218,7 +218,7 @@ namespace NSMB.Entities.World {
                 if (underSurface) {
                     // Don't let fireballs "poof"
                     if (entity is Fireball fm) {
-                        if (fm.body.position.y < SurfaceHeight - 0.2f) {
+                        if (fm.body.Position.y < SurfaceHeight - 0.2f) {
                             fm.DespawnEntity(false);
                         }
                     } else if (entity is not BigStar) {
@@ -234,18 +234,18 @@ namespace NSMB.Entities.World {
                 if (player2.IsDead || player2.CurrentPipe)
                     return;
 
-                float height = player2.body.position.y + (player2.WorldHitboxSize.y * 0.5f);
+                float height = player2.body.Position.y + (player2.WorldHitboxSize.y * 0.5f);
                 bool underwater = height <= SurfaceHeight;
 
                 if (liquidType == LiquidType.Water) {
 
-                    if (player2.IsSwimming && !underwater && player2.body.velocity.y > 0) {
+                    if (player2.IsSwimming && !underwater && player2.body.Velocity.y > 0) {
                         // Jumped out of the water
                         player2.IsSwimming = false;
                         player2.SwimJump = true;
                         player2.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
                         if (Runner.IsServer)
-                            Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Exit);
+                            Rpc_Splash(new(player2.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.Velocity.y)), ParticleType.Exit);
                     } else {
                         player2.IsSwimming = underwater;
                         player2.IsWaterWalking = false;
@@ -255,7 +255,7 @@ namespace NSMB.Entities.World {
                     //    return;
 
                     if (Runner.IsServer)
-                        Rpc_Splash(new(player2.body.position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.velocity.y)), ParticleType.Enter);
+                        Rpc_Splash(new(player2.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.Velocity.y)), ParticleType.Enter);
                     player2.Death(false, liquidType == LiquidType.Lava);
                     return;
                 }

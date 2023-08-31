@@ -62,8 +62,8 @@ namespace NSMB.Entities.Collectable {
             if (IsStationary) {
                 // Main star: use the "spawn-in" animation
                 animator.enabled = true;
-                body.freeze = true;
-                body.velocity = Vector2.zero;
+                body.Freeze = true;
+                body.Velocity = Vector2.zero;
                 StartCoroutine(PulseEffect());
 
             } else {
@@ -71,13 +71,13 @@ namespace NSMB.Entities.Collectable {
                 Passthrough = true;
                 sRenderer.color = new(1, 1, 1, 0.55f);
                 gameObject.layer = Layers.LayerHitsNothing;
-                body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), deathBoostAmount);
+                body.Velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), deathBoostAmount);
 
                 // Death via pit boost, we need some extra velocity
                 if (DroppedByPit)
-                    body.velocity += Vector2.up * 3;
+                    body.Velocity += Vector2.up * 3;
 
-                body.freeze = false;
+                body.Freeze = false;
                 worldCollider.enabled = true;
             }
 
@@ -104,35 +104,35 @@ namespace NSMB.Entities.Collectable {
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
             if (GameData.Instance?.GameEnded ?? false) {
-                body.velocity = Vector2.zero;
-                body.freeze = true;
+                body.Velocity = Vector2.zero;
+                body.Freeze = true;
                 return;
             }
 
             if (!Object || IsStationary)
                 return;
 
-            if (!Collectable && body.velocity.y < 0)
+            if (!Collectable && body.Velocity.y < 0)
                 sRenderer.color = Color.white;
 
-            body.velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), body.velocity.y);
-            Collectable |= body.velocity.y < 0;
+            body.Velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), body.Velocity.y);
+            Collectable |= body.Velocity.y < 0;
 
             if (HandleCollision())
                 return;
 
-            if (Passthrough && Collectable && body.velocity.y <= 0 && !Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Runner.GetPhysicsScene2D().OverlapBox(body.position, Vector3.one * 0.33f, 0, GroundFilter)) {
+            if (Passthrough && Collectable && body.Velocity.y <= 0 && !Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.Position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Runner.GetPhysicsScene2D().OverlapBox(body.Position, Vector3.one * 0.33f, 0, GroundFilter)) {
                 Passthrough = false;
                 gameObject.layer = Layers.LayerEntity;
             }
             if (!Passthrough) {
-                if (body.position.y < GameManager.Instance.LevelMinY ||
-                    (GameManager.Instance.loopingLevel && (body.position.x < GameManager.Instance.LevelMinX - 0.5f || body.position.x > GameManager.Instance.LevelMaxX + 0.5f))) {
+                if (body.Position.y < GameManager.Instance.LevelMinY ||
+                    (GameManager.Instance.loopingLevel && (body.Position.x < GameManager.Instance.LevelMinX - 0.5f || body.Position.x > GameManager.Instance.LevelMaxX + 0.5f))) {
                     DespawnEntity();
                     return;
                 }
 
-                if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.position + worldCollider.offset, worldCollider.size * transform.lossyScale)) {
+                if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.Position + worldCollider.offset, worldCollider.size * transform.lossyScale)) {
                     gameObject.layer = Layers.LayerHitsNothing;
                 } else {
                     gameObject.layer = Layers.LayerEntity;
@@ -171,15 +171,15 @@ namespace NSMB.Entities.Collectable {
 
         private bool HandleCollision() {
 
-            PhysicsDataStruct data = body.data;
+            PhysicsDataStruct data = body.Data;
 
             if (data.HitLeft || data.HitRight) {
                 FacingRight = data.HitLeft;
-                body.velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.velocity.y);
+                body.Velocity = new(moveSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
             }
 
             if (data.OnGround && Collectable) {
-                body.velocity = new(body.velocity.x, bounceAmount);
+                body.Velocity = new(body.Velocity.x, bounceAmount);
                 if (data.HitRoof) {
                     DespawnEntity();
                     return true;
@@ -239,7 +239,7 @@ namespace NSMB.Entities.Collectable {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
             // Do nothing when bumped
         }
     }

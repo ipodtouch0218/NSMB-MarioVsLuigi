@@ -59,7 +59,7 @@ namespace NSMB.Entities {
         public override Vector2 FrozenOffset {
             get {
 
-                Vector2 entityPosition = body ? body.position : transform.position;
+                Vector2 entityPosition = body ? body.Position : transform.position;
                 Bounds bounds = default;
                 Renderer[] renderers = GetComponentsInChildren<Renderer>();
                 foreach (Renderer renderer in renderers) {
@@ -146,13 +146,13 @@ namespace NSMB.Entities {
             if (!IsActive) {
                 gameObject.layer = Layers.LayerHitsNothing;
                 AngularVelocity = 0;
-                body.velocity = Vector2.zero;
-                body.freeze = true;
+                body.Velocity = Vector2.zero;
+                body.Freeze = true;
                 return;
 
             } else if (IsDead || IsFrozen) {
                 gameObject.layer = Layers.LayerHitsNothing;
-                body.freeze = false;
+                body.Freeze = false;
 
                 if (WasSpecialKilled) {
                     AngularVelocity = 400f * (FacingRight ? 1 : -1);
@@ -160,7 +160,7 @@ namespace NSMB.Entities {
                 return;
             } else {
                 gameObject.layer = Layers.LayerEntity;
-                body.freeze = false;
+                body.Freeze = false;
             }
 
             if (collideWithOtherEnemies) {
@@ -168,8 +168,8 @@ namespace NSMB.Entities {
             }
 
             if (dieWhenInsideBlock) {
-                Vector2 loc = body.position + hitbox.offset * transform.lossyScale;
-                if (!body.freeze && Utils.Utils.IsTileSolidAtWorldLocation(loc)) {
+                Vector2 loc = body.Position + hitbox.offset * transform.lossyScale;
+                if (!body.Freeze && Utils.Utils.IsTileSolidAtWorldLocation(loc)) {
                     SpecialKill(FacingRight, false, 0);
                 }
             }
@@ -177,7 +177,7 @@ namespace NSMB.Entities {
 
         protected virtual void CheckForEntityCollisions() {
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
 
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
@@ -189,7 +189,7 @@ namespace NSMB.Entities {
                     if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant)
                         continue;
 
-                    Utils.Utils.UnwrapLocations(body.position, killable.body.position, out Vector2 ourPos, out Vector2 theirPos);
+                    Utils.Utils.UnwrapLocations(body.Position, killable.body.Position, out Vector2 ourPos, out Vector2 theirPos);
                     bool goRight = ourPos.x > theirPos.x;
 
                     if (Mathf.Abs(ourPos.x - theirPos.x) < 0.015f) {
@@ -222,11 +222,11 @@ namespace NSMB.Entities {
             ComboCounter = (byte) combo;
             FacingRight = right;
 
-            body.velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
+            body.Velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
             AngularVelocity = 400f * (FacingRight ? 1 : -1);
-            body.gravity = Vector2.down * 14.75f;
+            body.Gravity = Vector2.down * 14.75f;
 
-            Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.position + hitbox.offset);
+            Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.Position + hitbox.offset);
         }
 
         public virtual void OnIsDeadChanged() {
@@ -240,7 +240,7 @@ namespace NSMB.Entities {
                     PlaySound(!IsFrozen ? ComboSounds[Mathf.Min(ComboSounds.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
 
                 if (WasGroundpounded)
-                    Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.position + hitbox.offset, Quaternion.identity);
+                    Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.Position + hitbox.offset, Quaternion.identity);
 
             } else {
                 //undo death effects
@@ -258,6 +258,9 @@ namespace NSMB.Entities {
             if (IsActive) {
                 if (sRenderer)
                     sRenderer.enabled = true;
+
+                if (body.interpolationTarget)
+                    body.interpolationTarget.rotation = Quaternion.identity;
             } else {
                 if (sRenderer)
                     sRenderer.enabled = false;
@@ -281,10 +284,7 @@ namespace NSMB.Entities {
             ComboCounter = 0;
 
             if (body) {
-                if (body.interpolationTarget)
-                    body.interpolationTarget.rotation = Quaternion.identity;
-
-                body.gravity = Vector2.down * 21.5f;
+                body.Gravity = Vector2.down * 21.5f;
             }
         }
 
@@ -299,7 +299,7 @@ namespace NSMB.Entities {
         //---IPlayerInteractable overrides
         public virtual void InteractWithPlayer(PlayerController player) {
 
-            Utils.Utils.UnwrapLocations(body.position + Vector2.up * 0.1f, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+            Utils.Utils.UnwrapLocations(body.Position + Vector2.up * 0.1f, player.body.Position, out Vector2 ourPos, out Vector2 theirPos);
             Vector2 damageDirection = (theirPos - ourPos).normalized;
             bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0.3f;
 
@@ -309,7 +309,7 @@ namespace NSMB.Entities {
                     Kill();
                     player.DoEntityBounce = true;
                 } else {
-                    SpecialKill(player.body.velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
+                    SpecialKill(player.body.Velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
                 }
                 return;
             }
@@ -330,7 +330,7 @@ namespace NSMB.Entities {
 
             } else if (player.IsCrouchedInShell) {
                 FacingRight = damageDirection.x < 0;
-                player.body.velocity = new(0, player.body.velocity.y);
+                player.body.Velocity = new(0, player.body.Velocity.y);
 
             } else if (player.IsDamageable) {
                 player.Powerdown(false);
@@ -358,7 +358,7 @@ namespace NSMB.Entities {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
             SpecialKill(false, false, 0);
         }
 
@@ -367,8 +367,8 @@ namespace NSMB.Entities {
             IsFrozen = true;
 
             if (body) {
-                body.velocity = Vector2.zero;
-                body.freeze = true;
+                body.Velocity = Vector2.zero;
+                body.Freeze = true;
             }
         }
 

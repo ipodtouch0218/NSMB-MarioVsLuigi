@@ -33,7 +33,7 @@ namespace NSMB.Entities.Collectable {
             CollectableTick = (int) (Runner.Tick + (0.2f * Runner.Simulation.Config.TickRate));
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
-            body.velocity = Vector2.up * GameData.Instance.random.RangeInclusive(5.5f, 6f);
+            body.Velocity = Vector2.up * GameData.Instance.random.RangeInclusive(5.5f, 6f);
         }
 
         public override void Render() {
@@ -44,21 +44,21 @@ namespace NSMB.Entities.Collectable {
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
             if (GameData.Instance && GameData.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
+                body.Velocity = Vector2.zero;
                 spriteAnimation.enabled = false;
-                body.freeze = true;
+                body.Freeze = true;
                 return;
             }
 
             if (!Object)
                 return;
 
-            bool inWall = Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f);
+            bool inWall = Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.Position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f);
             gameObject.layer = inWall ? Layers.LayerHitsNothing : Layers.LayerEntityNoGroundEntity;
 
-            PhysicsDataStruct data = body.data;
+            PhysicsDataStruct data = body.Data;
             if (data.OnGround) {
-                body.velocity -= body.velocity * Runner.DeltaTime;
+                body.Velocity -= body.Velocity * Runner.DeltaTime;
                 if (data.HitRoof) {
                     Runner.Despawn(Object);
                     return;
@@ -66,7 +66,7 @@ namespace NSMB.Entities.Collectable {
 
                 // TODO: doesn't always trigger, even for host. Strange.
                 // IsForward is ok, the sound isnt top priority
-                if (body.velocity.y < -0.5f * (Mathf.Sin(data.FloorAngle) + 1f))
+                if (body.Velocity.y < -0.5f * (Mathf.Sin(data.FloorAngle) + 1f))
                     CoinBounceAnimCounter++;
             }
         }

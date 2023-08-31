@@ -25,7 +25,7 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
     }
 
     [ExecuteAlways]
-    public void Update() {
+    public void LateUpdate() {
 #if UNITY_EDITOR
         if (!runInEditor && !Application.isPlaying)
             return;

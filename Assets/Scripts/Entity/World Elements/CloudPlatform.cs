@@ -76,7 +76,7 @@ public class CloudPlatform : SimulationBehaviour {
 
         // Update collision timers
         foreach (CloudContact contact in positions) {
-            if (!contact.exit && (!contact.collider || !contact.mover.data.OnGround || !Utils.BufferContains(CollisionBuffer, collisionCount, contact.collider)))
+            if (!contact.exit && (!contact.collider || !contact.mover.Data.OnGround || !Utils.BufferContains(CollisionBuffer, collisionCount, contact.collider)))
                 contact.exit = true;
 
             if (contact.exit) {
@@ -130,7 +130,7 @@ public class CloudPlatform : SimulationBehaviour {
 
     private void HandleTrigger(Collider2D collision) {
         EntityMover mover = collision.GetComponentInParent<EntityMover>();
-        if (!mover.data.OnGround)
+        if (!mover.Data.OnGround)
             return;
 
         if (GetContact(collision) == null)

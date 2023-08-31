@@ -34,7 +34,7 @@ namespace NSMB.Entities.Enemies {
 
         public override void Spawned() {
             base.Spawned();
-            body.velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.velocity.y);
+            body.Velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
             mpb ??= new();
         }
 
@@ -57,8 +57,8 @@ namespace NSMB.Entities.Enemies {
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
             if (GameData.Instance.GameEnded) {
-                body.velocity = Vector2.zero;
-                body.freeze = true;
+                body.Velocity = Vector2.zero;
+                body.Freeze = true;
                 AngularVelocity = 0;
                 animator.enabled = false;
                 return;
@@ -76,20 +76,20 @@ namespace NSMB.Entities.Enemies {
             }
 
             if (!Lit)
-                body.velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.velocity.y);
+                body.Velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
         }
 
         private bool HandleCollision() {
             if (Holder)
                 return false;
 
-            PhysicsDataStruct data = body.data;
+            PhysicsDataStruct data = body.Data;
 
             if (Lit && data.OnGround) {
                 //apply friction
-                body.velocity -= body.velocity * (Runner.DeltaTime * 3.5f);
-                if (Mathf.Abs(body.velocity.x) < 0.05) {
-                    body.velocity = new(0, body.velocity.y);
+                body.Velocity -= body.Velocity * (Runner.DeltaTime * 3.5f);
+                if (Mathf.Abs(body.Velocity.x) < 0.05) {
+                    body.Velocity = new(0, body.Velocity.y);
                 }
             }
 
@@ -112,7 +112,7 @@ namespace NSMB.Entities.Enemies {
                 return;
 
             DetonationTimer = TickTimer.CreateFromSeconds(Runner, detonationTime);
-            body.velocity = Vector2.zero;
+            body.Velocity = Vector2.zero;
         }
 
         public void Detonate() {
@@ -121,7 +121,7 @@ namespace NSMB.Entities.Enemies {
 
             // Damage entities in range. TODO: change to nonalloc?
             DetonationHits.Clear();
-            Runner.GetPhysicsScene2D().OverlapCircle(body.position + hitbox.offset, 1f, default, DetonationHits);
+            Runner.GetPhysicsScene2D().OverlapCircle(body.Position + hitbox.offset, 1f, default, DetonationHits);
 
             // Use distinct to only damage enemies once
             foreach (GameObject hitObj in DetonationHits.Select(c => c.gameObject).Distinct()) {
@@ -143,7 +143,7 @@ namespace NSMB.Entities.Enemies {
             }
 
             // (sort or) 'splode tiles in range.
-            Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(body.position);
+            Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(body.Position);
             TileManager tm = GameManager.Instance.TileManager;
             for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
                 for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
@@ -155,7 +155,7 @@ namespace NSMB.Entities.Enemies {
                     Utils.Utils.WrapTileLocation(ref ourLocation);
 
                     if (tm.GetTile(ourLocation, out InteractableTile tile))
-                        tile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(ourLocation), out bool _);
+                        tile.Interact(this, TileInteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(ourLocation), out bool _);
                 }
             }
 
@@ -165,7 +165,7 @@ namespace NSMB.Entities.Enemies {
 
         public void Turnaround(bool hitWallOnLeft) {
             FacingRight = hitWallOnLeft;
-            body.velocity = new((Lit ? Mathf.Abs(body.velocity.x) : walkSpeed) * (FacingRight ? 1 : -1), body.velocity.y);
+            body.Velocity = new((Lit ? Mathf.Abs(body.Velocity.x) : walkSpeed) * (FacingRight ? 1 : -1), body.Velocity.y);
 
             if (Runner.IsForward)
                 animator.SetTrigger("turnaround");
@@ -180,11 +180,11 @@ namespace NSMB.Entities.Enemies {
 
             // Special insta-kill cases
             if (player.InstakillsEnemies) {
-                SpecialKill(player.body.velocity.x > 0, false, player.StarCombo++);
+                SpecialKill(player.body.Velocity.x > 0, false, player.StarCombo++);
                 return;
             }
 
-            Utils.Utils.UnwrapLocations(body.position + Vector2.up * 0.1f, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+            Utils.Utils.UnwrapLocations(body.Position + Vector2.up * 0.1f, player.body.Position, out Vector2 ourPos, out Vector2 theirPos);
             bool fromRight = ourPos.x < theirPos.x;
 
             Vector2 damageDirection = (theirPos - ourPos).normalized;
@@ -197,7 +197,7 @@ namespace NSMB.Entities.Enemies {
                     Pickup(player);
                 } else {
                     // Kicked by player
-                    Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                    Kick(player, !fromRight, Mathf.Abs(player.body.Velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                 }
             } else {
                 if (attackedFromAbove) {
@@ -207,7 +207,7 @@ namespace NSMB.Entities.Enemies {
                         Light();
 
                     if (!mini && player.IsGroundpounding) {
-                        Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                        Kick(player, !fromRight, Mathf.Abs(player.body.Velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
 
                     } else {
                         player.DoEntityBounce = true;
@@ -218,7 +218,7 @@ namespace NSMB.Entities.Enemies {
                 } else if (player.IsCrouchedInShell) {
                     // Bounce off blue shell crouched player
                     FacingRight = damageDirection.x < 0;
-                    player.body.velocity = new(0, player.body.velocity.y);
+                    player.body.Velocity = new(0, player.body.Velocity.y);
                     return;
 
                 } else if (player.IsDamageable) {
@@ -230,7 +230,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractableTile.InteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
             //Light if we get bumped
             Light();
         }
@@ -276,10 +276,10 @@ namespace NSMB.Entities.Enemies {
 
         protected override void CheckForEntityCollisions() {
             base.CheckForEntityCollisions();
-            if (IsDead || !Lit || Mathf.Abs(body.velocity.x) < 1f)
+            if (IsDead || !Lit || Mathf.Abs(body.Velocity.x) < 1f)
                 return;
 
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
 
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
@@ -293,11 +293,11 @@ namespace NSMB.Entities.Enemies {
                         continue;
 
                     // Kill entity we ran into
-                    killable.SpecialKill(killable.body.position.x > body.position.x, false, ComboCounter++);
+                    killable.SpecialKill(killable.body.Position.x > body.Position.x, false, ComboCounter++);
 
                     // Kill ourselves if we're being held too
                     if (Holder)
-                        SpecialKill(killable.body.position.x < body.position.x, false, 0);
+                        SpecialKill(killable.body.Position.x < body.Position.x, false, 0);
 
                     continue;
                 }

@@ -77,12 +77,12 @@ namespace NSMB.Entities {
 
             gameObject.layer = (Holder || FastSlide) ? Layers.LayerEntity : Layers.LayerGroundEntity;
 
-            if (body.position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
+            if (body.Position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
                 Kill();
                 return;
             }
 
-            if (Holder && Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f)) {
+            if (Holder && Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.Position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f)) {
                 KillWithReason(UnfreezeReason.HitWall);
                 return;
             }
@@ -92,9 +92,9 @@ namespace NSMB.Entities {
                 if (!HandleTile())
                     return;
 
-                FrozenEntity.body.position = body.position + EntityPositionOffset;
-                FrozenEntity.body.velocity = Vector2.zero;
-                FrozenEntity.body.freeze = true;
+                FrozenEntity.body.Position = body.Position + EntityPositionOffset;
+                FrozenEntity.body.Velocity = Vector2.zero;
+                FrozenEntity.body.Freeze = true;
             }
 
             if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {
@@ -118,7 +118,7 @@ namespace NSMB.Entities {
             if (!FastSlide) {
                 float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
                 if (remainingTime < 1f)
-                    body.position = new(body.position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
+                    body.Position = new(body.Position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
             }
 
 
@@ -144,7 +144,7 @@ namespace NSMB.Entities {
                 //    }
                 //}
 
-                body.velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.velocity.y);
+                body.Velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
             }
 
             ApplyConstraints();
@@ -152,9 +152,9 @@ namespace NSMB.Entities {
 
         private bool HandleTile() {
 
-            if ((FastSlide && (body.data.HitLeft || body.data.HitRight))
-                || (flying && Fallen && body.data.OnGround && !Holder)
-                || ((Holder || body.data.OnGround) && body.data.HitRoof)) {
+            if ((FastSlide && (body.Data.HitLeft || body.Data.HitRight))
+                || (flying && Fallen && body.Data.OnGround && !Holder)
+                || ((Holder || body.Data.OnGround) && body.Data.HitRoof)) {
 
                 Kill();
                 return false;
@@ -165,7 +165,7 @@ namespace NSMB.Entities {
 
         private void ApplyConstraints() {
             //body.mass = Holder ? 0 : 1;
-            body.freeze = !FrozenEntity.IsCarryable;
+            body.Freeze = !FrozenEntity.IsCarryable;
 
             if (!Holder) {
                 //if (!FastSlide)
@@ -196,7 +196,7 @@ namespace NSMB.Entities {
             if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
                 return;
 
-            Utils.Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 playerPos);
+            Utils.Utils.UnwrapLocations(body.Position, player.body.Position, out Vector2 ourPos, out Vector2 playerPos);
 
             bool attackedFromAbove = Vector2.Dot((playerPos - ourPos).normalized, Vector2.up) > 0.4f;
             bool attackedFromBelow = playerPos.y < ourPos.y
@@ -211,7 +211,7 @@ namespace NSMB.Entities {
 
             if (player.HasGroundpoundHitbox && attackedFromAbove && player.State != Enums.PowerupState.MiniMushroom) {
                 // Groundpounded by player
-                player.body.velocity = new(0, 38.671875f * Runner.DeltaTime);
+                player.body.Velocity = new(0, 38.671875f * Runner.DeltaTime);
                 player.GroundpoundAnimCounter++;
                 KillWithReason(UnfreezeReason.Groundpounded);
                 return;
@@ -253,7 +253,7 @@ namespace NSMB.Entities {
             base.Pickup(player);
             Physics2D.IgnoreCollision(hitbox, player.MainHitbox);
             AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, (AutoBreakTimer.RemainingTime(Runner) ?? 0f) + 1f);
-            body.velocity = Vector2.zero;
+            body.Velocity = Vector2.zero;
         }
 
         public override void Throw(bool toRight, bool crouch) {
@@ -266,7 +266,7 @@ namespace NSMB.Entities {
 
             if (FrozenEntity.IsFlying) {
                 Fallen = true;
-                body.freeze = false;
+                body.Freeze = false;
             }
             ApplyConstraints();
         }
@@ -281,7 +281,7 @@ namespace NSMB.Entities {
                 return;
 
             // Only run when fastsliding...
-            int count = Runner.GetPhysicsScene2D().OverlapBox(body.position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
+            int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
 
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
@@ -302,11 +302,11 @@ namespace NSMB.Entities {
                         continue;
 
                     // Kill entity we ran into
-                    killable.SpecialKill(killable.body.position.x > body.position.x, false, Combo++);
+                    killable.SpecialKill(killable.body.Position.x > body.Position.x, false, Combo++);
 
                     // Kill ourselves if we're being held too
                     if (Holder)
-                        SpecialKill(killable.body.position.x < body.position.x, false, 0);
+                        SpecialKill(killable.body.Position.x < body.Position.x, false, 0);
 
                     continue;
                 }
@@ -343,7 +343,7 @@ namespace NSMB.Entities {
 
         //---Static
         public static void FreezeEntity(NetworkRunner runner, FreezableEntity entity) {
-            Vector2 entityPosition = entity.body ? entity.body.position : entity.transform.position;
+            Vector2 entityPosition = entity.body ? entity.body.Position : entity.transform.position;
             Vector2 spawnPosition = entityPosition - entity.FrozenOffset;
 
             runner.Spawn(PrefabList.Instance.Obj_FrozenCube, spawnPosition, onBeforeSpawned: (runner, obj) => {

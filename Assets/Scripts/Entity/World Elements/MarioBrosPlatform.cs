@@ -123,14 +123,14 @@ namespace NSMB.Entities.World {
                     return;
             }
 
-            InteractableTile.Bump(player, InteractableTile.InteractionDirection.Up, worldPos + BumpOffset);
+            InteractableTile.Bump(player, TileInteractionDirection.Up, worldPos + BumpOffset);
 
             Bumps.Add(new BumpInfo() { point = (int) localPos, spawnTick = Runner.Tick });
         }
 
         //---IPlayerInteractable overrides
         public void InteractWithPlayer(PlayerController player) {
-            if (player.IsInKnockback || player.IsFrozen || player.body.position.y > transform.position.y)
+            if (player.IsInKnockback || player.IsFrozen || player.body.Position.y > transform.position.y)
                 return;
 
             int contacts = boxCollider.GetContacts(ContactBuffer);
@@ -143,7 +143,7 @@ namespace NSMB.Entities.World {
                 if (contact.normal != Vector2.up)
                     return;
 
-                Bump(player, new(player.body.position.x, contact.point.y));
+                Bump(player, new(player.body.Position.x, contact.point.y));
             }
         }
 

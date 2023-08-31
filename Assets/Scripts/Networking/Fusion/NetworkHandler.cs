@@ -141,7 +141,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {
-        Debug.Log("[Network] Authentication response received");
 
         if (data.ContainsKey("Token") && data["Token"] != null) {
             PlayerPrefs.SetString("token", (string) data["Token"]);

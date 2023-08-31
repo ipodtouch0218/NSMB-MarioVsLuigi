@@ -246,7 +246,7 @@ GameObject:
   - component: {fileID: 7405962687031427707}
   m_Layer: 8
   m_Name: Spinner
-  m_TagString: Untagged
+  m_TagString: spinner
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

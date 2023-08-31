@@ -16,7 +16,7 @@ namespace NSMB.Entities.Enemies {
             if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
                 return;
 
-            Utils.Utils.UnwrapLocations(body.position, player.body.position, out Vector2 ourPos, out Vector2 theirPos);
+            Utils.Utils.UnwrapLocations(body.Position, player.body.Position, out Vector2 ourPos, out Vector2 theirPos);
             bool fromRight = ourPos.x < theirPos.x;
             Vector2 damageDirection = (theirPos - ourPos).normalized;
             bool attackedFromAbove = Vector2.Dot(damageDirection, Vector2.up) > 0f;
@@ -53,7 +53,7 @@ namespace NSMB.Entities.Enemies {
                         Pickup(player);
                     } else {
                         // Kick
-                        Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                        Kick(player, !fromRight, Mathf.Abs(player.body.Velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                     }
                     return;
                 }
@@ -74,7 +74,7 @@ namespace NSMB.Entities.Enemies {
                         // Normal mario interactions
                         if (player.IsGroundpounding) {
                             //normal mario is groundpounding, we get kick'd
-                            Kick(player, !fromRight, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
+                            Kick(player, !fromRight, Mathf.Abs(player.body.Velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
                         } else {
                             // Normal mario isnt groundpounding, we get stopped
                             EnterShell(true, player);

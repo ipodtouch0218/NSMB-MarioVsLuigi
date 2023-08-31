@@ -18,6 +18,10 @@ public class HorizontalCamera : MonoBehaviour {
     public void Start() {
         ourCamera = GetComponent<Camera>();
         AdjustCamera();
+
+        SizeIncreaseTarget = 0;
+        SizeIncreaseCurrent = 0;
+        SizeIncreaseVelocity = 0;
     }
 
     public void Update() {
