@@ -153,7 +153,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
             // Semisolid check.
             if (hit.collider.gameObject.layer == Layers.LayerSemisolid) {
                 if (
-                    (direction.y > 0) || // We are moving upwards, impossible to collide.
+                    (direction.y > 0 || Velocity.y > 0) || // We are moving upwards, impossible to collide.
                     (raycastPos.y - (ColliderSize.y * 0.5f) < hit.point.y - 0.03f) || // Lower bound of hitbox is BELOW the semisolid hit
                     (Mathf.Abs(angle) > maxFloorAngle) // Didn't hit upwards...
                    ) {

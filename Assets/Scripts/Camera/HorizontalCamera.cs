@@ -33,6 +33,7 @@ public class HorizontalCamera : MonoBehaviour {
     }
 
     private void AdjustCamera() {
+
         float aspect = ourCamera.aspect;
         double size = BaseSize + SizeIncreaseCurrent;
 

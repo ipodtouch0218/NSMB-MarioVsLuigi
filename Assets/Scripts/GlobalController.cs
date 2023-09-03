@@ -83,16 +83,18 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void Update() {
-        int currentWidth = Screen.width;
-        int currentHeight = Screen.height;
+        int windowWidth = Screen.width;
+        int windowHeight = Screen.height;
 
         if (Settings.Instance.graphicsNdsEnabled && SceneManager.GetActiveScene().buildIndex != 0) {
-            float aspect = (float) currentWidth / currentHeight;
+
             int targetHeight = 224;
-            int targetWidth = Mathf.FloorToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : aspect));
+            int targetWidth = Mathf.CeilToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : (float) windowWidth / windowHeight));
+
             if (!ndsTexture || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
                 if (ndsTexture)
                     ndsTexture.Release();
+
                 ndsTexture = RenderTexture.GetTemporary(targetWidth, targetHeight);
                 ndsTexture.filterMode = FilterMode.Point;
                 ndsTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32;
@@ -105,12 +107,12 @@ public class GlobalController : Singleton<GlobalController> {
 
         //todo: this jitters to hell
 #if UNITY_STANDALONE
-        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (windowWidth != currentWidth || windowHeight != currentHeight)) {
-            currentHeight = (int) (currentWidth * (9f / 16f));
-            Screen.SetResolution(currentWidth, currentHeight, FullScreenMode.Windowed);
+        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (this.windowWidth != windowWidth || this.windowHeight != windowHeight)) {
+            windowHeight = (int) (windowWidth * (9f / 16f));
+            Screen.SetResolution(windowWidth, windowHeight, FullScreenMode.Windowed);
         }
-        windowWidth = currentWidth;
-        windowHeight = currentHeight;
+        this.windowWidth = windowWidth;
+        this.windowHeight = windowHeight;
 #endif
     }
 

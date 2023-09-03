@@ -13,7 +13,6 @@ public class CameraController : NetworkBehaviour {
 
     //---Static Variables
     private static readonly Vector2 AirOffset = new(0, 0.65f);
-    private static readonly Vector2 AirThreshold = new(0.6f, 1.3f), GroundedThreshold = new(0.6f, 0f);
     private static CameraController CurrentController;
 
     private static float _screenShake;
@@ -117,17 +116,31 @@ public class CameraController : NetworkBehaviour {
 
         float vOrtho = targetCamera.orthographicSize;
         float xOrtho = vOrtho * targetCamera.aspect;
-
-        // Instant camera movements. we dont want to lag behind in these cases
         Vector3 newCameraPosition = CurrentPosition;
+
+        // Lagging camera movements
+        if (controller.IsOnGround)
+            LastFloorHeight = PlayerPos.y;
+        bool validFloor = controller.IsOnGround || LastFloorHeight < PlayerPos.y;
+
+        // Floor height
+        if (validFloor)
+            newCameraPosition.y = Mathf.Max(newCameraPosition.y, LastFloorHeight + floorOffset);
+
+        // Smoothing
+        Vector3 smoothDamp = SmoothDampVel;
+        newCameraPosition = Vector3.SmoothDamp(CurrentPosition, newCameraPosition, ref smoothDamp, 0.5f, float.MaxValue, delta);
+        SmoothDampVel = smoothDamp;
 
         // Bottom camera clip
         float cameraBottom = newCameraPosition.y - vOrtho;
         float cameraBottomDistanceToPlayer = PlayerPos.y - cameraBottom;
         float cameraBottomMinDistance = (2.5f/3.5f) * vOrtho;
 
-        if (cameraBottomDistanceToPlayer < cameraBottomMinDistance)
+        if (cameraBottomDistanceToPlayer < cameraBottomMinDistance) {
             newCameraPosition.y -= (cameraBottomMinDistance - cameraBottomDistanceToPlayer);
+            SmoothDampVel = new(SmoothDampVel.x, 0);
+        }
 
         // Top camera clip
         float playerHeight = controller.transform.localScale.y;
@@ -135,8 +148,10 @@ public class CameraController : NetworkBehaviour {
         float cameraTopDistanceToPlayer = cameraTop - (PlayerPos.y + playerHeight);
         float cameraTopMinDistance = (1.25f/3.5f) * vOrtho;
 
-        if (cameraTopDistanceToPlayer < cameraTopMinDistance)
+        if (cameraTopDistanceToPlayer < cameraTopMinDistance) {
             newCameraPosition.y += (cameraTopMinDistance - cameraTopDistanceToPlayer);
+            SmoothDampVel = new(SmoothDampVel.x, 0);
+        }
 
         Vector3 wrappedPos = PlayerPos;
         Utils.WrapWorldLocation(ref wrappedPos);
@@ -154,33 +169,18 @@ public class CameraController : NetworkBehaviour {
         if (xDifference > 0.25f)
             newCameraPosition.x += (0.25f - xDifference - 0.01f) * (right ? 1 : -1);
 
-        // Lagging camera movements
-        Vector3 targetPosition = newCameraPosition;
-        if (controller.IsOnGround)
-            LastFloorHeight = PlayerPos.y;
-        bool validFloor = controller.IsOnGround || LastFloorHeight < PlayerPos.y;
-
-        // Floor height
-        if (validFloor)
-            targetPosition.y = Mathf.Max(targetPosition.y, LastFloorHeight + floorOffset);
-
-        // Smoothing
-        Vector3 smoothDamp = SmoothDampVel;
-        targetPosition = Vector3.SmoothDamp(newCameraPosition, targetPosition, ref smoothDamp, 0.5f, float.MaxValue, delta);
-        SmoothDampVel = smoothDamp;
-
         // Clamping to within level bounds
         float maxY = heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho);
-        if (targetPosition.y > maxY)
+        if (newCameraPosition.y > maxY)
             SmoothDampVel = Vector3.zero;
 
-        targetPosition.x = Mathf.Clamp(targetPosition.x, minX + xOrtho, maxX - xOrtho);
-        targetPosition.y = Mathf.Clamp(targetPosition.y, minY + vOrtho, maxY);
+        newCameraPosition.x = Mathf.Clamp(newCameraPosition.x, minX + xOrtho, maxX - xOrtho);
+        newCameraPosition.y = Mathf.Clamp(newCameraPosition.y, minY + vOrtho, maxY);
 
         // Z preservation
-        targetPosition.z = -10;
+        newCameraPosition.z = -10;
 
-        return targetPosition;
+        return newCameraPosition;
     }
 
     //---Helpers
@@ -196,9 +196,6 @@ public class CameraController : NetworkBehaviour {
         if (!controller || !controller.Object)
             return;
 
-        Gizmos.color = Color.blue;
-        Vector2 threshold = controller.IsOnGround ? GroundedThreshold : AirThreshold;
-        Gizmos.DrawWireCube(PlayerPos, threshold * 2);
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(new(PlayerPos.x, LastFloorHeight), HalfRight);
     }

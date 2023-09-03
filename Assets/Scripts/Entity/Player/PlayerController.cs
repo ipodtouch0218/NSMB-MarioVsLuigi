@@ -45,6 +45,7 @@ namespace NSMB.Entities.Player {
         [Networked] private Tick LastInputTick { get; set; }
         [Networked] public NetworkBool IsFunctionallyRunning { get; set; }
         [Networked] public NetworkBool IsOnGround { get; set; }
+        [Networked] private NetworkBool PreviousTickIsOnGround { get; set; }
         [Networked(OnChanged = nameof(OnIsCrouchingChanged))] public NetworkBool IsCrouching { get; set; }
         [Networked(OnChanged = nameof(OnIsSlidingChanged))] public NetworkBool IsSliding { get; set; }
         [Networked] public NetworkBool IsSkidding { get; set; }
@@ -236,7 +237,6 @@ namespace NSMB.Entities.Player {
         private Enums.Particle footstepParticle = Enums.Particle.None;
         private bool footstepVariant;
 
-        private bool previousTickIsOnGround;
         public Vector2 previousTickVelocity, previousTickPosition;
 
         private int noLivesStarSpawnDirection;
@@ -325,10 +325,8 @@ namespace NSMB.Entities.Player {
         public void BeforeTick() {
             previousTickPosition = body.Position;
             previousTickVelocity = body.Velocity;
-            previousTickIsOnGround = IsOnGround;
-
-            IsOnGround = GroundSnapCheck();
             HandleLayerState();
+            IsOnGround = GroundSnapCheck();
         }
 
         public override void Spawned() {
@@ -489,10 +487,12 @@ namespace NSMB.Entities.Player {
 
                 if (!IsDead) {
                     HandleGroundCollision();
+                    IsOnGround |= GroundSnapCheck();
+
                     if (IsOnGround)
                         IgnoreCoyoteTime = false;
 
-                    if (previousTickIsOnGround) {
+                    if (PreviousTickIsOnGround) {
 
                         if (!IsOnGround) {
                             if (!IgnoreCoyoteTime)
@@ -511,6 +511,7 @@ namespace NSMB.Entities.Player {
                 CheckForEntityCollision();
 
                 PreviousInputs = input;
+                PreviousTickIsOnGround = IsOnGround;
             }
 
             animationController.HandlePipeAnimation();
@@ -1566,7 +1567,7 @@ namespace NSMB.Entities.Player {
             );
 
             IsOnGround = false;
-            previousTickIsOnGround = false;
+            PreviousTickIsOnGround = false;
             IsInShell = false;
             IsGroundpounding = false;
             IsSpinnerFlying = false;
@@ -1655,7 +1656,7 @@ namespace NSMB.Entities.Player {
                 float speed = Runner.DeltaTime * 5f * (uphill ? Mathf.Clamp01(1f - (Mathf.Abs(body.Velocity.x) / RunningMaxSpeed)) : 4f);
 
                 float newX = Mathf.Clamp(body.Velocity.x - (Mathf.Sin(angleDeg) * speed), -(RunningMaxSpeed * 1.3f), RunningMaxSpeed * 1.3f);
-                float newY = Mathf.Sin(angleDeg) * newX + 0.4f;
+                float newY = (uphill ? 0 : -1.5f) * Mathf.Abs(newX);
                 body.Velocity = new Vector2(newX, newY);
             }
 
@@ -1690,7 +1691,7 @@ namespace NSMB.Entities.Player {
                 float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.1f;
                 body.Velocity = new Vector2(x, change);
                 IsOnGround = true;
-                previousTickIsOnGround = true;
+                PreviousTickIsOnGround = true;
                 OnSlope = tile ? tile.isSlope : false;
             } else {
                 hit = Runner.GetPhysicsScene2D().BoxCast(body.Position + (Vector2.up * 0.05f), new Vector2((MainHitbox.size.x + Physics2D.defaultContactOffset * 3f) * transform.lossyScale.x, 0.1f), 0, Vector2.down, 0.3f, Layers.MaskAnyGround);
@@ -1710,7 +1711,7 @@ namespace NSMB.Entities.Player {
                     float change = Mathf.Sin(angle * Mathf.Deg2Rad) * x * 1.1f;
                     body.Velocity = new(x, change);
                     IsOnGround = true;
-                    previousTickIsOnGround = true;
+                    PreviousTickIsOnGround = true;
                     OnSlope = tile ? tile.isSlope : false;
                 } else {
                     FloorAngle = 0;
@@ -1729,7 +1730,7 @@ namespace NSMB.Entities.Player {
         }
 
         private bool GroundSnapCheck() {
-            if (!IsOnGround || IsDead || (body.Velocity.y > 0.1f && FloorAngle == 0) || PropellerLaunchTimer.IsActive(Runner) || CurrentPipe)
+            if ((!IsOnGround && !PreviousTickIsOnGround) || IsDead || (body.Velocity.y > 0.1f && FloorAngle == 0) || PropellerLaunchTimer.IsActive(Runner) || CurrentPipe)
                 return false;
 
             // TODO: improve
@@ -1956,7 +1957,7 @@ namespace NSMB.Entities.Player {
                 IsSpinnerFlying = true;
                 SpinnerLaunchAnimCounter++;
                 IsOnGround = false;
-                previousTickIsOnGround = false;
+                PreviousTickIsOnGround = false;
                 IsCrouching = false;
                 IsInShell = false;
                 IsSkidding = false;
@@ -2257,8 +2258,6 @@ namespace NSMB.Entities.Player {
             IsInShell |= State == Enums.PowerupState.BlueShell && !IsSliding && IsOnGround && IsFunctionallyRunning
                 && !HeldEntity && Mathf.Abs(body.Velocity.x) >= SPEED_STAGE_MAX[RUN_STAGE] * 0.9f
                 && (body.Velocity.x > 0) == FacingRight;
-            if (IsOnGround || previousTickIsOnGround)
-                body.Velocity = new(body.Velocity.x, 0);
         }
 
         private float CalculateSlopeMaxSpeedOffset(float floorAngle) {
@@ -2780,7 +2779,7 @@ namespace NSMB.Entities.Player {
                 WallSlideRight = false;
             }
 
-            if (previousTickIsOnGround && !IsOnGround && !ProperJump && IsCrouching && !IsInShell && !IsGroundpounding)
+            if (PreviousTickIsOnGround && !IsOnGround && !ProperJump && IsCrouching && !IsInShell && !IsGroundpounding)
                 body.Velocity = new(body.Velocity.x, -3.75f);
         }
 
