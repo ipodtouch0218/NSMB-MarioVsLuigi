@@ -153,7 +153,7 @@ namespace NSMB.Entities.Enemies {
             } else if (IsInShell && !IsStationary && (data.HitLeft || data.HitRight)) {
                 foreach (PhysicsDataStruct.TileContact tile in data.TilesHitSide) {
                     if (GameManager.Instance.TileManager.GetTile(tile.location, out InteractableTile it))
-                        it.Interact(this, TileInteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(tile.location), out bool _);
+                        it.Interact(this, InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(tile.location), out bool _);
                 }
             }
         }
@@ -329,7 +329,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
             if (IsDead)
                 return;
 

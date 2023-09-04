@@ -12,7 +12,7 @@ namespace NSMB.Tiles {
         //---Serialized Variables
         [SerializeField] private Enums.PrefabParticle breakParticle;
 
-        public override bool Interact(BasicEntity interacter, TileInteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             if (interacter is not PlayerController) {
                 bumpSound = true;
                 return false;
@@ -21,10 +21,10 @@ namespace NSMB.Tiles {
 
             PlayerController player = (PlayerController) interacter;
 
-            if (player.IsInShell && (direction == TileInteractionDirection.Left || direction == TileInteractionDirection.Right))
+            if (player.IsInShell && (direction == InteractionDirection.Left || direction == InteractionDirection.Right))
                 bumpSound = true;
 
-            if (player.State != Enums.PowerupState.MegaMushroom || direction == TileInteractionDirection.Down || direction == TileInteractionDirection.Up)
+            if (player.State != Enums.PowerupState.MegaMushroom || direction == InteractionDirection.Down || direction == InteractionDirection.Up)
                 return false;
 
             Vector2Int ourLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
@@ -33,7 +33,7 @@ namespace NSMB.Tiles {
 
             ushort[] emptyTiles = new ushort[height];
 
-            interacter.SpawnResizableParticle(worldLocation, direction == TileInteractionDirection.Right, false, new Vector2(1, height), breakParticle);
+            interacter.SpawnResizableParticle(worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
 
             GameManager.Instance.TileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
             return true;

@@ -16,6 +16,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
     [Networked] public Vector2 Position { get; set; }
     [Networked] public Vector2 Velocity { get; set; }
     [Networked] public NetworkBool Freeze { get; set; }
+    [Networked] public NetworkBool LockX { get; set; }
+    [Networked] public NetworkBool LockY { get; set; }
     [Networked] public Vector2 Gravity { get; set; }
     [Networked] public ref PhysicsDataStruct Data => ref MakeRef<PhysicsDataStruct>();
 
@@ -129,6 +131,11 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
         if (depth >= MaxIterations)
             return Vector2.zero;
 
+        if (LockX)
+            raycastVel.Set(0, raycastVel.y);
+        if (LockY)
+            raycastVel.Set(raycastVel.x, 0);
+
         float distance = raycastVel.magnitude + Skin;
         Vector2 direction = raycastVel.normalized;
         Vector2 size = ColliderSize;
@@ -168,95 +175,52 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
                 Data.CrushableGround |= !hit.collider.CompareTag("platform");
                 Data.FloorAngle = angle;
 
-                if (isTilemap) {
+                if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
+                    AddObjectContacts(no, InteractionDirection.Down);
+                } else if (isTilemap) {
                     float lowerBound = raycastPos.x - (ColliderSize.x * 0.5f) - 0.01f;
                     float upperBound = raycastPos.x + (ColliderSize.x * 0.5f) + 0.01f;
                     float y = hit.point.y + hit.normal.y * -0.2f;
 
-                    for (float x = Mathf.FloorToInt(lowerBound * 2) * 0.5f; x <= Mathf.FloorToInt(upperBound * 2) * 0.5f; x += 0.5f) {
-                        Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));
-                        PhysicsDataStruct.TileContact tile = new() {
-                            location = loc,
-                            direction = TileInteractionDirection.Down,
-                        };
-                        if (!Data.TileContacts.Contains(tile)) {
-                            Data.TileContacts.Add(tile);
-                        }
-                    }
-                } else if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
-                    PhysicsDataStruct.ObjectContact obj = new() {
-                        networkObjectId = no.Id,
-                        direction = TileInteractionDirection.Down,
-                    };
-                    if (!Data.ObjectContacts.Contains(obj)) {
-                        Data.ObjectContacts.Add(obj);
-                    }
+                    AddTileContacts(lowerBound, upperBound, y, InteractionDirection.Down);
+
                 }
 
             } else if (Mathf.Abs(angle) > 180 - maxFloorAngle) {
                 // Roof
                 Data.HitRoof = true;
 
-                if (isTilemap) {
+                if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
+                    AddObjectContacts(no, InteractionDirection.Up);
+                } else if (isTilemap) {
                     float lowerBound = raycastPos.x - (ColliderSize.x * 0.5f) - 0.01f;
                     float upperBound = raycastPos.x + (ColliderSize.x * 0.5f) + 0.01f;
                     float y = hit.point.y + hit.normal.y * -0.2f;
 
-                    for (float x = Mathf.FloorToInt(lowerBound * 2) * 0.5f; x <= Mathf.FloorToInt(upperBound * 2) * 0.5f; x += 0.5f) {
-                        Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));
-                        PhysicsDataStruct.TileContact tile = new() {
-                            location = loc,
-                            direction = TileInteractionDirection.Up,
-                        };
-                        if (!Data.TileContacts.Contains(tile)) {
-                            Data.TileContacts.Add(tile);
-                        }
-                    }
-                } else if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
-                    PhysicsDataStruct.ObjectContact obj = new() {
-                        networkObjectId = no.Id,
-                        direction = TileInteractionDirection.Up,
-                    };
-                    if (!Data.ObjectContacts.Contains(obj)) {
-                        Data.ObjectContacts.Add(obj);
-                    }
+                    AddTileContacts(lowerBound, upperBound, y, InteractionDirection.Up);
+
                 }
 
             } else {
-                TileInteractionDirection interactionDirection;
+                InteractionDirection interactionDirection;
                 if (angle > 0) {
                     // Left
                     Data.HitLeft = true;
-                    interactionDirection = TileInteractionDirection.Left;
+                    interactionDirection = InteractionDirection.Left;
                 } else {
                     // Right
                     Data.HitRight = true;
-                    interactionDirection = TileInteractionDirection.Right;
+                    interactionDirection = InteractionDirection.Right;
                 }
 
-                if (isTilemap) {
+                if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
+                    AddObjectContacts(no, interactionDirection);
+                } else if (isTilemap) {
                     float lowerBound = raycastPos.y - (ColliderSize.y * 0.5f) - 0.01f;
                     float upperBound = raycastPos.y + (ColliderSize.y * 0.5f) + 0.01f;
                     float x = hit.point.x + hit.normal.x * -0.2f;
 
-                    for (float y = Mathf.FloorToInt(lowerBound * 2) * 0.5f; y <= Mathf.FloorToInt(upperBound * 2) * 0.5f; y += 0.5f) {
-                        Vector2Int loc = Utils.WorldToTilemapPosition(new(x, y));
-                        PhysicsDataStruct.TileContact tile = new() {
-                            location = loc,
-                            direction = interactionDirection,
-                        };
-                        if (!Data.TileContacts.Contains(tile)) {
-                            Data.TileContacts.Add(tile);
-                        }
-                    }
-                } else if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
-                    PhysicsDataStruct.ObjectContact obj = new() {
-                        networkObjectId = no.Id,
-                        direction = interactionDirection,
-                    };
-                    if (!Data.ObjectContacts.Contains(obj)) {
-                        Data.ObjectContacts.Add(obj);
-                    }
+                    AddTileContacts(lowerBound, upperBound, x, interactionDirection);
                 }
             }
 
@@ -291,9 +255,43 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
             Vector2 leftover = raycastVel - positionToSurfacePoint;
             leftover = bounceOnImpacts ? Vector2.Reflect(leftover, hit.normal) : Vector3.ProjectOnPlane(leftover, hit.normal);
 
+            if (LockX)
+                leftover.Set(0, leftover.y);
+            if (LockY)
+                leftover.Set(leftover.x, 0);
+
             return positionToSurfacePoint + CollideAndSlide(raycastPos + positionToSurfacePoint, leftover, gravityPass, depth + 1);
         }
 
         return raycastVel;
+    }
+
+    public void AddTileContacts(float lowerBound, float upperBound, float otherComponent, InteractionDirection direction) {
+        for (float i = Mathf.FloorToInt(lowerBound * 2) * 0.5f; i <= Mathf.FloorToInt(upperBound * 2) * 0.5f; i += 0.5f) {
+            Vector2 worldLoc;
+            if (direction == InteractionDirection.Up || direction == InteractionDirection.Down) {
+                worldLoc = new(i, otherComponent);
+            } else {
+                worldLoc = new(otherComponent, i);
+            }
+
+            PhysicsDataStruct.TileContact tile = new() {
+                location = Utils.WorldToTilemapPosition(worldLoc),
+                direction = direction,
+            };
+            if (!Data.TileContacts.Contains(tile)) {
+                Data.TileContacts.Add(tile);
+            }
+        }
+    }
+
+    public void AddObjectContacts(NetworkObject obj, InteractionDirection direction) {
+        PhysicsDataStruct.ObjectContact contact = new() {
+            networkObjectId = obj.Id,
+            direction = direction,
+        };
+        if (!Data.ObjectContacts.Contains(contact)) {
+            Data.ObjectContacts.Add(contact);
+        }
     }
 }

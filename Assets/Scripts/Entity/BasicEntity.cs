@@ -104,7 +104,7 @@ namespace NSMB.Entities {
         public virtual void OnFacingRightChanged() { }
 
         //---IBlockBumpable overrides
-        public abstract void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction);
+        public abstract void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction);
 
         //---RPCs
         public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, Enums.PrefabParticle prefab) {

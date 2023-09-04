@@ -123,7 +123,7 @@ namespace NSMB.Entities.World {
                     return;
             }
 
-            InteractableTile.Bump(player, TileInteractionDirection.Up, worldPos + BumpOffset);
+            InteractableTile.Bump(player, InteractionDirection.Up, worldPos + BumpOffset);
 
             Bumps.Add(new BumpInfo() { point = (int) localPos, spawnTick = Runner.Tick });
         }

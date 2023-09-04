@@ -17,7 +17,7 @@ namespace NSMB.Tiles {
         [SerializeField] private TileBase leftBrokenHatTile, rightBrokenHatTile;
         [SerializeField] private Enums.PrefabParticle pipeParticle, destroyedPipeParticle;
 
-        public override bool Interact(BasicEntity interacter, TileInteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             bumpSound = true;
             if (interacter is not PlayerController player)
                 return false;
@@ -28,18 +28,18 @@ namespace NSMB.Tiles {
                 return false;
 
             // we've hit the underside of the pipe
-            if ((upsideDownPipe && direction == TileInteractionDirection.Down) || (!upsideDownPipe && direction == TileInteractionDirection.Up))
+            if ((upsideDownPipe && direction == InteractionDirection.Down) || (!upsideDownPipe && direction == InteractionDirection.Up))
                 return false;
 
             TileManager tilemap = GameManager.Instance.TileManager;
             Vector2Int ourLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
-            if (leftOfPipe && direction == TileInteractionDirection.Left) {
+            if (leftOfPipe && direction == InteractionDirection.Left) {
                 if (Utils.Utils.GetTileAtTileLocation(ourLocation + Vector2Int.right) is InteractableTile otherPipe) {
                     return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.right * 0.5f), out bumpSound);
                 }
             }
-            if (!leftOfPipe && direction == TileInteractionDirection.Right) {
+            if (!leftOfPipe && direction == InteractionDirection.Right) {
                 if (Utils.Utils.GetTileAtTileLocation(ourLocation + Vector2Int.left) is InteractableTile otherPipe) {
                     return otherPipe.Interact(interacter, direction, worldLocation + (Vector3.left * 0.5f), out bumpSound);
                 }
@@ -63,7 +63,7 @@ namespace NSMB.Tiles {
             bool shrink = false;
             bool addHat = true;
 
-            if (direction == TileInteractionDirection.Down || direction == TileInteractionDirection.Up) {
+            if (direction == InteractionDirection.Down || direction == InteractionDirection.Up) {
                 // Hit top/bottom of pipe.
                 if (hat == origin || height <= 1)
                     return false;

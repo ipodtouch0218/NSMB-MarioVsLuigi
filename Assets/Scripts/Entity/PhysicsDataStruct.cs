@@ -14,17 +14,17 @@ public struct PhysicsDataStruct : INetworkStruct {
     [Networked, Capacity(16)] public NetworkLinkedList<TileContact> TileContacts => default;
     [Networked, Capacity(8)] public NetworkLinkedList<ObjectContact> ObjectContacts => default;
 
-    public IEnumerable<T> GetContactsFromDirection<T>(IEnumerable<T> list, TileInteractionDirection direction) where T : IContactStruct {
+    public IEnumerable<T> GetContactsFromDirection<T>(IEnumerable<T> list, InteractionDirection direction) where T : IContactStruct {
         foreach (T contact in list) {
             if ((contact.direction & direction) != 0)
                 yield return contact;
         }
     }
 
-    public IEnumerable<TileContact> TilesStandingOn => GetContactsFromDirection(TileContacts, TileInteractionDirection.Down);
-    public IEnumerable<TileContact> TilesHitSide => GetContactsFromDirection(TileContacts, TileInteractionDirection.Left | TileInteractionDirection.Right);
-    public IEnumerable<TileContact> TilesHitRoof => GetContactsFromDirection(TileContacts, TileInteractionDirection.Up);
-    public IEnumerable<ObjectContact> ObjectsStandingOn => GetContactsFromDirection(ObjectContacts, TileInteractionDirection.Down);
+    public IEnumerable<TileContact> TilesStandingOn => GetContactsFromDirection(TileContacts, InteractionDirection.Down);
+    public IEnumerable<TileContact> TilesHitSide => GetContactsFromDirection(TileContacts, InteractionDirection.Left | InteractionDirection.Right);
+    public IEnumerable<TileContact> TilesHitRoof => GetContactsFromDirection(TileContacts, InteractionDirection.Up);
+    public IEnumerable<ObjectContact> ObjectsStandingOn => GetContactsFromDirection(ObjectContacts, InteractionDirection.Down);
 
     public bool OnGround {
         get => Utils.BitTest(Flags, 0);
@@ -52,17 +52,17 @@ public struct PhysicsDataStruct : INetworkStruct {
     }
 
     public interface IContactStruct : INetworkStruct {
-        public TileInteractionDirection direction { get; set; }
+        public InteractionDirection direction { get; set; }
     }
 
     public struct TileContact : IContactStruct {
         public Vector2Int location;
-        public TileInteractionDirection direction { get; set; }
+        public InteractionDirection direction { get; set; }
     }
 
     public struct ObjectContact : IContactStruct {
         public NetworkId networkObjectId;
-        public TileInteractionDirection direction { get; set; }
+        public InteractionDirection direction { get; set; }
 
         public NetworkObject GetNetworkObject(NetworkRunner runner) {
             return runner.FindObject(networkObjectId);

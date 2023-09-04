@@ -40,8 +40,8 @@ namespace NSMB.Entities.Collectable {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
-            if (direction == TileInteractionDirection.Down)
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
+            if (direction == InteractionDirection.Down)
                 return;
 
             PlayerController target = null;

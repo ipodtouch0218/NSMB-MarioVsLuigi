@@ -552,12 +552,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _position: {x: 0, y: 0}
-  _velocity: {x: 0, y: 0}
-  _freeze:
+  _Position: {x: 0, y: 0}
+  _Velocity: {x: 0, y: 0}
+  _Freeze:
     _value: 0
-  _gravity: {x: 0, y: -21.582}
-  _data:
+  _Gravity: {x: 0, y: -21.582}
+  _Data:
     Flags: 0
     FloorAngle: 0
     _TileContacts:
@@ -565,7 +565,7 @@ MonoBehaviour:
     _ObjectContacts:
       Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   interpolationTarget: {fileID: 7382415506076328421}
-  collider: {fileID: 5334425534174023789}
+  activeCollider: {fileID: 5334425534174023789}
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0

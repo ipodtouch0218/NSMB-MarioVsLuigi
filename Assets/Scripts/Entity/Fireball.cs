@@ -309,7 +309,7 @@ namespace NSMB.Entities {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
             // Do nothing when bumped
         }
 

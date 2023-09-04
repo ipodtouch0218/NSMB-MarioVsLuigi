@@ -155,7 +155,7 @@ namespace NSMB.Entities.Enemies {
                     Utils.Utils.WrapTileLocation(ref ourLocation);
 
                     if (tm.GetTile(ourLocation, out InteractableTile tile))
-                        tile.Interact(this, TileInteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(ourLocation), out bool _);
+                        tile.Interact(this, InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(ourLocation), out bool _);
                 }
             }
 
@@ -230,7 +230,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
             //Light if we get bumped
             Light();
         }

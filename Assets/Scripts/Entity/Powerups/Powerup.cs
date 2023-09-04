@@ -271,8 +271,8 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         //---IBlockBumpable overrides
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
-            if (direction == TileInteractionDirection.Down || FollowPlayer)
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
+            if (direction == InteractionDirection.Down || FollowPlayer)
                 return;
 
             body.Velocity = new(body.Velocity.x, 5f);

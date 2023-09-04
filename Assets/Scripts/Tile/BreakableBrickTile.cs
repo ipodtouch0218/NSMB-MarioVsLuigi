@@ -22,7 +22,7 @@ namespace NSMB.Tiles {
         [SerializeField, FormerlySerializedAs("breakableByGiantMario")] public bool breakableByMegaMario = true;
         [SerializeField] private Vector2Int tileSize = Vector2Int.one;
 
-        protected bool BreakBlockCheck(BasicEntity interacter, TileInteractionDirection direction, Vector3 worldLocation) {
+        protected bool BreakBlockCheck(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             bool doBump = false, doBreak = false, giantBreak = false;
             if (interacter is PlayerController pl) {
                 if (pl.State <= Enums.PowerupState.MiniMushroom && !pl.IsDrilling) {
@@ -72,23 +72,23 @@ namespace NSMB.Tiles {
             interacter.PlayNetworkedSound(sound);
         }
 
-        public void BumpWithAnimation(BasicEntity interacter, TileInteractionDirection direction, Vector3 worldLocation) {
+        public void BumpWithAnimation(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             Bump(interacter, direction, worldLocation);
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
             // Bump
-            bool downwards = direction == TileInteractionDirection.Down;
+            bool downwards = direction == InteractionDirection.Down;
             GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 this, downwards, downwards ? -SpawnOffset : SpawnOffset, false, NetworkPrefabRef.Empty);
         }
 
-        public override bool Interact(BasicEntity interacter, TileInteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
+        public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             // Breaking block check.
             bool broken = BreakBlockCheck(interacter, direction, worldLocation);
 
             bumpSound = !broken;
             if (interacter is PlayerController player) {
-                bumpSound |= (direction == TileInteractionDirection.Left || direction == TileInteractionDirection.Right) && player.IsInShell;
+                bumpSound |= (direction == InteractionDirection.Left || direction == InteractionDirection.Right) && player.IsInShell;
                 bumpSound &= !player.IsGroundpounding;
                 bumpSound &= !player.IsDrilling;
             }

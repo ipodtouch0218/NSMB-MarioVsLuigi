@@ -1002,7 +1002,7 @@ namespace NSMB.Entities.Player {
             if (GameManager.Instance.paused || GameData.Instance.GameEnded)
                 return;
 
-            if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead || MegaStartTimer.IsActive(Runner)) {
+            if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead || MegaStartTimer.IsActive(Runner) || (IsStationaryMegaShrink && MegaEndTimer.IsActive(Runner))) {
                 PlaySound(Enums.Sounds.UI_Error);
                 return;
             }
@@ -1113,7 +1113,7 @@ namespace NSMB.Entities.Player {
         }
         #endregion
 
-        public override void BlockBump(BasicEntity bumper, Vector2Int tile, TileInteractionDirection direction) {
+        public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
             if (IsInKnockback)
                 return;
 
@@ -1137,7 +1137,8 @@ namespace NSMB.Entities.Player {
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         public void Rpc_SpawnReserveItem() {
-            if (StoredPowerup == Enums.PowerupState.NoPowerup || MegaStartTimer.IsActive(Runner))
+
+            if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead || MegaStartTimer.IsActive(Runner) || (IsStationaryMegaShrink && MegaEndTimer.IsActive(Runner)))
                 return;
 
             SpawnItem(StoredPowerup.GetPowerupScriptable().prefab);
@@ -1461,18 +1462,18 @@ namespace NSMB.Entities.Player {
                     Vector2 worldPosCenter = Utils.Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f;
                     Utils.Utils.WrapTileLocation(ref tileLocation);
 
-                    TileInteractionDirection dir = TileInteractionDirection.Up;
+                    InteractionDirection dir = InteractionDirection.Up;
                     if (worldPosCenter.y - 0.25f + Physics2D.defaultContactOffset * 2f <= body.Position.y) {
                         if (!grounded && !IsGroundpounding)
                             continue;
 
-                        dir = TileInteractionDirection.Down;
+                        dir = InteractionDirection.Down;
                     } else if (worldPosCenter.y + Physics2D.defaultContactOffset * 2f >= body.Position.y + size.y) {
-                        dir = TileInteractionDirection.Up;
+                        dir = InteractionDirection.Up;
                     } else if (worldPosCenter.x <= body.Position.x) {
-                        dir = TileInteractionDirection.Left;
+                        dir = InteractionDirection.Left;
                     } else if (worldPosCenter.x >= body.Position.x) {
-                        dir = TileInteractionDirection.Right;
+                        dir = InteractionDirection.Right;
                     }
 
                     if (GameManager.Instance.TileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
@@ -1490,20 +1491,20 @@ namespace NSMB.Entities.Player {
                         Vector2 worldPosCenter = Utils.Utils.TilemapToWorldPosition(tileLocation) + Vector3.one * 0.25f;
                         Utils.Utils.WrapTileLocation(ref tileLocation);
 
-                        TileInteractionDirection dir = TileInteractionDirection.Up;
+                        InteractionDirection dir = InteractionDirection.Up;
                         if (worldPosCenter.y - 0.25f + Physics2D.defaultContactOffset * 2f <= body.Position.y) {
                             if (!grounded && !IsGroundpounding)
                                 continue;
 
-                            dir = TileInteractionDirection.Down;
+                            dir = InteractionDirection.Down;
                         } else if (worldPosCenter.x - 0.25f < checkPosition.x - checkSize.x * 0.5f) {
-                            dir = TileInteractionDirection.Left;
+                            dir = InteractionDirection.Left;
                         } else if (worldPosCenter.x + 0.25f > checkPosition.x + checkSize.x * 0.5f) {
-                            dir = TileInteractionDirection.Right;
+                            dir = InteractionDirection.Right;
                         }
 
                         if (GameManager.Instance.TileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
-                            if (!pipe.upsideDownPipe || dir == TileInteractionDirection.Up)
+                            if (!pipe.upsideDownPipe || dir == InteractionDirection.Up)
                                 continue;
                         }
 
@@ -1513,7 +1514,7 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        private bool InteractWithTile(Vector2Int tilePos, TileInteractionDirection direction, out bool interacted, out bool bumpSound) {
+        private bool InteractWithTile(Vector2Int tilePos, InteractionDirection direction, out bool interacted, out bool bumpSound) {
 
             if (interacted = GameManager.Instance.TileManager.GetTile(tilePos, out InteractableTile tile)) {
                 return tile.Interact(this, direction, Utils.Utils.TilemapToWorldPosition(tilePos), out bumpSound);
@@ -2570,7 +2571,7 @@ namespace NSMB.Entities.Player {
                 bool interactedAny = false;
                 foreach (PhysicsDataStruct.TileContact tile in TilesJumpedInto) {
                     Vector2Int pos = tile.location;
-                    tempHitBlock |= InteractWithTile(pos, TileInteractionDirection.Up, out bool interacted, out bool bumpSound);
+                    tempHitBlock |= InteractWithTile(pos, InteractionDirection.Up, out bool interacted, out bool bumpSound);
                     if (bumpSound)
                         BlockBumpSoundCounter++;
 
@@ -2992,7 +2993,7 @@ namespace NSMB.Entities.Player {
 
             ContinueGroundpound = false;
             foreach (PhysicsDataStruct.TileContact tile in TilesStandingOn) {
-                ContinueGroundpound |= InteractWithTile(tile.location, TileInteractionDirection.Down, out bool _, out bool bumpSound);
+                ContinueGroundpound |= InteractWithTile(tile.location, InteractionDirection.Down, out bool _, out bool bumpSound);
                 if (bumpSound)
                     BlockBumpSoundCounter++;
             }

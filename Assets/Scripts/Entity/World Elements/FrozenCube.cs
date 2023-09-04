@@ -54,6 +54,8 @@ namespace NSMB.Entities {
             if (!FrozenEntity.IsCarryable) {
                 dieWhenInsideBlock = false;
             }
+
+            body.interpolationTarget.position = new(body.interpolationTarget.position.x, body.interpolationTarget.position.y, -4.5f);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -344,7 +346,9 @@ namespace NSMB.Entities {
         //---Static
         public static void FreezeEntity(NetworkRunner runner, FreezableEntity entity) {
             Vector2 entityPosition = entity.body ? entity.body.Position : entity.transform.position;
-            Vector2 spawnPosition = entityPosition - entity.FrozenOffset;
+            Vector2 spawnPosition = entityPosition + entity.FrozenOffset;
+
+            Debug.Log($"offset: {entity.FrozenOffset}");
 
             runner.Spawn(PrefabList.Instance.Obj_FrozenCube, spawnPosition, onBeforeSpawned: (runner, obj) => {
                 FrozenCube cube = obj.GetComponent<FrozenCube>();
