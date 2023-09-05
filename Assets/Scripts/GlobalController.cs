@@ -29,6 +29,8 @@ public class GlobalController : Singleton<GlobalController> {
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, connecting, fusionStatsTemplate;
     public LoadingCanvas loadingCanvas;
 
+    public RectTransform ndsRect;
+
     public RenderTexture ndsTexture;
 
     public bool checkedForVersion, firstConnection;

@@ -11057,6 +11057,7 @@ MonoBehaviour:
   connecting: {fileID: 3461526970985687573}
   fusionStatsTemplate: {fileID: 6113396266618169604}
   loadingCanvas: {fileID: 4559077638615233841}
+  ndsRect: {fileID: 3574729310994062265}
   ndsTexture: {fileID: 8400000, guid: 34cd49408ebecd94ebb393f8b26a5d96, type: 2}
   checkedForVersion: 0
   firstConnection: 0
@@ -34806,7 +34807,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e406ddc510864a4408115627a881482f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aspect: 1.3333334
 --- !u!114 &4687170132880179745
 MonoBehaviour:
   m_ObjectHideFlags: 0

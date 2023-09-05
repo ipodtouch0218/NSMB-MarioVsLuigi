@@ -1,11 +1,7 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(RectTransform))]
 public class ResizeToFit : MonoBehaviour {
-
-    //---Serialized Variables
-    [SerializeField] private float aspect = 4f / 3f;
 
     //---Private Variables
     private RectTransform rect;

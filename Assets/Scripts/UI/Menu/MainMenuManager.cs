@@ -167,7 +167,7 @@ namespace NSMB.UI.MainMenu {
 
             GlobalController.Instance.connecting.SetActive(connectingToNetwork && lobbyMenu.activeInHierarchy);
 
-            joinRoomBtn.interactable = connectedToNetwork && roomManager.SelectedRoom != null;
+            joinRoomBtn.interactable = connectedToNetwork && roomManager.SelectedRoom != null && validName;
             createRoomBtn.interactable = connectedToNetwork && validName;
             //regionDropdown.interactable = connectedToNetwork;
 

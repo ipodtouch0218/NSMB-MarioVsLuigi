@@ -18,6 +18,7 @@ public class UserNametag : MonoBehaviour {
     [SerializeField] private GameObject nametag;
     [SerializeField] private TMP_Text text;
     [SerializeField] private Image arrow;
+    [SerializeField] private RectTransform parentTransform;
 
     //---Private Variables
     private string cachedNickname;
@@ -54,32 +55,8 @@ public class UserNametag : MonoBehaviour {
             }
         }
 
-        Vector2 size = new(Screen.width, Screen.height);
-        Vector3 screenPoint = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * size;
-        screenPoint.z = 0;
-
-        if (Settings.Instance.graphicsNdsEnabled && Settings.Instance.graphicsNdsForceAspect) {
-            // Handle black borders
-            float screenW = Screen.width;
-            float screenH = Screen.height;
-            float screenAspect = screenW / screenH;
-
-            if (screenAspect > cam.aspect) {
-                float availableWidth = screenH * cam.aspect;
-                float widthPercentage = availableWidth / screenW;
-
-                screenPoint.x *= widthPercentage;
-                screenPoint.x += (screenW - availableWidth) * 0.5f;
-            } else {
-                float availableHeight = screenW * (1f / cam.aspect);
-                float heightPercentage = availableHeight / screenH;
-                screenPoint.y *= heightPercentage;
-                screenPoint.y += (screenH - availableHeight) * 0.5f;
-
-                screenPoint.x *= heightPercentage;
-            }
-        }
-        transform.position = screenPoint;
+        transform.position = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentTransform.sizeDelta;
+        transform.position += parentTransform.position - (Vector3) (parentTransform.pivot * parentTransform.rect.size);
 
         cachedNickname ??= data.GetNickname();
 

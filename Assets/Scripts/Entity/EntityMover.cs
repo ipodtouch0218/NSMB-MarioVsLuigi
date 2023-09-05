@@ -13,7 +13,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
     private static readonly int MaxIterations = 5;
 
     //---Networked Variables
-    [Networked] public Vector2 Position { get; set; }
+    [Networked] private Vector2 InternalPosition { get; set; }
     [Networked] public Vector2 Velocity { get; set; }
     [Networked] public NetworkBool Freeze { get; set; }
     [Networked] public NetworkBool LockX { get; set; }
@@ -22,6 +22,13 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
     [Networked] public ref PhysicsDataStruct Data => ref MakeRef<PhysicsDataStruct>();
 
     //---Properties
+    public Vector2 Position {
+        get => InternalPosition;
+        set {
+            InternalPosition = value;
+            transform.position = value;
+        }
+    }
     private Vector2 ColliderOffset => transform.lossyScale * activeCollider.offset;
     private Vector2 ColliderSize => transform.lossyScale * activeCollider.size;
 
@@ -38,7 +45,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
 
     public override void Spawned() {
         Position = transform.position;
-        positionInterpolator = GetInterpolator(nameof(Position));
+        positionInterpolator = GetInterpolator(nameof(InternalPosition));
 
         InterpolationDataSource = InterpolationDataSources.Predicted;
     }
