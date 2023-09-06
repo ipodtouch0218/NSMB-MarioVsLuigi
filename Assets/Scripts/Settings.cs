@@ -36,7 +36,7 @@ public class Settings : Singleton<Settings> {
         ApplyVolumeSettings();
     }
 
-    public string GenericLocale {
+    public string GeneralLocale {
         get => GlobalController.Instance.translationManager.CurrentLocale;
         set => GlobalController.Instance.translationManager.ChangeLanguage(value);
     }
@@ -143,12 +143,12 @@ public class Settings : Singleton<Settings> {
         set => ControlSystem.controls.asset.LoadBindingOverridesFromJson(value);
     }
 
-    public bool ValidNickname => genericNickname.IsValidUsername(false);
+    public bool ValidNickname => generalNickname.IsValidUsername(false);
 
     //---Public Variables
-    public string genericNickname;
-    public int genericCharacter, genericSkin;
-    public bool genericScoreboardAlways, genericChatFiltering;
+    public string generalNickname;
+    public int generalCharacter, generalSkin;
+    public bool generalScoreboardAlways, generalChatFiltering, generalDisableNATPunchthrough;
 
     public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
 
@@ -172,12 +172,12 @@ public class Settings : Singleton<Settings> {
 
     public void SaveSettings() {
         // Generic
-        PlayerPrefs.SetString("Generic_Nickname", genericNickname);
-        PlayerPrefs.SetInt("Generic_ScoreboardAlwaysVisible", genericScoreboardAlways ? 1 : 0);
-        PlayerPrefs.SetInt("Generic_ChatFilter", genericChatFiltering ? 1 : 0);
-        PlayerPrefs.SetInt("Generic_Character", genericCharacter);
-        PlayerPrefs.SetInt("Generic_Skin", genericSkin);
-        PlayerPrefs.SetString("Generic_Locale", GenericLocale);
+        PlayerPrefs.SetString("General_Nickname", generalNickname);
+        PlayerPrefs.SetInt("General_ScoreboardAlwaysVisible", generalScoreboardAlways ? 1 : 0);
+        PlayerPrefs.SetInt("General_ChatFilter", generalChatFiltering ? 1 : 0);
+        PlayerPrefs.SetInt("General_Character", generalCharacter);
+        PlayerPrefs.SetInt("General_Skin", generalSkin);
+        PlayerPrefs.SetString("General_Locale", GeneralLocale);
 
         // Graphics
         PlayerPrefs.SetString("Graphics_FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
@@ -240,12 +240,12 @@ public class Settings : Singleton<Settings> {
          * PlayerPrefs.SetInt("Skin",                    skin);
          */
 
-        genericNickname = PlayerPrefs.GetString("Nickname");
-        genericScoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
-        genericChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
-        genericCharacter = PlayerPrefs.GetInt("Character", 0);
-        genericSkin = PlayerPrefs.GetInt("Skin", 0);
-        GenericLocale = "en-US";
+        generalNickname = PlayerPrefs.GetString("Nickname");
+        generalScoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
+        generalChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
+        generalCharacter = PlayerPrefs.GetInt("Character", 0);
+        generalSkin = PlayerPrefs.GetInt("Skin", 0);
+        GeneralLocale = "en-US";
 
         GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;
         GraphicsFullscreenMode = (int) Screen.fullScreenMode;
@@ -282,12 +282,13 @@ public class Settings : Singleton<Settings> {
 
     private void LoadFromVersion1() {
         //Generic
-        TryGetSetting("Generic_Nickname", out genericNickname);
-        TryGetSetting("Generic_ScoreboardAlwaysVisible", out genericScoreboardAlways);
-        TryGetSetting("Generic_ChatFilter", out genericChatFiltering);
-        TryGetSetting("Generic_Character", out genericCharacter);
-        TryGetSetting("Generic_Skin", out genericSkin);
-        if (TryGetSetting("Generic_Locale", out string tempLocale)) GenericLocale = tempLocale;
+        TryGetSetting("General_Nickname", out generalNickname);
+        TryGetSetting("General_ScoreboardAlwaysVisible", out generalScoreboardAlways);
+        TryGetSetting("General_ChatFilter", out generalChatFiltering);
+        TryGetSetting("General_Character", out generalCharacter);
+        TryGetSetting("General_Skin", out generalSkin);
+        if (TryGetSetting("General_Locale", out string tempLocale)) GeneralLocale = tempLocale;
+        TryGetSetting("General_DisableNATPunchthrough", out generalDisableNATPunchthrough);
 
         //Graphics
         if (TryGetSetting("Graphics_FullscreenMode", out int tempFullscreenMode)) GraphicsFullscreenMode = tempFullscreenMode;
@@ -311,10 +312,10 @@ public class Settings : Singleton<Settings> {
         TryGetSetting("Audio_Panning", out audioPanning);
 
         //Controls
-        if (TryGetSetting("Controls_Rumble", out int tempRumble)) controlsRumble = (RumbleManager.RumbleSetting) tempRumble;
         TryGetSetting("Controls_FireballFromSprint", out controlsFireballSprint);
         TryGetSetting("Controls_AutoSprint", out controlsAutoSprint);
         TryGetSetting("Controls_PropellerJump", out controlsPropellerJump);
+        if (TryGetSetting("Controls_Rumble", out int tempRumble)) controlsRumble = (RumbleManager.RumbleSetting) tempRumble;
         if (TryGetSetting("Controls_Bindings", out string tempBindings)) ControlsBindings = tempBindings;
     }
 

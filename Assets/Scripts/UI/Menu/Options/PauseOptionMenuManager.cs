@@ -280,7 +280,7 @@ namespace NSMB.UI.Pause.Options {
             int original = currentOptionIndex;
             currentOptionIndex = index;
 
-            while (SelectedOption is NonselectableOption && index >= 0 && index < SelectedTab.options.Count) {
+            while ((!SelectedOption || !SelectedOption.IsSelectable) && index >= 0 && index < SelectedTab.options.Count) {
                 currentOptionIndex += direction;
             }
 
@@ -339,8 +339,8 @@ namespace NSMB.UI.Pause.Options {
             if (sound)
                 GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
 
-            scroll.verticalNormalizedPosition = 0;
             Canvas.ForceUpdateCanvases();
+            scroll.verticalNormalizedPosition = 1;
         }
 
         public void SetTab(PauseOptionTab tab) {

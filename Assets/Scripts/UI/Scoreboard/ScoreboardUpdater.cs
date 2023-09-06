@@ -140,7 +140,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     private void OnAllPlayersLoaded() {
         CreateEntries();
 
-        if (Settings.Instance.genericScoreboardAlways)
+        if (Settings.Instance.generalScoreboardAlways)
             SetEnabled();
     }
 

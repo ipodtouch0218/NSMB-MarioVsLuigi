@@ -168,7 +168,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     async void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {
-        Debug.Log($"[Network] Receive host migration signal, we will become a {hostMigrationToken.GameMode}");
+        Debug.Log($"[Network] Starting host migration, we will become a {hostMigrationToken.GameMode}");
         MainMenuManager.WasHostMigration = true;
         GlobalController.Instance.connecting.SetActive(true);
 
@@ -182,6 +182,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             HostMigrationToken = hostMigrationToken,
             HostMigrationResume = HostMigrationResume,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
+            DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
             DisableClientSessionCreation = false,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
             Scene = 0,
@@ -194,7 +195,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         try {
             OnInput?.Invoke(runner, input);
         } catch (Exception e) {
-            Debug.LogError($"Caught an exception while handling OnInput: {e.Message}");
+            Debug.LogError($"[Network] Caught an exception while handling OnInput: {e.Message}");
         }
     }
 
@@ -221,7 +222,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 if (SessionData.Instance) {
                     // Inherited room data, change the host name to ours.
                     runner.SessionInfo.UpdateCustomProperties(new() {
-                        [Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname,
+                        [Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname,
                     });
                 } else {
                     // Create room data
@@ -400,7 +401,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host, int players = 10) {
-        GlobalController.Instance.connectionToken.nickname = Settings.Instance.genericNickname;
+        GlobalController.Instance.connectionToken.nickname = Settings.Instance.generalNickname;
 
         connecting++;
         int attempts = 3;
@@ -433,10 +434,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
             args.ConnectionToken = GlobalController.Instance.connectionToken.Serialize();
+            args.DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough;
             args.SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>();
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
 
-            args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.genericNickname;
+            args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname;
             args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;
 
             // Attempt to create the room
@@ -459,7 +461,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     public static async Task<StartGameResult> JoinRoom(string roomId) {
-        GlobalController.Instance.connectionToken.nickname = Settings.Instance.genericNickname;
+        GlobalController.Instance.connectionToken.nickname = Settings.Instance.generalNickname;
 
         connecting++;
 
@@ -481,6 +483,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             GameMode = GameMode.Client,
             SessionName = roomId,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
+            DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
             DisableClientSessionCreation = true,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
         });

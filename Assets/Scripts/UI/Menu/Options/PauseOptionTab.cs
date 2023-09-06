@@ -24,6 +24,10 @@ namespace NSMB.UI.Pause.Options {
 
         public virtual void Selected() {
             foreach (PauseOption option in options) {
+#if PLATFORM_WEBGL
+                if (option.hideOnWebGL)
+                    continue;
+#endif
                 option.gameObject.SetActive(true);
                 option.Deselected();
             }

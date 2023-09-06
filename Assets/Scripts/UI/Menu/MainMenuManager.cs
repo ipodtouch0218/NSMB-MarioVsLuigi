@@ -133,7 +133,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             // Controls & Settings
-            nicknameField.text = Settings.Instance.genericNickname;
+            nicknameField.text = Settings.Instance.generalNickname;
             nicknameField.characterLimit = NicknameMax;
             UpdateNickname();
 
@@ -234,8 +234,8 @@ namespace NSMB.UI.MainMenu {
 
             // Set the player settings
             PlayerData data = Runner.GetLocalPlayerData();
-            characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.genericCharacter);
-            SwapPlayerSkin(data ? data.SkinIndex : (byte) Settings.Instance.genericSkin, false);
+            characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.generalCharacter);
+            SwapPlayerSkin(data ? data.SkinIndex : (byte) Settings.Instance.generalSkin, false);
             spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
             // Set the room settings
@@ -530,7 +530,7 @@ namespace NSMB.UI.MainMenu {
                 characterDropdown.SetValueWithoutNotify(character);
             }
 
-            Settings.Instance.genericCharacter = character;
+            Settings.Instance.generalCharacter = character;
             Settings.Instance.SaveSettings();
 
             CharacterData data = ScriptableManager.Instance.characters[character];
@@ -559,7 +559,7 @@ namespace NSMB.UI.MainMenu {
 
             if (callback) {
                 LocalData.Rpc_SetSkinIndex(index);
-                Settings.Instance.genericSkin = index;
+                Settings.Instance.generalSkin = index;
                 Settings.Instance.SaveSettings();
             }
 
@@ -567,7 +567,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void UpdateNickname() {
-            validName = Settings.Instance.genericNickname.IsValidUsername();
+            validName = Settings.Instance.generalNickname.IsValidUsername();
             if (!validName) {
                 ColorBlock colors = nicknameField.colors;
                 colors.normalColor = new(1, 0.7f, 0.7f, 1);
@@ -582,7 +582,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void SetUsername(TMP_InputField field) {
-            Settings.Instance.genericNickname = field.text;
+            Settings.Instance.generalNickname = field.text;
             UpdateNickname();
 
             Settings.Instance.SaveSettings();

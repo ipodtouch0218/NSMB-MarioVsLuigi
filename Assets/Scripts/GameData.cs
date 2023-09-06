@@ -435,7 +435,7 @@ namespace NSMB.Game {
                 if (SessionData.Instance.Teams) {
                     Team team = ScriptableManager.Instance.teams[winningTeam];
                     winner = team.displayName;
-                    resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "teamname", winner);
+                    resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
                 } else {
                     string username = teamManager.GetTeamMembers(winningTeam).First().Data.GetNickname();
                     winner = username;

@@ -51,7 +51,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             SelectedRoom = room;
-            joinRoomButton.interactable = SelectedRoom && Settings.Instance.genericNickname.IsValidUsername(false);
+            joinRoomButton.interactable = SelectedRoom && Settings.Instance.generalNickname.IsValidUsername(false);
             lastSelectTime = Time.time;
         }
 

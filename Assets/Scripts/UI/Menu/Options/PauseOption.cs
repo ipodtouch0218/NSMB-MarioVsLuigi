@@ -10,11 +10,19 @@ namespace NSMB.UI.Pause.Options {
         //---Public Variables
         public RectTransform rectTransform;
 
+        //---Properties
+#if PLATFORM_WEBGL
+        public virtual bool IsSelectable => !hideOnWebGL;
+#else
+        public virtual bool IsSelectable => true;
+#endif
+
         //---Serialized Variables
         [SerializeField] private PauseOptionMenuManager manager;
         [SerializeField] internal TMP_Text label;
         [SerializeField] protected PauseOptionLoader loader;
         [SerializeField] public string translationKey;
+        [SerializeField] internal bool hideOnWebGL;
 
         //---Properties
         public bool IsSelected { get; private set; }
