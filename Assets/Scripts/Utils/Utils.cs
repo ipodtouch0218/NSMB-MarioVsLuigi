@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,6 @@ using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
-using System;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -243,8 +243,18 @@ namespace NSMB.Utils {
                         PhysicsShapeBuffer[j] = point;
                     }
 
-                    if (PolygonsOverlap(PhysicsShapeBuffer, BoxPointsBuffer))
+                    if (DoPolygonsOverlap(PhysicsShapeBuffer, BoxPointsBuffer)) {
+
+                        for (int j = 0; j < BoxPointsBuffer.Length; j++) {
+                            Debug.DrawLine(BoxPointsBuffer[j], BoxPointsBuffer[(j + 1) % BoxPointsBuffer.Length], Color.red);
+                        }
+
+                        for (int j = 0; j < PhysicsShapeBuffer.Count; j++) {
+                            Debug.DrawLine(PhysicsShapeBuffer[j], PhysicsShapeBuffer[(j + 1) % PhysicsShapeBuffer.Count], Color.green);
+                        }
+
                         return true;
+                    }
                 }
                 return false;
             }
@@ -252,22 +262,33 @@ namespace NSMB.Utils {
             return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
         }
 
-        public static bool PolygonsOverlap(IList<Vector2> polygonA, IList<Vector2> polygonB) {
-            int edgeCountA = polygonA.Count;
-            int edgeCountB = polygonB.Count;
-
-            // Loop through all the edges of both polygons
-            for (int i = 0; i < edgeCountA; i++) {
-                if (IsInside(polygonB, polygonA[i]))
+        // https://stackoverflow.com/questions/10635040/how-to-detect-overlapping-polygons
+        private static bool DoPolygonsOverlap(IList<Vector2> firstPolygon, IList<Vector2> secondPolygon) {
+            foreach (var item in firstPolygon) {
+                if (IsPointInPolygon(secondPolygon, item)) {
                     return true;
+                }
             }
-
-            for (int i = 0; i < edgeCountB; i++) {
-                if (IsInside(polygonA, polygonB[i]))
+            foreach (var item in secondPolygon) {
+                if (IsPointInPolygon(firstPolygon, item)) {
                     return true;
+                }
             }
-
             return false;
+        }
+
+        private static bool IsPointInPolygon(IList<Vector2> polygon, Vector2 testPoint) {
+            bool result = false;
+            int j = polygon.Count() - 1;
+            for (int i = 0; i < polygon.Count(); i++) {
+                if (polygon[i].y < testPoint.y && polygon[j].y >= testPoint.y || polygon[j].y < testPoint.y && polygon[i].y >= testPoint.y) {
+                    if (polygon[i].x + (testPoint.y - polygon[i].y) / (polygon[j].y - polygon[i].y) * (polygon[j].x - polygon[i].x) < testPoint.x) {
+                        result = !result;
+                    }
+                }
+                j = i;
+            }
+            return result;
         }
 
         public static bool IsTileSolidAtWorldLocation(Vector2 worldLocation) {
@@ -301,122 +322,13 @@ namespace NSMB.Utils {
                         PhysicsShapeBuffer[j] = point;
                     }
 
-                    if (IsInside(PhysicsShapeBuffer, worldLocation))
+                    if (IsPointInPolygon(PhysicsShapeBuffer, worldLocation))
                         return true;
                 }
                 return false;
             }
 
             return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
-        }
-
-        // Given three collinear points p, q, r,
-        // the function checks if point q lies
-        // on line segment 'pr'
-        private static bool OnSegment(Vector2 p, Vector2 q, Vector2 r) {
-            if (q.x <= Mathf.Max(p.x, r.x) &&
-                q.x >= Mathf.Min(p.x, r.x) &&
-                q.y <= Mathf.Max(p.y, r.y) &&
-                q.y >= Mathf.Min(p.y, r.y)) {
-                return true;
-            }
-            return false;
-        }
-
-        // To find orientation of ordered triplet (p, q, r).
-        // The function returns following values
-        // 0 --> p, q and r are collinear
-        // 1 --> Clockwise
-        // 2 --> Counterclockwise
-        private static float Orientation(Vector2 p, Vector2 q, Vector2 r) {
-            float val = (q.y - p.y) * (r.x - q.x) -
-                    (q.x - p.x) * (r.y - q.y);
-
-            if (Mathf.Abs(val) < 0.001f) {
-                return 0; // collinear
-            }
-            return (val > 0) ? 1 : 2; // clock or counterclock wise
-        }
-
-        // The function that returns true if
-        // line segment 'p1q1' and 'p2q2' intersect.
-        private static bool DoIntersect(Vector2 p1, Vector2 q1,
-                                Vector2 p2, Vector2 q2) {
-            // Find the four orientations needed for
-            // general and special cases
-            float o1 = Orientation(p1, q1, p2);
-            float o2 = Orientation(p1, q1, q2);
-            float o3 = Orientation(p2, q2, p1);
-            float o4 = Orientation(p2, q2, q1);
-
-            // General case
-            if (o1 != o2 && o3 != o4) {
-                return true;
-            }
-
-            // Special Cases
-            // p1, q1 and p2 are collinear and
-            // p2 lies on segment p1q1
-            if (o1 == 0 && OnSegment(p1, p2, q1)) {
-                return true;
-            }
-
-            // p1, q1 and p2 are collinear and
-            // q2 lies on segment p1q1
-            if (o2 == 0 && OnSegment(p1, q2, q1)) {
-                return true;
-            }
-
-            // p2, q2 and p1 are collinear and
-            // p1 lies on segment p2q2
-            if (o3 == 0 && OnSegment(p2, p1, q2)) {
-                return true;
-            }
-
-            // p2, q2 and q1 are collinear and
-            // q1 lies on segment p2q2
-            if (o4 == 0 && OnSegment(p2, q1, q2)) {
-                return true;
-            }
-
-            // Doesn't fall in any of the above cases
-            return false;
-        }
-
-        // Returns true if the point p lies
-        // inside the polygon[] with n vertices
-        private static bool IsInside(IList<Vector2> polygon, Vector2 p) {
-            // There must be at least 3 vertices in polygon[]
-            if (polygon.Count < 3) {
-                return false;
-            }
-
-            // Create a point for line segment from p to infinite
-            Vector2 extreme = new(1000, p.y);
-
-            // Count intersections of the above line
-            // with sides of polygon
-            int count = 0, i = 0;
-            do {
-                int next = (i + 1) % polygon.Count;
-
-                // Check if the line segment from 'p' to
-                // 'extreme' intersects with the line
-                // segment from 'polygon[i]' to 'polygon[next]'
-                if (DoIntersect(polygon[i], polygon[next], p, extreme)) {
-                    // If the point 'p' is collinear with line
-                    // segment 'i-next', then check if it lies
-                    // on segment. If it lies, return true, otherwise false
-                    if (Orientation(polygon[i], p, polygon[next]) == 0) {
-                        return OnSegment(polygon[i], p, polygon[next]);
-                    }
-                    count++;
-                }
-                i = next;
-            } while (i != 0);
-
-            // Return true if count is odd, false otherwise
-            return count % 2 == 1; // Same as (count%2 == 1)
         }
 
         public static bool IsAnyTileSolidBetweenWorldBox(Vector2 checkPosition, Vector2 checkSize, bool boxcast = true) {

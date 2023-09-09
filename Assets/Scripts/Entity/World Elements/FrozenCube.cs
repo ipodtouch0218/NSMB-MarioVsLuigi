@@ -55,6 +55,7 @@ namespace NSMB.Entities {
                 dieWhenInsideBlock = false;
             }
 
+            body.LockX = true;
             body.interpolationTarget.position = new(body.interpolationTarget.position.x, body.interpolationTarget.position.y, -4.5f);
         }
 
@@ -123,7 +124,6 @@ namespace NSMB.Entities {
                     body.Position = new(body.Position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
             }
 
-
             // Our entity despawned. remove.
             if (!FrozenEntity) {
                 Runner.Despawn(Object);
@@ -145,7 +145,7 @@ namespace NSMB.Entities {
                 //            body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
                 //    }
                 //}
-
+                body.LockX = false;
                 body.Velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
             }
 
@@ -346,9 +346,7 @@ namespace NSMB.Entities {
         //---Static
         public static void FreezeEntity(NetworkRunner runner, FreezableEntity entity) {
             Vector2 entityPosition = entity.body ? entity.body.Position : entity.transform.position;
-            Vector2 spawnPosition = entityPosition + entity.FrozenOffset;
-
-            Debug.Log($"offset: {entity.FrozenOffset}");
+            Vector2 spawnPosition = entityPosition - entity.FrozenOffset;
 
             runner.Spawn(PrefabList.Instance.Obj_FrozenCube, spawnPosition, onBeforeSpawned: (runner, obj) => {
                 FrozenCube cube = obj.GetComponent<FrozenCube>();

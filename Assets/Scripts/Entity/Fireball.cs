@@ -8,6 +8,7 @@ using NSMB.Tiles;
 
 namespace NSMB.Entities {
 
+    [OrderBefore(typeof(FrozenCube))]
     [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
     public class Fireball : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
@@ -176,9 +177,8 @@ namespace NSMB.Entities {
                 BreakEffectAnimCounter++;
 
             IsActive = false;
+            hitbox.enabled = IsActive;
             body.Freeze = true;
-
-            Debug.Log($"Destroyed on tick {Runner.Tick} at {body.Position}");
         }
 
         public override void OnIsActiveChanged() {

@@ -139,9 +139,9 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
             return Vector2.zero;
 
         if (LockX)
-            raycastVel.Set(0, raycastVel.y);
+            raycastVel.x = 0;
         if (LockY)
-            raycastVel.Set(raycastVel.x, 0);
+            raycastVel.y = 0;
 
         float distance = raycastVel.magnitude + Skin;
         Vector2 direction = raycastVel.normalized;
@@ -190,7 +190,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
                     float y = hit.point.y + hit.normal.y * -0.2f;
 
                     AddTileContacts(lowerBound, upperBound, y, InteractionDirection.Down);
-
                 }
 
             } else if (Mathf.Abs(angle) > 180 - maxFloorAngle) {
@@ -205,7 +204,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
                     float y = hit.point.y + hit.normal.y * -0.2f;
 
                     AddTileContacts(lowerBound, upperBound, y, InteractionDirection.Up);
-
                 }
 
             } else {
@@ -237,8 +235,13 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
             if (hit.distance <= 0) {
                 RaycastHit2D stuckHit = Runner.GetPhysicsScene2D().Raycast(raycastPos, (hit.point - raycastPos), Mathf.Max(size.x, size.y), filter);
                 if (stuckHit) {
-
                     Vector2 offset = stuckHit.normal * (Vector2.Distance(hit.point, stuckHit.point) + Skin + Skin + Skin);
+
+                    if (LockX)
+                        offset.x = 0;
+                    if (LockY)
+                        offset.y = 0;
+
                     Position += offset;
                     raycastPos += offset;
 
@@ -250,6 +253,12 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
             if (Vector2.Dot(positionToSurfacePoint, hit.normal) > 0) {
                 // Hit normal pushing us away from the wall
                 Vector2 offset = (Vector2) Vector3.Project(positionToSurfacePoint, hit.normal);
+
+                if (LockX)
+                    offset.x = 0;
+                if (LockY)
+                    offset.y = 0;
+
                 Position += offset;
                 raycastPos += offset;
                 direction = ((Vector2) Vector3.ProjectOnPlane(direction, hit.normal)).normalized;
@@ -261,11 +270,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
 
             Vector2 leftover = raycastVel - positionToSurfacePoint;
             leftover = bounceOnImpacts ? Vector2.Reflect(leftover, hit.normal) : Vector3.ProjectOnPlane(leftover, hit.normal);
-
-            if (LockX)
-                leftover.Set(0, leftover.y);
-            if (LockY)
-                leftover.Set(leftover.x, 0);
 
             return positionToSurfacePoint + CollideAndSlide(raycastPos + positionToSurfacePoint, leftover, gravityPass, depth + 1);
         }
