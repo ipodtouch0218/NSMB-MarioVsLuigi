@@ -5,7 +5,7 @@ using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
 
-public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
+public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IRemotePrefabCreated {
 
     //---Static Variables
     private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
@@ -43,10 +43,15 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick {
     private RawInterpolator positionInterpolator;
     private Vector2 previousRenderPosition;
 
-    public override void Spawned() {
-        Position = transform.position;
-        positionInterpolator = GetInterpolator(nameof(InternalPosition));
+    public void RemotePrefabCreated() {
+        transform.position = Position;
+    }
 
+    public override void Spawned() {
+        if (HasStateAuthority)
+            Position = transform.position;
+
+        positionInterpolator = GetInterpolator(nameof(InternalPosition));
         InterpolationDataSource = InterpolationDataSources.Predicted;
     }
 

@@ -51,6 +51,9 @@ namespace NSMB.UI.MainMenu {
                 mm.playerList.UpdateAllPlayerEntries();
                 mm.UpdateStartGameButton();
             }
+
+            if (Runner.IsServer)
+                Runner.PushHostMigrationSnapshot();
         }
 
         #region Level Index

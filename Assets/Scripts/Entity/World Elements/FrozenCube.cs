@@ -60,11 +60,25 @@ namespace NSMB.Entities {
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            Instantiate(PrefabList.Instance.Particle_IceBreak, transform.position, Quaternion.identity);
+            Instantiate(PrefabList.Instance.Particle_IceBreak, body.interpolationTarget.position + (CubeSize.y * 0.5f) * Vector3.up, Quaternion.identity);
         }
 
         public void LateUpdate() {
-            if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.body.interpolationTarget && body.interpolationTarget) {
+
+            if (!Object || IsDead || !body.interpolationTarget)
+                return;
+
+            // Shaking animation. Don't play if we're being held or moving fast, unless we're a player
+            if ((!Holder && !FastSlide) || FrozenEntity is PlayerController) {
+                float remainingTime = AutoBreakTimer.RemainingRenderTime(Runner) ?? 0f;
+                if (remainingTime < 1) {
+                    Vector3 newPosition = body.Position + Vector2.right * (Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount);
+                    newPosition.z = body.interpolationTarget.position.z;
+                    body.interpolationTarget.position = newPosition;
+                }
+            }
+
+            if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.body.interpolationTarget) {
                 Transform target = FrozenEntity.body.interpolationTarget.transform;
                 Vector2 newPos = (Vector2) body.interpolationTarget.position + EntityPositionOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
@@ -73,10 +87,11 @@ namespace NSMB.Entities {
         }
 
         public override void FixedUpdateNetwork() {
-            base.FixedUpdateNetwork();
 
-            if (!Object)
+            if (!Object || IsDead)
                 return;
+
+            base.FixedUpdateNetwork();
 
             gameObject.layer = (Holder || FastSlide) ? Layers.LayerEntity : Layers.LayerGroundEntity;
 
@@ -117,12 +132,6 @@ namespace NSMB.Entities {
 
             if (Holder)
                 return;
-
-            if (!FastSlide) {
-                float remainingTime = AutoBreakTimer.RemainingTime(Runner) ?? 0f;
-                if (remainingTime < 1f)
-                    body.Position = new(body.Position.x + Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount * Runner.DeltaTime, transform.position.y);
-            }
 
             // Our entity despawned. remove.
             if (!FrozenEntity) {
@@ -329,11 +338,16 @@ namespace NSMB.Entities {
             }
 
             IsDead = true;
+            body.Freeze = true;
             Runner.Despawn(Object);
         }
 
         public override void SpecialKill(bool right, bool groundpound, int combo) {
             Kill();
+        }
+
+        public override void OnFacingRightChanged() {
+            // Never rotate our sprite
         }
 
         //---OnChangeds

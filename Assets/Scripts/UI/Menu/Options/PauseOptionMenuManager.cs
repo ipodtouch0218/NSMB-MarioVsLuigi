@@ -307,7 +307,9 @@ namespace NSMB.UI.Pause.Options {
             } else {
                 // No selected option = tab selected
                 if (center) {
-                    scroll.verticalNormalizedPosition = 1f;
+                    Canvas.ForceUpdateCanvases();
+                    scroll.verticalNormalizedPosition = 1;
+                    Canvas.ForceUpdateCanvases();
                 }
             }
         }
@@ -341,6 +343,7 @@ namespace NSMB.UI.Pause.Options {
 
             Canvas.ForceUpdateCanvases();
             scroll.verticalNormalizedPosition = 1;
+            Canvas.ForceUpdateCanvases();
         }
 
         public void SetTab(PauseOptionTab tab) {

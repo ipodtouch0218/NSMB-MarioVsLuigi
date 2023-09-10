@@ -55,7 +55,7 @@ public class UserNametag : MonoBehaviour {
             }
         }
 
-        transform.position = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentTransform.sizeDelta;
+        transform.position = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentTransform.rect.size;
         transform.position += parentTransform.position - (Vector3) (parentTransform.pivot * parentTransform.rect.size);
 
         cachedNickname ??= data.GetNickname();

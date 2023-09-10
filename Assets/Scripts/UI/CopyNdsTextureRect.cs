@@ -15,8 +15,9 @@ public class CopyNdsTextureRect : MonoBehaviour {
         if (Settings.Instance.graphicsNdsEnabled) {
             CopyFromRect(GlobalController.Instance.ndsRect);
         } else {
-            rect.anchorMin = rect.anchorMax = Vector2.one * 0.5f;
-            rect.sizeDelta = Vector2.one * parentRect.rect.size;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.sizeDelta = Vector2.zero;
         }
     }
 

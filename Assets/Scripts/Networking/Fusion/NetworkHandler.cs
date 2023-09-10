@@ -178,7 +178,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
         RecreateInstance();
 
-        StartGameResult result = await Runner.StartGame(new() {
+        _ = Runner.StartGame(new() {
             HostMigrationToken = hostMigrationToken,
             HostMigrationResume = HostMigrationResume,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
@@ -208,28 +208,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         if (runner.IsServer && !runner.IsSinglePlayer) {
             // Create player data
-            PlayerData[] dataObjects = FindObjectsOfType<PlayerData>();
             PlayerData existingData = FindObjectsOfType<PlayerData>().Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player)).SingleOrDefault();
 
             if (existingData) {
-                runner.SetPlayerObject(player, existingData.Object);
-                existingData.JoinTick = -1;
+                existingData.ReassignPlayerData(player);
             } else {
                 runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
             }
 
-            if (player == runner.LocalPlayer) {
-                if (SessionData.Instance) {
-                    // Inherited room data, change the host name to ours.
-                    runner.SessionInfo.UpdateCustomProperties(new() {
-                        [Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname,
-                    });
-                } else {
-                    // Create room data
-                    NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
-                    SessionData.Instance = session.GetComponent<SessionData>();
-                }
-            }
             Runner.PushHostMigrationSnapshot();
         }
 
@@ -312,7 +298,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         Instance = Instantiate(prefab).GetComponent<NetworkHandler>();
         Instance.Initialize();
-        Debug.Log("[Network] NetworkHandler created");
+        //Debug.Log("[Network] NetworkHandler created");
     }
 
     public void Initialize() {
@@ -429,7 +415,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 return null;
             }
 
-            Debug.Log($"[Network] Creating a game in {CurrentRegion} with the ID {idBuilder}");
+            if (gamemode == GameMode.Single) {
+                Debug.Log($"[Network] Creating a singleplayer game");
+            } else {
+                Debug.Log($"[Network] Creating a game in {CurrentRegion} with the ID {idBuilder}");
+            }
+
             args.AuthValues = authValues;
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
@@ -437,6 +428,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough;
             args.SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>();
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
+            args.Initialized = RoomInitialized;
 
             args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname;
             args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;
@@ -486,6 +478,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
             DisableClientSessionCreation = true,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
+            Initialized = RoomInitialized,
         });
         if (!result.Ok) {
             Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
@@ -541,42 +534,46 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         OnRegionPingsUpdated?.Invoke();
     }
 
-    private void HostMigrationResume(NetworkRunner runner) {
+    private static void RoomInitialized(NetworkRunner runner) {
+        if (runner.IsServer) {
+            NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
+            SessionData.Instance = session.GetComponent<SessionData>();
+        }
+    }
+
+    private static void HostMigrationResume(NetworkRunner runner) {
+
+        if (runner.IsServer) {
+            // Update the room's name to be our own.
+            runner.SessionInfo.UpdateCustomProperties(new() {
+                [Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname,
+            });
+        }
 
         foreach (var resumeNO in runner.GetResumeSnapshotNetworkObjects()) {
+            if (resumeNO.TryGetComponent(out SessionData _)) {
+                runner.Spawn(resumeNO, onBeforeSpawned: (runner, newNO) => {
+                    newNO.CopyStateFrom(resumeNO);
+                });
+            } else if (resumeNO.TryGetComponent(out PlayerData pd)) {
 
-            if (resumeNO.TryGetComponent(out PlayerData data)) {
-                if (resumeNO.InputAuthority == runner.SessionInfo.MaxPlayers - 1)
+                // Don't respawn the PlayerData for the host that just left. Stupid.
+                if (pd.Object.InputAuthority == runner.SessionInfo.MaxPlayers - 1)
                     continue;
 
-                PlayerRef newAuthority = resumeNO.InputAuthority;
-                if (newAuthority != PlayerRef.None) {
-                    if (newAuthority == runner.SessionInfo.MaxPlayers - 1)
-                        newAuthority = PlayerRef.None;
-                    else if (newAuthority == 0)
-                        newAuthority = runner.SessionInfo.MaxPlayers - 1;
-                    else
-                        newAuthority -= 1;
-                }
+                // Oh, and immediately assign our own. We're greedy :)
+                // (not doing it breaks stuff cuz EnterRoom is called first...)
+                PlayerRef? player = null;
+                if (pd.GetUserIdString() == runner.GetPlayerUserId())
+                    player = runner.LocalPlayer;
 
-                runner.Spawn(resumeNO, inputAuthority: newAuthority, onBeforeSpawned: (runner, newNO) => {
+                runner.Spawn(resumeNO, inputAuthority: player, onBeforeSpawned: (runner, newNO) => {
                     newNO.CopyStateFrom(resumeNO);
                 });
             }
-
-            //if (resumeNO.TryGetComponent(out PlayerData data) && resumeNO.InputAuthority == runner.SessionInfo.MaxPlayers - 1) {
-            //    // Don't bring over the old host's data.
-            //    continue;
-            //}
-
-            //runner.Spawn(resumeNO, inputAuthority: newAuthority, onBeforeSpawned: (runner, newNO) => {
-            //    newNO.CopyStateFrom(resumeNO);
-            //});
         }
 
-        //foreach ((var resumeNO, NetworkObjectHeaderPtr pointer) in runner.GetResumeSnapshotNetworkSceneObjects()) {
-        //    Debug.Log(resumeNO.Name + " - " + pointer);
-        //    resumeNO.CopyStateFromSceneObject(pointer);
-        //}
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.EnterRoom(false);
     }
 }

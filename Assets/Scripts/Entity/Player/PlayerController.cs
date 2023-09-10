@@ -1746,9 +1746,10 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            hit = Runner.GetPhysicsScene2D().BoxCast(body.Position + Vector2.up * 0.15f, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
+            Vector2 startPos = body.Position + Vector2.up * 0.15f;
+            hit = Runner.GetPhysicsScene2D().BoxCast(startPos, new Vector2(WorldHitboxSize.x, 0.05f), 0, Vector2.down, 0.4f, Layers.MaskAnyGround);
             if (hit) {
-                // body.Position = new(body.Position.x, hit.point.y + Physics2D.defaultContactOffset);
+                body.Position = startPos + (Vector2.down * hit.distance);
                 return true;
             }
 

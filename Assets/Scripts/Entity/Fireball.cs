@@ -217,7 +217,8 @@ namespace NSMB.Entities {
             if (!IsActive)
                 return;
 
-            if (!Runner.IsServer && !player.HasInputAuthority)
+            // Don't interact with proxies
+            if (IsProxy)
                 return;
 
             // Check if they own us. If so, don't collide.

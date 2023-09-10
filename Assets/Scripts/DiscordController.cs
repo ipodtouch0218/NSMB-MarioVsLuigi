@@ -88,7 +88,8 @@ public class DiscordController : MonoBehaviour {
             return;
 
         Activity activity = new();
-        session ??= NetworkHandler.Runner?.SessionInfo;
+        if (!session && NetworkHandler.Runner)
+            session = NetworkHandler.Runner.SessionInfo;
 
         TranslationManager tm = GlobalController.Instance.translationManager;
 

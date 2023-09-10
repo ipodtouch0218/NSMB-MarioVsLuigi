@@ -117,7 +117,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.375, y: 0.4}
+  m_Size: {x: 0.35, y: 0.4}
   m_EdgeRadius: 0
 --- !u!114 &8906202613893743769
 MonoBehaviour:
@@ -299,9 +299,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _Position: {x: 0, y: 0}
   _Velocity: {x: 0, y: 0}
   _Freeze:
+    _value: 0
+  _LockX:
+    _value: 0
+  _LockY:
     _value: 0
   _Gravity: {x: 0, y: -21.582}
   _Data:

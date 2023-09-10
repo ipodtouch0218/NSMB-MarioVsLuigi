@@ -70,23 +70,37 @@ public class PlayerData : NetworkBehaviour {
             ConnectionToken = new();
         }
 
-        if (Runner.IsResume) {
-            if (Runner.IsServer) {
-                JoinTick = -1;
-            }
-        } else {
-            JoinTick = Runner.Tick;
-        }
+        JoinTick = Runner.Tick;
 
-        if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1)
+        if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1) {
             Team = 0;
-        else
+            IsRoomOwner = true;
+        } else {
             Team = (sbyte) ((Object.InputAuthority + 1) % 5);
+        }
+    }
+
+    public void ReassignPlayerData(PlayerRef player) {
+        Object.AssignInputAuthority(player);
+        Runner.SetPlayerObject(player, Object);
+
+        if (player == Runner.LocalPlayer) {
+            JoinTick = -1;
+            IsRoomOwner = true;
+        }
     }
 
     public override void Spawned() {
         // Keep track of our data, pls kthx
         Runner.SetPlayerObject(Object.InputAuthority, Object);
+
+        if (Runner.IsResume) {
+            SetNickname(ConnectionToken.nickname.Value);
+            Ping = 0;
+        }
+
+        IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
+        nicknameColor = NicknameColor.FromConnectionToken(ConnectionToken);
 
         if (SessionData.Instance)
             SessionData.Instance.LoadWins(this);
@@ -96,20 +110,16 @@ public class PlayerData : NetworkBehaviour {
             Rpc_SetCharacterIndex((byte) Settings.Instance.generalCharacter);
             Rpc_SetSkinIndex((byte) Settings.Instance.generalSkin);
 
-            if (Runner.IsServer)
-                IsRoomOwner = true;
-
             PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenToggled;
         }
 
-        IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
+        // Check if we need to play sfx / send a chat message
+        if (SessionData.PlayersNeedingJoinMessage.Remove(Object.InputAuthority)) {
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
 
-        if (MainMenuManager.Instance)
-            MainMenuManager.Instance.OnPlayerDataValidated();
-
-        ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
-
-        nicknameColor = NicknameColor.FromConnectionToken(ConnectionToken);
+            if (MainMenuManager.Instance)
+                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
+        }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -144,15 +154,18 @@ public class PlayerData : NetworkBehaviour {
 
         RawNickname = name;
 
-        // Check for players with duplicate names, and add (1), (2), etc
-        int count = Runner.ActivePlayers
-            .Select(pr => pr.GetPlayerData(Runner))
-            .Where(pd => pd && pd.Object)
-            .Where(pd => pd.RawNickname.ToString().Filter() == name)
-            .Count();
+        if (Object.InputAuthority != Runner.SessionInfo.MaxPlayers - 1) {
+            // Check for players with duplicate names, and add (1), (2), etc
+            int count = Runner.ActivePlayers
+                .Where(pr => pr < Object.InputAuthority)
+                .Select(pr => pr.GetPlayerData(Runner))
+                .Where(pd => pd && pd.Object)
+                .Where(pd => pd.RawNickname.ToString().Filter() == name)
+                .Count();
 
-        if (count > 0)
-            name += " (" + count + ")";
+            if (count > 0)
+                name += " (" + count + ")";
+        }
 
         DisplayNickname = name;
     }

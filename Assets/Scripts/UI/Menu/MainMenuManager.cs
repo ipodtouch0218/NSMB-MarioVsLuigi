@@ -80,15 +80,12 @@ namespace NSMB.UI.MainMenu {
             NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
             NetworkHandler.OnConnectFailed += OnConnectFailed;
             NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
+            NetworkHandler.OnHostMigration += OnHostMigration;
             MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
 
             ControlSystem.controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
-        }
-
-        private void OnSceneLoadStart() {
-            GlobalController.Instance.loadingCanvas.Initialize();
         }
 
         public void OnDisable() {
@@ -100,6 +97,7 @@ namespace NSMB.UI.MainMenu {
             NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
             NetworkHandler.OnConnectFailed -= OnConnectFailed;
             NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
+            NetworkHandler.OnHostMigration -= OnHostMigration;
             MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
 
             ControlSystem.controls.UI.Pause.performed -= OnPause;
@@ -165,7 +163,7 @@ namespace NSMB.UI.MainMenu {
             bool connectedToNetwork = NetworkHandler.Connected && !Runner.SessionInfo;
             bool connectingToNetwork = NetworkHandler.Connecting || Runner.SessionInfo;
 
-            GlobalController.Instance.connecting.SetActive(connectingToNetwork && lobbyMenu.activeInHierarchy);
+            GlobalController.Instance.connecting.SetActive((connectingToNetwork && lobbyMenu.activeInHierarchy) || WasHostMigration);
 
             joinRoomBtn.interactable = connectedToNetwork && roomManager.SelectedRoom != null && validName;
             createRoomBtn.interactable = connectedToNetwork && validName;
@@ -212,7 +210,6 @@ namespace NSMB.UI.MainMenu {
                 chat.ReplayChatMessages();
 
             } else if (WasHostMigration) {
-                WasHostMigration = false;
 
                 // Host chat notification
                 if (Runner.IsServer)
@@ -220,6 +217,7 @@ namespace NSMB.UI.MainMenu {
 
             } else {
                 chat.ClearChat();
+                chatTextField.SetTextWithoutNotify("");
 
                 // Host chat notification
                 if (Runner.IsServer)
@@ -228,7 +226,11 @@ namespace NSMB.UI.MainMenu {
 
             // Open the in-room menu
             OpenInRoomMenu();
-            StartCoroutine(ResetRoomSettingScrollPosition());
+
+            if (!WasHostMigration) {
+                // Fix the damned setting scroll menu
+                StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
+            }
 
             playerList.RemoveAllPlayerEntries();
 
@@ -245,23 +247,40 @@ namespace NSMB.UI.MainMenu {
             // Preview the current level
             PreviewLevel(SessionData.Instance.Level);
 
-            // Reset chat input field
-            chatTextField.SetTextWithoutNotify("");
-
             // Reset the "Game start" button counting down
             OnCountdownTick(-1);
 
-            // Update the room header text
-            SessionInfo session = Runner.SessionInfo;
-            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
-            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
+            // Update the room header text + color
+            UpdateRoomHeader();
 
             // Discord RPC
-            GlobalController.Instance.discordController.UpdateActivity(session);
+            GlobalController.Instance.discordController.UpdateActivity();
 
-            // Host-based header color
+            WasHostMigration = false;
+        }
+
+        public void UpdateRoomHeader() {
+            string name;
+            if (Runner.IsServer && Runner.IsResume) {
+                // In this case, the session property will be incorrect. Because fuck you, that's why.
+                // The PlayerData should exist, though
+                name = Runner.GetLocalPlayerData().RawNickname;
+            } else {
+                SessionInfo session = Runner.SessionInfo;
+                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out name);
+            }
+            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
+
             UnityEngine.Random.InitState(name.GetHashCode() + 2035767);
-            colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
+            colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0.5f, 1f, 0f, 1f);
+        }
+
+        private IEnumerator SetVerticalNormalizedPositionFix(ScrollRect scroll, float value) {
+            for (int i = 0; i < 3; i++) {
+                scroll.verticalNormalizedPosition = value;
+                Canvas.ForceUpdateCanvases();
+                yield return null;
+            }
         }
 
         public void PreviewLevel(int levelIndex) {
@@ -269,12 +288,6 @@ namespace NSMB.UI.MainMenu {
                 levelIndex = 0;
 
             Camera.main.transform.position = maps[levelIndex].levelPreviewPosition.transform.position;
-        }
-
-        private IEnumerator ResetRoomSettingScrollPosition() {
-            settingsScroll.verticalNormalizedPosition = 1;
-            yield return null;
-            settingsScroll.verticalNormalizedPosition = 1;
         }
 
         private void DisableAllMenus() {
@@ -641,15 +654,6 @@ namespace NSMB.UI.MainMenu {
         }
 
         // ROOM CALLBACKS
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-            UpdateStartGameButton();
-        }
-
-        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-            sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
-            UpdateStartGameButton();
-            GlobalController.Instance.discordController.UpdateActivity();
-        }
 
         // CONNECTION CALLBACKS
         public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
@@ -707,10 +711,7 @@ namespace NSMB.UI.MainMenu {
             //TODO: RTL FONT
 
             if (Runner && Runner.SessionInfo) {
-                SessionInfo session = Runner.SessionInfo;
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string name);
-                lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
-                //lobbyHeaderText.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
+                UpdateRoomHeader();
 
                 if (SessionData.Instance.Object) {
                     OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
@@ -718,7 +719,6 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        //---Callbacks
         public void OnCountdownTick(int time) {
             TranslationManager tm = GlobalController.Instance.translationManager;
             if (time > 0) {
@@ -740,16 +740,33 @@ namespace NSMB.UI.MainMenu {
             startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
-        public void OnPlayerDataValidated() {
-            sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
+        private void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+            UpdateStartGameButton();
+
+            if (player != runner.LocalPlayer)
+                SessionData.PlayersNeedingJoinMessage.Add(player);
         }
 
-        public void OnRegionPingsUpdated() {
+        private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+            sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
+            UpdateStartGameButton();
+            GlobalController.Instance.discordController.UpdateActivity();
+        }
+
+        private void OnRegionPingsUpdated() {
             UpdateRegionDropdown();
         }
 
-#if UNITY_EDITOR
+        private void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {
+            playerList.RemoveAllPlayerEntries();
+        }
+
+        private void OnSceneLoadStart() {
+            GlobalController.Instance.loadingCanvas.Initialize();
+        }
+
         //---Debug
+#if UNITY_EDITOR
         private static readonly Vector3 MaxCameraSize = new(16f/9f * 7f, 7f);
 
         public void OnDrawGizmos() {

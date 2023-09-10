@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 
 public class NumberParticle : MonoBehaviour {
@@ -10,7 +11,7 @@ public class NumberParticle : MonoBehaviour {
 
     //---Components
     [SerializeField] private AnimationCurve yMovement;
-    [SerializeField] private new Animation animation;
+    [SerializeField, FormerlySerializedAs("animation")] private Animation legacyAnimation;
 
     //---Private Variables
     private MaterialPropertyBlock mpb;
@@ -21,7 +22,7 @@ public class NumberParticle : MonoBehaviour {
 
     public void OnValidate() {
         if (!text) text = GetComponentInChildren<TMP_Text>();
-        if (!animation) animation = GetComponentInChildren<Animation>();
+        if (!legacyAnimation) legacyAnimation = GetComponentInChildren<Animation>();
     }
 
     public void Update() {
@@ -45,7 +46,7 @@ public class NumberParticle : MonoBehaviour {
         mpb.SetColor("_Color", color);
         mr.SetPropertyBlock(mpb);
 
-        animation.enabled = final;
+        legacyAnimation.enabled = final;
 
         spawnTime = Time.time;
         Destroy(gameObject.transform.parent.gameObject, final ? 1.42f : 0.666f);

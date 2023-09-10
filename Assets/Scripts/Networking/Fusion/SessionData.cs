@@ -5,13 +5,14 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Extensions;
-using NSMB.Utils;
 using NSMB.UI.MainMenu;
+using NSMB.Utils;
 
 public class SessionData : NetworkBehaviour {
 
     //---Static Variables
     public static SessionData Instance;
+    public static HashSet<PlayerRef> PlayersNeedingJoinMessage = new();
     private static readonly WaitForSeconds WaitTwoSeconds = new(2);
 
 #pragma warning disable CS0414
@@ -58,11 +59,14 @@ public class SessionData : NetworkBehaviour {
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
+        Instance = this;
     }
 
     public override void Spawned() {
-        if (Instance != this) {
-            Instance = this;
+        Instance = this;
+
+        if (!Runner.IsResume) {
+            PlayersNeedingJoinMessage.Clear();
             if (MainMenuManager.Instance)
                 MainMenuManager.Instance.EnterRoom(false);
         }
