@@ -92,14 +92,13 @@ namespace NSMB.Game {
             // By default, spectate. when we get assigned a player object, we disable it there.
             gm.spectationManager.Spectating = true;
 
-            if (Runner.IsServer && Runner.IsSinglePlayer && !Runner.IsResume) {
+            if (Runner.IsServer && Runner.IsSinglePlayer) {
                 // Handle spawning in editor by spawning the room + player data objects
-                Runner.Spawn(PrefabList.Instance.SessionDataHolder);
                 NetworkObject localData = Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
                 Runner.SetPlayerObject(Runner.LocalPlayer, localData);
             }
 
-            if (GameStartTime <= 0 && !Runner.IsResume && !GameStartTimer.IsRunning) {
+            if (GameStartTime <= 0 && !GameStartTimer.IsRunning) {
                 // The game hasn't started.
                 // Tell our host that we're done loading
                 PlayerData localData = Runner.GetLocalPlayerData();

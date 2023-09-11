@@ -237,8 +237,6 @@ namespace NSMB.Entities.Player {
         private Enums.Particle footstepParticle = Enums.Particle.None;
         private bool footstepVariant;
 
-        public Vector2 previousTickVelocity, previousTickPosition;
-
         private int noLivesStarSpawnDirection;
 
         #region //---MOVEMENT STAGES & CONSTANTS
@@ -323,8 +321,6 @@ namespace NSMB.Entities.Player {
         }
 
         public void BeforeTick() {
-            previousTickPosition = body.Position;
-            previousTickVelocity = body.Velocity;
             HandleLayerState();
             IsOnGround = GroundSnapCheck();
         }
@@ -814,7 +810,7 @@ namespace NSMB.Entities.Player {
                     if (other.State == Enums.PowerupState.MiniMushroom)
                         other.DoKnockback(!fromRight, dropStars ? 1 : 0, false, Object);
 
-                } else if (Mathf.Abs(previousTickVelocity.x) > WalkingMaxSpeed || Mathf.Abs(other.previousTickVelocity.x) > WalkingMaxSpeed) {
+                } else if (Mathf.Abs(body.Velocity.x) > WalkingMaxSpeed || Mathf.Abs(other.body.Velocity.x) > WalkingMaxSpeed) {
                     // Bump
                     if (IsOnGround)
                         DoKnockback(fromRight, dropStars ? 1 : 0, true, other.Object);
@@ -1440,13 +1436,13 @@ namespace NSMB.Entities.Player {
 
         #region -- TILE COLLISIONS --
         private void HandleMegaTiles(bool pipes) {
-            //TODO?
+
             if (State != Enums.PowerupState.MegaMushroom || MegaStartTimer.IsActive(Runner))
                 return;
 
             Vector2 checkSize = WorldHitboxSize * 1.1f;
 
-            bool grounded = previousTickVelocity.y < -8f && IsOnGround;
+            bool grounded = body.Velocity.y < -8f && IsOnGround;
             Vector2 offset = Vector2.zero;
             if (grounded)
                 offset = Vector2.down * 0.5f;
@@ -1685,7 +1681,7 @@ namespace NSMB.Entities.Player {
                 if (!tile && GameManager.Instance.semisolidTilemap)
                     tile = GameManager.Instance.semisolidTilemap.GetTile<TileWithProperties>((Vector3Int) Utils.Utils.WorldToTilemapPosition(hit.point));
 
-                float x = Mathf.Abs(FloorAngle - angle) > 1f && Mathf.Abs(angle) > 1f ? previousTickVelocity.x : body.Velocity.x;
+                float x = Mathf.Abs(FloorAngle - angle) > 1f && Mathf.Abs(angle) > 1f ? body.PreviousTickVelocity.x : body.Velocity.x;
 
                 FloorAngle = angle;
 
@@ -1705,7 +1701,7 @@ namespace NSMB.Entities.Player {
                     if (!tile && GameManager.Instance.semisolidTilemap)
                         tile = GameManager.Instance.semisolidTilemap.GetTile<TileWithProperties>((Vector3Int) Utils.Utils.WorldToTilemapPosition(hit.point));
 
-                    float x = Mathf.Abs(FloorAngle - angle) > 1f && Mathf.Abs(angle) > 1f ? previousTickVelocity.x : body.Velocity.x;
+                    float x = Mathf.Abs(FloorAngle - angle) > 1f && Mathf.Abs(angle) > 1f ? body.PreviousTickVelocity.x : body.Velocity.x;
 
                     FloorAngle = angle;
 
@@ -2206,7 +2202,11 @@ namespace NSMB.Entities.Player {
 
                 if (Mathf.Sign(speed) == Mathf.Sign(acc)) {
                     // Clamp only if accelerating
-                    newX = Mathf.Clamp(newX, -max, max);
+                    if (acc > 0) {
+                        newX = Mathf.Max(newX, -max);
+                    } else {
+                        newX = Mathf.Min(newX, max);
+                    }
                 }
 
                 if (IsSkidding && !IsTurnaround && (Mathf.Sign(newX) != sign || speed < 0.05f)) {
@@ -2269,7 +2269,7 @@ namespace NSMB.Entities.Player {
 
         private static readonly Vector2 StuckInBlockSizeCheck = new(0.9f, 0.9f);
         private bool HandleStuckInBlock() {
-            if (!body || State == Enums.PowerupState.MegaMushroom || CurrentPipe)
+            if (CurrentPipe || MegaStartTimer.IsActive(Runner) || (MegaEndTimer.IsActive(Runner) && IsStationaryMegaShrink))
                 return false;
 
             Vector2 checkSize = WorldHitboxSize * StuckInBlockSizeCheck;
@@ -2293,7 +2293,7 @@ namespace NSMB.Entities.Player {
                 // Code for mario to instantly teleport to the closest free position when he gets stuck
 
                 // Prevent mario from clipping to the floor if we got pushed in via our hitbox changing (shell on ice, for example)
-                body.Position = previousTickPosition;
+                body.Position = body.PreviousTickPosition;
                 origin = body.Position + (checkSize * 0.5f * Vector2.up);
 
                 int angle = 45;
@@ -2322,7 +2322,7 @@ namespace NSMB.Entities.Player {
                     }
                 }
 
-                body.Position = previousTickPosition;
+                body.Position = body.PreviousTickPosition;
             }
 
             body.Gravity = Vector2.zero;
@@ -2333,16 +2333,17 @@ namespace NSMB.Entities.Player {
         public void FinishMegaMario(bool success) {
             if (success) {
                 MegaTimer = TickTimer.CreateFromSeconds(Runner, 15f);
+                body.Freeze = false;
             } else {
                 // Hit a ceiling, cancel
                 State = Enums.PowerupState.Mushroom;
                 MegaEndTimer = TickTimer.CreateFromSeconds(Runner, megaStartTime - MegaStartTimer.RemainingTime(Runner) ?? 0f);
                 MegaStartTimer = TickTimer.None;
                 MegaTimer = TickTimer.None;
+                body.Freeze = true;
                 IsStationaryMegaShrink = true;
                 StoredPowerup = Enums.PowerupState.MegaMushroom;
             }
-            body.Freeze = false;
         }
 
         private void HandleFacingDirection(bool left, bool right) {
@@ -2472,8 +2473,6 @@ namespace NSMB.Entities.Player {
 
             if (MegaEndTimer.IsRunning && IsStationaryMegaShrink) {
                 body.Velocity = Vector2.zero;
-                body.Freeze = true;
-                transform.position = body.Position = previousTickPosition;
 
                 if (MegaEndTimer.Expired(Runner)) {
                     DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);

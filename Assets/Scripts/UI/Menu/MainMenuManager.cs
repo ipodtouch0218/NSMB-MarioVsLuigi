@@ -742,9 +742,6 @@ namespace NSMB.UI.MainMenu {
 
         private void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
             UpdateStartGameButton();
-
-            if (player != runner.LocalPlayer)
-                SessionData.PlayersNeedingJoinMessage.Add(player);
         }
 
         private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {

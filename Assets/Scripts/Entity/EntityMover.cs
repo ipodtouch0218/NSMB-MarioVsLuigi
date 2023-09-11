@@ -5,7 +5,7 @@ using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
 
-public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IRemotePrefabCreated {
+public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
 
     //---Static Variables
     private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
@@ -20,6 +20,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IRemotePre
     [Networked] public NetworkBool LockY { get; set; }
     [Networked] public Vector2 Gravity { get; set; }
     [Networked] public ref PhysicsDataStruct Data => ref MakeRef<PhysicsDataStruct>();
+    [Networked] public Vector2 PreviousTickPosition { get; private set; }
+    [Networked] public Vector2 PreviousTickVelocity { get; private set; }
 
     //---Properties
     public Vector2 Position {
@@ -43,10 +45,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IRemotePre
     private RawInterpolator positionInterpolator;
     private Vector2 previousRenderPosition;
 
-    public void RemotePrefabCreated() {
-        transform.position = Position;
-    }
-
     public override void Spawned() {
         if (HasStateAuthority)
             Position = transform.position;
@@ -60,6 +58,15 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IRemotePre
     }
 
     public void AfterTick() {
+        transform.position = Position;
+    }
+
+    public void AfterAllTicks(bool resimulation, int ticks) {
+        PreviousTickPosition = Position;
+        PreviousTickVelocity = Velocity;
+    }
+
+    public void RemotePrefabCreated() {
         transform.position = Position;
     }
 

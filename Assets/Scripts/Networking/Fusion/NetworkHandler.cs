@@ -204,13 +204,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        Debug.Log($"[Network] Player joined room (UserId = {runner.GetPlayerUserId(player)})");
 
+        // Handle PlayerDatas
+        bool hadExistingData = false;
         if (runner.IsServer && !runner.IsSinglePlayer) {
-            // Create player data
             PlayerData existingData = FindObjectsOfType<PlayerData>().Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player)).SingleOrDefault();
+            hadExistingData = existingData;
 
-            if (existingData) {
+            if (hadExistingData) {
                 existingData.ReassignPlayerData(player);
             } else {
                 runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
@@ -219,6 +220,15 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             Runner.PushHostMigrationSnapshot();
         }
 
+        // Require a join message
+        if (!hadExistingData) {
+            SessionData.PlayersNeedingJoinMessage.Add(player);
+            PlayerData data = player.GetPlayerData(runner);
+            if (data)
+                data.SendJoinMessageIfNeeded();
+        }
+
+        // Update Discord integration
         if (player != runner.LocalPlayer)
             GlobalController.Instance.discordController.UpdateActivity();
 
@@ -535,20 +545,26 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     private static void RoomInitialized(NetworkRunner runner) {
+
+        SessionData.PlayersNeedingJoinMessage.Clear();
+
         if (runner.IsServer) {
             NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
-            SessionData.Instance = session.GetComponent<SessionData>();
+
+            if (session)
+                SessionData.Instance = session.GetComponent<SessionData>();
         }
     }
 
     private static void HostMigrationResume(NetworkRunner runner) {
 
-        if (runner.IsServer) {
-            // Update the room's name to be our own.
-            runner.SessionInfo.UpdateCustomProperties(new() {
-                [Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname,
-            });
-        }
+        if (!runner.IsServer)
+            return;
+
+        // Update the room's name to be our own.
+        runner.SessionInfo.UpdateCustomProperties(new() {
+            [Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname,
+        });
 
         foreach (var resumeNO in runner.GetResumeSnapshotNetworkObjects()) {
             if (resumeNO.TryGetComponent(out SessionData _)) {

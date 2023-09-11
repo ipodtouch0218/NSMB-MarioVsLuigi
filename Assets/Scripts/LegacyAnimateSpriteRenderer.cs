@@ -8,7 +8,9 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
     public bool isDisplaying = true;
 
     //---Serialized Variables
+#if UNITY_EDITOR
     [SerializeField] private bool runInEditor = false;
+#endif
     [SerializeField] private float frame; // Must be a float because legacy animators dont support ints, apparently?
     [SerializeField] private float fps = 8;
     [SerializeField] public Sprite[] frames;

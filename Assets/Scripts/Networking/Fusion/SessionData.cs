@@ -66,7 +66,6 @@ public class SessionData : NetworkBehaviour {
         Instance = this;
 
         if (!Runner.IsResume) {
-            PlayersNeedingJoinMessage.Clear();
             if (MainMenuManager.Instance)
                 MainMenuManager.Instance.EnterRoom(false);
         }

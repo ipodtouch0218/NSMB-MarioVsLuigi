@@ -17,16 +17,6 @@ namespace NSMB.UI.MainMenu {
         //---Properties
         private NetworkRunner Runner => NetworkHandler.Instance.runner;
 
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-            AddPlayerEntry(player);
-            UpdateAllPlayerEntries();
-        }
-
-        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-            RemovePlayerEntry(player);
-            UpdateAllPlayerEntries();
-        }
-
         public void OnEnable() {
             if (!NetworkHandler.Instance.runner)
                 return;
@@ -66,11 +56,13 @@ namespace NSMB.UI.MainMenu {
                 go.SetActive(true);
             }
 
-            UpdatePlayerEntry(player);
+            UpdateAllPlayerEntries();
         }
 
         public void RemoveAllPlayerEntries() {
-            playerListEntries.Values.ToList().ForEach(entry => Destroy(entry.gameObject));
+            foreach ((_, PlayerListEntry entry) in playerListEntries) {
+                Destroy(entry.gameObject);
+            }
             playerListEntries.Clear();
         }
 
@@ -80,6 +72,7 @@ namespace NSMB.UI.MainMenu {
 
             Destroy(playerListEntries[player].gameObject);
             playerListEntries.Remove(player);
+            UpdateAllPlayerEntries();
         }
 
         public void UpdateAllPlayerEntries() {
@@ -118,6 +111,15 @@ namespace NSMB.UI.MainMenu {
                 return playerListEntries[player];
 
             return null;
+        }
+
+        //---Callbacks
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+            AddPlayerEntry(player);
+        }
+
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+            RemovePlayerEntry(player);
         }
     }
 }

@@ -47,9 +47,9 @@ namespace NSMB.UI.MainMenu {
             ChangeCustomPowerups(roomData.CustomPowerups);
             SetRoomIdVisibility(isRoomCodeVisible);
 
-            if (MainMenuManager.Instance is MainMenuManager mm) {
-                mm.playerList.UpdateAllPlayerEntries();
-                mm.UpdateStartGameButton();
+            if (MainMenuManager.Instance) {
+                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
+                MainMenuManager.Instance.UpdateStartGameButton();
             }
 
             if (Runner.IsServer)

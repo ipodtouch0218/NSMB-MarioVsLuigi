@@ -15,7 +15,6 @@ using NSMB.Entities.Collectable;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Tiles;
-using UnityEditor;
 
 namespace NSMB.Game {
     public class GameManager : MonoBehaviour {
@@ -141,7 +140,7 @@ namespace NSMB.Game {
             // Handles spawning in editor
             if (!NetworkHandler.Runner.SessionInfo.IsValid) {
                 // Join a singleplayer room if we're not in one
-                _ = await NetworkHandler.CreateRoom(new() {
+                await NetworkHandler.CreateRoom(new() {
                     Scene = SceneManager.GetActiveScene().buildIndex,
                 }, GameMode.Single);
             }

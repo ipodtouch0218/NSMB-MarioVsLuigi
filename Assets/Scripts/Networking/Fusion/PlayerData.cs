@@ -65,7 +65,9 @@ public class PlayerData : NetworkBehaviour {
             // Successful :D
             SetNickname(ConnectionToken.nickname.Value);
         } catch {
-            Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Object.InputAuthority)}'. If you're directly booting the game within a level in the Unity Editor, this is not a bug.");
+            if (!Runner.IsSinglePlayer)
+                Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Object.InputAuthority)}'.");
+
             SetNickname(ConnectionToken.nickname.Value);
             ConnectionToken = new();
         }
@@ -102,6 +104,11 @@ public class PlayerData : NetworkBehaviour {
         IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
         nicknameColor = NicknameColor.FromConnectionToken(ConnectionToken);
 
+        if (Runner.IsServer && HasInputAuthority) {
+            JoinTick = -1;
+            IsRoomOwner = true;
+        }
+
         if (SessionData.Instance)
             SessionData.Instance.LoadWins(this);
 
@@ -114,12 +121,7 @@ public class PlayerData : NetworkBehaviour {
         }
 
         // Check if we need to play sfx / send a chat message
-        if (SessionData.PlayersNeedingJoinMessage.Remove(Object.InputAuthority)) {
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
-
-            if (MainMenuManager.Instance)
-                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
-        }
+        SendJoinMessageIfNeeded();
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -131,6 +133,16 @@ public class PlayerData : NetworkBehaviour {
         }
 
         runner.SetPlayerObject(Object.InputAuthority, null);
+    }
+
+    public void SendJoinMessageIfNeeded() {
+        if (!SessionData.PlayersNeedingJoinMessage.Remove(Object.InputAuthority))
+            return;
+
+        ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
     }
 
     public string GetNickname(bool filter = true) {

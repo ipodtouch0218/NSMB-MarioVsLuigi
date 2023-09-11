@@ -10,7 +10,7 @@ namespace NSMB.Entities.Collectable {
     public class LooseCoin : Coin {
 
         //---Networked Variables
-        [Networked] private int CollectableTick { get; set; }
+        [Networked] private Tick CollectableTick { get; set; }
         [Networked(OnChanged = nameof(OnCoinBounceAnimCounterChanged))] private byte CoinBounceAnimCounter { get; set; }
 
         //---Serialized Variables
@@ -58,15 +58,20 @@ namespace NSMB.Entities.Collectable {
 
             PhysicsDataStruct data = body.Data;
             if (data.OnGround) {
-                body.Velocity -= body.Velocity * Runner.DeltaTime;
                 if (data.HitRoof) {
+                    // Crushed
                     Runner.Despawn(Object);
                     return;
                 }
 
+                // Bounce
+                body.Velocity = -body.PreviousTickVelocity * 0.5f;
+                if (body.Velocity.y < 0.2f)
+                    body.Velocity = new(body.Velocity.x, 0);
+
                 // TODO: doesn't always trigger, even for host. Strange.
                 // IsForward is ok, the sound isnt top priority
-                if (body.Velocity.y < -0.5f * (Mathf.Sin(data.FloorAngle) + 1f))
+                if (body.PreviousTickVelocity.y < -0.5f * (Mathf.Sin(data.FloorAngle) + 1f))
                     CoinBounceAnimCounter++;
             }
         }

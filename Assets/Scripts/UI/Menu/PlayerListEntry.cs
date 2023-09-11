@@ -80,7 +80,10 @@ namespace NSMB.UI.MainMenu {
                 pingText.text = "";
             } else {
                 int ping = player.Ping;
-                pingText.text = ping + " " + Utils.Utils.GetPingSymbol(ping);
+                if (ping == 0)
+                    pingText.text = "...";
+                else
+                    pingText.text = ping + " " + Utils.Utils.GetPingSymbol(ping);
             }
 
             string characterSymbol = player.GetCharacterData().uistring;

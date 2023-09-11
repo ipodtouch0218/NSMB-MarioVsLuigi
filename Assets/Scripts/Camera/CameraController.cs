@@ -8,7 +8,6 @@ using NSMB.Game;
 using NSMB.Utils;
 
 [OrderBefore(typeof(Powerup))]
-//[OrderAfter(typeof(NetworkRigidbody2D), typeof(PlayerController))]
 public class CameraController : NetworkBehaviour {
 
     //---Static Variables
@@ -143,7 +142,7 @@ public class CameraController : NetworkBehaviour {
         }
 
         // Top camera clip
-        float playerHeight = controller.transform.localScale.y;
+        float playerHeight = controller.models.transform.lossyScale.y;
         float cameraTop = newCameraPosition.y + vOrtho;
         float cameraTopDistanceToPlayer = cameraTop - (PlayerPos.y + playerHeight);
         float cameraTopMinDistance = (1.25f/3.5f) * vOrtho;
