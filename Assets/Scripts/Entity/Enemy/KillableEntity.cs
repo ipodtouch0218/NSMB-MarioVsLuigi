@@ -259,7 +259,7 @@ namespace NSMB.Entities {
                 if (sRenderer)
                     sRenderer.enabled = true;
 
-                if (body.interpolationTarget)
+                if (body && body.interpolationTarget)
                     body.interpolationTarget.rotation = Quaternion.identity;
             } else {
                 if (sRenderer)

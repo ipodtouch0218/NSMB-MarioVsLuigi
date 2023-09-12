@@ -280,7 +280,7 @@ namespace NSMB.UI.Pause.Options {
             int original = currentOptionIndex;
             currentOptionIndex = index;
 
-            while ((!SelectedOption || !SelectedOption.IsSelectable) && index >= 0 && index < SelectedTab.options.Count) {
+            while ((!SelectedOption || !SelectedOption.IsSelectable) && currentOptionIndex >= 0 && currentOptionIndex < SelectedTab.options.Count) {
                 currentOptionIndex += direction;
             }
 

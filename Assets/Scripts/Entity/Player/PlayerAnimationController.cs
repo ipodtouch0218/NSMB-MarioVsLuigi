@@ -5,6 +5,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Extensions;
 using NSMB.Game;
+using UnityEngine.Rendering.UI;
 
 namespace NSMB.Entities.Player {
     [OrderAfter(typeof(PlayerController))]
@@ -270,7 +271,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool("mega", controller.State == Enums.PowerupState.MegaMushroom);
             animator.SetBool("inShell", controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding || controller.IsSliding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
             animator.SetBool("turnaround", controller.IsTurnaround);
-            animator.SetBool("swimming", controller.IsSwimming && !controller.IsGroundpounding && !controller.IsDrilling);
+            animator.SetBool("swimming", controller.IsSwimming && !controller.IsGroundpounding && !controller.IsDrilling && !controller.IsFrozen);
             animator.SetBool("a_held", controller.PreviousInputs.buttons.IsSet(PlayerControls.Jump));
             animator.SetBool("fireballKnockback", controller.IsWeakKnockback);
             animator.SetBool("knockforwards", controller.IsForwardsKnockback);
@@ -287,6 +288,9 @@ namespace NSMB.Entities.Player {
             } else if (controller.OnIce) {
                 animatedVelocity = 0;
             }
+            if (animatedVelocity < 0.01f)
+                animatedVelocity = 0;
+
             animator.SetFloat("velocityX", animatedVelocity);
             animator.SetFloat("velocityY", body.Velocity.y);
         }

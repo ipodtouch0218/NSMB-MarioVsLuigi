@@ -75,7 +75,7 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool IsWeakKnockback { get; set; }
         [Networked] public NetworkBool IsForwardsKnockback { get; set; }
         [Networked] private NetworkBool KnockbackWasOriginallyFacingRight { get; set; }
-        [Networked] public TickTimer KnockbackTimer { get; set; }
+        [Networked] public Tick KnockbackTick { get; set; }
         [Networked] public NetworkObject KnockbackAttacker { get; set; }
         //Groundpound
         [Networked(OnChanged = nameof(OnGroundpoundAnimCounterChanged))] public byte GroundpoundAnimCounter { get; set; }
@@ -1397,6 +1397,9 @@ namespace NSMB.Entities.Player {
         }
 
         protected void PlayMegaFootstep() {
+            if (IsSwimming)
+                return;
+
             CameraController.ScreenShake = 0.15f;
             SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.Position + new Vector2(FacingRight ? 0.5f : -0.5f, 0));
             PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte) (footstepVariant ? 1 : 2));
@@ -1405,7 +1408,7 @@ namespace NSMB.Entities.Player {
         }
 
         protected void Footstep() {
-            if (State == Enums.PowerupState.MegaMushroom)
+            if (IsSwimming || State == Enums.PowerupState.MegaMushroom)
                 return;
 
             bool left = PreviousInputs.buttons.IsSet(PlayerControls.Left);
@@ -1544,7 +1547,7 @@ namespace NSMB.Entities.Player {
             IsForwardsKnockback = FacingRight != fromRight;
             KnockbackAttacker = attacker;
             KnockbackWasOriginallyFacingRight = FacingRight;
-            KnockbackTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
+            KnockbackTick = Runner.Tick;
 
             Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.Position);
             TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
@@ -1589,7 +1592,6 @@ namespace NSMB.Entities.Player {
 
         private void ResetKnockback() {
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1f);
-            KnockbackTimer = TickTimer.None;
             //DoEntityBounce = false;
             IsInKnockback = false;
             body.Velocity = new(0, body.Velocity.y);
@@ -1864,7 +1866,7 @@ namespace NSMB.Entities.Player {
             if (WallSliding) {
                 // Walljump check
                 FacingRight = WallSlideLeft;
-                if (jump && WallJumpTimer.ExpiredOrNotRunning(Runner)) {
+                if (jump && WallJumpTimer.ExpiredOrNotRunning(Runner) && !BounceJump) {
                     // Perform walljump
 
                     body.Velocity = new(WALLJUMP_HSPEED * (WallSlideLeft ? 1 : -1), State == Enums.PowerupState.MiniMushroom ? WALLJUMP_MINI_VSPEED : WALLJUMP_VSPEED);
@@ -2200,13 +2202,8 @@ namespace NSMB.Entities.Player {
                 int direction = left ? -1 : 1;
                 float newX = body.Velocity.x + acc * Runner.DeltaTime * direction;
 
-                if (Mathf.Sign(speed) == Mathf.Sign(acc)) {
-                    // Clamp only if accelerating
-                    if (acc > 0) {
-                        newX = Mathf.Max(newX, -max);
-                    } else {
-                        newX = Mathf.Min(newX, max);
-                    }
+                if ((body.Velocity.x < max && newX > max) || (body.Velocity.x > -max && newX < -max)) {
+                    newX = Mathf.Clamp(newX, -max, max);
                 }
 
                 if (IsSkidding && !IsTurnaround && (Mathf.Sign(newX) != sign || speed < 0.05f)) {
@@ -2519,7 +2516,10 @@ namespace NSMB.Entities.Player {
                 IsCrouching = false;
                 IsInShell = false;
                 body.Velocity -= body.Velocity * (delta * 2f);
-                if (IsOnGround && Mathf.Abs(body.Velocity.x) < 0.35f && KnockbackTimer.Expired(Runner))
+
+                float timeStunned = (Runner.Tick - KnockbackTick) * Runner.DeltaTime;
+
+                if ((IsSwimming && timeStunned > 1.5f) || (!IsSwimming && IsOnGround && Mathf.Abs(body.Velocity.x) < 0.35f && timeStunned > 0.5f))
                     ResetKnockback();
 
                 AttemptThrowHeldItem();
@@ -2780,8 +2780,12 @@ namespace NSMB.Entities.Player {
                 WallSlideRight = false;
             }
 
-            if (PreviousTickIsOnGround && !IsOnGround && !ProperJump && IsCrouching && !IsInShell && !IsGroundpounding)
-                body.Velocity = new(body.Velocity.x, -3.75f);
+            if (PreviousTickIsOnGround && !IsOnGround && !ProperJump) {
+                if (IsCrouching && State != Enums.PowerupState.BlueShell && !IsGroundpounding)
+                    body.Velocity = new(body.Velocity.x, -3.75f);
+                else
+                    body.Velocity = new(body.Velocity.x, 0f);
+            }
         }
 
         private void HandleGravity(bool jumpHeld) {

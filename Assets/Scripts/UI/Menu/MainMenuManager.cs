@@ -193,8 +193,9 @@ namespace NSMB.UI.MainMenu {
                 RegionOption selected = (RegionOption) regionDropdown.options[regionDropdown.value];
 
                 if (NetworkHandler.RegionPings != null) {
-                    foreach (RegionOption option in regionDropdown.options) {
-                        option.Ping = NetworkHandler.RegionPings[Array.IndexOf(NetworkHandler.Regions, option.Region)];
+                    foreach (var option in regionDropdown.options) {
+                        if (option is RegionOption ro)
+                            ro.Ping = NetworkHandler.RegionPings[Array.IndexOf(NetworkHandler.Regions, ro.Region)];
                     }
                 }
 
@@ -806,10 +807,10 @@ namespace NSMB.UI.MainMenu {
                 if (other is not RegionOption ro)
                     return -1;
 
-                if (Ping == 0)
-                    return -1;
-                if (ro.Ping == 0)
+                if (Ping <= 0)
                     return 1;
+                if (ro.Ping <= 0)
+                    return -1;
 
                 return Ping.CompareTo(ro.Ping);
             }

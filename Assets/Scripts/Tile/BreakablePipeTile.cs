@@ -87,21 +87,18 @@ namespace NSMB.Tiles {
                     if (bottom && ourLocation == origin && (tileHeight != 1 || alreadyDestroyed))
                         return false;
 
-                    if (tileHeight < 0)
-                        return false;
-
                 } else {
                     addHat = bottom;
                     tileHeight = GetPipeHeight(ourLocation);
-
-                    if (tileHeight < 0)
-                        return false;
 
                     world -= (Vector2) (ourLocation - origin) * 0.5f;
 
                     if (bottom)
                         world += Vector2.up * 0.5f;
                 }
+
+                if (tileHeight - (addHat ? 1 : 0) < 0)
+                    return false;
 
                 player.SpawnResizableParticle(world + (leftOfPipe ? Vector2.zero : Vector2.left * 0.5f), leftOfPipe, upsideDownPipe, new Vector2(2, tileHeight - (addHat ? 1 : 0)), alreadyDestroyed ? destroyedPipeParticle : pipeParticle);
             }

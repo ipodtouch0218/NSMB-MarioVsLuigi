@@ -3,13 +3,17 @@
 public class ParallaxMover : MonoBehaviour {
 
     //---Serialized Variables
-    [SerializeField] private float speed;
+    [SerializeField] protected float speed;
 
     //---Private Variables
-    private Vector3 moveBy;
+    protected Vector3 moveBy;
+
+    public void OnValidate() {
+        moveBy = Vector3.right * speed;
+    }
 
     public void Start() {
-        moveBy = new(speed, 0, 0);
+        moveBy = Vector3.right * speed;
         foreach (var mover in GetComponentsInParent<ParallaxMover>()) {
             if (mover.transform != transform) {
                 enabled = false;
@@ -18,7 +22,7 @@ public class ParallaxMover : MonoBehaviour {
         }
     }
 
-    public void Update() {
+    public virtual void Update() {
         transform.position += Time.deltaTime * moveBy;
     }
 }

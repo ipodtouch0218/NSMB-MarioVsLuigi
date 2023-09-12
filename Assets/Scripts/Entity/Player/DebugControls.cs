@@ -50,6 +50,8 @@ public class DebugControls : MonoBehaviour {
         });
 
         FreezePlayer(Key.F9);
+        KnockbackPlayer(Key.F10, false);
+        KnockbackPlayer(Key.F11, true);
 
         if (kb[Key.U].wasPressedThisFrame) {
             GameManager.Instance.musicManager.Restart();
@@ -75,7 +77,16 @@ public class DebugControls : MonoBehaviour {
         }
     }
 
-    private void DebugItem(Key key, NetworkPrefabRef item) {
+    private void KnockbackPlayer(Key key, bool weak) {
+        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame)
+            return;
+
+        PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
+        p.DoKnockback(p.FacingRight, 0, weak, null);
+    }
+
+
+        private void DebugItem(Key key, NetworkPrefabRef item) {
         if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame)
             return;
 
