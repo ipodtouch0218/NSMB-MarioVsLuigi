@@ -42,9 +42,9 @@ namespace NSMB.Entities.Collectable {
             }
         }
 
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             if (!IsDotted) {
-                base.InteractWithPlayer(player);
+                base.InteractWithPlayer(player, contact);
                 return;
             }
 

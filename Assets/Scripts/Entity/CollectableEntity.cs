@@ -15,6 +15,6 @@ namespace NSMB.Entities.Collectable {
         }
 
         //---IPlayerInteractable overrides
-        public abstract void InteractWithPlayer(PlayerController player);
+        public abstract void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null);
     }
 }

@@ -212,7 +212,7 @@ namespace NSMB.Entities {
         }
 
         //---IPlayerInteractable overrides
-        public void InteractWithPlayer(PlayerController player) {
+        public void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             // If we're not active, don't collide.
             if (!IsActive)
                 return;

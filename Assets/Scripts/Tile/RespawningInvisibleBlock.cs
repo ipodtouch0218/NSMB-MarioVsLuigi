@@ -31,7 +31,7 @@ namespace NSMB.Entities.World {
             transform.position = new Vector3(Mathf.FloorToInt(transform.position.x * 2) / 2f, Mathf.FloorToInt(transform.position.y * 2) / 2f, transform.position.z) + BlockOffset;
         }
 
-        public void InteractWithPlayer(PlayerController player) {
+        public void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             if (!BumpTimer.ExpiredOrNotRunning(Runner))
                 return;
 

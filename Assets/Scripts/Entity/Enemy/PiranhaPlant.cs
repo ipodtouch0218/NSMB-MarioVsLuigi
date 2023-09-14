@@ -98,7 +98,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             // Don't use player.InstakillsEnemies as we don't want sliding to kill us.
             if (player.IsStarmanInvincible || player.IsInShell || player.State == Enums.PowerupState.MegaMushroom) {
                 Kill();

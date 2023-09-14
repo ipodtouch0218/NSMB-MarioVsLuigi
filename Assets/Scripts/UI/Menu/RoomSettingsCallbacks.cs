@@ -52,7 +52,7 @@ namespace NSMB.UI.MainMenu {
                 MainMenuManager.Instance.UpdateStartGameButton();
             }
 
-            if (Runner.IsServer)
+            if (Runner.IsServer && Runner.Tick != 0)
                 Runner.PushHostMigrationSnapshot();
         }
 
@@ -143,6 +143,7 @@ namespace NSMB.UI.MainMenu {
 
             Room.SetLives((sbyte) newValue);
         }
+
         public void EnableLives() {
             if (!Runner.IsServer)
                 return;
@@ -180,6 +181,7 @@ namespace NSMB.UI.MainMenu {
 
             Room.SetTimer((sbyte) newValue);
         }
+
         public void EnableTime() {
             if (!Runner.IsServer)
                 return;
@@ -191,6 +193,7 @@ namespace NSMB.UI.MainMenu {
 
             Room.SetTimer((sbyte) newValue);
         }
+
         private void ChangeTime(int time) {
             timerEnabledToggle.SetIsOnWithoutNotify(time != -1);
             timerInputField.interactable = time != -1;

@@ -172,7 +172,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             // Temporary invincibility, we dont want to spam the kick sound
             if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))

@@ -32,7 +32,7 @@ namespace NSMB.Entities.Player {
 
         //---Networked Variables
         //-Player State
-        [Networked(OnChanged = nameof(OnPowerupStateChanged))] public Enums.PowerupState State { get; set; }
+        [Networked] public Enums.PowerupState State { get; set; }
         [Networked] public Enums.PowerupState PreviousState { get; set; }
         [Networked] public Enums.PowerupState StoredPowerup { get; set; }
         [Networked] public byte Stars { get; set; }
@@ -151,8 +151,6 @@ namespace NSMB.Entities.Player {
         public override Vector2 FrozenOffset => Vector2.up * 0.1f;
         public bool HitLeft => body.Data.HitLeft;
         public bool HitRight => body.Data.HitRight;
-        public bool CrushGround => body.Data.CrushableGround;
-        public bool HitRoof => body.Data.HitRoof;
         public bool WallSliding => WallSlideLeft || WallSlideRight;
         public bool InstakillsEnemies => IsStarmanInvincible || IsInShell || (IsSliding && Mathf.Abs(body.Velocity.x) > 0.1f) || State == Enums.PowerupState.MegaMushroom;
         public bool IsCrouchedInShell => State == Enums.PowerupState.BlueShell && IsCrouching && !IsInShell;
@@ -209,10 +207,6 @@ namespace NSMB.Entities.Player {
             set => _StarCombo = IsStarmanInvincible ? value : (byte) 0;
         }
         public PlayerData Data { get; private set; }
-        // Tile data
-        private IEnumerable<PhysicsDataStruct.TileContact> TilesStandingOn => body.Data.TilesStandingOn;
-        private IEnumerable<PhysicsDataStruct.TileContact> TilesJumpedInto => body.Data.TilesHitRoof;
-        private IEnumerable<PhysicsDataStruct.TileContact> TilesHitSide => body.Data.TilesHitSide;
 
         //---Components
         [SerializeField] public CameraController cameraController;
@@ -332,7 +326,7 @@ namespace NSMB.Entities.Player {
             body.Freeze = true;
 
             Data = Object.InputAuthority.GetPlayerData(Runner);
-            if (Object.HasInputAuthority) {
+            if (HasInputAuthority) {
                 body.InterpolationDataSource = InterpolationDataSources.Predicted;
 
                 GameManager.Instance.localPlayer = this;
@@ -344,8 +338,6 @@ namespace NSMB.Entities.Player {
 
             if (FirstSpawn) {
                 Lives = SessionData.Instance.Lives;
-
-                //transform.position = body.position = GameManager.Instance.spawnpoint;
                 Vector3 spawn = GameData.Instance.GetSpawnpoint(SpawnpointIndex);
                 body.Position = spawn;
                 cameraController.Recenter(spawn);
@@ -517,21 +509,20 @@ namespace NSMB.Entities.Player {
             // We can become stuck in a block after uncrouching
             if (!IsDead)
                 HandleStuckInBlock();
-            HandleScale();
+
+            transform.localScale = CalculateScale(false);
         }
         #endregion
 
-        private void HandleScale() {
-            transform.localScale = CalculateScale(false);
-        }
-
         internal Vector3 CalculateScale(bool render) {
             if (MegaEndTimer.IsActive(Runner)) {
-                return Vector3.one + (Vector3.one * (Mathf.Min(1, ((render ? MegaEndTimer.RemainingRenderTime(Runner) : MegaEndTimer.RemainingTime(Runner)) ?? 0f) / (megaStartTime * 0.5f)) * 2.6f));
+                float endTimer = (render ? MegaEndTimer.RemainingRenderTime(Runner) : MegaEndTimer.RemainingTime(Runner)) ?? 0f;
+                return Vector3.one + (Vector3.one * (Mathf.Min(1, endTimer / megaStartTime) * 2.6f));
             } else {
+                float startTimer = (render ? MegaStartTimer.RemainingRenderTime(Runner) : MegaStartTimer.RemainingTime(Runner)) ?? 0f;
                 return State switch {
                     Enums.PowerupState.MiniMushroom => ZeroPointFive,
-                    Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (((render ? MegaStartTimer.RemainingRenderTime(Runner) : MegaStartTimer.RemainingTime(Runner)) ?? 0f) / megaStartTime)) * 2.6f)),
+                    Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (startTimer / megaStartTime)) * 2.6f)),
                     _ => Vector3.one,
                 };
             }
@@ -590,7 +581,7 @@ namespace NSMB.Entities.Player {
             OnIce = false;
             footstepSound = Enums.Sounds.Player_Walk_Grass;
             footstepParticle = Enums.Particle.None;
-            foreach (PhysicsDataStruct.TileContact tile in TilesStandingOn) {
+            foreach (PhysicsDataStruct.TileContact tile in body.Data.TilesStandingOn) {
                 Vector2Int pos = tile.location;
                 if (GameManager.Instance.TileManager.GetTile(pos, out TileWithProperties propTile)) {
                     footstepSound = propTile.footstepSound;
@@ -611,53 +602,61 @@ namespace NSMB.Entities.Player {
                 int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + (body.Velocity * Runner.DeltaTime) + (hitbox.offset * transform.localScale), hitbox.size * transform.localScale, 0, TempCollisionBuffer);
                 Array.Copy(TempCollisionBuffer, 0, CollisionBuffer, collisions, count);
                 collisions += count;
-
             }
 
+            // Interact with overlapped entities
             CollidedObjects.Clear();
             for (int i = 0; i < collisions; i++) {
-                GameObject collidedObject = CollisionBuffer[i].gameObject;
+                AttemptToInteractWithObject(CollisionBuffer[i].gameObject);
+            }
 
-                if (CollidedObjects.Contains(collidedObject))
-                    continue;
+            // Interact with touched objects
+            foreach (PhysicsDataStruct.ObjectContact contact in body.Data.ObjectContacts) {
+                AttemptToInteractWithObject(contact.GetNetworkObject(Runner).gameObject, contact);
+            }
+        }
 
-                CollidedObjects.Add(collidedObject);
+        private void AttemptToInteractWithObject(GameObject collidedObject, PhysicsDataStruct.IContactStruct contact = null) {
 
-                // Don't interact with ourselves.
-                if (CollisionBuffer[i].transform.IsChildOf(transform))
-                    continue;
+            if (CollidedObjects.Contains(collidedObject))
+                return;
 
-                // Or objects we're holding.
-                if (HeldEntity && HeldEntity.gameObject == collidedObject)
-                    continue;
+            CollidedObjects.Add(collidedObject);
 
-                // Or our own frozen cube
-                if (FrozenCube && FrozenCube.gameObject == collidedObject)
-                    continue;
+            // Don't interact with ourselves.
+            if (collidedObject.transform.IsChildOf(transform))
+                return;
 
-                if (collidedObject.GetComponentInParent<IPlayerInteractable>() is IPlayerInteractable interactable) {
-                    // Or frozen entities.
-                    if (interactable is FreezableEntity freezable && freezable.IsFrozen)
-                        continue;
+            // Or objects we're holding.
+            if (HeldEntity && HeldEntity.gameObject == collidedObject)
+                return;
 
-                    // Or dead entities.
-                    if (interactable is KillableEntity killable && killable.IsDead)
-                        continue;
+            // Or our own frozen cube
+            if (FrozenCube && FrozenCube.gameObject == collidedObject)
+                return;
 
-                    // And don't predict the collection of stars / coins.
-                    if (interactable is CollectableEntity && IsProxy)
-                        continue;
+            if (collidedObject.GetComponentInParent<IPlayerInteractable>() is IPlayerInteractable interactable) {
+                // Or frozen entities.
+                if (interactable is FreezableEntity freezable && freezable.IsFrozen)
+                    return;
 
-                    if (interactable is PlayerController pl) {
-                        InteractWithPlayer(pl);
-                    } else {
-                        interactable.InteractWithPlayer(this);
-                    }
+                // Or dead entities.
+                if (interactable is KillableEntity killable && killable.IsDead)
+                    return;
+
+                // And don't predict the collection of stars / coins.
+                if (interactable is CollectableEntity && IsProxy)
+                    return;
+
+                if (interactable is PlayerController pl) {
+                    InteractWithPlayer(pl, contact);
+                } else {
+                    interactable.InteractWithPlayer(this, contact);
                 }
             }
         }
 
-        public void InteractWithPlayer(PlayerController other) {
+        public void InteractWithPlayer(PlayerController other, PhysicsDataStruct.IContactStruct contact = null) {
 
             if (IsDead || other.IsDead)
                 return;
@@ -1049,6 +1048,9 @@ namespace NSMB.Entities.Player {
 
             if (!IsDead) {
                 DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
+
+                if (HasStateAuthority)
+                    Rpc_PlaySound(Enums.Sounds.Player_Sound_Powerdown);
             }
             return true;
         }
@@ -1117,28 +1119,6 @@ namespace NSMB.Entities.Player {
             bool onRight = ourPos.x > theirPos.x;
 
             DoKnockback(!onRight, 1, false, Object);
-        }
-
-        #region -- COIN / STAR COLLECTION --
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void Rpc_SpawnCoinEffects(Vector3 position, byte coins, bool final) {
-            PlaySound(Enums.Sounds.World_Coin_Collect);
-
-            if (cameraController.IsControllingCamera)
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.1f, 0.05f, RumbleManager.RumbleSetting.High);
-
-            NumberParticle num = Instantiate(PrefabList.Instance.Particle_CoinNumber, position, Quaternion.identity).GetComponentInChildren<NumberParticle>();
-            num.ApplyColorAndText(Utils.Utils.GetSymbolString(coins.ToString(), Utils.Utils.numberSymbols), animationController.GlowColor, final);
-        }
-
-        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        public void Rpc_SpawnReserveItem() {
-
-            if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead || MegaStartTimer.IsActive(Runner) || (IsStationaryMegaShrink && MegaEndTimer.IsActive(Runner)))
-                return;
-
-            SpawnItem(StoredPowerup.GetPowerupScriptable().prefab);
-            StoredPowerup = Enums.PowerupState.NoPowerup;
         }
 
         public void SetReserveItem(Enums.PowerupState newItem) {
@@ -1224,7 +1204,6 @@ namespace NSMB.Entities.Player {
             }
             GameData.Instance.CheckForWinner();
         }
-        #endregion
 
         #region -- DEATH / RESPAWNING --
         public void Death(bool deathplane, bool fire) {
@@ -1272,22 +1251,17 @@ namespace NSMB.Entities.Player {
             WallSlideLeft = false;
             IsSwimming = false;
             IsWaterWalking = false;
+            IsFrozen = false;
 
-            if (FrozenCube) {
+            if (FrozenCube)
                 Runner.Despawn(FrozenCube.Object);
-                IsFrozen = false;
-            }
 
             body.Velocity = Vector2.zero;
             body.Freeze = true;
             AttemptThrowHeldItem(null, true);
-        }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void Rpc_DisconnectDeath() {
-            Disconnected = true;
-            Lives = 0;
-            Death(false, false);
+            if (HasStateAuthority)
+                Rpc_PlaySound(cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
         }
 
         public void AttemptThrowHeldItem(bool? right = null, bool crouch = false) {
@@ -1307,7 +1281,7 @@ namespace NSMB.Entities.Player {
             if (Lives == 0) {
                 GameData.Instance.CheckForWinner();
 
-                if (Object.HasInputAuthority)
+                if (HasInputAuthority)
                     GameManager.Instance.spectationManager.Spectating = true;
 
                 Runner.Despawn(Object);
@@ -1377,7 +1351,7 @@ namespace NSMB.Entities.Player {
 
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
 
-            if (Object.HasInputAuthority)
+            if (HasInputAuthority)
                 ScoreboardUpdater.Instance.OnRespawnToggle();
         }
         #endregion
@@ -1775,7 +1749,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void UpwardsPipeCheck(bool up) {
-            if (!up || IsGroundpounding || !HitRoof || State == Enums.PowerupState.MegaMushroom || IsInKnockback || HeldEntity)
+            if (!up || IsGroundpounding || !body.Data.HitRoof || State == Enums.PowerupState.MegaMushroom || IsInKnockback || HeldEntity)
                 return;
 
             // Todo: change to nonalloc?
@@ -2566,10 +2540,10 @@ namespace NSMB.Entities.Player {
             }
 
             // Activate blocks jumped into
-            if (HitRoof && !IsStuckInBlock) {
+            if (body.Data.HitRoof && !IsStuckInBlock) {
                 bool tempHitBlock = false;
                 bool interactedAny = false;
-                foreach (PhysicsDataStruct.TileContact tile in TilesJumpedInto) {
+                foreach (PhysicsDataStruct.TileContact tile in body.Data.TilesHitRoof) {
                     Vector2Int pos = tile.location;
                     tempHitBlock |= InteractWithTile(pos, InteractionDirection.Up, out bool interacted, out bool bumpSound);
                     if (bumpSound)
@@ -2631,7 +2605,7 @@ namespace NSMB.Entities.Player {
 
                     if (HitLeft || HitRight) {
                         bool interactedAny = false;
-                        foreach (PhysicsDataStruct.TileContact tile in TilesHitSide) {
+                        foreach (PhysicsDataStruct.TileContact tile in body.Data.TilesHitSide) {
                             InteractWithTile(tile.location, tile.direction, out bool interacted, out bool bumpSound);
                             if (bumpSound)
                                 BlockBumpSoundCounter++;
@@ -2656,7 +2630,7 @@ namespace NSMB.Entities.Player {
                 if (Runner.SimulationTime - TimeGrounded > 0.15f)
                     JumpState = PlayerJumpState.None;
 
-                if (HitRoof && IsOnGround && CrushGround && body.Velocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
+                if (body.Data.HitRoof && IsOnGround && body.Data.CrushableGround && body.Velocity.y <= 0.1 && State != Enums.PowerupState.MegaMushroom) {
                     // Crushed.
                     Powerdown(true);
                 }
@@ -2996,7 +2970,7 @@ namespace NSMB.Entities.Player {
                 GroundpoundAnimCounter++;
 
             ContinueGroundpound = false;
-            foreach (PhysicsDataStruct.TileContact tile in TilesStandingOn) {
+            foreach (PhysicsDataStruct.TileContact tile in body.Data.TilesStandingOn) {
                 ContinueGroundpound |= InteractWithTile(tile.location, InteractionDirection.Down, out bool _, out bool bumpSound);
                 if (bumpSound)
                     BlockBumpSoundCounter++;
@@ -3009,6 +2983,40 @@ namespace NSMB.Entities.Player {
                 if (ContinueGroundpound)
                     IsOnGround = false;
             }
+        }
+
+        //---RPCs
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_SpawnCoinEffects(Vector3 position, byte coins, bool final) {
+            PlaySound(Enums.Sounds.World_Coin_Collect);
+
+            if (cameraController.IsControllingCamera)
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.1f, 0.05f, RumbleManager.RumbleSetting.High);
+
+            NumberParticle num = Instantiate(PrefabList.Instance.Particle_CoinNumber, position, Quaternion.identity).GetComponentInChildren<NumberParticle>();
+            num.ApplyColorAndText(Utils.Utils.GetSymbolString(coins.ToString(), Utils.Utils.numberSymbols), animationController.GlowColor, final);
+        }
+
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+        public void Rpc_SpawnReserveItem() {
+
+            if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead || MegaStartTimer.IsActive(Runner) || (IsStationaryMegaShrink && MegaEndTimer.IsActive(Runner)))
+                return;
+
+            SpawnItem(StoredPowerup.GetPowerupScriptable().prefab);
+            StoredPowerup = Enums.PowerupState.NoPowerup;
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_DisconnectDeath() {
+            Disconnected = true;
+            Lives = 0;
+            Death(false, false);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_PlaySound(Enums.Sounds sound, byte variant = 0, float volume = 1) {
+            PlaySound(sound, variant, volume);
         }
 
         //---OnChangeds
@@ -3092,9 +3100,9 @@ namespace NSMB.Entities.Player {
                 player.animator.SetBool("knockback", false);
                 player.animator.SetBool("flying", false);
                 player.animator.SetBool("firedeath", player.FireDeath);
-                player.PlaySound(player.cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
+                //player.PlaySound(player.cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
 
-                if (player.Object.HasInputAuthority)
+                if (player.HasInputAuthority)
                     ScoreboardUpdater.Instance.OnDeathToggle();
             } else {
                 // Respawn poof particle
@@ -3287,33 +3295,6 @@ namespace NSMB.Entities.Player {
 
             if (player.cameraController.IsControllingCamera)
                 GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, player.IsWeakKnockback ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
-        }
-
-        public static void OnPowerupStateChanged(Changed<PlayerController> changed) {
-            if (!GameData.Instance.PlaySounds)
-                return;
-
-            PlayerController player = changed.Behaviour;
-
-            if (player.IsDead || player.IsRespawning)
-                return;
-
-            Enums.PowerupState previous = player.PreviousState;
-            Enums.PowerupState current = player.State;
-
-            // Don't worry about Mega Mushrooms.
-            if (previous == Enums.PowerupState.MegaMushroom || player.MegaEndTimer.IsActive(player.Runner))
-                return;
-
-            // We've taken damage when we go from > mushroom to mushroom, or mushroom to no powerup
-            if ((previous > Enums.PowerupState.Mushroom && current == Enums.PowerupState.Mushroom)
-                || (previous == Enums.PowerupState.Mushroom && current == Enums.PowerupState.NoPowerup)) {
-                // Taken damage
-                player.PlaySound(Enums.Sounds.Player_Sound_Powerdown);
-            } else {
-                // Collected powerup is handled in the MovingPowerup class.
-                // (because the sound is powerup dependent)
-            }
         }
 
         private float timeSinceLastBumpSound;

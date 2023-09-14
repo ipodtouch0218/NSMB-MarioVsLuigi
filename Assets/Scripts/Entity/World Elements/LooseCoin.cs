@@ -77,11 +77,11 @@ namespace NSMB.Entities.Collectable {
         }
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             if (Runner.Tick < CollectableTick)
                 return;
 
-            base.InteractWithPlayer(player);
+            base.InteractWithPlayer(player, contact);
             Runner.Despawn(Object);
         }
 

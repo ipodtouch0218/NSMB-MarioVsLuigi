@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 using Fusion;
@@ -12,15 +11,14 @@ namespace NSMB.Entities.World {
     public class MarioBrosPlatform : NetworkBehaviour, IPlayerInteractable {
 
         //---Static Variables
-        private static readonly ContactPoint2D[] ContactBuffer = new ContactPoint2D[48];
-        private static readonly Vector2 BumpOffset = new(-0.25f, -0.1f);
+        private static readonly Vector2 BumpOffset = new(-0.25f, -0.5f);
         private static readonly Color BlankColor = new(0, 0, 0, 255);
 
         //---Networked Variables
         [Networked, Capacity(10)] private NetworkLinkedList<BumpInfo> Bumps => default;
 
         //---Serialized Variables
-        [Delayed][SerializeField] private int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
+        [SerializeField, Delayed] private int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
         [SerializeField] private float bumpDuration = 0.4f;
         [SerializeField] private bool changeCollider = true;
 
@@ -129,28 +127,20 @@ namespace NSMB.Entities.World {
         }
 
         //---IPlayerInteractable overrides
-        public void InteractWithPlayer(PlayerController player) {
+        public void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             if (player.IsInKnockback || player.IsFrozen || player.body.Position.y > transform.position.y)
                 return;
 
-            int contacts = boxCollider.GetContacts(ContactBuffer);
-            for (int i = 0; i < contacts; i++) {
-                ContactPoint2D contact = ContactBuffer[i];
+            if (contact == null || contact.direction != InteractionDirection.Up)
+                return;
 
-                if (contact.rigidbody.gameObject != player.gameObject)
-                    continue;
-
-                if (contact.normal != Vector2.up)
-                    return;
-
-                Bump(player, new(player.body.Position.x, contact.point.y));
-            }
+            Bump(player, new(player.body.Position.x, transform.position.y));
         }
 
         //---Helpers
         private struct BumpInfo : INetworkStruct {
             public int point;
-            public int spawnTick;
+            public Tick spawnTick;
         }
     }
 }

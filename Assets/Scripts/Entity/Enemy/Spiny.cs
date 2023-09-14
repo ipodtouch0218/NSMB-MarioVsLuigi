@@ -7,7 +7,7 @@ namespace NSMB.Entities.Enemies {
     public class Spiny : Koopa {
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             if (Holder)
                 return;

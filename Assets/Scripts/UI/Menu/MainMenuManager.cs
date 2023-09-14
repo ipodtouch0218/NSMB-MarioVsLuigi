@@ -125,7 +125,7 @@ namespace NSMB.UI.MainMenu {
                 // Initial connection to the game
                 OpenTitleScreen();
 
-            } else if (Runner.IsServer || Runner.IsConnectedToServer) {
+            } else if ((Runner.IsServer || Runner.IsConnectedToServer) && SessionData.Instance && SessionData.Instance.Object) {
                 // Call enterroom callback
                 EnterRoom(true);
             }
@@ -181,9 +181,7 @@ namespace NSMB.UI.MainMenu {
                 // Create brand-new options
                 for (int i = 0; i < NetworkHandler.Regions.Length; i++) {
                     string region = NetworkHandler.Regions[i];
-                    int ping = 0;
-                    if (NetworkHandler.RegionPings != null)
-                        ping = NetworkHandler.RegionPings[i];
+                    NetworkHandler.RegionPings.TryGetValue(region, out int ping);
 
                     regionDropdown.options.Add(new RegionOption(region, ping));
                 }
@@ -195,7 +193,7 @@ namespace NSMB.UI.MainMenu {
                 if (NetworkHandler.RegionPings != null) {
                     foreach (var option in regionDropdown.options) {
                         if (option is RegionOption ro)
-                            ro.Ping = NetworkHandler.RegionPings[Array.IndexOf(NetworkHandler.Regions, ro.Region)];
+                            ro.Ping = NetworkHandler.RegionPings[ro.Region];
                     }
                 }
 
@@ -711,12 +709,9 @@ namespace NSMB.UI.MainMenu {
 
             //TODO: RTL FONT
 
-            if (Runner && Runner.SessionInfo) {
+            if (SessionData.Instance && SessionData.Instance.Object) {
                 UpdateRoomHeader();
-
-                if (SessionData.Instance.Object) {
-                    OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
-                }
+                OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
             }
         }
 

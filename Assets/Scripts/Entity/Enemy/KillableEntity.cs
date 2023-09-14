@@ -297,7 +297,7 @@ namespace NSMB.Entities {
         }
 
         //---IPlayerInteractable overrides
-        public virtual void InteractWithPlayer(PlayerController player) {
+        public virtual void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             Utils.Utils.UnwrapLocations(body.Position + Vector2.up * 0.1f, player.body.Position, out Vector2 ourPos, out Vector2 theirPos);
             Vector2 damageDirection = (theirPos - ourPos).normalized;

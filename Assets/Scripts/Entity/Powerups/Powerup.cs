@@ -279,7 +279,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             // Fixes players hitting multiple colliders at once (propeller)
             if (!Object || !Object.IsValid)

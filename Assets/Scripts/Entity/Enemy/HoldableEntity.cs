@@ -94,7 +94,7 @@ namespace NSMB.Entities {
         }
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             //don't interact with our lovely holder
             if (Holder == player)
                 return;
@@ -103,7 +103,7 @@ namespace NSMB.Entities {
             if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
                 return;
 
-            base.InteractWithPlayer(player);
+            base.InteractWithPlayer(player, contact);
         }
 
         //---KillableEntity overrides

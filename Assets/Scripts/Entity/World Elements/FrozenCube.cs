@@ -193,7 +193,7 @@ namespace NSMB.Entities {
         }
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             // Don't interact with our lovely holder
             if (Holder == player)
@@ -360,7 +360,7 @@ namespace NSMB.Entities {
         //---Static
         public static void FreezeEntity(NetworkRunner runner, FreezableEntity entity) {
             Vector2 entityPosition = entity.body ? entity.body.Position : entity.transform.position;
-            Vector2 spawnPosition = entityPosition - entity.FrozenOffset;
+            Vector2 spawnPosition = entityPosition - entity.FrozenOffset + (Vector2.up * 0.05f);
 
             runner.Spawn(PrefabList.Instance.Obj_FrozenCube, spawnPosition, onBeforeSpawned: (runner, obj) => {
                 FrozenCube cube = obj.GetComponent<FrozenCube>();

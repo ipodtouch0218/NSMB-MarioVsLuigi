@@ -82,6 +82,11 @@ public class SessionData : NetworkBehaviour {
             NetworkHandler.OnConnectRequest += OnConnectRequest;
 
             pingUpdaterCorotuine = StartCoroutine(UpdatePings());
+
+            if (Runner.IsResume) {
+                GameStartTimer = TickTimer.None;
+                GameStarted = false;
+            }
         }
 
         gameObject.name = "SessionData (" + Runner.SessionInfo.Name + ")";

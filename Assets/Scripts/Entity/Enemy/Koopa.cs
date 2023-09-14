@@ -231,7 +231,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             // Don't interact with anyone if we're being held.
             if (Holder)

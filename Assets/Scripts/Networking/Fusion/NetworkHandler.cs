@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,22 +6,31 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
+using Newtonsoft.Json;
 
 using static ConnectionToken;
 using Fusion;
 using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Utils;
 using NSMB.UI.MainMenu;
-using NSMB.Game;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
     //---Static Variables
     public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us", "usw" };
-    public static readonly string[] RegionIps = { "15.235.132.46", "192.36.27.39", "139.162.127.196", "158.247.198.230", "200.25.36.72", "45.86.230.227", "45.145.148.21" };
-    public static int[] RegionPings;
+    public static readonly Dictionary<string, string> RegionIPs = new() {
+        ["asia"] = "15.235.132.46",
+        ["eu"  ] = "192.36.27.39",
+        ["jp"  ] = "139.162.127.196",
+        ["kr"  ] = "158.247.198.230",
+        ["sa"  ] = "200.25.36.72",
+        ["us"  ] = "45.86.230.227",
+        ["usw" ] = "45.145.148.21",
+    };
+    public static readonly Dictionary<string, int> RegionPings = new();
 
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
@@ -97,7 +105,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     //---Custom Events
     public static event Action OnRegionPingsUpdated;
     #endregion
-
 
     #region NetworkRunner Callbacks
     void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {
@@ -217,10 +224,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
             }
 
-            Runner.PushHostMigrationSnapshot();
+            if (runner.Tick != 0)
+                runner.PushHostMigrationSnapshot();
         }
 
-        // Require a join message
+        // Please spare a join message, sir?
         if (!hadExistingData) {
             SessionData.PlayersNeedingJoinMessage.Add(player);
             PlayerData data = player.GetPlayerData(runner);
@@ -506,25 +514,22 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     private static float pingStartTime;
     public static IEnumerator PingRegions() {
-        RegionPings ??= new int[Regions.Length];
-        for (int i = 0; i < RegionPings.Length; i++) {
-            RegionPings[i] = 0;
+        foreach ((string region, _) in RegionIPs) {
+            RegionPings[region] = 0;
         }
 
         pingStartTime = Time.time;
-        Ping[] pingers = new Ping[Regions.Length];
+        Dictionary<string, Ping> pingers = new();
 
-        for (int i = 0; i < Regions.Length; i++) {
-            string ip = RegionIps[i];
-            pingers[i] = new Ping(ip);
+        foreach ((string region, string ip) in RegionIPs) {
+            pingers[region] = new(ip);
         }
 
         bool anyRemaining = true;
         while (anyRemaining && Time.time - pingStartTime < 4) {
             anyRemaining = false;
 
-            for (int i = 0; i < pingers.Length; i++) {
-                Ping pinger = pingers[i];
+            foreach ((string region, Ping pinger) in pingers) {
                 if (pinger == null)
                     continue;
 
@@ -534,9 +539,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 }
 
                 // Ping done.
-                RegionPings[i] = pinger.time;
+                RegionPings[region] = pinger.time;
                 pinger.DestroyPing();
-                pingers[i] = null;
             }
             yield return null;
         }

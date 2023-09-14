@@ -194,7 +194,7 @@ namespace NSMB.Entities.Collectable {
         }
 
         //---IPlayerInteractable overrides
-        public override void InteractWithPlayer(PlayerController player) {
+        public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             if (player.IsDead)
                 return;
 
@@ -214,7 +214,6 @@ namespace NSMB.Entities.Collectable {
 
             // Despawn
             Runner.Despawn(Object);
-            //DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
         }
 
         //---CollectableEntity overrides

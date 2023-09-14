@@ -7,16 +7,16 @@ namespace NSMB.Loading {
         [SerializeField] private int marioX = -296, peachX = 296, minX = -410;
         [SerializeField] private Vector3 movementSpeed;
         [SerializeField] private MarioLoader mario;
+        [SerializeField] private Animator animator;
+        [SerializeField] private RectTransform rect;
 
         //---Private Variables
-        private Animator animator;
-        private RectTransform rect;
         private bool goomba, goombaHit;
         private float goombaTimer;
 
-        public void Awake() {
-            animator = GetComponent<Animator>();
-            rect = GetComponent<RectTransform>();
+        public void OnValidate() {
+            if (!animator) animator = GetComponent<Animator>();
+            if (!rect) rect = GetComponent<RectTransform>();
         }
 
         public void OnEnable() {
