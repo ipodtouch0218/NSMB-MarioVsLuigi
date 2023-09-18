@@ -14,6 +14,7 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
+using static Enums;
 
 namespace NSMB.Entities.Player {
     [OrderAfter(typeof(EntityMover))]
@@ -90,6 +91,7 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool IsSpinnerFlying { get; set; }
         [Networked(OnChanged = nameof(OnSpinnerLaunchAnimCounterChanged))] public byte SpinnerLaunchAnimCounter { get; set; }
         [Networked] public NetworkBool IsDrilling { get; set; }
+        [Networked(OnChanged = nameof(OnDustParticleAnimCounterChanged))] public byte DustParticleAnimCounter { get; set; }
         //Pipes
         [Networked] public Vector2 PipeDirection { get; set; }
         [Networked] public PipeManager CurrentPipe { get; set; }
@@ -569,6 +571,11 @@ namespace NSMB.Entities.Player {
             OnSpinner = null;
             foreach (PhysicsDataStruct.ObjectContact objectContact in body.Data.ObjectsStandingOn) {
                 NetworkObject obj = objectContact.GetNetworkObject(Runner);
+
+                // Predictive objects don't have a NetworkID.
+                if (!obj)
+                    continue;
+
                 if (obj.CompareTag("spinner") && obj.gameObject.TryGetComponent(out SpinnerAnimator spinner)) {
                     OnSpinner = spinner;
                     OnSpinner.HasPlayer = true;
@@ -612,7 +619,13 @@ namespace NSMB.Entities.Player {
 
             // Interact with touched objects
             foreach (PhysicsDataStruct.ObjectContact contact in body.Data.ObjectContacts) {
-                AttemptToInteractWithObject(contact.GetNetworkObject(Runner).gameObject, contact);
+                NetworkObject obj = contact.GetNetworkObject(Runner);
+
+                // Predictive objects will never have an ID so we can't reference them. Oh well...
+                if (!obj)
+                    continue;
+
+                AttemptToInteractWithObject(obj.gameObject, contact);
             }
         }
 
@@ -1261,7 +1274,7 @@ namespace NSMB.Entities.Player {
             AttemptThrowHeldItem(null, true);
 
             if (HasStateAuthority)
-                Rpc_PlaySound(cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
+                Rpc_PlayDeathSound();
         }
 
         public void AttemptThrowHeldItem(bool? right = null, bool crouch = false) {
@@ -1925,7 +1938,7 @@ namespace NSMB.Entities.Player {
             if (!DoEntityBounce && (!doJump || IsInKnockback || (State == Enums.PowerupState.MegaMushroom && JumpState == PlayerJumpState.SingleJump) || WallSliding))
                 return;
 
-            if (!DoEntityBounce && OnSpinner && IsOnGround && !HeldEntity) {
+            if (!DoEntityBounce && OnSpinner && !HeldEntity) {
                 // Jump of spinner
                 body.Velocity = new(body.Velocity.x, launchVelocity);
                 IsSpinnerFlying = true;
@@ -2460,8 +2473,8 @@ namespace NSMB.Entities.Player {
 
             if (State == Enums.PowerupState.MegaMushroom) {
                 HandleMegaTiles(true);
-                if (IsOnGround && JumpState == PlayerJumpState.SingleJump) {
-                    SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.Position);
+                if (Runner.IsForward && IsOnGround && JumpState == PlayerJumpState.SingleJump) {
+                    DustParticleAnimCounter++;
                     CameraController.ScreenShake = 0.15f;
                     JumpState = PlayerJumpState.None;
                 }
@@ -2639,8 +2652,9 @@ namespace NSMB.Entities.Player {
                 WallSlideLeft = false;
                 WallSlideRight = false;
                 IsJumping = false;
-                if (IsDrilling)
-                    SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.Position);
+                if (IsDrilling) {
+                    DustParticleAnimCounter++;
+                }
 
                 if (OnSpinner && Mathf.Abs(body.Velocity.x) < 0.3f && !HeldEntity) {
                     Transform spnr = OnSpinner.transform;
@@ -2767,8 +2781,10 @@ namespace NSMB.Entities.Player {
             if ((IsGroundpounding || IsDrilling) && IsSwimming)
                 return;
 
-            if (IsOnGround)
+            if (IsOnGround) {
+                body.Gravity = Vector2.up * GRAVITY_STAGE_ACC[^1];
                 return;
+            }
 
             float gravity;
 
@@ -3019,6 +3035,11 @@ namespace NSMB.Entities.Player {
             PlaySound(sound, variant, volume);
         }
 
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_PlayDeathSound() {
+            PlaySound(cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
+        }
+
         //---OnChangeds
         public static void OnGroundpoundingChanged(Changed<PlayerController> changed) {
             if (!GameData.Instance.PlaySounds)
@@ -3219,6 +3240,14 @@ namespace NSMB.Entities.Player {
 
             player.PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
             player.PlaySound(Enums.Sounds.World_Spinner_Launch);
+        }
+
+        public static void OnDustParticleAnimCounterChanged(Changed<PlayerController> changed) {
+            if (!GameData.Instance.PlaySounds)
+                return;
+
+            PlayerController player = changed.Behaviour;
+            player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.Position);
         }
 
         public static void OnJumpAnimCounterChanged(Changed<PlayerController> changed) {

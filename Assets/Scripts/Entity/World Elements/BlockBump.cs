@@ -116,7 +116,7 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
     //---Components
     [SerializeField] private SpriteRenderer sRenderer;
 
-    public void OnBeforeSpawned(Vector2Int tileLocation, ushort bumpTile, ushort resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
+    public void OnBeforeSpawned(Vector2Int tileLocation, ushort bumpTile, ushort resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Tick tick, Vector2 spawnOffset = default) {
         TileLocation = tileLocation;
         BumpTile = bumpTile;
         ResultTile = resultTile;
@@ -125,25 +125,25 @@ public class BlockBump : NetworkBehaviour, IPredictedSpawnBehaviour {
         SpawnOffset = spawnOffset;
         SpawnCoin = spawnCoin;
 
-        DespawnTimer = TickTimer.CreateFromSeconds(Runner, bumpDuration);
+        DespawnTimer = TickTimer.CreateFromSeconds(Runner, bumpDuration - ((Runner.Tick - tick) * Runner.DeltaTime));
     }
 
-    public void OnBeforeSpawned(Vector2Int tileLocation, TileBase bumpTile, TileBase resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Vector2 spawnOffset = default) {
+    public void OnBeforeSpawned(Vector2Int tileLocation, TileBase bumpTile, TileBase resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Tick tick, Vector2 spawnOffset = default) {
         GameManager gm = GameManager.Instance;
         ushort bumpTileId = gm.GetTileIdFromTileInstance(bumpTile);
         ushort resultTileId = gm.GetTileIdFromTileInstance(resultTile);
 
-        OnBeforeSpawned(tileLocation, bumpTileId, resultTileId, spawnPrefab, downwards, spawnCoin, spawnOffset);
+        OnBeforeSpawned(tileLocation, bumpTileId, resultTileId, spawnPrefab, downwards, spawnCoin, tick, spawnOffset);
     }
 
     public override void Spawned() {
-        //spawn coin effect immediately
+        // Spawn coin effect immediately
         if (!Object.IsPredictedSpawn && SpawnCoin) {
             GameObject coin = Instantiate(PrefabList.Instance.Particle_CoinFromBlock, transform.position + new Vector3(0, IsDownwards ? -0.25f : 0.5f), Quaternion.identity);
             coin.GetComponentInChildren<Animator>().SetBool("down", IsDownwards);
         }
 
-        //graphics bs
+        // Graphics bs
         TileBase tile = GameManager.Instance.GetTileInstanceFromTileId(BumpTile);
         Sprite sprite;
         if (tile is TileWithProperties tp) {

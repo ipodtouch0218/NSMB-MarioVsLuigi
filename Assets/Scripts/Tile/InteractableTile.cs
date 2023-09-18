@@ -14,7 +14,6 @@ namespace NSMB.Tiles {
 
         public static void Bump(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             // Check for entities above to bump
-            Debug.DrawLine(worldLocation + BumpOffset - (BumpSize / 2), worldLocation + BumpOffset + (BumpSize / 2), Color.red, 10f);
             int count = NetworkHandler.Runner.GetPhysicsScene2D().OverlapBox(worldLocation + BumpOffset, BumpSize, 0, CollisionBuffer);
             for (int i = 0; i < count; i++) {
                 Collider2D collider = CollisionBuffer[i];

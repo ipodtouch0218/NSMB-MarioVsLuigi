@@ -55,10 +55,8 @@ public class ScoreboardUpdater : MonoBehaviour {
             if (!data)
                 continue;
 
-            if (!data.IsCurrentlySpectating)
-                continue;
-
-            count++;
+            if (data.IsCurrentlySpectating)
+                count++;
         }
         spectatorText.text = (count == 0) ? "" : "<sprite name=room_spectator><sprite name=hudnumber_x><sprite name=hudnumber_" + count + ">";
     }
@@ -139,6 +137,7 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     private void OnAllPlayersLoaded() {
         CreateEntries();
+        UpdateSpectatorCount();
 
         if (Settings.Instance.generalScoreboardAlways)
             SetEnabled();

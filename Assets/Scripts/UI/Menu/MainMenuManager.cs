@@ -106,6 +106,7 @@ namespace NSMB.UI.MainMenu {
 
         public void Start() {
             // Clear game-specific settings so they don't carry over
+            WasHostMigration = false;
             HorizontalCamera.SizeIncreaseTarget = 0;
             HorizontalCamera.SizeIncreaseCurrent = 0;
 
@@ -173,6 +174,10 @@ namespace NSMB.UI.MainMenu {
             joinPrivateRoomBtn.gameObject.SetActive(connectedToNetwork);
 
             wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
+        }
+
+        public void OnDestroy() {
+            GlobalController.Instance.connecting.SetActive(false);
         }
 
         public void UpdateRegionDropdown() {

@@ -51,8 +51,6 @@ public class CameraController : NetworkBehaviour {
     //---Private Variables
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
     private Camera targetCamera;
-    private Interpolator<Vector3> positionInterpolator;
-    private float currentExtrapolationValue;
 
     public void OnValidate() {
         if (!controller) controller = GetComponentInParent<PlayerController>();
@@ -63,29 +61,22 @@ public class CameraController : NetworkBehaviour {
         targetCamera.GetComponentsInChildren(secondaryPositioners);
     }
 
-    public override void Spawned() {
-        positionInterpolator = GetInterpolator<Vector3>(nameof(CurrentPosition));
-    }
-
     public void LateUpdate() {
         if (!IsControllingCamera)
             return;
 
-        float delta = (Runner.SimulationRenderTime - Runner.SimulationTime) * Runner.Simulation.Config.TickRate;
-        float difference = delta - currentExtrapolationValue;
-        CurrentPosition = CalculateNewPosition(Runner.DeltaTime * difference);
-        currentExtrapolationValue = delta;
+        float delta = Runner.DeltaTime - (Runner.SimulationTime - Runner.SimulationRenderTime);
+        Vector3 newPosition = CalculateNewPosition(delta);
 
         Vector3 shakeOffset = Vector3.zero;
         if ((_screenShake -= Time.deltaTime) > 0)
             shakeOffset = new Vector3((Random.value - 0.5f) * _screenShake, (Random.value - 0.5f) * _screenShake);
 
-        SetPosition(CurrentPosition + shakeOffset);
+        SetPosition(newPosition + shakeOffset);
     }
 
     public override void FixedUpdateNetwork() {
         CurrentPosition = CalculateNewPosition(Runner.DeltaTime);
-        currentExtrapolationValue = 0;
     }
 
     public void Recenter(Vector2 pos) {

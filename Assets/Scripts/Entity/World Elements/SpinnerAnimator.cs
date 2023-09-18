@@ -29,17 +29,18 @@ namespace NSMB.Entities.World {
 
         public void BeforeTick() {
             HasPlayer = false;
+            hitbox.transform.localPosition = new(0, ArmPosition * -0.084f, 0);
         }
 
         public override void Render() {
             spinSpeed = Mathf.MoveTowards(spinSpeed, HasPlayer ? fastSpinSpeed : idleSpinSpeed, Time.deltaTime * 1350f);
             topArmBone.eulerAngles += spinSpeed * Time.deltaTime * Vector3.up;
-            hitbox.transform.localPosition = topArmBone.localPosition = new Vector3(0, armPositionInterpolator.Value * -0.084f, 0);
+            topArmBone.localPosition = new(0, armPositionInterpolator.Value * -0.084f, 0);
         }
 
         public override void FixedUpdateNetwork() {
             ArmPosition = Mathf.MoveTowards(ArmPosition, HasPlayer ? 1 : 0, pressSpeed * Runner.DeltaTime);
-            hitbox.transform.localPosition = topArmBone.localPosition = new Vector3(0, ArmPosition * -0.084f, 0);
+            hitbox.transform.localPosition = new(0, ArmPosition * -0.084f, 0);
         }
     }
 }

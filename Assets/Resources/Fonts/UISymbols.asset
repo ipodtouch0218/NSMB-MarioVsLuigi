@@ -516,8 +516,8 @@ MonoBehaviour:
     m_Unicode: 65534
     m_GlyphIndex: 71
     m_Scale: 1
-    m_Name: hudnumbers_timer
-    m_HashCode: -1534639119
+    m_Name: hudnumber_timer
+    m_HashCode: 868715650
   m_SpriteGlyphTable:
   - m_Index: 0
     m_Metrics:

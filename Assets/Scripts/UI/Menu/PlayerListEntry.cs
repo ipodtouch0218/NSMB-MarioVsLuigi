@@ -81,7 +81,7 @@ namespace NSMB.UI.MainMenu {
             } else {
                 int ping = player.Ping;
                 if (ping == 0)
-                    pingText.text = "...";
+                    pingText.text = "";
                 else
                     pingText.text = ping + " " + Utils.Utils.GetPingSymbol(ping);
             }
