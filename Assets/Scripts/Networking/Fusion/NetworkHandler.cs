@@ -31,9 +31,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         ["usw" ] = "45.145.148.21",
     };
     public static readonly Dictionary<string, int> RegionPings = new();
-
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
+
 
     private static GameObject prefab;
     private static bool reattemptCreate;

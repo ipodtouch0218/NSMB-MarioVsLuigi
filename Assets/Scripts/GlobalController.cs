@@ -71,8 +71,10 @@ public class GlobalController : Singleton<GlobalController> {
         }
         ControlSystem.controls.Enable();
         ControlSystem.controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
+
         NetworkHandler.OnShutdown += OnShutdown;
         NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+        NetworkHandler.OnHostMigration += OnHostMigration;
 
         CreateFusionStatsInstance();
     }
@@ -80,8 +82,10 @@ public class GlobalController : Singleton<GlobalController> {
     public void OnDestroy() {
         ControlSystem.controls.Debug.FPSMonitor.performed -= ToggleFpsMonitor;
         ControlSystem.controls.Disable();
+
         NetworkHandler.OnShutdown -= OnShutdown;
         NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
+        NetworkHandler.OnHostMigration -= OnHostMigration;
     }
 
     public void Update() {
@@ -173,6 +177,10 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     private void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
+        CreateFusionStatsInstance();
+    }
+
+    private void OnHostMigration(NetworkRunner runner, HostMigrationToken token) {
         CreateFusionStatsInstance();
     }
 

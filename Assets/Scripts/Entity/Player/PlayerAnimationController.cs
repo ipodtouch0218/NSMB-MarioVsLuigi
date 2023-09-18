@@ -156,7 +156,7 @@ namespace NSMB.Entities.Player {
 
         private void SetFacingDirection() {
             //TODO: refactor
-            if (GameData.Instance.GameEnded || controller.IsFrozen) {
+            if (GameData.Instance.GameEnded) {
                 if (controller.IsDead) {
                     modelRotationTarget.Set(0, 180, 0);
                     modelRotateInstantly = true;
@@ -169,7 +169,7 @@ namespace NSMB.Entities.Player {
 
             modelRotateInstantly = false;
 
-            if (controller.IsInKnockback) {
+            if (controller.IsInKnockback || controller.IsFrozen) {
                 modelRotationTarget.Set(0, controller.FacingRight ? 110 : 250, 0);
                 modelRotateInstantly = true;
 
@@ -210,8 +210,6 @@ namespace NSMB.Entities.Player {
         }
 
         private void InterpolateFacingDirection() {
-            if (controller.IsFrozen)
-                return;
 
             if (modelRotateInstantly || wasTurnaround) {
                 models.transform.rotation = Quaternion.Euler(modelRotationTarget);
@@ -227,7 +225,9 @@ namespace NSMB.Entities.Player {
             if (GameData.Instance.GameEnded)
                 return;
 
-            propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
+            if (controller.State == Enums.PowerupState.PropellerMushroom && !controller.IsFrozen) {
+                propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
+            }
         }
 
         private void SetParticleEmission(ParticleSystem particle, bool value) {

@@ -60,7 +60,7 @@ namespace NSMB.Entities {
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            Instantiate(PrefabList.Instance.Particle_IceBreak, body.interpolationTarget.position + (CubeSize.y * 0.5f) * Vector3.up, Quaternion.identity);
+            Instantiate(PrefabList.Instance.Particle_IceBreak, body.interpolationTarget.position, Quaternion.identity);
         }
 
         public void LateUpdate() {
@@ -93,6 +93,9 @@ namespace NSMB.Entities {
 
             base.FixedUpdateNetwork();
 
+            if (!Object || IsDead)
+                return;
+
             gameObject.layer = (Holder || FastSlide) ? Layers.LayerEntity : Layers.LayerGroundEntity;
 
             if (body.Position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
@@ -121,9 +124,10 @@ namespace NSMB.Entities {
                     if (!FastSlide)
                         KillReason = UnfreezeReason.Timer;
 
-                    if (flying)
+                    if (flying) {
                         Fallen = true;
-                    else {
+                        ApplyConstraints();
+                    } else {
                         KillWithReason(UnfreezeReason.Timer);
                         return;
                     }
@@ -154,7 +158,6 @@ namespace NSMB.Entities {
                 //            body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
                 //    }
                 //}
-                body.LockX = false;
                 body.Velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
             }
 
@@ -175,15 +178,19 @@ namespace NSMB.Entities {
         }
 
         private void ApplyConstraints() {
-            //body.mass = Holder ? 0 : 1;
-            body.Freeze = !FrozenEntity.IsCarryable;
+            if (!FrozenEntity.IsCarryable) {
+                body.Freeze = true;
+                return;
+            }
+
+            body.Freeze = false;
 
             if (!Holder) {
-                //if (!FastSlide)
-                //    body.constraints |= RigidbodyConstraints2D.FreezePositionX;
-
-                //if (flying && !Fallen)
-                //    body.constraints |= RigidbodyConstraints2D.FreezePositionY;
+                body.LockX = !FastSlide;
+                body.LockY = flying && !Fallen;
+            } else {
+                body.LockX = false;
+                body.LockY = false;
             }
         }
 

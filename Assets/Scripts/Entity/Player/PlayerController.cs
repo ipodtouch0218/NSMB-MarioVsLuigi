@@ -14,7 +14,6 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using static Enums;
 
 namespace NSMB.Entities.Player {
     [OrderAfter(typeof(EntityMover))]
@@ -232,6 +231,7 @@ namespace NSMB.Entities.Player {
         private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
         private Enums.Particle footstepParticle = Enums.Particle.None;
         private bool footstepVariant;
+        private PlayerNetworkInput onInputPreviousInputs;
 
         private int noLivesStarSpawnDirection;
 
@@ -493,7 +493,7 @@ namespace NSMB.Entities.Player {
                     }
 
                     UpdateTileProperties();
-                    CheckForPowerupActions(pressedButtons);
+                    CheckForPowerupActions(input, PreviousInputs);
                     HandleMovement(heldButtons, pressedButtons);
                 }
 
@@ -872,13 +872,15 @@ namespace NSMB.Entities.Player {
 
         #region -- CONTROLLER FUNCTIONS --
         public void OnInput(NetworkRunner runner, NetworkInput input) {
-            PlayerNetworkInput newInput = new();
+            PlayerNetworkInput newInput = onInputPreviousInputs;
 
-            //input nothing when paused
+            // Input nothing when paused
             if (GameManager.Instance.paused) {
+                newInput.buttons.SetAllUp();
                 input.Set(newInput);
                 return;
             }
+
 
             Vector2 joystick = ControlSystem.controls.Player.Movement.ReadValue<Vector2>();
             bool jump = ControlSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
@@ -897,25 +899,25 @@ namespace NSMB.Entities.Player {
             newInput.buttons.Set(PlayerControls.Left, left);
             newInput.buttons.Set(PlayerControls.Right, right);
             newInput.buttons.Set(PlayerControls.Jump, jump);
-            newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
             newInput.buttons.Set(PlayerControls.Sprint, sprint ^ Settings.Instance.controlsAutoSprint);
-            newInput.buttons.Set(PlayerControls.SprintPowerupAction, sprint && Settings.Instance.controlsFireballSprint);
+            newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
+
+            // Powerup action counter avoids dropped inputs
+            NetworkButtons pressed = newInput.buttons.GetPressed(onInputPreviousInputs.buttons);
+            if (pressed.IsSet(PlayerControls.PowerupAction)
+                || (pressed.IsSet(PlayerControls.Sprint) && Settings.Instance.controlsFireballSprint && (State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower))
+                || (pressed.IsSet(PlayerControls.Jump) && !IsOnGround && Settings.Instance.controlsPropellerJump && State == Enums.PowerupState.PropellerMushroom))
+                newInput.powerupActionCounter++;
 
             input.Set(newInput);
+            onInputPreviousInputs = newInput;
         }
 
-        private void CheckForPowerupActions(NetworkButtons pressedButtons) {
-            // Powerup action button check
-            bool checkSprintButton = State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower;
-            if (pressedButtons.IsSet(PlayerControls.PowerupAction)
-                || (pressedButtons.IsSet(PlayerControls.SprintPowerupAction) && checkSprintButton)) {
+        private void CheckForPowerupActions(PlayerNetworkInput current, PlayerNetworkInput previous) {
+            if (current.powerupActionCounter == previous.powerupActionCounter)
+                return;
 
-                ActivatePowerupAction();
-            }
-
-            if (Settings.Instance.controlsPropellerJump && pressedButtons.IsSet(PlayerControls.Jump) && !IsOnGround) {
-                StartPropeller();
-            }
+            ActivatePowerupAction();
         }
 
         private void ActivatePowerupAction() {
@@ -3389,9 +3391,9 @@ namespace NSMB.Entities.Player {
         }
 
         public override void OnIsFrozenChanged() {
+            animator.enabled = !IsFrozen;
             animator.Play("falling");
             animator.Update(0f);
-            animator.enabled = !IsFrozen;
 
             if (!IsFrozen && cameraController.IsControllingCamera)
                 GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.2f, 0.3f, RumbleManager.RumbleSetting.High);
