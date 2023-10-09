@@ -35,8 +35,11 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             player.AttemptThrowHeldItem();
 
-            if (!particle)
-                particle = Instantiate(PrefabList.Instance.Particle_Giant, player.transform.position, Quaternion.identity);
+            if (!particle) {
+                Vector3 position = player.transform.position;
+                position.z = -4;
+                particle = Instantiate(PrefabList.Instance.Particle_Giant, position, Quaternion.identity);
+            }
 
             return PowerupReserveResult.ReserveOldPowerup;
         }

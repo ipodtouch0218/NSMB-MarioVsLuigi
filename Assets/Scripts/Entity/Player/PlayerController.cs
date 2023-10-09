@@ -519,9 +519,12 @@ namespace NSMB.Entities.Player {
         internal Vector3 CalculateScale(bool render) {
             if (MegaEndTimer.IsActive(Runner)) {
                 float endTimer = (render ? MegaEndTimer.RemainingRenderTime(Runner) : MegaEndTimer.RemainingTime(Runner)) ?? 0f;
+                if (!IsStationaryMegaShrink)
+                    endTimer *= 2;
                 return Vector3.one + (Vector3.one * (Mathf.Min(1, endTimer / megaStartTime) * 2.6f));
             } else {
                 float startTimer = (render ? MegaStartTimer.RemainingRenderTime(Runner) : MegaStartTimer.RemainingTime(Runner)) ?? 0f;
+
                 return State switch {
                     Enums.PowerupState.MiniMushroom => ZeroPointFive,
                     Enums.PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (startTimer / megaStartTime)) * 2.6f)),
@@ -1432,17 +1435,16 @@ namespace NSMB.Entities.Player {
             if (State != Enums.PowerupState.MegaMushroom || MegaStartTimer.IsActive(Runner))
                 return;
 
-            Vector2 checkSize = WorldHitboxSize * 1.1f;
-
-            bool grounded = body.Velocity.y < -8f && IsOnGround;
+            bool hitGroundTiles = body.Velocity.y < -8f && (IsOnGround || IsGroundpounding);
             Vector2 offset = Vector2.zero;
-            if (grounded)
-                offset = Vector2.down * 0.5f;
+            if (hitGroundTiles)
+                offset = Vector2.down * 0.25f;
 
-            Vector2 checkPosition = body.Position + (Vector2.up * checkSize * 0.5f) + (2 * Runner.DeltaTime * body.Velocity) + offset;
+            Vector2 checkSizeHalf = WorldHitboxSize * 0.5f;
+            Vector2 checkPosition = body.Position + (Vector2.up * checkSizeHalf) + (Runner.DeltaTime * body.Velocity) + offset;
 
-            Vector2Int minPos = Utils.Utils.WorldToTilemapPosition(checkPosition - (checkSize * 0.5f), wrap: false);
-            Vector2Int size = Utils.Utils.WorldToTilemapPosition(checkPosition + (checkSize * 0.5f), wrap: false) - minPos;
+            Vector2Int minPos = Utils.Utils.WorldToTilemapPosition(checkPosition - (checkSizeHalf), wrap: false);
+            Vector2Int size = Utils.Utils.WorldToTilemapPosition(checkPosition + (checkSizeHalf), wrap: false) - minPos;
 
             for (int x = 0; x <= size.x; x++) {
                 for (int y = 0; y <= size.y; y++) {
@@ -1451,12 +1453,12 @@ namespace NSMB.Entities.Player {
                     Utils.Utils.WrapTileLocation(ref tileLocation);
 
                     InteractionDirection dir = InteractionDirection.Up;
-                    if (worldPosCenter.y - 0.25f + Physics2D.defaultContactOffset * 2f <= body.Position.y) {
-                        if (!grounded && !IsGroundpounding)
+                    if (worldPosCenter.y + 0.25f <= body.Position.y) {
+                        if (!hitGroundTiles)
                             continue;
 
                         dir = InteractionDirection.Down;
-                    } else if (worldPosCenter.y + Physics2D.defaultContactOffset * 2f >= body.Position.y + size.y) {
+                    } else if (worldPosCenter.y >= body.Position.y + size.y) {
                         dir = InteractionDirection.Up;
                     } else if (worldPosCenter.x <= body.Position.x) {
                         dir = InteractionDirection.Left;
@@ -1480,14 +1482,14 @@ namespace NSMB.Entities.Player {
                         Utils.Utils.WrapTileLocation(ref tileLocation);
 
                         InteractionDirection dir = InteractionDirection.Up;
-                        if (worldPosCenter.y - 0.25f + Physics2D.defaultContactOffset * 2f <= body.Position.y) {
-                            if (!grounded && !IsGroundpounding)
+                        if (worldPosCenter.y + 0.25f <= body.Position.y) {
+                            if (!hitGroundTiles)
                                 continue;
 
                             dir = InteractionDirection.Down;
-                        } else if (worldPosCenter.x - 0.25f < checkPosition.x - checkSize.x * 0.5f) {
+                        } else if (worldPosCenter.x <= body.Position.x) {
                             dir = InteractionDirection.Left;
-                        } else if (worldPosCenter.x + 0.25f > checkPosition.x + checkSize.x * 0.5f) {
+                        } else if (worldPosCenter.x >= body.Position.x) {
                             dir = InteractionDirection.Right;
                         }
 
