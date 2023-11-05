@@ -7,6 +7,8 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
+using UnityEngine.Scripting;
+using static Unity.Collections.Unicode;
 
 namespace NSMB.Entities.Collectable {
     public class BigStar : CollectableEntity {
@@ -140,20 +142,25 @@ namespace NSMB.Entities.Collectable {
             }
         }
 
-        public override void Despawned(NetworkRunner runner, bool hasState) {
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_StarCollected(PlayerController collector) {
+            Collector = collector;
 
             if (GameData.Instance && !GameData.Instance.dontPlaySounds) {
-                if (!Collector) {
-                    GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
-                } else {
-                    bool sameTeam = Collector.Data.Team == runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
-                    Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
-                    if (Collector.cameraController.IsControllingCamera)
-                        GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.8f, 0.1f, RumbleManager.RumbleSetting.High);
-
-                    Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
-                }
+                bool sameTeam = Collector.Data.Team == Runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
+                Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
             }
+
+            if (Collector.cameraController.IsControllingCamera)
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.8f, 0.1f, RumbleManager.RumbleSetting.High);
+
+            Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState) {
+
+            if (GameData.Instance && !GameData.Instance.dontPlaySounds && !Collector)
+                GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
 
             if (icon)
                 Destroy(icon.gameObject);
@@ -203,6 +210,10 @@ namespace NSMB.Entities.Collectable {
 
             Collector = player;
 
+            if (HasStateAuthority) {
+                Rpc_StarCollected(player);
+            }
+
             // We can collect
             player.Stars = (byte) Mathf.Min(player.Stars + 1, SessionData.Instance.StarRequirement);
 
@@ -213,7 +224,7 @@ namespace NSMB.Entities.Collectable {
             GameData.Instance.CheckForWinner();
 
             // Despawn
-            Runner.Despawn(Object);
+            DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1);
         }
 
         //---CollectableEntity overrides

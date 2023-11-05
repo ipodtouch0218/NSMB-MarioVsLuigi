@@ -33,6 +33,11 @@ PrefabInstance:
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: 1233864249221731145
       objectReference: {fileID: 0}
+    - target: {fileID: 5521876106847805377, guid: 4f50cb5e806289d43bf820de1f1347bb,
+        type: 3}
+      propertyPath: _interpolationDataSource
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8133877121043965814, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: m_Sprite

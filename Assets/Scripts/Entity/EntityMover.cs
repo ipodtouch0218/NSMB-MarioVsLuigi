@@ -50,7 +50,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             Position = transform.position;
 
         positionInterpolator = GetInterpolator(nameof(InternalPosition));
-        InterpolationDataSource = InterpolationDataSources.Predicted;
     }
 
     public void BeforeTick() {
@@ -81,7 +80,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
         } else if (IsProxy || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
 
             // Proxy interpolation with some smoothing:
-
             if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, Position) > interpolationTeleportDistance) {
                 // Teleport over large distances
                 newPosition = Utils.WrapWorldLocation(Position);
@@ -93,7 +91,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 newPosition = Utils.WrapWorldLocation(newPosition);
             }
         } else {
-
             // State/Input Authority interpolation with no smoothing:
 
             Vector2Int fromInt = *(Vector2Int*) from;
@@ -121,7 +118,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     public override void FixedUpdateNetwork() {
         ResetPhysicsData();
 
-        if (!Freeze) {
+        if (!Freeze && (!IsProxy || InterpolationDataSource == InterpolationDataSources.Predicted)) {
             Vector2 movement;
             movement = CollideAndSlide(Position + ColliderOffset, Velocity * Runner.DeltaTime, false);
             movement += CollideAndSlide(Position + ColliderOffset + movement, Gravity * (Runner.DeltaTime * Runner.DeltaTime), true);

@@ -10581,6 +10581,7 @@ MonoBehaviour:
   _SpinnerLaunchAnimCounter: 0
   _IsDrilling:
     _value: 0
+  _DustParticleAnimCounter: 0
   _PipeDirection: {x: 0, y: 0}
   _CurrentPipe: {fileID: 0}
   _PipeEntering:

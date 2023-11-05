@@ -34,6 +34,7 @@ public class DiscordController : MonoBehaviour {
         }
     }
 
+#pragma warning disable CS0162
     public void Start() {
 #if UNITY_WEBGL || UNITY_WSA
         enabled = false;
@@ -55,6 +56,7 @@ public class DiscordController : MonoBehaviour {
             Debug.Log($"[Discord] Failed to set launch path (on {Application.platform})");
         }
     }
+#pragma warning restore CS0162
 
     public void TryJoinGame(string secret) {
         //TODO: MainMenu jank...
@@ -80,6 +82,7 @@ public class DiscordController : MonoBehaviour {
         } catch { }
     }
 
+#pragma warning disable CS0162
     public void UpdateActivity(SessionInfo session = null) {
 #if UNITY_WEBGL || UNITY_WSA
         return;
@@ -133,4 +136,5 @@ public class DiscordController : MonoBehaviour {
 
         activityManager.UpdateActivity(activity, (res) => { });
     }
+#pragma warning restore CS0162
 }

@@ -37,10 +37,10 @@ public class AuthenticationHandler {
             return null;
         }
 
-
-        AuthenticationValues values = new();
-        values.AuthType = CustomAuthenticationType.Custom;
-        values.UserId = userid;
+        AuthenticationValues values = new() {
+            AuthType = CustomAuthenticationType.Custom,
+            UserId = userid,
+        };
         values.AddAuthParameter("data", client.downloadHandler.text.Trim().Replace("\"", ""));
 
         client.Dispose();

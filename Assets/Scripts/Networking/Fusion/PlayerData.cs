@@ -169,9 +169,9 @@ public class PlayerData : NetworkBehaviour {
         if (Object.InputAuthority != Runner.SessionInfo.MaxPlayers - 1) {
             // Check for players with duplicate names, and add (1), (2), etc
             int count = Runner.ActivePlayers
-                .Where(pr => pr < Object.InputAuthority)
                 .Select(pr => pr.GetPlayerData(Runner))
                 .Where(pd => pd && pd.Object)
+                .Where(pd => pd.JoinTick < JoinTick)
                 .Where(pd => pd.RawNickname.ToString().Filter() == name)
                 .Count();
 

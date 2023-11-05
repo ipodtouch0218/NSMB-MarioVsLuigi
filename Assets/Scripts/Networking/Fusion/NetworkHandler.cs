@@ -335,10 +335,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #region Room-Related Methods
     private static async Task<AuthenticationValues> Authenticate() {
         connecting++;
+
         string id = PlayerPrefs.GetString("id", null);
         string token = PlayerPrefs.GetString("token", null);
-        //string id = null;
-        //string token = null;
 
         AuthenticationValues authValues = await AuthenticationHandler.Authenticate(id, token);
         connecting--;
@@ -391,7 +390,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             Debug.Log($"[Network] Connected to a Lobby ({Runner.LobbyInfo.Name}, {CurrentRegion})");
 
-            //save id for later authentication
+            // Save id for later authentication
             PlayerPrefs.SetString("id", Runner.AuthenticationValues.UserId);
             PlayerPrefs.Save();
 

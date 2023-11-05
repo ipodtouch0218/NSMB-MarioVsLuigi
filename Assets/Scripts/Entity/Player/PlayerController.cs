@@ -430,7 +430,7 @@ namespace NSMB.Entities.Player {
         }
 
         private PlayerNetworkInput HandleMissingInputs() {
-            if ((Runner.Tick - LastInputTick) > Runner.Simulation.Config.TickRate * 1f)
+            if ((Runner.Tick - LastInputTick) > Runner.Simulation.Config.TickRate * 0.25f)
                 return default;
 
             PlayerNetworkInput inputs = PreviousInputs;
@@ -461,12 +461,16 @@ namespace NSMB.Entities.Player {
                 // If we can't get inputs from the player, just go based on their previous networked input state.
                 PlayerNetworkInput input;
                 if (GetInput(out PlayerNetworkInput currentInputs)) {
+                    // Got the inputs from the player!
                     input = currentInputs;
                     HandleButtonHolding(input);
                     LastInputTick = Runner.Tick;
-
-                } else {
+                } else if (!IsProxy) {
+                    // Didn't get the inputs, but we *need* them. Interpolate based on what it *could* be?
                     input = HandleMissingInputs();
+                } else {
+                    // Just trust the server
+                    input = PreviousInputs;
                 }
 
                 NetworkButtons heldButtons = input.buttons;
@@ -604,7 +608,7 @@ namespace NSMB.Entities.Player {
 
         private void CheckForEntityCollision() {
             // Don't check for collisions if we're dead, frozen, in a pipe, etc.
-            if (IsDead || IsFrozen || CurrentPipe)
+            if (IsProxy || IsDead || IsFrozen || CurrentPipe)
                 return;
 
             int collisions = 0;

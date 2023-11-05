@@ -27,7 +27,6 @@ namespace NSMB.UI.MainMenu {
         private NetworkRunner Runner => NetworkHandler.Runner;
         private PlayerData LocalData => Runner.GetLocalPlayerData();
 
-
         //---Public Variables
         public bool nonNetworkShutdown;
         public AudioSource sfx, music;
@@ -69,7 +68,9 @@ namespace NSMB.UI.MainMenu {
         private bool validName;
         private bool wasSettingsOpen;
 
-        public void Awake() => Set(this, false);
+        public void Awake() {
+            Set(this, false);
+        }
 
         public void OnEnable() {
             // Register callbacks

@@ -35,8 +35,14 @@ public class UserNametag : MonoBehaviour {
 
     public void LateUpdate() {
 
-        if (!parent || parent.Disconnected || !data || !data.Object) {
+        // If our parent object dies, we also die.
+        if (!parent) {
             Destroy(gameObject);
+            return;
+        }
+
+        // If the parent disconnects, don't immediately die, but don't keep trying to update our info either.
+        if (parent.Disconnected || !data || !data.Object) {
             return;
         }
 
