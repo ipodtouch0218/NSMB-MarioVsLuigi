@@ -1,46 +1,32 @@
-# NSMB-MarioVsLuigi
-A unity-standalone 2-10 player remake of the Mario vs. Luigi gamemode from the New Super Mario Bros DS download game. 
+# Mario Vs Luigi - Mobile Port
 
-Includes the 5 default levels (Grassland, Bricks, Castle, Pipes, and Ice), along with a handful of custom levels to battle on! 
-All power-ups are included and remain faithful to their original counterparts, along with the new addition of the Propeller Suit & Ice Flower!
+An adaptation of [MarioVsLuigi](https://github.com/ipodtouch0218/NSMB-MarioVsLuigi) for mobile phones. This port is a 1:1 adaptation of MvsL for smartphones, i've only changed things that don't give an advantage over other non-mobile players while also making a better experience for the mobile users.
 
-## Discord
-[**Join the discord**](https://discord.gg/dgKVaUKpj5) to keep up to date with the development of the game, make feature suggestions, report bugs (if you're too lazy to use issues...), get technical support, look for people to play with, and just talk about the game!
+## Main features
+- Being able to connect to the official lobbies.
+- Touch screen adapted controls.
+- Compatible from Android 5.1 to Android 14 
 
-## Download
 
-[Play now in browser on itch.io!](https://ipodtouch0218.itch.io/nsmb-mariovsluigi)
+## Planed features for future updates
+- Beeing able to make Mobile-version-only lobbies.
+- Fixing the lobby chat.
+- The ability to disable touch controls at will.
 
-Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest
+## Features I won't add 
+This section recopiles the most asked features for the android port that are
+either not possible right now, pointless or not as good of an idea as they seem.
 
-## Default Controls
-| Action | Keyboard | Gamepad *(unstable)* |
-| --- | --- | --- |
-| Movement | WASD / Arrow Keys | Left Analog / DPad |
-| Jump | Space / Z | A / B Buttons |
-| Sprint | Shift / X (hold) | X / Y Buttons (hold) |
-| Powerup Action | E / C | RB / RT |
-| Reserve Item | Q / V | LB / LT |
-| Show Scoreboard | Tab | Select |
-| Pause | Escape | Start Button |
-| UI Confirm | Left Mouse / Enter / Z | A Button |
+- **D-Pad**: Although the d-pad is the predilected way to play 2d platformers, it sucks at that if it's on a touchscreen, wher your finguers cannot distinguish the sides, that's why i won't add the d-pad.
+
+- **Movable/resizeable controls**: If im beeing honest, i don't really want to go through the pain that seems to be doing that just at first glance.
+
+## Other Work In progress projects
+- NSMBW, NSMB2 & NSMBUD Styles.
+- Singleplayer/cooperative mode with completly new levels and remixes of old ones.
 
 <details>
-  <summary><h2>Opening in Unity Editor</h2></summary>
-
-1. Install Unity 2022.1.9f1 (or newer) via Unity Hub (Installs > Install Editor > Scroll to bottom)
-2. Download and install [git](https://git-scm.com/downloads). Do NOT use the .zip download, as it will cause errors within Unity.
-3. Open Command Prompt (Windows) or Terminal (MacOS / Linux)
-4. Navigate to the folder you want the source code to be in using `cd <path>`. For example, `cd %USERPROFILE%\Documents` will save it in My Documents.
-5. Clone the repository by running `git clone https://github.com/ipodtouch0218/NSMB-MarioVsLuigi.git` in the Command Prompt / Terminal
-  - Optionally, [fork the repository](https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/fork)
-6. Open the project in Unity Hub (gray "Open" button in top right)
-7. Change the Unity Editor to use your computer's platform in File > Build Settings
-8. Create a build using "Build and Run" inside File > Build Settings, or Ctrl+B
-
-</details>
-<details>
-  <summary><h2>Credits</h2></summary>
+  <summary><h2>Credits for the base Project</h2></summary>
 
 ### Original Content:
 * New Super Mario Bros.
@@ -91,4 +77,10 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Luke Hackett (Sound)
 * mindnomad (Sound)
 
+</details>
+
+
+<details>
+  <summary><h2>Credits for the Mobile Port</h2></summary>
+* Mark19 (Wark19)
 </details>
