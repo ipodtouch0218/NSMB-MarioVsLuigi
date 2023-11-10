@@ -83,5 +83,7 @@ either not possible right now, pointless or not as good of an idea as they seem.
 <details>
   <summary><h2>Credits for the Mobile Port</h2></summary>
 ### All:
+
 * Mark19 (Wark19)
+
 </details>
