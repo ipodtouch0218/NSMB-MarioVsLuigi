@@ -222,9 +222,13 @@ namespace NSMB.Entities.World {
                             fm.DespawnEntity(false);
                         }
                     } else if (entity is not BigStar) {
-                        if (!entity.DespawnTimer.IsRunning)
-                            entity.DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
-                        //entity.DespawnEntity();
+                        if (entity is KillableEntity ke) {
+                            ke.Crushed();
+                        } else {
+                            if (!entity.DespawnTimer.IsRunning)
+                                entity.DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
+                            //entity.DespawnEntity();
+                        }
                     }
                 }
             }

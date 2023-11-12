@@ -267,13 +267,6 @@ namespace NSMB.Entities.Enemies {
             }
         }
 
-        public override void SpecialKill(bool right, bool groundpound, int combo) {
-            base.SpecialKill(right, groundpound, combo);
-
-            // Stop the fuse sound if we were killed early (by shell, for example).
-            sfx.Stop();
-        }
-
         protected override void CheckForEntityCollisions() {
             base.CheckForEntityCollisions();
             if (IsDead || !Lit || Mathf.Abs(body.Velocity.x) < 1f)

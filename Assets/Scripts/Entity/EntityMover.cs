@@ -78,7 +78,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
         if (Freeze) {
             newPosition = Position;
-        } else if (IsProxy || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
+        } else if ((IsProxy && InterpolationDataSource != InterpolationDataSources.Predicted) || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
             // Proxy interpolation with some smoothing:
 
             if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, Position) > interpolationTeleportDistance) {

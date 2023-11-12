@@ -179,6 +179,8 @@ public static class Enums {
 
         [PrefabParticleData("Prefabs/Particle/BulletBillLauncher")] BulletBillLauncher_Break,
 
+        [PrefabParticleData("Prefabs/Particle/Puff")] Enemy_Puff,
+
         [PrefabParticleData("Prefabs/Particle/WalljumpParticle")] Player_WallJump,
     }
 

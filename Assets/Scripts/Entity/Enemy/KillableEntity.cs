@@ -29,6 +29,7 @@ namespace NSMB.Entities {
         //---Networked Variables
         [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
         [Networked] protected NetworkBool WasSpecialKilled { get; set; }
+        [Networked(OnChanged = nameof(OnWasCrushedChanged))] protected NetworkBool WasCrushed { get; set; }
         [Networked] protected NetworkBool WasGroundpounded { get; set; }
         [Networked] protected float AngularVelocity { get; set; }
         [Networked] protected byte ComboCounter { get; set; }
@@ -79,7 +80,6 @@ namespace NSMB.Entities {
                     interpolationOffset = entityPosition - (Vector2) body.interpolationTarget.position;
                 }
 
-                Vector2 size = bounds.size;
                 Vector2 position = new(bounds.center.x, bounds.min.y);
                 Vector2 offset = entityPosition - position - interpolationOffset;
 
@@ -170,7 +170,8 @@ namespace NSMB.Entities {
             if (dieWhenInsideBlock) {
                 Vector2 loc = body.Position + hitbox.offset * transform.lossyScale;
                 if (!body.Freeze && Utils.Utils.IsTileSolidAtWorldLocation(loc)) {
-                    SpecialKill(FacingRight, false, 0);
+                    Crushed();
+                    return;
                 }
             }
         }
@@ -219,6 +220,7 @@ namespace NSMB.Entities {
             IsDead = true;
             WasSpecialKilled = true;
             WasGroundpounded = groundpound;
+            WasCrushed = false;
             ComboCounter = (byte) combo;
             FacingRight = right;
 
@@ -229,21 +231,34 @@ namespace NSMB.Entities {
             Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.Position + hitbox.offset);
         }
 
+        public virtual void Crushed() {
+            if (WasCrushed)
+                return;
+
+            IsDead = true;
+            WasSpecialKilled = false;
+            WasGroundpounded = false;
+            IsActive = false;
+            WasCrushed = true;
+            ComboCounter = 0;
+            body.Velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
+        }
+
         public virtual void OnIsDeadChanged() {
             if (IsDead) {
-                //death effects
+                // Death effects
                 if (animator)
                     animator.enabled = false;
                 sfx.enabled = true;
 
-                if (WasSpecialKilled)
+                if (WasSpecialKilled || WasCrushed)
                     PlaySound(!IsFrozen ? ComboSounds[Mathf.Min(ComboSounds.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
 
                 if (WasGroundpounded)
                     Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.Position + hitbox.offset, Quaternion.identity);
 
             } else {
-                //undo death effects
+                // Undo death effects
                 if (animator)
                     animator.enabled = true;
             }
@@ -281,6 +296,7 @@ namespace NSMB.Entities {
             FacingRight = false;
             WasSpecialKilled = false;
             WasGroundpounded = false;
+            WasCrushed = false;
             ComboCounter = 0;
 
             if (body) {
@@ -392,6 +408,15 @@ namespace NSMB.Entities {
         //---OnChangeds
         public static void OnIsDeadChanged(Changed<KillableEntity> changed) {
             changed.Behaviour.OnIsDeadChanged();
+        }
+
+        public static void OnWasCrushedChanged(Changed<KillableEntity> changed) {
+            KillableEntity entity = changed.Behaviour;
+            if (!entity.WasCrushed)
+                return;
+
+            entity.PlaySound(Enums.Sounds.Enemy_Shell_Kick, null, 0, 0.5f);
+            entity.SpawnParticle(entity.body.Position, Enums.PrefabParticle.Enemy_Puff);
         }
     }
 }
