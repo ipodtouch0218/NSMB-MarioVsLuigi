@@ -361,17 +361,17 @@ namespace NSMB.Entities.Player {
 
             PipeManager pe = controller.CurrentPipe;
 
-            body.Freeze = true;
+            body.IsKinematic = true;
             body.Velocity = controller.PipeDirection;
 
             if (controller.PipeTimer.Expired(Runner)) {
                 if (controller.PipeEntering) {
-                    //teleport to other pipe
+                    // Teleport to other pipe
 
                     if (pe.otherPipe.bottom == pe.bottom)
                         controller.PipeDirection *= -1;
 
-                    Vector2 offset = controller.PipeDirection * (pipeDuration * 0.5f);
+                    Vector2 offset = controller.PipeDirection * (pipeDuration * 0.45f);
                     if (pe.otherPipe.bottom) {
                         float size = controller.MainHitbox.size.y * transform.localScale.y;
                         offset.y += size;
@@ -383,9 +383,9 @@ namespace NSMB.Entities.Player {
                     controller.PipeEntering = false;
                     controller.CurrentPipe = pe.otherPipe;
                 } else {
-                    //end pipe animation
+                    // End pipe animation
                     controller.CurrentPipe = null;
-                    body.Freeze = false;
+                    body.IsKinematic = false;
                     controller.IsOnGround = false;
                     controller.JumpState = PlayerController.PlayerJumpState.None;
                     controller.IsCrouching = false;

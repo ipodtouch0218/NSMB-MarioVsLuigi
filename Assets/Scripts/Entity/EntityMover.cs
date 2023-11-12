@@ -16,6 +16,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     [Networked] private Vector2 InternalPosition { get; set; }
     [Networked] public Vector2 Velocity { get; set; }
     [Networked] public NetworkBool Freeze { get; set; }
+    [Networked] public NetworkBool IsKinematic { get; set; }
     [Networked] public NetworkBool LockX { get; set; }
     [Networked] public NetworkBool LockY { get; set; }
     [Networked] public Vector2 Gravity { get; set; }
@@ -78,8 +79,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
         if (Freeze) {
             newPosition = Position;
         } else if (IsProxy || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
-
             // Proxy interpolation with some smoothing:
+
             if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, Position) > interpolationTeleportDistance) {
                 // Teleport over large distances
                 newPosition = Utils.WrapWorldLocation(Position);
@@ -121,7 +122,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
         if (!Freeze && (!IsProxy || InterpolationDataSource == InterpolationDataSources.Predicted)) {
             Vector2 movement;
             movement = CollideAndSlide(Position + ColliderOffset, Velocity * Runner.DeltaTime, false);
-            movement += CollideAndSlide(Position + ColliderOffset + movement, Gravity * (Runner.DeltaTime * Runner.DeltaTime), true);
+            if (!IsKinematic)
+                movement += CollideAndSlide(Position + ColliderOffset + movement, Gravity * (Runner.DeltaTime * Runner.DeltaTime), true);
             movement *= Runner.Config.Simulation.TickRate;
 
             Velocity = movement;
@@ -146,6 +148,9 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     private Vector2 CollideAndSlide(Vector2 raycastPos, Vector2 raycastVel, bool gravityPass, int depth = 0) {
         if (depth >= MaxIterations)
             return Vector2.zero;
+
+        if (IsKinematic)
+            return raycastVel;
 
         if (LockX)
             raycastVel.x = 0;

@@ -621,7 +621,21 @@ namespace NSMB.Entities.Player {
             // Interact with overlapped entities
             CollidedObjects.Clear();
             for (int i = 0; i < collisions; i++) {
-                AttemptToInteractWithObject(CollisionBuffer[i].gameObject);
+                PhysicsDataStruct.ObjectContact contact = new();
+                Vector2 center = (Vector2) CollisionBuffer[i].transform.position + CollisionBuffer[i].offset;
+                Utils.Utils.UnwrapLocations(body.Position, center, out Vector2 ours, out Vector2 theirs);
+                float angle = Vector2.SignedAngle(ours - theirs, Vector2.up);
+                angle += 360 + 45;
+                angle %= 360;
+
+                contact.direction = angle switch {
+                    < 90 => InteractionDirection.Up,
+                    < 180 => InteractionDirection.Right,
+                    < 270 => InteractionDirection.Down,
+                    _ => InteractionDirection.Left
+                };
+
+                AttemptToInteractWithObject(CollisionBuffer[i].gameObject, contact);
             }
 
             // Interact with touched objects
@@ -678,15 +692,23 @@ namespace NSMB.Entities.Player {
 
         public void InteractWithPlayer(PlayerController other, PhysicsDataStruct.IContactStruct contact = null) {
 
+            // Don't interact with ghosts
             if (IsDead || other.IsDead)
                 return;
 
+            // Or players in pipes
+            if (CurrentPipe || other.CurrentPipe)
+                return;
+
+            // Or frozen players (we interact with the frozencube)
             if (IsFrozen || other.IsFrozen)
                 return;
 
+            // Or players with I-Frames
             if (DamageInvincibilityTimer.IsActive(Runner) || other.DamageInvincibilityTimer.IsActive(Runner))
                 return;
 
+            // Or players in the Mega Mushroom grow animation
             if (MegaStartTimer.IsActive(Runner) || other.MegaStartTimer.IsActive(Runner))
                 return;
 
@@ -1546,7 +1568,7 @@ namespace NSMB.Entities.Player {
 
             Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.Position);
             TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
-            if (tile)
+            if (!weak && tile)
                 fromRight = !fromRight;
 
             body.Velocity = new Vector2(
@@ -1750,45 +1772,7 @@ namespace NSMB.Entities.Player {
         }
 
         #region -- PIPES --
-
-        private void DownwardsPipeCheck(bool down) {
-            if (!down || State == Enums.PowerupState.MegaMushroom || !IsOnGround || IsInKnockback || IsInShell || HeldEntity)
-                return;
-
-            foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.Position, Vector2.down, 0.1f)) {
-                GameObject obj = hit.transform.gameObject;
-                if (!obj.CompareTag("pipe"))
-                    continue;
-                PipeManager pipe = obj.GetComponent<PipeManager>();
-                if (!pipe.entryAllowed || (pipe.miniOnly && State != Enums.PowerupState.MiniMushroom))
-                    continue;
-
-                // Enter pipe
-                EnterPipe(pipe, Vector2.down);
-                break;
-            }
-        }
-
-        private void UpwardsPipeCheck(bool up) {
-            if (!up || IsGroundpounding || !body.Data.HitRoof || State == Enums.PowerupState.MegaMushroom || IsInKnockback || HeldEntity)
-                return;
-
-            // Todo: change to nonalloc?
-            foreach (RaycastHit2D hit in Physics2D.RaycastAll(body.Position, Vector2.up, 1f)) {
-                GameObject obj = hit.transform.gameObject;
-                if (!obj.CompareTag("pipe"))
-                    continue;
-                PipeManager pipe = obj.GetComponent<PipeManager>();
-                if (!pipe.entryAllowed || (pipe.miniOnly && State != Enums.PowerupState.MiniMushroom))
-                    continue;
-
-                // Pipe found
-                EnterPipe(pipe, Vector2.up);
-                break;
-            }
-        }
-
-        private void EnterPipe(PipeManager pipe, Vector2 direction) {
+        public void EnterPipe(PipeManager pipe, Vector2 direction) {
             CurrentPipe = pipe;
             PipeEntering = true;
             PipeTimer = TickTimer.CreateFromSeconds(Runner, animationController.pipeDuration * 0.5f);
@@ -2553,12 +2537,6 @@ namespace NSMB.Entities.Player {
             */
 
             SwimJump = false;
-
-            // Pipes
-            if (PipeReentryTimer.ExpiredOrNotRunning(Runner)) {
-                DownwardsPipeCheck(down);
-                UpwardsPipeCheck(up);
-            }
 
             // Activate blocks jumped into
             if (body.Data.HitRoof && !IsStuckInBlock) {

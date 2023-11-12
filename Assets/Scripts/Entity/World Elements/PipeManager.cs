@@ -1,11 +1,44 @@
 ﻿using UnityEngine;
 
 using Fusion;
+using NSMB.Entities.Player;
+using NSMB.Extensions;
+using NSMB.Utils;
 
-public class PipeManager : NetworkBehaviour {
+public class PipeManager : NetworkBehaviour, IPlayerInteractable {
 
     public bool entryAllowed = true, bottom = false, miniOnly = false;
     public PipeManager otherPipe;
+
+    [SerializeField] private BoxCollider2D hitbox;
+
+    public void OnValidate() {
+        if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
+    }
+
+    public void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact) {
+        if (!entryAllowed)
+            return;
+
+        if (player.PipeReentryTimer.IsActive(Runner))
+            return;
+
+        if (miniOnly && player.State != Enums.PowerupState.MiniMushroom)
+            return;
+
+        Utils.UnwrapLocations((Vector2) transform.position + hitbox.offset, player.body.Position, out Vector2 ours, out Vector2 theirs);
+        float angle = Mathf.Abs(Vector2.SignedAngle(ours - theirs, Vector2.up));
+
+        bool canEnter =
+            (bottom && player.body.Data.HitRoof && angle < 90 && player.PreviousInputs.buttons.IsSet(PlayerControls.Up)) ||
+            (!bottom && player.IsOnGround && angle < 90 && player.PreviousInputs.buttons.IsSet(PlayerControls.Down));
+
+        if (!canEnter)
+            return;
+
+        // All clear enjoy your ride
+        player.EnterPipe(this, bottom ? Vector2.up : Vector2.down);
+    }
 
     //---Debug
 #if UNITY_EDITOR
