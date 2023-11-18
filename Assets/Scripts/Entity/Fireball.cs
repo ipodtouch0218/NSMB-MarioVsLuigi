@@ -61,6 +61,7 @@ namespace NSMB.Entities {
             //nrb.Rigidbody.position = spawnpoint;
             body.Freeze = false;
             body.Velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
+            body.InterpolationDataSource = Owner.IsProxy ? InterpolationDataSources.Snapshots : InterpolationDataSources.Predicted;
         }
 
         public override void Spawned() {

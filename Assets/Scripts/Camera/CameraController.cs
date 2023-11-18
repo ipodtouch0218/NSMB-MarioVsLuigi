@@ -43,6 +43,7 @@ public class CameraController : NetworkBehaviour {
             }
         }
     }
+    public Camera TargetCamera { get; private set; }
 
     //---Serialized Variables
     [SerializeField] private float floorOffset = 1f;
@@ -50,15 +51,14 @@ public class CameraController : NetworkBehaviour {
 
     //---Private Variables
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
-    private Camera targetCamera;
 
     public void OnValidate() {
         if (!controller) controller = GetComponentInParent<PlayerController>();
     }
 
     public void Awake() {
-        targetCamera = Camera.main;
-        targetCamera.GetComponentsInChildren(secondaryPositioners);
+        TargetCamera = Camera.main;
+        TargetCamera.GetComponentsInChildren(secondaryPositioners);
     }
 
     public void LateUpdate() {
@@ -89,7 +89,7 @@ public class CameraController : NetworkBehaviour {
         if (!IsControllingCamera)
             return;
 
-        targetCamera.transform.position = position;
+        TargetCamera.transform.position = position;
         if (BackgroundLoop.Instance)
             BackgroundLoop.Instance.Reposition();
 
@@ -104,8 +104,8 @@ public class CameraController : NetworkBehaviour {
         if (!controller.IsDead && !controller.IsRespawning)
             PlayerPos = AntiJitter(controller.body.interpolationTarget.position);
 
-        float vOrtho = targetCamera.orthographicSize;
-        float xOrtho = vOrtho * targetCamera.aspect;
+        float vOrtho = TargetCamera.orthographicSize;
+        float xOrtho = vOrtho * TargetCamera.aspect;
         Vector3 newCameraPosition = CurrentPosition;
 
         // Lagging camera movements

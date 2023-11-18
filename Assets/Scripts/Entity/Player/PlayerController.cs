@@ -23,8 +23,7 @@ namespace NSMB.Entities.Player {
 
         //---Static Variables
         private static readonly List<GameObject> CollidedObjects = new(16);
-        private static readonly Collider2D[] CollisionBuffer = new Collider2D[64];
-        private static readonly Collider2D[] TempCollisionBuffer = new Collider2D[32];
+        private static readonly List<LagCompensatedHit> LagCompensatedBuffer = new(16);
         private static readonly ContactPoint2D[] TileContactBuffer = new ContactPoint2D[32];
         private static readonly Vector3 ZeroPointFive = Vector3.one * 0.5f;
 
@@ -611,20 +610,25 @@ namespace NSMB.Entities.Player {
             if (IsProxy || IsDead || IsFrozen || CurrentPipe)
                 return;
 
-            int collisions = 0;
+            LagCompensatedBuffer.Clear();
             foreach (BoxCollider2D hitbox in hitboxes) {
-                int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + (body.Velocity * Runner.DeltaTime) + (hitbox.offset * transform.localScale), hitbox.size * transform.localScale, 0, TempCollisionBuffer);
-                Array.Copy(TempCollisionBuffer, 0, CollisionBuffer, collisions, count);
-                collisions += count;
+                Runner.LagCompensation.OverlapBox(
+                    body.Position + (body.Velocity * Runner.DeltaTime) + (hitbox.offset * transform.localScale),
+                    ((Vector3) (hitbox.size * 0.5f) + Vector3.forward).Multiply(transform.localScale),
+                    Quaternion.identity,
+                    Object.InputAuthority,
+                    LagCompensatedBuffer,
+                    options: HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority | HitOptions.SubtickAccuracy | HitOptions.DetailedHit,
+                    clearHits: false);
             }
 
             // Interact with overlapped entities
             CollidedObjects.Clear();
-            for (int i = 0; i < collisions; i++) {
+            foreach (LagCompensatedHit hit in LagCompensatedBuffer) {
+
+                GameObject hitObject = hit.GameObject;
                 PhysicsDataStruct.ObjectContact contact = new();
-                Vector2 center = (Vector2) CollisionBuffer[i].transform.position + CollisionBuffer[i].offset;
-                Utils.Utils.UnwrapLocations(body.Position, center, out Vector2 ours, out Vector2 theirs);
-                float angle = Vector2.SignedAngle(ours - theirs, Vector2.up);
+                float angle = Vector2.SignedAngle(hit.Normal, Vector2.up);
                 angle += 360 + 45;
                 angle %= 360;
 
@@ -635,7 +639,7 @@ namespace NSMB.Entities.Player {
                     _ => InteractionDirection.Left
                 };
 
-                AttemptToInteractWithObject(CollisionBuffer[i].gameObject, contact);
+                AttemptToInteractWithObject(hitObject, contact);
             }
 
             // Interact with touched objects

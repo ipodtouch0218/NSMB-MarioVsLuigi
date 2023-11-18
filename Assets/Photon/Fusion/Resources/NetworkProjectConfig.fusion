@@ -4,7 +4,7 @@
     "PeerMode": 0,
     "PhysicsEngine": 1,
     "ServerPhysicsMode": 1,
-    "UseLagCompensation": false,
+    "UseLagCompensation": true,
     "LagCompensation": {
         "HitboxBufferSize": 12,
         "HitboxCapacity": 512,
@@ -33,7 +33,7 @@
     },
     "SceneLoadSpawnMode": 2,
     "DeltaCompressor": 0,
-    "InvokeRenderInBatchMode": true,
+    "InvokeRenderInBatchMode": false,
     "MaxNetworkedObjectCount": 8192,
     "NetworkIdIsObjectName": false,
     "HideNetworkObjectInactivityGuard": false,
@@ -44,7 +44,7 @@
         "TickRate": 30,
         "MaxPrediction": 30,
         "DefaultPlayers": 10,
-        "ReplicationMode": 1,
+        "ReplicationMode": 0,
         "ObjectInterest": false,
         "ServerPacketInterval": 1,
         "ClientPacketInterval": 1
@@ -53,8 +53,8 @@
         "DeltaAdjustment": 4,
         "AllowedJitter": 35,
         "SnapLimit": 400,
-        "MultiplierMin": 1.5,
-        "MultiplierMax": 1.75
+        "MultiplierMin": 1.25,
+        "MultiplierMax": 1.25
     },
     "Network": {
         "SocketSendBufferSize": 256,

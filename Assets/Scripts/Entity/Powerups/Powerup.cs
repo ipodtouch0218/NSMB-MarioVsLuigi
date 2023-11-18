@@ -220,7 +220,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 float timeRemaining = SpawnAnimationTimer.RemainingRenderTime(Runner) ?? 0f;
                 float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
                 sRenderer.transform.localScale = Vector3.one * (1 + adjustment);
-                body.interpolationTarget.position = new(FollowPlayer.body.interpolationTarget.position.x, FollowPlayer.cameraController.CurrentPosition.y + 1.68f);
+                body.interpolationTarget.position = new(FollowPlayer.body.interpolationTarget.position.x, FollowPlayer.cameraController.TargetCamera.transform.position.y + 1.68f);
 
                 if (!disableSpawnAnimation) {
                     mpb.SetFloat("WaveEnabled", 0);

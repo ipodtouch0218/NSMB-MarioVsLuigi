@@ -592,7 +592,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             }
         }
 
-        if (MainMenuManager.Instance)
+        if (MainMenuManager.Instance) {
+            MainMenuManager.WasHostMigration = true;
             MainMenuManager.Instance.EnterRoom(false);
+        }
     }
 }

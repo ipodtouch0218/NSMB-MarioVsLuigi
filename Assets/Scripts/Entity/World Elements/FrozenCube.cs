@@ -239,7 +239,7 @@ namespace NSMB.Entities {
                 KillWithReason(UnfreezeReason.BlockBump);
                 return;
 
-            } else if (FastSlide) {
+            } else if (FastSlide || Holder) {
                 // Do damage
                 player.DoKnockback(ourPos.x > playerPos.x, 1, false, Object);
                 Kill();
