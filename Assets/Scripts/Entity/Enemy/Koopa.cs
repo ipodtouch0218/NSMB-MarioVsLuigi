@@ -11,11 +11,8 @@ using NSMB.Utils;
 
 namespace NSMB.Entities.Enemies {
 
-    [OrderAfter(typeof(NetworkPhysicsSimulation2D))]
+    //[OrderAfter(typeof(NetworkPhysicsSimulation2D))]
     public class Koopa : HoldableEntity {
-
-        //---Static Variables
-        private static readonly Vector2 BlockOffset = new(0, 0.05f);
 
         //---Networked Variables
         [Networked] public TickTimer WakeupTimer { get; set; }
@@ -23,7 +20,7 @@ namespace NSMB.Entities.Enemies {
         [Networked] public NetworkBool IsStationary { get; set; }
         [Networked] public NetworkBool IsUpsideDown { get; set; }
         [Networked] private NetworkBool Putdown { get; set; }
-        [Networked(OnChanged = nameof(OnBlueShellCollectorChanged))] private PlayerController BlueShellCollector { get; set; }
+        [Networked] private PlayerController BlueShellCollector { get; set; }
 
         //---Serialized Variables
         [SerializeField] private Sprite deadSprite;
@@ -437,9 +434,21 @@ namespace NSMB.Entities.Enemies {
         }
 
         //---OnChangeds
-        private static void OnBlueShellCollectorChanged(Changed<Koopa> changed) {
-            if (changed.Behaviour.BlueShellCollector)
-                changed.Behaviour.BlueShellCollector.PlaySound(Enums.Sounds.Player_Sound_PowerupCollect);
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
+
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(BlueShellCollector):
+                    OnBlueShellCollectorChanged();
+                    break;
+                }
+            }
+        }
+
+        private void OnBlueShellCollectorChanged() {
+            if (BlueShellCollector)
+                BlueShellCollector.PlaySound(Enums.Sounds.Player_Sound_PowerupCollect);
         }
     }
 }

@@ -62,6 +62,11 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 3502658418062677356, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
+      propertyPath: SortKey
+      value: 2471584883
+      objectReference: {fileID: 0}
+    - target: {fileID: 3502658418062677356, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
       value: 339800340092276151
       objectReference: {fileID: 0}

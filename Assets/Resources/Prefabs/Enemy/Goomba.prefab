@@ -164,7 +164,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f5b530d04bdafb4b866d48e39e4d5e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   _FacingRight:
     _value: 0
   _IsActive:
@@ -384,20 +383,15 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 447155003
   ObjectInterest: 0
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
   Flags: 2305
-  NetworkGuid:
-    RawGuidValue: 1ce5864bde999014a92015b065520add
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7523289063499453453}
   - {fileID: 4636113223263193814}
-  SimulationBehaviours:
-  - {fileID: 2884479414836889194}
 --- !u!114 &4636113223263193814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,9 +404,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a384a75a1c0645459861c223ac33652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 2
   _Velocity: {x: 0, y: 0}
   _Freeze:
+    _value: 0
+  _IsKinematic:
     _value: 0
   _LockX:
     _value: 0

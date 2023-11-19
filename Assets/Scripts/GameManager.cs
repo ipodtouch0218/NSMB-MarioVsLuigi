@@ -141,7 +141,7 @@ namespace NSMB.Game {
             if (!NetworkHandler.Runner.SessionInfo.IsValid) {
                 // Join a singleplayer room if we're not in one
                 await NetworkHandler.CreateRoom(new() {
-                    Scene = SceneManager.GetActiveScene().buildIndex,
+                    Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
                 }, GameMode.Single);
             }
 
@@ -217,7 +217,7 @@ namespace NSMB.Game {
 
             pauseUI.SetActive(false);
             sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-            GameData.Instance.Rpc_EndGame(PlayerRef.None);
+            GameData.Instance.Rpc_EndGame(-1);
         }
 
         public void PauseQuitGame() {

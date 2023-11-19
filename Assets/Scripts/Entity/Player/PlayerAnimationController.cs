@@ -7,7 +7,8 @@ using NSMB.Extensions;
 using NSMB.Game;
 
 namespace NSMB.Entities.Player {
-    [OrderAfter(typeof(PlayerController))]
+
+    //[OrderAfter(typeof(PlayerController))]
     public class PlayerAnimationController : NetworkBehaviour {
 
         //---Static Variables

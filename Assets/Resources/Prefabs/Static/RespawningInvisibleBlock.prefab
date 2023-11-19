@@ -87,7 +87,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c520b16e633450a4bb0238413fcdf116, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   bumpTile: {fileID: 11400000, guid: 3532b2dd7d04184489604475da441af1, type: 2}
   resultTile: {fileID: 11400000, guid: 8cc8c3eed522e86409440cf81284951a, type: 2}
 --- !u!114 &3681017443671302445
@@ -102,15 +101,11 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 1672546253
   ObjectInterest: 0
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
   Flags: 67841
-  NetworkGuid:
-    RawGuidValue: 52fa37521c30ebb40ab4cac4ef31be57
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4425110965538168456}
-  SimulationBehaviours: []

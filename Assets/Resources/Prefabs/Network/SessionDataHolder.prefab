@@ -45,21 +45,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ba11c1a6ae90f24ba14f2238591f0d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   _MaxPlayers: 0
   _PrivateRoom:
     _value: 0
   _GameStarted:
     _value: 0
   _Level: 0
-  _StarRequirement: 0
-  _CoinRequirement: 0
-  _Lives: 0
-  _Timer: 0
   _DrawOnTimeUp:
     _value: 0
-  _CustomPowerups:
+  _Teams:
     _value: 0
+  _AlternatingMusicIndex: 0
 --- !u!114 &2600866393204277219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,15 +68,11 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 2240804480
   ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
   Flags: 2305
-  NetworkGuid:
-    RawGuidValue: 6fe1d2f7545d144468b4dbaf10fabd89
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2600866393204277216}
-  SimulationBehaviours: []

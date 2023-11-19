@@ -134,7 +134,8 @@ PlayerSettings:
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
   bundleVersion: 1.8.0.0
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: 49335f30d253220488d2d332ade6e901, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -811,7 +812,7 @@ PlayerSettings:
     PS5: 
     QNX: 
     Stadia: 
-    Standalone: FUSION_WEAVER
+    Standalone: FUSION_WEAVER;FUSION2
     WebGL: FUSION_WEAVER
     Windows Store Apps: FUSION_WEAVER
     XboxOne: 

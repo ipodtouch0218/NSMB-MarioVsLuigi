@@ -694,7 +694,7 @@
             This concentrates the basics for serialization and cloning
             </summary>
         </member>
-        <member name="F:Fusion.Protocol.Message.CUSTOM_DATA_LENGHT">
+        <member name="F:Fusion.Protocol.Message.CustomDataLenght">
             <summary>
             Max Lenght of the Custom Data
             </summary>
@@ -725,6 +725,7 @@
             Created a new Message with a certain version
             </summary>
             <param name="protocolMessage">Protocol Message Version</param>
+            <param name="serializationVersion">Fusion Serialization Version</param>
         </member>
         <member name="M:Fusion.Protocol.Message.Serialize(Fusion.Protocol.BitStream)">
             <summary>
@@ -738,13 +739,12 @@
             </summary>
             <param name="serializer">Buffer to read from or write into the data of the Message</param>
         </member>
-        <member name="M:Fusion.Protocol.Message.CheckCompability(Fusion.Protocol.ProtocolMessageVersion,System.Version,System.Boolean)">
+        <member name="M:Fusion.Protocol.Message.CheckCompability(Fusion.Protocol.ProtocolMessageVersion,System.Version)">
             <summary>
             Check if this Message is compatible with target versions
             </summary>
             <param name="targetProtocolVersion">Target Protocol Message Version</param>
             <param name="pluginSerializationVersion">Target Fusion Serialization Version</param>
-            <param name="enableSerializationVersionCheck">Enable the Serialization Version Check</param>
             <returns>True if message is compatible with versions</returns>
         </member>
         <member name="T:Fusion.Protocol.Disconnect">
@@ -909,6 +909,11 @@
             Peer Unique ID
             </summary>
         </member>
+        <member name="F:Fusion.Protocol.Join.PlayerRef">
+            <summary>
+            Player Unique Ref
+            </summary>
+        </member>
         <member name="T:Fusion.Protocol.SyncType">
             <summary>
             Network Config Msg Type
@@ -1047,26 +1052,10 @@
             CRC Hash based on the content of the internal data or the expected CRC after all fragments are computed
             </summary>
         </member>
-        <member name="P:Fusion.Protocol.Snapshot.SnapshotBuffer">
-            <summary>
-            Actual Snapshot data
-            </summary>
-        </member>
-        <member name="P:Fusion.Protocol.Snapshot.SnapshotSize">
-            <summary>
-            Snapshot Total Size
-            </summary>
-        </member>
-        <member name="M:Fusion.Protocol.Snapshot.ComputeCRC(System.Byte[])">
+        <member name="M:Fusion.Protocol.Snapshot.ComputeCRC(System.Byte[],System.Int32)">
             <summary>
             Computes the CRC64 of the current Buffer Data stored on the Snapshot
             </summary>
-        </member>
-        <member name="M:Fusion.Protocol.Snapshot.Merge(Fusion.Protocol.Snapshot)">
-            <summary>
-            Merge the received Snapshot data on this own data
-            </summary>
-            <param name="snapshot">Snapshot to be merged</param>
         </member>
         <member name="M:Fusion.Protocol.Snapshot.Clone">
             <summary>
@@ -1217,6 +1206,16 @@
         <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_2_3">
             <summary>
             Added Peer Unique Key
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_3_0">
+            <summary>
+            Added Join Message PlayerRef
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_4_0">
+            <summary>
+            Rework Host Migration
             </summary>
         </member>
         <member name="F:Fusion.Protocol.ProtocolMessageVersion.LATEST">

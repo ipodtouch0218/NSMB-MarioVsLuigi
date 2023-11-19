@@ -19,23 +19,23 @@ public class PlayerData : NetworkBehaviour {
     public event Action<bool> OnInOptionsChangedEvent;
 
     //---Networked Variables
-    [Networked, Capacity(20)]                                    public string RawNickname { get; set; } = "noname";
-    [Networked(OnChanged = nameof(OnNameChanged)), Capacity(28)] private string DisplayNickname { get; set; } = "noname";
-    [Networked]                                                  public ConnectionToken ConnectionToken { get; set; }
-    [Networked]                                                  public sbyte PlayerId { get; set; }
-    [Networked]                                                  public uint Wins { get; set; }
-    [Networked(OnChanged = nameof(OnStartSettingChanged))]       public sbyte Team { get; set; }
-    [Networked(OnChanged = nameof(OnStartSettingChanged))]       public NetworkBool IsManualSpectator { get; set; }
-    [Networked]                                                  public NetworkBool IsCurrentlySpectating { get; set; }
-    [Networked]                                                  public NetworkBool IsRoomOwner { get; set; }
-    [Networked(OnChanged = nameof(OnLoadStateChanged))]          public NetworkBool IsLoaded { get; set; }
-    [Networked]                                                  public NetworkBool IsMuted { get; set; }
-    [Networked(OnChanged = nameof(OnInOptionsChanged))]          public NetworkBool IsInOptions { get; set; }
-    [Networked]                                                  public TickTimer MessageCooldownTimer { get; set; }
-    [Networked(OnChanged = nameof(OnCharacterChanged))]          public byte CharacterIndex { get; set; }
-    [Networked(OnChanged = nameof(OnSkinChanged))]               public byte SkinIndex { get; set; }
-    [Networked(OnChanged = nameof(OnSettingChanged))]            public int Ping { get; set; }
-    [Networked]                                                  public int JoinTick { get; set; }
+    [Networked, Capacity(20)] public string RawNickname { get; set; } = "noname";
+    [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
+    [Networked] public ConnectionToken ConnectionToken { get; set; }
+    [Networked] public sbyte PlayerId { get; set; }
+    [Networked] public uint Wins { get; set; }
+    [Networked] public sbyte Team { get; set; }
+    [Networked] public NetworkBool IsManualSpectator { get; set; }
+    [Networked] public NetworkBool IsCurrentlySpectating { get; set; }
+    [Networked] public NetworkBool IsRoomOwner { get; set; }
+    [Networked] public NetworkBool IsLoaded { get; set; }
+    [Networked] public NetworkBool IsMuted { get; set; }
+    [Networked] public NetworkBool IsInOptions { get; set; }
+    [Networked] public TickTimer MessageCooldownTimer { get; set; }
+    [Networked] public byte CharacterIndex { get; set; }
+    [Networked] public byte SkinIndex { get; set; }
+    [Networked] public int Ping { get; set; }
+    [Networked] public int JoinTick { get; set; }
 
     public Guid UserId => ConnectionToken.signedData.UserId;
     public NicknameColor NicknameColor => nicknameColor;
@@ -44,6 +44,7 @@ public class PlayerData : NetworkBehaviour {
     private NicknameColor nicknameColor;
     private Tick lastUpdatedTick;
     private string filteredNickname;
+    private ChangeDetector changeDetector;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -74,11 +75,11 @@ public class PlayerData : NetworkBehaviour {
 
         JoinTick = Runner.Tick;
 
-        if (Object.InputAuthority == Runner.SessionInfo.MaxPlayers - 1) {
+        if (Object.InputAuthority.AsIndex == Runner.SessionInfo.MaxPlayers - 1) {
             Team = 0;
             IsRoomOwner = true;
         } else {
-            Team = (sbyte) ((Object.InputAuthority + 1) % 5);
+            Team = (sbyte) ((Object.InputAuthority.AsIndex + 1) % 5);
         }
     }
 
@@ -120,8 +121,30 @@ public class PlayerData : NetworkBehaviour {
             PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenToggled;
         }
 
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+
         // Check if we need to play sfx / send a chat message
         SendJoinMessageIfNeeded();
+    }
+
+    public override void Render() {
+        base.Render();
+
+
+        foreach (var change in changeDetector.DetectChanges(this)) {
+            switch (change) {
+            case nameof(Team):
+            case nameof(IsManualSpectator):
+                OnStartSettingChanged();
+                break;
+            case nameof(DisplayNickname): OnNameChanged(); break;
+            case nameof(Ping): OnSettingChanged(); break;
+            case nameof(IsLoaded): OnLoadStateChanged(); break;
+            case nameof(IsInOptions): OnInOptionsChanged(); break;
+            case nameof(CharacterIndex): OnCharacterChanged(); break;
+            case nameof(SkinIndex): OnSkinChanged(); break;
+            }
+        }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
@@ -166,7 +189,7 @@ public class PlayerData : NetworkBehaviour {
 
         RawNickname = name;
 
-        if (Object.InputAuthority != Runner.SessionInfo.MaxPlayers - 1) {
+        if (Object.InputAuthority.AsIndex != Runner.SessionInfo.MaxPlayers - 1) {
             // Check for players with duplicate names, and add (1), (2), etc
             int count = Runner.ActivePlayers
                 .Select(pr => pr.GetPlayerData(Runner))
@@ -244,47 +267,47 @@ public class PlayerData : NetworkBehaviour {
         Rpc_SetOptionsOpen(isOpen);
     }
 
-    public static void OnLoadStateChanged(Changed<PlayerData> changed) {
-        if (changed.Behaviour.IsLoaded && GameData.Instance)
+    public void OnLoadStateChanged() {
+        if (IsLoaded && GameData.Instance)
             GameData.Instance.CheckIfAllPlayersLoaded();
     }
 
-    public static void OnSettingChanged(Changed<PlayerData> changed) {
-        if (!MainMenuManager.Instance || changed.Behaviour.lastUpdatedTick >= changed.Behaviour.Runner.Tick)
+    public void OnSettingChanged() {
+        if (!MainMenuManager.Instance || lastUpdatedTick >= Runner.Tick)
             return;
 
-        changed.Behaviour.lastUpdatedTick = changed.Behaviour.Runner.Tick;
+        lastUpdatedTick = Runner.Tick;
         MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
     }
 
-    public static void OnStartSettingChanged(Changed<PlayerData> changed) {
+    public void OnStartSettingChanged() {
         if (!MainMenuManager.Instance)
             return;
 
         MainMenuManager.Instance.UpdateStartGameButton();
-        OnSettingChanged(changed);
+        OnSettingChanged();
     }
 
-    public static void OnNameChanged(Changed<PlayerData> changed) {
-        changed.Behaviour.gameObject.name = "PlayerData (" + changed.Behaviour.DisplayNickname + ", " + changed.Behaviour.UserId.ToString() + ")";
+    public void OnNameChanged() {
+        gameObject.name = "PlayerData (" + DisplayNickname + ", " + UserId.ToString() + ")";
     }
 
-    public static void OnCharacterChanged(Changed<PlayerData> changed) {
-        if (!MainMenuManager.Instance || !changed.Behaviour.Object.HasInputAuthority)
+    public void OnCharacterChanged() {
+        if (!MainMenuManager.Instance || !Object.HasInputAuthority)
             return;
 
-        MainMenuManager.Instance.SwapCharacter(changed.Behaviour.CharacterIndex, false);
-        OnSettingChanged(changed);
+        MainMenuManager.Instance.SwapCharacter(CharacterIndex, false);
+        OnSettingChanged();
     }
 
-    public static void OnSkinChanged(Changed<PlayerData> changed) {
-        if (!MainMenuManager.Instance || !changed.Behaviour.Object.HasInputAuthority)
+    public void OnSkinChanged() {
+        if (!MainMenuManager.Instance || !Object.HasInputAuthority)
             return;
 
-        MainMenuManager.Instance.SwapPlayerSkin(changed.Behaviour.SkinIndex, false);
+        MainMenuManager.Instance.SwapPlayerSkin(SkinIndex, false);
     }
 
-    public static void OnInOptionsChanged(Changed<PlayerData> changed) {
-        changed.Behaviour.OnInOptionsChangedEvent?.Invoke(changed.Behaviour.IsInOptions);
+    public void OnInOptionsChanged() {
+        OnInOptionsChangedEvent?.Invoke(IsInOptions);
     }
 }

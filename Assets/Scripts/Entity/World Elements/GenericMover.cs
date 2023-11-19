@@ -3,7 +3,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Game;
 
-[OrderBefore(typeof(EntityMover))]
+//[OrderBefore(typeof(EntityMover))]
 public class GenericMover : NetworkBehaviour, IBeforeTick {
 
     //---Networked Variables
@@ -44,7 +44,7 @@ public class GenericMover : NetworkBehaviour, IBeforeTick {
         if (!GameData.Instance || GameData.Instance.GameEnded)
             return;
 
-        SetPosition(interpolationTarget, Origin, Runner.SimulationRenderTime - GameData.Instance.GameStartTime);
+        SetPosition(interpolationTarget, Origin, Runner.LocalRenderTime - GameData.Instance.GameStartTime);
     }
 
     public override void FixedUpdateNetwork() {

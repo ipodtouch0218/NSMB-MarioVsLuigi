@@ -27,9 +27,9 @@ namespace NSMB.Entities {
         protected static ContactFilter2D EntityFilter;
 
         //---Networked Variables
-        [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
+        [Networked] public NetworkBool IsDead { get; set; }
         [Networked] protected NetworkBool WasSpecialKilled { get; set; }
-        [Networked(OnChanged = nameof(OnWasCrushedChanged))] protected NetworkBool WasCrushed { get; set; }
+        [Networked] protected NetworkBool WasCrushed { get; set; }
         [Networked] protected NetworkBool WasGroundpounded { get; set; }
         [Networked] protected float AngularVelocity { get; set; }
         [Networked] protected byte ComboCounter { get; set; }
@@ -114,19 +114,8 @@ namespace NSMB.Entities {
         }
 
         public override void Spawned() {
-            if (FirstSpawn) {
-                SpawnLocation = transform.position;
-
-                if (IsRespawningEntity)
-                    DespawnEntity();
-                else
-                    RespawnEntity();
-            }
-            GameManager.Instance.networkObjects.Add(Object);
-            OnFacingRightChanged();
+            base.Spawned();
             OnIsActiveChanged();
-
-            FirstSpawn = false;
         }
 
         public override void Render() {
@@ -406,17 +395,23 @@ namespace NSMB.Entities {
         }
 
         //---OnChangeds
-        public static void OnIsDeadChanged(Changed<KillableEntity> changed) {
-            changed.Behaviour.OnIsDeadChanged();
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
+
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(IsDead): OnIsDeadChanged(); break;
+                case nameof(WasCrushed): OnWasCrushedChanged(); break;
+                }
+            }
         }
 
-        public static void OnWasCrushedChanged(Changed<KillableEntity> changed) {
-            KillableEntity entity = changed.Behaviour;
-            if (!entity.WasCrushed)
+        public void OnWasCrushedChanged() {
+            if (!WasCrushed)
                 return;
 
-            entity.PlaySound(Enums.Sounds.Enemy_Shell_Kick, null, 0, 0.5f);
-            entity.SpawnParticle(entity.body.Position, Enums.PrefabParticle.Enemy_Puff);
+            PlaySound(Enums.Sounds.Enemy_Shell_Kick, null, 0, 0.5f);
+            SpawnParticle(body.Position, Enums.PrefabParticle.Enemy_Puff);
         }
     }
 }

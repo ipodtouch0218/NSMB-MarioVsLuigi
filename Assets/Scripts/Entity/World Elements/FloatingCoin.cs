@@ -9,7 +9,7 @@ namespace NSMB.Entities.Collectable {
     public class FloatingCoin : Coin {
 
         //---Networked Variables
-        [Networked(OnChanged = nameof(OnIsDottedChanged))] private bool IsDotted { get; set; }
+        [Networked] private bool IsDotted { get; set; }
         [Networked] private TickTimer DottedTimer { get; set; }
 
         //---Serialized Variables
@@ -29,6 +29,7 @@ namespace NSMB.Entities.Collectable {
         }
 
         public override void Spawned() {
+            base.Spawned();
             if (dottedCoin)
                 IsDotted = true;
         }
@@ -59,14 +60,24 @@ namespace NSMB.Entities.Collectable {
         }
 
         //---OnChangeds
-        public static void OnIsDottedChanged(Changed<FloatingCoin> changed) {
-            FloatingCoin coin = changed.Behaviour;
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
 
-            coin.defaultCoinAnimate.isDisplaying = !coin.IsDotted;
-            coin.dottedCoinAnimate.isDisplaying = coin.IsDotted;
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(IsDotted):
+                    OnIsDottedChanged();
+                    break;
+                }
+            }
+        }
 
-            if (!coin.IsDotted)
-                coin.PlaySound(Enums.Sounds.World_Coin_Dotted_Spawn);
+        public void OnIsDottedChanged() {
+            defaultCoinAnimate.isDisplaying = !IsDotted;
+            dottedCoinAnimate.isDisplaying = IsDotted;
+
+            if (!IsDotted)
+                PlaySound(Enums.Sounds.World_Coin_Dotted_Spawn);
         }
     }
 }

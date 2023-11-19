@@ -20,21 +20,30 @@ namespace NSMB.Entities.Enemies {
         [SerializeField] private float popupTime = 0.5f, chompTime = 2f;
 
         //---Private Variables
-        private Interpolator<float> popupAnimationTimeInterpolator;
+        private PropertyReader<float> popupAnimationTimePropertyReader;
+
 
         public override void Spawned() {
             base.Spawned();
             PopupCountdownTimer = TickTimer.CreateFromSeconds(Runner, popupTimerRequirement);
-            popupAnimationTimeInterpolator = GetInterpolator<float>(nameof(PopupAnimationTime));
+            popupAnimationTimePropertyReader = GetPropertyReader<float>(nameof(PopupAnimationTime));
         }
 
         public override void Render() {
             if (IsFrozen)
                 return;
 
-            interpolationTarget.localPosition = new(0, (popupAnimationTimeInterpolator.Value - 1) * popupDistance, 0);
+            float popupRenderTime;
+            if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
+                (float fromPosition, float toPosition) = popupAnimationTimePropertyReader.Read(from, to);
+                popupRenderTime = Mathf.Lerp(fromPosition, toPosition, alpha);
+            } else {
+                popupRenderTime = PopupAnimationTime;
+            }
+
+            interpolationTarget.localPosition = new(0, (popupRenderTime - 1) * popupDistance, 0);
             animator.SetBool("active", ChompTimer.IsRunning);
-            animator.SetBool("chomping", PopupAnimationTime > 0.99f);
+            animator.SetBool("chomping", popupRenderTime > 0.99f);
             sRenderer.enabled = !IsDead;
         }
 

@@ -45,18 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 3198692493
   ObjectInterest: 0
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
   Flags: 2305
-  NetworkGuid:
-    RawGuidValue: cf98b2b907b9bc74ab8c14624e3c5575
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7778410660804686588}
-  SimulationBehaviours: []
 --- !u!114 &7778410660804686588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69,9 +65,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90281b85f699b3d4f9f2583f81cd26da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  _Nickname: noname
-  _DisplayNickname: noname
+  _RawNickname: noname
   _PlayerId: 0
   _Wins: 0
   _Team: 0
@@ -85,9 +79,9 @@ MonoBehaviour:
     _value: 0
   _IsMuted:
     _value: 0
+  _IsInOptions:
+    _value: 0
   _CharacterIndex: 0
   _SkinIndex: 0
   _Ping: 0
-  _Initialized:
-    _value: 0
   _JoinTick: 0

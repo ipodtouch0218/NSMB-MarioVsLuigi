@@ -10,8 +10,8 @@ namespace NSMB.Entities.Collectable {
     public class LooseCoin : Coin {
 
         //---Networked Variables
-        [Networked] private Tick CollectableTick { get; set; }
-        [Networked(OnChanged = nameof(OnCoinBounceAnimCounterChanged))] private byte CoinBounceAnimCounter { get; set; }
+        [Networked] private int CollectableTick { get; set; }
+        [Networked] private byte CoinBounceAnimCounter { get; set; }
 
         //---Serialized Variables
         [SerializeField] private float despawn = 8;
@@ -30,13 +30,14 @@ namespace NSMB.Entities.Collectable {
 
         public override void Spawned() {
             base.Spawned();
-            CollectableTick = (int) (Runner.Tick + (0.2f * Runner.Simulation.Config.TickRate));
+            CollectableTick = (int) (Runner.Tick + (0.2f * Runner.TickRate));
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
             body.Velocity = Vector2.up * GameData.Instance.random.RangeInclusive(5.5f, 6f);
         }
 
         public override void Render() {
+            base.Render();
             float despawnTimeRemaining = DespawnTimer.RemainingRenderTime(Runner) ?? 0f;
             spriteRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
         }
@@ -86,8 +87,20 @@ namespace NSMB.Entities.Collectable {
         }
 
         //---OnChangeds
-        public static void OnCoinBounceAnimCounterChanged(Changed<LooseCoin> changed) {
-            changed.Behaviour.PlaySound(Enums.Sounds.World_Coin_Drop);
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
+
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(CoinBounceAnimCounter):
+                    OnCoinBounceAnimCounterChanged();
+                    break;
+                }
+            }
+        }
+
+        public void OnCoinBounceAnimCounterChanged() {
+            PlaySound(Enums.Sounds.World_Coin_Drop);
         }
     }
 }

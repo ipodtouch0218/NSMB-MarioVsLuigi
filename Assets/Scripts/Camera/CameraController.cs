@@ -7,7 +7,7 @@ using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 
-[OrderBefore(typeof(Powerup))]
+//[OrderBefore(typeof(Powerup))]
 public class CameraController : NetworkBehaviour {
 
     //---Static Variables
@@ -65,7 +65,7 @@ public class CameraController : NetworkBehaviour {
         if (!IsControllingCamera)
             return;
 
-        float delta = Runner.DeltaTime - (Runner.SimulationTime - Runner.SimulationRenderTime);
+        float delta = Runner.DeltaTime - (Runner.SimulationTime - Runner.LocalRenderTime);
         Vector3 newPosition = CalculateNewPosition(delta);
 
         Vector3 shakeOffset = Vector3.zero;

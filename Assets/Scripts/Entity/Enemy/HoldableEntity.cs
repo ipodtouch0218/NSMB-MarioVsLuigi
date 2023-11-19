@@ -6,7 +6,7 @@ using NSMB.Entities.Enemies;
 using NSMB.Game;
 
 namespace NSMB.Entities {
-    [OrderAfter(typeof(PlayerController))]
+    //[OrderAfter(typeof(PlayerController))]
     public abstract class HoldableEntity : KillableEntity, IBeforeTick {
 
         //---Networked Variables
@@ -14,7 +14,7 @@ namespace NSMB.Entities {
         [Networked] public PlayerController PreviousHolder { get; set; }
         [Networked] protected TickTimer ThrowInvincibility { get; set; }
         [Networked] protected float CurrentKickSpeed { get; set; }
-        [Networked(OnChanged = nameof(OnKickedAnimCounterChanged))] protected byte KickedAnimCounter { get; set; }
+        [Networked] protected byte KickedAnimCounter { get; set; }
 
         //---Serailized Variables
         [SerializeField] protected float throwSpeed = 4.5f;
@@ -161,13 +161,23 @@ namespace NSMB.Entities {
         }
 
         //---OnChanged
-        public static void OnKickedAnimCounterChanged(Changed<HoldableEntity> changed) {
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
+
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(KickedAnimCounter): OnKickedAnimCounterChanged(); break;
+                }
+            }
+        }
+
+        public void OnKickedAnimCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            if (!changed.Behaviour.IsActive) return;
+            if (!IsActive) return;
 
-            changed.Behaviour.PlaySound(Enums.Sounds.Enemy_Shell_Kick);
+            PlaySound(Enums.Sounds.Enemy_Shell_Kick);
         }
     }
 }

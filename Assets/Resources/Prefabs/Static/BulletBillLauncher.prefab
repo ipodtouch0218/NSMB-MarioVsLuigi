@@ -48,7 +48,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1a6a82b51b138f47931fde891270f59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   playerSearchRadius: 7
   playerCloseCutoff: 1
   initialShootTimer: 4
@@ -68,21 +67,17 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 2017035545
   ObjectInterest: 0
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
   Flags: 67841
-  NetworkGuid:
-    RawGuidValue: 48dd05d6e5db3a84e9abb9f5710a952f
   NestedObjects:
   - {fileID: 1334191793277783954}
   - {fileID: 7877647967856190049}
   - {fileID: 1168098775591439193}
   NetworkedBehaviours:
   - {fileID: 6797847914880496266}
-  SimulationBehaviours: []
 --- !u!1001 &4280945566382162272
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -171,6 +166,11 @@ PrefabInstance:
         type: 3}
       propertyPath: Flags
       value: 3073
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213839771229971201, guid: 42350f427b980ac45b4ce789698052ce,
+        type: 3}
+      propertyPath: SortKey
+      value: 1007521642
       objectReference: {fileID: 0}
     - target: {fileID: 6213839771229971201, guid: 42350f427b980ac45b4ce789698052ce,
         type: 3}
@@ -308,6 +308,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6213839771229971201, guid: 42350f427b980ac45b4ce789698052ce,
         type: 3}
+      propertyPath: SortKey
+      value: 2001124592
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213839771229971201, guid: 42350f427b980ac45b4ce789698052ce,
+        type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
       value: 0
       objectReference: {fileID: 0}
@@ -439,6 +444,11 @@ PrefabInstance:
         type: 3}
       propertyPath: Flags
       value: 3073
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213839771229971201, guid: 42350f427b980ac45b4ce789698052ce,
+        type: 3}
+      propertyPath: SortKey
+      value: 3916309458
       objectReference: {fileID: 0}
     - target: {fileID: 6213839771229971201, guid: 42350f427b980ac45b4ce789698052ce,
         type: 3}

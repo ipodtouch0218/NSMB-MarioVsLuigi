@@ -64,7 +64,7 @@ public class ChatManager : MonoBehaviour {
 
     public void DisplayPlayerMessage(string message, PlayerRef source) {
         // What
-        if (!source.IsValid)
+        if (!source.IsRealPlayer)
             return;
 
         PlayerData data = source.GetPlayerData(NetworkHandler.Runner);
@@ -96,7 +96,7 @@ public class ChatManager : MonoBehaviour {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerRef player = info.Source;
 
-        if (!player.IsValid)
+        if (!player.IsRealPlayer)
             return;
 
         PlayerData data = player.GetPlayerData(runner);

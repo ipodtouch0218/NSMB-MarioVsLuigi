@@ -450,8 +450,17 @@
              </remarks>
              <param name="eventData">The event currently being dispatched.</param>
         </member>
+        <member name="F:ExitGames.Client.Photon.PhotonSocketError.Busy">
+            <summary>Data wasn't sent yet.</summary>
+        </member>
+        <member name="F:ExitGames.Client.Photon.PhotonSocketError.PendingSend">
+            <summary>Data is being sent async (still in use).</summary>
+        </member>
         <member name="F:ExitGames.Client.Photon.IPhotonSocket.Protocol">
             <summary>The protocol for this socket, defined in constructor.</summary>
+        </member>
+        <member name="P:ExitGames.Client.Photon.IPhotonSocket.SocketErrorCode">
+            <summary>Socket implementations should store the SocketErrorCode here, if anything happens.</summary>
         </member>
         <member name="F:ExitGames.Client.Photon.IPhotonSocket.ConnectAddress">
             <summary>Address, as defined via a Connect() call. Including protocol, port and or path.</summary>
@@ -1185,6 +1194,10 @@
             Use the SocketImplementationConfig to define which IPhotonSocket is used per ConnectionProtocol.
             </remarks>
         </member>
+        <member name="P:ExitGames.Client.Photon.PhotonPeer.SocketErrorCode">
+            <summary>Provides access to a SocketError code (if available) after a call to OnStatusChanged with a Socket-level exception.</summary>
+            <remarks>Useful for debugging send / receive error cases.</remarks>
+        </member>
         <member name="F:ExitGames.Client.Photon.PhotonPeer.DebugOut">
             <summary>
             Sets the level (and amount) of debug output provided by the library.
@@ -1240,7 +1253,12 @@
              Send either byte[], ArraySegment or use the ByteArraySlicePool to acquire ByteArraySlices to send.
              </remarks>
         </member>
-        <!-- Badly formed XML comment ignored for member "P:ExitGames.Client.Photon.PhotonPeer.WrapIncomingStructs" -->
+        <member name="P:ExitGames.Client.Photon.PhotonPeer.WrapIncomingStructs">
+            <summary>
+            Incoming struct types are wrapped in a pooled IWrapperStruct, rather than being cast to object. This eliminated allocations and garbage collection from boxing,
+            however object that are wrapped structs will need to be cast to WrapperStruct&lt;T&gt; and their values extracted with (obj as WrapperStruct&lt;T&gt;).Value.
+            </summary>
+        </member>
         <member name="P:ExitGames.Client.Photon.PhotonPeer.ByteArraySlicePool">
              <summary>Instance of a ByteArraySlicePool. UseByteArraySlicePoolForEvents defines if this PhotonPeer is using the pool for deserialization of byte[] in Photon events.</summary>
              <remarks>
@@ -1472,7 +1490,7 @@
              DisconnectTimeout and SentCountAllowance are competing settings: either might trigger a disconnect on the
              client first, depending on the values and Roundtrip Time.
             
-             Default: 10000 ms. Maximum setting: 65535.
+             Default: 10000 ms.
              Setting a negative value will apply the default timeout.
              </remarks>
         </member>

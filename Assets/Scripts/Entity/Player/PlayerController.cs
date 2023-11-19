@@ -16,7 +16,7 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Player {
-    [OrderAfter(typeof(EntityMover))]
+    //[OrderAfter(typeof(EntityMover))]
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
 
         #region Variables
@@ -41,12 +41,12 @@ namespace NSMB.Entities.Player {
         //-Player Movement
         //Generic
         [Networked] public PlayerNetworkInput PreviousInputs { get; set; }
-        [Networked] private Tick LastInputTick { get; set; }
+        [Networked] private int LastInputTick { get; set; }
         [Networked] public NetworkBool IsFunctionallyRunning { get; set; }
         [Networked] public NetworkBool IsOnGround { get; set; }
         [Networked] private NetworkBool PreviousTickIsOnGround { get; set; }
-        [Networked(OnChanged = nameof(OnIsCrouchingChanged))] public NetworkBool IsCrouching { get; set; }
-        [Networked(OnChanged = nameof(OnIsSlidingChanged))] public NetworkBool IsSliding { get; set; }
+        [Networked] public NetworkBool IsCrouching { get; set; }
+        [Networked] public NetworkBool IsSliding { get; set; }
         [Networked] public NetworkBool IsSkidding { get; set; }
         [Networked] public NetworkBool IsTurnaround { get; set; }
         [Networked] private byte WalkingTurnaroundFrames { get; set; } //TODO: change somehow
@@ -59,26 +59,26 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool OnSlope { get; set; }
         [Networked] public NetworkBool OnIce { get; set; }
         //Jumping
-        [Networked(OnChanged = nameof(OnJumpAnimCounterChanged))] private byte JumpAnimCounter { get; set; }
-        [Networked(OnChanged = nameof(OnJumpLandingAnimCounterChanged))] private byte JumpLandingAnimCounter { get; set; }
+        [Networked] private byte JumpAnimCounter { get; set; }
+        [Networked] private byte JumpLandingAnimCounter { get; set; }
         [Networked] public NetworkBool IsJumping { get; set; }
         [Networked] public PlayerJumpState JumpState { get; set; }
         [Networked] public NetworkBool ProperJump { get; set; }
         [Networked] public NetworkBool DoEntityBounce { get; set; }
         [Networked] public NetworkBool BounceJump { get; set; }
         [Networked] public TickTimer JumpLandingTimer { get; set; }
-        [Networked(OnChanged = nameof(OnBlockBumpSoundCounterChanged))] public byte BlockBumpSoundCounter { get; set; }
+        [Networked] public byte BlockBumpSoundCounter { get; set; }
         //Knockback
         [Networked] public NetworkBool IsInKnockback { get; set; }
-        [Networked(OnChanged = nameof(OnKnockbackAnimCounterChanged))] private byte KnockbackAnimCounter { get; set; }
+        [Networked] private byte KnockbackAnimCounter { get; set; }
         [Networked] public NetworkBool IsWeakKnockback { get; set; }
         [Networked] public NetworkBool IsForwardsKnockback { get; set; }
         [Networked] private NetworkBool KnockbackWasOriginallyFacingRight { get; set; }
-        [Networked] public Tick KnockbackTick { get; set; }
+        [Networked] public int KnockbackTick { get; set; }
         [Networked] public NetworkObject KnockbackAttacker { get; set; }
         //Groundpound
-        [Networked(OnChanged = nameof(OnGroundpoundAnimCounterChanged))] public byte GroundpoundAnimCounter { get; set; }
-        [Networked(OnChanged = nameof(OnGroundpoundingChanged))] public NetworkBool IsGroundpounding { get; set; }
+        [Networked] public byte GroundpoundAnimCounter { get; set; }
+        [Networked] public NetworkBool IsGroundpounding { get; set; }
         [Networked] public TickTimer GroundpoundStartTimer { get; set; }
         [Networked] public TickTimer GroundpoundCooldownTimer { get; set; }
         [Networked] private NetworkBool GroundpoundHeld { get; set; }
@@ -87,17 +87,17 @@ namespace NSMB.Entities.Player {
         //Spinner
         [Networked] public SpinnerAnimator OnSpinner { get; set; }
         [Networked] public NetworkBool IsSpinnerFlying { get; set; }
-        [Networked(OnChanged = nameof(OnSpinnerLaunchAnimCounterChanged))] public byte SpinnerLaunchAnimCounter { get; set; }
+        [Networked] public byte SpinnerLaunchAnimCounter { get; set; }
         [Networked] public NetworkBool IsDrilling { get; set; }
-        [Networked(OnChanged = nameof(OnDustParticleAnimCounterChanged))] public byte DustParticleAnimCounter { get; set; }
+        [Networked] public byte DustParticleAnimCounter { get; set; }
         //Pipes
         [Networked] public Vector2 PipeDirection { get; set; }
         [Networked] public PipeManager CurrentPipe { get; set; }
         [Networked] public NetworkBool PipeEntering { get; set; }
-        [Networked(OnChanged = nameof(OnPipeTimerChanged))] public TickTimer PipeTimer { get; set; }
+        [Networked] public TickTimer PipeTimer { get; set; }
         [Networked] public TickTimer PipeReentryTimer { get; set; }
         //Walljump
-        [Networked(OnChanged = nameof(OnWallJumpTimerChanged))] public TickTimer WallJumpTimer { get; set; }
+        [Networked] public TickTimer WallJumpTimer { get; set; }
         [Networked] public TickTimer WallSlideEndTimer { get; set; }
         [Networked] public NetworkBool WallSlideLeft { get; set; }
         [Networked] public NetworkBool WallSlideRight { get; set; }
@@ -107,40 +107,40 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool SwimJump { get; set; }
         [Networked] public float SwimLeaveForceHoldJumpTime { get; set; }
         [Networked] public NetworkBool IsSwimming { get; set; }
-        [Networked(OnChanged = nameof(OnIsWaterWalkingChanged))] public NetworkBool IsWaterWalking { get; set; }
+        [Networked] public NetworkBool IsWaterWalking { get; set; }
         //-Death & Respawning
         [Networked] public NetworkBool Disconnected { get; set; }
-        [Networked(OnChanged = nameof(OnIsDeadChanged))] public NetworkBool IsDead { get; set; }
-        [Networked(OnChanged = nameof(OnDeathAnimationTimerChanged))] public TickTimer DeathAnimationTimer { get; set; }
-        [Networked(OnChanged = nameof(OnIsRespawningChanged))] public NetworkBool IsRespawning { get; set; }
+        [Networked] public NetworkBool IsDead { get; set; }
+        [Networked] public TickTimer DeathAnimationTimer { get; set; }
+        [Networked] public NetworkBool IsRespawning { get; set; }
         [Networked] public NetworkBool FireDeath { get; set; }
         [Networked] public NetworkBool DeathplaneDeath { get; set; }
         [Networked] public TickTimer RespawnTimer { get; set; }
         [Networked] public TickTimer PreRespawnTimer { get; set; }
 
         //-Entity Interactions
-        [Networked(OnChanged = nameof(OnHeldEntityChanged))] public HoldableEntity HeldEntity { get; set; }
-        [Networked(OnChanged = nameof(OnThrowAnimCounterChanged))] public byte ThrowAnimCounter { get; set; }
+        [Networked] public HoldableEntity HeldEntity { get; set; }
+        [Networked] public byte ThrowAnimCounter { get; set; }
         [Networked] public float HoldStartTime { get; set; }
         [Networked] public TickTimer ShellSlowdownTimer { get; set; }
         [Networked] public TickTimer DamageInvincibilityTimer { get; set; }
         [Networked] private byte _StarCombo { get; set; }
 
         //-Powerup Stuffs
-        [Networked(OnChanged = nameof(OnFireballAnimCounterChanged))] private byte FireballAnimCounter { get; set; }
+        [Networked] private byte FireballAnimCounter { get; set; }
         [Networked] public TickTimer FireballShootTimer { get; set; }
         [Networked] public TickTimer FireballDelayTimer { get; set; }
         [Networked] public NetworkBool CanShootAdditionalFireball { get; set; }
         [Networked] public TickTimer StarmanTimer { get; set; }
         [Networked] public NetworkBool IsPropellerFlying { get; set; }
-        [Networked(OnChanged = nameof(OnPropellerLaunchTimerChanged))] public TickTimer PropellerLaunchTimer { get; set; }
-        [Networked(OnChanged = nameof(OnPropellerSpinTimerChanged))] public TickTimer PropellerSpinTimer { get; set; }
+        [Networked] public TickTimer PropellerLaunchTimer { get; set; }
+        [Networked] public TickTimer PropellerSpinTimer { get; set; }
         [Networked] private TickTimer PropellerDrillCooldown { get; set; }
         [Networked] public NetworkBool UsedPropellerThisJump { get; set; }
-        [Networked(OnChanged = nameof(OnMegaStartTimerChanged))] public TickTimer MegaStartTimer { get; set; }
-        [Networked(OnChanged = nameof(OnMegaTimerChanged))] public TickTimer MegaTimer { get; set; }
+        [Networked] public TickTimer MegaStartTimer { get; set; }
+        [Networked] public TickTimer MegaTimer { get; set; }
         [Networked] public TickTimer MegaEndTimer { get; set; }
-        [Networked(OnChanged = nameof(OnIsStationaryMegaShrinkChanged))] private bool IsStationaryMegaShrink { get; set; }
+        [Networked] private bool IsStationaryMegaShrink { get; set; }
         [Networked] public NetworkBool IsInShell { get; set; }
         [Networked] public FrozenCube FrozenCube { get; set; }
 
@@ -321,14 +321,13 @@ namespace NSMB.Entities.Player {
         }
 
         public override void Spawned() {
-
             hitboxes = GetComponentsInChildren<BoxCollider2D>();
 
             body.Freeze = true;
 
             Data = Object.InputAuthority.GetPlayerData(Runner);
             if (HasInputAuthority) {
-                body.InterpolationDataSource = InterpolationDataSources.Predicted;
+                //body.InterpolationDataSource = InterpolationDataSources.Predicted;
 
                 GameManager.Instance.localPlayer = this;
                 GameManager.Instance.spectationManager.Spectating = false;
@@ -366,6 +365,8 @@ namespace NSMB.Entities.Player {
         }
 
         public override void Render() {
+            base.Render();
+
             if (GameData.Instance.GameState < Enums.GameState.Playing) {
                 models.SetActive(false);
                 return;
@@ -390,11 +391,11 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        [Networked] private Tick UpHeldStart { get; set; }
-        [Networked] private Tick DownHeldStart { get; set; }
-        [Networked] private Tick LeftHeldStart { get; set; }
-        [Networked] private Tick RightHeldStart { get; set; }
-        [Networked] private Tick JumpHeldStart { get; set; }
+        [Networked] private int UpHeldStart { get; set; }
+        [Networked] private int DownHeldStart { get; set; }
+        [Networked] private int LeftHeldStart { get; set; }
+        [Networked] private int RightHeldStart { get; set; }
+        [Networked] private int JumpHeldStart { get; set; }
 
         private void HandleButtonHolding(PlayerNetworkInput newInputs) {
             if (newInputs.buttons.WasPressed(PreviousInputs.buttons, PlayerControls.Up)) {
@@ -429,15 +430,15 @@ namespace NSMB.Entities.Player {
         }
 
         private PlayerNetworkInput HandleMissingInputs() {
-            if ((Runner.Tick - LastInputTick) > Runner.Simulation.Config.TickRate * 0.25f)
+            if ((Runner.Tick - LastInputTick) > Runner.TickRate * 0.25f)
                 return default;
 
             PlayerNetworkInput inputs = PreviousInputs;
-            inputs.buttons.Set(PlayerControls.Up, inputs.buttons.IsSet(PlayerControls.Up) && UpHeldStart != -1 && (UpHeldStart == Runner.Tick || (Runner.Tick - UpHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
-            inputs.buttons.Set(PlayerControls.Down, inputs.buttons.IsSet(PlayerControls.Down) && DownHeldStart != -1 && (DownHeldStart == Runner.Tick || (Runner.Tick - DownHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
-            inputs.buttons.Set(PlayerControls.Left, inputs.buttons.IsSet(PlayerControls.Left) && LeftHeldStart != -1 && (LeftHeldStart == Runner.Tick || (Runner.Tick - LeftHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
-            inputs.buttons.Set(PlayerControls.Right, inputs.buttons.IsSet(PlayerControls.Right) && RightHeldStart != -1 && (RightHeldStart == Runner.Tick || (Runner.Tick - RightHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
-            inputs.buttons.Set(PlayerControls.Jump, inputs.buttons.IsSet(PlayerControls.Jump) && JumpHeldStart != -1 && (JumpHeldStart == Runner.Tick || (Runner.Tick - JumpHeldStart) > Runner.Simulation.Config.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Up, inputs.buttons.IsSet(PlayerControls.Up) && UpHeldStart != -1 && (UpHeldStart == Runner.Tick || (Runner.Tick - UpHeldStart) > Runner.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Down, inputs.buttons.IsSet(PlayerControls.Down) && DownHeldStart != -1 && (DownHeldStart == Runner.Tick || (Runner.Tick - DownHeldStart) > Runner.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Left, inputs.buttons.IsSet(PlayerControls.Left) && LeftHeldStart != -1 && (LeftHeldStart == Runner.Tick || (Runner.Tick - LeftHeldStart) > Runner.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Right, inputs.buttons.IsSet(PlayerControls.Right) && RightHeldStart != -1 && (RightHeldStart == Runner.Tick || (Runner.Tick - RightHeldStart) > Runner.TickRate * 0.1f));
+            inputs.buttons.Set(PlayerControls.Jump, inputs.buttons.IsSet(PlayerControls.Jump) && JumpHeldStart != -1 && (JumpHeldStart == Runner.Tick || (Runner.Tick - JumpHeldStart) > Runner.TickRate * 0.1f));
 
             return inputs;
         }
@@ -618,7 +619,7 @@ namespace NSMB.Entities.Player {
                     Quaternion.identity,
                     Object.InputAuthority,
                     LagCompensatedBuffer,
-                    options: HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority | HitOptions.SubtickAccuracy | HitOptions.DetailedHit,
+                    options: HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority | HitOptions.SubtickAccuracy,
                     clearHits: false);
             }
 
@@ -2142,7 +2143,7 @@ namespace NSMB.Entities.Player {
                 // Check that we're not going above our limit
                 float max = maxArray[maxStage] + CalculateSlopeMaxSpeedOffset(Mathf.Abs(FloorAngle) * (uphill ? 1 : -1));
                 if (speed > max) {
-                    float maxDeceleration = (speed - max) * Runner.Config.Simulation.TickRate;
+                    float maxDeceleration = (speed - max) * Runner.TickRate;
                     acc = Mathf.Clamp(-acc, -maxDeceleration, maxDeceleration);
                 }
 
@@ -2869,7 +2870,7 @@ namespace NSMB.Entities.Player {
 
         private void SetHoldingOffset(bool renderTime = false) {
             if (HeldEntity is FrozenCube) {
-                float time = Mathf.Clamp01(((renderTime ? Runner.SimulationRenderTime : Runner.SimulationTime) - HoldStartTime) / pickupTime);
+                float time = Mathf.Clamp01(((renderTime ? Runner.LocalRenderTime : Runner.SimulationTime) - HoldStartTime) / pickupTime);
                 HeldEntity.holderOffset = new(0, MainHitbox.size.y * (1f - Utils.Utils.QuadraticEaseOut(1f - time)), -2);
             } else {
                 HeldEntity.holderOffset = new((FacingRight ? 1 : -1) * 0.25f, (State >= Enums.PowerupState.Mushroom ? 0.3f : 0.075f) - HeldEntity.sRenderer.localBounds.min.y, !FacingRight ? -0.09f : 0f);
@@ -3031,351 +3032,350 @@ namespace NSMB.Entities.Player {
         }
 
         //---OnChangeds
-        public static void OnGroundpoundingChanged(Changed<PlayerController> changed) {
-            if (!GameData.Instance.PlaySounds)
-                return;
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
 
-            PlayerController player = changed.Behaviour;
-            if (!player.IsGroundpounding)
-                return;
-
-            player.PlaySound(Enums.Sounds.Player_Sound_GroundpoundStart);
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(IsGroundpounding): OnGroundpoundingChanged(); break;
+                case nameof(GroundpoundAnimCounter): OnGroundpoundAnimCounterChanged(); break;
+                case nameof(WallJumpTimer): {
+                    OnWallJumpTimerChanged(GetPropertyReader<NetworkBool>(nameof(WallSlideLeft)).Read(oldBuffer));
+                    break;
+                }
+                case nameof(IsDead): OnIsDeadChanged(); break;
+                case nameof(DeathAnimationTimer): OnDeathAnimationTimerChanged(); break;
+                case nameof(IsRespawning): OnIsRespawningChanged(); break;
+                case nameof(FireballAnimCounter): OnFireballAnimCounterChanged(); break;
+                case nameof(IsSliding): OnIsSlidingChanged(); break;
+                case nameof(IsCrouching): OnIsCrouchingChanged(); break;
+                case nameof(PipeTimer): OnPipeTimerChanged(); break;
+                case nameof(PropellerLaunchTimer): OnPropellerLaunchTimerChanged(); break;
+                case nameof(PropellerSpinTimer): OnPropellerSpinTimerChanged(); break;
+                case nameof(SpinnerLaunchAnimCounter): OnSpinnerLaunchAnimCounterChanged(); break;
+                case nameof(DustParticleAnimCounter): OnDustParticleAnimCounterChanged(); break;
+                case nameof(JumpAnimCounter): OnJumpAnimCounterChanged(); break;
+                case nameof(JumpLandingAnimCounter): OnJumpLandingAnimCounterChanged(); break;
+                case nameof(IsWaterWalking): OnIsWaterWalkingChanged(); break;
+                case nameof(KnockbackAnimCounter): OnKnockbackAnimCounterChanged(); break;
+                case nameof(BlockBumpSoundCounter): OnBlockBumpSoundCounterChanged(); break;
+                case nameof(MegaTimer): OnMegaTimerChanged(); break;
+                case nameof(MegaStartTimer): OnMegaStartTimerChanged(); break;
+                case nameof(IsStationaryMegaShrink): OnIsStationaryMegaShrinkChanged(); break;
+                // case nameof(IsFrozen): OnIsFrozenChanged(); break;
+                case nameof(HeldEntity): OnHeldEntityChanged(); break;
+                }
+            }
         }
 
-        public static void OnGroundpoundAnimCounterChanged(Changed<PlayerController> changed) {
+        public void OnGroundpoundingChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
+            if (!IsGroundpounding)
+                return;
+
+            PlaySound(Enums.Sounds.Player_Sound_GroundpoundStart);
+        }
+
+        public void OnGroundpoundAnimCounterChanged() {
+            if (!GameData.Instance.PlaySounds)
+                return;
 
             // Groundpound
-            if (player.State != Enums.PowerupState.MegaMushroom) {
-                Enums.Sounds sound = player.State switch {
+            if (State != Enums.PowerupState.MegaMushroom) {
+                Enums.Sounds sound = State switch {
                     Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Groundpound,
                     _ => Enums.Sounds.Player_Sound_GroundpoundLanding,
                 };
-                player.PlaySound(sound);
-                player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.Position);
+                PlaySound(sound);
+                SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.Position);
 
-                if (player.cameraController.IsControllingCamera)
+                if (cameraController.IsControllingCamera)
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f, RumbleManager.RumbleSetting.Low);
             } else {
                 CameraController.ScreenShake = 0.15f;
             }
 
-            if (!player.ContinueGroundpound && player.State == Enums.PowerupState.MegaMushroom) {
-                player.PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
-                player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.Position);
+            if (!ContinueGroundpound && State == Enums.PowerupState.MegaMushroom) {
+                PlaySound(Enums.Sounds.Powerup_MegaMushroom_Groundpound);
+                SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.Position);
                 CameraController.ScreenShake = 0.35f;
 
-                if (player.cameraController.IsControllingCamera)
+                if (cameraController.IsControllingCamera)
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f, RumbleManager.RumbleSetting.Low);
             }
         }
 
-        public static void OnWallJumpTimerChanged(Changed<PlayerController> changed) {
+        public void OnWallJumpTimerChanged(bool previousWallSlideLeft) {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            if (!player.WallJumpTimer.IsRunning)
+            if (!WallJumpTimer.IsRunning)
                 return;
 
-            Vector2 offset = player.MainHitbox.size * 0.5f;
-            changed.LoadOld();
-            offset.x *= changed.Behaviour.WallSlideLeft ? -1 : 1;
+            Vector2 offset = MainHitbox.size * 0.5f;
+            offset.x *= previousWallSlideLeft ? -1 : 1;
 
-            player.PlaySound(Enums.Sounds.Player_Sound_WallJump);
-            player.PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
+            PlaySound(Enums.Sounds.Player_Sound_WallJump);
+            PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
 
-            player.animator.SetTrigger("walljump");
-
-            changed.LoadNew();
+            animator.SetTrigger("walljump");
         }
 
         private float lastRespawnParticle;
-        public static void OnIsDeadChanged(Changed<PlayerController> changed) {
+        public void OnIsDeadChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
+            animator.SetBool("dead", IsDead);
 
-            player.animator.SetBool("dead", player.IsDead);
-
-            if (player.IsDead) {
+            if (IsDead) {
                 if (GameData.Instance.GameState < Enums.GameState.Playing)
                     return;
 
-                player.animator.Play("deadstart");
-                player.animator.SetBool("knockback", false);
-                player.animator.SetBool("flying", false);
-                player.animator.SetBool("firedeath", player.FireDeath);
-                //player.PlaySound(player.cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
+                animator.Play("deadstart");
+                animator.SetBool("knockback", false);
+                animator.SetBool("flying", false);
+                animator.SetBool("firedeath", FireDeath);
+                //PlaySound(cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
 
-                if (player.HasInputAuthority)
+                if (HasInputAuthority)
                     ScoreboardUpdater.Instance.OnDeathToggle();
             } else {
                 // Respawn poof particle
-                if (Mathf.Abs(player.lastRespawnParticle - player.Runner.SimulationTime) > 2) {
-                    GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, player.Spawnpoint);
-                    player.lastRespawnParticle = player.Runner.SimulationTime;
+                if (Mathf.Abs(lastRespawnParticle - Runner.SimulationTime) > 2) {
+                    GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, Spawnpoint);
+                    lastRespawnParticle = Runner.SimulationTime;
                 }
             }
         }
 
-        public static void OnDeathAnimationTimerChanged(Changed<PlayerController> changed) {
+        public void OnDeathAnimationTimerChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            if (player.DeathAnimationTimer.IsRunning) {
+            if (DeathAnimationTimer.IsRunning) {
                 // Player initial death animation
-                player.animator.Play("deadstart");
+                animator.Play("deadstart");
 
-            } else if (!player.DeathplaneDeath) {
+            } else if (!DeathplaneDeath) {
                 // Play second half of death animation
-                player.animator.SetTrigger("deathup");
+                animator.SetTrigger("deathup");
 
-                if (player.FireDeath) {
-                    player.PlaySound(Enums.Sounds.Player_Voice_LavaDeath);
-                    player.PlaySound(Enums.Sounds.Player_Sound_LavaHiss);
+                if (FireDeath) {
+                    PlaySound(Enums.Sounds.Player_Voice_LavaDeath);
+                    PlaySound(Enums.Sounds.Player_Sound_LavaHiss);
                 }
             }
         }
 
         private RespawnParticle respawnParticle;
-        public static void OnIsRespawningChanged(Changed<PlayerController> changed) {
-            PlayerController player = changed.Behaviour;
-            if (!player.IsRespawning || player.respawnParticle)
+        public void OnIsRespawningChanged() {
+            if (!IsRespawning || respawnParticle)
                 return;
 
-            player.respawnParticle = Instantiate(PrefabList.Instance.Particle_Respawn, player.Spawnpoint, Quaternion.identity);
-            player.respawnParticle.player = player;
+            respawnParticle = Instantiate(PrefabList.Instance.Particle_Respawn, Spawnpoint, Quaternion.identity);
+            respawnParticle.player = this;
         }
 
-        public static void OnFireballAnimCounterChanged(Changed<PlayerController> changed) {
+        public void OnFireballAnimCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            player.animator.SetTrigger("fireball");
-            player.sfx.PlayOneShot(player.State == Enums.PowerupState.IceFlower ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot);
+            animator.SetTrigger("fireball");
+            sfx.PlayOneShot(State == Enums.PowerupState.IceFlower ? Enums.Sounds.Powerup_Iceball_Shoot : Enums.Sounds.Powerup_Fireball_Shoot);
         }
 
-        public static void OnIsSlidingChanged(Changed<PlayerController> changed) {
+        public void OnIsSlidingChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            if (player.IsSliding)
+            if (IsSliding)
                 return;
 
-            if (!player.IsOnGround || Mathf.Abs(player.body.Velocity.x) > 0.2f)
+            if (!IsOnGround || Mathf.Abs(body.Velocity.x) > 0.2f)
                 return;
 
-            player.PlaySound(Enums.Sounds.Player_Sound_SlideEnd);
+            PlaySound(Enums.Sounds.Player_Sound_SlideEnd);
         }
 
-        public static void OnIsCrouchingChanged(Changed<PlayerController> changed) {
+        public void OnIsCrouchingChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            if (!player.IsCrouching)
+            if (!IsCrouching)
                 return;
 
-            player.PlaySound(player.State == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
+            PlaySound(State == Enums.PowerupState.BlueShell ? Enums.Sounds.Powerup_BlueShell_Enter : Enums.Sounds.Player_Sound_Crouch);
         }
 
-        public static void OnPipeTimerChanged(Changed<PlayerController> changed) {
+        public void OnPipeTimerChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            if (!player.PipeTimer.IsRunning)
+            if (!PipeTimer.IsRunning)
                 return;
 
-            player.PlaySound(Enums.Sounds.Player_Sound_Powerdown);
+            PlaySound(Enums.Sounds.Player_Sound_Powerdown);
         }
 
-        public static void OnPropellerLaunchTimerChanged(Changed<PlayerController> changed) {
+        public void OnPropellerLaunchTimerChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            if (!player.PropellerLaunchTimer.IsRunning)
+            if (!PropellerLaunchTimer.IsRunning)
                 return;
 
-            player.PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
+            PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Start);
         }
 
-        public static void OnPropellerSpinTimerChanged(Changed<PlayerController> changed) {
+        public void OnPropellerSpinTimerChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            if (!player.PropellerSpinTimer.IsRunning)
+            if (!PropellerSpinTimer.IsRunning)
                 return;
 
-            player.PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
+            PlaySound(Enums.Sounds.Powerup_PropellerMushroom_Spin);
         }
 
-        public static void OnSpinnerLaunchAnimCounterChanged(Changed<PlayerController> changed) {
+        public void OnSpinnerLaunchAnimCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            player.PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
-            player.PlaySound(Enums.Sounds.World_Spinner_Launch);
+            PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
+            PlaySound(Enums.Sounds.World_Spinner_Launch);
         }
 
-        public static void OnDustParticleAnimCounterChanged(Changed<PlayerController> changed) {
+        public void OnDustParticleAnimCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            player.SpawnParticle(PrefabList.Instance.Particle_Groundpound, player.body.Position);
+            SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.Position);
         }
 
-        public static void OnJumpAnimCounterChanged(Changed<PlayerController> changed) {
+        public void OnJumpAnimCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            if (player.IsSwimming) {
+            if (IsSwimming) {
                 // Paddle
-                player.PlaySound(Enums.Sounds.Player_Sound_Swim);
-                player.animator.SetTrigger("paddle");
+                PlaySound(Enums.Sounds.Player_Sound_Swim);
+                animator.SetTrigger("paddle");
                 return;
             }
 
-            if (!player.IsJumping)
+            if (!IsJumping)
                 return;
 
             // Voice SFX
-            switch (player.JumpState) {
+            switch (JumpState) {
             case PlayerJumpState.DoubleJump:
-                player.PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
+                PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
                 break;
             case PlayerJumpState.TripleJump:
-                player.PlaySound(Enums.Sounds.Player_Voice_TripleJump);
+                PlaySound(Enums.Sounds.Player_Voice_TripleJump);
                 break;
             }
 
-            if (player.BounceJump) {
-                player.PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
+            if (BounceJump) {
+                PlaySound(Enums.Sounds.Enemy_Generic_Stomp);
 
-                if (player.cameraController.IsControllingCamera)
+                if (cameraController.IsControllingCamera)
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.4f, 0.15f, RumbleManager.RumbleSetting.Low);
                 return;
             }
 
             // Jump SFX
-            Enums.Sounds sound = player.State switch {
+            Enums.Sounds sound = State switch {
                 Enums.PowerupState.MiniMushroom => Enums.Sounds.Powerup_MiniMushroom_Jump,
                 Enums.PowerupState.MegaMushroom => Enums.Sounds.Powerup_MegaMushroom_Jump,
                 _ => Enums.Sounds.Player_Sound_Jump,
             };
-            player.PlaySound(sound);
+            PlaySound(sound);
         }
 
-        public static void OnJumpLandingAnimCounterChanged(Changed<PlayerController> changed) {
-            PlayerController player = changed.Behaviour;
-
-            player.animator.Play("jumplanding" + (player.JumpLandingTimer.IsActive(player.Runner) ? "-edge" : ""));
+        public void OnJumpLandingAnimCounterChanged() {
+            animator.Play("jumplanding" + (JumpLandingTimer.IsActive(Runner) ? "-edge" : ""));
         }
 
-        public static void OnIsWaterWalkingChanged(Changed<PlayerController> changed) {
+        public void OnIsWaterWalkingChanged() {
+            if (!GameData.Instance.PlaySounds)
+                return;
+;
+            if (!IsWaterWalking)
+                return;
+
+            PlaySound(Enums.Sounds.Powerup_MiniMushroom_WaterWalk);
+        }
+
+        public void OnKnockbackAnimCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-            if (!player.IsWaterWalking)
+            if (!IsInKnockback)
                 return;
 
-            player.PlaySound(Enums.Sounds.Powerup_MiniMushroom_WaterWalk);
-        }
+            if (KnockbackAttacker)
+                SpawnParticle("Prefabs/Particle/PlayerBounce", KnockbackAttacker.transform.position);
 
-        public static void OnKnockbackAnimCounterChanged(Changed<PlayerController> changed) {
-            if (!GameData.Instance.PlaySounds)
-                return;
+            PlaySound(IsWeakKnockback ? Enums.Sounds.Player_Sound_Collision_Fireball : Enums.Sounds.Player_Sound_Collision, 0, 3);
 
-            PlayerController player = changed.Behaviour;
-            if (!player.IsInKnockback)
-                return;
-
-            if (player.KnockbackAttacker)
-                player.SpawnParticle("Prefabs/Particle/PlayerBounce", player.KnockbackAttacker.transform.position);
-
-            player.PlaySound(player.IsWeakKnockback ? Enums.Sounds.Player_Sound_Collision_Fireball : Enums.Sounds.Player_Sound_Collision, 0, 3);
-
-            if (player.cameraController.IsControllingCamera)
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, player.IsWeakKnockback ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
+            if (cameraController.IsControllingCamera)
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, IsWeakKnockback ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
         }
 
         private float timeSinceLastBumpSound;
-        public static void OnBlockBumpSoundCounterChanged(Changed<PlayerController> changed) {
+        public void OnBlockBumpSoundCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            if (player.timeSinceLastBumpSound + 0.2f > player.Runner.SimulationRenderTime)
+            if (timeSinceLastBumpSound + 0.2f > Runner.LocalRenderTime)
                 return;
 
-            player.PlaySound(Enums.Sounds.World_Block_Bump);
-            player.timeSinceLastBumpSound = player.Runner.SimulationRenderTime;
+            PlaySound(Enums.Sounds.World_Block_Bump);
+            timeSinceLastBumpSound = Runner.LocalRenderTime;
         }
 
-        public static void OnThrowAnimCounterChanged(Changed<PlayerController> changed) {
+        public void OnThrowAnimCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            player.PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);
-            player.animator.SetTrigger("throw");
+            PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);
+            animator.SetTrigger("throw");
         }
 
-        public static void OnMegaTimerChanged(Changed<PlayerController> changed) {
+        public void OnMegaTimerChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            if (player.IsDead)
+            if (IsDead)
                 return;
 
-            player.PlaySoundEverywhere(player.MegaTimer.IsRunning ? Enums.Sounds.Player_Voice_MegaMushroom : Enums.Sounds.Powerup_MegaMushroom_End);
+            PlaySoundEverywhere(MegaTimer.IsRunning ? Enums.Sounds.Player_Voice_MegaMushroom : Enums.Sounds.Powerup_MegaMushroom_End);
         }
 
-        public static void OnMegaStartTimerChanged(Changed<PlayerController> changed) {
+        public void OnMegaStartTimerChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            if (player.MegaStartTimer.ExpiredOrNotRunning(player.Runner))
+            if (MegaStartTimer.ExpiredOrNotRunning(Runner))
                 return;
 
-            player.animator.Play("mega-scale");
+            animator.Play("mega-scale");
         }
 
-        public static void OnIsStationaryMegaShrinkChanged(Changed<PlayerController> changed) {
+        public void OnIsStationaryMegaShrinkChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            if (!player.IsStationaryMegaShrink)
+            if (!IsStationaryMegaShrink)
                 return;
 
-            player.animator.enabled = true;
-            player.animator.Play("mega-cancel", 0, 1f - ((player.MegaEndTimer.RemainingTime(player.Runner) ?? 0f) / player.megaStartTime));
-            player.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
+            animator.enabled = true;
+            animator.Play("mega-cancel", 0, 1f - ((MegaEndTimer.RemainingTime(Runner) ?? 0f) / megaStartTime));
+            PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
         }
 
         public override void OnIsFrozenChanged() {
@@ -3387,21 +3387,19 @@ namespace NSMB.Entities.Player {
                 GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.2f, 0.3f, RumbleManager.RumbleSetting.High);
         }
 
-        public static void OnHeldEntityChanged(Changed<PlayerController> changed) {
+        public void OnHeldEntityChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            PlayerController player = changed.Behaviour;
-
-            if (!player.HeldEntity)
+            if (!HeldEntity)
                 return;
 
-            if (player.HeldEntity is FrozenCube) {
-                player.animator.Play("head-pickup");
-                player.animator.ResetTrigger("fireball");
-                player.PlaySound(Enums.Sounds.Player_Voice_DoubleJump, 2);
+            if (HeldEntity is FrozenCube) {
+                animator.Play("head-pickup");
+                animator.ResetTrigger("fireball");
+                PlaySound(Enums.Sounds.Player_Voice_DoubleJump, 2);
             }
-            player.animator.ResetTrigger("throw");
+            animator.ResetTrigger("throw");
         }
 
         //---Debug

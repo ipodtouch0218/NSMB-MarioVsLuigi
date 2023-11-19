@@ -25,19 +25,19 @@ public class SessionData : NetworkBehaviour {
 #pragma warning restore CS0414
 
     //---Networked Variables
-    [Networked(OnChanged = nameof(SettingChanged))]                                           public byte MaxPlayers { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool PrivateRoom { get; set; }
-    [Networked(OnChanged = nameof(GameStartTimerChanged))]                                    public TickTimer GameStartTimer { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool GameStarted { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                           public byte Level { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultLives))]           public sbyte Lives { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultTimer))]           public sbyte Timer { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool DrawOnTimeUp { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged), Default = nameof(defaultCustomPowerups))]  public NetworkBool CustomPowerups { get; set; }
-    [Networked(OnChanged = nameof(SettingChanged))]                                           public NetworkBool Teams { get; set; }
-    [Networked]                                                                               public byte AlternatingMusicIndex { get; set; }
+    [Networked] public byte MaxPlayers { get; set; }
+    [Networked] public NetworkBool PrivateRoom { get; set; }
+    [Networked] public TickTimer GameStartTimer { get; set; }
+    [Networked] public NetworkBool GameStarted { get; set; }
+    [Networked] public byte Level { get; set; }
+    [Networked(Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
+    [Networked(Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
+    [Networked(Default = nameof(defaultLives))] public sbyte Lives { get; set; }
+    [Networked(Default = nameof(defaultTimer))] public sbyte Timer { get; set; }
+    [Networked] public NetworkBool DrawOnTimeUp { get; set; }
+    [Networked(Default = nameof(defaultCustomPowerups))]  public NetworkBool CustomPowerups { get; set; }
+    [Networked] public NetworkBool Teams { get; set; }
+    [Networked] public byte AlternatingMusicIndex { get; set; }
 
     //---Properties
     private MainMenuChat Chat {
@@ -56,6 +56,8 @@ public class SessionData : NetworkBehaviour {
     private float lastStartCancelTime = -10f;
     private bool playedStartSound;
     private Coroutine pingUpdaterCorotuine;
+    private ChangeDetector changeDetector;
+    private PropertyReader<byte> levelPropertyReader;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -89,7 +91,32 @@ public class SessionData : NetworkBehaviour {
             }
         }
 
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        levelPropertyReader = GetPropertyReader<byte>(nameof(Level));
         gameObject.name = "SessionData (" + Runner.SessionInfo.Name + ")";
+    }
+
+    public override void Render() {
+        foreach (var change in changeDetector.DetectChanges(this, out var previous, out _)) {
+            switch (change) {
+            case nameof(MaxPlayers):
+            case nameof(PrivateRoom):
+            case nameof(GameStarted):
+            case nameof(Level):
+            case nameof(StarRequirement):
+            case nameof(CoinRequirement):
+            case nameof(Lives):
+            case nameof(Timer):
+            case nameof(DrawOnTimeUp):
+            case nameof(CustomPowerups):
+            case nameof(Teams):
+                OnSettingChanged(previous);
+                break;
+            case nameof(GameStartTimer):
+                OnGameStartTimerChanged();
+                break;
+            }
+        }
     }
 
     public override void FixedUpdateNetwork() {
@@ -107,9 +134,9 @@ public class SessionData : NetworkBehaviour {
 
             } else {
                 int ticksLeft = (GameStartTimer.RemainingTicks(Runner) ?? 0) + 1;
-                if (ticksLeft % Runner.Config.Simulation.TickRate == 0) {
+                if (ticksLeft % Runner.TickRate == 0) {
                     // Send countdown
-                    int seconds = ticksLeft / Runner.Config.Simulation.TickRate;
+                    int seconds = ticksLeft / Runner.TickRate;
                     MainMenuManager.Instance.OnCountdownTick(seconds);
                 }
             }
@@ -277,47 +304,43 @@ public class SessionData : NetworkBehaviour {
         SetGameStarted(true);
 
         // Load the correct scene
-        Runner.SetActiveScene(MainMenuManager.Instance.GetCurrentSceneRef());
+        if (Runner.IsServer)
+            Runner.LoadScene(MainMenuManager.Instance.GetCurrentSceneRef());
     }
 
     //---OnChangeds
-    public static void SettingChanged(Changed<SessionData> data) {
-        SessionData lobby = data.Behaviour;
-        Tick currentTick = lobby.Object.Runner.Tick;
-        if (currentTick <= lobby.lastUpdatedTick)
+    public void OnSettingChanged(NetworkBehaviourBuffer previous) {
+        Tick currentTick = Object.Runner.Tick;
+        if (currentTick <= lastUpdatedTick)
             return;
 
         //no "started" setting to update
-        byte newLevel = lobby.Level;
-        data.LoadOld();
-        byte oldLevel = lobby.Level;
-        data.LoadNew();
+        int oldLevel = previous.Read(levelPropertyReader);
 
         if (MainMenuManager.Instance && MainMenuManager.Instance.roomSettingsCallbacks)
-            MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(lobby, oldLevel != newLevel);
+            MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(this, oldLevel != Level);
 
-        lobby.lastUpdatedTick = currentTick;
+        lastUpdatedTick = currentTick;
     }
 
-    public static void GameStartTimerChanged(Changed<SessionData> data) {
+    public void OnGameStartTimerChanged() {
         if (!MainMenuManager.Instance)
             return;
 
-        SessionData sd = data.Behaviour;
-        float time = sd.Runner.SimulationTime;
+        float time = Runner.SimulationTime;
 
-        if (!sd.GameStartTimer.IsRunning) {
-            if (sd.playedStartSound) {
+        if (!GameStartTimer.IsRunning) {
+            if (playedStartSound) {
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled");
             }
-            sd.lastStartCancelTime = sd.Runner.SimulationTime;
+            lastStartCancelTime = Runner.SimulationTime;
             MainMenuManager.Instance.OnCountdownTick(-1);
-            sd.playedStartSound = false;
+            playedStartSound = false;
         } else {
-            if (sd.lastStartCancelTime + 3f < time || sd.Runner.GetLocalPlayerData().IsRoomOwner) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", "countdown", Mathf.CeilToInt(sd.GameStartTimer.RemainingTime(sd.Runner) ?? 0).ToString());
+            if (lastStartCancelTime + 3f < time || Runner.GetLocalPlayerData().IsRoomOwner) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", "countdown", Mathf.CeilToInt((GameStartTimer.RemainingTime(Runner) - 0.01f) ?? 0).ToString());
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
-                sd.playedStartSound = true;
+                playedStartSound = true;
             }
             MainMenuManager.Instance.OnCountdownTick(3);
         }

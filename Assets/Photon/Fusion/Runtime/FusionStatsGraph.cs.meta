@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: a5d15872b7ea01a4ba287865a146bec2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - LabelTitle: {instanceID: 0}
+  - BackImage: {instanceID: 0}
+  - Shader: {fileID: 4800000, guid: 191d95ce624abaa4ba0294fc7baa2845, type: 3}
+  - GraphImg: {instanceID: 0}
+  - LabelMin: {instanceID: 0}
+  - LabelMax: {instanceID: 0}
+  - LabelAvg: {instanceID: 0}
+  - LabelLast: {instanceID: 0}
+  - LabelPer: {instanceID: 0}
+  - _viewDropdown: {instanceID: 0}
+  - _avgBttn: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

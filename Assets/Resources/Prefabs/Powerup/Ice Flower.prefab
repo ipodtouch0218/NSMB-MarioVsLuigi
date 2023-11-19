@@ -15,6 +15,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
         type: 3}
+      propertyPath: SortKey
+      value: 1281116551
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
       propertyPath: NetworkedBehaviours.Array.size
       value: 2
       objectReference: {fileID: 0}

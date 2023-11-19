@@ -5,7 +5,7 @@ using NSMB.Entities.Player;
 
 namespace NSMB.Entities.World {
 
-    [OrderAfter(typeof(PlayerController))]
+    //[OrderAfter(typeof(PlayerController))]
     public class SpinnerAnimator : NetworkBehaviour, IBeforeTick {
 
         //---Networked Variables
@@ -21,10 +21,10 @@ namespace NSMB.Entities.World {
         public float spinSpeed;
 
         //---Private Variables
-        private Interpolator<float> armPositionInterpolator;
+        private PropertyReader<float> armPositionPropertyReader;
 
         public override void Spawned() {
-            armPositionInterpolator = GetInterpolator<float>(nameof(ArmPosition));
+            armPositionPropertyReader = GetPropertyReader<float>(nameof(ArmPosition));
         }
 
         public void BeforeTick() {
@@ -33,9 +33,18 @@ namespace NSMB.Entities.World {
         }
 
         public override void Render() {
+
+            float armRenderPosition;
+            if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
+                (float fromPosition, float toPosition) = armPositionPropertyReader.Read(from, to);
+                armRenderPosition = Mathf.Lerp(fromPosition, toPosition, alpha);
+            } else {
+                armRenderPosition = ArmPosition;
+            }
+
             spinSpeed = Mathf.MoveTowards(spinSpeed, HasPlayer ? fastSpinSpeed : idleSpinSpeed, Time.deltaTime * 1350f);
             topArmBone.eulerAngles += spinSpeed * Time.deltaTime * Vector3.up;
-            topArmBone.localPosition = new(0, armPositionInterpolator.Value * -0.084f, 0);
+            topArmBone.localPosition = new(0, armRenderPosition * -0.084f, 0);
         }
 
         public override void FixedUpdateNetwork() {

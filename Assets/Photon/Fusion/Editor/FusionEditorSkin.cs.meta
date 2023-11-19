@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 2119ee8fcf3d90445867b93c17e27272
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - ScriptHeaderFont: {fileID: 12800000, guid: d9d6a85f7c05f99439d73c334199cb58, type: 3}
+  - Skin: {fileID: 11400000, guid: c809d493e97d33546a90fc00dcd9ba38, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

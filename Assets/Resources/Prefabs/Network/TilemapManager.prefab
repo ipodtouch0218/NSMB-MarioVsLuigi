@@ -45,10 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64a158b8178117f4ab99f51f91ded8c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  sceneTiles: []
   chunks: []
-  gm: {fileID: 0}
 --- !u!114 &5516776251931916605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,15 +58,11 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 2233492855
   ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 1
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 1
   Flags: 2305
-  NetworkGuid:
-    RawGuidValue: 51fc8b1fda1033b4f97419526359da76
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 9008587433658350353}
-  SimulationBehaviours: []

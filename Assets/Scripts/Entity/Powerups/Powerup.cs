@@ -10,7 +10,7 @@ using NSMB.Utils;
 
 namespace NSMB.Entities.Collectable.Powerups {
 
-    [OrderAfter(typeof(PlayerController), typeof(EntityMover))]
+    //[OrderAfter(typeof(PlayerController), typeof(EntityMover))]
     public class Powerup : CollectableEntity, IBlockBumpable {
 
         //---Static Variables
@@ -18,7 +18,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         private static readonly int OriginalSortingOrder = 10;
 
         //---Networked Variables
-        [Networked(OnChanged = nameof(OnReserveResultChanged))] private PowerupReserveResult ReserveResult { get; set; }
+        [Networked] private PowerupReserveResult ReserveResult { get; set; }
         [Networked] protected PlayerController FollowPlayer { get; set; }
         [Networked] private TickTimer IgnorePlayerTimer { get; set; }
 
@@ -340,26 +340,32 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         //---OnChangeds
-        public static void OnReserveResultChanged(Changed<Powerup> changed) {
-            Powerup powerup = changed.Behaviour;
-            PlayerController collector = powerup.Collector;
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
 
-            PowerupScriptable newPowerup = powerup.powerupScriptable;
-
-            switch (powerup.ReserveResult) {
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(ReserveResult):
+                    OnReserveResultChanged();
+                    break;
+                }
+            }
+        }
+        public void OnReserveResultChanged() {
+            switch (ReserveResult) {
             case PowerupReserveResult.ReserveOldPowerup:
             case PowerupReserveResult.NoneButPlaySound: {
                 // Just play the collect sound
-                if (newPowerup.soundPlaysEverywhere) {
-                    collector.PlaySoundEverywhere(newPowerup.soundEffect);
+                if (powerupScriptable.soundPlaysEverywhere) {
+                    Collector.PlaySoundEverywhere(powerupScriptable.soundEffect);
                 } else {
-                    collector.PlaySound(newPowerup.soundEffect);
+                    Collector.PlaySound(powerupScriptable.soundEffect);
                 }
                 break;
             }
             case PowerupReserveResult.ReserveNewPowerup: {
                 // Reserve the new powerup
-                collector.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
+                Collector.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
                 break;
             }
             }

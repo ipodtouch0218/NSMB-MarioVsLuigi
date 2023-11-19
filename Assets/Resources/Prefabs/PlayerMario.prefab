@@ -83,7 +83,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb46ec3ddc407dd4cafade9981e03a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 2
   _CurrentPosition: {x: 0, y: 0, z: 0}
   floorOffset: 0.75
   controller: {fileID: 4824223341387914485}
@@ -275,7 +274,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe023cea6fd5f842af136c8824b0710, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!1 &1136710984746719041
 GameObject:
   m_ObjectHideFlags: 0
@@ -10519,7 +10517,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 984b6c8bdb2dc4a419d0cd6be4254d4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   _FacingRight:
     _value: 0
   _IsActive:
@@ -10571,6 +10568,7 @@ MonoBehaviour:
     _value: 0
   _IsForwardsKnockback:
     _value: 0
+  _KnockbackTick: 0
   _KnockbackAttacker: {fileID: 0}
   _GroundpoundAnimCounter: 0
   _IsGroundpounding:
@@ -10661,7 +10659,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf9d71929a202541b352e506ca0197e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   deathUp: 0
   wasTurnaround: 0
   enableGlow: 0
@@ -10957,14 +10954,11 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 502304264
   ObjectInterest: 0
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
-  Flags: 2305
-  NetworkGuid:
-    RawGuidValue: 7624e7a260085f5409f044e3d21ae8d5
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
+  Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4824223341387914485}
@@ -10972,7 +10966,6 @@ MonoBehaviour:
   - {fileID: 7021228977528019271}
   - {fileID: 8020175873997104482}
   - {fileID: 1541702763616586234}
-  SimulationBehaviours: []
 --- !u!114 &7021228977528019271
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10985,9 +10978,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a384a75a1c0645459861c223ac33652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   _Velocity: {x: 0, y: 0}
   _Freeze:
+    _value: 0
+  _IsKinematic:
     _value: 0
   _LockX:
     _value: 0

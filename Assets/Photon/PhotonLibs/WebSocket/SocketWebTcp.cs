@@ -16,6 +16,7 @@ namespace ExitGames.Client.Photon
     using System;
     using System.Collections;
     using UnityEngine;
+    using UnityEngine.Scripting;
     using SupportClassPun = SupportClass;
 
 
@@ -47,6 +48,7 @@ namespace ExitGames.Client.Photon
 
         private readonly object syncer = new object();
 
+        [Preserve]
         public SocketWebTcp(PeerBase npeer) : base(npeer)
         {
             this.ServerAddress = npeer.ServerAddress;

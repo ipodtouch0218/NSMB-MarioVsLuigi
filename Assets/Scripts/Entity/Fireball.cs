@@ -8,8 +8,8 @@ using NSMB.Tiles;
 
 namespace NSMB.Entities {
 
-    [OrderBefore(typeof(FrozenCube))]
-    [OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
+    //[OrderBefore(typeof(FrozenCube))]
+    //[OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
     public class Fireball : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
         //---Static Variables
@@ -20,7 +20,7 @@ namespace NSMB.Entities {
         [Networked] private float CurrentSpeed { get; set; }
         [Networked] public NetworkBool AlreadyBounced { get; set; }
         [Networked] public NetworkBool IsIceball { get; set; }
-        [Networked(OnChanged = nameof(OnBreakEffectAnimCounterChanged))] public byte BreakEffectAnimCounter { get; set; }
+        [Networked] public byte BreakEffectAnimCounter { get; set; }
 
         //---Serialized Variables
         [SerializeField] private ParticleSystem iceBreak, fireBreak, iceTrail, fireTrail;
@@ -61,7 +61,7 @@ namespace NSMB.Entities {
             //nrb.Rigidbody.position = spawnpoint;
             body.Freeze = false;
             body.Velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
-            body.InterpolationDataSource = Owner.IsProxy ? InterpolationDataSources.Snapshots : InterpolationDataSources.Predicted;
+            //body.InterpolationDataSource = Owner.IsProxy ? InterpolationDataSources.Snapshots : InterpolationDataSources.Predicted;
         }
 
         public override void Spawned() {
@@ -78,6 +78,8 @@ namespace NSMB.Entities {
         }
 
         public override void Render() {
+            base.Render();
+
             if (GameData.Instance.GameEnded) {
                 foreach (var anim in GetComponentsInChildren<LegacyAnimateSpriteRenderer>())
                     anim.enabled = false;
@@ -316,26 +318,36 @@ namespace NSMB.Entities {
         }
 
         //---OnChangeds
-        public static void OnBreakEffectAnimCounterChanged(Changed<Fireball> changed) {
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
+
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(BreakEffectAnimCounter):
+                    OnBreakEffectAnimCounterChanged();
+                    break;
+                }
+            }
+        }
+
+        public void OnBreakEffectAnimCounterChanged() {
             if (!GameData.Instance.PlaySounds)
                 return;
 
-            Fireball fireball = changed.Behaviour;
-
             // Don't play particles below the killplane
-            if (fireball.body.Position.y < GameManager.Instance.LevelMinY)
+            if (body.Position.y < GameManager.Instance.LevelMinY)
                 return;
 
             // Or if the game is over
             if (GameData.Instance.GameState == Enums.GameState.Ended)
                 return;
 
-            if (fireball.IsIceball) {
-                fireball.iceBreak.Play();
-                fireball.sfx.PlayOneShot(Enums.Sounds.Powerup_Iceball_Break);
+            if (IsIceball) {
+                iceBreak.Play();
+                sfx.PlayOneShot(Enums.Sounds.Powerup_Iceball_Break);
             } else {
-                fireball.fireBreak.Play();
-                fireball.sfx.PlayOneShot(Enums.Sounds.Powerup_Fireball_Break);
+                fireBreak.Play();
+                sfx.PlayOneShot(Enums.Sounds.Powerup_Fireball_Break);
             }
         }
     }

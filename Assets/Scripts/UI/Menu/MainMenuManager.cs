@@ -489,7 +489,7 @@ namespace NSMB.UI.MainMenu {
             validRoomConfig &= realPlayers >= 1;
 
             // Only do team checks if there's more than one player
-            if (SessionData.Instance.Teams && realPlayers > 1) {
+            if (SessionData.Instance && SessionData.Instance.Teams && realPlayers > 1) {
                 int teams = nonSpectators.Select(pd => pd.Team).Distinct().Count();
                 validRoomConfig &= teams > 1;
             }
@@ -643,7 +643,7 @@ namespace NSMB.UI.MainMenu {
                 return SceneRef.None;
 
             byte index = SessionData.Instance.Level;
-            return maps[index].buildIndex;
+            return SceneRef.FromIndex(maps[index].buildIndex);
         }
 
         // Network callbacks

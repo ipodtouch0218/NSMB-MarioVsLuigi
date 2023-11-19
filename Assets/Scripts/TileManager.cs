@@ -5,13 +5,12 @@ using UnityEngine.Tilemaps;
 using Fusion;
 using NSMB.Entities;
 using NSMB.Entities.Collectable;
-using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
 
 namespace NSMB.Tiles {
 
-    [OrderBefore(typeof(PlayerController))]
+    //[OrderBefore(typeof(PlayerController))]
     public class TileManager : NetworkBehaviour {
 
         //---Properties

@@ -6,7 +6,7 @@ using NSMB.Entities;
 public abstract class FreezableEntity : BasicEntity {
 
     //---Networked Variables
-    [Networked(OnChanged = nameof(OnIsFrozenChanged))] public NetworkBool IsFrozen { get; set; }
+    [Networked] public NetworkBool IsFrozen { get; set; }
 
     //---Properties
     public abstract bool IsCarryable { get; }
@@ -29,12 +29,13 @@ public abstract class FreezableEntity : BasicEntity {
     }
 
     //---OnChangeds
-    public static void OnIsFrozenChanged(Changed<FreezableEntity> changed) {
-        FreezableEntity entity = changed.Behaviour;
+    protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+        base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
 
-        entity.OnIsFrozenChanged();
-
-        if (entity.IsFrozen)
-            entity.PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
+        foreach (var change in ChangesBuffer) {
+            switch (change) {
+            case nameof(IsFrozen): OnIsFrozenChanged(); break;
+            }
+        }
     }
 }

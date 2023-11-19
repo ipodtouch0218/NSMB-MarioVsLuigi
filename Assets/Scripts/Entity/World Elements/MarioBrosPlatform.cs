@@ -66,7 +66,7 @@ namespace NSMB.Entities.World {
                 pixels[i] = BlankColor;
 
             foreach (BumpInfo bump in Bumps) {
-                float percentageCompleted = (Runner.SimulationRenderTime - (bump.spawnTick * Runner.DeltaTime)) / bumpDuration;
+                float percentageCompleted = (Runner.LocalRenderTime - (bump.spawnTick * Runner.DeltaTime)) / bumpDuration;
                 float v = Mathf.Sin(Mathf.PI * percentageCompleted);
 
                 for (int x = -bumpWidthPoints - bumpBlurPoints; x <= bumpWidthPoints + bumpBlurPoints; x++) {
@@ -140,7 +140,7 @@ namespace NSMB.Entities.World {
         //---Helpers
         private struct BumpInfo : INetworkStruct {
             public int point;
-            public Tick spawnTick;
+            public int spawnTick;
         }
     }
 }

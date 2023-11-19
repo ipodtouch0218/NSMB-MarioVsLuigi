@@ -45,7 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a564c1d7f18e0942a24c6663ab20ef0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   _AlivePlayers: []
   _PooledFireballs: []
   _GameStartTime: -1
@@ -53,6 +52,8 @@ MonoBehaviour:
   _IsMusicEnabled:
     _value: 0
   _GameState: 0
+  gameEndTime: 0
+  dontPlaySounds: 0
 --- !u!114 &4973850741018079510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65,15 +66,11 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 2984955458
   ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 1
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 1
   Flags: 2305
-  NetworkGuid:
-    RawGuidValue: 6f681abe0b48a534cb6d0c74c31b3a5f
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -4242094890873383859}
-  SimulationBehaviours: []

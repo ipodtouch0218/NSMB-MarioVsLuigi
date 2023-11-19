@@ -4,6 +4,54 @@
         <name>Fusion.Common</name>
     </assembly>
     <members>
+        <member name="T:Fusion.Async.AsyncOperationHandler`1">
+            <summary>
+            Abstract Async Operation Handler
+            
+            Built around the <see cref="T:System.Threading.Tasks.TaskCompletionSource`1"/>
+            </summary>
+            <typeparam name="T">Result Type of the Async Operation</typeparam>
+        </member>
+        <member name="F:Fusion.Async.AsyncOperationHandler`1.OperationTimeoutSec">
+            <summary>
+            Default Operation Timeout
+            </summary>
+        </member>
+        <member name="P:Fusion.Async.AsyncOperationHandler`1.Task">
+            <summary>
+            Internal Task
+            </summary>
+        </member>
+        <member name="M:Fusion.Async.AsyncOperationHandler`1.#ctor(System.Threading.CancellationToken,System.Single,System.String)">
+            <summary>
+            Create a new Operation Handler
+            </summary>
+            <param name="externalCancellationToken">Optional External Cancellation Token</param>
+            <param name="operationTimeout">Optional Custom Operation Timeout</param>
+            <param name="customTimeoutMsg">Optional Custom Timeout Message</param>
+        </member>
+        <member name="M:Fusion.Async.AsyncOperationHandler`1.SetResult(`0)">
+            <summary>
+            Set the result of Async Operation
+            </summary>
+            <param name="result">Result to be set on the Operation</param>
+        </member>
+        <member name="M:Fusion.Async.AsyncOperationHandler`1.SetException(System.Exception)">
+            <summary>
+            Set the Async Operation as faulted using the Exception
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Fusion.Async.AsyncOperationHandler`1.Expire">
+            <summary>
+            Cancel the Async Operation via a <see cref="T:System.TimeoutException"/>
+            </summary>
+        </member>
+        <member name="M:Fusion.Async.AsyncOperationHandler`1.Cancel">
+            <summary>
+            Cancel the Async Operation via a <see cref="T:System.OperationCanceledException"/>
+            </summary>
+        </member>
         <member name="T:Fusion.Async.TaskManager">
             <summary>
             Task Factory is used to create new Tasks and Schedule long running Tasks
@@ -54,12 +102,6 @@
             <param name="delay">Delay in milliseconds to wait</param>
             <param name="token">Cancelation Token used to stop the Delay</param>
             <returns>Awaitable Task</returns>
-        </member>
-        <member name="T:Fusion.Collections.SynchronizedQueue`1">
-            <summary>
-            Queue that usese Sync locks for each operations
-            </summary>
-            <typeparam name="T">Type used by the internal Queue</typeparam>
         </member>
         <member name="M:Fusion.CompressionUtils.Compress(System.Byte[])">
             <summary>
@@ -139,6 +181,265 @@
             Used to tag the Messages in <see cref="T:Fusion.Protocol.ICommunicator"/>.
             </summary>
         </member>
+        <member name="T:Fusion.DisplayAsEnumAttribute">
+            <summary>
+            Casts an enum or int value in the inspector to specific enum type for rendering of its popup list. 
+            Supplying a method name rather than a type allows a property with the type Type to be used to dynamically get the enum type.
+            </summary>
+        </member>
+        <member name="T:Fusion.CompareOperator">
+            <summary>
+              Comparison method for evaluating condition member value against compareToValues.
+            </summary>
+        </member>
+        <member name="F:Fusion.CompareOperator.Equal">
+            <summary>
+              True if condition member value equals compareToValue.
+            </summary>
+        </member>
+        <member name="F:Fusion.CompareOperator.NotEqual">
+            <summary>
+              True if condition member value is not equal to compareToValue.
+            </summary>
+        </member>
+        <member name="F:Fusion.CompareOperator.Less">
+            <summary>
+              True if condition member value is less than compareToValue.
+            </summary>
+        </member>
+        <member name="F:Fusion.CompareOperator.LessOrEqual">
+            <summary>
+              True if condition member value is less than or equal to compareToValue.
+            </summary>
+        </member>
+        <member name="F:Fusion.CompareOperator.GreaterOrEqual">
+            <summary>
+              True if condition member value is greater than or equal to compareToValue.
+            </summary>
+        </member>
+        <member name="F:Fusion.CompareOperator.Greater">
+            <summary>
+              True if condition member value is greater than compareToValue.
+            </summary>
+        </member>
+        <member name="F:Fusion.CompareOperator.NotZero">
+            <summary>
+              Returns true if the condition member evaluates to anything other than zero.
+              In the case of object references, this means true for any non-null value.
+            </summary>
+        </member>
+        <member name="F:Fusion.CompareOperator.IsZero">
+            <summary>
+              Returns true if the condition member evaluates to zero.
+              In the case of object references, this means true for any null value.
+            </summary>
+        </member>
+        <member name="T:Fusion.DoIfAttributeBase">
+            <summary>
+              Editor attribute for selective editor rendering. Condition member can be a property, field or method (with a
+              return value).
+              <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para>
+            </summary>
+        </member>
+        <member name="T:Fusion.DrawIfAttribute">
+            <summary>
+              Editor attribute for selectively drawing/hiding fields. Condition member can be a property, field or method
+              (with a return value).
+              <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para>
+            </summary>
+        </member>
+        <member name="F:Fusion.DrawIfAttribute.Mode">
+            <summary>
+              Instructs the attribute completely hide the field if not draw, rather than the default of just disabling it.
+            </summary>
+        </member>
+        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,System.Double,Fusion.CompareOperator,Fusion.DrawIfMode)">
+            <summary>
+              Constructor.
+            </summary>
+            <param name="propertyPath">
+              Condition member can be a property, field or method (with a return value).
+              <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para>
+            </param>
+            <param name="compareToValue">The value to compare the member value against.</param>
+            <param name="mode">How the field should be hidden (disabled or removed)</param>
+            <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
+        </member>
+        <member name="M:Fusion.DrawIfAttribute.#ctor(System.String,System.Boolean,Fusion.CompareOperator,Fusion.DrawIfMode)">
+            <summary>
+              Constructor.
+            </summary>
+            <param name="propertyPath">
+              Condition member can be a property, field or method (with a return value).
+              <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para>
+            </param>
+            <param name="compareToValue">The value to compare the member value against.</param>
+            <param name="compare">How the condition member value and compareToValye will be evaluated.</param>
+            <param name="mode">How the field should be hidden (disabled or removed)</param>
+        </member>
+        <member name="F:Fusion.ErrorIfAttribute.Message">
+            <summary>
+            The default warning text, when a warning is shown.
+            </summary>
+        </member>
+        <member name="P:Fusion.ScriptHelpAttribute.Url">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:Fusion.ScriptHelpAttribute.BackColor">
+            <summary>
+              Color of the inspector header for this component type. None indicates no header graphic should be used.
+            </summary>
+        </member>
+        <member name="P:Fusion.ScriptHelpAttribute.Style">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Fusion.ScriptHeaderIcon">
+            <summary>
+              Icon to be rendered on the component graphic header in the Unity inspector.
+            </summary>
+        </member>
+        <member name="T:Fusion.ScriptHeaderBackColor">
+            <summary>
+              Color of the component graphic header in the Unity inspector. None indicates no header graphic should be used.
+            </summary>
+        </member>
+        <member name="T:Fusion.Units">
+            <summary>
+            Unit Type for a certain field.
+            This helps to identify the unit that a certain value represents, like Seconds or Percentage
+            </summary>
+        </member>
+        <member name="F:Fusion.Units.None">
+            <summary> </summary>
+        </member>
+        <member name="F:Fusion.Units.Ticks">
+            <summary>ticks</summary>
+        </member>
+        <member name="F:Fusion.Units.Seconds">
+            <summary>seconds - secs</summary>
+        </member>
+        <member name="F:Fusion.Units.MilliSecs">
+            <summary>millisecs - ms</summary>
+        </member>
+        <member name="F:Fusion.Units.Kilobytes">
+            <summary>kilobytes - kB</summary>
+        </member>
+        <member name="F:Fusion.Units.Megabytes">
+            <summary>megabytes - MB</summary>
+        </member>
+        <member name="F:Fusion.Units.Normalized">
+            <summary>normalized - norm</summary>
+        </member>
+        <member name="F:Fusion.Units.Multiplier">
+            <summary>multiplier - mult</summary>
+        </member>
+        <member name="F:Fusion.Units.Percentage">
+            <summary>%</summary>
+        </member>
+        <member name="F:Fusion.Units.NormalizedPercentage">
+            <summary>normalized % - n%</summary>
+        </member>
+        <member name="F:Fusion.Units.Degrees">
+            <summary>degrees - \u00B0</summary>
+        </member>
+        <member name="F:Fusion.Units.PerSecond">
+            <summary>per sec - /sec</summary>
+        </member>
+        <member name="F:Fusion.Units.DegreesPerSecond">
+            <summary>\u00B0 / sec - \u00B0/sec</summary>
+        </member>
+        <member name="F:Fusion.Units.Radians">
+            <summary>radians - rad</summary>
+        </member>
+        <member name="F:Fusion.Units.RadiansPerSecond">
+            <summary>radian / sec - rad/s</summary>
+        </member>
+        <member name="F:Fusion.Units.TicksPerSecond">
+            <summary>ticks / sec - tck/s</summary>
+        </member>
+        <member name="F:Fusion.Units.Units">
+            <summary>units - units</summary>
+        </member>
+        <member name="F:Fusion.Units.Bytes">
+            <summary>bytes - bytes</summary>
+        </member>
+        <member name="F:Fusion.Units.Count">
+            <summary>count - count</summary>
+        </member>
+        <member name="F:Fusion.Units.Packets">
+            <summary>packets - packets</summary>
+        </member>
+        <member name="F:Fusion.Units.Frames">
+            <summary>frames - frames</summary>
+        </member>
+        <member name="F:Fusion.Units.FramesPerSecond">
+            <summary>fps - fps</summary>
+        </member>
+        <member name="F:Fusion.Units.SquareMagnitude">
+            <summary>sqrMagnitude - sqrMag</summary>
+        </member>
+        <member name="T:Fusion.UnitAttribute">
+            <summary>
+            Unit Attribute class.
+            Used to mark a field with the respective <see cref="T:Fusion.Units"/>
+            </summary>
+        </member>
+        <member name="T:Fusion.WarnIfAttribute">
+            <summary>
+              Editor attribute for adding notices to fields if the condition member evaluates as true.
+              Condition member can be a property, field or method (with a return value).
+              <para>Value of condition method is converted to a long. Null = 0, False = 0, True = 1, Unity Object = InstanceId</para>
+            </summary>
+        </member>
+        <member name="F:Fusion.WarnIfAttribute.Message">
+            <summary>
+            The default warning text, when a warning is shown.
+            </summary>
+        </member>
+        <member name="T:Fusion.FieldsMask">
+            <summary>
+            Base class for <see cref="T:Fusion.FieldsMask`1"/>.
+            </summary>
+        </member>
+        <member name="M:Fusion.FieldsMask.#ctor(Fusion.Mask256)">
+            <summary>
+            Constructor for <see cref="T:Fusion.FieldsMask"/>.
+            </summary>
+        </member>
+        <member name="M:Fusion.FieldsMask.#ctor(System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Constructor for <see cref="T:Fusion.FieldsMask"/>.
+            </summary>
+        </member>
+        <member name="M:Fusion.FieldsMask.#ctor">
+            <summary>
+            Constructor for <see cref="T:Fusion.FieldsMask"/>.
+            </summary>
+        </member>
+        <member name="M:Fusion.FieldsMask.op_Implicit(Fusion.FieldsMask)~Fusion.Mask256">
+            <summary>
+            Implicitly convert <see cref="T:Fusion.FieldsMask"/> to its long mask value.
+            </summary>
+        </member>
+        <member name="T:Fusion.FieldsMask`1">
+            <summary>
+            Associates and displays a 64 bit mask which represents the field members of a struct. Makes it possible to treat a Struct like an Flags Enum.
+            NOTE: A <see cref="T:Fusion.FieldsMask`1"/> attribute is required for proper rendering in the Inspector.
+            </summary>
+        </member>
+        <member name="M:Fusion.FieldsMask`1.#ctor(Fusion.Mask256)">
+            <summary>
+            Constructor for <see cref="T:Fusion.FieldsMask`1"/>.
+            </summary>
+        </member>
+        <member name="M:Fusion.FieldsMask`1.#ctor">
+            <summary>
+            Constructor for <see cref="T:Fusion.FieldsMask`1"/>.
+            </summary>
+        </member>
         <member name="T:Fusion.JsonUtils">
             <summary>
             Collection of simple JSON Utility methods
@@ -152,45 +453,27 @@
             <param name="baseJson">JSON output of "JsonUtility.ToJson" call</param>
             <returns>Same JSON but without the "referenes" object</returns>
         </member>
-        <member name="F:Fusion.Log.LogLevel">
-            <summary>
-            Set the Log Level based on the severity of the Log.
-            
-            Default: <see cref="F:Fusion.LogType.Debug"/>
-            </summary>
+        <member name="T:Fusion.Maths.FastAbs2">
+            <summary>Uses fieldoffset to allow quick setting of the sign bit of floats.</summary>
         </member>
-        <member name="M:Fusion.Log.Init(Fusion.ILogger,Fusion.LogType)">
+        <member name="M:Fusion.Maths.QuaternionCompress(UnityEngine.Quaternion)">
             <summary>
-            Initialize the Log class with a Custom Logger implementation.
-            It will change the current <see cref="F:Fusion.Log.LogLevel"/> to <see cref="F:Fusion.LogType.Debug"/> by default when called.
+            Primary Compression Method. Converts a quaternion into a ulong buffer. Depending on size most of the top bits will be 0. 
             </summary>
-            <param name="logger">Custom Logger Implementation</param>
-            <param name="LogLevel">New LogLevel</param>
+            <param name="rot">The quaternion to be compressed</param>
+            <returns>A ulong buffer of the compressed quat.</returns>
         </member>
-        <member name="M:Fusion.Profiling.FusionSamplers.IncrementFrame">
+        <member name="M:Fusion.Maths.QuaternionDecompress(System.UInt32)">
             <summary>
-            Instructs all sub-Samplers to register a frame change. The next Add will go to the next frame section.
+            Primary Decompression Method. Decompress the 3 channels and missing channel ID from the serialized ULong buffer.
             </summary>
+            <param name="buffer">The ulong that represents the compressed quaternion.</param>
+            <returns>The restored Quaternion.</returns>
         </member>
-        <member name="M:Fusion.Profiling.FusionSamplers.GetSampler(System.Int32,System.String)">
+        <member name="T:Fusion.StatsMetaAttribute">
             <summary>
-            Get Sampler from the connection specific collection.
+            This stat goes on field elements of classes/structs and is used by FieldsMask.
             </summary>
-        </member>
-        <member name="M:Fusion.Profiling.FusionSamplers.GetSampler(System.String)">
-            <summary>
-            Get Sampler from the common samplers (non-connection specific) collection.
-            </summary>
-        </member>
-        <member name="M:Fusion.Radix.Sort(Fusion.Radix.SortTarget*,Fusion.Radix.SortTarget*,System.Int32,System.Int32*,System.Int32*)">
-            <summary>
-            Sort 4 byte integers
-            </summary>
-            <param name="a">array to sort</param>
-            <param name="t">temp array that is >= aLength</param>
-            <param name="aLength">length of array</param>
-            <param name="p">integer array with size (1 &lt;&lt; RADIX)</param>
-            <param name="c">integer array with size (1 &lt;&lt; RADIX) * 4</param>
         </member>
         <member name="F:Fusion.RuntimeUnityFlagsSetup.flagsBuildFlags">
             <summary>

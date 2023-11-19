@@ -144,7 +144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0733d35123a9ad4aaf63213211c5b4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   splashPrefab: {fileID: 5915462787734291377, guid: 54793bd6f9fdffd4cb86e445ffca9741,
     type: 3}
   splashExitPrefab: {fileID: 5915462787734291377, guid: 54793bd6f9fdffd4cb86e445ffca9741,
@@ -172,15 +171,11 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 3357233732
   ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
   Flags: 67841
-  NetworkGuid:
-    RawGuidValue: 2dd296828f2080541ab2b41eeda650a7
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2500780753419200967}
-  SimulationBehaviours: []

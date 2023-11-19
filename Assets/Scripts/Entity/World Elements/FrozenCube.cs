@@ -9,7 +9,7 @@ using NSMB.Utils;
 
 namespace NSMB.Entities {
 
-    [OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity), typeof(FreezableEntity), typeof(PlayerController))]
+    //[OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity), typeof(FreezableEntity), typeof(PlayerController))]
     public class FrozenCube : HoldableEntity {
 
         //---Networked Variables

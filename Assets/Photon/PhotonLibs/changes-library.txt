@@ -3,6 +3,38 @@ Photon C# Client Library - Changelog
 Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
+
+Version 4.1.7.2 (20. September 2023 - rev7218)
+    Fixed: DisconnectTimeout is no longer capped. You can set any value client side. Server side timeouts can only be set for Self Hosted or Enterprise Server.
+
+Version 4.1.7.1 (06. September 2023 - rev7148)
+    Fixed: Internal state changes to report UDP based Client Timeouts to the server.
+
+Version 4.1.7.0 (18. August 2023 - rev7111)
+    Added: PhotonPeer.SocketErrorCode (int) to provide the low level error code (relevant when the connection gets lost).
+    Changed: SocketUdp to report WouldBlock exceptions as "busy". The handling code could use this to not try send anything else in this loop.
+    Added: Preserve attribute to SocketWebTcp constructor to keep Unity from stripping it from builds.
+
+Version 4.1.6.26 (09. August 2023 - rev7076)
+    Fixed: PhotonClientWebSocket.Send() waits up to 5ms after sending async to allow the message being written to the network layer.
+    Fixed: PhotonClientWebSocket.Send() now provides a distinct return code if the WebSocket did not yet finish sending the data. In that case, the memory which was used for it, is not returned to the pooling. This can cause allocations but fixes cases where messages were modified after they were considered sent.
+    Changed: PhotonClientWebSocket connecting to the server is cancelled after 7 second max (was: 5).
+    Changed: PhotonClientWebSocket AsyncConnectAndReceive will log to the debug callback instead of using Console.Writeline().
+    Changed: PhotonClientWebSocket error handling for readTask.Wait().
+
+Version 4.1.6.25 (05. June 2023 - rev6925)
+    Added: TPeer now measures longestSentCall in SendData().
+    Changed: TPeer.SendOutgoingCommands() to return false if the socket is still busy (which means "no need to call send again in this loop).
+
+Version 4.1.6.24 (15. May 2023 - rev6894)
+    Changed: PhotonClientWebSocket.Send() will now Wait up to 3ms for the Send-Task before it returns "busy". This allows the task to complete and the TPeer can send multiple messages until it send MTU bytes. That avoids increasing lag, if the game logic calls SendOutgoingCommands() sparingly.
+    Changed: PeerBase.Reset() will now also clear the ActionQueue.
+    Fixed: WebSocket connection issues where clients never get into a Connected state. This is a workaround for cases where a WebSocket bug skips the callback for the Init Response from the server. This is a rare issue which does not reproduce 100% of the time.
+    Changed: WebSocket connections will now send pings in one second intervals as long as the WebSocket is connected (and the peerConnectionState is not Disconnected).
+    Changed: If a ping result arrives while the peer is still Connecting, it is used as Init Response on WebSocket connections.
+    Changed: TPeer.FetchServerTimestamp() to only log something (INFO level) if the peer is not connected and initialized yet. FetchServerTimestamp can be repeated and does not need a SendError callback.
+    Changed: PhotonClientWebSocket.Disconnect() to call CloseAsync() if the WebSocket is already in state CloseReceived. This should just close the socket locally.
+
 Version 4.1.6.23 (15. March 2023 - rev6743)
     Fixed: Handling of unknown command types in Initialize(EnetPeer peer, byte[] inBuff, ref int readingOffset). Reading offset is set by Size value.
     Fixed: ReadCustomType() and ReadCustomTypeArray() to check if DeserializeStreamFunction is null, before using it. There was a check which prevented issues but it wasn't correct.

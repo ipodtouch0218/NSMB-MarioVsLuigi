@@ -4,6 +4,7 @@ using UnityEngine.Serialization;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
+using Org.BouncyCastle.Pqc.Crypto.Frodo;
 
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
 
@@ -43,14 +44,11 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     [SerializeField] private bool bounceOnImpacts;
 
     //---Private Variables
-    private RawInterpolator positionInterpolator;
     private Vector2 previousRenderPosition;
 
     public override void Spawned() {
         if (HasStateAuthority)
             Position = transform.position;
-
-        positionInterpolator = GetInterpolator(nameof(InternalPosition));
     }
 
     public void BeforeTick() {
@@ -78,7 +76,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
         if (Freeze) {
             newPosition = Position;
-        } else if ((IsProxy && InterpolationDataSource != InterpolationDataSources.Predicted) || !positionInterpolator.TryGetValues(out void* from, out void* to, out float alpha)) {
+        } else if ((IsProxy /* && InterpolationDataSource != InterpolationDataSources.Predicted*/) || !TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
             // Proxy interpolation with some smoothing:
 
             if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, Position) > interpolationTeleportDistance) {
@@ -93,21 +91,18 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             }
         } else {
             // State/Input Authority interpolation with no smoothing:
+            PropertyReader<Vector2> reader = GetPropertyReader<Vector2>(nameof(InternalPosition));
+            var fromVector = from.Read(reader);
+            var toVector = to.Read(reader);
 
-            Vector2Int fromInt = *(Vector2Int*) from;
-            Vector2 fromFloat = (Vector2) fromInt * 0.001f;
-
-            Vector2Int toInt = *(Vector2Int*) to;
-            Vector2 toFloat = (Vector2) toInt * 0.001f;
-
-            if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromFloat, toFloat) > interpolationTeleportDistance) {
+            if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromVector, toVector) > interpolationTeleportDistance) {
                 // Teleport over large distances
-                newPosition = Utils.WrapWorldLocation(toFloat);
+                newPosition = Utils.WrapWorldLocation(toVector);
             } else {
                 // Normal interpolation (over level seams, too)...
-                Utils.UnwrapLocations(fromFloat, toFloat, out Vector2 fromFloatRelative, out Vector2 toFloatRelative);
+                Utils.UnwrapLocations(fromVector, toVector, out Vector2 fromFloatRelative, out Vector2 toFloatRelative);
                 Vector2 difference = toFloatRelative - fromFloatRelative;
-                newPosition = Vector2.Lerp(fromFloat, fromFloat + difference, alpha);
+                newPosition = Vector2.Lerp(fromVector, fromVector + difference, alpha);
                 newPosition = Utils.WrapWorldLocation(newPosition);
             }
         }
@@ -119,12 +114,12 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     public override void FixedUpdateNetwork() {
         ResetPhysicsData();
 
-        if (!Freeze && (!IsProxy || InterpolationDataSource == InterpolationDataSources.Predicted)) {
+        if (!Freeze && (!IsProxy /* || InterpolationDataSource == InterpolationDataSources.Predicted*/)) {
             Vector2 movement;
             movement = CollideAndSlide(Position + ColliderOffset, Velocity * Runner.DeltaTime, false);
             if (!IsKinematic)
                 movement += CollideAndSlide(Position + ColliderOffset + movement, Gravity * (Runner.DeltaTime * Runner.DeltaTime), true);
-            movement *= Runner.Config.Simulation.TickRate;
+            movement *= Runner.TickRate;
 
             Velocity = movement;
             Position = Utils.WrapWorldLocation(Position + (Velocity * Runner.DeltaTime));

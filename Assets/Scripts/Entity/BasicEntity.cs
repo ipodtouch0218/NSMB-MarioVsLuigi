@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 using Fusion;
@@ -7,12 +8,15 @@ using NSMB.Tiles;
 
 namespace NSMB.Entities {
 
-    [OrderAfter(typeof(EntityMover))]
+    //[OrderAfter(typeof(EntityMover))]
     public abstract class BasicEntity : NetworkBehaviour, IBlockBumpable {
 
+        //---Static Variables
+        protected List<string> ChangesBuffer = new(32);
+
         //---Networked Variables
-        [Networked(OnChanged = nameof(OnFacingRightChanged))] public NetworkBool FacingRight { get; set; }
-        [Networked(OnChanged = nameof(OnIsActiveChanged))] public NetworkBool IsActive { get; set; }
+        [Networked] public NetworkBool FacingRight { get; set; }
+        [Networked] public NetworkBool IsActive { get; set; }
         [Networked] public TickTimer DespawnTimer { get; set; }
         [Networked] protected NetworkBool FirstSpawn { get; set; } = true;
         [Networked] protected Vector2 SpawnLocation { get; set; }
@@ -22,13 +26,14 @@ namespace NSMB.Entities {
         [SerializeField] public AudioSource sfx;
 
         //---Properties
-        public bool IsRespawningEntity => Object.IsSceneObject;
+        public bool IsRespawningEntity => Object.NetworkTypeId.IsSceneObject;
 
         //---Public Variables
         public bool checkForNearbyPlayersWhenRespawning = true;
 
         //---Private Variables
         private bool brickBreakSound;
+        protected ChangeDetector changeDetector;
 
         public virtual void OnValidate() {
             if (!body) body = GetComponent<EntityMover>();
@@ -45,7 +50,14 @@ namespace NSMB.Entities {
             GameManager.Instance.networkObjects.Add(Object);
             OnFacingRightChanged();
 
+            changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
             FirstSpawn = false;
+        }
+
+        public override void Render() {
+            NetworkBehaviourBuffer oldBuffer = default;
+            NetworkBehaviourBuffer newBuffer = default;
+            HandleRenderChanges(true, ref oldBuffer, ref newBuffer);
         }
 
         public override void FixedUpdateNetwork() {
@@ -197,12 +209,20 @@ namespace NSMB.Entities {
         }
 
         //---OnChangeds
-        public static void OnFacingRightChanged(Changed<BasicEntity> changed) {
-            changed.Behaviour.OnFacingRightChanged();
-        }
+        protected virtual void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            if (fillBuffer) {
+                ChangesBuffer.Clear();
+                foreach (var change in changeDetector.DetectChanges(this, out oldBuffer, out newBuffer)) {
+                    ChangesBuffer.Add(change);
+                }
+            }
 
-        public static void OnIsActiveChanged(Changed<BasicEntity> changed) {
-            changed.Behaviour.OnIsActiveChanged();
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(FacingRight): OnFacingRightChanged(); break;
+                case nameof(IsActive): OnIsActiveChanged(); break;
+                }
+            }
         }
     }
 }

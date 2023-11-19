@@ -8,7 +8,7 @@ using NSMB.Entities.Player;
 namespace NSMB.Entities.World {
 
     [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-    [OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity))]
+    //[OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity))]
     public class WaterSplash : NetworkBehaviour {
 
         //---Static Variables

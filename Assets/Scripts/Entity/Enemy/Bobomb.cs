@@ -16,8 +16,8 @@ namespace NSMB.Entities.Enemies {
         private static readonly List<Collider2D> DetonationHits = new();
 
         //---Networked Variables
-        [Networked(OnChanged = nameof(OnDetonationTimerChanged))] public TickTimer DetonationTimer { get; set; }
-        [Networked(OnChanged = nameof(OnIsDetonatedChanged))] private NetworkBool IsDetonated { get; set; }
+        [Networked] public TickTimer DetonationTimer { get; set; }
+        [Networked] private NetworkBool IsDetonated { get; set; }
 
         //---Serialized Variables
         [SerializeField] private GameObject explosionPrefab;
@@ -299,37 +299,45 @@ namespace NSMB.Entities.Enemies {
 
         //---ThrowableEntity overrides
         public override void Kick(PlayerController kicker, bool toRight, float speed, bool groundpound) {
-            //always do a groundpound variant kick
+            // Always do a groundpound variant kick
             base.Kick(kicker, toRight, speed, true);
         }
 
         //---OnChangeds
-        private GameObject explosion;
-        public static void OnIsDetonatedChanged(Changed<Bobomb> changed) {
-            Bobomb bomb = changed.Behaviour;
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
 
-            if (bomb.IsDetonated) {
-                //spawn explosion
-                if (!bomb.explosion)
-                    bomb.explosion = Instantiate(bomb.explosionPrefab, bomb.sRenderer.bounds.center, Quaternion.identity);
-
-                bomb.sRenderer.enabled = false;
-                bomb.sfx.Pause();
-            } else {
-                bomb.sRenderer.enabled = true;
-                bomb.sfx.UnPause();
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(IsDetonated): OnIsDetonatedChanged(); break;
+                case nameof(DetonationTimer): OnDetonationTimerChanged(); break;
+                }
             }
         }
 
-        public static void OnDetonationTimerChanged(Changed<Bobomb> changed) {
-            Bobomb bomb = changed.Behaviour;
-            bool lit = bomb.Lit;
-            bomb.animator.SetBool("lit", lit);
+        private GameObject explosion;
+        public void OnIsDetonatedChanged() {
 
-            if (!lit)
+            if (IsDetonated) {
+                // Spawn explosion
+                if (!explosion)
+                    explosion = Instantiate(explosionPrefab, sRenderer.bounds.center, Quaternion.identity);
+
+                sRenderer.enabled = false;
+                sfx.Pause();
+            } else {
+                sRenderer.enabled = true;
+                sfx.UnPause();
+            }
+        }
+
+        public void OnDetonationTimerChanged() {
+            animator.SetBool("lit", Lit);
+
+            if (!Lit)
                 return;
 
-            bomb.PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
+            PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
         }
     }
 }

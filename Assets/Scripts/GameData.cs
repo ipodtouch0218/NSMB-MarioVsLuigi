@@ -45,7 +45,6 @@ namespace NSMB.Game {
         [Networked] public NetworkBool IsMusicEnabled { get; set; }
         [Networked] public Enums.GameState GameState { get; set; }
         [Networked] public ref NetworkBitArray AvailableStarSpawns => ref MakeRef<NetworkBitArray>();
-        [Networked] private byte BlockBumpPredictionCounter { get; set; }
 
         //---Public Variables
         public NetworkRNG random;
@@ -66,9 +65,6 @@ namespace NSMB.Game {
         private TickTimer startMusicTimer;
         private bool hurryUpSoundPlayed, endSoundPlayed;
         private bool calledAllPlayersLoaded;
-
-        private readonly List<BlockBumpData> predictiveBlockBumpSpawnData = new();
-        private byte lastSpawnedPredictionCounter;
 
         //---Lifetime
         public void OnEnable() {
@@ -130,16 +126,14 @@ namespace NSMB.Game {
 
         public void BeforeTick() {
             // Seed RNG
-            random = new(Runner.Simulation.Tick);
+            random = new(Runner.Tick);
         }
 
         public override void FixedUpdateNetwork() {
             if (GameEnded)
                 return;
 
-            CheckForPredictiveBlockBumpSpawns();
-
-            if (Runner.IsServer && GameState == Enums.GameState.Loading && (Runner.Tick % Runner.Simulation.Config.TickRate) == 0) {
+            if (Runner.IsServer && GameState == Enums.GameState.Loading && (Runner.Tick % Runner.TickRate) == 0) {
                 CheckIfAllPlayersLoaded();
             }
 
@@ -177,7 +171,7 @@ namespace NSMB.Game {
                             audioSfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
                         endSoundPlayed = true;
                     } else {
-                        int tickrate = Runner.Config.Simulation.TickRate;
+                        int tickrate = Runner.TickRate;
                         int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
 
                         if (!hurryUpSoundPlayed && remainingTicks < 61 * tickrate) {
@@ -220,7 +214,7 @@ namespace NSMB.Game {
 
             if (aliveTeams == 0) {
                 // All teams dead, draw?
-                Rpc_EndGame(PlayerRef.None);
+                Rpc_EndGame(-1);
                 return true;
             }
 
@@ -244,7 +238,7 @@ namespace NSMB.Game {
                 // Ran out of time, instantly end if DrawOnTimeUp is set
                 if (SessionData.Instance.DrawOnTimeUp) {
                     // No one wins
-                    Rpc_EndGame(PlayerRef.None);
+                    Rpc_EndGame(-1);
                     return true;
                 }
 
@@ -259,20 +253,6 @@ namespace NSMB.Game {
 
             // No winner, Keep playing
             return false;
-        }
-
-        private void CheckForPredictiveBlockBumpSpawns() {
-            if (Runner.IsServer || Runner.IsResimulation)
-                return;
-
-            foreach (BlockBumpData data in predictiveBlockBumpSpawnData) {
-                if (lastSpawnedPredictionCounter == data.predictionCounter || lastSpawnedPredictionCounter - data.predictionCounter > 128)
-                    continue;
-
-                BumpBlock(data.x, data.y, data.oldTile, data.newTile, data.downwards, data.offset, data.spawnCoin, data.spawnPrefab, data.tick, data.predictionCounter);
-                lastSpawnedPredictionCounter = data.predictionCounter;
-            }
-            predictiveBlockBumpSpawnData.Clear();
         }
 
         /// <summary>
@@ -353,38 +333,9 @@ namespace NSMB.Game {
 
             Vector3 spawnLocation = Utils.Utils.TilemapToWorldPosition(loc) + OneFourth;
 
-            if (Runner.IsForward) {
-
-                counter ??= BlockBumpPredictionCounter++;
-                tick ??= Runner.Tick;
-
-                NetworkObject obj = Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
-                    obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, tick.Value, offset);
-                }, predictionKey: new() { Byte1 = (byte) tick.Value, Byte0 = counter.Value });
-
-                obj.PredictedSpawn.Tick = tick.Value;
-
-            } else {
-                // We want a block bump bump but we can't make one. Ugh.
-                // Note that we want to spawn one, and handle it later.
-                // We also have to make sure that we don't spawn mutliple because it will try to do that
-                // (beacuse resimulations [and it hates me])
-                BlockBumpData data = new() {
-                    x = x,
-                    y = y,
-                    oldTile = oldTile,
-                    newTile = newTile,
-                    downwards = downwards,
-                    offset = offset,
-                    spawnCoin = spawnCoin,
-                    spawnPrefab = spawnPrefab,
-
-                    tick = Runner.Tick,
-                    predictionCounter = BlockBumpPredictionCounter++,
-                };
-
-                predictiveBlockBumpSpawnData.Add(data);
-            }
+            NetworkObject obj = Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
+                obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, tick ?? Runner.Tick, offset);
+            });
 
             GameManager.Instance.TileManager.SetTile(loc, null);
         }
@@ -565,7 +516,8 @@ namespace NSMB.Game {
 
             yield return new WaitForSecondsRealtime(0.25f);
 
-            Runner.SetActiveScene(0);
+            if (Runner.IsServer)
+                Runner.LoadScene(SceneRef.FromIndex(0));
         }
 
         private void HandleMusic() {

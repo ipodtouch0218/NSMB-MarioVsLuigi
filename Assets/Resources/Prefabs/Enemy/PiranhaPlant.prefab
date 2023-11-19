@@ -361,13 +361,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 678c29978dd34f647a21f2a2c3db5a9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 2
   _FacingRight:
     _value: 0
   _IsActive:
     _value: 0
   body: {fileID: 0}
-  nrb: {fileID: 0}
   sfx: {fileID: 7558042822839980312}
   checkForNearbyPlayersWhenRespawning: 0
   _IsFrozen:
@@ -383,7 +381,6 @@ MonoBehaviour:
   animator: {fileID: 863355600414429673}
   legacyAnimation: {fileID: 0}
   sRenderer: {fileID: 5652721323520962159}
-  physics: {fileID: 0}
   _PopupAnimationTime: 0
   interpolationTarget: {fileID: 435428292489101360}
   playerDetectSize: 1
@@ -403,15 +400,11 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 367916708
   ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
   Flags: 2305
-  NetworkGuid:
-    RawGuidValue: 28a7f3ea2c44a564d906449744561724
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 3689884099564413062}
-  SimulationBehaviours: []

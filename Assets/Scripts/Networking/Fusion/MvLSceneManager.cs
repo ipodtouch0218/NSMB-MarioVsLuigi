@@ -1,14 +1,14 @@
-using Fusion;
 using System;
-using UnityEngine.SceneManagement;
-using UnityEngine;
+using System.Collections;
 
-public class MvLSceneManager : NetworkSceneManagerDefault
-{
+using Fusion;
+
+public class MvLSceneManager : Fusion.NetworkSceneManagerDefault {
+
     public static event Action OnSceneLoadStart;
 
-    protected override YieldInstruction LoadSceneAsync(SceneRef sceneRef, LoadSceneParameters parameters, Action<Scene> loaded) {
+    protected override IEnumerator LoadSceneCoroutine(SceneRef sceneRef, NetworkLoadSceneParameters sceneParams) {
         OnSceneLoadStart?.Invoke();
-        return base.LoadSceneAsync(sceneRef, parameters, loaded);
+        return base.LoadSceneCoroutine(sceneRef, sceneParams);
     }
 }

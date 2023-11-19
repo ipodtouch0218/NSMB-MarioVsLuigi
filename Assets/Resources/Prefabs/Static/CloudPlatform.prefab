@@ -163,18 +163,13 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SortKey: 3842164125
   ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 0
-  AoiPositionSource: {fileID: 0}
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 0
   Flags: 67841
-  NetworkGuid:
-    RawGuidValue: da972f64d20815e4487e3000ae7ce690
   NestedObjects: []
   NetworkedBehaviours: []
-  SimulationBehaviours:
-  - {fileID: 8010249587145537852}
 --- !u!1 &8010249587262149985
 GameObject:
   m_ObjectHideFlags: 0

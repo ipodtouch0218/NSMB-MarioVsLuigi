@@ -81,8 +81,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public delegate void OnPlayerLeftDelegate(NetworkRunner runner, PlayerRef player);
     public static event OnPlayerLeftDelegate OnPlayerLeft;
 
-    public delegate void OnReliableDataReceivedDelegate(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data);
+    public delegate void OnReliableDataReceivedDelegate(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data);
     public static event OnReliableDataReceivedDelegate OnReliableDataReceived;
+
+    public delegate void OnReliableDataProgressDelegate(NetworkRunner runner, PlayerRef player, ReliableKey key, float what);
+    public static event OnReliableDataProgressDelegate OnReliableDataProgress;
 
     public delegate void OnSceneLoadDoneDelegate(NetworkRunner runner);
     public static event OnSceneLoadDoneDelegate OnSceneLoadDone;
@@ -140,8 +143,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             request.Refuse();
     }
 
-    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner) {
-        Debug.Log("[Network] Disconnected from Server");
+    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) {
+        Debug.Log($"[Network] Disconnected from Server (Reason: {reason})");
 
         OnDisconnectedFromServer?.Invoke(runner);
         RecreateInstance();
@@ -190,9 +193,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             HostMigrationResume = HostMigrationResume,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
-            DisableClientSessionCreation = false,
+            EnableClientSessionCreation = true,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
-            Scene = 0,
+            Scene = SceneRef.FromIndex(0),
         });
 
         OnHostMigration?.Invoke(runner, hostMigrationToken);
@@ -264,8 +267,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         runner.Despawn(data.Object);
     }
 
-    void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) {
-        OnReliableDataReceived?.Invoke(runner, player, data);
+    void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) {
+        OnReliableDataReceived?.Invoke(runner, player, key, data);
+    }
+
+    void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float what) {
+        OnReliableDataProgress?.Invoke(runner, player, key, what);
     }
 
     void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner) {
@@ -299,6 +306,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) {
         OnUserSimulationMessage?.Invoke(runner, message);
+    }
+
+    void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) {
+
+    }
+
+    void INetworkRunnerCallbacks.OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) {
+
     }
     #endregion
 
@@ -367,8 +382,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         }
 
         // Version separation
-        AppSettings appSettings = new() {
-            AppIdFusion = PhotonAppSettings.Instance.AppSettings.AppIdFusion,
+        FusionAppSettings appSettings = new() {
+            AppIdFusion = PhotonAppSettings.Global.AppSettings.AppIdFusion,
             AppVersion = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value,
             EnableLobbyStatistics = true,
             UseNameServer = true,
@@ -445,7 +460,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough;
             args.SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>();
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
-            args.Initialized = RoomInitialized;
+            args.OnGameStarted = RoomInitialized;
 
             args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname;
             args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;
@@ -493,9 +508,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             SessionName = roomId,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
-            DisableClientSessionCreation = true,
+            EnableClientSessionCreation = false,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
-            Initialized = RoomInitialized,
+            OnGameStarted = RoomInitialized,
         });
         if (!result.Ok) {
             Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
@@ -577,7 +592,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             } else if (resumeNO.TryGetComponent(out PlayerData pd)) {
 
                 // Don't respawn the PlayerData for the host that just left. Stupid.
-                if (pd.Object.InputAuthority == runner.SessionInfo.MaxPlayers - 1)
+                if (pd.Object.InputAuthority.AsIndex == runner.SessionInfo.MaxPlayers - 1)
                     continue;
 
                 // Oh, and immediately assign our own. We're greedy :)

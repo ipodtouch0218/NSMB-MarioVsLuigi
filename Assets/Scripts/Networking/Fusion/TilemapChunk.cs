@@ -6,7 +6,7 @@ using NSMB.Game;
 
 namespace NSMB.Tiles {
 
-    [OrderAfter(typeof(TileManager))]
+    //[OrderAfter(typeof(TileManager))]
     public class TilemapChunk : NetworkBehaviour, IBeforeTick, IAfterTick {
 
         //---Static Variables
@@ -151,6 +151,7 @@ namespace NSMB.Tiles {
         }
 
 #if UNITY_EDITOR
+        // --- Debug
         private static readonly Color SelectedColor = new(0.5f, 0.5f, 0.5f, 0.2f);
         private static readonly Vector3 ChunkSize = new(8, 8, 0);
         public void OnDrawGizmosSelected() {

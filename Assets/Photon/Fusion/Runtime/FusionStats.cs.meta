@@ -1,0 +1,49 @@
+fileFormatVersion: 2
+guid: d358eee53e80c8a45be7aae6cb5d4a4d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _objIds: {instanceID: 0}
+  - _titleText: {instanceID: 0}
+  - _clearIcon: {instanceID: 0}
+  - _pauseIcon: {instanceID: 0}
+  - _togglIcon: {instanceID: 0}
+  - _closeIcon: {instanceID: 0}
+  - _canvsIcon: {instanceID: 0}
+  - _clearLabel: {instanceID: 0}
+  - _pauseLabel: {instanceID: 0}
+  - _togglLabel: {instanceID: 0}
+  - _closeLabel: {instanceID: 0}
+  - _canvsLabel: {instanceID: 0}
+  - _objectNameText: {instanceID: 0}
+  - _graphGridLayoutGroup: {instanceID: 0}
+  - _canvas: {instanceID: 0}
+  - _canvasRT: {instanceID: 0}
+  - _rootPanelRT: {instanceID: 0}
+  - _guidesRT: {instanceID: 0}
+  - _headerRT: {instanceID: 0}
+  - _statsPanelRT: {instanceID: 0}
+  - _graphsLayoutRT: {instanceID: 0}
+  - _titleRT: {instanceID: 0}
+  - _buttonsRT: {instanceID: 0}
+  - _objectTitlePanelRT: {instanceID: 0}
+  - _objectIdsGroupRT: {instanceID: 0}
+  - _objectMetersPanelRT: {instanceID: 0}
+  - _titleButton: {instanceID: 0}
+  - _objctButton: {instanceID: 0}
+  - _clearButton: {instanceID: 0}
+  - _togglButton: {instanceID: 0}
+  - _pauseButton: {instanceID: 0}
+  - _closeButton: {instanceID: 0}
+  - _canvsButton: {instanceID: 0}
+  - _object: {instanceID: 0}
+  - _runner: {instanceID: 0}
+  - LabelFont: {fileID: 12800000, guid: 5b587a998c6994e4a9a7e724729f140e, type: 3}
+  - ValueFont: {fileID: 12800000, guid: a4ed52b30ac954791b7f3c691f1a348e, type: 3}
+  - GraphShader: {fileID: 4800000, guid: 191d95ce624abaa4ba0294fc7baa2845, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
