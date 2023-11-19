@@ -30,6 +30,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void Render() {
+            base.Render();
             if (IsFrozen)
                 return;
 

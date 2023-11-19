@@ -383,10 +383,12 @@ namespace NSMB.UI.MainMenu {
         public void OpenErrorBox(string key) {
             errorPrompt.OpenWithText(key);
             nonNetworkShutdown = false;
+            GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
         public void OpenNetworkErrorBox(string key) {
             networkErrorPrompt.OpenWithText(key);
+            GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
         public void OpenNetworkErrorBox(ShutdownReason reason) {

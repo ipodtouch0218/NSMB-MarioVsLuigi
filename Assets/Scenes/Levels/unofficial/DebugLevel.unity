@@ -310,6 +310,31 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 903953614458399358, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 903953614458399358, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 903953614458399358, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1284403462586313449, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1726141835936031342, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1731295336454021316, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -391,6 +416,16 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3537434420574305115, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4269451001951704030, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: tilemap
@@ -449,7 +484,7 @@ PrefabInstance:
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: originalTiles.Array.size
-      value: 512
+      value: 1024
       objectReference: {fileID: 0}
     - target: {fileID: 5500062339093502114, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
@@ -1162,6 +1197,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5713209705635899267, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5981962928583605274, guid: 43d56bd18d06e9b4abe323618a20a228,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6097373057582557604, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1347,6 +1392,11 @@ PrefabInstance:
         type: 3}
       propertyPath: Flags
       value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 4157375552812710484, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: SortKey
+      value: 3249281513
       objectReference: {fileID: 0}
     - target: {fileID: 4157375552812710484, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -2924,6 +2974,11 @@ PrefabInstance:
         type: 3}
       propertyPath: Flags
       value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
+      propertyPath: SortKey
+      value: 3315481743
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
@@ -5835,6 +5890,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
+      propertyPath: SortKey
+      value: 1095042120
+      objectReference: {fileID: 0}
+    - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
+        type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
       value: -9059363154640767102
       objectReference: {fileID: 0}
@@ -5926,6 +5986,11 @@ PrefabInstance:
         type: 3}
       propertyPath: Flags
       value: 68097
+      objectReference: {fileID: 0}
+    - target: {fileID: 8633693366087775819, guid: da972f64d20815e4487e3000ae7ce690,
+        type: 3}
+      propertyPath: SortKey
+      value: 3785144485
       objectReference: {fileID: 0}
     - target: {fileID: 8633693366087775819, guid: da972f64d20815e4487e3000ae7ce690,
         type: 3}

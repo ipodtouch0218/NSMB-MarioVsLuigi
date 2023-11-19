@@ -94,6 +94,7 @@ namespace NSMB.Entities.Collectable {
         }
 
         public override void Render() {
+            base.Render();
             if (IsStationary || (GameData.Instance?.GameEnded ?? false))
                 return;
 

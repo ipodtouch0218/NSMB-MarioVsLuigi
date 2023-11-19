@@ -18,7 +18,6 @@ namespace NSMB.Entities.Collectable.Powerups {
         private static readonly int OriginalSortingOrder = 10;
 
         //---Networked Variables
-        [Networked] private PowerupReserveResult ReserveResult { get; set; }
         [Networked] protected PlayerController FollowPlayer { get; set; }
         [Networked] private TickTimer IgnorePlayerTimer { get; set; }
 
@@ -129,6 +128,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         public override void Render() {
+            base.Render();
             if (Collector)
                 return;
 
@@ -308,22 +308,25 @@ namespace NSMB.Entities.Collectable.Powerups {
             PowerupScriptable newPowerup = powerupScriptable;
             Enums.PowerupState newState = newPowerup.state;
 
-            ReserveResult = collectScript.OnPowerupCollect(player, newPowerup);
+            PowerupReserveResult result = collectScript.OnPowerupCollect(player, newPowerup);
 
-            switch (ReserveResult) {
+            switch (result) {
             case PowerupReserveResult.ReserveOldPowerup: {
                 if (oldState != Enums.PowerupState.NoPowerup)
-                    Collector.SetReserveItem(oldState);
+                    player.SetReserveItem(oldState);
                 break;
             }
             case PowerupReserveResult.ReserveNewPowerup: {
-                Collector.SetReserveItem(newState);
+                player.SetReserveItem(newState);
                 break;
             }
             }
 
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
             IsActive = false;
+
+            if (HasStateAuthority)
+                Rpc_CollectedPowerup(player, result);
         }
 
         //---CollectableEntity overrides
@@ -339,33 +342,23 @@ namespace NSMB.Entities.Collectable.Powerups {
             }
         }
 
-        //---OnChangeds
-        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
-            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
-
-            foreach (var change in ChangesBuffer) {
-                switch (change) {
-                case nameof(ReserveResult):
-                    OnReserveResultChanged();
-                    break;
-                }
-            }
-        }
-        public void OnReserveResultChanged() {
-            switch (ReserveResult) {
+        //---RPCs
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_CollectedPowerup(PlayerController collector, PowerupReserveResult result) {
+            switch (result) {
             case PowerupReserveResult.ReserveOldPowerup:
             case PowerupReserveResult.NoneButPlaySound: {
                 // Just play the collect sound
                 if (powerupScriptable.soundPlaysEverywhere) {
-                    Collector.PlaySoundEverywhere(powerupScriptable.soundEffect);
+                    collector.PlaySoundEverywhere(powerupScriptable.soundEffect);
                 } else {
-                    Collector.PlaySound(powerupScriptable.soundEffect);
+                    collector.PlaySound(powerupScriptable.soundEffect);
                 }
                 break;
             }
             case PowerupReserveResult.ReserveNewPowerup: {
                 // Reserve the new powerup
-                Collector.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
+                collector.PlaySound(Enums.Sounds.Player_Sound_PowerupReserveStore);
                 break;
             }
             }

@@ -619,7 +619,7 @@ namespace NSMB.Entities.Player {
                     Quaternion.identity,
                     Object.InputAuthority,
                     LagCompensatedBuffer,
-                    options: HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority | HitOptions.SubtickAccuracy,
+                    options: HitOptions.IgnoreInputAuthority | HitOptions.SubtickAccuracy | HitOptions.IncludeBox2D,
                     clearHits: false);
             }
 

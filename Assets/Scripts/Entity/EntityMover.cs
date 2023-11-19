@@ -45,10 +45,13 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
     //---Private Variables
     private Vector2 previousRenderPosition;
+    private PropertyReader<Vector2> internalPositionPropertyReader;
 
     public override void Spawned() {
         if (HasStateAuthority)
             Position = transform.position;
+
+        internalPositionPropertyReader = GetPropertyReader<Vector2>(nameof(InternalPosition));
     }
 
     public void BeforeTick() {
@@ -91,9 +94,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             }
         } else {
             // State/Input Authority interpolation with no smoothing:
-            PropertyReader<Vector2> reader = GetPropertyReader<Vector2>(nameof(InternalPosition));
-            var fromVector = from.Read(reader);
-            var toVector = to.Read(reader);
+            (Vector2 fromVector, Vector2 toVector) = internalPositionPropertyReader.Read(from, to);
 
             if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromVector, toVector) > interpolationTeleportDistance) {
                 // Teleport over large distances
