@@ -453,7 +453,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 Debug.Log($"[Network] Creating a game in {CurrentRegion} with the ID {idBuilder}");
             }
 
-            args.AuthValues = authValues;
+            //args.AuthValues = authValues;
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
             args.ConnectionToken = GlobalController.Instance.connectionToken.Serialize();

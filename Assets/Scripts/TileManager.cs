@@ -61,6 +61,8 @@ namespace NSMB.Tiles {
         }
 
         public void ResetMap() {
+            GameData.Instance.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - GameData.Instance.RealPlayerCount * 0.2f);
+
             foreach (TilemapChunk chunk in chunks)
                 chunk.ResetMap();
 
@@ -76,8 +78,6 @@ namespace NSMB.Tiles {
 
                 enemy.RespawnEntity();
             }
-
-            GameData.Instance.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - GameData.Instance.RealPlayerCount * 0.2f);
         }
 
         public TileBase GetTile(int x, int y) {

@@ -1,8 +1,6 @@
-Shader "TextMeshPro/Distance Field External Outline"
-{
+Shader "TextMeshPro/Distance Field External Outline" {
 
-    Properties
-    {
+    Properties {
         _FaceTex ("Face Texture", 2D) = "white" {}
         _FaceUVSpeedX ("Face UV Speed X", Range(-5, 5)) = 0.0
         _FaceUVSpeedY ("Face UV Speed Y", Range(-5, 5)) = 0.0
@@ -82,9 +80,8 @@ Shader "TextMeshPro/Distance Field External Outline"
         _StencilWriteMask ("Stencil Write Mask", Float) = 255
         _StencilReadMask ("Stencil Read Mask", Float) = 255
 
-        _ColorMask ("Color Mask", Float) = 15
-
         _CullMode ("Cull Mode", Float) = 0
+        _ColorMask ("Color Mask", Float) = 15
     }
 
     CGINCLUDE
@@ -99,7 +96,7 @@ Shader "TextMeshPro/Distance Field External Outline"
         float4 position : POSITION;
         float3 normal : NORMAL;
         fixed4 color : COLOR;
-        float2 texcoord0 : TEXCOORD0;
+        float4 texcoord0 : TEXCOORD0;
         float2 texcoord1 : TEXCOORD1;
     };
 
@@ -118,13 +115,18 @@ Shader "TextMeshPro/Distance Field External Outline"
 			float4	texcoord2		: TEXCOORD4;		// u,v, scale, bias
 			fixed4	underlayColor	: COLOR1;
         #endif
+
         float4 textures : TEXCOORD5;
     };
 
-    float4 _FaceTex_ST;
-    float4 _OutlineTex_ST;
+		// Used by Unity internally to handle Texture Tiling and Offset.
+        float4 _FaceTex_ST;
+        float4 _OutlineTex_ST;
+		float _UIMaskSoftnessX;
+        float _UIMaskSoftnessY;
+        int _UIVertexColorAlwaysGammaSpace;
 
-    pixel_t VertShaderOutlined(vertex_t input, float outlineScale)
+		pixel_t VertShaderOutlined(vertex_t input, float outlineScale)
     {
         pixel_t output;
 
@@ -133,7 +135,7 @@ Shader "TextMeshPro/Distance Field External Outline"
         UNITY_TRANSFER_INSTANCE_ID(input, output);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-        float bold = step(input.texcoord1.y, 0);
+		float bold = step(input.texcoord0.w, 0);
 
         float4 vert = input.position;
         vert.x += _VertexOffsetX;
@@ -144,11 +146,8 @@ Shader "TextMeshPro/Distance Field External Outline"
         float2 pixelSize = vPosition.w;
         pixelSize /= float2(_ScaleX, _ScaleY) * abs(mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy));
         float scale = rsqrt(dot(pixelSize, pixelSize));
-        scale *= abs(input.texcoord1.y) * _GradientScale * (_Sharpness + 1);
-        if (UNITY_MATRIX_P[3][3] == 0)
-           scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale,
-                         abs(dot(UnityObjectToWorldNormal(input.normal.xyz),
-                                 normalize(WorldSpaceViewDir(vert)))));
+		scale *= abs(input.texcoord0.w) * _GradientScale * (_Sharpness + 1);
+		if (UNITY_MATRIX_P[3][3] == 0) scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(input.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
 
         float weight = lerp(_WeightNormal, _WeightBold, bold) / 4.0;
         weight = (weight + _FaceDilate) * _ScaleRatioA * 0.5;
@@ -181,17 +180,21 @@ Shader "TextMeshPro/Distance Field External Outline"
         float2 maskUV = (vert.xy - clampedRect.xy) / (clampedRect.zw - clampedRect.xy);
 
         // Support for texture tiling and offset
-        float2 textureUV = UnpackUV(input.texcoord1.x);
+        float2 textureUV = input.texcoord1;
         float2 faceUV = TRANSFORM_TEX(textureUV, _FaceTex);
         float2 outlineUV = TRANSFORM_TEX(textureUV, _OutlineTex);
 
 
+        if (_UIVertexColorAlwaysGammaSpace && !IsGammaSpace())
+        {
+            input.color.rgb = UIGammaToLinear(input.color.rgb);
+        }
         output.position = vPosition;
         output.color = input.color;
         output.atlas = input.texcoord0;
         output.param = float4(alphaClip, scale, bias * outlineScale, weight);
-        output.mask = half4(vert.xy * 2 - clampedRect.xy - clampedRect.zw,
-                            0.25 / (0.25 * half2(_MaskSoftnessX, _MaskSoftnessY) + pixelSize.xy));
+		const half2 maskSoftness = half2(max(_UIMaskSoftnessX, _MaskSoftnessX), max(_UIMaskSoftnessY, _MaskSoftnessY));
+        output.mask = half4(vert.xy * 2 - clampedRect.xy - clampedRect.zw,  0.25 / (0.25 * maskSoftness + pixelSize.xy));
         output.viewDir = mul((float3x3)_EnvMatrix, _WorldSpaceCameraPos.xyz - mul(unity_ObjectToWorld, vert).xyz);
         #if (UNDERLAY_ON || UNDERLAY_INNER)
 			output.texcoord2 = float4(input.texcoord0 + bOffset, bScale, bBias);
