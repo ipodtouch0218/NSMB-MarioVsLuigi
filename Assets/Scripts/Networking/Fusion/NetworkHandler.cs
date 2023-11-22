@@ -38,6 +38,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     private static GameObject prefab;
     private static bool reattemptCreate;
     public static int connecting;
+    private static List<PlayerData> playerDatas = new();
 
     //---Properties
     public static string CurrentRegion { get; set; }
@@ -168,7 +169,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 Debug.Log($"[Network] Authenication successful ({signedData.UserId}), server signature verified");
                 GlobalController.Instance.connectionToken = connectionToken;
             } else {
-                Debug.LogWarning("[Network] Authentication server responded with signed data, but it had an invalid signature");
+                Debug.LogWarning("[Network] Authentication server responded with signed data, but it had an invalid signature. Possible server spoofing?");
             }
         } else {
             Debug.LogWarning("[Network] Authentication server did not respond with any signed data, ID Spoofing is possible");
@@ -215,16 +216,24 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
 
+        // Fusion 2.0.0 rc7 bug.
+        if (!runner.IsPlayerValid(player)) {
+            return;
+        }
+
         // Handle PlayerDatas
         bool hadExistingData = false;
         if (runner.IsServer && !runner.IsSinglePlayer) {
-            PlayerData existingData = FindObjectsOfType<PlayerData>().Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player)).SingleOrDefault();
+            PlayerData existingData = FindObjectsByType<PlayerData>(FindObjectsSortMode.None)
+                .Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player))
+                .SingleOrDefault();
             hadExistingData = existingData;
 
             if (hadExistingData) {
                 existingData.ReassignPlayerData(player);
             } else {
-                runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
+                NetworkObject obj = runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
+                playerDatas.Add(obj.GetComponent<PlayerData>());
             }
 
             if (runner.Tick != 0)
@@ -250,21 +259,24 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         OnPlayerLeft?.Invoke(runner, player);
 
-        PlayerData data = player.GetPlayerData(runner);
+        PlayerData data = null;
+        foreach (PlayerData d in playerDatas) {
+            if (d.Object.InputAuthority == player) {
+                data = d;
+                break;
+            }
+        }
+
         if (data) {
             Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.quit", "playername", data.GetNickname());
             if (Runner.IsServer) {
-                StartCoroutine(DestroyPlayerDataLater(data));
+                runner.Despawn(data.Object);
             }
+            playerDatas.Remove(data);
         }
 
         GlobalController.Instance.discordController.UpdateActivity();
-    }
-
-    private IEnumerator DestroyPlayerDataLater(PlayerData data) {
-        yield return new WaitForSecondsRealtime(1);
-        runner.Despawn(data.Object);
     }
 
     void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) {
@@ -331,7 +343,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         Instance = Instantiate(prefab).GetComponent<NetworkHandler>();
         Instance.Initialize();
-        //Debug.Log("[Network] NetworkHandler created");
     }
 
     public void Initialize() {
@@ -453,7 +464,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 Debug.Log($"[Network] Creating a game in {CurrentRegion} with the ID {idBuilder}");
             }
 
-            //args.AuthValues = authValues;
+            args.AuthValues = authValues;
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
             args.ConnectionToken = GlobalController.Instance.connectionToken.Serialize();
@@ -564,13 +575,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     private static void RoomInitialized(NetworkRunner runner) {
 
+        playerDatas.Clear();
         SessionData.PlayersNeedingJoinMessage.Clear();
 
         if (runner.IsServer) {
             NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder);
-
-            if (session)
-                SessionData.Instance = session.GetComponent<SessionData>();
+            SessionData.Instance = session.GetComponent<SessionData>();
         }
     }
 

@@ -33,7 +33,7 @@ namespace NSMB.Entities.Collectable {
             CollectableTick = (int) (Runner.Tick + (0.2f * Runner.TickRate));
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
-            body.Velocity = Vector2.up * GameData.Instance.random.RangeInclusive(5.5f, 6f);
+            body.Velocity = Vector2.up * GameManager.Instance.random.RangeInclusive(5.5f, 6f);
         }
 
         public override void Render() {
@@ -44,7 +44,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (GameData.Instance && GameData.Instance.GameEnded) {
+            if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 spriteAnimation.enabled = false;
                 body.Freeze = true;

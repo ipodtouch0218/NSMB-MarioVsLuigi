@@ -50,14 +50,14 @@ namespace NSMB.Entities.Enemies {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            GameData gm = GameData.Instance;
+            GameManager gm = GameManager.Instance;
             if (gm) {
                 if (gm.GameEnded) {
                     animator.enabled = false;
                     return;
                 }
 
-                if (!gm.IsMusicEnabled)
+                if (gm.GameState != Enums.GameState.Playing)
                     return;
             }
 
@@ -153,7 +153,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void OnIsDeadChanged() {
-            if (IsDead && GameData.Instance && GameData.Instance.GameState == Enums.GameState.Playing) {
+            if (IsDead && GameManager.Instance && GameManager.Instance.GameState == Enums.GameState.Playing) {
                 PlaySound(Enums.Sounds.Enemy_PiranhaPlant_Death);
                 PlaySound(IsFrozen ? Enums.Sounds.Enemy_Generic_FreezeShatter : Enums.Sounds.Enemy_Shell_Kick);
                 GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position + Vector3.up * 0.5f);

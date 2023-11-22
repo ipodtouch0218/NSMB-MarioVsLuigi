@@ -26,7 +26,7 @@ namespace NSMB.Entities.Enemies {
                 return;
             }
 
-            if (GameData.Instance.GameEnded) {
+            if (GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 AngularVelocity = 0;
                 legacyAnimation.enabled = false;

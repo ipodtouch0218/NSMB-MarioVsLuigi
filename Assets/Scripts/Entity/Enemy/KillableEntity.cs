@@ -59,8 +59,7 @@ namespace NSMB.Entities {
         }
         public override Vector2 FrozenOffset {
             get {
-
-                Vector2 entityPosition = body ? body.Position : transform.position;
+                Vector2 entityPosition = transform.position;
                 Bounds bounds = default;
                 Renderer[] renderers = GetComponentsInChildren<Renderer>();
                 foreach (Renderer renderer in renderers) {
@@ -75,13 +74,8 @@ namespace NSMB.Entities {
                         bounds.Encapsulate(renderer.bounds);
                 }
 
-                Vector2 interpolationOffset = Vector2.zero;
-                if (body && body.interpolationTarget) {
-                    interpolationOffset = entityPosition - (Vector2) body.interpolationTarget.position;
-                }
-
                 Vector2 position = new(bounds.center.x, bounds.min.y);
-                Vector2 offset = entityPosition - position - interpolationOffset;
+                Vector2 offset = entityPosition - position;
 
                 return offset;
             }
@@ -120,16 +114,16 @@ namespace NSMB.Entities {
 
         public override void Render() {
             base.Render();
-            if (!IsActive || !body || !body.interpolationTarget)
+            if (!IsActive)
                 return;
 
             if (IsDead)
-                body.interpolationTarget.rotation *= Quaternion.Euler(0, 0, AngularVelocity * Time.deltaTime);
+                transform.rotation *= Quaternion.Euler(0, 0, AngularVelocity * Time.deltaTime);
         }
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (!GameData.Instance || !Object || !body)
+            if (!GameManager.Instance || !Object || !body)
                 return;
 
             if (!IsActive) {
@@ -263,8 +257,8 @@ namespace NSMB.Entities {
                 if (sRenderer)
                     sRenderer.enabled = true;
 
-                if (body && body.interpolationTarget)
-                    body.interpolationTarget.rotation = Quaternion.identity;
+                if (body)
+                    transform.rotation = Quaternion.identity;
             } else {
                 if (sRenderer)
                     sRenderer.enabled = false;

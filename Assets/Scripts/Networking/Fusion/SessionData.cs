@@ -7,6 +7,7 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
+using UnityEngine.SceneManagement;
 
 public class SessionData : NetworkBehaviour {
 
@@ -72,13 +73,14 @@ public class SessionData : NetworkBehaviour {
                 MainMenuManager.Instance.EnterRoom(false);
         }
 
-        PrivateRoom = !Runner.SessionInfo.IsVisible;
-        if (MaxPlayers == 0) {
-            NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
-            MaxPlayers = (byte) players;
-        }
-
         if (Runner.IsServer) {
+
+            PrivateRoom = !Runner.SessionInfo.IsVisible;
+            if (MaxPlayers == 0) {
+                NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
+                MaxPlayers = (byte) players;
+            }
+
             bannedIds = new();
             bannedIps = new();
             NetworkHandler.OnConnectRequest += OnConnectRequest;
@@ -97,6 +99,16 @@ public class SessionData : NetworkBehaviour {
     }
 
     public override void Render() {
+
+        if (!GameStarted && GameStartTimer.IsActive(Runner) && MainMenuManager.Instance) {
+            int ticksLeft = (GameStartTimer.RemainingTicks(Runner) ?? 0) + 1;
+            if (ticksLeft % Runner.TickRate == 0) {
+                // Send countdown
+                int seconds = ticksLeft / Runner.TickRate;
+                MainMenuManager.Instance.OnCountdownTick(seconds);
+            }
+        }
+
         foreach (var change in changeDetector.DetectChanges(this, out var previous, out _)) {
             switch (change) {
             case nameof(MaxPlayers):
@@ -129,16 +141,7 @@ public class SessionData : NetworkBehaviour {
 
             if (GameStartTimer.Expired(Runner)) {
                 // Start game
-                if (Runner.IsServer)
-                    Rpc_StartGame();
-
-            } else {
-                int ticksLeft = (GameStartTimer.RemainingTicks(Runner) ?? 0) + 1;
-                if (ticksLeft % Runner.TickRate == 0) {
-                    // Send countdown
-                    int seconds = ticksLeft / Runner.TickRate;
-                    MainMenuManager.Instance.OnCountdownTick(seconds);
-                }
+                Rpc_StartGame();
             }
         }
     }
@@ -304,8 +307,9 @@ public class SessionData : NetworkBehaviour {
         SetGameStarted(true);
 
         // Load the correct scene
-        if (Runner.IsServer)
-            Runner.LoadScene(MainMenuManager.Instance.GetCurrentSceneRef());
+        if (Runner.IsServer) {
+            Runner.LoadScene(MainMenuManager.Instance.GetCurrentSceneRef(), LoadSceneMode.Single);
+        }
     }
 
     //---OnChangeds

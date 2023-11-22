@@ -39,9 +39,9 @@ namespace NSMB.Tiles {
             bool downwards = direction == InteractionDirection.Down;
 
             // Don't spawn downwards if the tile below us is solid
-            downwards &= !GameManager.Instance.TileManager.GetTile(tileLocation + Vector2Int.down);
+            downwards &= !GameManager.Instance.tileManager.GetTile(tileLocation + Vector2Int.down);
 
-            GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+            GameManager.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 resultTile, downwards, SpawnOffset, false, spawnResult);
             return false;
         }

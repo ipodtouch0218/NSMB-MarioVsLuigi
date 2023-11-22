@@ -46,7 +46,7 @@ public class UserNametag : MonoBehaviour {
             return;
         }
 
-        nametag.SetActive(!(parent.IsDead && parent.IsRespawning) && GameData.Instance.GameState >= Enums.GameState.Playing);
+        nametag.SetActive(!(parent.IsDead && parent.IsRespawning) && GameManager.Instance.GameState >= Enums.GameState.Playing);
 
         if (!nametag.activeSelf)
             return;

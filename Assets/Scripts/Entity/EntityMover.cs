@@ -5,6 +5,7 @@ using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
 
+[SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Resimulate | SimulationStages.Forward)]
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
 
     //---Static Variables
@@ -37,7 +38,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
     //---Serialized Variables
     [Header("Serialized")]
-    [SerializeField] public Transform interpolationTarget;
     [SerializeField, FormerlySerializedAs("collider")] private BoxCollider2D activeCollider;
     [SerializeField] private float maxFloorAngle = 70, interpolationTeleportDistance = 1f;
     [SerializeField] private bool bounceOnImpacts;
@@ -71,9 +71,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     }
 
     public unsafe override void Render() {
-        if (!interpolationTarget)
-            interpolationTarget = transform;
-
         Vector3 newPosition;
 
         if (Freeze) {
@@ -106,8 +103,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             }
         }
 
-        newPosition.z = interpolationTarget.position.z;
-        previousRenderPosition = interpolationTarget.position = newPosition;
+        newPosition.z = transform.position.z;
+        previousRenderPosition = transform.position = newPosition;
     }
 
     public override void FixedUpdateNetwork() {

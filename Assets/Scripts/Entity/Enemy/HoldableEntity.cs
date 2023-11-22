@@ -30,17 +30,13 @@ namespace NSMB.Entities {
 
         public override void Render() {
             base.Render();
-            if (!body.interpolationTarget)
-                return;
-
             if (IsDead)
                 return;
 
             if (Holder) {
-                Transform target = body.interpolationTarget.transform;
-                Vector3 newPos = Holder.body.interpolationTarget.position + holderOffset;
+                Vector3 newPos = Holder.transform.position + holderOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
-                target.position = newPos;
+                transform.position = newPos;
             }
         }
 
@@ -174,7 +170,7 @@ namespace NSMB.Entities {
         }
 
         public void OnKickedAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!IsActive) return;

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 using Fusion;
@@ -11,7 +10,6 @@ namespace NSMB.Extensions {
         }
 
         public static float? RemainingRenderTime(this TickTimer timer, NetworkRunner runner) {
-
             float? timeRemaining = timer.RemainingTime(runner);
             if (!timeRemaining.HasValue)
                 return null;

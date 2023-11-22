@@ -7,14 +7,13 @@ using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using UnityEngine.Scripting;
-using static Unity.Collections.Unicode;
 
 namespace NSMB.Entities.Collectable {
     public class BigStar : CollectableEntity {
 
         //---Static Variables
         private static ContactFilter2D GroundFilter;
+        private static Color UncollectableColor = new(1, 1, 1, 0.55f);
 
         //---Networked Variables
         [Networked] public NetworkBool IsStationary { get; set; }
@@ -71,8 +70,8 @@ namespace NSMB.Entities.Collectable {
             } else {
                 // Player-dropped star
                 Passthrough = true;
-                sRenderer.color = new(1, 1, 1, 0.55f);
                 gameObject.layer = Layers.LayerHitsNothing;
+                sRenderer.color = UncollectableColor;
                 body.Velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), deathBoostAmount);
 
                 // Death via pit boost, we need some extra velocity
@@ -83,8 +82,8 @@ namespace NSMB.Entities.Collectable {
                 worldCollider.enabled = true;
             }
 
-            // Don't make a spawn sound if we're spawned before the game starts
-            if (GameData.Instance.PlaySounds && GameData.Instance.GameState == Enums.GameState.Playing)
+            // Only make a sound if we're already playing
+            if (GameManager.Instance.GameState == Enums.GameState.Playing)
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
 
             if (!GroundFilter.useTriggers) {
@@ -95,7 +94,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void Render() {
             base.Render();
-            if (IsStationary || (GameData.Instance?.GameEnded ?? false))
+            if (IsStationary || (GameManager.Instance?.GameEnded ?? false))
                 return;
 
             graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
@@ -106,7 +105,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (GameData.Instance?.GameEnded ?? false) {
+            if (GameManager.Instance?.GameEnded ?? false) {
                 body.Velocity = Vector2.zero;
                 body.Freeze = true;
                 return;
@@ -114,9 +113,6 @@ namespace NSMB.Entities.Collectable {
 
             if (!Object || IsStationary)
                 return;
-
-            if (!Collectable && body.Velocity.y < 0)
-                sRenderer.color = Color.white;
 
             body.Velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), body.Velocity.y);
             Collectable |= body.Velocity.y < 0;
@@ -147,7 +143,7 @@ namespace NSMB.Entities.Collectable {
         public void Rpc_StarCollected(PlayerController collector) {
             Collector = collector;
 
-            if (GameData.Instance && !GameData.Instance.dontPlaySounds) {
+            if (GameManager.Instance && GameManager.Instance.GameState == Enums.GameState.Playing) {
                 bool sameTeam = Collector.Data.Team == Runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
                 Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
             }
@@ -160,7 +156,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
 
-            if (GameData.Instance && !GameData.Instance.dontPlaySounds && !Collector)
+            if (GameManager.Instance && GameManager.Instance.GameState == Enums.GameState.Playing && !Collector)
                 GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
 
             if (icon)
@@ -220,9 +216,9 @@ namespace NSMB.Entities.Collectable {
 
             // Game mechanics
             if (IsStationary && Runner.IsServer)
-                GameManager.Instance.TileManager.ResetMap();
+                GameManager.Instance.tileManager.ResetMap();
 
-            GameData.Instance.CheckForWinner();
+            GameManager.Instance.CheckForWinner();
 
             // Despawn
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1);
@@ -252,6 +248,21 @@ namespace NSMB.Entities.Collectable {
         //---IBlockBumpable overrides
         public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
             // Do nothing when bumped
+        }
+
+        //---OnChangeds
+        protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
+            base.HandleRenderChanges(fillBuffer, ref oldBuffer, ref newBuffer);
+
+            foreach (var change in ChangesBuffer) {
+                switch (change) {
+                case nameof(Collectable): OnCollectableChanged(); break;
+                }
+            }
+        }
+
+        private void OnCollectableChanged() {
+            sRenderer.color = Collectable ? Color.white : UncollectableColor;
         }
     }
 }

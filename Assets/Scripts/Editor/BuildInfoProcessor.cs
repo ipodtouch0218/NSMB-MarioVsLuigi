@@ -19,7 +19,6 @@ public class BuildInfoProcessor : IPreprocessBuildWithReport {
 
         using StreamWriter file = new(@"Assets/Scripts/BuildInfo.cs");
         file.WriteLine(sb.ToString());
-        UnityEngine.Debug.Log("MyCustomBuildProcessor.OnPreprocessBuild for target " + report.summary.platform + " at path " + report.summary.outputPath);
     }
 }
 

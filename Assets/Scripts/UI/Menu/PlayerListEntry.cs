@@ -5,7 +5,6 @@ using TMPro;
 
 using Fusion;
 using NSMB.Extensions;
-using NSMB.Utils;
 
 namespace NSMB.UI.MainMenu {
     public class PlayerListEntry : MonoBehaviour {

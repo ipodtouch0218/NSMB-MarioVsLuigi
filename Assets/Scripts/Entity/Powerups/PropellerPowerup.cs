@@ -16,7 +16,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         [SerializeField] private AnimationCurve flyingPathX, flyingPathY;
 
         public override void FixedUpdateNetwork() {
-            if (GameData.Instance && GameData.Instance.GameEnded) {
+            if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 body.Freeze = true;
                 return;

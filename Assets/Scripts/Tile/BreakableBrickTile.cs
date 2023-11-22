@@ -58,7 +58,7 @@ namespace NSMB.Tiles {
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
             // Tilemap
-            GameManager.Instance.TileManager.SetTile(tileLocation, null);
+            GameManager.Instance.tileManager.SetTile(tileLocation, null);
 
             // Particle
             for (int x = 0; x < tileSize.x; x++) {
@@ -78,7 +78,7 @@ namespace NSMB.Tiles {
 
             // Bump
             bool downwards = direction == InteractionDirection.Down;
-            GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+            GameManager.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 this, downwards, downwards ? -SpawnOffset : SpawnOffset, false, NetworkPrefabRef.Empty);
         }
 

@@ -19,14 +19,13 @@ namespace NSMB.UI.Prompts {
             maxPlayersLabel.text = maxPlayersSlider.value.ToString();
         }
 
-        public void CreateRoom() {
+        public async void CreateRoom() {
             byte maxPlayers = (byte) maxPlayersSlider.value;
+            gameObject.SetActive(false);
 
-            _ = NetworkHandler.CreateRoom(new() {
+            await NetworkHandler.CreateRoom(new() {
                 IsVisible = !privateRoomToggle.isOn
             }, players: maxPlayers);
-
-            gameObject.SetActive(false);
         }
     }
 }

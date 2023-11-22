@@ -55,11 +55,11 @@ namespace NSMB.UI.MainMenu {
             lastSelectTime = Time.time;
         }
 
-        public void JoinSelectedRoom() {
+        public async void JoinSelectedRoom() {
             if (!SelectedRoom)
                 return;
 
-            _ = NetworkHandler.JoinRoom(SelectedRoom.session.Name);
+            await NetworkHandler.JoinRoom(SelectedRoom.session.Name);
         }
 
         public void OpenPrivateRoomPrompt() {

@@ -22,7 +22,7 @@ namespace NSMB.Entities.Enemies {
 
         public override void FixedUpdateNetwork() {
 
-            if (GameData.Instance.GameEnded) {
+            if (GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 body.Freeze = true;
                 legacyAnimation.enabled = false;
@@ -44,7 +44,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         private void DespawnCheck() {
-            foreach (PlayerController player in GameData.Instance.AlivePlayers) {
+            foreach (PlayerController player in GameManager.Instance.AlivePlayers) {
                 if (!player)
                     continue;
 

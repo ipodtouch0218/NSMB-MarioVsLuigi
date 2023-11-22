@@ -29,10 +29,10 @@ public class GenericMover : NetworkBehaviour, IBeforeTick {
     }
 
     public void BeforeTick() {
-        if (GameData.Instance.GameEnded)
+        if (GameManager.Instance.GameEnded)
             return;
 
-        SetPosition(transform, Origin, Runner.SimulationTime - Runner.DeltaTime - GameData.Instance.GameStartTime);
+        SetPosition(transform, Origin, Runner.SimulationTime - Runner.DeltaTime - GameManager.Instance.GameStartTime);
     }
 
     public void Update() {
@@ -41,17 +41,17 @@ public class GenericMover : NetworkBehaviour, IBeforeTick {
     }
 
     public override void Render() {
-        if (!GameData.Instance || GameData.Instance.GameEnded)
+        if (!GameManager.Instance || GameManager.Instance.GameEnded)
             return;
 
-        SetPosition(interpolationTarget, Origin, Runner.LocalRenderTime - GameData.Instance.GameStartTime);
+        SetPosition(interpolationTarget, Origin, Runner.LocalRenderTime - GameManager.Instance.GameStartTime);
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameData.Instance.GameEnded)
+        if (GameManager.Instance.GameEnded)
             return;
 
-        SetPosition(transform, Origin, Runner.SimulationTime - GameData.Instance.GameStartTime);
+        SetPosition(transform, Origin, Runner.SimulationTime - GameManager.Instance.GameStartTime);
     }
 
     private void SetPosition(Transform target, Vector3 origin, float secondsElapsed) {

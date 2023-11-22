@@ -9,7 +9,6 @@ public class PrefabList : ScriptableObject {
 
     //---Network Helpers
     public NetworkPrefabRef PlayerDataHolder, SessionDataHolder, GameDataHolder;
-    public NetworkPrefabRef TileManager, TilemapChunk;
 
     //---World Elements
     public NetworkPrefabRef Obj_Fireball;

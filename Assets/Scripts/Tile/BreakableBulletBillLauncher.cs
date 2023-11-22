@@ -35,12 +35,12 @@ namespace NSMB.Tiles {
 
             interacter.SpawnResizableParticle(worldLocation, direction == InteractionDirection.Right, false, new Vector2(1, height), breakParticle);
 
-            GameManager.Instance.TileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
+            GameManager.Instance.tileManager.SetTilesBlock(origin.x, origin.y, 1, height, emptyTiles);
             return true;
         }
 
         private Vector2Int GetLauncherOrigin(Vector2Int ourLocation) {
-            TileManager tm = GameManager.Instance.TileManager;
+            TileManager tm = GameManager.Instance.tileManager;
             Vector2Int searchDirection = Vector2Int.down;
             Vector2Int searchVector = Vector2Int.down;
 
@@ -52,7 +52,7 @@ namespace NSMB.Tiles {
 
         private int GetLauncherHeight(Vector2Int ourLocation) {
             int height = 1;
-            TileManager tm = GameManager.Instance.TileManager;
+            TileManager tm = GameManager.Instance.tileManager;
             Vector2Int searchVector = Vector2Int.up;
             while (tm.GetTile(ourLocation + searchVector) is BreakableBulletBillLauncher) {
                 height++;

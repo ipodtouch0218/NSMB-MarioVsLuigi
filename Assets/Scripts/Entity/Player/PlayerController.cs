@@ -16,7 +16,8 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Player {
-    //[OrderAfter(typeof(EntityMover))]
+
+    [SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Forward | SimulationStages.Resimulate)]
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
 
         #region Variables
@@ -81,8 +82,6 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool IsGroundpounding { get; set; }
         [Networked] public TickTimer GroundpoundStartTimer { get; set; }
         [Networked] public TickTimer GroundpoundCooldownTimer { get; set; }
-        [Networked] private NetworkBool GroundpoundHeld { get; set; }
-        [Networked] private float GroundpoundStartTime { get; set; }
         [Networked] private NetworkBool ContinueGroundpound { get; set; }
         //Spinner
         [Networked] public SpinnerAnimator OnSpinner { get; set; }
@@ -163,7 +162,7 @@ namespace NSMB.Entities.Player {
         public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
         public BoxCollider2D MainHitbox => hitboxes[0];
         public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
-        public Vector3 Spawnpoint => GameData.Instance.GetSpawnpoint(SpawnpointIndex);
+        public Vector3 Spawnpoint => GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
         private int MovementStage {
             get {
                 float xVel = Mathf.Abs(body.Velocity.x) - 0.01f;
@@ -338,15 +337,15 @@ namespace NSMB.Entities.Player {
 
             if (FirstSpawn) {
                 Lives = SessionData.Instance.Lives;
-                Vector3 spawn = GameData.Instance.GetSpawnpoint(SpawnpointIndex);
+                Vector3 spawn = GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
                 body.Position = spawn;
                 cameraController.Recenter(spawn);
             }
 
             cameraController.IsControllingCamera = HasInputAuthority;
 
-            if (!GameData.Instance.AlivePlayers.Contains(this)) {
-                GameData.Instance.AlivePlayers.Add(this);
+            if (!GameManager.Instance.AlivePlayers.Contains(this)) {
+                GameManager.Instance.AlivePlayers.Add(this);
             }
 
             ControlSystem.controls.Enable();
@@ -360,19 +359,19 @@ namespace NSMB.Entities.Player {
                 NetworkHandler.Runner.ProvideInput = false;
             }
 
-            if (GameData.Instance && hasState)
-                GameData.Instance.AlivePlayers.Remove(this);
+            if (GameManager.Instance && hasState)
+                GameManager.Instance.AlivePlayers.Remove(this);
         }
 
         public override void Render() {
             base.Render();
 
-            if (GameData.Instance.GameState < Enums.GameState.Playing) {
+            if (GameManager.Instance.GameState < Enums.GameState.Playing) {
                 models.SetActive(false);
                 return;
             }
 
-            if (GameData.Instance.GameEnded) {
+            if (GameManager.Instance.GameEnded) {
                 animator.enabled = false;
                 return;
             }
@@ -444,79 +443,85 @@ namespace NSMB.Entities.Player {
         }
 
         public override void FixedUpdateNetwork() {
-            if (GameData.Instance.GameState < Enums.GameState.Playing) {
+            if (GameManager.Instance.GameState < Enums.GameState.Playing) {
                 return;
             }
 
-            if (GameData.Instance.GameEnded) {
+            if (GameManager.Instance.GameEnded) {
                 // Game ended, freeze.
                 body.Velocity = Vector2.zero;
                 body.Freeze = true;
                 return;
             }
 
-            if (IsDead) {
-                HandleDeathTimers();
-            } else if (!IsFrozen) {
-                // If we can't get inputs from the player, just go based on their previous networked input state.
-                PlayerNetworkInput input;
-                if (GetInput(out PlayerNetworkInput currentInputs)) {
-                    // Got the inputs from the player!
-                    input = currentInputs;
-                    HandleButtonHolding(input);
-                    LastInputTick = Runner.Tick;
-                } else if (!IsProxy) {
-                    // Didn't get the inputs, but we *need* them. Interpolate based on what it *could* be?
-                    input = HandleMissingInputs();
-                } else {
-                    // Just trust the server
-                    input = PreviousInputs;
-                }
+            if (!IsProxy) {
 
-                NetworkButtons heldButtons = input.buttons;
-                NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
-
-                // TODO: remove groundpoundLastFrame? Do we even need this anymore?
-                groundpoundLastFrame = IsGroundpounding;
-
-                if (!IsDead) {
-                    HandleGroundCollision();
-                    IsOnGround |= GroundSnapCheck();
-
-                    if (IsOnGround)
-                        IgnoreCoyoteTime = false;
-
-                    if (PreviousTickIsOnGround) {
-
-                        if (!IsOnGround) {
-                            if (!IgnoreCoyoteTime)
-                                CoyoteTime = Runner.SimulationTime + 0.05f;
-
-                            IgnoreCoyoteTime = false;
-                        }
+                if (IsDead) {
+                    HandleDeathTimers();
+                } else if (!IsFrozen) {
+                    // If we can't get inputs from the player, just go based on their previous networked input state.
+                    PlayerNetworkInput input;
+                    if (GetInput(out PlayerNetworkInput currentInputs)) {
+                        // Got the inputs from the player!
+                        input = currentInputs;
+                        HandleButtonHolding(input);
+                        LastInputTick = Runner.Tick;
+                    } else if (!IsProxy) {
+                        // Didn't get the inputs, but we *need* them. Interpolate based on what it *could* be?
+                        input = HandleMissingInputs();
+                    } else {
+                        // Just trust the server
+                        input = PreviousInputs;
                     }
 
-                    UpdateTileProperties();
-                    CheckForPowerupActions(input, PreviousInputs);
-                    HandleMovement(heldButtons, pressedButtons);
+                    NetworkButtons heldButtons = input.buttons;
+                    NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
+
+                    // TODO: remove groundpoundLastFrame? Do we even need this anymore?
+                    groundpoundLastFrame = IsGroundpounding;
+
+                    if (!IsDead) {
+                        HandleGroundCollision();
+                        IsOnGround |= GroundSnapCheck();
+
+                        if (IsOnGround)
+                            IgnoreCoyoteTime = false;
+
+                        if (PreviousTickIsOnGround) {
+
+                            if (!IsOnGround) {
+                                if (!IgnoreCoyoteTime)
+                                    CoyoteTime = Runner.SimulationTime + 0.05f;
+
+                                IgnoreCoyoteTime = false;
+                            }
+                        }
+
+                        UpdateTileProperties();
+                        CheckForPowerupActions(input, PreviousInputs);
+                        HandleMovement(heldButtons, pressedButtons);
+                    }
+
+                    //HandleBlockSnapping();
+                    CheckForEntityCollision();
+
+                    PreviousInputs = input;
+                    PreviousTickIsOnGround = IsOnGround;
                 }
 
-                //HandleBlockSnapping();
-                CheckForEntityCollision();
-
-                PreviousInputs = input;
-                PreviousTickIsOnGround = IsOnGround;
+                animationController.HandlePipeAnimation();
             }
 
-            animationController.HandlePipeAnimation();
-
             UpdateHitbox();
+            Debug.Log("a");
 
-            // We can become stuck in a block after uncrouching
-            if (!IsDead)
-                HandleStuckInBlock();
+            if (!IsProxy) {
+                // We can become stuck in a block after uncrouching
+                if (!IsDead)
+                    HandleStuckInBlock();
 
-            transform.localScale = CalculateScale(false);
+                transform.localScale = CalculateScale(false);
+            }
         }
         #endregion
 
@@ -597,7 +602,7 @@ namespace NSMB.Entities.Player {
             footstepParticle = Enums.Particle.None;
             foreach (PhysicsDataStruct.TileContact tile in body.Data.TilesStandingOn) {
                 Vector2Int pos = tile.location;
-                if (GameManager.Instance.TileManager.GetTile(pos, out TileWithProperties propTile)) {
+                if (GameManager.Instance.tileManager.GetTile(pos, out TileWithProperties propTile)) {
                     footstepSound = propTile.footstepSound;
                     footstepParticle = propTile.footstepParticle;
                     OnIce = propTile.iceSkidding;
@@ -955,7 +960,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void ActivatePowerupAction() {
-            if (IsDead || IsFrozen || IsInKnockback || CurrentPipe || GameData.Instance.GameEnded || HeldEntity)
+            if (IsDead || IsFrozen || IsInKnockback || CurrentPipe || GameManager.Instance.GameEnded || HeldEntity)
                 return;
 
             switch (State) {
@@ -968,7 +973,7 @@ namespace NSMB.Entities.Player {
                     return;
 
                 int activeFireballs = 0;
-                foreach (var fireball in GameData.Instance.PooledFireballs) {
+                foreach (var fireball in GameManager.Instance.PooledFireballs) {
                     if (fireball.IsActive && fireball.Owner == this)
                         activeFireballs++;
                 }
@@ -991,7 +996,7 @@ namespace NSMB.Entities.Player {
 
                 Fireball inactiveFireball = null;
                 for (int i = PlayerId * 6; i < (PlayerId + 1) * 6; i++) {
-                    Fireball fireball = GameData.Instance.PooledFireballs[i];
+                    Fireball fireball = GameManager.Instance.PooledFireballs[i];
                     if (fireball.IsActive)
                         continue;
 
@@ -1043,7 +1048,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnReserveItem(InputAction.CallbackContext context) {
-            if (GameManager.Instance.paused || GameData.Instance.GameEnded)
+            if (GameManager.Instance.paused || GameManager.Instance.GameEnded)
                 return;
 
             if (StoredPowerup == Enums.PowerupState.NoPowerup || IsDead || MegaStartTimer.IsActive(Runner) || (IsStationaryMegaShrink && MegaEndTimer.IsActive(Runner))) {
@@ -1198,6 +1203,9 @@ namespace NSMB.Entities.Player {
         }
 
         public void SpawnItem(NetworkPrefabRef prefab) {
+            if (!Runner.IsServer)
+                return;
+
             if (prefab == NetworkPrefabRef.Empty)
                 prefab = Utils.Utils.GetRandomItem(this).prefab;
 
@@ -1251,7 +1259,7 @@ namespace NSMB.Entities.Player {
                 Stars--;
                 amount--;
             }
-            GameData.Instance.CheckForWinner();
+            GameManager.Instance.CheckForWinner();
         }
 
         #region -- DEATH / RESPAWNING --
@@ -1271,7 +1279,7 @@ namespace NSMB.Entities.Player {
 
             if ((Lives > 0 && --Lives == 0) || Disconnected) {
                 // Last death - drop all stars at 0.5s each
-                if (!GameData.Instance.CheckForWinner())
+                if (!GameManager.Instance.CheckForWinner())
                     SpawnStars(1, DeathplaneDeath);
 
                 PreRespawnTimer = TickTimer.None;
@@ -1328,7 +1336,7 @@ namespace NSMB.Entities.Player {
             RespawnTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
             if (Lives == 0) {
-                GameData.Instance.CheckForWinner();
+                GameManager.Instance.CheckForWinner();
 
                 if (HasInputAuthority)
                     GameManager.Instance.spectationManager.Spectating = true;
@@ -1497,7 +1505,7 @@ namespace NSMB.Entities.Player {
                         dir = InteractionDirection.Right;
                     }
 
-                    if (GameManager.Instance.TileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
+                    if (GameManager.Instance.tileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
                         if (pipe.upsideDownPipe || !pipes || IsGroundpounding)
                             continue;
                     }
@@ -1524,7 +1532,7 @@ namespace NSMB.Entities.Player {
                             dir = InteractionDirection.Right;
                         }
 
-                        if (GameManager.Instance.TileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
+                        if (GameManager.Instance.tileManager.GetTile(tileLocation, out BreakablePipeTile pipe)) {
                             if (!pipe.upsideDownPipe || dir == InteractionDirection.Up)
                                 continue;
                         }
@@ -1537,7 +1545,7 @@ namespace NSMB.Entities.Player {
 
         private bool InteractWithTile(Vector2Int tilePos, InteractionDirection direction, out bool interacted, out bool bumpSound) {
 
-            if (interacted = GameManager.Instance.TileManager.GetTile(tilePos, out InteractableTile tile)) {
+            if (interacted = GameManager.Instance.tileManager.GetTile(tilePos, out InteractableTile tile)) {
                 return tile.Interact(this, direction, Utils.Utils.TilemapToWorldPosition(tilePos), out bumpSound);
             }
 
@@ -1551,7 +1559,7 @@ namespace NSMB.Entities.Player {
             if ((weak && IsWeakKnockback && IsInKnockback) || (IsInKnockback && !IsWeakKnockback))
                 return;
 
-            if (GameData.Instance.GameState != Enums.GameState.Playing || DamageInvincibilityTimer.IsActive(Runner) || CurrentPipe || IsFrozen || IsDead || MegaStartTimer.IsActive(Runner) || MegaEndTimer.IsActive(Runner))
+            if (GameManager.Instance.GameState != Enums.GameState.Playing || DamageInvincibilityTimer.IsActive(Runner) || CurrentPipe || IsFrozen || IsDead || MegaStartTimer.IsActive(Runner) || MegaEndTimer.IsActive(Runner))
                 return;
 
             if (State == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
@@ -1649,7 +1657,6 @@ namespace NSMB.Entities.Player {
                     if (!IsInShell && Mathf.Abs(FloorAngle) >= slopeSlidingAngle && OnSlope) {
                         IsGroundpounding = false;
                         IsSliding = true;
-                        GroundpoundHeld = false;
                         body.Velocity = new Vector2(-Mathf.Sign(FloorAngle) * SPEED_SLIDE_MAX, 0);
                     } else {
                         body.Velocity = Vector2.zero;
@@ -1667,7 +1674,6 @@ namespace NSMB.Entities.Player {
             }
             if (OnSlope && (!((FacingRight && HitRight) || (!FacingRight && HitLeft)) && IsCrouching && Mathf.Abs(FloorAngle) >= slopeSlidingAngle && !IsInShell && State != Enums.PowerupState.MegaMushroom)) {
                 IsSliding = true;
-                GroundpoundHeld = false;
                 IsCrouching = false;
             }
             if (IsSliding && IsOnGround && Mathf.Abs(FloorAngle) > slopeSlidingAngle) {
@@ -2950,7 +2956,6 @@ namespace NSMB.Entities.Player {
                 ContinueGroundpound = true;
                 IsSliding = false;
                 body.Velocity = Vector2.up * 1.5f;
-                GroundpoundHeld = false;
                 GroundpoundStartTimer = TickTimer.CreateFromSeconds(Runner, groundpoundTime * (State == Enums.PowerupState.MegaMushroom ? 1.5f : 1));
             }
         }
@@ -3075,7 +3080,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnGroundpoundingChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!IsGroundpounding)
@@ -3085,7 +3090,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnGroundpoundAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             // Groundpound
@@ -3114,7 +3119,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnWallJumpTimerChanged(bool previousWallSlideLeft) {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!WallJumpTimer.IsRunning)
@@ -3124,20 +3129,20 @@ namespace NSMB.Entities.Player {
             offset.x *= previousWallSlideLeft ? -1 : 1;
 
             PlaySound(Enums.Sounds.Player_Sound_WallJump);
-            PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
+            PlaySound(Enums.Sounds.Player_Voice_WallJump, (byte) GameManager.Instance.random.RangeExclusive(1, 3));
 
             animator.SetTrigger("walljump");
         }
 
         private float lastRespawnParticle;
         public void OnIsDeadChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             animator.SetBool("dead", IsDead);
 
             if (IsDead) {
-                if (GameData.Instance.GameState < Enums.GameState.Playing)
+                if (GameManager.Instance.GameState < Enums.GameState.Playing)
                     return;
 
                 animator.Play("deadstart");
@@ -3158,7 +3163,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnDeathAnimationTimerChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (DeathAnimationTimer.IsRunning) {
@@ -3186,7 +3191,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnFireballAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             animator.SetTrigger("fireball");
@@ -3194,7 +3199,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnIsSlidingChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (IsSliding)
@@ -3207,7 +3212,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnIsCrouchingChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!IsCrouching)
@@ -3217,7 +3222,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnPipeTimerChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!PipeTimer.IsRunning)
@@ -3227,7 +3232,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnPropellerLaunchTimerChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!PropellerLaunchTimer.IsRunning)
@@ -3237,7 +3242,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnPropellerSpinTimerChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!PropellerSpinTimer.IsRunning)
@@ -3247,7 +3252,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnSpinnerLaunchAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             PlaySound(Enums.Sounds.Player_Voice_SpinnerLaunch);
@@ -3255,14 +3260,14 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnDustParticleAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             SpawnParticle(PrefabList.Instance.Particle_Groundpound, body.Position);
         }
 
         public void OnJumpAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (IsSwimming) {
@@ -3278,7 +3283,7 @@ namespace NSMB.Entities.Player {
             // Voice SFX
             switch (JumpState) {
             case PlayerJumpState.DoubleJump:
-                PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameData.Instance.random.RangeExclusive(1, 3));
+                PlaySound(Enums.Sounds.Player_Voice_DoubleJump, (byte) GameManager.Instance.random.RangeExclusive(1, 3));
                 break;
             case PlayerJumpState.TripleJump:
                 PlaySound(Enums.Sounds.Player_Voice_TripleJump);
@@ -3307,7 +3312,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnIsWaterWalkingChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 ;
             if (!IsWaterWalking)
@@ -3317,7 +3322,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnKnockbackAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!IsInKnockback)
@@ -3334,7 +3339,7 @@ namespace NSMB.Entities.Player {
 
         private float timeSinceLastBumpSound;
         public void OnBlockBumpSoundCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (timeSinceLastBumpSound + 0.2f > Runner.LocalRenderTime)
@@ -3345,7 +3350,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnThrowAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             PlaySound(Enums.Sounds.Player_Voice_WallJump, 2);
@@ -3353,7 +3358,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnMegaTimerChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (IsDead)
@@ -3363,7 +3368,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnMegaStartTimerChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (MegaStartTimer.ExpiredOrNotRunning(Runner))
@@ -3373,7 +3378,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnIsStationaryMegaShrinkChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!IsStationaryMegaShrink)
@@ -3394,7 +3399,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void OnHeldEntityChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             if (!HeldEntity)

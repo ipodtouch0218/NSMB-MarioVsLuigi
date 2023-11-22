@@ -56,7 +56,7 @@ namespace NSMB.Entities.Enemies {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (GameData.Instance.GameEnded) {
+            if (GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 body.Freeze = true;
                 AngularVelocity = 0;
@@ -144,7 +144,7 @@ namespace NSMB.Entities.Enemies {
 
             // (sort or) 'splode tiles in range.
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(body.Position);
-            TileManager tm = GameManager.Instance.TileManager;
+            TileManager tm = GameManager.Instance.tileManager;
             for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
                 for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
                     // Use taxi-cab distance to make a somewhat circular explosion

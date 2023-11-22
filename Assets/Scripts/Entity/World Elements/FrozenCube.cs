@@ -57,16 +57,16 @@ namespace NSMB.Entities {
             }
 
             body.LockX = true;
-            body.interpolationTarget.position = new(body.interpolationTarget.position.x, body.interpolationTarget.position.y, -4.5f);
+            transform.position = new(transform.position.x, transform.position.y, -4.5f);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            Instantiate(PrefabList.Instance.Particle_IceBreak, body.interpolationTarget.position, Quaternion.identity);
+            Instantiate(PrefabList.Instance.Particle_IceBreak, transform.position, Quaternion.identity);
         }
 
         public void LateUpdate() {
 
-            if (!Object || IsDead || !body.interpolationTarget)
+            if (!Object || IsDead)
                 return;
 
             // Shaking animation. Don't play if we're being held or moving fast, unless we're a player
@@ -74,14 +74,14 @@ namespace NSMB.Entities {
                 float remainingTime = AutoBreakTimer.RemainingRenderTime(Runner) ?? 0f;
                 if (remainingTime < 1) {
                     Vector3 newPosition = body.Position + Vector2.right * (Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount);
-                    newPosition.z = body.interpolationTarget.position.z;
-                    body.interpolationTarget.position = newPosition;
+                    newPosition.z = transform.position.z;
+                    transform.position = newPosition;
                 }
             }
 
-            if (FrozenEntity && FrozenEntity.IsCarryable && FrozenEntity.body.interpolationTarget) {
-                Transform target = FrozenEntity.body.interpolationTarget.transform;
-                Vector2 newPos = (Vector2) body.interpolationTarget.position + EntityPositionOffset;
+            if (FrozenEntity && FrozenEntity.IsCarryable) {
+                Transform target = FrozenEntity.transform.transform;
+                Vector2 newPos = (Vector2) transform.position + EntityPositionOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
                 target.position = new(newPos.x, newPos.y, target.position.z);
             }

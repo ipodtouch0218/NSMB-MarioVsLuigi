@@ -8,8 +8,7 @@ using Fusion;
 using NSMB.Extensions;
 
 namespace NSMB.UI.MainMenu {
-    public class MainMenuChat : MonoBehaviour
-    {
+    public class MainMenuChat : MonoBehaviour {
         //---Serialized Variables
         [SerializeField] private ChatMessage messagePrefab;
         [SerializeField] private TMP_InputField chatbox;

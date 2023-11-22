@@ -18,60 +18,33 @@ namespace NSMB.Tiles {
         public int ChunksY { get; private set; }
         public int WorldOriginX { get; private set; }
         public int WorldOriginY { get; private set; }
+        private GameManager GameManager => GameManager.Instance;
 
         //---Public Variables
-        public List<TilemapChunk> chunks;
+        [SerializeField] public List<TilemapChunk> chunks;
 
-        //---Private Variables
-        private GameManager gm;
-
-        public void Awake() {
-            gm = GameManager.Instance;
-        }
+        //---Serialized Variables
+        [SerializeField] public TilemapChunk tilemapChunkPrefab;
 
         public override void Spawned() {
-            ChunksX = Mathf.CeilToInt(gm.levelWidthTile / 16f);
-            ChunksY = Mathf.CeilToInt(gm.levelHeightTile / 16f);
-            WorldOriginX = gm.levelMinTileX;
-            WorldOriginY = gm.levelMinTileY;
-
-            int requiredChunks = ChunksX * ChunksY;
-
-            for (int i = 0; i < requiredChunks; i++) {
-                Runner.Spawn(PrefabList.Instance.TilemapChunk, onBeforeSpawned: (runner, obj) => {
-                    obj.GetComponent<TilemapChunk>().OnBeforeSpawned(
-                        (ushort) (i % ChunksX),
-                        (ushort) (i / ChunksX)
-                    );
-                });
-            }
-        }
-
-        public void AddChunk(TilemapChunk chunk) {
-            if (chunks.Contains(chunk))
-                return;
-
-            chunks.Add(chunk);
-            chunks.Sort((chunkA, chunkB) => {
-                if (chunkA.ChunkY == chunkB.ChunkY)
-                    return chunkA.ChunkX - chunkB.ChunkX;
-
-                return chunkA.ChunkY - chunkB.ChunkY;
-            });
+            ChunksX = Mathf.CeilToInt(GameManager.levelWidthTile / 16f);
+            ChunksY = Mathf.CeilToInt(GameManager.levelHeightTile / 16f);
+            WorldOriginX = GameManager.levelMinTileX;
+            WorldOriginY = GameManager.levelMinTileY;
         }
 
         public void ResetMap() {
-            GameData.Instance.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - GameData.Instance.RealPlayerCount * 0.2f);
+            GameManager.Instance.BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 10.4f - GameManager.Instance.RealPlayerCount * 0.2f);
 
             foreach (TilemapChunk chunk in chunks)
                 chunk.ResetMap();
 
-            foreach (FloatingCoin coin in gm.coins)
+            foreach (FloatingCoin coin in GameManager.coins)
                 coin.ResetCoin();
 
-            foreach (KillableEntity enemy in gm.enemies) {
+            foreach (KillableEntity enemy in GameManager.enemies) {
                 if (enemy.checkForNearbyPlayersWhenRespawning) {
-                    if (Runner.GetPhysicsScene2D().OverlapCircle(enemy.body.Position, 2.5f, Layers.MaskOnlyPlayers)) {
+                    if (Runner.GetPhysicsScene2D().OverlapCircle(enemy.body.Position, 2f, Layers.MaskOnlyPlayers)) {
                         continue;
                     }
                 }
@@ -84,10 +57,10 @@ namespace NSMB.Tiles {
 
             TilemapChunk chunk = GetChunkAtTileLocation(x, y);
             if (!chunk)
-                return gm.tilemap.GetTile(new(x, y));
+                return GameManager.tilemap.GetTile(new(x, y));
 
             ushort tileId = chunk.GetTile(TileLocationToChunkIndex(x, y));
-            return gm.GetTileInstanceFromTileId(tileId);
+            return GameManager.GetTileInstanceFromTileId(tileId);
         }
 
         public TileBase GetTile(Vector2Int loc) {
@@ -120,7 +93,7 @@ namespace NSMB.Tiles {
         public void SetTilesBlock(int x, int y, int width, int height, TileBase[] tiles) {
             ushort[] tileIds = new ushort[tiles.Length];
             for (int i = 0; i < tiles.Length; i++)
-                tileIds[i] = gm.GetTileIdFromTileInstance(tiles[i]);
+                tileIds[i] = GameManager.GetTileIdFromTileInstance(tiles[i]);
 
             SetTilesBlock(x, y, width, height, tileIds);
         }
@@ -142,11 +115,11 @@ namespace NSMB.Tiles {
         }
 
         public void SetTile(int x, int y, TileBase tile) {
-            SetTile(x, y, gm.GetTileIdFromTileInstance(tile));
+            SetTile(x, y, GameManager.GetTileIdFromTileInstance(tile));
         }
 
         public void SetTile(int x, int y, ushort tileId) {
-            if (tileId > gm.sceneTiles.Length)
+            if (tileId > GameManager.sceneTiles.Length)
                 return;
 
             TilemapChunk chunk = GetChunkAtTileLocation(x, y);
@@ -163,7 +136,6 @@ namespace NSMB.Tiles {
         }
 
         private TilemapChunk GetChunkAtTileLocation(int x, int y) {
-
             int chunkX = (x - WorldOriginX) >> 4;
             int chunkY = (y - WorldOriginY) >> 4;
 
@@ -176,13 +148,13 @@ namespace NSMB.Tiles {
 #if UNITY_EDITOR
         private static Vector3 ChunkSize = new(8, 8, 0);
         public void OnDrawGizmos() {
-            if (!gm.tilemap)
+            if (!GameManager)
                 return;
 
             Gizmos.color = Color.black;
             for (int x = 0; x < ChunksX; x++) {
                 for (int y = 0; y < ChunksY; y++) {
-                    Gizmos.DrawWireCube(new(gm.LevelMinX + 4 + (x * 8), gm.LevelMinY + 4 + (y * 8)), ChunkSize);
+                    Gizmos.DrawWireCube(new(GameManager.LevelMinX + 4 + (x * 8), GameManager.LevelMinY + 4 + (y * 8)), ChunkSize);
                 }
             }
         }

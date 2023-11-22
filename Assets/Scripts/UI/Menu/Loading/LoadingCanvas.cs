@@ -21,11 +21,11 @@ namespace NSMB.Loading {
         private Coroutine fadeCoroutine;
 
         public void Awake() {
-            GameData.OnAllPlayersLoaded += EndLoading;
+            GameManager.OnAllPlayersLoaded += EndLoading;
         }
 
         public void OnDestroy() {
-            GameData.OnAllPlayersLoaded -= EndLoading;
+            GameManager.OnAllPlayersLoaded -= EndLoading;
         }
 
         public void Initialize() {

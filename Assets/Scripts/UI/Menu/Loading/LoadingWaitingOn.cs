@@ -44,21 +44,21 @@ namespace NSMB.Loading {
             }
 
             // Still loading
-            if (!GameData.Instance || !GameData.Instance.Object.IsValid) {
+            if (!GameManager.Instance || !GameManager.Instance.Object) {
                 text.text = tm.GetTranslation("ui.loading.loading");
                 playerListParent.SetActive(false);
                 return;
             }
 
             // Game starting
-            if (GameData.Instance.GameStartTimer.IsRunning) {
+            if (GameManager.Instance.GameStartTimer.IsRunning) {
                 text.text = tm.GetTranslation("ui.loading.starting");
                 playerListParent.SetActive(false);
                 return;
             }
 
             HashSet<string> waitingFor = new();
-            NetworkRunner runner = GameData.Instance.Runner;
+            NetworkRunner runner = GameManager.Instance.Runner;
             foreach (PlayerRef player in runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(runner);
                 if (!data || data.IsCurrentlySpectating)

@@ -39,7 +39,7 @@ namespace NSMB.Entities.World {
         }
 
         public override void FixedUpdateNetwork() {
-            if (GameData.Instance.GameEnded)
+            if (GameManager.Instance.GameEnded)
                 return;
 
             if (ShootTimer.Expired(Runner)) {

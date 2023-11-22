@@ -262,12 +262,8 @@ namespace NSMB.UI.MainMenu {
 
             int oldValue = Room.MaxPlayers;
             int newValue = (int) playersSlider.value;
-            int currentPlayers = Runner.SessionInfo.PlayerCount;
 
-            if (newValue < currentPlayers)
-                newValue = currentPlayers;
-
-            newValue = Mathf.Clamp(newValue, 2, 10);
+            newValue = Mathf.Clamp(newValue, Mathf.Max(2, Runner.SessionInfo.PlayerCount), 10);
 
             if (newValue == oldValue) {
                 ChangeMaxPlayers(oldValue);

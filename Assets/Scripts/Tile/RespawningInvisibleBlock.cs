@@ -60,8 +60,12 @@ namespace NSMB.Entities.World {
             Vector3 location = Utils.Utils.TilemapToWorldPosition(tileLocation) + BlockOffset;
             Coin.GivePlayerCoin(player, location);
 
-            GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
+            GameManager.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, bumpTile,
                 resultTile, false, SpawnOffset, true, NetworkPrefabRef.Empty);
+        }
+
+        public TileBase[] GetTileDependencies() {
+            return new TileBase[] { bumpTile, resultTile };
         }
 
 #if UNITY_EDITOR
@@ -69,9 +73,5 @@ namespace NSMB.Entities.World {
             Gizmos.DrawIcon(new Vector3(Mathf.FloorToInt(transform.position.x * 2) / 2f, Mathf.FloorToInt(transform.position.y * 2) / 2f, transform.position.z) + BlockOffset, "HiddenBlock", true, GizmoColor);
         }
 #endif
-
-        public TileBase[] GetTileDependencies() {
-            return new TileBase[] { bumpTile, resultTile };
-        }
     }
 }

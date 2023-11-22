@@ -3,6 +3,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Game;
 
+[SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Forward | SimulationStages.Resimulate)]
 public class WrappingHitbox : NetworkBehaviour {
 
     private EntityMover body;
@@ -16,7 +17,7 @@ public class WrappingHitbox : NetworkBehaviour {
         ourColliders = GetComponents<BoxCollider2D>();
 
         // Null propagation is ok w/ GameManager.Instance
-        if (!(GameManager.Instance?.loopingLevel ?? false)) {
+        if (!GameManager.Instance || !GameManager.Instance.loopingLevel) {
             enabled = false;
             return;
         }
@@ -43,7 +44,8 @@ public class WrappingHitbox : NetworkBehaviour {
         childCollider.offset = ourCollider.offset + (((body.Position.x < GameManager.Instance.LevelMiddleX) ? offset : -offset) / body.transform.lossyScale);
         childCollider.sharedMaterial = ourCollider.sharedMaterial;
         childCollider.size = ourCollider.size;
-        childCollider.usedByComposite = ourCollider.usedByComposite;
-        childCollider.usedByEffector = ourCollider.usedByComposite;
+        childCollider.compositeOperation = ourCollider.compositeOperation;
+        childCollider.compositeOrder = ourCollider.compositeOrder;
+        childCollider.usedByEffector = ourCollider.usedByEffector;
     }
 }

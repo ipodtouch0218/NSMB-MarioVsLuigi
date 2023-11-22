@@ -44,13 +44,13 @@ public class UIUpdater : MonoBehaviour {
     }
 
     public void OnEnable() {
-        GameData.OnAllPlayersLoaded += OnAllPlayersLoaded;
+        GameManager.OnAllPlayersLoaded += OnAllPlayersLoaded;
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     public void OnDisable() {
-        GameData.OnAllPlayersLoaded -= OnAllPlayersLoaded;
+        GameManager.OnAllPlayersLoaded -= OnAllPlayersLoaded;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
@@ -140,10 +140,10 @@ public class UIUpdater : MonoBehaviour {
         }
 
         if (SessionData.Instance.Timer > 0) {
-            if (!GameData.Instance.GameEnded) {
-                float? timeRemaining = GameData.Instance.GameEndTimer.RemainingRenderTime(Runner);
+            if (!GameManager.Instance.GameEnded) {
+                float? timeRemaining = GameManager.Instance.GameEndTimer.RemainingRenderTime(Runner);
 
-                if ((GameData.Instance.IsMusicEnabled || GameData.Instance.GameEnded) && timeRemaining == null)
+                if ((GameManager.Instance.IsMusicEnabled || GameManager.Instance.GameEnded) && timeRemaining == null)
                     timeRemaining = 0;
 
                 if (timeRemaining != null) {

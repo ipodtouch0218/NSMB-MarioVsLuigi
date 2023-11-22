@@ -73,7 +73,7 @@ namespace NSMB.Entities.Enemies {
             if (!Object)
                 return;
 
-            if (GameData.Instance && GameData.Instance.GameEnded) {
+            if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 animator.enabled = false;
                 body.Freeze = true;
@@ -149,7 +149,7 @@ namespace NSMB.Entities.Enemies {
 
             } else if (IsInShell && !IsStationary && (data.HitLeft || data.HitRight)) {
                 foreach (PhysicsDataStruct.TileContact tile in data.TilesHitSide) {
-                    if (GameManager.Instance.TileManager.GetTile(tile.location, out InteractableTile it))
+                    if (GameManager.Instance.tileManager.GetTile(tile.location, out InteractableTile it))
                         it.Interact(this, InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(tile.location), out bool _);
                 }
             }

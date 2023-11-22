@@ -48,11 +48,11 @@ namespace NSMB.Entities.Player {
         private TrackIcon icon;
 
         public void OnEnable() {
-            GameData.OnAllPlayersLoaded += OnAllPlayersLoaded;
+            GameManager.OnAllPlayersLoaded += OnAllPlayersLoaded;
         }
 
         public void OnDisable() {
-            GameData.OnAllPlayersLoaded -= OnAllPlayersLoaded;
+            GameManager.OnAllPlayersLoaded -= OnAllPlayersLoaded;
         }
 
         public void Awake() {
@@ -85,7 +85,7 @@ namespace NSMB.Entities.Player {
         }
 
         public override void Render() {
-            if (GameData.Instance.GameStartTimer.IsRunning) {
+            if (GameManager.Instance.GameStartTimer.IsRunning) {
                 DisableAllModels();
                 return;
             }
@@ -103,7 +103,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void HandleAnimations() {
-            if (GameData.Instance.GameEnded) {
+            if (GameManager.Instance.GameEnded) {
                 models.SetActive(true);
 
                 // Disable Particles
@@ -156,7 +156,7 @@ namespace NSMB.Entities.Player {
 
         private void SetFacingDirection() {
             //TODO: refactor
-            if (GameData.Instance.GameEnded) {
+            if (GameManager.Instance.GameEnded) {
                 if (controller.IsDead) {
                     modelRotationTarget.Set(0, 180, 0);
                     modelRotateInstantly = true;
@@ -213,7 +213,7 @@ namespace NSMB.Entities.Player {
 
             if (modelRotateInstantly || wasTurnaround) {
                 models.transform.rotation = Quaternion.Euler(modelRotationTarget);
-            } else if (!GameData.Instance.GameEnded) {
+            } else if (!GameManager.Instance.GameEnded) {
                 float maxRotation = 2000f * Time.deltaTime;
                 float x = models.transform.eulerAngles.x, y = models.transform.eulerAngles.y, z = models.transform.eulerAngles.z;
                 x += Mathf.Clamp(modelRotationTarget.x - x, -maxRotation, maxRotation);
@@ -222,7 +222,7 @@ namespace NSMB.Entities.Player {
                 models.transform.rotation = Quaternion.Euler(x, y, z);
             }
 
-            if (GameData.Instance.GameEnded)
+            if (GameManager.Instance.GameEnded)
                 return;
 
             if (controller.State == Enums.PowerupState.PropellerMushroom && !controller.IsFrozen) {
@@ -330,7 +330,7 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingRenderTime(Runner) ?? 0f;
-            models.SetActive(!controller.IsRespawning && (GameData.Instance.GameEnded || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
+            models.SetActive(!controller.IsRespawning && (GameManager.Instance.GameEnded || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
 
             // Model changing
             bool large = controller.State >= Enums.PowerupState.Mushroom;

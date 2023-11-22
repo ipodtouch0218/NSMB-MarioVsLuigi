@@ -85,10 +85,10 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectateNextPlayer() {
-        if (!GameData.Instance)
+        if (!GameManager.Instance)
             return;
 
-        NetworkLinkedList<PlayerController> players = GameData.Instance.AlivePlayers;
+        NetworkLinkedList<PlayerController> players = GameManager.Instance.AlivePlayers;
         int count = players.Count;
         if (count <= 0)
             return;
@@ -105,10 +105,10 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectatePreviousPlayer() {
-        if (!GameData.Instance)
+        if (!GameManager.Instance)
             return;
 
-        NetworkLinkedList<PlayerController> players = GameData.Instance.AlivePlayers;
+        NetworkLinkedList<PlayerController> players = GameManager.Instance.AlivePlayers;
         int count = players.Count;
         if (count <= 0)
             return;
@@ -132,7 +132,7 @@ public class SpectationManager : MonoBehaviour {
             index += 9;
             index %= 10;
 
-            List<PlayerController> sortedPlayers = new(GameData.Instance.AlivePlayers);
+            List<PlayerController> sortedPlayers = new(GameManager.Instance.AlivePlayers);
             sortedPlayers.Sort(new PlayerComparer());
 
             if (index >= sortedPlayers.Count)

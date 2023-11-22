@@ -103,7 +103,7 @@ public class BlockBump : NetworkBehaviour {
     }
 
     public void Kill() {
-        GameManager.Instance.TileManager.SetTile(TileLocation, ResultTile);
+        GameManager.Instance.tileManager.SetTile(TileLocation, ResultTile);
 
         if (SpawnPrefab == NetworkPrefabRef.Empty) {
             Runner.Despawn(Object);

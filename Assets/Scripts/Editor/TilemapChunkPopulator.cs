@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using Fusion;
 using NSMB.Game;
 
 namespace NSMB.Tiles {
@@ -23,14 +22,17 @@ namespace NSMB.Tiles {
 
         private static void ProcessScene(string path) {
 
-            GameManager gm = Object.FindObjectOfType<GameManager>();
+            GameManager gm = Object.FindFirstObjectByType<GameManager>();
 
             // No GameManager = Not in a level scene.
-            if (!gm || !gm.tilemap)
+            if (!gm || !gm.tilemap) {
+                Debug.Log($"Saving non-MvL Game scene at {path} (no GameManager!)");
                 return;
+            }
 
             Debug.Log("Handling saving of a gameplay scene at " + path);
             Tilemap tilemap = gm.tilemap;
+            TileManager tileManager = gm.tileManager;
 
             // Get unique tiles
             TileBase[] uniqueTiles = new TileBase[ushort.MaxValue];
@@ -44,7 +46,7 @@ namespace NSMB.Tiles {
                 TileBase tb = uniqueTilesList[i];
                 GetDependenciesRecursively(tb as IHaveTileDependencies, uniqueTilesList, checkedForDependencies);
             }
-            foreach (IHaveTileDependencies td in Object.FindObjectsOfType<MonoBehaviour>().OfType<IHaveTileDependencies>()) {
+            foreach (IHaveTileDependencies td in Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<IHaveTileDependencies>()) {
                 GetDependenciesRecursively(td, uniqueTilesList, checkedForDependencies);
             }
             uniqueTilesList = uniqueTilesList.Distinct().ToList();
@@ -64,8 +66,24 @@ namespace NSMB.Tiles {
 
             gm.originalTiles = tileIds;
 
-            Debug.Log($"Successfully saved level data. {uniqueTilesList.Count} unique tiles ({gm.levelWidthTile} x {gm.levelHeightTile}, {requiredChunksX} x {requiredChunksY}).");
+            // Create TilemapChunks
+            while (tileManager.transform.childCount > 0)
+                Object.DestroyImmediate(tileManager.transform.GetChild(0).gameObject);
+            tileManager.chunks.Clear();
+
+            for (int y = 0; y < requiredChunksY; y++) {
+                for (int x = 0; x < requiredChunksX; x++) {
+                    TilemapChunk newObject = Object.Instantiate(tileManager.tilemapChunkPrefab, tileManager.transform);
+                    newObject.chunkX = x;
+                    newObject.chunkY = y;
+                    newObject.name = $"TilemapChunk ({x},{y})";
+                    tileManager.chunks.Add(newObject);
+                }
+            }
+
+            Debug.Log($"Successfully saved level data. {uniqueTilesList.Count} unique tiles ({gm.levelWidthTile} x {gm.levelHeightTile} tiles, {requiredChunksX} x {requiredChunksY} chunks).");
             EditorUtility.SetDirty(gm);
+            EditorUtility.SetDirty(tileManager);
         }
 
         private static void GetDependenciesRecursively(IHaveTileDependencies td, List<TileBase> results, List<IHaveTileDependencies> alreadyChecked) {

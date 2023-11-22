@@ -141,7 +141,7 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (GameData.Instance && GameData.Instance.GameEnded) {
+            if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 body.Freeze = true;
                 return;
@@ -204,7 +204,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             }
 
             if (avoidPlayers && body.Data.OnGround) {
-                PlayerController closest = GameData.Instance.AlivePlayers.OrderBy(player => Utils.Utils.WrappedDistance(body.Position, player.body.Position)).FirstOrDefault();
+                PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.Utils.WrappedDistance(body.Position, player.body.Position)).FirstOrDefault();
                 if (closest) {
                     FacingRight = Utils.Utils.WrappedDirectionSign(closest.body.Position, body.Position) == -1;
                 }
@@ -220,7 +220,7 @@ namespace NSMB.Entities.Collectable.Powerups {
                 float timeRemaining = SpawnAnimationTimer.RemainingRenderTime(Runner) ?? 0f;
                 float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
                 sRenderer.transform.localScale = Vector3.one * (1 + adjustment);
-                body.interpolationTarget.position = new(FollowPlayer.body.interpolationTarget.position.x, FollowPlayer.cameraController.TargetCamera.transform.position.y + 1.68f);
+                transform.position = new(FollowPlayer.transform.position.x, FollowPlayer.cameraController.TargetCamera.transform.position.y + 1.68f);
 
                 if (!disableSpawnAnimation) {
                     mpb.SetFloat("WaveEnabled", 0);

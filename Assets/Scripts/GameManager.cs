@@ -15,10 +15,16 @@ using NSMB.Entities.Collectable;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Tiles;
+using System.Collections;
+using NSMB.Utils;
+using NSMB.Translation;
 
 namespace NSMB.Game {
-    public class GameManager : MonoBehaviour {
+    public class GameManager : NetworkBehaviour {
 
+        //---Static Variables
+        public static event Action OnAllPlayersLoaded;
+        private static readonly Vector3 OneFourth = new(0.25f, 0.25f, 0f);
         private static GameManager _instance;
         public static GameManager Instance {
             get {
@@ -26,15 +32,28 @@ namespace NSMB.Game {
                     return _instance;
 
                 if (SceneManager.GetActiveScene().buildIndex != 0)
-                    _instance = FindObjectOfType<GameManager>();
+                    _instance = FindFirstObjectByType<GameManager>();
 
                 return _instance;
             }
             private set => _instance = value;
         }
 
+        //---Networked Variables
+        [Networked] public TickTimer BigStarRespawnTimer { get; set; }
+        [Networked] public TickTimer GameStartTimer { get; set; }
+        [Networked] public TickTimer GameEndTimer { get; set; }
+        [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
+        [Networked, Capacity(60)] public NetworkLinkedList<Fireball> PooledFireballs => default;
+        [Networked] public float GameStartTime { get; set; } = -1;
+        [Networked] public byte RealPlayerCount { get; set; }
+        [Networked] public NetworkBool IsMusicEnabled { get; set; }
+        [Networked] public Enums.GameState GameState { get; set; }
+        [Networked] public ref NetworkBitArray AvailableStarSpawns => ref MakeRef<NetworkBitArray>();
+
         //---Properties
-        public GameData GameData => GameData.Instance;
+        public bool GameEnded => GameState == Enums.GameState.Ended;
+        public bool PlaySounds { get; private set; } = false;
 
         private float? levelWidth, levelHeight, middleX, minX, minY, maxX, maxY;
         public float LevelWidth => levelWidth ??= levelWidthTile * tilemap.transform.localScale.x * tilemap.cellSize.x;
@@ -44,16 +63,6 @@ namespace NSMB.Game {
         public float LevelMiddleX => middleX ??= LevelMinX + (LevelWidth * 0.5f);
         public float LevelMinY => minY ??= (levelMinTileY * tilemap.transform.localScale.y * tilemap.cellSize.y) + tilemap.transform.position.y;
         public float LevelMaxY => maxY ??= ((levelMinTileY + levelHeightTile) * tilemap.transform.localScale.y * tilemap.cellSize.y) + tilemap.transform.position.y;
-
-        private TileManager _tileManager;
-        public TileManager TileManager {
-            get {
-                if (!_tileManager)
-                    _tileManager = FindObjectOfType<TileManager>();
-
-                return _tileManager;
-            }
-        }
 
         //---Serialized Variables
         [Header("Music")]
@@ -88,7 +97,6 @@ namespace NSMB.Game {
         [SerializeField] public GameObject objectPoolParent;
         [SerializeField] public TMP_Text winText;
         [SerializeField] public Animator winTextAnimator;
-        [SerializeField] public FadeOutManager fadeManager;
 
         //---Public Variables
         public readonly HashSet<NetworkObject> networkObjects = new();
@@ -100,6 +108,10 @@ namespace NSMB.Game {
         public double gameStartTimestamp, gameEndTimestamp;
         public bool paused;
 
+        public NetworkRNG random;
+        public float gameEndTime;
+        public bool dontPlaySounds;
+
         [NonSerialized] public KillableEntity[] enemies;
         [NonSerialized] public FloatingCoin[] coins;
         [HideInInspector] public TileBase[] sceneTiles;
@@ -107,8 +119,13 @@ namespace NSMB.Game {
 
         //---Private Variables
         private bool pauseStateLastFrame, optionsWereOpenLastFrame;
+        private bool hurryUpSoundPlayed, endSoundPlayed;
+        private bool calledAllPlayersLoaded;
 
         //---Components
+        [Header("Misc Components")]
+        [SerializeField] public TileManager tileManager;
+        [SerializeField] public FadeOutManager fadeManager;
         [SerializeField] public SpectationManager spectationManager;
         [SerializeField] public LoopingMusicPlayer musicManager;
         [SerializeField] public AudioSource music, sfx;
@@ -116,17 +133,27 @@ namespace NSMB.Game {
         public void OnEnable() {
             ControlSystem.controls.UI.Pause.performed += OnPause;
             ControlSystem.controls.Debug.ToggleHUD.performed += OnToggleHud;
+
+            NetworkHandler.OnShutdown += OnShutdown;
+            NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+            OnAllPlayersLoaded += OurOnAllPlayersLoaded;
         }
 
         public void OnDisable() {
             ControlSystem.controls.UI.Pause.performed -= OnPause;
             ControlSystem.controls.Debug.ToggleHUD.performed -= OnToggleHud;
+
+            NetworkHandler.OnShutdown -= OnShutdown;
+            NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+            OnAllPlayersLoaded -= OurOnAllPlayersLoaded;
         }
 
         public void OnValidate() {
             // Remove our cached values if we change something in editor.
             // We shouldn't have to worry about values changing mid-game ever.
             levelWidth = levelHeight = middleX = minX = minY = maxX = maxY = null;
+
+            if (!tileManager) tileManager = GetComponentInChildren<TileManager>();
         }
 
         public void Awake() {
@@ -148,15 +175,105 @@ namespace NSMB.Game {
 
             // Find objects in the scene
             starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-            enemies = FindObjectsOfType<KillableEntity>().Where(ke => ke is not BulletBill).ToArray();
-            coins = FindObjectsOfType<FloatingCoin>();
+            enemies = FindObjectsByType<KillableEntity>(FindObjectsSortMode.None).Where(ke => ke is not BulletBill).ToArray();
+            coins = FindObjectsByType<FloatingCoin>(FindObjectsSortMode.None);
 
             nametagCanvas.gameObject.SetActive(Settings.Instance.GraphicsPlayerNametags);
+        }
 
-            // Spawn a GameDataHolder, if one doesn't already exist.
-            if (!GameData.Instance) {
-                NetworkHandler.Runner.Spawn(PrefabList.Instance.GameDataHolder);
-                NetworkHandler.Runner.Spawn(PrefabList.Instance.TileManager);
+        public override void Spawned() {
+            Instance = this;
+
+            // By default, spectate. when we get assigned a player object, we disable it there.
+            spectationManager.Spectating = true;
+
+            if (Runner.IsServer && Runner.IsSinglePlayer) {
+                // Handle spawning in editor by spawning the room + player data objects
+                NetworkObject localData = Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
+                Runner.SetPlayerObject(Runner.LocalPlayer, localData);
+            }
+
+            if (GameStartTime <= 0 && !GameStartTimer.IsRunning) {
+                // The game hasn't started.
+                // Tell our host that we're done loading
+                PlayerData localData = Runner.GetLocalPlayerData();
+                localData.Rpc_FinishedLoading();
+            } else {
+                // The game HAS already started.
+                SetGameTimestamps();
+                StartCoroutine(CallAllPlayersLoaded());
+            }
+
+            // Set up alternating music for the default stages
+            if (!mainMusic) {
+                byte musicIndex = SessionData.Instance.AlternatingMusicIndex;
+                int songs = ScriptableManager.Instance.alternatingStageMusic.Length;
+                mainMusic = ScriptableManager.Instance.alternatingStageMusic[musicIndex % songs];
+            }
+        }
+
+        public override void Render() {
+            base.Render();
+
+            if (GameManager.Instance.GameState == Enums.GameState.Playing)
+                HandleMusic();
+
+            // Handle sound effects for the timer, if it's enabled
+            if (GameEndTimer.IsRunning) {
+                if (GameEndTimer.Expired(Runner)) {
+                    if (!endSoundPlayed)
+                        sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
+                    endSoundPlayed = true;
+                } else {
+                    int tickrate = Runner.TickRate;
+                    int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
+
+                    if (!hurryUpSoundPlayed && remainingTicks < 61 * tickrate) {
+                        // 60 second warning
+                        hurryUpSoundPlayed = true;
+                        sfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
+                    } else if (remainingTicks <= (10 * tickrate)) {
+                        // 10 second "dings"
+                        if (remainingTicks % tickrate == 0)
+                            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+                        // At 3 seconds, double speed
+                        else if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
+                            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+                    }
+                }
+            }
+        }
+
+        public override void FixedUpdateNetwork() {
+            if (GameEnded)
+                return;
+
+            switch (GameState) {
+            case Enums.GameState.Loading: {
+                if ((Runner.Tick % Runner.TickRate) == 0) {
+                    CheckIfAllPlayersLoaded();
+                }
+                break;
+            }
+            case Enums.GameState.Starting: {
+                if (GameStartTimer.Expired(Runner)) {
+                    GameStartTimer = TickTimer.None;
+                    Host_StartGame();
+                }
+                break;
+            }
+            }
+
+            if (BigStarRespawnTimer.Expired(Runner)) {
+                if (AttemptSpawnBigStar())
+                    BigStarRespawnTimer = TickTimer.None;
+                else
+                    BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+            }
+
+            if (GameEndTimer.Expired(Runner)) {
+                CheckForWinner();
+                GameEndTimer = TickTimer.None;
             }
         }
 
@@ -198,7 +315,7 @@ namespace NSMB.Game {
         }
 
         public void Pause(bool newState) {
-            if (paused == newState || GameData.GameState != Enums.GameState.Playing)
+            if (paused == newState || GameState != Enums.GameState.Playing)
                 return;
 
             paused = newState;
@@ -218,7 +335,7 @@ namespace NSMB.Game {
 
             pauseUI.SetActive(false);
             sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-            GameData.Instance.Rpc_EndGame(-1);
+            Rpc_EndGame(-1);
         }
 
         public void PauseQuitGame() {
@@ -231,7 +348,12 @@ namespace NSMB.Game {
             sfx.PlayOneShot(Enums.Sounds.UI_Decide);
         }
 
-        public Vector3 GetSpawnpoint(int playerIndex, int players) {
+        public Vector3 GetSpawnpoint(int playerIndex, int players = -1) {
+            if (players <= -1)
+                players = RealPlayerCount;
+            if (players == 0)
+                players = 1;
+
             float comp = (float) playerIndex / players * 2 * Mathf.PI + (Mathf.PI / 2f) + (Mathf.PI / (2 * players));
             float scale = (2 - (players + 1f) / players) * spawnCircleWidth;
 
@@ -240,11 +362,10 @@ namespace NSMB.Game {
             return spawn;
         }
 
-        //---Debug
 #if UNITY_EDITOR
+        //---Debug
         [SerializeField] private int DebugSpawns = 10;
         private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f), StarSpawnBox = new(1f, 0.9f, 0.2f, 0.2f);
-        private static readonly Vector3 OneFourth = new(0.25f, 0.25f);
         public void OnDrawGizmos() {
             if (!tilemap)
                 return;
@@ -271,8 +392,7 @@ namespace NSMB.Game {
 
                     if (tile is CoinTile)
                         Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "coin");
-
-                    if (tile is PowerupTile)
+                    else if (tile is PowerupTile)
                         Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "powerup");
                 }
             }
@@ -291,5 +411,460 @@ namespace NSMB.Game {
             }
         }
 #endif
+
+        public override void Despawned(NetworkRunner runner, bool hasState) {
+            if (!runner.IsServer || !hasState)
+                return;
+
+            DestroyNetworkObjects(runner);
+        }
+
+        public void BeforeTick() {
+            // Seed RNG
+            random = new(Runner.Tick);
+        }
+
+
+
+        /// <summary>
+        /// Checks if a team has won, and calls Rpc_EndGame if one has.
+        /// </summary>
+        public bool CheckForWinner() {
+            if (GameState != Enums.GameState.Playing || !Runner.IsServer)
+                return false;
+
+            int requiredStars = SessionData.Instance.StarRequirement;
+            bool starGame = requiredStars != -1;
+
+            bool hasFirstPlace = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
+            int aliveTeams = teamManager.GetAliveTeamCount();
+            bool timeUp = SessionData.Instance.Timer > 0 && GameEndTimer.ExpiredOrNotRunning(Runner);
+
+            if (aliveTeams == 0) {
+                // All teams dead, draw?
+                Rpc_EndGame(-1);
+                return true;
+            }
+
+            if (aliveTeams == 1 && RealPlayerCount > 1) {
+                // One team left alive (and it's not a solo game), they win immediately.
+                Rpc_EndGame(firstPlaceTeam);
+                return true;
+            }
+
+            if (hasFirstPlace) {
+                // We have a team that's clearly in first...
+                if (starGame && (firstPlaceStars >= requiredStars || timeUp)) {
+                    // And they have enough stars.
+                    Rpc_EndGame(firstPlaceTeam);
+                    return true;
+                }
+                // They don't have enough stars. wait 'till later
+            }
+
+            if (timeUp) {
+                // Ran out of time, instantly end if DrawOnTimeUp is set
+                if (SessionData.Instance.DrawOnTimeUp) {
+                    // No one wins
+                    Rpc_EndGame(-1);
+                    return true;
+                }
+
+                if (RealPlayerCount <= 1) {
+                    // One player, no overtime.
+                    Rpc_EndGame(firstPlaceTeam);
+                    return true;
+                }
+
+                // Keep playing into overtime.
+            }
+
+            // No winner, Keep playing
+            return false;
+        }
+
+        /// <summary>
+        /// Officially starts the game if all clients say that they're loaded.
+        /// </summary>
+        public void CheckIfAllPlayersLoaded() {
+            // If we aren't the server, don't bother checking. We can't start the game regardless.
+            if (!Runner || !Runner.IsServer || GameState != Enums.GameState.Loading)
+                return;
+
+            if (!Runner.IsSinglePlayer) {
+                foreach (PlayerRef player in Runner.ActivePlayers) {
+                    PlayerData data = player.GetPlayerData(Runner);
+
+                    if (data == null || data.IsCurrentlySpectating)
+                        continue;
+
+                    if (!data.IsLoaded)
+                        return;
+                }
+            }
+
+            // Everyone is loaded, officially start the game.
+            GameState = Enums.GameState.Starting;
+            SceneManager.SetActiveScene(gameObject.scene);
+            GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0.2f : 5.7f);
+
+            // Find out how many players we have
+            foreach (PlayerRef client in Runner.ActivePlayers) {
+                PlayerData data = client.GetPlayerData(Runner);
+                if (!data || data.IsCurrentlySpectating)
+                    continue;
+
+                RealPlayerCount++;
+            }
+
+            List<int> spawnpoints = Enumerable.Range(0, RealPlayerCount).ToList();
+
+            // Create player instances
+            foreach (PlayerRef player in Runner.ActivePlayers) {
+                PlayerData data = player.GetPlayerData(Runner);
+                if (!data)
+                    continue;
+
+                data.IsLoaded = false;
+                if (data.IsCurrentlySpectating)
+                    continue;
+
+                Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player, onBeforeSpawned: (runner, obj) => {
+                    // Set the spawnpoint that they should spawn at
+                    int index = UnityEngine.Random.Range(0, spawnpoints.Count);
+                    int spawnpoint = spawnpoints[index];
+                    spawnpoints.RemoveAt(index);
+
+                    obj.GetComponent<PlayerController>().OnBeforeSpawned(spawnpoint);
+                });
+            }
+
+            // Create pooled Fireball instances (max of 6 per player)
+            for (int i = 0; i < RealPlayerCount * 6; i++)
+                Runner.Spawn(PrefabList.Instance.Obj_Fireball);
+
+            // Tell everyone else to start the game
+            StartCoroutine(CallLoadingComplete(2));
+        }
+
+        public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab, int? tick = null, byte? counter = null) {
+            Vector2Int loc = new(x, y);
+            Vector3 spawnLocation = Utils.Utils.TilemapToWorldPosition(loc) + OneFourth;
+
+            // TODO: find a way to predict these.
+            if (Runner.IsServer) {
+                Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
+                    obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, tick ?? Runner.Tick, offset);
+                });
+            }
+
+            GameManager.Instance.tileManager.SetTile(loc, null);
+        }
+
+        //---Callbacks
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
+            // Kill player if they are still alive
+            if (Object.HasStateAuthority) {
+                foreach (PlayerController pl in AlivePlayers) {
+                    if (pl.Object.InputAuthority == player)
+                        pl.Rpc_DisconnectDeath();
+                }
+            }
+
+            CheckIfAllPlayersLoaded();
+            CheckForWinner();
+        }
+
+        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
+            GlobalController.Instance.disconnectCause = shutdownReason;
+            SceneManager.LoadScene(0);
+        }
+
+        //---RPCs
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_EndGame(int team) {
+            gameEndTime = Runner.SimulationTime;
+            StartCoroutine(EndGame(team));
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_LoadingComplete() {
+            if (!calledAllPlayersLoaded)
+                OnAllPlayersLoaded?.Invoke();
+            calledAllPlayersLoaded = true;
+        }
+
+        //---Helpers
+        private void Host_StartGame() {
+            // Respawn players
+            foreach (PlayerController player in AlivePlayers)
+                player.PreRespawn();
+
+            // Respawn enemies
+            foreach (KillableEntity enemy in enemies)
+                enemy.RespawnEntity();
+
+            // Start "WaitForGameStart" objects
+            foreach (var wfgs in FindObjectsByType<WaitForGameStart>(FindObjectsSortMode.None))
+                wfgs.AttemptExecute();
+
+            // Spawn the initial Big Star
+            AttemptSpawnBigStar();
+
+            Rpc_StartGame();
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void Rpc_StartGame() {
+            // Play start jingle
+            sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
+
+            StartCoroutine(WaitToStartGame());
+        }
+
+        private IEnumerator WaitToStartGame() {
+            yield return new WaitForSecondsRealtime(1.3f);
+
+            // Keep track of game timestamps
+            GameState = Enums.GameState.Playing;
+            GameStartTime = Runner.SimulationTime;
+            IsMusicEnabled = true;
+            PlaySounds = true;
+
+            // Start timer
+            int timer = SessionData.Instance.Timer;
+            if (timer > 0)
+                GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer * 60 + 1);
+
+            // Update Discord RPC status
+            SetGameTimestamps();
+            GlobalController.Instance.discordController.UpdateActivity();
+        }
+
+        private IEnumerator EndGame(int winningTeam) {
+            // TODO: Clean this up, massively.
+
+            GameState = Enums.GameState.Ended;
+            IsMusicEnabled = false;
+            PlaySounds = false;
+
+            ForceUnpause();
+            musicManager.Stop();
+
+            yield return new WaitForSecondsRealtime(1);
+
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            bool draw = winningTeam == -1;
+            string resultText;
+            string winner = null;
+            if (draw) {
+                resultText = tm.GetTranslation("ui.result.draw");
+            } else {
+                if (SessionData.Instance.Teams) {
+                    Team team = ScriptableManager.Instance.teams[winningTeam];
+                    winner = team.displayName;
+                    resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
+                } else {
+                    string username = teamManager.GetTeamMembers(winningTeam).First().Data.GetNickname();
+                    winner = username;
+                    resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);
+                }
+
+                if (Runner.IsServer) {
+                    foreach (PlayerController player in teamManager.GetTeamMembers(winningTeam)) {
+                        player.Data.Wins++;
+                    }
+                }
+            }
+            winText.text = resultText;
+
+            PlayerData local = Runner.GetLocalPlayerData();
+            bool win = !draw && (winningTeam == local.Team || local.IsCurrentlySpectating);
+            int secondsUntilMenu = draw ? 5 : 4;
+
+            Enums.Sounds resultSound;
+            string resultTrigger;
+
+            if (draw) {
+                resultSound = Enums.Sounds.UI_Match_Draw;
+                resultTrigger = "startNegative";
+            } else if (win) {
+                resultSound = Enums.Sounds.UI_Match_Win;
+                resultTrigger = "start";
+            } else {
+                resultSound = Enums.Sounds.UI_Match_Lose;
+                resultTrigger = "startNegative";
+            }
+
+            music.PlayOneShot(resultSound);
+            winTextAnimator.SetTrigger(resultTrigger);
+
+            if (draw) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw");
+            } else if (SessionData.Instance.Teams) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", "team", winner);
+            } else {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", "playername", winner);
+            }
+
+            // Return back to the main menu
+            yield return new WaitForSecondsRealtime(secondsUntilMenu);
+
+            DestroyNetworkObjects(Runner);
+
+            if (Runner.IsServer) {
+                // Handle resetting player states for the next game
+                foreach (PlayerRef player in Runner.ActivePlayers) {
+                    PlayerData data = player.GetPlayerData(Runner);
+
+                    // Set IsLoaded to false
+                    data.IsLoaded = false;
+
+                    // Set spectating state to false
+                    data.IsCurrentlySpectating = false;
+
+                    // Move people without teams into a valid teams range
+                    if (SessionData.Instance.Teams)
+                        data.Team = (sbyte) Mathf.Clamp(data.Team, 0, ScriptableManager.Instance.teams.Length);
+                }
+
+                SessionData.Instance.AlternatingMusicIndex++;
+            }
+
+            SessionData.Instance.SetGameStarted(false);
+            SessionData.Instance.GameStartTimer = TickTimer.None;
+
+            yield return new WaitForSecondsRealtime(0.25f);
+
+            if (Runner.IsServer) {
+                Runner.LoadScene(SceneRef.FromIndex(0), LoadSceneMode.Single);
+            }
+        }
+
+        private void HandleMusic() {
+            bool invincible = false;
+            bool mega = false;
+            bool speedup = false;
+
+            foreach (var player in AlivePlayers) {
+                if (!player)
+                    continue;
+
+                mega |= player.State == Enums.PowerupState.MegaMushroom && player.MegaStartTimer.ExpiredOrNotRunning(Runner);
+                invincible |= player.IsStarmanInvincible;
+            }
+
+            speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
+            speedup |= teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
+
+            if (!speedup) {
+                int playersWithOneLife = 0;
+                int playerCount = 0;
+                foreach (var player in AlivePlayers) {
+                    if (!player || player.Lives == 0) continue;
+                    if (player.Lives == 1) playersWithOneLife++;
+
+                    playerCount++;
+                }
+
+                // Also speed up the music if:
+                // A: two players left, at least one has one life
+                // B: three+ players left, all have one life
+                speedup |= (playerCount <= 2 && playersWithOneLife > 0) || (playersWithOneLife >= playerCount);
+            }
+
+            if (mega) {
+                musicManager.Play(megaMushroomMusic);
+            } else if (invincible) {
+                musicManager.Play(invincibleMusic);
+            } else {
+                musicManager.Play(mainMusic);
+            }
+
+            musicManager.FastMusic = speedup;
+        }
+
+        /// <summary>
+        /// Spawns a Big Star, if we can find a valid spawnpoint.
+        /// </summary>
+        /// <returns>If the star successfully spawned</returns>
+        private bool AttemptSpawnBigStar() {
+
+            for (int attempt = 0; attempt < starSpawns.Length; attempt++) {
+                int validSpawns = starSpawns.Length - AvailableStarSpawns.UnsetBitCount();
+
+                if (validSpawns <= 0) {
+                    ResetAvailableStarSpawns();
+                    validSpawns = starSpawns.Length;
+                }
+
+                int nthSpawn = random.RangeExclusive(0, validSpawns);
+                AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int im);
+                if (AvailableStarSpawns.GetNthSetBitIndex(nthSpawn, out int index)) {
+
+                    Vector3 spawnPos = starSpawns[index].transform.position;
+                    AvailableStarSpawns[index] = false;
+
+                    if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 3, Layers.MaskOnlyPlayers)) {
+                        // A player is too close to this spawn. Don't spawn.
+                        continue;
+                    }
+
+                    // Valid spawn
+                    Runner.Spawn(PrefabList.Instance.Obj_BigStar, spawnPos, onBeforeSpawned: (runner, obj) => {
+                        obj.GetComponent<BigStar>().OnBeforeSpawned(0, true, false);
+                    });
+                    return true;
+                }
+            }
+
+            // This should hopefully never happen...
+            return false;
+        }
+
+        private void ResetAvailableStarSpawns() {
+            AvailableStarSpawns.RawSet(unchecked((ulong) ~0L));
+        }
+
+        /// <summary>
+        /// Sets the game timestamps for Discord RPC
+        /// </summary>
+        private void SetGameTimestamps() {
+            double now = DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
+            float secondsSinceStart = Runner.SimulationTime - GameStartTime;
+            gameStartTimestamp = now - secondsSinceStart;
+
+            int timer = SessionData.Instance.Timer;
+            if (timer > 0)
+                gameEndTimestamp = gameStartTimestamp + (timer * 60);
+        }
+
+        private IEnumerator CallLoadingComplete(float seconds) {
+            yield return new WaitForSeconds(seconds);
+            Rpc_LoadingComplete();
+        }
+
+        private IEnumerator CallAllPlayersLoaded() {
+            yield return new WaitForSeconds(1f);
+            if (!calledAllPlayersLoaded)
+                OnAllPlayersLoaded?.Invoke();
+            calledAllPlayersLoaded = true;
+        }
+
+        private void DestroyNetworkObjects(NetworkRunner runner) {
+            // Remove all networked objects. Fusion doesn't do this for us, unlike PUN.
+            foreach (var obj in networkObjects) {
+                if (obj)
+                    runner.Despawn(obj);
+            }
+        }
+
+        private void OurOnAllPlayersLoaded() {
+            foreach (var player in AlivePlayers)
+                teamManager.AddPlayer(player);
+
+            teamScoreboardElement.OnAllPlayersLoaded();
+        }
     }
 }

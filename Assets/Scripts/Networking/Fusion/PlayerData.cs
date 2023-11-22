@@ -130,7 +130,6 @@ public class PlayerData : NetworkBehaviour {
     public override void Render() {
         base.Render();
 
-
         foreach (var change in changeDetector.DetectChanges(this)) {
             switch (change) {
             case nameof(Team):
@@ -203,6 +202,7 @@ public class PlayerData : NetworkBehaviour {
         }
 
         DisplayNickname = name;
+        OnNameChanged();
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -268,8 +268,8 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public void OnLoadStateChanged() {
-        if (IsLoaded && GameData.Instance)
-            GameData.Instance.CheckIfAllPlayersLoaded();
+        if (IsLoaded && GameManager.Instance)
+            GameManager.Instance.CheckIfAllPlayersLoaded();
     }
 
     public void OnSettingChanged() {

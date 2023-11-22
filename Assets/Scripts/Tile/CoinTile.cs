@@ -43,7 +43,7 @@ namespace NSMB.Tiles {
             Bump(interacter, direction, worldLocation);
 
             bool downwards = direction == InteractionDirection.Down;
-            GameData.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
+            GameManager.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 resultTile, downwards, SpawnOffset, true, NetworkPrefabRef.Empty);
 
             return false;

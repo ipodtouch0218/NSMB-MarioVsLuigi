@@ -73,14 +73,14 @@ namespace NSMB.Entities {
 
             transform.SetParent(GameManager.Instance.objectPoolParent.transform);
 
-            if (!GameData.Instance.PooledFireballs.Contains(this))
-                GameData.Instance.PooledFireballs.Add(this);
+            if (!GameManager.Instance.PooledFireballs.Contains(this))
+                GameManager.Instance.PooledFireballs.Add(this);
         }
 
         public override void Render() {
             base.Render();
 
-            if (GameData.Instance.GameEnded) {
+            if (GameManager.Instance.GameEnded) {
                 foreach (var anim in GetComponentsInChildren<LegacyAnimateSpriteRenderer>())
                     anim.enabled = false;
             }
@@ -95,7 +95,7 @@ namespace NSMB.Entities {
                 return;
             }
 
-            if (GameData.Instance && GameData.Instance.GameEnded) {
+            if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Freeze = true;
                 return;
             }
@@ -331,7 +331,7 @@ namespace NSMB.Entities {
         }
 
         public void OnBreakEffectAnimCounterChanged() {
-            if (!GameData.Instance.PlaySounds)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
             // Don't play particles below the killplane
@@ -339,7 +339,7 @@ namespace NSMB.Entities {
                 return;
 
             // Or if the game is over
-            if (GameData.Instance.GameState == Enums.GameState.Ended)
+            if (GameManager.Instance.GameState == Enums.GameState.Ended)
                 return;
 
             if (IsIceball) {

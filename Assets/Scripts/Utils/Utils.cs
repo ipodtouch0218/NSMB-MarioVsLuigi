@@ -168,7 +168,7 @@ namespace NSMB.Utils {
 
         public static TileBase GetTileAtTileLocation(Vector2Int tileLocation) {
             WrapTileLocation(ref tileLocation);
-            return GameManager.Instance.TileManager.GetTile(tileLocation);
+            return GameManager.Instance.tileManager.GetTile(tileLocation);
         }
         public static TileBase GetTileAtWorldLocation(Vector2 worldLocation) {
             return GetTileAtTileLocation(WorldToTilemapPosition(worldLocation));
@@ -382,7 +382,7 @@ namespace NSMB.Utils {
             bool big = gm.spawnBigPowerups;
             bool vertical = gm.spawnVerticalPowerups;
 
-            bool cantSpawnMega = GameData.Instance.AlivePlayers.Any(pc => pc.State == Enums.PowerupState.MegaMushroom);
+            bool cantSpawnMega = GameManager.Instance.AlivePlayers.Any(pc => pc.State == Enums.PowerupState.MegaMushroom);
 
             float totalChance = 0;
             foreach (PowerupScriptable powerup in powerups) {
@@ -394,7 +394,7 @@ namespace NSMB.Utils {
                 totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
             }
 
-            float rand = GameData.Instance.random.NextSingleExclusive() * totalChance;
+            float rand = GameManager.Instance.random.NextSingleExclusive() * totalChance;
             foreach (PowerupScriptable powerup in powerups) {
                 if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega)
                     continue;

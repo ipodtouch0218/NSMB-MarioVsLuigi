@@ -24,12 +24,12 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     public void OnEnable() {
         ControlSystem.controls.UI.Scoreboard.performed += OnToggleScoreboard;
-        GameData.OnAllPlayersLoaded += OnAllPlayersLoaded;
+        GameManager.OnAllPlayersLoaded += OnAllPlayersLoaded;
     }
 
     public void OnDisable() {
         ControlSystem.controls.UI.Scoreboard.performed -= OnToggleScoreboard;
-        GameData.OnAllPlayersLoaded -= OnAllPlayersLoaded;
+        GameManager.OnAllPlayersLoaded -= OnAllPlayersLoaded;
     }
 
     public void Awake() {
@@ -117,7 +117,7 @@ public class ScoreboardUpdater : MonoBehaviour {
             entryObj.SetActive(true);
             entryObj.name = player.GetNickname();
             ScoreboardEntry entry = entryObj.GetComponent<ScoreboardEntry>();
-            entry.target = GameData.Instance.AlivePlayers.FirstOrDefault(pc => pc.Data == player);
+            entry.target = GameManager.Instance.AlivePlayers.FirstOrDefault(pc => pc.Data == player);
 
             entries.Add(entry);
         }
