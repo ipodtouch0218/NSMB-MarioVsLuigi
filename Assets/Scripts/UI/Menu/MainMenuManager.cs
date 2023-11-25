@@ -710,7 +710,7 @@ namespace NSMB.UI.MainMenu {
             characterDropdown.ClearOptions();
             foreach (CharacterData character in ScriptableManager.Instance.characters) {
                 string name = tm.GetTranslation(character.translationString);
-                characterDropdown.options.Add(new TMP_Dropdown.OptionData(name, character.readySprite, Color.white));
+                characterDropdown.options.Add(new TMP_Dropdown.OptionData(name, character.readySprite));
             }
             characterDropdown.SetValueWithoutNotify(selectedCharacter);
             characterDropdown.RefreshShownValue();

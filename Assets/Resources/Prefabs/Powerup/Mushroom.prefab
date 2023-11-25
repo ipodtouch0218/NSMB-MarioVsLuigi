@@ -152,7 +152,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1017215213198693185}
-  - {fileID: 8906202613893743769}
   - {fileID: 61054484300622194}
 --- !u!114 &7863306663182383513
 MonoBehaviour:

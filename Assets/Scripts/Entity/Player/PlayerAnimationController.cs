@@ -276,7 +276,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool("fireballKnockback", controller.IsWeakKnockback);
             animator.SetBool("knockforwards", controller.IsForwardsKnockback);
 
-            float animatedVelocity = controller.IsOnGround ? Mathf.Abs(body.Velocity.x) : body.Velocity.magnitude;
+            float animatedVelocity = body.Velocity.magnitude;
             if (controller.IsStuckInBlock) {
                 animatedVelocity = 0;
             } else if (controller.IsPropellerFlying) {

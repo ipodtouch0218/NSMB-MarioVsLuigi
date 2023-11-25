@@ -4,7 +4,7 @@ using Fusion;
 using NSMB.Entities;
 using NSMB.Game;
 
-public class KillplaneKill : NetworkBehaviour {
+public class KillplaneKill : SimulationBehaviour {
 
     //---Serialized Variables
     [SerializeField] private float killTime = 0f;
@@ -20,18 +20,18 @@ public class KillplaneKill : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        // Used when we are networked
+        //used when we are networked
         if (!entity)
             return;
 
-        // If it is not running, check if we're below the stage
+        //if it is not running, check if we're below the stage
         if (!entity.DespawnTimer.IsRunning && transform.position.y < GameManager.Instance.LevelMinY)
             entity.DespawnTimer = TickTimer.CreateFromSeconds(Runner, killTime);
     }
 
     public void Update() {
         // Used when we aren't networked
-        if (killed || Object)
+        if (killed || (Object && Object.IsValid))
             return;
 
         if (transform.position.y >= GameManager.Instance.LevelMinY)

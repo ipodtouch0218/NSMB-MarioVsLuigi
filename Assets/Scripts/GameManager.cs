@@ -165,8 +165,7 @@ namespace NSMB.Game {
 
         public async void Start() {
             // Handles spawning in editor
-            if (!NetworkHandler.Runner.SessionInfo) {
-                Debug.Log($"no sessioinfo {NetworkHandler.Runner.SessionInfo}");
+            if (!NetworkHandler.Runner.SessionInfo.IsValid) {
                 // Join a singleplayer room if we're not in one
                 await NetworkHandler.CreateRoom(new() {
                     Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),

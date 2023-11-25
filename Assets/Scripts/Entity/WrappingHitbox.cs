@@ -44,8 +44,7 @@ public class WrappingHitbox : NetworkBehaviour {
         childCollider.offset = ourCollider.offset + (((body.Position.x < GameManager.Instance.LevelMiddleX) ? offset : -offset) / body.transform.lossyScale);
         childCollider.sharedMaterial = ourCollider.sharedMaterial;
         childCollider.size = ourCollider.size;
-        childCollider.compositeOperation = ourCollider.compositeOperation;
-        childCollider.compositeOrder = ourCollider.compositeOrder;
+        childCollider.usedByComposite = ourCollider.usedByComposite;
         childCollider.usedByEffector = ourCollider.usedByEffector;
     }
 }

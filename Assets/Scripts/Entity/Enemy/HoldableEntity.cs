@@ -46,11 +46,9 @@ namespace NSMB.Entities {
                 body.Position = Holder.body.Position + (Vector2) holderOffset;
 
                 hitbox.enabled = false;
-                body.IsKinematic = true;
                 CheckForEntityCollisions();
             } else {
                 hitbox.enabled = true;
-                body.IsKinematic = false;
                 base.FixedUpdateNetwork();
             }
         }
@@ -93,11 +91,11 @@ namespace NSMB.Entities {
 
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
-            // Don't interact with our lovely holder
+            //don't interact with our lovely holder
             if (Holder == player)
                 return;
 
-            // Temporary invincibility
+            //temporary invincibility
             if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
                 return;
 

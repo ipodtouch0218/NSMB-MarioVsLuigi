@@ -16,7 +16,7 @@ namespace NSMB.Entities {
 
         //---Networked Variables
         [Networked] public NetworkBool FacingRight { get; set; }
-        [Networked] public NetworkBool IsActive { get; set; } = true;
+        [Networked] public NetworkBool IsActive { get; set; }
         [Networked] public TickTimer DespawnTimer { get; set; }
         [Networked] protected NetworkBool FirstSpawn { get; set; } = true;
         [Networked] protected Vector2 SpawnLocation { get; set; }
@@ -42,12 +42,10 @@ namespace NSMB.Entities {
 
         public override void Spawned() {
             if (FirstSpawn) {
-                SpawnLocation = transform.position;
+                SpawnLocation = body ? body.Position : transform.position;
 
                 if (IsRespawningEntity)
                     DespawnEntity();
-                else
-                    RespawnEntity();
             }
             GameManager.Instance.networkObjects.Add(Object);
             OnFacingRightChanged();

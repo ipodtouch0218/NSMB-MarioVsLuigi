@@ -4,6 +4,7 @@ using UnityEngine.Serialization;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
+using Org.BouncyCastle.Pqc.Crypto.Frodo;
 
 [SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Resimulate | SimulationStages.Forward)]
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
@@ -97,8 +98,9 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 newPosition = Utils.WrapWorldLocation(toVector);
             } else {
                 // Normal interpolation (over level seams, too)...
-                Utils.UnwrapLocations(fromVector, toVector, out Vector2 fromVectorRelative, out Vector2 toVectorRelative);
-                newPosition = Vector2.Lerp(fromVectorRelative, toVectorRelative, alpha);
+                Utils.UnwrapLocations(fromVector, toVector, out Vector2 fromFloatRelative, out Vector2 toFloatRelative);
+                Vector2 difference = toFloatRelative - fromFloatRelative;
+                newPosition = Vector2.Lerp(fromVector, fromVector + difference, alpha);
                 newPosition = Utils.WrapWorldLocation(newPosition);
             }
         }
