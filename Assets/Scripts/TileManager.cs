@@ -10,7 +10,6 @@ using NSMB.Utils;
 
 namespace NSMB.Tiles {
 
-    //[OrderBefore(typeof(PlayerController))]
     public class TileManager : NetworkBehaviour {
 
         //---Properties

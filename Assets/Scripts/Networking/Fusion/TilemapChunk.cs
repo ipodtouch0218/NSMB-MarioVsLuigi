@@ -5,8 +5,6 @@ using Fusion;
 using NSMB.Game;
 
 namespace NSMB.Tiles {
-
-    //[OrderAfter(typeof(TileManager))]
     public class TilemapChunk : NetworkBehaviour, IBeforeTick, IAfterTick {
 
         //---Static Variables
@@ -53,6 +51,8 @@ namespace NSMB.Tiles {
         }
 
         public override void Spawned() {
+            Runner.SetIsSimulated(Object, true);
+
             if (initialized)
                 return;
 

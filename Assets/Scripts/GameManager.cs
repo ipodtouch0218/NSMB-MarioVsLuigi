@@ -165,7 +165,8 @@ namespace NSMB.Game {
 
         public async void Start() {
             // Handles spawning in editor
-            if (!NetworkHandler.Runner.SessionInfo.IsValid) {
+            if (!NetworkHandler.Runner.SessionInfo) {
+                Debug.Log($"no sessioinfo {NetworkHandler.Runner.SessionInfo}");
                 // Join a singleplayer room if we're not in one
                 await NetworkHandler.CreateRoom(new() {
                     Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
@@ -790,6 +791,9 @@ namespace NSMB.Game {
         /// <returns>If the star successfully spawned</returns>
         private bool AttemptSpawnBigStar() {
 
+            if (!Runner.IsServer)
+                return true;
+
             for (int attempt = 0; attempt < starSpawns.Length; attempt++) {
                 int validSpawns = starSpawns.Length - AvailableStarSpawns.UnsetBitCount();
 
@@ -805,7 +809,7 @@ namespace NSMB.Game {
                     Vector3 spawnPos = starSpawns[index].transform.position;
                     AvailableStarSpawns[index] = false;
 
-                    if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 3, Layers.MaskOnlyPlayers)) {
+                    if (Runner.GetPhysicsScene2D().OverlapCircle(spawnPos, 2.5f, Layers.MaskOnlyPlayers)) {
                         // A player is too close to this spawn. Don't spawn.
                         continue;
                     }

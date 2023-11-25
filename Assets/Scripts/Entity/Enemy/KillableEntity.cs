@@ -108,18 +108,8 @@ namespace NSMB.Entities {
         }
 
         public override void Spawned() {
-            if (FirstSpawn) {
-                SpawnLocation = body ? body.Position : transform.position;
-
-                if (IsRespawningEntity)
-                    DespawnEntity();
-            }
-            GameManager.Instance.networkObjects.Add(Object);
+            base.Spawned();
             OnFacingRightChanged();
-            OnIsActiveChanged();
-
-            changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
-            FirstSpawn = false;
         }
 
         public override void Render() {

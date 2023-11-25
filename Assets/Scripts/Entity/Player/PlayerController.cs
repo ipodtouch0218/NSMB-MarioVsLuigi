@@ -16,8 +16,6 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Player {
-
-    [SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Forward | SimulationStages.Resimulate)]
     public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
 
         #region Variables
@@ -320,6 +318,7 @@ namespace NSMB.Entities.Player {
         }
 
         public override void Spawned() {
+            Runner.SetIsSimulated(Object, true);
             hitboxes = GetComponentsInChildren<BoxCollider2D>();
 
             body.Freeze = true;
@@ -513,7 +512,6 @@ namespace NSMB.Entities.Player {
             }
 
             UpdateHitbox();
-            Debug.Log("a");
 
             if (!IsProxy) {
                 // We can become stuck in a block after uncrouching
@@ -2533,7 +2531,7 @@ namespace NSMB.Entities.Player {
             bool canJump = jumpPressed || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
             bool doJump = (canJump && (IsOnGround || Runner.SimulationTime <= CoyoteTime)) || (!IsSwimming && SwimJump);
             bool doWalljump = canJump && !IsOnGround && WallSliding;
-            bool doGroundpound = pressedButtons.IsSet(PlayerControls.Down);
+            bool doGroundpound = pressedButtons.IsSet(PlayerControls.Down) || (IsPropellerFlying && heldButtons.IsSet(PlayerControls.Down));
 
             /*
             //GROUNDPOUND BUFFERING
@@ -2582,8 +2580,13 @@ namespace NSMB.Entities.Player {
                 if (PropellerLaunchTimer.IsActive(Runner)) {
                     IsSwimming = false;
                     float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
-                    float targetVelocity = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0);
-                    body.Velocity = new(body.Velocity.x, Mathf.Min(body.Velocity.y + (24f * Runner.DeltaTime), targetVelocity));
+                    if (remainingTime > 0.9f) {
+                        body.Velocity = new(body.Velocity.x, propellerLaunchVelocity);
+                    } else {
+                        float targetVelocity = propellerLaunchVelocity - (remainingTime < 0.4f ? (1 - (remainingTime * 2.5f)) * propellerLaunchVelocity : 0);
+                        body.Velocity = new(body.Velocity.x, Mathf.Min(body.Velocity.y + (24f * Runner.DeltaTime), targetVelocity));
+                    }
+
                     if (IsOnGround)
                         body.Position += Vector2.up * 0.05f;
                 } else if (((jumpHeld && Settings.Instance.controlsPropellerJump) || powerupAction) && !IsDrilling && body.Velocity.y < -0.1f && (PropellerSpinTimer.RemainingTime(Runner) ?? 0f) < propellerSpinTime * 0.25f) {
@@ -2746,7 +2749,7 @@ namespace NSMB.Entities.Player {
                 }
             } else if (IsPropellerFlying) {
                 if (IsDrilling) {
-                    body.Velocity = new(Mathf.Clamp(body.Velocity.x, -WalkingMaxSpeed, WalkingMaxSpeed), -drillVelocity);
+                    body.Velocity = new(Mathf.Clamp(body.Velocity.x, -WalkingMaxSpeed * (1/4f), WalkingMaxSpeed * (1/4f)), -drillVelocity);
                 } else {
                     float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
                     float htv = WalkingMaxSpeed * 1.18f + (remainingTime * 2f);
@@ -3064,6 +3067,7 @@ namespace NSMB.Entities.Player {
                 case nameof(IsWaterWalking): OnIsWaterWalkingChanged(); break;
                 case nameof(KnockbackAnimCounter): OnKnockbackAnimCounterChanged(); break;
                 case nameof(BlockBumpSoundCounter): OnBlockBumpSoundCounterChanged(); break;
+                case nameof(ThrowAnimCounter): OnThrowAnimCounterChanged(); break;
                 case nameof(MegaTimer): OnMegaTimerChanged(); break;
                 case nameof(MegaStartTimer): OnMegaStartTimerChanged(); break;
                 case nameof(IsStationaryMegaShrink): OnIsStationaryMegaShrinkChanged(); break;

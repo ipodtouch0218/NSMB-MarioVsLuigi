@@ -49,6 +49,7 @@ namespace NSMB.Entities {
             ApplyConstraints();
 
             FrozenEntity.Freeze(this);
+            FrozenEntity.PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
 
             // Move entity inside us
             if (!FrozenEntity.IsCarryable) {

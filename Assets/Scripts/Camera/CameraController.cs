@@ -2,7 +2,6 @@
 using UnityEngine;
 
 using Fusion;
-using NSMB.Entities.Collectable.Powerups;
 using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
@@ -51,9 +50,12 @@ public class CameraController : NetworkBehaviour {
 
     //---Private Variables
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
+    private PropertyReader<Vector3> currentPositionReader;
 
     public void OnValidate() {
         if (!controller) controller = GetComponentInParent<PlayerController>();
+
+        currentPositionReader = GetPropertyReader<Vector3>(nameof(CurrentPosition));
     }
 
     public void Awake() {
@@ -61,12 +63,24 @@ public class CameraController : NetworkBehaviour {
         TargetCamera.GetComponentsInChildren(secondaryPositioners);
     }
 
-    public void LateUpdate() {
+    public override void Render() {
         if (!IsControllingCamera)
             return;
 
-        float delta = Runner.DeltaTime - (Runner.SimulationTime - Runner.LocalRenderTime);
-        Vector3 newPosition = CalculateNewPosition(delta);
+        Vector3 newPosition;
+
+        if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
+            (var fromVector, var toVector) = currentPositionReader.Read(from, to);
+
+            Utils.UnwrapLocations(fromVector, toVector, out var fromVectorRelative, out var toVectorRelative);
+            Vector2 lerped = Vector2.Lerp(fromVectorRelative, toVectorRelative, alpha);
+            Utils.WrapWorldLocation(ref lerped);
+
+            newPosition = lerped;
+            newPosition.z = CurrentPosition.z;
+        } else {
+            newPosition = CurrentPosition;
+        }
 
         Vector3 shakeOffset = Vector3.zero;
         if ((_screenShake -= Time.deltaTime) > 0)
