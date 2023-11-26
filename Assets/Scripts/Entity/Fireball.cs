@@ -57,11 +57,9 @@ namespace NSMB.Entities {
 
             // Physics
             body.Position = spawnpoint;
-            //nrb.TeleportToPosition(spawnpoint, Vector3.zero);
-            //nrb.Rigidbody.position = spawnpoint;
             body.Freeze = false;
             body.Velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
-            //body.InterpolationDataSource = Owner.IsProxy ? InterpolationDataSources.Snapshots : InterpolationDataSources.Predicted;
+            Object.AssignInputAuthority(owner.Object.InputAuthority);
         }
 
         public override void Spawned() {

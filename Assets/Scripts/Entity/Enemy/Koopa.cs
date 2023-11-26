@@ -11,7 +11,6 @@ using NSMB.Utils;
 
 namespace NSMB.Entities.Enemies {
 
-    //[OrderAfter(typeof(NetworkPhysicsSimulation2D))]
     public class Koopa : HoldableEntity {
 
         //---Networked Variables
@@ -93,7 +92,8 @@ namespace NSMB.Entities.Enemies {
             PhysicsDataStruct data = body.Data;
             if (IsInShell) {
                 hitbox.size = inShellHitboxSize;
-                hitbox.offset = inShellHitboxOffset;
+                fusionHitbox.BoxExtents = hitbox.size * 0.5f;
+                fusionHitbox.Offset = hitbox.offset = inShellHitboxOffset;
 
                 if (IsStationary) {
                     if (data.OnGround && body.Velocity.y < 1)
@@ -106,7 +106,8 @@ namespace NSMB.Entities.Enemies {
                 }
             } else {
                 hitbox.size = outShellHitboxSize;
-                hitbox.offset = outShellHitboxOffset;
+                fusionHitbox.BoxExtents = hitbox.size * 0.5f;
+                fusionHitbox.Offset = hitbox.offset = outShellHitboxOffset;
             }
 
             if (!Holder && !IsStationary) {

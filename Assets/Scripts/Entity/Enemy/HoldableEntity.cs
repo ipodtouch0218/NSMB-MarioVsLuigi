@@ -45,11 +45,12 @@ namespace NSMB.Entities {
                 body.Velocity = Holder.body.Velocity;
                 body.Position = Holder.body.Position + (Vector2) holderOffset;
 
-                hitbox.enabled = false;
+                fusionHitbox.HitboxActive = hitbox.enabled = false;
+
                 body.IsKinematic = true;
                 CheckForEntityCollisions();
             } else {
-                hitbox.enabled = true;
+                fusionHitbox.HitboxActive = hitbox.enabled = true;
                 body.IsKinematic = false;
                 base.FixedUpdateNetwork();
             }

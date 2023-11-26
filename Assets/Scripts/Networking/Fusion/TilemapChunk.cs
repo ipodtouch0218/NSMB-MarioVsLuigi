@@ -11,12 +11,10 @@ namespace NSMB.Tiles {
         private static readonly TileBase[] TileBuffer = new TileBase[256];
 
         //---Networked Variables
+        [Networked] public ushort ChunkX { get; set; }
+        [Networked] public ushort ChunkY { get; set; }
         [Networked] public byte DirtyCounter { get; set; }
         [Networked, Capacity(256)] public NetworkArray<ushort> Tiles => default;
-
-        //---Public Variables
-        public int chunkX;
-        public int chunkY;
 
         //---Private Variables
         private readonly ushort[] originalTiles = new ushort[256];
@@ -50,6 +48,11 @@ namespace NSMB.Tiles {
             latestDirtyCounter = DirtyCounter;
         }
 
+        public void OnBeforeSpawned(ushort x, ushort y) {
+            ChunkX = x;
+            ChunkY = y;
+        }
+
         public override void Spawned() {
             Runner.SetIsSimulated(Object, true);
 
@@ -59,18 +62,18 @@ namespace NSMB.Tiles {
             transform.SetParent(GameManager.Instance.tileManager.transform, true);
             tilemapCollider = GameManager.Instance.tilemap.GetComponent<TilemapCollider2D>();
             LoadState();
-
             if (Runner.IsServer)
                 Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
 
             UpdateTilemapState();
+            GameManager.Instance.tileManager.AddChunk(this);
             initialized = true;
         }
 
         public void LoadState() {
             GameManager gm = GameManager.Instance;
 
-            int chunkOriginIndex = (chunkX * 16) + (chunkY * GameManager.Instance.tileManager.ChunksX * 256);
+            int chunkOriginIndex = (ChunkX * 16) + (ChunkY * GameManager.Instance.tileManager.ChunksX * 256);
 
             for (int i = 0; i < 256; i++) {
                 int x = i % 16;
@@ -82,7 +85,7 @@ namespace NSMB.Tiles {
                 }
             }
 
-            bounds = new(gm.levelMinTileX + (chunkX * 16), gm.levelMinTileY + (chunkY * 16), 0, 16, 16, 1);
+            bounds = new(gm.levelMinTileX + (ChunkX * 16), gm.levelMinTileY + (ChunkY * 16), 0, 16, 16, 1);
         }
 
         public void ResetMap() {
@@ -151,7 +154,7 @@ namespace NSMB.Tiles {
         public void OnDrawGizmosSelected() {
             Gizmos.color = SelectedColor;
             GameManager gm = GameManager.Instance;
-            Gizmos.DrawCube(new(gm.LevelMinX + 4 + (chunkX * 8), gm.LevelMinY + 4 + (chunkY * 8)), ChunkSize);
+            Gizmos.DrawCube(new(gm.LevelMinX + 4 + (ChunkX * 8), gm.LevelMinY + 4 + (ChunkY * 8)), ChunkSize);
         }
 #endif
     }

@@ -348,7 +348,7 @@ namespace NSMB.Entities.Player {
             float newZ = -4;
             if (controller.IsDead)
                 newZ = -6;
-            else if (controller.CurrentPipe)
+            else if (controller.CurrentPipe || controller.IsFrozen)
                 newZ = 1;
 
             transform.position = new(transform.position.x, transform.position.y, newZ);

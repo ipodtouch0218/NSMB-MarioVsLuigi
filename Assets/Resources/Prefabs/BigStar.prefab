@@ -4854,6 +4854,8 @@ GameObject:
   - component: {fileID: 8025866746367081787}
   - component: {fileID: -4356651289696895989}
   - component: {fileID: 4392193488416578036}
+  - component: {fileID: 1779108696006128181}
+  - component: {fileID: 9186129651980250131}
   m_Layer: 9
   m_Name: BigStar
   m_TagString: Untagged
@@ -5137,6 +5139,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1973747262660636110}
   - {fileID: 4392193488416578036}
+  - {fileID: 1779108696006128181}
 --- !u!114 &4392193488416578036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5168,11 +5171,48 @@ MonoBehaviour:
       Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   _PreviousTickPosition: {x: 0, y: 0}
   _PreviousTickVelocity: {x: 0, y: 0}
-  interpolationTarget: {fileID: 8519953457714558423}
   activeCollider: {fileID: 1973747262660636111}
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0
+--- !u!114 &1779108696006128181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config: 3
+  BroadRadius: 0.55
+  Offset: {x: 0, y: 0, z: 0}
+  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  Hitboxes:
+  - {fileID: 9186129651980250131}
+--- !u!114 &9186129651980250131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 1
+  SphereRadius: 0
+  CapsuleRadius: 0
+  BoxExtents: {x: 0.375, y: 0.375, z: 1}
+  CapsuleHeight: 0
+  Offset: {x: 0, y: 0, z: 0}
+  Root: {fileID: 1779108696006128181}
+  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &6306428316705399139
 GameObject:
   m_ObjectHideFlags: 0

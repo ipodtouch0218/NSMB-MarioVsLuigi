@@ -4,13 +4,14 @@ using UnityEngine.Serialization;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
+using NSMB.Entities.Player;
 
 [SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Resimulate | SimulationStages.Forward)]
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
 
     //---Static Variables
     private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
-    private static readonly float Skin = 0.01f, LerpInterpValue = 0.33f;
+    private static readonly float Skin = 0.015f, LerpInterpValue = 0.33f;
     private static readonly int MaxIterations = 5;
 
     //---Networked Variables
@@ -75,21 +76,9 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
         if (Freeze) {
             newPosition = Position;
-        } else if ((IsProxy /* && InterpolationDataSource != InterpolationDataSources.Predicted*/) || !TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
-            // Proxy interpolation with some smoothing:
+        } else if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
+            // Snapshot interpolation with no smoothing:
 
-            if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, Position) > interpolationTeleportDistance) {
-                // Teleport over large distances
-                newPosition = Utils.WrapWorldLocation(Position);
-            } else {
-                // Interpolate from where we are to the next point.
-                Utils.UnwrapLocations(previousRenderPosition, Position, out Vector2 fromRelative, out Vector2 toRelative);
-                Vector2 difference = toRelative - fromRelative;
-                newPosition = Vector2.Lerp(previousRenderPosition, previousRenderPosition + difference, Mathf.Clamp01(LerpInterpValue - Time.deltaTime));
-                newPosition = Utils.WrapWorldLocation(newPosition);
-            }
-        } else {
-            // State/Input Authority interpolation with no smoothing:
             (Vector2 fromVector, Vector2 toVector) = internalPositionPropertyReader.Read(from, to);
 
             if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromVector, toVector) > interpolationTeleportDistance) {
@@ -101,6 +90,19 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 newPosition = Vector2.Lerp(fromVectorRelative, toVectorRelative, alpha);
                 newPosition = Utils.WrapWorldLocation(newPosition);
             }
+        } else {
+            // Fallback interpolation with some smoothing:
+
+            if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, Position) > interpolationTeleportDistance) {
+                // Teleport over large distances
+                newPosition = Utils.WrapWorldLocation(Position);
+            } else {
+                // Interpolate from where we are to the next point.
+                Utils.UnwrapLocations(previousRenderPosition, Position, out Vector2 fromRelative, out Vector2 toRelative);
+                Vector2 difference = toRelative - fromRelative;
+                newPosition = Vector2.Lerp(previousRenderPosition, previousRenderPosition + difference, Mathf.Clamp01(LerpInterpValue - Time.deltaTime));
+                newPosition = Utils.WrapWorldLocation(newPosition);
+            }
         }
 
         newPosition.z = transform.position.z;
@@ -110,7 +112,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     public override void FixedUpdateNetwork() {
         ResetPhysicsData();
 
-        if (!Freeze && (!IsProxy /* || InterpolationDataSource == InterpolationDataSources.Predicted*/)) {
+        if (!Freeze) {
             Vector2 movement;
             movement = CollideAndSlide(Position + ColliderOffset, Velocity * Runner.DeltaTime, false);
             if (!IsKinematic)
@@ -154,6 +156,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
         int filter = Layers.GetCollisionMask(activeCollider.gameObject.layer);
 
         int hits = Runner.GetPhysicsScene2D().BoxCast(raycastPos, size, 0, direction, distance, RaycastBuffer, filter);
+
         for (int i = 0; i < hits; i++) {
             RaycastHit2D hit = RaycastBuffer[i];
 

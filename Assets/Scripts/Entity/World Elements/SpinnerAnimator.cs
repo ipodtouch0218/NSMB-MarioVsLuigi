@@ -1,11 +1,9 @@
 using UnityEngine;
 
 using Fusion;
-using NSMB.Entities.Player;
 
 namespace NSMB.Entities.World {
 
-    //[OrderAfter(typeof(PlayerController))]
     public class SpinnerAnimator : NetworkBehaviour, IBeforeTick {
 
         //---Networked Variables
@@ -25,6 +23,7 @@ namespace NSMB.Entities.World {
 
         public override void Spawned() {
             armPositionPropertyReader = GetPropertyReader<float>(nameof(ArmPosition));
+            Runner.SetIsSimulated(Object, true);
         }
 
         public void BeforeTick() {
@@ -33,7 +32,6 @@ namespace NSMB.Entities.World {
         }
 
         public override void Render() {
-
             float armRenderPosition;
             if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
                 (float fromPosition, float toPosition) = armPositionPropertyReader.Read(from, to);

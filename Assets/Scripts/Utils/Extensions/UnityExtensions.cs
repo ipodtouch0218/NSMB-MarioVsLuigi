@@ -104,6 +104,9 @@ namespace NSMB.Extensions {
             if (transform.parent)
                 lossyScale = lossyScale.Divide(transform.parent.lossyScale);
 
+            if (lossyScale.z == 0 || !float.IsFinite(lossyScale.z))
+                lossyScale.z = 1;
+
             transform.localScale = lossyScale;
         }
     }

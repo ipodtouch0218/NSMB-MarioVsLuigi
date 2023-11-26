@@ -19,17 +19,37 @@ namespace NSMB.Tiles {
         public int WorldOriginY { get; private set; }
         private GameManager GameManager => GameManager.Instance;
 
-        //---Public Variables
-        [SerializeField] public List<TilemapChunk> chunks;
-
-        //---Serialized Variables
-        [SerializeField] public TilemapChunk tilemapChunkPrefab;
+        //---Private Variables
+        private List<TilemapChunk> chunks = new();
 
         public override void Spawned() {
             ChunksX = Mathf.CeilToInt(GameManager.levelWidthTile / 16f);
             ChunksY = Mathf.CeilToInt(GameManager.levelHeightTile / 16f);
             WorldOriginX = GameManager.levelMinTileX;
             WorldOriginY = GameManager.levelMinTileY;
+
+            if (Runner.IsServer) {
+                for (int y = 0; y < ChunksY; y++) {
+                    for (int x = 0; x < ChunksX; x++) {
+                        Runner.Spawn(PrefabList.Instance.TilemapChunk, onBeforeSpawned: (runner, obj) => {
+                            obj.GetComponent<TilemapChunk>().OnBeforeSpawned((ushort) x, (ushort) y);
+                        });
+                    }
+                }
+            }
+        }
+
+        public void AddChunk(TilemapChunk chunk) {
+            if (chunks.Contains(chunk))
+                return;
+
+            chunks.Add(chunk);
+            chunks.Sort((chunkA, chunkB) => {
+                if (chunkA.ChunkY == chunkB.ChunkY)
+                    return chunkA.ChunkX - chunkB.ChunkX;
+
+                return chunkA.ChunkY - chunkB.ChunkY;
+            });
         }
 
         public void ResetMap() {

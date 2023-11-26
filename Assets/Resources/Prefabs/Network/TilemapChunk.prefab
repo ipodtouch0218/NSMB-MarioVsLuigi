@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2084930905717922039}
   - component: {fileID: 6049557798542441352}
+  - component: {fileID: 4922962586498095092}
   m_Layer: 0
   m_Name: TilemapChunk
   m_TagString: Untagged
@@ -24,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 952464375624945634}
-  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6049557798542441352
 MonoBehaviour:
@@ -44,7 +45,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c33719b6058cda4c9a3669de683f83a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _ChunkX: 0
+  _ChunkY: 0
   _DirtyCounter: 0
   _Tiles: 
-  chunkX: 0
-  chunkY: 0
+--- !u!114 &4922962586498095092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952464375624945634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 2596058406
+  ObjectInterest: 1
+  _DestroyWhenStateAuthorityLeaves: 0
+  _AllowStateAuthorityOverride: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 6049557798542441352}

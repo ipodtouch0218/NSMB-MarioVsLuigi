@@ -215,7 +215,7 @@ namespace NSMB.Game {
         public override void Render() {
             base.Render();
 
-            if (GameManager.Instance.GameState == Enums.GameState.Playing)
+            if (GameState == Enums.GameState.Playing)
                 HandleMusic();
 
             // Handle sound effects for the timer, if it's enabled
@@ -245,7 +245,7 @@ namespace NSMB.Game {
         }
 
         public override void FixedUpdateNetwork() {
-            if (GameEnded)
+            if (!HasStateAuthority || GameEnded)
                 return;
 
             switch (GameState) {
@@ -495,9 +495,10 @@ namespace NSMB.Game {
                 foreach (PlayerRef player in Runner.ActivePlayers) {
                     PlayerData data = player.GetPlayerData(Runner);
 
-                    if (data == null || data.IsCurrentlySpectating)
+                    if (!data || data.IsCurrentlySpectating)
                         continue;
 
+                    // I'm still loading!
                     if (!data.IsLoaded)
                         return;
                 }
@@ -558,7 +559,7 @@ namespace NSMB.Game {
                 });
             }
 
-            GameManager.Instance.tileManager.SetTile(loc, null);
+            tileManager.SetTile(loc, null);
         }
 
         //---Callbacks
@@ -751,8 +752,11 @@ namespace NSMB.Game {
                 if (!player)
                     continue;
 
-                mega |= player.State == Enums.PowerupState.MegaMushroom && player.MegaStartTimer.ExpiredOrNotRunning(Runner);
-                invincible |= player.IsStarmanInvincible;
+                if (Settings.Instance.audioSpecialPowerupMusicLocalOnly && !player.cameraController.IsControllingCamera)
+                    return;
+
+                mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && player.State == Enums.PowerupState.MegaMushroom && player.MegaStartTimer.ExpiredOrNotRunning(Runner);
+                invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && player.IsStarmanInvincible;
             }
 
             speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);

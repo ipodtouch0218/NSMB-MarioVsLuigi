@@ -212,7 +212,6 @@ namespace NSMB.Entities.Player {
         private BoxCollider2D[] hitboxes;
 
         //---Public Variables
-        [HideInInspector] public bool groundpoundLastFrame;
         [HideInInspector] public float powerupFlash;
 
         //---Serialized Variables
@@ -476,9 +475,6 @@ namespace NSMB.Entities.Player {
                     NetworkButtons heldButtons = input.buttons;
                     NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
 
-                    // TODO: remove groundpoundLastFrame? Do we even need this anymore?
-                    groundpoundLastFrame = IsGroundpounding;
-
                     if (!IsDead) {
                         HandleGroundCollision();
                         IsOnGround |= GroundSnapCheck();
@@ -496,7 +492,6 @@ namespace NSMB.Entities.Player {
                             }
                         }
 
-                        UpdateTileProperties();
                         CheckForPowerupActions(input, PreviousInputs);
                         HandleMovement(heldButtons, pressedButtons);
                     }
@@ -511,15 +506,16 @@ namespace NSMB.Entities.Player {
                 animationController.HandlePipeAnimation();
             }
 
+            UpdateTileProperties();
             UpdateHitbox();
 
             if (!IsProxy) {
                 // We can become stuck in a block after uncrouching
                 if (!IsDead)
                     HandleStuckInBlock();
-
-                transform.localScale = CalculateScale(false);
             }
+
+            transform.localScale = CalculateScale(false);
         }
         #endregion
 
@@ -617,12 +613,12 @@ namespace NSMB.Entities.Player {
             LagCompensatedBuffer.Clear();
             foreach (BoxCollider2D hitbox in hitboxes) {
                 Runner.LagCompensation.OverlapBox(
-                    body.Position + (body.Velocity * Runner.DeltaTime) + (hitbox.offset * transform.localScale),
+                    body.Position + (hitbox.offset * transform.localScale),
                     ((Vector3) (hitbox.size * 0.5f) + Vector3.forward).Multiply(transform.localScale),
                     Quaternion.identity,
                     Object.InputAuthority,
                     LagCompensatedBuffer,
-                    options: HitOptions.IgnoreInputAuthority | HitOptions.SubtickAccuracy | HitOptions.IncludeBox2D,
+                    options: HitOptions.IgnoreInputAuthority | HitOptions.SubtickAccuracy | HitOptions.IgnoreInputAuthority | HitOptions.IncludeBox2D,
                     clearHits: false);
             }
 
@@ -631,6 +627,10 @@ namespace NSMB.Entities.Player {
             foreach (LagCompensatedHit hit in LagCompensatedBuffer) {
 
                 GameObject hitObject = hit.GameObject;
+
+                if (!hit.Hitbox && hitObject.TryGetComponent<Hitbox>(out _))
+                    continue;
+
                 PhysicsDataStruct.ObjectContact contact = new();
                 float angle = Vector2.SignedAngle(hit.Normal, Vector2.up);
                 angle += 360 + 45;
@@ -1207,12 +1207,17 @@ namespace NSMB.Entities.Player {
             if (prefab == NetworkPrefabRef.Empty)
                 prefab = Utils.Utils.GetRandomItem(this).prefab;
 
-            Runner.Spawn(prefab, new(body.Position.x, cameraController.CurrentPosition.y + 1.68f, 0), onBeforeSpawned: (runner, obj) => {
-                obj.GetComponent<Powerup>().OnBeforeSpawned(this);
+            Runner.Spawn(prefab, new(body.Position.x, body.Position.y, 0), onBeforeSpawned: (runner, obj) => {
+                Powerup p = obj.GetComponent<Powerup>();
+                p.OnBeforeSpawned(this);
+                p.body.Position = body.Position;
             });
         }
 
         private void SpawnStars(int amount, bool deathplane) {
+
+            if (!Runner.IsServer)
+                return;
 
             GameManager gm = GameManager.Instance;
             bool fastStars = amount > 2 && Stars > 2;
@@ -1577,10 +1582,10 @@ namespace NSMB.Entities.Player {
             KnockbackWasOriginallyFacingRight = FacingRight;
             KnockbackTick = Runner.Tick;
 
-            Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.Position);
-            TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
-            if (!weak && tile)
-                fromRight = !fromRight;
+            //Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.Position);
+            //TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
+            //if (!weak && tile)
+            //    fromRight = !fromRight;
 
             body.Velocity = new Vector2(
                 (fromRight ? -1 : 1) *
@@ -2254,7 +2259,7 @@ namespace NSMB.Entities.Player {
 
         private static readonly Vector2 StuckInBlockSizeCheck = new(0.9f, 0.9f);
         private bool HandleStuckInBlock() {
-            if (CurrentPipe || MegaStartTimer.IsActive(Runner) || (MegaEndTimer.IsActive(Runner) && IsStationaryMegaShrink))
+            if (IsFrozen || CurrentPipe || MegaStartTimer.IsActive(Runner) || (MegaEndTimer.IsActive(Runner) && IsStationaryMegaShrink))
                 return false;
 
             Vector2 checkSize = WorldHitboxSize * StuckInBlockSizeCheck;
@@ -2743,13 +2748,13 @@ namespace NSMB.Entities.Player {
             };
             if (IsSpinnerFlying) {
                 if (IsDrilling) {
-                    body.Velocity = new(body.Velocity.x, -drillVelocity);
+                    body.Velocity = new(body.Velocity.x, Mathf.Max(body.Velocity.y, -drillVelocity));
                 } else {
                     body.Velocity = new(body.Velocity.x, Mathf.Max(body.Velocity.y, -flyingTerminalVelocity));
                 }
             } else if (IsPropellerFlying) {
                 if (IsDrilling) {
-                    body.Velocity = new(Mathf.Clamp(body.Velocity.x, -WalkingMaxSpeed * (1/4f), WalkingMaxSpeed * (1/4f)), -drillVelocity);
+                    body.Velocity = new(Mathf.Clamp(body.Velocity.x, -WalkingMaxSpeed * (1/4f), WalkingMaxSpeed * (1/4f)), Mathf.Max(body.Velocity.y, -drillVelocity));
                 } else {
                     float remainingTime = PropellerLaunchTimer.RemainingTime(Runner) ?? 0f;
                     float htv = WalkingMaxSpeed * 1.18f + (remainingTime * 2f);
@@ -2790,7 +2795,11 @@ namespace NSMB.Entities.Player {
 
             // Slow-rise check
             if (IsSpinnerFlying || IsPropellerFlying) {
-                gravity = flyingGravity * Physics2D.gravity.y;
+                if (IsDrilling) {
+                    gravity = GRAVITY_STAGE_ACC[^1];
+                } else {
+                    gravity = flyingGravity * Physics2D.gravity.y;
+                }
             } else {
                 if (IsGroundpounding) {
                     if (GroundpoundStartTimer.IsActive(Runner)) {

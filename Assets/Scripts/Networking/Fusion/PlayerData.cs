@@ -17,6 +17,7 @@ public class PlayerData : NetworkBehaviour {
 
     //---Events
     public event Action<bool> OnInOptionsChangedEvent;
+    public event Action<bool> OnIsReadyChangedEvent;
 
     //---Networked Variables
     [Networked, Capacity(20)] public string RawNickname { get; set; } = "noname";
@@ -31,6 +32,7 @@ public class PlayerData : NetworkBehaviour {
     [Networked] public NetworkBool IsLoaded { get; set; }
     [Networked] public NetworkBool IsMuted { get; set; }
     [Networked] public NetworkBool IsInOptions { get; set; }
+    [Networked] public NetworkBool IsReady { get; set; }
     [Networked] public TickTimer MessageCooldownTimer { get; set; }
     [Networked] public byte CharacterIndex { get; set; }
     [Networked] public byte SkinIndex { get; set; }
@@ -140,6 +142,7 @@ public class PlayerData : NetworkBehaviour {
             case nameof(Ping): OnSettingChanged(); break;
             case nameof(IsLoaded): OnLoadStateChanged(); break;
             case nameof(IsInOptions): OnInOptionsChanged(); break;
+            case nameof(IsReady): OnIsReadyChanged(); break;
             case nameof(CharacterIndex): OnCharacterChanged(); break;
             case nameof(SkinIndex): OnSkinChanged(); break;
             }
@@ -263,6 +266,11 @@ public class PlayerData : NetworkBehaviour {
         IsInOptions = open;
     }
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void Rpc_SetIsReady(bool ready) {
+        IsReady = ready;
+    }
+
     private void OnOptionsOpenToggled(bool isOpen) {
         Rpc_SetOptionsOpen(isOpen);
     }
@@ -293,7 +301,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public void OnCharacterChanged() {
-        if (!MainMenuManager.Instance || !Object.HasInputAuthority)
+        if (!MainMenuManager.Instance || !HasInputAuthority)
             return;
 
         MainMenuManager.Instance.SwapCharacter(CharacterIndex, false);
@@ -301,7 +309,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public void OnSkinChanged() {
-        if (!MainMenuManager.Instance || !Object.HasInputAuthority)
+        if (!MainMenuManager.Instance || !HasInputAuthority)
             return;
 
         MainMenuManager.Instance.SwapPlayerSkin(SkinIndex, false);
@@ -309,5 +317,12 @@ public class PlayerData : NetworkBehaviour {
 
     public void OnInOptionsChanged() {
         OnInOptionsChangedEvent?.Invoke(IsInOptions);
+    }
+
+    public void OnIsReadyChanged() {
+        OnIsReadyChangedEvent?.Invoke(IsReady);
+
+        if (MainMenuManager.Instance && HasInputAuthority)
+            MainMenuManager.Instance.UpdateStartGameButton();
     }
 }

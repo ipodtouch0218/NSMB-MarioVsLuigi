@@ -96,6 +96,9 @@ public class SessionData : NetworkBehaviour {
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         levelPropertyReader = GetPropertyReader<byte>(nameof(Level));
         gameObject.name = "SessionData (" + Runner.SessionInfo.Name + ")";
+
+        if (MainMenuManager.Instance)
+            MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(Instance, false);
     }
 
     public override void Render() {
@@ -286,6 +289,7 @@ public class SessionData : NetworkBehaviour {
 
             data.IsCurrentlySpectating = data.IsManualSpectator;
             data.IsLoaded = false;
+            data.IsReady = false;
 
             if (data.IsCurrentlySpectating) {
                 data.PlayerId = -1;

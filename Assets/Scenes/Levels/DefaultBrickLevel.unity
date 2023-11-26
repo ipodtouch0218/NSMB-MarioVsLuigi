@@ -4904,18 +4904,18 @@ PrefabInstance:
     - target: {fileID: 184355828371754224, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 4
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 184355828371754224, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: NetworkedBehaviours.Array.data[2]
       value: 
-      objectReference: {fileID: 2140295849}
+      objectReference: {fileID: 0}
     - target: {fileID: 184355828371754224, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: NetworkedBehaviours.Array.data[3]
       value: 
-      objectReference: {fileID: 2146237090}
+      objectReference: {fileID: 0}
     - target: {fileID: 822077676654890402, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -5051,12 +5051,12 @@ PrefabInstance:
         type: 3}
       propertyPath: chunks.Array.data[0]
       value: 
-      objectReference: {fileID: 2140295849}
+      objectReference: {fileID: 0}
     - target: {fileID: 3199354014281383139, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: chunks.Array.data[1]
       value: 
-      objectReference: {fileID: 2146237090}
+      objectReference: {fileID: 0}
     - target: {fileID: 3357010861536891764, guid: 43d56bd18d06e9b4abe323618a20a228,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -5920,23 +5920,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6381916647485414113, guid: 43d56bd18d06e9b4abe323618a20a228,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2140295848}
-    - targetCorrespondingSourceObject: {fileID: 6381916647485414113, guid: 43d56bd18d06e9b4abe323618a20a228,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2146237091}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43d56bd18d06e9b4abe323618a20a228, type: 3}
---- !u!4 &873727633 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6381916647485414113, guid: 43d56bd18d06e9b4abe323618a20a228,
-    type: 3}
-  m_PrefabInstance: {fileID: 873727632}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &990002637
 GameObject:
   m_ObjectHideFlags: 0
@@ -7240,99 +7226,3 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1953587316}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2140295847
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2140295848}
-  - component: {fileID: 2140295849}
-  m_Layer: 0
-  m_Name: TilemapChunk (0,0)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2140295848
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2140295847}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 873727633}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2140295849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2140295847}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c33719b6058cda4c9a3669de683f83a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _DirtyCounter: 0
-  _Tiles: 
-  chunkX: 0
-  chunkY: 0
---- !u!1 &2146237089
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2146237091}
-  - component: {fileID: 2146237090}
-  m_Layer: 0
-  m_Name: TilemapChunk (1,0)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2146237090
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2146237089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c33719b6058cda4c9a3669de683f83a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _DirtyCounter: 0
-  _Tiles: 
-  chunkX: 1
-  chunkY: 0
---- !u!4 &2146237091
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2146237089}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 873727633}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

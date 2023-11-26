@@ -152,7 +152,8 @@ public class Settings : Singleton<Settings> {
 
     public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
 
-    public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning;
+    public Enums.SpecialPowerupMusic audioSpecialPowerupMusic;
+    public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning, audioSpecialPowerupMusicLocalOnly;
 
     public RumbleManager.RumbleSetting controlsRumble;
     public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
@@ -199,6 +200,8 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Audio_MuteMusicOnUnfocus", audioMuteMusicOnUnfocus ? 1 : 0);
         PlayerPrefs.SetInt("Audio_MuteSFXOnUnfocus", audioMuteSFXOnUnfocus ? 1 : 0);
         PlayerPrefs.SetInt("Audio_Panning", audioPanning ? 1 : 0);
+        PlayerPrefs.SetInt("Audio_SpecialPowerupMusic", (int) audioSpecialPowerupMusic);
+        PlayerPrefs.SetInt("Audio_SpecialPowerupMusicLocal", audioSpecialPowerupMusicLocalOnly ? 1 : 0);
 
         // Controls
         PlayerPrefs.SetInt("Controls_FireballFromSprint", controlsFireballSprint ? 1 : 0);
@@ -265,6 +268,8 @@ public class Settings : Singleton<Settings> {
         audioMuteMusicOnUnfocus = false;
         audioMuteSFXOnUnfocus = false;
         audioPanning = true;
+        audioSpecialPowerupMusic = Enums.SpecialPowerupMusic.Starman | Enums.SpecialPowerupMusic.MegaMushroom;
+        audioSpecialPowerupMusicLocalOnly = false;
 
         FileInfo bindingsFile = new(Application.persistentDataPath + "/controls.json");
         if (bindingsFile.Exists) {
@@ -304,12 +309,14 @@ public class Settings : Singleton<Settings> {
         if (TryGetSetting("Graphics_Colorblind", out bool tempColorblind)) GraphicsColorblind = tempColorblind;
 
         //Audio
-        if (GetIfExists("Audio_MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;
-        if (GetIfExists("Audio_MusicVolume", out float tempMusicVolume)) AudioMusicVolume = tempMusicVolume;
-        if (GetIfExists("Audio_SFXVolume", out float tempSFXVolume)) AudioSFXVolume = tempSFXVolume;
+        if (TryGetSetting("Audio_MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;
+        if (TryGetSetting("Audio_MusicVolume", out float tempMusicVolume)) AudioMusicVolume = tempMusicVolume;
+        if (TryGetSetting("Audio_SFXVolume", out float tempSFXVolume)) AudioSFXVolume = tempSFXVolume;
         TryGetSetting("Audio_MuteMusicOnUnfocus", out audioMuteMusicOnUnfocus);
         TryGetSetting("Audio_MuteSFXOnUnfocus", out audioMuteSFXOnUnfocus);
         TryGetSetting("Audio_Panning", out audioPanning);
+        if (TryGetSetting("Audio_SpecialPowerupMusic", out int tempAudioSpecialPowerupMusic)) audioSpecialPowerupMusic = (Enums.SpecialPowerupMusic) tempAudioSpecialPowerupMusic;
+        TryGetSetting("Audio_SpecialPowerupMusicLocalOnly", out audioSpecialPowerupMusicLocalOnly);
 
         //Controls
         TryGetSetting("Controls_FireballFromSprint", out controlsFireballSprint);
@@ -339,7 +346,7 @@ public class Settings : Singleton<Settings> {
         return true;
     }
 
-    private bool GetIfExists(string key, out float value) {
+    private bool TryGetSetting(string key, out float value) {
         if (!PlayerPrefs.HasKey(key)) {
             value = default;
             return false;

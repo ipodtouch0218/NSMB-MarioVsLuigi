@@ -196,7 +196,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
             EnableClientSessionCreation = true,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
-            Scene = SceneRef.FromIndex(0),
+            Scene = SceneRef.FromIndex(0)
         });
 
         OnHostMigration?.Invoke(runner, hostMigrationToken);
@@ -472,6 +472,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>();
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
             args.OnGameStarted = RoomInitialized;
+            args.Scene = SceneRef.FromIndex(0);
 
             args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname;
             args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;

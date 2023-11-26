@@ -4901,6 +4901,8 @@ GameObject:
   - component: {fileID: 844320328102276428}
   - component: {fileID: 2644380969240041381}
   - component: {fileID: 5158080774805734746}
+  - component: {fileID: 1200111384242601477}
+  - component: {fileID: 4930450600683655096}
   m_Layer: 9
   m_Name: Fireball
   m_TagString: Untagged
@@ -5141,11 +5143,12 @@ MonoBehaviour:
   ObjectInterest: 0
   _DestroyWhenStateAuthorityLeaves: 0
   _AllowStateAuthorityOverride: 0
-  Flags: 2305
+  Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1164692562165207756}
   - {fileID: 5158080774805734746}
+  - {fileID: 1200111384242601477}
 --- !u!114 &5158080774805734746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5177,11 +5180,48 @@ MonoBehaviour:
       Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   _PreviousTickPosition: {x: 0, y: 0}
   _PreviousTickVelocity: {x: 0, y: 0}
-  interpolationTarget: {fileID: 3150262645453679834}
   activeCollider: {fileID: -1769135492019179076}
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0
+--- !u!114 &1200111384242601477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1011982274984717421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config: 3
+  BroadRadius: 0.2
+  Offset: {x: 0, y: 0.1375, z: 0}
+  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  Hitboxes:
+  - {fileID: 4930450600683655096}
+--- !u!114 &4930450600683655096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1011982274984717421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 1
+  SphereRadius: 0
+  CapsuleRadius: 0
+  BoxExtents: {x: 0.1375, y: 0.1375, z: 1}
+  CapsuleHeight: 0
+  Offset: {x: 0, y: 0.1375, z: 0}
+  Root: {fileID: 1200111384242601477}
+  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &2135618848759859508
 GameObject:
   m_ObjectHideFlags: 0

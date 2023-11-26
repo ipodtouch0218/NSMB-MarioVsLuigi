@@ -34,6 +34,7 @@ namespace NSMB.Entities.Collectable {
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
             body.Velocity = Vector2.up * GameManager.Instance.random.RangeInclusive(5.5f, 6f);
+            Runner.SetIsSimulated(Object, true);
         }
 
         public override void Render() {
@@ -71,7 +72,6 @@ namespace NSMB.Entities.Collectable {
                     body.Velocity = new(body.Velocity.x, 0);
 
                 // TODO: doesn't always trigger, even for host. Strange.
-                // IsForward is ok, the sound isnt top priority
                 if (body.PreviousTickVelocity.y < -0.5f * (Mathf.Sin(data.FloorAngle) + 1f))
                     CoinBounceAnimCounter++;
             }

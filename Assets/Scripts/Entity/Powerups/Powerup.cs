@@ -141,14 +141,15 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
+
+            if (!Object || Collector)
+                return;
+
             if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 body.Freeze = true;
                 return;
             }
-
-            if (!Object || Collector)
-                return;
 
             if (FollowPlayer) {
                 // Attached to a player. Don't interact, and follow the player.

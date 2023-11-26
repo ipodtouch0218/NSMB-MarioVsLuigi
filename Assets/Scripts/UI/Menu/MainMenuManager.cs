@@ -15,6 +15,7 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
+using UnityEngine.Rendering.UI;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuManager : Singleton<MainMenuManager> {
@@ -178,7 +179,8 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDestroy() {
-            GlobalController.Instance.connecting.SetActive(false);
+            if (GlobalController.Instance)
+                GlobalController.Instance.connecting.SetActive(false);
         }
 
         public void UpdateRegionDropdown() {
@@ -447,15 +449,18 @@ namespace NSMB.UI.MainMenu {
 
         public void StartCountdown() {
 
-            // We can't start the game if we're not the server.
-            if (!Runner.IsServer)
+            PlayerData data = Runner.GetLocalPlayerData();
+            if (!data.IsRoomOwner) {
+                // Toggle ready up state instead
+                sfx.PlayOneShot(data.IsReady ? Enums.Sounds.UI_Back : Enums.Sounds.UI_Decide);
+                data.Rpc_SetIsReady(!data.IsReady);
                 return;
+            }
 
             if (SessionData.Instance.GameStartTimer.IsRunning) {
                 // Cancel early.
                 SessionData.Instance.GameStartTimer = TickTimer.None;
                 sfx.PlayOneShot(Enums.Sounds.UI_Back);
-
             } else {
                 // Make sure we can actually start the game
                 if (!IsRoomConfigurationValid())
@@ -475,12 +480,18 @@ namespace NSMB.UI.MainMenu {
 
         public void UpdateStartGameButton() {
             PlayerData data = Runner.GetLocalPlayerData();
-            if (!data || !data.IsRoomOwner) {
-                startGameBtn.interactable = false;
-                return;
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            if (data && data.IsRoomOwner) {
+                startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
+                startGameBtn.interactable = IsRoomConfigurationValid();
+            } else {
+                if (data && data.IsReady) {
+                    startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.unready");
+                } else {
+                    startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.readyup");
+                }
+                startGameBtn.interactable = true;
             }
-
-            startGameBtn.interactable = IsRoomConfigurationValid();
         }
 
         public bool IsRoomConfigurationValid() {
@@ -724,16 +735,17 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnCountdownTick(int time) {
+            PlayerData data = Runner.GetLocalPlayerData();
             TranslationManager tm = GlobalController.Instance.translationManager;
             if (time > 0) {
+                startGameBtn.interactable = data && data.IsRoomOwner;
                 startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
                 hostControlsGroup.interactable = false;
                 if (time == 1 && fadeMusicCoroutine == null)
                     fadeMusicCoroutine = StartCoroutine(FadeMusic());
             } else {
-                startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
-                PlayerData data = Runner.GetLocalPlayerData();
-                hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
+                UpdateStartGameButton();
+                hostControlsGroup.interactable = data && data.IsRoomOwner;
                 if (fadeMusicCoroutine != null) {
                     StopCoroutine(fadeMusicCoroutine);
                     fadeMusicCoroutine = null;
@@ -763,7 +775,8 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnSceneLoadStart() {
-            GlobalController.Instance.loadingCanvas.Initialize();
+            if (!Runner.TryGetSceneInfo(out var sceneInfo) || sceneInfo.Scenes[0].AsIndex != 0)
+                GlobalController.Instance.loadingCanvas.Initialize();
         }
 
         //---Debug

@@ -157,6 +157,12 @@ public static class Enums {
         [SoundData("world/water_splash")]                       World_Water_Splash = 77,
     }
 
+    [Flags]
+    public enum SpecialPowerupMusic {
+        Starman = 1 << 0,
+        MegaMushroom = 1 << 1,
+    }
+
     public enum Particle : byte {
         None = 0,
 

@@ -42,7 +42,8 @@ namespace NSMB.Entities {
 
             sRenderer.size = CubeSize;
             hitbox.size = CubeSize - (Vector2.one * 0.05f);
-            hitbox.offset = CubeSize * Vector2.up * 0.5f;
+            fusionHitbox.BoxExtents = hitbox.size * 0.5f;
+            fusionHitbox.Offset = hitbox.offset = CubeSize * Vector2.up * 0.5f;
 
             AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
             flying = FrozenEntity.IsFlying;

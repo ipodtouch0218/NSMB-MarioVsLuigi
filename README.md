@@ -85,12 +85,12 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Bilhal
 * Cecilia
 * Davo
-* Dede
 * Filipianosol
 * Flandre Scarlet
 * Flichka
 * Freeze
 * HatsuneMiku
+* haywireghost
 * HD Erick Games
 * Hyruyoshi
 * Iketarou

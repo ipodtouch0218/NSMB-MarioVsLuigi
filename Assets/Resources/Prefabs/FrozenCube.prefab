@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: -4211955845073762521}
   - component: {fileID: 3997958104174501866}
   - component: {fileID: 3575323815080525926}
+  - component: {fileID: 4917212830917736075}
+  - component: {fileID: 3006671777509063445}
   m_Layer: 14
   m_Name: FrozenCube
   m_TagString: frozencube
@@ -273,6 +275,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 5742616016131993260}
   - {fileID: 3575323815080525926}
+  - {fileID: 4917212830917736075}
 --- !u!114 &3575323815080525926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,11 +307,48 @@ MonoBehaviour:
       Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   _PreviousTickPosition: {x: 0, y: 0}
   _PreviousTickVelocity: {x: 0, y: 0}
-  interpolationTarget: {fileID: 3560772426833456990}
   activeCollider: {fileID: 7126150137336674110}
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0
+--- !u!114 &4917212830917736075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465303805189439310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config: 3
+  BroadRadius: 1.5
+  Offset: {x: 0, y: 1, z: 0}
+  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  Hitboxes:
+  - {fileID: 3006671777509063445}
+--- !u!114 &3006671777509063445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465303805189439310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 1
+  SphereRadius: 0
+  CapsuleRadius: 0
+  BoxExtents: {x: 0.25, y: 0.25, z: 0}
+  CapsuleHeight: 0
+  Offset: {x: 0, y: 0.25, z: 0}
+  Root: {fileID: 4917212830917736075}
+  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &5906585881545024381
 GameObject:
   m_ObjectHideFlags: 0

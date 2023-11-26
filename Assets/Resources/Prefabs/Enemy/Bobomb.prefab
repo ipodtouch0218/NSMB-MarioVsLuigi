@@ -122,6 +122,8 @@ GameObject:
   - component: {fileID: -3689537593968581114}
   - component: {fileID: 1441508528031699944}
   - component: {fileID: 6128206130774469154}
+  - component: {fileID: 1819210150938506519}
+  - component: {fileID: 161037357079201089}
   m_Layer: 9
   m_Name: Bobomb
   m_TagString: Untagged
@@ -173,6 +175,7 @@ MonoBehaviour:
   collideWithOtherEnemies: 1
   dieWhenInsideBlock: 1
   flipSpriteRenderer: 1
+  fusionHitbox: {fileID: 161037357079201089}
   hitbox: {fileID: 3286581577125373962}
   animator: {fileID: 8735478572021304808}
   legacyAnimation: {fileID: 0}
@@ -394,6 +397,7 @@ MonoBehaviour:
   - {fileID: 3286581577125373967}
   - {fileID: -2214749743101336736}
   - {fileID: 6128206130774469154}
+  - {fileID: 1819210150938506519}
 --- !u!114 &6128206130774469154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,3 +433,41 @@ MonoBehaviour:
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0
+--- !u!114 &1819210150938506519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286581577125373952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config: 3
+  BroadRadius: 0.26
+  Offset: {x: 0, y: 0.1875, z: 0}
+  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  Hitboxes:
+  - {fileID: 161037357079201089}
+--- !u!114 &161037357079201089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286581577125373952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 1
+  SphereRadius: 0
+  CapsuleRadius: 0
+  BoxExtents: {x: 0.1575, y: 0.1575, z: 0}
+  CapsuleHeight: 0
+  Offset: {x: 0, y: 0.1875, z: 0}
+  Root: {fileID: 1819210150938506519}
+  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

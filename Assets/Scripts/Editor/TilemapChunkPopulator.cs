@@ -56,7 +56,7 @@ namespace NSMB.Tiles {
             int requiredChunksX = (int) Mathf.Ceil(gm.levelWidthTile / 16f);
             int requiredChunksY = (int) Mathf.Ceil(gm.levelHeightTile / 16f);
 
-            BoundsInt bounds = new(gm.levelMinTileX, gm.levelMinTileY , 0, requiredChunksX * 16, requiredChunksY * 16, 1);
+            BoundsInt bounds = new(gm.levelMinTileX, gm.levelMinTileY, 0, requiredChunksX * 16, requiredChunksY * 16, 1);
             TileBase[] tileBases = tilemap.GetTilesBlock(bounds);
             ushort[] tileIds = new ushort[tileBases.Length];
 
@@ -65,21 +65,6 @@ namespace NSMB.Tiles {
             }
 
             gm.originalTiles = tileIds;
-
-            // Create TilemapChunks
-            while (tileManager.transform.childCount > 0)
-                Object.DestroyImmediate(tileManager.transform.GetChild(0).gameObject);
-            tileManager.chunks.Clear();
-
-            for (int y = 0; y < requiredChunksY; y++) {
-                for (int x = 0; x < requiredChunksX; x++) {
-                    TilemapChunk newObject = Object.Instantiate(tileManager.tilemapChunkPrefab, tileManager.transform);
-                    newObject.chunkX = x;
-                    newObject.chunkY = y;
-                    newObject.name = $"TilemapChunk ({x},{y})";
-                    tileManager.chunks.Add(newObject);
-                }
-            }
 
             Debug.Log($"Successfully saved level data. {uniqueTilesList.Count} unique tiles ({gm.levelWidthTile} x {gm.levelHeightTile} tiles, {requiredChunksX} x {requiredChunksY} chunks).");
             EditorUtility.SetDirty(gm);
