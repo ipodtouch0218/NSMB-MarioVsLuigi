@@ -5,6 +5,7 @@ using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
+using NSMB.Utils;
 
 namespace NSMB.Entities {
 
@@ -20,7 +21,8 @@ namespace NSMB.Entities {
         [Networked] private float CurrentSpeed { get; set; }
         [Networked] public NetworkBool AlreadyBounced { get; set; }
         [Networked] public NetworkBool IsIceball { get; set; }
-        [Networked] public byte BreakEffectAnimCounter { get; set; }
+        [Networked] public int InactiveTick { get; set; }
+        [Networked] private Vector2 BreakEffectLocation { get; set; }
 
         //---Serialized Variables
         [SerializeField] private ParticleSystem iceBreak, fireBreak, iceTrail, fireTrail;
@@ -59,7 +61,7 @@ namespace NSMB.Entities {
             body.Position = spawnpoint;
             body.Freeze = false;
             body.Velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
-            Object.AssignInputAuthority(owner.Object.InputAuthority);
+            Runner.SetIsSimulated(Object, !owner.IsProxy);
         }
 
         public override void Spawned() {
@@ -86,7 +88,7 @@ namespace NSMB.Entities {
 
         public override void FixedUpdateNetwork() {
             body.Freeze = !IsActive;
-            hitbox.enabled = IsActive;
+            gameObject.layer = IsActive ? Layers.LayerEntity : Layers.LayerEntityNoGroundEntity;
 
             if (!IsActive) {
                 body.Velocity = Vector2.zero;
@@ -156,8 +158,8 @@ namespace NSMB.Entities {
                     continue;
 
                 if (collidedObject.GetComponentInParent<IFireballInteractable>() is IFireballInteractable interactable) {
-                    // Don't interact with our owner
-                    if (interactable is PlayerController player && player == Owner)
+                    // Don't interact with players in this way
+                    if (interactable is PlayerController)
                         continue;
 
                     bool result = IsIceball ? interactable.InteractWithIceball(this) : interactable.InteractWithFireball(this);
@@ -174,12 +176,20 @@ namespace NSMB.Entities {
 
         //---BasicEntity overrides
         public override void DespawnEntity(object data = null) {
-            if (data is not bool playEffect || playEffect)
-                BreakEffectAnimCounter++;
+            if (data is not bool playEffect || playEffect) {
+                if (body.Position.y > GameManager.Instance.LevelMinY && GameManager.Instance.GameState != Enums.GameState.Ended) {
+                    if (body.Position == BreakEffectLocation) {
+                        BreakEffectLocation += Vector2.up * 0.01f;
+                    } else {
+                        BreakEffectLocation = body.Position;
+                    }
+                }
+            }
 
             IsActive = false;
-            hitbox.enabled = IsActive;
+            InactiveTick = Runner.Tick;
             body.Freeze = true;
+            body.Position = new(0, -1000); // Bodge...
         }
 
         public override void OnIsActiveChanged() {
@@ -215,12 +225,12 @@ namespace NSMB.Entities {
         //---IPlayerInteractable overrides
         public void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             // If we're not active, don't collide.
-            if (!IsActive)
-                return;
+            //if (!IsActive)
+            //    return;
 
             // Don't interact with proxies
-            if (IsProxy)
-                return;
+            //if (IsProxy)
+            //    return;
 
             // Check if they own us. If so, don't collide.
             if (Owner == player)
@@ -321,25 +331,18 @@ namespace NSMB.Entities {
 
             foreach (var change in ChangesBuffer) {
                 switch (change) {
-                case nameof(BreakEffectAnimCounter):
-                    OnBreakEffectAnimCounterChanged();
+                case nameof(BreakEffectLocation):
+                    OnBreakEffectLocationChanged();
                     break;
                 }
             }
         }
 
-        public void OnBreakEffectAnimCounterChanged() {
+        public void OnBreakEffectLocationChanged() {
             if (GameManager.Instance.GameState != Enums.GameState.Playing)
                 return;
 
-            // Don't play particles below the killplane
-            if (body.Position.y < GameManager.Instance.LevelMinY)
-                return;
-
-            // Or if the game is over
-            if (GameManager.Instance.GameState == Enums.GameState.Ended)
-                return;
-
+            sfx.transform.position = BreakEffectLocation;
             if (IsIceball) {
                 iceBreak.Play();
                 sfx.PlayOneShot(Enums.Sounds.Powerup_Iceball_Break);

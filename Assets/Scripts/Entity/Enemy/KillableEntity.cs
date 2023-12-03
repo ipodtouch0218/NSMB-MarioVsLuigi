@@ -89,7 +89,6 @@ namespace NSMB.Entities {
         [SerializeField] protected bool flipSpriteRenderer = false;
 
         //---Components
-        [SerializeField] public Hitbox fusionHitbox;
         [SerializeField] public BoxCollider2D hitbox;
         [SerializeField] protected Animator animator;
         [SerializeField] protected LegacyAnimateSpriteRenderer legacyAnimation;
@@ -97,7 +96,6 @@ namespace NSMB.Entities {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!fusionHitbox) fusionHitbox = GetComponent<Hitbox>();
             if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
             if (!animator) animator = GetComponentInChildren<Animator>();
             if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -379,7 +377,6 @@ namespace NSMB.Entities {
         public override void Unfreeze(UnfreezeReason reasonByte) {
             IsFrozen = false;
             hitbox.enabled = true;
-            fusionHitbox.HitboxActive = true;
 
             SpecialKill(false, false, 0);
         }

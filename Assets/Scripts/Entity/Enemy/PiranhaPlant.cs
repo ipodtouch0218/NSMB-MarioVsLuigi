@@ -62,7 +62,7 @@ namespace NSMB.Entities.Enemies {
             }
 
             if (IsDead) {
-                fusionHitbox.HitboxActive = hitbox.enabled = false;
+                hitbox.enabled = false;
                 PopupAnimationTime = 0;
                 ChompTimer = TickTimer.None;
                 return;
@@ -99,7 +99,7 @@ namespace NSMB.Entities.Enemies {
 
             float change = (1f / popupTime) * Runner.DeltaTime * (chomping ? 1 : -1);
             PopupAnimationTime = Mathf.Clamp01(PopupAnimationTime + change);
-            fusionHitbox.HitboxActive = hitbox.enabled = PopupAnimationTime >= 0.01f;
+            hitbox.enabled = PopupAnimationTime >= 0.01f;
             hitbox.transform.localPosition = new(0, (PopupAnimationTime - 1) * popupDistance, 0);
         }
 

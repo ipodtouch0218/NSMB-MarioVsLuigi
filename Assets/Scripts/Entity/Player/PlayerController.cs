@@ -23,7 +23,6 @@ namespace NSMB.Entities.Player {
         //---Static Variables
         private static readonly List<GameObject> CollidedObjects = new(16);
         private static readonly List<LagCompensatedHit> LagCompensatedBuffer = new(16);
-        private static readonly ContactPoint2D[] TileContactBuffer = new ContactPoint2D[32];
         private static readonly Vector3 ZeroPointFive = Vector3.one * 0.5f;
 
         private static readonly Vector2 GroundpoundStartUpwardsVelocity = Vector2.up * 1.5f;

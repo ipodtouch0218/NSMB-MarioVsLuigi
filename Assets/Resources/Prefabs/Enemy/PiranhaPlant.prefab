@@ -247,8 +247,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4904021044407665645}
   - component: {fileID: 1094213376118772922}
-  - component: {fileID: 8284551372080845912}
-  - component: {fileID: 6666574227332119760}
   m_Layer: 0
   m_Name: Hitbox
   m_TagString: Untagged
@@ -316,44 +314,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.45, y: 0.75}
   m_EdgeRadius: 0
---- !u!114 &8284551372080845912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6138843839452149636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config: 3
-  BroadRadius: 0.48
-  Offset: {x: 0, y: 0.36, z: 0}
-  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  Hitboxes:
-  - {fileID: 6666574227332119760}
---- !u!114 &6666574227332119760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6138843839452149636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Type: 1
-  SphereRadius: 0
-  CapsuleRadius: 0
-  BoxExtents: {x: 0.225, y: 0.375, z: 0}
-  CapsuleHeight: 0
-  Offset: {x: 0, y: 0.375, z: 0}
-  Root: {fileID: 8284551372080845912}
-  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &6254190274066690703
 GameObject:
   m_ObjectHideFlags: 0
@@ -417,7 +377,7 @@ MonoBehaviour:
   collideWithOtherEnemies: 1
   dieWhenInsideBlock: 0
   flipSpriteRenderer: 0
-  fusionHitbox: {fileID: 6666574227332119760}
+  fusionHitbox: {fileID: 0}
   hitbox: {fileID: 1094213376118772922}
   animator: {fileID: 863355600414429673}
   legacyAnimation: {fileID: 0}
@@ -449,4 +409,3 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 3689884099564413062}
-  - {fileID: 8284551372080845912}

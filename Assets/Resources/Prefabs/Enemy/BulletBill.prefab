@@ -4989,8 +4989,6 @@ GameObject:
   - component: {fileID: 5407584048357268515}
   - component: {fileID: 6213839771229971201}
   - component: {fileID: 2108662388035762444}
-  - component: {fileID: 5805536510871160121}
-  - component: {fileID: 5538623755841512650}
   m_Layer: 10
   m_Name: BulletBill
   m_TagString: Untagged
@@ -5044,7 +5042,7 @@ MonoBehaviour:
   collideWithOtherEnemies: 0
   dieWhenInsideBlock: 0
   flipSpriteRenderer: 0
-  fusionHitbox: {fileID: 5538623755841512650}
+  fusionHitbox: {fileID: 0}
   hitbox: {fileID: 2627485830306083576}
   animator: {fileID: 0}
   legacyAnimation: {fileID: 5184426367989315057}
@@ -5250,7 +5248,6 @@ MonoBehaviour:
   - {fileID: 2721581803245764244}
   - {fileID: 3529903825791625940}
   - {fileID: 2108662388035762444}
-  - {fileID: 5805536510871160121}
 --- !u!114 &2108662388035762444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5286,44 +5283,6 @@ MonoBehaviour:
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0
---- !u!114 &5805536510871160121
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2627485830306083579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config: 3
-  BroadRadius: 0.35
-  Offset: {x: 0, y: 0.15, z: 0}
-  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  Hitboxes:
-  - {fileID: 5538623755841512650}
---- !u!114 &5538623755841512650
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2627485830306083579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Type: 1
-  SphereRadius: 0
-  CapsuleRadius: 0
-  BoxExtents: {x: 0.255, y: 0.15, z: 0}
-  CapsuleHeight: 0
-  Offset: {x: 0, y: 0.15, z: 0}
-  Root: {fileID: 5805536510871160121}
-  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &2855663874240651994
 GameObject:
   m_ObjectHideFlags: 0

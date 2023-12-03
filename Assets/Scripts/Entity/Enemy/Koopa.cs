@@ -92,8 +92,7 @@ namespace NSMB.Entities.Enemies {
             PhysicsDataStruct data = body.Data;
             if (IsInShell) {
                 hitbox.size = inShellHitboxSize;
-                fusionHitbox.BoxExtents = hitbox.size * 0.5f;
-                fusionHitbox.Offset = hitbox.offset = inShellHitboxOffset;
+                 hitbox.offset = inShellHitboxOffset;
 
                 if (IsStationary) {
                     if (data.OnGround && body.Velocity.y < 1)
@@ -106,8 +105,7 @@ namespace NSMB.Entities.Enemies {
                 }
             } else {
                 hitbox.size = outShellHitboxSize;
-                fusionHitbox.BoxExtents = hitbox.size * 0.5f;
-                fusionHitbox.Offset = hitbox.offset = outShellHitboxOffset;
+                hitbox.offset = outShellHitboxOffset;
             }
 
             if (!Holder && !IsStationary) {

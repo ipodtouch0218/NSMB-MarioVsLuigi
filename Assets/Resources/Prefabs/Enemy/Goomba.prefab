@@ -129,8 +129,6 @@ GameObject:
   - component: {fileID: 5674404523704379184}
   - component: {fileID: 8059900885248764230}
   - component: {fileID: 4636113223263193814}
-  - component: {fileID: 5387141680540000291}
-  - component: {fileID: 5049607885718933112}
   m_Layer: 9
   m_Name: Goomba
   m_TagString: Untagged
@@ -182,7 +180,7 @@ MonoBehaviour:
   collideWithOtherEnemies: 1
   dieWhenInsideBlock: 1
   flipSpriteRenderer: 0
-  fusionHitbox: {fileID: 5049607885718933112}
+  fusionHitbox: {fileID: 0}
   hitbox: {fileID: 7523289063499453452}
   animator: {fileID: 0}
   legacyAnimation: {fileID: 2072787540995169967}
@@ -390,13 +388,12 @@ MonoBehaviour:
   ObjectInterest: 0
   _DestroyWhenStateAuthorityLeaves: 0
   _AllowStateAuthorityOverride: 0
-  Flags: 2305
+  Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7523289063499453453}
   - {fileID: 2884479414836889194}
   - {fileID: 4636113223263193814}
-  - {fileID: 5387141680540000291}
 --- !u!114 &4636113223263193814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -432,41 +429,3 @@ MonoBehaviour:
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0
---- !u!114 &5387141680540000291
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7523289063499453450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config: 3
-  BroadRadius: 0.25
-  Offset: {x: 0, y: 0.21, z: 0}
-  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  Hitboxes:
-  - {fileID: 5049607885718933112}
---- !u!114 &5049607885718933112
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7523289063499453450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Type: 1
-  SphereRadius: 0
-  CapsuleRadius: 0
-  BoxExtents: {x: 0.15, y: 0.19, z: 0}
-  CapsuleHeight: 0
-  Offset: {x: 0, y: 0.21, z: 0}
-  Root: {fileID: 5387141680540000291}
-  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

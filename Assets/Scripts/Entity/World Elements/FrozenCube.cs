@@ -9,7 +9,6 @@ using NSMB.Utils;
 
 namespace NSMB.Entities {
 
-    //[OrderAfter(typeof(NetworkPhysicsSimulation2D), typeof(BasicEntity), typeof(FreezableEntity), typeof(PlayerController))]
     public class FrozenCube : HoldableEntity {
 
         //---Networked Variables
@@ -42,8 +41,7 @@ namespace NSMB.Entities {
 
             sRenderer.size = CubeSize;
             hitbox.size = CubeSize - (Vector2.one * 0.05f);
-            fusionHitbox.BoxExtents = hitbox.size * 0.5f;
-            fusionHitbox.Offset = hitbox.offset = CubeSize * Vector2.up * 0.5f;
+            hitbox.offset = CubeSize * Vector2.up * 0.5f;
 
             AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
             flying = FrozenEntity.IsFlying;
@@ -59,13 +57,14 @@ namespace NSMB.Entities {
 
             body.LockX = true;
             transform.position = new(transform.position.x, transform.position.y, -4.5f);
+            Runner.SetIsSimulated(Object, true);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
             Instantiate(PrefabList.Instance.Particle_IceBreak, transform.position, Quaternion.identity);
         }
 
-        public void LateUpdate() {
+        public override void Render() {
 
             if (!Object || IsDead)
                 return;
