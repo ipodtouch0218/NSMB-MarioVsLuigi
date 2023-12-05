@@ -189,9 +189,8 @@ public class GlobalController : Singleton<GlobalController> {
             return;
 
         // Fixed bugged layout if the graph was already open.
-        //foreach (Fusion.FusionStats graph in fusionStats.GetComponentsInChildren<Fusion.FusionStats>()) {
-        //    graph.CalculateLayout();
-        //}
+        Debug.Log(fusionStats);
+        fusionStats.GetComponent<FusionStats>().PlayerRef = player;
     }
 
 

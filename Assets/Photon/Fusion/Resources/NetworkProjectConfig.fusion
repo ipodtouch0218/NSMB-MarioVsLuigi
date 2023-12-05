@@ -19,10 +19,10 @@
         "InputTransferMode": 0,
         "PlayerCount": 10,
         "TickRateSelection": {
-            "Client": 60,
-            "ServerIndex": 1,
+            "Client": 30,
+            "ServerIndex": 0,
             "ClientSendIndex": 0,
-            "ServerSendIndex": 1
+            "ServerSendIndex": 0
         }
     },
     "Network": {

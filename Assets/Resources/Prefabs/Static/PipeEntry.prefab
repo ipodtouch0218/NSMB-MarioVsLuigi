@@ -112,7 +112,7 @@ MonoBehaviour:
   ObjectInterest: 1
   _DestroyWhenStateAuthorityLeaves: 0
   _AllowStateAuthorityOverride: 0
-  Flags: 67841
+  Flags: 329985
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8995129457460367436}
