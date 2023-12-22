@@ -5,13 +5,12 @@ An adaptation of [MarioVsLuigi](https://github.com/ipodtouch0218/NSMB-MarioVsLui
 ## Main features
 - Being able to connect to the official lobbies.
 - Touch screen adapted controls.
-- Compatible from Android 5.1 to Android 14 
-
+- Compatible from Android 5.1 to Android 14
+- Fixing the lobby chat.
+- The ability to disable touch controls at will.
 
 ## Planed features for future updates
 - Beeing able to make Mobile-version-only lobbies.
-- Fixing the lobby chat.
-- The ability to disable touch controls at will.
 
 ## Features I won't add 
 This section recopiles the most asked features for the android port that are
